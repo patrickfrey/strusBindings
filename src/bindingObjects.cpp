@@ -26,7 +26,7 @@
 
 --------------------------------------------------------------------
 */
-#include "strus/strusObjects.hpp"
+#include "strus/bindingObjects.hpp"
 #include "strus/strus.hpp"
 
 
@@ -66,24 +66,11 @@ std::string Storage::documentAttribute( Index docno, char varname) const
 	return THIS->documentAttribute( docno, varname);
 }
 
-
-MetaDataReader::MetaDataReader( const Storage& storage, char varname)
+float Storage::documentMetaData( const Index& docno, char varname)
 {
-	strus::StorageInterface* STORAGE = (strus::StorageInterface*)storage.m_impl;
-	m_impl = STORAGE->createMetaDataReader( varname);
+	strus::StorageInterface* THIS = (strus::StorageInterface*)m_impl;
+	return THIS->documentMetaData( docno, varname);
 }
-
-MetaDataReader::~MetaDataReader()
-{
-	delete (strus::MetaDataReaderInterface*)m_impl;
-}
-
-float MetaDataReader::readValue( const Index& docno_)
-{
-	strus::MetaDataReaderInterface* THIS = (strus::MetaDataReaderInterface*)m_impl;
-	return THIS->readValue( docno_);
-}
-
 
 
 Inserter::Inserter( const Storage& storage, const std::string& docid)

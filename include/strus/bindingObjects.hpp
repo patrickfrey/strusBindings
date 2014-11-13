@@ -45,27 +45,13 @@ public:
 	Index documentNumber( const std::string& docid) const;
 
 	std::string documentAttribute( Index docno, char varname) const;
+	float documentMetaData( const Index& docno, char varname);
 
 private:
-	friend class MetaDataReader;
 	friend class Inserter;
 	friend class Query;
 	void* m_impl;
 	void* m_qp_impl;
-};
-
-
-
-class MetaDataReader
-{
-public:
-	MetaDataReader( const Storage& storage, char varname);
-	~MetaDataReader();
-
-	float readValue( const Index& docno_);
-
-private:
-	void* m_impl;
 };
 
 
