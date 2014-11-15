@@ -2,7 +2,7 @@ TOPDIR=..
 include $(TOPDIR)/variables.mk
 
 CPP_OBJS=\
-	strusObjects.o
+	bindingObjects.o
 
 CPP_INCLUDE=-I$(TOPDIR)/include -I. -I$(INSTALL_INCDIR)
 CXXFLAGS=-g -Werror -Wall -pedantic $(OPTIMIZE) -std=c++98
