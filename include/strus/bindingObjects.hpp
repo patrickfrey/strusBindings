@@ -130,7 +130,7 @@ public:
 	virtual std::vector<ResultDocument>
 		evaluate(
 			std::size_t fromRank,
-			std::size_t maxNofRanks) const=0;
+			std::size_t maxNofRanks) const;
 private:
 	void* m_impl;
 	const void* m_storage_impl;
