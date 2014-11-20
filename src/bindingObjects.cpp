@@ -28,10 +28,66 @@
 */
 #include "strus/bindingObjects.hpp"
 #include "strus/strus.hpp"
+#include "strus/analyzerInterface.hpp"
+#include "strus/analyzerLib.hpp"
+#include "strus/tokenMinerLib.hpp"
+#include "strus/tokenMinerFactory.hpp"
+#include <stdexcept>
+#include <iostream>
+#include <sstream>
+#include <boost/scoped_ptr.hpp>
+
+Document::Document( const std::string& docId_)
+	:m_id(docId_)
+{}
+
+Document::Document( const Analyzer& analyzer, const std::string& docId_, const std::string& content)
+	:m_id(docId_)
+{
+	strus::AnalyzerInterface* alz = (strus::AnalyzerInterface*)analyzer.m_impl;
+	strus::analyzer::Document doc = alz->analyze( content);
+
+	std::vector<strus::analyzer::Attribute>::const_iterator
+		ai = doc.attributes().begin(), ae = doc.attributes().end();
+	for (; ai != ae; ++ai)
+	{
+		setAttribute( ai->name(), ai->value());
+	}
+	std::vector<strus::analyzer::MetaData>::const_iterator
+		mi = doc.metadata().begin(), me = doc.metadata().end();
+	for (; mi != me; ++mi)
+	{
+		setMetaData( mi->name(), mi->value());
+	}
+	std::vector<strus::analyzer::Term>::const_iterator
+		ti = doc.terms().begin(), te = doc.terms().end();
+	for (; ti != te; ++ti)
+	{
+		addTerm( ti->type(), ti->value(), ti->pos());
+	}
+}
+
+void Document::addTerm(
+		const std::string& type_,
+		const std::string& value_,
+		const Index& position_)
+{
+	m_terms.push_back( Term( type_,value_,position_));
+}
+
+void Document::setMetaData( char name_, float value_)
+{
+	m_metaData.push_back( MetaData( name_,value_));
+}
+
+void Document::setAttribute( char name_, const std::string& value_)
+{
+	m_attributes.push_back( Attribute( name_, value_));
+}
 
 
-Storage::Storage( const char* config)
-	:m_impl( strus::createStorageClient( config))
+Storage::Storage( const std::string& config)
+	:m_impl( strus::createStorageClient( config.c_str()))
 {
 	m_qp_impl = strus::createQueryProcessorInterface( (strus::StorageInterface*)m_impl);
 }
@@ -54,7 +110,7 @@ Index Storage::maxDocumentNumber() const
 	return THIS->maxDocumentNumber();
 }
 
-Index Storage::documentNumber( const std::string& docid) const
+Index Storage::documentNumber( const std::string& docId) const
 {
 	strus::StorageInterface* THIS = (strus::StorageInterface*)m_impl;
 	return THIS->maxDocumentNumber();
@@ -72,45 +128,75 @@ float Storage::documentMetaData( const Index& docno, char varname)
 	return THIS->documentMetaData( docno, varname);
 }
 
-
-Inserter::Inserter( const Storage& storage, const std::string& docid)
+void Storage::insertDocument( const Document& doc)
 {
-	strus::StorageInterface* STORAGE = (strus::StorageInterface*)storage.m_impl;
-	m_impl = STORAGE->createInserter( docid);
+	strus::StorageInterface* THIS = (strus::StorageInterface*)m_impl;
+	strus::StorageInserterInterface* inserter = THIS->createInserter( doc.id());
+	boost::scoped_ptr<strus::StorageInserterInterface> inserter_ref( inserter);
+
+	std::vector<Document::Attribute>::const_iterator
+		ai = doc.attributes().begin(), ae = doc.attributes().end();
+	for (; ai != ae; ++ai)
+	{
+		inserter->setAttribute( ai->name(), ai->value());
+	}
+	std::vector<Document::MetaData>::const_iterator
+		mi = doc.metaData().begin(), me = doc.metaData().end();
+	for (; mi != me; ++mi)
+	{
+		inserter->setMetaData( mi->name(), mi->value());
+	}
+	std::vector<Document::Term>::const_iterator
+		ti = doc.terms().begin(), te = doc.terms().end();
+	for (; ti != te; ++ti)
+	{
+		inserter->addTermOccurrence( ti->type(), ti->value(), ti->position(), 0.0/*weight*/);
+	}
+	inserter->done();
 }
 
-Inserter::~Inserter()
+void Storage::deleteDocument( const std::string& docId)
 {
-	delete (strus::StorageInserterInterface*)m_impl;
+	strus::StorageInterface* THIS = (strus::StorageInterface*)m_impl;
+	THIS->deleteDocument( docId);
 }
 
-void Inserter::addTerm( const std::string& type_,
-		const std::string& value_,
-		const Index& position_)
+void Storage::flush()
 {
-	strus::StorageInserterInterface* THIS = (strus::StorageInserterInterface*)m_impl;
-	THIS->addTermOccurrence( type_, value_, position_, 0.0/*weight*/);
+	strus::StorageInterface* THIS = (strus::StorageInterface*)m_impl;
+	THIS->flush();
 }
 
-void Inserter::setMetaData( char name_, float value_)
+void Storage::create( const char* config)
 {
-	strus::StorageInserterInterface* THIS = (strus::StorageInserterInterface*)m_impl;
-	THIS->setMetaData( name_, value_);
+	strus::createStorageDatabase( config);
 }
 
-void Inserter::setAttribute( char name_, const std::string& value_)
+void Storage::destroy( const char* config)
 {
-	strus::StorageInserterInterface* THIS = (strus::StorageInserterInterface*)m_impl;
-	THIS->setAttribute( name_, value_);
+	strus::destroyStorageDatabase( config);
 }
 
-void Inserter::done()
+Analyzer::Analyzer( const std::string& source)
+	:m_tkminer_impl(0),m_impl(0)
 {
-	strus::StorageInserterInterface* THIS = (strus::StorageInserterInterface*)m_impl;
-	THIS->done();
+	try
+	{
+		m_tkminer_impl = strus::createTokenMinerFactory("");
+		m_impl = strus::createAnalyzer( *(strus::TokenMinerFactory*)m_tkminer_impl, source);
+	}
+	catch (const std::exception& e)
+	{
+		if (m_tkminer_impl) delete (strus::TokenMinerFactory*)m_tkminer_impl;
+	}
 }
 
-
+std::string Analyzer::tostring() const
+{
+	std::ostringstream out;
+	((strus::AnalyzerInterface*)m_impl)->print( out);
+	return out.str();
+}
 
 QueryProgram::QueryProgram( const std::string& source)
 {
