@@ -72,17 +72,17 @@ void Document::addTerm(
 		const std::string& value_,
 		const Index& position_)
 {
-	m_terms.push_back( Term( type_,value_,position_));
+	m_terms.push_back( DocumentTerm( type_,value_,position_));
 }
 
 void Document::setMetaData( char name_, float value_)
 {
-	m_metaData.push_back( MetaData( name_,value_));
+	m_metaData.push_back( DocumentMetaData( name_,value_));
 }
 
 void Document::setAttribute( char name_, const std::string& value_)
 {
-	m_attributes.push_back( Attribute( name_, value_));
+	m_attributes.push_back( DocumentAttribute( name_, value_));
 }
 
 
@@ -134,19 +134,19 @@ void Storage::insertDocument( const Document& doc)
 	strus::StorageInserterInterface* inserter = THIS->createInserter( doc.id());
 	boost::scoped_ptr<strus::StorageInserterInterface> inserter_ref( inserter);
 
-	std::vector<Document::Attribute>::const_iterator
+	std::vector<DocumentAttribute>::const_iterator
 		ai = doc.attributes().begin(), ae = doc.attributes().end();
 	for (; ai != ae; ++ai)
 	{
 		inserter->setAttribute( ai->name(), ai->value());
 	}
-	std::vector<Document::MetaData>::const_iterator
+	std::vector<DocumentMetaData>::const_iterator
 		mi = doc.metaData().begin(), me = doc.metaData().end();
 	for (; mi != me; ++mi)
 	{
 		inserter->setMetaData( mi->name(), mi->value());
 	}
-	std::vector<Document::Term>::const_iterator
+	std::vector<DocumentTerm>::const_iterator
 		ti = doc.terms().begin(), te = doc.terms().end();
 	for (; ti != te; ++ti)
 	{
@@ -177,6 +177,12 @@ void Storage::destroy( const char* config)
 	strus::destroyStorageDatabase( config);
 }
 
+void Storage::close()
+{
+	strus::StorageInterface* THIS = (strus::StorageInterface*)m_impl;
+	THIS->close();
+}
+
 Analyzer::Analyzer( const std::string& source)
 	:m_tkminer_impl(0),m_impl(0)
 {
@@ -193,8 +199,9 @@ Analyzer::Analyzer( const std::string& source)
 
 std::string Analyzer::tostring() const
 {
+	strus::AnalyzerInterface* THIS = (strus::AnalyzerInterface*)m_impl;
 	std::ostringstream out;
-	((strus::AnalyzerInterface*)m_impl)->print( out);
+	THIS->print( out);
 	return out.str();
 }
 
@@ -208,21 +215,48 @@ QueryProgram::~QueryProgram()
 	delete (strus::QueryEvalInterface*)m_impl;
 }
 
+std::string QueryProgram::tostring() const
+{
+	strus::QueryEvalInterface* THIS = (strus::QueryEvalInterface*)m_impl;
+	std::ostringstream out;
+	THIS->print( out);
+	return out.str();
+}
 
-Query::Query( const Storage& storage, const QueryProgram& prg)
+
+Query::Query()
 {
 	m_impl = new strus::queryeval::Query();
-	m_storage_impl = storage.m_impl;
-	m_qp_impl = storage.m_qp_impl;
-	m_prg_impl = prg.m_impl;
 }
 
 Query::Query( const Query& o)
 {
 	m_impl = new strus::queryeval::Query( *(strus::queryeval::Query*)o.m_impl);
-	m_storage_impl = o.m_storage_impl;
-	m_qp_impl = o.m_qp_impl;
-	m_prg_impl = o.m_prg_impl;
+}
+
+Query::Query( const Analyzer& analyzer, const std::string& content)
+{
+	strus::AnalyzerInterface* alz = (strus::AnalyzerInterface*)analyzer.m_impl;
+	strus::analyzer::Document doc = alz->analyze( content);
+
+	std::vector<strus::analyzer::Attribute>::const_iterator
+		ai = doc.attributes().begin(), ae = doc.attributes().end();
+	if (ai != ae)
+	{
+		throw std::runtime_error("no attribute definitions expected in query");
+	}
+	std::vector<strus::analyzer::MetaData>::const_iterator
+		mi = doc.metadata().begin(), me = doc.metadata().end();
+	if (mi != me)
+	{
+		throw std::runtime_error("no attribute definitions expected in query");
+	}
+	std::vector<strus::analyzer::Term>::const_iterator
+		ti = doc.terms().begin(), te = doc.terms().end();
+	for (; ti != te; ++ti)
+	{
+		addTerm( ti->type(), ti->type(), ti->value());
+	}
 }
 
 Query::~Query()
@@ -249,16 +283,18 @@ void Query::joinTerms(
 	THIS->joinTerms( set_, opname_, range_, nofArgs_);
 }
 
-std::vector<ResultDocument>
+std::vector<Rank>
 	Query::evaluate(
+		const Storage& storage,
+		const QueryProgram& prg,
 		std::size_t fromRank,
 		std::size_t maxNofRanks) const
 {
-	const strus::StorageInterface* STORAGE = (const strus::StorageInterface*)m_storage_impl;
-	const strus::QueryEvalInterface* QEVAL = (const strus::QueryEvalInterface*)m_prg_impl;
-	const strus::QueryProcessorInterface* QPROC = (const strus::QueryProcessorInterface*)m_qp_impl;
+	const strus::StorageInterface* STORAGE = (const strus::StorageInterface*)storage.m_impl;
+	const strus::QueryProcessorInterface* QPROC = (const strus::QueryProcessorInterface*)storage.m_qp_impl;
+	const strus::QueryEvalInterface* QEVAL = (const strus::QueryEvalInterface*)prg.m_impl;
 
-	std::vector<ResultDocument> rt;
+	std::vector<Rank> rt;
 	std::vector<strus::queryeval::ResultDocument> res
 		= QEVAL->getRankedDocumentList(
 			*STORAGE, *QPROC, *(strus::queryeval::Query*)m_impl,
@@ -267,7 +303,7 @@ std::vector<ResultDocument>
 		ri = res.begin(), re = res.end();
 	for (;ri != re; ++ri)
 	{
-		ResultDocument reselem;
+		Rank reselem;
 		reselem.docno = (unsigned int)ri->docno();
 		reselem.weight = ri->weight();
 		std::vector<strus::queryeval::ResultDocument::Attribute>::const_iterator
@@ -275,7 +311,7 @@ std::vector<ResultDocument>
 	
 		for (;ai != ae; ++ai)
 		{
-			ResultAttribute attr;
+			RankAttribute attr;
 			attr.name = ai->name();
 			attr.value = ai->value();
 			reselem.attributes.push_back( attr);

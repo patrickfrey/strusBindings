@@ -47,78 +47,78 @@ public:
 
 private:
 	friend class Document;
+	friend class Query;
 	void* m_tkminer_impl;
 	void* m_impl;
 };
 
 
+/// \brief One typed term occurrence in a document
+class DocumentTerm
+{
+public:
+	DocumentTerm( const std::string& type_, const std::string& value_, const Index& position_)
+		:m_type(type_),m_value(value_),m_position(position_){}
+	DocumentTerm( const DocumentTerm& o)
+		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position){}
+	DocumentTerm()
+		:m_position(0){}
+
+	const std::string& type() const		{return m_type;}
+	const std::string& value() const	{return m_value;}
+	unsigned int position() const		{return m_position;}
+
+private:
+	std::string m_type;
+	std::string m_value;
+	Index m_position;
+};
+
+/// \brief Data object that represents single property of a document that
+///	can be subject of retrieval or act as search restriction.
+class DocumentMetaData
+{
+public:
+	DocumentMetaData( char name_, float value_)
+		:m_name(name_),m_value(value_){}
+	DocumentMetaData( const DocumentMetaData& o)
+		:m_name(o.m_name),m_value(o.m_value){}
+	DocumentMetaData()
+		:m_name(0),m_value(0.0){}
+
+	char name() const		{return m_name;}
+	const float value() const	{return m_value;}
+
+private:
+	char m_name;
+	float m_value;
+};
+
+/// \brief Data object that describes a single property of a document
+///	that is not subject of retrieval, but acts as description of the
+///	document.
+class DocumentAttribute
+{
+public:
+	DocumentAttribute( char name_, const std::string& value_)
+		:m_name(name_),m_value(value_){}
+	DocumentAttribute( const DocumentAttribute& o)
+		:m_name(o.m_name),m_value(o.m_value){}
+	DocumentAttribute()
+		:m_name(0){}
+
+	char name() const			{return m_name;}
+	const std::string& value() const	{return m_value;}
+
+private:
+	char m_name;
+	std::string m_value;
+};
+
 /// \brief Document object representing one item of retrieval. A document can be
 ///	manually composed of its sub parts or it can be the result of an analyzer run.
 class Document
 {
-public:
-	/// \brief One typed term occurrence in the document
-	class Term
-	{
-	public:
-		Term( const std::string& type_, const std::string& value_, const Index& position_)
-			:m_type(type_),m_value(value_),m_position(position_){}
-		Term( const Term& o)
-			:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position){}
-		Term()
-			:m_position(0){}
-
-		const std::string& type() const		{return m_type;}
-		const std::string& value() const	{return m_value;}
-		unsigned int position() const		{return m_position;}
-
-	private:
-		std::string m_type;
-		std::string m_value;
-		Index m_position;
-	};
-
-	/// \brief Data object that represents single property of the document that
-	///	can be subject of retrieval or act as search restriction.
-	class MetaData
-	{
-	public:
-		MetaData( char name_, float value_)
-			:m_name(name_),m_value(value_){}
-		MetaData( const MetaData& o)
-			:m_name(o.m_name),m_value(o.m_value){}
-		MetaData()
-			:m_name(0),m_value(0.0){}
-
-		char name() const		{return m_name;}
-		const float value() const	{return m_value;}
-
-	private:
-		char m_name;
-		float m_value;
-	};
-
-	/// \brief Data object that describes a single property of the document
-	///	that is not subject of retrieval, but acts as description of the
-	///	document.
-	class Attribute
-	{
-	public:
-		Attribute( char name_, const std::string& value_)
-			:m_name(name_),m_value(value_){}
-		Attribute( const Attribute& o)
-			:m_name(o.m_name),m_value(o.m_value){}
-		Attribute()
-			:m_name(0){}
-
-		char name() const			{return m_name;}
-		const std::string& value() const	{return m_value;}
-
-	private:
-		char m_name;
-		std::string m_value;
-	};
-
 public:
 	/// \brief  Open a document to add elements manually
 	explicit Document( const std::string& docId);
@@ -134,26 +134,26 @@ public:
 			const std::string& value_,
 			const Index& position_);
 
-	/// \brief Define a meta data property value of the document
+	/// \brief Define a meta data value of the document
 	void setMetaData( char name_, float value_);
 
-	/// \brief Define an attribute property value of the document
+	/// \brief Define an attribute of the document
 	void setAttribute( char name_, const std::string& value_);
 
 	/// \brief Get the unique id of the document
-	const std::string& id() const				{return m_id;}
+	const std::string& id() const					{return m_id;}
 	/// \brief Get the list of terms of the document
-	const std::vector<Term>& terms() const			{return m_terms;}
+	const std::vector<DocumentTerm>& terms() const			{return m_terms;}
 	/// \brief Get the list of meta data of the document
-	const std::vector<MetaData>& metaData() const		{return m_metaData;}
+	const std::vector<DocumentMetaData>& metaData() const		{return m_metaData;}
 	/// \brief Get the list of attributes of the document
-	const std::vector<Attribute>& attributes() const	{return m_attributes;}
+	const std::vector<DocumentAttribute>& attributes() const	{return m_attributes;}
 
 private:
 	std::string m_id;
-	std::vector<Term> m_terms;
-	std::vector<MetaData> m_metaData;
-	std::vector<Attribute> m_attributes;
+	std::vector<DocumentTerm> m_terms;
+	std::vector<DocumentMetaData> m_metaData;
+	std::vector<DocumentAttribute> m_attributes;
 };
 
 
@@ -200,6 +200,9 @@ public:
 	/// \note Handle this carefully
 	static void destroy( const char* config);
 
+	/// \brief Close of the storage that throws in case of an error
+	void close();
+
 private:
 	friend class Query;
 	void* m_impl;
@@ -216,6 +219,9 @@ public:
 	explicit QueryProgram( const std::string& source);
 	~QueryProgram();
 
+	/// \brief Printing the program contents to a string
+	std::string tostring() const;
+
 private:
 	friend class Query;
 	void* m_impl;
@@ -223,10 +229,10 @@ private:
 
 
 /// \brief Attribute of a query evaluation result element
-struct ResultAttribute
+struct RankAttribute
 {
-	ResultAttribute(){}
-	ResultAttribute( const ResultAttribute& o)
+	RankAttribute(){}
+	RankAttribute( const RankAttribute& o)
 		:name(o.name),value(o.value){}
 
 	std::string name;
@@ -234,15 +240,15 @@ struct ResultAttribute
 };
 
 /// \brief Weighted document reference with attributes (result of a query evaluation)
-struct ResultDocument
+struct Rank
 {
 	Index docno;
 	float weight;
-	std::vector<ResultAttribute> attributes;
+	std::vector<RankAttribute> attributes;
 
-	ResultDocument()
+	Rank()
 		:docno(0),weight(0.0){}
-	ResultDocument( const ResultDocument& o)
+	Rank( const Rank& o)
 		:docno(o.docno),weight(o.weight),attributes(o.attributes){}
 };
 
@@ -250,7 +256,8 @@ struct ResultDocument
 class Query
 {
 public:
-	Query( const Storage& storage, const QueryProgram& prg);
+	Query();
+	Query( const Analyzer& analyzer, const std::string& content);
 	Query( const Query& o);
 	~Query();
 
@@ -265,15 +272,14 @@ public:
 		int range_,
 		std::size_t nofArgs_);
 
-	virtual std::vector<ResultDocument>
+	virtual std::vector<Rank>
 		evaluate(
+			const Storage& storage,
+			const QueryProgram& prg,
 			std::size_t fromRank,
 			std::size_t maxNofRanks) const;
 private:
 	void* m_impl;
-	const void* m_storage_impl;
-	const void* m_qp_impl;
-	const void* m_prg_impl;
 };
 
 #endif
