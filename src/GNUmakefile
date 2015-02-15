@@ -5,9 +5,9 @@ CPP_OBJS=\
 	bindingObjects.o
 
 CPP_INCLUDE=-I$(TOPDIR)/include -I. -I$(INSTALL_INCDIR)
-CXXFLAGS=-g -Werror -Wall -pedantic $(OPTIMIZE) -std=c++98
+CXXFLAGS=-g -Wfatal-errors -Werror -Wall -pedantic $(OPTIMIZE) -std=c++98
 LDFLAGS=-L$(INSTALL_LIBDIR)
-LIBS=-lstrus_queryeval -lstrus_analyzer -lstrus_tokenminer -lstrus_utils -lstemmer -lstrus_lvdbstorage -lboost_system
+LIBS=-lstrus_database_leveldb -lstrus_storage -lstrus_queryeval -lstrus_queryproc -lstrus_analyzer -lstrus_textprocessor -lstrus_tokenizer_word -lstrus_tokenizer_punctuation -lstrus_normalizer_snowball -lstemmer -lstrus_utils -lboost_system
 
 all: libstrus_bindings.so
 

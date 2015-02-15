@@ -30,38 +30,132 @@
 #define _STRUS_BINDING_OBJECTS_HPP_INCLUDED
 #include <string>
 #include <vector>
+#include <map>
+#include <boost/shared_ptr.hpp>
 
 typedef unsigned int Index;
+typedef unsigned long GlobalCounter;
 
-/// \brief Analyzer object representing one program for segmenting, 
-///	tokenizing and normalizing a document into atomic parts, that 
-///	can be inserted into a storage and be retrieved from there.
-class Analyzer
+/// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
+class Reference
 {
 public:
-	/// \brief Constructor from the program source
-	explicit Analyzer( const std::string& source);
+	typedef void (*Deleter)( void* obj);
 
-	/// \brief Printing the program contents to a string
-	std::string tostring() const;
+	/// \brief Default constructor
+	explicit Reference( Deleter deleter_)
+		:m_ptr(),m_deleter(deleter_){}
+
+	/// \brief Copy constructor
+	Reference( const Reference& o)
+		:m_ptr(o.m_ptr),m_deleter(o.m_deleter){}
+
+	/// \brief Destructor
+	~Reference(){}
+
+	void reset( void* obj_=0)
+	{
+		m_ptr.reset( obj_, m_deleter);
+	}
+
+	/// \brief Assignment operator
+	Reference& operator = (const Reference& o)
+	{
+		m_ptr = o.m_ptr;
+		m_deleter = o.m_deleter;
+		return *this;
+	}
+
+	/// \brief Object access as function
+	const void* get() const				{return m_ptr.get();}
+	/// \brief Object access as function
+	void* get()					{return m_ptr.get();}
 
 private:
-	friend class Document;
-	friend class Query;
-	void* m_tkminer_impl;
-	void* m_impl;
+	boost::shared_ptr<void> m_ptr;
+	void (*m_deleter)( void* obj);
 };
 
 
-/// \brief One typed term occurrence in a document
-class DocumentTerm
+/// \brief Object representing a function definition with string parameters
+class Function
 {
 public:
-	DocumentTerm( const std::string& type_, const std::string& value_, const Index& position_)
+	Function( const Function& o)
+		:m_name(o.m_name),m_arguments(o.m_arguments){}
+	Function( const std::string& name_, const std::string& arg1)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg1);
+	}
+	Function( const std::string& name_, const std::string& arg1, const std::string& arg2)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg1);
+		m_arguments.push_back( arg2);
+	}
+	Function( const std::string& name_)
+		:m_name(name_),m_arguments(){}
+
+	const std::string& name() const				{return m_name;}
+	const std::vector<std::string>& arguments() const	{return m_arguments;}
+
+private:
+	std::string m_name;
+	std::vector<std::string> m_arguments;
+};
+
+
+/// \brief Variant type for passing parameter values of arbitrary type
+class Variant
+{
+public:
+	enum Type
+	{
+		EMPTY,UINT,INT,FLOAT,TEXT
+	};
+
+	Variant();
+	Variant( const Variant& o);
+	Variant( unsigned int v);
+	Variant( int v);
+	Variant( float v);
+	Variant( const char* v);
+	Variant( const std::string& v);
+
+	Type type() const		{return m_type;}
+	unsigned int getUInt() const;
+	int getInt() const;
+	float getFloat() const;
+	const char* getText() const;
+
+private:
+	friend class Storage;
+	friend class Summarizer;
+	friend class WeightingFunction;
+	friend class QueryEval;
+	friend class DocumentAnalyzer;
+	Type m_type;
+	union
+	{
+		unsigned int UINT;
+		int INT;
+		float FLOAT;
+		const char* TEXT;
+	} m_value;
+	std::string m_buf;
+};
+
+
+/// \brief One typed term occurrence in a document or a query
+class Term
+{
+public:
+	Term( const std::string& type_, const std::string& value_, const Index& position_)
 		:m_type(type_),m_value(value_),m_position(position_){}
-	DocumentTerm( const DocumentTerm& o)
+	Term( const Term& o)
 		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position){}
-	DocumentTerm()
+	Term()
 		:m_position(0){}
 
 	const std::string& type() const		{return m_type;}
@@ -79,39 +173,39 @@ private:
 class DocumentMetaData
 {
 public:
-	DocumentMetaData( char name_, float value_)
+	DocumentMetaData( const std::string& name_, Variant value_)
 		:m_name(name_),m_value(value_){}
 	DocumentMetaData( const DocumentMetaData& o)
 		:m_name(o.m_name),m_value(o.m_value){}
 	DocumentMetaData()
-		:m_name(0),m_value(0.0){}
+		:m_name(0),m_value(){}
 
-	char name() const		{return m_name;}
-	const float value() const	{return m_value;}
+	const std::string& name() const		{return m_name;}
+	const Variant& value() const		{return m_value;}
 
 private:
-	char m_name;
-	float m_value;
+	std::string m_name;
+	Variant m_value;
 };
 
 /// \brief Data object that describes a single property of a document
-///	that is not subject of retrieval, but acts as description of the
-///	document.
+///	that is not subject of retrieval. It acts as description of the
+///	document that can be shown as a result of retrieval.
 class DocumentAttribute
 {
 public:
-	DocumentAttribute( char name_, const std::string& value_)
+	DocumentAttribute( const std::string& name_, const std::string& value_)
 		:m_name(name_),m_value(value_){}
 	DocumentAttribute( const DocumentAttribute& o)
 		:m_name(o.m_name),m_value(o.m_value){}
 	DocumentAttribute()
 		:m_name(0){}
 
-	char name() const			{return m_name;}
+	const std::string& name() const		{return m_name;}
 	const std::string& value() const	{return m_value;}
 
 private:
-	char m_name;
+	std::string m_name;
 	std::string m_value;
 };
 
@@ -121,39 +215,115 @@ class Document
 {
 public:
 	/// \brief  Open a document to add elements manually
-	explicit Document( const std::string& docId);
+	explicit Document( const std::string& docid);
 
-	/// \brief Open a document created from an analyzed source
-	/// \note You can add additional elements manually
-	Document( const Analyzer& analyzer,
-			const std::string& docId_,
-			const std::string& content);
-
-	/// \brief Add a single term occurrence to the document
-	void addTerm( const std::string& type_,
-			const std::string& value_,
-			const Index& position_);
-
+	/// \brief Add a single term occurrence to the document for retrieval
+	void addSearchIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
+	/// \brief Add a single term occurrence to the document for use in the summary of a retrieval result
+	void addForwardIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
 	/// \brief Define a meta data value of the document
-	void setMetaData( char name_, float value_);
-
+	void setMetaData( const std::string& name_, Variant value_);
 	/// \brief Define an attribute of the document
-	void setAttribute( char name_, const std::string& value_);
+	void setAttribute( const std::string& name_, const std::string& value_);
+	/// \brief Allow a user to access the document
+	/// \remark This function is only implemented if ACL is enabled in the storage
+	void setUserAccessRight( const std::string& username_);
 
 	/// \brief Get the unique id of the document
 	const std::string& id() const					{return m_id;}
-	/// \brief Get the list of terms of the document
-	const std::vector<DocumentTerm>& terms() const			{return m_terms;}
+	/// \brief Get the list of search terms of the document
+	const std::vector<Term>& searchIndexTerms() const		{return m_searchIndexTerms;}
+	/// \brief Get the list of forward terms of the document
+	const std::vector<Term>& forwardIndexTerms() const		{return m_forwardIndexTerms;}
 	/// \brief Get the list of meta data of the document
 	const std::vector<DocumentMetaData>& metaData() const		{return m_metaData;}
 	/// \brief Get the list of attributes of the document
 	const std::vector<DocumentAttribute>& attributes() const	{return m_attributes;}
+	/// \brief Get the list of users that are allowed to access the document
+	const std::vector<std::string>& users() const			{return m_users;}
 
 private:
 	std::string m_id;
-	std::vector<DocumentTerm> m_terms;
+	std::vector<Term> m_searchIndexTerms;
+	std::vector<Term> m_forwardIndexTerms;
 	std::vector<DocumentMetaData> m_metaData;
 	std::vector<DocumentAttribute> m_attributes;
+	std::vector<std::string> m_users;
+};
+
+
+/// \class DocumentAnalyzer
+/// \brief Analyzer object representing a program for segmenting, 
+///	tokenizing and normalizing a document into atomic parts, that 
+///	can be inserted into a storage and be retrieved from there.
+class DocumentAnalyzer
+{
+public:
+	/// \brief Constructor
+	DocumentAnalyzer();
+	/// \brief Destructor
+	~DocumentAnalyzer(){}
+
+	void addSearchIndexFeature(
+		const std::string& type,
+		const std::string& selectexpr,
+		const Function& tokenizer,
+		const Function& normalizer);
+
+	void addForwardIndexFeature(
+		const std::string& type,
+		const std::string& selectexpr,
+		const Function& tokenizer,
+		const Function& normalizer);
+
+	void defineMetaData(
+		const std::string& fieldname,
+		const std::string& selectexpr,
+		const Function& tokenizer,
+		const Function& normalizer);
+
+	void defineAttribute(
+		const std::string& attribname,
+		const std::string& selectexpr,
+		const Function& tokenizer,
+		const Function& normalizer);
+
+	Document analyze( const std::string& docid, const std::string& content);
+
+private:
+	Reference m_textproc_impl;
+	Reference m_analyzer_impl;
+};
+
+
+/// \class QueryAnalyzer
+/// \brief Analyzer object representing a set of function for transforming a phrase,
+///	the smallest unit in any query language, to a set of terms that can be used
+///	to build a query.
+class QueryAnalyzer
+{
+public:
+	/// \brief Constructor
+	QueryAnalyzer();
+	/// \brief Destructor
+	~QueryAnalyzer(){}
+
+	/// \brief Defines a phrase type by name. Phrases can be passed together with this name
+	///		to the query analyzer to get the terms for building query.
+	void definePhraseType(
+			const std::string& phraseType,
+			const std::string& featureType,
+			const Function& tokenizer,
+			const Function& normalizer);
+
+	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
+	std::vector<Term> analyzePhrase(
+			const std::string& phraseType,
+			const std::string& phraseContent) const;
+
+private:
+	Reference m_textproc_impl;
+	Reference m_analyzer_impl;
 };
 
 
@@ -166,20 +336,10 @@ public:
 	/// \remark config is not a file name, but a string of semicolon separated key value assignments
 	explicit Storage( const std::string& config);
 
-	~Storage();
+	~Storage(){}
 
 	/// \brief Get the number of documents inserted into the storage
-	Index nofDocumentsInserted() const;
-	/// \brief Get the largest document number ever assigned to a document in the storage
-	/// \remark The largest document number may belong to a document deleted, because document numbers are not recycled
-	Index maxDocumentNumber() const;
-	/// \brief Get the document number of a document inserted
-	Index documentNumber( const std::string& docId) const;
-
-	/// \brief Get a specific document attribute of a document inserted
-	std::string documentAttribute( Index docno, char varname) const;
-	/// \brief Get a specific document metadata element of a document inserted
-	float documentMetaData( const Index& docno, char varname);
+	GlobalCounter nofDocumentsInserted() const;
 
 	/// \brief Prepare inserting a document into the storage
 	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
@@ -187,9 +347,12 @@ public:
 
 	/// \brief Prepare deletion of a document from the storage
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
-	void deleteDocument( const std::string& docId);
+	void deleteDocument( const std::string& docid);
 
-	/// \brief Commit all insert or delete statements open.
+	/// \brief Delete all document access rights of a user
+	void deleteUserAccessRights( const std::string& username);
+
+	/// \brief Commit all insert or delete or user access right change statements open.
 	void flush();
 
 	/// \brief Create a new storage described by config
@@ -204,27 +367,95 @@ public:
 	void close();
 
 private:
-	friend class Query;
-	void* m_impl;
-	void* m_qp_impl;
+	friend class QueryEval;
+	Reference m_database_impl;
+	Reference m_storage_impl;
+	Reference m_queryproc_impl;
+	Reference m_transaction_impl;
 };
 
 
-/// \brief Query program object representing a retrieval method for documents in a storage.
-class QueryProgram
+class Summarizer
 {
 public:
-	/// \brief Constructor from a program source
-	/// \remark source is not a file name, but the program source as string.
-	explicit QueryProgram( const std::string& source);
-	~QueryProgram();
+	Summarizer(){}
+	Summarizer( const Summarizer& o)
+		:m_parameters(o.m_parameters),m_features(o.m_features){}
 
-	/// \brief Printing the program contents to a string
-	std::string tostring() const;
+	void defineParameter( const std::string& name_, const Variant& value_)
+	{
+		m_parameters[ name_] = value_;
+	}
+
+	void defineFeature( const std::string& class_, const std::string& set_)
+	{
+		m_features[ class_] = set_;
+	}
+
+private:
+	friend class QueryEval;
+	std::map<std::string,Variant> m_parameters;
+	std::map<std::string,std::string> m_features;
+};
+
+class WeightingFunction
+{
+public:
+	WeightingFunction(){}
+	WeightingFunction( const WeightingFunction& o)
+		:m_parameters(o.m_parameters){}
+
+	void defineParameter( const std::string& name_, const Variant& value_)
+	{
+		m_parameters[ name_] = value_;
+	}
+
+private:
+	friend class QueryEval;
+	std::map<std::string,Variant> m_parameters;
+};
+
+/// \brief Query program object representing a retrieval method for documents in a storage.
+class QueryEval
+{
+public:
+	/// \brief Constructor
+	explicit QueryEval( const Storage& storage);
+	/// \brief Destructor
+	~QueryEval(){}
+
+	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match phrases summarization)
+	void addTerm(
+			const std::string& set_,
+			const std::string& type_,
+			const std::string& value_);
+
+	/// \brief Declare a feature set to be used as selecting feature
+	void addSelectionFeature( const std::string& set_);
+
+	/// \brief Declare a feature set to be used as restriction
+	void addRestrictionFeature( const std::string& set_);
+
+	/// \brief Declare a feature set to be used for weighting
+	void addWeightingFeature( const std::string& set_);
+
+	/// \brief Declare a summarizer
+	void addSummarizer(
+			const std::string& resultAttribute,
+			const std::string& functionName,
+			const Summarizer& summarizer);
+
+	/// \brief Declare the weighting function used
+	void defineWeightingFunction(
+			const std::string& functionName,
+			const WeightingFunction& weightingFunction);
 
 private:
 	friend class Query;
-	void* m_impl;
+	Reference m_database_impl;
+	Reference m_storage_impl;
+	Reference m_queryproc_impl;
+	Reference m_queryeval_impl;
 };
 
 
@@ -252,34 +483,53 @@ struct Rank
 		:docno(o.docno),weight(o.weight),attributes(o.attributes){}
 };
 
-/// \brief Object representing a query
+/// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
 public:
-	Query();
-	Query( const Analyzer& analyzer, const std::string& content);
+	/// \brief Constructor
+	explicit Query( const QueryEval& queryeval);
+	/// \brief Copy constructor
 	Query( const Query& o);
-	~Query();
+	~Query(){}
 
-	void addTerm(
-		const std::string& set_,
-		const std::string& type_,
-		const std::string& value_);
+	/// \brief Push a single term feature on the stack
+	void pushTerm( const std::string& type_, const std::string& value_);
 
-	void joinTerms(
-		const std::string& set_,
-		const std::string& opname_,
-		int range_,
-		std::size_t nofArgs_);
+	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
+	void pushExpression( const std::string& opname_, std::size_t argc, int range_);
 
-	virtual std::vector<Rank>
-		evaluate(
-			const Storage& storage,
-			const QueryProgram& prg,
-			std::size_t fromRank,
-			std::size_t maxNofRanks) const;
+	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
+	void defineFeature( const std::string& set_, float weight_=1.0);
+
+	/// \brief Define a meta data restrictions
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] operand numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	void defineMetaDataRestriction(
+			const char* compareOp, const std::string& name,
+			const Variant& operand, bool newGroup=true);
+
+	/// \brief Set maximum number of ranks to evaluate (not the maximum size of the result rank list. This is maxNofRanks - minRank)
+	void setMaxNofRanks( std::size_t maxNofRanks_);
+
+	/// \brief Set the index of the first rank to be returned
+	void setMinRank( std::size_t minRank_);
+
+	/// \brief Set the user of the query (overwrites the current user set silently)
+	void setUserName( const std::string& username_);
+
+	/// \brief Evaluate the query
+	/// \return the result
+	std::vector<Rank> evaluate() const;
+
 private:
-	void* m_impl;
+	Reference m_database_impl;
+	Reference m_storage_impl;
+	Reference m_queryeval_impl;
+	Reference m_queryproc_impl;
+	Reference m_query_impl;
 };
 
 #endif
