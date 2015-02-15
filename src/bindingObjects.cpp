@@ -524,28 +524,27 @@ void QueryEval::addSummarizer(
 		const Summarizer& summarizer)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
-	std::auto_ptr<strus::SummarizerConfigInterface>
-		config( queryeval->createSummarizerConfig( resultAttribute, functionName));
+	strus::SummarizerConfig config;
 	std::map<std::string,Variant>::const_iterator
 		pi = summarizer.m_parameters.begin(), pe = summarizer.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
 		if (pi->second.m_type == Variant::TEXT)
 		{
-			config->defineTextualParameter( pi->first, pi->second.m_value.TEXT);
+			config.defineTextualParameter( pi->first, pi->second.m_value.TEXT);
 		}
 		else
 		{
-			config->defineNumericParameter( pi->first, arithmeticVariant( pi->second));
+			config.defineNumericParameter( pi->first, arithmeticVariant( pi->second));
 		}
 	}
 	std::map<std::string,std::string>::const_iterator
 		fi = summarizer.m_features.begin(), fe = summarizer.m_features.end();
 	for (; fi != fe; ++fi)
 	{
-		config->defineFeatureParameter( fi->first, fi->second);
+		config.defineFeatureParameter( fi->first, fi->second);
 	}
-	config->done();
+	queryeval->addSummarizer( resultAttribute, functionName, config);
 }
 
 void QueryEval::defineWeightingFunction(
@@ -553,14 +552,14 @@ void QueryEval::defineWeightingFunction(
 		const WeightingFunction& weightingFunction)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
-	std::auto_ptr<strus::WeightingConfigInterface>
-		config( queryeval->createWeightingConfig( functionName));
+	strus::WeightingConfig config;
 	std::map<std::string,Variant>::const_iterator
 		pi = weightingFunction.m_parameters.begin(), pe = weightingFunction.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
-		config->defineNumericParameter( pi->first, arithmeticVariant( pi->second));
+		config.defineNumericParameter( pi->first, arithmeticVariant( pi->second));
 	}
+	queryeval->setWeighting( functionName, config);
 }
 
 
