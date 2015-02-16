@@ -78,23 +78,23 @@ private:
 
 
 /// \brief Object representing a function definition with string parameters
-class Function
+class FunctionDef
 {
 public:
-	Function( const Function& o)
+	FunctionDef( const FunctionDef& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	Function( const std::string& name_, const std::string& arg1)
+	FunctionDef( const std::string& name_, const std::string& arg1)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg1);
 	}
-	Function( const std::string& name_, const std::string& arg1, const std::string& arg2)
+	FunctionDef( const std::string& name_, const std::string& arg1, const std::string& arg2)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg1);
 		m_arguments.push_back( arg2);
 	}
-	Function( const std::string& name_)
+	FunctionDef( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
 	const std::string& name() const				{return m_name;}
@@ -120,6 +120,7 @@ public:
 	Variant( unsigned int v);
 	Variant( int v);
 	Variant( float v);
+	Variant( double v);
 	Variant( const char* v);
 	Variant( const std::string& v);
 
@@ -168,16 +169,16 @@ private:
 	Index m_position;
 };
 
-/// \brief Data object that represents single property of a document that
+/// \brief Data object that represents single numeric property of a document that
 ///	can be subject of retrieval or act as search restriction.
-class DocumentMetaData
+class MetaData
 {
 public:
-	DocumentMetaData( const std::string& name_, Variant value_)
+	MetaData( const std::string& name_, Variant value_)
 		:m_name(name_),m_value(value_){}
-	DocumentMetaData( const DocumentMetaData& o)
+	MetaData( const MetaData& o)
 		:m_name(o.m_name),m_value(o.m_value){}
-	DocumentMetaData()
+	MetaData()
 		:m_name(0),m_value(){}
 
 	const std::string& name() const		{return m_name;}
@@ -191,14 +192,14 @@ private:
 /// \brief Data object that describes a single property of a document
 ///	that is not subject of retrieval. It acts as description of the
 ///	document that can be shown as a result of retrieval.
-class DocumentAttribute
+class Attribute
 {
 public:
-	DocumentAttribute( const std::string& name_, const std::string& value_)
+	Attribute( const std::string& name_, const std::string& value_)
 		:m_name(name_),m_value(value_){}
-	DocumentAttribute( const DocumentAttribute& o)
+	Attribute( const Attribute& o)
 		:m_name(o.m_name),m_value(o.m_value){}
-	DocumentAttribute()
+	Attribute()
 		:m_name(0){}
 
 	const std::string& name() const		{return m_name;}
@@ -214,8 +215,10 @@ private:
 class Document
 {
 public:
-	/// \brief  Open a document to add elements manually
-	explicit Document( const std::string& docid);
+	/// \brief Default constructor
+	Document(){}
+	/// \brief Copy constructor
+	Document( const Document& o);
 
 	/// \brief Add a single term occurrence to the document for retrieval
 	void addSearchIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
@@ -229,25 +232,22 @@ public:
 	/// \remark This function is only implemented if ACL is enabled in the storage
 	void setUserAccessRight( const std::string& username_);
 
-	/// \brief Get the unique id of the document
-	const std::string& id() const					{return m_id;}
 	/// \brief Get the list of search terms of the document
 	const std::vector<Term>& searchIndexTerms() const		{return m_searchIndexTerms;}
 	/// \brief Get the list of forward terms of the document
 	const std::vector<Term>& forwardIndexTerms() const		{return m_forwardIndexTerms;}
 	/// \brief Get the list of meta data of the document
-	const std::vector<DocumentMetaData>& metaData() const		{return m_metaData;}
+	const std::vector<MetaData>& metaData() const			{return m_metaData;}
 	/// \brief Get the list of attributes of the document
-	const std::vector<DocumentAttribute>& attributes() const	{return m_attributes;}
+	const std::vector<Attribute>& attributes() const		{return m_attributes;}
 	/// \brief Get the list of users that are allowed to access the document
 	const std::vector<std::string>& users() const			{return m_users;}
 
 private:
-	std::string m_id;
 	std::vector<Term> m_searchIndexTerms;
 	std::vector<Term> m_forwardIndexTerms;
-	std::vector<DocumentMetaData> m_metaData;
-	std::vector<DocumentAttribute> m_attributes;
+	std::vector<MetaData> m_metaData;
+	std::vector<Attribute> m_attributes;
 	std::vector<std::string> m_users;
 };
 
@@ -261,34 +261,36 @@ class DocumentAnalyzer
 public:
 	/// \brief Constructor
 	DocumentAnalyzer();
+	/// \brief Copy constructor
+	DocumentAnalyzer( const DocumentAnalyzer& o);
 	/// \brief Destructor
 	~DocumentAnalyzer(){}
 
 	void addSearchIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
-		const Function& tokenizer,
-		const Function& normalizer);
+		const FunctionDef& tokenizer,
+		const FunctionDef& normalizer);
 
 	void addForwardIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
-		const Function& tokenizer,
-		const Function& normalizer);
+		const FunctionDef& tokenizer,
+		const FunctionDef& normalizer);
 
 	void defineMetaData(
 		const std::string& fieldname,
 		const std::string& selectexpr,
-		const Function& tokenizer,
-		const Function& normalizer);
+		const FunctionDef& tokenizer,
+		const FunctionDef& normalizer);
 
 	void defineAttribute(
 		const std::string& attribname,
 		const std::string& selectexpr,
-		const Function& tokenizer,
-		const Function& normalizer);
+		const FunctionDef& tokenizer,
+		const FunctionDef& normalizer);
 
-	Document analyze( const std::string& docid, const std::string& content);
+	Document analyze( const std::string& content);
 
 private:
 	Reference m_textproc_impl;
@@ -305,6 +307,8 @@ class QueryAnalyzer
 public:
 	/// \brief Constructor
 	QueryAnalyzer();
+	/// \brief Copy constructor
+	QueryAnalyzer( const QueryAnalyzer& o);
 	/// \brief Destructor
 	~QueryAnalyzer(){}
 
@@ -313,8 +317,8 @@ public:
 	void definePhraseType(
 			const std::string& phraseType,
 			const std::string& featureType,
-			const Function& tokenizer,
-			const Function& normalizer);
+			const FunctionDef& tokenizer,
+			const FunctionDef& normalizer);
 
 	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
 	std::vector<Term> analyzePhrase(
@@ -335,6 +339,7 @@ public:
 	/// \brief Constructor from a configuration description string
 	/// \remark config is not a file name, but a string of semicolon separated key value assignments
 	explicit Storage( const std::string& config);
+	Storage( const Storage& o);
 
 	~Storage(){}
 
@@ -343,7 +348,7 @@ public:
 
 	/// \brief Prepare inserting a document into the storage
 	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
-	void insertDocument( const Document& doc);
+	void insertDocument( const std::string& docid, const Document& doc);
 
 	/// \brief Prepare deletion of a document from the storage
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
@@ -378,9 +383,10 @@ private:
 class Summarizer
 {
 public:
-	Summarizer(){}
+	explicit Summarizer( const std::string& name_)
+		:m_name(name_){}
 	Summarizer( const Summarizer& o)
-		:m_parameters(o.m_parameters),m_features(o.m_features){}
+		:m_name(o.m_name),m_parameters(o.m_parameters),m_features(o.m_features){}
 
 	void defineParameter( const std::string& name_, const Variant& value_)
 	{
@@ -394,6 +400,7 @@ public:
 
 private:
 	friend class QueryEval;
+	std::string m_name;
 	std::map<std::string,Variant> m_parameters;
 	std::map<std::string,std::string> m_features;
 };
@@ -401,9 +408,10 @@ private:
 class WeightingFunction
 {
 public:
-	WeightingFunction(){}
+	explicit WeightingFunction( const std::string& name_)
+		:m_name(name_){}
 	WeightingFunction( const WeightingFunction& o)
-		:m_parameters(o.m_parameters){}
+		:m_name(o.m_name),m_parameters(o.m_parameters){}
 
 	void defineParameter( const std::string& name_, const Variant& value_)
 	{
@@ -412,6 +420,7 @@ public:
 
 private:
 	friend class QueryEval;
+	std::string m_name;
 	std::map<std::string,Variant> m_parameters;
 };
 
@@ -421,6 +430,8 @@ class QueryEval
 public:
 	/// \brief Constructor
 	explicit QueryEval( const Storage& storage);
+	/// \brief Copy constructor
+	QueryEval( const QueryEval& o);
 	/// \brief Destructor
 	~QueryEval(){}
 
@@ -442,12 +453,10 @@ public:
 	/// \brief Declare a summarizer
 	void addSummarizer(
 			const std::string& resultAttribute,
-			const std::string& functionName,
 			const Summarizer& summarizer);
 
 	/// \brief Declare the weighting function used
 	void defineWeightingFunction(
-			const std::string& functionName,
 			const WeightingFunction& weightingFunction);
 
 private:
@@ -460,27 +469,44 @@ private:
 
 
 /// \brief Attribute of a query evaluation result element
-struct RankAttribute
+class RankAttribute
 {
+public:
 	RankAttribute(){}
+	RankAttribute( const std::string& name_, const std::string& value_)
+		:m_name(name_),m_value(value_){}
 	RankAttribute( const RankAttribute& o)
-		:name(o.name),value(o.value){}
+		:m_name(o.m_name),m_value(o.m_value){}
 
-	std::string name;
-	std::string value;
+	const std::string& name() const		{return m_name;}
+	const std::string& value() const	{return m_value;}
+
+private:
+	friend class Query;
+	std::string m_name;
+	std::string m_value;
 };
 
 /// \brief Weighted document reference with attributes (result of a query evaluation)
-struct Rank
+class Rank
 {
-	Index docno;
-	float weight;
-	std::vector<RankAttribute> attributes;
-
+public:
 	Rank()
-		:docno(0),weight(0.0){}
+		:m_docno(0),m_weight(0.0){}
+	Rank( Index docno_, float weight_, const std::vector<RankAttribute>& attributes_)
+		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
 	Rank( const Rank& o)
-		:docno(o.docno),weight(o.weight),attributes(o.attributes){}
+		:m_docno(o.m_docno),m_weight(o.m_weight),m_attributes(o.m_attributes){}
+
+	Index docno() const					{return m_docno;}
+	float weight() const					{return m_weight;}
+	const std::vector<RankAttribute>& attributes() const	{return m_attributes;}
+
+private:
+	friend class Query;
+	Index m_docno;
+	float m_weight;
+	std::vector<RankAttribute> m_attributes;
 };
 
 /// \brief Query program object representing a retrieval method for documents in a storage.

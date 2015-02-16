@@ -24,6 +24,15 @@
 # Helper scripts
 setenv.sh
 
-# Compiled Programs
+# Compiled programs
+tests/query_cpp/src/testQuery
 
+# Generated test data
+tests/query_cpp/data/
+
+# SWIG generated code
+swig/php_strus.h
+swig/strus.php
+swig/strus_wrap.c
+swig/strus_wrap.cpp
 

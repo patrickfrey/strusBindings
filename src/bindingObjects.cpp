@@ -87,6 +87,12 @@ Variant::Variant( float v)
 	m_value.FLOAT = v;
 }
 
+Variant::Variant( double v)
+	:m_type(FLOAT)
+{
+	m_value.FLOAT = (float)v;
+}
+
 Variant::Variant( const char* v)
 	:m_type(TEXT),m_buf(v)
 {
@@ -123,8 +129,12 @@ const char* Variant::getText() const
 	throw std::logic_error( "illegal access of variant value");
 }
 
-Document::Document( const std::string& docId_)
-	:m_id(docId_)
+Document::Document( const Document& o)
+	:m_searchIndexTerms(o.m_searchIndexTerms)
+	,m_forwardIndexTerms(o.m_forwardIndexTerms)
+	,m_metaData(o.m_metaData)
+	,m_attributes(o.m_attributes)
+	,m_users(o.m_users)
 {}
 
 void Document::addSearchIndexTerm(
@@ -145,12 +155,12 @@ void Document::addForwardIndexTerm(
 
 void Document::setMetaData( const std::string& name_, Variant value_)
 {
-	m_metaData.push_back( DocumentMetaData( name_,value_));
+	m_metaData.push_back( MetaData( name_,value_));
 }
 
 void Document::setAttribute( const std::string& name_, const std::string& value_)
 {
-	m_attributes.push_back( DocumentAttribute( name_, value_));
+	m_attributes.push_back( Attribute( name_, value_));
 }
 
 void Document::setUserAccessRight( const std::string& username_)
@@ -172,11 +182,16 @@ DocumentAnalyzer::DocumentAnalyzer()
 	(void)segmenter.release();
 }
 
+DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
+	:m_textproc_impl(o.m_textproc_impl)
+	,m_analyzer_impl(o.m_analyzer_impl)
+{}
+
 void DocumentAnalyzer::addSearchIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
-	const Function& tokenizer,
-	const Function& normalizer)
+	const FunctionDef& tokenizer,
+	const FunctionDef& normalizer)
 {
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeature(
 		type, selectexpr,
@@ -187,8 +202,8 @@ void DocumentAnalyzer::addSearchIndexFeature(
 void DocumentAnalyzer::addForwardIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
-	const Function& tokenizer,
-	const Function& normalizer)
+	const FunctionDef& tokenizer,
+	const FunctionDef& normalizer)
 {
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeature(
 		type, selectexpr,
@@ -199,8 +214,8 @@ void DocumentAnalyzer::addForwardIndexFeature(
 void DocumentAnalyzer::defineMetaData(
 	const std::string& fieldname,
 	const std::string& selectexpr,
-	const Function& tokenizer,
-	const Function& normalizer)
+	const FunctionDef& tokenizer,
+	const FunctionDef& normalizer)
 {
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaData(
 		fieldname, selectexpr,
@@ -211,8 +226,8 @@ void DocumentAnalyzer::defineMetaData(
 void DocumentAnalyzer::defineAttribute(
 	const std::string& attribname,
 	const std::string& selectexpr,
-	const Function& tokenizer,
-	const Function& normalizer)
+	const FunctionDef& tokenizer,
+	const FunctionDef& normalizer)
 {
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAttribute(
 		attribname, selectexpr,
@@ -260,9 +275,9 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 	return rt;
 }
 
-Document DocumentAnalyzer::analyze( const std::string& docid, const std::string& content)
+Document DocumentAnalyzer::analyze( const std::string& content)
 {
-	Document rt( docid);
+	Document rt;
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 
 	strus::analyzer::Document doc = THIS->analyze( content);
@@ -306,12 +321,16 @@ QueryAnalyzer::QueryAnalyzer()
 	m_textproc_impl.reset( textproc.release());
 }
 
+QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
+	:m_textproc_impl(o.m_textproc_impl)
+	,m_analyzer_impl(o.m_analyzer_impl)
+{}
 
 void QueryAnalyzer::definePhraseType(
 		const std::string& phraseType,
 		const std::string& featureType,
-		const Function& tokenizer,
-		const Function& normalizer)
+		const FunctionDef& tokenizer,
+		const FunctionDef& normalizer)
 {
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	THIS->definePhraseType(
@@ -369,13 +388,25 @@ Storage::Storage( const std::string& config)
 	m_queryproc_impl.reset( queryproc.release());
 }
 
+Storage::Storage( const Storage& o)
+	:m_database_impl(o.m_database_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_queryproc_impl(o.m_queryproc_impl)
+	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
+{
+	if (o.m_transaction_impl.get())
+	{
+		throw std::runtime_error("try to create a storage interface clone of a storage with an open transaction");
+	}
+}
+
 GlobalCounter Storage::nofDocumentsInserted() const
 {
 	strus::StorageInterface* THIS = (strus::StorageInterface*)m_storage_impl.get();
 	return THIS->globalNofDocumentsInserted();
 }
 
-void Storage::insertDocument( const Document& doc)
+void Storage::insertDocument( const std::string& docid, const Document& doc)
 {
 	strus::StorageInterface* THIS = (strus::StorageInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -383,15 +414,15 @@ void Storage::insertDocument( const Document& doc)
 		m_transaction_impl.reset( (strus::StorageTransactionInterface*)THIS->createTransaction());
 	}
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
-	std::auto_ptr<strus::StorageDocumentInterface> document( transaction->createDocument( doc.id()));
+	std::auto_ptr<strus::StorageDocumentInterface> document( transaction->createDocument( docid));
 
-	std::vector<DocumentAttribute>::const_iterator
+	std::vector<Attribute>::const_iterator
 		ai = doc.attributes().begin(), ae = doc.attributes().end();
 	for (; ai != ae; ++ai)
 	{
 		document->setAttribute( ai->name(), ai->value());
 	}
-	std::vector<DocumentMetaData>::const_iterator
+	std::vector<MetaData>::const_iterator
 		mi = doc.metaData().begin(), me = doc.metaData().end();
 	for (; mi != me; ++mi)
 	{
@@ -405,9 +436,9 @@ void Storage::insertDocument( const Document& doc)
 	}
 	std::vector<Term>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
-	for (; ti != te; ++ti)
+	for (; fi != fe; ++fi)
 	{
-		document->addForwardIndexTerm( ti->type(), ti->value(), ti->position());
+		document->addForwardIndexTerm( fi->type(), fi->value(), fi->position());
 	}
 	std::vector<std::string>::const_iterator
 		ui = doc.users().begin(), ue = doc.users().end();
@@ -491,6 +522,13 @@ QueryEval::QueryEval( const Storage& storage)
 	m_queryeval_impl.reset( strus::createQueryEval( (strus::QueryProcessorInterface*)m_queryproc_impl.get()));
 }
 
+QueryEval::QueryEval( const QueryEval& o)
+	:m_database_impl(o.m_database_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_queryproc_impl(o.m_queryproc_impl)
+	,m_queryeval_impl(o.m_queryeval_impl)
+{}
+
 void QueryEval::addTerm(
 		const std::string& set_,
 		const std::string& type_,
@@ -520,7 +558,6 @@ void QueryEval::addWeightingFeature( const std::string& set_)
 
 void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
-		const std::string& functionName,
 		const Summarizer& summarizer)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -544,11 +581,10 @@ void QueryEval::addSummarizer(
 	{
 		config.defineFeatureParameter( fi->first, fi->second);
 	}
-	queryeval->addSummarizer( resultAttribute, functionName, config);
+	queryeval->addSummarizer( resultAttribute, summarizer.m_name, config);
 }
 
 void QueryEval::defineWeightingFunction(
-		const std::string& functionName,
 		const WeightingFunction& weightingFunction)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -559,7 +595,7 @@ void QueryEval::defineWeightingFunction(
 	{
 		config.defineNumericParameter( pi->first, arithmeticVariant( pi->second));
 	}
-	queryeval->setWeighting( functionName, config);
+	queryeval->setWeighting( weightingFunction.m_name, config);
 }
 
 
@@ -668,17 +704,17 @@ std::vector<Rank> Query::evaluate() const
 	for (;ri != re; ++ri)
 	{
 		Rank reselem;
-		reselem.docno = (unsigned int)ri->docno();
-		reselem.weight = ri->weight();
+		reselem.m_docno = (unsigned int)ri->docno();
+		reselem.m_weight = ri->weight();
 		std::vector<strus::ResultDocument::Attribute>::const_iterator
 			ai = ri->attributes().begin(), ae = ri->attributes().end();
 	
 		for (;ai != ae; ++ai)
 		{
 			RankAttribute attr;
-			attr.name = ai->name();
-			attr.value = ai->value();
-			reselem.attributes.push_back( attr);
+			attr.m_name = ai->name();
+			attr.m_value = ai->value();
+			reselem.m_attributes.push_back( attr);
 		}
 		rt.push_back( reselem);
 	}
