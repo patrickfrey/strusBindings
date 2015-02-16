@@ -54,7 +54,7 @@ struct ReferenceDeleter
 };
 
 Variant::Variant()
-	:m_type(EMPTY){}
+	:m_type(UNDEFINED){}
 
 Variant::Variant( const Variant& o)
 	:m_type(o.m_type),m_buf(o.m_buf)
@@ -257,7 +257,7 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 	strus::ArithmeticVariant rt;
 	switch (val.type())
 	{
-		case Variant::EMPTY:
+		case Variant::UNDEFINED:
 			break;
 		case Variant::INT:
 			rt = val.getInt();
@@ -432,13 +432,13 @@ void Storage::insertDocument( const std::string& docid, const Document& doc)
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
 	for (; ti != te; ++ti)
 	{
-		document->addSearchIndexTerm( ti->type(), ti->value(), ti->position());
+		document->addSearchIndexTerm( ti->typeName(), ti->value(), ti->position());
 	}
 	std::vector<Term>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
 	for (; fi != fe; ++fi)
 	{
-		document->addForwardIndexTerm( fi->type(), fi->value(), fi->position());
+		document->addForwardIndexTerm( fi->typeName(), fi->value(), fi->position());
 	}
 	std::vector<std::string>::const_iterator
 		ui = doc.users().begin(), ue = doc.users().end();

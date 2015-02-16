@@ -129,7 +129,7 @@ int main( int , const char** )
 		unsigned int maxpos = 0;
 		for (; qi != qe; ++qidx,++qi)
 		{
-			query.pushTerm( qi->type(), qi->value());
+			query.pushTerm( qi->typeName(), qi->value());
 			if (qi->position() > maxpos)
 			{
 				maxpos = qi->position();

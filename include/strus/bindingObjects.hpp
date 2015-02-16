@@ -112,7 +112,7 @@ class Variant
 public:
 	enum Type
 	{
-		EMPTY,UINT,INT,FLOAT,TEXT
+		UNDEFINED,UINT,INT,FLOAT,TEXT
 	};
 
 	Variant();
@@ -124,7 +124,8 @@ public:
 	Variant( const char* v);
 	Variant( const std::string& v);
 
-	Type type() const		{return m_type;}
+	bool defined() const			{return m_type != UNDEFINED;}
+	Type type() const			{return m_type;}
 	unsigned int getUInt() const;
 	int getInt() const;
 	float getFloat() const;
@@ -159,7 +160,7 @@ public:
 	Term()
 		:m_position(0){}
 
-	const std::string& type() const		{return m_type;}
+	const std::string& typeName() const	{return m_type;}
 	const std::string& value() const	{return m_value;}
 	unsigned int position() const		{return m_position;}
 
