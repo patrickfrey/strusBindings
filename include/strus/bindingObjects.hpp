@@ -153,15 +153,21 @@ private:
 class Term
 {
 public:
+	/// \brief Constructor
 	Term( const std::string& type_, const std::string& value_, const Index& position_)
 		:m_type(type_),m_value(value_),m_position(position_){}
+	/// \brief Copy constructor
 	Term( const Term& o)
 		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position){}
+	/// \brief Default constructor
 	Term()
 		:m_position(0){}
 
-	const std::string& typeName() const	{return m_type;}
+	/// \brief Get the term type name
+	const std::string& name() const		{return m_type;}
+	/// \brief Get the term value
 	const std::string& value() const	{return m_value;}
+	/// \brief Get the term position
 	unsigned int position() const		{return m_position;}
 
 private:
@@ -175,14 +181,19 @@ private:
 class MetaData
 {
 public:
+	/// \brief Constructor
 	MetaData( const std::string& name_, Variant value_)
 		:m_name(name_),m_value(value_){}
+	/// \brief Copy constructor
 	MetaData( const MetaData& o)
 		:m_name(o.m_name),m_value(o.m_value){}
+	/// \brief Default constructor
 	MetaData()
 		:m_name(0),m_value(){}
 
+	/// \brief Get the type name of this meta data field:
 	const std::string& name() const		{return m_name;}
+	/// \brief Get the value of this meta data field:
 	const Variant& value() const		{return m_value;}
 
 private:
@@ -196,14 +207,19 @@ private:
 class Attribute
 {
 public:
+	/// \brief Constructor
 	Attribute( const std::string& name_, const std::string& value_)
 		:m_name(name_),m_value(value_){}
+	/// \brief Constructor
 	Attribute( const Attribute& o)
 		:m_name(o.m_name),m_value(o.m_value){}
+	/// \brief Constructor
 	Attribute()
 		:m_name(0){}
 
+	/// \brief Get the unique type name of this attribute
 	const std::string& name() const		{return m_name;}
+	/// \brief Get the type value of this attribute
 	const std::string& value() const	{return m_value;}
 
 private:
@@ -267,30 +283,51 @@ public:
 	/// \brief Destructor
 	~DocumentAnalyzer(){}
 
+	/// \brief Define how a feature to insert into the inverted index (search index) is selected, tokenized and normalized
+	/// \param[in] type type of the features produced
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] tokenizer normalizer function description to use for this feature
 	void addSearchIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
 		const FunctionDef& tokenizer,
 		const FunctionDef& normalizer);
 
+	/// \brief Define how a feature to insert into the forward index (summarization) is selected, tokenized and normalized
+	/// \param[in] type type of the features produced
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] tokenizer normalizer function description to use for this feature
 	void addForwardIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
 		const FunctionDef& tokenizer,
 		const FunctionDef& normalizer);
 
+	/// \brief Define how a feature to insert as meta data (summarization) is selected, tokenized and normalized
+	/// \param[in] fieldname name of the addressed meta data field.
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] tokenizer normalizer function description to use for this feature
 	void defineMetaData(
 		const std::string& fieldname,
 		const std::string& selectexpr,
 		const FunctionDef& tokenizer,
 		const FunctionDef& normalizer);
 
+	/// \brief Define how a feature to insert as document attribute (summarization) is selected, tokenized and normalized
 	void defineAttribute(
 		const std::string& attribname,
 		const std::string& selectexpr,
 		const FunctionDef& tokenizer,
 		const FunctionDef& normalizer);
+	/// \param[in] attribname name of the addressed attribute.
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] tokenizer normalizer function description to use for this feature
 
+	/// \brief Analye the content and return the set of features to insert
 	Document analyze( const std::string& content);
 
 private:
@@ -384,16 +421,20 @@ private:
 class Summarizer
 {
 public:
+	/// \brief Constructor
 	explicit Summarizer( const std::string& name_)
 		:m_name(name_){}
+	/// \brief Copy constructor
 	Summarizer( const Summarizer& o)
 		:m_name(o.m_name),m_parameters(o.m_parameters),m_features(o.m_features){}
 
+	/// \brief Define a summarizer feature
 	void defineParameter( const std::string& name_, const Variant& value_)
 	{
 		m_parameters[ name_] = value_;
 	}
 
+	/// \brief Define a summarizer feature
 	void defineFeature( const std::string& class_, const std::string& set_)
 	{
 		m_features[ class_] = set_;
@@ -473,13 +514,18 @@ private:
 class RankAttribute
 {
 public:
+	/// \brief Constructor
 	RankAttribute(){}
+	/// \brief Constructor
 	RankAttribute( const std::string& name_, const std::string& value_)
 		:m_name(name_),m_value(value_){}
+	/// \brief Copy connstructor
 	RankAttribute( const RankAttribute& o)
 		:m_name(o.m_name),m_value(o.m_value){}
 
+	/// \brief Get the name of this attribute
 	const std::string& name() const		{return m_name;}
+	/// \brief Get the value of this attribute
 	const std::string& value() const	{return m_value;}
 
 private:
@@ -492,15 +538,21 @@ private:
 class Rank
 {
 public:
+	/// \brief Constructor
 	Rank()
 		:m_docno(0),m_weight(0.0){}
+	/// \brief Constructor
 	Rank( Index docno_, float weight_, const std::vector<RankAttribute>& attributes_)
 		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
+	/// \brief Copy constructor
 	Rank( const Rank& o)
 		:m_docno(o.m_docno),m_weight(o.m_weight),m_attributes(o.m_attributes){}
 
+	/// \brief Get the internal document nuber used
 	Index docno() const					{return m_docno;}
+	/// \brief Get the weight of the rank
 	float weight() const					{return m_weight;}
+	/// \brief Get the attributes
 	const std::vector<RankAttribute>& attributes() const	{return m_attributes;}
 
 private:
@@ -518,13 +570,14 @@ public:
 	explicit Query( const QueryEval& queryeval);
 	/// \brief Copy constructor
 	Query( const Query& o);
+	/// \brief Destructor
 	~Query(){}
 
 	/// \brief Push a single term feature on the stack
 	void pushTerm( const std::string& type_, const std::string& value_);
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
-	void pushExpression( const std::string& opname_, std::size_t argc, int range_);
+	void pushExpression( const std::string& opname_, unsigned int argc, int range_);
 
 	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
 	void defineFeature( const std::string& set_, float weight_=1.0);
@@ -539,10 +592,10 @@ public:
 			const Variant& operand, bool newGroup=true);
 
 	/// \brief Set maximum number of ranks to evaluate (not the maximum size of the result rank list. This is maxNofRanks - minRank)
-	void setMaxNofRanks( std::size_t maxNofRanks_);
+	void setMaxNofRanks( unsigned int maxNofRanks_);
 
 	/// \brief Set the index of the first rank to be returned
-	void setMinRank( std::size_t minRank_);
+	void setMinRank( unsigned int minRank_);
 
 	/// \brief Set the user of the query (overwrites the current user set silently)
 	void setUserName( const std::string& username_);

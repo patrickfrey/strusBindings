@@ -432,13 +432,13 @@ void Storage::insertDocument( const std::string& docid, const Document& doc)
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
 	for (; ti != te; ++ti)
 	{
-		document->addSearchIndexTerm( ti->typeName(), ti->value(), ti->position());
+		document->addSearchIndexTerm( ti->name(), ti->value(), ti->position());
 	}
 	std::vector<Term>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
 	for (; fi != fe; ++fi)
 	{
-		document->addForwardIndexTerm( fi->typeName(), fi->value(), fi->position());
+		document->addForwardIndexTerm( fi->name(), fi->value(), fi->position());
 	}
 	std::vector<std::string>::const_iterator
 		ui = doc.users().begin(), ue = doc.users().end();
@@ -625,7 +625,7 @@ void Query::pushTerm( const std::string& type_, const std::string& value_)
 	THIS->pushTerm( type_, value_);
 }
 
-void Query::pushExpression( const std::string& opname_, std::size_t argc, int range_)
+void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushExpression( opname_, argc, range_);
@@ -675,13 +675,13 @@ void Query::defineMetaDataRestriction(
 	THIS->defineMetaDataRestriction( cmpop, name, arithmeticVariant(operand), newGroup);
 }
 
-void Query::setMaxNofRanks( std::size_t maxNofRanks_)
+void Query::setMaxNofRanks( unsigned int maxNofRanks_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->setMaxNofRanks( maxNofRanks_);
 }
 
-void Query::setMinRank( std::size_t minRank_)
+void Query::setMinRank( unsigned int minRank_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->setMinRank( minRank_);

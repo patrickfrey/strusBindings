@@ -21,7 +21,12 @@
 %ignore Reference::operator = (const Reference& o);
 %ignore Reference::get() const;
 %ignore Reference::get();
-
+%ignore MetaData::name() const;
+%ignore MetaData::value() const;
+%ignore Attribute::name() const;
+%ignore Attribute::value() const;
+%ignore FunctionDef::name() const;
+%ignore FunctionDef::arguments() const;
 
 // Parse the original header file
 %include "../include/strus/bindingObjects.hpp"
