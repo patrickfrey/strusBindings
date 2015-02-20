@@ -49,8 +49,7 @@ tests/query_cpp/data/
 
 # SWIG generated code
 swig/gen/
-swig/strus_wrap.cpp
-swig/strus_wrap.cxx
-swig/strus_wrap.xml
+swig/strusPYTHON_wrap.cxx
+
 
 
