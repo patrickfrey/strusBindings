@@ -163,6 +163,12 @@ void Document::setAttribute( const std::string& name_, const std::string& value_
 	m_attributes.push_back( Attribute( name_, value_));
 }
 
+void Document::setDocid( const std::string& docid_)
+{
+	m_docid = docid_;
+	m_attributes.push_back( Attribute( "docid", docid_));
+}
+
 void Document::setUserAccessRight( const std::string& username_)
 {
 	m_users.push_back( username_);
@@ -286,7 +292,14 @@ Document DocumentAnalyzer::analyze( const std::string& content)
 		ai = doc.attributes().begin(), ae = doc.attributes().end();
 	for (; ai != ae; ++ai)
 	{
-		rt.setAttribute( ai->name(), ai->value());
+		if (ai->name() == strus::Constants::attribute_docid())
+		{
+			rt.setDocid( ai->value());
+		}
+		else
+		{
+			rt.setAttribute( ai->name(), ai->value());
+		}
 	}
 	std::vector<strus::analyzer::MetaData>::const_iterator
 		mi = doc.metadata().begin(), me = doc.metadata().end();
@@ -629,6 +642,12 @@ void Query::pushExpression( const std::string& opname_, unsigned int argc, int r
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushExpression( opname_, argc, range_);
+}
+
+void Query::attachVariable( const std::string& name_)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	THIS->attachVariable( name_);
 }
 
 void Query::defineFeature( const std::string& set_, float weight_)

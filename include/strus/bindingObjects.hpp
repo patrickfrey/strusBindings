@@ -248,6 +248,8 @@ public:
 	/// \brief Allow a user to access the document
 	/// \remark This function is only implemented if ACL is enabled in the storage
 	void setUserAccessRight( const std::string& username_);
+	/// \brief Set the document identifier (docid) of the document
+	void setDocid( const std::string& docid_);
 
 	/// \brief Get the list of search terms of the document
 	const std::vector<Term>& searchIndexTerms() const		{return m_searchIndexTerms;}
@@ -259,6 +261,9 @@ public:
 	const std::vector<Attribute>& attributes() const		{return m_attributes;}
 	/// \brief Get the list of users that are allowed to access the document
 	const std::vector<std::string>& users() const			{return m_users;}
+	/// \brief Get the document identifier (docid) of the document
+	/// \return the document identifier
+	const std::string& docid()					{return m_docid;}
 
 private:
 	std::vector<Term> m_searchIndexTerms;
@@ -266,6 +271,7 @@ private:
 	std::vector<MetaData> m_metaData;
 	std::vector<Attribute> m_attributes;
 	std::vector<std::string> m_users;
+	std::string m_docid;
 };
 
 
@@ -578,6 +584,12 @@ public:
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
 	void pushExpression( const std::string& opname_, unsigned int argc, int range_);
+
+	/// \brief Attaches a variable to the top expression or term on the query stack.
+	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
+	/// \param[in] name_ name of the variable attached
+	/// \remark The stack is not changed
+	void attachVariable( const std::string& name_);
 
 	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
 	void defineFeature( const std::string& set_, float weight_=1.0);
