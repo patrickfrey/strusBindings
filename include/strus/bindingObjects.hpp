@@ -417,7 +417,6 @@ public:
 
 private:
 	friend class QueryEval;
-	Reference m_database_impl;
 	Reference m_storage_impl;
 	Reference m_queryproc_impl;
 	Reference m_transaction_impl;
@@ -509,7 +508,6 @@ public:
 
 private:
 	friend class Query;
-	Reference m_database_impl;
 	Reference m_storage_impl;
 	Reference m_queryproc_impl;
 	Reference m_queryeval_impl;
@@ -617,7 +615,6 @@ public:
 	std::vector<Rank> evaluate() const;
 
 private:
-	Reference m_database_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
 	Reference m_queryproc_impl;
