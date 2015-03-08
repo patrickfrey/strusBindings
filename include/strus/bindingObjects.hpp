@@ -279,11 +279,10 @@ private:
 /// \brief Analyzer object representing a program for segmenting, 
 ///	tokenizing and normalizing a document into atomic parts, that 
 ///	can be inserted into a storage and be retrieved from there.
+/// \remark The only way to construct a document analyzer instance is to call StrusContext::createDocumentAnalyzer()
 class DocumentAnalyzer
 {
 public:
-	/// \brief Constructor
-	DocumentAnalyzer();
 	/// \brief Copy constructor
 	DocumentAnalyzer( const DocumentAnalyzer& o);
 	/// \brief Destructor
@@ -337,7 +336,11 @@ public:
 	Document analyze( const std::string& content);
 
 private:
-	Reference m_textproc_impl;
+	/// \brief Constructor used by StrusContext
+	friend class StrusContext;
+	DocumentAnalyzer( const Reference& moduleloader, const std::string& segmentername);
+
+	Reference m_moduleloader_impl;
 	Reference m_analyzer_impl;
 };
 
@@ -346,11 +349,10 @@ private:
 /// \brief Analyzer object representing a set of function for transforming a phrase,
 ///	the smallest unit in any query language, to a set of terms that can be used
 ///	to build a query.
+/// \remark The only way to construct a query analyzer instance is to call StrusContext::createQueryAnalyzer()
 class QueryAnalyzer
 {
 public:
-	/// \brief Constructor
-	QueryAnalyzer();
 	/// \brief Copy constructor
 	QueryAnalyzer( const QueryAnalyzer& o);
 	/// \brief Destructor
@@ -370,22 +372,26 @@ public:
 			const std::string& phraseContent) const;
 
 private:
-	Reference m_textproc_impl;
+	/// \brief Constructor used by StrusContext
+	friend class StrusContext;
+	explicit QueryAnalyzer( const Reference& moduleloader);
+
+	Reference m_moduleloader_impl;
 	Reference m_analyzer_impl;
 };
 
 
 /// \brief Singleton object representing the client to the storage 
 ///	of the information retrieval engine.
-class Storage
+/// \remark The only way to construct a storage client instance is to call StrusContext::createStorageClient(const std::string&)
+class StorageClient
 {
 public:
-	/// \brief Constructor from a configuration description string
-	/// \remark config is not a file name, but a string of semicolon separated key value assignments
-	explicit Storage( const std::string& config);
-	Storage( const Storage& o);
+	/// \brief Copy constructor
+	StorageClient( const StorageClient& o);
 
-	~Storage(){}
+	/// \brief Destructor
+	~StorageClient(){}
 
 	/// \brief Get the number of documents inserted into the storage
 	GlobalCounter nofDocumentsInserted() const;
@@ -404,21 +410,16 @@ public:
 	/// \brief Commit all insert or delete or user access right change statements open.
 	void flush();
 
-	/// \brief Create a new storage described by config
-	/// \remark Fails if the storage already exists
-	static void create( const char* config);
-
-	/// \brief Delete the storage described by config
-	/// \note Handle this carefully
-	static void destroy( const char* config);
-
-	/// \brief Close of the storage that throws in case of an error
+	/// \brief Close of the storage client
 	void close();
 
 private:
-	friend class QueryEval;
+	friend class StrusContext;
+	StorageClient( const Reference& moduleloader, const std::string& config);
+
+	friend class Query;
+	Reference m_moduleloader_impl;
 	Reference m_storage_impl;
-	Reference m_queryproc_impl;
 	Reference m_transaction_impl;
 };
 
@@ -475,8 +476,6 @@ private:
 class QueryEval
 {
 public:
-	/// \brief Constructor
-	explicit QueryEval( const Storage& storage);
 	/// \brief Copy constructor
 	QueryEval( const QueryEval& o);
 	/// \brief Destructor
@@ -507,9 +506,12 @@ public:
 			const WeightingFunction& weightingFunction);
 
 private:
+	/// \brief Constructor used by strusContext
+	friend class StrusContext;
+	explicit QueryEval( const Reference& moduleloader);
+
 	friend class Query;
-	Reference m_storage_impl;
-	Reference m_queryproc_impl;
+	Reference m_moduleloader_impl;
 	Reference m_queryeval_impl;
 };
 
@@ -571,7 +573,7 @@ class Query
 {
 public:
 	/// \brief Constructor
-	explicit Query( const QueryEval& queryeval);
+	Query( const QueryEval& queryeval, const StorageClient& storage);
 	/// \brief Copy constructor
 	Query( const Query& o);
 	/// \brief Destructor
@@ -615,10 +617,54 @@ public:
 	std::vector<Rank> evaluate() const;
 
 private:
+	Reference m_moduleloader_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
-	Reference m_queryproc_impl;
 	Reference m_query_impl;
+};
+
+
+/// \brief Object holding the global context of the strus IR engine
+class StrusContext
+{
+public:
+	/// \brief Constructor
+	StrusContext();
+	/// \brief Copy constructor
+	StrusContext( const StrusContext& o);
+	/// \brief Destructor
+	~StrusContext(){}
+
+	/// \brief Load a module
+	void loadModule( const std::string& name_);
+
+	/// \brief Load a module
+	/// \param[in] paths semicolon separated list of module search paths
+	void setPath( const std::string& paths_);
+
+	/// \brief Create a storage client instance
+	StorageClient createStorageClient( const std::string& config_);
+
+	/// \brief Create a new storage (physically) described by config
+	/// \remark Fails if the storage already exists
+	void createStorage( const char* config);
+
+	/// \brief Delete the storage (physically) described by config
+	/// \note Handle this function carefully
+	void destroyStorage( const char* config);
+
+	/// \brief Create a document analyzer instance
+	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
+	DocumentAnalyzer createDocumentAnalyzer( const std::string& segmentername_="");
+
+	/// \brief Create a query analyzer instance
+	QueryAnalyzer createQueryAnalyzer();
+
+	/// \brief Create a query evaluation instance
+	QueryEval createQueryEval();
+
+private:
+	Reference m_moduleloader_impl;
 };
 
 #endif

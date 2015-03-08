@@ -28,13 +28,9 @@
 */
 #include "strus/bindingObjects.hpp"
 #include "strus/strus.hpp"
-#include "strus/lib/queryeval.hpp"
-#include "strus/lib/queryproc.hpp"
-#include "strus/lib/database_leveldb.hpp"
-#include "strus/lib/storage.hpp"
-#include "strus/lib/analyzer.hpp"
-#include "strus/lib/textprocessor.hpp"
-#include "strus/lib/segmenter_textwolf.hpp"
+#include "strus/lib/module.hpp"
+#include "strus/moduleLoaderInterface.hpp"
+#include "strus/objectBuilderInterface.hpp"
 #include "strus/private/arithmeticVariantAsString.hpp"
 #include "strus/private/configParser.hpp"
 #include <stdexcept>
@@ -174,22 +170,16 @@ void Document::setUserAccessRight( const std::string& username_)
 	m_users.push_back( username_);
 }
 
-DocumentAnalyzer::DocumentAnalyzer()
-	:m_textproc_impl(ReferenceDeleter<strus::TextProcessorInterface>::function)
+DocumentAnalyzer::DocumentAnalyzer( const Reference& moduleloader, const std::string& segmentername)
+	:m_moduleloader_impl(moduleloader)
 	,m_analyzer_impl(ReferenceDeleter<strus::DocumentAnalyzerInterface>::function)
 {
-	std::auto_ptr<strus::SegmenterInterface>
-		segmenter( strus::createSegmenter_textwolf());
-	std::auto_ptr<strus::TextProcessorInterface>
-		textproc( strus::createTextProcessor());
-
-	m_analyzer_impl.reset( strus::createDocumentAnalyzer( textproc.get(), segmenter.get()));
-	m_textproc_impl.reset( textproc.release());
-	(void)segmenter.release();
+	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	m_analyzer_impl.reset( moduleLoader->builder().createDocumentAnalyzer( segmentername));
 }
 
 DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
-	:m_textproc_impl(o.m_textproc_impl)
+	:m_moduleloader_impl(o.m_moduleloader_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 {}
 
@@ -324,18 +314,16 @@ Document DocumentAnalyzer::analyze( const std::string& content)
 }
 
 
-QueryAnalyzer::QueryAnalyzer()
-	:m_textproc_impl(ReferenceDeleter<strus::TextProcessorInterface>::function)
+QueryAnalyzer::QueryAnalyzer( const Reference& moduleloader)
+	:m_moduleloader_impl(moduleloader)
 	,m_analyzer_impl(ReferenceDeleter<strus::QueryAnalyzerInterface>::function)
 {
-	std::auto_ptr<strus::TextProcessorInterface> textproc( strus::createTextProcessor());
-
-	m_analyzer_impl.reset( strus::createQueryAnalyzer( textproc.get()));
-	m_textproc_impl.reset( textproc.release());
+	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	m_analyzer_impl.reset( moduleLoader->builder().createQueryAnalyzer());
 }
 
 QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
-	:m_textproc_impl(o.m_textproc_impl)
+	:m_moduleloader_impl(o.m_moduleloader_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 {}
 
@@ -370,42 +358,18 @@ std::vector<Term> QueryAnalyzer::analyzePhrase(
 }
 
 
-Storage::Storage( const std::string& config)
-	:m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
-	,m_queryproc_impl(ReferenceDeleter<strus::QueryProcessorInterface>::function)
+StorageClient::StorageClient( const Reference& moduleloader, const std::string& config_)
+	:m_moduleloader_impl( moduleloader)
+	,m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
-	const strus::DatabaseInterface* dbi = strus::getDatabase_leveldb();
-	const strus::StorageInterface* sti = strus::getStorage();
-
-	std::string databasecfg( config);
-	std::string storagecfg( config);
-
-	strus::removeKeysFromConfigString(
-			databasecfg,
-			sti->getConfigParameters( strus::StorageInterface::CmdCreateClient));
-	//... In database_cfg is now the pure database configuration without the storage settings
-
-	strus::removeKeysFromConfigString(
-			storagecfg,
-			dbi->getConfigParameters( strus::DatabaseInterface::CmdCreateClient));
-	//... In storage_cfg is now the pure storage configuration without the database settings
-
-	std::auto_ptr<strus::DatabaseClientInterface>
-		database( dbi->createClient( databasecfg));
-	std::auto_ptr<strus::StorageClientInterface>
-		storage( sti->createClient( storagecfg, database.get()));
-	(void)database.release();
-	std::auto_ptr<strus::QueryProcessorInterface>
-		queryproc( strus::createQueryProcessor( storage.get()));
-
-	m_storage_impl.reset( storage.release());
-	m_queryproc_impl.reset( queryproc.release());
+	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	m_storage_impl.reset( moduleLoader->builder().createStorageClient( config_));
 }
 
-Storage::Storage( const Storage& o)
-	:m_storage_impl(o.m_storage_impl)
-	,m_queryproc_impl(o.m_queryproc_impl)
+StorageClient::StorageClient( const StorageClient& o)
+	:m_moduleloader_impl(o.m_moduleloader_impl)
+	,m_storage_impl(o.m_storage_impl)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
 	if (o.m_transaction_impl.get())
@@ -414,13 +378,13 @@ Storage::Storage( const Storage& o)
 	}
 }
 
-GlobalCounter Storage::nofDocumentsInserted() const
+GlobalCounter StorageClient::nofDocumentsInserted() const
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	return THIS->globalNofDocumentsInserted();
 }
 
-void Storage::insertDocument( const std::string& docid, const Document& doc)
+void StorageClient::insertDocument( const std::string& docid, const Document& doc)
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -463,7 +427,7 @@ void Storage::insertDocument( const std::string& docid, const Document& doc)
 	document->done();
 }
 
-void Storage::deleteDocument( const std::string& docId)
+void StorageClient::deleteDocument( const std::string& docId)
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -474,7 +438,7 @@ void Storage::deleteDocument( const std::string& docId)
 	transaction->deleteDocument( docId);
 }
 
-void Storage::deleteUserAccessRights( const std::string& username)
+void StorageClient::deleteUserAccessRights( const std::string& username)
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -485,63 +449,32 @@ void Storage::deleteUserAccessRights( const std::string& username)
 	transaction->deleteUserAccessRights( username);
 }
 
-void Storage::flush()
+void StorageClient::flush()
 {
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
-	transaction->commit();
-	m_transaction_impl.reset();
+	if (transaction)
+	{
+		transaction->commit();
+		m_transaction_impl.reset();
+	}
 }
 
-void Storage::create( const char* config)
-{
-	const strus::DatabaseInterface* dbi = strus::getDatabase_leveldb();
-	const strus::StorageInterface* sti = strus::getStorage();
-
-	std::string databasecfg( config);
-	std::string storagecfg( config);
-
-	strus::removeKeysFromConfigString(
-			databasecfg,
-			sti->getConfigParameters( strus::StorageInterface::CmdCreateClient));
-	//... In database_cfg is now the pure database configuration without the storage settings
-
-	strus::removeKeysFromConfigString(
-			storagecfg,
-			dbi->getConfigParameters( strus::DatabaseInterface::CmdCreateClient));
-	//... In storage_cfg is now the pure storage configuration without the database settings
-
-	dbi->createDatabase( databasecfg);
-
-	std::auto_ptr<strus::DatabaseClientInterface>
-		database( dbi->createClient( databasecfg));
-
-	sti->createStorage( storagecfg, database.get());
-}
-
-void Storage::destroy( const char* config)
-{
-	const strus::DatabaseInterface* dbi = strus::getDatabase_leveldb();
-	dbi->destroyDatabase( config);
-}
-
-void Storage::close()
+void StorageClient::close()
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	THIS->close();
 }
 
-
-QueryEval::QueryEval( const Storage& storage)
-	:m_storage_impl(storage.m_storage_impl)
-	,m_queryproc_impl(storage.m_queryproc_impl)
+QueryEval::QueryEval( const Reference& moduleloader)
+	:m_moduleloader_impl(moduleloader)
 	,m_queryeval_impl(ReferenceDeleter<strus::QueryEvalInterface>::function)
 {
-	m_queryeval_impl.reset( strus::createQueryEval( (strus::QueryProcessorInterface*)m_queryproc_impl.get()));
+	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	m_queryeval_impl.reset( moduleLoader->builder().createQueryEval());
 }
 
 QueryEval::QueryEval( const QueryEval& o)
-	:m_storage_impl(o.m_storage_impl)
-	,m_queryproc_impl(o.m_queryproc_impl)
+	:m_moduleloader_impl(o.m_moduleloader_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 {}
 
@@ -615,10 +548,10 @@ void QueryEval::defineWeightingFunction(
 }
 
 
-Query::Query( const QueryEval& queryeval)
-	:m_storage_impl(queryeval.m_storage_impl)
+Query::Query( const QueryEval& queryeval, const StorageClient& storage)
+	:m_moduleloader_impl(queryeval.m_moduleloader_impl)
+	,m_storage_impl(storage.m_storage_impl)
 	,m_queryeval_impl(queryeval.m_queryeval_impl)
-	,m_queryproc_impl(queryeval.m_queryproc_impl)
 	,m_query_impl( ReferenceDeleter<strus::QueryInterface>::function)
 {
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -627,9 +560,9 @@ Query::Query( const QueryEval& queryeval)
 }
 
 Query::Query( const Query& o)
-	:m_storage_impl(o.m_storage_impl)
+	:m_moduleloader_impl(o.m_moduleloader_impl)
+	,m_storage_impl(o.m_storage_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
-	,m_queryproc_impl(o.m_queryproc_impl)
 	,m_query_impl(o.m_query_impl)
 {}
 
@@ -739,6 +672,85 @@ std::vector<Rank> Query::evaluate() const
 		rt.push_back( reselem);
 	}
 	return rt;
+}
+
+
+StrusContext::StrusContext()
+	:m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+{
+	m_moduleloader_impl.reset( strus::createModuleLoader());
+}
+
+StrusContext::StrusContext( const StrusContext& o)
+	:m_moduleloader_impl(o.m_moduleloader_impl)
+{}
+
+void StrusContext::loadModule( const std::string& name_)
+{
+	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	moduleLoader->loadModule( name_);
+}
+
+void StrusContext::setPath( const std::string& paths_)
+{
+	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	moduleLoader->addModulePath( paths_);
+}
+
+StorageClient StrusContext::createStorageClient( const std::string& config_)
+{
+	return StorageClient( m_moduleloader_impl, config_);
+}
+
+DocumentAnalyzer StrusContext::createDocumentAnalyzer( const std::string& segmentername_)
+{
+	return DocumentAnalyzer( m_moduleloader_impl, segmentername_);
+}
+
+QueryAnalyzer StrusContext::createQueryAnalyzer()
+{
+	return QueryAnalyzer( m_moduleloader_impl);
+}
+
+QueryEval StrusContext::createQueryEval()
+{
+	return QueryEval( m_moduleloader_impl);
+}
+
+void StrusContext::createStorage( const char* config)
+{
+	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config);
+	const strus::StorageInterface* sti = moduleLoader->builder().getStorage();
+
+	std::string dbname;
+	std::string databasecfg( config);
+	(void)strus::extractStringFromConfigString( dbname, databasecfg, "database");
+	std::string storagecfg( databasecfg);
+
+	strus::removeKeysFromConfigString(
+			databasecfg,
+			sti->getConfigParameters( strus::StorageInterface::CmdCreateClient));
+	//... In database_cfg is now the pure database configuration without the storage settings
+
+	strus::removeKeysFromConfigString(
+			storagecfg,
+			dbi->getConfigParameters( strus::DatabaseInterface::CmdCreateClient));
+	//... In storage_cfg is now the pure storage configuration without the database settings
+
+	dbi->createDatabase( databasecfg);
+
+	std::auto_ptr<strus::DatabaseClientInterface>
+		database( dbi->createClient( databasecfg));
+
+	sti->createStorage( storagecfg, database.get());
+}
+
+void StrusContext::destroyStorage( const char* config)
+{
+	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config);
+	dbi->destroyDatabase( config);
 }
 
 
