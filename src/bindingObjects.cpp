@@ -33,6 +33,7 @@
 #include "strus/objectBuilderInterface.hpp"
 #include "strus/private/arithmeticVariantAsString.hpp"
 #include "strus/private/configParser.hpp"
+#include "utils.hpp"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
@@ -183,28 +184,57 @@ DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
 	,m_analyzer_impl(o.m_analyzer_impl)
 {}
 
+
+static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
+	const std::vector<std::string>& options)
+{
+	strus::DocumentAnalyzerInterface::FeatureOptions rt;
+	std::vector<std::string>::const_iterator
+		oi = options.begin(), oe = options.end();
+	for (; oi != oe; ++oi)
+	{
+		if (strus::utils::caseInsensitiveEquals( *oi, "BindPosSucc"))
+		{
+			rt.definePositionBind( strus::DocumentAnalyzerInterface::FeatureOptions::BindSuccessor);
+		}
+		else if (strus::utils::caseInsensitiveEquals( *oi, "BindPosPred"))
+		{
+			rt.definePositionBind( strus::DocumentAnalyzerInterface::FeatureOptions::BindPredecessor);
+		}
+		else
+		{
+			throw std::runtime_error( std::string( "unknown feature option '") + *oi + "'");
+		}
+	}
+	return rt;
+}
+
 void DocumentAnalyzer::addSearchIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
 	const FunctionDef& tokenizer,
-	const FunctionDef& normalizer)
+	const FunctionDef& normalizer,
+	const std::vector<std::string>& options)
 {
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeature(
 		type, selectexpr,
 		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), 
-		strus::NormalizerConfig( normalizer.name(), normalizer.arguments()));
+		strus::NormalizerConfig( normalizer.name(), normalizer.arguments()),
+		getFeatureOptions( options));
 }
 
 void DocumentAnalyzer::addForwardIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
 	const FunctionDef& tokenizer,
-	const FunctionDef& normalizer)
+	const FunctionDef& normalizer,
+	const std::vector<std::string>& options)
 {
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeature(
 		type, selectexpr,
 		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), 
-		strus::NormalizerConfig( normalizer.name(), normalizer.arguments()));
+		strus::NormalizerConfig( normalizer.name(), normalizer.arguments()),
+		getFeatureOptions( options));
 }
 
 void DocumentAnalyzer::defineMetaData(

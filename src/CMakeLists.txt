@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # --------------------------------------
 set( source_files
 	bindingObjects.cpp
+	utils.cpp
 )
 
 include_directories( "${Boost_INCLUDE_DIRS}"  "${PROJECT_SOURCE_DIR}/include"  "${strus_INCLUDE_DIRS}"  "${strusanalyzer_INCLUDE_DIRS}" )

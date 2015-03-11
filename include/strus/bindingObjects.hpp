@@ -293,22 +293,26 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] tokenizer normalizer function description to use for this feature
+	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	void addSearchIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
 		const FunctionDef& tokenizer,
-		const FunctionDef& normalizer);
+		const FunctionDef& normalizer,
+		const std::vector<std::string>& options=std::vector<std::string>());
 
 	/// \brief Define how a feature to insert into the forward index (summarization) is selected, tokenized and normalized
 	/// \param[in] type type of the features produced
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] tokenizer normalizer function description to use for this feature
+	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	void addForwardIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
 		const FunctionDef& tokenizer,
-		const FunctionDef& normalizer);
+		const FunctionDef& normalizer,
+		const std::vector<std::string>& options=std::vector<std::string>());
 
 	/// \brief Define how a feature to insert as meta data (summarization) is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
