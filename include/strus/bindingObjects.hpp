@@ -110,56 +110,20 @@ private:
 class NormalizerConfig
 {
 public:
-	NormalizerConfig( const NormalizerConfig& o)
-		:m_name(o.m_name),m_arguments(o.m_arguments),m_input(o.m_input?(new NormalizerConfig(*o.m_input)):0){}
-	NormalizerConfig( const std::string& name_, const std::string& arg1)
-		:m_name(name_),m_input(0)
-	{
-		m_arguments.push_back( arg1);
-	}
-	NormalizerConfig( const std::string& name_, const std::string& arg1, const std::string& arg2)
-		:m_name(name_),m_input(0)
-	{
-		m_arguments.push_back( arg1);
-		m_arguments.push_back( arg2);
-	}
-	NormalizerConfig( const std::string& name_)
-		:m_name(name_),m_arguments(),m_input(0){}
-	~NormalizerConfig()
-	{
-		if (m_input) delete m_input;
-	}
+	NormalizerConfig( const NormalizerConfig& o);
+	NormalizerConfig( const std::string& name_, const std::string& arg1);
+	NormalizerConfig( const std::string& name_, const std::string& arg1, const std::string& arg2);
+	NormalizerConfig( const std::string& name_);
+	~NormalizerConfig();
 
-	const std::string& name() const				{return m_name;}
-	const std::vector<std::string>& arguments() const	{return m_arguments;}
-	const NormalizerConfig* input() const			{return m_input;}
-
-	NormalizerConfig& operator()( const std::string& name_, const std::string& arg1)
-	{
-		NormalizerConfig* ni = this;
-		for (;ni->m_input; ni = ni->m_input){}
-		ni->m_input = new NormalizerConfig( name_, arg1);
-		return *this;
-	}
-	NormalizerConfig& operator()( const std::string& name_, const std::string& arg1, const std::string& arg2)
-	{
-		NormalizerConfig* ni = this;
-		for (;ni->m_input; ni = ni->m_input){}
-		ni->m_input = new NormalizerConfig( name_, arg1, arg2);
-		return *this;
-	}
-	NormalizerConfig& operator()( const std::string& name_)
-	{
-		NormalizerConfig* ni = this;
-		for (;ni->m_input; ni = ni->m_input){}
-		ni->m_input = new NormalizerConfig( name_);
-		return *this;
-	}
+	NormalizerConfig& operator()( const std::string& name_, const std::string& arg1);
+	NormalizerConfig& operator()( const std::string& name_, const std::string& arg1, const std::string& arg2);
+	NormalizerConfig& operator()( const std::string& name_);
 
 private:
-	std::string m_name;
-	std::vector<std::string> m_arguments;
-	NormalizerConfig* m_input;
+	friend class QueryAnalyzer;
+	friend class DocumentAnalyzer;
+	void* m_impl;
 };
 
 
