@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 include_directories( "${Boost_INCLUDE_DIRS}"  "${PROJECT_SOURCE_DIR}/include"  "${strus_INCLUDE_DIRS}" "${strusanalyzer_INCLUDE_DIRS}" )
 link_directories( "${Boost_LIBRARY_DIRS}" "${PROJECT_SOURCE_DIR}/src"  "${strus_LIBRARY_DIRS}"  "${strusanalyzer_LIBRARY_DIRS}" )
