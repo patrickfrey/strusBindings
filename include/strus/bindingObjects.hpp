@@ -519,17 +519,17 @@ public:
 	/// \brief Declare a feature set to be used as restriction
 	void addRestrictionFeature( const std::string& set_);
 
-	/// \brief Declare a feature set to be used for weighting
-	void addWeightingFeature( const std::string& set_);
-
 	/// \brief Declare a summarizer
 	void addSummarizer(
 			const std::string& resultAttribute,
 			const Summarizer& summarizer);
 
-	/// \brief Declare the weighting function used
-	void defineWeightingFunction(
-			const WeightingFunction& weightingFunction);
+	/// \brief Add a weighting function to use as summand of the document weight
+	/// \param[in] weightingFunction the function to add
+	/// \param[in] weightingFeatureSets the sets of features to use for weighting with the function declared
+	void addWeightingFunction(
+			const WeightingFunction& weightingFunction,
+			const std::vector<std::string>& weightingFeatureSets);
 
 private:
 	/// \brief Constructor used by strusContext

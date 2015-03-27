@@ -595,12 +595,6 @@ void QueryEval::addRestrictionFeature( const std::string& set_)
 	queryeval->addRestrictionFeature( set_);
 }
 
-void QueryEval::addWeightingFeature( const std::string& set_)
-{
-	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
-	queryeval->addWeightingFeature( set_);
-}
-
 void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
 		const Summarizer& summarizer)
@@ -629,8 +623,9 @@ void QueryEval::addSummarizer(
 	queryeval->addSummarizer( resultAttribute, summarizer.m_name, config);
 }
 
-void QueryEval::defineWeightingFunction(
-		const WeightingFunction& weightingFunction)
+void QueryEval::addWeightingFunction(
+		const WeightingFunction& weightingFunction,
+		const std::vector<std::string>& weightingFeatureSets)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	strus::WeightingConfig config;
@@ -640,7 +635,7 @@ void QueryEval::defineWeightingFunction(
 	{
 		config.defineNumericParameter( pi->first, arithmeticVariant( pi->second));
 	}
-	queryeval->setWeighting( weightingFunction.m_name, config);
+	queryeval->addWeightingFunction( weightingFunction.m_name, config, weightingFeatureSets);
 }
 
 
