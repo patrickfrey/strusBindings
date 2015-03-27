@@ -50,72 +50,6 @@ struct ReferenceDeleter
 	}
 };
 
-typedef std::vector<strus::NormalizerConfig> NormalizerConfigListImpl;
-NormalizerConfig::NormalizerConfig( const NormalizerConfig& o)
-{
-	m_impl = (void*)new NormalizerConfigListImpl( *(NormalizerConfigListImpl*)o.m_impl);
-}
-
-NormalizerConfig::NormalizerConfig( const std::string& name_, const std::string& arg1)
-{
-	NormalizerConfigListImpl* THIS = new NormalizerConfigListImpl();
-	m_impl = (void*)THIS;
-	std::vector<std::string> args;
-	args.push_back( arg1);
-	THIS->push_back( strus::NormalizerConfig( name_, args));
-}
-
-NormalizerConfig::NormalizerConfig( const std::string& name_, const std::string& arg1, const std::string& arg2)
-{
-	NormalizerConfigListImpl* THIS = new NormalizerConfigListImpl();
-	m_impl = (void*)THIS;
-	std::vector<std::string> args;
-	args.push_back( arg1);
-	args.push_back( arg2);
-	THIS->push_back( strus::NormalizerConfig( name_, args));
-}
-
-NormalizerConfig::NormalizerConfig( const std::string& name_)
-{
-	NormalizerConfigListImpl* THIS = new NormalizerConfigListImpl();
-	m_impl = (void*)THIS;
-	std::vector<std::string> args;
-	THIS->push_back( strus::NormalizerConfig( name_, args));
-}
-
-NormalizerConfig::~NormalizerConfig()
-{
-	delete (NormalizerConfigListImpl*)m_impl;
-}
-
-NormalizerConfig& NormalizerConfig::operator()( const std::string& name_, const std::string& arg1)
-{
-	NormalizerConfigListImpl* THIS = (NormalizerConfigListImpl*)m_impl;
-	std::vector<std::string> args;
-	args.push_back( arg1);
-	THIS->insert( THIS->begin(), strus::NormalizerConfig( name_, args));
-	return *this;
-}
-
-NormalizerConfig& NormalizerConfig::operator()( const std::string& name_, const std::string& arg1, const std::string& arg2)
-{
-	NormalizerConfigListImpl* THIS = (NormalizerConfigListImpl*)m_impl;
-	std::vector<std::string> args;
-	args.push_back( arg1);
-	args.push_back( arg2);
-	THIS->insert( THIS->begin(), strus::NormalizerConfig( name_, args));
-	return *this;
-}
-
-NormalizerConfig& NormalizerConfig::operator()( const std::string& name_)
-{
-	NormalizerConfigListImpl* THIS = (NormalizerConfigListImpl*)m_impl;
-	std::vector<std::string> args;
-	THIS->insert( THIS->begin(), strus::NormalizerConfig( name_, args));
-	return *this;
-}
-
-
 Variant::Variant()
 	:m_type(UNDEFINED){}
 
@@ -275,56 +209,69 @@ static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
 	return rt;
 }
 
+static std::vector<strus::NormalizerConfig> getNormalizers(
+		const std::vector<Normalizer>& normalizers)
+{
+	std::vector<strus::NormalizerConfig> rt;
+	std::vector<Normalizer>::const_iterator
+		ni = normalizers.begin(), ne = normalizers.end();
+	for (;ni != ne; ++ni)
+	{
+		rt.push_back( strus::NormalizerConfig( ni->name(), ne->arguments()));
+	}
+	return rt;
+}
+
 void DocumentAnalyzer::addSearchIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
-	const TokenizerConfig& tokenizer,
-	const NormalizerConfig& normalizer,
+	const Tokenizer& tokenizer,
+	const std::vector<Normalizer>& normalizers,
 	const std::vector<std::string>& options)
 {
-	NormalizerConfigListImpl* nl = (NormalizerConfigListImpl*)normalizer.m_impl;
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeature(
 		type, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), 
-		*nl, getFeatureOptions( options));
+		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
+		getNormalizers( normalizers),
+		getFeatureOptions( options));
 }
 
 void DocumentAnalyzer::addForwardIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
-	const TokenizerConfig& tokenizer,
-	const NormalizerConfig& normalizer,
+	const Tokenizer& tokenizer,
+	const std::vector<Normalizer>& normalizers,
 	const std::vector<std::string>& options)
 {
-	NormalizerConfigListImpl* nl = (NormalizerConfigListImpl*)normalizer.m_impl;
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeature(
 		type, selectexpr,
 		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), 
-		*nl, getFeatureOptions( options));
+		getNormalizers( normalizers),
+		getFeatureOptions( options));
 }
 
 void DocumentAnalyzer::defineMetaData(
 	const std::string& fieldname,
 	const std::string& selectexpr,
-	const TokenizerConfig& tokenizer,
-	const NormalizerConfig& normalizer)
+	const Tokenizer& tokenizer,
+	const std::vector<Normalizer>& normalizers)
 {
-	NormalizerConfigListImpl* nl = (NormalizerConfigListImpl*)normalizer.m_impl;
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaData(
 		fieldname, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), *nl);
+		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
+		getNormalizers( normalizers));
 }
 
 void DocumentAnalyzer::defineAttribute(
 	const std::string& attribname,
 	const std::string& selectexpr,
-	const TokenizerConfig& tokenizer,
-	const NormalizerConfig& normalizer)
+	const Tokenizer& tokenizer,
+	const std::vector<Normalizer>& normalizers)
 {
-	NormalizerConfigListImpl* nl = (NormalizerConfigListImpl*)normalizer.m_impl;
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAttribute(
 		attribname, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), *nl);
+		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
+		getNormalizers( normalizers));
 }
 
 static Variant getNumericVariantFromString( const std::string& value)
@@ -426,14 +373,14 @@ QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
 void QueryAnalyzer::definePhraseType(
 		const std::string& phraseType,
 		const std::string& featureType,
-		const TokenizerConfig& tokenizer,
-		const NormalizerConfig& normalizer)
+		const Tokenizer& tokenizer,
+		const std::vector<Normalizer>& normalizers)
 {
-	NormalizerConfigListImpl* nl = (NormalizerConfigListImpl*)normalizer.m_impl;
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	THIS->definePhraseType(
 		phraseType, featureType,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), *nl);
+		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
+		getNormalizers(normalizers));
 }
 
 std::vector<Term> QueryAnalyzer::analyzePhrase(

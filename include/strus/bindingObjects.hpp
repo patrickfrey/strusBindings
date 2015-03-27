@@ -78,23 +78,23 @@ private:
 
 
 /// \brief Object representing a tokenizer function definition
-class TokenizerConfig
+class Tokenizer
 {
 public:
-	TokenizerConfig( const TokenizerConfig& o)
+	Tokenizer( const Tokenizer& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	TokenizerConfig( const std::string& name_, const std::string& arg1)
+	Tokenizer( const std::string& name_, const std::string& arg1)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg1);
 	}
-	TokenizerConfig( const std::string& name_, const std::string& arg1, const std::string& arg2)
+	Tokenizer( const std::string& name_, const std::string& arg1, const std::string& arg2)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg1);
 		m_arguments.push_back( arg2);
 	}
-	TokenizerConfig( const std::string& name_)
+	Tokenizer( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
 	const std::string& name() const				{return m_name;}
@@ -107,23 +107,39 @@ private:
 
 
 /// \brief Object representing a normalizer function definition
-class NormalizerConfig
+class Normalizer
 {
 public:
-	NormalizerConfig( const NormalizerConfig& o);
-	NormalizerConfig( const std::string& name_, const std::string& arg1);
-	NormalizerConfig( const std::string& name_, const std::string& arg1, const std::string& arg2);
-	NormalizerConfig( const std::string& name_);
-	~NormalizerConfig();
+	Normalizer( const Normalizer& o)
+		:m_name(o.m_name),m_arguments(o.m_arguments){}
 
-	NormalizerConfig& operator()( const std::string& name_, const std::string& arg1);
-	NormalizerConfig& operator()( const std::string& name_, const std::string& arg1, const std::string& arg2);
-	NormalizerConfig& operator()( const std::string& name_);
+	Normalizer( const std::string& name_, const std::string& arg1)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg1);
+	}
+
+	Normalizer( const std::string& name_, const std::string& arg1, const std::string& arg2)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg1);
+		m_arguments.push_back( arg2);
+	}
+
+	Normalizer( const std::string& name_)
+		:m_name(name_),m_arguments(){}
+
+	~Normalizer();
+
+	const std::string& name() const				{return m_name;}
+	const std::vector<std::string>& arguments() const	{return m_arguments;}
 
 private:
 	friend class QueryAnalyzer;
 	friend class DocumentAnalyzer;
-	void* m_impl;
+
+	std::string m_name;
+	std::vector<std::string> m_arguments;
 };
 
 
@@ -314,49 +330,49 @@ public:
 	/// \param[in] type type of the features produced
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] tokenizer normalizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	void addSearchIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
-		const TokenizerConfig& tokenizer,
-		const NormalizerConfig& normalizer,
+		const Tokenizer& tokenizer,
+		const std::vector<Normalizer>& normalizers,
 		const std::vector<std::string>& options=std::vector<std::string>());
 
 	/// \brief Define how a feature to insert into the forward index (summarization) is selected, tokenized and normalized
 	/// \param[in] type type of the features produced
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] tokenizer normalizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	void addForwardIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,
-		const TokenizerConfig& tokenizer,
-		const NormalizerConfig& normalizer,
+		const Tokenizer& tokenizer,
+		const std::vector<Normalizer>& normalizers,
 		const std::vector<std::string>& options=std::vector<std::string>());
 
 	/// \brief Define how a feature to insert as meta data (summarization) is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] tokenizer normalizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	void defineMetaData(
 		const std::string& fieldname,
 		const std::string& selectexpr,
-		const TokenizerConfig& tokenizer,
-		const NormalizerConfig& normalizer);
+		const Tokenizer& tokenizer,
+		const std::vector<Normalizer>& normalizers);
 
 	/// \brief Define how a feature to insert as document attribute (summarization) is selected, tokenized and normalized
-	void defineAttribute(
-		const std::string& attribname,
-		const std::string& selectexpr,
-		const TokenizerConfig& tokenizer,
-		const NormalizerConfig& normalizer);
 	/// \param[in] attribname name of the addressed attribute.
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] tokenizer normalizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	void defineAttribute(
+		const std::string& attribname,
+		const std::string& selectexpr,
+		const Tokenizer& tokenizer,
+		const std::vector<Normalizer>& normalizers);
 
 	/// \brief Analye the content and return the set of features to insert
 	Document analyze( const std::string& content);
@@ -386,13 +402,19 @@ public:
 
 	/// \brief Defines a phrase type by name. Phrases can be passed together with this name
 	///		to the query analyzer to get the terms for building query.
+	/// \param[in] phraseType name of the phrase type defined
+	/// \param[in] featureType feature type name assigned to the features created by this phrase type
+	/// \param[in] tokenizer tokenizer function description to use for the features of this phrase type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this phrase type in the ascending order of appearance
 	void definePhraseType(
 			const std::string& phraseType,
 			const std::string& featureType,
-			const TokenizerConfig& tokenizer,
-			const NormalizerConfig& normalizer);
+			const Tokenizer& tokenizer,
+			const std::vector<Normalizer>& normalizers);
 
 	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
+	/// \param[in] phraseType name of the phrase type to use for analysis
+	/// \param[in] phraseContent content string of the query phrase to analyze
 	std::vector<Term> analyzePhrase(
 			const std::string& phraseType,
 			const std::string& phraseContent) const;

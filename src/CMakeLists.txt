@@ -9,7 +9,7 @@ set( source_files
 )
 
 include_directories( "${Boost_INCLUDE_DIRS}"  "${PROJECT_SOURCE_DIR}/include"  "${strus_INCLUDE_DIRS}"  "${strusanalyzer_INCLUDE_DIRS}" )
-link_directories( "${Boost_LIBRARY_DIRS}"  "${strus_LIBRARY_DIRS}" "${strusanalyzer_LIBRARY_DIRS}" )
+link_directories( "${Boost_LIBRARY_DIRS}" )
 
 
 add_library( strus_bindings SHARED ${source_files} )
