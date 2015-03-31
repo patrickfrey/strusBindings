@@ -14,12 +14,11 @@ add_custom_command(
 	OUTPUT strus_wrap.cpp
 	PRE_BUILD
 	COMMAND  swig -php -c++ -outdir ${PROJECT_SOURCE_DIR}/swig ${PROJECT_SOURCE_DIR}/swig/strus.i
-	COMMAND  mv  "${PROJECT_SOURCE_DIR}/swig/strus_wrap.cpp"  ./
 	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/swig/php"
 	COMMENT "build PHP5 bindings" VERBATIM
 	DEPENDS  ${PROJECT_SOURCE_DIR}/swig/strus.i )
 
-add_library( strus_php SHARED strus_wrap.cpp )
+add_library( strus_php SHARED ${PROJECT_SOURCE_DIR}/swig/strus_wrap.cpp )
 target_link_libraries( strus_php strus_bindings )
 
 set_target_properties(
