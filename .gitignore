@@ -48,12 +48,9 @@ tests/query_cpp/src/testQuery
 tests/query_cpp/data/
 
 # SWIG generated code
-swig/gen/
 swig/strusPYTHON_wrap.cxx
-swig/php_strus.h
-swig/strus.php
 swig/strus_wrap.c
 swig/strus_wrap.cpp
-
-
+swig/php/php_strus.h
+swig/php/strus.php
 
