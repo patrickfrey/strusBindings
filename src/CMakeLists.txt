@@ -8,12 +8,12 @@ set( source_files
 	utils.cpp
 )
 
-include_directories( "${Boost_INCLUDE_DIRS}"  "${PROJECT_SOURCE_DIR}/include"  "${strus_INCLUDE_DIRS}"  "${strusanalyzer_INCLUDE_DIRS}" )
-link_directories( "${Boost_LIBRARY_DIRS}" )
+include_directories( "${PROJECT_SOURCE_DIR}/include"  "${strus_INCLUDE_DIRS}"  "${strusanalyzer_INCLUDE_DIRS}"  "${strusmodule_INCLUDE_DIRS}"  )
+link_directories( "${strusmodule_LIBRARY_DIRS}" )
 
 
 add_library( strus_bindings SHARED ${source_files} )
-target_link_libraries( strus_bindings "${Boost_LIBRARIES}"  "${strus_LIBRARIES}" "${strusanalyzer_LIBRARIES}" )
+target_link_libraries( strus_bindings "${strusmodule_LIBRARIES}"  )
 set_target_properties(
     strus_bindings
     PROPERTIES
@@ -26,5 +26,5 @@ set_target_properties(
 # INSTALLATION
 # ------------------------------
 install( TARGETS strus_bindings
-           LIBRARY DESTINATION lib/strus )
+           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus )
 

@@ -50,7 +50,7 @@ tests/query_cpp/data/
 # SWIG generated code
 swig/strusPYTHON_wrap.cxx
 swig/strus_wrap.c
-swig/strus_wrap.cpp
-swig/php_strus.h
+swig/php/strus_wrap.cpp
+swig/php/php_strus.h
 swig/strus.php
-
+	

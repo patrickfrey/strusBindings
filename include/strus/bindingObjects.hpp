@@ -36,6 +36,10 @@
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
 
+/// \brief Bindings namespace
+/// \note Do not to mistake Strus (bindings namespace) for strus (core library namespace) !
+namespace Strus
+{
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
 class Reference
 {
@@ -129,7 +133,7 @@ public:
 	Normalizer( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
-	~Normalizer();
+	~Normalizer(){}
 
 	const std::string& name() const				{return m_name;}
 	const std::vector<std::string>& arguments() const	{return m_arguments;}
@@ -714,6 +718,7 @@ public:
 private:
 	Reference m_moduleloader_impl;
 };
+}//namespace
 
 #endif
 
