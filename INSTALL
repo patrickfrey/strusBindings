@@ -1,1 +1,7 @@
 cmake CMakeLists.txt; make; sudo make install
+
+PHP:
+Define "extension strus_php.so" in your php.ini.
+Copy the shared object files and solinks strus_php.so* into the php extension directory (`php-config5 --extension-dir`)
+Copy the script swig/strus.php to /usr/share/php/
+

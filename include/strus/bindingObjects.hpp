@@ -36,10 +36,6 @@
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
 
-/// \brief Bindings namespace
-/// \note Do not to mistake Strus (bindings namespace) for strus (core library namespace) !
-namespace Strus
-{
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
 class Reference
 {
@@ -163,7 +159,6 @@ public:
 	Variant( int v);
 	Variant( float v);
 	Variant( double v);
-	Variant( const char* v);
 	Variant( const std::string& v);
 
 	bool defined() const			{return m_type != UNDEFINED;}
@@ -699,11 +694,11 @@ public:
 
 	/// \brief Create a new storage (physically) described by config
 	/// \remark Fails if the storage already exists
-	void createStorage( const char* config);
+	void createStorage( const std::string& config_);
 
 	/// \brief Delete the storage (physically) described by config
 	/// \note Handle this function carefully
-	void destroyStorage( const char* config);
+	void destroyStorage( const std::string& config_);
 
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
@@ -718,7 +713,6 @@ public:
 private:
 	Reference m_moduleloader_impl;
 };
-}//namespace
 
 #endif
 

@@ -42,8 +42,6 @@
 #include <cstdlib>
 #include <limits>
 
-using namespace Strus;
-
 template <class Object>
 struct ReferenceDeleter
 {
@@ -91,12 +89,6 @@ DLL_PUBLIC Variant::Variant( double v)
 	:m_type(FLOAT)
 {
 	m_value.FLOAT = (float)v;
-}
-
-DLL_PUBLIC Variant::Variant( const char* v)
-	:m_type(TEXT),m_buf(v)
-{
-	m_value.TEXT = m_buf.c_str();
 }
 
 DLL_PUBLIC Variant::Variant( const std::string& v)
@@ -758,14 +750,14 @@ DLL_PUBLIC QueryEval StrusContext::createQueryEval()
 	return QueryEval( m_moduleloader_impl);
 }
 
-DLL_PUBLIC void StrusContext::createStorage( const char* config)
+DLL_PUBLIC void StrusContext::createStorage( const std::string& config_)
 {
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config);
+	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config_);
 	const strus::StorageInterface* sti = moduleLoader->builder().getStorage();
 
 	std::string dbname;
-	std::string databasecfg( config);
+	std::string databasecfg( config_);
 	(void)strus::extractStringFromConfigString( dbname, databasecfg, "database");
 	std::string storagecfg( databasecfg);
 
@@ -787,11 +779,11 @@ DLL_PUBLIC void StrusContext::createStorage( const char* config)
 	sti->createStorage( storagecfg, database.get());
 }
 
-DLL_PUBLIC void StrusContext::destroyStorage( const char* config)
+DLL_PUBLIC void StrusContext::destroyStorage( const std::string& config_)
 {
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config);
-	dbi->destroyDatabase( config);
+	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config_);
+	dbi->destroyDatabase( config_);
 }
 
 

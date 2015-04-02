@@ -1,4 +1,8 @@
 %module strus
+%include "std_string.i"
+%include "std_vector.i"
+%apply const std::string& {std::string*};
+
 %{
 #include "../include/strus/bindingObjects.hpp"
 %}
