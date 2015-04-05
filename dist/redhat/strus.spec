@@ -1,4 +1,4 @@
-# Strus spec file
+# StrusBindings spec file
 
 # Set distribution based on some OpenSuse and distribution macros
 # this is only relevant when building on https://build.opensuse.org
@@ -124,7 +124,7 @@
 %define sles 1
 %endif
 
-Summary: Library implementing the loading of modules for a text search engine
+Summary: Language bindings for the strus text search engine
 Name: strusbindings
 Version: 0.0.1
 Release: 0.1
@@ -173,11 +173,11 @@ Packager: Patrick Frey <patrickpfrey@yahoo.com>
 Library implementing the loading of dynalically loadable of a text search engine.
 
 %package devel
-Summary: strus development files
+Summary: strus language bindings
 Group: Development/Libraries/C++
 
 %description devel
-The libraries and header files used for development with strus.
+Language bindings for the strus text search engine
 
 Requires: %{name} >= %{version}-%{release}
 
@@ -210,17 +210,13 @@ make test
 %files
 %defattr( -, root, root )
 %dir %{_libdir}/%{name}
-%{_libdir}/%{name}/libstrus_module.so.0.0
-%{_libdir}/%{name}/libstrus_module.so.0.0.1
+%{_libdir}/%{name}/libstrus_bindings.so.0.0
+%{_libdir}/%{name}/libstrus_bindings.so.0.0.1
 
 %files devel
-%{_libdir}/%{name}/libstrus_module.so
+%{_libdir}/%{name}/libstrus_bindings.so
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*.hpp
-%dir %{_includedir}/%{name}/lib
-%{_includedir}/%{name}/lib/*.hpp
-%dir %{_includedir}/%{name}/private
-%{_includedir}/%{name}/private/*.hpp
 
 %changelog
 * Fri Mar 20 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.0.1-0.1
