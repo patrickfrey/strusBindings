@@ -30,7 +30,8 @@
 #include "strus/strus.hpp"
 #include "strus/lib/module.hpp"
 #include "strus/moduleLoaderInterface.hpp"
-#include "strus/objectBuilderInterface.hpp"
+#include "strus/storageObjectBuilderInterface.hpp"
+#include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/private/arithmeticVariantAsString.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/dll_tags.hpp"
@@ -166,16 +167,16 @@ DLL_PUBLIC void Document::setUserAccessRight( const std::string& username_)
 	m_users.push_back( username_);
 }
 
-DLL_PUBLIC DocumentAnalyzer::DocumentAnalyzer( const Reference& moduleloader, const std::string& segmentername)
-	:m_moduleloader_impl(moduleloader)
+DLL_PUBLIC DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const std::string& segmentername)
+	:m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::DocumentAnalyzerInterface>::function)
 {
-	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	m_analyzer_impl.reset( moduleLoader->builder().createDocumentAnalyzer( segmentername));
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmentername));
 }
 
 DLL_PUBLIC DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
-	:m_moduleloader_impl(o.m_moduleloader_impl)
+	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 {}
 
@@ -352,16 +353,16 @@ DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
 }
 
 
-DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const Reference& moduleloader)
-	:m_moduleloader_impl(moduleloader)
+DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder)
+	:m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::QueryAnalyzerInterface>::function)
 {
-	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	m_analyzer_impl.reset( moduleLoader->builder().createQueryAnalyzer());
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	m_analyzer_impl.reset( objBuilder->createQueryAnalyzer());
 }
 
 DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
-	:m_moduleloader_impl(o.m_moduleloader_impl)
+	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 {}
 
@@ -396,17 +397,17 @@ DLL_PUBLIC std::vector<Term> QueryAnalyzer::analyzePhrase(
 }
 
 
-DLL_PUBLIC StorageClient::StorageClient( const Reference& moduleloader, const std::string& config_)
-	:m_moduleloader_impl( moduleloader)
+DLL_PUBLIC StorageClient::StorageClient( const Reference& objbuilder, const std::string& config_)
+	:m_objbuilder_impl( objbuilder)
 	,m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
-	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	m_storage_impl.reset( moduleLoader->builder().createStorageClient( config_));
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	m_storage_impl.reset( objBuilder->createStorageClient( config_));
 }
 
 DLL_PUBLIC StorageClient::StorageClient( const StorageClient& o)
-	:m_moduleloader_impl(o.m_moduleloader_impl)
+	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
@@ -503,16 +504,16 @@ DLL_PUBLIC void StorageClient::close()
 	THIS->close();
 }
 
-DLL_PUBLIC QueryEval::QueryEval( const Reference& moduleloader)
-	:m_moduleloader_impl(moduleloader)
+DLL_PUBLIC QueryEval::QueryEval( const Reference& objbuilder)
+	:m_objbuilder_impl(objbuilder)
 	,m_queryeval_impl(ReferenceDeleter<strus::QueryEvalInterface>::function)
 {
-	const strus::ModuleLoaderInterface* moduleLoader = (const strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	m_queryeval_impl.reset( moduleLoader->builder().createQueryEval());
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	m_queryeval_impl.reset( objBuilder->createQueryEval());
 }
 
 DLL_PUBLIC QueryEval::QueryEval( const QueryEval& o)
-	:m_moduleloader_impl(o.m_moduleloader_impl)
+	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 {}
 
@@ -582,7 +583,7 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 
 
 DLL_PUBLIC Query::Query( const QueryEval& queryeval, const StorageClient& storage)
-	:m_moduleloader_impl(queryeval.m_moduleloader_impl)
+	:m_objbuilder_impl(queryeval.m_objbuilder_impl)
 	,m_storage_impl(storage.m_storage_impl)
 	,m_queryeval_impl(queryeval.m_queryeval_impl)
 	,m_query_impl( ReferenceDeleter<strus::QueryInterface>::function)
@@ -593,7 +594,7 @@ DLL_PUBLIC Query::Query( const QueryEval& queryeval, const StorageClient& storag
 }
 
 DLL_PUBLIC Query::Query( const Query& o)
-	:m_moduleloader_impl(o.m_moduleloader_impl)
+	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 	,m_query_impl(o.m_query_impl)
@@ -710,51 +711,84 @@ DLL_PUBLIC std::vector<Rank> Query::evaluate() const
 
 DLL_PUBLIC StrusContext::StrusContext()
 	:m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
 	m_moduleloader_impl.reset( strus::createModuleLoader());
 }
 
 DLL_PUBLIC StrusContext::StrusContext( const StrusContext& o)
 	:m_moduleloader_impl(o.m_moduleloader_impl)
+	,m_storage_objbuilder_impl(o.m_storage_objbuilder_impl)
+	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
 {}
 
 DLL_PUBLIC void StrusContext::loadModule( const std::string& name_)
 {
+	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
+	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->loadModule( name_);
 }
 
 DLL_PUBLIC void StrusContext::setPath( const std::string& paths_)
 {
+	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to set the module search path after the first use of objects");
+	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to set the module search path after the first use of objects");
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->addModulePath( paths_);
 }
 
 DLL_PUBLIC StorageClient StrusContext::createStorageClient( const std::string& config_)
 {
-	return StorageClient( m_moduleloader_impl, config_);
+	if (!m_storage_objbuilder_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
+	}
+	return StorageClient( m_storage_objbuilder_impl, config_);
 }
 
 DLL_PUBLIC DocumentAnalyzer StrusContext::createDocumentAnalyzer( const std::string& segmentername_)
 {
-	return DocumentAnalyzer( m_moduleloader_impl, segmentername_);
+	if (!m_analyzer_objbuilder_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_analyzer_objbuilder_impl.reset( moduleLoader->createAnalyzerObjectBuilder());
+	}
+	return DocumentAnalyzer( m_analyzer_objbuilder_impl, segmentername_);
 }
 
 DLL_PUBLIC QueryAnalyzer StrusContext::createQueryAnalyzer()
 {
-	return QueryAnalyzer( m_moduleloader_impl);
+	if (!m_analyzer_objbuilder_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_analyzer_objbuilder_impl.reset( moduleLoader->createAnalyzerObjectBuilder());
+	}
+	return QueryAnalyzer( m_analyzer_objbuilder_impl);
 }
 
 DLL_PUBLIC QueryEval StrusContext::createQueryEval()
 {
-	return QueryEval( m_moduleloader_impl);
+	if (!m_storage_objbuilder_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
+	}
+	return QueryEval( m_storage_objbuilder_impl);
 }
 
 DLL_PUBLIC void StrusContext::createStorage( const std::string& config_)
 {
-	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config_);
-	const strus::StorageInterface* sti = moduleLoader->builder().getStorage();
+	if (!m_storage_objbuilder_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
+	}
+	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
+	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
+	const strus::StorageInterface* sti = objBuilder->getStorage();
 
 	std::string dbname;
 	std::string databasecfg( config_);
@@ -781,8 +815,13 @@ DLL_PUBLIC void StrusContext::createStorage( const std::string& config_)
 
 DLL_PUBLIC void StrusContext::destroyStorage( const std::string& config_)
 {
-	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	const strus::DatabaseInterface* dbi = moduleLoader->builder().getDatabase( config_);
+	if (!m_storage_objbuilder_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
+	}
+	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
+	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
 	dbi->destroyDatabase( config_);
 }
 

@@ -379,9 +379,9 @@ public:
 private:
 	/// \brief Constructor used by StrusContext
 	friend class StrusContext;
-	DocumentAnalyzer( const Reference& moduleloader, const std::string& segmentername);
+	DocumentAnalyzer( const Reference& objbuilder, const std::string& segmentername);
 
-	Reference m_moduleloader_impl;
+	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
 
@@ -421,9 +421,9 @@ public:
 private:
 	/// \brief Constructor used by StrusContext
 	friend class StrusContext;
-	explicit QueryAnalyzer( const Reference& moduleloader);
+	explicit QueryAnalyzer( const Reference& objbuilder);
 
-	Reference m_moduleloader_impl;
+	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
 
@@ -462,10 +462,10 @@ public:
 
 private:
 	friend class StrusContext;
-	StorageClient( const Reference& moduleloader, const std::string& config);
+	StorageClient( const Reference& objbuilder, const std::string& config);
 
 	friend class Query;
-	Reference m_moduleloader_impl;
+	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
 };
@@ -555,10 +555,10 @@ public:
 private:
 	/// \brief Constructor used by strusContext
 	friend class StrusContext;
-	explicit QueryEval( const Reference& moduleloader);
+	explicit QueryEval( const Reference& objbuilder);
 
 	friend class Query;
-	Reference m_moduleloader_impl;
+	Reference m_objbuilder_impl;
 	Reference m_queryeval_impl;
 };
 
@@ -664,7 +664,7 @@ public:
 	std::vector<Rank> evaluate() const;
 
 private:
-	Reference m_moduleloader_impl;
+	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
 	Reference m_query_impl;
@@ -712,6 +712,8 @@ public:
 
 private:
 	Reference m_moduleloader_impl;
+	Reference m_storage_objbuilder_impl;
+	Reference m_analyzer_objbuilder_impl;
 };
 
 #endif
