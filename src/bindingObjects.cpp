@@ -550,7 +550,7 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 	{
 		if (pi->second.m_type == Variant::TEXT)
 		{
-			config.defineTextualParameter( pi->first, pi->second.m_value.TEXT);
+			config.defineStringParameter( pi->first, pi->second.m_value.TEXT);
 		}
 		else
 		{
@@ -561,7 +561,7 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 		fi = summarizer.m_features.begin(), fe = summarizer.m_features.end();
 	for (; fi != fe; ++fi)
 	{
-		config.defineFeatureParameter( fi->first, fi->second);
+		config.addFeatureParameter( fi->first, fi->second);
 	}
 	queryeval->addSummarizer( resultAttribute, summarizer.m_name, config);
 }
