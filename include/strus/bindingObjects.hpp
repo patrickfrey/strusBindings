@@ -675,19 +675,29 @@ private:
 class StrusContext
 {
 public:
-	/// \brief Constructor
+	/// \brief Constructor for local mode with own module loader
 	StrusContext();
+	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
+	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
+	StrusContext( const char* connectionstring);
 	/// \brief Copy constructor
 	StrusContext( const StrusContext& o);
 	/// \brief Destructor
 	~StrusContext(){}
 
 	/// \brief Load a module
+	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void loadModule( const std::string& name_);
 
-	/// \brief Load a module
+	/// \brief Define where to load modules from
 	/// \param[in] paths semicolon separated list of module search paths
-	void setPath( const std::string& paths_);
+	/// \remark Only implemented in local mode with own module loader (see constructors)
+	void addModulePath( const std::string& paths_);
+
+	/// \brief Define where to load analyzer resource files from
+	/// \param[in] paths semicolon separated list of module search paths
+	/// \remark Only implemented in local mode with own module loader (see constructors)
+	void addResourcePath( const std::string& paths_);
 
 	/// \brief Create a storage client instance
 	StorageClient createStorageClient( const std::string& config_);
@@ -711,7 +721,12 @@ public:
 	QueryEval createQueryEval();
 
 private:
+	void initStorageObjBuilder();
+	void initAnalyzerObjBuilder();
+
+private:
 	Reference m_moduleloader_impl;
+	Reference m_rpc_impl;
 	Reference m_storage_objbuilder_impl;
 	Reference m_analyzer_objbuilder_impl;
 };

@@ -28,7 +28,11 @@
 */
 #include "strus/bindingObjects.hpp"
 #include "strus/strus.hpp"
+#include "strus/lib/rpc_client.hpp"
+#include "strus/lib/rpc_client_socket.hpp"
 #include "strus/lib/module.hpp"
+#include "strus/rpcClientInterface.hpp"
+#include "strus/rpcClientMessagingInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
@@ -711,81 +715,122 @@ DLL_PUBLIC std::vector<Rank> Query::evaluate() const
 
 DLL_PUBLIC StrusContext::StrusContext()
 	:m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
 	m_moduleloader_impl.reset( strus::createModuleLoader());
 }
 
+DLL_PUBLIC StrusContext::StrusContext( const char* connectionstring)
+	:m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+{
+	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
+	messaging.reset( strus::createRpcClientMessaging( connectionstring));
+	m_rpc_impl.reset( strus::createRpcClient( messaging.get()));
+	(void)messaging.release();
+}
+
 DLL_PUBLIC StrusContext::StrusContext( const StrusContext& o)
 	:m_moduleloader_impl(o.m_moduleloader_impl)
+	,m_rpc_impl(o.m_rpc_impl)
 	,m_storage_objbuilder_impl(o.m_storage_objbuilder_impl)
 	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
 {}
 
 DLL_PUBLIC void StrusContext::loadModule( const std::string& name_)
 {
+	if (!m_moduleloader_impl.get()) throw std::runtime_error( "cannot load modules in RPC client mode");
 	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
 	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->loadModule( name_);
 }
 
-DLL_PUBLIC void StrusContext::setPath( const std::string& paths_)
+DLL_PUBLIC void StrusContext::addModulePath( const std::string& paths_)
 {
+	if (!m_moduleloader_impl.get()) throw std::runtime_error( "cannot add a module path in RPC client mode");
 	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to set the module search path after the first use of objects");
 	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to set the module search path after the first use of objects");
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->addModulePath( paths_);
 }
 
-DLL_PUBLIC StorageClient StrusContext::createStorageClient( const std::string& config_)
+DLL_PUBLIC void StrusContext::addResourcePath( const std::string& paths_)
 {
-	if (!m_storage_objbuilder_impl.get())
+	if (!m_moduleloader_impl.get()) throw std::runtime_error( "cannot add a resource path in RPC client mode");
+	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
+	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
+	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	moduleLoader->addResourcePath( paths_);
+}
+
+void StrusContext::initStorageObjBuilder()
+{
+	if (m_rpc_impl.get())
+	{
+		strus::RpcClientInterface* client = (strus::RpcClientInterface*)m_rpc_impl.get();
+		m_storage_objbuilder_impl.reset( client->createStorageObjectBuilder());
+	}
+	else if (m_moduleloader_impl.get())
 	{
 		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
 	}
+	else
+	{
+		throw std::runtime_error( "bad state, no context initialized");
+	}
+}
+
+void StrusContext::initAnalyzerObjBuilder()
+{
+	if (m_rpc_impl.get())
+	{
+		strus::RpcClientInterface* client = (strus::RpcClientInterface*)m_rpc_impl.get();
+		m_analyzer_objbuilder_impl.reset( client->createAnalyzerObjectBuilder());
+	}
+	else if (m_moduleloader_impl.get())
+	{
+		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+		m_analyzer_objbuilder_impl.reset( moduleLoader->createAnalyzerObjectBuilder());
+	}
+	else
+	{
+		throw std::runtime_error( "bad state, no context initialized");
+	}
+}
+
+DLL_PUBLIC StorageClient StrusContext::createStorageClient( const std::string& config_)
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return StorageClient( m_storage_objbuilder_impl, config_);
 }
 
 DLL_PUBLIC DocumentAnalyzer StrusContext::createDocumentAnalyzer( const std::string& segmentername_)
 {
-	if (!m_analyzer_objbuilder_impl.get())
-	{
-		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_analyzer_objbuilder_impl.reset( moduleLoader->createAnalyzerObjectBuilder());
-	}
+	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	return DocumentAnalyzer( m_analyzer_objbuilder_impl, segmentername_);
 }
 
 DLL_PUBLIC QueryAnalyzer StrusContext::createQueryAnalyzer()
 {
-	if (!m_analyzer_objbuilder_impl.get())
-	{
-		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_analyzer_objbuilder_impl.reset( moduleLoader->createAnalyzerObjectBuilder());
-	}
+	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	return QueryAnalyzer( m_analyzer_objbuilder_impl);
 }
 
 DLL_PUBLIC QueryEval StrusContext::createQueryEval()
 {
-	if (!m_storage_objbuilder_impl.get())
-	{
-		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
-	}
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return QueryEval( m_storage_objbuilder_impl);
 }
 
 DLL_PUBLIC void StrusContext::createStorage( const std::string& config_)
 {
-	if (!m_storage_objbuilder_impl.get())
-	{
-		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
-	}
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
 	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
 	const strus::StorageInterface* sti = objBuilder->getStorage();
@@ -815,11 +860,7 @@ DLL_PUBLIC void StrusContext::createStorage( const std::string& config_)
 
 DLL_PUBLIC void StrusContext::destroyStorage( const std::string& config_)
 {
-	if (!m_storage_objbuilder_impl.get())
-	{
-		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
-	}
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
 	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
 	dbi->destroyDatabase( config_);
