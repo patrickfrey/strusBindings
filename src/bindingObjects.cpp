@@ -209,18 +209,61 @@ static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
 	return rt;
 }
 
-static std::vector<strus::NormalizerConfig> getNormalizers(
-		const std::vector<Normalizer>& normalizers)
+static std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> > getNormalizers(
+		const std::vector<Normalizer>& normalizers,
+		const strus::TextProcessorInterface* textproc)
 {
-	std::vector<strus::NormalizerConfig> rt;
+	std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> > rt;
 	std::vector<Normalizer>::const_iterator
 		ni = normalizers.begin(), ne = normalizers.end();
 	for (;ni != ne; ++ni)
 	{
-		rt.push_back( strus::NormalizerConfig( ni->name(), ne->arguments()));
+		const strus::NormalizerFunctionInterface* nf = textproc->getNormalizer( ni->name());
+		strus::Reference<strus::NormalizerFunctionInstanceInterface> function(
+				nf->createInstance( ne->arguments(), textproc));
+		
+		rt.push_back( function);
 	}
 	return rt;
 }
+
+static strus::Reference<strus::TokenizerFunctionInstanceInterface> getTokenizer(
+		const Tokenizer& tokenizer,
+		const strus::TextProcessorInterface* textproc)
+{
+	const strus::TokenizerFunctionInterface* nf = textproc->getTokenizer( tokenizer.name());
+	strus::Reference<strus::TokenizerFunctionInstanceInterface> rt(
+			nf->createInstance( tokenizer.arguments(), textproc));
+	return rt;
+}
+
+struct FeatureFuncDef
+{
+	std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> > normalizers_ref;
+	std::vector<strus::NormalizerFunctionInstanceInterface*> normalizers;
+	strus::Reference<strus::TokenizerFunctionInstanceInterface> tokenizer;
+
+	FeatureFuncDef( const Reference& m_objbuilder_impl,
+			const Tokenizer& tokenizer_,
+			const std::vector<Normalizer>& normalizers_)
+	{
+		const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+		const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+		normalizers_ref = getNormalizers( normalizers_, textproc);
+		std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> >::iterator
+			ni = normalizers_ref.begin(), ne = normalizers_ref.end();
+		for (; ni != ne; ++ni) normalizers.push_back( ni->get());
+		tokenizer = getTokenizer( tokenizer_, textproc);
+	}
+
+	void release()
+	{
+		(void)tokenizer.release();
+		std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> >::iterator
+			ni = normalizers_ref.begin(), ne = normalizers_ref.end();
+		for (; ni != ne; ++ni) (void)ni->release();
+	}
+};
 
 DLL_PUBLIC void DocumentAnalyzer::addSearchIndexFeature(
 	const std::string& type,
@@ -229,11 +272,12 @@ DLL_PUBLIC void DocumentAnalyzer::addSearchIndexFeature(
 	const std::vector<Normalizer>& normalizers,
 	const std::vector<std::string>& options)
 {
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers);
+
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeature(
-		type, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
-		getNormalizers( normalizers),
+		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers,
 		getFeatureOptions( options));
+	funcdef.release();
 }
 
 DLL_PUBLIC void DocumentAnalyzer::addForwardIndexFeature(
@@ -243,11 +287,12 @@ DLL_PUBLIC void DocumentAnalyzer::addForwardIndexFeature(
 	const std::vector<Normalizer>& normalizers,
 	const std::vector<std::string>& options)
 {
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers);
+
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeature(
-		type, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()), 
-		getNormalizers( normalizers),
+		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers,
 		getFeatureOptions( options));
+	funcdef.release();
 }
 
 DLL_PUBLIC void DocumentAnalyzer::defineMetaData(
@@ -256,10 +301,11 @@ DLL_PUBLIC void DocumentAnalyzer::defineMetaData(
 	const Tokenizer& tokenizer,
 	const std::vector<Normalizer>& normalizers)
 {
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers);
+
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaData(
-		fieldname, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
-		getNormalizers( normalizers));
+		fieldname, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers);
+	funcdef.release();
 }
 
 DLL_PUBLIC void DocumentAnalyzer::defineAttribute(
@@ -268,10 +314,11 @@ DLL_PUBLIC void DocumentAnalyzer::defineAttribute(
 	const Tokenizer& tokenizer,
 	const std::vector<Normalizer>& normalizers)
 {
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers);
+
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAttribute(
-		attribname, selectexpr,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
-		getNormalizers( normalizers));
+		attribname, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers);
+	funcdef.release();
 }
 
 static Variant getNumericVariantFromString( const std::string& value)
@@ -377,10 +424,11 @@ DLL_PUBLIC void QueryAnalyzer::definePhraseType(
 		const std::vector<Normalizer>& normalizers)
 {
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers);
+
 	THIS->definePhraseType(
-		phraseType, featureType,
-		strus::TokenizerConfig( tokenizer.name(), tokenizer.arguments()),
-		getNormalizers(normalizers));
+		phraseType, featureType, funcdef.tokenizer.get(), funcdef.normalizers);
+	funcdef.release();
 }
 
 DLL_PUBLIC std::vector<Term> QueryAnalyzer::analyzePhrase(
@@ -546,43 +594,57 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
 		const Summarizer& summarizer)
 {
+	typedef strus::QueryEvalInterface::SummarizerFeatureParameter SummarizerFeatureParameter;
+
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
+	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( summarizer.m_name);
+	strus::Reference<strus::SummarizerFunctionInstanceInterface> function( sf->createInstance( queryproc));
+
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
-	strus::SummarizerConfig config;
 	std::map<std::string,Variant>::const_iterator
 		pi = summarizer.m_parameters.begin(), pe = summarizer.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
 		if (pi->second.m_type == Variant::TEXT)
 		{
-			config.defineStringParameter( pi->first, pi->second.m_value.TEXT);
+			function->addStringParameter( pi->first, pi->second.m_value.TEXT);
 		}
 		else
 		{
-			config.defineNumericParameter( pi->first, arithmeticVariant( pi->second));
+			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
 		}
 	}
+	std::vector<SummarizerFeatureParameter> featureParameters;
 	std::map<std::string,std::string>::const_iterator
 		fi = summarizer.m_features.begin(), fe = summarizer.m_features.end();
 	for (; fi != fe; ++fi)
 	{
-		config.addFeatureParameter( fi->first, fi->second);
+		featureParameters.push_back( SummarizerFeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addSummarizer( resultAttribute, summarizer.m_name, config);
+	queryeval->addSummarizerFunction(
+			summarizer.m_name, function.get(), featureParameters, resultAttribute);
+	function.release();
 }
 
 DLL_PUBLIC void QueryEval::addWeightingFunction(
 		const WeightingFunction& weightingFunction,
 		const std::vector<std::string>& weightingFeatureSets)
 {
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
+	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( weightingFunction.m_name);
+	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance());
+
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
-	strus::WeightingConfig config;
 	std::map<std::string,Variant>::const_iterator
 		pi = weightingFunction.m_parameters.begin(), pe = weightingFunction.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
-		config.defineNumericParameter( pi->first, arithmeticVariant( pi->second));
+		function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
 	}
-	queryeval->addWeightingFunction( weightingFunction.m_name, config, weightingFeatureSets);
+	queryeval->addWeightingFunction( weightingFunction.m_name, function.get(), weightingFeatureSets);
+	function.release();
 }
 
 
@@ -612,8 +674,11 @@ DLL_PUBLIC void Query::pushTerm( const std::string& type_, const std::string& va
 
 DLL_PUBLIC void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_)
 {
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
+	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushExpression( opname_, argc, range_);
+	THIS->pushExpression( joinopr, argc, range_);
 }
 
 DLL_PUBLIC void Query::attachVariable( const std::string& name_)

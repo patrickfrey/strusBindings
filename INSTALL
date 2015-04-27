@@ -1,7 +1,28 @@
 cmake CMakeLists.txt; make; sudo make install
 
 PHP:
-Define "extension strus_php.so" in your php.ini.
-Copy the shared object files and solinks strus_php.so* into the php extension directory (`php-config5 --extension-dir`)
-Copy the script swig/strus.php to /usr/share/php/
+	Define "extension strus_php.so" in your php.ini. The php.ini path can be evaluated with the PHP phpinfo() command.
+	Be careful to edit the right file. Php loads different php.ini files depending on context 
+	(webserver or command line)
+	Copy the shared object file swig/php/strus.so into the php extension directory (`php-config5 --extension-dir`)
+	$ sudo cp swig/php/strus.so `php-config --extension-dir`/
+	Copy the script swig/strus.php to /usr/share/php/
+
+	When you make changes to your php.ini do restart the php engine:
+	$ sudo service php5-fpm restart
+
+	Possible errors:
+	1) Apache:
+		If your strus PHP script called by the Apache webserver does not work, check your 
+		apache error.log. 
+		[Sun Apr 26 13:42:45.209548 2015] [:error] [pid 12992] [client
+		127.0.0.1:38873] PHP Fatal error:  Call to undefined function dl() in
+		/usr/share/php/strus.php on line 22
+
+		This error means that the externsion strus_php.so configured in your php.ini
+		could not be loaded and the php script strus.php tries to load in dynamically
+		calling 'dl'. The function 'dl' has been removed from some SAPIs in PHP 5.3. 
+
+
+
 

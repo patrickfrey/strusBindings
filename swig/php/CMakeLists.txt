@@ -22,20 +22,13 @@ add_custom_command(
 	COMMENT "build PHP5 bindings" VERBATIM
 	DEPENDS  ../strus.i )
 
-add_library( strus_php SHARED strus_wrap.cpp )
-target_link_libraries( strus_php  strus_bindings )
-
-set_target_properties(
-    strus_php
-    PROPERTIES
-    DEBUG_POSTFIX "_d"
-    SOVERSION "${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}"
-    VERSION "${STRUS_VERSION}"
-)
+add_library( strus MODULE strus_wrap.cpp )
+set_target_properties( strus PROPERTIES PREFIX "")
+target_link_libraries( strus  strus_bindings )
 
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install( TARGETS strus_php
-           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus )
+# Copy manually the strus.so module to the path you get with php-config --extension-dir
+
 
