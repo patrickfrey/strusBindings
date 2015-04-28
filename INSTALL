@@ -7,6 +7,7 @@ PHP:
 	Copy the shared object file swig/php/strus.so into the php extension directory (`php-config5 --extension-dir`)
 	$ sudo cp swig/php/strus.so `php-config --extension-dir`/
 	Copy the script swig/strus.php to /usr/share/php/
+	$ sudo cp swig/strus.php /usr/share/php/
 
 	When you make changes to your php.ini do restart the php engine:
 	$ sudo service php5-fpm restart

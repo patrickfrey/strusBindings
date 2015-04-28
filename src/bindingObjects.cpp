@@ -102,6 +102,75 @@ DLL_PUBLIC Variant::Variant( const std::string& v)
 	m_value.TEXT = m_buf.c_str();
 }
 
+DLL_PUBLIC Variant::Variant( const char* v)
+	:m_type(TEXT),m_buf(v?v:"")
+{
+	m_value.TEXT = m_buf.c_str();
+}
+
+DLL_PUBLIC void Variant::init()
+{
+	m_type = UNDEFINED;
+	m_value.INT = 0;
+	m_buf.clear();
+}
+
+DLL_PUBLIC void Variant::assign( const Variant& o)
+{
+	m_type = o.m_type;
+	m_buf = o.m_buf;
+	if (m_type == TEXT)
+	{
+		m_value.TEXT = m_buf.c_str();
+	}
+	else
+	{
+		std::memcpy( &m_value, &o.m_value, sizeof(m_value));
+	}
+}
+
+DLL_PUBLIC void Variant::assign( unsigned int v)
+{
+	m_type = UINT;
+	m_value.UINT = v;
+	m_buf.clear();
+}
+
+DLL_PUBLIC void Variant::assign( int v)
+{
+	m_type = INT;
+	m_value.INT = v;
+	m_buf.clear();
+}
+
+DLL_PUBLIC void Variant::assign( float v)
+{
+	m_type = FLOAT;
+	m_value.FLOAT = v;
+	m_buf.clear();
+}
+
+DLL_PUBLIC void Variant::assign( double v)
+{
+	m_type = FLOAT;
+	m_value.FLOAT = v;
+	m_buf.clear();
+}
+
+DLL_PUBLIC void Variant::assign( const std::string& v)
+{
+	m_buf = v;
+	m_type = TEXT;
+	m_value.TEXT = m_buf.c_str();
+}
+
+DLL_PUBLIC void Variant::assign( const char* v)
+{
+	m_type = TEXT;
+	m_buf = v?v:"";
+	m_value.TEXT = m_buf.c_str();
+}
+
 DLL_PUBLIC unsigned int Variant::getUInt() const
 {
 	if (m_type == UINT) return m_value.UINT;
@@ -150,7 +219,7 @@ DLL_PUBLIC void Document::addForwardIndexTerm(
 	m_forwardIndexTerms.push_back( Term( type_,value_,position_));
 }
 
-DLL_PUBLIC void Document::setMetaData( const std::string& name_, Variant value_)
+DLL_PUBLIC void Document::setMetaData( const std::string& name_, const Variant& value_)
 {
 	m_metaData.push_back( MetaData( name_,value_));
 }

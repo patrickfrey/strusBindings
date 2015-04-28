@@ -1,6 +1,8 @@
 %module strus
 %include "std_string.i"
 %include "std_vector.i"
+%include "typemaps.i"
+%include "exception.i"
 %apply const std::string& {std::string*};
 
 %{
@@ -17,6 +19,8 @@
 #if defined(SWIGOCAML)
 %ignore Variant::Variant( unsigned int v);
 %ignore Variant::Variant( double v);
+%ignore Variant::assign( unsigned int v);
+%ignore Variant::assign( double v);
 #endif
 %ignore Reference::Reference( Reference::Deleter deleter_);
 %ignore Reference::Reference( const Reference& o);
@@ -32,5 +36,9 @@
 %ignore FunctionDef::arguments() const;
 
 // Parse the original header file
+%include "variant_type.i"
 %include "../include/strus/bindingObjects.hpp"
+
+
+
 

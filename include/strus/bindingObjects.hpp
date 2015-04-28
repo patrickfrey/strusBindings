@@ -160,6 +160,7 @@ public:
 	Variant( float v);
 	Variant( double v);
 	Variant( const std::string& v);
+	Variant( const char* v);
 
 	bool defined() const			{return m_type != UNDEFINED;}
 	Type type() const			{return m_type;}
@@ -167,6 +168,15 @@ public:
 	int getInt() const;
 	float getFloat() const;
 	const char* getText() const;
+
+	void init();
+	void assign( const Variant& o);
+	void assign( unsigned int v);
+	void assign( int v);
+	void assign( float v);
+	void assign( double v);
+	void assign( const std::string& v);
+	void assign( const char* v);
 
 private:
 	friend class Storage;
@@ -219,7 +229,7 @@ class MetaData
 {
 public:
 	/// \brief Constructor
-	MetaData( const std::string& name_, Variant value_)
+	MetaData( const std::string& name_, const Variant& value_)
 		:m_name(name_),m_value(value_){}
 	/// \brief Copy constructor
 	MetaData( const MetaData& o)
@@ -279,7 +289,7 @@ public:
 	/// \brief Add a single term occurrence to the document for use in the summary of a retrieval result
 	void addForwardIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
 	/// \brief Define a meta data value of the document
-	void setMetaData( const std::string& name_, Variant value_);
+	void setMetaData( const std::string& name_, const Variant& value_);
 	/// \brief Define an attribute of the document
 	void setAttribute( const std::string& name_, const std::string& value_);
 	/// \brief Allow a user to access the document
