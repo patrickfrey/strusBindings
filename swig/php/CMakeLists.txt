@@ -5,7 +5,7 @@ string( REPLACE "-I"  ""  PHP_INCLUDES  ${PHP_INCLUDES}  )
 string( STRIP  ${PHP_INCLUDES}  PHP_INCLUDES )
 string( REPLACE " "  ";"  PHP_INCLUDES  ${PHP_INCLUDES}  )
 MESSAGE( "PHP includes: ${PHP_INCLUDES}" )
-execute_process( COMMAND  php-config5 --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR )
+execute_process( COMMAND  php-config --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR )
 string( STRIP  ${PHP_EXTENSION_DIR}  PHP_EXTENSION_DIR )
 
 include_directories( "${PROJECT_SOURCE_DIR}/include"  "${PROJECT_SOURCE_DIR}/swig/php"  ${PHP_INCLUDES} )
