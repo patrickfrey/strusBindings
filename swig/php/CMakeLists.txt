@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
-execute_process( COMMAND  php-config5 --includes  OUTPUT_VARIABLE  PHP_INCLUDES )
+execute_process( COMMAND  php-config --includes  OUTPUT_VARIABLE  PHP_INCLUDES )
 string( REPLACE "-I"  ""  PHP_INCLUDES  ${PHP_INCLUDES}  )
 string( STRIP  ${PHP_INCLUDES}  PHP_INCLUDES )
 string( REPLACE " "  ";"  PHP_INCLUDES  ${PHP_INCLUDES}  )
