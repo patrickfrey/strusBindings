@@ -3,6 +3,19 @@
 %include "std_vector.i"
 %include "typemaps.i"
 %include "exception.i"
+
+%exception {
+	try {
+		$action
+	} catch (const std::runtime_error& e) {
+		SWIG_exception( SWIG_RuntimeError, e.what());
+	} catch (const std::logic_error& e) {
+		SWIG_exception( SWIG_ValueError, e.what());
+	} catch (const std::bad_alloc& e) {
+		SWIG_exception( SWIG_MemoryError, e.what());
+	}
+}
+
 %apply const std::string& {std::string*};
 
 %{
@@ -35,8 +48,10 @@
 %ignore FunctionDef::name() const;
 %ignore FunctionDef::arguments() const;
 
-// Parse the original header file
-%include "variant_type.i"
+%include "std_vector_string.i"
+%include "strus_variant.i"
+%include "strus_tokenizer.i"
+%include "strus_normalizer.i"
 %include "../include/strus/bindingObjects.hpp"
 
 

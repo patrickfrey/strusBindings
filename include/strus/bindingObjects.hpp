@@ -81,24 +81,19 @@ private:
 class Tokenizer
 {
 public:
+	Tokenizer(){}
 	Tokenizer( const Tokenizer& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	Tokenizer( const std::string& name_, const std::string& arg1)
-		:m_name(name_)
-	{
-		m_arguments.push_back( arg1);
-	}
-	Tokenizer( const std::string& name_, const std::string& arg1, const std::string& arg2)
-		:m_name(name_)
-	{
-		m_arguments.push_back( arg1);
-		m_arguments.push_back( arg2);
-	}
+	Tokenizer( const std::string& name_, const std::vector<std::string>& arg_)
+		:m_name(name_),m_arguments(arg_){}
 	Tokenizer( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
 	const std::string& name() const				{return m_name;}
 	const std::vector<std::string>& arguments() const	{return m_arguments;}
+
+	void setName( const std::string& name_)			{m_name = name_;}
+	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
 
 private:
 	std::string m_name;
@@ -110,22 +105,11 @@ private:
 class Normalizer
 {
 public:
+	Normalizer(){}
 	Normalizer( const Normalizer& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-
-	Normalizer( const std::string& name_, const std::string& arg1)
-		:m_name(name_)
-	{
-		m_arguments.push_back( arg1);
-	}
-
-	Normalizer( const std::string& name_, const std::string& arg1, const std::string& arg2)
-		:m_name(name_)
-	{
-		m_arguments.push_back( arg1);
-		m_arguments.push_back( arg2);
-	}
-
+	Normalizer( const std::string& name_, const std::vector<std::string>& arg_)
+		:m_name(name_),m_arguments(arg_){}
 	Normalizer( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
@@ -133,6 +117,9 @@ public:
 
 	const std::string& name() const				{return m_name;}
 	const std::vector<std::string>& arguments() const	{return m_arguments;}
+
+	void setName( const std::string& name_)			{m_name = name_;}
+	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
 
 private:
 	friend class QueryAnalyzer;
@@ -475,6 +462,7 @@ private:
 	StorageClient( const Reference& objbuilder, const std::string& config);
 
 	friend class Query;
+	friend class QueryEval;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
@@ -529,6 +517,9 @@ private:
 	std::map<std::string,Variant> m_parameters;
 };
 
+/// \brief Forward declaration
+class Query;
+
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class QueryEval
 {
@@ -561,6 +552,10 @@ public:
 	void addWeightingFunction(
 			const WeightingFunction& weightingFunction,
 			const std::vector<std::string>& weightingFeatureSets);
+
+	/// \brief Create a query based on this query evaluation scheme
+	/// \param[in] storage storage to issue the query on
+	Query* createQuery( const StorageClient& storage) const;
 
 private:
 	/// \brief Constructor used by strusContext
@@ -629,8 +624,6 @@ private:
 class Query
 {
 public:
-	/// \brief Constructor
-	Query( const QueryEval& queryeval, const StorageClient& storage);
 	/// \brief Copy constructor
 	Query( const Query& o);
 	/// \brief Destructor
@@ -674,6 +667,10 @@ public:
 	std::vector<Rank> evaluate() const;
 
 private:
+	friend class QueryEval;
+	Query( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_)
+		:m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_){}
+
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;

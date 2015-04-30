@@ -716,17 +716,15 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 	function.release();
 }
 
-
-DLL_PUBLIC Query::Query( const QueryEval& queryeval, const StorageClient& storage)
-	:m_objbuilder_impl(queryeval.m_objbuilder_impl)
-	,m_storage_impl(storage.m_storage_impl)
-	,m_queryeval_impl(queryeval.m_queryeval_impl)
-	,m_query_impl( ReferenceDeleter<strus::QueryInterface>::function)
+DLL_PUBLIC Query* QueryEval::createQuery( const StorageClient& storage) const
 {
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
-	strus::StorageClientInterface* st = (strus::StorageClientInterface*)m_storage_impl.get();
-	m_query_impl.reset( qe->createQuery( st));
+	strus::StorageClientInterface* st = (strus::StorageClientInterface*)storage.m_storage_impl.get();
+	Reference query( ReferenceDeleter<strus::QueryInterface>::function);
+	query.reset( qe->createQuery( st));
+	return new Query( m_objbuilder_impl, storage.m_storage_impl, m_queryeval_impl, query);
 }
+
 
 DLL_PUBLIC Query::Query( const Query& o)
 	:m_objbuilder_impl(o.m_objbuilder_impl)
