@@ -20,7 +20,7 @@ add_custom_command(
 	COMMAND  mv ../php_strus.h ./
 	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/swig/php"
 	COMMENT "build PHP5 bindings" VERBATIM
-	DEPENDS  ../strus.i ../strus_variant.i ../strus_tokenizer.i ../strus_normalizer.i ../std_vector_string.i 
+	DEPENDS  ../strus.i ../strus_variant.i ../strus_tokenizer.i ../strus_normalizer.i ../std_vector_string.i ../std_vector_rank.i ../std_vector_term.i 
 )
 
 add_library( strus MODULE strus_wrap.cpp )

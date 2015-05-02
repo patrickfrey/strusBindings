@@ -9,10 +9,13 @@
 		$action
 	} catch (const std::runtime_error& e) {
 		SWIG_exception( SWIG_RuntimeError, e.what());
+		goto fail;
 	} catch (const std::logic_error& e) {
 		SWIG_exception( SWIG_ValueError, e.what());
+		goto fail;
 	} catch (const std::bad_alloc& e) {
 		SWIG_exception( SWIG_MemoryError, e.what());
+		goto fail;
 	}
 }
 
@@ -49,6 +52,8 @@
 %ignore FunctionDef::arguments() const;
 
 %include "std_vector_string.i"
+%include "std_vector_term.i"
+%include "std_vector_rank.i"
 %include "strus_variant.i"
 %include "strus_tokenizer.i"
 %include "strus_normalizer.i"

@@ -289,7 +289,7 @@ static std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> 
 	{
 		const strus::NormalizerFunctionInterface* nf = textproc->getNormalizer( ni->name());
 		strus::Reference<strus::NormalizerFunctionInstanceInterface> function(
-				nf->createInstance( ne->arguments(), textproc));
+				nf->createInstance( ni->arguments(), textproc));
 		
 		rt.push_back( function);
 	}
@@ -570,13 +570,13 @@ DLL_PUBLIC void StorageClient::insertDocument( const std::string& docid, const D
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
 	for (; ti != te; ++ti)
 	{
-		document->addSearchIndexTerm( ti->name(), ti->value(), ti->position());
+		document->addSearchIndexTerm( ti->type(), ti->value(), ti->position());
 	}
 	std::vector<Term>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
 	for (; fi != fe; ++fi)
 	{
-		document->addForwardIndexTerm( fi->name(), fi->value(), fi->position());
+		document->addForwardIndexTerm( fi->type(), fi->value(), fi->position());
 	}
 	std::vector<std::string>::const_iterator
 		ui = doc.users().begin(), ue = doc.users().end();

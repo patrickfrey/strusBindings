@@ -102,7 +102,13 @@
 			{
 				zval val, *str;
 				int is_str = (Z_TYPE_PP(data) == IS_STRING);
-				if (Z_TYPE_PP(data) == IS_ARRAY)
+				if (is_str)
+				{
+					str = *data;
+					temp.push_back( Normalizer( Z_STRVAL_P(str)));
+					zval_dtor(&val);
+				}
+				else if (Z_TYPE_PP(data) == IS_ARRAY)
 				{
 					temp.push_back( Normalizer());
 
@@ -142,12 +148,6 @@
 							zval_dtor(&e_val);
 						}
 					}
-				}
-				else if (is_str)
-				{
-					str = *data;
-					temp.push_back( Normalizer( Z_STRVAL_P(str)));
-					zval_dtor(&val);
 				}
 				else
 				{

@@ -198,7 +198,7 @@ public:
 		:m_position(0){}
 
 	/// \brief Get the term type name
-	const std::string& name() const		{return m_type;}
+	const std::string& type() const		{return m_type;}
 	/// \brief Get the term value
 	const std::string& value() const	{return m_value;}
 	/// \brief Get the term position
