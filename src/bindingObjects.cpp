@@ -57,12 +57,12 @@ struct ReferenceDeleter
 };
 
 DLL_PUBLIC Variant::Variant()
-	:m_type(UNDEFINED){}
+	:m_type(Variant_UNDEFINED){}
 
 DLL_PUBLIC Variant::Variant( const Variant& o)
 	:m_type(o.m_type),m_buf(o.m_buf)
 {
-	if (m_type == TEXT)
+	if (m_type == Variant_TEXT)
 	{
 		m_value.TEXT = m_buf.c_str();
 	}
@@ -73,38 +73,38 @@ DLL_PUBLIC Variant::Variant( const Variant& o)
 }
 
 DLL_PUBLIC Variant::Variant( unsigned int v)
-	:m_type(UINT)
+	:m_type(Variant_UINT)
 {
 	m_value.UINT = v;
 }
 
 DLL_PUBLIC Variant::Variant( int v)
-	:m_type(INT)
+	:m_type(Variant_INT)
 {
 	m_value.INT = v;
 }
 
 DLL_PUBLIC Variant::Variant( float v)
-	:m_type(FLOAT)
+	:m_type(Variant_FLOAT)
 {
 	m_value.FLOAT = v;
 }
 
 DLL_PUBLIC Variant::Variant( double v)
-	:m_type(FLOAT)
+	:m_type(Variant_FLOAT)
 {
 	m_value.FLOAT = (float)v;
 }
 
 DLL_PUBLIC Variant::Variant( const std::string& v)
-	:m_type(TEXT),m_buf(v)
+	:m_type(Variant_TEXT),m_buf(v)
 {
 	m_value.TEXT = m_buf.c_str();
 }
 
 DLL_PUBLIC void Variant::init()
 {
-	m_type = UNDEFINED;
+	m_type = Variant_UNDEFINED;
 	m_value.INT = 0;
 	m_buf.clear();
 }
@@ -113,7 +113,7 @@ DLL_PUBLIC void Variant::assign( const Variant& o)
 {
 	m_type = o.m_type;
 	m_buf = o.m_buf;
-	if (m_type == TEXT)
+	if (m_type == Variant_TEXT)
 	{
 		m_value.TEXT = m_buf.c_str();
 	}
@@ -125,28 +125,28 @@ DLL_PUBLIC void Variant::assign( const Variant& o)
 
 DLL_PUBLIC void Variant::assign( unsigned int v)
 {
-	m_type = UINT;
+	m_type = Variant_UINT;
 	m_value.UINT = v;
 	m_buf.clear();
 }
 
 DLL_PUBLIC void Variant::assign( int v)
 {
-	m_type = INT;
+	m_type = Variant_INT;
 	m_value.INT = v;
 	m_buf.clear();
 }
 
 DLL_PUBLIC void Variant::assign( float v)
 {
-	m_type = FLOAT;
+	m_type = Variant_FLOAT;
 	m_value.FLOAT = v;
 	m_buf.clear();
 }
 
 DLL_PUBLIC void Variant::assign( double v)
 {
-	m_type = FLOAT;
+	m_type = Variant_FLOAT;
 	m_value.FLOAT = v;
 	m_buf.clear();
 }
@@ -154,31 +154,31 @@ DLL_PUBLIC void Variant::assign( double v)
 DLL_PUBLIC void Variant::assign( const std::string& v)
 {
 	m_buf = v;
-	m_type = TEXT;
+	m_type = Variant_TEXT;
 	m_value.TEXT = m_buf.c_str();
 }
 
 DLL_PUBLIC unsigned int Variant::getUInt() const
 {
-	if (m_type == UINT) return m_value.UINT;
+	if (m_type == Variant_UINT) return m_value.UINT;
 	throw std::logic_error( "illegal access of variant value");
 }
 
 DLL_PUBLIC int Variant::getInt() const
 {
-	if (m_type == INT) return m_value.INT;
+	if (m_type == Variant_INT) return m_value.INT;
 	throw std::logic_error( "illegal access of variant value");
 }
 
 DLL_PUBLIC float Variant::getFloat() const
 {
-	if (m_type == FLOAT) return m_value.FLOAT;
+	if (m_type == Variant_FLOAT) return m_value.FLOAT;
 	throw std::logic_error( "illegal access of variant value");
 }
 
 DLL_PUBLIC const char* Variant::getText() const
 {
-	if (m_type == TEXT) return m_value.TEXT;
+	if (m_type == Variant_TEXT) return m_value.TEXT;
 	throw std::logic_error( "illegal access of variant value");
 }
 
@@ -399,18 +399,18 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 	strus::ArithmeticVariant rt;
 	switch (val.type())
 	{
-		case Variant::UNDEFINED:
+		case Variant_UNDEFINED:
 			break;
-		case Variant::INT:
+		case Variant_INT:
 			rt = val.getInt();
 			break;
-		case Variant::UINT:
+		case Variant_UINT:
 			rt = val.getUInt();
 			break;
-		case Variant::FLOAT:
+		case Variant_FLOAT:
 			rt = val.getFloat();
 			break;
-		case Variant::TEXT:
+		case Variant_TEXT:
 			rt = strus::arithmeticVariantFromString( val.getText());
 			break;
 	}
@@ -662,7 +662,7 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 		pi = summarizer.m_parameters.begin(), pe = summarizer.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
-		if (pi->second.m_type == Variant::TEXT)
+		if (pi->second.m_type == Variant_TEXT)
 		{
 			function->addStringParameter( pi->first, pi->second.m_value.TEXT);
 		}

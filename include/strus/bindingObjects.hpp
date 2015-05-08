@@ -132,15 +132,19 @@ private:
 
 
 
+enum VariantType
+{
+	Variant_UNDEFINED,
+	Variant_UINT,
+	Variant_INT,
+	Variant_FLOAT,
+	Variant_TEXT
+};
+
 /// \brief Variant type for passing parameter values of arbitrary type
 class Variant
 {
 public:
-	enum Type
-	{
-		UNDEFINED,UINT,INT,FLOAT,TEXT
-	};
-
 	Variant();
 	Variant( const Variant& o);
 	Variant( unsigned int v);
@@ -149,8 +153,8 @@ public:
 	Variant( double v);
 	Variant( const std::string& v);
 
-	bool defined() const			{return m_type != UNDEFINED;}
-	Type type() const			{return m_type;}
+	bool defined() const			{return m_type != Variant_UNDEFINED;}
+	VariantType type() const		{return m_type;}
 	unsigned int getUInt() const;
 	int getInt() const;
 	float getFloat() const;
@@ -170,7 +174,7 @@ private:
 	friend class WeightingFunction;
 	friend class QueryEval;
 	friend class DocumentAnalyzer;
-	Type m_type;
+	VariantType m_type;
 	union
 	{
 		unsigned int UINT;
