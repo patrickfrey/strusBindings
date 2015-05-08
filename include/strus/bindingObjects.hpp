@@ -131,7 +131,7 @@ private:
 };
 
 
-
+/// \brief Enumeration of internal variant representation
 enum VariantType
 {
 	Variant_UNDEFINED,

@@ -22,6 +22,7 @@
 %ignore Variant::Variant( double v);
 %ignore Variant::assign( unsigned int v);
 %ignore Variant::assign( double v);
+%ignore Variant::m_value;
 #endif
 %ignore Reference::Reference( Reference::Deleter deleter_);
 %ignore Reference::Reference( const Reference& o);
