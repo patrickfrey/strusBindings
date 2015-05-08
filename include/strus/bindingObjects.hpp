@@ -131,7 +131,7 @@ private:
 };
 
 
-/// \brief Enumeration of internal variant representation
+/// \brief Enumeration for defining internal variant representation
 enum VariantType
 {
 	Variant_UNDEFINED,
@@ -139,6 +139,15 @@ enum VariantType
 	Variant_INT,
 	Variant_FLOAT,
 	Variant_TEXT
+};
+
+/// \brief Union for internal variant value representation
+union VariantValue
+{
+	unsigned int UINT;
+	int INT;
+	float FLOAT;
+	const char* TEXT;
 };
 
 /// \brief Variant type for passing parameter values of arbitrary type
@@ -175,13 +184,7 @@ private:
 	friend class QueryEval;
 	friend class DocumentAnalyzer;
 	VariantType m_type;
-	union
-	{
-		unsigned int UINT;
-		int INT;
-		float FLOAT;
-		const char* TEXT;
-	} m_value;
+	VariantValue m_value;
 	std::string m_buf;
 };
 

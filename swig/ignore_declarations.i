@@ -24,3 +24,4 @@
 %ignore Attribute::value() const;
 %ignore FunctionDef::name() const;
 %ignore FunctionDef::arguments() const;
+%warnfilter(451) VariantValue::TEXT;
