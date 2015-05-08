@@ -15,12 +15,12 @@ link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" )
 add_custom_command(
 	OUTPUT strus_wrap.cpp
 	PRE_BUILD
-	COMMAND  swig -php -c++ -outdir ${PROJECT_SOURCE_DIR}/swig ../strus.i
+	COMMAND  swig -Werror -php -c++ -outdir ${PROJECT_SOURCE_DIR}/swig ../strus.i
 	COMMAND  mv ../strus_wrap.cpp ./
 	COMMAND  mv ../php_strus.h ./
 	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/swig/php"
 	COMMENT "build PHP5 bindings" VERBATIM
-	DEPENDS  ../strus.i ../strus_variant.i ../strus_tokenizer.i ../strus_normalizer.i ../std_vector_string.i ../std_vector_rank.i ../std_vector_term.i 
+	DEPENDS  ../strus.i ../strus_variant.i ../strus_tokenizer.i ../strus_normalizer.i ../std_vector_string.i ../std_vector_rank.i ../std_vector_term.i ../exception_handler.i
 )
 
 add_library( strus MODULE strus_wrap.cpp )

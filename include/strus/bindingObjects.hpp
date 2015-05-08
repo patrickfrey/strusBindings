@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
 typedef unsigned int Index;
@@ -147,7 +148,6 @@ public:
 	Variant( float v);
 	Variant( double v);
 	Variant( const std::string& v);
-	Variant( const char* v);
 
 	bool defined() const			{return m_type != UNDEFINED;}
 	Type type() const			{return m_type;}
@@ -163,7 +163,6 @@ public:
 	void assign( float v);
 	void assign( double v);
 	void assign( const std::string& v);
-	void assign( const char* v);
 
 private:
 	friend class Storage;

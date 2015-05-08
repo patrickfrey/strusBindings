@@ -102,12 +102,6 @@ DLL_PUBLIC Variant::Variant( const std::string& v)
 	m_value.TEXT = m_buf.c_str();
 }
 
-DLL_PUBLIC Variant::Variant( const char* v)
-	:m_type(TEXT),m_buf(v?v:"")
-{
-	m_value.TEXT = m_buf.c_str();
-}
-
 DLL_PUBLIC void Variant::init()
 {
 	m_type = UNDEFINED;
@@ -161,13 +155,6 @@ DLL_PUBLIC void Variant::assign( const std::string& v)
 {
 	m_buf = v;
 	m_type = TEXT;
-	m_value.TEXT = m_buf.c_str();
-}
-
-DLL_PUBLIC void Variant::assign( const char* v)
-{
-	m_type = TEXT;
-	m_buf = v?v:"";
 	m_value.TEXT = m_buf.c_str();
 }
 
