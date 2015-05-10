@@ -555,9 +555,11 @@ public:
 	/// \brief Add a weighting function to use as summand of the document weight
 	/// \param[in] weightingFunction the function to add
 	/// \param[in] weightingFeatureSets the sets of features to use for weighting with the function declared
+	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	void addWeightingFunction(
 			const WeightingFunction& weightingFunction,
-			const std::vector<std::string>& weightingFeatureSets);
+			const std::vector<std::string>& weightingFeatureSets,
+			float weight);
 
 	/// \brief Create a query based on this query evaluation scheme
 	/// \param[in] storage storage to issue the query on
@@ -640,6 +642,10 @@ public:
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
 	void pushExpression( const std::string& opname_, unsigned int argc, int range_);
+
+	/// \brief Push a duplicate of the topmost element of the query stack
+	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
+	void pushDuplicate();
 
 	/// \brief Attaches a variable to the top expression or term on the query stack.
 	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.

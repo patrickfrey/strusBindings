@@ -44,6 +44,7 @@ namespace std {
 					++next_mi;
 					++mi;
 				}
+				add_next_index_string( multiattr, mi->second, 1);
 				add_property_zval( rank, mi->first.c_str(), multiattr);
 			}
 		}

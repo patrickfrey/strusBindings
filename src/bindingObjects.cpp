@@ -685,7 +685,8 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 
 DLL_PUBLIC void QueryEval::addWeightingFunction(
 		const WeightingFunction& weightingFunction,
-		const std::vector<std::string>& weightingFeatureSets)
+		const std::vector<std::string>& weightingFeatureSets,
+		float weight)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
@@ -697,9 +698,16 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 		pi = weightingFunction.m_parameters.begin(), pe = weightingFunction.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
-		function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
+		if (pi->second.type() == Variant_TEXT)
+		{
+			function->addStringParameter( pi->first, pi->second.getText());
+		}
+		else
+		{
+			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
+		}
 	}
-	queryeval->addWeightingFunction( weightingFunction.m_name, function.get(), weightingFeatureSets);
+	queryeval->addWeightingFunction( weightingFunction.m_name, function.get(), weightingFeatureSets, weight);
 	function.release();
 }
 
@@ -733,6 +741,12 @@ DLL_PUBLIC void Query::pushExpression( const std::string& opname_, unsigned int 
 	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushExpression( joinopr, argc, range_);
+}
+
+DLL_PUBLIC void Query::pushDuplicate()
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	THIS->pushDuplicate();
 }
 
 DLL_PUBLIC void Query::attachVariable( const std::string& name_)

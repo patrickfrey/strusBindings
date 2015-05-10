@@ -13,7 +13,7 @@ link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" )
 
 # Php:
 add_custom_command(
-	OUTPUT strus_wrap.cpp
+	OUTPUT strus_wrap.cpp ../strus.php php_strus.h
 	PRE_BUILD
 	COMMAND  swig -Werror -php -c++ -outdir ${PROJECT_SOURCE_DIR}/swig ../strus.i
 	COMMAND  mv ../strus_wrap.cpp ./
