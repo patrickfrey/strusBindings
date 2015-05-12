@@ -517,10 +517,17 @@ public:
 		m_parameters[ name_] = value_;
 	}
 
+	/// \brief Define a weighting feature
+	void defineFeature( const std::string& class_, const std::string& set_)
+	{
+		m_features[ class_] = set_;
+	}
+
 private:
 	friend class QueryEval;
 	std::string m_name;
 	std::map<std::string,Variant> m_parameters;
+	std::map<std::string,std::string> m_features;
 };
 
 /// \brief Forward declaration
@@ -554,11 +561,9 @@ public:
 
 	/// \brief Add a weighting function to use as summand of the document weight
 	/// \param[in] weightingFunction the function to add
-	/// \param[in] weightingFeatureSets the sets of features to use for weighting with the function declared
 	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	void addWeightingFunction(
 			const WeightingFunction& weightingFunction,
-			const std::vector<std::string>& weightingFeatureSets,
 			float weight);
 
 	/// \brief Create a query based on this query evaluation scheme

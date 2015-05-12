@@ -650,7 +650,7 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
 		const Summarizer& summarizer)
 {
-	typedef strus::QueryEvalInterface::SummarizerFeatureParameter SummarizerFeatureParameter;
+	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
@@ -671,12 +671,12 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
 		}
 	}
-	std::vector<SummarizerFeatureParameter> featureParameters;
+	std::vector<FeatureParameter> featureParameters;
 	std::map<std::string,std::string>::const_iterator
 		fi = summarizer.m_features.begin(), fe = summarizer.m_features.end();
 	for (; fi != fe; ++fi)
 	{
-		featureParameters.push_back( SummarizerFeatureParameter( fi->first, fi->second));
+		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
 	queryeval->addSummarizerFunction(
 			summarizer.m_name, function.get(), featureParameters, resultAttribute);
@@ -685,9 +685,10 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 
 DLL_PUBLIC void QueryEval::addWeightingFunction(
 		const WeightingFunction& weightingFunction,
-		const std::vector<std::string>& weightingFeatureSets,
 		float weight)
 {
+	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
+
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( weightingFunction.m_name);
@@ -707,7 +708,14 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
 		}
 	}
-	queryeval->addWeightingFunction( weightingFunction.m_name, function.get(), weightingFeatureSets, weight);
+	std::vector<FeatureParameter> featureParameters;
+	std::map<std::string,std::string>::const_iterator
+		fi = weightingFunction.m_features.begin(), fe = weightingFunction.m_features.end();
+	for (; fi != fe; ++fi)
+	{
+		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
+	}
+	queryeval->addWeightingFunction( weightingFunction.m_name, function.get(), featureParameters, weight);
 	function.release();
 }
 
