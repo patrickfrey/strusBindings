@@ -685,9 +685,9 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 }
 
 DLL_PUBLIC void QueryEval::addWeightingFunction(
+		float weight,
 		const std::string& name,
-		const WeightingConfig& config,
-		float weight)
+		const WeightingConfig& config)
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 

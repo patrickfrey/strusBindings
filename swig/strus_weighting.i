@@ -30,7 +30,7 @@
 			{
 				zval elem;
 				char *name = 0;
-				unsigned int name_len = 0;
+				unsigned int name_len = 0;// length of string including 0 byte !
 				unsigned long index;
 				if (!zend_hash_get_current_key_ex( hash, &name, &name_len, &index, 0, &ptr) == HASH_KEY_IS_STRING)
 				{
@@ -38,21 +38,21 @@
 				}
 				if (name && name[0] == '.')
 				{
-					temp.defineFeature( std::string( name+1, name_len-1), std::string( Z_STRVAL_P(*data)));
+					temp.defineFeature( std::string( name+1, name_len-2), std::string( Z_STRVAL_P(*data)));
 				}
 				else switch (Z_TYPE_PP(data))
 				{
 					case IS_LONG:
-						temp.defineParameter( std::string( name, name_len), Variant( (int)Z_LVAL_P( *data)));
+						temp.defineParameter( std::string( name, name_len-1), Variant( (int)Z_LVAL_P( *data)));
 						break;
 					case IS_STRING:
-						temp.defineParameter( std::string( name, name_len), Variant( (char*)Z_STRVAL_P( *data)));
+						temp.defineParameter( std::string( name, name_len-1), Variant( (char*)Z_STRVAL_P( *data)));
 						break;
 					case IS_DOUBLE:
-						temp.defineParameter( std::string( name, name_len), Variant( (double)Z_DVAL_P( *data)));
+						temp.defineParameter( std::string( name, name_len-1), Variant( (double)Z_DVAL_P( *data)));
 						break;
 					case IS_BOOL:
-						temp.defineParameter( std::string( name, name_len), Variant( (bool)Z_BVAL_P( *data)));
+						temp.defineParameter( std::string( name, name_len-1), Variant( (bool)Z_BVAL_P( *data)));
 						break;
 				}
 			}

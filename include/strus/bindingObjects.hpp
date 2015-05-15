@@ -560,13 +560,13 @@ public:
 			const SummarizerConfig& config);
 
 	/// \brief Add a weighting function to use as summand of the document weight
+	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	/// \param[in] name the name of the weighting function to add
 	/// \param[in] config the configuration of the function to add
-	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	void addWeightingFunction(
+			float weight,
 			const std::string& name,
-			const WeightingConfig& config,
-			float weight);
+			const WeightingConfig& config);
 
 	/// \brief Create a query based on this query evaluation scheme
 	/// \param[in] storage storage to issue the query on
