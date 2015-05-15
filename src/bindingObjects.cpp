@@ -648,18 +648,19 @@ DLL_PUBLIC void QueryEval::addRestrictionFeature( const std::string& set_)
 
 DLL_PUBLIC void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
-		const Summarizer& summarizer)
+		const std::string& name,
+		const SummarizerConfig& config)
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( summarizer.m_name);
+	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( name);
 	strus::Reference<strus::SummarizerFunctionInstanceInterface> function( sf->createInstance( queryproc));
 
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	std::map<std::string,Variant>::const_iterator
-		pi = summarizer.m_parameters.begin(), pe = summarizer.m_parameters.end();
+		pi = config.m_parameters.begin(), pe = config.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
 		if (pi->second.m_type == Variant_TEXT)
@@ -673,30 +674,31 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 	}
 	std::vector<FeatureParameter> featureParameters;
 	std::map<std::string,std::string>::const_iterator
-		fi = summarizer.m_features.begin(), fe = summarizer.m_features.end();
+		fi = config.m_features.begin(), fe = config.m_features.end();
 	for (; fi != fe; ++fi)
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
 	queryeval->addSummarizerFunction(
-			summarizer.m_name, function.get(), featureParameters, resultAttribute);
+			name, function.get(), featureParameters, resultAttribute);
 	function.release();
 }
 
 DLL_PUBLIC void QueryEval::addWeightingFunction(
-		const WeightingFunction& weightingFunction,
+		const std::string& name,
+		const WeightingConfig& config,
 		float weight)
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( weightingFunction.m_name);
+	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
 	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance());
 
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	std::map<std::string,Variant>::const_iterator
-		pi = weightingFunction.m_parameters.begin(), pe = weightingFunction.m_parameters.end();
+		pi = config.m_parameters.begin(), pe = config.m_parameters.end();
 	for (; pi != pe; ++pi)
 	{
 		if (pi->second.type() == Variant_TEXT)
@@ -710,12 +712,12 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 	}
 	std::vector<FeatureParameter> featureParameters;
 	std::map<std::string,std::string>::const_iterator
-		fi = weightingFunction.m_features.begin(), fe = weightingFunction.m_features.end();
+		fi = config.m_features.begin(), fe = config.m_features.end();
 	for (; fi != fe; ++fi)
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addWeightingFunction( weightingFunction.m_name, function.get(), featureParameters, weight);
+	queryeval->addWeightingFunction( name, function.get(), featureParameters, weight);
 	function.release();
 }
 

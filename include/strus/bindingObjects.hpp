@@ -475,15 +475,14 @@ private:
 };
 
 
-class Summarizer
+class SummarizerConfig
 {
 public:
 	/// \brief Constructor
-	explicit Summarizer( const std::string& name_)
-		:m_name(name_){}
+	SummarizerConfig(){}
 	/// \brief Copy constructor
-	Summarizer( const Summarizer& o)
-		:m_name(o.m_name),m_parameters(o.m_parameters),m_features(o.m_features){}
+	SummarizerConfig( const SummarizerConfig& o)
+		:m_parameters(o.m_parameters),m_features(o.m_features){}
 
 	/// \brief Define a summarizer feature
 	void defineParameter( const std::string& name_, const Variant& value_)
@@ -499,18 +498,16 @@ public:
 
 private:
 	friend class QueryEval;
-	std::string m_name;
 	std::map<std::string,Variant> m_parameters;
 	std::map<std::string,std::string> m_features;
 };
 
-class WeightingFunction
+class WeightingConfig
 {
 public:
-	explicit WeightingFunction( const std::string& name_)
-		:m_name(name_){}
-	WeightingFunction( const WeightingFunction& o)
-		:m_name(o.m_name),m_parameters(o.m_parameters){}
+	WeightingConfig(){}
+	WeightingConfig( const WeightingConfig& o)
+		:m_parameters(o.m_parameters){}
 
 	void defineParameter( const std::string& name_, const Variant& value_)
 	{
@@ -525,7 +522,6 @@ public:
 
 private:
 	friend class QueryEval;
-	std::string m_name;
 	std::map<std::string,Variant> m_parameters;
 	std::map<std::string,std::string> m_features;
 };
@@ -555,15 +551,21 @@ public:
 	void addRestrictionFeature( const std::string& set_);
 
 	/// \brief Declare a summarizer
+	/// \param[in] resultAttribute name of the result attribute this summarization result is assigned to
+	/// \param[in] name the name of the summarizer to add
+	/// \param[in] config the configuration of the summarizer to add
 	void addSummarizer(
 			const std::string& resultAttribute,
-			const Summarizer& summarizer);
+			const std::string& name,
+			const SummarizerConfig& config);
 
 	/// \brief Add a weighting function to use as summand of the document weight
-	/// \param[in] weightingFunction the function to add
+	/// \param[in] name the name of the weighting function to add
+	/// \param[in] config the configuration of the function to add
 	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	void addWeightingFunction(
-			const WeightingFunction& weightingFunction,
+			const std::string& name,
+			const WeightingConfig& config,
 			float weight);
 
 	/// \brief Create a query based on this query evaluation scheme
