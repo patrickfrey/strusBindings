@@ -278,28 +278,45 @@ public:
 	Document( const Document& o);
 
 	/// \brief Add a single term occurrence to the document for retrieval
+	/// \param[in] type_ term type name of the search index term
+	/// \param[in] value_ term value of the search index term
+	/// \param[in] position_ word count position of the search index term
 	void addSearchIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
 	/// \brief Add a single term occurrence to the document for use in the summary of a retrieval result
+	/// \param[in] type_ term type name of the forward index term
+	/// \param[in] value_ term value of the forward index term
+	/// \param[in] position_ word count position of the forward index term
 	void addForwardIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
 	/// \brief Define a meta data value of the document
+	/// \param[in] name_ name of the meta data table element
+	/// \param[in] value_ value of the meta data table element
 	void setMetaData( const std::string& name_, const Variant& value_);
 	/// \brief Define an attribute of the document
+	/// \param[in] name_ name of the document attribute
+	/// \param[in] value_ value of the document attribute
 	void setAttribute( const std::string& name_, const std::string& value_);
 	/// \brief Allow a user to access the document
+	/// \param[in] username_ name of the user to be allowed to access this document
 	/// \remark This function is only implemented if ACL is enabled in the storage
 	void setUserAccessRight( const std::string& username_);
 	/// \brief Set the document identifier (docid) of the document
+	/// \param[in] docid_ document identifier of this document
 	void setDocid( const std::string& docid_);
 
 	/// \brief Get the list of search terms of the document
+	/// \return the list of terms
 	const std::vector<Term>& searchIndexTerms() const		{return m_searchIndexTerms;}
 	/// \brief Get the list of forward terms of the document
+	/// \return the list of terms
 	const std::vector<Term>& forwardIndexTerms() const		{return m_forwardIndexTerms;}
 	/// \brief Get the list of meta data of the document
+	/// \return the list of meta data definitions
 	const std::vector<MetaData>& metaData() const			{return m_metaData;}
 	/// \brief Get the list of attributes of the document
+	/// \return the list of attributes
 	const std::vector<Attribute>& attributes() const		{return m_attributes;}
 	/// \brief Get the list of users that are allowed to access the document
+	/// \return the list of users allowed to access this document
 	const std::vector<std::string>& users() const			{return m_users;}
 	/// \brief Get the document identifier (docid) of the document
 	/// \return the document identifier
@@ -341,7 +358,7 @@ public:
 		const std::vector<Normalizer>& normalizers,
 		const std::vector<std::string>& options=std::vector<std::string>());
 
-	/// \brief Define how a feature to insert into the forward index (summarization) is selected, tokenized and normalized
+	/// \brief Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
 	/// \param[in] type type of the features produced
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
@@ -354,7 +371,7 @@ public:
 		const std::vector<Normalizer>& normalizers,
 		const std::vector<std::string>& options=std::vector<std::string>());
 
-	/// \brief Define how a feature to insert as meta data (summarization) is selected, tokenized and normalized
+	/// \brief Define how a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
@@ -365,7 +382,7 @@ public:
 		const Tokenizer& tokenizer,
 		const std::vector<Normalizer>& normalizers);
 
-	/// \brief Define how a feature to insert as document attribute (summarization) is selected, tokenized and normalized
+	/// \brief Define how a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
 	/// \param[in] attribname name of the addressed attribute.
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
@@ -377,6 +394,7 @@ public:
 		const std::vector<Normalizer>& normalizers);
 
 	/// \brief Analye the content and return the set of features to insert
+	/// \param[in] content string (NOT a file name !) of the document to analyze
 	Document analyze( const std::string& content);
 
 private:
@@ -431,8 +449,7 @@ private:
 };
 
 
-/// \brief Singleton object representing the client to the storage 
-///	of the information retrieval engine.
+/// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call StrusContext::createStorageClient(const std::string&)
 class StorageClient
 {
@@ -444,17 +461,23 @@ public:
 	~StorageClient(){}
 
 	/// \brief Get the number of documents inserted into the storage
+	/// return the total number of documents
 	GlobalCounter nofDocumentsInserted() const;
 
-	/// \brief Prepare inserting a document into the storage
+	/// \brief Prepare the inserting a document into the storage
+	/// \param[in] docid the identifier of the document to insert
+	/// \param[in] doc the structure of the document to insert
 	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
 	void insertDocument( const std::string& docid, const Document& doc);
 
-	/// \brief Prepare deletion of a document from the storage
+	/// \brief Prepare the deletion of a document from the storage
+	/// \param[in] docid the identifier of the document to delete
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
 	void deleteDocument( const std::string& docid);
 
-	/// \brief Delete all document access rights of a user
+	/// \brief Prepare the deletion of all document access rights of a user
+	/// \param[in] username the name of the user to delete all access rights (in the local collection)
+	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const std::string& username);
 
 	/// \brief Commit all insert or delete or user access right change statements open.
@@ -529,7 +552,7 @@ private:
 /// \brief Forward declaration
 class Query;
 
-/// \brief Query program object representing a retrieval method for documents in a storage.
+/// \brief Query evaluation program object representing an information retrieval scheme for documents in a storage.
 class QueryEval
 {
 public:
@@ -539,16 +562,25 @@ public:
 	~QueryEval(){}
 
 	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match phrases summarization)
+	/// \param[in] set_ identifier of the term set that is used to address the terms
+	/// \param[in] type_ feature type of the of the term
+	/// \param[in] value_ feature value of the of the term
 	void addTerm(
 			const std::string& set_,
 			const std::string& type_,
 			const std::string& value_);
 
 	/// \brief Declare a feature set to be used as selecting feature
+	/// \param[in] set_ identifier of the term set addressing the terms to use for selection
 	void addSelectionFeature( const std::string& set_);
 
 	/// \brief Declare a feature set to be used as restriction
+	/// \param[in] set_ identifier of the term set addressing the terms to use as restriction
 	void addRestrictionFeature( const std::string& set_);
+
+	/// \brief Declare a feature set to be used as exclusion
+	/// \param[in] set_ identifier of the term set addressing the terms to use as exclusion
+	void addExclusionFeature( const std::string& set_);
 
 	/// \brief Declare a summarizer
 	/// \param[in] resultAttribute name of the result attribute this summarization result is assigned to
@@ -559,7 +591,7 @@ public:
 			const std::string& name,
 			const SummarizerConfig& config);
 
-	/// \brief Add a weighting function to use as summand of the document weight
+	/// \brief Add a weighting function to use as summand of the total document weight
 	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	/// \param[in] name the name of the weighting function to add
 	/// \param[in] config the configuration of the function to add
@@ -568,8 +600,8 @@ public:
 			const std::string& name,
 			const WeightingConfig& config);
 
-	/// \brief Create a query based on this query evaluation scheme
-	/// \param[in] storage storage to issue the query on
+	/// \brief Create a query builder based on this query evaluation scheme
+	/// \param[in] storage storage to execute the query on
 	Query* createQuery( const StorageClient& storage) const;
 
 private:
@@ -644,10 +676,15 @@ public:
 	/// \brief Destructor
 	~Query(){}
 
-	/// \brief Push a single term feature on the stack
+	/// \brief Push a single term on the stack
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
 	void pushTerm( const std::string& type_, const std::string& value_);
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
+	/// \param[in] opname_ name of the expression operator
+	/// \param[in] argc number of operands (topmost elements from stack) of the expression
+	/// \param[in] range_ range number for the expression span in the document
 	void pushExpression( const std::string& opname_, unsigned int argc, int range_);
 
 	/// \brief Push a duplicate of the topmost element of the query stack
@@ -661,9 +698,11 @@ public:
 	void attachVariable( const std::string& name_);
 
 	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
+	/// \param[in] set_ name of the feature set, this feature is addressed with
+	/// \param[in] weight_ individual weight of the feature in the query
 	void defineFeature( const std::string& set_, float weight_=1.0);
 
-	/// \brief Define a meta data restrictions
+	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] operand numeric value to compare with the meta data field (right side of comparison operator)
@@ -672,16 +711,20 @@ public:
 			const char* compareOp, const std::string& name,
 			const Variant& operand, bool newGroup=true);
 
-	/// \brief Set maximum number of ranks to evaluate (not the maximum size of the result rank list. This is maxNofRanks - minRank)
+	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
+	/// \param[in] maxNofRanks_ maximum number of results to return by this query
 	void setMaxNofRanks( unsigned int maxNofRanks_);
 
 	/// \brief Set the index of the first rank to be returned
+	/// \param[in] minRank_ index of the first rank to be returned by this query
 	void setMinRank( unsigned int minRank_);
 
-	/// \brief Set the user of the query (overwrites the current user set silently)
-	void setUserName( const std::string& username_);
+	/// \brief Add a user for this query (as alternative role)
+	/// \param[in] username_ an alternative name of a user for the evaluation of this query
+	/// \note the user restriction applies if no user role specified in the query is allowed to see the document.
+	void addUserName( const std::string& username_);
 
-	/// \brief Evaluate the query
+	/// \brief Evaluate this query and return the result
 	/// \return the result
 	std::vector<Rank> evaluate() const;
 
@@ -697,7 +740,14 @@ private:
 };
 
 
-/// \brief Object holding the global context of the strus IR engine
+/// \brief Object holding the global context of the strus information retrieval engine
+/// \note There a two modes of this context object operating on a different base.
+///	If you create this object without parameter, then the context is local.
+///	In a local context you can load modules, define resources, etc. If you create
+///	this object with a connection string as parameter, then all object created by
+///	this context reside on the server (strusRpcServer) addressed with the connection string.
+///	In this case loaded modules and resources are ignored. What modules to use is then
+///	specified on server startup.
 class StrusContext
 {
 public:
@@ -715,17 +765,18 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void loadModule( const std::string& name_);
 
-	/// \brief Define where to load modules from
+	/// \brief Add a path from where to try to load modules from
 	/// \param[in] paths semicolon separated list of module search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addModulePath( const std::string& paths_);
 
 	/// \brief Define where to load analyzer resource files from
-	/// \param[in] paths semicolon separated list of module search paths
+	/// \param[in] paths semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const std::string& paths_);
 
 	/// \brief Create a storage client instance
+	/// \param[in] config_ configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,
 	StorageClient createStorageClient( const std::string& config_);
 
 	/// \brief Create a new storage (physically) described by config

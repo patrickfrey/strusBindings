@@ -23,7 +23,7 @@
 <description>Get the name of the document meta data element</description>
 </method>
 
-<method id="value" return="variant">
+<method id="value" return="Variant">
 <description>Get the value of the document meta data element</description>
 </method>
 
@@ -48,7 +48,7 @@
 <description>term type name of the search index term</description>
 </param>
 <param name="value" type="string">
-<description>term value name of the search index term</description>
+<description>term value of the search index term</description>
 </param>
 <param name="position" type="int">
 <description>word count position of the search index term</description>
@@ -61,7 +61,7 @@
 <description>term type name of the forward index term</description>
 </param>
 <param name="value" type="string">
-<description>term value name of the forward index term</description>
+<description>term value of the forward index term</description>
 </param>
 <param name="position" type="int">
 <description>word count position of the forward index term</description>
@@ -131,7 +131,7 @@
 </class>
 <class id="DocumentAnalyzer">
 
-<description>Analyzer object representing a program for segmenting, tokenizing and normalizing a document into atomic parts, that can be inserted into a storage and be retrieved from there.</description>
+<description>Analyzer object representing a program for segmenting, tokenizing and normalizing a document into its atomic parts, that can be inserted into a storage and be retrieved from there.</description>
 <remark>The only way to construct a document analyzer instance is to call StrusContext::createDocumentAnalyzer()</remark>
 
 <method id="addSearchIndexFeature" return="void">
@@ -145,12 +145,12 @@
 <description>expression selecting the elements to fetch for producing this feature</description>
 </param>
 
-<param name="tokenizer" type="Tokenizer">
-<description>tokenizer function description to use for this feature</description>
+<param name="tokenizer" type="StringList">
+<description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
 </param>
 
-<param name="normalizers" type="vector<Normalizer>">
-<description>list of normalizer function descriptions to use for this feature in the ascending order of appearance</description>
+<param name="normalizers" type="vector<StringList>">
+<description>list of normalizer function descriptions  as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
 </param>
 
 <param name="options" type="vector<string>">
@@ -158,423 +158,446 @@
 </param>
 </method>
 
-
-	/// \brief Define how a feature to insert into the forward index (summarization) is selected, tokenized and normalized
-	/// \param[in] type type of the features produced
-	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
-	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
-	void addForwardIndexFeature(
-		const std::string& type,
-		const std::string& selectexpr,
-		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers,
-		const std::vector<std::string>& options=std::vector<std::string>());
-
-	/// \brief Define how a feature to insert as meta data (summarization) is selected, tokenized and normalized
-	/// \param[in] fieldname name of the addressed meta data field.
-	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
-	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	void defineMetaData(
-		const std::string& fieldname,
-		const std::string& selectexpr,
-		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers);
-
-	/// \brief Define how a feature to insert as document attribute (summarization) is selected, tokenized and normalized
-	/// \param[in] attribname name of the addressed attribute.
-	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
-	/// \param[in] tokenizer tokenizer function description to use for this feature
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	void defineAttribute(
-		const std::string& attribname,
-		const std::string& selectexpr,
-		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers);
-
-	/// \brief Analye the content and return the set of features to insert
-	Document analyze( const std::string& content);
-
-private:
-	/// \brief Constructor used by StrusContext
-	friend class StrusContext;
-	DocumentAnalyzer( const Reference& objbuilder, const std::string& segmentername);
-
-	Reference m_objbuilder_impl;
-	Reference m_analyzer_impl;
-};
-
-
-/// \class QueryAnalyzer
-/// \brief Analyzer object representing a set of function for transforming a phrase,
-///	the smallest unit in any query language, to a set of terms that can be used
-///	to build a query.
-/// \remark The only way to construct a query analyzer instance is to call StrusContext::createQueryAnalyzer()
-class QueryAnalyzer
-{
-public:
-	/// \brief Copy constructor
-	QueryAnalyzer( const QueryAnalyzer& o);
-	/// \brief Destructor
-	~QueryAnalyzer(){}
-
-	/// \brief Defines a phrase type by name. Phrases can be passed together with this name
-	///		to the query analyzer to get the terms for building query.
-	/// \param[in] phraseType name of the phrase type defined
-	/// \param[in] featureType feature type name assigned to the features created by this phrase type
-	/// \param[in] tokenizer tokenizer function description to use for the features of this phrase type
-	/// \param[in] normalizers list of normalizer function description to use for the features of this phrase type in the ascending order of appearance
-	void definePhraseType(
-			const std::string& phraseType,
-			const std::string& featureType,
-			const Tokenizer& tokenizer,
-			const std::vector<Normalizer>& normalizers);
-
-	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
-	/// \param[in] phraseType name of the phrase type to use for analysis
-	/// \param[in] phraseContent content string of the query phrase to analyze
-	std::vector<Term> analyzePhrase(
-			const std::string& phraseType,
-			const std::string& phraseContent) const;
-
-private:
-	/// \brief Constructor used by StrusContext
-	friend class StrusContext;
-	explicit QueryAnalyzer( const Reference& objbuilder);
-
-	Reference m_objbuilder_impl;
-	Reference m_analyzer_impl;
-};
-
-
-/// \brief Singleton object representing the client to the storage 
-///	of the information retrieval engine.
-/// \remark The only way to construct a storage client instance is to call StrusContext::createStorageClient(const std::string&)
-class StorageClient
-{
-public:
-	/// \brief Copy constructor
-	StorageClient( const StorageClient& o);
-
-	/// \brief Destructor
-	~StorageClient(){}
-
-	/// \brief Get the number of documents inserted into the storage
-	GlobalCounter nofDocumentsInserted() const;
-
-	/// \brief Prepare inserting a document into the storage
-	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
-	void insertDocument( const std::string& docid, const Document& doc);
-
-	/// \brief Prepare deletion of a document from the storage
-	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
-	void deleteDocument( const std::string& docid);
-
-	/// \brief Delete all document access rights of a user
-	void deleteUserAccessRights( const std::string& username);
-
-	/// \brief Commit all insert or delete or user access right change statements open.
-	void flush();
-
-	/// \brief Close of the storage client
-	void close();
-
-private:
-	friend class StrusContext;
-	StorageClient( const Reference& objbuilder, const std::string& config);
-
-	friend class Query;
-	friend class QueryEval;
-	Reference m_objbuilder_impl;
-	Reference m_storage_impl;
-	Reference m_transaction_impl;
-};
-
-
-class SummarizerConfig
-{
-public:
-	/// \brief Constructor
-	SummarizerConfig(){}
-	/// \brief Copy constructor
-	SummarizerConfig( const SummarizerConfig& o)
-		:m_parameters(o.m_parameters),m_features(o.m_features){}
-
-	/// \brief Define a summarizer feature
-	void defineParameter( const std::string& name_, const Variant& value_)
-	{
-		m_parameters[ name_] = value_;
-	}
-
-	/// \brief Define a summarizer feature
-	void defineFeature( const std::string& class_, const std::string& set_)
-	{
-		m_features[ class_] = set_;
-	}
-
-private:
-	friend class QueryEval;
-	std::map<std::string,Variant> m_parameters;
-	std::map<std::string,std::string> m_features;
-};
-
-class WeightingConfig
-{
-public:
-	WeightingConfig(){}
-	WeightingConfig( const WeightingConfig& o)
-		:m_parameters(o.m_parameters){}
-
-	void defineParameter( const std::string& name_, const Variant& value_)
-	{
-		m_parameters[ name_] = value_;
-	}
-
-	/// \brief Define a weighting feature
-	void defineFeature( const std::string& class_, const std::string& set_)
-	{
-		m_features[ class_] = set_;
-	}
-
-private:
-	friend class QueryEval;
-	std::map<std::string,Variant> m_parameters;
-	std::map<std::string,std::string> m_features;
-};
-
-/// \brief Forward declaration
-class Query;
-
-/// \brief Query program object representing a retrieval method for documents in a storage.
-class QueryEval
-{
-public:
-	/// \brief Copy constructor
-	QueryEval( const QueryEval& o);
-	/// \brief Destructor
-	~QueryEval(){}
-
-	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match phrases summarization)
-	void addTerm(
-			const std::string& set_,
-			const std::string& type_,
-			const std::string& value_);
-
-	/// \brief Declare a feature set to be used as selecting feature
-	void addSelectionFeature( const std::string& set_);
-
-	/// \brief Declare a feature set to be used as restriction
-	void addRestrictionFeature( const std::string& set_);
-
-	/// \brief Declare a summarizer
-	/// \param[in] resultAttribute name of the result attribute this summarization result is assigned to
-	/// \param[in] name the name of the summarizer to add
-	/// \param[in] config the configuration of the summarizer to add
-	void addSummarizer(
-			const std::string& resultAttribute,
-			const std::string& name,
-			const SummarizerConfig& config);
-
-	/// \brief Add a weighting function to use as summand of the document weight
-	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
-	/// \param[in] name the name of the weighting function to add
-	/// \param[in] config the configuration of the function to add
-	void addWeightingFunction(
-			float weight,
-			const std::string& name,
-			const WeightingConfig& config);
-
-	/// \brief Create a query based on this query evaluation scheme
-	/// \param[in] storage storage to issue the query on
-	Query* createQuery( const StorageClient& storage) const;
-
-private:
-	/// \brief Constructor used by strusContext
-	friend class StrusContext;
-	explicit QueryEval( const Reference& objbuilder);
-
-	friend class Query;
-	Reference m_objbuilder_impl;
-	Reference m_queryeval_impl;
-};
-
-
-/// \brief Attribute of a query evaluation result element
-class RankAttribute
-{
-public:
-	/// \brief Constructor
-	RankAttribute(){}
-	/// \brief Constructor
-	RankAttribute( const std::string& name_, const std::string& value_)
-		:m_name(name_),m_value(value_){}
-	/// \brief Copy connstructor
-	RankAttribute( const RankAttribute& o)
-		:m_name(o.m_name),m_value(o.m_value){}
-
-	/// \brief Get the name of this attribute
-	const std::string& name() const		{return m_name;}
-	/// \brief Get the value of this attribute
-	const std::string& value() const	{return m_value;}
-
-private:
-	friend class Query;
-	std::string m_name;
-	std::string m_value;
-};
-
-/// \brief Weighted document reference with attributes (result of a query evaluation)
-class Rank
-{
-public:
-	/// \brief Constructor
-	Rank()
-		:m_docno(0),m_weight(0.0){}
-	/// \brief Constructor
-	Rank( Index docno_, float weight_, const std::vector<RankAttribute>& attributes_)
-		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
-	/// \brief Copy constructor
-	Rank( const Rank& o)
-		:m_docno(o.m_docno),m_weight(o.m_weight),m_attributes(o.m_attributes){}
-
-	/// \brief Get the internal document nuber used
-	Index docno() const					{return m_docno;}
-	/// \brief Get the weight of the rank
-	float weight() const					{return m_weight;}
-	/// \brief Get the attributes
-	const std::vector<RankAttribute>& attributes() const	{return m_attributes;}
-
-private:
-	friend class Query;
-	Index m_docno;
-	float m_weight;
-	std::vector<RankAttribute> m_attributes;
-};
-
-/// \brief Query program object representing a retrieval method for documents in a storage.
-class Query
-{
-public:
-	/// \brief Copy constructor
-	Query( const Query& o);
-	/// \brief Destructor
-	~Query(){}
-
-	/// \brief Push a single term feature on the stack
-	void pushTerm( const std::string& type_, const std::string& value_);
-
-	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
-	void pushExpression( const std::string& opname_, unsigned int argc, int range_);
-
-	/// \brief Push a duplicate of the topmost element of the query stack
-	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
-	void pushDuplicate();
-
-	/// \brief Attaches a variable to the top expression or term on the query stack.
-	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
-	/// \param[in] name_ name of the variable attached
-	/// \remark The stack is not changed
-	void attachVariable( const std::string& name_);
-
-	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
-	void defineFeature( const std::string& set_, float weight_=1.0);
-
-	/// \brief Define a meta data restrictions
-	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
-	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] operand numeric value to compare with the meta data field (right side of comparison operator)
-	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
-			const char* compareOp, const std::string& name,
-			const Variant& operand, bool newGroup=true);
-
-	/// \brief Set maximum number of ranks to evaluate (not the maximum size of the result rank list. This is maxNofRanks - minRank)
-	void setMaxNofRanks( unsigned int maxNofRanks_);
-
-	/// \brief Set the index of the first rank to be returned
-	void setMinRank( unsigned int minRank_);
-
-	/// \brief Set the user of the query (overwrites the current user set silently)
-	void setUserName( const std::string& username_);
-
-	/// \brief Evaluate the query
-	/// \return the result
-	std::vector<Rank> evaluate() const;
-
-private:
-	friend class QueryEval;
-	Query( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_)
-		:m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_){}
-
-	Reference m_objbuilder_impl;
-	Reference m_storage_impl;
-	Reference m_queryeval_impl;
-	Reference m_query_impl;
-};
-
-
-/// \brief Object holding the global context of the strus IR engine
-class StrusContext
-{
-public:
-	/// \brief Constructor for local mode with own module loader
-	StrusContext();
-	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
-	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	StrusContext( const char* connectionstring);
-	/// \brief Copy constructor
-	StrusContext( const StrusContext& o);
-	/// \brief Destructor
-	~StrusContext(){}
-
-	/// \brief Load a module
-	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void loadModule( const std::string& name_);
-
-	/// \brief Define where to load modules from
-	/// \param[in] paths semicolon separated list of module search paths
-	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void addModulePath( const std::string& paths_);
-
-	/// \brief Define where to load analyzer resource files from
-	/// \param[in] paths semicolon separated list of module search paths
-	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void addResourcePath( const std::string& paths_);
-
-	/// \brief Create a storage client instance
-	StorageClient createStorageClient( const std::string& config_);
-
-	/// \brief Create a new storage (physically) described by config
-	/// \remark Fails if the storage already exists
-	void createStorage( const std::string& config_);
-
-	/// \brief Delete the storage (physically) described by config
-	/// \note Handle this function carefully
-	void destroyStorage( const std::string& config_);
-
-	/// \brief Create a document analyzer instance
-	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
-	DocumentAnalyzer createDocumentAnalyzer( const std::string& segmentername_="");
-
-	/// \brief Create a query analyzer instance
-	QueryAnalyzer createQueryAnalyzer();
-
-	/// \brief Create a query evaluation instance
-	QueryEval createQueryEval();
-
-private:
-	void initStorageObjBuilder();
-	void initAnalyzerObjBuilder();
-
-private:
-	Reference m_moduleloader_impl;
-	Reference m_rpc_impl;
-	Reference m_storage_objbuilder_impl;
-	Reference m_analyzer_objbuilder_impl;
-};
-
-#endif
+<method id="addForwardIndexFeature" return="void">
+<description>Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized</description>
+
+<param name="type" type="string">
+<description>type type of the features produced</description>
+</param>
+
+<param name="selectexpr" type="string">
+<description>expression selecting the elements to fetch for producing this feature</description>
+</param>
+
+<param name="tokenizer" type="StringList">
+<description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
+</param>
+
+<param name="normalizers" type="vector<StringList>">
+<description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
+</param>
+
+<param name="options" type="vector<string>">
+<description>list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature</description>
+</param>
+</method>
+
+<method id="defineMetaData" return="void">
+<description>Define how a feature to insert as meta data is selected, tokenized and normalized.</description>
+
+<param name="fieldname" type="string">
+<description>name of the addressed meta data table element</description>
+</param>
+
+<param name="selectexpr" type="string">
+<description>expression selecting the elements to fetch for producing this feature</description>
+</param>
+
+<param name="tokenizer" type="StringList">
+<description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
+</param>
+
+<param name="normalizers" type="vector<StringList>">
+<description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
+</param>
+</method>
+
+<method id="defineAttribute" return="void">
+<description>Define how a feature to insert as document attribute (summarization) is selected, tokenized and normalized.</description>
+
+<param name="attribname" type="string">
+<description>name of the addressed attribute</description>
+</param>
+
+<param name="selectexpr" type="string">
+<description>expression selecting the elements to fetch for producing this feature</description>
+</param>
+
+<param name="tokenizer" type="StringList">
+<description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
+</param>
+
+<param name="normalizers" type="vector<StringList>">
+<description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
+</param>
+</method>
+
+<method id="analyze" return="Document">
+<description>Analye the content and return the document structure.</description>
+</method>
+
+<param name="content" type="string">
+<description>content string (NOT a file name !) of the document to analyze</description>
+</param>
+</method>
+
+</class>
+<class id="QueryAnalyzer">
+<description>Analyzer object representing a set of functions for segmenting, tokenizing and normalizing a phrase into its atomic parts, that can be used for document retrieval.</description>
+<remark>The only way to construct a query analyzer instance is to call createQueryAnalyzer of StrusContext.</remark>
+
+<method id="definePhraseType" return="void">
+<description>Defines a phrase type by name. Phrases can be passed together with this name to the query analyzer to get the terms for building query.</description>
+
+<param name="phraseType" type="string">
+<description>name of the phrase type defined</description>
+</param>
+
+<param name="featureType" type="string">
+<description>feature type name assigned to the features created by this phrase type</description>
+</param>
+
+<param name="tokenizer" type="StringList">
+<description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this phrase type</description>
+</param>
+
+<param name="normalizers" type="vector<StringList>">
+<description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this phrase type in the ascending order of appearance</description>
+</param>
+</method>
+
+<method id="analyzePhrase" return="vector<Term>">
+<description>Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.</description>
+
+<param name="phraseType" type="string">
+<description>name of the phrase type to select analysis method</description>
+</param>
+
+<param name="phraseContent" type="string">
+<description>content string of the phrase to analyze</description>
+</param>
+</method>
+
+</class>
+<class id="StorageClient">
+<description>Object representing a client connection to the storage .</description>
+<remark>The only way to construct a storage client instance is to call the method createStorageClient of StrusContext.</remark>
+
+<method id="nofDocumentsInserted" return="GlobalCounter">
+<description>Get the global number of documents inserted into all storage nodes (of all nodes of the search index).</description>
+</method>
+
+<method id="insertDocument" return="void">
+<description>Prepare the inserting a document into the storage.</description>
+<remark>The document is physically inserted with the next implicit or explicit call of 'flush'</remark>
+
+<param name="docid" type="string">
+<description>the identifier of the document to insert</description>
+</param>
+
+<param name="doc" type="Document">
+<description>the structure of the document to insert</description>
+</param>
+</method>
+
+<method id="deleteDocument" return="void">
+<description>Prepare the deletion of a document from the storage.</description>
+<remark>The document is physically deleted with the next implicit or explicit call of 'flush'</remark>
+
+<param name="docid" type="string">
+<description>the identifier of the document to delete</description>
+</param>
+</method>
+
+<method id="deleteUserAccessRights" return="void">
+<description>Prepare the deletion of all document access rights of a user.</description>
+<remark>The user access rights are changed accordingly with the next implicit or explicit call of 'flush'</remark>
+
+<param name="username" type="string">
+<description>the name of the user to delete all access rights (in the local collection)</description>
+</param>
+</method>
+
+<method id="flush" return="void">
+<description>Commit all insert or delete or user access right change statements open.</description>
+</method>
+
+<method id="close" return="void">
+<description>Close the storage client.</description>
+</method>
+
+</class>
+<class id="QueryEval">
+<description>Query evaluation program object representing an information retrieval scheme for documents in a storage.</description>
+
+<method id="addTerm" return="void">
+<description>Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match phrases summarization).</description>
+
+<param name="set" type="string">
+<description>identifier of the term set that is used to address the terms</description>
+</param>
+
+<param name="type" type="string">
+<description>feature type of the of the term</description>
+</param>
+
+<param name="value" type="string">
+<description>feature value of the of the term</description>
+</param>
+</method>
+
+<method id="addSelectionFeature" return="void">
+<description>Declare a feature set to be used as selecting feature.</description>
+
+<param name="set" type="string">
+<description>identifier of the term set addressing the terms to use for selection</description>
+</param>
+</method>
+
+<method id="addRestrictionFeature" return="void">
+<description>Declare a feature set to be used as restriction.</description>
+
+<param name="set" type="string">
+<description>identifier of the term set addressing the terms to use as restriction</description>
+</param>
+</method>
+
+<method id="addExclusionFeature" return="void">
+<description>Declare a feature set to be used as exclusion.</description>
+
+<param name="set" type="string">
+<description>identifier of the term set addressing the terms to use as exclusion</description>
+</param>
+</method>
+
+<method id="addSummarizer" return="void">
+<description>Declare a summarizer.</description>
+
+<param name="resultAttribute" type="string">
+<description>name of the result attribute this summarization result is assigned to</description>
+</param>
+
+<param name="name" type="string">
+<description>the name of the summarizer to add</description>
+</param>
+
+<param name="config" type="Map">
+<description>a list of named configuration options (implementation depending on language) of the summarizer to add.
+	The values of the configuration options can be numeric or of type string. 
+	Key identifiers starting with a dot '.' are declaring feature parameters.
+	The names of the configuration key identifiers depend on the summarizer implementation.</description>
+</param>
+</method>
+
+<method id="addWeightingFunction" return="void">
+<description>Add a weighting function to use as summand of the total document weight.</description>
+
+<param name="weight" type="float">
+<description>additive weight of the document</description>
+</param>
+
+<param name="name" type="string">
+<description>the name of weighting function to add</description>
+</param>
+
+<param name="config" type="Map">
+<description>a list of named configuration options (implementation depending on language) of the weighting function to add.
+	The values of the configuration options can be numeric or of type string. 
+	Key identifiers starting with a dot '.' are declaring feature parameters.
+	The names of the configuration key identifiers depend on the weighting function implementation.</description>
+</param>
+</method>
+
+<method id="createQuery" return="Query">
+<description>Create a query builder based on this query evaluation scheme.</description>
+
+<param name="storage" type="StorageClient">
+<description>storage to execute the query on</description>
+</param>
+</method>
+
+</class>
+<class id="Query">
+<description>Object representing an instance of a query for documents in a storage.</description>
+<note>The expressions of the query are constructed as tree with a classical stack machine.</note>
+<remark>The only way to construct a query instance is to call the method createQuery of QueryEval.</remark>
+
+<method id="pushTerm" return="void">
+<description>Push a single term on the stack.</description>
+
+<param name="type" type="string">
+<description>query term type name</description>
+</param>
+
+<param name="value" type="string">
+<description>query term value</description>
+</param>
+</method>
+
+<method id="pushExpression" return="void">
+<description>Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack.</description>
+
+<param name="opname" type="string">
+<description>name of the expression operator</description>
+</param>
+
+<param name="argc" type="int">
+<description>number of operands (topmost elements from stack) of the expression</description>
+</param>
+
+<param name="range" type="int">
+<description>span ot the expression in the document</description>
+</param>
+</method>
+
+<method id="pushDuplicate" return="void">
+<description>Push a duplicate of the topmost element of the query stack.</description>
+<remark>This function makes it possible to reference terms or expressions more than once as features or as subexpressions.</remark>
+</method>
+
+<method id="attachVariable" return="void">
+<description>Attaches a variable to the topmost expression or term on the query stack.</description>
+<note>The positions of the query matches of the referenced term or expression in a document can be accessed through this variable in summarization.</note>
+
+<param name="name" type="string">
+<description>name of the variable attached</description>
+</param>
+</method>
+
+<method id="defineFeature" return="void">
+<description>Create a feature from the top element on the stack (and pop the element from the stack).</description>
+
+<param name="name" type="string">
+<description>name of the set that is used to address this feature</description>
+</param>
+
+<param name="weight" type="float">
+<description>individual weight of this feature in the query</description>
+</param>
+</method>
+
+<method id="defineMetaDataRestriction" return="void">
+<description>Define a meta data restriction.</description>
+
+<param name="compareOp" type="string">
+<description>compare operator, one of "=","!=",">=","<=","<",">".</description>
+</param>
+
+<param name="name" type="string">
+<description>name of the meta data field (left side of comparison operator)</description>
+</param>
+
+<param name="operand" type="Variant">
+<description>numeric value to compare with the meta data field (right side of comparison operator)</description>
+</param>
+
+<param name="newGroup" type="bool">
+<description>true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)</description>
+<note>The grouping with the 'newGroup' parameter helps to build expressions in conjunctive normal form. If 'newGroup' is true, then a new group of OR elements is started.</note>
+</param>
+</method>
+
+<method id="setMaxNofRanks" return="void">
+<description>Set maximum number of ranks to return as query result.</description>
+
+<param name="maxNofRanks" type="int">
+<description>maximum number of results to return by this query</description>
+</param>
+</method>
+
+<method id="setMinRank" return="void">
+<description>Set the index of the first rank to be returned by this query.</description>
+
+<param name="minRank" type="int">
+<description>index of the first rank to be returned by this query</description>
+</param>
+</method>
+
+<method id="addUserName" return="void">
+<description>Add a user for this query (as alternative role).</description>
+<note>The user restriction applies if no user role specified in the query is allowed to see the document</note>
+
+<param name="username" type="string">
+<description>an alternative name of a user for the evaluation of this query</description>
+</param>
+</method>
+
+<method id="evaluate" return="vector<Map>">
+<description>Evaluate this query and return the result. The result is a list of 
+associative arrays. Some elements of the map of one result are hardcoded like "weight" and "docno".
+The rest is defined by the summarizers used. </description>
+</method>
+
+</class>
+<class id="StrusContext">
+<description>Object holding the global context of the strus information retrieval engine</description>
+<note>There a two modes of this context object operating on a different base.
+	If you create this object without parameter, then the context is local.
+	In a local context you can load modules, define resources, etc. If you create
+	this object with a connection string as parameter, then all object created by
+	this context reside on the server (strusRpcServer) addressed with the connection string.
+	In this case loaded modules and resources are ignored. What modules to use is then
+	specified on server startup.</note>
+
+<method id="loadModule" return="void">
+<description>Load a module</description>
+<remark>Only implemented in local context mode with own module loader</remark>
+
+<param name="paths" type="string">
+<description>semicolon separated list of module search paths</description>
+</param>
+</method>
+
+<method id="addModulePath" return="void">
+<description>Add a path from where to try to load modules from</description>
+<remark>Only implemented in local context mode with own module loader</remark>
+
+<param name="paths" type="string">
+<description>semicolon separated list of module search paths or single path</description>
+</param>
+</method>
+
+<method id="addResourcePath" return="void">
+<description>Add a path from where to try to load resources from</description>
+<remark>Only implemented in local context mode with own module loader</remark>
+
+<param name="paths" type="string">
+<description>semicolon separated list of resource search paths or single path</description>
+</param>
+</method>
+
+<method id="createStorageClient" return="StorageClient">
+<description>Create a storage client instance</description>
+
+<param name="config" type="string">
+<description>configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,<description>
+</param>
+</method>
+
+<method id="createStorage" return="void">
+<description>Create a new storage (physically) described by config</description>
+
+<param name="config" type="string">
+<description>configuration string of the new storage<description>
+</param>
+</method>
+
+<method id="destroyStorage" return="void">
+<description>Destroy a storage (physically) described by config</description>
+<note>Handle this function carefully</note>
+
+<param name="config" type="string">
+<description>configuration string identifying the storage to destroy<description>
+</param>
+</method>
+
+<method id="createDocumentAnalyzer" return="DocumentAnalyzer">
+<description>Create a document analyzer instance</description>
+
+<param name="segmentername" type="string">
+<description>name of the segmenter to use (if empty then the default segmenter is used)<description>
+</param>
+</method>
+
+<method id="createQueryAnalyzer" return="QueryAnalyzer">
+<description>Create a query analyzer instance</description>
+</method>
+
+<method id="createQueryAnalyzer" return="QueryEval">
+<description>Create a query evaluation instance</description>
+</method>
+
+</class>
+</bindings>
 
 

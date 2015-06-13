@@ -646,6 +646,12 @@ DLL_PUBLIC void QueryEval::addRestrictionFeature( const std::string& set_)
 	queryeval->addRestrictionFeature( set_);
 }
 
+DLL_PUBLIC void QueryEval::addExclusionFeature( const std::string& set_)
+{
+	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
+	queryeval->addExclusionFeature( set_);
+}
+
 DLL_PUBLIC void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
 		const std::string& name,
@@ -821,10 +827,10 @@ DLL_PUBLIC void Query::setMinRank( unsigned int minRank_)
 	THIS->setMinRank( minRank_);
 }
 
-DLL_PUBLIC void Query::setUserName( const std::string& username_)
+DLL_PUBLIC void Query::addUserName( const std::string& username_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->setUserName( username_);
+	THIS->addUserName( username_);
 }
 
 DLL_PUBLIC std::vector<Rank> Query::evaluate() const
