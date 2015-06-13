@@ -33,7 +33,8 @@
 		<h3><xsl:value-of select="@id"/></h3>
 		<p class="description"><xsl:value-of select="description"/></p>
 		<h4>Methods</h4>
-		<table>
+		<div id="api">
+		<table border="1">
 		<tr>
 		<th width="10%" align="left">Name</th>
 		<th width="10%" align="left">Result</th>
@@ -51,6 +52,7 @@
 		</tr>
 		</xsl:for-each>
 		</table>
+		</div>
 		</xsl:for-each>
 	</div>
 </div>
