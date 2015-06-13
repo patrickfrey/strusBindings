@@ -21,12 +21,16 @@
 		with no explicit typeing we refer to the type of an object that exists only as 
 		a single instance in the context by using the name of the object type starting with
 		a lower case letter as name of the variable. The snippet
+		</p>
 		<pre>
                         $query = $queryEval->createQuery( $storage);
 		</pre>
-		States the construction of an object of type <i>Query</i> with the name <i>query</i>
-		by an object of type <i>QueryEval</i> with name <i>queryEval</i> with the parameter
-		of type <i>Storage</i> named <i>storage</i>.
+		<p class="description">
+		States the construction of an object of type <a href="#Query">Query</a> with the name <i>query</i>
+		by an object of type <a href="#QueryEval">QueryEval</a> with name <i>queryEval</i> with the parameter
+		of type <a href="#Storage">Storage</a> named <i>storage</i>.
+		<br/> The root object you construct first in PHP is <a href="#StrusContext">the
+		strus context</a>.
 		</p>
 
 		<xsl:for-each select="bindings/class">
@@ -104,6 +108,9 @@
 				<xsl:when test="@return = 'Map[]'">
 				List of associative arrays with strings as keys and string or numeric values
 				</xsl:when>
+				<xsl:when test="@return = 'Variant'">
+					Any numeric type (byte, int, float)
+				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="@return"/>
 				</xsl:otherwise>
@@ -120,6 +127,9 @@
 				</xsl:when>
 				<xsl:when test="@type = 'Map[]'">
 					(type list of associative arrays)
+				</xsl:when>
+				<xsl:when test="@type = 'Variant'">
+					Any numeric type (byte, int, float)
 				</xsl:when>
 				<xsl:otherwise>
 				</xsl:otherwise>
