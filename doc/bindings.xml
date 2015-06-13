@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bindings>
 <class id="Term">
-<description>Single term occurrence in the document</description>
+<description>Single term occurrence in a document.</description>
 
 <method id="type" return="string">
-<description>Get the type name ot the term</description>
+<description>Get the type name ot the term.</description>
 </method>
 
 <method id="value" return="string">
-<description>Get the value ot the term</description>
+<description>Get the value ot the term.</description>
 </method>
 
 <method id="position" return="int">
-<description>Get the word count position ot the term</description>
+<description>Get the word count position ot the term.</description>
 </method>
 
 </class>
-<description>Meta data table element of a document</description>
+<description>Meta data table element of a document.</description>
 <class id="MetaData">
+<description>Meta data element of a document.</description>
 
 <method id="name" return="string">
-<description>Get the name of the document meta data element</description>
+<description>Get the name of the document meta data element.</description>
 </method>
 
 <method id="value" return="Variant">
-<description>Get the value of the document meta data element</description>
+<description>Get the value of the document meta data element.</description>
 </method>
 
 </class>
 <class id="Attribute">
-<description>Attribute of a document</description>
+<description>Attribute of a document.</description>
 
 <method id="name" return="string">
-<description>Get the name of the document attribute</description>
+<description>Get the name of the document attribute.</description>
 </method>
 
 <method id="value" return="string">
-<description>Get the value of the document attribute</description>
+<description>Get the value of the document attribute.</description>
 </method>
 
 </class>
@@ -44,6 +45,7 @@
 <description>Document definition</description>
 
 <method id="addSearchIndexTerm" return="void">
+<description>Add a single term occurrence to the document for retrieval (inverted index).</description>
 <param name="type" type="string">
 <description>term type name of the search index term</description>
 </param>
@@ -53,10 +55,10 @@
 <param name="position" type="int">
 <description>word count position of the search index term</description>
 </param>
-<description>Add a single term occurrence to the document for retrieval (inverted index)</description>
 </method>
 
 <method id="addForwardIndexTerm" return="void">
+<description>Add a single term occurrence to the document for summarization (forward index).</description>
 <param name="type" type="string">
 <description>term type name of the forward index term</description>
 </param>
@@ -66,42 +68,41 @@
 <param name="position" type="int">
 <description>word count position of the forward index term</description>
 </param>
-<description>Add a single term occurrence to the document for summarization (forward index)</description>
 </method>
 
 <method id="setMetaData" return="void">
+<description>Define a meta data table element value of the document for query restrictions and summarization.</description>
 <param name="name" type="string">
 <description>name ot the meta data element</description>
 </param>
 <param name="value" type="string">
 <description>value of the meta data element</description>
 </param>
-<description>Define a meta data table element value of the document for query restrictions and summarization</description>
 </method>
 
 <method id="setAttribute" return="void">
+<description>Define an attribute of the document for summarization.</description>
 <param name="name" type="string">
 <description>name of the document attribute</description>
 </param>
 <param name="value" type="string">
 <description>value of the document attribute</description>
 </param>
-<description>Define an attribute of the document for summarization</description>
 </method>
 
 <method id="setUserAccessRight" return="void">
+<description>Allow a user to access the document.</description>
+<remark>This function is only implemented if ACL is enabled in the storage.</remark>
 <param name="username" type="string">
 <description>name of user that is allowed to access this document</description>
 </param>
-<description>Allow a user to access the document</description>
-<remark>This function is only implemented if ACL is enabled in the storage</remark>
 </method>
 
 <method id="setDocid" return="void">
+<description>Set the document identifier (docid) of the document.</description>
 <param name="docid" type="string">
 <description>identifier of the document</description>
 </param>
-<description>Set the document identifier (docid) of the document</description>
 </method>
 
 <method id="searchIndexTerms" return="Term[]">
@@ -132,10 +133,10 @@
 <class id="DocumentAnalyzer">
 
 <description>Analyzer object representing a program for segmenting, tokenizing and normalizing a document into its atomic parts, that can be inserted into a storage and be retrieved from there.</description>
-<remark>The only way to construct a document analyzer instance is to call StrusContext::createDocumentAnalyzer()</remark>
+<remark>The only way to construct a document analyzer instance is to call createDocumentAnalyzer of StrusContext.</remark>
 
 <method id="addSearchIndexFeature" return="void">
-<description>Define how a feature to insert into the inverted index (search index) is selected, tokenized and normalized</description>
+<description>Define how a feature to insert into the inverted index (search index) is selected, tokenized and normalized.</description>
 
 <param name="type" type="string">
 <description>type type of the features produced</description>
@@ -159,7 +160,7 @@
 </method>
 
 <method id="addForwardIndexFeature" return="void">
-<description>Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized</description>
+<description>Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized.</description>
 
 <param name="type" type="string">
 <description>type type of the features produced</description>
@@ -371,7 +372,7 @@
 </param>
 
 <param name="config" type="Map">
-<description>a list of named configuration options (implementation depending on language) of the summarizer to add.
+<description>a list of named configuration options of the summarizer to add.
 	The values of the configuration options can be numeric or of type string. 
 	Key identifiers starting with a dot '.' are declaring feature parameters.
 	The names of the configuration key identifiers depend on the summarizer implementation.</description>
@@ -390,7 +391,7 @@
 </param>
 
 <param name="config" type="Map">
-<description>a list of named configuration options (implementation depending on language) of the weighting function to add.
+<description>a list of named configuration options of the weighting function to add.
 	The values of the configuration options can be numeric or of type string. 
 	Key identifiers starting with a dot '.' are declaring feature parameters.
 	The names of the configuration key identifiers depend on the weighting function implementation.</description>
@@ -513,13 +514,14 @@
 
 <method id="evaluate" return="Map[]">
 <description>Evaluate this query and return the result. The result is a list of 
-associative arrays. Some elements of the map of one result are hardcoded like "weight" and "docno".
+ranked documents with attributes. Some result elements are hardcoded like "weight" and "docno". Others
+are depending on the summarizer configurations.
 The rest is defined by the summarizers used. </description>
 </method>
 
 </class>
 <class id="StrusContext">
-<description>Object holding the global context of the strus information retrieval engine</description>
+<description>Object holding the global context of the strus information retrieval engine.</description>
 <note>There a two modes of this context object operating on a different base.
 	If you create this object without parameter, then the context is local.
 	In a local context you can load modules, define resources, etc. If you create
@@ -529,8 +531,8 @@ The rest is defined by the summarizers used. </description>
 	specified on server startup.</note>
 
 <method id="loadModule" return="void">
-<description>Load a module</description>
-<remark>Only implemented in local context mode with own module loader</remark>
+<description>Load a module.</description>
+<remark>Only implemented in local context mode with own module loader.</remark>
 
 <param name="paths" type="string">
 <description>semicolon separated list of module search paths</description>
@@ -538,8 +540,8 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="addModulePath" return="void">
-<description>Add a path from where to try to load modules from</description>
-<remark>Only implemented in local context mode with own module loader</remark>
+<description>Add a path from where to try to load modules from.</description>
+<remark>Only implemented in local context mode with own module loader.</remark>
 
 <param name="paths" type="string">
 <description>semicolon separated list of module search paths or single path</description>
@@ -547,7 +549,7 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="addResourcePath" return="void">
-<description>Add a path from where to try to load resources from</description>
+<description>Add a path from where to try to load resources from.</description>
 <remark>Only implemented in local context mode with own module loader</remark>
 
 <param name="paths" type="string">
@@ -556,7 +558,7 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="createStorageClient" return="StorageClient">
-<description>Create a storage client instance</description>
+<description>Create a storage client instance.</description>
 
 <param name="config" type="string">
 <description>configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen</description>
@@ -564,7 +566,7 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="createStorage" return="void">
-<description>Create a new storage (physically) described by config</description>
+<description>Create a new storage (physically) described by config-</description>
 
 <param name="config" type="string">
 <description>configuration string of the new storage</description>
@@ -572,7 +574,7 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="destroyStorage" return="void">
-<description>Destroy a storage (physically) described by config</description>
+<description>Destroy a storage (physically) described by config.</description>
 <note>Handle this function carefully</note>
 
 <param name="config" type="string">
@@ -581,7 +583,7 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="createDocumentAnalyzer" return="DocumentAnalyzer">
-<description>Create a document analyzer instance</description>
+<description>Create a document analyzer instance-</description>
 
 <param name="segmentername" type="string">
 <description>name of the segmenter to use (if empty then the default segmenter is used)</description>
@@ -589,11 +591,11 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 <method id="createQueryAnalyzer" return="QueryAnalyzer">
-<description>Create a query analyzer instance</description>
+<description>Create a query analyzer instance.</description>
 </method>
 
 <method id="createQueryAnalyzer" return="QueryEval">
-<description>Create a query evaluation instance</description>
+<description>Create a query evaluation instance.</description>
 </method>
 
 </class>
