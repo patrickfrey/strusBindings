@@ -104,23 +104,23 @@
 <description>Set the document identifier (docid) of the document</description>
 </method>
 
-<method id="searchIndexTerms" return="vector<Term>">
+<method id="searchIndexTerms" return="Term[]">
 <description>Get the list of search terms of this document</description>
 </method>
 
-<method id="forwardIndexTerms" return="vector<Term>">
+<method id="forwardIndexTerms" return="Term[]">
 <description>Get the list of forward terms of this document</description>
 </method>
 
-<method id="metaData" return="vector<MetaData>">
+<method id="metaData" return="MetaData[]">
 <description>Get the list of meta data of this document</description>
 </method>
 
-<method id="attributes" return="vector<Attribute>">
+<method id="attributes" return="Attribute[]">
 <description>Get the list of attributes of this document</description>
 </method>
 
-<method id="users" return="vector<string>">
+<method id="users" return="string[]">
 <description>Get the list of users that are allowed to access this document</description>
 </method>
 
@@ -149,11 +149,11 @@
 <description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
 </param>
 
-<param name="normalizers" type="vector<StringList>">
+<param name="normalizers" type="StringList[]">
 <description>list of normalizer function descriptions  as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
 </param>
 
-<param name="options" type="vector<string>">
+<param name="options" type="string[]">
 <description>list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature</description>
 </param>
 </method>
@@ -173,11 +173,11 @@
 <description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
 </param>
 
-<param name="normalizers" type="vector<StringList>">
+<param name="normalizers" type="StringList[]">
 <description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
 </param>
 
-<param name="options" type="vector<string>">
+<param name="options" type="string[]">
 <description>list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature</description>
 </param>
 </method>
@@ -197,7 +197,7 @@
 <description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
 </param>
 
-<param name="normalizers" type="vector<StringList>">
+<param name="normalizers" type="StringList[]">
 <description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
 </param>
 </method>
@@ -217,14 +217,13 @@
 <description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this feature</description>
 </param>
 
-<param name="normalizers" type="vector<StringList>">
+<param name="normalizers" type="StringList[]">
 <description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this feature in the ascending order of appearance</description>
 </param>
 </method>
 
 <method id="analyze" return="Document">
 <description>Analye the content and return the document structure.</description>
-</method>
 
 <param name="content" type="string">
 <description>content string (NOT a file name !) of the document to analyze</description>
@@ -251,12 +250,12 @@
 <description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for this phrase type</description>
 </param>
 
-<param name="normalizers" type="vector<StringList>">
+<param name="normalizers" type="StringList[]">
 <description>list of normalizer function descriptions as list of strings (first element is the function name, the following elements are the parameters) to use for this phrase type in the ascending order of appearance</description>
 </param>
 </method>
 
-<method id="analyzePhrase" return="vector<Term>">
+<method id="analyzePhrase" return="Term[]">
 <description>Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.</description>
 
 <param name="phraseType" type="string">
@@ -470,7 +469,7 @@
 <description>Define a meta data restriction.</description>
 
 <param name="compareOp" type="string">
-<description>compare operator, one of "=","!=",">=","<=","<",">".</description>
+<description>compare operator, one of "=","!=","&gt;=","&lt;=","&lt;","&gt;".</description>
 </param>
 
 <param name="name" type="string">
@@ -512,7 +511,7 @@
 </param>
 </method>
 
-<method id="evaluate" return="vector<Map>">
+<method id="evaluate" return="Map[]">
 <description>Evaluate this query and return the result. The result is a list of 
 associative arrays. Some elements of the map of one result are hardcoded like "weight" and "docno".
 The rest is defined by the summarizers used. </description>
@@ -560,7 +559,7 @@ The rest is defined by the summarizers used. </description>
 <description>Create a storage client instance</description>
 
 <param name="config" type="string">
-<description>configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,<description>
+<description>configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen</description>
 </param>
 </method>
 
@@ -568,7 +567,7 @@ The rest is defined by the summarizers used. </description>
 <description>Create a new storage (physically) described by config</description>
 
 <param name="config" type="string">
-<description>configuration string of the new storage<description>
+<description>configuration string of the new storage</description>
 </param>
 </method>
 
@@ -577,7 +576,7 @@ The rest is defined by the summarizers used. </description>
 <note>Handle this function carefully</note>
 
 <param name="config" type="string">
-<description>configuration string identifying the storage to destroy<description>
+<description>configuration string identifying the storage to destroy</description>
 </param>
 </method>
 
@@ -585,7 +584,7 @@ The rest is defined by the summarizers used. </description>
 <description>Create a document analyzer instance</description>
 
 <param name="segmentername" type="string">
-<description>name of the segmenter to use (if empty then the default segmenter is used)<description>
+<description>name of the segmenter to use (if empty then the default segmenter is used)</description>
 </param>
 </method>
 
