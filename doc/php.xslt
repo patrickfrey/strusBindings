@@ -22,7 +22,7 @@
 </xsl:for-each>
 <div id="wrap">
 	<div id="content">
-		<h1>PHP language bingings</h1>
+		<h1>PHP language bindings</h1>
 		<h2>Introduction</h2>
 		<p class="description">This chapter describes the language bindings of strus for PHP
 		with examples of how to create and use them.<br/>
@@ -50,7 +50,8 @@
 		The snippet
 		</p>
 		<pre>
-                        $query = $queryEval->createQuery( $storage);
+
+<a href="#Query">$query</a> = <a href="#QueryEval">$queryEval</a>-&gt;createQuery( <a href="#Storage">$storage</a>);
 		</pre>
 		<p class="description">
 		describes therefore the construction of an object of type <a href="#Query">Query</a> with the name <i>query</i>
@@ -58,45 +59,73 @@
 		of type <a href="#Storage">Storage</a> named <i>storage</i>.
 		</p>
 		<h3>Create a strus RPC context for a session residing on a server</h3>
+		<p class="description">
+		You create a remote strus context by calling its constructor with the RPC server address
+		as argument.
+		</p>
 		<pre>
-                        <a href="#StrusContext">$context</a> = new StrusContext( "localhost:7181" );
+<a href="#StrusContext">$context</a> = new StrusContext( "localhost:7181" );
 		</pre>
 		<h3>Create a query evaluation scheme</h3>
+		<p class="description">
+		A query evaluation scheme is created by calling the context method to create
+		a query evaluation instance. The scheme is built by calling the methods for
+		building the scheme on this instance. The weighting function configuration is
+		defined as associative array. The keys starting with dot '.' reference query
+		feature sets used by the scheme.
+		</p>
 		<pre>
-                        <a href="#QueryEval">$queryEval</a> = $context-&gt;createQueryEval();
-                        <a href="#QueryEval">$queryEval</a>-&gt;addWeightingFunction( 1.0, "BM25", [
-                                                                "k1" =&gt; 0.75, "b" =&gt; 2.1,
-                                                                "avgdoclen" =&gt; 500,
-                                                                ".match" =&gt; "docfeat" ]);
+
+<a href="#QueryEval">$queryEval</a> = $context-&gt;createQueryEval();
+<a href="#QueryEval">$queryEval</a>-&gt;addWeightingFunction( 1.0, "BM25", [
+                "k1" =&gt; 0.75, "b" =&gt; 2.1,
+                "avgdoclen" =&gt; 500,
+                ".match" =&gt; "docfeat" ]);
 		</pre>
 		<h3>Analyze a query phrase</h3>
+		<p class="description">
+		A query in strus is modeled as a set of query phrases combined by some proprietary
+		operators of a query language. Strus does not impose any defined query language.
+		Maybe there is none. There is a proposition for a query language implemented in
+		the utilities program loader library, but it is not mandatory to use it.<br/>
+		The query analyzer allows you to define methods of analyzing the basic parts
+		called phrases of your query language. The following example shows the definition
+		of a phrase type and the analysis ot the phrase "hello&#32;world":
+		</p>
 		<pre>
-                        <a href="#QueryAnalyzer">$queryAnalyzer</a> = <a href="#StrusContext">$context</a>-&gt;createQueryAnalyzer();
-                        <a href="#QueryAnalyzer">$queryAnalyzer</a>-&gt;definePhraseType( "text", "stem", "word", 
-                                ["lc",
-                                ["dictmap", "irregular_verbs_en.txt"],
-                                ["stem", "en"],
-                                ["convdia", "en"],
-                                "lc"]);
-                        <a href="#Term">$terms</a> = <a href="#QueryAnalyzer">$queryAnalyzer</a>-&gt;analyzePhrase( "text", "hello world");
+<a href="#QueryAnalyzer">$queryAnalyzer</a> = <a href="#StrusContext">$context</a>-&gt;createQueryAnalyzer();
+<a href="#QueryAnalyzer">$queryAnalyzer</a>-&gt;definePhraseType( "text", "stem", "word", 
+                ["lc",
+                ["dictmap", "irregular_verbs_en.txt"],
+                ["stem", "en"],
+                ["convdia", "en"],
+                "lc"]);
+<a href="#Term">$terms</a> = <a href="#QueryAnalyzer">$queryAnalyzer</a>-&gt;analyzePhrase( "text", "hello world");
 		</pre>
 		<h3>Create and evaluate a query</h3>
+		<p class="description">
+		A query is created by calling the constructing method of the query evaluation instance 
+		of the query evaluation scheme you want to use. The query is built by calling the
+		query instance methods for constructing the queried terms and structures.
+		</p>
 		<pre>
-                                <a href="#Storage">$storageClient</a> = $context-&gt;createStorageClient( "" );
-                                if (count( <a href="#Term">$terms</a>) > 0)
-                                {
-                                        foreach (<a href="#Term">$terms</a> as &amp;<a href="#Term">$term</a>)
-                                        {
-                                                <a href="#Query">$query</a>-&gt;pushTerm( "stem", <a href="#Term">$term</a>-&gt;value);
-                                                <a href="#Query">$query</a>-&gt;pushDuplicate( "stem", <a href="#Term">$term</a>-&gt;value);
-                                                <a href="#Query">$query</a>-&gt;defineFeature( "docfeat");
-                                        }
-                                        <a href="#Query">$query</a>-&gt;pushExpression( "within", count($terms), 100000);
-                                        <a href="#Query">$query</a>-&gt;defineFeature( "selfeat");
-                                }
-                                <a href="#Query">$query</a>-&gt;setMaxNofRanks( $maxNofRanks);
-                                <a href="#Query">$query</a>-&gt;setMinRank( $minRank);
-                                $result = return <a href="#Query">$query</a>-&gt;evaluate();
+<a href="#Storage">$storageClient</a> = $context-&gt;createStorageClient( "" );
+<a href="#Storage">$query</a> = <a href="#QueryEval">$queryEval</a>-&gt;createQuery( "" );
+
+if (count( <a href="#Term">$terms</a>) > 0)
+{
+        foreach (<a href="#Term">$terms</a> as &amp;<a href="#Term">$term</a>)
+        {
+                <a href="#Query">$query</a>-&gt;pushTerm( "stem", <a href="#Term">$term</a>-&gt;value);
+                <a href="#Query">$query</a>-&gt;pushDuplicate( "stem", <a href="#Term">$term</a>-&gt;value);
+                <a href="#Query">$query</a>-&gt;defineFeature( "docfeat");
+        }
+        <a href="#Query">$query</a>-&gt;pushExpression( "within", count($terms), 100000);
+        <a href="#Query">$query</a>-&gt;defineFeature( "selfeat");
+}
+<a href="#Query">$query</a>-&gt;setMaxNofRanks( $maxNofRanks);
+<a href="#Query">$query</a>-&gt;setMinRank( $minRank);
+$result = return <a href="#Query">$query</a>-&gt;evaluate();
 		</pre>
 		<h2>Objects</h2>
 		<xsl:for-each select="bindings/class">
