@@ -75,12 +75,24 @@
 		feature sets used by the scheme.
 		</p>
 		<pre>
-
-<a href="#QueryEval">$queryEval</a> = $context-&gt;createQueryEval();
+<a href="#QueryEval">$queryEval</a> = <a href="#StrusContext">$context</a>-&gt;createQueryEval();
+# Add weighting of the features of the feature set "<i>docfeat</i>":
 <a href="#QueryEval">$queryEval</a>-&gt;addWeightingFunction( 1.0, "BM25", [
                 "k1" =&gt; 0.75, "b" =&gt; 2.1,
                 "avgdoclen" =&gt; 500,
                 ".match" =&gt; "docfeat" ]);
+
+# Define what data is shown to present a result of the query:
+<a href="#QueryEval">$queryEval</a>-&gt;addSummarizer(
+                "TITLE", "attribute", [ "name" => "title" ] );
+<a href="#QueryEval">$queryEval</a>-&gt;addSummarizer( "CONTENT", "matchphrase", [
+                "type" => "orig", "len" => 40, "nof" => 3, "structseek" => 30,
+                "mark" => '<b>$</b>',
+                ".struct" => "sentence", ".match" => "docfeat" ] );
+
+# Define the set of features used to select the document that should be weighted as "<i>selfeat</i>":
+<a href="#QueryEval">$queryEval</a>-&gt;addSelectionFeature( "selfeat");
+
 		</pre>
 		<h3>Analyze a query phrase</h3>
 		<p class="description">
@@ -127,7 +139,7 @@ if (count( <a href="#Term">$terms</a>) > 0)
 <a href="#Query">$query</a>-&gt;setMinRank( $minRank);
 $result = return <a href="#Query">$query</a>-&gt;evaluate();
 		</pre>
-		<h2>Objects</h2>
+		<h2>Object types</h2>
 		<xsl:for-each select="bindings/class">
 		<a>
 			<xsl:attribute name="name">
