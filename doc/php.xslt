@@ -13,26 +13,92 @@
 	<title>PHP bindings for strus</title>
 </head>
 <body>
+<xsl:for-each select="bindings/tracking">
+<xsl:if test="@id = 'php'">
+<script>
+<xsl:value-of select="."/>
+</script>
+</xsl:if> 
+</xsl:for-each>
 <div id="wrap">
 	<div id="content">
-		<h2>Object description</h2>
-		<p class="description">This section describes the objects of the strus PHP bindings
-		with examples of how to create and use them. Because PHP is a value typed language
-		with no explicit typeing we refer to the type of an object that exists only as 
-		a single instance in the context by using the name of the object type starting with
-		a lower case letter as name of the variable. The snippet
+		<h1>PHP language bingings</h1>
+		<h2>Introduction</h2>
+		<p class="description">This chapter describes the language bindings of strus for PHP
+		with examples of how to create and use them.<br/>
+		The language bindings have been built using <a href="http://www.swig.org">SWIG</a>
+		based on a wrapper C++ interface. This wrapper interface serves as common base
+		for all language bindings as a sort of super interface (strus/bindingObjects.hpp).
+		If you write a language binding you should have a look at this wrapper interface.
+		It is not part of this documentation, because showing it could be misleading.
+		</p>
+		<h2>Overview</h2>
+		<p class="description">
+		The root object you construct first in PHP is <a href="#StrusContext">the
+		strus context</a>. From this context you can construct the main instances
+		of the objects doing the job you want to do. Depending on how you create
+		the strus context, the objects you create beginning with the root object
+		are accessed directly or they are residing on a server and the language 
+		objects serve as proxy for the server objects.
+		</p>
+		<h2>Examples</h2>
+		<p class="description">
+		PHP is a value typed language with no explicit typing.<br/>
+		In the following examples we refer to the type of an object that 
+		exists only as a single instance in the context by using the name of 
+		the object type starting with a lower case letter as name of the variable.
+		The snippet
 		</p>
 		<pre>
                         $query = $queryEval->createQuery( $storage);
 		</pre>
 		<p class="description">
-		States the construction of an object of type <a href="#Query">Query</a> with the name <i>query</i>
+		describes therefore the construction of an object of type <a href="#Query">Query</a> with the name <i>query</i>
 		by an object of type <a href="#QueryEval">QueryEval</a> with name <i>queryEval</i> with the parameter
 		of type <a href="#Storage">Storage</a> named <i>storage</i>.
-		<br/> The root object you construct first in PHP is <a href="#StrusContext">the
-		strus context</a>.
 		</p>
-
+		<h3>Create a strus RPC context for a session residing on a server</h3>
+		<pre>
+                        <a href="#StrusContext">$context</a> = new StrusContext( "localhost:7181" );
+		</pre>
+		<h3>Create a query evaluation scheme</h3>
+		<pre>
+                        <a href="#QueryEval">$queryEval</a> = $context-&gt;createQueryEval();
+                        <a href="#QueryEval">$queryEval</a>-&gt;addWeightingFunction( 1.0, "BM25", [
+                                                                "k1" =&gt; 0.75, "b" =&gt; 2.1,
+                                                                "avgdoclen" =&gt; 500,
+                                                                ".match" =&gt; "docfeat" ]);
+		</pre>
+		<h3>Analyze a query phrase</h3>
+		<pre>
+                        <a href="#QueryAnalyzer">$queryAnalyzer</a> = <a href="#StrusContext">$context</a>-&gt;createQueryAnalyzer();
+                        <a href="#QueryAnalyzer">$queryAnalyzer</a>-&gt;definePhraseType( "text", "stem", "word", 
+                                ["lc",
+                                ["dictmap", "irregular_verbs_en.txt"],
+                                ["stem", "en"],
+                                ["convdia", "en"],
+                                "lc"]);
+                        <a href="#Term">$terms</a> = <a href="#QueryAnalyzer">$queryAnalyzer</a>-&gt;analyzePhrase( "text", "hello world");
+		</pre>
+		<h3>Create and evaluate a query</h3>
+		<pre>
+                                <a href="#Storage">$storageClient</a> = $context-&gt;createStorageClient( "" );
+                                if (count( <a href="#Term">$terms</a>) > 0)
+                                {
+                                        foreach (<a href="#Term">$terms</a> as &amp;<a href="#Term">$term</a>)
+                                        {
+                                                <a href="#Query">$query</a>-&gt;pushTerm( "stem", <a href="#Term">$term</a>-&gt;value);
+                                                <a href="#Query">$query</a>-&gt;pushDuplicate( "stem", <a href="#Term">$term</a>-&gt;value);
+                                                <a href="#Query">$query</a>-&gt;defineFeature( "docfeat");
+                                        }
+                                        <a href="#Query">$query</a>-&gt;pushExpression( "within", count($terms), 100000);
+                                        <a href="#Query">$query</a>-&gt;defineFeature( "selfeat");
+                                }
+                                <a href="#Query">$query</a>-&gt;setMaxNofRanks( $maxNofRanks);
+                                <a href="#Query">$query</a>-&gt;setMinRank( $minRank);
+                                $result = return <a href="#Query">$query</a>-&gt;evaluate();
+		</pre>
+		<h2>Objects</h2>
 		<xsl:for-each select="bindings/class">
 		<a>
 			<xsl:attribute name="name">
