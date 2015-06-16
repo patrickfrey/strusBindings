@@ -300,11 +300,11 @@ struct FeatureFuncDef
 	std::vector<strus::NormalizerFunctionInstanceInterface*> normalizers;
 	strus::Reference<strus::TokenizerFunctionInstanceInterface> tokenizer;
 
-	FeatureFuncDef( const Reference& m_objbuilder_impl,
+	FeatureFuncDef( const Reference& objbuilder_impl,
 			const Tokenizer& tokenizer_,
 			const std::vector<Normalizer>& normalizers_)
 	{
-		const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+		const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)objbuilder_impl.get();
 		const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 		normalizers_ref = getNormalizers( normalizers_, textproc);
 		std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> >::iterator
@@ -363,6 +363,20 @@ DLL_PUBLIC void DocumentAnalyzer::defineMetaData(
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaData(
 		fieldname, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
+}
+
+DLL_PUBLIC void DocumentAnalyzer::defineStatisticsMetaData(
+	const std::string& fieldname,
+	const StatisticsFunction& function)
+{
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	
+	const strus::StatisticsFunctionInterface* functionimpl = textproc->getStatistics( function.name());
+	strus::Reference<strus::StatisticsFunctionInstanceInterface> functioninst( functionimpl->createInstance( function.arguments()));
+	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineStatisticsMetaData(
+		fieldname, functioninst.get());
+	functioninst.release();
 }
 
 DLL_PUBLIC void DocumentAnalyzer::defineAttribute(

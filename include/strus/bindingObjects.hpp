@@ -131,6 +131,34 @@ private:
 };
 
 
+/// \brief Object representing a statistics collector function definition
+class StatisticsFunction
+{
+public:
+	StatisticsFunction(){}
+	StatisticsFunction( const StatisticsFunction& o)
+		:m_name(o.m_name),m_arguments(o.m_arguments){}
+	StatisticsFunction( const std::string& name_, const std::vector<std::string>& arg_)
+		:m_name(name_),m_arguments(arg_){}
+	StatisticsFunction( const std::string& name_)
+		:m_name(name_),m_arguments(){}
+
+	~StatisticsFunction(){}
+
+	const std::string& name() const				{return m_name;}
+	const std::vector<std::string>& arguments() const	{return m_arguments;}
+
+	void setName( const std::string& name_)			{m_name = name_;}
+	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+
+private:
+	friend class DocumentAnalyzer;
+
+	std::string m_name;
+	std::vector<std::string> m_arguments;
+};
+
+
 /// \brief Enumeration for defining internal variant representation
 enum VariantType
 {
@@ -381,6 +409,13 @@ public:
 		const std::string& selectexpr,
 		const Tokenizer& tokenizer,
 		const std::vector<Normalizer>& normalizers);
+
+	/// \brief Declare some collected statistics of the document to be put into the meta data table used for restrictions, weighting and summarization.
+ 	/// \param[in] fieldname name of the addressed meta data field.
+	/// \param[in] function defining how and from what the document statistics are collected
+	void defineStatisticsMetaData(
+		const std::string& fieldname,
+		const StatisticsFunction& function);
 
 	/// \brief Define how a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
 	/// \param[in] attribname name of the addressed attribute.
