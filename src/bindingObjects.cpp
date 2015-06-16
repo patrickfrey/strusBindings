@@ -365,15 +365,15 @@ DLL_PUBLIC void DocumentAnalyzer::defineMetaData(
 	funcdef.release();
 }
 
-DLL_PUBLIC void DocumentAnalyzer::defineStatisticsMetaData(
+DLL_PUBLIC void DocumentAnalyzer::defineAggregatedMetaData(
 	const std::string& fieldname,
-	const StatisticsFunction& function)
+	const Aggregator& function)
 {
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 	
-	const strus::StatisticsFunctionInterface* functionimpl = textproc->getStatisticsFunction( function.name());
-	strus::Reference<strus::StatisticsFunctionInstanceInterface> functioninst( functionimpl->createInstance( function.arguments()));
+	const strus::AggregatorFunctionInterface* functionimpl = textproc->getAggregator( function.name());
+	strus::Reference<strus::AggregatorFunctionInstanceInterface> functioninst( functionimpl->createInstance( function.arguments()));
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineStatisticsMetaData(
 		fieldname, functioninst.get());
 	functioninst.release();

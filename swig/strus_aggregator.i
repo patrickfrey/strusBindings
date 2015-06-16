@@ -1,19 +1,19 @@
 #if defined(SWIGPHP)
-%typemap(in) const StatisticsFunction&	(StatisticsFunction temp)
+%typemap(in) const Aggregator&	(Aggregator temp)
 {
 	switch ((*$input)->type)
 	{
 		case IS_LONG:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to StatisticsFunction");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to Aggregator");
 			break;
 		case IS_STRING:
 			temp.setName( std::string( Z_STRVAL_PP( $input)));
 			break;
 		case IS_DOUBLE:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to StatisticsFunction");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to Aggregator");
 			break;
 		case IS_BOOL:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert BOOL to StatisticsFunction");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert BOOL to Aggregator");
 			break;
 		case IS_NULL:
 			break;
@@ -58,19 +58,19 @@
 			break;
 		}
 		case IS_OBJECT:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert OBJECT to StatisticsFunction");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert OBJECT to Aggregator");
 			break;
 		case IS_RESOURCE:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert RESOURCE to StatisticsFunction");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert RESOURCE to Aggregator");
 			break;
 		default: 
-			SWIG_exception( SWIG_RuntimeError, "unable to convert unknown type to StatisticsFunction");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert unknown type to Aggregator");
 			break;
 	}
 	$1 = &temp;
 }
 #else
-#error no typemaps defined for StatisticsFunction in this language
+#error no typemaps defined for Aggregator in this language
 #endif
 
 

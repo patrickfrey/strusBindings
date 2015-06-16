@@ -18,7 +18,7 @@
 %include "strus_variant.i"
 %include "strus_tokenizer.i"
 %include "strus_normalizer.i"
-%include "strus_statfunc.i"
+%include "strus_aggregator.i"
 %include "strus_summarizer.i"
 %include "strus_weighting.i"
 %include "../include/strus/bindingObjects.hpp"

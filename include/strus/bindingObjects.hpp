@@ -131,19 +131,19 @@ private:
 };
 
 
-/// \brief Object representing a statistics collector function definition
-class StatisticsFunction
+/// \brief Object representing a aggregator function definition
+class Aggregator
 {
 public:
-	StatisticsFunction(){}
-	StatisticsFunction( const StatisticsFunction& o)
+	Aggregator(){}
+	Aggregator( const Aggregator& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	StatisticsFunction( const std::string& name_, const std::vector<std::string>& arg_)
+	Aggregator( const std::string& name_, const std::vector<std::string>& arg_)
 		:m_name(name_),m_arguments(arg_){}
-	StatisticsFunction( const std::string& name_)
+	Aggregator( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
-	~StatisticsFunction(){}
+	~Aggregator(){}
 
 	const std::string& name() const				{return m_name;}
 	const std::vector<std::string>& arguments() const	{return m_arguments;}
@@ -410,12 +410,12 @@ public:
 		const Tokenizer& tokenizer,
 		const std::vector<Normalizer>& normalizers);
 
-	/// \brief Declare some collected statistics of the document to be put into the meta data table used for restrictions, weighting and summarization.
+	/// \brief Declare some aggregated value of the document to be put into the meta data table used for restrictions, weighting and summarization.
  	/// \param[in] fieldname name of the addressed meta data field.
-	/// \param[in] function defining how and from what the document statistics are collected
-	void defineStatisticsMetaData(
+	/// \param[in] function defining how and from what the value is aggregated
+	void defineAggregatedMetaData(
 		const std::string& fieldname,
-		const StatisticsFunction& function);
+		const Aggregator& function);
 
 	/// \brief Define how a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
 	/// \param[in] attribname name of the addressed attribute.
