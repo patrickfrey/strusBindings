@@ -372,7 +372,7 @@ DLL_PUBLIC void DocumentAnalyzer::defineStatisticsMetaData(
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 	
-	const strus::StatisticsFunctionInterface* functionimpl = textproc->getStatistics( function.name());
+	const strus::StatisticsFunctionInterface* functionimpl = textproc->getStatisticsFunction( function.name());
 	strus::Reference<strus::StatisticsFunctionInstanceInterface> functioninst( functionimpl->createInstance( function.arguments()));
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineStatisticsMetaData(
 		fieldname, functioninst.get());
