@@ -212,6 +212,18 @@
 </param>
 </method>
 
+<method id="defineStatisticsMetaData" return="void">
+<description>Declare some collected statistics of the document to be put into the meta data table used for restrictions, weighting and summarization.</description>
+
+<param name="fieldname" type="string">
+<description>name of the addressed meta data table element</description>
+</param>
+
+<param name="function" type="StringList">
+<description>tokenizer function description as list of strings (first element is the function name, the following elements are the parameters) to use for collecting statistics for the specified field</description>
+</param>
+</method>
+
 <method id="defineAttribute" return="void">
 <description>Define how a feature to insert as document attribute (summarization) is selected, tokenized and normalized.</description>
 
