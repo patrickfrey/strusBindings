@@ -40,6 +40,7 @@
 #include "strus/private/configParser.hpp"
 #include "private/dll_tags.hpp"
 #include "utils.hpp"
+#include <cmath>
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
@@ -377,21 +378,23 @@ DLL_PUBLIC void DocumentAnalyzer::defineAttribute(
 	funcdef.release();
 }
 
-static Variant getNumericVariantFromString( const std::string& value)
+static Variant getNumericVariantFromDouble( double value)
 {
-	strus::ArithmeticVariant val( strus::arithmeticVariantFromString( value));
-	switch (val.type)
+	if (value - std::floor( value) < std::numeric_limits<float>::epsilon())
 	{
-		case strus::ArithmeticVariant::Null:
-			return Variant();
-		case strus::ArithmeticVariant::Int:
-			return Variant( (int)val);
-		case strus::ArithmeticVariant::UInt:
-			return Variant( (unsigned int)val);
-		case strus::ArithmeticVariant::Float:
-			return Variant( (float)val);
+		if (value < 0.0)
+		{
+			return Variant( (int)(std::floor( value) + std::numeric_limits<float>::epsilon()));
+		}
+		else
+		{
+			return Variant( (unsigned int)(std::floor( value) + std::numeric_limits<float>::epsilon()));
+		}
 	}
-	throw std::runtime_error( std::string("cannot create numeric variant type from string: '") + value + "'");
+	else
+	{
+		return Variant( value);
+	}
 }
 
 static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
@@ -441,7 +444,7 @@ DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
 		mi = doc.metadata().begin(), me = doc.metadata().end();
 	for (; mi != me; ++mi)
 	{
-		Variant val = getNumericVariantFromString( mi->value());
+		Variant val = getNumericVariantFromDouble( mi->value());
 		rt.setMetaData( mi->name(), val);
 	}
 	std::vector<strus::analyzer::Term>::const_iterator
