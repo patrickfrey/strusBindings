@@ -12,8 +12,8 @@ namespace std {
 		zval* term;
 		MAKE_STD_ZVAL( term);
 		object_init( term);
-		add_property_string( term, "type", ti->type().c_str(), 1);
-		add_property_string( term, "value", ti->value().c_str(), 1);
+		add_property_string( term, "type", reinterpret_cast<char*>(ti->type().c_str()), 1);
+		add_property_string( term, "value", reinterpret_cast<char*>(ti->value().c_str()), 1);
 		add_property_long( term, "position", ti->position());
 		add_next_index_zval( return_value, term);
 	}
