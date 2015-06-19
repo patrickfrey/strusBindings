@@ -374,7 +374,7 @@ DLL_PUBLIC void DocumentAnalyzer::defineAggregatedMetaData(
 	
 	const strus::AggregatorFunctionInterface* functionimpl = textproc->getAggregator( function.name());
 	strus::Reference<strus::AggregatorFunctionInstanceInterface> functioninst( functionimpl->createInstance( function.arguments()));
-	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineStatisticsMetaData(
+	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAggregatedMetaData(
 		fieldname, functioninst.get());
 	functioninst.release();
 }
