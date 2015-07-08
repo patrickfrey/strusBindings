@@ -13,7 +13,7 @@ case "$1" in
 		service php5-fpm start
 		service nginx start
 	;;
-	"")
+	*)
 		echo "Usage: docker run start" 
 		exit
 	;;
