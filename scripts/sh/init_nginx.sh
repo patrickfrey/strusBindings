@@ -1,6 +1,6 @@
 #!/bin/sh
 
-function clean_up
+clean_up()
 {
 	echo "shut down";
 }
