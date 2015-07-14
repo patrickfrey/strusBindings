@@ -295,6 +295,59 @@ private:
 	std::string m_value;
 };
 
+
+/// \brief Defines a description of the properties of a document content processed by the analyzer
+class DocumentClass
+{
+public:
+	/// \brief Default constructor
+	DocumentClass(){}
+	/// \brief Constructor
+	explicit DocumentClass(
+			const std::string& mimeType_)		:m_mimeType(mimeType_){}
+	/// \brief Constructor
+	DocumentClass(
+			const std::string& mimeType_,
+			const std::string& encoding_)		:m_mimeType(mimeType_),m_encoding(encoding_){}
+	/// \brief Constructor
+	DocumentClass(
+			const std::string& mimeType_,
+			const std::string& encoding_,
+			const std::string& scheme_)		:m_mimeType(mimeType_),m_scheme(scheme_),m_encoding(encoding_){}
+	/// \brief Copy constructor
+	DocumentClass( const DocumentClass& o)			:m_mimeType(o.m_mimeType),m_scheme(o.m_scheme),m_encoding(o.m_encoding){}
+
+	/// \brief Check if this document class is valid
+	/// \return true, if yes
+	bool valid() const					{return !m_mimeType.empty();}
+
+	/// \brief Set the MIME type of the document class
+	/// \param[in] the document MIME type string
+	void setMimeType( const std::string& mimeType_)		{m_mimeType = mimeType_;}
+	/// \brief Set the scheme identifier of the document class
+	/// \param[in] the document scheme identifier
+	void setScheme( const std::string& scheme_)		{m_scheme = scheme_;}
+	/// \brief Set the character set encoding of the document class
+	/// \param[in] the character set encoding string
+	void setEncoding( const std::string& encoding_)		{m_encoding = encoding_;}
+
+	/// \brief Get the MIME type of the document class
+	/// \return the document MIME type string
+	const std::string& mimeType() const			{return m_mimeType;}
+	/// \brief Get the scheme identifier of the document class
+	/// \return the document scheme identifier
+	const std::string& scheme() const			{return m_scheme;}
+	/// \brief Get the character set encoding of the document class
+	/// \return the character set encoding string
+	const std::string& encoding() const			{return m_encoding;}
+
+private:
+	std::string m_mimeType;
+	std::string m_scheme;
+	std::string m_encoding;
+};
+
+
 /// \brief Document object representing one item of retrieval. A document can be
 ///	manually composed of its sub parts or it can be the result of an analyzer run.
 class Document
@@ -431,6 +484,11 @@ public:
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze
 	Document analyze( const std::string& content);
+
+	/// \brief Analye the content and return the set of features to insert
+	/// \param[in] content string (NOT a file name !) of the document to analyze
+	/// \param[in] dclass document class of the document to analyze
+	Document analyze( const std::string& content, const DocumentClass& dclass);
 
 private:
 	/// \brief Constructor used by StrusContext
@@ -821,6 +879,11 @@ public:
 	/// \brief Delete the storage (physically) described by config
 	/// \note Handle this function carefully
 	void destroyStorage( const std::string& config_);
+
+	/// \brief Detect the type of document from its content
+	/// \param[in] the document content to classify
+	/// \return the document class
+	DocumentClass detectDocumentClass( const std::string& content) const;
 
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)

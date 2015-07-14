@@ -434,12 +434,10 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 	return rt;
 }
 
-DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
+static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const std::string& content, const strus::DocumentClass& dclass)
 {
 	Document rt;
-	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
-
-	strus::analyzer::Document doc = THIS->analyze( content);
+	strus::analyzer::Document doc = THIS->analyze( content, dclass);
 
 	std::vector<strus::analyzer::Attribute>::const_iterator
 		ai = doc.attributes().begin(), ae = doc.attributes().end();
@@ -474,6 +472,28 @@ DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
 		rt.addForwardIndexTerm( fi->type(), fi->value(), fi->pos());
 	}
 	return rt;
+}
+
+DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
+{
+	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	strus::DocumentClass dclass;
+
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	if (!textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
+	{
+		throw std::runtime_error( "failed to detect document class of document to analyze"); 
+	}
+	return analyzeDocument( THIS, content, dclass);
+}
+
+DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content, const DocumentClass& dclass)
+{
+	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	strus::DocumentClass documentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
+	
+	return analyzeDocument( THIS, content, documentClass);
 }
 
 
@@ -967,6 +987,21 @@ void StrusContext::initAnalyzerObjBuilder()
 	else
 	{
 		throw std::runtime_error( "bad state, no context initialized");
+	}
+}
+
+DLL_PUBLIC DocumentClass StrusContext::detectDocumentClass( const std::string& content) const
+{
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_analyzer_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	strus::DocumentClass dclass;
+	if (textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
+	{
+		return DocumentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
+	}
+	else
+	{
+		return DocumentClass();
 	}
 }
 
