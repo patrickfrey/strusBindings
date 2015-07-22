@@ -778,7 +778,7 @@ public:
 	/// \param[in] opname_ name of the expression operator
 	/// \param[in] argc number of operands (topmost elements from stack) of the expression
 	/// \param[in] range_ range number for the expression span in the document
-	void pushExpression( const std::string& opname_, unsigned int argc, int range_);
+	void pushExpression( const std::string& opname_, unsigned int argc, int range_=0);
 
 	/// \brief Push a duplicate of the topmost element of the query stack
 	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
@@ -883,7 +883,7 @@ public:
 	/// \brief Detect the type of document from its content
 	/// \param[in] the document content to classify
 	/// \return the document class
-	DocumentClass detectDocumentClass( const std::string& content) const;
+	DocumentClass detectDocumentClass( const std::string& content);
 
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
@@ -894,6 +894,9 @@ public:
 
 	/// \brief Create a query evaluation instance
 	QueryEval createQueryEval();
+
+	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
+	void close();
 
 private:
 	void initStorageObjBuilder();

@@ -990,8 +990,9 @@ void StrusContext::initAnalyzerObjBuilder()
 	}
 }
 
-DLL_PUBLIC DocumentClass StrusContext::detectDocumentClass( const std::string& content) const
+DLL_PUBLIC DocumentClass StrusContext::detectDocumentClass( const std::string& content)
 {
+	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_analyzer_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 	strus::DocumentClass dclass;
@@ -1067,4 +1068,11 @@ DLL_PUBLIC void StrusContext::destroyStorage( const std::string& config_)
 	dbi->destroyDatabase( config_);
 }
 
+DLL_PUBLIC void StrusContext::close()
+{
+	m_analyzer_objbuilder_impl.reset();
+	m_storage_objbuilder_impl.reset();
+	if (m_rpc_impl.get()) ((strus::RpcClientInterface*)m_rpc_impl.get())->close();
+	m_moduleloader_impl.reset();
+}
 
