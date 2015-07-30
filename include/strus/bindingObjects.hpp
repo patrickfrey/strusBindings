@@ -500,6 +500,9 @@ private:
 };
 
 
+/// \brief Forward declaration
+class QueryAnalyzeQueue;
+
 /// \class QueryAnalyzer
 /// \brief Analyzer object representing a set of function for transforming a phrase,
 ///	the smallest unit in any query language, to a set of terms that can be used
@@ -528,9 +531,14 @@ public:
 	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
 	/// \param[in] phraseType name of the phrase type to use for analysis
 	/// \param[in] phraseContent content string of the query phrase to analyze
+	/// \deprecated
 	std::vector<Term> analyzePhrase(
 			const std::string& phraseType,
 			const std::string& phraseContent) const;
+
+	/// \brief Creates a queue for phrase bulk analysis
+	/// \return the queue
+	QueryAnalyzeQueue* createQueue() const;
 
 private:
 	/// \brief Constructor used by StrusContext
@@ -539,6 +547,41 @@ private:
 
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
+};
+
+
+/// \class QueryAnalyzeQueue
+/// \brief Analyzer object implementing a queue of analyze phrase tasks.
+/// \remark Query analysis with this class reduces network roundtrips when using it as proxy
+class QueryAnalyzeQueue
+{
+public:
+	/// \brief Copy constructor
+	QueryAnalyzeQueue( const QueryAnalyzeQueue& o);
+	/// \brief Destructor
+	~QueryAnalyzeQueue(){}
+
+	/// \brief Push a phrase into the queue for phrases to tokenize and normalize
+	/// \param[in] phraseType name of the phrase type to use for analysis
+	/// \param[in] phraseContent content string of the query phrase to analyze
+	void push(
+			const std::string& phraseType,
+			const std::string& phraseContent);
+
+	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
+	/// \return list of terms (query phrase analyzer result)
+	std::vector<Term> fetch();
+
+private:
+	/// \brief Constructor used by StrusContext
+	friend class QueryAnalyzer;
+	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& analyzer);
+
+	Reference m_objbuilder_impl;
+	Reference m_analyzer_impl;
+	std::vector<Term> m_phrase_queue;
+	std::vector<std::vector<Term> > m_result_queue;
+	std::size_t m_result_queue_idx;
 };
 
 

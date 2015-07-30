@@ -508,7 +508,13 @@ DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder)
 DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
 	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
+
 {}
+
+DLL_PUBLIC QueryAnalyzeQueue* QueryAnalyzer::createQueue() const
+{
+	return new QueryAnalyzeQueue( m_objbuilder_impl, m_analyzer_impl);
+}
 
 DLL_PUBLIC void QueryAnalyzer::definePhraseType(
 		const std::string& phraseType,
@@ -539,6 +545,66 @@ DLL_PUBLIC std::vector<Term> QueryAnalyzer::analyzePhrase(
 		rt.push_back( Term( ti->type(), ti->value(), ti->pos()));
 	}
 	return rt;
+}
+
+DLL_PUBLIC QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
+	:m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_analyzer_impl(o.m_analyzer_impl)
+	,m_phrase_queue(o.m_phrase_queue)
+	,m_result_queue(o.m_result_queue)
+	,m_result_queue_idx(o.m_result_queue_idx)
+{}
+
+DLL_PUBLIC QueryAnalyzeQueue::QueryAnalyzeQueue( const Reference& objbuilder, const Reference& analyzer)
+	:m_objbuilder_impl(objbuilder)
+	,m_analyzer_impl(analyzer)
+	,m_result_queue_idx(0)
+{}
+
+
+DLL_PUBLIC void QueryAnalyzeQueue::push(
+		const std::string& phraseType,
+		const std::string& phraseContent)
+{
+	m_phrase_queue.push_back( Term( phraseType, phraseContent, 0));
+}
+
+DLL_PUBLIC std::vector<Term> QueryAnalyzeQueue::fetch()
+{
+	if (m_result_queue_idx < m_result_queue.size())
+	{
+		return m_result_queue[ m_result_queue_idx++];
+	}
+	m_result_queue.clear();
+
+	std::vector<strus::QueryAnalyzerInterface::Phrase> phraseBulk;
+	std::vector<Term>::const_iterator pi = m_phrase_queue.begin(), pe = m_phrase_queue.end();
+	for (; pi != pe; ++pi)
+	{
+		phraseBulk.push_back( strus::QueryAnalyzerInterface::Phrase( pi->type(), pi->value()));
+	}
+	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	std::vector<strus::analyzer::TermVector>
+		results = THIS->analyzePhraseBulk( phraseBulk);
+	std::vector<strus::analyzer::TermVector>::const_iterator
+		ri = results.begin(), re = results.end();
+	for (; ri != re; ++ri)
+	{
+		m_result_queue.push_back( std::vector<Term>());
+		std::vector<strus::analyzer::Term>::const_iterator ti = ri->begin(), te = re->end();
+		for (; ti != te; ++ti)
+		{
+			m_result_queue.back().push_back( Term( ti->type(), ti->value(), ti->pos()));
+		}
+	}
+	if (m_result_queue_idx < m_result_queue.size())
+	{
+		return m_result_queue[ m_result_queue_idx++];
+	}
+	else
+	{
+		throw std::runtime_error( "no results to fetch from query analyzer queue");
+	}
 }
 
 
