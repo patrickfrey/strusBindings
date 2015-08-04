@@ -4,5 +4,7 @@
 - v0.1.4
 * Thu July 30 2015  Patrick Frey  <patrickpfrey@yahoo.com>
 - v0.1.5 Add queue interface for query phrase analysis to avoid TCP roundtrips when using strus over a proxy
+* Tue Aug 4 2015  Patrick Frey  <patrickpfrey@yahoo.com>
+- v0.1.6 Fixed occasional crash in PHP due to free of uninitialized variables (zval_dtor)
 
 
