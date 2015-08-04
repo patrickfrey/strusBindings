@@ -30,6 +30,8 @@
 				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
 			{
 				zval val, *str;
+				INIT_ZVAL( val);
+
 				int is_str = (Z_TYPE_PP(data) == IS_STRING);
 				if (is_str)
 				{

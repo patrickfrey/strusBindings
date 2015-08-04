@@ -33,6 +33,8 @@ namespace std {
 				zend_hash_move_forward_ex(hash,&ptr))
 			{
 				zval temp, *str;
+				INIT_ZVAL( temp);
+
 				int is_str = 1;
 				if (Z_TYPE_PP(data) != IS_STRING)
 				{

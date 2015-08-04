@@ -30,6 +30,8 @@
 				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
 			{
 				zval val, *str;
+				INIT_ZVAL( val);
+
 				int is_str = (Z_TYPE_PP(data) == IS_STRING);
 				if (is_str)
 				{
@@ -101,6 +103,8 @@
 				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
 			{
 				zval val, *str;
+				INIT_ZVAL( val);
+
 				int is_str = (Z_TYPE_PP(data) == IS_STRING);
 				if (is_str)
 				{
@@ -123,6 +127,7 @@
 						zend_hash_move_forward_ex(e_hash,&e_ptr),++e_argcnt)
 					{
 						zval e_val, *e_str;
+						INIT_ZVAL( e_val);
 						int e_is_str = (Z_TYPE_PP(e_data) == IS_STRING);
 						if (e_is_str)
 						{
