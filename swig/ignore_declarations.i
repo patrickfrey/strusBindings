@@ -16,6 +16,7 @@
 %ignore Reference::Reference( const Reference& o);
 %ignore Reference::~Reference();
 %ignore Reference::reset( void* obj_=0);
+%ignore Reference::operator=(const Reference& o);
 %ignore Reference::get() const;
 %ignore Reference::get();
 %ignore MetaData::name() const;

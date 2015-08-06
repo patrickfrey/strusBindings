@@ -56,3 +56,6 @@ swig/php/strus.php
 swig/java/strus_wrap.c
 swig/java/*.java
 swig/java/strus_wrap.cxx
+swig/python/strus.py
+swig/python/strus_wrap.cxx
+
