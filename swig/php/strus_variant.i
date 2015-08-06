@@ -1,5 +1,3 @@
-
-#if defined(SWIGPHP)
 %typemap(in) const Variant& (Variant temp)
 {
 	switch ((*$input)->type)
@@ -16,7 +14,4 @@
 	}
 	$1 = &temp;
 }
-#else
-#error no typemaps defined for the strus variant type in this language
-#endif
 

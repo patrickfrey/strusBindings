@@ -1,4 +1,3 @@
-#if defined(SWIGPHP)
 %typemap(in) const SummarizerConfig&	(SummarizerConfig temp)
 {
 	switch ((*$input)->type)
@@ -70,7 +69,4 @@
 	}
 	$1 = &temp;
 }
-#else
-#error no typemaps defined for SummarizerConfig in this language
-#endif
 

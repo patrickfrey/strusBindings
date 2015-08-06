@@ -1,4 +1,3 @@
-#if defined(SWIGPHP)
 %typemap(in) const Normalizer&	(Normalizer temp)
 {
 	switch ((*$input)->type)
@@ -177,9 +176,5 @@
 	}
 	$1 = &temp;
 }
-
-#else
-#error no typemaps defined for Normalizer in this language
-#endif
 
 

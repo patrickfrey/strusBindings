@@ -46,6 +46,13 @@ if(WIN32)
 set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} /D_WIN32_WINNT=0x0504")
 endif()
 
+find_package( JNI QUIET )
+IF (${JNI_FOUND} STREQUAL "TRUE")
+   MESSAGE( STATUS  "Found JNI package ${JNI_INCLUDE_DIRS} ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2}")
+ELSE (${JNI_FOUND} STREQUAL "TRUE")
+   MESSAGE( STATUS  "Could not locate JNI package: ${JNI_FOUND} ")
+ENDIF (${JNI_FOUND} STREQUAL "TRUE")
+
 set( Strus_PREFIX_PATH  "${CMAKE_PREFIX_PATH}" )
 find_package( strusrpc QUIET )
 IF (${strusrpc_FOUND})

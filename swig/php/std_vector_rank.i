@@ -2,7 +2,6 @@ namespace std {
 	%template(RankVector) vector<Rank>;
 }
 
-#if defined(SWIGPHP)
 %typemap(out) std::vector<Rank>
 {
 	array_init( return_value);
@@ -51,7 +50,3 @@ namespace std {
 		add_next_index_zval( return_value, rank);
 	}
 }
-#else
-#error no typemaps defined for std::vector<Rank> in this language
-#endif
-

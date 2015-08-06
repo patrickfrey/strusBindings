@@ -2,7 +2,6 @@ namespace std {
 	%template(StringVector) vector<string>;
 }
 
-#if defined(SWIGPHP)
 %typemap(in) std::vector<std::string>&	(std::vector<std::string> ar)
 {
 	switch ((*$input)->type)
@@ -68,8 +67,4 @@ namespace std {
 	}
 	$1 = &ar;
 }
-#else
-#error no typemaps defined for std::vector<std::string> in this language
-#endif
-
 

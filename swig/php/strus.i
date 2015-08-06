@@ -10,7 +10,7 @@
 #include "../include/strus/bindingObjects.hpp"
 %}
 
-%include "ignore_declarations.i"
+%include "../ignore_declarations.i"
 %include "exception_handler.i"
 %include "std_vector_string.i"
 %include "std_vector_term.i"
@@ -21,7 +21,7 @@
 %include "strus_aggregator.i"
 %include "strus_summarizer.i"
 %include "strus_weighting.i"
-%include "../include/strus/bindingObjects.hpp"
+%include "../../include/strus/bindingObjects.hpp"
 
 
 

@@ -2,7 +2,6 @@ namespace std {
 	%template(TermVector) vector<Term>;
 }
 
-#if defined(SWIGPHP)
 %typemap(out) std::vector<Term>
 {
 	array_init( return_value);
@@ -18,8 +17,4 @@ namespace std {
 		add_next_index_zval( return_value, term);
 	}
 }
-#else
-#error no typemaps defined for std::vector<Term> in this language
-#endif
-
 

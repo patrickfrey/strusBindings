@@ -1,19 +1,18 @@
-#if defined(SWIGPHP)
-%typemap(in) const Tokenizer&	(Tokenizer temp)
+%typemap(in) const Aggregator&	(Aggregator temp)
 {
 	switch ((*$input)->type)
 	{
 		case IS_LONG:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to Tokenizer");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to Aggregator");
 			break;
 		case IS_STRING:
 			temp.setName( std::string( Z_STRVAL_PP( $input)));
 			break;
 		case IS_DOUBLE:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to Tokenizer");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to Aggregator");
 			break;
 		case IS_BOOL:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert BOOL to Tokenizer");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert BOOL to Aggregator");
 			break;
 		case IS_NULL:
 			break;
@@ -60,19 +59,16 @@
 			break;
 		}
 		case IS_OBJECT:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert OBJECT to Tokenizer");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert OBJECT to Aggregator");
 			break;
 		case IS_RESOURCE:
-			SWIG_exception( SWIG_RuntimeError, "unable to convert RESOURCE to Tokenizer");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert RESOURCE to Aggregator");
 			break;
 		default: 
-			SWIG_exception( SWIG_RuntimeError, "unable to convert unknown type to Tokenizer");
+			SWIG_exception( SWIG_RuntimeError, "unable to convert unknown type to Aggregator");
 			break;
 	}
 	$1 = &temp;
 }
-#else
-#error no typemaps defined for Tokenizer in this language
-#endif
 
 

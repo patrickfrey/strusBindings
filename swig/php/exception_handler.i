@@ -1,4 +1,3 @@
-#if defined(SWIGPHP)
 %exception {
 	try {
 		$action
@@ -12,7 +11,4 @@
 		zend_throw_exception( NULL, const_cast<char*>("unknown exception"), 0 TSRMLS_CC);
 	}
 }
-#else
-#error no exception handling defined for this language
-#endif
 
