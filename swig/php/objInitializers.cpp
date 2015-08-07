@@ -26,9 +26,9 @@
 
 --------------------------------------------------------------------
 */
-#include <zend_exceptions.h>
 #include <zend.h>
 #include <zend_API.h>
+#include <zend_exceptions.h>
 #include "objInitializers.hpp"
 
 int initVariant( Variant& result, zval* obj)
@@ -38,7 +38,7 @@ int initVariant( Variant& result, zval* obj)
 	}
 	catch (...)
 	{
-		zend_error( E_ERROR, "memory allocation error in variant type initialization");
+		zend_throw_exception( NULL, const_cast<char*>("memory allocation error in variant type initialization"), 0 TSRMLS_CC);
 		return -1;
 	}
 	return 0;
@@ -144,44 +144,44 @@ int initStringVector( std::vector<std::string>& result, zval* obj)
 
 zval* getTermVector( const std::vector<Term>& ar)
 {
-	int error = 0;
+	zval* rt = 0;
 	try
 	{
 	}
 	catch ( const std::exception& err)
 	{
 		zend_error( E_ERROR, err.what());
-		return -1;
+		return 0;
 	}
-	return error;
+	return rt;
 }
 
 static zval* getRankAttributeVector( const std::vector<RankAttribute>& ar)
 {
-	int error = 0;
+	zval* rt = 0;
 	try
 	{
 	}
 	catch ( const std::exception& err)
 	{
 		zend_error( E_ERROR, err.what());
-		return -1;
+		return 0;
 	}
-	return error;
+	return rt;
 }
 
 zval* getRankVector( const std::vector<Rank>& ar)
 {
-	int error = 0;
+	zval* rt = 0;
 	try
 	{
 	}
 	catch ( const std::exception& err)
 	{
 		zend_error( E_ERROR, err.what());
-		return -1;
+		return 0;
 	}
-	return error;
+	return rt;
 }
 
 

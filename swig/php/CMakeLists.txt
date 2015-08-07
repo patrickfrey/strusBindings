@@ -21,7 +21,7 @@ add_custom_command(
 	DEPENDS  strus.i strus_variant.i strus_tokenizer.i strus_normalizer.i strus_aggregator.i std_vector_string.i std_vector_rank.i std_vector_term.i exception_handler.i  strus_weighting.i strus_summarizer.i ../ignore_declarations.i 
 )
 
-add_library( strus_php MODULE strus_wrap.cpp )
+add_library( strus_php MODULE strus_wrap.cpp objInitializers.cpp )
 set_target_properties( strus_php PROPERTIES PREFIX "")
 target_link_libraries( strus_php  strus_bindings )
 
