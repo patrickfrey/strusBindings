@@ -1,8 +1,10 @@
-%include "objInitializers.hpp"
+%inline %{
+#include "objInitializers.hpp"
+%}
 
 %typemap(in) const Aggregator&	(Aggregator temp)
 {
-	if (0!=initAggregator( &temp, (*$input)))
+	if (0!=initAggregator( temp, $input))
 	{
 		SWIG_fail;
 	}

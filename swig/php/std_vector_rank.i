@@ -5,7 +5,7 @@ namespace std {
 %typemap(out) std::vector<Rank>
 {
 	array_init( return_value);
-	std::vector<Rank>::const_iterator ri = $input.begin(), re = $input.end();
+	std::vector<Rank>::const_iterator ri = $1.begin(), re = $1.end();
 	for (; ri != re; ++ri)
 	{
 		zval* rank;

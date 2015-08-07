@@ -1,8 +1,10 @@
-%include "objInitializers.hpp"
+%inline %{
+#include "objInitializers.hpp"
+%}
 
 %typemap(in) const SummarizerConfig&	(SummarizerConfig temp)
 {
-	if (0!=initSummarizerConfig( &temp, (*$input)))
+	if (0!=initSummarizerConfig( temp, $input))
 	{
 		SWIG_fail;
 	}

@@ -1,4 +1,6 @@
-%include "objInitializers.hpp"
+%inline %{
+#include "objInitializers.hpp"
+%}
 
 namespace std {
 	%template(TermVector) vector<Term>;
@@ -6,8 +8,8 @@ namespace std {
 
 %typemap(out) std::vector<Rank>
 {
-	return_value = getTermVector( $input);
-	if (!return_value)
+	resultobj = getTermVector( $1);
+	if (!resultobj)
 	{
 		SWIG_fail;
 	}

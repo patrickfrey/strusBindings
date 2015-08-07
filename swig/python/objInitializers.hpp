@@ -33,7 +33,7 @@
 #include <vector>
 
 int initVariant( Variant& result, PyObject* obj);
-int initTokenizer( Normalizer& result, PyObject* obj);
+int initTokenizer( Tokenizer& result, PyObject* obj);
 int initNormalizer( Normalizer& result, PyObject* obj);
 int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
 int initAggregator( Aggregator& result, PyObject* obj);

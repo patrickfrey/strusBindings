@@ -5,7 +5,7 @@ namespace std {
 %typemap(out) std::vector<Term>
 {
 	array_init( return_value);
-	std::vector<Term>::const_iterator ti = $input.begin(), te = $input.end();
+	std::vector<Term>::const_iterator ti = $1.begin(), te = $1.end();
 	for (; ti != te; ++ti)
 	{
 		zval* term;
