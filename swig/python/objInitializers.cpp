@@ -200,7 +200,7 @@ int initNormalizer( Normalizer& result, PyObject* obj)
 
 int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 {
-	int error;
+	int error = 0;
 	if (PyString_Check( obj))
 	{
 		char* name = PyString_AS_STRING( obj);
@@ -260,7 +260,7 @@ int initAggregator( Aggregator& result, PyObject* obj)
 template <class Object>
 static int defineQueryEvaluationFunctionParameter( Object& result, PyObject* keyitem, PyObject* valueitem)
 {
-	int error = 1;
+	int error = 0;
 	char* key;
 	Variant value;
 

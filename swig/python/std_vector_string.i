@@ -1,3 +1,5 @@
+%include "objInitializers.hpp"
+
 namespace std {
 	%template(StringVector) vector<string>;
 }
