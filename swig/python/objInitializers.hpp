@@ -26,23 +26,22 @@
 
 --------------------------------------------------------------------
 */
-/// \brief Some utility functions that are centralised to control dependencies to boost
-#ifndef _STRUS_UTILS_HPP_INCLUDED
-#define _STRUS_UTILS_HPP_INCLUDED
-#include <string>
+#ifndef _STRUS_BINDING_PYHON_OBJECT_INITIALIZERS_HPP_INCLUDED
+#define _STRUS_BINDING_PYHON_OBJECT_INITIALIZERS_HPP_INCLUDED
+#include <Python.h>
+#include "strus/bindingObjects.hpp"
+#include <vector>
 
-namespace strus {
-namespace utils {
+int initVariant( Variant& result, PyObject* obj);
+int initTokenizer( Normalizer& result, PyObject* obj);
+int initNormalizer( Normalizer& result, PyObject* obj);
+int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
+int initAggregator( Aggregator& result, PyObject* obj);
+int initSummarizerConfig( SummarizerConfig& result, PyObject* obj);
+int initWeightingConfig( WeightingConfig& result, PyObject* obj);
+int initStringVector( std::vector<std::string>& result, PyObject* obj);
 
-std::string tolower( const std::string& val);
-std::string trim( const std::string& val);
-bool caseInsensitiveEquals( const std::string& val1, const std::string& val2);
-bool caseInsensitiveStartsWith( const std::string& val, const std::string& prefix);
-int toint( const std::string& val);
-std::string tostring( long val);
-std::string tostring( float val);
+PyObject* getTermVector( const std::vector<Term>& ar);
+PyObject* getRankVector( const std::vector<Rank>& ar);
 
-}} //namespace
 #endif
-
-

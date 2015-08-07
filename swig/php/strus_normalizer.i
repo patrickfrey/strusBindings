@@ -6,7 +6,14 @@
 			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to Normalizer");
 			break;
 		case IS_STRING:
-			temp.setName( std::string( Z_STRVAL_PP( $input)));
+			try
+			{
+				temp.setName( std::string( Z_STRVAL_PP( $input)));
+			}
+			catch (...)
+			{
+				SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+			}
 			break;
 		case IS_DOUBLE:
 			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to Normalizer");
@@ -43,13 +50,20 @@
 					convert_to_string(&val);
 					str = &val;
 				}
-				if (argcnt == 0)
+				try
 				{
-					temp.setName( Z_STRVAL_P(str));
+					if (argcnt == 0)
+					{
+						temp.setName( Z_STRVAL_P(str));
+					}
+					else
+					{
+						temp.addArgument( Z_STRVAL_P(str));
+					}
 				}
-				else
+				catch (...)
 				{
-					temp.addArgument( Z_STRVAL_P(str));
+					SWIG_exception( SWIG_RuntimeError, "memory allocation error");
 				}
 				if (!is_str)
 				{
@@ -79,7 +93,14 @@
 			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to std::vector<Normalizer>");
 			break;
 		case IS_STRING:
-			temp.push_back( Normalizer( std::string( Z_STRVAL_PP( $input))));
+			try
+			{
+				temp.push_back( Normalizer( std::string( Z_STRVAL_PP( $input))));
+			}
+			catch (...)
+			{
+				SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+			}
 			break;
 		case IS_DOUBLE:
 			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to std::vector<Normalizer>");
@@ -139,13 +160,20 @@
 						{
 							e_str = *e_data;
 						}
-						if (e_argcnt == 0)
+						try
 						{
-							temp.back().setName( Z_STRVAL_P(e_str));
+							if (e_argcnt == 0)
+							{
+								temp.back().setName( Z_STRVAL_P(e_str));
+							}
+							else
+							{
+								temp.back().addArgument( Z_STRVAL_P(e_str));
+							}
 						}
-						else
+						catch (...)
 						{
-							temp.back().addArgument( Z_STRVAL_P(e_str));
+							SWIG_exception( SWIG_RuntimeError, "memory allocation error");
 						}
 						if (!e_is_str)
 						{
@@ -159,8 +187,15 @@
 					zval_copy_ctor(&val);
 					convert_to_string(&val);
 					str = &val;
-					temp.push_back( Normalizer( Z_STRVAL_P(str)));
-				}				
+					try
+					{
+						temp.push_back( Normalizer( Z_STRVAL_P(str)));
+					}
+					catch (...)
+					{
+						SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+					}
+				}
 			}
 			break;
 		}

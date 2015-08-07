@@ -10,7 +10,14 @@ namespace std {
 			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to std::vector<std::string>");
 			break;
 		case IS_STRING:
-			ar.push_back( Z_STRVAL_PP( $input));
+			try
+			{
+				ar.push_back( Z_STRVAL_PP( $input));
+			}
+			catch (...)
+			{
+				SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+			}
 			break;
 		case IS_DOUBLE:
 			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to std::vector<std::string>");
@@ -47,7 +54,14 @@ namespace std {
 				{
 					str = *data;
 				}
-				ar.push_back( std::string( Z_STRVAL_P(str)));
+				try
+				{
+					ar.push_back( std::string( Z_STRVAL_P(str)));
+				}
+				catch (...)
+				{
+					SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+				}
 				if (!is_str)
 				{
 					zval_dtor(&temp);

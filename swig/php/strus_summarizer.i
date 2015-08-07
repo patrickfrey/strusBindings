@@ -37,22 +37,39 @@
 				}
 				if (name && name[0] == '.')
 				{
-					temp.defineFeature( std::string( name+1, name_len-2), std::string( Z_STRVAL_P(*data)));
+					try
+					{
+						temp.defineFeature( std::string( name+1, name_len-2), std::string( Z_STRVAL_P(*data)));
+					}
+					catch (...)
+					{
+						SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+					}
 				}
-				else switch (Z_TYPE_PP(data))
+				else
 				{
-					case IS_LONG:
-						temp.defineParameter( std::string( name, name_len-1), Variant( (int)Z_LVAL_P( *data)));
-						break;
-					case IS_STRING:
-						temp.defineParameter( std::string( name, name_len-1), Variant( (char*)Z_STRVAL_P( *data)));
-						break;
-					case IS_DOUBLE:
-						temp.defineParameter( std::string( name, name_len-1), Variant( (double)Z_DVAL_P( *data)));
-						break;
-					case IS_BOOL:
-						temp.defineParameter( std::string( name, name_len-1), Variant( (bool)Z_BVAL_P( *data)));
-						break;
+					try
+					{
+						switch (Z_TYPE_PP(data))
+						{
+							case IS_LONG:
+								temp.defineParameter( std::string( name, name_len-1), Variant( (int)Z_LVAL_P( *data)));
+								break;
+							case IS_STRING:
+								temp.defineParameter( std::string( name, name_len-1), Variant( (char*)Z_STRVAL_P( *data)));
+								break;
+							case IS_DOUBLE:
+								temp.defineParameter( std::string( name, name_len-1), Variant( (double)Z_DVAL_P( *data)));
+								break;
+							case IS_BOOL:
+								temp.defineParameter( std::string( name, name_len-1), Variant( (bool)Z_BVAL_P( *data)));
+								break;
+						}
+					}
+					catch (...)
+					{
+						SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+					}
 				}
 			}
 			break;

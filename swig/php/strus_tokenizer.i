@@ -6,7 +6,14 @@
 			SWIG_exception( SWIG_RuntimeError, "unable to convert LONG to Tokenizer");
 			break;
 		case IS_STRING:
-			temp.setName( std::string( Z_STRVAL_PP( $input)));
+			try
+			{
+				temp.setName( std::string( Z_STRVAL_PP( $input)));
+			}
+			catch (...)
+			{
+				SWIG_exception( SWIG_RuntimeError, "memory allocation error");
+			}
 			break;
 		case IS_DOUBLE:
 			SWIG_exception( SWIG_RuntimeError, "unable to convert DOUBLE to Tokenizer");
@@ -43,13 +50,20 @@
 					convert_to_string(&val);
 					str = &val;
 				}
-				if (argcnt == 0)
+				try
 				{
-					temp.setName( Z_STRVAL_P(str));
+					if (argcnt == 0)
+					{
+						temp.setName( Z_STRVAL_P(str));
+					}
+					else
+					{
+						temp.addArgument( Z_STRVAL_P(str));
+					}
 				}
-				else
+				catch (...)
 				{
-					temp.addArgument( Z_STRVAL_P(str));
+					SWIG_exception( SWIG_RuntimeError, "memory allocation error");
 				}
 				if (!is_str)
 				{

@@ -65,7 +65,7 @@ int utils::toint( const std::string& val)
 	}
 }
 
-std::string utils::tostring( int val)
+std::string utils::tostring( long val)
 {
 	try
 	{
@@ -77,4 +77,15 @@ std::string utils::tostring( int val)
 	}
 }
 
+std::string utils::tostring( float val)
+{
+	try
+	{
+		return boost::lexical_cast<std::string>( val);
+	}
+	catch (...)
+	{
+		throw std::runtime_error( "failed to convert number to string (out of memory)");
+	}
+}
 

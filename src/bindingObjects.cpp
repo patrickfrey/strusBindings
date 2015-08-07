@@ -57,6 +57,36 @@ struct ReferenceDeleter
 	}
 };
 
+DLL_PUBLIC void Tokenizer::addArgumentInt( long arg_)
+{
+	addArgument( strus::utils::tostring( arg_));
+}
+
+DLL_PUBLIC void Tokenizer::addArgumentFloat( float arg_)
+{
+	addArgument( strus::utils::tostring( arg_));
+}
+
+DLL_PUBLIC void Normalizer::addArgumentInt( long arg_)
+{
+	addArgument( strus::utils::tostring( arg_));
+}
+
+DLL_PUBLIC void Normalizer::addArgumentFloat( float arg_)
+{
+	addArgument( strus::utils::tostring( arg_));
+}
+
+DLL_PUBLIC void Aggregator::addArgumentInt( long arg_)
+{
+	addArgument( strus::utils::tostring( arg_));
+}
+
+DLL_PUBLIC void Aggregator::addArgumentFloat( float arg_)
+{
+	addArgument( strus::utils::tostring( arg_));
+}
+
 DLL_PUBLIC Variant::Variant()
 	:m_type(Variant_UNDEFINED){}
 
@@ -124,35 +154,35 @@ DLL_PUBLIC void Variant::assign( const Variant& o)
 	}
 }
 
-DLL_PUBLIC void Variant::assign( unsigned int v)
+DLL_PUBLIC void Variant::assignUint( unsigned long v)
 {
 	m_type = Variant_UINT;
 	m_value.UINT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assign( int v)
+DLL_PUBLIC void Variant::assignInt( long v)
 {
 	m_type = Variant_INT;
 	m_value.INT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assign( float v)
+DLL_PUBLIC void Variant::assignFloat( float v)
 {
 	m_type = Variant_FLOAT;
 	m_value.FLOAT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assign( double v)
+DLL_PUBLIC void Variant::assignDouble( double v)
 {
 	m_type = Variant_FLOAT;
 	m_value.FLOAT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assign( const std::string& v)
+DLL_PUBLIC void Variant::assignText( const std::string& v)
 {
 	m_buf = v;
 	m_type = Variant_TEXT;

@@ -95,6 +95,8 @@ public:
 
 	void setName( const std::string& name_)			{m_name = name_;}
 	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+	void addArgumentInt( long arg_);
+	void addArgumentFloat( float arg_);
 
 private:
 	std::string m_name;
@@ -121,6 +123,8 @@ public:
 
 	void setName( const std::string& name_)			{m_name = name_;}
 	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+	void addArgumentInt( long arg_);
+	void addArgumentFloat( float arg_);
 
 private:
 	friend class QueryAnalyzer;
@@ -150,6 +154,8 @@ public:
 
 	void setName( const std::string& name_)			{m_name = name_;}
 	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+	void addArgumentInt( long arg_);
+	void addArgumentFloat( float arg_);
 
 private:
 	friend class DocumentAnalyzer;
@@ -199,11 +205,11 @@ public:
 
 	void init();
 	void assign( const Variant& o);
-	void assign( unsigned int v);
-	void assign( int v);
-	void assign( float v);
-	void assign( double v);
-	void assign( const std::string& v);
+	void assignUint( unsigned long v);
+	void assignInt( long v);
+	void assignFloat( float v);
+	void assignDouble( double v);
+	void assignText( const std::string& v);
 
 private:
 	friend class Storage;
