@@ -33,7 +33,7 @@
 #include <vector>
 
 int initVariant( Variant& result, zval* obj);
-int initTokenizer( Normalizer& result, zval obj);
+int initTokenizer( Tokenizer& result, zval* obj);
 int initNormalizer( Normalizer& result, zval* obj);
 int initNormalizerList( std::vector<Normalizer>& result, zval* obj);
 int initAggregator( Aggregator& result, zval* obj);
@@ -41,7 +41,7 @@ int initSummarizerConfig( SummarizerConfig& result, zval* obj);
 int initWeightingConfig( WeightingConfig& result, zval* obj);
 int initStringVector( std::vector<std::string>& result, zval* obj);
 
-zval* getTermVector( const std::vector<Term>& ar);
-zval* getRankVector( const std::vector<Rank>& ar);
+int getTermVector( zval* result, const std::vector<Term>& ar);
+int getRankVector( zval* result, const std::vector<Rank>& ar);
 
 #endif

@@ -1,3 +1,7 @@
+%inline %{
+#include "objInitializers.hpp"
+%}
+
 %exception {
 	try {
 		$action
