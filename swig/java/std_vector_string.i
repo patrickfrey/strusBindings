@@ -8,7 +8,7 @@ namespace std {
 
 %typemap(in) std::vector<std::string>&	(std::vector<std::string> temp)
 {
-	if (0!=initStringVector( temp, $input))
+	if (0!=initStringVector( temp, jenv, $input))
 	{
 		SWIG_fail;
 	}

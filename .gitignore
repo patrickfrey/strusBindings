@@ -44,6 +44,7 @@ CPackSourceConfig.cmake
 
 # Compiled programs
 tests/query_cpp/src/testQuery
+swig/java/net/strus/*.class
 
 # Generated test data
 tests/query_cpp/data/
