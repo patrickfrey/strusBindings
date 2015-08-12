@@ -22,7 +22,7 @@ link_directories(
 
 
 add_library( strus_bindings SHARED ${source_files} )
-target_link_libraries( strus_bindings "${strusmodule_LIBRARIES}" "${strusrpc_LIBRARIES}" )
+target_link_libraries( strus_bindings strus_module strus_rpc_client strus_rpc_client_socket )
 set_target_properties(
     strus_bindings
     PROPERTIES

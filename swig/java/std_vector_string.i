@@ -6,15 +6,15 @@ namespace std {
 	%template(StringVector) vector<string>;
 }
 
-%typemap(in) std::vector<std::string>&	(std::vector<std::string> temp)
-{
-	if (0!=initStringVector( temp, jenv, $input))
-	{
-		SWIG_fail;
-	}
-	else
-	{
-		$1 = &temp;
-	}
-}
+//%typemap(in) std::vector<std::string>&	(std::vector<std::string> temp)
+//{
+//	if (0!=initStringVector( temp, jenv, $input))
+//	{
+//		SWIG_fail;
+//	}
+//	else
+//	{
+//		$1 = &temp;
+//	}
+//}
 

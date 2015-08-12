@@ -44,7 +44,8 @@ CPackSourceConfig.cmake
 
 # Compiled programs
 tests/query_cpp/src/testQuery
-swig/java/net/strus/*.class
+swig/java/net/strus/example/*.class
+swig/java/net/strus/api/*.class
 
 # Generated test data
 tests/query_cpp/data/
@@ -57,6 +58,9 @@ swig/php/strus.php
 swig/java/strus_wrap.c
 swig/java/*.java
 swig/java/strus_wrap.cxx
+swig/java/net/strus/api/*.jar
+swig/java/net/strus/api/*.java
+swig/java/net/strus/api/*.class
 swig/python/strus.py
 swig/python/strus_wrap.cxx
 

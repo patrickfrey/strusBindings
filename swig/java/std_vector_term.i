@@ -2,16 +2,15 @@
 #include "objInitializers.hpp"
 %}
 
-namespace std {
-	%template(TermVector) vector<Term>;
-}
+%typemap(javapackage) std::vector<Term>  "net.strus.api.TermVector"
+%template(TermVector) std::vector<Term>;
 
-%typemap(out) std::vector<Term>
-{
-	resultobj = getTermVector( jenv, $1);
-	if (!resultobj)
-	{
-		SWIG_fail;
-	}
-}
+//%typemap(out) std::vector<Term>
+//{
+//	resultobj = getTermVector( jenv, $1);
+//	if (!resultobj)
+//	{
+//		SWIG_fail;
+//	}
+//}
 

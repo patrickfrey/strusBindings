@@ -1,4 +1,4 @@
-package net.strus;
+package net.strus.example;
 
 public class HelloWorld
 {
