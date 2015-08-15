@@ -13,13 +13,15 @@ ENDFUNCTION( build_example CNAM )
 
 build_example( HelloWorld )
 build_example( CreateCollection )
+build_example( CreateCollectionNoAnalyzer )
 build_example( Status )
 
-add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class Status.class )
+add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class CreateCollectionNoAnalyzer.class Status.class )
 
 set( ENV{LD_LIBRARY_PATH} "${PROJECT_SOURCE_DIR}/swig/java" )
 add_test( HelloWorld java -classpath ../../.. net.strus.example.HelloWorld )
 add_test( CreateCollection java -classpath ../../.. net.strus.example.CreateCollection )
+add_test( CreateCollectionNoAnalyzer java -classpath ../../.. net.strus.example.CreateCollectionNoAnalyzer )
 add_test( Status java -classpath ../../.. net.strus.example.Status )
 
 

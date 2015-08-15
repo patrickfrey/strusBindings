@@ -32,6 +32,9 @@
 #include "strus/bindingObjects.hpp"
 #include <vector>
 
+namespace strus
+{
+
 int initVariant( Variant& result, JNIEnv* jenv, jlong obj);
 int initTokenizer( Tokenizer& result, JNIEnv* jenv, jlong obj);
 int initNormalizer( Normalizer& result, JNIEnv* jenv, jlong obj);
@@ -41,4 +44,6 @@ int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jlong obj);
 int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jlong obj);
 int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jlong obj);
 
+}//namespace
 #endif
+

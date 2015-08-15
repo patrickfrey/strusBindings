@@ -27,6 +27,7 @@
 --------------------------------------------------------------------
 */
 #include "objInitializers.hpp"
+#include "strus/private/dll_tags.hpp"
 
 static int ERROR( JNIEnv* jenv, const char* msg)
 {
@@ -63,7 +64,7 @@ static int initVector( std::vector<ObjType>& result, JNIEnv* jenv, jlong objidx)
 // int initTokenizer( Tokenizer& result, JNIEnv* jenv, jlong objptr){}
 // int initNormalizer( Normalizer& result, JNIEnv* jenv, jlong objptr){}
 
-int initNormalizerVector( std::vector<Normalizer>& result, JNIEnv* jenv, jlong objidx)
+DLL_PUBLIC int strus::initNormalizerVector( std::vector<Normalizer>& result, JNIEnv* jenv, jlong objidx)
 {
 	return initVector<Normalizer>( result, jenv, objidx);
 }
@@ -72,7 +73,7 @@ int initNormalizerVector( std::vector<Normalizer>& result, JNIEnv* jenv, jlong o
 // int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jlong objptr){}
 // int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jlong objptr){}
 
-int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jlong objidx)
+DLL_PUBLIC int strus::initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jlong objidx)
 {
 	return initVector<std::string>( result, jenv, objidx);
 }

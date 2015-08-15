@@ -4,13 +4,9 @@ import net.strus.api.*;
 public class Status
 {
 	public static void main( String []args) {
-		String config = "localhost:7181";
-		if (args.length > 0)
-		{
-			config = args[ 0];
-		}
-		StrusContext ctx = new StrusContext( config);
-		StorageClient storage = ctx.createStorageClient("");
+		String config = "path=storage";
+		StrusContext ctx = new StrusContext();
+		StorageClient storage = ctx.createStorageClient( config);
 		long nofDocuments = storage.nofDocumentsInserted();
 		System.out.println( "Number of documents inserted: " + nofDocuments);
 	}

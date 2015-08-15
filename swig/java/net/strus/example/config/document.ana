@@ -1,0 +1,8 @@
+[SearchIndex]
+	word = convdia(en):lc:stem(en) word /doc/text();
+[ForwardIndex]
+	orig = orig split /doc/text();
+[Attribute]
+	title = orig content /doc/title();
+
+

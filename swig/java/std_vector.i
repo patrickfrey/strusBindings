@@ -45,13 +45,7 @@ public:
 %define AUTOBOX(CTYPE, JTYPE)
 %typemap(autobox) CTYPE, const CTYPE&, CTYPE& "JTYPE"
 %enddef
-AUTOBOX(double, Double)
-AUTOBOX(float, Float)
-AUTOBOX(boolean, Boolean)
-AUTOBOX(signed char, Byte)
-AUTOBOX(short, Short)
-AUTOBOX(int, Integer)
-AUTOBOX(long, Long)
+AUTOBOX(std::string, String)
 AUTOBOX(SWIGTYPE, $typemap(jstype,$1_basetype))
 
 %typemap(javabase) std::vector "java.util.AbstractList<$typemap(autobox,$1_basetype::value_type)>"

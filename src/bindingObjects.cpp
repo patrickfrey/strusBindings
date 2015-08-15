@@ -690,12 +690,14 @@ DLL_PUBLIC void StorageClient::insertDocument( const std::string& docid, const D
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
 	for (; ti != te; ++ti)
 	{
+/*[-]*/std::cout << "++++ document->addSearchIndexTerm( " << ti->type() << "," << ti->value() << "," << ti->position() << ")" << std::endl; 
 		document->addSearchIndexTerm( ti->type(), ti->value(), ti->position());
 	}
 	std::vector<Term>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
 	for (; fi != fe; ++fi)
 	{
+/*[-]*/std::cout << "++++ document->addForwardIndexTerm( " << fi->type() << "," << fi->value() << "," << fi->position() << ")" << std::endl; 
 		document->addForwardIndexTerm( fi->type(), fi->value(), fi->position());
 	}
 	std::vector<std::string>::const_iterator
