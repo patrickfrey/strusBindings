@@ -1,0 +1,76 @@
+package net.strus.example;
+import net.strus.api.*;
+import java.io.*;
+
+public class CreateCollection
+{
+	static String readFile( String path) throws IOException {
+		try (BufferedReader br = new BufferedReader(new FileReader(path)))
+		{
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			
+			while (line != null) {
+				sb.append(line);
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			return sb.toString();
+		}
+	}
+
+	public static void main( String []args) {
+		String config = "path=storage";
+		if (args.length > 0)
+		{
+			config = args[ 0];
+		}
+		// Create context and base objects:
+		StrusContext ctx = new StrusContext( "");
+		ctx.createStorage( config);
+		StorageClient storage = ctx.createStorageClient( config);
+		DocumentAnalyzer analyzer = ctx.createDocumentAnalyzer();
+
+		// Define the analyzer:
+		Tokenizer word_tokenizer = new Tokenizer( "word");
+		Tokenizer split_tokenizer = new Tokenizer( "split");
+		Tokenizer content_tokenizer = new Tokenizer( "content");
+
+		NormalizerVector stem_normalizer = new NormalizerVector();
+		stem_normalizer.add( new Normalizer( "stem", "en"));
+		stem_normalizer.add( new Normalizer( "lc"));
+		stem_normalizer.add( new Normalizer( "convdia", "en"));
+		NormalizerVector orig_normalizer = new NormalizerVector();
+		orig_normalizer.add( new Normalizer( "orig"));
+
+		analyzer.addSearchIndexFeature( "word", "/doc/text()", word_tokenizer, stem_normalizer); 
+		analyzer.addForwardIndexFeature( "orig", "/doc/text()", split_tokenizer, orig_normalizer);
+		analyzer.defineAttribute( "title", "/doc/title()", content_tokenizer, orig_normalizer);
+
+		// Read input files, analyze and insert them:
+		try
+		{
+			File folder = new File( "./data");
+			File[] listOfFiles = folder.listFiles();
+
+			for (File file : listOfFiles) {
+				if (file.isFile())
+				{
+					String filename = file.getName();
+					if (filename.endsWith( ".xml"))
+					{
+						Document doc = analyzer.analyze( readFile( filename));
+						storage.insertDocument( filename, doc);
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			System.err.println( "Failed to read all input files: " + e.getMessage());
+			return;
+		}
+		System.out.println( "done");
+	}
+} 
+

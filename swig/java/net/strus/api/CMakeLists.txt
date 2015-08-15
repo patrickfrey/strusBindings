@@ -8,6 +8,7 @@ set( generated_java_source_files
 	Document.java
 	MetaData.java
 	Normalizer.java
+	NormalizerVector.java
 	QueryAnalyzeQueue.java
 	QueryAnalyzer.java
 	QueryEval.java
@@ -23,11 +24,7 @@ set( generated_java_source_files
 	SummarizerConfig.java
 	SWIGTYPE_p_std__vectorT_Attribute_t.java
 	SWIGTYPE_p_std__vectorT_MetaData_t.java
-	SWIGTYPE_p_std__vectorT_Normalizer_t.java
 	SWIGTYPE_p_std__vectorT_RankAttribute_t.java
-	SWIGTYPE_p_std__vectorT_Rank_t.java
-	SWIGTYPE_p_std__vectorT_std__string_t.java
-	SWIGTYPE_p_std__vectorT_Term_t.java
 	Term.java
 	TermVector.java
 	Tokenizer.java

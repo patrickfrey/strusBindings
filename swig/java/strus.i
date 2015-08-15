@@ -3,6 +3,7 @@
 %include "std_vector.i"
 %include "typemaps.i"
 %include "exception.i"
+%include "arrays_java.i"
 
 %apply const std::string& {std::string*};
 
@@ -10,9 +11,11 @@
 #include "../include/strus/bindingObjects.hpp"
 %}
 
-%include "namespace.i"
+%include "newobject.i"
+%include "java_heap.i"
 %include "../ignore_declarations.i"
 %include "exception_handler.i"
+
 %include "std_vector_string.i"
 %include "std_vector_term.i"
 %include "std_vector_rank.i"

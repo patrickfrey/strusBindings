@@ -87,6 +87,17 @@ public:
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
 	Tokenizer( const std::string& name_, const std::vector<std::string>& arg_)
 		:m_name(name_),m_arguments(arg_){}
+	Tokenizer( const std::string& name_, const std::string& arg_)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg_);
+	}
+	Tokenizer( const std::string& name_, const std::string& arg1_, const std::string& arg2_)
+		:m_name(name_),m_arguments()
+	{
+		m_arguments.push_back( arg1_);
+		m_arguments.push_back( arg2_);
+	}
 	Tokenizer( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
@@ -113,6 +124,17 @@ public:
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
 	Normalizer( const std::string& name_, const std::vector<std::string>& arg_)
 		:m_name(name_),m_arguments(arg_){}
+	Normalizer( const std::string& name_, const std::string& arg_)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg_);
+	}
+	Normalizer( const std::string& name_, const std::string& arg1_, const std::string& arg2_)
+		:m_name(name_),m_arguments()
+	{
+		m_arguments.push_back( arg1_);
+		m_arguments.push_back( arg2_);
+	}
 	Normalizer( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 
@@ -144,6 +166,17 @@ public:
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
 	Aggregator( const std::string& name_, const std::vector<std::string>& arg_)
 		:m_name(name_),m_arguments(arg_){}
+	Aggregator( const std::string& name_, const std::string& arg_)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg_);
+	}
+	Aggregator( const std::string& name_, const std::string& arg1_, const std::string& arg2_)
+		:m_name(name_),m_arguments()
+	{
+		m_arguments.push_back( arg1_);
+		m_arguments.push_back( arg2_);
+	}
 	Aggregator( const std::string& name_)
 		:m_name(name_),m_arguments(){}
 

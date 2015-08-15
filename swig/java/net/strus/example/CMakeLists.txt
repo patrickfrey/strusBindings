@@ -12,9 +12,15 @@ FUNCTION( build_example NAME )
 ENDFUNCTION( build_example CNAM )
 
 build_example( HelloWorld )
+build_example( CreateCollection )
 build_example( Status )
 
-add_custom_target( run ALL DEPENDS HelloWorld.class Status.class )
+add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class Status.class )
+
+set( ENV{LD_LIBRARY_PATH} "${PROJECT_SOURCE_DIR}/swig/java" )
+add_test( HelloWorld java -classpath ../../.. net.strus.example.HelloWorld )
+add_test( CreateCollection java -classpath ../../.. net.strus.example.CreateCollection )
+add_test( Status java -classpath ../../.. net.strus.example.Status )
 
 
 

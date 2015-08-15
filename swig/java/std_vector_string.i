@@ -2,19 +2,24 @@
 #include "objInitializers.hpp"
 %}
 
-namespace std {
-	%template(StringVector) vector<string>;
+%template(StringVector) std::vector<std::string>;
+%typemap(out) std::vector<std::string>
+{
+	resultobj = getStringVector( $1);
+	if (!resultobj)
+	{
+		return $null;
+	}
 }
-
-//%typemap(in) std::vector<std::string>&	(std::vector<std::string> temp)
-//{
-//	if (0!=initStringVector( temp, jenv, $input))
-//	{
-//		SWIG_fail;
-//	}
-//	else
-//	{
-//		$1 = &temp;
-//	}
-//}
+%typemap(in) const std::vector<std::string>&	(std::vector<std::string> temp)
+{
+	if (0!=initStringVector( temp, jenv, $input))
+	{
+		return $null;
+	}
+	else
+	{
+		$1 = &temp;
+	}
+}
 

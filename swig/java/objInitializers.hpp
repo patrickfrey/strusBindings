@@ -32,16 +32,13 @@
 #include "strus/bindingObjects.hpp"
 #include <vector>
 
-int initVariant( Variant& result, JNIEnv* jenv, jobject obj);
-int initTokenizer( Tokenizer& result, JNIEnv* jenv, jobject obj);
-int initNormalizer( Normalizer& result, JNIEnv* jenv, jobject obj);
-int initNormalizerList( std::vector<Normalizer>& result, JNIEnv* jenv, jobject obj);
-int initAggregator( Aggregator& result, JNIEnv* jenv, jobject obj);
-int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jobject obj);
-int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jobject obj);
-int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jobject obj);
-
-jobject getTermVector( JNIEnv* jenv, const std::vector<Term>& ar);
-jobject getRankVector( JNIEnv* jenv, const std::vector<Rank>& ar);
+int initVariant( Variant& result, JNIEnv* jenv, jlong obj);
+int initTokenizer( Tokenizer& result, JNIEnv* jenv, jlong obj);
+int initNormalizer( Normalizer& result, JNIEnv* jenv, jlong obj);
+int initNormalizerVector( std::vector<Normalizer>& result, JNIEnv* jenv, jlong obj);
+int initAggregator( Aggregator& result, JNIEnv* jenv, jlong obj);
+int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jlong obj);
+int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jlong obj);
+int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jlong obj);
 
 #endif

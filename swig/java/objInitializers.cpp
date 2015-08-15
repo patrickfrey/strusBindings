@@ -35,61 +35,46 @@ static int ERROR( JNIEnv* jenv, const char* msg)
 	return -1;
 }
 
-int initVariant( Variant& result, JNIEnv* jenv, jobject obj)
+template <typename ObjType>
+static int initVector( std::vector<ObjType>& result, JNIEnv* jenv, jlong objidx)
 {
-	jclass variant_class = jenv->FindClass("Variant");
-	jclass objCls = jenv->GetObjectClass( obj);
-	jmethodID mGetInt = jenv->GetMethodID( objCls, "intValue","()I;");
-	if(mGetInt == NULL)
+	try
 	{
-		return ERROR( jenv, "cannot convert parameter to int");
+		typedef std::vector<ObjType>* ObjPtrType;
+		std::vector<ObjType>* objptr = *(ObjPtrType*)(&objidx);
+		typename std::vector<ObjType>::const_iterator oi = objptr->begin(), oe = objptr->end();
+		for (; oi != oe; ++oi)
+		{
+			result.push_back( *oi);
+		}
 	}
-	result.assignInt( jenv->CallIntMethod( obj, mGetInt));
+	catch (const std::bad_alloc& err)
+	{
+		return ERROR( jenv, "memory allocation error");
+	}
+	catch (const std::runtime_error& err)
+	{
+		return ERROR( jenv, err.what());
+	}
+	return 0;
 }
 
-int initTokenizer( Tokenizer& result, JNIEnv* jenv, jobject obj)
+// int initVariant( Variant& result, JNIEnv* jenv, jlong objptr){}
+// int initTokenizer( Tokenizer& result, JNIEnv* jenv, jlong objptr){}
+// int initNormalizer( Normalizer& result, JNIEnv* jenv, jlong objptr){}
+
+int initNormalizerVector( std::vector<Normalizer>& result, JNIEnv* jenv, jlong objidx)
 {
-	
+	return initVector<Normalizer>( result, jenv, objidx);
 }
 
-int initNormalizer( Normalizer& result, JNIEnv* jenv, jobject obj)
-{
-	
-}
+// int initAggregator( Aggregator& result, JNIEnv* jenv, jlong objptr){}
+// int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jlong objptr){}
+// int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jlong objptr){}
 
-int initNormalizerList( std::vector<Normalizer>& result, JNIEnv* jenv, jobject obj)
+int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jlong objidx)
 {
-	
-}
-
-int initAggregator( Aggregator& result, JNIEnv* jenv, jobject obj)
-{
-	
-}
-
-int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jobject obj)
-{
-	
-}
-
-int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jobject obj)
-{
-	
-}
-
-int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jobject obj)
-{
-	
-}
-
-jobject getTermVector( JNIEnv* jenv, const std::vector<Term>& ar)
-{
-	
-}
-
-jobject getRankVector( JNIEnv* jenv, const std::vector<Rank>& ar)
-{
-	
+	return initVector<std::string>( result, jenv, objidx);
 }
 
 

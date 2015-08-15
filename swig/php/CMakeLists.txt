@@ -1,5 +1,8 @@
 cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing" )
+
 execute_process( COMMAND  php-config --includes  OUTPUT_VARIABLE  PHP_INCLUDES )
 string( REPLACE "-I"  ""  PHP_INCLUDES  ${PHP_INCLUDES}  )
 string( STRIP  ${PHP_INCLUDES}  PHP_INCLUDES )
