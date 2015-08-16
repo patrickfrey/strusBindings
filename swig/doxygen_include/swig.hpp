@@ -144,49 +144,14 @@ class NormalizerVector;
 class Tokenizer;
 
 /// \brief 
-class TermVector :public java::util::AbstractList<Term>
-{
-public:
-	///\brief Create a Term vector with a preallocated size
-	///\param[in] size number of elements to preallocate
-	TermVector(int32_t size);
-};
+#ifdef TOTO_UNFINISHED
+class TermVector;
+class RankVector;
+class RankAttributeVector;
+class AttributeVector;
+class MetaDataVector;
+#endif
 
-/// \brief Fixed size vector of a query rank. Represents the result of an information rerieval query
-class RankVector :public java::util::AbstractList<Rank>
-{
-public:
-	///\brief Create a Rank (item of a query result) vector with a preallocated size
-	///\param[in] size number of elements to preallocate
-	RankVector(int32_t size);
-};
-
-/// \brief Fixed size vector of a query rank. Represents the result of an information rerieval query
-class RankAttributeVector :public java::util::AbstractList<RankAttribute>
-{
-public:
-	///\brief Create a RankAttribute (attribute of a query result) vector with a preallocated size
-	///\param[in] size number of elements to preallocate
-	RankAttributeVector(int32_t size);
-};
-
-/// \brief Fixed size vector of document attributes
-class AttributeVector :public java::util::AbstractList<Attribute>
-{
-public:
-	///\brief Create a document attribute vector with a preallocated size
-	///\param[in] size number of elements to preallocate
-	AttributeVector(int32_t size);
-};
-
-/// \brief Fixed size vector of document meta data elements
-class MetaDataVector :public java::util::AbstractList<MetaData>
-{
-public:
-	///\brief Create a document meta data vector with a preallocated size
-	///\param[in] size number of elements to preallocate
-	MetaDataVector(int32_t size);
-};
 #elif defined DOXYGEN_PYTHON
 #else
 #error Unknown language (swig.hpp)
