@@ -133,11 +133,11 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a5fd7a4e7c8bdd9d0264ffddf169e8343"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#addb4394a833b218500e57efcf8b79683"><param name="Name" value="defineMetaData"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a51141baf6ce15c90c17f12ef6b767204"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a6d1d7752d3623bdf58d8cfc698d4637c"><param name="Name" value="defineParameter"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a4dee4a6fd92066b8a2b349646108ecd9"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#ae5937aec1698b23c391c8df33eaf3c63"><param name="Name" value="defineParameter"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a6d1d7752d3623bdf58d8cfc698d4637c"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#ab44198679dcc817ba147197cabd00a87"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#ae5937aec1698b23c391c8df33eaf3c63"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a1aaea16ea477aa0ebb71488e5c020c55"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#af524baa1ecf3e92fd9f0b86f24aa99c3"><param name="Name" value="definePhraseType"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#af45bff61eb15dd9fed521f2dde47f501"><param name="Name" value="deleteDocument"></OBJECT>
@@ -255,7 +255,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3d0dd306369d2021b334b9c94d61577a"><param name="Name" value="searchIndexTerms"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a17fc85cc4feefb42d061b643cccd3afa"><param name="Name" value="setAttribute"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3f54642e0167712d09e4cfe9a205cbad"><param name="Name" value="setDocid"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a80ace02838cc446040a83344786db7c0"><param name="Name" value="setMetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a7650ca67309880c549c4b5a0b1a1c22c"><param name="Name" value="setMetaData"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#ae2f86405b75ecd9dfb121c65ca62600d"><param name="Name" value="setUserAccessRight"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#acf0e0fdb117e9c9c5986b47765e3f320"><param name="Name" value="users"></OBJECT>
   </UL>
@@ -314,7 +314,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a88437a83a060f3a42f7684b9a7b781b1"><param name="Name" value="addUserName"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#ab5b15272650236a955ff148aca6d6cfd"><param name="Name" value="attachVariable"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a95ced4b2dc417849681f98c90eb8b3fb"><param name="Name" value="defineFeature"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a51141baf6ce15c90c17f12ef6b767204"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a4dee4a6fd92066b8a2b349646108ecd9"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a087ed8d00de8e0a42e6edda7e11e330c"><param name="Name" value="evaluate"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a0631495bd2639a327ce3ea30df99cb62"><param name="Name" value="pushDuplicate"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a42d2b373bc30431e3059e1c7969259fb"><param name="Name" value="pushExpression"></OBJECT>
@@ -413,7 +413,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a5bd33eb97d009c208bad9ec8054d3bb8"><param name="Name" value="defineFeature"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a6d1d7752d3623bdf58d8cfc698d4637c"><param name="Name" value="defineParameter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#ae5937aec1698b23c391c8df33eaf3c63"><param name="Name" value="defineParameter"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a426b44e0245ed7e797d6798fde9dc048"><param name="Name" value="SummarizerConfig"></OBJECT>
   </UL>
@@ -469,7 +469,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a5fd7a4e7c8bdd9d0264ffddf169e8343"><param name="Name" value="defineFeature"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#ab44198679dcc817ba147197cabd00a87"><param name="Name" value="defineParameter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a1aaea16ea477aa0ebb71488e5c020c55"><param name="Name" value="defineParameter"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#aa64f74db4b96a54b9ffc0279f09800fa"><param name="Name" value="WeightingConfig"></OBJECT>
   </UL>
@@ -547,7 +547,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3f54642e0167712d09e4cfe9a205cbad"><param name="Name" value="setDocid"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a6ffdf2f82dfd99f1d33315ab1f5eb340"><param name="Name" value="setEncoding"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a3ace0f4feabf00c1f24ef70d492098f2"><param name="Name" value="setMaxNofRanks"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a80ace02838cc446040a83344786db7c0"><param name="Name" value="setMetaData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a7650ca67309880c549c4b5a0b1a1c22c"><param name="Name" value="setMetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a905c8ccbdbbf8c4f11fc6bd63105b010"><param name="Name" value="setMimeType"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a7e09783d1a74df3e81c5275b0cb2b37f"><param name="Name" value="setMinRank"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aecfa7ed4f777cfb80602248acd78609e"><param name="Name" value="setName"></OBJECT>
