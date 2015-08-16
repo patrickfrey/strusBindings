@@ -17,6 +17,7 @@ public class CreateCollectionNoAnalyzer
 				doc.addSearchIndexTerm( "word", item, pos);
 			}
 		}
+		pos = 0;
 		for (String item : forwardIndex)
 		{
 			++pos;
@@ -30,7 +31,7 @@ public class CreateCollectionNoAnalyzer
 	}
 
 	public static void main( String []args) {
-		String config = "path=storage";
+		String config = "path=storage; metadata=doclen UINT16";
 		if (args.length > 0)
 		{
 			config = args[ 0];
@@ -50,8 +51,8 @@ public class CreateCollectionNoAnalyzer
 		StorageClient storage = ctx.createStorageClient( config);
 
 		// Define the test documents:
-		String[] doc_A_searchIndex = {"tokyo","is","a","place","that","is","complet","differ","than","what","you","would","expect","as","european","citizen"};
-		String[] doc_A_forwardIndex = {"Tokyo","is","a","place","that","is","completely","different","than","what","you","would","expect","as","European","citizen."};
+		String[] doc_A_searchIndex = {"tokyo","is","a","citi","that","is","complet","differ","than","what","you","would","expect","as","european","citizen"};
+		String[] doc_A_forwardIndex = {"Tokyo","is","a","city","that","is","completely","different","than","what","you","would","expect","as","European","citizen."};
 		String doc_A_title = "One day in Tokyo";
 
 		String[] doc_B_searchIndex = {"new", "york", "is", "a", "citi", "with", "dimens", "you", "can", "t", "imagine"};

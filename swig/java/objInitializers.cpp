@@ -78,4 +78,22 @@ DLL_PUBLIC int strus::initStringVector( std::vector<std::string>& result, JNIEnv
 	return initVector<std::string>( result, jenv, objidx);
 }
 
+DLL_PUBLIC int strus::initVariantValue( Variant& value, JNIEnv* jenv, jstring str) {
+	try
+	{
+		jboolean isCopy = JNI_FALSE;
+		const char *nativeString = jenv->GetStringUTFChars( str, &isCopy);
+		value.assignText( nativeString);
+		jenv->ReleaseStringUTFChars( str, nativeString);
+	}
+	catch (const std::bad_alloc& err)
+	{
+		return ERROR( jenv, "memory allocation error");
+	}
+	catch (const std::runtime_error& err)
+	{
+		return ERROR( jenv, err.what());
+	}
+	return 0;
+}
 

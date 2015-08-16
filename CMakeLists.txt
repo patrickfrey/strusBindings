@@ -69,6 +69,7 @@ enable_testing()
 # Subdirectories:
 add_subdirectory( src )
 add_subdirectory( swig )
+add_subdirectory( tests )
   
 include( cmake/report_build_settings.cmake )
 

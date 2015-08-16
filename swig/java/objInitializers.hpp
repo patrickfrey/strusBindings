@@ -43,6 +43,7 @@ int initAggregator( Aggregator& result, JNIEnv* jenv, jlong obj);
 int initSummarizerConfig( SummarizerConfig& result, JNIEnv* jenv, jlong obj);
 int initWeightingConfig( WeightingConfig& result, JNIEnv* jenv, jlong obj);
 int initStringVector( std::vector<std::string>& result, JNIEnv* jenv, jlong obj);
+int initVariantValue( Variant& value, JNIEnv* jenv, jstring str);
 
 }//namespace
 #endif

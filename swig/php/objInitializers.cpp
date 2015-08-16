@@ -262,7 +262,7 @@ static int defineQueryEvaluationFunctionParameter( Object& result, const char* k
 					result.defineParameter( std::string( key, keylen), Variant( (double)Z_DVAL_P( valueitem)));
 					break;
 				case IS_BOOL:
-					result.defineParameter( std::string( key, keylen), Variant( (bool)Z_BVAL_P( valueitem)));
+					result.defineParameter( std::string( key, keylen), Variant( (int)Z_BVAL_P( valueitem)));
 					break;
 				default:
 					THROW_EXCEPTION( "bad query evaluation function parameter value");
@@ -313,7 +313,6 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
 				zend_hash_move_forward_ex(hash,&ptr))
 			{
-				zval elem;
 				char *name = 0;
 				unsigned int name_len = 0;// length of string including 0 byte !
 				unsigned long index;

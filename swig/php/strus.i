@@ -11,6 +11,7 @@
 %}
 
 %include "../ignore_declarations.i"
+%ignore Variant::Variant(char const *);
 %include "exception_handler.i"
 %include "std_vector_string.i"
 %include "std_vector_term.i"

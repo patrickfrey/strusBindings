@@ -14,6 +14,7 @@ set( generated_java_source_files
 	QueryEval.java
 	Query.java
 	RankAttribute.java
+	RankAttributeVector.java
 	Rank.java
 	RankVector.java
 	StorageClient.java

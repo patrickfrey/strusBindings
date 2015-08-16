@@ -62,9 +62,9 @@ DLL_PUBLIC void Tokenizer::addArgumentInt( long arg_)
 	addArgument( strus::utils::tostring( arg_));
 }
 
-DLL_PUBLIC void Tokenizer::addArgumentFloat( float arg_)
+DLL_PUBLIC void Tokenizer::addArgumentFloat( double arg_)
 {
-	addArgument( strus::utils::tostring( arg_));
+	addArgument( strus::utils::tostring( (float)arg_));
 }
 
 DLL_PUBLIC void Normalizer::addArgumentInt( long arg_)
@@ -72,9 +72,9 @@ DLL_PUBLIC void Normalizer::addArgumentInt( long arg_)
 	addArgument( strus::utils::tostring( arg_));
 }
 
-DLL_PUBLIC void Normalizer::addArgumentFloat( float arg_)
+DLL_PUBLIC void Normalizer::addArgumentFloat( double arg_)
 {
-	addArgument( strus::utils::tostring( arg_));
+	addArgument( strus::utils::tostring( (float)arg_));
 }
 
 DLL_PUBLIC void Aggregator::addArgumentInt( long arg_)
@@ -82,9 +82,9 @@ DLL_PUBLIC void Aggregator::addArgumentInt( long arg_)
 	addArgument( strus::utils::tostring( arg_));
 }
 
-DLL_PUBLIC void Aggregator::addArgumentFloat( float arg_)
+DLL_PUBLIC void Aggregator::addArgumentFloat( double arg_)
 {
-	addArgument( strus::utils::tostring( arg_));
+	addArgument( strus::utils::tostring( (float)arg_));
 }
 
 DLL_PUBLIC Variant::Variant()
@@ -115,19 +115,19 @@ DLL_PUBLIC Variant::Variant( int v)
 	m_value.INT = v;
 }
 
-DLL_PUBLIC Variant::Variant( float v)
+DLL_PUBLIC Variant::Variant( double v)
 	:m_type(Variant_FLOAT)
 {
 	m_value.FLOAT = v;
 }
 
-DLL_PUBLIC Variant::Variant( double v)
-	:m_type(Variant_FLOAT)
+DLL_PUBLIC Variant::Variant( const std::string& v)
+	:m_type(Variant_TEXT),m_buf(v)
 {
-	m_value.FLOAT = (float)v;
+	m_value.TEXT = m_buf.c_str();
 }
 
-DLL_PUBLIC Variant::Variant( const std::string& v)
+DLL_PUBLIC Variant::Variant( const char* v)
 	:m_type(Variant_TEXT),m_buf(v)
 {
 	m_value.TEXT = m_buf.c_str();
@@ -168,14 +168,7 @@ DLL_PUBLIC void Variant::assignInt( long v)
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assignFloat( float v)
-{
-	m_type = Variant_FLOAT;
-	m_value.FLOAT = v;
-	m_buf.clear();
-}
-
-DLL_PUBLIC void Variant::assignDouble( double v)
+DLL_PUBLIC void Variant::assignFloat( double v)
 {
 	m_type = Variant_FLOAT;
 	m_value.FLOAT = v;
@@ -189,19 +182,19 @@ DLL_PUBLIC void Variant::assignText( const std::string& v)
 	m_value.TEXT = m_buf.c_str();
 }
 
-DLL_PUBLIC unsigned int Variant::getUInt() const
+DLL_PUBLIC unsigned long Variant::getUInt() const
 {
 	if (m_type == Variant_UINT) return m_value.UINT;
 	throw std::logic_error( "illegal access of variant value");
 }
 
-DLL_PUBLIC int Variant::getInt() const
+DLL_PUBLIC long Variant::getInt() const
 {
 	if (m_type == Variant_INT) return m_value.INT;
 	throw std::logic_error( "illegal access of variant value");
 }
 
-DLL_PUBLIC float Variant::getFloat() const
+DLL_PUBLIC double Variant::getFloat() const
 {
 	if (m_type == Variant_FLOAT) return m_value.FLOAT;
 	throw std::logic_error( "illegal access of variant value");
@@ -240,6 +233,21 @@ DLL_PUBLIC void Document::addForwardIndexTerm(
 DLL_PUBLIC void Document::setMetaData( const std::string& name_, const Variant& value_)
 {
 	m_metaData.push_back( MetaData( name_,value_));
+}
+
+DLL_PUBLIC void Document::setMetaData( const std::string& name_, double value_)
+{
+	m_metaData.push_back( MetaData( name_,Variant(value_)));
+}
+
+DLL_PUBLIC void Document::setMetaData( const std::string& name_, int value_)
+{
+	m_metaData.push_back( MetaData( name_,Variant(value_)));
+}
+
+DLL_PUBLIC void Document::setMetaData( const std::string& name_, unsigned int value_)
+{
+	m_metaData.push_back( MetaData( name_,Variant(value_)));
 }
 
 DLL_PUBLIC void Document::setAttribute( const std::string& name_, const std::string& value_)
@@ -424,15 +432,15 @@ DLL_PUBLIC void DocumentAnalyzer::defineAttribute(
 
 static Variant getNumericVariantFromDouble( double value)
 {
-	if (value - std::floor( value) < std::numeric_limits<float>::epsilon())
+	if (value - std::floor( value) < std::numeric_limits<double>::epsilon())
 	{
 		if (value < 0.0)
 		{
-			return Variant( (int)(std::floor( value) + std::numeric_limits<float>::epsilon()));
+			return Variant( (int)(std::floor( value) + std::numeric_limits<double>::epsilon()));
 		}
 		else
 		{
-			return Variant( (unsigned int)(std::floor( value) + std::numeric_limits<float>::epsilon()));
+			return Variant( (unsigned int)(std::floor( value) + std::numeric_limits<double>::epsilon()));
 		}
 	}
 	else
@@ -449,13 +457,13 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 		case Variant_UNDEFINED:
 			break;
 		case Variant_INT:
-			rt = val.getInt();
+			rt = (int)val.getInt();
 			break;
 		case Variant_UINT:
-			rt = val.getUInt();
+			rt = (unsigned int)val.getUInt();
 			break;
 		case Variant_FLOAT:
-			rt = val.getFloat();
+			rt = (float)val.getFloat();
 			break;
 		case Variant_TEXT:
 			rt = strus::arithmeticVariantFromString( val.getText());
@@ -541,9 +549,9 @@ DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
 
 {}
 
-DLL_PUBLIC QueryAnalyzeQueue* QueryAnalyzer::createQueue() const
+DLL_PUBLIC QueryAnalyzeQueue QueryAnalyzer::createQueue() const
 {
-	return new QueryAnalyzeQueue( m_objbuilder_impl, m_analyzer_impl);
+	return QueryAnalyzeQueue( m_objbuilder_impl, m_analyzer_impl);
 }
 
 DLL_PUBLIC void QueryAnalyzer::definePhraseType(
@@ -690,14 +698,12 @@ DLL_PUBLIC void StorageClient::insertDocument( const std::string& docid, const D
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
 	for (; ti != te; ++ti)
 	{
-/*[-]*/std::cout << "++++ document->addSearchIndexTerm( " << ti->type() << "," << ti->value() << "," << ti->position() << ")" << std::endl; 
 		document->addSearchIndexTerm( ti->type(), ti->value(), ti->position());
 	}
 	std::vector<Term>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
 	for (; fi != fe; ++fi)
 	{
-/*[-]*/std::cout << "++++ document->addForwardIndexTerm( " << fi->type() << "," << fi->value() << "," << fi->position() << ")" << std::endl; 
 		document->addForwardIndexTerm( fi->type(), fi->value(), fi->position());
 	}
 	std::vector<std::string>::const_iterator
@@ -826,7 +832,7 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 }
 
 DLL_PUBLIC void QueryEval::addWeightingFunction(
-		float weight,
+		double weight,
 		const std::string& name,
 		const WeightingConfig& config)
 {
@@ -862,13 +868,13 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 	function.release();
 }
 
-DLL_PUBLIC Query* QueryEval::createQuery( const StorageClient& storage) const
+DLL_PUBLIC Query QueryEval::createQuery( const StorageClient& storage) const
 {
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	strus::StorageClientInterface* st = (strus::StorageClientInterface*)storage.m_storage_impl.get();
 	Reference query( ReferenceDeleter<strus::QueryInterface>::function);
 	query.reset( qe->createQuery( st));
-	return new Query( m_objbuilder_impl, storage.m_storage_impl, m_queryeval_impl, query);
+	return Query( m_objbuilder_impl, storage.m_storage_impl, m_queryeval_impl, query);
 }
 
 
@@ -906,7 +912,7 @@ DLL_PUBLIC void Query::attachVariable( const std::string& name_)
 	THIS->attachVariable( name_);
 }
 
-DLL_PUBLIC void Query::defineFeature( const std::string& set_, float weight_)
+DLL_PUBLIC void Query::defineFeature( const std::string& set_, double weight_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->defineFeature( set_, weight_);

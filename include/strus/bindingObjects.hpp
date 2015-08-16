@@ -107,7 +107,7 @@ public:
 	void setName( const std::string& name_)			{m_name = name_;}
 	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
 	void addArgumentInt( long arg_);
-	void addArgumentFloat( float arg_);
+	void addArgumentFloat( double arg_);
 
 private:
 	std::string m_name;
@@ -146,7 +146,7 @@ public:
 	void setName( const std::string& name_)			{m_name = name_;}
 	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
 	void addArgumentInt( long arg_);
-	void addArgumentFloat( float arg_);
+	void addArgumentFloat( double arg_);
 
 private:
 	friend class QueryAnalyzer;
@@ -188,7 +188,7 @@ public:
 	void setName( const std::string& name_)			{m_name = name_;}
 	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
 	void addArgumentInt( long arg_);
-	void addArgumentFloat( float arg_);
+	void addArgumentFloat( double arg_);
 
 private:
 	friend class DocumentAnalyzer;
@@ -213,7 +213,7 @@ union VariantValue
 {
 	unsigned int UINT;
 	int INT;
-	float FLOAT;
+	double FLOAT;
 	const char* TEXT;
 };
 
@@ -225,23 +225,22 @@ public:
 	Variant( const Variant& o);
 	Variant( unsigned int v);
 	Variant( int v);
-	Variant( float v);
 	Variant( double v);
 	Variant( const std::string& v);
+	Variant( const char* v);
 
 	bool defined() const			{return m_type != Variant_UNDEFINED;}
 	VariantType type() const		{return m_type;}
-	unsigned int getUInt() const;
-	int getInt() const;
-	float getFloat() const;
+	unsigned long getUInt() const;
+	long getInt() const;
+	double getFloat() const;
 	const char* getText() const;
 
 	void init();
 	void assign( const Variant& o);
 	void assignUint( unsigned long v);
 	void assignInt( long v);
-	void assignFloat( float v);
-	void assignDouble( double v);
+	void assignFloat( double v);
 	void assignText( const std::string& v);
 
 private:
@@ -398,27 +397,39 @@ public:
 	Document( const Document& o);
 
 	/// \brief Add a single term occurrence to the document for retrieval
-	/// \param[in] type_ term type name of the search index term
-	/// \param[in] value_ term value of the search index term
-	/// \param[in] position_ word count position of the search index term
-	void addSearchIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
+	/// \param[in] type term type name of the search index term
+	/// \param[in] value term value of the search index term
+	/// \param[in] position word count position of the search index term
+	void addSearchIndexTerm( const std::string& type, const std::string& value, const Index& position);
 	/// \brief Add a single term occurrence to the document for use in the summary of a retrieval result
-	/// \param[in] type_ term type name of the forward index term
-	/// \param[in] value_ term value of the forward index term
-	/// \param[in] position_ word count position of the forward index term
-	void addForwardIndexTerm( const std::string& type_, const std::string& value_, const Index& position_);
+	/// \param[in] type term type name of the forward index term
+	/// \param[in] value term value of the forward index term
+	/// \param[in] position word count position of the forward index term
+	void addForwardIndexTerm( const std::string& type, const std::string& value, const Index& position);
 	/// \brief Define a meta data value of the document
-	/// \param[in] name_ name of the meta data table element
-	/// \param[in] value_ value of the meta data table element
-	void setMetaData( const std::string& name_, const Variant& value_);
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData( const std::string& name, const Variant& value);
+	/// \brief Define a meta data value of the document
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData( const std::string& name, double value);
+	/// \brief Define a meta data value of the document
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData( const std::string& name, int value);
+	/// \brief Define a meta data value of the document
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData( const std::string& name, unsigned int value);
 	/// \brief Define an attribute of the document
-	/// \param[in] name_ name of the document attribute
-	/// \param[in] value_ value of the document attribute
-	void setAttribute( const std::string& name_, const std::string& value_);
+	/// \param[in] name name of the document attribute
+	/// \param[in] value value of the document attribute
+	void setAttribute( const std::string& name, const std::string& value);
 	/// \brief Allow a user to access the document
-	/// \param[in] username_ name of the user to be allowed to access this document
+	/// \param[in] username name of the user to be allowed to access this document
 	/// \remark This function is only implemented if ACL is enabled in the storage
-	void setUserAccessRight( const std::string& username_);
+	void setUserAccessRight( const std::string& username);
 	/// \brief Set the document identifier (docid) of the document
 	/// \param[in] docid_ document identifier of this document
 	void setDocid( const std::string& docid_);
@@ -577,7 +588,7 @@ public:
 
 	/// \brief Creates a queue for phrase bulk analysis
 	/// \return the queue
-	QueryAnalyzeQueue* createQueue() const;
+	QueryAnalyzeQueue createQueue() const;
 
 private:
 	/// \brief Constructor used by StrusContext
@@ -682,16 +693,52 @@ public:
 	SummarizerConfig( const SummarizerConfig& o)
 		:m_parameters(o.m_parameters),m_features(o.m_features){}
 
-	/// \brief Define a summarizer feature
-	void defineParameter( const std::string& name_, const Variant& value_)
+	/// \brief Define a summarizer parameter
+	/// \param[in] name name of the parameter as defined in the summarizer implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, const Variant& value)
 	{
-		m_parameters[ name_] = value_;
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a summarizer parameter
+	/// \param[in] name name of the parameter as defined in the summarizer implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, const char* value)
+	{
+		m_parameters[ name] = Variant(value);
+	}
+
+	/// \brief Define a summarizer parameter
+	/// \param[in] name name of the parameter as defined in the summarizer implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, int value)
+	{
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a summarizer parameter
+	/// \param[in] name name of the parameter as defined in the summarizer implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, unsigned int value)
+	{
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a summarizer parameter
+	/// \param[in] name name of the parameter as defined in the summarizer implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, double value)
+	{
+		m_parameters[ name] = value;
 	}
 
 	/// \brief Define a summarizer feature
-	void defineFeature( const std::string& class_, const std::string& set_)
+	/// \param[in] name name of the feature as defined in the summarizer implementation
+	/// \param[in] set feature set of the feature used to address the features
+	void defineFeature( const std::string& kind, const std::string& set)
 	{
-		m_features[ class_] = set_;
+		m_features[ kind] = set;
 	}
 
 private:
@@ -707,15 +754,52 @@ public:
 	WeightingConfig( const WeightingConfig& o)
 		:m_parameters(o.m_parameters){}
 
-	void defineParameter( const std::string& name_, const Variant& value_)
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, const Variant& value)
 	{
-		m_parameters[ name_] = value_;
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, int value)
+	{
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, unsigned int value)
+	{
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, double value)
+	{
+		m_parameters[ name] = value;
+	}
+
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const std::string& name, const char* value)
+	{
+		m_parameters[ name] = Variant(value);
 	}
 
 	/// \brief Define a weighting feature
-	void defineFeature( const std::string& class_, const std::string& set_)
+	/// \param[in] name name of the feature as defined in the weighting function implementation
+	/// \param[in] set feature set of the feature used to address the features
+	void defineFeature( const std::string& kind, const std::string& set)
 	{
-		m_features[ class_] = set_;
+		m_features[ kind] = set;
 	}
 
 private:
@@ -771,13 +855,13 @@ public:
 	/// \param[in] name the name of the weighting function to add
 	/// \param[in] config the configuration of the function to add
 	void addWeightingFunction(
-			float weight,
+			double weight,
 			const std::string& name,
 			const WeightingConfig& config);
 
-	/// \brief Create a query builder based on this query evaluation scheme
+	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
-	Query* createQuery( const StorageClient& storage) const;
+	Query createQuery( const StorageClient& storage) const;
 
 private:
 	/// \brief Constructor used by strusContext
@@ -822,7 +906,7 @@ public:
 	Rank()
 		:m_docno(0),m_weight(0.0){}
 	/// \brief Constructor
-	Rank( Index docno_, float weight_, const std::vector<RankAttribute>& attributes_)
+	Rank( Index docno_, double weight_, const std::vector<RankAttribute>& attributes_)
 		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
 	/// \brief Copy constructor
 	Rank( const Rank& o)
@@ -831,14 +915,14 @@ public:
 	/// \brief Get the internal document nuber used
 	Index docno() const					{return m_docno;}
 	/// \brief Get the weight of the rank
-	float weight() const					{return m_weight;}
+	double weight() const					{return m_weight;}
 	/// \brief Get the attributes
 	const std::vector<RankAttribute>& attributes() const	{return m_attributes;}
 
 private:
 	friend class Query;
 	Index m_docno;
-	float m_weight;
+	double m_weight;
 	std::vector<RankAttribute> m_attributes;
 };
 
@@ -875,16 +959,16 @@ public:
 	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
 	/// \param[in] set_ name of the feature set, this feature is addressed with
 	/// \param[in] weight_ individual weight of the feature in the query
-	void defineFeature( const std::string& set_, float weight_=1.0);
+	void defineFeature( const std::string& set_, double weight_=1.0);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] operand numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const std::string& name,
-			const Variant& operand, bool newGroup=true);
+			const Variant& value, bool newGroup=true);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query

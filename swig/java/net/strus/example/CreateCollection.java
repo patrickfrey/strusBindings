@@ -21,7 +21,7 @@ public class CreateCollection
 	}
 
 	public static void main( String []args) {
-		String config = "path=storage";
+		String config = "path=storage; metadata=doclen UINT16";
 		if (args.length > 0)
 		{
 			config = args[ 0];

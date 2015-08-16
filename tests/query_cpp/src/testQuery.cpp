@@ -33,42 +33,48 @@
 #include <cstdlib>
 #include <string>
 #include <map>
+#include <set>
 #include <memory>
-#include <boost/scoped_ptr.hpp>
 
 int main( int , const char** )
 {
 	try
 	{
+		StrusContext ctx;
+		DocumentAnalyzer documentAnalyzer( ctx.createDocumentAnalyzer());
 		// Define document analyzer:
-		DocumentAnalyzer documentAnalyzer;
+		std::vector<Normalizer> normalizer_stem;
+		normalizer_stem.push_back( Normalizer("stem", "de"));
+		std::vector<Normalizer> normalizer_orig;
+		normalizer_orig.push_back( Normalizer("orig"));
+		
 		documentAnalyzer.addSearchIndexFeature(
-			"word", "/doc/text()", FunctionDef("word"), FunctionDef("stem", "de"));
+			"word", "/doc/text()", Tokenizer("word"), normalizer_stem);
 		documentAnalyzer.addForwardIndexFeature(
-			"orig", "/doc/text()", FunctionDef("word"), FunctionDef("orig"));
+			"orig", "/doc/text()", Tokenizer("word"), normalizer_orig);
 		documentAnalyzer.defineMetaData(
-			"date", "/doc/date()", FunctionDef("content"), FunctionDef("orig"));
+			"date", "/doc/date()", Tokenizer("content"), normalizer_orig);
 		documentAnalyzer.defineMetaData(
-			"class", "/doc/class()", FunctionDef("content"), FunctionDef("orig"));
+			"class", "/doc/class()", Tokenizer("content"), normalizer_orig);
 		documentAnalyzer.defineAttribute(
-			"title", "/doc/title()", FunctionDef("content"), FunctionDef("orig"));
+			"title", "/doc/title()", Tokenizer("content"), normalizer_orig);
 		documentAnalyzer.defineAttribute(
-			"docid", "/doc@id", FunctionDef("content"), FunctionDef("orig"));
+			"docid", "/doc@id", Tokenizer("content"), normalizer_orig);
 
 		// Define query analyzer:
-		QueryAnalyzer queryAnalyzer;
+		QueryAnalyzer queryAnalyzer( ctx.createQueryAnalyzer());
 		queryAnalyzer.definePhraseType(
-			"default", "word", FunctionDef("word"), FunctionDef("stem", "de"));
+			"default", "word", Tokenizer("word"), normalizer_stem);
 
 		// Create storage:
 		try
 		{
-			Storage::destroy( "path=data/test");
+			ctx.destroyStorage( "path=data/test");
 		}
 		catch (...)
 		{}
-		Storage::create( "path=data/test; acl=yes; metadata=doclen UINT16, class UINT16, data INT32");
-		Storage storage( "path=data/test");
+		ctx.createStorage( "path=data/test; acl=yes; metadata=doclen UINT16, class UINT16, data INT32");
+		StorageClient storage( ctx.createStorageClient( "path=data/test"));
 
 		// Insert documents:
 		Document doc;
@@ -99,37 +105,36 @@ int main( int , const char** )
 		storage.flush();
 
 		// Define the query evaluation program:
-		QueryEval queryEval( storage);
+		QueryEval queryEval = ctx.createQueryEval();
 		queryEval.addTerm( "punct", "punct", "dot");
 		queryEval.addSelectionFeature( "weighted");
 		queryEval.addRestrictionFeature( "weighted");
-		queryEval.addWeightingFeature( "weighted");
 
-		Summarizer titlesum( "attribute");
+		SummarizerConfig titlesum;
 		titlesum.defineParameter( "name", "title");
-		queryEval.addSummarizer( "title", titlesum);
-		Summarizer docidsum( "attribute");
+		queryEval.addSummarizer( "title", "attribute", titlesum);
+		SummarizerConfig docidsum;
 		docidsum.defineParameter( "name", "docid");
-		queryEval.addSummarizer( "docid", docidsum);
-		Summarizer matchsum( "matchpos");
+		queryEval.addSummarizer( "docid", "attribute", docidsum);
+		SummarizerConfig matchsum;
 		matchsum.defineFeature( "match", "weighted");
-		queryEval.addSummarizer( "match", matchsum);
+		queryEval.addSummarizer( "match", "matchpos", matchsum);
 
-		WeightingFunction weightingFunction( "BM25");
-		weightingFunction.defineParameter( "k1", 0.75);
-		weightingFunction.defineParameter( "b", 2.1);
-		weightingFunction.defineParameter( "avgdoclen", 8);
-		queryEval.defineWeightingFunction( weightingFunction);
+		WeightingConfig weightingConfig;
+		weightingConfig.defineParameter( "k1", 0.75);
+		weightingConfig.defineParameter( "b", 2.1);
+		weightingConfig.defineParameter( "avgdoclen", 8);
+		queryEval.addWeightingFunction( 1.0, "BM25", weightingConfig);
 
 		// Create a query from a phrase:
-		Query query( queryEval);
+		Query query( queryEval.createQuery( storage));
 		std::vector<Term> queryterms = queryAnalyzer.analyzePhrase( "default", "to school");
 		std::vector<Term>::const_iterator qi = queryterms.begin(), qe = queryterms.end();
 		std::size_t qidx = 0;
 		unsigned int maxpos = 0;
 		for (; qi != qe; ++qidx,++qi)
 		{
-			query.pushTerm( qi->name(), qi->value());
+			query.pushTerm( qi->type(), qi->value());
 			if (qi->position() > maxpos)
 			{
 				maxpos = qi->position();
@@ -145,13 +150,22 @@ int main( int , const char** )
 		query.setMaxNofRanks( 10);
 		query.setMinRank( 0);
 
-		query.setUserName( "nobody");
-	
+		query.addUserName( "nobody");
+
+		std::set<unsigned int> expected;
+		expected.insert( 1);
+		expected.insert( 5);
+
 		std::vector<Rank> result = query.evaluate();
 		std::vector<Rank>::const_iterator ri = result.begin(), re = result.end();
 		for (std::size_t ridx=1; ri != re; ++ridx,++ri)
 		{
 			std::cout << "[" << ridx << "] docno=" << ri->docno() << ", weight=" << ri->weight();
+			if (expected.find( ri->docno()) == expected.end())
+			{
+				throw std::runtime_error( "found document not expected");
+			}
+			expected.erase( ri->docno());
 			std::vector<RankAttribute>::const_iterator
 				ai = ri->attributes().begin(), ae = ri->attributes().end();
 			for (std::size_t aidx=0; ai != ae; ++aidx,++ai)
@@ -160,6 +174,10 @@ int main( int , const char** )
 				std::cout << ai->name() << "=" << ai->value();
 			}
 			std::cout << std::endl;
+		}
+		if (!expected.empty())
+		{
+			throw std::runtime_error( "expected document not found");
 		}
 		std::cerr << "Ok. query test with bindings passed." << std::endl;
 		return 0;
