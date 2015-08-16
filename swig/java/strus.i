@@ -11,7 +11,6 @@
 #include "../include/strus/bindingObjects.hpp"
 %}
 
-%include "newobject.i"
 %include "java_heap.i"
 %include "ignore_declarations.i"
 %include "exception_handler.i"

@@ -13,7 +13,7 @@ add_custom_command(
 	COMMAND  swig -Werror -java -package net.strus.api -c++ -outdir ${PROJECT_SOURCE_DIR}/swig/java/net/strus/api -o strus_wrap.cxx strus.i
 	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/swig/java"
 	COMMENT "build Java bindings" VERBATIM
-	DEPENDS  strus.i exception_handler.i  ignore_declarations.i  newobject.i  java_heap.i
+	DEPENDS  strus.i exception_handler.i  ignore_declarations.i  java_heap.i
 )
 
 add_library( strus_java SHARED strus_wrap.cxx objInitializers.cpp )
