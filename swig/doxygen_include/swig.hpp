@@ -135,10 +135,11 @@ public:
 struct StringVector;
 
 /// \brief A structure representing a sequence of normalization functions. Either a PHP string describing a single function by name without parameters or an array of function objects, each function object represented as string for a function name or an array with the first element being the function name and the following elements the parameters passed to the function.
-/// \example "lc"                                   :Single function doing lowercase as normalization
-/// \example [["stem,"de"]]                         :Single function doing german (de) stemming with snowball as normalization
-/// \example ["lc",["stem,"de"],["convdia","de"]]   :Three functions doing in sequence lowercase, german (de) stemming and conversion of diacritical characters as normalization
-class NormalizerVector;
+///	"lc"                                   :Single function doing lowercase as normalization
+///	[["stem,"de"]]                         :Single function doing german (de) stemming with snowball as normalization
+///	["lc",["stem,"de"],["convdia","de"]]   :Three functions doing in sequence lowercase, german (de) stemming and conversion of diacritical characters as normalization
+class NormalizerVector
+{};
 
 /// \brief A structure representing a tokenization function. Either a PHP string describing a single function by name without parameters or an array with the first element being the function name and the following elements the parameters passed to the function.
 class Tokenizer;
