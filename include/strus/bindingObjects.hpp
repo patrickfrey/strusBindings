@@ -34,9 +34,30 @@
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
+#ifdef DOXYGEN_LANG
+#include "swig.hpp"
+// ... doxygen needs this for creating alternative interface descriptions for different languages
+#if defined DOXYGEN_JAVA
+namespace net {
+namespace strus {
+namespace api {
+#endif
+#else
+#define String std::string
+#define StringVector std::vector<std::string>
+#define NormalizerVector std::vector<Normalizer>
+#define TermVector std::vector<Term>
+#define RankVector std::vector<Rank>
+#define RankAttributeVector std::vector<RankAttribute>
+#define AttributeVector std::vector<Attribute>
+#define MetaDataVector std::vector<MetaData>
+#endif
+
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
 
+
+#ifndef DOXYGEN_LANG
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
 class Reference
 {
@@ -76,6 +97,7 @@ private:
 	boost::shared_ptr<void> m_ptr;
 	void (*m_deleter)( void* obj);
 };
+#endif
 
 
 /// \brief Object representing a tokenizer function definition
@@ -85,27 +107,27 @@ public:
 	Tokenizer(){}
 	Tokenizer( const Tokenizer& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	Tokenizer( const std::string& name_, const std::vector<std::string>& arg_)
+	Tokenizer( const String& name_, const StringVector& arg_)
 		:m_name(name_),m_arguments(arg_){}
-	Tokenizer( const std::string& name_, const std::string& arg_)
+	Tokenizer( const String& name_, const String& arg_)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg_);
 	}
-	Tokenizer( const std::string& name_, const std::string& arg1_, const std::string& arg2_)
+	Tokenizer( const String& name_, const String& arg1_, const String& arg2_)
 		:m_name(name_),m_arguments()
 	{
 		m_arguments.push_back( arg1_);
 		m_arguments.push_back( arg2_);
 	}
-	Tokenizer( const std::string& name_)
+	Tokenizer( const String& name_)
 		:m_name(name_),m_arguments(){}
 
-	const std::string& name() const				{return m_name;}
-	const std::vector<std::string>& arguments() const	{return m_arguments;}
+	const String& name() const				{return m_name;}
+	const StringVector& arguments() const			{return m_arguments;}
 
-	void setName( const std::string& name_)			{m_name = name_;}
-	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+	void setName( const String& name_)			{m_name = name_;}
+	void addArgument( const String& arg_)			{m_arguments.push_back( arg_);}
 	void addArgumentInt( long arg_);
 	void addArgumentFloat( double arg_);
 
@@ -122,29 +144,29 @@ public:
 	Normalizer(){}
 	Normalizer( const Normalizer& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	Normalizer( const std::string& name_, const std::vector<std::string>& arg_)
+	Normalizer( const String& name_, const StringVector& arg_)
 		:m_name(name_),m_arguments(arg_){}
-	Normalizer( const std::string& name_, const std::string& arg_)
+	Normalizer( const String& name_, const String& arg_)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg_);
 	}
-	Normalizer( const std::string& name_, const std::string& arg1_, const std::string& arg2_)
+	Normalizer( const String& name_, const String& arg1_, const String& arg2_)
 		:m_name(name_),m_arguments()
 	{
 		m_arguments.push_back( arg1_);
 		m_arguments.push_back( arg2_);
 	}
-	Normalizer( const std::string& name_)
+	Normalizer( const String& name_)
 		:m_name(name_),m_arguments(){}
 
 	~Normalizer(){}
 
-	const std::string& name() const				{return m_name;}
-	const std::vector<std::string>& arguments() const	{return m_arguments;}
+	const String& name() const				{return m_name;}
+	const StringVector& arguments() const	{return m_arguments;}
 
-	void setName( const std::string& name_)			{m_name = name_;}
-	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+	void setName( const String& name_)			{m_name = name_;}
+	void addArgument( const String& arg_)		{m_arguments.push_back( arg_);}
 	void addArgumentInt( long arg_);
 	void addArgumentFloat( double arg_);
 
@@ -161,33 +183,60 @@ private:
 class Aggregator
 {
 public:
+	/// \brief Default constructor
 	Aggregator(){}
+	/// \brief Copy constructor
 	Aggregator( const Aggregator& o)
 		:m_name(o.m_name),m_arguments(o.m_arguments){}
-	Aggregator( const std::string& name_, const std::vector<std::string>& arg_)
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	/// \param[in] arg_ arguments of the aggregator function
+	Aggregator( const String& name_, const StringVector& arg_)
 		:m_name(name_),m_arguments(arg_){}
-	Aggregator( const std::string& name_, const std::string& arg_)
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	/// \param[in] arg_ single argument of the aggregator function
+	Aggregator( const String& name_, const String& arg_)
 		:m_name(name_)
 	{
 		m_arguments.push_back( arg_);
 	}
-	Aggregator( const std::string& name_, const std::string& arg1_, const std::string& arg2_)
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	/// \param[in] arg1_ first argument of the aggregator function
+	/// \param[in] arg2_ second argument of the aggregator function
+	Aggregator( const String& name_, const String& arg1_, const String& arg2_)
 		:m_name(name_),m_arguments()
 	{
 		m_arguments.push_back( arg1_);
 		m_arguments.push_back( arg2_);
 	}
-	Aggregator( const std::string& name_)
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	Aggregator( const String& name_)
 		:m_name(name_),m_arguments(){}
 
+	/// \brief Destructor
 	~Aggregator(){}
 
-	const std::string& name() const				{return m_name;}
-	const std::vector<std::string>& arguments() const	{return m_arguments;}
+	/// \brief Get the name of the aggregator function
+	/// \return the name
+	const String& name() const				{return m_name;}
+	/// \brief Get the arguments of the aggregator function
+	/// \return the arguments
+	const StringVector& arguments() const	{return m_arguments;}
 
-	void setName( const std::string& name_)			{m_name = name_;}
-	void addArgument( const std::string& arg_)		{m_arguments.push_back( arg_);}
+	/// \brief Set the name of the aggregator function
+	/// \param[in] name_ the name
+	void setName( const String& name_)			{m_name = name_;}
+	/// \brief Add an argument to the aggregator function
+	/// \param[in] arg_ the argument to add
+	void addArgument( const String& arg_)		{m_arguments.push_back( arg_);}
+	/// \brief Add a numeric argument to the aggregator function
+	/// \param[in] arg_ the argument to add
 	void addArgumentInt( long arg_);
+	/// \brief Add a numeric argument to the aggregator function
+	/// \param[in] arg_ the argument to add
 	void addArgumentFloat( double arg_);
 
 private:
@@ -221,27 +270,57 @@ union VariantValue
 class Variant
 {
 public:
+	/// \brief Default constructor
 	Variant();
+	/// \brief Copy constructor
 	Variant( const Variant& o);
+	/// \brief Constructor from a nonnegative integer
 	Variant( unsigned int v);
+	/// \brief Constructor from an integer
 	Variant( int v);
+	/// \brief Constructor from a floating point number
 	Variant( double v);
-	Variant( const std::string& v);
+	/// \brief Constructor from a string
+	Variant( const String& v);
+	/// \brief Constructor from a string pointer
 	Variant( const char* v);
 
+	/// \brief Check if the variant is defined (not NULL)
+	/// \return true, if yes, false if not
 	bool defined() const			{return m_type != Variant_UNDEFINED;}
+	/// \brief Get the type of the variant 
+	/// \return the type
 	VariantType type() const		{return m_type;}
+	/// \brief Get the value of the variant as nonnegative integer
+	/// \return the value
 	unsigned long getUInt() const;
+	/// \brief Get the value of the variant as integer
+	/// \return the value
 	long getInt() const;
+	/// \brief Get the value of the variant as floating point number
+	/// \return the value
 	double getFloat() const;
+	/// \brief Get the value of the variant as pointer to a string
+	/// \return the value
 	const char* getText() const;
 
+	/// \brief Initialize this value as undefined (NULL)
 	void init();
+	/// \brief Assign a value to this variant
+	/// \param[in] o the value to assign
 	void assign( const Variant& o);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
 	void assignUint( unsigned long v);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
 	void assignInt( long v);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
 	void assignFloat( double v);
-	void assignText( const std::string& v);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
+	void assignText( const String& v);
 
 private:
 	friend class Storage;
@@ -260,7 +339,7 @@ class Term
 {
 public:
 	/// \brief Constructor
-	Term( const std::string& type_, const std::string& value_, const Index& position_)
+	Term( const String& type_, const String& value_, const Index& position_)
 		:m_type(type_),m_value(value_),m_position(position_){}
 	/// \brief Copy constructor
 	Term( const Term& o)
@@ -270,9 +349,9 @@ public:
 		:m_position(0){}
 
 	/// \brief Get the term type name
-	const std::string& type() const		{return m_type;}
+	const String& type() const		{return m_type;}
 	/// \brief Get the term value
-	const std::string& value() const	{return m_value;}
+	const String& value() const	{return m_value;}
 	/// \brief Get the term position
 	unsigned int position() const		{return m_position;}
 
@@ -288,7 +367,7 @@ class MetaData
 {
 public:
 	/// \brief Constructor
-	MetaData( const std::string& name_, const Variant& value_)
+	MetaData( const String& name_, const Variant& value_)
 		:m_name(name_),m_value(value_){}
 	/// \brief Copy constructor
 	MetaData( const MetaData& o)
@@ -298,7 +377,7 @@ public:
 		:m_name(0),m_value(){}
 
 	/// \brief Get the type name of this meta data field:
-	const std::string& name() const		{return m_name;}
+	const String& name() const		{return m_name;}
 	/// \brief Get the value of this meta data field:
 	const Variant& value() const		{return m_value;}
 
@@ -314,7 +393,7 @@ class Attribute
 {
 public:
 	/// \brief Constructor
-	Attribute( const std::string& name_, const std::string& value_)
+	Attribute( const String& name_, const String& value_)
 		:m_name(name_),m_value(value_){}
 	/// \brief Constructor
 	Attribute( const Attribute& o)
@@ -324,9 +403,9 @@ public:
 		:m_name(0){}
 
 	/// \brief Get the unique type name of this attribute
-	const std::string& name() const		{return m_name;}
+	const String& name() const		{return m_name;}
 	/// \brief Get the type value of this attribute
-	const std::string& value() const	{return m_value;}
+	const String& value() const	{return m_value;}
 
 private:
 	std::string m_name;
@@ -342,16 +421,16 @@ public:
 	DocumentClass(){}
 	/// \brief Constructor
 	explicit DocumentClass(
-			const std::string& mimeType_)		:m_mimeType(mimeType_){}
+			const String& mimeType_)		:m_mimeType(mimeType_){}
 	/// \brief Constructor
 	DocumentClass(
-			const std::string& mimeType_,
-			const std::string& encoding_)		:m_mimeType(mimeType_),m_encoding(encoding_){}
+			const String& mimeType_,
+			const String& encoding_)		:m_mimeType(mimeType_),m_encoding(encoding_){}
 	/// \brief Constructor
 	DocumentClass(
-			const std::string& mimeType_,
-			const std::string& encoding_,
-			const std::string& scheme_)		:m_mimeType(mimeType_),m_scheme(scheme_),m_encoding(encoding_){}
+			const String& mimeType_,
+			const String& encoding_,
+			const String& scheme_)			:m_mimeType(mimeType_),m_scheme(scheme_),m_encoding(encoding_){}
 	/// \brief Copy constructor
 	DocumentClass( const DocumentClass& o)			:m_mimeType(o.m_mimeType),m_scheme(o.m_scheme),m_encoding(o.m_encoding){}
 
@@ -360,24 +439,24 @@ public:
 	bool valid() const					{return !m_mimeType.empty();}
 
 	/// \brief Set the MIME type of the document class
-	/// \param[in] the document MIME type string
-	void setMimeType( const std::string& mimeType_)		{m_mimeType = mimeType_;}
+	/// \param[in] mimeType_ the document MIME type string
+	void setMimeType( const String& mimeType_)		{m_mimeType = mimeType_;}
 	/// \brief Set the scheme identifier of the document class
-	/// \param[in] the document scheme identifier
-	void setScheme( const std::string& scheme_)		{m_scheme = scheme_;}
+	/// \param[in] scheme_ the document scheme identifier
+	void setScheme( const String& scheme_)			{m_scheme = scheme_;}
 	/// \brief Set the character set encoding of the document class
-	/// \param[in] the character set encoding string
-	void setEncoding( const std::string& encoding_)		{m_encoding = encoding_;}
+	/// \param[in] encoding_ the character set encoding as string
+	void setEncoding( const String& encoding_)		{m_encoding = encoding_;}
 
 	/// \brief Get the MIME type of the document class
 	/// \return the document MIME type string
-	const std::string& mimeType() const			{return m_mimeType;}
+	const String& mimeType() const			{return m_mimeType;}
 	/// \brief Get the scheme identifier of the document class
 	/// \return the document scheme identifier
-	const std::string& scheme() const			{return m_scheme;}
+	const String& scheme() const			{return m_scheme;}
 	/// \brief Get the character set encoding of the document class
 	/// \return the character set encoding string
-	const std::string& encoding() const			{return m_encoding;}
+	const String& encoding() const			{return m_encoding;}
 
 private:
 	std::string m_mimeType;
@@ -400,58 +479,58 @@ public:
 	/// \param[in] type term type name of the search index term
 	/// \param[in] value term value of the search index term
 	/// \param[in] position word count position of the search index term
-	void addSearchIndexTerm( const std::string& type, const std::string& value, const Index& position);
+	void addSearchIndexTerm( const String& type, const String& value, const Index& position);
 	/// \brief Add a single term occurrence to the document for use in the summary of a retrieval result
 	/// \param[in] type term type name of the forward index term
 	/// \param[in] value term value of the forward index term
 	/// \param[in] position word count position of the forward index term
-	void addForwardIndexTerm( const std::string& type, const std::string& value, const Index& position);
+	void addForwardIndexTerm( const String& type, const String& value, const Index& position);
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
-	void setMetaData( const std::string& name, const Variant& value);
+	void setMetaData( const String& name, const Variant& value);
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
-	void setMetaData( const std::string& name, double value);
+	void setMetaData( const String& name, double value);
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
-	void setMetaData( const std::string& name, int value);
+	void setMetaData( const String& name, int value);
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
-	void setMetaData( const std::string& name, unsigned int value);
+	void setMetaData( const String& name, unsigned int value);
 	/// \brief Define an attribute of the document
 	/// \param[in] name name of the document attribute
 	/// \param[in] value value of the document attribute
-	void setAttribute( const std::string& name, const std::string& value);
+	void setAttribute( const String& name, const String& value);
 	/// \brief Allow a user to access the document
 	/// \param[in] username name of the user to be allowed to access this document
 	/// \remark This function is only implemented if ACL is enabled in the storage
-	void setUserAccessRight( const std::string& username);
+	void setUserAccessRight( const String& username);
 	/// \brief Set the document identifier (docid) of the document
 	/// \param[in] docid_ document identifier of this document
-	void setDocid( const std::string& docid_);
+	void setDocid( const String& docid_);
 
 	/// \brief Get the list of search terms of the document
 	/// \return the list of terms
-	const std::vector<Term>& searchIndexTerms() const		{return m_searchIndexTerms;}
+	const TermVector& searchIndexTerms() const			{return m_searchIndexTerms;}
 	/// \brief Get the list of forward terms of the document
 	/// \return the list of terms
-	const std::vector<Term>& forwardIndexTerms() const		{return m_forwardIndexTerms;}
+	const TermVector& forwardIndexTerms() const			{return m_forwardIndexTerms;}
 	/// \brief Get the list of meta data of the document
 	/// \return the list of meta data definitions
-	const std::vector<MetaData>& metaData() const			{return m_metaData;}
+	const MetaDataVector& metaData() const				{return m_metaData;}
 	/// \brief Get the list of attributes of the document
 	/// \return the list of attributes
-	const std::vector<Attribute>& attributes() const		{return m_attributes;}
+	const AttributeVector& attributes() const			{return m_attributes;}
 	/// \brief Get the list of users that are allowed to access the document
 	/// \return the list of users allowed to access this document
-	const std::vector<std::string>& users() const			{return m_users;}
+	const StringVector& users() const				{return m_users;}
 	/// \brief Get the document identifier (docid) of the document
 	/// \return the document identifier
-	const std::string& docid()					{return m_docid;}
+	const String& docid()					{return m_docid;}
 
 private:
 	std::vector<Term> m_searchIndexTerms;
@@ -483,11 +562,11 @@ public:
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	void addSearchIndexFeature(
-		const std::string& type,
-		const std::string& selectexpr,
+		const String& type,
+		const String& selectexpr,
 		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers,
-		const std::vector<std::string>& options=std::vector<std::string>());
+		const NormalizerVector& normalizers,
+		const StringVector& options=StringVector());
 
 	/// \brief Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
 	/// \param[in] type type of the features produced
@@ -496,11 +575,11 @@ public:
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	void addForwardIndexFeature(
-		const std::string& type,
-		const std::string& selectexpr,
+		const String& type,
+		const String& selectexpr,
 		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers,
-		const std::vector<std::string>& options=std::vector<std::string>());
+		const NormalizerVector& normalizers,
+		const StringVector& options=StringVector());
 
 	/// \brief Define how a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
@@ -508,16 +587,16 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	void defineMetaData(
-		const std::string& fieldname,
-		const std::string& selectexpr,
+		const String& fieldname,
+		const String& selectexpr,
 		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers);
+		const NormalizerVector& normalizers);
 
 	/// \brief Declare some aggregated value of the document to be put into the meta data table used for restrictions, weighting and summarization.
  	/// \param[in] fieldname name of the addressed meta data field.
 	/// \param[in] function defining how and from what the value is aggregated
 	void defineAggregatedMetaData(
-		const std::string& fieldname,
+		const String& fieldname,
 		const Aggregator& function);
 
 	/// \brief Define how a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
@@ -526,24 +605,24 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	void defineAttribute(
-		const std::string& attribname,
-		const std::string& selectexpr,
+		const String& attribname,
+		const String& selectexpr,
 		const Tokenizer& tokenizer,
-		const std::vector<Normalizer>& normalizers);
+		const NormalizerVector& normalizers);
 
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze
-	Document analyze( const std::string& content);
+	Document analyze( const String& content);
 
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze
 	/// \param[in] dclass document class of the document to analyze
-	Document analyze( const std::string& content, const DocumentClass& dclass);
+	Document analyze( const String& content, const DocumentClass& dclass);
 
 private:
 	/// \brief Constructor used by StrusContext
 	friend class StrusContext;
-	DocumentAnalyzer( const Reference& objbuilder, const std::string& segmentername);
+	DocumentAnalyzer( const Reference& objbuilder, const String& segmentername);
 
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
@@ -573,18 +652,18 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for the features of this phrase type
 	/// \param[in] normalizers list of normalizer function description to use for the features of this phrase type in the ascending order of appearance
 	void definePhraseType(
-			const std::string& phraseType,
-			const std::string& featureType,
+			const String& phraseType,
+			const String& featureType,
 			const Tokenizer& tokenizer,
-			const std::vector<Normalizer>& normalizers);
+			const NormalizerVector& normalizers);
 
 	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
 	/// \param[in] phraseType name of the phrase type to use for analysis
 	/// \param[in] phraseContent content string of the query phrase to analyze
 	/// \deprecated
-	std::vector<Term> analyzePhrase(
-			const std::string& phraseType,
-			const std::string& phraseContent) const;
+	TermVector analyzePhrase(
+			const String& phraseType,
+			const String& phraseContent) const;
 
 	/// \brief Creates a queue for phrase bulk analysis
 	/// \return the queue
@@ -615,12 +694,12 @@ public:
 	/// \param[in] phraseType name of the phrase type to use for analysis
 	/// \param[in] phraseContent content string of the query phrase to analyze
 	void push(
-			const std::string& phraseType,
-			const std::string& phraseContent);
+			const String& phraseType,
+			const String& phraseContent);
 
 	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
 	/// \return list of terms (query phrase analyzer result)
-	std::vector<Term> fetch();
+	TermVector fetch();
 
 private:
 	/// \brief Constructor used by StrusContext
@@ -654,17 +733,17 @@ public:
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert
 	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
-	void insertDocument( const std::string& docid, const Document& doc);
+	void insertDocument( const String& docid, const Document& doc);
 
 	/// \brief Prepare the deletion of a document from the storage
 	/// \param[in] docid the identifier of the document to delete
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
-	void deleteDocument( const std::string& docid);
+	void deleteDocument( const String& docid);
 
 	/// \brief Prepare the deletion of all document access rights of a user
 	/// \param[in] username the name of the user to delete all access rights (in the local collection)
 	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
-	void deleteUserAccessRights( const std::string& username);
+	void deleteUserAccessRights( const String& username);
 
 	/// \brief Commit all insert or delete or user access right change statements open.
 	void flush();
@@ -674,7 +753,7 @@ public:
 
 private:
 	friend class StrusContext;
-	StorageClient( const Reference& objbuilder, const std::string& config);
+	StorageClient( const Reference& objbuilder, const String& config);
 
 	friend class Query;
 	friend class QueryEval;
@@ -684,6 +763,7 @@ private:
 };
 
 
+/// \brief Configuration describing the values passed to a summarizer function
 class SummarizerConfig
 {
 public:
@@ -696,7 +776,7 @@ public:
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, const Variant& value)
+	void defineParameter( const String& name, const Variant& value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -704,7 +784,7 @@ public:
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, const char* value)
+	void defineParameter( const String& name, const char* value)
 	{
 		m_parameters[ name] = Variant(value);
 	}
@@ -712,7 +792,7 @@ public:
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, int value)
+	void defineParameter( const String& name, int value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -720,7 +800,7 @@ public:
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, unsigned int value)
+	void defineParameter( const String& name, unsigned int value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -728,17 +808,17 @@ public:
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, double value)
+	void defineParameter( const String& name, double value)
 	{
 		m_parameters[ name] = value;
 	}
 
 	/// \brief Define a summarizer feature
-	/// \param[in] name name of the feature as defined in the summarizer implementation
+	/// \param[in] sumtype type name of the feature as defined in the summarizer implementation
 	/// \param[in] set feature set of the feature used to address the features
-	void defineFeature( const std::string& kind, const std::string& set)
+	void defineFeature( const String& sumtype, const String& set)
 	{
-		m_features[ kind] = set;
+		m_features[ sumtype] = set;
 	}
 
 private:
@@ -747,17 +827,20 @@ private:
 	std::map<std::string,std::string> m_features;
 };
 
+/// \brief Configuration describing the values passed to a weighting function
 class WeightingConfig
 {
 public:
+	/// \brief Default constructor
 	WeightingConfig(){}
+	/// \brief Copy constructor
 	WeightingConfig( const WeightingConfig& o)
 		:m_parameters(o.m_parameters){}
 
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, const Variant& value)
+	void defineParameter( const String& name, const Variant& value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -765,7 +848,7 @@ public:
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, int value)
+	void defineParameter( const String& name, int value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -773,7 +856,7 @@ public:
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, unsigned int value)
+	void defineParameter( const String& name, unsigned int value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -781,7 +864,7 @@ public:
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, double value)
+	void defineParameter( const String& name, double value)
 	{
 		m_parameters[ name] = value;
 	}
@@ -789,17 +872,17 @@ public:
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
-	void defineParameter( const std::string& name, const char* value)
+	void defineParameter( const String& name, const char* value)
 	{
 		m_parameters[ name] = Variant(value);
 	}
 
 	/// \brief Define a weighting feature
-	/// \param[in] name name of the feature as defined in the weighting function implementation
+	/// \param[in] sumtype type name of the feature as defined in the weighting function implementation
 	/// \param[in] set feature set of the feature used to address the features
-	void defineFeature( const std::string& kind, const std::string& set)
+	void defineFeature( const String& sumtype, const String& set)
 	{
-		m_features[ kind] = set;
+		m_features[ sumtype] = set;
 	}
 
 private:
@@ -825,29 +908,29 @@ public:
 	/// \param[in] type_ feature type of the of the term
 	/// \param[in] value_ feature value of the of the term
 	void addTerm(
-			const std::string& set_,
-			const std::string& type_,
-			const std::string& value_);
+			const String& set_,
+			const String& type_,
+			const String& value_);
 
 	/// \brief Declare a feature set to be used as selecting feature
 	/// \param[in] set_ identifier of the term set addressing the terms to use for selection
-	void addSelectionFeature( const std::string& set_);
+	void addSelectionFeature( const String& set_);
 
 	/// \brief Declare a feature set to be used as restriction
 	/// \param[in] set_ identifier of the term set addressing the terms to use as restriction
-	void addRestrictionFeature( const std::string& set_);
+	void addRestrictionFeature( const String& set_);
 
 	/// \brief Declare a feature set to be used as exclusion
 	/// \param[in] set_ identifier of the term set addressing the terms to use as exclusion
-	void addExclusionFeature( const std::string& set_);
+	void addExclusionFeature( const String& set_);
 
 	/// \brief Declare a summarizer
 	/// \param[in] resultAttribute name of the result attribute this summarization result is assigned to
 	/// \param[in] name the name of the summarizer to add
 	/// \param[in] config the configuration of the summarizer to add
 	void addSummarizer(
-			const std::string& resultAttribute,
-			const std::string& name,
+			const String& resultAttribute,
+			const String& name,
 			const SummarizerConfig& config);
 
 	/// \brief Add a weighting function to use as summand of the total document weight
@@ -856,7 +939,7 @@ public:
 	/// \param[in] config the configuration of the function to add
 	void addWeightingFunction(
 			double weight,
-			const std::string& name,
+			const String& name,
 			const WeightingConfig& config);
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
@@ -881,16 +964,16 @@ public:
 	/// \brief Constructor
 	RankAttribute(){}
 	/// \brief Constructor
-	RankAttribute( const std::string& name_, const std::string& value_)
+	RankAttribute( const String& name_, const String& value_)
 		:m_name(name_),m_value(value_){}
 	/// \brief Copy connstructor
 	RankAttribute( const RankAttribute& o)
 		:m_name(o.m_name),m_value(o.m_value){}
 
 	/// \brief Get the name of this attribute
-	const std::string& name() const		{return m_name;}
+	const String& name() const		{return m_name;}
 	/// \brief Get the value of this attribute
-	const std::string& value() const	{return m_value;}
+	const String& value() const		{return m_value;}
 
 private:
 	friend class Query;
@@ -906,7 +989,7 @@ public:
 	Rank()
 		:m_docno(0),m_weight(0.0){}
 	/// \brief Constructor
-	Rank( Index docno_, double weight_, const std::vector<RankAttribute>& attributes_)
+	Rank( Index docno_, double weight_, const RankAttributeVector& attributes_)
 		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
 	/// \brief Copy constructor
 	Rank( const Rank& o)
@@ -917,7 +1000,7 @@ public:
 	/// \brief Get the weight of the rank
 	double weight() const					{return m_weight;}
 	/// \brief Get the attributes
-	const std::vector<RankAttribute>& attributes() const	{return m_attributes;}
+	const RankAttributeVector& attributes() const		{return m_attributes;}
 
 private:
 	friend class Query;
@@ -938,13 +1021,13 @@ public:
 	/// \brief Push a single term on the stack
 	/// \param[in] type_ query term type name
 	/// \param[in] value_ query term value
-	void pushTerm( const std::string& type_, const std::string& value_);
+	void pushTerm( const String& type_, const String& value_);
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
 	/// \param[in] opname_ name of the expression operator
 	/// \param[in] argc number of operands (topmost elements from stack) of the expression
 	/// \param[in] range_ range number for the expression span in the document
-	void pushExpression( const std::string& opname_, unsigned int argc, int range_=0);
+	void pushExpression( const String& opname_, unsigned int argc, int range_=0);
 
 	/// \brief Push a duplicate of the topmost element of the query stack
 	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
@@ -954,12 +1037,12 @@ public:
 	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
 	/// \param[in] name_ name of the variable attached
 	/// \remark The stack is not changed
-	void attachVariable( const std::string& name_);
+	void attachVariable( const String& name_);
 
 	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
 	/// \param[in] set_ name of the feature set, this feature is addressed with
 	/// \param[in] weight_ individual weight of the feature in the query
-	void defineFeature( const std::string& set_, double weight_=1.0);
+	void defineFeature( const String& set_, double weight_=1.0);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
@@ -967,7 +1050,7 @@ public:
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
-			const char* compareOp, const std::string& name,
+			const char* compareOp, const String& name,
 			const Variant& value, bool newGroup=true);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
@@ -981,11 +1064,11 @@ public:
 	/// \brief Add a user for this query (as alternative role)
 	/// \param[in] username_ an alternative name of a user for the evaluation of this query
 	/// \note the user restriction applies if no user role specified in the query is allowed to see the document.
-	void addUserName( const std::string& username_);
+	void addUserName( const String& username_);
 
 	/// \brief Evaluate this query and return the result
 	/// \return the result
-	std::vector<Rank> evaluate() const;
+	RankVector evaluate() const;
 
 private:
 	friend class QueryEval;
@@ -1021,39 +1104,42 @@ public:
 	~StrusContext(){}
 
 	/// \brief Load a module
+	/// \param[in] name_ name of the module to load
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void loadModule( const std::string& name_);
+	void loadModule( const String& name_);
 
 	/// \brief Add a path from where to try to load modules from
-	/// \param[in] paths semicolon separated list of module search paths
+	/// \param[in] paths_ semicolon separated list of module search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void addModulePath( const std::string& paths_);
+	void addModulePath( const String& paths_);
 
 	/// \brief Define where to load analyzer resource files from
-	/// \param[in] paths semicolon separated list of resource search paths
+	/// \param[in] paths_ semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void addResourcePath( const std::string& paths_);
+	void addResourcePath( const String& paths_);
 
 	/// \brief Create a storage client instance
 	/// \param[in] config_ configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,
-	StorageClient createStorageClient( const std::string& config_);
+	StorageClient createStorageClient( const String& config_);
 
 	/// \brief Create a new storage (physically) described by config
-	/// \remark Fails if the storage already exists
-	void createStorage( const std::string& config_);
+	/// \param[in] config_ storage configuration
+ 	/// \remark Fails if the storage already exists
+	void createStorage( const String& config_);
 
 	/// \brief Delete the storage (physically) described by config
+	/// \param[in] config_ storage description
 	/// \note Handle this function carefully
-	void destroyStorage( const std::string& config_);
+	void destroyStorage( const String& config_);
 
 	/// \brief Detect the type of document from its content
-	/// \param[in] the document content to classify
+	/// \param[in] content the document content to classify
 	/// \return the document class
-	DocumentClass detectDocumentClass( const std::string& content);
+	DocumentClass detectDocumentClass( const String& content);
 
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
-	DocumentAnalyzer createDocumentAnalyzer( const std::string& segmentername_="");
+	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
 
 	/// \brief Create a query analyzer instance
 	QueryAnalyzer createQueryAnalyzer();
@@ -1075,6 +1161,11 @@ private:
 	Reference m_analyzer_objbuilder_impl;
 };
 
+#ifdef DOXYGEN_LANG
+#if defined DOXYGEN_JAVA
+}}}
+#endif
+#endif
 #endif
 
 

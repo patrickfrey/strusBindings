@@ -27,6 +27,15 @@
 --------------------------------------------------------------------
 */
 #include "strus/bindingObjects.hpp"
+#undef String
+#undef StringVector
+#undef NormalizerVector
+#undef TermVector
+#undef RankVector
+#undef RankAttributeVector
+#undef AttributeVector
+#undef MetaDataVector
+
 #include "strus/strus.hpp"
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"

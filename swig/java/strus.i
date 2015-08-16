@@ -33,7 +33,7 @@
 %typemap(javapackage) std::vector<MetaData>  "net.strus.api.MetaDataVector"
 %template(MetaDataVector) std::vector<MetaData>;
 
-%typemap(javapackage) std::vector<TermVector>  "net.strus.api.TermVector"
+%typemap(javapackage) std::vector<Normalizer>  "net.strus.api.NormalizerVector"
 %template(NormalizerVector) std::vector<Normalizer>;
 
 %typemap(javacode) StrusContext %{
