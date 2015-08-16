@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head><link rel="icon" type="image/ico" href="images/strus.ico"/><meta http-equiv="content-type" content="text/html; charset=utf-8"/><meta name="description" content="Language bindings PHP for strus, a collection of C++ libraries for building a full-text search engine."/><meta name="keywords" content="fulltext search engine C++"/><meta name="author" content="Patrick Frey &lt;patrickpfrey (a) yahoo (dt) com&gt;"/><link rel="stylesheet" type="text/css" href="text-profile.css" title="Text Profile" media="all"/><title>Java bindings for strus</title>
+</head>
+<body>
+<script type="text/javascript">
+</script>
+<div id="wrap"><div id="content"><h1>Java language bindings</h1><h2>Introduction</h2>
+	<p class="description">This chapter describes the language bindings of strus for Java based 
+		on JNI and build with SWIG with examples of how to create and use them.<br/>
+		The language bindings have been built using <a href="http://www.swig.org">SWIG</a>
+		based on a wrapper C++ interface. This wrapper interface serves as common base
+		for all language bindings as a sort of super interface (strus/bindingObjects.hpp).
+		</p>
+		<h2>Doxygen interface documentation</h2>
+		<p class="description">There exist a <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/index.html">
+		documentation for the Java interface</a> generated with
+		doxygen. The interface has been derived from the wrapper interface used as base.
+		It introduces all Java classes defined. Unfortunately it contains still some type 
+		qualifiers pointing to it's C++ origin. Please don't blame it for that. I'll find solutions.
+		Suggestions are welcome.
+		</p>
+		<h2>Description</h2>
+		<p class="description">All objects of the strus Java
+		API are in the namespace "net.strus.api". The first thing you do, when using 
+		the strus Java interface, is to create the root object called StrusContext. 
+		From this context object you can construct the main instances
+		of the objects doing the job you want to do. Depending on how you create
+		the strus context, the objects you create beginning with the root object
+		are accessed directly or they are residing on a server and the language 
+		objects serve as proxy for the server objects.
+		</p>
+		<h2>Examples</h2>
+		<p class="description">
+		</p>
+</div></div></body></html>
+
