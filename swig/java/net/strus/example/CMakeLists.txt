@@ -16,7 +16,7 @@ foreach( test ${tests} )
 	build_example( ${test} )
 endforeach( test )
 
-add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class CreateCollectionNoAnalyzer.class Status.class )
+add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class CreateCollectionNoAnalyzer.class Status.class QueryNoAnalyzer.class )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/swig/java/net/strus/example" )
 

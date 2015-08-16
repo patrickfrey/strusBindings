@@ -10,8 +10,7 @@
 #include "../include/strus/bindingObjects.hpp"
 %}
 
-%include "../ignore_declarations.i"
-%ignore Variant::Variant(char const *);
+%include "ignore_declarations.i"
 %include "exception_handler.i"
 %include "std_vector_string.i"
 %include "std_vector_term.i"

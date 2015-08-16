@@ -13,8 +13,7 @@
 
 %include "newobject.i"
 %include "java_heap.i"
-%include "../ignore_declarations.i"
-%ignore Variant::Variant(char const *);
+%include "ignore_declarations.i"
 %include "exception_handler.i"
 
 %include "std_vector_string.i"
