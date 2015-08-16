@@ -6,6 +6,10 @@
 %ignore Variant::assign( unsigned int v);
 %ignore Variant::assign( double v);
 #endif
+%ignore Document::setMetaData( const String& name, const Variant& value);
+%ignore SummarizerConfig::defineParameter( const String& name, const Variant& value);
+%ignore WeightingConfig::defineParameter( const String& name, const Variant& value);
+%ignore Query::defineMetaDataRestriction( const char* compareOp, const String& name, const Variant& value, bool newGroup=true);
 %ignore Variant::m_value;
 %ignore Reference::Reference( Reference::Deleter deleter_);
 %ignore Reference::Reference( const Reference& o);
