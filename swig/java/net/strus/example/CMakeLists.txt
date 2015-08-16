@@ -11,23 +11,17 @@ FUNCTION( build_example NAME )
 )
 ENDFUNCTION( build_example CNAM )
 
-build_example( HelloWorld )
-build_example( CreateCollection )
-build_example( CreateCollectionNoAnalyzer )
-build_example( Status )
+set( tests HelloWorld Status CreateCollection CreateCollectionNoAnalyzer QueryNoAnalyzer )
+foreach( test ${tests} )
+	build_example( ${test} )
+endforeach( test )
 
 add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class CreateCollectionNoAnalyzer.class Status.class )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/swig/java/net/strus/example" )
 
-add_test( NAME HelloWorld COMMAND java -classpath ../../.. net.strus.example.HelloWorld WORKING_DIRECTORY ${THISDIR} )
-add_test( NAME CreateCollection COMMAND java -classpath ../../.. net.strus.example.CreateCollection WORKING_DIRECTORY  ${THISDIR} )
-add_test( NAME CreateCollectionNoAnalyzer COMMAND java -classpath ../../.. net.strus.example.CreateCollectionNoAnalyzer WORKING_DIRECTORY  ${THISDIR} )
-add_test( NAME Status COMMAND java -classpath ../../.. net.strus.example.Status WORKING_DIRECTORY ${THISDIR} )
-
-set_tests_properties( Status PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/swig/java" )
-set_tests_properties( CreateCollection PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/swig/java" )
-set_tests_properties( CreateCollectionNoAnalyzer PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/swig/java" )
-
-
+foreach( test ${tests} )
+	add_test( NAME ${test} COMMAND java -classpath ../../.. net.strus.example.${test} WORKING_DIRECTORY ${THISDIR} )
+	set_tests_properties( ${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/swig/java" )
+endforeach( test )
 

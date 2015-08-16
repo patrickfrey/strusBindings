@@ -50,7 +50,11 @@ public class QueryNoAnalyzer
 	public static void main( String[] args) {
 		StrusContext ctx = new StrusContext();
 		String config = "path=storage";
-
+		if (args.length == 0)
+		{
+			args = new String[1];
+			args[0] = "citi";
+		}
 		StorageClient storage = ctx.createStorageClient( config);
 		QueryEval queryEval = createQueryEval( ctx);
 		RankVector results = evaluateQuery( storage, queryEval, args);
