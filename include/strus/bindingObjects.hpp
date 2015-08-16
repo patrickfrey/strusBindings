@@ -333,7 +333,6 @@ private:
 	std::string m_buf;
 };
 
-
 /// \brief One typed term occurrence in a document or a query
 class Term
 {
@@ -485,10 +484,12 @@ public:
 	/// \param[in] value term value of the forward index term
 	/// \param[in] position word count position of the forward index term
 	void addForwardIndexTerm( const String& type, const String& value, const Index& position);
+#ifndef DOXYGEN_JAVA
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
 	void setMetaData( const String& name, const Variant& value);
+#endif
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
@@ -773,6 +774,7 @@ public:
 	SummarizerConfig( const SummarizerConfig& o)
 		:m_parameters(o.m_parameters),m_features(o.m_features){}
 
+#ifndef DOXYGEN_JAVA
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
@@ -780,7 +782,7 @@ public:
 	{
 		m_parameters[ name] = value;
 	}
-
+#endif
 	/// \brief Define a summarizer parameter
 	/// \param[in] name name of the parameter as defined in the summarizer implementation
 	/// \param[in] value value of the parameter
@@ -837,6 +839,7 @@ public:
 	WeightingConfig( const WeightingConfig& o)
 		:m_parameters(o.m_parameters){}
 
+#ifndef DOXYGEN_JAVA
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
@@ -844,7 +847,7 @@ public:
 	{
 		m_parameters[ name] = value;
 	}
-
+#endif
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
@@ -1044,6 +1047,7 @@ public:
 	/// \param[in] weight_ individual weight of the feature in the query
 	void defineFeature( const String& set_, double weight_=1.0);
 
+#ifndef DOXYGEN_JAVA
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
@@ -1052,6 +1056,42 @@ public:
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
 			const Variant& value, bool newGroup=true);
+#endif
+	/// \brief Define a meta data restriction
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	void defineMetaDataRestriction(
+			const char* compareOp, const String& name,
+			double value, bool newGroup=true)
+	{
+		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	}
+
+	/// \brief Define a meta data restriction
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	void defineMetaDataRestriction(
+			const char* compareOp, const String& name,
+			unsigned int value, bool newGroup=true)
+	{
+		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	}
+
+	/// \brief Define a meta data restriction
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	void defineMetaDataRestriction(
+			const char* compareOp, const String& name,
+			int value, bool newGroup=true)
+	{
+		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	}
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query

@@ -131,6 +131,62 @@ public:
 }}}
 
 #elif defined DOXYGEN_PHP
+/// \brief A single PHP string or an array  of strings
+struct StringVector;
+
+/// \brief A structure representing a sequence of normalization functions. Either a PHP string describing a single function by name without parameters or an array of function objects, each function object represented as string for a function name or an array with the first element being the function name and the following elements the parameters passed to the function.
+/// \example "lc"                                   :Single function doing lowercase as normalization
+/// \example [["stem,"de"]]                         :Single function doing german (de) stemming with snowball as normalization
+/// \example ["lc",["stem,"de"],["convdia","de"]]   :Three functions doing in sequence lowercase, german (de) stemming and conversion of diacritical characters as normalization
+class NormalizerVector;
+
+/// \brief A structure representing a tokenization function. Either a PHP string describing a single function by name without parameters or an array with the first element being the function name and the following elements the parameters passed to the function.
+class Tokenizer;
+
+/// \brief 
+class TermVector :public java::util::AbstractList<Term>
+{
+public:
+	///\brief Create a Term vector with a preallocated size
+	///\param[in] size number of elements to preallocate
+	TermVector(int32_t size);
+};
+
+/// \brief Fixed size vector of a query rank. Represents the result of an information rerieval query
+class RankVector :public java::util::AbstractList<Rank>
+{
+public:
+	///\brief Create a Rank (item of a query result) vector with a preallocated size
+	///\param[in] size number of elements to preallocate
+	RankVector(int32_t size);
+};
+
+/// \brief Fixed size vector of a query rank. Represents the result of an information rerieval query
+class RankAttributeVector :public java::util::AbstractList<RankAttribute>
+{
+public:
+	///\brief Create a RankAttribute (attribute of a query result) vector with a preallocated size
+	///\param[in] size number of elements to preallocate
+	RankAttributeVector(int32_t size);
+};
+
+/// \brief Fixed size vector of document attributes
+class AttributeVector :public java::util::AbstractList<Attribute>
+{
+public:
+	///\brief Create a document attribute vector with a preallocated size
+	///\param[in] size number of elements to preallocate
+	AttributeVector(int32_t size);
+};
+
+/// \brief Fixed size vector of document meta data elements
+class MetaDataVector :public java::util::AbstractList<MetaData>
+{
+public:
+	///\brief Create a document meta data vector with a preallocated size
+	///\param[in] size number of elements to preallocate
+	MetaDataVector(int32_t size);
+};
 #elif defined DOXYGEN_PYTHON
 #else
 #error Unknown language (swig.hpp)

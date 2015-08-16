@@ -6,6 +6,20 @@
 %ignore Variant::assign( unsigned int v);
 %ignore Variant::assign( double v);
 #endif
+%ignore Document::setMetaData( const String& name, double value);
+%ignore Document::setMetaData( const String& name, int value);
+%ignore Document::setMetaData( const String& name, unsigned int value);
+%ignore SummarizerConfig::defineParameter( const String& name, const char* value);
+%ignore SummarizerConfig::defineParameter( const String& name, int value);
+%ignore SummarizerConfig::defineParameter( const String& name, unsigned int value);
+%ignore SummarizerConfig::defineParameter( const String& name, double value);
+%ignore WeightingConfig::defineParameter( const String& name, const char* value);
+%ignore WeightingConfig::defineParameter( const String& name, int value);
+%ignore WeightingConfig::defineParameter( const String& name, unsigned int value);
+%ignore WeightingConfig::defineParameter( const String& name, double value);
+%ignore Query::defineMetaDataRestriction( const char* compareOp, const String& name, double value, bool newGroup=true);
+%ignore Query::defineMetaDataRestriction( const char* compareOp, const String& name, int value, bool newGroup=true);
+%ignore Query::defineMetaDataRestriction( const char* compareOp, const String& name, unsigned int value, bool newGroup=true);
 %ignore Variant::m_value;
 %ignore Reference::Reference( Reference::Deleter deleter_);
 %ignore Reference::Reference( const Reference& o);
