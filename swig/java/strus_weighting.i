@@ -1,5 +1,0 @@
-%inline %{
-#include "objInitializers.hpp"
-%}
-
-

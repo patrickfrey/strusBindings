@@ -3,10 +3,12 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 set( generated_java_source_files
 	Aggregator.java
 	Attribute.java
+	AttributeVector.java
 	DocumentAnalyzer.java
 	DocumentClass.java
 	Document.java
 	MetaData.java
+	MetaDataVector.java
 	Normalizer.java
 	NormalizerVector.java
 	QueryAnalyzeQueue.java
@@ -23,9 +25,6 @@ set( generated_java_source_files
 	strus.java
 	strusJNI.java
 	SummarizerConfig.java
-	SWIGTYPE_p_std__vectorT_Attribute_t.java
-	SWIGTYPE_p_std__vectorT_MetaData_t.java
-	SWIGTYPE_p_std__vectorT_RankAttribute_t.java
 	Term.java
 	TermVector.java
 	Tokenizer.java
