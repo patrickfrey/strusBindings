@@ -1,10 +1,4 @@
 %ignore Reference;
-%ignore Variant::defined() const;
-%ignore Variant::type() const;
-%ignore Variant::getUInt() const;
-%ignore Variant::getInt() const;
-%ignore Variant::getFloat() const;
-%ignore Variant::getText() const;
 #if defined(SWIGOCAML)
 %ignore Variant::Variant( unsigned int v);
 %ignore Variant::Variant( double v);
@@ -19,10 +13,4 @@
 %ignore Reference::operator=(const Reference& o);
 %ignore Reference::get() const;
 %ignore Reference::get();
-%ignore MetaData::name() const;
-%ignore MetaData::value() const;
-%ignore Attribute::name() const;
-%ignore Attribute::value() const;
-%ignore FunctionDef::name() const;
-%ignore FunctionDef::arguments() const;
 %warnfilter(451) VariantValue::TEXT;
