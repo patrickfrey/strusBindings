@@ -1,0 +1,624 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML><HEAD></HEAD><BODY>
+<OBJECT type="text/site properties">
+<param name="FrameName" value="right">
+</OBJECT>
+<UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< Attribute >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< MetaData >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< Normalizer >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< Rank >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< RankAttribute >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< std::string >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="AbstractList< Term >"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a7f85091b8c0a9cd84906052762181e95"><param name="Name" value="addArgument"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a7f85091b8c0a9cd84906052762181e95"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a7ffb048e716047505638beb05db3ef06"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#a2bca7a2bee51850885b18bf25236f739"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#af5c80c60e45371a097178963c5af6201"><param name="Name" value="addArgumentFloat"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#af5c80c60e45371a097178963c5af6201"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#ae6b13aa0b176e26c3050c42194db2d3c"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#a1dd0ee092ae1a24df2c4266d9baca0ed"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aeacb3ae35ccbf3cfea1407d00724abdc"><param name="Name" value="addArgumentInt"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aeacb3ae35ccbf3cfea1407d00724abdc"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a026dddfedb2c1147490a4cbac5b354a7"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#ad2d50c696959f394b9b3cef47ad1b8ce"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a819bff920dabecf60d625fcf4295497f"><param name="Name" value="addExclusionFeature"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#acbd2ee3328b86f9049b4b33b6829ceb9"><param name="Name" value="addForwardIndexFeature"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#adaff0f1dbfd184d4edd9819aade65b2e"><param name="Name" value="addForwardIndexTerm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a62135274d1716b34eb9652e00f03af10"><param name="Name" value="addModulePath"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a5b79e725e8199b9654f211d8f0905d49"><param name="Name" value="addResourcePath"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a0bdb0fc520274205fa2b37dce80be147"><param name="Name" value="addRestrictionFeature"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a964664631c897018b20b7a7fe35a0558"><param name="Name" value="addSearchIndexFeature"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a8678495ae0f7fa13257c99c2b436effe"><param name="Name" value="addSearchIndexTerm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ae6f6f25b49895ede66dfa1ab29404b7c"><param name="Name" value="addSelectionFeature"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a7904d24723a0da80ce9cf8034e3d326b"><param name="Name" value="addSummarizer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ac78dfa3846845fe4a80ffe1c6b11f4d2"><param name="Name" value="addTerm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a88437a83a060f3a42f7684b9a7b781b1"><param name="Name" value="addUserName"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ab6d6d85ffd62eeaed53862192d5d250b"><param name="Name" value="addWeightingFunction"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a14835a8369fa47a3d5438a26193c87f9"><param name="Name" value="Aggregator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a05fbccdffa34fc618d2d17aacc53714a"><param name="Name" value="analyze"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a2a4d11c20c69f3193598179b2ee4c285"><param name="Name" value="analyzePhrase"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a32f489b129c39a5ec0c2c86ee4c425ff"><param name="Name" value="arguments"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a32f489b129c39a5ec0c2c86ee4c425ff"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#abe2bfd366066afd261b269bc4c80e2bc"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#afbb333e29e79155b8e8273fc46735987"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a973a3a823fb001a56b88fd46c5d6879c"><param name="Name" value="assign"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#aec572899c0f0e62ca8ef0ffccdf6b3d0"><param name="Name" value="assignFloat"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ac639e6a4eb25c40cdfb50597586e513d"><param name="Name" value="assignInt"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#af43816a7765dd0bd33fcc1bc2b6b4db0"><param name="Name" value="assignText"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a6e808d80d24502bebbe61d85a8694834"><param name="Name" value="assignUint"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#ab5b15272650236a955ff148aca6d6cfd"><param name="Name" value="attachVariable"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#ac9f7bfe88a4e1f44f08d252b4f388d26"><param name="Name" value="Attribute"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a37b4f8aab6ce8566ddd8606b77d481ca"><param name="Name" value="attributes"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a37b4f8aab6ce8566ddd8606b77d481ca"><param name="Name" value="net::strus::api::Document"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a42f888aba5780dae6b48606902f2dd0a"><param name="Name" value="net::strus::api::Rank"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1AttributeVector.html#aeb304b549bd2102e37d4df9c22eed957"><param name="Name" value="AttributeVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html"><param name="Name" value="bindingObjects.hpp"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="Name" value="GlobalCounter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#aef185b8df53f196d028b118ab9ff3485"><param name="Name" value="Index"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae0aa4e05fb9696c6892e54873eef6b0a"><param name="Name" value="close"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae0aa4e05fb9696c6892e54873eef6b0a"><param name="Name" value="net::strus::api::StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a91427b101a5a10c3672113a01aec129d"><param name="Name" value="net::strus::api::StrusContext"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#afa62654eafb2c206f402c8ed59a13829"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ae5388ae842fbc082013a30e4ac9f5c31"><param name="Name" value="createQuery"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#af2fa9022bf0765b3b3b40827ce2b925e"><param name="Name" value="createQueryAnalyzer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a845b1a1b0c9e5b907a23276c87f18a0a"><param name="Name" value="createQueryEval"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a02c8509f7802b1ad2003bcd0927d8ade"><param name="Name" value="createQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a6715c76af2920c58a2ca8c8788414e3a"><param name="Name" value="createStorage"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#ad72870117ab77fea582d25cc6e8a2f9e"><param name="Name" value="createStorageClient"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a5494dca562d9e0bc231d1f475237441f"><param name="Name" value="defineAggregatedMetaData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a1816b654f3d9b39b937e330bc0f7b82a"><param name="Name" value="defineAttribute"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a0601b579e41a74a1448f0a4f7044c2f3"><param name="Name" value="defined"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a95ced4b2dc417849681f98c90eb8b3fb"><param name="Name" value="defineFeature"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a95ced4b2dc417849681f98c90eb8b3fb"><param name="Name" value="net::strus::api::Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a5bd33eb97d009c208bad9ec8054d3bb8"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a5fd7a4e7c8bdd9d0264ffddf169e8343"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#addb4394a833b218500e57efcf8b79683"><param name="Name" value="defineMetaData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a51141baf6ce15c90c17f12ef6b767204"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a6d1d7752d3623bdf58d8cfc698d4637c"><param name="Name" value="defineParameter"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a6d1d7752d3623bdf58d8cfc698d4637c"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#ab44198679dcc817ba147197cabd00a87"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#af524baa1ecf3e92fd9f0b86f24aa99c3"><param name="Name" value="definePhraseType"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#af45bff61eb15dd9fed521f2dde47f501"><param name="Name" value="deleteDocument"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#acd501f2be0adbe2cdec3f667ecd46164"><param name="Name" value="deleteUserAccessRights"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="deprecated.html"><param name="Name" value="Deprecated List"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a9f8a9af5d52fe7de2b27cc53c9146f28"><param name="Name" value="destroyStorage"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a6cb7a64eb31cc86b374b5f5560af03d9"><param name="Name" value="detectDocumentClass"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a60dafaf0c41760a776ea53926fef8ac8"><param name="Name" value="docid"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#aa22a77cf9cb5a3d41db04d90d571d22e"><param name="Name" value="docno"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a71a258e94e4527f8507c99b513ac3298"><param name="Name" value="Document"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="DocumentAnalyzer"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a4305c8dcfab0afa29561f06b7013f63a"><param name="Name" value="net::strus::api::DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="net::strus::api::Variant"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a45f0b1fe14d943ffab0bb3c31db5186a"><param name="Name" value="DocumentClass"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#aa93355740b7b4456b5e9ae0e47088766"><param name="Name" value="encoding"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a087ed8d00de8e0a42e6edda7e11e330c"><param name="Name" value="evaluate"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a16ecfa32fa92157e97b7e276202e1f3f"><param name="Name" value="fetch"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#ae021b6fd576c8d28cd45a3ae2300d73b"><param name="Name" value="FLOAT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aa0cb912dff7c99637fc8a96f5852ce31"><param name="Name" value="flush"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a65dc60959aa41626989d84dd89f8e6ca"><param name="Name" value="forwardIndexTerms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< Attribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< MetaData >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< Normalizer >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< Rank >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< RankAttribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< std::string >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="AbstractList< Term >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="java::util::AbstractList"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a347d96f5c0635e5d30a210249beb407f"><param name="Name" value="getFloat"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab05a2a338a289deb30a5b131e6fca69f"><param name="Name" value="getInt"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a1976ad08406f843a020a357a97c89ba1"><param name="Name" value="getText"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a34702aa65fc6a8b7744bad4bf74d97ce"><param name="Name" value="getUInt"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="Name" value="GlobalCounter"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="Name" value="bindingObjects.hpp"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="Name" value="net::strus::api"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485"><param name="Name" value="Index"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485"><param name="Name" value="bindingObjects.hpp"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485"><param name="Name" value="net::strus::api"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab4c7a4b674d63341cec33f90a90422fc"><param name="Name" value="init"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a1d056fd4716c1145173a2ed88ded5ba7"><param name="Name" value="insertDocument"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#af9d43435386baccad86821c16872d96e"><param name="Name" value="INT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacejava.html"><param name="Name" value="java"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacejava_1_1lang.html"><param name="Name" value="java::lang"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1lang_1_1String.html"><param name="Name" value="java::lang::String"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1lang_1_1String.html#a7fd3460e6d62585f44b1458fdf65fb53"><param name="Name" value="String"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacejava_1_1util.html"><param name="Name" value="java::util"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html"><param name="Name" value="java::util::AbstractList"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#ad0d06d722c4e2bf6df93b1589508ee8f"><param name="Name" value="get"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a1e236742227c8486817c8b7f27a604e6"><param name="Name" value="loadModule"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a4bf60c1217a1cab9b2c1e246423296e1"><param name="Name" value="metaData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html#a20d189bb12150a671cbb31d3b7c6895d"><param name="Name" value="MetaData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaDataVector.html#afc2287fc9f55aa7216f1e27281cbd448"><param name="Name" value="MetaDataVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a58c3de1c105fcf6c193374416e7184f0"><param name="Name" value="mimeType"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a6e86bd72ec63bc635cab9970327abd67"><param name="Name" value="name"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a6e86bd72ec63bc635cab9970327abd67"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#ae81b80e0108bdf95215feae7703139f9"><param name="Name" value="net::strus::api::Attribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html#a662c0df7904643be84dc022a904080b0"><param name="Name" value="net::strus::api::MetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a26173308191524617ff32767559b1472"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a077c17b11bac0df19550a08192b5305f"><param name="Name" value="net::strus::api::RankAttribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#adf5891caed7520f48a776aeea538dd15"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet.html"><param name="Name" value="net"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus.html"><param name="Name" value="net::strus"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html"><param name="Name" value="net::strus::api"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a7f85091b8c0a9cd84906052762181e95"><param name="Name" value="addArgument"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#af5c80c60e45371a097178963c5af6201"><param name="Name" value="addArgumentFloat"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aeacb3ae35ccbf3cfea1407d00724abdc"><param name="Name" value="addArgumentInt"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a14835a8369fa47a3d5438a26193c87f9"><param name="Name" value="Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a32f489b129c39a5ec0c2c86ee4c425ff"><param name="Name" value="arguments"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#a6e86bd72ec63bc635cab9970327abd67"><param name="Name" value="name"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aecfa7ed4f777cfb80602248acd78609e"><param name="Name" value="setName"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aabe5a086c3b0ce36f41bbd03e9274549"><param name="Name" value="~Aggregator"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html"><param name="Name" value="net::strus::api::Attribute"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#ac9f7bfe88a4e1f44f08d252b4f388d26"><param name="Name" value="Attribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#ae81b80e0108bdf95215feae7703139f9"><param name="Name" value="name"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#a4d9fc22b475a6319064a0b21edfb1944"><param name="Name" value="value"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1AttributeVector.html"><param name="Name" value="net::strus::api::AttributeVector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1AttributeVector.html#aeb304b549bd2102e37d4df9c22eed957"><param name="Name" value="AttributeVector"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html"><param name="Name" value="net::strus::api::Document"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#adaff0f1dbfd184d4edd9819aade65b2e"><param name="Name" value="addForwardIndexTerm"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a8678495ae0f7fa13257c99c2b436effe"><param name="Name" value="addSearchIndexTerm"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a37b4f8aab6ce8566ddd8606b77d481ca"><param name="Name" value="attributes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a60dafaf0c41760a776ea53926fef8ac8"><param name="Name" value="docid"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a71a258e94e4527f8507c99b513ac3298"><param name="Name" value="Document"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a65dc60959aa41626989d84dd89f8e6ca"><param name="Name" value="forwardIndexTerms"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a4bf60c1217a1cab9b2c1e246423296e1"><param name="Name" value="metaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3d0dd306369d2021b334b9c94d61577a"><param name="Name" value="searchIndexTerms"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a17fc85cc4feefb42d061b643cccd3afa"><param name="Name" value="setAttribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3f54642e0167712d09e4cfe9a205cbad"><param name="Name" value="setDocid"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a80ace02838cc446040a83344786db7c0"><param name="Name" value="setMetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#ae2f86405b75ecd9dfb121c65ca62600d"><param name="Name" value="setUserAccessRight"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#acf0e0fdb117e9c9c5986b47765e3f320"><param name="Name" value="users"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html"><param name="Name" value="net::strus::api::DocumentAnalyzer"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#acbd2ee3328b86f9049b4b33b6829ceb9"><param name="Name" value="addForwardIndexFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a964664631c897018b20b7a7fe35a0558"><param name="Name" value="addSearchIndexFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a05fbccdffa34fc618d2d17aacc53714a"><param name="Name" value="analyze"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a5494dca562d9e0bc231d1f475237441f"><param name="Name" value="defineAggregatedMetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a1816b654f3d9b39b937e330bc0f7b82a"><param name="Name" value="defineAttribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#addb4394a833b218500e57efcf8b79683"><param name="Name" value="defineMetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a4305c8dcfab0afa29561f06b7013f63a"><param name="Name" value="DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#ad1f0e74e7c7d820907e93ba501878cea"><param name="Name" value="~DocumentAnalyzer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html"><param name="Name" value="net::strus::api::DocumentClass"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a45f0b1fe14d943ffab0bb3c31db5186a"><param name="Name" value="DocumentClass"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#aa93355740b7b4456b5e9ae0e47088766"><param name="Name" value="encoding"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a58c3de1c105fcf6c193374416e7184f0"><param name="Name" value="mimeType"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#ac690b4012cc1bc1b5bf801507f9284db"><param name="Name" value="scheme"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a6ffdf2f82dfd99f1d33315ab1f5eb340"><param name="Name" value="setEncoding"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a905c8ccbdbbf8c4f11fc6bd63105b010"><param name="Name" value="setMimeType"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#ada6dc7fdcc4b09aa194ea1a246cc80be"><param name="Name" value="setScheme"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#ad314aac4ced276b5e505955ef90606c1"><param name="Name" value="valid"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html"><param name="Name" value="net::strus::api::MetaData"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html#a20d189bb12150a671cbb31d3b7c6895d"><param name="Name" value="MetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html#a662c0df7904643be84dc022a904080b0"><param name="Name" value="name"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html#aa11234f1c7422d044e45ecb96aa557af"><param name="Name" value="value"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaDataVector.html"><param name="Name" value="net::strus::api::MetaDataVector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaDataVector.html#afc2287fc9f55aa7216f1e27281cbd448"><param name="Name" value="MetaDataVector"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a7ffb048e716047505638beb05db3ef06"><param name="Name" value="addArgument"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#ae6b13aa0b176e26c3050c42194db2d3c"><param name="Name" value="addArgumentFloat"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a026dddfedb2c1147490a4cbac5b354a7"><param name="Name" value="addArgumentInt"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#abe2bfd366066afd261b269bc4c80e2bc"><param name="Name" value="arguments"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a26173308191524617ff32767559b1472"><param name="Name" value="name"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a4b30b7098c890b50bca5ab4dbd9fb4d1"><param name="Name" value="Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="QueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a6365d9032c5f51cd3eb8b6588311ddef"><param name="Name" value="setName"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a15041c59f35fd64657fc7876261ff8b0"><param name="Name" value="~Normalizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1NormalizerVector.html"><param name="Name" value="net::strus::api::NormalizerVector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1NormalizerVector.html#ac7d12af5fcedefd26025a0f16c3f9531"><param name="Name" value="NormalizerVector"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html"><param name="Name" value="net::strus::api::Query"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a88437a83a060f3a42f7684b9a7b781b1"><param name="Name" value="addUserName"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#ab5b15272650236a955ff148aca6d6cfd"><param name="Name" value="attachVariable"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a95ced4b2dc417849681f98c90eb8b3fb"><param name="Name" value="defineFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a51141baf6ce15c90c17f12ef6b767204"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a087ed8d00de8e0a42e6edda7e11e330c"><param name="Name" value="evaluate"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a0631495bd2639a327ce3ea30df99cb62"><param name="Name" value="pushDuplicate"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a42d2b373bc30431e3059e1c7969259fb"><param name="Name" value="pushExpression"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#acee0a0822f093ae0088efda34d70ac57"><param name="Name" value="pushTerm"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a39d6c6c776beb8776f31febae6dbb19d"><param name="Name" value="Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a3ace0f4feabf00c1f24ef70d492098f2"><param name="Name" value="setMaxNofRanks"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a7e09783d1a74df3e81c5275b0cb2b37f"><param name="Name" value="setMinRank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a065f35b68d8447c9ec7ea43ca65cc1d2"><param name="Name" value="~Query"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html"><param name="Name" value="net::strus::api::QueryAnalyzeQueue"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a16ecfa32fa92157e97b7e276202e1f3f"><param name="Name" value="fetch"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a364bfa89a7ab8d17563af5c1f3892df2"><param name="Name" value="push"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a79071fae619c2777a2472e9c47b3a54b"><param name="Name" value="QueryAnalyzeQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="QueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a9e34d3e3ecc1dbfb21615bfbd37a4617"><param name="Name" value="~QueryAnalyzeQueue"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html"><param name="Name" value="net::strus::api::QueryAnalyzer"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a2a4d11c20c69f3193598179b2ee4c285"><param name="Name" value="analyzePhrase"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a02c8509f7802b1ad2003bcd0927d8ade"><param name="Name" value="createQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#af524baa1ecf3e92fd9f0b86f24aa99c3"><param name="Name" value="definePhraseType"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#ae2bb9e3e254ca3ad32f9a35fea705813"><param name="Name" value="QueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a7f6f6fc3eaaddd33e0b287d9b77c220e"><param name="Name" value="~QueryAnalyzer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html"><param name="Name" value="net::strus::api::QueryEval"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a819bff920dabecf60d625fcf4295497f"><param name="Name" value="addExclusionFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a0bdb0fc520274205fa2b37dce80be147"><param name="Name" value="addRestrictionFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ae6f6f25b49895ede66dfa1ab29404b7c"><param name="Name" value="addSelectionFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a7904d24723a0da80ce9cf8034e3d326b"><param name="Name" value="addSummarizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ac78dfa3846845fe4a80ffe1c6b11f4d2"><param name="Name" value="addTerm"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ab6d6d85ffd62eeaed53862192d5d250b"><param name="Name" value="addWeightingFunction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ae5388ae842fbc082013a30e4ac9f5c31"><param name="Name" value="createQuery"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a70c853b5af7a792b44eb3b4b7bb09c17"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a31aaaed013b3f46dee640662e8d7aa1b"><param name="Name" value="~QueryEval"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html"><param name="Name" value="net::strus::api::Rank"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a42f888aba5780dae6b48606902f2dd0a"><param name="Name" value="attributes"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#aa22a77cf9cb5a3d41db04d90d571d22e"><param name="Name" value="docno"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#ab1cff0bb16c60fb8829571383dde44b7"><param name="Name" value="Rank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a3c328b27eeb88f57fa0f2cb00092013e"><param name="Name" value="weight"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html"><param name="Name" value="net::strus::api::RankAttribute"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a077c17b11bac0df19550a08192b5305f"><param name="Name" value="name"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#aa5c7be0d68b616594c8f271535f7fe0b"><param name="Name" value="RankAttribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a9b9fba339e94c0830ed2a44ba49de433"><param name="Name" value="value"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttributeVector.html"><param name="Name" value="net::strus::api::RankAttributeVector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttributeVector.html#a7083524f61086582334d82d0114fef36"><param name="Name" value="RankAttributeVector"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankVector.html"><param name="Name" value="net::strus::api::RankVector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankVector.html#a08067019e3c448e83dadcb663868d415"><param name="Name" value="RankVector"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html"><param name="Name" value="net::strus::api::StorageClient"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae0aa4e05fb9696c6892e54873eef6b0a"><param name="Name" value="close"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#af45bff61eb15dd9fed521f2dde47f501"><param name="Name" value="deleteDocument"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#acd501f2be0adbe2cdec3f667ecd46164"><param name="Name" value="deleteUserAccessRights"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aa0cb912dff7c99637fc8a96f5852ce31"><param name="Name" value="flush"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a1d056fd4716c1145173a2ed88ded5ba7"><param name="Name" value="insertDocument"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aada576797c21f134f0c59b0eddde1391"><param name="Name" value="nofDocumentsInserted"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae04cbda2776770ea288dd5b798465a94"><param name="Name" value="StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aa5ddac4765d921647991c12ebf78d85f"><param name="Name" value="~StorageClient"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StringVector.html"><param name="Name" value="net::strus::api::StringVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html"><param name="Name" value="net::strus::api::StrusContext"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a62135274d1716b34eb9652e00f03af10"><param name="Name" value="addModulePath"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a5b79e725e8199b9654f211d8f0905d49"><param name="Name" value="addResourcePath"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a91427b101a5a10c3672113a01aec129d"><param name="Name" value="close"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#afa62654eafb2c206f402c8ed59a13829"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#af2fa9022bf0765b3b3b40827ce2b925e"><param name="Name" value="createQueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a845b1a1b0c9e5b907a23276c87f18a0a"><param name="Name" value="createQueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a6715c76af2920c58a2ca8c8788414e3a"><param name="Name" value="createStorage"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#ad72870117ab77fea582d25cc6e8a2f9e"><param name="Name" value="createStorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a9f8a9af5d52fe7de2b27cc53c9146f28"><param name="Name" value="destroyStorage"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a6cb7a64eb31cc86b374b5f5560af03d9"><param name="Name" value="detectDocumentClass"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a1e236742227c8486817c8b7f27a604e6"><param name="Name" value="loadModule"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a5bd7d9d1a7675dee760c35ec5645f202"><param name="Name" value="StrusContext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#ab7020c8d5b6268028e087e7160213ec4"><param name="Name" value="~StrusContext"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a5bd33eb97d009c208bad9ec8054d3bb8"><param name="Name" value="defineFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a6d1d7752d3623bdf58d8cfc698d4637c"><param name="Name" value="defineParameter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a426b44e0245ed7e797d6798fde9dc048"><param name="Name" value="SummarizerConfig"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html"><param name="Name" value="net::strus::api::Term"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#a1dc0beae3cb4082d679e572657d20eb9"><param name="Name" value="position"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#a67e141ae18b1e16c85fc7e343d0e7344"><param name="Name" value="Term"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#af95459c3092114b5ce49684b0528dee1"><param name="Name" value="type"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#ad2798fd7223f8508a386b1b1584d0f3f"><param name="Name" value="value"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1TermVector.html"><param name="Name" value="net::strus::api::TermVector"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1TermVector.html#aa5eaa11c4305fd81fd9e9a60df7a7de2"><param name="Name" value="TermVector"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#a2bca7a2bee51850885b18bf25236f739"><param name="Name" value="addArgument"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#a1dd0ee092ae1a24df2c4266d9baca0ed"><param name="Name" value="addArgumentFloat"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#ad2d50c696959f394b9b3cef47ad1b8ce"><param name="Name" value="addArgumentInt"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#afbb333e29e79155b8e8273fc46735987"><param name="Name" value="arguments"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#adf5891caed7520f48a776aeea538dd15"><param name="Name" value="name"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#ac8650187f1e1763e58e38d8748df25a6"><param name="Name" value="setName"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#a7c0a733905ffe5d469db135fd49f6381"><param name="Name" value="Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html"><param name="Name" value="net::strus::api::Variant"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a973a3a823fb001a56b88fd46c5d6879c"><param name="Name" value="assign"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#aec572899c0f0e62ca8ef0ffccdf6b3d0"><param name="Name" value="assignFloat"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ac639e6a4eb25c40cdfb50597586e513d"><param name="Name" value="assignInt"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#af43816a7765dd0bd33fcc1bc2b6b4db0"><param name="Name" value="assignText"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a6e808d80d24502bebbe61d85a8694834"><param name="Name" value="assignUint"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a0601b579e41a74a1448f0a4f7044c2f3"><param name="Name" value="defined"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a347d96f5c0635e5d30a210249beb407f"><param name="Name" value="getFloat"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab05a2a338a289deb30a5b131e6fca69f"><param name="Name" value="getInt"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a1976ad08406f843a020a357a97c89ba1"><param name="Name" value="getText"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a34702aa65fc6a8b7744bad4bf74d97ce"><param name="Name" value="getUInt"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab4c7a4b674d63341cec33f90a90422fc"><param name="Name" value="init"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab647623b3295040f83d3afb2a502a223"><param name="Name" value="Storage"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab7a4828c8a78bcb30696f99c4da55860"><param name="Name" value="Summarizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a16a07b1ce7876affefb333c8ebde2d43"><param name="Name" value="type"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ac6c9a2d7543a7cc45f37128ca36e5743"><param name="Name" value="Variant"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a452b49bb4a7e6a440df9ab09fd634034"><param name="Name" value="WeightingFunction"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html"><param name="Name" value="net::strus::api::VariantValue"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#ae021b6fd576c8d28cd45a3ae2300d73b"><param name="Name" value="FLOAT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#af9d43435386baccad86821c16872d96e"><param name="Name" value="INT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#a67cbcfa3e1b850d5df649d84c84ad51b"><param name="Name" value="TEXT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#a525e3d35fa11db09d9a82b4b0c5c46c8"><param name="Name" value="UINT"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a5fd7a4e7c8bdd9d0264ffddf169e8343"><param name="Name" value="defineFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#ab44198679dcc817ba147197cabd00a87"><param name="Name" value="defineParameter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#aa64f74db4b96a54b9ffc0279f09800fa"><param name="Name" value="WeightingConfig"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html"><param name="Name" value="net::strus::api"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="Name" value="GlobalCounter"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485"><param name="Name" value="Index"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a60a646e1e6f0ec2c012531a24f8bc826"><param name="Name" value="Variant_FLOAT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a51f845adf01033be6bd8ff2d5eecef8d"><param name="Name" value="Variant_INT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a1eea43b62fb8e32c221b8fe807fafbd1"><param name="Name" value="Variant_TEXT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a3b0d436999e54e933b11f6c4df1b5b38"><param name="Name" value="Variant_UINT"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752ad9d257e1d17cb0e9251b51c040bbe248"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aada576797c21f134f0c59b0eddde1391"><param name="Name" value="nofDocumentsInserted"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a4b30b7098c890b50bca5ab4dbd9fb4d1"><param name="Name" value="Normalizer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1NormalizerVector.html#ac7d12af5fcedefd26025a0f16c3f9531"><param name="Name" value="NormalizerVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#a1dc0beae3cb4082d679e572657d20eb9"><param name="Name" value="position"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a364bfa89a7ab8d17563af5c1f3892df2"><param name="Name" value="push"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a0631495bd2639a327ce3ea30df99cb62"><param name="Name" value="pushDuplicate"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a42d2b373bc30431e3059e1c7969259fb"><param name="Name" value="pushExpression"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#acee0a0822f093ae0088efda34d70ac57"><param name="Name" value="pushTerm"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a39d6c6c776beb8776f31febae6dbb19d"><param name="Name" value="Query"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a39d6c6c776beb8776f31febae6dbb19d"><param name="Name" value="net::strus::api::Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="net::strus::api::QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="net::strus::api::Rank"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="net::strus::api::RankAttribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="net::strus::api::StorageClient"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a79071fae619c2777a2472e9c47b3a54b"><param name="Name" value="QueryAnalyzeQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="QueryAnalyzer"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="net::strus::api::QueryAnalyzeQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#ae2bb9e3e254ca3ad32f9a35fea705813"><param name="Name" value="net::strus::api::QueryAnalyzer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="net::strus::api::Query"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a70c853b5af7a792b44eb3b4b7bb09c17"><param name="Name" value="net::strus::api::QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="net::strus::api::StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="net::strus::api::SummarizerConfig"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="net::strus::api::Variant"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="net::strus::api::WeightingConfig"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#ab1cff0bb16c60fb8829571383dde44b7"><param name="Name" value="Rank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#aa5c7be0d68b616594c8f271535f7fe0b"><param name="Name" value="RankAttribute"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttributeVector.html#a7083524f61086582334d82d0114fef36"><param name="Name" value="RankAttributeVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankVector.html#a08067019e3c448e83dadcb663868d415"><param name="Name" value="RankVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="removeRange"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< Attribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< MetaData >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< Normalizer >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< Rank >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< RankAttribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< std::string >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="AbstractList< Term >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a0c8aee5e4b74de46836c8aa72709a1d2"><param name="Name" value="java::util::AbstractList"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#ac690b4012cc1bc1b5bf801507f9284db"><param name="Name" value="scheme"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3d0dd306369d2021b334b9c94d61577a"><param name="Name" value="searchIndexTerms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="set"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< Attribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< MetaData >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< Normalizer >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< Rank >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< RankAttribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< std::string >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="AbstractList< Term >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a69efb733099e593676bb4601571aea51"><param name="Name" value="java::util::AbstractList"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a17fc85cc4feefb42d061b643cccd3afa"><param name="Name" value="setAttribute"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a3f54642e0167712d09e4cfe9a205cbad"><param name="Name" value="setDocid"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a6ffdf2f82dfd99f1d33315ab1f5eb340"><param name="Name" value="setEncoding"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a3ace0f4feabf00c1f24ef70d492098f2"><param name="Name" value="setMaxNofRanks"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#a80ace02838cc446040a83344786db7c0"><param name="Name" value="setMetaData"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#a905c8ccbdbbf8c4f11fc6bd63105b010"><param name="Name" value="setMimeType"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a7e09783d1a74df3e81c5275b0cb2b37f"><param name="Name" value="setMinRank"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aecfa7ed4f777cfb80602248acd78609e"><param name="Name" value="setName"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aecfa7ed4f777cfb80602248acd78609e"><param name="Name" value="net::strus::api::Aggregator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a6365d9032c5f51cd3eb8b6588311ddef"><param name="Name" value="net::strus::api::Normalizer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#ac8650187f1e1763e58e38d8748df25a6"><param name="Name" value="net::strus::api::Tokenizer"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#ada6dc7fdcc4b09aa194ea1a246cc80be"><param name="Name" value="setScheme"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#ae2f86405b75ecd9dfb121c65ca62600d"><param name="Name" value="setUserAccessRight"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="size"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< Attribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< MetaData >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< Normalizer >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< Rank >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< RankAttribute >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< std::string >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="AbstractList< Term >"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1util_1_1AbstractList.html#a511135ac3449b3f1d1bbdc77cf554c82"><param name="Name" value="java::util::AbstractList"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab647623b3295040f83d3afb2a502a223"><param name="Name" value="Storage"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae04cbda2776770ea288dd5b798465a94"><param name="Name" value="StorageClient"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classjava_1_1lang_1_1String.html#a7fd3460e6d62585f44b1458fdf65fb53"><param name="Name" value="String"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="net::strus::api::DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="net::strus::api::QueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="net::strus::api::QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="net::strus::api::StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#a5bd7d9d1a7675dee760c35ec5645f202"><param name="Name" value="net::strus::api::StrusContext"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ab7a4828c8a78bcb30696f99c4da55860"><param name="Name" value="Summarizer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#a426b44e0245ed7e797d6798fde9dc048"><param name="Name" value="SummarizerConfig"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#a67e141ae18b1e16c85fc7e343d0e7344"><param name="Name" value="Term"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1TermVector.html#aa5eaa11c4305fd81fd9e9a60df7a7de2"><param name="Name" value="TermVector"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#a67cbcfa3e1b850d5df649d84c84ad51b"><param name="Name" value="TEXT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Tokenizer.html#a7c0a733905ffe5d469db135fd49f6381"><param name="Name" value="Tokenizer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#af95459c3092114b5ce49684b0528dee1"><param name="Name" value="type"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#af95459c3092114b5ce49684b0528dee1"><param name="Name" value="net::strus::api::Term"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a16a07b1ce7876affefb333c8ebde2d43"><param name="Name" value="net::strus::api::Variant"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="unionnet_1_1strus_1_1api_1_1VariantValue.html#a525e3d35fa11db09d9a82b4b0c5c46c8"><param name="Name" value="UINT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Document.html#acf0e0fdb117e9c9c5986b47765e3f320"><param name="Name" value="users"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentClass.html#ad314aac4ced276b5e505955ef90606c1"><param name="Name" value="valid"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#a4d9fc22b475a6319064a0b21edfb1944"><param name="Name" value="value"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Attribute.html#a4d9fc22b475a6319064a0b21edfb1944"><param name="Name" value="net::strus::api::Attribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1MetaData.html#aa11234f1c7422d044e45ecb96aa557af"><param name="Name" value="net::strus::api::MetaData"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a9b9fba339e94c0830ed2a44ba49de433"><param name="Name" value="net::strus::api::RankAttribute"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#ad2798fd7223f8508a386b1b1584d0f3f"><param name="Name" value="net::strus::api::Term"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#ac6c9a2d7543a7cc45f37128ca36e5743"><param name="Name" value="Variant"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a60a646e1e6f0ec2c012531a24f8bc826"><param name="Name" value="Variant_FLOAT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a51f845adf01033be6bd8ff2d5eecef8d"><param name="Name" value="Variant_INT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a1eea43b62fb8e32c221b8fe807fafbd1"><param name="Name" value="Variant_TEXT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a3b0d436999e54e933b11f6c4df1b5b38"><param name="Name" value="Variant_UINT"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752ad9d257e1d17cb0e9251b51c040bbe248"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a3c328b27eeb88f57fa0f2cb00092013e"><param name="Name" value="weight"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1WeightingConfig.html#aa64f74db4b96a54b9ffc0279f09800fa"><param name="Name" value="WeightingConfig"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Variant.html#a452b49bb4a7e6a440df9ab09fd634034"><param name="Name" value="WeightingFunction"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Aggregator.html#aabe5a086c3b0ce36f41bbd03e9274549"><param name="Name" value="~Aggregator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#ad1f0e74e7c7d820907e93ba501878cea"><param name="Name" value="~DocumentAnalyzer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a15041c59f35fd64657fc7876261ff8b0"><param name="Name" value="~Normalizer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Query.html#a065f35b68d8447c9ec7ea43ca65cc1d2"><param name="Name" value="~Query"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#a9e34d3e3ecc1dbfb21615bfbd37a4617"><param name="Name" value="~QueryAnalyzeQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a7f6f6fc3eaaddd33e0b287d9b77c220e"><param name="Name" value="~QueryAnalyzer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryEval.html#a31aaaed013b3f46dee640662e8d7aa1b"><param name="Name" value="~QueryEval"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aa5ddac4765d921647991c12ebf78d85f"><param name="Name" value="~StorageClient"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StrusContext.html#ab7020c8d5b6268028e087e7160213ec4"><param name="Name" value="~StrusContext"></OBJECT>
+</UL>
+</BODY>
+</HTML>
