@@ -5,10 +5,13 @@ import java.util.List;
 
 public class CreateCollectionNoAnalyzer
 {
+	// Insert a document defined by its parts passed as arguments:
 	public static void insertDoc( StorageClient storage, String docid, String[] searchIndex, String[] forwardIndex, String title)
 	{
+		// Create the document to insert:
 		Document doc = new Document();
 		int pos = 0;
+		// Define the search index (inverted index) for the document:
 		for (String item : searchIndex)
 		{
 			++pos;
@@ -17,6 +20,7 @@ public class CreateCollectionNoAnalyzer
 				doc.addSearchIndexTerm( "word", item, pos);
 			}
 		}
+		// Define the forward index (items for summary) for the document:
 		pos = 0;
 		for (String item : forwardIndex)
 		{
@@ -26,7 +30,9 @@ public class CreateCollectionNoAnalyzer
 				doc.addForwardIndexTerm( "orig", item, pos);
 			}
 		}
+		// Define the document title:
 		doc.setAttribute( "title", title);
+		// Prepare the document for insert (the insert will be finalized with storage.flush()):
 		storage.insertDocument( docid, doc);
 	}
 
@@ -50,7 +56,7 @@ public class CreateCollectionNoAnalyzer
 		ctx.createStorage( config);
 		StorageClient storage = ctx.createStorageClient( config);
 
-		// Define the test documents:
+		// Define the test documents (The terms of the document are already normalized here):
 		String[] doc_A_searchIndex = {"tokyo","is","a","citi","that","is","complet","differ","than","what","you","would","expect","as","european","citizen"};
 		String[] doc_A_forwardIndex = {"Tokyo","is","a","city","that","is","completely","different","than","what","you","would","expect","as","European","citizen."};
 		String doc_A_title = "One day in Tokyo";
