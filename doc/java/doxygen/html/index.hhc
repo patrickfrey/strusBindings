@@ -8,7 +8,7 @@
   <UL>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Create a collection of document (without using the strus analyzer)"><param name="ImageNumber" value="1"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Create a collection of documents (with strus analyzer)"><param name="ImageNumber" value="1"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Name" value="Retrieve a ranklist with a simple query consisting of some terms"><param name="ImageNumber" value="1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Retrieve a ranklist with a simple query consisting of some terms (without analyzer)"><param name="ImageNumber" value="1"></OBJECT>
   </UL>
 <LI><OBJECT type="text/sitemap"><param name="Name" value="Deprecated List"><param name="Local" value="deprecated.html"><param name="ImageNumber" value="11"></OBJECT>
 <LI><OBJECT type="text/sitemap"><param name="Name" value="Namespaces"><param name="ImageNumber" value="1"></OBJECT>
