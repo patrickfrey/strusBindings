@@ -1,6 +1,10 @@
 strus Java bindings	 {#mainpage}
 ===================
 
+This interface documenation has been generated from the base C++ interface with some injection of some
+additional stuff like namespaces and helper classes, that are specific for the Java interface.
+Unfortunately it contains still some type qualifiers pointing to it's C++ origin. 
+Please don't blame it for that. I'll find other solutions. Suggestions are welcome. 
 The strus Java bindings provide a Java interface for accessing the 
 retrieval storage, indexing documents and queries and evaluating queries.
 
