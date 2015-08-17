@@ -219,7 +219,7 @@ public class CreateCollection
 } 
 \endcode
 
-\section QueryNoAnalyzer Retrieve a ranklist with a simple query consisting of some terms
+\section QueryNoAnalyzer Retrieve a ranklist with a simple query consisting of some terms (without analyzer)
 The query evaluation scheme used for ranking the results is BM25. The policy that decides what to return is
 defined by a selection expression that matches documents that contain all of the query terms.
 So we search for documents that contain all query terms and rank them with BM25:
