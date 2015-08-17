@@ -45,28 +45,45 @@
 <div class="contents">
 <div class="textblock"><p>The strus Java bindings provide a Java interface for accessing the retrieval storage, indexing documents and queries and evaluating queries.</p>
 <p>The entry point of a strus application with Java is the context (<a class="el" href="classnet_1_1strus_1_1api_1_1StrusContext.html">net::strus::api::StrusContext</a>) object. It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Java/JNI environment.</p>
-<h1><a class="anchor" id="CreateCollection"></a>
-Create a collection of documents (with strus analyzer)</h1>
+<h1><a class="anchor" id="CreateCollectionNoAnalyzer"></a>
+Create a collection of document (without using the strus analyzer)</h1>
+<p>In the Java universe there exist a lot of alternatives to analyze or index a document. This example accommodates this and shows how to insert a test collection defined without using the strus analyzer. The terms are assumed to come from "somewhere". </p>
 <div class="fragment"><div class="line"><span class="keyword">package </span>net.strus.example;</div>
 <div class="line"><span class="keyword">import</span> net.strus.api.*;</div>
 <div class="line"><span class="keyword">import</span> java.io.*;</div>
 <div class="line"><span class="keyword">import</span> java.util.List;</div>
 <div class="line"></div>
-<div class="line"><span class="keyword">public</span> <span class="keyword">class </span>CreateCollection</div>
+<div class="line"><span class="keyword">public</span> <span class="keyword">class </span>CreateCollectionNoAnalyzer</div>
 <div class="line">{</div>
-<div class="line">        <span class="keyword">static</span> String readFile( String path) <span class="keywordflow">throws</span> IOException {</div>
-<div class="line">                <span class="keywordflow">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(path)))</div>
+<div class="line">        <span class="comment">// Insert a document defined by its parts passed as arguments:</span></div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> insertDoc( StorageClient storage, String docid, String[] searchIndex, String[] forwardIndex, String title)</div>
+<div class="line">        {</div>
+<div class="line">                <span class="comment">// Create the document to insert:</span></div>
+<div class="line">                Document doc = <span class="keyword">new</span> Document();</div>
+<div class="line">                <span class="keywordtype">int</span> pos = 0;</div>
+<div class="line">                <span class="comment">// Define the search index (inverted index) for the document:</span></div>
+<div class="line">                <span class="keywordflow">for</span> (String item : searchIndex)</div>
 <div class="line">                {</div>
-<div class="line">                        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</div>
-<div class="line">                        String line = br.readLine();</div>
-<div class="line"></div>
-<div class="line">                        <span class="keywordflow">while</span> (line != null) {</div>
-<div class="line">                                sb.append(line);</div>
-<div class="line">                                sb.append(System.lineSeparator());</div>
-<div class="line">                                line = br.readLine();</div>
+<div class="line">                        ++pos;</div>
+<div class="line">                        <span class="keywordflow">if</span> (item.length() &gt; 0)</div>
+<div class="line">                        {</div>
+<div class="line">                                doc.addSearchIndexTerm( <span class="stringliteral">&quot;word&quot;</span>, item, pos);</div>
 <div class="line">                        }</div>
-<div class="line">                        <span class="keywordflow">return</span> sb.toString();</div>
 <div class="line">                }</div>
+<div class="line">                <span class="comment">// Define the forward index (items for summary) for the document:</span></div>
+<div class="line">                pos = 0;</div>
+<div class="line">                <span class="keywordflow">for</span> (String item : forwardIndex)</div>
+<div class="line">                {</div>
+<div class="line">                        ++pos;</div>
+<div class="line">                        <span class="keywordflow">if</span> (item != null)</div>
+<div class="line">                        {</div>
+<div class="line">                                doc.addForwardIndexTerm( <span class="stringliteral">&quot;orig&quot;</span>, item, pos);</div>
+<div class="line">                        }</div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Define the document title:</span></div>
+<div class="line">                doc.setAttribute( <span class="stringliteral">&quot;title&quot;</span>, title);</div>
+<div class="line">                <span class="comment">// Prepare the document for insert (the insert will be finalized with storage.flush()):</span></div>
+<div class="line">                storage.insertDocument( docid, doc);</div>
 <div class="line">        }</div>
 <div class="line"></div>
 <div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> main( String []args) {</div>
@@ -75,7 +92,7 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                {</div>
 <div class="line">                        config = args[ 0];</div>
 <div class="line">                }</div>
-<div class="line">                <span class="comment">// Create context, storage and analyzer:</span></div>
+<div class="line">                <span class="comment">// Create context and storage:</span></div>
 <div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
 <div class="line">                <span class="keywordflow">try</span></div>
 <div class="line">                {</div>
@@ -88,27 +105,114 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                }</div>
 <div class="line">                ctx.createStorage( config);</div>
 <div class="line">                StorageClient storage = ctx.createStorageClient( config);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Define the test documents (The terms of the document are already normalized here):</span></div>
+<div class="line">                String[] doc_A_searchIndex = {<span class="stringliteral">&quot;tokyo&quot;</span>,<span class="stringliteral">&quot;is&quot;</span>,<span class="stringliteral">&quot;a&quot;</span>,<span class="stringliteral">&quot;citi&quot;</span>,<span class="stringliteral">&quot;that&quot;</span>,<span class="stringliteral">&quot;is&quot;</span>,<span class="stringliteral">&quot;complet&quot;</span>,<span class="stringliteral">&quot;differ&quot;</span>,<span class="stringliteral">&quot;than&quot;</span>,<span class="stringliteral">&quot;what&quot;</span>,<span class="stringliteral">&quot;you&quot;</span>,<span class="stringliteral">&quot;would&quot;</span>,<span class="stringliteral">&quot;expect&quot;</span>,<span class="stringliteral">&quot;as&quot;</span>,<span class="stringliteral">&quot;european&quot;</span>,<span class="stringliteral">&quot;citizen&quot;</span>};</div>
+<div class="line">                String[] doc_A_forwardIndex = {<span class="stringliteral">&quot;Tokyo&quot;</span>,<span class="stringliteral">&quot;is&quot;</span>,<span class="stringliteral">&quot;a&quot;</span>,<span class="stringliteral">&quot;city&quot;</span>,<span class="stringliteral">&quot;that&quot;</span>,<span class="stringliteral">&quot;is&quot;</span>,<span class="stringliteral">&quot;completely&quot;</span>,<span class="stringliteral">&quot;different&quot;</span>,<span class="stringliteral">&quot;than&quot;</span>,<span class="stringliteral">&quot;what&quot;</span>,<span class="stringliteral">&quot;you&quot;</span>,<span class="stringliteral">&quot;would&quot;</span>,<span class="stringliteral">&quot;expect&quot;</span>,<span class="stringliteral">&quot;as&quot;</span>,<span class="stringliteral">&quot;European&quot;</span>,<span class="stringliteral">&quot;citizen.&quot;</span>};</div>
+<div class="line">                String doc_A_title = <span class="stringliteral">&quot;One day in Tokyo&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">                String[] doc_B_searchIndex = {<span class="stringliteral">&quot;new&quot;</span>, <span class="stringliteral">&quot;york&quot;</span>, <span class="stringliteral">&quot;is&quot;</span>, <span class="stringliteral">&quot;a&quot;</span>, <span class="stringliteral">&quot;citi&quot;</span>, <span class="stringliteral">&quot;with&quot;</span>, <span class="stringliteral">&quot;dimens&quot;</span>, <span class="stringliteral">&quot;you&quot;</span>, <span class="stringliteral">&quot;can&quot;</span>, <span class="stringliteral">&quot;t&quot;</span>, <span class="stringliteral">&quot;imagine&quot;</span>};</div>
+<div class="line">                String[] doc_B_forwardIndex = {<span class="stringliteral">&quot;New&quot;</span>, <span class="stringliteral">&quot;York&quot;</span>, <span class="stringliteral">&quot;is&quot;</span>, <span class="stringliteral">&quot;a&quot;</span>, <span class="stringliteral">&quot;city&quot;</span>, <span class="stringliteral">&quot;with&quot;</span>, <span class="stringliteral">&quot;dimensions&quot;</span>, <span class="stringliteral">&quot;you&quot;</span>, <span class="stringliteral">&quot;can&#39;t&quot;</span>, null, <span class="stringliteral">&quot;imagine&quot;</span>};</div>
+<div class="line">                String doc_B_title = <span class="stringliteral">&quot;A visit in New York&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">                String[] doc_C_searchIndex = {<span class="stringliteral">&quot;when&quot;</span>,<span class="stringliteral">&quot;i&quot;</span>,<span class="stringliteral">&quot;first&quot;</span>,<span class="stringliteral">&quot;visit&quot;</span>,<span class="stringliteral">&quot;germani&quot;</span>,<span class="stringliteral">&quot;it&quot;</span>,<span class="stringliteral">&quot;was&quot;</span>,<span class="stringliteral">&quot;still&quot;</span>,<span class="stringliteral">&quot;split&quot;</span>,<span class="stringliteral">&quot;into&quot;</span>,<span class="stringliteral">&quot;two&quot;</span>,<span class="stringliteral">&quot;part&quot;</span>};</div>
+<div class="line">                String[] doc_C_forwardIndex = {<span class="stringliteral">&quot;When&quot;</span>,<span class="stringliteral">&quot;I&quot;</span>,<span class="stringliteral">&quot;first&quot;</span>,<span class="stringliteral">&quot;visited&quot;</span>,<span class="stringliteral">&quot;germany&quot;</span>,<span class="stringliteral">&quot;it&quot;</span>,<span class="stringliteral">&quot;was&quot;</span>,<span class="stringliteral">&quot;still&quot;</span>,<span class="stringliteral">&quot;splitted&quot;</span>,<span class="stringliteral">&quot;into&quot;</span>,<span class="stringliteral">&quot;two&quot;</span>,<span class="stringliteral">&quot;parts.&quot;</span>};</div>
+<div class="line">                String doc_C_title = <span class="stringliteral">&quot;A journey through Germany&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Insert the test documents:</span></div>
+<div class="line">                <span class="keywordflow">try</span></div>
+<div class="line">                {</div>
+<div class="line">                        insertDoc( storage, <span class="stringliteral">&quot;A&quot;</span>, doc_A_searchIndex, doc_A_forwardIndex, doc_A_title);</div>
+<div class="line">                        insertDoc( storage, <span class="stringliteral">&quot;B&quot;</span>, doc_B_searchIndex, doc_B_forwardIndex, doc_B_title);</div>
+<div class="line">                        insertDoc( storage, <span class="stringliteral">&quot;C&quot;</span>, doc_C_searchIndex, doc_C_forwardIndex, doc_C_title);</div>
+<div class="line"></div>
+<div class="line">                        <span class="comment">// Without this commit the documents wont be inserted:</span></div>
+<div class="line">                        storage.flush();</div>
+<div class="line">                }</div>
+<div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
+<div class="line">                {</div>
+<div class="line">                        System.err.println( <span class="stringliteral">&quot;Failed to insert documents: &quot;</span> + e.getMessage());</div>
+<div class="line">                        <span class="keywordflow">return</span>;</div>
+<div class="line">                }</div>
+<div class="line">                System.out.println( <span class="stringliteral">&quot;done&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line">} </div>
+</div><!-- fragment --><h1><a class="anchor" id="CreateCollection"></a>
+Create a collection of documents (with strus analyzer)</h1>
+<p>Now we show an example doing the same as the previous one, but reading its documents to process from files and processing them with the strus document analyzer. </p>
+<div class="fragment"><div class="line"><span class="keyword">package </span>net.strus.example;</div>
+<div class="line"><span class="keyword">import</span> net.strus.api.*;</div>
+<div class="line"><span class="keyword">import</span> java.io.*;</div>
+<div class="line"><span class="keyword">import</span> java.util.List;</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">public</span> <span class="keyword">class </span>CreateCollection</div>
+<div class="line">{</div>
+<div class="line">        <span class="comment">// Read a file and return its contents</span></div>
+<div class="line">        <span class="keyword">static</span> String readFile( String path) <span class="keywordflow">throws</span> IOException {</div>
+<div class="line">                <span class="keywordflow">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(path)))</div>
+<div class="line">                {</div>
+<div class="line">                        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</div>
+<div class="line">                        String line = br.readLine();</div>
+<div class="line">                        </div>
+<div class="line">                        <span class="keywordflow">while</span> (line != null) {</div>
+<div class="line">                                sb.append(line);</div>
+<div class="line">                                sb.append(System.lineSeparator());</div>
+<div class="line">                                line = br.readLine();</div>
+<div class="line">                        }</div>
+<div class="line">                        <span class="keywordflow">return</span> sb.toString();</div>
+<div class="line">                }</div>
+<div class="line">        }</div>
+<div class="line"></div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> main( String []args) {</div>
+<div class="line">                <span class="comment">// Get the storage configuration string from arguments or a default:</span></div>
+<div class="line">                String config = <span class="stringliteral">&quot;path=storage; metadata=doclen UINT16&quot;</span>;</div>
+<div class="line">                <span class="keywordflow">if</span> (args.length &gt; 0)</div>
+<div class="line">                {</div>
+<div class="line">                        config = args[ 0];</div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Create context, storage and analyzer:</span></div>
+<div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line">                <span class="keywordflow">try</span></div>
+<div class="line">                {</div>
+<div class="line">                        ctx.destroyStorage( config);</div>
+<div class="line">                        <span class="comment">//... delete the storage files if they already exists</span></div>
+<div class="line">                }</div>
+<div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
+<div class="line">                {</div>
+<div class="line">                        <span class="comment">//... ignore if storage did not exist</span></div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Create a new storage:</span></div>
+<div class="line">                ctx.createStorage( config);</div>
+<div class="line">                <span class="comment">// Get a client for the new created storage:</span></div>
+<div class="line">                StorageClient storage = ctx.createStorageClient( config);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Define the document analyzer to use:</span></div>
 <div class="line">                DocumentAnalyzer analyzer = ctx.createDocumentAnalyzer();</div>
+<div class="line">                {</div>
+<div class="line">                        <span class="comment">// Define the tokenizers:</span></div>
+<div class="line">                        Tokenizer word_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;word&quot;</span>);      <span class="comment">//... tokenizer for word boundaries</span></div>
+<div class="line">                        Tokenizer split_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;split&quot;</span>);    <span class="comment">//... tokenizer to split by whitespaces</span></div>
+<div class="line">                        Tokenizer content_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;content&quot;</span>);<span class="comment">//... tokenizer doing nothing</span></div>
+<div class="line">        </div>
+<div class="line">                        <span class="comment">// Create the normalizer for the search terms:</span></div>
+<div class="line">                        NormalizerVector stem_normalizer = <span class="keyword">new</span> NormalizerVector(3);</div>
+<div class="line">                        stem_normalizer.set( 0, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;stem&quot;</span>, <span class="stringliteral">&quot;en&quot;</span>)); <span class="comment">//... snowball stemming</span></div>
+<div class="line">                        stem_normalizer.set( 1, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;lc&quot;</span>));         <span class="comment">//... lowercase</span></div>
+<div class="line">                        stem_normalizer.set( 2, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;convdia&quot;</span>, <span class="stringliteral">&quot;en&quot;</span>));<span class="comment">//... convert diachritical characters</span></div>
+<div class="line">        </div>
+<div class="line">                        <span class="comment">// Create the normalizer for the forward index (summary) and the title:</span></div>
+<div class="line">                        NormalizerVector orig_normalizer = <span class="keyword">new</span> NormalizerVector(1);</div>
+<div class="line">                        orig_normalizer.set( 0, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;orig&quot;</span>));       </div>
 <div class="line"></div>
-<div class="line">                <span class="comment">// Define the analyzer:</span></div>
-<div class="line">                Tokenizer word_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;word&quot;</span>);</div>
-<div class="line">                Tokenizer split_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;split&quot;</span>);</div>
-<div class="line">                Tokenizer content_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;content&quot;</span>);</div>
-<div class="line"></div>
-<div class="line">                NormalizerVector stem_normalizer = <span class="keyword">new</span> NormalizerVector(3);</div>
-<div class="line">                stem_normalizer.set( 0, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;stem&quot;</span>, <span class="stringliteral">&quot;en&quot;</span>));</div>
-<div class="line">                stem_normalizer.set( 1, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;lc&quot;</span>));</div>
-<div class="line">                stem_normalizer.set( 2, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;convdia&quot;</span>, <span class="stringliteral">&quot;en&quot;</span>));</div>
-<div class="line">                NormalizerVector orig_normalizer = <span class="keyword">new</span> NormalizerVector(1);</div>
-<div class="line">                orig_normalizer.set( 0, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;orig&quot;</span>));</div>
-<div class="line"></div>
-<div class="line">                analyzer.addSearchIndexFeature( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, word_tokenizer, stem_normalizer); </div>
-<div class="line">                analyzer.addForwardIndexFeature( <span class="stringliteral">&quot;orig&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, split_tokenizer, orig_normalizer);</div>
-<div class="line">                analyzer.defineAttribute( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;/doc/title()&quot;</span>, content_tokenizer, orig_normalizer);</div>
-<div class="line"></div>
+<div class="line">                        <span class="comment">// Define the features and attributes to store:</span></div>
+<div class="line">                        analyzer.addSearchIndexFeature( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, word_tokenizer, stem_normalizer); </div>
+<div class="line">                        analyzer.addForwardIndexFeature( <span class="stringliteral">&quot;orig&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, split_tokenizer, orig_normalizer);</div>
+<div class="line">                        analyzer.defineAttribute( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;/doc/title()&quot;</span>, content_tokenizer, orig_normalizer);</div>
+<div class="line">                }</div>
 <div class="line">                <span class="comment">// Read input files, analyze and insert them:</span></div>
 <div class="line">                <span class="keywordflow">try</span></div>
 <div class="line">                {</div>
+<div class="line">                        <span class="comment">// Get the files to analyze and insert:</span></div>
 <div class="line">                        String datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
 <div class="line">                        File folder = <span class="keyword">new</span> File( datadir);</div>
 <div class="line">                        File[] listOfFiles = folder.listFiles();</div>
@@ -119,13 +223,14 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                                        String filename = file.getName();</div>
 <div class="line">                                        <span class="keywordflow">if</span> (filename.endsWith( <span class="stringliteral">&quot;.xml&quot;</span>))</div>
 <div class="line">                                        {</div>
+<div class="line">                                                <span class="comment">// Analyze and insert the document:</span></div>
 <div class="line">                                                String docid = filename.substring( 0, filename.length()-4);</div>
 <div class="line">                                                Document doc = analyzer.analyze( readFile( datadir + filename));</div>
 <div class="line">                                                storage.insertDocument( docid, doc);</div>
 <div class="line">                                        }</div>
 <div class="line">                                }</div>
 <div class="line">                        }</div>
-<div class="line">                        <span class="comment">// Without this commit the documents wont be inserted:</span></div>
+<div class="line">                        <span class="comment">// Without this the documents wont be inserted:</span></div>
 <div class="line">                        storage.flush();</div>
 <div class="line">                }</div>
 <div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
@@ -135,12 +240,126 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                }</div>
 <div class="line">                System.out.println( <span class="stringliteral">&quot;done&quot;</span>);</div>
 <div class="line">        }</div>
-<div class="line">}</div>
+<div class="line">} </div>
+</div><!-- fragment --><h1><a class="anchor" id="QueryNoAnalyzer"></a>
+Retrieve a ranklist with a simple query consisting of some terms. The query</h1>
+<p>evaluation scheme used for ranking the results is BM25. The policy that decides what to return is defined by a selection expression that matches documents that contain all of the query terms. So we search for documents that contain all query terms and rank them with BM25:</p>
+<div class="fragment"><div class="line"><span class="keyword">package </span>net.strus.example;</div>
+<div class="line"><span class="keyword">import</span> net.strus.api.*;</div>
+<div class="line"><span class="keyword">import</span> java.io.*;</div>
+<div class="line"><span class="keyword">import</span> java.util.List;</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">public</span> <span class="keyword">class </span>QueryNoAnalyzer</div>
+<div class="line">{</div>
+<div class="line">        <span class="comment">// Evaluate a query defined by some terms with a query evaluation scheme passed:</span></div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> RankVector evaluateQuery( StorageClient storage, QueryEval queryEval, String[] terms)</div>
+<div class="line">        {</div>
+<div class="line">                <span class="comment">// Create a query to instantiate for the query evaluation scheme passed:</span></div>
+<div class="line">                Query query = queryEval.createQuery( storage);</div>
+<div class="line">                <span class="comment">// Iterate on the terms and create a single term feature for each term and collect</span></div>
+<div class="line">                <span class="comment">// all terms to create a selection expression out of them:</span></div>
+<div class="line">                <span class="keywordflow">for</span> (String term : terms) {</div>
+<div class="line">                        <span class="comment">// We push the query terms on the stack and create a query feature &#39;seek&#39; </span></div>
+<div class="line">                        <span class="comment">// for each of it:</span></div>
+<div class="line">                        query.pushTerm( <span class="stringliteral">&quot;word&quot;</span>, term);</div>
+<div class="line">                        <span class="comment">// Ever feature is duplicated on the stack, because we use them to </span></div>
+<div class="line">                        <span class="comment">// build the selection expression that selects all documents for ranking</span></div>
+<div class="line">                        <span class="comment">// that contain all terms</span></div>
+<div class="line">                        query.pushDuplicate();</div>
+<div class="line">                        <span class="comment">// We assign the features created to the set named &#39;seek&#39; because they are </span></div>
+<div class="line">                        <span class="comment">// referenced with this name in the query evaluation:</span></div>
+<div class="line">                        query.defineFeature( <span class="stringliteral">&quot;seek&quot;</span>, 1.0);</div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Create a selection feature &#39;select&#39; that matches documents that contain all query terms:</span></div>
+<div class="line">                <span class="keywordflow">if</span> (terms.length &gt; 0)</div>
+<div class="line">                {</div>
+<div class="line">                        <span class="comment">// Now we build the selection expression with the terms pushed as duplicates on</span></div>
+<div class="line">                        <span class="comment">// the stack in the loop before:</span></div>
+<div class="line">                        query.pushExpression( <span class="stringliteral">&quot;contains&quot;</span>, terms.length);</div>
+<div class="line">                        <span class="comment">// We assign the feature created to the set named &#39;select&#39; because this is the</span></div>
+<div class="line">                        <span class="comment">// name of the set defined as selection feature in the query evaluation configuration</span></div>
+<div class="line">                        <span class="comment">// (QueryEval.addSelectionFeature):</span></div>
+<div class="line">                        query.defineFeature( <span class="stringliteral">&quot;select&quot;</span>);</div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Define the maximum number of best result (ranks) to return:</span></div>
+<div class="line">                query.setMaxNofRanks( 20);</div>
+<div class="line">                <span class="comment">// Define the index of the first rank (for implementing scrolling: 0 for the first, </span></div>
+<div class="line">                <span class="comment">// 20 for the 2nd, 40 for the 3rd page, etc.):</span></div>
+<div class="line">                query.setMinRank( 0);</div>
+<div class="line">                <span class="keywordflow">return</span> query.evaluate();</div>
+<div class="line">        }</div>
+<div class="line"></div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> QueryEval createQueryEval( StrusContext ctx) {</div>
+<div class="line">                QueryEval queryEval = ctx.createQueryEval();</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Here we define what query features decide, what is ranked for the result:</span></div>
+<div class="line">                queryEval.addSelectionFeature( <span class="stringliteral">&quot;select&quot;</span>);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Here we define how we rank a document selected. We use the &#39;BM25&#39; weighting scheme:</span></div>
+<div class="line">                WeightingConfig weighting = <span class="keyword">new</span> WeightingConfig();</div>
+<div class="line">                weighting.defineParameter( <span class="stringliteral">&quot;k1&quot;</span>, 0.75);         <span class="comment">//... k1 paramater of BM25</span></div>
+<div class="line">                weighting.defineParameter( <span class="stringliteral">&quot;b&quot;</span>, 2.1);           <span class="comment">//... b paramater of BM25</span></div>
+<div class="line">                weighting.defineParameter( <span class="stringliteral">&quot;avgdoclen&quot;</span>, 1000);  <span class="comment">//... average document length passed as parameter</span></div>
+<div class="line">                weighting.defineFeature( <span class="stringliteral">&quot;match&quot;</span>, <span class="stringliteral">&quot;seek&quot;</span>);      <span class="comment">//... we search for features of the set we call &#39;seek&#39;</span></div>
+<div class="line">                queryEval.addWeightingFunction( 1.0, <span class="stringliteral">&quot;BM25&quot;</span>, weighting);</div>
+<div class="line">        </div>
+<div class="line">                <span class="comment">// Now we define what attributes of the documents are returned and how they are build.</span></div>
+<div class="line">                <span class="comment">// The functions that extract stuff from documents for presentation are called summarizers.</span></div>
+<div class="line">                <span class="comment">// First we add a summarizer that extracts us the title of the document:</span></div>
+<div class="line">                SummarizerConfig sum_title = <span class="keyword">new</span> SummarizerConfig();</div>
+<div class="line">                sum_title.defineParameter( <span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;title&quot;</span>);</div>
+<div class="line">                queryEval.addSummarizer( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;attribute&quot;</span>, sum_title);</div>
+<div class="line">        </div>
+<div class="line">                <span class="comment">// Then we add a summarizer that collects the sections that enclose the best matches </span></div>
+<div class="line">                <span class="comment">// in a ranked document:</span></div>
+<div class="line">                SummarizerConfig sum_match = <span class="keyword">new</span> SummarizerConfig();</div>
+<div class="line">                sum_match.defineParameter( <span class="stringliteral">&quot;type&quot;</span>, <span class="stringliteral">&quot;orig&quot;</span>);</div>
+<div class="line">                sum_match.defineParameter( <span class="stringliteral">&quot;nof&quot;</span>, 4);</div>
+<div class="line">                sum_match.defineParameter( <span class="stringliteral">&quot;len&quot;</span>, 60);</div>
+<div class="line">                sum_match.defineFeature( <span class="stringliteral">&quot;match&quot;</span>, <span class="stringliteral">&quot;seek&quot;</span>);</div>
+<div class="line">                queryEval.addSummarizer( <span class="stringliteral">&quot;summary&quot;</span>, <span class="stringliteral">&quot;matchphrase&quot;</span>, sum_match);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Now we are done:</span></div>
+<div class="line">                <span class="keywordflow">return</span> queryEval;</div>
+<div class="line">        }</div>
+<div class="line"></div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> main( String[] args) {</div>
+<div class="line">                <span class="keywordflow">if</span> (args.length == 0)</div>
+<div class="line">                {</div>
+<div class="line">                        args = <span class="keyword">new</span> String[1];</div>
+<div class="line">                        args[0] = <span class="stringliteral">&quot;citi&quot;</span>;</div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Create the storage client (the storage is assumed to be created with &#39;CreateCollectionNoAnalyzer.java&#39;):</span></div>
+<div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line">                String config = <span class="stringliteral">&quot;path=storage&quot;</span>;</div>
+<div class="line">                StorageClient storage = ctx.createStorageClient( config);</div>
+<div class="line">                <span class="comment">// Create the query evaluation scheme:</span></div>
+<div class="line">                QueryEval queryEval = createQueryEval( ctx);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Evaluate the query:</span></div>
+<div class="line">                RankVector results = evaluateQuery( storage, queryEval, args);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// We iterate on the results returned and we print them:</span></div>
+<div class="line">                System.out.println( <span class="stringliteral">&quot;Number of results: &quot;</span> + results.size());</div>
+<div class="line">                <span class="keywordtype">int</span> pos = 0;</div>
+<div class="line">                <span class="keywordflow">for</span> (Rank result : results)</div>
+<div class="line">                {</div>
+<div class="line">                        ++pos;</div>
+<div class="line">                        System.out.println( <span class="stringliteral">&quot;rank &quot;</span> + pos + <span class="stringliteral">&quot;: &quot;</span> + result.docno() + <span class="stringliteral">&quot; &quot;</span> + result.weight() + <span class="stringliteral">&quot;:&quot;</span>);</div>
+<div class="line">                        RankAttributeVector attributes = result.attributes();</div>
+<div class="line">                        <span class="keywordflow">for</span> (RankAttribute attribute : attributes)</div>
+<div class="line">                        {</div>
+<div class="line">                                System.out.println( <span class="stringliteral">&quot;\t&quot;</span> + attribute.name() + <span class="stringliteral">&quot;: &quot;</span> + attribute.value());</div>
+<div class="line">                        }</div>
+<div class="line">                }</div>
+<div class="line">                System.out.println( <span class="stringliteral">&quot;done&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line">} </div>
 </div><!-- fragment --> </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 17 2015 10:15:24 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 17 2015 11:00:02 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
