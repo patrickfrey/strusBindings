@@ -1,7 +1,7 @@
 strus Java bindings	 {#mainpage}
 ===================
 
-This interface documenation has been generated from the base C++ interface with some injection of some
+This interface documentation has been generated from the base C++ interface with injection of some
 additional stuff like namespaces and helper classes, that are specific for the Java interface.
 Unfortunately it contains still some type qualifiers pointing to it's C++ origin. 
 Please don't blame it for that. I'll find other solutions. Suggestions are welcome. 
@@ -219,7 +219,7 @@ public class CreateCollection
 } 
 \endcode
 
-\section QueryNoAnalyzer Retrieve a ranklist with a simple query consisting of some terms
+\section QueryNoAnalyzer Retrieve a ranklist with a simple query consisting of some terms (without analyzer)
 The query evaluation scheme used for ranking the results is BM25. The policy that decides what to return is
 defined by a selection expression that matches documents that contain all of the query terms.
 So we search for documents that contain all query terms and rank them with BM25:
