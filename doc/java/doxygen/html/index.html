@@ -44,12 +44,103 @@
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The strus Java bindings provide a Java interface for accessing the retrieval storage, indexing documents and queries and evaluating queries.</p>
-<p>The entry point of a strus application with Java is the context (<a class="el" href="classnet_1_1strus_1_1api_1_1StrusContext.html">net::strus::api::StrusContext</a>) object. It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Java/JNI environment. </p>
-</div></div><!-- contents -->
+<p>The entry point of a strus application with Java is the context (<a class="el" href="classnet_1_1strus_1_1api_1_1StrusContext.html">net::strus::api::StrusContext</a>) object. It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Java/JNI environment.</p>
+<h1><a class="anchor" id="CreateCollection"></a>
+Create a collection of documents (with strus analyzer)</h1>
+<div class="fragment"><div class="line"><span class="keyword">package </span>net.strus.example;</div>
+<div class="line"><span class="keyword">import</span> net.strus.api.*;</div>
+<div class="line"><span class="keyword">import</span> java.io.*;</div>
+<div class="line"><span class="keyword">import</span> java.util.List;</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">public</span> <span class="keyword">class </span>CreateCollection</div>
+<div class="line">{</div>
+<div class="line">        <span class="keyword">static</span> String readFile( String path) <span class="keywordflow">throws</span> IOException {</div>
+<div class="line">                <span class="keywordflow">try</span> (BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(path)))</div>
+<div class="line">                {</div>
+<div class="line">                        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</div>
+<div class="line">                        String line = br.readLine();</div>
+<div class="line"></div>
+<div class="line">                        <span class="keywordflow">while</span> (line != null) {</div>
+<div class="line">                                sb.append(line);</div>
+<div class="line">                                sb.append(System.lineSeparator());</div>
+<div class="line">                                line = br.readLine();</div>
+<div class="line">                        }</div>
+<div class="line">                        <span class="keywordflow">return</span> sb.toString();</div>
+<div class="line">                }</div>
+<div class="line">        }</div>
+<div class="line"></div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> main( String []args) {</div>
+<div class="line">                String config = <span class="stringliteral">&quot;path=storage; metadata=doclen UINT16&quot;</span>;</div>
+<div class="line">                <span class="keywordflow">if</span> (args.length &gt; 0)</div>
+<div class="line">                {</div>
+<div class="line">                        config = args[ 0];</div>
+<div class="line">                }</div>
+<div class="line">                <span class="comment">// Create context, storage and analyzer:</span></div>
+<div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line">                <span class="keywordflow">try</span></div>
+<div class="line">                {</div>
+<div class="line">                        ctx.destroyStorage( config);</div>
+<div class="line">                        <span class="comment">//... destroy storage if it already exists</span></div>
+<div class="line">                }</div>
+<div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
+<div class="line">                {</div>
+<div class="line">                        <span class="comment">//... ignore if storage did not exist</span></div>
+<div class="line">                }</div>
+<div class="line">                ctx.createStorage( config);</div>
+<div class="line">                StorageClient storage = ctx.createStorageClient( config);</div>
+<div class="line">                DocumentAnalyzer analyzer = ctx.createDocumentAnalyzer();</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Define the analyzer:</span></div>
+<div class="line">                Tokenizer word_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;word&quot;</span>);</div>
+<div class="line">                Tokenizer split_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;split&quot;</span>);</div>
+<div class="line">                Tokenizer content_tokenizer = <span class="keyword">new</span> Tokenizer( <span class="stringliteral">&quot;content&quot;</span>);</div>
+<div class="line"></div>
+<div class="line">                NormalizerVector stem_normalizer = <span class="keyword">new</span> NormalizerVector(3);</div>
+<div class="line">                stem_normalizer.set( 0, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;stem&quot;</span>, <span class="stringliteral">&quot;en&quot;</span>));</div>
+<div class="line">                stem_normalizer.set( 1, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;lc&quot;</span>));</div>
+<div class="line">                stem_normalizer.set( 2, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;convdia&quot;</span>, <span class="stringliteral">&quot;en&quot;</span>));</div>
+<div class="line">                NormalizerVector orig_normalizer = <span class="keyword">new</span> NormalizerVector(1);</div>
+<div class="line">                orig_normalizer.set( 0, <span class="keyword">new</span> Normalizer( <span class="stringliteral">&quot;orig&quot;</span>));</div>
+<div class="line"></div>
+<div class="line">                analyzer.addSearchIndexFeature( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, word_tokenizer, stem_normalizer); </div>
+<div class="line">                analyzer.addForwardIndexFeature( <span class="stringliteral">&quot;orig&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, split_tokenizer, orig_normalizer);</div>
+<div class="line">                analyzer.defineAttribute( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;/doc/title()&quot;</span>, content_tokenizer, orig_normalizer);</div>
+<div class="line"></div>
+<div class="line">                <span class="comment">// Read input files, analyze and insert them:</span></div>
+<div class="line">                <span class="keywordflow">try</span></div>
+<div class="line">                {</div>
+<div class="line">                        String datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
+<div class="line">                        File folder = <span class="keyword">new</span> File( datadir);</div>
+<div class="line">                        File[] listOfFiles = folder.listFiles();</div>
+<div class="line"></div>
+<div class="line">                        <span class="keywordflow">for</span> (File file : listOfFiles) {</div>
+<div class="line">                                <span class="keywordflow">if</span> (file.isFile())</div>
+<div class="line">                                {</div>
+<div class="line">                                        String filename = file.getName();</div>
+<div class="line">                                        <span class="keywordflow">if</span> (filename.endsWith( <span class="stringliteral">&quot;.xml&quot;</span>))</div>
+<div class="line">                                        {</div>
+<div class="line">                                                String docid = filename.substring( 0, filename.length()-4);</div>
+<div class="line">                                                Document doc = analyzer.analyze( readFile( datadir + filename));</div>
+<div class="line">                                                storage.insertDocument( docid, doc);</div>
+<div class="line">                                        }</div>
+<div class="line">                                }</div>
+<div class="line">                        }</div>
+<div class="line">                        <span class="comment">// Without this commit the documents wont be inserted:</span></div>
+<div class="line">                        storage.flush();</div>
+<div class="line">                }</div>
+<div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
+<div class="line">                {</div>
+<div class="line">                        System.err.println( <span class="stringliteral">&quot;Failed to read all input files: &quot;</span> + e.getMessage());</div>
+<div class="line">                        <span class="keywordflow">return</span>;</div>
+<div class="line">                }</div>
+<div class="line">                System.out.println( <span class="stringliteral">&quot;done&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line">}</div>
+</div><!-- fragment --> </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 16 2015 23:55:04 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 17 2015 10:15:24 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
