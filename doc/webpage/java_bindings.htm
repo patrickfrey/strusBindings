@@ -6,8 +6,7 @@
 <script type="text/javascript">
 </script>
 <div id="wrap"><div id="content"><h1>Java language bindings</h1><h2>Introduction</h2>
-	<p class="description">This chapter describes the language bindings of strus for Java based 
-		on JNI and build with SWIG with examples of how to create and use them.<br/>
+	<p class="description">
 		The language bindings have been built using <a href="http://www.swig.org">SWIG</a>
 		based on a wrapper C++ interface. This wrapper interface serves as common base
 		for all language bindings as a sort of super interface (strus/bindingObjects.hpp).
@@ -15,23 +14,49 @@
 		<h2>Doxygen interface documentation</h2>
 		<p class="description">There exist a <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/index.html">
 		documentation for the Java interface</a> generated with
-		doxygen. The interface has been derived from the wrapper interface used as base.
+		doxygen. You will also find there some examples to introduce the Java bindings.
+		The interface has been derived from the wrapper interface used as base.
 		It introduces all Java classes defined. Unfortunately it contains still some type 
 		qualifiers pointing to it's C++ origin. Please don't blame it for that. I'll find solutions.
 		Suggestions are welcome.
 		</p>
 		<h2>Description</h2>
 		<p class="description">All objects of the strus Java
-		API are in the namespace "net.strus.api". The first thing you do, when using 
+		API are in the namespace <i>net.strus.api</i>. The first thing you do, when using 
 		the strus Java interface, is to create the root object called StrusContext. 
 		From this context object you can construct the main instances
 		of the objects doing the job you want to do. Depending on how you create
 		the strus context, the objects you create beginning with the root object
 		are accessed directly or they are residing on a server and the language 
 		objects serve as proxy for the server objects.
+		<br/>If you want to access the strus storage directly, you create the
+		context without passing any argument to the constructor:
+		<pre>
+			String storageConfig = "path=storage; metadata=doclen UINT16";
+			<a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a> ctx = new <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a>();
+			<h href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> storage = ctx.createStorageClient( config);
+		</pre>
+		If you want to access strus over a proxy for a strus RPC server, you pass the connection
+		string as &lt;address&gt;:&lt;port&gt; (example "localhost:7181") as first argument of
+		the StrusContext constructor and you create the storage client without configuration:
+		<pre>
+			String rpcServer = "localhost:7181";
+			<a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a> ctx = new <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a>( rpcServer);
+			<h href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> storage = ctx.createStorageClient("");
+		</pre>
+		<br/>What is better depends on your use case. The possibility to use strus 
+		as proxy was mainly introduced for accessing strus in the context of a webserver,
+		where holding of objects beyond the scope of a connection is difficult or impossible.
+		An other argument is that the command line tools of strus can be used simoultaneously
+		with some other instance like a server accessing the storage.
+		<br/>In case of Java people will most likely not us a proxy, but build their whole
+		universe in Java, using a server written in Java to access the storage. Most of the 
+		examples written for Java will therefore show the direct access to strus.
 		</p>
 		<h2>Examples</h2>
 		<p class="description">
+		Currently all examples a introduced on <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/index.html">
+		the front page of the strus Java interface documentation</a>.
 		</p>
 </div></div></body></html>
 

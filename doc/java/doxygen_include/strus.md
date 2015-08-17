@@ -9,6 +9,8 @@ context (@ref net::strus::api::StrusContext) object.
 It is the root object from which all other objects are created.
 It can be constructed either as proxy, that redirects all method calls to an RpcServer
 or it can be constructed as instance running in the Java/JNI environment.
+The following examples are tests built and executed in the strusBindings project.
+We are working on how to install the .jar with the strus API classes properly.
 
 \section CreateCollectionNoAnalyzer Create a collection of document (without using the strus analyzer)
 In the Java universe there exist a lot of alternatives to analyze or index a document. This example
@@ -213,7 +215,7 @@ public class CreateCollection
 } 
 \endcode
 
-\section QueryNoAnalyzer Retrieve a ranklist with a simple query consisting of some terms.
+\section QueryNoAnalyzer Retrieve a ranklist with a simple query consisting of some terms
 The query evaluation scheme used for ranking the results is BM25. The policy that decides what to return is
 defined by a selection expression that matches documents that contain all of the query terms.
 So we search for documents that contain all query terms and rank them with BM25:
