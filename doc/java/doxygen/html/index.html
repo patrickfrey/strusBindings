@@ -43,7 +43,7 @@
 <div class="title">strus Java bindings </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The strus Java bindings provide a Java interface for accessing the retrieval storage, indexing documents and queries and evaluating queries.</p>
+<div class="textblock"><p>This interface documenation has been generated from the base C++ interface with some injection of some additional stuff like namespaces and helper classes, that are specific for the Java interface. Unfortunately it contains still some type qualifiers pointing to it's C++ origin. Please don't blame it for that. I'll find other solutions. Suggestions are welcome. The strus Java bindings provide a Java interface for accessing the retrieval storage, indexing documents and queries and evaluating queries.</p>
 <p>The entry point of a strus application with Java is the context (<a class="el" href="classnet_1_1strus_1_1api_1_1StrusContext.html">net::strus::api::StrusContext</a>) object. It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Java/JNI environment. The following examples are tests built and executed in the strusBindings project. We are working on how to install the .jar with the strus API classes properly.</p>
 <h1><a class="anchor" id="CreateCollectionNoAnalyzer"></a>
 Create a collection of document (without using the strus analyzer)</h1>
@@ -359,7 +359,7 @@ Retrieve a ranklist with a simple query consisting of some terms</h1>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 17 2015 11:43:05 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 17 2015 11:55:30 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
