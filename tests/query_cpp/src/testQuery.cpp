@@ -69,12 +69,12 @@ int main( int , const char** )
 		// Create storage:
 		try
 		{
-			ctx.destroyStorage( "path=data/test");
+			ctx.destroyStorage( "path=storage");
 		}
 		catch (...)
 		{}
-		ctx.createStorage( "path=data/test; acl=yes; metadata=doclen UINT16, class UINT16, data INT32");
-		StorageClient storage( ctx.createStorageClient( "path=data/test"));
+		ctx.createStorage( "path=storage; acl=yes; metadata=doclen UINT16, class UINT16, data INT32");
+		StorageClient storage( ctx.createStorageClient( "path=storage"));
 
 		// Insert documents:
 		Document doc;

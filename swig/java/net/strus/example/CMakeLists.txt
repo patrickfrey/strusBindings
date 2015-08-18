@@ -11,7 +11,7 @@ FUNCTION( build_example NAME )
 )
 ENDFUNCTION( build_example CNAM )
 
-set( tests HelloWorld Status CreateCollection CreateCollectionNoAnalyzer QueryNoAnalyzer )
+set( tests HelloWorld CreateCollection CreateCollectionNoAnalyzer Status QueryNoAnalyzer )
 foreach( test ${tests} )
 	build_example( ${test} )
 endforeach( test )
