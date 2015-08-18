@@ -48,7 +48,7 @@ swig/java/net/strus/example/*.class
 swig/java/net/strus/api/*.class
 
 # Generated test data
-tests/query_cpp/data/
+tests/query_cpp/storage/
 swig/java/net/strus/example/storage/
 
 # SWIG generated code
