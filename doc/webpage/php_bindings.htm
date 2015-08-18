@@ -20,6 +20,8 @@
 		for all language bindings as a sort of super interface (strus/bindingObjects.hpp).
 		If you write a language binding you should have a look at this wrapper interface.
 		It is not part of this documentation, because showing it could be misleading.
+		</p><h2>Tutorial</h2><p class="description">
+		You'll fine a tutorial based on a docker image <a href="http://www.codeproject.com/Articles/1009582/Building-a-search-engine-with-Strus-tutorial">here</a>.
 		</p><h2>Overview</h2><p class="description">
 		The root object you construct first in PHP is <a href="#StrusContext">the
 		strus context</a>. From this context you can construct the main instances
@@ -40,7 +42,8 @@
 		of type <a href="#Storage">Storage</a> named <i>storage</i>.
 		</p><h3>Create a strus RPC context for a session residing on a server</h3><p class="description">
 		You create a remote strus context by calling its constructor with the RPC server address
-		as argument.
+		as argument. The strus RPC server serving the requests for such a proxy is part of 
+		the <a href="http://patrickfrey.github.io/strusRpc/doc/doxygen/html/index.html">strusRpc project</a>.
 		</p><pre><a href="#StrusContext">$context</a> = new StrusContext( "localhost:7181" );
 		</pre><h3>Create a query evaluation scheme</h3><p class="description">
 		A query evaluation scheme is created by calling the context method to create
