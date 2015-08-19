@@ -14,3 +14,6 @@
 	}
 }
 
+%typemap(typecheck,match="in",precedence=SWIG_TYPECHECK_STRING) const WeightingConfig& {
+	$1 = (PyString_Check( $input) || PySequence_Check( $input))?1:0;
+}

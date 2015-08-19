@@ -50,6 +50,7 @@ swig/java/net/strus/api/*.class
 # Generated test data
 tests/query_cpp/storage/
 swig/java/net/strus/example/storage/
+swig/python/example/storage/
 
 # SWIG generated code
 swig/strusPYTHON_wrap.cxx
@@ -62,6 +63,7 @@ swig/java/strus_wrap.cxx
 swig/java/net/strus/api/*.jar
 swig/java/net/strus/api/*.java
 swig/java/net/strus/api/*.class
+swig/python/strus.pyc
 swig/python/strus.py
 swig/python/strus_wrap.cxx
 

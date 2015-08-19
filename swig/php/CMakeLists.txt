@@ -31,6 +31,8 @@ target_link_libraries( strus_php  strus_bindings )
 # ------------------------------
 # INSTALLATION
 # ------------------------------
+install( TARGETS strus_php
+           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus )
 # Copy manually the strus_php.so module as strus.so to the path you get with php-config --extension-dir
 
 

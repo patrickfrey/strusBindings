@@ -14,6 +14,9 @@
 	}
 }
 
+%typemap(typecheck,match="in",precedence=SWIG_TYPECHECK_STRING) const Normalizer& {
+	$1 = (PyString_Check( $input) || PySequence_Check( $input))?1:0;
+}
 
 %typemap(in) const std::vector<Normalizer>&	(std::vector<Normalizer> temp)
 {
@@ -27,4 +30,7 @@
 	}
 }
 
+%typemap(typecheck,match="in",precedence=SWIG_TYPECHECK_STRING) const std::vector<Normalizer>& {
+	$1 = (PyString_Check( $input) || PySequence_Check( $input))?1:0;
+}
 
