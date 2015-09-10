@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/swig/python/example" )
-set( tests helloWorld status )
+set( tests helloWorld createCollection query status )
 
 foreach( test ${tests} )
 	add_test( NAME python_${test} COMMAND python ${test}.py WORKING_DIRECTORY ${THISDIR} )
