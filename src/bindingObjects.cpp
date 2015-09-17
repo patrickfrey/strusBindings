@@ -965,6 +965,27 @@ DLL_PUBLIC void Query::defineMetaDataRestriction(
 	THIS->defineMetaDataRestriction( cmpop, name, arithmeticVariant(operand), newGroup);
 }
 
+DLL_PUBLIC void Query::defineMetaDataRestriction(
+		const char* compareOp, const std::string& name,
+		double value, bool newGroup)
+{
+	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+}
+
+DLL_PUBLIC void Query::defineMetaDataRestriction(
+		const char* compareOp, const std::string& name,
+		unsigned int value, bool newGroup)
+{
+	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+}
+
+DLL_PUBLIC void Query::defineMetaDataRestriction(
+		const char* compareOp, const std::string& name,
+		int value, bool newGroup)
+{
+	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+}
+
 DLL_PUBLIC void Query::setMaxNofRanks( unsigned int maxNofRanks_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();

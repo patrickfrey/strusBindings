@@ -1064,10 +1064,7 @@ public:
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
-			double value, bool newGroup=true)
-	{
-		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
-	}
+			double value, bool newGroup=true);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
@@ -1076,10 +1073,7 @@ public:
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
-			unsigned int value, bool newGroup=true)
-	{
-		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
-	}
+			unsigned int value, bool newGroup=true);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
@@ -1088,10 +1082,7 @@ public:
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
-			int value, bool newGroup=true)
-	{
-		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
-	}
+			int value, bool newGroup=true);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query
