@@ -44,6 +44,7 @@ namespace api {
 #endif
 #else
 #define String std::string
+#define IntVector std::vector<int>
 #define StringVector std::vector<std::string>
 #define NormalizerVector std::vector<Normalizer>
 #define TermVector std::vector<Term>
@@ -1083,6 +1084,11 @@ public:
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
 			int value, bool newGroup=true);
+
+	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
+	/// \param[in] docnolist_ list of documents to evaluate the query on
+	void addDocumentEvaluationSet(
+			const IntVector& docnolist_);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query

@@ -986,6 +986,16 @@ DLL_PUBLIC void Query::defineMetaDataRestriction(
 	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
 }
 
+DLL_PUBLIC void Query::addDocumentEvaluationSet(
+		const std::vector<int>& docnolist_)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	std::vector<strus::Index> docnolist;
+	std::vector<int>::const_iterator di = docnolist_.begin(), de = docnolist_.end();
+	for (; di != de; ++di) docnolist.push_back( *di);
+	THIS->addDocumentEvaluationSet( docnolist);
+}
+
 DLL_PUBLIC void Query::setMaxNofRanks( unsigned int maxNofRanks_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
