@@ -812,6 +812,10 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( name);
+	if (!sf)
+	{
+		throw std::runtime_error( std::string("summarizer function not defined: '") + name + "'");
+	}
 	strus::Reference<strus::SummarizerFunctionInstanceInterface> function( sf->createInstance( queryproc));
 
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -850,6 +854,10 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
+	if (!sf)
+	{
+		throw std::runtime_error( std::string("weighting function not defined: '") + name + "'");
+	}
 	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance());
 
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -905,6 +913,10 @@ DLL_PUBLIC void Query::pushExpression( const std::string& opname_, unsigned int 
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
+	if (!joinopr)
+	{
+		throw std::runtime_error( std::string("posting join operator not defined: '") + name + "'");
+	}
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushExpression( joinopr, argc, range_);
 }
