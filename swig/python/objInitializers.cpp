@@ -454,6 +454,69 @@ int initStringVector( std::vector<std::string>& result, PyObject* obj)
 	return error;
 }
 
+int initIntVector( std::vector<int>& result, PyObject* obj)
+{
+	int error = 0;
+	if (PyInt_Check( obj))
+	{
+		int item = PyInt_AS_LONG( obj);
+		try
+		{
+			result.push_back( item);
+		}
+		catch (...)
+		{
+			PyErr_SetString( PyExc_Exception, "out of memory exception");
+			error = -1;
+		}
+	}
+	else if (PySequence_Check( obj))
+	{
+		PyObject* seq = PySequence_Fast( obj, "integer list expected as sequence");
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii < len; ii++)
+			{
+				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				/* DON'T DECREF item here */
+				try
+				{
+					if (PyInt_Check( item))
+					{
+						int itemval = PyInt_AS_LONG( item);
+						result.push_back( itemval);
+					}
+					else
+					{
+						PyErr_SetString( PyExc_Exception, "integer expected as element of integer list");
+						error = -1;
+						break;
+					}
+				}
+				catch (...)
+				{
+					PyErr_SetString( PyExc_Exception, "out of memory exception");
+					error = -1;
+					break;
+				}
+			}
+			Py_DECREF( seq);
+		}
+		else
+		{
+			PyErr_SetString( PyExc_Exception, "list of integers expected");
+			error = -1;
+		}
+	}
+	else
+	{
+		PyErr_SetString( PyExc_Exception, "list of integers or single integer expected (check)");
+		error = -1;
+	}
+	return error;
+}
+
 PyObject* getTermVector( const std::vector<Term>& ar)
 {
 	PyObject* rt = PyList_New( ar.size());
