@@ -624,8 +624,9 @@ public:
 private:
 	/// \brief Constructor used by StrusContext
 	friend class StrusContext;
-	DocumentAnalyzer( const Reference& objbuilder, const String& segmentername);
+	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername);
 
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
@@ -674,8 +675,9 @@ public:
 private:
 	/// \brief Constructor used by StrusContext
 	friend class StrusContext;
-	explicit QueryAnalyzer( const Reference& objbuilder);
+	QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd);
 
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
@@ -755,10 +757,11 @@ public:
 
 private:
 	friend class StrusContext;
-	StorageClient( const Reference& objbuilder, const String& config);
+	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
 
 	friend class Query;
 	friend class QueryEval;
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
@@ -953,9 +956,10 @@ public:
 private:
 	/// \brief Constructor used by strusContext
 	friend class StrusContext;
-	explicit QueryEval( const Reference& objbuilder);
+	QueryEval( const Reference& objbuilder, const Reference& errorhnd);
 
 	friend class Query;
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_queryeval_impl;
 };
@@ -1131,10 +1135,11 @@ class StrusContext
 {
 public:
 	/// \brief Constructor for local mode with own module loader
-	StrusContext();
+	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
+	explicit StrusContext( unsigned int maxNofThreads=0);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	StrusContext( const char* connectionstring);
+	StrusContext( const char* connectionstring, unsigned int maxNofThreads=0);
 	/// \brief Copy constructor
 	StrusContext( const StrusContext& o);
 	/// \brief Destructor
@@ -1192,6 +1197,7 @@ private:
 	void initAnalyzerObjBuilder();
 
 private:
+	Reference m_errorhnd_impl;
 	Reference m_moduleloader_impl;
 	Reference m_rpc_impl;
 	Reference m_storage_objbuilder_impl;

@@ -40,14 +40,15 @@
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"
 #include "strus/lib/module.hpp"
+#include "strus/lib/error.hpp"
 #include "strus/rpcClientInterface.hpp"
 #include "strus/rpcClientMessagingInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
-#include "strus/private/arithmeticVariantAsString.hpp"
+#include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
-#include "private/dll_tags.hpp"
+#include "internationalization.hpp"
 #include "utils.hpp"
 #include <cmath>
 #include <stdexcept>
@@ -66,40 +67,40 @@ struct ReferenceDeleter
 	}
 };
 
-DLL_PUBLIC void Tokenizer::addArgumentInt( long arg_)
+void Tokenizer::addArgumentInt( long arg_)
 {
 	addArgument( strus::utils::tostring( arg_));
 }
 
-DLL_PUBLIC void Tokenizer::addArgumentFloat( double arg_)
+void Tokenizer::addArgumentFloat( double arg_)
 {
 	addArgument( strus::utils::tostring( (float)arg_));
 }
 
-DLL_PUBLIC void Normalizer::addArgumentInt( long arg_)
+void Normalizer::addArgumentInt( long arg_)
 {
 	addArgument( strus::utils::tostring( arg_));
 }
 
-DLL_PUBLIC void Normalizer::addArgumentFloat( double arg_)
+void Normalizer::addArgumentFloat( double arg_)
 {
 	addArgument( strus::utils::tostring( (float)arg_));
 }
 
-DLL_PUBLIC void Aggregator::addArgumentInt( long arg_)
+void Aggregator::addArgumentInt( long arg_)
 {
 	addArgument( strus::utils::tostring( arg_));
 }
 
-DLL_PUBLIC void Aggregator::addArgumentFloat( double arg_)
+void Aggregator::addArgumentFloat( double arg_)
 {
 	addArgument( strus::utils::tostring( (float)arg_));
 }
 
-DLL_PUBLIC Variant::Variant()
+Variant::Variant()
 	:m_type(Variant_UNDEFINED){}
 
-DLL_PUBLIC Variant::Variant( const Variant& o)
+Variant::Variant( const Variant& o)
 	:m_type(o.m_type),m_buf(o.m_buf)
 {
 	if (m_type == Variant_TEXT)
@@ -112,44 +113,44 @@ DLL_PUBLIC Variant::Variant( const Variant& o)
 	}
 }
 
-DLL_PUBLIC Variant::Variant( unsigned int v)
+Variant::Variant( unsigned int v)
 	:m_type(Variant_UINT)
 {
 	m_value.UINT = v;
 }
 
-DLL_PUBLIC Variant::Variant( int v)
+Variant::Variant( int v)
 	:m_type(Variant_INT)
 {
 	m_value.INT = v;
 }
 
-DLL_PUBLIC Variant::Variant( double v)
+Variant::Variant( double v)
 	:m_type(Variant_FLOAT)
 {
 	m_value.FLOAT = v;
 }
 
-DLL_PUBLIC Variant::Variant( const std::string& v)
+Variant::Variant( const std::string& v)
 	:m_type(Variant_TEXT),m_buf(v)
 {
 	m_value.TEXT = m_buf.c_str();
 }
 
-DLL_PUBLIC Variant::Variant( const char* v)
+Variant::Variant( const char* v)
 	:m_type(Variant_TEXT),m_buf(v)
 {
 	m_value.TEXT = m_buf.c_str();
 }
 
-DLL_PUBLIC void Variant::init()
+void Variant::init()
 {
 	m_type = Variant_UNDEFINED;
 	m_value.INT = 0;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assign( const Variant& o)
+void Variant::assign( const Variant& o)
 {
 	m_type = o.m_type;
 	m_buf = o.m_buf;
@@ -163,59 +164,59 @@ DLL_PUBLIC void Variant::assign( const Variant& o)
 	}
 }
 
-DLL_PUBLIC void Variant::assignUint( unsigned long v)
+void Variant::assignUint( unsigned long v)
 {
 	m_type = Variant_UINT;
 	m_value.UINT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assignInt( long v)
+void Variant::assignInt( long v)
 {
 	m_type = Variant_INT;
 	m_value.INT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assignFloat( double v)
+void Variant::assignFloat( double v)
 {
 	m_type = Variant_FLOAT;
 	m_value.FLOAT = v;
 	m_buf.clear();
 }
 
-DLL_PUBLIC void Variant::assignText( const std::string& v)
+void Variant::assignText( const std::string& v)
 {
 	m_buf = v;
 	m_type = Variant_TEXT;
 	m_value.TEXT = m_buf.c_str();
 }
 
-DLL_PUBLIC unsigned long Variant::getUInt() const
+unsigned long Variant::getUInt() const
 {
 	if (m_type == Variant_UINT) return m_value.UINT;
-	throw std::logic_error( "illegal access of variant value");
+	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
-DLL_PUBLIC long Variant::getInt() const
+long Variant::getInt() const
 {
 	if (m_type == Variant_INT) return m_value.INT;
-	throw std::logic_error( "illegal access of variant value");
+	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
-DLL_PUBLIC double Variant::getFloat() const
+double Variant::getFloat() const
 {
 	if (m_type == Variant_FLOAT) return m_value.FLOAT;
-	throw std::logic_error( "illegal access of variant value");
+	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
-DLL_PUBLIC const char* Variant::getText() const
+const char* Variant::getText() const
 {
 	if (m_type == Variant_TEXT) return m_value.TEXT;
-	throw std::logic_error( "illegal access of variant value");
+	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
-DLL_PUBLIC Document::Document( const Document& o)
+Document::Document( const Document& o)
 	:m_searchIndexTerms(o.m_searchIndexTerms)
 	,m_forwardIndexTerms(o.m_forwardIndexTerms)
 	,m_metaData(o.m_metaData)
@@ -223,7 +224,7 @@ DLL_PUBLIC Document::Document( const Document& o)
 	,m_users(o.m_users)
 {}
 
-DLL_PUBLIC void Document::addSearchIndexTerm(
+void Document::addSearchIndexTerm(
 		const std::string& type_,
 		const std::string& value_,
 		const Index& position_)
@@ -231,7 +232,7 @@ DLL_PUBLIC void Document::addSearchIndexTerm(
 	m_searchIndexTerms.push_back( Term( type_,value_,position_));
 }
 
-DLL_PUBLIC void Document::addForwardIndexTerm(
+void Document::addForwardIndexTerm(
 		const std::string& type_,
 		const std::string& value_,
 		const Index& position_)
@@ -239,52 +240,54 @@ DLL_PUBLIC void Document::addForwardIndexTerm(
 	m_forwardIndexTerms.push_back( Term( type_,value_,position_));
 }
 
-DLL_PUBLIC void Document::setMetaData( const std::string& name_, const Variant& value_)
+void Document::setMetaData( const std::string& name_, const Variant& value_)
 {
 	m_metaData.push_back( MetaData( name_,value_));
 }
 
-DLL_PUBLIC void Document::setMetaData( const std::string& name_, double value_)
+void Document::setMetaData( const std::string& name_, double value_)
 {
 	m_metaData.push_back( MetaData( name_,Variant(value_)));
 }
 
-DLL_PUBLIC void Document::setMetaData( const std::string& name_, int value_)
+void Document::setMetaData( const std::string& name_, int value_)
 {
 	m_metaData.push_back( MetaData( name_,Variant(value_)));
 }
 
-DLL_PUBLIC void Document::setMetaData( const std::string& name_, unsigned int value_)
+void Document::setMetaData( const std::string& name_, unsigned int value_)
 {
 	m_metaData.push_back( MetaData( name_,Variant(value_)));
 }
 
-DLL_PUBLIC void Document::setAttribute( const std::string& name_, const std::string& value_)
+void Document::setAttribute( const std::string& name_, const std::string& value_)
 {
 	m_attributes.push_back( Attribute( name_, value_));
 }
 
-DLL_PUBLIC void Document::setDocid( const std::string& docid_)
+void Document::setDocid( const std::string& docid_)
 {
 	m_docid = docid_;
 	m_attributes.push_back( Attribute( "docid", docid_));
 }
 
-DLL_PUBLIC void Document::setUserAccessRight( const std::string& username_)
+void Document::setUserAccessRight( const std::string& username_)
 {
 	m_users.push_back( username_);
 }
 
-DLL_PUBLIC DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const std::string& segmentername)
-	:m_objbuilder_impl(objbuilder)
+DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const std::string& segmentername)
+	:m_errorhnd_impl(errorhnd)
+	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::DocumentAnalyzerInterface>::function)
 {
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmentername));
 }
 
-DLL_PUBLIC DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
-	:m_objbuilder_impl(o.m_objbuilder_impl)
+DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 {}
 
@@ -307,7 +310,7 @@ static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
 		}
 		else
 		{
-			throw std::runtime_error( std::string( "unknown feature option '") + *oi + "'");
+			throw strus::runtime_error( _TXT( "unknown feature option '%s'"), oi->c_str());
 		}
 	}
 	return rt;
@@ -369,7 +372,7 @@ struct FeatureFuncDef
 	}
 };
 
-DLL_PUBLIC void DocumentAnalyzer::addSearchIndexFeature(
+void DocumentAnalyzer::addSearchIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
 	const Tokenizer& tokenizer,
@@ -384,7 +387,7 @@ DLL_PUBLIC void DocumentAnalyzer::addSearchIndexFeature(
 	funcdef.release();
 }
 
-DLL_PUBLIC void DocumentAnalyzer::addForwardIndexFeature(
+void DocumentAnalyzer::addForwardIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
 	const Tokenizer& tokenizer,
@@ -399,7 +402,7 @@ DLL_PUBLIC void DocumentAnalyzer::addForwardIndexFeature(
 	funcdef.release();
 }
 
-DLL_PUBLIC void DocumentAnalyzer::defineMetaData(
+void DocumentAnalyzer::defineMetaData(
 	const std::string& fieldname,
 	const std::string& selectexpr,
 	const Tokenizer& tokenizer,
@@ -412,7 +415,7 @@ DLL_PUBLIC void DocumentAnalyzer::defineMetaData(
 	funcdef.release();
 }
 
-DLL_PUBLIC void DocumentAnalyzer::defineAggregatedMetaData(
+void DocumentAnalyzer::defineAggregatedMetaData(
 	const std::string& fieldname,
 	const Aggregator& function)
 {
@@ -426,7 +429,7 @@ DLL_PUBLIC void DocumentAnalyzer::defineAggregatedMetaData(
 	functioninst.release();
 }
 
-DLL_PUBLIC void DocumentAnalyzer::defineAttribute(
+void DocumentAnalyzer::defineAttribute(
 	const std::string& attribname,
 	const std::string& selectexpr,
 	const Tokenizer& tokenizer,
@@ -475,7 +478,10 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 			rt = (float)val.getFloat();
 			break;
 		case Variant_TEXT:
-			rt = strus::arithmeticVariantFromString( val.getText());
+			if (!rt.initFromString( val.getText()))
+			{
+				throw strus::runtime_error( _TXT( "failed convert variant to numeric value"));
+			}
 			break;
 	}
 	return rt;
@@ -521,7 +527,7 @@ static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const s
 	return rt;
 }
 
-DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
+Document DocumentAnalyzer::analyze( const std::string& content)
 {
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	strus::DocumentClass dclass;
@@ -530,12 +536,12 @@ DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content)
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 	if (!textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
 	{
-		throw std::runtime_error( "failed to detect document class of document to analyze"); 
+		throw strus::runtime_error( _TXT( "failed to detect document class of document to analyze"));
 	}
 	return analyzeDocument( THIS, content, dclass);
 }
 
-DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content, const DocumentClass& dclass)
+Document DocumentAnalyzer::analyze( const std::string& content, const DocumentClass& dclass)
 {
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	strus::DocumentClass documentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
@@ -544,26 +550,28 @@ DLL_PUBLIC Document DocumentAnalyzer::analyze( const std::string& content, const
 }
 
 
-DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder)
-	:m_objbuilder_impl(objbuilder)
+QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd)
+	:m_errorhnd_impl(errorhnd)
+	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::QueryAnalyzerInterface>::function)
 {
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	m_analyzer_impl.reset( objBuilder->createQueryAnalyzer());
 }
 
-DLL_PUBLIC QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
-	:m_objbuilder_impl(o.m_objbuilder_impl)
+QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 
 {}
 
-DLL_PUBLIC QueryAnalyzeQueue QueryAnalyzer::createQueue() const
+QueryAnalyzeQueue QueryAnalyzer::createQueue() const
 {
 	return QueryAnalyzeQueue( m_objbuilder_impl, m_analyzer_impl);
 }
 
-DLL_PUBLIC void QueryAnalyzer::definePhraseType(
+void QueryAnalyzer::definePhraseType(
 		const std::string& phraseType,
 		const std::string& featureType,
 		const Tokenizer& tokenizer,
@@ -577,7 +585,7 @@ DLL_PUBLIC void QueryAnalyzer::definePhraseType(
 	funcdef.release();
 }
 
-DLL_PUBLIC std::vector<Term> QueryAnalyzer::analyzePhrase(
+std::vector<Term> QueryAnalyzer::analyzePhrase(
 		const std::string& phraseType,
 		const std::string& phraseContent) const
 {
@@ -594,7 +602,7 @@ DLL_PUBLIC std::vector<Term> QueryAnalyzer::analyzePhrase(
 	return rt;
 }
 
-DLL_PUBLIC QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
+QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
 	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 	,m_phrase_queue(o.m_phrase_queue)
@@ -602,21 +610,21 @@ DLL_PUBLIC QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
 	,m_result_queue_idx(o.m_result_queue_idx)
 {}
 
-DLL_PUBLIC QueryAnalyzeQueue::QueryAnalyzeQueue( const Reference& objbuilder, const Reference& analyzer)
+QueryAnalyzeQueue::QueryAnalyzeQueue( const Reference& objbuilder, const Reference& analyzer)
 	:m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(analyzer)
 	,m_result_queue_idx(0)
 {}
 
 
-DLL_PUBLIC void QueryAnalyzeQueue::push(
+void QueryAnalyzeQueue::push(
 		const std::string& phraseType,
 		const std::string& phraseContent)
 {
 	m_phrase_queue.push_back( Term( phraseType, phraseContent, 0));
 }
 
-DLL_PUBLIC std::vector<Term> QueryAnalyzeQueue::fetch()
+std::vector<Term> QueryAnalyzeQueue::fetch()
 {
 	if (m_result_queue_idx < m_result_queue.size())
 	{
@@ -650,13 +658,14 @@ DLL_PUBLIC std::vector<Term> QueryAnalyzeQueue::fetch()
 	}
 	else
 	{
-		throw std::runtime_error( "no results to fetch from query analyzer queue");
+		throw strus::runtime_error( _TXT("no results to fetch from query analyzer queue"));
 	}
 }
 
 
-DLL_PUBLIC StorageClient::StorageClient( const Reference& objbuilder, const std::string& config_)
-	:m_objbuilder_impl( objbuilder)
+StorageClient::StorageClient( const Reference& objbuilder, const Reference& errorhnd, const std::string& config_)
+	:m_errorhnd_impl(errorhnd)
+	,m_objbuilder_impl( objbuilder)
 	,m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
@@ -664,24 +673,25 @@ DLL_PUBLIC StorageClient::StorageClient( const Reference& objbuilder, const std:
 	m_storage_impl.reset( objBuilder->createStorageClient( config_));
 }
 
-DLL_PUBLIC StorageClient::StorageClient( const StorageClient& o)
-	:m_objbuilder_impl(o.m_objbuilder_impl)
+StorageClient::StorageClient( const StorageClient& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
 	if (o.m_transaction_impl.get())
 	{
-		throw std::runtime_error("try to create a storage interface clone of a storage with an open transaction");
+		throw strus::runtime_error(_TXT("try to create a storage interface clone of a storage with an open transaction"));
 	}
 }
 
-DLL_PUBLIC GlobalCounter StorageClient::nofDocumentsInserted() const
+GlobalCounter StorageClient::nofDocumentsInserted() const
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	return THIS->globalNofDocumentsInserted();
 }
 
-DLL_PUBLIC void StorageClient::insertDocument( const std::string& docid, const Document& doc)
+void StorageClient::insertDocument( const std::string& docid, const Document& doc)
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -724,7 +734,7 @@ DLL_PUBLIC void StorageClient::insertDocument( const std::string& docid, const D
 	document->done();
 }
 
-DLL_PUBLIC void StorageClient::deleteDocument( const std::string& docId)
+void StorageClient::deleteDocument( const std::string& docId)
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -735,7 +745,7 @@ DLL_PUBLIC void StorageClient::deleteDocument( const std::string& docId)
 	transaction->deleteDocument( docId);
 }
 
-DLL_PUBLIC void StorageClient::deleteUserAccessRights( const std::string& username)
+void StorageClient::deleteUserAccessRights( const std::string& username)
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
@@ -746,7 +756,7 @@ DLL_PUBLIC void StorageClient::deleteUserAccessRights( const std::string& userna
 	transaction->deleteUserAccessRights( username);
 }
 
-DLL_PUBLIC void StorageClient::flush()
+void StorageClient::flush()
 {
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
 	if (transaction)
@@ -756,26 +766,28 @@ DLL_PUBLIC void StorageClient::flush()
 	}
 }
 
-DLL_PUBLIC void StorageClient::close()
+void StorageClient::close()
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	THIS->close();
 }
 
-DLL_PUBLIC QueryEval::QueryEval( const Reference& objbuilder)
-	:m_objbuilder_impl(objbuilder)
+QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
+	:m_errorhnd_impl(errorhnd)
+	,m_objbuilder_impl(objbuilder)
 	,m_queryeval_impl(ReferenceDeleter<strus::QueryEvalInterface>::function)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	m_queryeval_impl.reset( objBuilder->createQueryEval());
 }
 
-DLL_PUBLIC QueryEval::QueryEval( const QueryEval& o)
-	:m_objbuilder_impl(o.m_objbuilder_impl)
+QueryEval::QueryEval( const QueryEval& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 {}
 
-DLL_PUBLIC void QueryEval::addTerm(
+void QueryEval::addTerm(
 		const std::string& set_,
 		const std::string& type_,
 		const std::string& value_)
@@ -784,25 +796,25 @@ DLL_PUBLIC void QueryEval::addTerm(
 	queryeval->addTerm( set_, type_, value_);
 }
 
-DLL_PUBLIC void QueryEval::addSelectionFeature( const std::string& set_)
+void QueryEval::addSelectionFeature( const std::string& set_)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	queryeval->addSelectionFeature( set_);
 }
 
-DLL_PUBLIC void QueryEval::addRestrictionFeature( const std::string& set_)
+void QueryEval::addRestrictionFeature( const std::string& set_)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	queryeval->addRestrictionFeature( set_);
 }
 
-DLL_PUBLIC void QueryEval::addExclusionFeature( const std::string& set_)
+void QueryEval::addExclusionFeature( const std::string& set_)
 {
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	queryeval->addExclusionFeature( set_);
 }
 
-DLL_PUBLIC void QueryEval::addSummarizer(
+void QueryEval::addSummarizer(
 		const std::string& resultAttribute,
 		const std::string& name,
 		const SummarizerConfig& config)
@@ -844,7 +856,7 @@ DLL_PUBLIC void QueryEval::addSummarizer(
 	function.release();
 }
 
-DLL_PUBLIC void QueryEval::addWeightingFunction(
+void QueryEval::addWeightingFunction(
 		double weight,
 		const std::string& name,
 		const WeightingConfig& config)
@@ -885,7 +897,7 @@ DLL_PUBLIC void QueryEval::addWeightingFunction(
 	function.release();
 }
 
-DLL_PUBLIC Query QueryEval::createQuery( const StorageClient& storage) const
+Query QueryEval::createQuery( const StorageClient& storage) const
 {
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	strus::StorageClientInterface* st = (strus::StorageClientInterface*)storage.m_storage_impl.get();
@@ -895,51 +907,51 @@ DLL_PUBLIC Query QueryEval::createQuery( const StorageClient& storage) const
 }
 
 
-DLL_PUBLIC Query::Query( const Query& o)
+Query::Query( const Query& o)
 	:m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 	,m_query_impl(o.m_query_impl)
 {}
 
-DLL_PUBLIC void Query::pushTerm( const std::string& type_, const std::string& value_)
+void Query::pushTerm( const std::string& type_, const std::string& value_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushTerm( type_, value_);
 }
 
-DLL_PUBLIC void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_)
+void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
 	if (!joinopr)
 	{
-		throw std::runtime_error( std::string("posting join operator not defined: '") + name + "'");
+		throw std::runtime_error( std::string("posting join operator not defined: '") + opname_ + "'");
 	}
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushExpression( joinopr, argc, range_);
 }
 
-DLL_PUBLIC void Query::pushDuplicate()
+void Query::pushDuplicate()
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->pushDuplicate();
 }
 
-DLL_PUBLIC void Query::attachVariable( const std::string& name_)
+void Query::attachVariable( const std::string& name_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->attachVariable( name_);
 }
 
-DLL_PUBLIC void Query::defineFeature( const std::string& set_, double weight_)
+void Query::defineFeature( const std::string& set_, double weight_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->defineFeature( set_, weight_);
 }
 
-DLL_PUBLIC void Query::defineMetaDataRestriction(
+void Query::defineMetaDataRestriction(
 		const char* compareOp, const std::string& name,
 		const Variant& operand, bool newGroup)
 {
@@ -970,35 +982,35 @@ DLL_PUBLIC void Query::defineMetaDataRestriction(
 	}
 	else
 	{
-		throw std::runtime_error( std::string("unknown compare operator '") + compareOp + "', expected one of '=','!=','>','<','<=','>='");
+		throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
 	}
 
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->defineMetaDataRestriction( cmpop, name, arithmeticVariant(operand), newGroup);
 }
 
-DLL_PUBLIC void Query::defineMetaDataRestriction(
+void Query::defineMetaDataRestriction(
 		const char* compareOp, const std::string& name,
 		double value, bool newGroup)
 {
 	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
 }
 
-DLL_PUBLIC void Query::defineMetaDataRestriction(
+void Query::defineMetaDataRestriction(
 		const char* compareOp, const std::string& name,
 		unsigned int value, bool newGroup)
 {
 	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
 }
 
-DLL_PUBLIC void Query::defineMetaDataRestriction(
+void Query::defineMetaDataRestriction(
 		const char* compareOp, const std::string& name,
 		int value, bool newGroup)
 {
 	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
 }
 
-DLL_PUBLIC void Query::addDocumentEvaluationSet(
+void Query::addDocumentEvaluationSet(
 		const std::vector<int>& docnolist_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
@@ -1008,25 +1020,25 @@ DLL_PUBLIC void Query::addDocumentEvaluationSet(
 	THIS->addDocumentEvaluationSet( docnolist);
 }
 
-DLL_PUBLIC void Query::setMaxNofRanks( unsigned int maxNofRanks_)
+void Query::setMaxNofRanks( unsigned int maxNofRanks_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->setMaxNofRanks( maxNofRanks_);
 }
 
-DLL_PUBLIC void Query::setMinRank( unsigned int minRank_)
+void Query::setMinRank( unsigned int minRank_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->setMinRank( minRank_);
 }
 
-DLL_PUBLIC void Query::addUserName( const std::string& username_)
+void Query::addUserName( const std::string& username_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->addUserName( username_);
 }
 
-DLL_PUBLIC std::vector<Rank> Query::evaluate() const
+std::vector<Rank> Query::evaluate() const
 {
 	std::vector<Rank> rt;
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
@@ -1055,59 +1067,76 @@ DLL_PUBLIC std::vector<Rank> Query::evaluate() const
 }
 
 
-DLL_PUBLIC StrusContext::StrusContext()
-	:m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+StrusContext::StrusContext( unsigned int maxNofThreads)
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
-	m_moduleloader_impl.reset( strus::createModuleLoader());
+	strus::ErrorBufferInterface* errorhnd;
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( stderr, maxNofThreads));
+	m_moduleloader_impl.reset( strus::createModuleLoader( errorhnd));
 }
 
-DLL_PUBLIC StrusContext::StrusContext( const char* connectionstring)
-	:m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+StrusContext::StrusContext( const char* connectionstring, unsigned int maxNofThreads)
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
+	strus::ErrorBufferInterface* errorhnd;
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( stderr, maxNofThreads));
+	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
+
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
-	messaging.reset( strus::createRpcClientMessaging( connectionstring));
-	m_rpc_impl.reset( strus::createRpcClient( messaging.get()));
+	messaging.reset( strus::createRpcClientMessaging( connectionstring, errorhnd));
+	if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
+	m_rpc_impl.reset( strus::createRpcClient( messaging.get(), errorhnd));
+	if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
 	(void)messaging.release();
 }
 
-DLL_PUBLIC StrusContext::StrusContext( const StrusContext& o)
-	:m_moduleloader_impl(o.m_moduleloader_impl)
+StrusContext::StrusContext( const StrusContext& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_moduleloader_impl(o.m_moduleloader_impl)
 	,m_rpc_impl(o.m_rpc_impl)
 	,m_storage_objbuilder_impl(o.m_storage_objbuilder_impl)
 	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
 {}
 
-DLL_PUBLIC void StrusContext::loadModule( const std::string& name_)
+void StrusContext::loadModule( const std::string& name_)
 {
-	if (!m_moduleloader_impl.get()) throw std::runtime_error( "cannot load modules in RPC client mode");
-	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
-	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot load modules in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->loadModule( name_);
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to load module: %s"), errorhnd->fetchError());
 }
 
-DLL_PUBLIC void StrusContext::addModulePath( const std::string& paths_)
+void StrusContext::addModulePath( const std::string& paths_)
 {
-	if (!m_moduleloader_impl.get()) throw std::runtime_error( "cannot add a module path in RPC client mode");
-	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to set the module search path after the first use of objects");
-	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to set the module search path after the first use of objects");
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a module path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->addModulePath( paths_);
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to add module path: %s"), errorhnd->fetchError());
 }
 
-DLL_PUBLIC void StrusContext::addResourcePath( const std::string& paths_)
+void StrusContext::addResourcePath( const std::string& paths_)
 {
-	if (!m_moduleloader_impl.get()) throw std::runtime_error( "cannot add a resource path in RPC client mode");
-	if (m_storage_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
-	if (m_analyzer_objbuilder_impl.get()) throw std::runtime_error( "tried to load modules after the first use of objects");
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->addResourcePath( paths_);
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to add resource path: %s"), errorhnd->fetchError());
 }
 
 void StrusContext::initStorageObjBuilder()
@@ -1124,8 +1153,10 @@ void StrusContext::initStorageObjBuilder()
 	}
 	else
 	{
-		throw std::runtime_error( "bad state, no context initialized");
+		throw strus::runtime_error( _TXT("bad state, no context initialized"));
 	}
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to init storage object builder: %s"), errorhnd->fetchError());
 }
 
 void StrusContext::initAnalyzerObjBuilder()
@@ -1142,15 +1173,19 @@ void StrusContext::initAnalyzerObjBuilder()
 	}
 	else
 	{
-		throw std::runtime_error( "bad state, no context initialized");
+		throw strus::runtime_error( _TXT("bad state, no context initialized"));
 	}
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to init analyzer object builder: %s"), errorhnd->fetchError());
 }
 
-DLL_PUBLIC DocumentClass StrusContext::detectDocumentClass( const std::string& content)
+DocumentClass StrusContext::detectDocumentClass( const std::string& content)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_analyzer_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 	strus::DocumentClass dclass;
 	if (textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
 	{
@@ -1158,77 +1193,88 @@ DLL_PUBLIC DocumentClass StrusContext::detectDocumentClass( const std::string& c
 	}
 	else
 	{
+		if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to detect document class: %s"), errorhnd->fetchError());
 		return DocumentClass();
 	}
 }
 
-DLL_PUBLIC StorageClient StrusContext::createStorageClient( const std::string& config_)
+StorageClient StrusContext::createStorageClient( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return StorageClient( m_storage_objbuilder_impl, config_);
+	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, config_);
 }
 
-DLL_PUBLIC DocumentAnalyzer StrusContext::createDocumentAnalyzer( const std::string& segmentername_)
+DocumentAnalyzer StrusContext::createDocumentAnalyzer( const std::string& segmentername_)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return DocumentAnalyzer( m_analyzer_objbuilder_impl, segmentername_);
+	return DocumentAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl, segmentername_);
 }
 
-DLL_PUBLIC QueryAnalyzer StrusContext::createQueryAnalyzer()
+QueryAnalyzer StrusContext::createQueryAnalyzer()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return QueryAnalyzer( m_analyzer_objbuilder_impl);
+	return QueryAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl);
 }
 
-DLL_PUBLIC QueryEval StrusContext::createQueryEval()
+QueryEval StrusContext::createQueryEval()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return QueryEval( m_storage_objbuilder_impl);
+	return QueryEval( m_storage_objbuilder_impl, m_errorhnd_impl);
 }
 
-DLL_PUBLIC void StrusContext::createStorage( const std::string& config_)
+void StrusContext::createStorage( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
 	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
+	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
 	const strus::StorageInterface* sti = objBuilder->getStorage();
+	if (!sti) throw strus::runtime_error( _TXT("failed to get storage: %s"), errorhnd->fetchError());
 
 	std::string dbname;
 	std::string databasecfg( config_);
-	(void)strus::extractStringFromConfigString( dbname, databasecfg, "database");
+	(void)strus::extractStringFromConfigString( dbname, databasecfg, "database", errorhnd);
 	std::string storagecfg( databasecfg);
 
 	strus::removeKeysFromConfigString(
 			databasecfg,
-			sti->getConfigParameters( strus::StorageInterface::CmdCreateClient));
+			sti->getConfigParameters( strus::StorageInterface::CmdCreateClient), errorhnd);
 	//... In database_cfg is now the pure database configuration without the storage settings
 
 	strus::removeKeysFromConfigString(
 			storagecfg,
-			dbi->getConfigParameters( strus::DatabaseInterface::CmdCreateClient));
+			dbi->getConfigParameters( strus::DatabaseInterface::CmdCreateClient), errorhnd);
 	//... In storage_cfg is now the pure storage configuration without the database settings
+	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 
-	dbi->createDatabase( databasecfg);
+	if (!dbi->createDatabase( databasecfg)) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 
 	std::auto_ptr<strus::DatabaseClientInterface>
 		database( dbi->createClient( databasecfg));
+	if (!database.get()) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 
-	sti->createStorage( storagecfg, database.get());
+	if (!sti->createStorage( storagecfg, database.get())) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 }
 
-DLL_PUBLIC void StrusContext::destroyStorage( const std::string& config_)
+void StrusContext::destroyStorage( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
+	if (!objBuilder) throw strus::runtime_error( _TXT("failed to get object builder: %s"), errorhnd->fetchError());
 	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
-	dbi->destroyDatabase( config_);
+	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
+	if (!dbi->destroyDatabase( config_)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
 }
 
-DLL_PUBLIC void StrusContext::close()
+void StrusContext::close()
 {
 	m_analyzer_objbuilder_impl.reset();
 	m_storage_objbuilder_impl.reset();
 	if (m_rpc_impl.get()) ((strus::RpcClientInterface*)m_rpc_impl.get())->close();
 	m_moduleloader_impl.reset();
 }
+
 

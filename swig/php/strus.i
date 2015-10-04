@@ -13,6 +13,7 @@
 %include "ignore_declarations.i"
 %include "exception_handler.i"
 %include "std_vector_string.i"
+%include "std_vector_int.i"
 %include "std_vector_term.i"
 %include "std_vector_rank.i"
 %include "strus_variant.i"
