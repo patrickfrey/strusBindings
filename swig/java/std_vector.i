@@ -6,6 +6,7 @@
 
 %include <stdint.i>
 %include <std_except.i>
+%include <std_common.i> 
 
 namespace std {
 template<class T> class vector {
@@ -40,6 +41,61 @@ public:
 	}
 };
 }
+
+%define specialize_std_vector(T)
+#warning "specialize_std_vector - specialization for type T no longer needed"
+%enddef
+
+
+%{
+#include <vector>
+%}
+
+%naturalvar std::vector<int>;
+
+%typemap(jni) std::vector<int> "jintArray"
+%typemap(jtype) std::vector<int> "int[]"
+%typemap(jstype) std::vector<int> "int[]"
+
+%typemap(out) std::vector<int>
+%{
+   $result = jenv->NewIntArray($1.size());
+   jenv->SetIntArrayRegion($result, 0, $1.size(), &$1[0]);
+%}
+
+%typemap(javaout) std::vector<int>
+  {
+    return $jnicall;
+  }
+
+%typemap(jni) const std::vector<int> & "jintArray"
+%typemap(jtype) const std::vector<int> & "int[]"
+%typemap(jstype) const std::vector<int> & "int[]"
+
+%typemap(in) const std::vector<int> &
+%{ if(!$input) {
+     SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "null std::vector");
+     return $null;
+    }
+    const jsize $1_size = jenv->GetArrayLength($input);
+    int * $1_ptr = jenv->GetIntArrayElements($input, NULL);
+    std::vector<int> $1_vect( $1_ptr, $1_ptr + $1_size );
+    jenv->ReleaseIntArrayElements($input, $1_ptr, JNI_ABORT);
+    $1 = &$1_vect;
+%}
+
+%typemap(javain) const std::vector<int> & "$javainput"
+
+%typemap(out) const std::vector<int> &
+%{
+   $result = jenv->NewIntArray($1->size());
+   jenv->SetIntArrayRegion($result, 0, $1->size(), &(*$1)[0]);
+%}
+
+%typemap(javaout) const std::vector<int> &
+  {
+    return $jnicall;
+  } 
 
 // Java typemaps for autoboxing in return types of generics
 %define AUTOBOX(CTYPE, JTYPE)
