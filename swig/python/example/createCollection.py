@@ -10,7 +10,7 @@ def readFile( path ):
 	return fileContent
 
 config = "path=storage; metadata=doclen UINT16"
-ctx = strus.StrusContext()
+ctx = strus.Context()
 try:
 	ctx.destroyStorage( config)
 	# ... delete the storage files if they already exists

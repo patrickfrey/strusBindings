@@ -29,7 +29,7 @@ public class CreateCollection
 			config = args[ 0];
 		}
 		// Create context, storage and analyzer:
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		try
 		{
 			ctx.destroyStorage( config);

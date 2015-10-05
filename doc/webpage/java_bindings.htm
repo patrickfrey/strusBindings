@@ -19,7 +19,7 @@
 		<h2>Description</h2>
 		<p class="description">All objects of the strus Java
 		API are in the namespace <i>net.strus.api</i>. The first thing you do, when using 
-		the strus Java interface, is to create the root object called StrusContext. 
+		the strus Java interface, is to create the root object called Context. 
 		From this context object you can construct the main instances
 		of the objects doing the job you want to do. Depending on how you create
 		the strus context, the objects you create beginning with the root object
@@ -29,15 +29,15 @@
 		context without passing any argument to the constructor:
 		<pre>
 			String storageConfig = "path=storage; metadata=doclen UINT16";
-			<a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a> ctx = new <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a>();
+			<a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1Context.html">Context</a> ctx = new <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1Context.html">Context</a>();
 			<h href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> storage = ctx.createStorageClient( config);
 		</pre>
 		If you want to access strus over a proxy for a strus RPC server, you pass the connection
 		string as &lt;address&gt;:&lt;port&gt; (example "localhost:7181") as first argument of
-		the StrusContext constructor and you create the storage client without configuration:
+		the Context constructor and you create the storage client without configuration:
 		<pre>
 			String rpcServer = "localhost:7181";
-			<a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a> ctx = new <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StrusContext.html">StrusContext</a>( rpcServer);
+			<a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1Context.html">Context</a> ctx = new <a href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1Context.html">Context</a>( rpcServer);
 			<h href="http://patrickfrey.github.io/strusBindings/doc/java/doxygen/html/classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> storage = ctx.createStorageClient("");
 		</pre>
 		<br/>What is better depends on your use case. The possibility to use strus 

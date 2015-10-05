@@ -43,7 +43,7 @@ public class CreateCollectionNoAnalyzer
 			config = args[ 0];
 		}
 		// Create context and storage:
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		try
 		{
 			ctx.destroyStorage( config);

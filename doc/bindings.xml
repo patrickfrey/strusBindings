@@ -142,7 +142,7 @@
 <class id="DocumentAnalyzer">
 
 <description>Analyzer object representing a program for segmenting, tokenizing and normalizing a document into its atomic parts, that can be inserted into a storage and be retrieved from there.</description>
-<remark>The only way to construct a document analyzer instance is to call createDocumentAnalyzer of StrusContext.</remark>
+<remark>The only way to construct a document analyzer instance is to call createDocumentAnalyzer of Context.</remark>
 
 <method id="addSearchIndexFeature" return="void">
 <description>Define how a feature to insert into the inverted index (search index) is selected, tokenized and normalized.</description>
@@ -255,7 +255,7 @@
 </class>
 <class id="QueryAnalyzer">
 <description>Analyzer object representing a set of functions for segmenting, tokenizing and normalizing a phrase into its atomic parts, that can be used for document retrieval.</description>
-<remark>The only way to construct a query analyzer instance is to call createQueryAnalyzer of StrusContext.</remark>
+<remark>The only way to construct a query analyzer instance is to call createQueryAnalyzer of Context.</remark>
 
 <method id="definePhraseType" return="void">
 <description>Defines a phrase type by name. Phrases can be passed together with this name to the query analyzer to get the terms for building query.</description>
@@ -292,7 +292,7 @@
 </class>
 <class id="StorageClient">
 <description>Object representing a client connection to the storage .</description>
-<remark>The only way to construct a storage client instance is to call the method createStorageClient of StrusContext.</remark>
+<remark>The only way to construct a storage client instance is to call the method createStorageClient of Context.</remark>
 
 <method id="nofDocumentsInserted" return="GlobalCounter">
 <description>Get the global number of documents inserted into all storage nodes (of all nodes of the search index).</description>
@@ -541,7 +541,7 @@ The rest is defined by the summarizers used. </description>
 </method>
 
 </class>
-<class id="StrusContext">
+<class id="Context">
 <description>Object holding the global context of the strus information retrieval engine.</description>
 <note>There a two modes of this context object operating on a different base.
 	If you create this object without parameter, then the context is local.

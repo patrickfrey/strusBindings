@@ -6,7 +6,7 @@ from os import walk
 queryphrase = "city"
 
 config = "path=storage"
-ctx = strus.StrusContext()
+ctx = strus.Context()
 
 try:
 	# Get a client for the storage:

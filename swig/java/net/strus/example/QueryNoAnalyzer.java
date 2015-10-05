@@ -43,7 +43,7 @@ public class QueryNoAnalyzer
 		return query.evaluate();
 	}
 
-	public static QueryEval createQueryEval( StrusContext ctx) {
+	public static QueryEval createQueryEval( Context ctx) {
 		QueryEval queryEval = ctx.createQueryEval();
 
 		// Here we define what query features decide, what is ranked for the result:
@@ -84,7 +84,7 @@ public class QueryNoAnalyzer
 			args[0] = "citi";
 		}
 		// Create the storage client (the storage is assumed to be created with 'CreateCollectionNoAnalyzer.java'):
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		String config = "path=storage";
 		StorageClient storage = ctx.createStorageClient( config);
 		// Create the query evaluation scheme:
