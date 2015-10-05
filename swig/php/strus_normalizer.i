@@ -2,8 +2,6 @@
 #include "objInitializers.hpp"
 %}
 
-%rename(TokenNormalizer) Normalizer;
-
 %typemap(in) const Normalizer&	(Normalizer temp)
 {
 	if (0!=initNormalizer( temp, *$input))

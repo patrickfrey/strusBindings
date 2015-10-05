@@ -1155,7 +1155,7 @@ std::vector<Rank> Query::evaluate() const
 }
 
 
-StrusContext::StrusContext( unsigned int maxNofThreads)
+Context::Context( unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
@@ -1175,7 +1175,7 @@ StrusContext::StrusContext( unsigned int maxNofThreads)
 	}
 }
 
-StrusContext::StrusContext( const char* connectionstring, unsigned int maxNofThreads)
+Context::Context( const char* connectionstring, unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
@@ -1194,7 +1194,7 @@ StrusContext::StrusContext( const char* connectionstring, unsigned int maxNofThr
 	(void)messaging.release();
 }
 
-StrusContext::StrusContext( const StrusContext& o)
+Context::Context( const Context& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_moduleloader_impl(o.m_moduleloader_impl)
 	,m_rpc_impl(o.m_rpc_impl)
@@ -1202,7 +1202,7 @@ StrusContext::StrusContext( const StrusContext& o)
 	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
 {}
 
-void StrusContext::loadModule( const std::string& name_)
+void Context::loadModule( const std::string& name_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot load modules in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
@@ -1215,7 +1215,7 @@ void StrusContext::loadModule( const std::string& name_)
 	}
 }
 
-void StrusContext::addModulePath( const std::string& paths_)
+void Context::addModulePath( const std::string& paths_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a module path in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
@@ -1224,7 +1224,7 @@ void StrusContext::addModulePath( const std::string& paths_)
 	moduleLoader->addModulePath( paths_);
 }
 
-void StrusContext::addResourcePath( const std::string& paths_)
+void Context::addResourcePath( const std::string& paths_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
@@ -1233,7 +1233,7 @@ void StrusContext::addResourcePath( const std::string& paths_)
 	moduleLoader->addResourcePath( paths_);
 }
 
-void StrusContext::initStorageObjBuilder()
+void Context::initStorageObjBuilder()
 {
 	if (m_rpc_impl.get())
 	{
@@ -1256,7 +1256,7 @@ void StrusContext::initStorageObjBuilder()
 	}
 }
 
-void StrusContext::initAnalyzerObjBuilder()
+void Context::initAnalyzerObjBuilder()
 {
 	if (m_rpc_impl.get())
 	{
@@ -1279,7 +1279,7 @@ void StrusContext::initAnalyzerObjBuilder()
 	}
 }
 
-DocumentClass StrusContext::detectDocumentClass( const std::string& content)
+DocumentClass Context::detectDocumentClass( const std::string& content)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -1298,31 +1298,31 @@ DocumentClass StrusContext::detectDocumentClass( const std::string& content)
 	}
 }
 
-StorageClient StrusContext::createStorageClient( const std::string& config_)
+StorageClient Context::createStorageClient( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, config_);
 }
 
-DocumentAnalyzer StrusContext::createDocumentAnalyzer( const std::string& segmentername_)
+DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	return DocumentAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl, segmentername_);
 }
 
-QueryAnalyzer StrusContext::createQueryAnalyzer()
+QueryAnalyzer Context::createQueryAnalyzer()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	return QueryAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl);
 }
 
-QueryEval StrusContext::createQueryEval()
+QueryEval Context::createQueryEval()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return QueryEval( m_storage_objbuilder_impl, m_errorhnd_impl);
 }
 
-void StrusContext::createStorage( const std::string& config_)
+void Context::createStorage( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -1358,7 +1358,7 @@ void StrusContext::createStorage( const std::string& config_)
 	if (!sti->createStorage( storagecfg, database.get())) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 }
 
-void StrusContext::destroyStorage( const std::string& config_)
+void Context::destroyStorage( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -1369,7 +1369,7 @@ void StrusContext::destroyStorage( const std::string& config_)
 	if (!dbi->destroyDatabase( config_)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
 }
 
-void StrusContext::close()
+void Context::close()
 {
 	m_analyzer_objbuilder_impl.reset();
 	m_storage_objbuilder_impl.reset();

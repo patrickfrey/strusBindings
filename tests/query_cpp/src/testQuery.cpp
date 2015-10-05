@@ -40,7 +40,7 @@ int main( int , const char** )
 {
 	try
 	{
-		StrusContext ctx;
+		Context ctx;
 		DocumentAnalyzer documentAnalyzer( ctx.createDocumentAnalyzer());
 		// Define document analyzer:
 		std::vector<Normalizer> normalizer_stem;

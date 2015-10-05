@@ -548,7 +548,7 @@ private:
 /// \brief Analyzer object representing a program for segmenting, 
 ///	tokenizing and normalizing a document into atomic parts, that 
 ///	can be inserted into a storage and be retrieved from there.
-/// \remark The only way to construct a document analyzer instance is to call StrusContext::createDocumentAnalyzer()
+/// \remark The only way to construct a document analyzer instance is to call Context::createDocumentAnalyzer()
 class DocumentAnalyzer
 {
 public:
@@ -622,8 +622,8 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 private:
-	/// \brief Constructor used by StrusContext
-	friend class StrusContext;
+	/// \brief Constructor used by Context
+	friend class Context;
 	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername);
 
 	Reference m_errorhnd_impl;
@@ -639,7 +639,7 @@ class QueryAnalyzeQueue;
 /// \brief Analyzer object representing a set of function for transforming a phrase,
 ///	the smallest unit in any query language, to a set of terms that can be used
 ///	to build a query.
-/// \remark The only way to construct a query analyzer instance is to call StrusContext::createQueryAnalyzer()
+/// \remark The only way to construct a query analyzer instance is to call Context::createQueryAnalyzer()
 class QueryAnalyzer
 {
 public:
@@ -673,8 +673,8 @@ public:
 	QueryAnalyzeQueue createQueue() const;
 
 private:
-	/// \brief Constructor used by StrusContext
-	friend class StrusContext;
+	/// \brief Constructor used by Context
+	friend class Context;
 	QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd);
 
 	Reference m_errorhnd_impl;
@@ -706,7 +706,7 @@ public:
 	TermVector fetch();
 
 private:
-	/// \brief Constructor used by StrusContext
+	/// \brief Constructor used by Context
 	friend class QueryAnalyzer;
 	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer);
 
@@ -720,7 +720,7 @@ private:
 
 
 /// \brief Object representing a client connection to the storage 
-/// \remark The only way to construct a storage client instance is to call StrusContext::createStorageClient(const std::string&)
+/// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
 class StorageClient
 {
 public:
@@ -757,7 +757,7 @@ public:
 	void close();
 
 private:
-	friend class StrusContext;
+	friend class Context;
 	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
 
 	friend class Query;
@@ -955,8 +955,8 @@ public:
 	Query createQuery( const StorageClient& storage) const;
 
 private:
-	/// \brief Constructor used by strusContext
-	friend class StrusContext;
+	/// \brief Constructor used by Context
+	friend class Context;
 	QueryEval( const Reference& objbuilder, const Reference& errorhnd);
 
 	friend class Query;
@@ -1133,19 +1133,19 @@ private:
 ///	this context reside on the server (strusRpcServer) addressed with the connection string.
 ///	In this case loaded modules and resources are ignored. What modules to use is then
 ///	specified on server startup.
-class StrusContext
+class Context
 {
 public:
 	/// \brief Constructor for local mode with own module loader
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
-	explicit StrusContext( unsigned int maxNofThreads=0);
+	explicit Context( unsigned int maxNofThreads=0);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	StrusContext( const char* connectionstring, unsigned int maxNofThreads=0);
+	Context( const char* connectionstring, unsigned int maxNofThreads=0);
 	/// \brief Copy constructor
-	StrusContext( const StrusContext& o);
+	Context( const Context& o);
 	/// \brief Destructor
-	~StrusContext(){}
+	~Context(){}
 
 	/// \brief Load a module
 	/// \param[in] name_ name of the module to load
