@@ -27,7 +27,7 @@
 --------------------------------------------------------------------
 */
 #include "private/dll_tags.hpp"
-#include "private/internationalization.hpp"
+#include "internationalization.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <libintl.h>
