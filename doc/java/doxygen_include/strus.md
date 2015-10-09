@@ -9,7 +9,7 @@ The strus Java bindings provide a Java interface for accessing the
 retrieval storage, indexing documents and queries and evaluating queries.
 
 The entry point of a strus application with Java is the 
-context (@ref net::strus::api::StrusContext) object.
+context (@ref net::strus::api::Context) object.
 It is the root object from which all other objects are created.
 It can be constructed either as proxy, that redirects all method calls to an RpcServer
 or it can be constructed as instance running in the Java/JNI environment.
@@ -66,7 +66,7 @@ public class CreateCollectionNoAnalyzer
 			config = args[ 0];
 		}
 		// Create context and storage:
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		try
 		{
 			ctx.destroyStorage( config);
@@ -147,7 +147,7 @@ public class CreateCollection
 			config = args[ 0];
 		}
 		// Create context, storage and analyzer:
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		try
 		{
 			ctx.destroyStorage( config);
@@ -270,7 +270,7 @@ public class QueryNoAnalyzer
 		return query.evaluate();
 	}
 
-	public static QueryEval createQueryEval( StrusContext ctx) {
+	public static QueryEval createQueryEval( Context ctx) {
 		QueryEval queryEval = ctx.createQueryEval();
 
 		// Here we define what query features decide, what is ranked for the result:
@@ -311,7 +311,7 @@ public class QueryNoAnalyzer
 			args[0] = "citi";
 		}
 		// Create the storage client (the storage is assumed to be created with 'CreateCollectionNoAnalyzer.java'):
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		String config = "path=storage";
 		StorageClient storage = ctx.createStorageClient( config);
 		// Create the query evaluation scheme:
