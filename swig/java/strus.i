@@ -36,7 +36,7 @@
 %typemap(javapackage) std::vector<Normalizer>  "net.strus.api.NormalizerVector"
 %template(NormalizerVector) std::vector<Normalizer>;
 
-%typemap(javacode) StrusContext %{
+%typemap(javacode) Context %{
 static {
 	System.loadLibrary( "strus_java");
 }

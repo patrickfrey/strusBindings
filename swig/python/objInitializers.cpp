@@ -343,12 +343,12 @@ static int initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 		PyObject* seq = PySequence_Fast( obj, "query evaluation function object definition expected as sequence of pairs or as dictionary");
 		if (seq)
 		{
-			Py_ssize_t ii=0,len = PySequence_Size( seq), elemlem;
+			Py_ssize_t ii=0,len = PySequence_Size( seq), elemlen = 0;
 			for (; ii<len; ++ii)
 			{
 				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
 				/* DON'T DECREF item here */
-				if (PySequence_Check( item) && 2==(elemlem=PySequence_Size( item)))
+				if (PySequence_Check( item) && 2==(elemlen=PySequence_Size( item)))
 				{
 					PyObject* keyitem = PySequence_Fast_GET_ITEM( item, 0);
 					PyObject* valueitem = PySequence_Fast_GET_ITEM( item, 1);
@@ -386,7 +386,7 @@ int initSummarizerConfig( SummarizerConfig& result, PyObject* obj)
 	return initQueryEvalFunctionConfig( result, obj);
 }
 
-int initWeightingConfig( SummarizerConfig& result, PyObject* obj)
+int initWeightingConfig( WeightingConfig& result, PyObject* obj)
 {
 	return initQueryEvalFunctionConfig( result, obj);
 }
@@ -454,6 +454,69 @@ int initStringVector( std::vector<std::string>& result, PyObject* obj)
 	return error;
 }
 
+int initIntVector( std::vector<int>& result, PyObject* obj)
+{
+	int error = 0;
+	if (PyInt_Check( obj))
+	{
+		int item = PyInt_AS_LONG( obj);
+		try
+		{
+			result.push_back( item);
+		}
+		catch (...)
+		{
+			PyErr_SetString( PyExc_Exception, "out of memory exception");
+			error = -1;
+		}
+	}
+	else if (PySequence_Check( obj))
+	{
+		PyObject* seq = PySequence_Fast( obj, "integer list expected as sequence");
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii < len; ii++)
+			{
+				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				/* DON'T DECREF item here */
+				try
+				{
+					if (PyInt_Check( item))
+					{
+						int itemval = PyInt_AS_LONG( item);
+						result.push_back( itemval);
+					}
+					else
+					{
+						PyErr_SetString( PyExc_Exception, "integer expected as element of integer list");
+						error = -1;
+						break;
+					}
+				}
+				catch (...)
+				{
+					PyErr_SetString( PyExc_Exception, "out of memory exception");
+					error = -1;
+					break;
+				}
+			}
+			Py_DECREF( seq);
+		}
+		else
+		{
+			PyErr_SetString( PyExc_Exception, "list of integers expected");
+			error = -1;
+		}
+	}
+	else
+	{
+		PyErr_SetString( PyExc_Exception, "list of integers or single integer expected (check)");
+		error = -1;
+	}
+	return error;
+}
+
 PyObject* getTermVector( const std::vector<Term>& ar)
 {
 	PyObject* rt = PyList_New( ar.size());
@@ -479,7 +542,7 @@ PyObject* getTermVector( const std::vector<Term>& ar)
 		if (0!=PyDict_SetItemString( elem, "position", position)) goto ERROR;
 		Py_DECREF( position); position = 0;
 
-		if (0!=PyList_SetItem( rt, aidx, elem)) goto ERROR;
+		PyList_SET_ITEM( rt, aidx, elem);
 		Py_DECREF( elem); elem = 0;
 	}
 	return rt;
@@ -507,13 +570,16 @@ static PyObject* getRankAttributeVector( const std::vector<RankAttribute>& ar)
 		elem = PyTuple_New( 2); if (!elem) goto ERROR;
 
 		if (0!=PyTuple_SetItem( elem, 0, name)) goto ERROR;
-		Py_DECREF( name); name = 0;
+//		Py_DECREF( name);
+		name = 0;
 
 		if (0!=PyTuple_SetItem( elem, 1, value)) goto ERROR;
-		Py_DECREF( value); value= 0;
+//		Py_DECREF( value);
+		value= 0;
 
-		if (0!=PyList_SetItem( rt, aidx, elem)) goto ERROR;
-		Py_DECREF( elem); elem= 0;
+		PyList_SET_ITEM( rt, aidx, elem);
+//		Py_DECREF( elem);
+		elem= 0;
 	}
 	return rt;
 ERROR:
@@ -540,18 +606,22 @@ PyObject* getRankVector( const std::vector<Rank>& ar)
 
 		docno = PyInt_FromLong( ai->docno()); if (!docno) goto ERROR;
 		if (0!=PyDict_SetItemString( elem, "docno", docno)) goto ERROR;
-		Py_DECREF( docno); docno = 0;
+//		Py_DECREF( docno);
+		docno = 0;
 
 		weight = PyFloat_FromDouble( ai->weight()); if (!weight) goto ERROR;
 		if (0!=PyDict_SetItemString( elem, "weight", weight)) goto ERROR;
-		Py_DECREF( weight); weight = 0;
+//		Py_DECREF( weight);
+		weight = 0;
 
 		attributes = getRankAttributeVector( ai->attributes()); if (!attributes) goto ERROR;
 		if (0!=PyDict_SetItemString( elem, "attributes", attributes)) goto ERROR;
-		Py_DECREF( attributes); attributes = 0;
+//		Py_DECREF( attributes);
+		attributes = 0;
 
-		if (0!=PyList_SET_ITEM( rt, aidx, elem)) goto ERROR;
-		Py_DECREF( elem); elem = 0;
+		PyList_SET_ITEM( rt, aidx, elem);
+//		Py_DECREF( elem);
+		elem = 0;
 	}
 	return rt;
 ERROR:

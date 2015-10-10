@@ -11,7 +11,7 @@ FUNCTION( build_example NAME )
 )
 ENDFUNCTION( build_example CNAM )
 
-set( tests HelloWorld Status CreateCollection CreateCollectionNoAnalyzer QueryNoAnalyzer )
+set( tests HelloWorld CreateCollection CreateCollectionNoAnalyzer Status QueryNoAnalyzer )
 foreach( test ${tests} )
 	build_example( ${test} )
 endforeach( test )
@@ -21,7 +21,7 @@ add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class Creat
 set( THISDIR "${PROJECT_SOURCE_DIR}/swig/java/net/strus/example" )
 
 foreach( test ${tests} )
-	add_test( NAME ${test} COMMAND java -classpath ../../.. net.strus.example.${test} WORKING_DIRECTORY ${THISDIR} )
-	set_tests_properties( ${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/swig/java" )
+	add_test( NAME java_${test} COMMAND java -classpath ../../.. net.strus.example.${test} WORKING_DIRECTORY ${THISDIR} )
+	set_tests_properties( java_${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/swig/java" )
 endforeach( test )
 

@@ -21,7 +21,7 @@ set( generated_java_source_files
 	RankVector.java
 	StorageClient.java
 	StringVector.java
-	StrusContext.java
+	Context.java
 	strus.java
 	strusJNI.java
 	SummarizerConfig.java

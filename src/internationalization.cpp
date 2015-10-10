@@ -26,23 +26,48 @@
 
 --------------------------------------------------------------------
 */
-#ifndef _STRUS_BINDING_PYHON_OBJECT_INITIALIZERS_HPP_INCLUDED
-#define _STRUS_BINDING_PYHON_OBJECT_INITIALIZERS_HPP_INCLUDED
-#include <Python.h>
-#include "strus/bindingObjects.hpp"
-#include <vector>
+#include "private/dll_tags.hpp"
+#include "internationalization.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+#include <libintl.h>
+#include <locale.h>
+#include <cstdarg>
 
-int initVariant( Variant& result, PyObject* obj);
-int initTokenizer( Tokenizer& result, PyObject* obj);
-int initNormalizer( Normalizer& result, PyObject* obj);
-int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
-int initAggregator( Aggregator& result, PyObject* obj);
-int initSummarizerConfig( SummarizerConfig& result, PyObject* obj);
-int initWeightingConfig( WeightingConfig& result, PyObject* obj);
-int initStringVector( std::vector<std::string>& result, PyObject* obj);
-int initIntVector( std::vector<int>& result, PyObject* obj);
+#define STRUS_GETTEXT_PACKAGE		"strus-dom"
+#define STRUS_GETTEXT_LOCALEDIR		""
 
-PyObject* getTermVector( const std::vector<Term>& ar);
-PyObject* getRankVector( const std::vector<Rank>& ar);
+std::runtime_error strus::runtime_error( const char* format, ...)
+{
+	char buffer[ 1024];
+	va_list args;
+	va_start( args, format);
+	const char* formatTranslation = ::dgettext( STRUS_GETTEXT_PACKAGE, format);
+	int buffersize = vsnprintf( buffer, sizeof(buffer), formatTranslation, args);
+	buffer[ sizeof(buffer)-1] = 0;
+	std::runtime_error rt( std::string( buffer, buffersize));
+	va_end (args);
+	return rt;
+}
 
+std::logic_error strus::logic_error( const char* format, ...)
+{
+	char buffer[ 1024];
+	va_list args;
+	va_start( args, format);
+	const char* formatTranslation = ::dgettext( STRUS_GETTEXT_PACKAGE, format);
+	int buffersize = vsnprintf( buffer, sizeof(buffer), formatTranslation, args);
+	buffer[ sizeof(buffer)-1] = 0;
+	std::logic_error rt( std::string( buffer, buffersize));
+	va_end (args);
+	return rt;
+}
+
+DLL_PUBLIC void strus::initMessageTextDomain()
+{
+#ifdef ENABLE_NLS
+	::bindtextdomain( STRUS_GETTEXT_PACKAGE, STRUS_GETTEXT_LOCALEDIR);
 #endif
+}
+
+

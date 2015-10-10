@@ -44,6 +44,7 @@ namespace api {
 #endif
 #else
 #define String std::string
+#define IntVector std::vector<int>
 #define StringVector std::vector<std::string>
 #define NormalizerVector std::vector<Normalizer>
 #define TermVector std::vector<Term>
@@ -547,7 +548,7 @@ private:
 /// \brief Analyzer object representing a program for segmenting, 
 ///	tokenizing and normalizing a document into atomic parts, that 
 ///	can be inserted into a storage and be retrieved from there.
-/// \remark The only way to construct a document analyzer instance is to call StrusContext::createDocumentAnalyzer()
+/// \remark The only way to construct a document analyzer instance is to call Context::createDocumentAnalyzer()
 class DocumentAnalyzer
 {
 public:
@@ -621,10 +622,11 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 private:
-	/// \brief Constructor used by StrusContext
-	friend class StrusContext;
-	DocumentAnalyzer( const Reference& objbuilder, const String& segmentername);
+	/// \brief Constructor used by Context
+	friend class Context;
+	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername);
 
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
@@ -637,7 +639,7 @@ class QueryAnalyzeQueue;
 /// \brief Analyzer object representing a set of function for transforming a phrase,
 ///	the smallest unit in any query language, to a set of terms that can be used
 ///	to build a query.
-/// \remark The only way to construct a query analyzer instance is to call StrusContext::createQueryAnalyzer()
+/// \remark The only way to construct a query analyzer instance is to call Context::createQueryAnalyzer()
 class QueryAnalyzer
 {
 public:
@@ -671,10 +673,11 @@ public:
 	QueryAnalyzeQueue createQueue() const;
 
 private:
-	/// \brief Constructor used by StrusContext
-	friend class StrusContext;
-	explicit QueryAnalyzer( const Reference& objbuilder);
+	/// \brief Constructor used by Context
+	friend class Context;
+	QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd);
 
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
@@ -703,10 +706,11 @@ public:
 	TermVector fetch();
 
 private:
-	/// \brief Constructor used by StrusContext
+	/// \brief Constructor used by Context
 	friend class QueryAnalyzer;
-	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& analyzer);
+	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer);
 
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 	std::vector<Term> m_phrase_queue;
@@ -716,7 +720,7 @@ private:
 
 
 /// \brief Object representing a client connection to the storage 
-/// \remark The only way to construct a storage client instance is to call StrusContext::createStorageClient(const std::string&)
+/// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
 class StorageClient
 {
 public:
@@ -753,11 +757,12 @@ public:
 	void close();
 
 private:
-	friend class StrusContext;
-	StorageClient( const Reference& objbuilder, const String& config);
+	friend class Context;
+	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
 
 	friend class Query;
 	friend class QueryEval;
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
@@ -950,11 +955,12 @@ public:
 	Query createQuery( const StorageClient& storage) const;
 
 private:
-	/// \brief Constructor used by strusContext
-	friend class StrusContext;
-	explicit QueryEval( const Reference& objbuilder);
+	/// \brief Constructor used by Context
+	friend class Context;
+	QueryEval( const Reference& objbuilder, const Reference& errorhnd);
 
 	friend class Query;
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_queryeval_impl;
 };
@@ -1064,10 +1070,7 @@ public:
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
-			double value, bool newGroup=true)
-	{
-		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
-	}
+			double value, bool newGroup=true);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
@@ -1076,10 +1079,7 @@ public:
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
-			unsigned int value, bool newGroup=true)
-	{
-		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
-	}
+			unsigned int value, bool newGroup=true);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
@@ -1088,10 +1088,12 @@ public:
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
-			int value, bool newGroup=true)
-	{
-		defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
-	}
+			int value, bool newGroup=true);
+
+	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
+	/// \param[in] docnolist_ list of documents to evaluate the query on
+	void addDocumentEvaluationSet(
+			const IntVector& docnolist_);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query
@@ -1112,9 +1114,10 @@ public:
 
 private:
 	friend class QueryEval;
-	Query( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_)
-		:m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_){}
+	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_)
+		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_){}
 
+	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
@@ -1130,18 +1133,19 @@ private:
 ///	this context reside on the server (strusRpcServer) addressed with the connection string.
 ///	In this case loaded modules and resources are ignored. What modules to use is then
 ///	specified on server startup.
-class StrusContext
+class Context
 {
 public:
 	/// \brief Constructor for local mode with own module loader
-	StrusContext();
+	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
+	explicit Context( unsigned int maxNofThreads=0);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	StrusContext( const char* connectionstring);
+	Context( const char* connectionstring, unsigned int maxNofThreads=0);
 	/// \brief Copy constructor
-	StrusContext( const StrusContext& o);
+	Context( const Context& o);
 	/// \brief Destructor
-	~StrusContext(){}
+	~Context(){}
 
 	/// \brief Load a module
 	/// \param[in] name_ name of the module to load
@@ -1195,6 +1199,7 @@ private:
 	void initAnalyzerObjBuilder();
 
 private:
+	Reference m_errorhnd_impl;
 	Reference m_moduleloader_impl;
 	Reference m_rpc_impl;
 	Reference m_storage_objbuilder_impl;

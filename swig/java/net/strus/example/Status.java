@@ -6,7 +6,7 @@ public class Status
 	public static void main( String []args) {
 		String config = "path=storage";
 		// Create the storage client:
-		StrusContext ctx = new StrusContext();
+		Context ctx = new Context();
 		StorageClient storage = ctx.createStorageClient( config);
 		// Query the number of documents inserted:
 		long nofDocuments = storage.nofDocumentsInserted();

@@ -5,6 +5,7 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 # --------------------------------------
 set( source_files
 	bindingObjects.cpp
+	internationalization.cpp
 	utils.cpp
 )
 
@@ -21,19 +22,7 @@ link_directories(
 )
 
 
-add_library( strus_bindings SHARED ${source_files} )
-target_link_libraries( strus_bindings strus_module strus_rpc_client strus_rpc_client_socket )
-set_target_properties(
-    strus_bindings
-    PROPERTIES
-    DEBUG_POSTFIX "_d"
-    SOVERSION "${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}"
-    VERSION ${STRUS_VERSION}
-)
+add_library( strus_bindings STATIC ${source_files} )
+target_link_libraries( strus_bindings strus_module strus_rpc_client strus_rpc_client_socket strus_utils strus_error )
 
-# ------------------------------
-# INSTALLATION
-# ------------------------------
-install( TARGETS strus_bindings
-           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus )
 
