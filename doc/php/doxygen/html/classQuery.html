@@ -94,6 +94,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abf4f50b25ab4ffc6de6875c73b333540"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#abf4f50b25ab4ffc6de6875c73b333540">defineMetaDataRestriction</a> (const char *compareOp, const String &amp;name, int value, bool newGroup=true)</td></tr>
 <tr class="memdesc:abf4f50b25ab4ffc6de6875c73b333540"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a meta data restriction.  <a href="#abf4f50b25ab4ffc6de6875c73b333540">More...</a><br/></td></tr>
 <tr class="separator:abf4f50b25ab4ffc6de6875c73b333540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a729fda0a198196332faa76ddae4e09be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a729fda0a198196332faa76ddae4e09be">addDocumentEvaluationSet</a> (const IntVector &amp;docnolist_)</td></tr>
+<tr class="memdesc:a729fda0a198196332faa76ddae4e09be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage.  <a href="#a729fda0a198196332faa76ddae4e09be">More...</a><br/></td></tr>
+<tr class="separator:a729fda0a198196332faa76ddae4e09be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa339bccb980d4c9ee5b33a92751e247b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#aa339bccb980d4c9ee5b33a92751e247b">setMaxNofRanks</a> (unsigned int maxNofRanks_)</td></tr>
 <tr class="memdesc:aa339bccb980d4c9ee5b33a92751e247b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)  <a href="#aa339bccb980d4c9ee5b33a92751e247b">More...</a><br/></td></tr>
 <tr class="separator:aa339bccb980d4c9ee5b33a92751e247b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,6 +162,30 @@ Friends</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a729fda0a198196332faa76ddae4e09be"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Query::addDocumentEvaluationSet </td>
+          <td>(</td>
+          <td class="paramtype">const IntVector &amp;&#160;</td>
+          <td class="paramname"><em>docnolist_</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">docnolist_</td><td>list of documents to evaluate the query on </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a331feb7688a327de6d553668244db807"></a>
 <div class="memitem">
 <div class="memproto">
@@ -297,9 +324,6 @@ Friends</h2></td></tr>
 <a class="anchor" id="a4a9b675dfa1f37e1a2d5027b3acd101c"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Query::defineMetaDataRestriction </td>
@@ -331,11 +355,6 @@ Friends</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Define a meta data restriction. </p>
@@ -354,9 +373,6 @@ Friends</h2></td></tr>
 <a class="anchor" id="a87b624022d4cd810189b8148e22949f9"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Query::defineMetaDataRestriction </td>
@@ -388,11 +404,6 @@ Friends</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Define a meta data restriction. </p>
@@ -411,9 +422,6 @@ Friends</h2></td></tr>
 <a class="anchor" id="abf4f50b25ab4ffc6de6875c73b333540"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Query::defineMetaDataRestriction </td>
@@ -445,11 +453,6 @@ Friends</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Define a meta data restriction. </p>
@@ -654,7 +657,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 17 2015 00:01:54 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Oct 10 2015 19:52:49 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

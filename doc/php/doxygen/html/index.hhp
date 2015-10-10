@@ -23,6 +23,8 @@ classAggregator.html
 classAggregator-members.html
 classAttribute.html
 classAttribute-members.html
+classContext.html
+classContext-members.html
 classDocument.html
 classDocument-members.html
 classDocumentAnalyzer.html
@@ -48,8 +50,6 @@ classRankAttribute.html
 classRankAttribute-members.html
 classStorageClient.html
 classStorageClient-members.html
-classStrusContext.html
-classStrusContext-members.html
 classSummarizerConfig.html
 classSummarizerConfig-members.html
 classTerm.html

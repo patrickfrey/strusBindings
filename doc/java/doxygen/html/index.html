@@ -44,7 +44,7 @@
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This interface documentation has been generated from the base C++ interface with injection of some additional stuff like namespaces and helper classes, that are specific for the Java interface. Unfortunately it contains still some type qualifiers pointing to it's C++ origin. Please don't blame it for that. I'll find other solutions. Suggestions are welcome. The strus Java bindings provide a Java interface for accessing the retrieval storage, indexing documents and queries and evaluating queries.</p>
-<p>The entry point of a strus application with Java is the context (<a class="el" href="classnet_1_1strus_1_1api_1_1StrusContext.html">net::strus::api::StrusContext</a>) object. It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Java/JNI environment. The following examples are tests built and executed in the strusBindings project. We are working on how to install the .jar with the strus API classes properly.</p>
+<p>The entry point of a strus application with Java is the context (<a class="el" href="classnet_1_1strus_1_1api_1_1Context.html">net::strus::api::Context</a>) object. It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Java/JNI environment. The following examples are tests built and executed in the strusBindings project. We are working on how to install the .jar with the strus API classes properly.</p>
 <h1><a class="anchor" id="CreateCollectionNoAnalyzer"></a>
 Create a collection of document (without using the strus analyzer)</h1>
 <p>In the Java universe there exist a lot of alternatives to analyze or index a document. This example accommodates this and shows how to insert a test collection defined without using the strus analyzer. The terms are assumed to come from "somewhere". </p>
@@ -93,7 +93,7 @@ Create a collection of document (without using the strus analyzer)</h1>
 <div class="line">                        config = args[ 0];</div>
 <div class="line">                }</div>
 <div class="line">                <span class="comment">// Create context and storage:</span></div>
-<div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line">                Context ctx = <span class="keyword">new</span> Context();</div>
 <div class="line">                <span class="keywordflow">try</span></div>
 <div class="line">                {</div>
 <div class="line">                        ctx.destroyStorage( config);</div>
@@ -171,7 +171,7 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                        config = args[ 0];</div>
 <div class="line">                }</div>
 <div class="line">                <span class="comment">// Create context, storage and analyzer:</span></div>
-<div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line">                Context ctx = <span class="keyword">new</span> Context();</div>
 <div class="line">                <span class="keywordflow">try</span></div>
 <div class="line">                {</div>
 <div class="line">                        ctx.destroyStorage( config);</div>
@@ -289,7 +289,7 @@ Retrieve a ranklist with a simple query consisting of some terms (without analyz
 <div class="line">                <span class="keywordflow">return</span> query.evaluate();</div>
 <div class="line">        }</div>
 <div class="line"></div>
-<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> QueryEval createQueryEval( StrusContext ctx) {</div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> QueryEval createQueryEval( Context ctx) {</div>
 <div class="line">                QueryEval queryEval = ctx.createQueryEval();</div>
 <div class="line"></div>
 <div class="line">                <span class="comment">// Here we define what query features decide, what is ranked for the result:</span></div>
@@ -330,7 +330,7 @@ Retrieve a ranklist with a simple query consisting of some terms (without analyz
 <div class="line">                        args[0] = <span class="stringliteral">&quot;citi&quot;</span>;</div>
 <div class="line">                }</div>
 <div class="line">                <span class="comment">// Create the storage client (the storage is assumed to be created with &#39;CreateCollectionNoAnalyzer.java&#39;):</span></div>
-<div class="line">                StrusContext ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line">                Context ctx = <span class="keyword">new</span> Context();</div>
 <div class="line">                String config = <span class="stringliteral">&quot;path=storage&quot;</span>;</div>
 <div class="line">                StorageClient storage = ctx.createStorageClient( config);</div>
 <div class="line">                <span class="comment">// Create the query evaluation scheme:</span></div>
@@ -359,7 +359,7 @@ Retrieve a ranklist with a simple query consisting of some terms (without analyz
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 17 2015 12:10:24 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Oct 10 2015 19:52:34 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

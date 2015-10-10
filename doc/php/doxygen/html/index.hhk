@@ -22,11 +22,12 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classNormalizer.html#aaf96b02bb7e84c742bcbf86a1681cc1c"><param name="Name" value="Normalizer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classTokenizer.html#abe7c31593c0c0366b0705c9a0f5bd932"><param name="Name" value="Tokenizer"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a729fda0a198196332faa76ddae4e09be"><param name="Name" value="addDocumentEvaluationSet"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a306f7ac20500fdcbdbdad9e0d808b2bf"><param name="Name" value="addExclusionFeature"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a0a0d75d50fe640d586a0179f4f3db530"><param name="Name" value="addForwardIndexFeature"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a0f4f2d222a37bef7c8a3b2b07ecd829e"><param name="Name" value="addForwardIndexTerm"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a49f8e708481da1408f6ebfa2b050a654"><param name="Name" value="addModulePath"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a1b01a7dd5810c71601d527d6b4ff32b9"><param name="Name" value="addResourcePath"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a75d86a2b3ab56bd55f1380ed27f36c90"><param name="Name" value="addModulePath"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#abb7e9ae15fb9ca920da19c1ca8e8f3b8"><param name="Name" value="addResourcePath"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a5e1d5c854e41b111c95fd49f4a632c18"><param name="Name" value="addRestrictionFeature"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a4373490881c1eb0a116d58ba4fadbda4"><param name="Name" value="addSearchIndexFeature"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#adbcfcb1b1808fdc82285b2cffbe8f36d"><param name="Name" value="addSearchIndexTerm"></OBJECT>
@@ -82,18 +83,38 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189caa0f9bec318b7249586966ee11b0e33d0"><param name="Name" value="Variant_UINT"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189ca0d7256b40bbce7cc98f898e03f107514"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3"><param name="Name" value="close"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="close"></OBJECT>
   <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3"><param name="Name" value="StorageClient"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a86c1722ac6fcb1dff0e7c2b420b60877"><param name="Name" value="StrusContext"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a3d703ac60e9c1adb433d435dd2944c67"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html"><param name="Name" value="Context"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a75d86a2b3ab56bd55f1380ed27f36c90"><param name="Name" value="addModulePath"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#abb7e9ae15fb9ca920da19c1ca8e8f3b8"><param name="Name" value="addResourcePath"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="close"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a9a281056e54bf35be0fe636f442b5b83"><param name="Name" value="Context"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a905301c75b5bb103fd1624e8d1420a1b"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a204d190bc923dd7e1a13b5b0fea6ec13"><param name="Name" value="createQueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a28ca03d0497780f6f7905fa8ee07d27a"><param name="Name" value="createQueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06"><param name="Name" value="createStorage"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a9053e31e9e159a0f7dc208d8fd5e8478"><param name="Name" value="createStorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ad26133b438031f93002c4cbf638a591a"><param name="Name" value="destroyStorage"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a0eb938370364cb61bf307c799125787c"><param name="Name" value="detectDocumentClass"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="DocumentAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a3591b847c0c4885e8810bac481b3ff00"><param name="Name" value="loadModule"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="QueryAnalyzer"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="QueryEval"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a2d34e4556448e40693f61d15e091b604"><param name="Name" value="~Context"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a905301c75b5bb103fd1624e8d1420a1b"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a29969c238aa6bc45659e0fe37b994a7c"><param name="Name" value="createQuery"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a341dafbcfdfccf8ffd31f68749adc87d"><param name="Name" value="createQueryAnalyzer"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#abc3e97e45a74c4cac465d08b0863b998"><param name="Name" value="createQueryEval"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a204d190bc923dd7e1a13b5b0fea6ec13"><param name="Name" value="createQueryAnalyzer"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a28ca03d0497780f6f7905fa8ee07d27a"><param name="Name" value="createQueryEval"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6"><param name="Name" value="createQueue"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a62392af0109ae542d320a2472e58ef9b"><param name="Name" value="createStorage"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a9fd676be94820099cd28d6176d20e1c8"><param name="Name" value="createStorageClient"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06"><param name="Name" value="createStorage"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a9053e31e9e159a0f7dc208d8fd5e8478"><param name="Name" value="createStorageClient"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ae81281a264b315f52e45a783173a2183"><param name="Name" value="defineAggregatedMetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#aa3aa93d9f07adcabd1470724144693f5"><param name="Name" value="defineAttribute"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html#ad3e384d4740c6185e95f3c5af7631594"><param name="Name" value="defined"></OBJECT>
@@ -114,8 +135,8 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#aeaa4bf1bb6a715b5c4e0d9c2126ecf97"><param name="Name" value="deleteDocument"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#af9f4465669e8ef6405872fa483fe2560"><param name="Name" value="deleteUserAccessRights"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="deprecated.html"><param name="Name" value="Deprecated List"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#ae421411f7b591b46bdd475f7a9a083de"><param name="Name" value="destroyStorage"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a8958b7de16ab91f2cecfa517f67def67"><param name="Name" value="detectDocumentClass"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ad26133b438031f93002c4cbf638a591a"><param name="Name" value="destroyStorage"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a0eb938370364cb61bf307c799125787c"><param name="Name" value="detectDocumentClass"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a08700c2193b5a22258cc4c1e1ed75fd2"><param name="Name" value="docid"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classRank.html#a422f6b05f4e6fc11b8fa1e366a05ca35"><param name="Name" value="docno"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html"><param name="Name" value="Document"></OBJECT>
@@ -140,12 +161,12 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a4373490881c1eb0a116d58ba4fadbda4"><param name="Name" value="addSearchIndexFeature"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classAggregator.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="Aggregator"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a9d2382c804131e11945e74845303ffad"><param name="Name" value="analyze"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ae81281a264b315f52e45a783173a2183"><param name="Name" value="defineAggregatedMetaData"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#aa3aa93d9f07adcabd1470724144693f5"><param name="Name" value="defineAttribute"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#af9a2cd4173a8190fab3bd3769eac5cc7"><param name="Name" value="defineMetaData"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#af149fcec73bc0d082631792eba3ec932"><param name="Name" value="DocumentAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classNormalizer.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="Normalizer"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html#a4d56b0b39ff48491c3b70afd3ee5b2ed"><param name="Name" value="Variant"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a81e88b4b68cba30490e927ed0e57674a"><param name="Name" value="~DocumentAnalyzer"></OBJECT>
   </UL>
@@ -175,7 +196,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html#ae640f7a0eec1bffe7776bbae143af701"><param name="Name" value="init"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#ada338b974a910b3209d48c6840621f17"><param name="Name" value="insertDocument"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="unionVariantValue.html#a5ef2f5f79b7ad1a2cbb52bf45c825d63"><param name="Name" value="INT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a2c3690f51df53b1e96b1fb23900bfdac"><param name="Name" value="loadModule"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a3591b847c0c4885e8810bac481b3ff00"><param name="Name" value="loadModule"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classMetaData.html"><param name="Name" value="MetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a31c4f0b0b97af20658ad47549b412855"><param name="Name" value="metaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classMetaData.html"><param name="Name" value="MetaData"></OBJECT>
@@ -216,6 +237,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#afe3a8dabb6e321fcf09da84a0b0c91c0"><param name="Name" value="pushTerm"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html"><param name="Name" value="Query"></OBJECT>
   <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a729fda0a198196332faa76ddae4e09be"><param name="Name" value="addDocumentEvaluationSet"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a331feb7688a327de6d553668244db807"><param name="Name" value="addUserName"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#afcc42bfac084d0fdb35d67223ac8a18c"><param name="Name" value="attachVariable"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#aeca9b1f75d23d15e0fd6a0f9bab2d8c0"><param name="Name" value="defineFeature"></OBJECT>
@@ -244,12 +266,12 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html"><param name="Name" value="QueryAnalyzer"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a9b6f50e5a824397ebf55ef6e05e97923"><param name="Name" value="analyzePhrase"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6"><param name="Name" value="createQueue"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a6418201f50897aa1c90a5f121e8418f0"><param name="Name" value="definePhraseType"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classNormalizer.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="Normalizer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzeQueue.html#a7c7867773f5714f21bdc7c2a576df966"><param name="Name" value="QueryAnalyzeQueue"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a8d6aade542d15d90e1fb82a3b6c5299b"><param name="Name" value="QueryAnalyzer"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a0af34b0fee4a6d41ce71f778f7d152b2"><param name="Name" value="~QueryAnalyzer"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html"><param name="Name" value="QueryEval"></OBJECT>
@@ -260,11 +282,11 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#ab7df408cd7ba71513c2c21b757c586fb"><param name="Name" value="addSummarizer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a3bb223203381ce29339c949ce0618d16"><param name="Name" value="addTerm"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#aab35396b8f99190a93c11b9f8df8bac9"><param name="Name" value="addWeightingFunction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a29969c238aa6bc45659e0fe37b994a7c"><param name="Name" value="createQuery"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a6a6c4276144366c4c87047c0ec081c31"><param name="Name" value="QueryEval"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="StorageClient"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classSummarizerConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="SummarizerConfig"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="Variant"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classWeightingConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="WeightingConfig"></OBJECT>
@@ -306,6 +328,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html"><param name="Name" value="StorageClient"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3"><param name="Name" value="close"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#aeaa4bf1bb6a715b5c4e0d9c2126ecf97"><param name="Name" value="deleteDocument"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#af9f4465669e8ef6405872fa483fe2560"><param name="Name" value="deleteUserAccessRights"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a5a32aea2625f50441c2bbdf4e068a127"><param name="Name" value="flush"></OBJECT>
@@ -314,28 +337,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a0a3a992c9827f6c97dc9c15d4e51807f"><param name="Name" value="StorageClient"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StrusContext"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a7d434cc199749f8e74d7ed0fe9619bd2"><param name="Name" value="~StorageClient"></OBJECT>
-  </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html"><param name="Name" value="StrusContext"></OBJECT>
-  <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a49f8e708481da1408f6ebfa2b050a654"><param name="Name" value="addModulePath"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a1b01a7dd5810c71601d527d6b4ff32b9"><param name="Name" value="addResourcePath"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a86c1722ac6fcb1dff0e7c2b420b60877"><param name="Name" value="close"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a3d703ac60e9c1adb433d435dd2944c67"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a341dafbcfdfccf8ffd31f68749adc87d"><param name="Name" value="createQueryAnalyzer"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#abc3e97e45a74c4cac465d08b0863b998"><param name="Name" value="createQueryEval"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a62392af0109ae542d320a2472e58ef9b"><param name="Name" value="createStorage"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a9fd676be94820099cd28d6176d20e1c8"><param name="Name" value="createStorageClient"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#ae421411f7b591b46bdd475f7a9a083de"><param name="Name" value="destroyStorage"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a8958b7de16ab91f2cecfa517f67def67"><param name="Name" value="detectDocumentClass"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="DocumentAnalyzer"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a2c3690f51df53b1e96b1fb23900bfdac"><param name="Name" value="loadModule"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="QueryAnalyzer"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="QueryEval"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#ad42a462b43f6f70b226dcb38f4410f42"><param name="Name" value="StorageClient"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#abf30738cc04e67cffcaa0c72df22c535"><param name="Name" value="StrusContext"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a31dd513e303551e24211c60cd1f1bc54"><param name="Name" value="~StrusContext"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html#ab7a4828c8a78bcb30696f99c4da55860"><param name="Name" value="Summarizer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classSummarizerConfig.html"><param name="Name" value="SummarizerConfig"></OBJECT>
@@ -421,6 +423,7 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html#a452b49bb4a7e6a440df9ab09fd634034"><param name="Name" value="WeightingFunction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classAggregator.html#a7d43c66b841c5e2f7a597eee0e0426e6"><param name="Name" value="~Aggregator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a2d34e4556448e40693f61d15e091b604"><param name="Name" value="~Context"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a81e88b4b68cba30490e927ed0e57674a"><param name="Name" value="~DocumentAnalyzer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classNormalizer.html#aa6437195b1223879aa1f14f211a965b5"><param name="Name" value="~Normalizer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#aad0c964335e9809cc7e22af34e9e8410"><param name="Name" value="~Query"></OBJECT>
@@ -428,7 +431,6 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a0af34b0fee4a6d41ce71f778f7d152b2"><param name="Name" value="~QueryAnalyzer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#afbadb19a7fbe01c4340d32be6a0f81a4"><param name="Name" value="~QueryEval"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a7d434cc199749f8e74d7ed0fe9619bd2"><param name="Name" value="~StorageClient"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStrusContext.html#a31dd513e303551e24211c60cd1f1bc54"><param name="Name" value="~StrusContext"></OBJECT>
 </UL>
 </BODY>
 </HTML>
