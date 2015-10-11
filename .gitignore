@@ -41,6 +41,8 @@ DartConfiguration.tcl
 Testing/
 CPackConfig.cmake
 CPackSourceConfig.cmake
+src/internationalization.cpp
+src/version.hpp
 
 # Compiled programs
 tests/query_cpp/src/testQuery
