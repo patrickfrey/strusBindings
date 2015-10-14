@@ -1036,7 +1036,8 @@ public:
 	/// \param[in] opname_ name of the expression operator
 	/// \param[in] argc number of operands (topmost elements from stack) of the expression
 	/// \param[in] range_ range number for the expression span in the document
-	void pushExpression( const String& opname_, unsigned int argc, int range_=0);
+	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
+	void pushExpression( const String& opname_, unsigned int argc, int range_=0, unsigned int cardinality_=0);
 
 	/// \brief Push a duplicate of the topmost element of the query stack
 	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.

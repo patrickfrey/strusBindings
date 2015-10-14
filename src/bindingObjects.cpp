@@ -1004,7 +1004,7 @@ void Query::pushTerm( const std::string& type_, const std::string& value_)
 	THIS->pushTerm( type_, value_);
 }
 
-void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_)
+void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_, unsigned int cardinality_)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
@@ -1014,7 +1014,7 @@ void Query::pushExpression( const std::string& opname_, unsigned int argc, int r
 	if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_.c_str());
 
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushExpression( joinopr, argc, range_);
+	THIS->pushExpression( joinopr, argc, range_, cardinality_);
 }
 
 void Query::pushDuplicate()
