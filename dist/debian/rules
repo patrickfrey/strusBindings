@@ -31,9 +31,9 @@ build-stamp:
 	dh_testdir
 
 	# Add here commands to compile the package.
-	mkdir build && cd build && cmake .. && $(MAKE)
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib/$(DEB_HOST_MULTIARCH) -DWITH_PHP="YES" . && $(MAKE)
 ifeq "$(filter nocheck,$(DEB_BUILD_OPTIONS))" ""
-	cd build && $(MAKE) test
+	$(MAKE) test
 endif
 	# --- end custom part for compiling
 	touch build-stamp
@@ -44,7 +44,7 @@ clean:
 	rm -f build-stamp
 
 	# Add here commands to clean up after the build process.
-	test -d build || ( cd build && $(MAKE) distclean ) || true
+	$(MAKE) distclean || true
 	# --- end custom part for cleaning up
 
 	dh_clean
@@ -57,7 +57,18 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	cd build &&	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings
+	cd swig/php
+	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-php
+	cd ../..
+
+	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/doc/strus
+	cp swig/php/strus.php /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/doc/strus/.
+
+	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/php5/strus
+	cp debian/strus.ini /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/php5/strus/.
+
+	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php/etc/php5/mods-available
+	cp debian/strus.ini /usr/src/packages/BUILD/debian/strusbindings-php/etc/php5/mods-available/.
 	# --- end custom part for installing
 
 # Build architecture-independent files here.
@@ -89,6 +100,7 @@ binary-arch: build install
 	dh_makeshlibs
 	dh_installdeb
 #	dh_perl
+	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

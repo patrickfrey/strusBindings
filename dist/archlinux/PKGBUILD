@@ -1,40 +1,46 @@
 # Contributor: Patrick Frey <patrickpfrey@yahoo.com> 
 # Maintainer: Patrick Frey <patrickpfrey@yahoo.com> 
 
-pkgname=strusbindings
-pkgver=0.0.1
+pkgbase=strusbindings
+pkgname=(strusbindings-php)
+_mainpkgver=0.1.7
+pkgver=${_mainpkgver}
 pkgrel=1
-pkgdesc='Library implementing the storage of a text search engine.'
+pkgdesc='Language bindings for the strus text search engine.'
 license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://project-strus.net"
-depends=('boost>=1.48' 'boost-libs>=1.48' 'leveldb')
-makedepends=('cmake')
-source=("${pkgname}-${pkgver}.tar.gz")
+depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=0.1.6" "strusanalyzer>=0.1.6" "strusmodule>=0.1.5" "strusrpc>=0.1.9")
+makedepends=('cmake' 'swig' 'php')
+source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
 build() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Building..."
-  mkdir build
-  cd build
-  cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=%{_libdir} ..
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib -DWITH_PHP="YES" .
   make
 }
 
-package() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+package_strusbindings-php() {
+  cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Installing.."
-  cd build
   make DESTDIR=${pkgdir} install
+  
+  mkdir -p ${pkgdir}/usr/share/php
+  cp swig/php/strus.php ${pkgdir}/usr/share/php/.
+  
+  mkdir -p ${pkgdir}/etc/php/conf.d
+  cat > ${pkgdir}/etc/php/conf.d/strus.ini << EOF
+; Enable strus extensions module
+extension=strus_php.so
+EOF
 }
 
 check() {
-  cd ${srcdir}/${pkgname}-${pkgver}
+  cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Testing..."
-  cd build
   make test
 }
-
