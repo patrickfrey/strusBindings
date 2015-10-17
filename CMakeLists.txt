@@ -77,10 +77,5 @@ add_subdirectory( tests )
   
 include( cmake/report_build_settings.cmake )
 
-# Install header files:
-install(DIRECTORY include/strus
-          DESTINATION include
-          FILES_MATCHING PATTERN "*.hpp")
-
 include( cmake/standard_targets.cmake )
 
