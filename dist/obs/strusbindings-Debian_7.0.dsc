@@ -1,6 +1,6 @@
 Format: 3.0 (quilt)
 Source: strusbindings
-Version: 0.1.7-xUbuntu12.04
+Version: 0.1.7-Debian7.0
 Binary: strusbindings
 Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
 Architecture: any
