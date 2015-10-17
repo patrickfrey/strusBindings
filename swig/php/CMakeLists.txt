@@ -8,9 +8,8 @@ string( REPLACE "-I"  ""  PHP_INCLUDES  ${PHP_INCLUDES}  )
 string( STRIP  ${PHP_INCLUDES}  PHP_INCLUDES )
 string( REPLACE " "  ";"  PHP_INCLUDES  ${PHP_INCLUDES}  )
 MESSAGE( "PHP includes: ${PHP_INCLUDES}" )
-execute_process( COMMAND  php-config --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR )
-string( STRIP  ${PHP_EXTENSION_DIR}  PHP_EXTENSION_DIR )
-
+execute_process( COMMAND  php-config --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+MESSAGE( STATUS  "PHP module path: ${PHP_EXTENSION_DIR}" )
 include_directories( "${PROJECT_SOURCE_DIR}/include"  "${PROJECT_SOURCE_DIR}/swig/php"  ${PHP_INCLUDES} )
 link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" "${strusrpc_LIBRARY_DIRS}" )
 
@@ -31,8 +30,5 @@ target_link_libraries( strus_php  strus_bindings )
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install( TARGETS strus_php
-           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus )
-# Copy manually the strus_php.so module as strus.so to the path you get with php-config --extension-dir
-
-
+install(TARGETS strus_php
+	LIBRARY DESTINATION ${PHP_EXTENSION_DIR} )
