@@ -1163,7 +1163,7 @@ Context::Context( unsigned int maxNofThreads)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
 	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( stderr, maxNofThreads));
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
 	if (!m_errorhnd_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
@@ -1183,7 +1183,7 @@ Context::Context( const char* connectionstring, unsigned int maxNofThreads)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
 	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( stderr, maxNofThreads));
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
 	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
 
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
