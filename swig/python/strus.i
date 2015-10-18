@@ -4,14 +4,13 @@
 %include "typemaps.i"
 %include "exception.i"
 
-%apply const std::string& {std::string*};
-
 %{
 #include "../include/strus/bindingObjects.hpp"
 %}
 
 %include "ignore_declarations.i"
 %include "exception_handler.i"
+%include "strus_std_string.i"
 %include "std_vector_string.i"
 %include "std_vector_int.i"
 %include "std_vector_term.i"

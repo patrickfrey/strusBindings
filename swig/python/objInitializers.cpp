@@ -66,6 +66,13 @@ int initVariant( Variant& result, PyObject* obj)
 			char* objval = PyString_AS_STRING( obj);
 			result.assignText( std::string( objval));
 		}
+		else if (PyUnicode_Check( item))
+		{
+			PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+			int rt = initVariant( result, temp_obj);
+			Py_DECREF( temp_obj);
+			return rt;
+		}
 		else
 		{
 			PyErr_SetString( PyExc_Exception, "cannot convert value to numeric value or string");
@@ -97,6 +104,14 @@ static int initFunctionObject( Object& result, PyObject* obj)
 			error = -1;
 		}
 	}
+	else if (PyUnicode_Check( obj))
+	{
+		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		if (!temp_obj) return -1;
+		int rt = initFunctionObject( result, temp_obj);
+		Py_DECREF( temp_obj);
+		return rt;
+	}
 	else if (PySequence_Check( obj))
 	{
 		PyObject* seq = PySequence_Fast( obj, "function definition expected as sequence");
@@ -125,6 +140,24 @@ static int initFunctionObject( Object& result, PyObject* obj)
 						PyErr_SetString( PyExc_Exception, "out of memory exception");
 						error = -1;
 					}
+				}
+				else if (PyUnicode_Check( item))
+				{
+					PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+					if (!temp_obj) return -1;
+					char* name = PyString_AS_STRING( temp_obj);
+					try
+					{
+						result.setName( name);
+						Py_DECREF( temp_obj);
+					}
+					catch (...)
+					{
+						PyErr_SetString( PyExc_Exception, "out of memory exception");
+						error = -1;
+						Py_DECREF( temp_obj);
+					}
+					return rt;
 				}
 				else
 				{
@@ -158,6 +191,33 @@ static int initFunctionObject( Object& result, PyObject* obj)
 						char* itemval = PyString_AS_STRING( item);
 						result.addArgument( itemval);
 					}
+					else if (PyUnicode_Check( item))
+					{
+						PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+						if (!temp_obj)
+						{
+							error = -1;
+							break;
+						}
+						char* itemval = PyString_AS_STRING( item);
+						try
+						{
+							result.addArgument( itemval);
+							Py_DECREF( temp_obj);
+						}
+						catch (const std::bad_alloc& e)
+						{
+							Py_DECREF( temp_obj);
+							throw e;
+						}
+						catch (const std::exception& e)
+						{
+							Py_DECREF( temp_obj);
+							PyErr_SetString( PyExc_Exception, e.what());
+							error = -1;
+							break;
+						}
+					}
 					else
 					{
 						PyErr_SetString( PyExc_Exception, "function argument is not a string or a numeric type");
@@ -165,9 +225,15 @@ static int initFunctionObject( Object& result, PyObject* obj)
 						break;
 					}
 				}
-				catch (...)
+				catch (const std::bad_alloc&)
 				{
 					PyErr_SetString( PyExc_Exception, "out of memory exception");
+					error = -1;
+					break;
+				}
+				catch (const std::exception& e)
+				{
+					PyErr_SetString( PyExc_Exception, e.what());
 					error = -1;
 					break;
 				}
@@ -213,6 +279,14 @@ int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 			PyErr_SetString( PyExc_Exception, "out of memory exception");
 			return -1;
 		}
+	}
+	else if (PyUnicode_Check( item))
+	{
+		PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+		if (!temp_obj) return -1;
+		int rt = initNormalizerList( result, temp_obj);
+		Py_DECREF( temp_obj);
+		return rt;
 	}
 	else if (PySequence_Check( obj))
 	{
@@ -262,11 +336,24 @@ static int defineQueryEvaluationFunctionParameter( Object& result, PyObject* key
 {
 	int error = 0;
 	char* key;
+	PyObject *temp_obj = 0;
 	Variant value;
 
 	if (PyString_Check( keyitem))
 	{
 		key = PyString_AS_STRING( keyitem);
+	}
+	else if (PyUnicode_Check( keyitem))
+	{
+		temp_obj = PyUnicode_AsUTF8String( keyitem);
+		if (temp_obj)
+		{
+			key = PyString_AS_STRING( temp_obj);
+		}
+		else
+		{
+			error = -1;
+		}
 	}
 	else
 	{
@@ -317,6 +404,7 @@ static int defineQueryEvaluationFunctionParameter( Object& result, PyObject* key
 			error = -1;
 		}
 	}
+	if (temp_obj) Py_DECREF( temp_obj);
 	return error;
 }
 
@@ -391,6 +479,37 @@ int initWeightingConfig( WeightingConfig& result, PyObject* obj)
 	return initQueryEvalFunctionConfig( result, obj);
 }
 
+int initString( std::string& result, PyObject* obj)
+{
+	if (PyString_Check( obj))
+	{
+		char* item = PyString_AS_STRING( obj);
+		try
+		{
+			result = item;
+		}
+		catch (...)
+		{
+			PyErr_SetString( PyExc_Exception, "out of memory exception");
+			error = -1;
+		}
+	}
+	else if (PyUnicode_Check( obj))
+	{
+		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		if (!temp_obj) return -1;
+		int rt = initString( result, temp_obj);
+		Py_DECREF( temp_obj);
+		return rt;
+	}
+	else
+	{
+		PyErr_SetString( PyExc_Exception, "string expected as argument");
+		error = -1;
+	}
+	return error;
+}
+
 int initStringVector( std::vector<std::string>& result, PyObject* obj)
 {
 	int error = 0;
@@ -407,12 +526,21 @@ int initStringVector( std::vector<std::string>& result, PyObject* obj)
 			error = -1;
 		}
 	}
+	else if (PyUnicode_Check( obj))
+	{
+		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		if (!temp_obj) return -1;
+		int rt = initStringVector( result, temp_obj);
+		Py_DECREF( temp_obj);
+		return rt;
+	}
 	else if (PySequence_Check( obj))
 	{
 		PyObject* seq = PySequence_Fast( obj, "string list expected as sequence");
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			result.reserve( result.size() + len);
 			for (; ii < len; ii++)
 			{
 				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
@@ -423,6 +551,16 @@ int initStringVector( std::vector<std::string>& result, PyObject* obj)
 					{
 						char* itemval = PyString_AS_STRING( item);
 						result.push_back( itemval);
+					}
+					else if (PyUnicode_Check( item))
+					{
+						PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+						if (temp_obj)
+						{
+							char* itemval = PyString_AS_STRING( temp_obj);
+							result.push_back( itemval); //... does never throw because we have reserved the memory before this loop
+							Py_DECREF( temp_obj);
+						}
 					}
 					else
 					{

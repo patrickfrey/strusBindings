@@ -39,6 +39,7 @@ int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
 int initAggregator( Aggregator& result, PyObject* obj);
 int initSummarizerConfig( SummarizerConfig& result, PyObject* obj);
 int initWeightingConfig( WeightingConfig& result, PyObject* obj);
+int initString( std::string& result, PyObject* obj);
 int initStringVector( std::vector<std::string>& result, PyObject* obj);
 int initIntVector( std::vector<int>& result, PyObject* obj);
 
