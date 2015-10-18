@@ -573,7 +573,7 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 			if (next_mi == me || next_mi->first != mi->first)
 			{
 				// ... single attribute
-				add_property_string( rank, const_cast<char*>(mi->first.c_str()), mi->second, 1);
+				add_property_string( rank, const_cast<char*>(mi->first.c_str()), const_cast<char*>(mi->second), 1);
 			}
 			else
 			{
