@@ -45,7 +45,7 @@ try:
 	for term in terms:
 		# We push the query terms on the stack and create a query feature 'seek' 
 		# for each of it:
-		query.pushTerm( term["type"], term["value"])
+		query.pushTerm( term.type, term.value)
 		# Ever feature is duplicated on the stack, because we use them to 
 		# build the selection expression that selects all documents for ranking
 		# that contain all terms
@@ -75,9 +75,8 @@ try:
 	pos = 0
 	for result in results:
 		pos += 1
-		print "rank ", pos, ": ", result["docno"], " ", result["weight"], ":"
-		attributes = result["attributes"]
-		for attribute in attributes:
+		print "rank ", pos, ": ", result.docno, " ", result.weight, ":"
+		for attribute in result.attributes:
 			print "\t", attribute[0], ": ", attribute[1]
 	print "done"
 except Exception,err:

@@ -66,9 +66,9 @@ int initVariant( Variant& result, PyObject* obj)
 			char* objval = PyString_AS_STRING( obj);
 			result.assignText( std::string( objval));
 		}
-		else if (PyUnicode_Check( item))
+		else if (PyUnicode_Check( obj))
 		{
-			PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+			PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
 			int rt = initVariant( result, temp_obj);
 			Py_DECREF( temp_obj);
 			return rt;
@@ -157,7 +157,6 @@ static int initFunctionObject( Object& result, PyObject* obj)
 						error = -1;
 						Py_DECREF( temp_obj);
 					}
-					return rt;
 				}
 				else
 				{
@@ -280,9 +279,9 @@ int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 			return -1;
 		}
 	}
-	else if (PyUnicode_Check( item))
+	else if (PyUnicode_Check( obj))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
 		if (!temp_obj) return -1;
 		int rt = initNormalizerList( result, temp_obj);
 		Py_DECREF( temp_obj);
@@ -481,6 +480,7 @@ int initWeightingConfig( WeightingConfig& result, PyObject* obj)
 
 int initString( std::string& result, PyObject* obj)
 {
+	int error = 0;
 	if (PyString_Check( obj))
 	{
 		char* item = PyString_AS_STRING( obj);
@@ -663,21 +663,26 @@ PyObject* getTermVector( const std::vector<Term>& ar)
 	PyObject* value = 0;
 	PyObject* position = 0;
 
+	return (PyObject *) list; 
 	std::vector<Term>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (Py_ssize_t aidx=0; ai != ae; ++ai,++aidx)
 	{
-		elem = PyDict_New(); if (!elem) goto ERROR;
+		elem = PyObject_New();
+		if (!elem) goto ERROR;
 
-		type = PyString_FromString( ai->type().c_str()); if (!type) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "type", type)) goto ERROR;
+		type = PyString_FromString( ai->type().c_str());
+		if (!type) goto ERROR;
+		if (0!=PyObject_SetAttrString( elem, "type", type)) goto ERROR;
 		Py_DECREF( type); type = 0;
 
-		value = PyString_FromString( ai->value().c_str()); if (!value) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "value", value)) goto ERROR;
+		value = PyUnicode_FromStringAndSize( ai->value().c_str(), ai->value().size());
+		if (!value) goto ERROR;
+		if (0!=PyObject_SetAttrString( elem, "value", value)) goto ERROR;
 		Py_DECREF( value); value = 0;
 
-		position = PyInt_FromLong( ai->position()); if (!position) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "position", position)) goto ERROR;
+		position = PyInt_FromLong( ai->position());
+		if (!position) goto ERROR;
+		if (0!=PyObject_SetAttrString( elem, "position", position)) goto ERROR;
 		Py_DECREF( position); position = 0;
 
 		PyList_SET_ITEM( rt, aidx, elem);
@@ -708,15 +713,12 @@ static PyObject* getRankAttributeVector( const std::vector<RankAttribute>& ar)
 		elem = PyTuple_New( 2); if (!elem) goto ERROR;
 
 		if (0!=PyTuple_SetItem( elem, 0, name)) goto ERROR;
-//		Py_DECREF( name);
 		name = 0;
 
 		if (0!=PyTuple_SetItem( elem, 1, value)) goto ERROR;
-//		Py_DECREF( value);
 		value= 0;
 
 		PyList_SET_ITEM( rt, aidx, elem);
-//		Py_DECREF( elem);
 		elem= 0;
 	}
 	return rt;
@@ -740,25 +742,25 @@ PyObject* getRankVector( const std::vector<Rank>& ar)
 	std::vector<Rank>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (Py_ssize_t aidx=0; ai != ae; ++ai,++aidx)
 	{
-		elem = PyDict_New();
+		elem = PyObject_New();
+		if (!elem) goto ERROR;
 
-		docno = PyInt_FromLong( ai->docno()); if (!docno) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "docno", docno)) goto ERROR;
-//		Py_DECREF( docno);
+		docno = PyInt_FromLong( ai->docno());
+		if (!docno) goto ERROR;
+		if (0!=PyObject_SetAttrString( elem, "docno", docno)) goto ERROR;
 		docno = 0;
 
-		weight = PyFloat_FromDouble( ai->weight()); if (!weight) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "weight", weight)) goto ERROR;
-//		Py_DECREF( weight);
+		weight = PyFloat_FromDouble( ai->weight());
+		if (!weight) goto ERROR;
+		if (0!=PyObject_SetAttrString( elem, "weight", weight)) goto ERROR;
 		weight = 0;
 
-		attributes = getRankAttributeVector( ai->attributes()); if (!attributes) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "attributes", attributes)) goto ERROR;
-//		Py_DECREF( attributes);
+		attributes = getRankAttributeVector( ai->attributes());
+		if (!attributes) goto ERROR;
+		if (0!=PyObject_SetAttrString( elem, "attributes", attributes)) goto ERROR;
 		attributes = 0;
 
 		PyList_SET_ITEM( rt, aidx, elem);
-//		Py_DECREF( elem);
 		elem = 0;
 	}
 	return rt;
