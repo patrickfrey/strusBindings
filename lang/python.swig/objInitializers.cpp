@@ -663,7 +663,6 @@ PyObject* getTermVector( const std::vector<Term>& ar)
 	PyObject* value = 0;
 	PyObject* position = 0;
 
-	return (PyObject *) list; 
 	std::vector<Term>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (Py_ssize_t aidx=0; ai != ae; ++ai,++aidx)
 	{

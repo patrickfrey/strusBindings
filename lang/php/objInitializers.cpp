@@ -538,6 +538,23 @@ int getTermVector( zval* result, const std::vector<Term>& ar)
 	return 0;
 }
 
+static int getRankAttributeVector( zval* result, const std::vector<RankAttribute>& ar)
+{
+	array_init( result);
+	std::vector<RankAttribute>::const_iterator ai = ar.begin(), ae = ar.end();
+	for (; ai != ae; ++ai)
+	{
+		zval* attr;
+		MAKE_STD_ZVAL( attr);
+		object_init( attr);
+		add_property_string( attr, "name", const_cast<char*>(ai->name().c_str()), 1);
+		add_property_string( attr, "value", const_cast<char*>(ai->value().c_str()), 1);
+		add_property_double( attr, "weight", ai->weight());
+		add_next_index_zval( result, attr);
+	}
+	return 0;
+}
+
 int getRankVector( zval* result, const std::vector<Rank>& ar)
 {
 	array_init( result);
@@ -546,51 +563,15 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 	{
 		zval* rank;
 		MAKE_STD_ZVAL( rank);
+		zval* rankattr;
+		MAKE_STD_ZVAL( rankattr);
+
 		object_init( rank);
 		add_property_long( rank, "docno", ri->docno());
 		add_property_double( rank, "weight", ri->weight());
+		getRankAttributeVector( rankattr, ri->attributes());
+		add_property_zval( rank, "attributes", rankattr);
 
-		std::vector<RankAttribute>::const_iterator ai = ri->attributes().begin(), ae = ri->attributes().end();
-		std::multimap<std::string,const char*> attr;
-		try
-		{
-			for (; ai != ae; ++ai)
-			{
-				attr.insert( std::pair<std::string,const char*>( ai->name(), ai->value().c_str()));
-			}
-		}
-		catch (...)
-		{
-			THROW_EXCEPTION( "memory allocation error");
-			return 0;
-		}
-		std::multimap<std::string,const char*>::const_iterator
-			mi = attr.begin(), me = attr.end();
-		for (; mi != me; ++mi)
-		{
-			std::multimap<std::string,const char*>::const_iterator next_mi = mi;
-			++next_mi;
-			if (next_mi == me || next_mi->first != mi->first)
-			{
-				// ... single attribute
-				add_property_string( rank, const_cast<char*>(mi->first.c_str()), const_cast<char*>(mi->second), 1);
-			}
-			else
-			{
-				// ... multi element attribute
-				zval* multiattr;
-				MAKE_STD_ZVAL( multiattr);
-				array_init( multiattr);
-				while (next_mi != me && next_mi->first == mi->first)
-				{
-					add_next_index_string( multiattr, mi->second, 1);
-					++next_mi;
-					++mi;
-				}
-				add_next_index_string( multiattr, mi->second, 1);
-				add_property_zval( rank, mi->first.c_str(), multiattr);
-			}
-		}
 		add_next_index_zval( result, rank);
 	}
 	return 0;

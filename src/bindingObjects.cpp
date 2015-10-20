@@ -48,7 +48,7 @@
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "utils.hpp"
 #include <cmath>
 #include <stdexcept>
@@ -215,6 +215,38 @@ const char* Variant::getText() const
 	if (m_type == Variant_TEXT) return m_value.TEXT;
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
+
+bool Variant::isEqual( const Variant& o) const
+{
+	if (m_type != o.m_type)
+	{
+		if (m_type == Variant_UINT)
+		{
+			if (o.m_type == Variant_INT)
+			{
+				if (o.m_value.INT >= 0) return (unsigned int)o.m_value.INT == m_value.UINT;
+			}
+		}
+		else if (m_type == Variant_INT)
+		{
+			if (o.m_type == Variant_UINT)
+			{
+				if (m_value.INT >= 0) return (unsigned int)m_value.INT == o.m_value.UINT;
+			}
+		}
+		return false;
+	}
+	switch (m_type)
+	{
+		case Variant_UNDEFINED: return true;
+		case Variant_UINT: return m_value.UINT == o.m_value.UINT;
+		case Variant_INT: return m_value.INT == o.m_value.INT;
+		case Variant_FLOAT: {double ww = m_value.FLOAT - o.m_value.FLOAT; return (ww < 0.0)?(-ww<std::numeric_limits<double>::epsilon()):(ww<std::numeric_limits<double>::epsilon());}
+		case Variant_TEXT: return (m_value.TEXT && o.m_value.TEXT)?(std::strcmp( m_value.TEXT, o.m_value.TEXT)==0):(m_value.TEXT==o.m_value.TEXT);
+	}
+	return false;
+}
+
 
 Document::Document( const Document& o)
 	:m_searchIndexTerms(o.m_searchIndexTerms)
@@ -1144,9 +1176,7 @@ std::vector<Rank> Query::evaluate() const
 	
 		for (;ai != ae; ++ai)
 		{
-			RankAttribute attr;
-			attr.m_name = ai->name();
-			attr.m_value = ai->value();
+			RankAttribute attr( ai->name(), ai->value(), ai->weight());
 			reselem.m_attributes.push_back( attr);
 		}
 		rt.push_back( reselem);

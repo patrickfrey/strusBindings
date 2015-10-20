@@ -33,8 +33,8 @@ set( generated_java_source_files
 	VariantValue.java
 	WeightingConfig.java
 )
-set( CMAKE_JAVA_TARGET_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/swig/java/net/strus/api )
-add_jar( strus_api ${generated_java_source_files} OUTPUT_DIR ${PROJECT_SOURCE_DIR}/swig/java/net/strus/api)
+set( CMAKE_JAVA_TARGET_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api )
+add_jar( strus_api ${generated_java_source_files} OUTPUT_DIR ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api)
 
 # ------------------------------
 # INSTALLATION

@@ -10,8 +10,8 @@ link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" "${s
 add_custom_command(
 	OUTPUT strus_wrap.cxx python_strus.h
 	PRE_BUILD
-	COMMAND  swig -Werror -python -c++ -outdir ${PROJECT_SOURCE_DIR}/swig/python -o strus_wrap.cxx strus.i
-	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/swig/python"
+	COMMAND  swig -Werror -python -c++ -outdir ${PROJECT_SOURCE_DIR}/lang/python -o strus_wrap.cxx strus.i
+	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lang/python"
 	COMMENT "build Python bindings" VERBATIM
 	DEPENDS  strus.i exception_handler.i strus_variant.i strus_tokenizer.i strus_normalizer.i strus_aggregator.i strus_summarizer.i  strus_weighting.i  std_vector_string.i strus_std_string.i std_vector_int.i std_vector_rank.i std_vector_term.i ignore_declarations.i
 )

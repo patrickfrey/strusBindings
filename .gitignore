@@ -46,26 +46,26 @@ src/version.hpp
 
 # Compiled programs
 tests/query_cpp/src/testQuery
-swig/java/net/strus/example/*.class
-swig/java/net/strus/api/*.class
+lang/java/net/strus/example/*.class
+lang/java/net/strus/api/*.class
 
 # Generated test data
 tests/query_cpp/storage/
-swig/java/net/strus/example/storage/
-swig/python/example/storage/
+lang/java/net/strus/example/storage/
+lang/python/example/storage/
 
 # SWIG generated code
-swig/strusPYTHON_wrap.cxx
-swig/php/strus_wrap.cpp
-swig/php/php_strus.h
-swig/php/strus.php
-swig/java/strus_wrap.c
-swig/java/*.java
-swig/java/strus_wrap.cxx
-swig/java/net/strus/api/*.jar
-swig/java/net/strus/api/*.java
-swig/java/net/strus/api/*.class
-swig/python/strus.pyc
-swig/python/strus.py
-swig/python/strus_wrap.cxx
+lang/strusPYTHON_wrap.cxx
+lang/php/strus_wrap.cpp
+lang/php/php_strus.h
+lang/php/strus.php
+lang/java/strus_wrap.c
+lang/java/*.java
+lang/java/strus_wrap.cxx
+lang/java/net/strus/api/*.jar
+lang/java/net/strus/api/*.java
+lang/java/net/strus/api/*.class
+lang/python.swig/strus.pyc
+lang/python.swig/strus.py
+lang/python.swig/strus_wrap.cxx
 
