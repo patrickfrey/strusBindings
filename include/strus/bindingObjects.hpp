@@ -42,6 +42,8 @@
 namespace net {
 namespace strus {
 namespace api {
+#elif defined DOXYGEN_PYTHON
+namespace strus {
 #endif
 #elif (defined STRUS_BOOST_PYTHON)
 typedef std::string String;
@@ -286,7 +288,12 @@ private:
 };
 #endif
 
-
+#if defined DOXYGEN_LANG
+/// \brief Object representing a string or a numeric value of the binding language
+class Variant
+{
+};
+#else
 /// \brief Enumeration for defining internal variant representation
 enum VariantType
 {
@@ -297,12 +304,6 @@ enum VariantType
 	Variant_TEXT
 };
 
-#if defined DOXYGEN_LANG
-/// \brief Object representing a string or a numeric value of the binding language
-class Variant
-{
-};
-#else
 /// \brief Union for internal variant value representation
 union VariantValue
 {
@@ -1581,6 +1582,8 @@ private:
 #ifdef DOXYGEN_LANG
 #if defined DOXYGEN_JAVA
 }}}
+#elif defined DOXYGEN_PYTHON
+}
 #endif
 #endif
 #endif
