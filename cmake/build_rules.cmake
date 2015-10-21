@@ -13,8 +13,8 @@ set_property(GLOBAL PROPERTY rule_launch_link ccache)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 set( STRUS_OPTIMIZATION_LEVEL "3" )
-set( CMAKE_CXX_FLAGS "-std=c++98  -Wall -pedantic -g -Wfatal-errors -fvisibility=hidden -fPIC -O${STRUS_OPTIMIZATION_LEVEL}" )
-set( CMAKE_C_FLAGS "-std=c99 -Wall -pedantic -Wfatal-errors -fPIC -O${STRUS_OPTIMIZATION_LEVEL}" )
+set( CMAKE_CXX_FLAGS "-std=gnu++98  -Wall -g -fvisibility=default -fPIC -O${STRUS_OPTIMIZATION_LEVEL}" )
+set( CMAKE_C_FLAGS "-std=c99 -Wall -fPIC -O${STRUS_OPTIMIZATION_LEVEL}" )
 endif()
 
 if(WIN32)

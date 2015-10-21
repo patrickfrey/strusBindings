@@ -5,8 +5,8 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 # --------------------------------------
 set( source_files
 	bindingObjects.cpp
-	internationalization.cpp
 	utils.cpp
+	internationalization.cpp
 )
 
 include_directories(

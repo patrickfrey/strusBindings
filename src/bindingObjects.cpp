@@ -48,7 +48,7 @@
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "utils.hpp"
 #include <cmath>
 #include <stdexcept>
@@ -215,6 +215,38 @@ const char* Variant::getText() const
 	if (m_type == Variant_TEXT) return m_value.TEXT;
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
+
+bool Variant::isEqual( const Variant& o) const
+{
+	if (m_type != o.m_type)
+	{
+		if (m_type == Variant_UINT)
+		{
+			if (o.m_type == Variant_INT)
+			{
+				if (o.m_value.INT >= 0) return (unsigned int)o.m_value.INT == m_value.UINT;
+			}
+		}
+		else if (m_type == Variant_INT)
+		{
+			if (o.m_type == Variant_UINT)
+			{
+				if (m_value.INT >= 0) return (unsigned int)m_value.INT == o.m_value.UINT;
+			}
+		}
+		return false;
+	}
+	switch (m_type)
+	{
+		case Variant_UNDEFINED: return true;
+		case Variant_UINT: return m_value.UINT == o.m_value.UINT;
+		case Variant_INT: return m_value.INT == o.m_value.INT;
+		case Variant_FLOAT: {double ww = m_value.FLOAT - o.m_value.FLOAT; return (ww < 0.0)?(-ww<std::numeric_limits<double>::epsilon()):(ww<std::numeric_limits<double>::epsilon());}
+		case Variant_TEXT: return (m_value.TEXT && o.m_value.TEXT)?(std::strcmp( m_value.TEXT, o.m_value.TEXT)==0):(m_value.TEXT==o.m_value.TEXT);
+	}
+	return false;
+}
+
 
 Document::Document( const Document& o)
 	:m_searchIndexTerms(o.m_searchIndexTerms)
@@ -1004,7 +1036,7 @@ void Query::pushTerm( const std::string& type_, const std::string& value_)
 	THIS->pushTerm( type_, value_);
 }
 
-void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_)
+void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_, unsigned int cardinality_)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
@@ -1014,7 +1046,7 @@ void Query::pushExpression( const std::string& opname_, unsigned int argc, int r
 	if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_.c_str());
 
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushExpression( joinopr, argc, range_);
+	THIS->pushExpression( joinopr, argc, range_, cardinality_);
 }
 
 void Query::pushDuplicate()
@@ -1144,9 +1176,7 @@ std::vector<Rank> Query::evaluate() const
 	
 		for (;ai != ae; ++ai)
 		{
-			RankAttribute attr;
-			attr.m_name = ai->name();
-			attr.m_value = ai->value();
+			RankAttribute attr( ai->name(), ai->value(), ai->weight());
 			reselem.m_attributes.push_back( attr);
 		}
 		rt.push_back( reselem);
@@ -1163,7 +1193,7 @@ Context::Context( unsigned int maxNofThreads)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
 	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( stderr, maxNofThreads));
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
 	if (!m_errorhnd_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
@@ -1183,7 +1213,7 @@ Context::Context( const char* connectionstring, unsigned int maxNofThreads)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 {
 	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( stderr, maxNofThreads));
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
 	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
 
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;

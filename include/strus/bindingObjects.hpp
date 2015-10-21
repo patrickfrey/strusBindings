@@ -28,6 +28,7 @@
 */
 #ifndef _STRUS_BINDING_OBJECTS_HPP_INCLUDED
 #define _STRUS_BINDING_OBJECTS_HPP_INCLUDED
+#include <limits>
 #include <string>
 #include <vector>
 #include <map>
@@ -42,6 +43,10 @@ namespace net {
 namespace strus {
 namespace api {
 #endif
+#elif (defined STRUS_BOOST_PYTHON)
+typedef std::string String;
+typedef std::vector<int> IntVector;
+typedef std::vector<std::string> StringVector;
 #else
 #define String std::string
 #define IntVector std::vector<int>
@@ -53,16 +58,18 @@ namespace api {
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
 #endif
-
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
-
 
 #ifndef DOXYGEN_LANG
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
 class Reference
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	Reference()
+		:m_deleter(0){}
+#endif
 	typedef void (*Deleter)( void* obj);
 
 	/// \brief Default constructor
@@ -163,10 +170,10 @@ public:
 
 	~Normalizer(){}
 
-	const String& name() const				{return m_name;}
-	const StringVector& arguments() const	{return m_arguments;}
+	const String& name() const			{return m_name;}
+	const StringVector& arguments() const		{return m_arguments;}
 
-	void setName( const String& name_)			{m_name = name_;}
+	void setName( const String& name_)		{m_name = name_;}
 	void addArgument( const String& arg_)		{m_arguments.push_back( arg_);}
 	void addArgumentInt( long arg_);
 	void addArgumentFloat( double arg_);
@@ -178,6 +185,9 @@ private:
 	std::string m_name;
 	std::vector<std::string> m_arguments;
 };
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Normalizer> NormalizerVector;
+#endif
 
 
 /// \brief Object representing a aggregator function definition
@@ -222,14 +232,14 @@ public:
 
 	/// \brief Get the name of the aggregator function
 	/// \return the name
-	const String& name() const				{return m_name;}
+	const String& name() const			{return m_name;}
 	/// \brief Get the arguments of the aggregator function
 	/// \return the arguments
-	const StringVector& arguments() const	{return m_arguments;}
+	const StringVector& arguments() const		{return m_arguments;}
 
 	/// \brief Set the name of the aggregator function
 	/// \param[in] name_ the name
-	void setName( const String& name_)			{m_name = name_;}
+	void setName( const String& name_)		{m_name = name_;}
 	/// \brief Add an argument to the aggregator function
 	/// \param[in] arg_ the argument to add
 	void addArgument( const String& arg_)		{m_arguments.push_back( arg_);}
@@ -288,10 +298,10 @@ public:
 
 	/// \brief Check if the variant is defined (not NULL)
 	/// \return true, if yes, false if not
-	bool defined() const			{return m_type != Variant_UNDEFINED;}
+	bool defined() const				{return m_type != Variant_UNDEFINED;}
 	/// \brief Get the type of the variant 
 	/// \return the type
-	VariantType type() const		{return m_type;}
+	VariantType type() const			{return m_type;}
 	/// \brief Get the value of the variant as nonnegative integer
 	/// \return the value
 	unsigned long getUInt() const;
@@ -323,6 +333,19 @@ public:
 	/// \param[in] v the value to assign
 	void assignText( const String& v);
 
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Variant& o) const
+	{
+		return isEqual( o);
+	}
+	bool operator!=( const Variant& o) const
+	{
+		return !isEqual( o);
+	}
+#endif
+private:
+	bool isEqual( const Variant& o) const;
+
 private:
 	friend class Storage;
 	friend class Summarizer;
@@ -333,6 +356,7 @@ private:
 	VariantValue m_value;
 	std::string m_buf;
 };
+
 
 /// \brief One typed term occurrence in a document or a query
 class Term
@@ -349,17 +373,32 @@ public:
 		:m_position(0){}
 
 	/// \brief Get the term type name
-	const String& type() const		{return m_type;}
+	const String& type() const			{return m_type;}
 	/// \brief Get the term value
-	const String& value() const	{return m_value;}
+	const String& value() const			{return m_value;}
 	/// \brief Get the term position
-	unsigned int position() const		{return m_position;}
+	unsigned int position() const			{return m_position;}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Term& o) const
+	{
+		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position ;
+	}
+	bool operator!=( const Term& o) const
+	{
+		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position;
+	}
+#endif
 
 private:
 	std::string m_type;
 	std::string m_value;
 	Index m_position;
 };
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Term> TermVector;
+#endif
+
 
 /// \brief Data object that represents single numeric property of a document that
 ///	can be subject of retrieval or act as search restriction.
@@ -377,14 +416,28 @@ public:
 		:m_name(0),m_value(){}
 
 	/// \brief Get the type name of this meta data field:
-	const String& name() const		{return m_name;}
+	const String& name() const			{return m_name;}
 	/// \brief Get the value of this meta data field:
-	const Variant& value() const		{return m_value;}
+	const Variant& value() const			{return m_value;}
 
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const MetaData& o) const
+	{
+		return (m_name == o.m_name && m_value == o.m_value);
+	}
+	bool operator!=( const MetaData& o) const
+	{
+		return (m_name != o.m_name || m_value != o.m_value);
+	}
+#endif
 private:
 	std::string m_name;
 	Variant m_value;
 };
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<MetaData> MetaDataVector;
+#endif
+
 
 /// \brief Data object that describes a single property of a document
 ///	that is not subject of retrieval. It acts as description of the
@@ -405,12 +458,25 @@ public:
 	/// \brief Get the unique type name of this attribute
 	const String& name() const		{return m_name;}
 	/// \brief Get the type value of this attribute
-	const String& value() const	{return m_value;}
+	const String& value() const		{return m_value;}
 
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Attribute& o) const
+	{
+		return m_name == o.m_name && m_value == o.m_value;
+	}
+	bool operator!=( const Attribute& o) const
+	{
+		return m_name != o.m_name || m_value != o.m_value;
+	}
+#endif
 private:
 	std::string m_name;
 	std::string m_value;
 };
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Attribute> AttributeVector;
+#endif
 
 
 /// \brief Defines a description of the properties of a document content processed by the analyzer
@@ -421,32 +487,32 @@ public:
 	DocumentClass(){}
 	/// \brief Constructor
 	explicit DocumentClass(
-			const String& mimeType_)		:m_mimeType(mimeType_){}
+			const String& mimeType_)	:m_mimeType(mimeType_){}
 	/// \brief Constructor
 	DocumentClass(
 			const String& mimeType_,
-			const String& encoding_)		:m_mimeType(mimeType_),m_encoding(encoding_){}
+			const String& encoding_)	:m_mimeType(mimeType_),m_encoding(encoding_){}
 	/// \brief Constructor
 	DocumentClass(
 			const String& mimeType_,
 			const String& encoding_,
-			const String& scheme_)			:m_mimeType(mimeType_),m_scheme(scheme_),m_encoding(encoding_){}
+			const String& scheme_)		:m_mimeType(mimeType_),m_scheme(scheme_),m_encoding(encoding_){}
 	/// \brief Copy constructor
-	DocumentClass( const DocumentClass& o)			:m_mimeType(o.m_mimeType),m_scheme(o.m_scheme),m_encoding(o.m_encoding){}
+	DocumentClass( const DocumentClass& o)		:m_mimeType(o.m_mimeType),m_scheme(o.m_scheme),m_encoding(o.m_encoding){}
 
 	/// \brief Check if this document class is valid
 	/// \return true, if yes
-	bool valid() const					{return !m_mimeType.empty();}
+	bool valid() const				{return !m_mimeType.empty();}
 
 	/// \brief Set the MIME type of the document class
 	/// \param[in] mimeType_ the document MIME type string
-	void setMimeType( const String& mimeType_)		{m_mimeType = mimeType_;}
+	void setMimeType( const String& mimeType_)	{m_mimeType = mimeType_;}
 	/// \brief Set the scheme identifier of the document class
 	/// \param[in] scheme_ the document scheme identifier
-	void setScheme( const String& scheme_)			{m_scheme = scheme_;}
+	void setScheme( const String& scheme_)		{m_scheme = scheme_;}
 	/// \brief Set the character set encoding of the document class
 	/// \param[in] encoding_ the character set encoding as string
-	void setEncoding( const String& encoding_)		{m_encoding = encoding_;}
+	void setEncoding( const String& encoding_)	{m_encoding = encoding_;}
 
 	/// \brief Get the MIME type of the document class
 	/// \return the document MIME type string
@@ -491,6 +557,29 @@ public:
 	/// \param[in] value value of the meta data table element
 	void setMetaData( const String& name, const Variant& value);
 #endif
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Define a meta data value of the document
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData_double( const String& name, double value)
+	{
+		setMetaData_double( name, value);
+	}
+	/// \brief Define a meta data value of the document
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData_int( const String& name, int value)
+	{
+		setMetaData_double( name, value);
+	}
+	/// \brief Define a meta data value of the document
+	/// \param[in] name name of the meta data table element
+	/// \param[in] value value of the meta data table element
+	void setMetaData_uint( const String& name, unsigned int value)
+	{
+		setMetaData_double( name, value);
+	}
+#endif
 	/// \brief Define a meta data value of the document
 	/// \param[in] name name of the meta data table element
 	/// \param[in] value value of the meta data table element
@@ -517,19 +606,19 @@ public:
 
 	/// \brief Get the list of search terms of the document
 	/// \return the list of terms
-	const TermVector& searchIndexTerms() const			{return m_searchIndexTerms;}
+	const TermVector& searchIndexTerms() const		{return m_searchIndexTerms;}
 	/// \brief Get the list of forward terms of the document
 	/// \return the list of terms
-	const TermVector& forwardIndexTerms() const			{return m_forwardIndexTerms;}
+	const TermVector& forwardIndexTerms() const		{return m_forwardIndexTerms;}
 	/// \brief Get the list of meta data of the document
 	/// \return the list of meta data definitions
-	const MetaDataVector& metaData() const				{return m_metaData;}
+	const MetaDataVector& metaData() const			{return m_metaData;}
 	/// \brief Get the list of attributes of the document
 	/// \return the list of attributes
-	const AttributeVector& attributes() const			{return m_attributes;}
+	const AttributeVector& attributes() const		{return m_attributes;}
 	/// \brief Get the list of users that are allowed to access the document
 	/// \return the list of users allowed to access this document
-	const StringVector& users() const				{return m_users;}
+	const StringVector& users() const			{return m_users;}
 	/// \brief Get the document identifier (docid) of the document
 	/// \return the document identifier
 	const String& docid()					{return m_docid;}
@@ -552,6 +641,9 @@ private:
 class DocumentAnalyzer
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	DocumentAnalyzer(){}
+#endif
 	/// \brief Copy constructor
 	DocumentAnalyzer( const DocumentAnalyzer& o);
 	/// \brief Destructor
@@ -570,6 +662,21 @@ public:
 		const NormalizerVector& normalizers,
 		const StringVector& options=StringVector());
 
+#ifdef STRUS_BOOST_PYTHON
+	void addSearchIndexFeature_4(
+		const String& type,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_);
+
+	void addSearchIndexFeature_5(
+		const String& type,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_,
+		const StringVector& options);
+#endif
+
 	/// \brief Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
 	/// \param[in] type type of the features produced
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
@@ -583,6 +690,21 @@ public:
 		const NormalizerVector& normalizers,
 		const StringVector& options=StringVector());
 
+#ifdef STRUS_BOOST_PYTHON
+	void addForwardIndexFeature_4(
+		const String& type,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_);
+
+	void addForwardIndexFeature_5(
+		const String& type,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_,
+		const StringVector& options);
+#endif
+
 	/// \brief Define how a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
@@ -594,12 +716,26 @@ public:
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers);
 
+#ifdef STRUS_BOOST_PYTHON
+	void defineMetaData_obj(
+		const String& fieldname,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_);
+#endif
+
 	/// \brief Declare some aggregated value of the document to be put into the meta data table used for restrictions, weighting and summarization.
  	/// \param[in] fieldname name of the addressed meta data field.
 	/// \param[in] function defining how and from what the value is aggregated
 	void defineAggregatedMetaData(
 		const String& fieldname,
 		const Aggregator& function);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineAggregatedMetaData_obj(
+		const String& fieldname,
+		const FunctionObject& function_);
+#endif
 
 	/// \brief Define how a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
 	/// \param[in] attribname name of the addressed attribute.
@@ -612,6 +748,14 @@ public:
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers);
 
+#ifdef STRUS_BOOST_PYTHON
+	void defineAttribute_obj(
+		const String& fieldname,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_);
+#endif
+
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze
 	Document analyze( const String& content);
@@ -621,6 +765,17 @@ public:
 	/// \param[in] dclass document class of the document to analyze
 	Document analyze( const String& content, const DocumentClass& dclass);
 
+#ifdef STRUS_BOOST_PYTHON
+	Document analyze_1( const String& content)
+	{
+		return analyze( content);
+	}
+
+	Document analyze_2( const String& content, const DocumentClass& dclass)
+	{
+		return analyze( content, dclass);
+	}
+#endif
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
@@ -643,6 +798,9 @@ class QueryAnalyzeQueue;
 class QueryAnalyzer
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	QueryAnalyzer(){}
+#endif
 	/// \brief Copy constructor
 	QueryAnalyzer( const QueryAnalyzer& o);
 	/// \brief Destructor
@@ -659,6 +817,14 @@ public:
 			const String& featureType,
 			const Tokenizer& tokenizer,
 			const NormalizerVector& normalizers);
+
+#ifdef STRUS_BOOST_PYTHON
+	void definePhraseType_obj(
+		const String& phrasetype,
+		const String& selectexpr,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_);
+#endif
 
 	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
 	/// \param[in] phraseType name of the phrase type to use for analysis
@@ -689,6 +855,9 @@ private:
 class QueryAnalyzeQueue
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	QueryAnalyzeQueue(){}
+#endif
 	/// \brief Copy constructor
 	QueryAnalyzeQueue( const QueryAnalyzeQueue& o);
 	/// \brief Destructor
@@ -724,6 +893,9 @@ private:
 class StorageClient
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	StorageClient(){}
+#endif
 	/// \brief Copy constructor
 	StorageClient( const StorageClient& o);
 
@@ -820,6 +992,29 @@ public:
 		m_parameters[ name] = value;
 	}
 
+#ifdef STRUS_BOOST_PYTHON
+	void defineParameter_string( const String& name, const char* value)
+	{
+		defineParameter( name, value);
+	}
+	void defineParameter_charp( const String& name, const char* value)
+	{
+		defineParameter( name, value);
+	}
+	void defineParameter_int( const String& name, int value)
+	{
+		defineParameter( name, value);
+	}
+	void defineParameter_uint( const String& name, unsigned int value)
+	{
+		defineParameter( name, value);
+	}
+	void defineParameter_double( const String& name, double value)
+	{
+		defineParameter( name, value);
+	}
+#endif
+
 	/// \brief Define a summarizer feature
 	/// \param[in] sumtype type name of the feature as defined in the summarizer implementation
 	/// \param[in] set feature set of the feature used to address the features
@@ -906,6 +1101,9 @@ class Query;
 class QueryEval
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	QueryEval(){}
+#endif
 	/// \brief Copy constructor
 	QueryEval( const QueryEval& o);
 	/// \brief Destructor
@@ -941,6 +1139,13 @@ public:
 			const String& name,
 			const SummarizerConfig& config);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addSummarizer_obj(
+		const String& resultAttribute,
+		const String& name,
+		const FunctionObject& config_);
+#endif
+
 	/// \brief Add a weighting function to use as summand of the total document weight
 	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	/// \param[in] name the name of the weighting function to add
@@ -949,6 +1154,13 @@ public:
 			double weight,
 			const String& name,
 			const WeightingConfig& config);
+
+#ifdef STRUS_BOOST_PYTHON
+	void addWeightingFunction_obj(
+		double weight,
+		const String& name,
+		const FunctionObject& config_);
+#endif
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
@@ -971,24 +1183,44 @@ class RankAttribute
 {
 public:
 	/// \brief Constructor
-	RankAttribute(){}
+	RankAttribute()
+		:m_weight(0.0){}
 	/// \brief Constructor
-	RankAttribute( const String& name_, const String& value_)
-		:m_name(name_),m_value(value_){}
+	RankAttribute( const String& name_, const String& value_, double weight_)
+		:m_name(name_),m_value(value_),m_weight(weight_){}
 	/// \brief Copy connstructor
 	RankAttribute( const RankAttribute& o)
-		:m_name(o.m_name),m_value(o.m_value){}
+		:m_name(o.m_name),m_value(o.m_value),m_weight(o.m_weight){}
 
 	/// \brief Get the name of this attribute
 	const String& name() const		{return m_name;}
 	/// \brief Get the value of this attribute
 	const String& value() const		{return m_value;}
+	/// \brief Get the weight of the attribute
+	double weight() const			{return m_weight;}
 
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const RankAttribute& o) const
+	{
+		if (m_name != o.m_name || m_value != o.m_value) return false;
+		double ww = m_weight - o.m_weight;
+		return (ww < 0.0)?(-ww<std::numeric_limits<double>::epsilon()):(ww<std::numeric_limits<double>::epsilon());
+	}
+	bool operator!=( const RankAttribute& o) const
+	{
+		return !operator==(o);
+	}
+#endif
 private:
 	friend class Query;
 	std::string m_name;
 	std::string m_value;
+	double m_weight;
 };
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<RankAttribute> RankAttributeVector;
+#endif
+
 
 /// \brief Weighted document reference with attributes (result of a query evaluation)
 class Rank
@@ -1011,17 +1243,37 @@ public:
 	/// \brief Get the attributes
 	const RankAttributeVector& attributes() const		{return m_attributes;}
 
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Rank& o) const
+	{
+		if (m_docno != o.m_docno) return false;
+		double ww = (m_weight - o.m_weight);
+		return (ww < 0.0)?(-ww < std::numeric_limits<double>::epsilon()):(ww < std::numeric_limits<double>::epsilon());
+	}
+	bool operator!=( const Rank& o) const
+	{
+		return !operator==( o);
+	}
+#endif
+
 private:
 	friend class Query;
 	Index m_docno;
 	double m_weight;
 	std::vector<RankAttribute> m_attributes;
 };
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Rank> RankVector;
+#endif
+
 
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
 public:
+#ifdef STRUS_BOOST_PYTHON
+	Query(){}
+#endif
 	/// \brief Copy constructor
 	Query( const Query& o);
 	/// \brief Destructor
@@ -1036,7 +1288,23 @@ public:
 	/// \param[in] opname_ name of the expression operator
 	/// \param[in] argc number of operands (topmost elements from stack) of the expression
 	/// \param[in] range_ range number for the expression span in the document
-	void pushExpression( const String& opname_, unsigned int argc, int range_=0);
+	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
+	void pushExpression( const String& opname_, unsigned int argc, int range_=0, unsigned int cardinality_=0);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushExpression2( const String& opname_, unsigned int argc)
+	{
+		pushExpression( opname_, argc, 0, 0);
+	}
+	void pushExpression3( const String& opname_, unsigned int argc, int range_)
+	{
+		pushExpression( opname_, argc, range_, 0);
+	}
+	void pushExpression4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
+	{
+		pushExpression( opname_, argc, range_, cardinality_);
+	}
+#endif
 
 	/// \brief Push a duplicate of the topmost element of the query stack
 	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
@@ -1052,6 +1320,18 @@ public:
 	/// \param[in] set_ name of the feature set, this feature is addressed with
 	/// \param[in] weight_ individual weight of the feature in the query
 	void defineFeature( const String& set_, double weight_=1.0);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineFeature1( const String& set_)
+	{
+		defineFeature( set_, 1.0);
+	}
+
+	void defineFeature2( const String& set_, double weight_)
+	{
+		defineFeature( set_, weight_);
+	}
+#endif
 
 #ifndef DOXYGEN_JAVA
 	/// \brief Define a meta data restriction
@@ -1089,6 +1369,50 @@ public:
 	void defineMetaDataRestriction(
 			const char* compareOp, const String& name,
 			int value, bool newGroup=true);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineMetaDataRestriction_double_3(
+			const char* compareOp, const String& name,
+			double value)
+	{
+		defineMetaDataRestriction( compareOp, name, value, true);
+	}
+
+	void defineMetaDataRestriction_double_4(
+			const char* compareOp, const String& name,
+			double value, bool newGroup)
+	{
+		defineMetaDataRestriction( compareOp, name, value, newGroup);
+	}
+
+	void defineMetaDataRestriction_uint_3(
+			const char* compareOp, const String& name,
+			unsigned int value)
+	{
+		defineMetaDataRestriction( compareOp, name, value, true);
+	}
+
+	void defineMetaDataRestriction_uint_4(
+			const char* compareOp, const String& name,
+			unsigned int value, bool newGroup)
+	{
+		defineMetaDataRestriction( compareOp, name, value, newGroup);
+	}
+
+	void defineMetaDataRestriction_int_3(
+			const char* compareOp, const String& name,
+			int value)
+	{
+		defineMetaDataRestriction( compareOp, name, value, true);
+	}
+
+	void defineMetaDataRestriction_int_4(
+			const char* compareOp, const String& name,
+			int value, bool newGroup)
+	{
+		defineMetaDataRestriction( compareOp, name, value, newGroup);
+	}
+#endif
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
 	/// \param[in] docnolist_ list of documents to evaluate the query on
@@ -1184,6 +1508,18 @@ public:
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
 	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
+
+#ifdef STRUS_BOOST_PYTHON
+	DocumentAnalyzer createDocumentAnalyzer_0()
+	{
+		return createDocumentAnalyzer();
+	}
+
+	DocumentAnalyzer createDocumentAnalyzer_1( const String& segmentername_)
+	{
+		return createDocumentAnalyzer( segmentername_);
+	}
+#endif
 
 	/// \brief Create a query analyzer instance
 	QueryAnalyzer createQueryAnalyzer();
