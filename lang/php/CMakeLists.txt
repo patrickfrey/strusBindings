@@ -24,7 +24,7 @@ add_custom_command(
 )
 
 add_library( strus_php MODULE strus_wrap.cpp objInitializers.cpp )
-set_target_properties( strus_php PROPERTIES PREFIX "")
+set_target_properties( strus_php PROPERTIES PREFIX "" OUTPUT_NAME strus )
 target_link_libraries( strus_php  strus_bindings )
 
 # ------------------------------
