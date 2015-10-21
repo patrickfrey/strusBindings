@@ -41,7 +41,6 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -73,10 +72,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7f6f6fc3eaaddd33e0b287d9b77c220e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a7f6f6fc3eaaddd33e0b287d9b77c220e">~QueryAnalyzer</a> ()</td></tr>
 <tr class="memdesc:a7f6f6fc3eaaddd33e0b287d9b77c220e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#a7f6f6fc3eaaddd33e0b287d9b77c220e">More...</a><br/></td></tr>
 <tr class="separator:a7f6f6fc3eaaddd33e0b287d9b77c220e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af524baa1ecf3e92fd9f0b86f24aa99c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#af524baa1ecf3e92fd9f0b86f24aa99c3">definePhraseType</a> (const String &amp;phraseType, const String &amp;featureType, const <a class="el" href="classnet_1_1strus_1_1api_1_1Tokenizer.html">Tokenizer</a> &amp;tokenizer, const <a class="el" href="classnet_1_1strus_1_1api_1_1NormalizerVector.html">NormalizerVector</a> &amp;normalizers)</td></tr>
+<tr class="memitem:af524baa1ecf3e92fd9f0b86f24aa99c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#af524baa1ecf3e92fd9f0b86f24aa99c3">definePhraseType</a> (const String &amp;phraseType, const String &amp;featureType, const <a class="el" href="classnet_1_1strus_1_1api_1_1Tokenizer.html">Tokenizer</a> &amp;tokenizer, const NormalizerVector &amp;normalizers)</td></tr>
 <tr class="memdesc:af524baa1ecf3e92fd9f0b86f24aa99c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a phrase type by name. Phrases can be passed together with this name to the query analyzer to get the terms for building query.  <a href="#af524baa1ecf3e92fd9f0b86f24aa99c3">More...</a><br/></td></tr>
 <tr class="separator:af524baa1ecf3e92fd9f0b86f24aa99c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a4d11c20c69f3193598179b2ee4c285"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1TermVector.html">TermVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a2a4d11c20c69f3193598179b2ee4c285">analyzePhrase</a> (const String &amp;phraseType, const String &amp;phraseContent) const </td></tr>
+<tr class="memitem:a2a4d11c20c69f3193598179b2ee4c285"><td class="memItemLeft" align="right" valign="top">TermVector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a2a4d11c20c69f3193598179b2ee4c285">analyzePhrase</a> (const String &amp;phraseType, const String &amp;phraseContent) const </td></tr>
 <tr class="memdesc:a2a4d11c20c69f3193598179b2ee4c285"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.  <a href="#a2a4d11c20c69f3193598179b2ee4c285">More...</a><br/></td></tr>
 <tr class="separator:a2a4d11c20c69f3193598179b2ee4c285"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02c8509f7802b1ad2003bcd0927d8ade"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html">QueryAnalyzeQueue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a02c8509f7802b1ad2003bcd0927d8ade">createQueue</a> () const </td></tr>
@@ -142,7 +141,7 @@ Friends</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classnet_1_1strus_1_1api_1_1TermVector.html">TermVector</a> net::strus::api::QueryAnalyzer::analyzePhrase </td>
+          <td class="memname">TermVector net::strus::api::QueryAnalyzer::analyzePhrase </td>
           <td>(</td>
           <td class="paramtype">const String &amp;&#160;</td>
           <td class="paramname"><em>phraseType</em>, </td>
@@ -216,7 +215,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="classnet_1_1strus_1_1api_1_1NormalizerVector.html">NormalizerVector</a> &amp;&#160;</td>
+          <td class="paramtype">const NormalizerVector &amp;&#160;</td>
           <td class="paramname"><em>normalizers</em>&#160;</td>
         </tr>
         <tr>
@@ -270,7 +269,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 10 2015 19:52:34 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 21 2015 14:29:41 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
