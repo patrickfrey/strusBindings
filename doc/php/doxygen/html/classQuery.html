@@ -70,9 +70,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afe3a8dabb6e321fcf09da84a0b0c91c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#afe3a8dabb6e321fcf09da84a0b0c91c0">pushTerm</a> (const String &amp;type_, const String &amp;value_)</td></tr>
 <tr class="memdesc:afe3a8dabb6e321fcf09da84a0b0c91c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push a single term on the stack.  <a href="#afe3a8dabb6e321fcf09da84a0b0c91c0">More...</a><br/></td></tr>
 <tr class="separator:afe3a8dabb6e321fcf09da84a0b0c91c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcf83ba3bd69314e2c6df8f98256638e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#adcf83ba3bd69314e2c6df8f98256638e">pushExpression</a> (const String &amp;opname_, unsigned int argc, int range_=0)</td></tr>
-<tr class="memdesc:adcf83ba3bd69314e2c6df8f98256638e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack.  <a href="#adcf83ba3bd69314e2c6df8f98256638e">More...</a><br/></td></tr>
-<tr class="separator:adcf83ba3bd69314e2c6df8f98256638e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50f881f1b5b6ecafef060854783e93ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a50f881f1b5b6ecafef060854783e93ee">pushExpression</a> (const String &amp;opname_, unsigned int argc, int range_=0, unsigned int cardinality_=0)</td></tr>
+<tr class="memdesc:a50f881f1b5b6ecafef060854783e93ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack.  <a href="#a50f881f1b5b6ecafef060854783e93ee">More...</a><br/></td></tr>
+<tr class="separator:a50f881f1b5b6ecafef060854783e93ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7d9d6da24b9809ea7aa030a7b2bab6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#ae7d9d6da24b9809ea7aa030a7b2bab6b">pushDuplicate</a> ()</td></tr>
 <tr class="memdesc:ae7d9d6da24b9809ea7aa030a7b2bab6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push a duplicate of the topmost element of the query stack.  <a href="#ae7d9d6da24b9809ea7aa030a7b2bab6b">More...</a><br/></td></tr>
 <tr class="separator:ae7d9d6da24b9809ea7aa030a7b2bab6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -504,7 +504,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="adcf83ba3bd69314e2c6df8f98256638e"></a>
+<a class="anchor" id="a50f881f1b5b6ecafef060854783e93ee"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -524,7 +524,13 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>range_</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>range_</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>cardinality_</em> = <code>0</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -540,6 +546,7 @@ Friends</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">opname_</td><td>name of the expression operator </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">argc</td><td>number of operands (topmost elements from stack) of the expression </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">range_</td><td>range number for the expression span in the document </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cardinality_</td><td>number that specifies the minimum size of a subset or subset permutation to match </td></tr>
   </table>
   </dd>
 </dl>
@@ -657,7 +664,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 10 2015 19:52:49 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 21 2015 13:19:09 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -64,9 +64,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab58c8235ddb1c504fa6d966ca8ad2d21"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRankAttribute.html#ab58c8235ddb1c504fa6d966ca8ad2d21">RankAttribute</a> ()</td></tr>
 <tr class="memdesc:ab58c8235ddb1c504fa6d966ca8ad2d21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ab58c8235ddb1c504fa6d966ca8ad2d21">More...</a><br/></td></tr>
 <tr class="separator:ab58c8235ddb1c504fa6d966ca8ad2d21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72bc5426aff85a9342b26431f0035c9d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRankAttribute.html#a72bc5426aff85a9342b26431f0035c9d">RankAttribute</a> (const String &amp;name_, const String &amp;value_)</td></tr>
-<tr class="memdesc:a72bc5426aff85a9342b26431f0035c9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a72bc5426aff85a9342b26431f0035c9d">More...</a><br/></td></tr>
-<tr class="separator:a72bc5426aff85a9342b26431f0035c9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84ffddbf8e637cf57f09daa6e18cfdee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRankAttribute.html#a84ffddbf8e637cf57f09daa6e18cfdee">RankAttribute</a> (const String &amp;name_, const String &amp;value_, double weight_)</td></tr>
+<tr class="memdesc:a84ffddbf8e637cf57f09daa6e18cfdee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a84ffddbf8e637cf57f09daa6e18cfdee">More...</a><br/></td></tr>
+<tr class="separator:a84ffddbf8e637cf57f09daa6e18cfdee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe44e69bb6d95bd0c7e612353234140a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRankAttribute.html#abe44e69bb6d95bd0c7e612353234140a">RankAttribute</a> (const <a class="el" href="classRankAttribute.html">RankAttribute</a> &amp;o)</td></tr>
 <tr class="memdesc:abe44e69bb6d95bd0c7e612353234140a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy connstructor.  <a href="#abe44e69bb6d95bd0c7e612353234140a">More...</a><br/></td></tr>
 <tr class="separator:abe44e69bb6d95bd0c7e612353234140a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -76,6 +76,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a03af897479650415036158e98324a409"><td class="memItemLeft" align="right" valign="top">const String &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRankAttribute.html#a03af897479650415036158e98324a409">value</a> () const </td></tr>
 <tr class="memdesc:a03af897479650415036158e98324a409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value of this attribute.  <a href="#a03af897479650415036158e98324a409">More...</a><br/></td></tr>
 <tr class="separator:a03af897479650415036158e98324a409"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b4adbb1a00f090f79283e1c994ba5b6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRankAttribute.html#a4b4adbb1a00f090f79283e1c994ba5b6">weight</a> () const </td></tr>
+<tr class="memdesc:a4b4adbb1a00f090f79283e1c994ba5b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the weight of the attribute.  <a href="#a4b4adbb1a00f090f79283e1c994ba5b6">More...</a><br/></td></tr>
+<tr class="separator:a4b4adbb1a00f090f79283e1c994ba5b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -110,7 +113,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a72bc5426aff85a9342b26431f0035c9d"></a>
+<a class="anchor" id="a84ffddbf8e637cf57f09daa6e18cfdee"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -127,7 +130,13 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>value_</em>&#160;</td>
+          <td class="paramname"><em>value_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>weight_</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -223,6 +232,31 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a4b4adbb1a00f090f79283e1c994ba5b6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double RankAttribute::weight </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the weight of the attribute. </p>
+
+</div>
+</div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
 <a class="anchor" id="a0de80064a367adf51ab09f7a9b6de05a"></a>
 <div class="memitem">
@@ -251,7 +285,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Oct 10 2015 19:52:49 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 21 2015 13:19:09 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
