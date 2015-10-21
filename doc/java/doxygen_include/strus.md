@@ -14,7 +14,6 @@ It is the root object from which all other objects are created.
 It can be constructed either as proxy, that redirects all method calls to an RpcServer
 or it can be constructed as instance running in the Java/JNI environment.
 The following examples are tests built and executed in the strusBindings project.
-We are working on how to install the .jar with the strus API classes properly.
 
 \section CreateCollectionNoAnalyzer Create a collection of document (without using the strus analyzer)
 In the Java universe there exist a lot of alternatives to analyze or index a document. This example

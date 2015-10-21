@@ -51,7 +51,9 @@ typedef std::vector<std::string> StringVector;
 #define String std::string
 #define IntVector std::vector<int>
 #define StringVector std::vector<std::string>
+#if !defined DOXYGEN_PHP && !defined DOXYGEN_PYTHON
 #define NormalizerVector std::vector<Normalizer>
+#endif
 #define TermVector std::vector<Term>
 #define RankVector std::vector<Rank>
 #define RankAttributeVector std::vector<RankAttribute>
@@ -108,6 +110,12 @@ private:
 #endif
 
 
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief Object epresenting a configuration of a tokenizer as single string naming a tokenizer without arguments or a tuple of strings consisting of the tokenizer name followed by the arguments
+class Tokenizer
+{
+};
+#else
 /// \brief Object representing a tokenizer function definition
 class Tokenizer
 {
@@ -143,8 +151,15 @@ private:
 	std::string m_name;
 	std::vector<std::string> m_arguments;
 };
+#endif
 
 
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief Object representing a configuration of a normalizer as single string naming a normalizer without arguments or a tuple of strings consisting of the normalizer name followed by the arguments
+class Normalizer
+{
+};
+#else
 /// \brief Object representing a normalizer function definition
 class Normalizer
 {
@@ -185,11 +200,24 @@ private:
 	std::string m_name;
 	std::vector<std::string> m_arguments;
 };
+#endif
+
 #ifdef STRUS_BOOST_PYTHON
 typedef std::vector<Normalizer> NormalizerVector;
 #endif
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief A sequence of normalizer definitions represented as single string naming a normalizer without arguments or list of strings tuples consisting of the normalizer name followed by the arguments
+class NormalizerVector
+{
+};
+#endif
 
-
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief Object representing a configuration of an aggregator function as single string naming an aggregator without arguments or a tuple of strings consisting of the aggregator name followed by the arguments
+class Aggregator
+{
+};
+#else
 /// \brief Object representing a aggregator function definition
 class Aggregator
 {
@@ -256,6 +284,7 @@ private:
 	std::string m_name;
 	std::vector<std::string> m_arguments;
 };
+#endif
 
 
 /// \brief Enumeration for defining internal variant representation
@@ -268,6 +297,12 @@ enum VariantType
 	Variant_TEXT
 };
 
+#if defined DOXYGEN_LANG
+/// \brief Object representing a string or a numeric value of the binding language
+class Variant
+{
+};
+#else
 /// \brief Union for internal variant value representation
 union VariantValue
 {
@@ -356,6 +391,7 @@ private:
 	VariantValue m_value;
 	std::string m_buf;
 };
+#endif
 
 
 /// \brief One typed term occurrence in a document or a query
