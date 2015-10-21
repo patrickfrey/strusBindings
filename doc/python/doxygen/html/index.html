@@ -32,6 +32,7 @@
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -43,13 +44,154 @@
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The strus Python bindings provide a Python interface for accessing the retrieval storage, indexing documents and queries and evaluating queries. To use the strus Python interface you have to load the module 'strus'.</p>
-<p>The entry point of a strus application with Python is the context object (strus.context). It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Python environment.</p>
-<p>The following examples illustrate the usage of the Python bindings. </p>
-</div></div><!-- contents -->
+<p>The entry point of a strus application with Python is the context object (<a class="el" href="classstrus_1_1Context.html" title="Object holding the global context of the strus information retrieval engine. ">strus.Context</a>). It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the Python environment.</p>
+<p>The following examples illustrate the usage of the Python bindings. They are taken from tests built and executed in the strusBindings project.</p>
+<h1><a class="anchor" id="createCollection"></a>
+Create a collection, analyze and insert 3 documents</h1>
+<div class="fragment"><div class="line"><span class="keyword">import</span> strus</div>
+<div class="line">from os <span class="keyword">import</span> walk</div>
+<div class="line"></div>
+<div class="line">def readFile( path ):</div>
+<div class="line">        <span class="stringliteral">&quot;This function reads a file&quot;</span></div>
+<div class="line">        with open( path, mode=<span class="stringliteral">&#39;rb&#39;</span>) as file:</div>
+<div class="line">                fileContent = file.read()</div>
+<div class="line">        return fileContent</div>
+<div class="line"></div>
+<div class="line">config = <span class="stringliteral">&quot;path=storage; metadata=doclen UINT16&quot;</span></div>
+<div class="line">ctx = strus.Context()</div>
+<div class="line">try:</div>
+<div class="line">        ctx.destroyStorage( config)</div>
+<div class="line">        # ... delete the storage files if they already exists</div>
+<div class="line">except:</div>
+<div class="line">        pass</div>
+<div class="line"></div>
+<div class="line"># Create a new storage:</div>
+<div class="line">ctx.createStorage( config)</div>
+<div class="line"># Get a client for the new created storage:</div>
+<div class="line">storage = ctx.createStorageClient( config)</div>
+<div class="line"></div>
+<div class="line"># Define the document analyzer to use:</div>
+<div class="line">analyzer = ctx.createDocumentAnalyzer()</div>
+<div class="line"></div>
+<div class="line"># Define the features and attributes to store:</div>
+<div class="line">analyzer.addSearchIndexFeature( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, <span class="stringliteral">&quot;word&quot;</span>, ((<span class="stringliteral">&quot;stem&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>),<span class="stringliteral">&quot;lc&quot;</span>,(<span class="stringliteral">&quot;convdia&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>)))</div>
+<div class="line">analyzer.addForwardIndexFeature( <span class="stringliteral">&quot;orig&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, <span class="stringliteral">&quot;split&quot;</span>, <span class="stringliteral">&quot;orig&quot;</span>);</div>
+<div class="line">analyzer.defineAttribute( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;/doc/title()&quot;</span>, <span class="stringliteral">&quot;content&quot;</span>, <span class="stringliteral">&quot;orig&quot;</span>);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Read input files, analyze and insert them:</span></div>
+<div class="line"><span class="preprocessor"></span>datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
+<div class="line"><span class="keywordflow">for</span> (dirpath, dirnames, filenames) in walk( datadir):</div>
+<div class="line">        for idx, filename in enumerate( filenames):</div>
+<div class="line">                if filename.endswith(<span class="stringliteral">&#39;.xml&#39;</span>):</div>
+<div class="line">                        print <span class="stringliteral">&quot;%u process document %s&quot;</span> % (idx,filename)</div>
+<div class="line">                        docid = filename[0:-4]</div>
+<div class="line">                        doc = analyzer.analyze( readFile( datadir + filename))</div>
+<div class="line">                        storage.insertDocument( docid, doc)</div>
+<div class="line"></div>
+<div class="line"># Without this the documents wont be inserted:</div>
+<div class="line">storage.flush()</div>
+<div class="line">print <span class="stringliteral">&quot;done&quot;</span></div>
+</div><!-- fragment --><h1><a class="anchor" id="status"></a>
+Query some status info, the number of documents inserted</h1>
+<div class="fragment"><div class="line"><span class="keyword">import</span> strus</div>
+<div class="line"></div>
+<div class="line">config = <span class="stringliteral">&quot;path=storage&quot;</span></div>
+<div class="line">ctx = strus.Context()</div>
+<div class="line">storage = ctx.createStorageClient( config)</div>
+<div class="line"><span class="preprocessor"># Query the number of documents inserted:</span></div>
+<div class="line"><span class="preprocessor"></span>nofDocuments = storage.nofDocumentsInserted();</div>
+<div class="line"><span class="preprocessor"># Output:</span></div>
+<div class="line"><span class="preprocessor">print &quot;Number of documents inserted: &quot;, nofDocuments</span></div>
+</div><!-- fragment --><h1><a class="anchor" id="query"></a>
+Issue a BM25 query on the created collection (first example) and show the best ranked documents</h1>
+<div class="fragment"><div class="line"><span class="keyword">import</span> strus</div>
+<div class="line">from os <span class="keyword">import</span> walk</div>
+<div class="line"></div>
+<div class="line">queryphrase = <span class="stringliteral">&quot;city&quot;</span></div>
+<div class="line"></div>
+<div class="line">config = <span class="stringliteral">&quot;path=storage&quot;</span></div>
+<div class="line">ctx = strus.Context()</div>
+<div class="line"></div>
+<div class="line"><span class="keywordflow">try</span>:</div>
+<div class="line"><span class="preprocessor">        # Get a client for the storage:</span></div>
+<div class="line"><span class="preprocessor"></span>        storage = ctx.createStorageClient( config)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Define the query analyzer to use:</span></div>
+<div class="line"><span class="preprocessor"></span>        analyzer = ctx.createQueryAnalyzer()</div>
+<div class="line">        analyzer.definePhraseType( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;word&quot;</span>, ((<span class="stringliteral">&quot;stem&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>),<span class="stringliteral">&quot;lc&quot;</span>,(<span class="stringliteral">&quot;convdia&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>)))</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Define the query evaluation scheme:</span></div>
+<div class="line"><span class="preprocessor"></span>        queryEval = ctx.createQueryEval()</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Here we define what query features decide, what is ranked for the result:</span></div>
+<div class="line"><span class="preprocessor"></span>        queryEval.addSelectionFeature( <span class="stringliteral">&quot;select&quot;</span>)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Here we define how we rank a document selected. We use the &#39;BM25&#39; weighting scheme:</span></div>
+<div class="line"><span class="preprocessor"></span>        queryEval.addWeightingFunction( 1.0, <span class="stringliteral">&quot;BM25&quot;</span>, ((<span class="stringliteral">&quot;k1&quot;</span>,0.75), (<span class="stringliteral">&quot;b&quot;</span>,2.1), (<span class="stringliteral">&quot;avgdoclen&quot;</span>, 1000), (<span class="stringliteral">&quot;.match&quot;</span>, <span class="stringliteral">&quot;seek&quot;</span>)))</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Now we define what attributes of the documents are returned and how they are build.</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # The functions that extract stuff from documents for presentation are called summarizers.</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # First we add a summarizer that extracts us the title of the document:</span></div>
+<div class="line"><span class="preprocessor"></span>        queryEval.addSummarizer( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;attribute&quot;</span>, [(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;title&quot;</span>)])</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Then we add a summarizer that collects the sections that enclose the best matches </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # in a ranked document:</span></div>
+<div class="line"><span class="preprocessor"></span>        queryEval.addSummarizer( <span class="stringliteral">&quot;summary&quot;</span>, <span class="stringliteral">&quot;matchphrase&quot;</span>, ((<span class="stringliteral">&quot;type&quot;</span>,<span class="stringliteral">&quot;orig&quot;</span>),(<span class="stringliteral">&quot;nof&quot;</span>,4),(<span class="stringliteral">&quot;len&quot;</span>,60),(<span class="stringliteral">&quot;.match&quot;</span>,<span class="stringliteral">&quot;seek&quot;</span>)))</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Now we build the query to issue:</span></div>
+<div class="line"><span class="preprocessor"></span>        query = queryEval.createQuery( storage)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # First we analyze the query phrase to get the terms to find in the form as they are stored in the storage</span></div>
+<div class="line"><span class="preprocessor"></span>        terms = analyzer.analyzePhrase( <span class="stringliteral">&quot;word&quot;</span>, queryphrase)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Then we iterate on the terms and create a single term feature for each term and collect</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # all terms to create a selection expression out of them:</span></div>
+<div class="line"><span class="preprocessor"></span>        <span class="keywordflow">for</span> term in terms:</div>
+<div class="line"><span class="preprocessor">                # We push the query terms on the stack and create a query feature &#39;seek&#39; </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">                # for each of it:</span></div>
+<div class="line"><span class="preprocessor"></span>                query.pushTerm( term.type(), term.value())</div>
+<div class="line">                # Ever feature is duplicated on the stack, because we use them to </div>
+<div class="line">                # build the selection expression that selects all documents <span class="keywordflow">for</span> ranking</div>
+<div class="line">                # that contain all terms</div>
+<div class="line">                query.pushDuplicate()</div>
+<div class="line"><span class="preprocessor">                # We assign the features created to the set named &#39;seek&#39; because they are </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">                # referenced with this name in the query evaluation:</span></div>
+<div class="line"><span class="preprocessor"></span>                query.defineFeature( <span class="stringliteral">&quot;seek&quot;</span>, 1.0)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Create a selection feature &#39;select&#39; that matches documents that contain all query terms:</span></div>
+<div class="line"><span class="preprocessor"></span>        <span class="keywordflow">if</span> len(terms) &gt; 0:</div>
+<div class="line"><span class="preprocessor">                # Now we build the selection expression with the terms pushed as duplicates on</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">                # the stack in the loop before:</span></div>
+<div class="line"><span class="preprocessor"></span>                query.pushExpression( <span class="stringliteral">&quot;contains&quot;</span>, len( terms))</div>
+<div class="line"><span class="preprocessor">                # We assign the feature created to the set named &#39;select&#39; because this is the</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">                # name of the set defined as selection feature in the query evaluation configuration</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">                # (QueryEval.addSelectionFeature):</span></div>
+<div class="line"><span class="preprocessor"></span>                query.defineFeature( <span class="stringliteral">&quot;select&quot;</span>)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Define the maximum number of best result (ranks) to return:</span></div>
+<div class="line"><span class="preprocessor"></span>        query.setMaxNofRanks( 20)</div>
+<div class="line"><span class="preprocessor">        # Define the index of the first rank (for implementing scrolling: 0 for the first, </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # 20 for the 2nd, 40 for the 3rd page, etc.):</span></div>
+<div class="line"><span class="preprocessor"></span>        query.setMinRank( 0)</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Now we evaluate the query and iterate on the result to display them:</span></div>
+<div class="line"><span class="preprocessor"></span>        results = query.evaluate()</div>
+<div class="line">        pos = 0</div>
+<div class="line">        <span class="keywordflow">for</span> result in results:</div>
+<div class="line">                pos += 1</div>
+<div class="line">                print <span class="stringliteral">&quot;rank &quot;</span>, pos, <span class="stringliteral">&quot;: &quot;</span>, result.docno(), <span class="stringliteral">&quot; &quot;</span>, result.weight(), <span class="stringliteral">&quot;:&quot;</span></div>
+<div class="line">                attributes = result.attributes()</div>
+<div class="line">                <span class="keywordflow">for</span> attribute in attributes:</div>
+<div class="line">                        print <span class="stringliteral">&quot;\t&quot;</span>, attribute.name(), <span class="stringliteral">&quot;: &quot;</span>, attribute.value()</div>
+<div class="line">        print <span class="stringliteral">&quot;done&quot;</span></div>
+<div class="line">except Exception,err:</div>
+<div class="line">        print <span class="stringliteral">&quot;Error: &quot;</span>, str(err)</div>
+<div class="line">        raise</div>
+</div><!-- fragment --> </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Oct 21 2015 14:42:21 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 21 2015 15:01:02 for strusBindings by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
