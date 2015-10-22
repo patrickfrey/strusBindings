@@ -1,8 +1,10 @@
 strus Python bindings	 {#mainpage}
 =====================
 
-The strus Python bindings provide a Python interface for accessing the 
+The strus Python interface provides objects for accessing the 
 retrieval storage, indexing documents and queries and evaluating queries.
+It has been built using SWIG based on a wrapper C++ interface (@ref strus/bindingObjects.hpp).
+
 To use the strus Python interface you have to load the module 'strus'.
 
 The entry point of a strus application with Python is the context object (strus.Context).
