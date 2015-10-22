@@ -37,11 +37,6 @@
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ae3831684f5704d18308e369b745d5533"><param name="Name" value="GlobalCounter"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773"><param name="Name" value="Index"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189cae2ca733e24b5dd199f75e10303457b5d"><param name="Name" value="Variant_FLOAT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189ca42172195184f410c38e62a667f53f32f"><param name="Name" value="Variant_INT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189caf3e4fb8794a0f7161404ab8f78230377"><param name="Name" value="Variant_TEXT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189caa0f9bec318b7249586966ee11b0e33d0"><param name="Name" value="Variant_UINT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189ca0d7256b40bbce7cc98f898e03f107514"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="close"></OBJECT>
   <UL>
@@ -291,11 +286,6 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classTerm.html#a6b037f71ed1b020b19dae596b42a4e2f"><param name="Name" value="Term"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classVariant.html"><param name="Name" value="Variant"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189cae2ca733e24b5dd199f75e10303457b5d"><param name="Name" value="Variant_FLOAT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189ca42172195184f410c38e62a667f53f32f"><param name="Name" value="Variant_INT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189caf3e4fb8794a0f7161404ab8f78230377"><param name="Name" value="Variant_TEXT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189caa0f9bec318b7249586966ee11b0e33d0"><param name="Name" value="Variant_UINT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#a8baf1ee0db4eb07d4003875cfe03189ca0d7256b40bbce7cc98f898e03f107514"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classRank.html#afde88ed3e30c3b385513dbdb9327629b"><param name="Name" value="weight"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classRank.html#afde88ed3e30c3b385513dbdb9327629b"><param name="Name" value="Rank"></OBJECT>

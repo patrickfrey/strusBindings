@@ -6,6 +6,8 @@
 <UL>
 <LI><OBJECT type="text/sitemap"><param name="Name" value="strus Java bindings"><param name="Local" value="index.html"><param name="ImageNumber" value="11"></OBJECT>
   <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="This example shows the creation of the root object Context that accesses the storage directly."><param name="ImageNumber" value="1"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="This example shows the creation of the root object Context as RPC proxy."><param name="ImageNumber" value="1"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Create a collection of document (without using the strus analyzer)"><param name="ImageNumber" value="1"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Create a collection of documents (with strus analyzer)"><param name="ImageNumber" value="1"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Retrieve a ranklist with a simple query consisting of some terms (without analyzer)"><param name="ImageNumber" value="1"></OBJECT>
@@ -27,8 +29,6 @@
     <UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="All"><param name="Local" value="namespacemembers.html"><param name="ImageNumber" value="11"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Typedefs"><param name="Local" value="namespacemembers_type.html"><param name="ImageNumber" value="11"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Enumerations"><param name="Local" value="namespacemembers_enum.html"><param name="ImageNumber" value="11"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Enumerator"><param name="Local" value="namespacemembers_eval.html"><param name="ImageNumber" value="11"></OBJECT>
     </UL>
   </UL>
 <LI><OBJECT type="text/sitemap"><param name="Name" value="Classes"><param name="ImageNumber" value="1"></OBJECT>
@@ -559,14 +559,6 @@
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="GlobalCounter"><param name="Local" value="bindingObjects_8hpp.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="ImageNumber" value="11"></OBJECT>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="Index"><param name="Local" value="bindingObjects_8hpp.html#aef185b8df53f196d028b118ab9ff3485"><param name="ImageNumber" value="11"></OBJECT>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="VariantType"><param name="ImageNumber" value="1"></OBJECT>
-            <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Variant_UNDEFINED"><param name="Local" value="bindingObjects_8hpp.html#a9e21e9434e1bf93eeca3682578100752ad9d257e1d17cb0e9251b51c040bbe248"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Variant_UINT"><param name="Local" value="bindingObjects_8hpp.html#a9e21e9434e1bf93eeca3682578100752a3b0d436999e54e933b11f6c4df1b5b38"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Variant_INT"><param name="Local" value="bindingObjects_8hpp.html#a9e21e9434e1bf93eeca3682578100752a51f845adf01033be6bd8ff2d5eecef8d"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Variant_FLOAT"><param name="Local" value="bindingObjects_8hpp.html#a9e21e9434e1bf93eeca3682578100752a60a646e1e6f0ec2c012531a24f8bc826"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Variant_TEXT"><param name="Local" value="bindingObjects_8hpp.html#a9e21e9434e1bf93eeca3682578100752a1eea43b62fb8e32c221b8fe807fafbd1"><param name="ImageNumber" value="11"></OBJECT>
-            </UL>
           </UL>
         </UL>
       </UL>

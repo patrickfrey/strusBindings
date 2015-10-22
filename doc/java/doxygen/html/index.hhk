@@ -346,11 +346,6 @@
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#ac3bca9074f870772f57bbe3edf2108c5"><param name="Name" value="GlobalCounter"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485"><param name="Name" value="Index"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a60a646e1e6f0ec2c012531a24f8bc826"><param name="Name" value="Variant_FLOAT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a51f845adf01033be6bd8ff2d5eecef8d"><param name="Name" value="Variant_INT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a1eea43b62fb8e32c221b8fe807fafbd1"><param name="Name" value="Variant_TEXT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a3b0d436999e54e933b11f6c4df1b5b38"><param name="Name" value="Variant_UINT"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752ad9d257e1d17cb0e9251b51c040bbe248"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aada576797c21f134f0c59b0eddde1391"><param name="Name" value="nofDocumentsInserted"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Normalizer.html#a4b30b7098c890b50bca5ab4dbd9fb4d1"><param name="Name" value="Normalizer"></OBJECT>
@@ -415,11 +410,6 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1RankAttribute.html#a9b9fba339e94c0830ed2a44ba49de433"><param name="Name" value="net::strus::api::RankAttribute"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Term.html#ad2798fd7223f8508a386b1b1584d0f3f"><param name="Name" value="net::strus::api::Term"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a60a646e1e6f0ec2c012531a24f8bc826"><param name="Name" value="Variant_FLOAT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a51f845adf01033be6bd8ff2d5eecef8d"><param name="Name" value="Variant_INT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a1eea43b62fb8e32c221b8fe807fafbd1"><param name="Name" value="Variant_TEXT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752a3b0d436999e54e933b11f6c4df1b5b38"><param name="Name" value="Variant_UINT"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacenet_1_1strus_1_1api.html#a9e21e9434e1bf93eeca3682578100752ad9d257e1d17cb0e9251b51c040bbe248"><param name="Name" value="Variant_UNDEFINED"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a3c328b27eeb88f57fa0f2cb00092013e"><param name="Name" value="weight"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Rank.html#a3c328b27eeb88f57fa0f2cb00092013e"><param name="Name" value="net::strus::api::Rank"></OBJECT>
