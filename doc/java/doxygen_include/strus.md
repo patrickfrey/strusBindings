@@ -5,15 +5,30 @@ This interface documentation has been generated from the base C++ interface with
 additional stuff like namespaces and helper classes, that are specific for the Java interface.
 Unfortunately it contains still some type qualifiers pointing to it's C++ origin. 
 Please don't blame it for that. I'll find other solutions. Suggestions are welcome. 
+
 The strus Java bindings provide a Java interface for accessing the 
 retrieval storage, indexing documents and queries and evaluating queries.
 
 The entry point of a strus application with Java is the 
 context (@ref net::strus::api::Context) object.
 It is the root object from which all other objects are created.
+All objects of the strus Java API are in the namespace <i>net.strus.api</i>.
 It can be constructed either as proxy, that redirects all method calls to an RpcServer
 or it can be constructed as instance running in the Java/JNI environment.
-The following examples are tests built and executed in the strusBindings project.
+
+\section CreateContextFile This example shows the creation of the root object Context that accesses the storage directly.
+\code
+String storageConfig = "path=storage; metadata=doclen UINT16";
+net.strus.api.Context ctx = new net.strus.api.Context();
+net.strus.api.StorageClient storage = ctx.createStorageClient( config);
+\endcode
+
+\section CreateContextRpc This example shows the creation of the root object Context as RPC proxy.
+\code
+String rpcServer = "localhost:7181";
+Context ctx = new Context( rpcServer);
+net.strus.api.StorageClient storage = ctx.createStorageClient("");
+\endcode
 
 \section CreateCollectionNoAnalyzer Create a collection of document (without using the strus analyzer)
 In the Java universe there exist a lot of alternatives to analyze or index a document. This example
