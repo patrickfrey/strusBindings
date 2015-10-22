@@ -7,10 +7,10 @@ Default topic=index.html
 Index file=index.hhk
 Language=0x409 English (United States)
 Binary TOC=YES
-Title=strusBindings
+Title=strusPHP
 
 [WINDOWS]
-main="strusBindings","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,0x10387e,,,,,,,,0
+main="strusPHP","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,0x10387e,,,,,,,,0
 
 [FILES]
 bindingObjects_8hpp_source.html
