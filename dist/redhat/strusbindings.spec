@@ -374,17 +374,17 @@ make
 %install
 
 %if %{with_php}
-cd swig/php
+cd lang/php
 make DESTDIR=$RPM_BUILD_ROOT install
 cd ../..
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{phpdir}
-cp swig/php/strus.php $RPM_BUILD_ROOT/%{_datadir}/%{phpdir}/.
+cp lang/php/strus.php $RPM_BUILD_ROOT/%{_datadir}/%{phpdir}/.
 
 mkdir -p $RPM_BUILD_ROOT/%{php_inidir}
 cat > $RPM_BUILD_ROOT/%{php_inidir}/%{php_inifile} <<EOF
 ; Enable strus extensions module
-extension=strus_php.so
+extension=strus.so
 EOF
 
 %endif
@@ -406,7 +406,7 @@ make test
 %files php
 %defattr( -, root, root )
 %config(noreplace) %{php_inidir}/%{php_inifile}
-%{php_extdir}/strus_php.so
+%{php_extdir}/strus.so
 %{_datadir}/%{phpdir}/strus.php
 %endif
 
