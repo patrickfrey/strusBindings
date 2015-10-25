@@ -2,7 +2,7 @@
 # Maintainer: Patrick Frey <patrickpfrey@yahoo.com> 
 
 pkgbase=strusbindings
-pkgname=(strusbindings-php)
+pkgname=(strusbindings-php strusbindings-java)
 _mainpkgver=0.1.7
 pkgver=${_mainpkgver}
 pkgrel=1
@@ -12,21 +12,27 @@ arch=('i686' 'x86_64')
 url="http://project-strus.net"
 depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=0.1.6" "strusanalyzer>=0.1.6" "strusmodule>=0.1.5" "strusrpc>=0.1.9")
 makedepends=('cmake' 'swig' 'php')
+makedepends_php=('php')
+makedepends_java=('java-environment')
 source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
 build() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Building..."
-  cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib -DWITH_PHP="YES" .
+  JAVA_HOME=/usr/lib/jvm/default \
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib \
+	-DWITH_PHP="YES" -DWITH_JAVA="YES" .
   make
 }
 
 package_strusbindings-php() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
-  msg "Installing.."
+  msg "Installing Php bindings.."
+  cd lang/php
   make DESTDIR=${pkgdir} install
+  cd ../..
   
   mkdir -p ${pkgdir}/usr/share/php
   cp lang/php/strus.php ${pkgdir}/usr/share/php/.
@@ -36,6 +42,15 @@ package_strusbindings-php() {
 ; Enable strus extensions module
 extension=strus.so
 EOF
+}
+
+package_strusbindings-java() {
+  cd ${srcdir}/${pkgbase}-${_mainpkgver}
+
+  msg "Installing Java bindings.."
+  cd lang/java
+  make DESTDIR=${pkgdir} install
+  cd ../..  
 }
 
 check() {
