@@ -22,7 +22,8 @@ build() {
   msg "Building..."
   JAVA_HOME=/usr/lib/jvm/default \
 	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib \
-	-DWITH_PHP="YES" -DWITH_JAVA="YES" .
+	-DWITH_PHP="YES" -DWITH_JAVA="YES" \
+	-DJAVA_LIB_INSTALL_DIR=/usr/share/java .
   make
 }
 
