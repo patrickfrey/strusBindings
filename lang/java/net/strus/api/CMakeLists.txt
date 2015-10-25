@@ -39,6 +39,6 @@ add_jar( strus_api ${generated_java_source_files} OUTPUT_DIR ${PROJECT_SOURCE_DI
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install_jar( strus_api ${LIB_INSTALL_DIR}/strus )
+install_jar( strus_api ${JAVA_LIB_INSTALL_DIR}/strus )
 
 
