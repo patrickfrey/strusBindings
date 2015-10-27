@@ -29,12 +29,12 @@ package_strusbindings-php() {
   make DESTDIR=${pkgdir} install
   
   mkdir -p ${pkgdir}/usr/share/php
-  cp swig/php/strus.php ${pkgdir}/usr/share/php/.
+  cp lang/php/strus.php ${pkgdir}/usr/share/php/.
   
   mkdir -p ${pkgdir}/etc/php/conf.d
   cat > ${pkgdir}/etc/php/conf.d/strus.ini << EOF
 ; Enable strus extensions module
-extension=strus_php.so
+extension=strus.so
 EOF
 }
 

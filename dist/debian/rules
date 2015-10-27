@@ -57,12 +57,12 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	cd swig/php
+	cd lang/php
 	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-php
 	cd ../..
 
 	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/doc/strus
-	cp swig/php/strus.php /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/doc/strus/.
+	cp lang/php/strus.php /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/doc/strus/.
 
 	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/php5/strus
 	cp debian/strus.ini /usr/src/packages/BUILD/debian/strusbindings-php/usr/share/php5/strus/.
