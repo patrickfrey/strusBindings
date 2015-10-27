@@ -140,13 +140,20 @@ my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
 $renameMethodMap{"setMetaData_int"} = "setMetaData";
 $renameMethodMap{"setMetaData_uint"} = "setMetaData";
+$renameMethodMap{"setAttribute_unicode"} = "setAttribute";
+$renameMethodMap{"analyze_unicode_1"} = "analyze";
+$renameMethodMap{"analyze_unicode_2"} = "analyze";
 $renameMethodMap{"analyze_1"} = "analyze";
 $renameMethodMap{"analyze_2"} = "analyze";
+$renameMethodMap{"analyzePhrase_unicode"} = "analyzePhrase";
+$renameMethodMap{"analyzePhrase"} = "analyzePhrase";
+$renameMethodMap{"push_unicode"} = "push";
 $renameMethodMap{"defineParameter_string"} = "defineParameter";
 $renameMethodMap{"defineParameter_charp"} = "defineParameter";
 $renameMethodMap{"defineParameter_int"} = "defineParameter";
 $renameMethodMap{"defineParameter_uint"} = "defineParameter";
 $renameMethodMap{"defineParameter_double"} = "defineParameter";
+$renameMethodMap{"defineParameter_unicode"} = "defineParameter";
 $renameMethodMap{"defineMetaDataRestriction_double_3"} = "defineMetaDataRestriction";
 $renameMethodMap{"defineMetaDataRestriction_double_4"} = "defineMetaDataRestriction";
 $renameMethodMap{"defineMetaDataRestriction_int_3"} = "defineMetaDataRestriction";
@@ -162,6 +169,11 @@ $renameMethodMap{"pushExpression3"} = "pushExpression";
 $renameMethodMap{"pushExpression4"} = "pushExpression";
 $renameMethodMap{"defineFeature1"} = "defineFeature";
 $renameMethodMap{"defineFeature2"} = "defineFeature";
+$renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
+$renameMethodMap{"createStorage_unicode"} = "createStorage";
+$renameMethodMap{"destroyStorage_unicode"} = "destroyStorage";
+$renameMethodMap{"detectDocumentClass_unicode"} = "detectDocumentClass";
+$renameMethodMap{"createDocumentAnalyzer_unicode"} = "createDocumentAnalyzer";
 $renameMethodMap{"createDocumentAnalyzer_0"} = "createDocumentAnalyzer";
 $renameMethodMap{"createDocumentAnalyzer_1"} = "createDocumentAnalyzer";
 $renameMethodMap{"defineMetaData_obj"} = "defineMetaData";
@@ -170,6 +182,12 @@ $renameMethodMap{"defineAttribute_obj"} = "defineAttribute";
 $renameMethodMap{"definePhraseType_obj"} = "definePhraseType";
 $renameMethodMap{"addSummarizer_obj"} = "addSummarizer";
 $renameMethodMap{"addWeightingFunction_obj"} = "addWeightingFunction";
+$renameMethodMap{"deleteDocument_unicode"} = "deleteDocument";
+$renameMethodMap{"deleteUserAccessRights_unicode"} = "deleteUserAccessRights";
+$renameMethodMap{"pushTerm_unicode"} = "pushTerm";
+$renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
+$renameMethodMap{"addModulePath_unicode"} = "addModulePath";
+$renameMethodMap{"addUserName_unicode"} = "addUserName";
 
 sub parseType
 {
@@ -481,7 +499,11 @@ foreach $inputfile( @inputfiles)
 			my $interfacename = nextToken();
 			if (nextToken() eq "{")
 			{
-				parseClass( $interfacename);
+				if (nextToken() ne "}")
+				{
+					prevToken();
+					parseClass( $interfacename);
+				}
 			}
 		}
 		++$ti;

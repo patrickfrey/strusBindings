@@ -194,19 +194,42 @@ void Variant::assignText( const std::string& v)
 
 unsigned long Variant::getUInt() const
 {
+	switch (m_type)
+	{
+		case Variant_INT: if (m_value.INT>=0) return m_value.UINT; else break;
+		case Variant_UINT: return (int)m_value.UINT;
+		case Variant_UNDEFINED: break;
+		case Variant_FLOAT: break;
+		case Variant_TEXT: break;
+	}
+	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 	if (m_type == Variant_UINT) return m_value.UINT;
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
 long Variant::getInt() const
 {
-	if (m_type == Variant_INT) return m_value.INT;
+	switch (m_type)
+	{
+		case Variant_INT: return (int)m_value.INT;
+		case Variant_UINT: if (m_value.INT>=0) return (int)m_value.INT; else break;
+		case Variant_UNDEFINED: break;
+		case Variant_FLOAT: break;
+		case Variant_TEXT: break;
+	}
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
 double Variant::getFloat() const
 {
-	if (m_type == Variant_FLOAT) return m_value.FLOAT;
+	switch (m_type)
+	{
+		case Variant_INT: return (double)m_value.INT;
+		case Variant_UINT: return (double)m_value.UINT;
+		case Variant_FLOAT: return m_value.FLOAT;
+		case Variant_UNDEFINED: break;
+		case Variant_TEXT: break;
+	}
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 

@@ -47,10 +47,12 @@ namespace strus {
 #endif
 #elif (defined STRUS_BOOST_PYTHON)
 typedef std::string String;
+typedef std::wstring WString;
 typedef std::vector<int> IntVector;
 typedef std::vector<std::string> StringVector;
 #else
 #define String std::string
+#define WString std::wstring
 #define IntVector std::vector<int>
 #define StringVector std::vector<std::string>
 #if !defined DOXYGEN_PHP && !defined DOXYGEN_PYTHON
@@ -64,6 +66,11 @@ typedef std::vector<std::string> StringVector;
 #endif
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
+
+#ifdef STRUS_BOOST_PYTHON
+std::string convert_UTF16_to_UTF8( const std::wstring& val);
+std::wstring convert_UTF8_to_UTF16( const std::string& val);
+#endif
 
 #ifndef DOXYGEN_LANG
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
@@ -114,6 +121,7 @@ private:
 
 #if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
 /// \brief Object epresenting a configuration of a tokenizer as single string naming a tokenizer without arguments or a tuple of strings consisting of the tokenizer name followed by the arguments
+#error DOXYGEN_PYTHON
 class Tokenizer
 {
 };
@@ -413,6 +421,12 @@ public:
 	const String& type() const			{return m_type;}
 	/// \brief Get the term value
 	const String& value() const			{return m_value;}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const
+	{
+		return convert_UTF8_to_UTF16( m_value);
+	}
+#endif
 	/// \brief Get the term position
 	unsigned int position() const			{return m_position;}
 
@@ -455,7 +469,7 @@ public:
 	/// \brief Get the type name of this meta data field:
 	const String& name() const			{return m_name;}
 	/// \brief Get the value of this meta data field:
-	const Variant& value() const			{return m_value;}
+	double value() const				{return m_value.getFloat();}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const MetaData& o) const
@@ -497,6 +511,13 @@ public:
 	/// \brief Get the type value of this attribute
 	const String& value() const		{return m_value;}
 
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const
+	{
+		return convert_UTF8_to_UTF16( m_value);
+	}
+#endif
+	
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Attribute& o) const
 	{
@@ -595,26 +616,17 @@ public:
 	void setMetaData( const String& name, const Variant& value);
 #endif
 #ifdef STRUS_BOOST_PYTHON
-	/// \brief Define a meta data value of the document
-	/// \param[in] name name of the meta data table element
-	/// \param[in] value value of the meta data table element
 	void setMetaData_double( const String& name, double value)
 	{
-		setMetaData_double( name, value);
+		setMetaData( name, value);
 	}
-	/// \brief Define a meta data value of the document
-	/// \param[in] name name of the meta data table element
-	/// \param[in] value value of the meta data table element
 	void setMetaData_int( const String& name, int value)
 	{
-		setMetaData_double( name, value);
+		setMetaData( name, value);
 	}
-	/// \brief Define a meta data value of the document
-	/// \param[in] name name of the meta data table element
-	/// \param[in] value value of the meta data table element
 	void setMetaData_uint( const String& name, unsigned int value)
 	{
-		setMetaData_double( name, value);
+		setMetaData( name, value);
 	}
 #endif
 	/// \brief Define a meta data value of the document
@@ -633,6 +645,12 @@ public:
 	/// \param[in] name name of the document attribute
 	/// \param[in] value value of the document attribute
 	void setAttribute( const String& name, const String& value);
+#ifdef STRUS_BOOST_PYTHON
+	void setAttribute_unicode( const String& name, const WString& value)
+	{
+		setAttribute( name, convert_UTF16_to_UTF8( value));
+	}
+#endif
 	/// \brief Allow a user to access the document
 	/// \param[in] username name of the user to be allowed to access this document
 	/// \remark This function is only implemented if ACL is enabled in the storage
@@ -803,6 +821,15 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
+	Document analyze_unicode_1( const WString& content)
+	{
+		return analyze( convert_UTF16_to_UTF8( content));
+	}
+
+	Document analyze_unicode_2( const WString& content, const DocumentClass& dclass)
+	{
+		return analyze( convert_UTF16_to_UTF8( content), dclass);
+	}
 	Document analyze_1( const String& content)
 	{
 		return analyze( content);
@@ -871,6 +898,15 @@ public:
 			const String& phraseType,
 			const String& phraseContent) const;
 
+#ifdef STRUS_BOOST_PYTHON
+	TermVector analyzePhrase_unicode(
+			const String& phraseType,
+			const WString& phraseContent) const
+	{
+		return analyzePhrase( phraseType, convert_UTF16_to_UTF8( phraseContent));
+	}
+#endif
+
 	/// \brief Creates a queue for phrase bulk analysis
 	/// \return the queue
 	QueryAnalyzeQueue createQueue() const;
@@ -906,6 +942,12 @@ public:
 	void push(
 			const String& phraseType,
 			const String& phraseContent);
+#ifdef STRUS_BOOST_PYTHON
+	void push_unicode( const String& phraseType, const WString& phraseContent)
+	{
+		push( phraseType, convert_UTF16_to_UTF8( phraseContent));
+	}
+#endif
 
 	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
 	/// \return list of terms (query phrase analyzer result)
@@ -953,11 +995,23 @@ public:
 	/// \param[in] docid the identifier of the document to delete
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
 	void deleteDocument( const String& docid);
+#ifdef STRUS_BOOST_PYTHON
+	void deleteDocument_unicode( const WString& docid)
+	{
+		deleteDocument( convert_UTF16_to_UTF8( docid));
+	}
+#endif
 
 	/// \brief Prepare the deletion of all document access rights of a user
 	/// \param[in] username the name of the user to delete all access rights (in the local collection)
 	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const String& username);
+#ifdef STRUS_BOOST_PYTHON
+	void deleteUserAccessRights_unicode( const WString& username)
+	{
+		deleteUserAccessRights( convert_UTF16_to_UTF8( username));
+	}
+#endif
 
 	/// \brief Commit all insert or delete or user access right change statements open.
 	void flush();
@@ -1029,29 +1083,6 @@ public:
 		m_parameters[ name] = value;
 	}
 
-#ifdef STRUS_BOOST_PYTHON
-	void defineParameter_string( const String& name, const char* value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_charp( const String& name, const char* value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_int( const String& name, int value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_uint( const String& name, unsigned int value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_double( const String& name, double value)
-	{
-		defineParameter( name, value);
-	}
-#endif
-
 	/// \brief Define a summarizer feature
 	/// \param[in] sumtype type name of the feature as defined in the summarizer implementation
 	/// \param[in] set feature set of the feature used to address the features
@@ -1113,6 +1144,13 @@ public:
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
 	void defineParameter( const String& name, const char* value)
+	{
+		m_parameters[ name] = Variant(value);
+	}
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const String& name, const String& value)
 	{
 		m_parameters[ name] = Variant(value);
 	}
@@ -1236,7 +1274,9 @@ public:
 	/// \brief Get the weight of the attribute
 	double weight() const			{return m_weight;}
 
-#ifdef STRUS_BOOST_PYTHON
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const			{return convert_UTF8_to_UTF16( m_value);}
+
 	bool operator==( const RankAttribute& o) const
 	{
 		if (m_name != o.m_name || m_value != o.m_value) return false;
@@ -1320,6 +1360,13 @@ public:
 	/// \param[in] type_ query term type name
 	/// \param[in] value_ query term value
 	void pushTerm( const String& type_, const String& value_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushTerm_unicode( const String& type_, const WString& value_)
+	{
+		pushTerm( type_, convert_UTF16_to_UTF8( value_));
+	}
+#endif
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
 	/// \param[in] opname_ name of the expression operator
@@ -1469,6 +1516,13 @@ public:
 	/// \note the user restriction applies if no user role specified in the query is allowed to see the document.
 	void addUserName( const String& username_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addUserName_unicode( const WString& username_)
+	{
+		addUserName( convert_UTF16_to_UTF8( username_));
+	}
+#endif
+
 	/// \brief Evaluate this query and return the result
 	/// \return the result
 	RankVector evaluate() const;
@@ -1518,40 +1572,80 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addModulePath( const String& paths_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addModulePath_unicode( const WString& paths_)
+	{
+		addModulePath( convert_UTF16_to_UTF8( paths_));
+	}
+#endif
 	/// \brief Define where to load analyzer resource files from
 	/// \param[in] paths_ semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addResourcePath_unicode( const WString& paths_)
+	{
+		addResourcePath( convert_UTF16_to_UTF8( paths_));
+	}
+#endif
 	/// \brief Create a storage client instance
 	/// \param[in] config_ configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,
 	StorageClient createStorageClient( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	StorageClient createStorageClient_unicode( const WString& config_)
+	{
+		return createStorageClient( convert_UTF16_to_UTF8( config_));
+	}
+#endif
 
 	/// \brief Create a new storage (physically) described by config
 	/// \param[in] config_ storage configuration
  	/// \remark Fails if the storage already exists
 	void createStorage( const String& config_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void createStorage_unicode( const WString& config_)
+	{
+		return createStorage( convert_UTF16_to_UTF8( config_));
+	}
+#endif
 	/// \brief Delete the storage (physically) described by config
 	/// \param[in] config_ storage description
 	/// \note Handle this function carefully
 	void destroyStorage( const String& config_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void destroyStorage_unicode( const WString& config_)
+	{
+		return destroyStorage( convert_UTF16_to_UTF8( config_));
+	}
+#endif
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
 	/// \return the document class
 	DocumentClass detectDocumentClass( const String& content);
 
+#ifdef STRUS_BOOST_PYTHON
+	DocumentClass detectDocumentClass_unicode( const WString& content)
+	{
+		return detectDocumentClass( convert_UTF16_to_UTF8( content));
+	}
+#endif
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
 	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
 
 #ifdef STRUS_BOOST_PYTHON
+	DocumentAnalyzer createDocumentAnalyzer_unicode( const WString& segmentername_)
+	{
+		return createDocumentAnalyzer( convert_UTF16_to_UTF8( segmentername_));
+	}
 	DocumentAnalyzer createDocumentAnalyzer_0()
 	{
 		return createDocumentAnalyzer();
 	}
-
 	DocumentAnalyzer createDocumentAnalyzer_1( const String& segmentername_)
 	{
 		return createDocumentAnalyzer( segmentername_);

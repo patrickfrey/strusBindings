@@ -4,7 +4,9 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/include" 
 	${PYTHON_INCLUDE_DIRS}
 	${Boost_INCLUDE_DIRS}
+	"${PROJECT_SOURCE_DIR}/3rdParty/textwolf/include"
 )
+
 link_directories(
         "${Boost_LIBRARY_DIRS}"
 	"${PROJECT_SOURCE_DIR}/src"
