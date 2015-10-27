@@ -67,11 +67,6 @@ typedef std::vector<std::string> StringVector;
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
 
-#ifdef STRUS_BOOST_PYTHON
-std::string convert_UTF16_to_UTF8( const std::wstring& val);
-std::wstring convert_UTF8_to_UTF16( const std::string& val);
-#endif
-
 #ifndef DOXYGEN_LANG
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
 class Reference
@@ -422,10 +417,7 @@ public:
 	/// \brief Get the term value
 	const String& value() const			{return m_value;}
 #if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
-	WString ucvalue() const
-	{
-		return convert_UTF8_to_UTF16( m_value);
-	}
+	WString ucvalue() const;
 #endif
 	/// \brief Get the term position
 	unsigned int position() const			{return m_position;}
@@ -512,10 +504,7 @@ public:
 	const String& value() const		{return m_value;}
 
 #if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
-	WString ucvalue() const
-	{
-		return convert_UTF8_to_UTF16( m_value);
-	}
+	WString ucvalue() const;
 #endif
 	
 #ifdef STRUS_BOOST_PYTHON
@@ -646,10 +635,7 @@ public:
 	/// \param[in] value value of the document attribute
 	void setAttribute( const String& name, const String& value);
 #ifdef STRUS_BOOST_PYTHON
-	void setAttribute_unicode( const String& name, const WString& value)
-	{
-		setAttribute( name, convert_UTF16_to_UTF8( value));
-	}
+	void setAttribute_unicode( const String& name, const WString& value);
 #endif
 	/// \brief Allow a user to access the document
 	/// \param[in] username name of the user to be allowed to access this document
@@ -821,24 +807,10 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
-	Document analyze_unicode_1( const WString& content)
-	{
-		return analyze( convert_UTF16_to_UTF8( content));
-	}
-
-	Document analyze_unicode_2( const WString& content, const DocumentClass& dclass)
-	{
-		return analyze( convert_UTF16_to_UTF8( content), dclass);
-	}
-	Document analyze_1( const String& content)
-	{
-		return analyze( content);
-	}
-
-	Document analyze_2( const String& content, const DocumentClass& dclass)
-	{
-		return analyze( content, dclass);
-	}
+	Document analyze_unicode_1( const WString& content);
+	Document analyze_unicode_2( const WString& content, const DocumentClass& dclass);
+	Document analyze_1( const String& content);
+	Document analyze_2( const String& content, const DocumentClass& dclass);
 #endif
 private:
 	/// \brief Constructor used by Context
@@ -901,10 +873,7 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	TermVector analyzePhrase_unicode(
 			const String& phraseType,
-			const WString& phraseContent) const
-	{
-		return analyzePhrase( phraseType, convert_UTF16_to_UTF8( phraseContent));
-	}
+			const WString& phraseContent) const;
 #endif
 
 	/// \brief Creates a queue for phrase bulk analysis
@@ -943,10 +912,7 @@ public:
 			const String& phraseType,
 			const String& phraseContent);
 #ifdef STRUS_BOOST_PYTHON
-	void push_unicode( const String& phraseType, const WString& phraseContent)
-	{
-		push( phraseType, convert_UTF16_to_UTF8( phraseContent));
-	}
+	void push_unicode( const String& phraseType, const WString& phraseContent);
 #endif
 
 	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
@@ -996,10 +962,7 @@ public:
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
 	void deleteDocument( const String& docid);
 #ifdef STRUS_BOOST_PYTHON
-	void deleteDocument_unicode( const WString& docid)
-	{
-		deleteDocument( convert_UTF16_to_UTF8( docid));
-	}
+	void deleteDocument_unicode( const WString& docid);
 #endif
 
 	/// \brief Prepare the deletion of all document access rights of a user
@@ -1007,10 +970,7 @@ public:
 	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const String& username);
 #ifdef STRUS_BOOST_PYTHON
-	void deleteUserAccessRights_unicode( const WString& username)
-	{
-		deleteUserAccessRights( convert_UTF16_to_UTF8( username));
-	}
+	void deleteUserAccessRights_unicode( const WString& username);
 #endif
 
 	/// \brief Commit all insert or delete or user access right change statements open.
@@ -1277,7 +1237,7 @@ public:
 	double weight() const			{return m_weight;}
 
 #if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
-	WString ucvalue() const			{return convert_UTF8_to_UTF16( m_value);}
+	WString ucvalue() const;
 
 	bool operator==( const RankAttribute& o) const
 	{
@@ -1364,10 +1324,7 @@ public:
 	void pushTerm( const String& type_, const String& value_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void pushTerm_unicode( const String& type_, const WString& value_)
-	{
-		pushTerm( type_, convert_UTF16_to_UTF8( value_));
-	}
+	void pushTerm_unicode( const String& type_, const WString& value_);
 #endif
 
 	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
@@ -1519,10 +1476,7 @@ public:
 	void addUserName( const String& username_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addUserName_unicode( const WString& username_)
-	{
-		addUserName( convert_UTF16_to_UTF8( username_));
-	}
+	void addUserName_unicode( const WString& username_);
 #endif
 
 	/// \brief Evaluate this query and return the result
@@ -1575,31 +1529,24 @@ public:
 	void addModulePath( const String& paths_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addModulePath_unicode( const WString& paths_)
-	{
-		addModulePath( convert_UTF16_to_UTF8( paths_));
-	}
+	void addModulePath_unicode( const WString& paths_);
 #endif
+
 	/// \brief Define where to load analyzer resource files from
 	/// \param[in] paths_ semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addResourcePath_unicode( const WString& paths_)
-	{
-		addResourcePath( convert_UTF16_to_UTF8( paths_));
-	}
+	void addResourcePath_unicode( const WString& paths_);
 #endif
+
 	/// \brief Create a storage client instance
 	/// \param[in] config_ configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,
 	StorageClient createStorageClient( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	StorageClient createStorageClient_unicode( const WString& config_)
-	{
-		return createStorageClient( convert_UTF16_to_UTF8( config_));
-	}
+	StorageClient createStorageClient_unicode( const WString& config_);
 #endif
 
 	/// \brief Create a new storage (physically) described by config
@@ -1608,10 +1555,7 @@ public:
 	void createStorage( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void createStorage_unicode( const WString& config_)
-	{
-		return createStorage( convert_UTF16_to_UTF8( config_));
-	}
+	void createStorage_unicode( const WString& config_);
 #endif
 	/// \brief Delete the storage (physically) described by config
 	/// \param[in] config_ storage description
@@ -1619,10 +1563,7 @@ public:
 	void destroyStorage( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void destroyStorage_unicode( const WString& config_)
-	{
-		return destroyStorage( convert_UTF16_to_UTF8( config_));
-	}
+	void destroyStorage_unicode( const WString& config_);
 #endif
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
@@ -1630,20 +1571,15 @@ public:
 	DocumentClass detectDocumentClass( const String& content);
 
 #ifdef STRUS_BOOST_PYTHON
-	DocumentClass detectDocumentClass_unicode( const WString& content)
-	{
-		return detectDocumentClass( convert_UTF16_to_UTF8( content));
-	}
+	DocumentClass detectDocumentClass_unicode( const WString& content);
 #endif
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
 	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
 
 #ifdef STRUS_BOOST_PYTHON
-	DocumentAnalyzer createDocumentAnalyzer_unicode( const WString& segmentername_)
-	{
-		return createDocumentAnalyzer( convert_UTF16_to_UTF8( segmentername_));
-	}
+	DocumentAnalyzer createDocumentAnalyzer_unicode( const WString& segmentername_);
+
 	DocumentAnalyzer createDocumentAnalyzer_0()
 	{
 		return createDocumentAnalyzer();
