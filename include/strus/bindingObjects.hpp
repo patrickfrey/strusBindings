@@ -1147,6 +1147,7 @@ public:
 	{
 		m_parameters[ name] = Variant(value);
 	}
+#if !defined SWIGJAVA && !defined SWIGPHP
 	/// \brief Define a parameter used for weighting
 	/// \param[in] name name of the parameter as defined in the weighting function implementation
 	/// \param[in] value value of the parameter
@@ -1154,6 +1155,7 @@ public:
 	{
 		m_parameters[ name] = Variant(value);
 	}
+#endif
 
 	/// \brief Define a weighting feature
 	/// \param[in] sumtype type name of the feature as defined in the weighting function implementation
