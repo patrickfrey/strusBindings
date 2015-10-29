@@ -27,37 +27,24 @@
 --------------------------------------------------------------------
 */
 #include "private/wcharString.hpp"
-#include "textwolf/textscanner.hpp"
-#include "textwolf/charset_utf8.hpp"
-#include "textwolf/charset_utf16.hpp"
-#include "textwolf/cstringiterator.hpp"
-#include "textwolf/wstringiterator.hpp"
-#include "textwolf/staticbuffer.hpp"
+#include "private/internationalization.hpp"
+#include <cstdlib>
 
 std::wstring convert_UTF8_to_UTF16( const std::string& val)
 {
 	std::wstring rt;
-	typedef textwolf::CStringIterator SrcIterator;
-	typedef textwolf::TextScanner<SrcIterator,textwolf::charset::UTF8> Scanner;
-	SrcIterator src( val.c_str(), val.size());
-	Scanner itr( src);
-	char charbufmem[ 16];
-	textwolf::StaticBuffer charbuf( charbufmem, sizeof(charbufmem));
-	textwolf::charset::UTF16<> out;
-
-	while (*itr)
+	rt.reserve( val.size());
+	std::size_t ii=0,nn=val.size();
+	int clen;
+	wchar_t wc;
+	while (0<(clen=std::mbtowc( &wc, val.c_str() + ii, nn - ii)))
 	{
-		textwolf::UChar ch = *itr;
-		charbuf.clear();
-		out.print( ch, charbuf);
-		const char* ptr = charbuf.ptr();
-		std::size_t ii=0, nn=charbuf.size();
-		for (; ii<nn; ii+=sizeof(wchar_t))
-		{
-			wchar_t ch = textwolf::ByteOrderConverter<sizeof(wchar_t)>::read( (unsigned const char*)(ptr+ii));
-			rt.push_back( ch);
-		}
-		++itr;
+		rt.push_back( wc);
+		ii += clen;
+	}
+	if (clen < 0)
+	{
+		throw strus::runtime_error( "multibyte to wide character conversion error");
 	}
 	return rt;
 }
@@ -65,17 +52,17 @@ std::wstring convert_UTF8_to_UTF16( const std::string& val)
 std::string convert_UTF16_to_UTF8( const std::wstring& val)
 {
 	std::string rt;
-	typedef textwolf::WStringIterator SrcIterator;
-	typedef textwolf::TextScanner<SrcIterator,textwolf::charset::UTF16<> > Scanner;
-	SrcIterator src( val.c_str(), val.size());
-	Scanner itr( src);
-	textwolf::charset::UTF8 out;
-
-	while (*itr)
+	rt.reserve( val.size());
+	char cbuf[8];
+	std::wstring::const_iterator vi = val.begin(), ve = val.end();
+	int clen = 0;
+	for (; vi < ve && 0<(clen=std::wctomb( cbuf, *vi)); ++vi)
 	{
-		textwolf::UChar ch = *itr;
-		out.print( ch, rt);
-		++itr;
+		rt.append( cbuf, clen);
+	}
+	if (clen < 0)
+	{
+		throw strus::runtime_error( "wide to multibyte character conversion error");
 	}
 	return rt;
 }
