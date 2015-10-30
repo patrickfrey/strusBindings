@@ -6,6 +6,7 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 set( source_files
 	bindingObjects.cpp
 	utils.cpp
+	wcharString.cpp
 	internationalization.cpp
 )
 
@@ -16,6 +17,7 @@ include_directories(
 	"${strusmodule_INCLUDE_DIRS}"
 	"${strusrpc_INCLUDE_DIRS}"
 )
+
 link_directories(
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"

@@ -27,6 +27,7 @@
 --------------------------------------------------------------------
 */
 #include "objInitializers.hpp"
+#include "private/internationalization.hpp"
 
 int initVariant( Variant& result, PyObject* obj)
 {
