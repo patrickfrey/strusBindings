@@ -1072,10 +1072,16 @@ void Query::pushExpression( const std::string& opname_, unsigned int argc, int r
 	THIS->pushExpression( joinopr, argc, range_, cardinality_);
 }
 
-void Query::pushDuplicate()
+void Query::pushDuplicate( unsigned int argc)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushDuplicate();
+	THIS->pushDuplicate( argc);
+}
+
+void Query::swapElements( unsigned int idx)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	THIS->swapElements( idx);
 }
 
 void Query::attachVariable( const std::string& name_)

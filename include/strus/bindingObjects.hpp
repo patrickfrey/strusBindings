@@ -1349,9 +1349,14 @@ public:
 	}
 #endif
 
-	/// \brief Push a duplicate of the topmost element of the query stack
+	/// \brief Push a duplicate of the topmost element and optionaly of other elements of the query stack
+	/// \param[in] args number of elements to duplicate (2 means that the topmost and the next element below it are duplicated and pushed in order of appearance on the stack)
 	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
-	void pushDuplicate();
+	void pushDuplicate( unsigned int argc=1);
+
+	/// \brief Swap an element with the topmost element of the query stack
+	/// \param[in] idx counting distance of the element to swap from the topmost element of the stack
+	void swapElements( unsigned int idx=1);
 
 	/// \brief Attaches a variable to the top expression or term on the query stack.
 	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
