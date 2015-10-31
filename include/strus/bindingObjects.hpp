@@ -1353,6 +1353,16 @@ public:
 	/// \param[in] args number of elements to duplicate (2 means that the topmost and the next element below it are duplicated and pushed in order of appearance on the stack)
 	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
 	void pushDuplicate( unsigned int argc=1);
+#ifdef STRUS_BOOST_PYTHON
+	void pushDuplicate_0()
+	{
+		pushDuplicate();
+	}
+	void pushDuplicate_1( unsigned int argc)
+	{
+		pushDuplicate( argc);
+	}
+#endif
 
 	/// \brief Swap an element with the topmost element of the query stack
 	/// \param[in] idx counting distance of the element to swap from the topmost element of the stack
