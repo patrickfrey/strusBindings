@@ -63,11 +63,11 @@ if(UNIX)
 
   # avoid errors like 'libmawt.so: cannot open shared object file' (for
   # instance on Debian)
+  set(JAVA_MAWT_LIBRARY '')
   find_library(JAVA_MAWT_LIBRARY NAMES mawt
     PATHS ${JAVA_HOME}/jre/lib/amd64/xawt
           ${JAVA_HOME}/jre/lib/i386/xawt
   )
-  MESSAGE( "HELLO: ${JAVA_MAWT_LIBRARY}" )
 endif()
 
 ENDIF (WITH_JAVA STREQUAL "YES")
