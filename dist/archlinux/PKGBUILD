@@ -11,9 +11,7 @@ license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://project-strus.net"
 depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=0.1.6" "strusanalyzer>=0.1.6" "strusmodule>=0.1.5" "strusrpc>=0.1.9")
-makedepends=('cmake' 'swig' 'php')
-makedepends_php=('php')
-makedepends_java=('java-environment')
+makedepends=('cmake' 'swig' 'php' 'java-environment')
 source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
 build() {
