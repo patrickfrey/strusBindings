@@ -904,6 +904,12 @@ QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
 	,m_queryeval_impl(ReferenceDeleter<strus::QueryEvalInterface>::function)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	m_queryproc = objBuilder->getQueryProcessor();
+	if (!m_queryproc)
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+	}
 	m_queryeval_impl.reset( objBuilder->createQueryEval());
 	if (!m_queryeval_impl.get())
 	{
@@ -916,6 +922,7 @@ QueryEval::QueryEval( const QueryEval& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
+	,m_queryproc(o.m_queryproc)
 {}
 
 void QueryEval::addTerm(
@@ -953,9 +960,7 @@ void QueryEval::addSummarizer(
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	if (!queryproc) throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
 	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( name);
 	if (!sf) throw strus::runtime_error( _TXT("summarizer function not defined: '%s'"), name.c_str());
@@ -997,9 +1002,7 @@ void QueryEval::addWeightingFunction(
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	if (!queryproc) throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
 	if (!sf) throw strus::runtime_error( _TXT("weighting function not defined: '%s'"), name.c_str());
@@ -1041,7 +1044,7 @@ Query QueryEval::createQuery( const StorageClient& storage) const
 	query.reset( qe->createQuery( st));
 	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
 
-	return Query( m_objbuilder_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query);
+	return Query( m_objbuilder_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
 
 
@@ -1051,6 +1054,7 @@ Query::Query( const Query& o)
 	,m_storage_impl(o.m_storage_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 	,m_query_impl(o.m_query_impl)
+	,m_queryproc(o.m_queryproc)
 {}
 
 void Query::pushTerm( const std::string& type_, const std::string& value_)
@@ -1061,10 +1065,7 @@ void Query::pushTerm( const std::string& type_, const std::string& value_)
 
 void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_, unsigned int cardinality_)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	if (!queryproc) throw strus::runtime_error( _TXT("failed to get query processor: %s"), errorhnd->fetchError());
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
 	if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_.c_str());
 
@@ -1082,6 +1083,12 @@ void Query::swapElements( unsigned int idx)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->swapElements( idx);
+}
+
+void Query::moveElement( unsigned int idx)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	THIS->moveElement( idx);
 }
 
 void Query::attachVariable( const std::string& name_)
@@ -1214,6 +1221,26 @@ std::vector<Rank> Query::evaluate() const
 }
 
 
+Context::Context()
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+{
+	strus::ErrorBufferInterface* errorhnd;
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
+	if (!m_errorhnd_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
+	}
+	m_moduleloader_impl.reset( strus::createModuleLoader( errorhnd));
+	if (!m_moduleloader_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
+	}
+}
+
 Context::Context( unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
@@ -1234,7 +1261,26 @@ Context::Context( unsigned int maxNofThreads)
 	}
 }
 
-Context::Context( const char* connectionstring, unsigned int maxNofThreads)
+Context::Context( const std::string& connectionstring)
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+{
+	strus::ErrorBufferInterface* errorhnd;
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
+	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
+
+	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
+	messaging.reset( strus::createRpcClientMessaging( connectionstring.c_str(), errorhnd));
+	if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
+	m_rpc_impl.reset( strus::createRpcClient( messaging.get(), errorhnd));
+	if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
+	(void)messaging.release();
+}
+
+Context::Context( const std::string& connectionstring, unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
@@ -1246,7 +1292,7 @@ Context::Context( const char* connectionstring, unsigned int maxNofThreads)
 	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
 
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
-	messaging.reset( strus::createRpcClientMessaging( connectionstring, errorhnd));
+	messaging.reset( strus::createRpcClientMessaging( connectionstring.c_str(), errorhnd));
 	if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
 	m_rpc_impl.reset( strus::createRpcClient( messaging.get(), errorhnd));
 	if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
@@ -1361,6 +1407,12 @@ StorageClient Context::createStorageClient( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, config_);
+}
+
+StorageClient Context::createStorageClient()
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, std::string());
 }
 
 DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)

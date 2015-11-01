@@ -1212,6 +1212,7 @@ private:
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_queryeval_impl;
+	const void* m_queryproc;
 };
 
 
@@ -1366,7 +1367,11 @@ public:
 
 	/// \brief Swap an element with the topmost element of the query stack
 	/// \param[in] idx counting distance of the element to swap from the topmost element of the stack
-	void swapElements( unsigned int idx=1);
+	void swapElements( unsigned int idx);
+
+	/// \brief move the topmost element of the query stack down displacing all upper stack elements (remove and insert the topmost element at another place in the stack)
+	/// \param[in] idx counting distance of the element insert position from the topmost element of the stack
+	void moveElement( unsigned int idx);
 
 	/// \brief Attaches a variable to the top expression or term on the query stack.
 	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
@@ -1500,14 +1505,15 @@ public:
 
 private:
 	friend class QueryEval;
-	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_)
-		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_){}
+	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
+		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_){}
 
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
 	Reference m_query_impl;
+	const void* m_queryproc;
 };
 
 
@@ -1523,11 +1529,19 @@ class Context
 {
 public:
 	/// \brief Constructor for local mode with own module loader
+	Context();
+	/// \brief Constructor for local mode with own module loader
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
-	explicit Context( unsigned int maxNofThreads=0);
+	explicit Context( unsigned int maxNofThreads);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
+	/// \param[in] connectionstring RPC server connection string
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	Context( const char* connectionstring, unsigned int maxNofThreads=0);
+	explicit Context( const std::string& connectionstring);
+	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
+	/// \param[in] connectionstring RPC server connection string
+	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
+	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
+	Context( const std::string& connectionstring, unsigned int maxNofThreads);
 	/// \brief Copy constructor
 	Context( const Context& o);
 	/// \brief Destructor
@@ -1556,11 +1570,16 @@ public:
 	void addResourcePath_unicode( const WString& paths_);
 #endif
 
+	/// \brief Create a storage client instance of the the default remote storage of the RPC server
+	StorageClient createStorageClient();
+
 	/// \brief Create a storage client instance
 	/// \param[in] config_ configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,
 	StorageClient createStorageClient( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
+	StorageClient createStorageClient_0();
+	StorageClient createStorageClient_1( const String& config_);
 	StorageClient createStorageClient_unicode( const WString& config_);
 #endif
 

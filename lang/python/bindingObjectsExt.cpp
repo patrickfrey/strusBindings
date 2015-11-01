@@ -201,6 +201,20 @@ void Query::addUserName_unicode( const WString& username_)
 	addUserName( convert_UTF16_to_UTF8( username_));
 }
 
+StorageClient Context::createStorageClient_0()
+{
+	return createStorageClient();
+}
+
+StorageClient Context::createStorageClient_1( const String& config_)
+{
+	return createStorageClient( config_);
+}
+
+StorageClient Context::createStorageClient_unicode( const WString& config_)
+{
+	return createStorageClient( convert_UTF16_to_UTF8( config_));
+}
 
 void Context::addModulePath_unicode( const WString& paths_)
 {
@@ -210,11 +224,6 @@ void Context::addModulePath_unicode( const WString& paths_)
 void Context::addResourcePath_unicode( const WString& paths_)
 {
 	addResourcePath( convert_UTF16_to_UTF8( paths_));
-}
-
-StorageClient Context::createStorageClient_unicode( const WString& config_)
-{
-	return createStorageClient( convert_UTF16_to_UTF8( config_));
 }
 
 void Context::createStorage_unicode( const WString& config_)

@@ -137,6 +137,7 @@ $ignoreMethodMap{"pushExpression"} = 1;
 $ignoreMethodMap{"pushDuplicate"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
+$ignoreMethodMap{"createStorageClient"} = 1;
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
 $renameMethodMap{"setMetaData_int"} = "setMetaData";
@@ -172,6 +173,8 @@ $renameMethodMap{"pushDuplicate_0"} = "pushDuplicate";
 $renameMethodMap{"pushDuplicate_1"} = "pushDuplicate";
 $renameMethodMap{"defineFeature1"} = "defineFeature";
 $renameMethodMap{"defineFeature2"} = "defineFeature";
+$renameMethodMap{"createStorageClient_0"} = "createStorageClient";
+$renameMethodMap{"createStorageClient_1"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
 $renameMethodMap{"createStorage_unicode"} = "createStorage";
 $renameMethodMap{"destroyStorage_unicode"} = "destroyStorage";
@@ -576,7 +579,17 @@ foreach $classdef( @classlist)
 
 	if (!$ignoreClassMap{$classname})
 	{
-		print OUTFILE "bp" . "::class_<$classname>(\"$classname\")\n";
+		if ($classname eq "Context")
+		{
+			print OUTFILE "bp" . '::class_<Context>("Context",bp::init<>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const std::string&>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const unsigned int>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const std::string&, unsigned int>())' . "\n";
+		}
+		else
+		{
+			print OUTFILE "bp" . "::class_<$classname>(\"$classname\")\n";
+		}
 		my $method;
 		foreach $method( @itemlist)
 		{
