@@ -5,7 +5,7 @@ Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
 Build-Depends: debhelper (>= 4.1.16), cmake,
  libboost-dev, libboost-thread-dev, libboost-system-dev,
  libboost-date-time-dev, strus-dev, strusanalyzer-dev, strusmodule-dev,
- strusrpc-dev, swig, php5-dev
+ strusrpc-dev, swig, php5-dev, openjdk-7-jdk
 Standards-Version: 3.8.3
 Homepage: http://project-strus.net
 
@@ -14,3 +14,10 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: strusbindings for the Php language
  Language bindings for the strus text search engine in Php.
+
+Package: strusbindings-java
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: strusbindings for the Java language
+ Language bindings for the strus text search engine in Java.
+

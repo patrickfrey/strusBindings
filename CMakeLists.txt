@@ -41,6 +41,35 @@ IF (${JNI_FOUND} STREQUAL "TRUE")
 ELSE (${JNI_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Could not locate JNI package: ${JNI_FOUND} ")
 ENDIF (${JNI_FOUND} STREQUAL "TRUE")
+
+if(UNIX)
+  # make sure we always have a JAVA_HOME variable set
+  IF ("$ENV{JAVA_HOME}" STREQUAL "")
+    EXECUTE_PROCESS(
+      COMMAND readlink "-f" "/usr/bin/javac"
+      COMMAND sed "s:/bin/javac::"
+      OUTPUT_VARIABLE JAVA_HOME OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_VARIABLE JAVA_HOME_ERROR_OUTPUT
+      ERROR_VARIABLE JAVA_HOME_RETURN_VALUE)
+    SET( ENV{JAVA_HOME} "${JAVA_HOME}" )
+  ENDIF ("$ENV{JAVA_HOME}" STREQUAL "")  
+  IF ("$ENV{JAVA_HOME}" STREQUAL "" )
+    MESSAGE(STATUS "JAVA_HOME_RETURN_VALUE")
+    MESSAGE(FATAL_ERROR "JAVA_HOME is not set!")
+  ELSE ("$ENV{JAVA_HOME}" STREQUAL "")
+    SET( JAVA_HOME "$ENV{JAVA_HOME}" )
+  ENDIF ("$ENV{JAVA_HOME}" STREQUAL "" )
+  MESSAGE( STATUS "JAVA_HOME: ${JAVA_HOME}" )
+
+  # avoid errors like 'libmawt.so: cannot open shared object file' (for
+  # instance on Debian)
+  set(JAVA_MAWT_LIBRARY "")
+  find_library(JAVA_MAWT_LIBRARY NAMES mawt
+    PATHS ${JAVA_HOME}/jre/lib/amd64/xawt
+          ${JAVA_HOME}/jre/lib/i386/xawt
+  )
+endif()
+
 ENDIF (WITH_JAVA STREQUAL "YES")
 
 IF (WITH_PYTHON STREQUAL "YES")

@@ -7,5 +7,5 @@ Architecture: any
 Build-Depends: debhelper (>= 4.1.16), cmake,
  libboost-dev, libboost-thread-dev, libboost-system-dev,
  libboost-date-time-dev, strus-dev, strusanalyzer-dev,
- strusmodule-dev, strusrpc-dev, swig, php5-dev
+ strusmodule-dev, strusrpc-dev, swig, php5-dev, openjdk-7-jdk
 Files:

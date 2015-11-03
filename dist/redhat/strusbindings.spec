@@ -6,7 +6,7 @@
 
 %define with_php 1
 %define with_python 0
-%define with_java 0
+%define with_java 1
 
 %define rhel 0
 %define rhel5 0
@@ -191,18 +191,6 @@ BuildRequires: sles-release
 %endif
 %endif
 
-# OBS has no repos containing some development libraries
-%if %{rhel}
-%define with_php 0
-%endif
-
-# Suse SL11 SP can't be distinguished, they have a way too old php
-%if %{sles}
-%if %{sles11}
-%endif
-%define with_php 0
-%endif
-
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
 Requires: boost153 >= 1.53.0
@@ -273,6 +261,7 @@ Requires: strus >= 0.1.6
 Requires: strusanalyzer >= 0.1.6
 Requires: strusmodule >= 0.1.5
 Requires: strusrpc >= 0.1.9
+%if %{with_php}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
@@ -283,6 +272,11 @@ BuildRequires: php-devel
 %endif
 %else
 BuildRequires: php-devel
+%endif
+%endif
+
+%if %{with_java}
+BuildRequires: java-1.8.0-openjdk-devel
 %endif
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
@@ -303,7 +297,6 @@ Group: Development/Libraries/Java
 %description java
 Language bindings for the strus text search enginge in Java
 
-BuildRequires: java-1.8.0-openjdk-devel
 Requires: java-1.8.0-openjdk
 
 %endif
@@ -357,11 +350,12 @@ Requires: python
 #mkdir build
 #cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=%{_lib} \
-%if %{with_java}
-	-DWITH_JAVA="YES" \
-%endif
 %if %{with_php}
 	-DWITH_PHP="YES" \
+%endif
+%if %{with_java}
+	-DWITH_JAVA="YES" \
+	-DJAVA_LIB_INSTALL_DIR=%{_jnidir} \
 %endif
 %if %{with_python}
 	-DWITH_PYTHON="YES" \
@@ -387,6 +381,12 @@ cat > $RPM_BUILD_ROOT/%{php_inidir}/%{php_inifile} <<EOF
 extension=strus.so
 EOF
 
+%endif
+
+%if %{with_java}
+cd lang/java
+make DESTDIR=$RPM_BUILD_ROOT install
+cd ../..
 %endif
   
 %clean
@@ -418,7 +418,7 @@ make test
 %{_libdir}/strus/libstrus_java.so
 %{_libdir}/strus/libstrus_java.so.0.1
 %{_libdir}/strus/libstrus_java.so.0.1.7
-%{_libdir}/strus/strus_api.jar
+%{_jnidir}/strus/strus_api.jar
 %endif
 
 %changelog
