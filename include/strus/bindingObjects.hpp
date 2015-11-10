@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstring>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
@@ -696,13 +697,22 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addSearchIndexFeature(
+		const String& type,
+		const String& selectexpr,
+		const Tokenizer& tokenizer,
+		const NormalizerVector& normalizers,
+		const StringVector& options);
+#else
 	void addSearchIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
 		const StringVector& options=StringVector());
-
+#endif
 #ifdef STRUS_BOOST_PYTHON
 	void addSearchIndexFeature_4(
 		const String& type,
@@ -724,13 +734,22 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addForwardIndexFeature(
+		const String& type,
+		const String& selectexpr,
+		const Tokenizer& tokenizer,
+		const NormalizerVector& normalizers,
+		const StringVector& options);
+#else
 	void addForwardIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
 		const StringVector& options=StringVector());
-
+#endif
 #ifdef STRUS_BOOST_PYTHON
 	void addForwardIndexFeature_4(
 		const String& type,
@@ -1307,6 +1326,120 @@ typedef std::vector<Rank> RankVector;
 #endif
 
 
+/// \brief Object representing a sequence of query operations to get the set of postings (d,p) of an atomic term or an expression
+class QueryExpression
+{
+public:
+	QueryExpression( const QueryExpression& o)
+		:m_ops(o.m_ops),m_strings(o.m_strings),m_size(o.m_size){}
+	QueryExpression()
+		:m_size(0){}
+
+	/// \brief Add operation "Push a single term on the stack"
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
+	void pushTerm( const String& type_, const String& value_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushTerm_unicode( const String& type_, const WString& value_);
+#endif
+	/// \brief Add operation "Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack"
+	/// \param[in] opname_ name of the expression operator
+	/// \param[in] argc_ number of operands (topmost elements from stack) of the expression
+	/// \param[in] range_ range number for the expression span in the document
+	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
+	void pushExpression( const String& opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushExpression_2( const String& opname_, unsigned int argc)
+	{
+		pushExpression( opname_, argc, 0, 0);
+	}
+	void pushExpression_3( const String& opname_, unsigned int argc, int range_)
+	{
+		pushExpression( opname_, argc, range_, 0);
+	}
+	void pushExpression_4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
+	{
+		pushExpression( opname_, argc, range_, cardinality_);
+	}
+#endif
+
+	/// \brief Add operation "Attach a variable to the top expression or term on the query stack".
+	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
+	/// \param[in] name_ name of the variable attached
+	/// \remark The stack is not changed
+	void attachVariable( const String& name_);
+#ifdef STRUS_BOOST_PYTHON
+	void attachVariable_unicode( const WString& name_);
+#endif
+
+	/// \brief Appends the operations of 'o' to this
+	/// \param[in] o expression to copy
+	void add( const QueryExpression& o);
+
+	/// \brief Get the number of items (sub expressions) on the stack as result of this expression
+	/// \return the number of items (sub expressions)
+	std::size_t size() const
+	{
+		return m_size;
+	}
+
+private:
+	friend class Query;
+
+	struct StackOp
+	{
+		enum Type
+		{
+			PushTerm,
+			PushExpression,
+			AttachVariable
+		};
+		enum ArgIndex
+		{
+			Term_type=0x0,
+			Term_value=0x1,
+			Expression_opname=0x0,
+			Expression_argc=0x1,
+			Expression_range=0x2,
+			Expression_cardinality=0x3,
+			Variable_name=0x0
+		};
+		Type type;
+		int arg[4];
+
+		StackOp( Type type_, int arg0_, int arg1_=0, int arg2_=0, int arg3_=0)
+			:type(type_)
+		{
+			arg[0] = arg0_;
+			arg[1] = arg1_;
+			arg[2] = arg2_;
+			arg[3] = arg3_;
+		}
+
+		StackOp()
+			:type(PushTerm)
+		{
+			std::memset( arg, 0, sizeof(arg));
+		}
+		StackOp( const StackOp& o)
+		{
+			std::memcpy( this, &o, sizeof(*this));
+		}
+	};
+	std::size_t allocid( const String& str);
+#ifdef STRUS_BOOST_PYTHON
+	std::size_t allocid( const WString& str);
+#endif
+
+private:
+	std::vector<StackOp> m_ops;
+	std::string m_strings;
+	std::size_t m_size;
+};
+
+
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
@@ -1319,80 +1452,26 @@ public:
 	/// \brief Destructor
 	~Query(){}
 
-	/// \brief Push a single term on the stack
-	/// \param[in] type_ query term type name
-	/// \param[in] value_ query term value
-	void pushTerm( const String& type_, const String& value_);
-
-#ifdef STRUS_BOOST_PYTHON
-	void pushTerm_unicode( const String& type_, const WString& value_);
-#endif
-
-	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
-	/// \param[in] opname_ name of the expression operator
-	/// \param[in] argc number of operands (topmost elements from stack) of the expression
-	/// \param[in] range_ range number for the expression span in the document
-	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
-	void pushExpression( const String& opname_, unsigned int argc, int range_=0, unsigned int cardinality_=0);
-
-#ifdef STRUS_BOOST_PYTHON
-	void pushExpression2( const String& opname_, unsigned int argc)
-	{
-		pushExpression( opname_, argc, 0, 0);
-	}
-	void pushExpression3( const String& opname_, unsigned int argc, int range_)
-	{
-		pushExpression( opname_, argc, range_, 0);
-	}
-	void pushExpression4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
-	{
-		pushExpression( opname_, argc, range_, cardinality_);
-	}
-#endif
-
-	/// \brief Push a duplicate of the topmost element and optionaly of other elements of the query stack
-	/// \param[in] args number of elements to duplicate (2 means that the topmost and the next element below it are duplicated and pushed in order of appearance on the stack)
-	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
-	void pushDuplicate( unsigned int argc=1);
-#ifdef STRUS_BOOST_PYTHON
-	void pushDuplicate_0()
-	{
-		pushDuplicate();
-	}
-	void pushDuplicate_1( unsigned int argc)
-	{
-		pushDuplicate( argc);
-	}
-#endif
-
-	/// \brief Swap an element with the topmost element of the query stack
-	/// \param[in] idx counting distance of the element to swap from the topmost element of the stack
-	void swapElements( unsigned int idx);
-
-	/// \brief move the topmost element of the query stack down displacing all upper stack elements (remove and insert the topmost element at another place in the stack)
-	/// \param[in] idx counting distance of the element insert position from the topmost element of the stack
-	void moveElement( unsigned int idx);
-
-	/// \brief Attaches a variable to the top expression or term on the query stack.
-	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
-	/// \param[in] name_ name of the variable attached
-	/// \remark The stack is not changed
-	void attachVariable( const String& name_);
-
-	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
+	/// \brief Create a feature from the query expression passed
 	/// \param[in] set_ name of the feature set, this feature is addressed with
+	/// \param[in] expr_ query expression that defines the postings of the feature and the variables attached
 	/// \param[in] weight_ individual weight of the feature in the query
-	void defineFeature( const String& set_, double weight_=1.0);
-
+	/// \remark the query expression passed as parameter is refused if it does not contain exactly one element
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void defineFeature( const String& set_, const QueryExpression& expr_, double weight_);
+#else
+	void defineFeature( const String& set_, const QueryExpression& expr_, double weight_=1.0);
+#endif
 #ifdef STRUS_BOOST_PYTHON
-	void defineFeature1( const String& set_)
+	void defineFeature_2( const String& set_, const QueryExpression& expr_)
 	{
-		defineFeature( set_, 1.0);
+		defineFeature( set_, expr_, 1.0);
 	}
 
-	void defineFeature2( const String& set_, double weight_)
+	void defineFeature_3( const String& set_, const QueryExpression& expr_, double weight_)
 	{
-		defineFeature( set_, weight_);
+		defineFeature( set_, expr_, weight_);
 	}
 #endif
 

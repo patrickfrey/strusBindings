@@ -7,12 +7,16 @@
 		$action
 	} catch (const std::runtime_error& e) {
 		zend_throw_exception( NULL, const_cast<char*>(e.what()), 0 TSRMLS_CC);
+		SWIG_fail;
 	} catch (const std::logic_error& e) {
 		zend_throw_exception( NULL, const_cast<char*>(e.what()), 0 TSRMLS_CC);
+		SWIG_fail;
 	} catch (const std::bad_alloc& e) {
 		zend_throw_exception( NULL, const_cast<char*>(e.what()), 0 TSRMLS_CC);
+		SWIG_fail;
 	} catch (...) { 
 		zend_throw_exception( NULL, const_cast<char*>("unknown exception"), 0 TSRMLS_CC);
+		SWIG_fail;
 	}
 }
 

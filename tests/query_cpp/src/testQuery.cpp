@@ -43,15 +43,16 @@ int main( int , const char** )
 		Context ctx;
 		DocumentAnalyzer documentAnalyzer( ctx.createDocumentAnalyzer());
 		// Define document analyzer:
+		std::vector<std::string> noopt;
 		std::vector<Normalizer> normalizer_stem;
 		normalizer_stem.push_back( Normalizer("stem", "de"));
 		std::vector<Normalizer> normalizer_orig;
 		normalizer_orig.push_back( Normalizer("orig"));
 		
 		documentAnalyzer.addSearchIndexFeature(
-			"word", "/doc/text()", Tokenizer("word"), normalizer_stem);
+			"word", "/doc/text()", Tokenizer("word"), normalizer_stem, noopt);
 		documentAnalyzer.addForwardIndexFeature(
-			"orig", "/doc/text()", Tokenizer("word"), normalizer_orig);
+			"orig", "/doc/text()", Tokenizer("word"), normalizer_orig, noopt);
 		documentAnalyzer.defineMetaData(
 			"date", "/doc/date()", Tokenizer("content"), normalizer_orig);
 		documentAnalyzer.defineMetaData(
@@ -132,16 +133,17 @@ int main( int , const char** )
 		std::vector<Term>::const_iterator qi = queryterms.begin(), qe = queryterms.end();
 		std::size_t qidx = 0;
 		unsigned int maxpos = 0;
+		QueryExpression expr;
 		for (; qi != qe; ++qidx,++qi)
 		{
-			query.pushTerm( qi->type(), qi->value());
+			expr.pushTerm( qi->type(), qi->value());
 			if (qi->position() > maxpos)
 			{
 				maxpos = qi->position();
 			}
 		}
-		query.pushExpression( "sequence", qidx, maxpos);
-		query.defineFeature( "weighted", 1.0);
+		expr.pushExpression( "sequence", qidx, maxpos);
+		query.defineFeature( "weighted", expr, 1.0);
 
 		// Evaluate the query and print the result:
 		query.defineMetaDataRestriction( "<=", "class", 5);

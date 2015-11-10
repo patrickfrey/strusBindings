@@ -191,9 +191,22 @@ void QueryEval::addWeightingFunction_obj(
 	addWeightingFunction( weight, name, config);
 }
 
-void Query::pushTerm_unicode( const String& type_, const WString& value_)
+std::size_t QueryExpression::allocid( const WString& str)
 {
-	pushTerm( type_, convert_UTF16_to_UTF8( value_));
+	return allocid( convert_UTF16_to_UTF8( str));
+}
+
+void QueryExpression::pushTerm_unicode( const String& type_, const WString& value_)
+{
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
+	m_ops.push_back(op);
+	m_size += 1;
+}
+
+void QueryExpression::attachVariable_unicode( const WString& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid( name_));
+	m_ops.push_back(op);
 }
 
 void Query::addUserName_unicode( const WString& username_)

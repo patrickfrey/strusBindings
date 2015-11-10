@@ -784,7 +784,10 @@ StorageClient::StorageClient( const Reference& objbuilder, const Reference& erro
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	m_storage_impl.reset( objBuilder->createStorageClient( config_));
-	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("failed to create storage client: %s"), errorhnd->fetchError());
+	if (!m_storage_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create storage client: %s"), errorhnd->fetchError());
+	}
 }
 
 StorageClient::StorageClient( const StorageClient& o)
@@ -1048,6 +1051,65 @@ Query QueryEval::createQuery( const StorageClient& storage) const
 }
 
 
+std::size_t QueryExpression::allocid( const std::string& str)
+{
+	std::size_t rt = m_strings.size()+1;
+	m_strings.push_back('\0');
+	m_strings.append( str);
+	return rt;
+}
+
+void QueryExpression::pushTerm( const std::string& type_, const std::string& value_)
+{
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void QueryExpression::pushExpression( const std::string& opname_, unsigned int argc_, int range_, unsigned int cardinality_)
+{
+	if (argc_ > (unsigned int)m_size)
+	{
+		throw strus::runtime_error( _TXT("illegal operation on stack of expression (%u > %u)"), argc_, (unsigned int)m_size);
+	}
+	StackOp op( StackOp::PushExpression, allocid( opname_), argc_, range_, cardinality_);
+	m_ops.push_back( op);
+	m_size -= argc_;
+	m_size += 1;
+}
+
+void QueryExpression::attachVariable( const std::string& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid( name_));
+	m_ops.push_back( op);
+}
+
+void QueryExpression::add( const QueryExpression& o)
+{
+	std::size_t strinc = m_strings.size();
+	m_strings.append( o.m_strings);
+	std::vector<StackOp>::const_iterator si = o.m_ops.begin(), se = o.m_ops.end();
+	for (; si != se; ++si)
+	{
+		StackOp op(*si);
+		switch (op.type)
+		{
+			case StackOp::PushTerm:
+				op.arg[ StackOp::Term_type] += strinc;
+				op.arg[ StackOp::Term_value] += strinc;
+				break;
+			case StackOp::PushExpression:
+				op.arg[ StackOp::Expression_opname] += strinc;
+				break;
+			case StackOp::AttachVariable:
+				op.arg[ StackOp::Variable_name] += strinc;
+				break;
+		}
+		m_ops.push_back( op);
+	}
+	m_size += o.m_size;
+}
+
 Query::Query( const Query& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
@@ -1057,49 +1119,48 @@ Query::Query( const Query& o)
 	,m_queryproc(o.m_queryproc)
 {}
 
-void Query::pushTerm( const std::string& type_, const std::string& value_)
+void Query::defineFeature( const std::string& set_, const QueryExpression& expr_, double weight_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushTerm( type_, value_);
-}
-
-void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_, unsigned int cardinality_)
-{
 	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
-	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
-	if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_.c_str());
 
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushExpression( joinopr, argc, range_, cardinality_);
-}
+	if (expr_.size() != 1)
+	{
+		throw strus::runtime_error( _TXT("the argument expression of defineFeature does not contain exactly one node (%u)"), (unsigned int)expr_.size());
+	}
+	std::vector<QueryExpression::StackOp>::const_iterator ei = expr_.m_ops.begin(), ee = expr_.m_ops.end();
+	for (; ei != ee; ++ei)
+	{
+		switch (ei->type)
+		{
+			case QueryExpression::StackOp::PushTerm:
+			{
+				const char* type_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_type];
+				const char* value_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_value];
+				THIS->pushTerm( type_, value_);
+				break;
+			}
+			case QueryExpression::StackOp::PushExpression:
+			{
+				const char* opname_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Expression_opname];
+				unsigned int argc_ = (unsigned int)ei->arg[ QueryExpression::StackOp::Expression_argc];
+				int range_ = (int)ei->arg[ QueryExpression::StackOp::Expression_range];
+				unsigned int cardinality_ = (unsigned int)ei->arg[ QueryExpression::StackOp::Expression_cardinality];
 
-void Query::pushDuplicate( unsigned int argc)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushDuplicate( argc);
-}
+				const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
+				if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_);
 
-void Query::swapElements( unsigned int idx)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->swapElements( idx);
-}
-
-void Query::moveElement( unsigned int idx)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->moveElement( idx);
-}
-
-void Query::attachVariable( const std::string& name_)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->attachVariable( name_);
-}
-
-void Query::defineFeature( const std::string& set_, double weight_)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+				THIS->pushExpression( joinopr, argc_, range_, cardinality_);
+				break;
+			}
+			case QueryExpression::StackOp::AttachVariable:
+			{
+				const char* name_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Variable_name];
+				THIS->attachVariable( name_);
+				break;
+			}
+		}
+	}
 	THIS->defineFeature( set_, weight_);
 }
 

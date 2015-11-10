@@ -134,7 +134,6 @@ $ignoreMethodMap{"defineMetaDataRestriction"} = 1;
 $ignoreMethodMap{"addForwardIndexFeature"} = 1;
 $ignoreMethodMap{"addSearchIndexFeature"} = 1;
 $ignoreMethodMap{"pushExpression"} = 1;
-$ignoreMethodMap{"pushDuplicate"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
@@ -166,13 +165,13 @@ $renameMethodMap{"addForwardIndexFeature_4"} = "addForwardIndexFeature";
 $renameMethodMap{"addForwardIndexFeature_5"} = "addForwardIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_4"} = "addSearchIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_5"} = "addSearchIndexFeature";
-$renameMethodMap{"pushExpression2"} = "pushExpression";
-$renameMethodMap{"pushExpression3"} = "pushExpression";
-$renameMethodMap{"pushExpression4"} = "pushExpression";
-$renameMethodMap{"pushDuplicate_0"} = "pushDuplicate";
-$renameMethodMap{"pushDuplicate_1"} = "pushDuplicate";
-$renameMethodMap{"defineFeature1"} = "defineFeature";
-$renameMethodMap{"defineFeature2"} = "defineFeature";
+$renameMethodMap{"pushTerm_unicode"} = "pushTerm";
+$renameMethodMap{"pushExpression_2"} = "pushExpression";
+$renameMethodMap{"pushExpression_3"} = "pushExpression";
+$renameMethodMap{"pushExpression_4"} = "pushExpression";
+$renameMethodMap{"attachVariable_unicode"} = "attachVariable";
+$renameMethodMap{"defineFeature_2"} = "defineFeature";
+$renameMethodMap{"defineFeature_3"} = "defineFeature";
 $renameMethodMap{"createStorageClient_0"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_1"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
@@ -190,7 +189,6 @@ $renameMethodMap{"addSummarizer_obj"} = "addSummarizer";
 $renameMethodMap{"addWeightingFunction_obj"} = "addWeightingFunction";
 $renameMethodMap{"deleteDocument_unicode"} = "deleteDocument";
 $renameMethodMap{"deleteUserAccessRights_unicode"} = "deleteUserAccessRights";
-$renameMethodMap{"pushTerm_unicode"} = "pushTerm";
 $renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
 $renameMethodMap{"addModulePath_unicode"} = "addModulePath";
 $renameMethodMap{"addUserName_unicode"} = "addUserName";
@@ -304,6 +302,15 @@ sub parseClass
 		{
 			--$bcnt;
 			nextToken();
+		}
+		elsif ($public == 0)
+		{
+			nextToken();
+			if ($tok eq '{')
+			{
+				++$bcnt;
+			}
+			next;
 		}
 		elsif ($tok eq '{')
 		{
@@ -441,7 +448,7 @@ sub parseClass
 			}
 			if ($methodname ne $classname)
 			{
-				if ($public != 0 && $operator == 0)
+				if ($operator == 0)
 				{
 					my $return_value_policy = "";
 					if ($returntype =~ m/const[&]/)

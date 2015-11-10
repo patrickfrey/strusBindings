@@ -27,6 +27,7 @@
 %rename(StrusStorageClient) StorageClient;
 %rename(StrusSummarizerConfig) SummarizerConfig;
 %rename(StrusWeightingConfig) WeightingConfig;
+%rename(StrusQueryExpression) QueryExpression;
 %rename(StrusQuery) Query;
 %rename(StrusQueryEval) QueryEval;
 %rename(StrusRankAttribute) RankAttribute;
