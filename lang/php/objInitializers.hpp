@@ -39,6 +39,7 @@ int initNormalizerList( std::vector<Normalizer>& result, zval* obj);
 int initAggregator( Aggregator& result, zval* obj);
 int initSummarizerConfig( SummarizerConfig& result, zval* obj);
 int initWeightingConfig( WeightingConfig& result, zval* obj);
+int initQueryExpression( QueryExpression& result, zval* obj);
 int initStringVector( std::vector<std::string>& result, zval* obj);
 int initIntVector( std::vector<int>& result, zval* obj);
 

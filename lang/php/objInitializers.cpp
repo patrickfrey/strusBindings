@@ -29,6 +29,7 @@
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>
+#include <limits>
 #include "objInitializers.hpp"
 
 #define THROW_EXCEPTION( MSG) zend_throw_exception( NULL, const_cast<char*>( MSG), 0 TSRMLS_CC)
@@ -354,6 +355,189 @@ int initSummarizerConfig( SummarizerConfig& result, zval* obj)
 int initWeightingConfig( WeightingConfig& result, zval* obj)
 {
 	return initQueryEvalFunctionConfig( result, obj);
+}
+
+int initQueryExpression( QueryExpression& result, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			THROW_EXCEPTION( "unable to convert LONG to query expression");
+			error = -1;
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to query expression");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			THROW_EXCEPTION( "unable to convert DOUBLE to query expression");
+			error = -1;
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to query expression");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			const char* variablename = 0;		//< variable assigned to this node
+			const char* funcname = 0;		//< name of the function to call or type of term
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P( obj);
+			unsigned int arraysize = zend_hash_num_elements( hash);
+			unsigned int aridx = 0;
+
+			// [1] Initialize header:
+			zend_hash_internal_pointer_reset_ex( hash, &ptr);
+			while (aridx < 2 && zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) == SUCCESS)
+			{
+				if ((Z_TYPE_PP(data) == IS_STRING))
+				{
+					const char* val = Z_STRVAL_P( *data);
+					if (aridx == 0 && val && val[0] == '=')
+					{
+						if (val[1] == '\0')
+						{
+							THROW_EXCEPTION( "assignment variable name is empty");
+							error = -1;
+							break;
+						}
+						variablename = val+1;
+						arraysize -= 1;
+						zend_hash_move_forward_ex( hash,&ptr);
+						++aridx;
+					}
+					else
+					{
+						funcname = val;
+						zend_hash_move_forward_ex( hash,&ptr);
+						++aridx;
+						break;
+					}
+				}
+				else
+				{
+					THROW_EXCEPTION( "string expected (function or type name) as first element of token or function definition");
+					error = -1;
+					break;
+				}
+			}
+			if (error) break;
+			if (!funcname)
+			{
+				THROW_EXCEPTION( "string expected (function or type name) as first element of token or function definition");
+				error = -1;
+				break;
+			}
+			// [2] Check if token definition, and push the token if it is:
+			if (arraysize <= 2)
+			{
+				// Check, if we got a token definition
+				const char* tokvalue = 0;
+				if (zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS)
+				{
+					tokvalue = "";
+				}
+				else if ((Z_TYPE_PP(data) == IS_STRING))
+				{
+					tokvalue = Z_STRVAL_P( *data);
+				}
+				if (tokvalue)
+				{
+					result.pushTerm( funcname, tokvalue);
+					if (variablename)
+					{
+						result.attachVariable( variablename);
+					}
+					return error;
+				}
+			}
+
+			// [3] Get function cardinality and range:
+			int range = 0;
+			bool range_defined = false;
+			unsigned int cardinality = 0;
+			bool cardinality_defined = false;
+			for(;
+				zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex( hash,&ptr))
+			{
+				if ((Z_TYPE_PP(data) == IS_LONG))
+				{
+					if (!range_defined)
+					{
+						long val = Z_LVAL_P( obj);
+						if (val >= std::numeric_limits<int>::max() || val <= std::numeric_limits<int>::min())
+						{
+							THROW_EXCEPTION( "range parameter exceeds maximum size");
+							error = -1;
+							break;
+						}
+						range_defined = true;
+						range = (int)val;
+					}
+					else if (!cardinality_defined)
+					{
+						long val = Z_LVAL_P( obj);
+						if (val >= std::numeric_limits<unsigned int>::max())
+						{
+							THROW_EXCEPTION( "range parameter exceeds maximum size");
+							error = -1;
+							break;
+						}
+						cardinality_defined = true;
+						cardinality = (unsigned int)val;
+					}
+					else
+					{
+						break;
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
+			if (error) break;
+
+			// [4] Build arguments:
+			unsigned int argcnt = 0;
+			for(;
+				zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex( hash,&ptr))
+			{
+				++argcnt;
+				error = initQueryExpression( result, *data);
+				if (error) break;
+			}
+			if (error) break;
+
+			// [5] Call the function and assign variable:
+			result.pushExpression( funcname, argcnt, range, cardinality);
+			if (variablename)
+			{
+				result.attachVariable( variablename);
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to query expression");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to query expression");
+			error = -1;
+			break;
+		default: 
+			THROW_EXCEPTION( "unable to convert unknown type to query expression");
+			error = -1;
+			break;
+	}
+	return error;
 }
 
 int initStringVector( std::vector<std::string>& result, zval* obj)
