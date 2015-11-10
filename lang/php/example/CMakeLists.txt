@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/lang/php/example" )
-set( tests helloWorld createCollection query queryexpr status )
+set( tests helloWorld createCollection query status )
 
 foreach( test ${tests} )
 	add_test( NAME php_${test} COMMAND php ${test}.php WORKING_DIRECTORY ${THISDIR} )
