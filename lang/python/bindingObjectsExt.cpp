@@ -27,12 +27,9 @@ void DocumentAnalyzer::addSearchIndexFeature_4(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	addSearchIndexFeature( type, selectexpr, tokenizer, normalizers, StringVector());
+	addSearchIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, StringVector());
 }
+
 void DocumentAnalyzer::addSearchIndexFeature_5(
 	const String& type,
 	const String& selectexpr,
@@ -40,11 +37,37 @@ void DocumentAnalyzer::addSearchIndexFeature_5(
 	const FunctionObject& normalizers_,
 	const StringVector& options)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	addSearchIndexFeature( type, selectexpr, tokenizer, normalizers, options);
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addSearchIndexFeature( type, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers, options);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addSearchIndexFeature( type, selectexpr, (const Tokenizer&)tokenizer, normalizers, options);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addSearchIndexFeature( type, selectexpr, tokenizer, (const NormalizerVector&)normalizers, options);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addSearchIndexFeature( type, selectexpr, tokenizer, normalizers, options);
+		}
+	}
 }
 
 void DocumentAnalyzer::addForwardIndexFeature_4(
@@ -53,12 +76,9 @@ void DocumentAnalyzer::addForwardIndexFeature_4(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	addForwardIndexFeature( type, selectexpr, tokenizer, normalizers, StringVector());
+	addForwardIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, StringVector());
 }
+
 void DocumentAnalyzer::addForwardIndexFeature_5(
 	const String& type,
 	const String& selectexpr,
@@ -66,11 +86,37 @@ void DocumentAnalyzer::addForwardIndexFeature_5(
 	const FunctionObject& normalizers_,
 	const StringVector& options)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	addForwardIndexFeature( type, selectexpr, tokenizer, normalizers, options);
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addForwardIndexFeature( type, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers, options);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addForwardIndexFeature( type, selectexpr, (const Tokenizer&)tokenizer, normalizers, options);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addForwardIndexFeature( type, selectexpr, tokenizer, (const NormalizerVector&)normalizers, options);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addForwardIndexFeature( type, selectexpr, tokenizer, normalizers, options);
+		}
+	}
 }
 
 void DocumentAnalyzer::defineMetaData_obj(
@@ -79,20 +125,54 @@ void DocumentAnalyzer::defineMetaData_obj(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	defineMetaData( fieldname, selectexpr, tokenizer, normalizers);
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			defineMetaData( fieldname, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			defineMetaData( fieldname, selectexpr, (const Tokenizer&)tokenizer, normalizers);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			defineMetaData( fieldname, selectexpr, tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			defineMetaData( fieldname, selectexpr, tokenizer, normalizers);
+		}
+	}
 }
 
 void DocumentAnalyzer::defineAggregatedMetaData_obj(
 	const String& fieldname,
 	const FunctionObject& function_)
 {
-	Aggregator function;
-	initAggregator( function, function_.ptr());
-	defineAggregatedMetaData( fieldname, function);
+	boost::python::extract<Aggregator> function(function_);
+	if (function.check())
+	{
+		defineAggregatedMetaData( fieldname, (const Aggregator&)function);
+	}
+	else
+	{
+		Aggregator function;
+		initAggregator( function, function_.ptr());
+		defineAggregatedMetaData( fieldname, function);
+	}
 }
 
 void DocumentAnalyzer::defineAttribute_obj(
@@ -101,11 +181,37 @@ void DocumentAnalyzer::defineAttribute_obj(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	defineAttribute( fieldname, selectexpr, tokenizer, normalizers);
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			defineAttribute( fieldname, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			defineAttribute( fieldname, selectexpr, (const Tokenizer&)tokenizer, normalizers);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			defineAttribute( fieldname, selectexpr, tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			defineAttribute( fieldname, selectexpr, tokenizer, normalizers);
+		}
+	}
 }
 
 Document DocumentAnalyzer::analyze_unicode_1( const WString& content)
@@ -134,11 +240,37 @@ void QueryAnalyzer::definePhraseType_obj(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	Tokenizer tokenizer;
-	NormalizerVector normalizers;
-	initTokenizer( tokenizer, tokenizer_.ptr());
-	initNormalizerList( normalizers, normalizers_.ptr());
-	definePhraseType( phrasetype, selectexpr, tokenizer, normalizers);
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			definePhraseType( phrasetype, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			definePhraseType( phrasetype, selectexpr, (const Tokenizer&)tokenizer, normalizers);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			definePhraseType( phrasetype, selectexpr, tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			definePhraseType( phrasetype, selectexpr, tokenizer, normalizers);
+		}
+	}
 }
 
 TermVector QueryAnalyzer::analyzePhrase_unicode(
@@ -174,10 +306,17 @@ void QueryEval::addSummarizer_obj(
 	const String& name,
 	const FunctionObject& config_)
 {
-	SummarizerConfig config;
-	int rt = initSummarizerConfig( config, config_.ptr());
-	if (rt) throw strus::runtime_error(_TXT("error parsing summarizer function config"));
-	addSummarizer( resultAttribute, name, config);
+	boost::python::extract<SummarizerConfig> config(config_);
+	if (config.check())
+	{
+		addSummarizer( resultAttribute, name, (const SummarizerConfig&)config);
+	}
+	else
+	{
+		SummarizerConfig config;
+		initSummarizerConfig( config, config_.ptr());
+		addSummarizer( resultAttribute, name, config);
+	}
 }
 
 void QueryEval::addWeightingFunction_obj(
@@ -185,10 +324,17 @@ void QueryEval::addWeightingFunction_obj(
 	const String& name,
 	const FunctionObject& config_)
 {
-	WeightingConfig config;
-	int rt = initWeightingConfig( config, config_.ptr());
-	if (rt) throw strus::runtime_error(_TXT("error parsing weighting function config"));
-	addWeightingFunction( weight, name, config);
+	boost::python::extract<WeightingConfig> config(config_);
+	if (config.check())
+	{
+		addWeightingFunction( weight, name, (const WeightingConfig&)config);
+	}
+	else
+	{
+		WeightingConfig config;
+		initWeightingConfig( config, config_.ptr());
+		addWeightingFunction( weight, name, config);
+	}
 }
 
 std::size_t QueryExpression::allocid( const WString& str)
@@ -212,6 +358,26 @@ void QueryExpression::attachVariable_unicode( const WString& name_)
 void Query::addUserName_unicode( const WString& username_)
 {
 	addUserName( convert_UTF16_to_UTF8( username_));
+}
+
+void Query::defineFeature_expr_2( const String& set_, const FunctionObject& expr_)
+{
+	defineFeature_expr_3( set_, expr_, 1.0);
+}
+
+void Query::defineFeature_expr_3( const String& set_, const FunctionObject& expr_, double weight_)
+{
+	boost::python::extract<QueryExpression> expr(expr_);
+	if (expr.check())
+	{
+		defineFeature( set_, (const QueryExpression&)expr, weight_);
+	}
+	else
+	{
+		QueryExpression expr;
+		initQueryExpression( expr, expr_.ptr());
+		defineFeature( set_, expr, weight_);
+	}
 }
 
 StorageClient Context::createStorageClient_0()

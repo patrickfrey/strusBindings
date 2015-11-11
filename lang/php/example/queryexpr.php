@@ -44,15 +44,15 @@ try
 	}
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:
-	$selexpr = array( "contains");
+	$selexpr = [ "contains" ];
 
 	foreach ($terms as &$term)
 	{
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
-		$query->defineFeature( "seek", array( $term->type,$term->value), 1.0);
+		$query->defineFeature( "seek", [ $term->type,$term->value], 1.0 );
 		# Each query term is also part of the selection expressions
-		$selexpr[] = array( $term->type, $term->value);
+		$selexpr[] = [ $term->type, $term->value ];
 	}
 	# We assign the feature created to the set named 'select' because this is the
 	# name of the set defined as selection feature in the query evaluation configuration

@@ -1473,6 +1473,9 @@ public:
 	{
 		defineFeature( set_, expr_, weight_);
 	}
+
+	void defineFeature_expr_2( const String& set_, const FunctionObject& expr_);
+	void defineFeature_expr_3( const String& set_, const FunctionObject& expr_, double weight_);
 #endif
 
 #ifndef DOXYGEN_JAVA

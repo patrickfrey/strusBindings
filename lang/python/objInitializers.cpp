@@ -29,101 +29,95 @@
 #include "objInitializers.hpp"
 #include "private/internationalization.hpp"
 
-int initVariant( Variant& result, PyObject* obj)
+void initVariant( Variant& result, PyObject* obj)
 {
-	try
+	if (PyLong_Check( obj))
 	{
-		if (PyLong_Check( obj))
+		long objval = PyInt_AS_LONG( obj);
+		if (objval < 0)
 		{
-			long objval = PyInt_AS_LONG( obj);
-			if (objval < 0)
-			{
-				result.assignInt( objval);
-			}
-			else
-			{
-				result.assignUint( objval);
-			}
-		}
-		else if (PyInt_Check( obj))
-		{
-			int objval = PyInt_AS_LONG( obj);
-			if (objval < 0)
-			{
-				result.assignInt( objval);
-			}
-			else
-			{
-				result.assignUint( objval);
-			}
-		}
-		else if (PyFloat_Check( obj))
-		{
-			double objval = PyFloat_AS_DOUBLE( obj);
-			result.assignFloat( objval);
-		}
-		else if (PyString_Check( obj))
-		{
-			char* objval = PyString_AS_STRING( obj);
-			result.assignText( std::string( objval));
-		}
-		else if (PyUnicode_Check( obj))
-		{
-			PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
-			int rt = initVariant( result, temp_obj);
-			Py_DECREF( temp_obj);
-			return rt;
+			result.assignInt( objval);
 		}
 		else
 		{
-			PyErr_SetString( PyExc_Exception, "cannot convert value to numeric value or string");
-			return -1;
+			result.assignUint( objval);
 		}
 	}
-	catch (...)
+	else if (PyInt_Check( obj))
 	{
-		PyErr_SetString( PyExc_Exception, "memory allocation error");
-		return -1;
+		int objval = PyInt_AS_LONG( obj);
+		if (objval < 0)
+		{
+			result.assignInt( objval);
+		}
+		else
+		{
+			result.assignUint( objval);
+		}
 	}
-	return 0;
-}
-
-template <class Object>
-static int initFunctionObject( Object& result, PyObject* obj)
-{
-	int error = 0;
-	if (PyString_Check( obj))
+	else if (PyFloat_Check( obj))
 	{
-		char* name = PyString_AS_STRING( obj);
-		try
-		{
-			result.setName( name);
-		}
-		catch (...)
-		{
-			PyErr_SetString( PyExc_Exception, "out of memory exception");
-			error = -1;
-		}
+		double objval = PyFloat_AS_DOUBLE( obj);
+		result.assignFloat( objval);
+	}
+	else if (PyString_Check( obj))
+	{
+		char* objval = PyString_AS_STRING( obj);
+		result.assignText( std::string( objval));
 	}
 	else if (PyUnicode_Check( obj))
 	{
 		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
-		if (!temp_obj) return -1;
-		int rt = initFunctionObject( result, temp_obj);
+		try
+		{
+			initVariant( result, temp_obj);
+		}
+		catch (const std::exception& err)
+		{
+			Py_DECREF( temp_obj);
+			throw strus::runtime_error( _TXT("error initializing numeric variant: %s"), err.what());
+		}
 		Py_DECREF( temp_obj);
-		return rt;
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("cannot convert value to numeric value or string"));
+	}
+}
+
+template <class Object>
+static void initFunctionObject( Object& result, PyObject* obj)
+{
+	if (PyString_Check( obj))
+	{
+		char* name = PyString_AS_STRING( obj);
+		result.setName( name);
+	}
+	else if (PyUnicode_Check( obj))
+	{
+		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
+		try
+		{
+			initFunctionObject( result, temp_obj);
+		}
+		catch (const std::exception& err)
+		{
+			Py_DECREF( temp_obj);
+			throw strus::runtime_error( _TXT("error initializing function object: %s"), err.what());
+		}
+		Py_DECREF( temp_obj);
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, "function definition expected as sequence");
+		PyObject* seq = PySequence_Fast( obj, _TXT("function definition expected as sequence"));
 		if (seq)
 		{
 			Py_ssize_t ii=1,len = PySequence_Size( seq);
 			if (len == 0)
 			{
-				PyErr_SetString( PyExc_Exception, "function definition is empty (no name defined)");
 				Py_DECREF( seq);
-				error = -1;
+				throw strus::runtime_error( _TXT( "function definition is empty (no name defined)"));
 			}
 			else
 			{
@@ -136,36 +130,40 @@ static int initFunctionObject( Object& result, PyObject* obj)
 					{
 						result.setName( name);
 					}
-					catch (...)
+					catch (const std::exception& err)
 					{
-						PyErr_SetString( PyExc_Exception, "out of memory exception");
-						error = -1;
+						Py_DECREF( seq);
+						throw strus::runtime_error( _TXT( "error initializing function object: %s"), err.what());
 					}
 				}
 				else if (PyUnicode_Check( item))
 				{
 					PyObject *temp_obj = PyUnicode_AsUTF8String( item);
-					if (!temp_obj) return -1;
+					if (!temp_obj)
+					{
+						Py_DECREF( seq);
+						throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+					}
 					char* name = PyString_AS_STRING( temp_obj);
 					try
 					{
 						result.setName( name);
-						Py_DECREF( temp_obj);
 					}
-					catch (...)
+					catch (const std::exception& err)
 					{
-						PyErr_SetString( PyExc_Exception, "out of memory exception");
-						error = -1;
 						Py_DECREF( temp_obj);
+						Py_DECREF( seq);
+						throw strus::runtime_error( _TXT( "error initializing function object: %s"), err.what());
 					}
+					Py_DECREF( temp_obj);
 				}
 				else
 				{
-					PyErr_SetString( PyExc_Exception, "first element of function definition is not a string (name of function)");
-					error = -1;
+					Py_DECREF( seq);
+					throw strus::runtime_error( _TXT( "first element of function definition is not a string (name of function)"));
 				}
 			}
-			if (!error) for (; ii < len; ii++)
+			for (; ii < len; ii++)
 			{
 				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
 				/* DON'T DECREF item here */
@@ -196,77 +194,57 @@ static int initFunctionObject( Object& result, PyObject* obj)
 						PyObject *temp_obj = PyUnicode_AsUTF8String( item);
 						if (!temp_obj)
 						{
-							error = -1;
-							break;
+							throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
 						}
 						char* itemval = PyString_AS_STRING( item);
 						try
 						{
 							result.addArgument( itemval);
-							Py_DECREF( temp_obj);
-						}
-						catch (const std::bad_alloc& e)
-						{
-							Py_DECREF( temp_obj);
-							throw e;
 						}
 						catch (const std::exception& e)
 						{
 							Py_DECREF( temp_obj);
-							PyErr_SetString( PyExc_Exception, e.what());
-							error = -1;
-							break;
+							throw strus::runtime_error( _TXT( "error initializing function object: %s"), e.what());
 						}
+						Py_DECREF( temp_obj);
 					}
 					else
 					{
-						PyErr_SetString( PyExc_Exception, "function argument is not a string or a numeric type");
-						error = -1;
-						break;
+						Py_DECREF( seq);
+						throw strus::runtime_error( _TXT( "error initializing function object: %s"), "function argument is not a string or a numeric type");
 					}
 				}
-				catch (const std::bad_alloc&)
+				catch (const std::exception& err)
 				{
-					PyErr_SetString( PyExc_Exception, "out of memory exception");
-					error = -1;
-					break;
-				}
-				catch (const std::exception& e)
-				{
-					PyErr_SetString( PyExc_Exception, e.what());
-					error = -1;
-					break;
+					Py_DECREF( seq);
+					throw strus::runtime_error( _TXT( "error initializing function object: %s"), err.what());
 				}
 			}
 			Py_DECREF( seq);
 		}
 		else
 		{
-			PyErr_SetString( PyExc_Exception, "function is not defined as sequence");
-			error = -1;
+			throw strus::runtime_error( _TXT( "function is not defined as sequence"));
 		}
 	}
 	else
 	{
-		PyErr_SetString( PyExc_Exception, "function is not defined as string or sequence (check)");
-		error = -1;
+		throw strus::runtime_error( _TXT( "function is not defined as string or sequence (check)"));
 	}
-	return error;
 }
 
-int initTokenizer( Tokenizer& result, PyObject* obj)
+void initTokenizer( Tokenizer& result, PyObject* obj)
 {
-	return initFunctionObject( result, obj);
+	initFunctionObject( result, obj);
 }
 
-int initNormalizer( Normalizer& result, PyObject* obj)
+void initNormalizer( Normalizer& result, PyObject* obj)
 {
-	return initFunctionObject( result, obj);
+	initFunctionObject( result, obj);
 }
 
-int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
+void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 {
-	int error = 0;
 	if (PyString_Check( obj))
 	{
 		char* name = PyString_AS_STRING( obj);
@@ -274,31 +252,36 @@ int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 		{
 			result.push_back( Normalizer( name));
 		}
-		catch (...)
+		catch (const std::exception& err)
 		{
-			PyErr_SetString( PyExc_Exception, "out of memory exception");
-			return -1;
+			throw strus::runtime_error( _TXT( "error initializing normalizer list: %s"), err.what());
 		}
 	}
 	else if (PyUnicode_Check( obj))
 	{
 		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
-		if (!temp_obj) return -1;
-		int rt = initNormalizerList( result, temp_obj);
+		if (!temp_obj) throw strus::runtime_error( _TXT( "error initializing normalizer list: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+		try
+		{
+			initNormalizerList( result, temp_obj);
+		}
+		catch (const std::exception& err)
+		{
+			Py_DECREF( temp_obj);
+			throw err;
+		}
 		Py_DECREF( temp_obj);
-		return rt;
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, "normalizer definition expected as sequence");
+		PyObject* seq = PySequence_Fast( obj, _TXT("normalizer definition expected as sequence"));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
 			if (len == 0)
 			{
-				PyErr_SetString( PyExc_Exception, "normalizer list is empty");
 				Py_DECREF( seq);
-				return -1;
+				throw strus::runtime_error( _TXT( "normalizer list is empty"));
 			}
 			for (; ii < len; ii++)
 			{
@@ -307,36 +290,33 @@ int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 				try
 				{
 					result.push_back( Normalizer());
-					if (0!=initNormalizer( result.back(), item))
-					{
-						error = -1;
-						break;
-					}
+					initNormalizer( result.back(), item);
 				}
-				catch (...)
+				catch (const std::exception& err)
 				{
-					PyErr_SetString( PyExc_Exception, "memory allocation error");
-					error = -1;
-					break;
+					Py_DECREF( seq);
+					throw strus::runtime_error( _TXT( "error initializing normalizer list: %s"), err.what());
 				}
 			}
 			Py_DECREF( seq);
 		}
 	}
-	return error;
+	else
+	{
+		throw strus::runtime_error( _TXT( "error initializing normalizer list: %s"), _TXT("cannot convert from this type"));
+	}
 }
 
-int initAggregator( Aggregator& result, PyObject* obj)
+void initAggregator( Aggregator& result, PyObject* obj)
 {
-	return initFunctionObject( result, obj);
+	initFunctionObject( result, obj);
 }
 
 template <class Object>
-static int defineQueryEvaluationFunctionParameter( Object& result, PyObject* keyitem, PyObject* valueitem)
+static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* keyitem, PyObject* valueitem)
 {
-	int error = 0;
 	char* key;
-	PyObject *temp_obj = 0;
+	PyObject *key_obj = 0;
 	Variant value;
 
 	if (PyString_Check( keyitem))
@@ -345,46 +325,38 @@ static int defineQueryEvaluationFunctionParameter( Object& result, PyObject* key
 	}
 	else if (PyUnicode_Check( keyitem))
 	{
-		temp_obj = PyUnicode_AsUTF8String( keyitem);
-		if (temp_obj)
+		key_obj = PyUnicode_AsUTF8String( keyitem);
+		if (key_obj)
 		{
-			key = PyString_AS_STRING( temp_obj);
+			key = PyString_AS_STRING( key_obj);
 		}
 		else
 		{
-			return -1;
+			Py_DECREF( key_obj);
+			throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
 		}
 	}
 	else
 	{
-		PyErr_SetString( PyExc_Exception, "string expected as query evaluation function parameter name");
-		return -1;
+		throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
 	}
-	if (0!=initVariant( value, valueitem))
-	{
-		error = -1;
-	}
-	else if (key[0] == '.')
+	initVariant( value, valueitem);
+	if (key[0] == '.')
 	{
 		if (value.type() != Variant_TEXT)
 		{
-			PyErr_SetString( PyExc_Exception, "string expected as query evaluation function feature parameter value");
-			error = -1;
+			if (key_obj) Py_DECREF( key_obj);
+			throw strus::runtime_error( _TXT("string expected as query evaluation function feature parameter value"));
 		}
 		else try
 		{
 			const char* valuestr = value.getText();
 			result.defineFeature( std::string( key+1), valuestr);
 		}
-		catch (const std::runtime_error& err)
+		catch (const std::exception& err)
 		{
-			PyErr_SetString( PyExc_Exception, err.what());
-			error = -1;
-		}
-		catch (...)
-		{
-			PyErr_SetString( PyExc_Exception, "memory allocation error");
-			error = -1;
+			if (key_obj) Py_DECREF( key_obj);
+			throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), err.what());
 		}
 	}
 	else
@@ -393,25 +365,18 @@ static int defineQueryEvaluationFunctionParameter( Object& result, PyObject* key
 		{
 			result.defineParameter( std::string( key), value);
 		}
-		catch (const std::runtime_error& err)
+		catch (const std::exception& err)
 		{
-			PyErr_SetString( PyExc_Exception, err.what());
-			error = -1;
-		}
-		catch (...)
-		{
-			PyErr_SetString( PyExc_Exception, "memory allocation error");
-			error = -1;
+			if (key_obj) Py_DECREF( key_obj);
+			throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), err.what());
 		}
 	}
-	if (temp_obj) Py_DECREF( temp_obj);
-	return error;
+	if (key_obj) Py_DECREF( key_obj);
 }
 
 template <class Object>
-static int initQueryEvalFunctionConfig( Object& result, PyObject* obj)
+static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 {
-	int error = 0;
 	if (PyDict_Check( obj))
 	{
 		PyObject *keyitem, *valueitem;
@@ -419,16 +384,12 @@ static int initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 		
 		while (PyDict_Next( obj, &pos, &keyitem, &valueitem))
 		{
-			if (0!=defineQueryEvaluationFunctionParameter( result, keyitem, valueitem))
-			{
-				error = -1;
-				break;
-			}
+			defineQueryEvaluationFunctionParameter( result, keyitem, valueitem);
 		}
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, "query evaluation function object definition expected as sequence of pairs or as dictionary");
+		PyObject* seq = PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary"));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq), elemlen = 0;
@@ -441,107 +402,289 @@ static int initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 					PyObject* keyitem = PySequence_Fast_GET_ITEM( item, 0);
 					PyObject* valueitem = PySequence_Fast_GET_ITEM( item, 1);
 
-					if (0!=defineQueryEvaluationFunctionParameter( result, keyitem, valueitem))
-					{
-						error = -1;
-						break;
-					}
+					defineQueryEvaluationFunctionParameter( result, keyitem, valueitem);
 				}
 				else
 				{
-					PyErr_SetString( PyExc_Exception, "query evaluation function object definition sequence elements must be pairs");
-					error = -1;
-					break;
+					throw strus::runtime_error( _TXT("query evaluation function object definition sequence elements must be pairs"));
 				}
 			}
 		}
 		else
 		{
-			PyErr_SetString( PyExc_Exception, "query evaluation function object definition expected a sequence of pairs or as dictionary");
-			error = -1;
+			throw strus::runtime_error( _TXT("query evaluation function object definition expected a sequence of pairs or as dictionary"));
 		}
 	}
 	else
 	{
-		PyErr_SetString( PyExc_Exception, "dictionary or list of pairs expected as query evaluation function object definition");
-		error = -1;
+		throw strus::runtime_error( _TXT("dictionary or list of pairs expected as query evaluation function object definition"));
 	}
-	return error;
 }
 
-int initSummarizerConfig( SummarizerConfig& result, PyObject* obj)
+void initSummarizerConfig( SummarizerConfig& result, PyObject* obj)
 {
-	return initQueryEvalFunctionConfig( result, obj);
+	initQueryEvalFunctionConfig( result, obj);
 }
 
-int initWeightingConfig( WeightingConfig& result, PyObject* obj)
+void initWeightingConfig( WeightingConfig& result, PyObject* obj)
 {
-	return initQueryEvalFunctionConfig( result, obj);
+	initQueryEvalFunctionConfig( result, obj);
 }
 
-int initString( std::string& result, PyObject* obj)
+static char* getString( PyObject* item, PyObject*& temp_obj)
 {
-	int error = 0;
-	if (PyString_Check( obj))
+	if (PyString_Check( item))
 	{
-		char* item = PyString_AS_STRING( obj);
-		try
-		{
-			result = item;
-		}
-		catch (...)
-		{
-			PyErr_SetString( PyExc_Exception, "out of memory exception");
-			error = -1;
-		}
+		return PyString_AS_STRING( item);
 	}
-	else if (PyUnicode_Check( obj))
+	else if (PyUnicode_Check( item))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
-		if (!temp_obj) return -1;
-		int rt = initString( result, temp_obj);
-		Py_DECREF( temp_obj);
-		return rt;
+		if (temp_obj) Py_DECREF( temp_obj);
+		temp_obj = PyUnicode_AsUTF8String( item);
+		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
+
+		return PyString_AS_STRING( temp_obj);
 	}
 	else
 	{
-		PyErr_SetString( PyExc_Exception, "string expected as argument");
-		error = -1;
+		throw strus::runtime_error( "not a string type");
 	}
-	return error;
 }
 
-int initStringVector( std::vector<std::string>& result, PyObject* obj)
+void initQueryExpression( QueryExpression& result, PyObject* obj)
 {
-	int error = 0;
+	if (PySequence_Check( obj))
+	{
+		PyObject* seq = PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary"));
+		if (seq)
+		{
+			enum {
+				Init,
+				Funcname,
+				Range,
+				Cardinality,
+				Arguments
+			} state = Init;
+			char* varname = 0;
+			char* funcname = 0;
+			char* termtype = 0;
+			char* termval = 0;
+			int range = 0;
+			unsigned int cardinality = 0;
+			unsigned int nof_arguments = 0;
+			int argcnt = 0;
+			char* itemstr;
+			PyObject* temp_obj_varname = 0;
+			PyObject* temp_obj_funcname = 0;
+			PyObject* temp_obj_termval = 0;
+
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii<len; ++ii)
+			{
+				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				/* DON'T DECREF item here */
+				switch (state)
+				{
+					case Init:
+						try
+						{
+							itemstr = getString( item, temp_obj_varname);
+						}
+						catch (const std::exception& err)
+						{
+							Py_DECREF( seq);
+							throw strus::runtime_error( _TXT("error fetching first element of expression tuple: %s"), err.what());
+						}
+						if (itemstr[0] == '=')
+						{
+							varname = itemstr+1;
+							state = Funcname;
+						}
+						else
+						{
+							funcname = itemstr;
+							state = Range;
+						}
+						break;
+					case Funcname:
+						try
+						{
+							funcname = getString( item, temp_obj_funcname);
+							if (ii+1 == len)
+							{
+								result.pushTerm( funcname, "");
+								if (varname)
+								{
+									result.attachVariable( varname);
+								}
+								funcname = 0;
+								break;
+							}
+						}
+						catch (const std::exception& err)
+						{
+							Py_DECREF( seq);
+							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+						}
+						state = Range;
+						break;
+					case Range:
+					case Cardinality:
+						if (PyLong_Check( item) || PyInt_Check( item))
+						{
+							long itemval = PyInt_AS_LONG( item);
+							if (state == Range)
+							{
+								if (itemval <= std::numeric_limits<int>::min() || itemval >= std::numeric_limits<int>::max())
+								{
+									Py_DECREF( seq);
+									throw strus::runtime_error( _TXT("range value exceeds size allowed"));
+								}
+								range = (int)itemval;
+								state = Cardinality;
+							}
+							else
+							{
+								// ... state == Cardinality
+								if (itemval <= 0 || itemval >= std::numeric_limits<int>::max())
+								{
+									Py_DECREF( seq);
+									throw strus::runtime_error( _TXT("cardinality value exceeds size allowed"));
+								}
+								cardinality = (unsigned int)itemval;
+								state = Arguments;
+							}
+							break;
+						}
+						state = Arguments;
+						/*no break here!*/
+					case Arguments:
+						if (argcnt++ == 0)
+						{
+							if (PyString_Check( item))
+							{
+								// [A] handle special case of 1 or 2-tuple of strings, that defines a term:
+								try
+								{
+									termtype = funcname;
+									termval = getString( item, temp_obj_termval);
+									++ii;
+									if (ii == len)
+									{
+										result.pushTerm( termtype, termval);
+										if (varname)
+										{
+											result.attachVariable( varname);
+										}
+										funcname = 0;
+										break;
+									}
+									else
+									{
+										throw strus::runtime_error( _TXT("term definition has too many arguments"));
+									}
+								}
+								catch (const std::exception& err)
+								{
+									Py_DECREF( seq);
+									throw strus::runtime_error( _TXT("error fetching term definition: %s"), err.what());
+								}
+							}
+						}
+						try
+						{
+							initQueryExpression( result, item);
+							++nof_arguments;
+						}
+						catch (const std::exception& err)
+						{
+							Py_DECREF( seq);
+							throw err;
+						}
+						break;
+				}
+			}
+			if (funcname)
+			{
+				result.pushExpression( funcname, nof_arguments, range, cardinality);
+				if (varname)
+				{
+					result.attachVariable( varname);
+				}
+			}
+			if (temp_obj_varname) Py_DECREF( temp_obj_varname);
+			if (temp_obj_funcname) Py_DECREF( temp_obj_funcname);
+			if (temp_obj_termval) Py_DECREF( temp_obj_termval);
+			Py_DECREF( seq);
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("query evaluation function object definition expected a sequence of pairs or as dictionary"));
+		}
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("query expression object definition expected as sequence of tuples"));
+	}
+}
+
+void initString( std::string& result, PyObject* obj)
+{
 	if (PyString_Check( obj))
 	{
 		char* item = PyString_AS_STRING( obj);
-		try
-		{
-			result.push_back( item);
-		}
-		catch (...)
-		{
-			PyErr_SetString( PyExc_Exception, "out of memory exception");
-			error = -1;
-		}
+		result = item;
 	}
 	else if (PyUnicode_Check( obj))
 	{
 		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
-		if (!temp_obj) return -1;
-		int rt = initStringVector( result, temp_obj);
+		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
+		try
+		{
+			initString( result, temp_obj);
+		}
+		catch (const std::exception& err)
+		{
+			Py_DECREF( temp_obj);
+			throw err;
+		}
 		Py_DECREF( temp_obj);
-		return rt;
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("string expected as argument"));
+	}
+}
+
+void initStringVector( std::vector<std::string>& result, PyObject* obj)
+{
+	if (PyString_Check( obj))
+	{
+		char* item = PyString_AS_STRING( obj);
+		result.push_back( item);
+	}
+	else if (PyUnicode_Check( obj))
+	{
+		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
+		try
+		{
+			initStringVector( result, temp_obj);
+		}
+		catch (const std::exception& err)
+		{
+			Py_DECREF( temp_obj);
+			throw err;
+		}
+		Py_DECREF( temp_obj);
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, "string list expected as sequence");
+		PyObject* seq = PySequence_Fast( obj, _TXT("string list expected as sequence"));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
-			result.reserve( result.size() + len);
+			result.reserve( result.size() + len); //... avoid bad_alloc exceptions in following push_back's
 			for (; ii < len; ii++)
 			{
 				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
@@ -556,62 +699,46 @@ int initStringVector( std::vector<std::string>& result, PyObject* obj)
 					else if (PyUnicode_Check( item))
 					{
 						PyObject *temp_obj = PyUnicode_AsUTF8String( item);
-						if (temp_obj)
-						{
-							char* itemval = PyString_AS_STRING( temp_obj);
-							result.push_back( itemval); //... does never throw because we have reserved the memory before this loop
-							Py_DECREF( temp_obj);
-						}
+						if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
+
+						char* itemval = PyString_AS_STRING( temp_obj);
+						result.push_back( itemval); //... does never throw because we have reserved the memory before this loop
+						Py_DECREF( temp_obj);
 					}
 					else
 					{
-						PyErr_SetString( PyExc_Exception, "string expected as element of string list");
-						error = -1;
-						break;
+						throw strus::runtime_error( _TXT("string expected as element of string list"));
 					}
 				}
-				catch (...)
+				catch (const std::exception& err)
 				{
-					PyErr_SetString( PyExc_Exception, "out of memory exception");
-					error = -1;
-					break;
+					Py_DECREF( seq);
+					throw strus::runtime_error( _TXT("error initializing string vector: %s"), err.what());
 				}
 			}
 			Py_DECREF( seq);
 		}
 		else
 		{
-			PyErr_SetString( PyExc_Exception, "list of strings expected");
-			error = -1;
+			throw strus::runtime_error( _TXT("list of strings expected"));
 		}
 	}
 	else
 	{
-		PyErr_SetString( PyExc_Exception, "list of strings or single string expected (check)");
-		error = -1;
+		throw strus::runtime_error( _TXT("list of strings or single string expected (check)"));
 	}
-	return error;
 }
 
-int initIntVector( std::vector<int>& result, PyObject* obj)
+void initIntVector( std::vector<int>& result, PyObject* obj)
 {
-	int error = 0;
 	if (PyInt_Check( obj))
 	{
 		int item = PyInt_AS_LONG( obj);
-		try
-		{
-			result.push_back( item);
-		}
-		catch (...)
-		{
-			PyErr_SetString( PyExc_Exception, "out of memory exception");
-			error = -1;
-		}
+		result.push_back( item);
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, "integer list expected as sequence");
+		PyObject* seq = PySequence_Fast( obj, _TXT("integer list expected as sequence"));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
@@ -628,150 +755,25 @@ int initIntVector( std::vector<int>& result, PyObject* obj)
 					}
 					else
 					{
-						PyErr_SetString( PyExc_Exception, "integer expected as element of integer list");
-						error = -1;
-						break;
+						throw strus::runtime_error( _TXT("integer expected as element of integer list"));
 					}
 				}
-				catch (...)
+				catch (const std::exception& err)
 				{
-					PyErr_SetString( PyExc_Exception, "out of memory exception");
-					error = -1;
-					break;
+					Py_DECREF( seq);
+					throw strus::runtime_error( _TXT("failed to build vector of integers: %s"), err.what());
 				}
 			}
 			Py_DECREF( seq);
 		}
 		else
 		{
-			PyErr_SetString( PyExc_Exception, "list of integers expected");
-			error = -1;
+			throw strus::runtime_error( _TXT("list of integers expected"));
 		}
 	}
 	else
 	{
-		PyErr_SetString( PyExc_Exception, "list of integers or single integer expected (check)");
-		error = -1;
+		throw strus::runtime_error( _TXT("list of integers or single integer expected (check)"));
 	}
-	return error;
 }
-
-PyObject* getTermVector( const std::vector<Term>& ar)
-{
-	PyObject* rt = PyList_New( ar.size());
-	PyObject* elem = 0;
-	PyObject* type = 0;
-	PyObject* value = 0;
-	PyObject* position = 0;
-
-	std::vector<Term>::const_iterator ai = ar.begin(), ae = ar.end();
-	for (Py_ssize_t aidx=0; ai != ae; ++ai,++aidx)
-	{
-		elem = PyDict_New();
-		if (!elem) goto ERROR;
-
-		type = PyString_FromString( ai->type().c_str());
-		if (!type) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "type", type)) goto ERROR;
-		Py_DECREF( type); type = 0;
-
-		value = PyUnicode_FromStringAndSize( ai->value().c_str(), ai->value().size());
-		if (!value) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "value", value)) goto ERROR;
-		Py_DECREF( value); value = 0;
-
-		position = PyInt_FromLong( ai->position());
-		if (!position) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "position", position)) goto ERROR;
-		Py_DECREF( position); position = 0;
-
-		PyList_SET_ITEM( rt, aidx, elem);
-		Py_DECREF( elem); elem = 0;
-	}
-	return rt;
-ERROR:
-	if (rt) Py_DECREF( rt);
-	if (type) Py_DECREF( type);
-	if (value) Py_DECREF( value);
-	if (position) Py_DECREF( position);
-	if (elem) Py_DECREF( elem);
-	return 0;
-}
-
-static PyObject* getRankAttributeVector( const std::vector<RankAttribute>& ar)
-{
-	PyObject* rt = PyList_New( ar.size());
-	PyObject* name = 0;
-	PyObject* value = 0;
-	PyObject* elem = 0;
-
-	std::vector<RankAttribute>::const_iterator ai = ar.begin(), ae = ar.end();
-	for (Py_ssize_t aidx=0; ai != ae; ++ai,++aidx)
-	{
-		name = PyString_FromString( ai->name().c_str()); if (!name) goto ERROR;
-		value = PyString_FromString( ai->value().c_str()); if (!value) goto ERROR;
-		elem = PyTuple_New( 2); if (!elem) goto ERROR;
-
-		if (0!=PyTuple_SetItem( elem, 0, name)) goto ERROR;
-		name = 0;
-
-		if (0!=PyTuple_SetItem( elem, 1, value)) goto ERROR;
-		value= 0;
-
-		PyList_SET_ITEM( rt, aidx, elem);
-		elem= 0;
-	}
-	return rt;
-ERROR:
-	if (rt) Py_DECREF( rt);
-	if (name) Py_DECREF( name);
-	if (value) Py_DECREF( value);
-	if (elem) Py_DECREF( elem);
-	return 0;
-}
-
-PyObject* getRankVector( const std::vector<Rank>& ar)
-{
-	PyObject* rt = PyList_New( ar.size());
-	if (!rt) return 0;
-	PyObject* docno = 0;
-	PyObject* weight = 0;
-	PyObject* attributes = 0;
-	PyObject* elem = 0;
-
-	std::vector<Rank>::const_iterator ai = ar.begin(), ae = ar.end();
-	for (Py_ssize_t aidx=0; ai != ae; ++ai,++aidx)
-	{
-		elem = PyDict_New();
-		if (!elem) goto ERROR;
-
-		docno = PyInt_FromLong( ai->docno());
-		if (!docno) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "docno", docno)) goto ERROR;
-		docno = 0;
-
-		weight = PyFloat_FromDouble( ai->weight());
-		if (!weight) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "weight", weight)) goto ERROR;
-		weight = 0;
-
-		attributes = getRankAttributeVector( ai->attributes());
-		if (!attributes) goto ERROR;
-		if (0!=PyDict_SetItemString( elem, "attributes", attributes)) goto ERROR;
-		attributes = 0;
-
-		PyList_SET_ITEM( rt, aidx, elem);
-		elem = 0;
-	}
-	return rt;
-ERROR:
-	if (rt) Py_DECREF( rt);
-	if (docno) Py_DECREF( docno);
-	if (weight) Py_DECREF( weight);
-	if (attributes) Py_DECREF( attributes);
-	if (elem) Py_DECREF( elem);
-	return 0;
-}
-
-
 

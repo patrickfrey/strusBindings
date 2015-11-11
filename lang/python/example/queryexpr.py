@@ -44,23 +44,16 @@ try:
 
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:
-	selexpr = strus.QueryExpression()
+	selexpr = [ "contains" ]
 	
 	for term in terms:
-		expr = strus.QueryExpression()
-		# We push the query terms on the stack and create a query feature 'seek' 
-		# for each of it:
-		expr.pushTerm( term.type(), term.value())
-		print "expr size ", expr.size()
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
-		query.defineFeature( "seek", expr, 1.0)
+		query.defineFeature( "seek", [term.type(), term.value()], 1.0)
 		# Each query term is also part of the selection expressions
-		selexpr.pushTerm( term.type(), term.value())
-		print "term ", term.type()," ", term.value()," (",selexpr.size(),")"
+		selexpr.append( [term.type(), term.value()] )
+		print "term ", term.type()," ", term.value()
 
-	# Create a selection feature 'select' that matches documents that contain all query terms.
-	selexpr.pushExpression( "contains", len( terms))
 	# We assign the feature created to the set named 'select' because this is the
 	# name of the set defined as selection feature in the query evaluation configuration
 	# (QueryEval.addSelectionFeature):
