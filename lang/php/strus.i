@@ -47,6 +47,7 @@
 %include "strus_aggregator.i"
 %include "strus_summarizer.i"
 %include "strus_weighting.i"
+%include "strus_queryexpr.i"
 %include "../../include/strus/bindingObjects.hpp"
 
 

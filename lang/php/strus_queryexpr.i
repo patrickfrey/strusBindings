@@ -4,7 +4,12 @@
 
 %typemap(in) const QueryExpression&	(QueryExpression temp)
 {
-	if (0!=initQueryExpression( temp, *$input))
+	QueryExpression* qe;
+	if (SWIG_IsOK( SWIG_ConvertPtr( *$input, (void**)&qe, SWIGTYPE_p_QueryExpression, 0)))
+	{
+		$1 = qe;
+	}
+	else if (0!=initQueryExpression( temp, *$input))
 	{
 		SWIG_fail;
 	}
