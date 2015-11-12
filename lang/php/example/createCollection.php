@@ -39,5 +39,6 @@ foreach ($datafiles as &$datafile)
 # Without this the documents wont be inserted:
 $storage->flush();
 print "done";
+?>
 
 

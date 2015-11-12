@@ -11,5 +11,6 @@ $nofDocuments = $storage->nofDocumentsInserted();
 
 # Output:
 print "Number of documents inserted: $nofDocuments\n";
+?>
 
 

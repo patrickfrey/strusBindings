@@ -45,7 +45,6 @@ try:
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:
 	selexpr = [ "contains" ]
-	
 	for term in terms:
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
