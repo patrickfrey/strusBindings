@@ -22,7 +22,7 @@ They are taken from tests built and executed in the strusBindings project.
 
 \section createCollection Create a collection, analyze and insert 3 documents 
 \code
-&lt;?php
+<?php
 require "strus.php";
 
 $config = "path=storage; metadata=doclen UINT16";
@@ -63,12 +63,12 @@ foreach ($datafiles as &$datafile)
 # Without this the documents wont be inserted:
 $storage->flush();
 print "done";
-?&gt;
+?>
 \endcode
 
 \section status Query some status info, the number of documents inserted
 \code
-&lt;?php
+<?php
 require "strus.php";
 
 $ctx = new StrusContext();
@@ -81,12 +81,12 @@ $nofDocuments = $storage->nofDocumentsInserted();
 
 # Output:
 print "Number of documents inserted: $nofDocuments\n";
-?&gt;
+?>
 \endcode
 
 \section query Issue a BM25 query on the created collection (first example) and show the best ranked documents
 \code
-&lt;?php
+<?php
 require "strus.php";
 
 $queryphrase = "city";
@@ -171,7 +171,7 @@ catch (Exception $err)
 {
 	print "Error: " . $err . "\n";
 }
-?&gt;
+?>
 \endcode
 
 
