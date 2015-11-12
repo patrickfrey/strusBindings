@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.2</span>
    </div>
   </td>
  </tr>
@@ -45,12 +45,160 @@
 <div class="textblock"><p>The strus PHP interface provides objects for accessing the retrieval storage, indexing documents and queries and evaluating queries. It has been built using SWIG based on a wrapper C++ interface (<a class="el" href="bindingObjects_8hpp.html">strus/bindingObjects.hpp</a>).</p>
 <p><b>Because of lacking namespaces all type names of the strus PHP extension have the prefix <em>Strus</em></b>. The class names in the interface documentation are without the <em>Strus</em> prefix. I failed to persuade doxygen to create the names with the <em>Strus</em> prefix.</p>
 <p>The entry point of a strus application with PHP is the context (<a class="el" href="classContext.html">Context</a>) object (<b>StrusContext</b>). It is the root object from which all other objects are created. It can be constructed either as proxy, that redirects all method calls to an RpcServer or it can be constructed as instance running in the PHP environment. Because it is most likely that PHP will run in a webserver context, it is recommended to use the RPC proxy variant there.</p>
-<p>The following examples illustrate the usage of the PHP bindings. You'll find a tutorial based on a docker image for how to build a search engine with strus and PHP <a href="http://www.codeproject.com/Articles/1009582/Building-a-search-engine-with-Strus-tutorial">here</a>. </p>
-</div></div><!-- contents -->
+<p>You'll find a tutorial based on a docker image for how to build a search engine with strus and PHP <a href="http://www.codeproject.com/Articles/1009582/Building-a-search-engine-with-Strus-tutorial">here</a>. The following examples illustrate the usage of the PHP bindings. They are taken from tests built and executed in the strusBindings project.</p>
+<h1><a class="anchor" id="createCollection"></a>
+Create a collection, analyze and insert 3 documents</h1>
+<div class="fragment"><div class="line">&amp;lt;?php</div>
+<div class="line">require <span class="stringliteral">&quot;strus.php&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">$config = <span class="stringliteral">&quot;path=storage; metadata=doclen UINT16&quot;</span>;</div>
+<div class="line">$ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line"><span class="keywordflow">try</span> {</div>
+<div class="line">        $ctx-&gt;destroyStorage( $config);</div>
+<div class="line"><span class="preprocessor">        # ... delete the storage files if they already exists</span></div>
+<div class="line"><span class="preprocessor"></span>} <span class="keywordflow">catch</span>( Exception $e ) {</div>
+<div class="line">}</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Create a new storage:</span></div>
+<div class="line"><span class="preprocessor"></span>$ctx-&gt;createStorage( $config);</div>
+<div class="line"><span class="preprocessor"># Get a client for the new created storage:</span></div>
+<div class="line"><span class="preprocessor"></span>$storage = $ctx-&gt;createStorageClient( $config);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Define the document analyzer to use:</span></div>
+<div class="line"><span class="preprocessor"></span>$analyzer = $ctx-&gt;createDocumentAnalyzer();</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Define the features and attributes to store:</span></div>
+<div class="line"><span class="preprocessor"></span>$analyzer-&gt;defineAttribute( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;/doc/title()&quot;</span>, <span class="stringliteral">&quot;content&quot;</span>, <span class="stringliteral">&quot;orig&quot;</span>);</div>
+<div class="line">$analyzer-&gt;addSearchIndexFeature( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, <span class="stringliteral">&quot;word&quot;</span>, [[<span class="stringliteral">&quot;stem&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>],<span class="stringliteral">&quot;lc&quot;</span>,[<span class="stringliteral">&quot;convdia&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>]], []);</div>
+<div class="line">$analyzer-&gt;addForwardIndexFeature( <span class="stringliteral">&quot;orig&quot;</span>, <span class="stringliteral">&quot;/doc/text()&quot;</span>, <span class="stringliteral">&quot;split&quot;</span>, <span class="stringliteral">&quot;orig&quot;</span>, []);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Read input files, analyze and insert them:</span></div>
+<div class="line"><span class="preprocessor"></span>$datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
+<div class="line">$datafiles = scandir( $datadir);</div>
+<div class="line"><span class="keywordflow">foreach</span> ($datafiles as &amp;$datafile)</div>
+<div class="line">{</div>
+<div class="line">        <span class="keywordflow">if</span> ($datafile[0] != <span class="charliteral">&#39;.&#39;</span>)</div>
+<div class="line">        {</div>
+<div class="line">                print <span class="stringliteral">&quot;process document &quot;</span> . $datafile . <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">                $docid = substr( $datafile, 0, strlen($datafile) -4);</div>
+<div class="line">                $fullname = $datadir . $datafile;</div>
+<div class="line">                $doc = $analyzer-&gt;analyze( file_get_contents( $fullname));</div>
+<div class="line">                $storage-&gt;insertDocument( $docid, $doc);</div>
+<div class="line">        }</div>
+<div class="line">}</div>
+<div class="line"><span class="preprocessor"># Without this the documents wont be inserted:</span></div>
+<div class="line"><span class="preprocessor"></span>$storage-&gt;flush();</div>
+<div class="line">print <span class="stringliteral">&quot;done&quot;</span>;</div>
+<div class="line">?&amp;gt;</div>
+</div><!-- fragment --><h1><a class="anchor" id="status"></a>
+Query some status info, the number of documents inserted</h1>
+<div class="fragment"><div class="line">&amp;lt;?php</div>
+<div class="line">require <span class="stringliteral">&quot;strus.php&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">$ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line"></div>
+<div class="line">$config = <span class="stringliteral">&quot;path=storage; metadata=doclen UINT16&quot;</span>;</div>
+<div class="line">$storage = $ctx-&gt;createStorageClient( $config);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Query the number of documents inserted:</span></div>
+<div class="line"><span class="preprocessor"></span>$nofDocuments = $storage-&gt;nofDocumentsInserted();</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor"># Output:</span></div>
+<div class="line"><span class="preprocessor"></span>print <span class="stringliteral">&quot;Number of documents inserted: $nofDocuments\n&quot;</span>;</div>
+<div class="line">?&amp;gt;</div>
+</div><!-- fragment --><h1><a class="anchor" id="query"></a>
+Issue a BM25 query on the created collection (first example) and show the best ranked documents</h1>
+<div class="fragment"><div class="line">&amp;lt;?php</div>
+<div class="line">require <span class="stringliteral">&quot;strus.php&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">$queryphrase = <span class="stringliteral">&quot;city&quot;</span>;</div>
+<div class="line"></div>
+<div class="line">$config = <span class="stringliteral">&quot;path=storage&quot;</span>;</div>
+<div class="line">$ctx = <span class="keyword">new</span> StrusContext();</div>
+<div class="line"></div>
+<div class="line"><span class="keywordflow">try</span></div>
+<div class="line">{</div>
+<div class="line"><span class="preprocessor">        # Get a client for the storage:</span></div>
+<div class="line"><span class="preprocessor"></span>        $storage = $ctx-&gt;createStorageClient( $config);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">        # Define the query analyzer to use:</span></div>
+<div class="line"><span class="preprocessor"></span>        $analyzer = $ctx-&gt;createQueryAnalyzer();</div>
+<div class="line">        $analyzer-&gt;definePhraseType( <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;word&quot;</span>, <span class="stringliteral">&quot;word&quot;</span>, [[<span class="stringliteral">&quot;stem&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>],<span class="stringliteral">&quot;lc&quot;</span>,[<span class="stringliteral">&quot;convdia&quot;</span>,<span class="stringliteral">&quot;en&quot;</span>]]);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">        # Define the query evaluation scheme:</span></div>
+<div class="line"><span class="preprocessor"></span>        $queryeval = $ctx-&gt;createQueryEval();</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">        # Here we define what query features decide, what is ranked for the result:</span></div>
+<div class="line"><span class="preprocessor"></span>        $queryeval-&gt;addSelectionFeature( <span class="stringliteral">&quot;select&quot;</span>);</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Here we define how we rank a document selected. We use the &#39;BM25&#39; weighting scheme:</span></div>
+<div class="line"><span class="preprocessor"></span>        $queryeval-&gt;addWeightingFunction( 1.0, <span class="stringliteral">&quot;BM25&quot;</span>, [<span class="stringliteral">&quot;k1&quot;</span>=&gt;0.75, <span class="stringliteral">&quot;b&quot;</span>=&gt;2.1, <span class="stringliteral">&quot;avgdoclen&quot;</span>=&gt;1000, <span class="stringliteral">&quot;.match&quot;</span>=&gt;<span class="stringliteral">&quot;seek&quot;</span>]);</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Now we define what attributes of the documents are returned and how they are build.</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # The functions that extract stuff from documents for presentation are called summarizers.</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # First we add a summarizer that extracts us the title of the document:</span></div>
+<div class="line"><span class="preprocessor"></span>        $queryeval-&gt;addSummarizer( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;attribute&quot;</span>, [<span class="stringliteral">&quot;name&quot;</span>=&gt;<span class="stringliteral">&quot;title&quot;</span>]);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">        # Then we add a summarizer that collects the sections that enclose the best matches </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # in a ranked document:</span></div>
+<div class="line"><span class="preprocessor"></span>        $queryeval-&gt;addSummarizer( <span class="stringliteral">&quot;summary&quot;</span>, <span class="stringliteral">&quot;matchphrase&quot;</span>, [<span class="stringliteral">&quot;type&quot;</span>=&gt;<span class="stringliteral">&quot;orig&quot;</span>,<span class="stringliteral">&quot;nof&quot;</span>=&gt;4,<span class="stringliteral">&quot;len&quot;</span>=&gt;60,<span class="stringliteral">&quot;.match&quot;</span>=&gt;<span class="stringliteral">&quot;seek&quot;</span>]);</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">        # Now we build the query to issue:</span></div>
+<div class="line"><span class="preprocessor"></span>        $query = $queryeval-&gt;createQuery( $storage);</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # First we analyze the query phrase to get the terms to find in the form as they are stored in the storage:</span></div>
+<div class="line"><span class="preprocessor"></span>        $terms = $analyzer-&gt;analyzePhrase( <span class="stringliteral">&quot;word&quot;</span>, $queryphrase);</div>
+<div class="line">        <span class="keywordflow">if</span> (count( $terms) == 0)</div>
+<div class="line">        {</div>
+<div class="line">                <span class="keywordflow">throw</span> Exception(<span class="stringliteral">&quot;query is empty&quot;</span>);</div>
+<div class="line">        }</div>
+<div class="line"><span class="preprocessor">        # Then we iterate on the terms and create a single term feature for each term and collect</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # all terms to create a selection expression out of them:</span></div>
+<div class="line"><span class="preprocessor"></span>        $selexpr = [ <span class="stringliteral">&quot;contains&quot;</span> ];</div>
+<div class="line"></div>
+<div class="line">        <span class="keywordflow">foreach</span> ($terms as &amp;$term)</div>
+<div class="line">        {</div>
+<div class="line"><span class="preprocessor">                # We assign the features created to the set named &#39;seek&#39; because they are </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">                # referenced with this name in the query evaluation:</span></div>
+<div class="line"><span class="preprocessor"></span>                $query-&gt;defineFeature( <span class="stringliteral">&quot;seek&quot;</span>, [ $term-&gt;type,$term-&gt;value], 1.0 );</div>
+<div class="line"><span class="preprocessor">                # Each query term is also part of the selection expressions</span></div>
+<div class="line"><span class="preprocessor"></span>                $selexpr[] = [ $term-&gt;type, $term-&gt;value ];</div>
+<div class="line">        }</div>
+<div class="line"><span class="preprocessor">        # We assign the feature created to the set named &#39;select&#39; because this is the</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # name of the set defined as selection feature in the query evaluation configuration</span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # ($queryeval-&gt;addSelectionFeature):</span></div>
+<div class="line"><span class="preprocessor"></span>        $query-&gt;defineFeature( <span class="stringliteral">&quot;select&quot;</span>, $selexpr, 1.0);</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Define the maximum number of best result (ranks) to return:</span></div>
+<div class="line"><span class="preprocessor"></span>        $query-&gt;setMaxNofRanks( 20);</div>
+<div class="line"><span class="preprocessor">        # Define the index of the first rank (for implementing scrolling: 0 for the first, </span></div>
+<div class="line"><span class="preprocessor"></span><span class="preprocessor">        # 20 for the 2nd, 40 for the 3rd page, etc.):</span></div>
+<div class="line"><span class="preprocessor"></span>        $query-&gt;setMinRank( 0);</div>
+<div class="line">        </div>
+<div class="line"><span class="preprocessor">        # Now we evaluate the query and iterate on the result to display them:</span></div>
+<div class="line"><span class="preprocessor"></span>        $results = $query-&gt;evaluate();</div>
+<div class="line">        $pos = 0;</div>
+<div class="line">        <span class="keywordflow">foreach</span> ($results as &amp;$result)</div>
+<div class="line">        {</div>
+<div class="line">                $pos += 1;</div>
+<div class="line">                print <span class="stringliteral">&quot;rank &quot;</span> . $pos . <span class="stringliteral">&quot;: &quot;</span> . $result-&gt;docno . <span class="stringliteral">&quot; &quot;</span> . $result-&gt;weight . <span class="stringliteral">&quot;:\n&quot;</span>;</div>
+<div class="line">                <span class="keywordflow">foreach</span> ($result-&gt;attributes as &amp;$attribute)</div>
+<div class="line">                {</div>
+<div class="line">                        print <span class="stringliteral">&quot;\t&quot;</span> . $attribute-&gt;name . <span class="stringliteral">&quot;: &quot;</span> . $attribute-&gt;value . <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">                }</div>
+<div class="line">        }</div>
+<div class="line">        print <span class="stringliteral">&quot;done\n&quot;</span>;</div>
+<div class="line">}</div>
+<div class="line"><span class="keywordflow">catch</span> (Exception $err)</div>
+<div class="line">{</div>
+<div class="line">        print <span class="stringliteral">&quot;Error: &quot;</span> . $err . <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line">}</div>
+<div class="line">?&amp;gt;</div>
+</div><!-- fragment --> </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 22 2015 12:36:14 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 13 2015 00:21:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

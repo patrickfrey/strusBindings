@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.2</span>
    </div>
   </td>
  </tr>
@@ -67,21 +67,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aad0c964335e9809cc7e22af34e9e8410"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#aad0c964335e9809cc7e22af34e9e8410">~Query</a> ()</td></tr>
 <tr class="memdesc:aad0c964335e9809cc7e22af34e9e8410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#aad0c964335e9809cc7e22af34e9e8410">More...</a><br/></td></tr>
 <tr class="separator:aad0c964335e9809cc7e22af34e9e8410"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe3a8dabb6e321fcf09da84a0b0c91c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#afe3a8dabb6e321fcf09da84a0b0c91c0">pushTerm</a> (const String &amp;type_, const String &amp;value_)</td></tr>
-<tr class="memdesc:afe3a8dabb6e321fcf09da84a0b0c91c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push a single term on the stack.  <a href="#afe3a8dabb6e321fcf09da84a0b0c91c0">More...</a><br/></td></tr>
-<tr class="separator:afe3a8dabb6e321fcf09da84a0b0c91c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50f881f1b5b6ecafef060854783e93ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a50f881f1b5b6ecafef060854783e93ee">pushExpression</a> (const String &amp;opname_, unsigned int argc, int range_=0, unsigned int cardinality_=0)</td></tr>
-<tr class="memdesc:a50f881f1b5b6ecafef060854783e93ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack.  <a href="#a50f881f1b5b6ecafef060854783e93ee">More...</a><br/></td></tr>
-<tr class="separator:a50f881f1b5b6ecafef060854783e93ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7d9d6da24b9809ea7aa030a7b2bab6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#ae7d9d6da24b9809ea7aa030a7b2bab6b">pushDuplicate</a> ()</td></tr>
-<tr class="memdesc:ae7d9d6da24b9809ea7aa030a7b2bab6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Push a duplicate of the topmost element of the query stack.  <a href="#ae7d9d6da24b9809ea7aa030a7b2bab6b">More...</a><br/></td></tr>
-<tr class="separator:ae7d9d6da24b9809ea7aa030a7b2bab6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afcc42bfac084d0fdb35d67223ac8a18c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#afcc42bfac084d0fdb35d67223ac8a18c">attachVariable</a> (const String &amp;name_)</td></tr>
-<tr class="memdesc:afcc42bfac084d0fdb35d67223ac8a18c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches a variable to the top expression or term on the query stack.  <a href="#afcc42bfac084d0fdb35d67223ac8a18c">More...</a><br/></td></tr>
-<tr class="separator:afcc42bfac084d0fdb35d67223ac8a18c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeca9b1f75d23d15e0fd6a0f9bab2d8c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#aeca9b1f75d23d15e0fd6a0f9bab2d8c0">defineFeature</a> (const String &amp;set_, double weight_=1.0)</td></tr>
-<tr class="memdesc:aeca9b1f75d23d15e0fd6a0f9bab2d8c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a feature from the top element on the stack (and pop the element from the stack)  <a href="#aeca9b1f75d23d15e0fd6a0f9bab2d8c0">More...</a><br/></td></tr>
-<tr class="separator:aeca9b1f75d23d15e0fd6a0f9bab2d8c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1e198480abbed202f3e6fa99cbdc9e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#ac1e198480abbed202f3e6fa99cbdc9e4">defineFeature</a> (const String &amp;set_, const <a class="el" href="classQueryExpression.html">QueryExpression</a> &amp;expr_, double weight_=1.0)</td></tr>
+<tr class="memdesc:ac1e198480abbed202f3e6fa99cbdc9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a feature from the query expression passed.  <a href="#ac1e198480abbed202f3e6fa99cbdc9e4">More...</a><br/></td></tr>
+<tr class="separator:ac1e198480abbed202f3e6fa99cbdc9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48be89ad411aca6d597301e5b05aff75"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a48be89ad411aca6d597301e5b05aff75">defineMetaDataRestriction</a> (const char *compareOp, const String &amp;name, const <a class="el" href="classVariant.html">Variant</a> &amp;value, bool newGroup=true)</td></tr>
 <tr class="memdesc:a48be89ad411aca6d597301e5b05aff75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a meta data restriction.  <a href="#a48be89ad411aca6d597301e5b05aff75">More...</a><br/></td></tr>
 <tr class="separator:a48be89ad411aca6d597301e5b05aff75"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -211,33 +199,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="afcc42bfac084d0fdb35d67223ac8a18c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Query::attachVariable </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>name_</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Attaches a variable to the top expression or term on the query stack. </p>
-<dl class="section note"><dt>Note</dt><dd>The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">name_</td><td>name of the variable attached </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The stack is not changed </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="aeca9b1f75d23d15e0fd6a0f9bab2d8c0"></a>
+<a class="anchor" id="ac1e198480abbed202f3e6fa99cbdc9e4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -246,6 +208,12 @@ Friends</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const String &amp;&#160;</td>
           <td class="paramname"><em>set_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classQueryExpression.html">QueryExpression</a> &amp;&#160;</td>
+          <td class="paramname"><em>expr_</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -261,14 +229,16 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create a feature from the top element on the stack (and pop the element from the stack) </p>
+<p>Create a feature from the query expression passed. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">set_</td><td>name of the feature set, this feature is addressed with </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">expr_</td><td>query expression that defines the postings of the feature and the variables attached </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">weight_</td><td>individual weight of the feature in the query </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section remark"><dt>Remarks</dt><dd>the query expression passed as parameter is refused if it does not contain exactly one element </dd></dl>
 
 </div>
 </div>
@@ -486,108 +456,6 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ae7d9d6da24b9809ea7aa030a7b2bab6b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Query::pushDuplicate </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Push a duplicate of the topmost element of the query stack. </p>
-<dl class="section note"><dt>Note</dt><dd>This function makes it possible to reference terms or expressions more than once as features or as subexpressions. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a50f881f1b5b6ecafef060854783e93ee"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Query::pushExpression </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>opname_</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>argc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>range_</em> = <code>0</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>cardinality_</em> = <code>0</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">opname_</td><td>name of the expression operator </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">argc</td><td>number of operands (topmost elements from stack) of the expression </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">range_</td><td>range number for the expression span in the document </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cardinality_</td><td>number that specifies the minimum size of a subset or subset permutation to match </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="afe3a8dabb6e321fcf09da84a0b0c91c0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Query::pushTerm </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>type_</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>value_</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Push a single term on the stack. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">type_</td><td>query term type name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">value_</td><td>query term value </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="aa339bccb980d4c9ee5b33a92751e247b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -664,7 +532,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Oct 22 2015 12:36:14 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 13 2015 00:21:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
