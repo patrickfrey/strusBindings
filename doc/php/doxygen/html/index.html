@@ -48,7 +48,7 @@
 <p>You'll find a tutorial based on a docker image for how to build a search engine with strus and PHP <a href="http://www.codeproject.com/Articles/1009582/Building-a-search-engine-with-Strus-tutorial">here</a>. The following examples illustrate the usage of the PHP bindings. They are taken from tests built and executed in the strusBindings project.</p>
 <h1><a class="anchor" id="createCollection"></a>
 Create a collection, analyze and insert 3 documents</h1>
-<div class="fragment"><div class="line">&amp;lt;?php</div>
+<div class="fragment"><div class="line">&lt;?php</div>
 <div class="line">require <span class="stringliteral">&quot;strus.php&quot;</span>;</div>
 <div class="line"></div>
 <div class="line">$config = <span class="stringliteral">&quot;path=storage; metadata=doclen UINT16&quot;</span>;</div>
@@ -89,10 +89,10 @@ Create a collection, analyze and insert 3 documents</h1>
 <div class="line"><span class="preprocessor"># Without this the documents wont be inserted:</span></div>
 <div class="line"><span class="preprocessor"></span>$storage-&gt;flush();</div>
 <div class="line">print <span class="stringliteral">&quot;done&quot;</span>;</div>
-<div class="line">?&amp;gt;</div>
+<div class="line">?&gt;</div>
 </div><!-- fragment --><h1><a class="anchor" id="status"></a>
 Query some status info, the number of documents inserted</h1>
-<div class="fragment"><div class="line">&amp;lt;?php</div>
+<div class="fragment"><div class="line">&lt;?php</div>
 <div class="line">require <span class="stringliteral">&quot;strus.php&quot;</span>;</div>
 <div class="line"></div>
 <div class="line">$ctx = <span class="keyword">new</span> StrusContext();</div>
@@ -105,10 +105,10 @@ Query some status info, the number of documents inserted</h1>
 <div class="line"></div>
 <div class="line"><span class="preprocessor"># Output:</span></div>
 <div class="line"><span class="preprocessor"></span>print <span class="stringliteral">&quot;Number of documents inserted: $nofDocuments\n&quot;</span>;</div>
-<div class="line">?&amp;gt;</div>
+<div class="line">?&gt;</div>
 </div><!-- fragment --><h1><a class="anchor" id="query"></a>
 Issue a BM25 query on the created collection (first example) and show the best ranked documents</h1>
-<div class="fragment"><div class="line">&amp;lt;?php</div>
+<div class="fragment"><div class="line">&lt;?php</div>
 <div class="line">require <span class="stringliteral">&quot;strus.php&quot;</span>;</div>
 <div class="line"></div>
 <div class="line">$queryphrase = <span class="stringliteral">&quot;city&quot;</span>;</div>
@@ -193,12 +193,12 @@ Issue a BM25 query on the created collection (first example) and show the best r
 <div class="line">{</div>
 <div class="line">        print <span class="stringliteral">&quot;Error: &quot;</span> . $err . <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line">}</div>
-<div class="line">?&amp;gt;</div>
+<div class="line">?&gt;</div>
 </div><!-- fragment --> </div></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:21:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Nov 13 2015 00:48:51 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
