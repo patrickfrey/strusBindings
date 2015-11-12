@@ -32,18 +32,16 @@
 #include "strus/bindingObjects.hpp"
 #include <vector>
 
-int initVariant( Variant& result, PyObject* obj);
-int initTokenizer( Tokenizer& result, PyObject* obj);
-int initNormalizer( Normalizer& result, PyObject* obj);
-int initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
-int initAggregator( Aggregator& result, PyObject* obj);
-int initSummarizerConfig( SummarizerConfig& result, PyObject* obj);
-int initWeightingConfig( WeightingConfig& result, PyObject* obj);
-int initString( std::string& result, PyObject* obj);
-int initStringVector( std::vector<std::string>& result, PyObject* obj);
-int initIntVector( std::vector<int>& result, PyObject* obj);
-
-PyObject* getTermVector( const std::vector<Term>& ar);
-PyObject* getRankVector( const std::vector<Rank>& ar);
+void initVariant( Variant& result, PyObject* obj);
+void initTokenizer( Tokenizer& result, PyObject* obj);
+void initNormalizer( Normalizer& result, PyObject* obj);
+void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
+void initAggregator( Aggregator& result, PyObject* obj);
+void initSummarizerConfig( SummarizerConfig& result, PyObject* obj);
+void initWeightingConfig( WeightingConfig& result, PyObject* obj);
+void initQueryExpression( QueryExpression& result, PyObject* obj);
+void initString( std::string& result, PyObject* obj);
+void initStringVector( std::vector<std::string>& result, PyObject* obj);
+void initIntVector( std::vector<int>& result, PyObject* obj);
 
 #endif

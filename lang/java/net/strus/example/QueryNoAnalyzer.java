@@ -8,33 +8,34 @@ public class QueryNoAnalyzer
 	// Evaluate a query defined by some terms with a query evaluation scheme passed:
 	public static RankVector evaluateQuery( StorageClient storage, QueryEval queryEval, String[] terms)
 	{
+		// Empty queries are refused:
+		if (terms.length == 0)
+		{
+			throw new RuntimeException( "calling evaluate with empty query");
+		}
 		// Create a query to instantiate for the query evaluation scheme passed:
 		Query query = queryEval.createQuery( storage);
 		// Iterate on the terms and create a single term feature for each term and collect
 		// all terms to create a selection expression out of them:
+		QueryExpression selectexpr = new QueryExpression();
 		for (String term : terms) {
 			// We push the query terms on the stack and create a query feature 'seek' 
 			// for each of it:
-			query.pushTerm( "word", term);
-			// Ever feature is duplicated on the stack, because we use them to 
-			// build the selection expression that selects all documents for ranking
-			// that contain all terms
-			query.pushDuplicate();
+			QueryExpression expr = new QueryExpression();
+			expr.pushTerm( "word", term);
+			selectexpr.pushTerm( "word", term);
+
 			// We assign the features created to the set named 'seek' because they are 
 			// referenced with this name in the query evaluation:
-			query.defineFeature( "seek", 1.0);
+			query.defineFeature( "seek", expr, 1.0);
 		}
-		// Create a selection feature 'select' that matches documents that contain all query terms:
-		if (terms.length > 0)
-		{
-			// Now we build the selection expression with the terms pushed as duplicates on
-			// the stack in the loop before:
-			query.pushExpression( "contains", terms.length);
-			// We assign the feature created to the set named 'select' because this is the
-			// name of the set defined as selection feature in the query evaluation configuration
-			// (QueryEval.addSelectionFeature):
-			query.defineFeature( "select");
-		}
+		// Create a selection feature 'select' that matches documents that contain all query terms.
+		// We assign the feature created to the set named 'select' because this is the
+		// name of the set defined as selection feature in the query evaluation configuration
+		// (QueryEval.addSelectionFeature):
+		selectexpr.pushExpression( "contains", terms.length);
+		query.defineFeature( "select", selectexpr);
+
 		// Define the maximum number of best result (ranks) to return:
 		query.setMaxNofRanks( 20);
 		// Define the index of the first rank (for implementing scrolling: 0 for the first, 

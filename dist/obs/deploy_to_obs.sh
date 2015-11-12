@@ -5,7 +5,7 @@ PACKAGE_VERSION=0.1.7
 OSC_HOME=$HOME/home:andreas_baumann/$PACKAGE_NAME
 
 rm -f ${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz
-cmake -DWITH_JAVA="YES" -DWITH_PHP="YES" .
+cmake .
 make dist-gz
 
 # git commit count since last tagging is used for a build number of

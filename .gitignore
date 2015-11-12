@@ -53,6 +53,7 @@ lang/java/net/strus/api/*.class
 tests/query_cpp/storage/
 lang/java/net/strus/example/storage/
 lang/python/example/storage/
+lang/php/example/storage/
 
 # SWIG generated code
 lang/strusPYTHON_wrap.cxx

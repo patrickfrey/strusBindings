@@ -15,7 +15,7 @@ link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" "${s
 
 # Php:
 add_custom_command(
-	OUTPUT strus_wrap.cpp ../strus.php php_strus.h
+	OUTPUT strus_wrap.cpp strus.php php_strus.h
 	PRE_BUILD
 	COMMAND  swig -Werror -php -c++ -outdir ${PROJECT_SOURCE_DIR}/lang/php strus.i
 	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lang/php"
@@ -27,8 +27,13 @@ add_library( strus_php MODULE strus_wrap.cpp objInitializers.cpp )
 set_target_properties( strus_php PROPERTIES PREFIX "" OUTPUT_NAME strus )
 target_link_libraries( strus_php  strus_bindings )
 
+add_subdirectory( example )
+
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install(TARGETS strus_php
+install( TARGETS strus_php
 	LIBRARY DESTINATION ${PHP_EXTENSION_DIR} )
+
+install( FILES strus.php DESTINATION /usr/share/php/ )
+

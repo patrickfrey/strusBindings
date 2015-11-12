@@ -40,6 +40,7 @@ public class CreateCollection
 			//... ignore if storage did not exist
 		}
 		// Create a new storage:
+		System.out.println("Create storage with config '" + config + "'");
 		ctx.createStorage( config);
 		// Get a client for the new created storage:
 		StorageClient storage = ctx.createStorageClient( config);

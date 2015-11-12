@@ -32,6 +32,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cstring>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
@@ -47,10 +48,12 @@ namespace strus {
 #endif
 #elif (defined STRUS_BOOST_PYTHON)
 typedef std::string String;
+typedef std::wstring WString;
 typedef std::vector<int> IntVector;
 typedef std::vector<std::string> StringVector;
 #else
 #define String std::string
+#define WString std::wstring
 #define IntVector std::vector<int>
 #define StringVector std::vector<std::string>
 #if !defined DOXYGEN_PHP && !defined DOXYGEN_PYTHON
@@ -114,6 +117,7 @@ private:
 
 #if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
 /// \brief Object epresenting a configuration of a tokenizer as single string naming a tokenizer without arguments or a tuple of strings consisting of the tokenizer name followed by the arguments
+#error DOXYGEN_PYTHON
 class Tokenizer
 {
 };
@@ -413,6 +417,9 @@ public:
 	const String& type() const			{return m_type;}
 	/// \brief Get the term value
 	const String& value() const			{return m_value;}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+#endif
 	/// \brief Get the term position
 	unsigned int position() const			{return m_position;}
 
@@ -455,7 +462,7 @@ public:
 	/// \brief Get the type name of this meta data field:
 	const String& name() const			{return m_name;}
 	/// \brief Get the value of this meta data field:
-	const Variant& value() const			{return m_value;}
+	double value() const				{return m_value.getFloat();}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const MetaData& o) const
@@ -497,6 +504,10 @@ public:
 	/// \brief Get the type value of this attribute
 	const String& value() const		{return m_value;}
 
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+#endif
+	
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Attribute& o) const
 	{
@@ -595,26 +606,17 @@ public:
 	void setMetaData( const String& name, const Variant& value);
 #endif
 #ifdef STRUS_BOOST_PYTHON
-	/// \brief Define a meta data value of the document
-	/// \param[in] name name of the meta data table element
-	/// \param[in] value value of the meta data table element
 	void setMetaData_double( const String& name, double value)
 	{
-		setMetaData_double( name, value);
+		setMetaData( name, value);
 	}
-	/// \brief Define a meta data value of the document
-	/// \param[in] name name of the meta data table element
-	/// \param[in] value value of the meta data table element
 	void setMetaData_int( const String& name, int value)
 	{
-		setMetaData_double( name, value);
+		setMetaData( name, value);
 	}
-	/// \brief Define a meta data value of the document
-	/// \param[in] name name of the meta data table element
-	/// \param[in] value value of the meta data table element
 	void setMetaData_uint( const String& name, unsigned int value)
 	{
-		setMetaData_double( name, value);
+		setMetaData( name, value);
 	}
 #endif
 	/// \brief Define a meta data value of the document
@@ -633,6 +635,9 @@ public:
 	/// \param[in] name name of the document attribute
 	/// \param[in] value value of the document attribute
 	void setAttribute( const String& name, const String& value);
+#ifdef STRUS_BOOST_PYTHON
+	void setAttribute_unicode( const String& name, const WString& value);
+#endif
 	/// \brief Allow a user to access the document
 	/// \param[in] username name of the user to be allowed to access this document
 	/// \remark This function is only implemented if ACL is enabled in the storage
@@ -692,13 +697,22 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addSearchIndexFeature(
+		const String& type,
+		const String& selectexpr,
+		const Tokenizer& tokenizer,
+		const NormalizerVector& normalizers,
+		const StringVector& options);
+#else
 	void addSearchIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
 		const StringVector& options=StringVector());
-
+#endif
 #ifdef STRUS_BOOST_PYTHON
 	void addSearchIndexFeature_4(
 		const String& type,
@@ -720,13 +734,22 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
 	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addForwardIndexFeature(
+		const String& type,
+		const String& selectexpr,
+		const Tokenizer& tokenizer,
+		const NormalizerVector& normalizers,
+		const StringVector& options);
+#else
 	void addForwardIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
 		const StringVector& options=StringVector());
-
+#endif
 #ifdef STRUS_BOOST_PYTHON
 	void addForwardIndexFeature_4(
 		const String& type,
@@ -803,15 +826,10 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
-	Document analyze_1( const String& content)
-	{
-		return analyze( content);
-	}
-
-	Document analyze_2( const String& content, const DocumentClass& dclass)
-	{
-		return analyze( content, dclass);
-	}
+	Document analyze_unicode_1( const WString& content);
+	Document analyze_unicode_2( const WString& content, const DocumentClass& dclass);
+	Document analyze_1( const String& content);
+	Document analyze_2( const String& content, const DocumentClass& dclass);
 #endif
 private:
 	/// \brief Constructor used by Context
@@ -871,6 +889,12 @@ public:
 			const String& phraseType,
 			const String& phraseContent) const;
 
+#ifdef STRUS_BOOST_PYTHON
+	TermVector analyzePhrase_unicode(
+			const String& phraseType,
+			const WString& phraseContent) const;
+#endif
+
 	/// \brief Creates a queue for phrase bulk analysis
 	/// \return the queue
 	QueryAnalyzeQueue createQueue() const;
@@ -906,6 +930,9 @@ public:
 	void push(
 			const String& phraseType,
 			const String& phraseContent);
+#ifdef STRUS_BOOST_PYTHON
+	void push_unicode( const String& phraseType, const WString& phraseContent);
+#endif
 
 	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
 	/// \return list of terms (query phrase analyzer result)
@@ -953,11 +980,17 @@ public:
 	/// \param[in] docid the identifier of the document to delete
 	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
 	void deleteDocument( const String& docid);
+#ifdef STRUS_BOOST_PYTHON
+	void deleteDocument_unicode( const WString& docid);
+#endif
 
 	/// \brief Prepare the deletion of all document access rights of a user
 	/// \param[in] username the name of the user to delete all access rights (in the local collection)
 	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const String& username);
+#ifdef STRUS_BOOST_PYTHON
+	void deleteUserAccessRights_unicode( const WString& username);
+#endif
 
 	/// \brief Commit all insert or delete or user access right change statements open.
 	void flush();
@@ -1029,29 +1062,6 @@ public:
 		m_parameters[ name] = value;
 	}
 
-#ifdef STRUS_BOOST_PYTHON
-	void defineParameter_string( const String& name, const char* value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_charp( const String& name, const char* value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_int( const String& name, int value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_uint( const String& name, unsigned int value)
-	{
-		defineParameter( name, value);
-	}
-	void defineParameter_double( const String& name, double value)
-	{
-		defineParameter( name, value);
-	}
-#endif
-
 	/// \brief Define a summarizer feature
 	/// \param[in] sumtype type name of the feature as defined in the summarizer implementation
 	/// \param[in] set feature set of the feature used to address the features
@@ -1116,6 +1126,15 @@ public:
 	{
 		m_parameters[ name] = Variant(value);
 	}
+#if !defined SWIGJAVA && !defined SWIGPHP
+	/// \brief Define a parameter used for weighting
+	/// \param[in] name name of the parameter as defined in the weighting function implementation
+	/// \param[in] value value of the parameter
+	void defineParameter( const String& name, const String& value)
+	{
+		m_parameters[ name] = Variant(value);
+	}
+#endif
 
 	/// \brief Define a weighting feature
 	/// \param[in] sumtype type name of the feature as defined in the weighting function implementation
@@ -1212,6 +1231,7 @@ private:
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_queryeval_impl;
+	const void* m_queryproc;
 };
 
 
@@ -1236,7 +1256,9 @@ public:
 	/// \brief Get the weight of the attribute
 	double weight() const			{return m_weight;}
 
-#ifdef STRUS_BOOST_PYTHON
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+
 	bool operator==( const RankAttribute& o) const
 	{
 		if (m_name != o.m_name || m_value != o.m_value) return false;
@@ -1304,6 +1326,120 @@ typedef std::vector<Rank> RankVector;
 #endif
 
 
+/// \brief Object representing a sequence of query operations to get the set of postings (d,p) of an atomic term or an expression
+class QueryExpression
+{
+public:
+	QueryExpression( const QueryExpression& o)
+		:m_ops(o.m_ops),m_strings(o.m_strings),m_size(o.m_size){}
+	QueryExpression()
+		:m_size(0){}
+
+	/// \brief Add operation "Push a single term on the stack"
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
+	void pushTerm( const String& type_, const String& value_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushTerm_unicode( const String& type_, const WString& value_);
+#endif
+	/// \brief Add operation "Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack"
+	/// \param[in] opname_ name of the expression operator
+	/// \param[in] argc_ number of operands (topmost elements from stack) of the expression
+	/// \param[in] range_ range number for the expression span in the document
+	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
+	void pushExpression( const String& opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushExpression_2( const String& opname_, unsigned int argc)
+	{
+		pushExpression( opname_, argc, 0, 0);
+	}
+	void pushExpression_3( const String& opname_, unsigned int argc, int range_)
+	{
+		pushExpression( opname_, argc, range_, 0);
+	}
+	void pushExpression_4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
+	{
+		pushExpression( opname_, argc, range_, cardinality_);
+	}
+#endif
+
+	/// \brief Add operation "Attach a variable to the top expression or term on the query stack".
+	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
+	/// \param[in] name_ name of the variable attached
+	/// \remark The stack is not changed
+	void attachVariable( const String& name_);
+#ifdef STRUS_BOOST_PYTHON
+	void attachVariable_unicode( const WString& name_);
+#endif
+
+	/// \brief Appends the operations of 'o' to this
+	/// \param[in] o expression to copy
+	void add( const QueryExpression& o);
+
+	/// \brief Get the number of items (sub expressions) on the stack as result of this expression
+	/// \return the number of items (sub expressions)
+	std::size_t size() const
+	{
+		return m_size;
+	}
+
+private:
+	friend class Query;
+
+	struct StackOp
+	{
+		enum Type
+		{
+			PushTerm,
+			PushExpression,
+			AttachVariable
+		};
+		enum ArgIndex
+		{
+			Term_type=0x0,
+			Term_value=0x1,
+			Expression_opname=0x0,
+			Expression_argc=0x1,
+			Expression_range=0x2,
+			Expression_cardinality=0x3,
+			Variable_name=0x0
+		};
+		Type type;
+		int arg[4];
+
+		StackOp( Type type_, int arg0_, int arg1_=0, int arg2_=0, int arg3_=0)
+			:type(type_)
+		{
+			arg[0] = arg0_;
+			arg[1] = arg1_;
+			arg[2] = arg2_;
+			arg[3] = arg3_;
+		}
+
+		StackOp()
+			:type(PushTerm)
+		{
+			std::memset( arg, 0, sizeof(arg));
+		}
+		StackOp( const StackOp& o)
+		{
+			std::memcpy( this, &o, sizeof(*this));
+		}
+	};
+	std::size_t allocid( const String& str);
+#ifdef STRUS_BOOST_PYTHON
+	std::size_t allocid( const WString& str);
+#endif
+
+private:
+	std::vector<StackOp> m_ops;
+	std::string m_strings;
+	std::size_t m_size;
+};
+
+
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
@@ -1316,58 +1452,30 @@ public:
 	/// \brief Destructor
 	~Query(){}
 
-	/// \brief Push a single term on the stack
-	/// \param[in] type_ query term type name
-	/// \param[in] value_ query term value
-	void pushTerm( const String& type_, const String& value_);
-
-	/// \brief Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack
-	/// \param[in] opname_ name of the expression operator
-	/// \param[in] argc number of operands (topmost elements from stack) of the expression
-	/// \param[in] range_ range number for the expression span in the document
-	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
-	void pushExpression( const String& opname_, unsigned int argc, int range_=0, unsigned int cardinality_=0);
-
-#ifdef STRUS_BOOST_PYTHON
-	void pushExpression2( const String& opname_, unsigned int argc)
-	{
-		pushExpression( opname_, argc, 0, 0);
-	}
-	void pushExpression3( const String& opname_, unsigned int argc, int range_)
-	{
-		pushExpression( opname_, argc, range_, 0);
-	}
-	void pushExpression4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
-	{
-		pushExpression( opname_, argc, range_, cardinality_);
-	}
-#endif
-
-	/// \brief Push a duplicate of the topmost element of the query stack
-	/// \note This function makes it possible to reference terms or expressions more than once as features or as subexpressions.
-	void pushDuplicate();
-
-	/// \brief Attaches a variable to the top expression or term on the query stack.
-	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
-	/// \param[in] name_ name of the variable attached
-	/// \remark The stack is not changed
-	void attachVariable( const String& name_);
-
-	/// \brief Create a feature from the top element on the stack (and pop the element from the stack)
+	/// \brief Create a feature from the query expression passed
 	/// \param[in] set_ name of the feature set, this feature is addressed with
+	/// \param[in] expr_ query expression that defines the postings of the feature and the variables attached
 	/// \param[in] weight_ individual weight of the feature in the query
-	void defineFeature( const String& set_, double weight_=1.0);
-
+	/// \remark the query expression passed as parameter is refused if it does not contain exactly one element
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void defineFeature( const String& set_, const QueryExpression& expr_, double weight_);
+#else
+	void defineFeature( const String& set_, const QueryExpression& expr_, double weight_=1.0);
+#endif
 #ifdef STRUS_BOOST_PYTHON
-	void defineFeature1( const String& set_)
+	void defineFeature_2( const String& set_, const QueryExpression& expr_)
 	{
-		defineFeature( set_, 1.0);
+		defineFeature( set_, expr_, 1.0);
 	}
 
-	void defineFeature2( const String& set_, double weight_)
+	void defineFeature_3( const String& set_, const QueryExpression& expr_, double weight_)
 	{
-		defineFeature( set_, weight_);
+		defineFeature( set_, expr_, weight_);
 	}
+
+	void defineFeature_expr_2( const String& set_, const FunctionObject& expr_);
+	void defineFeature_expr_3( const String& set_, const FunctionObject& expr_, double weight_);
 #endif
 
 #ifndef DOXYGEN_JAVA
@@ -1469,20 +1577,25 @@ public:
 	/// \note the user restriction applies if no user role specified in the query is allowed to see the document.
 	void addUserName( const String& username_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addUserName_unicode( const WString& username_);
+#endif
+
 	/// \brief Evaluate this query and return the result
 	/// \return the result
 	RankVector evaluate() const;
 
 private:
 	friend class QueryEval;
-	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_)
-		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_){}
+	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
+		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_){}
 
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
 	Reference m_query_impl;
+	const void* m_queryproc;
 };
 
 
@@ -1498,11 +1611,19 @@ class Context
 {
 public:
 	/// \brief Constructor for local mode with own module loader
+	Context();
+	/// \brief Constructor for local mode with own module loader
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
-	explicit Context( unsigned int maxNofThreads=0);
+	explicit Context( unsigned int maxNofThreads);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
+	/// \param[in] connectionstring RPC server connection string
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	Context( const char* connectionstring, unsigned int maxNofThreads=0);
+	explicit Context( const std::string& connectionstring);
+	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
+	/// \param[in] connectionstring RPC server connection string
+	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
+	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
+	Context( const std::string& connectionstring, unsigned int maxNofThreads);
 	/// \brief Copy constructor
 	Context( const Context& o);
 	/// \brief Destructor
@@ -1518,40 +1639,67 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addModulePath( const String& paths_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addModulePath_unicode( const WString& paths_);
+#endif
+
 	/// \brief Define where to load analyzer resource files from
 	/// \param[in] paths_ semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void addResourcePath_unicode( const WString& paths_);
+#endif
+
+	/// \brief Create a storage client instance of the the default remote storage of the RPC server
+	StorageClient createStorageClient();
+
 	/// \brief Create a storage client instance
 	/// \param[in] config_ configuration string of the storage client or empty, if the default remote storage of the RPC server is chosen,
 	StorageClient createStorageClient( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	StorageClient createStorageClient_0();
+	StorageClient createStorageClient_1( const String& config_);
+	StorageClient createStorageClient_unicode( const WString& config_);
+#endif
 
 	/// \brief Create a new storage (physically) described by config
 	/// \param[in] config_ storage configuration
  	/// \remark Fails if the storage already exists
 	void createStorage( const String& config_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void createStorage_unicode( const WString& config_);
+#endif
 	/// \brief Delete the storage (physically) described by config
 	/// \param[in] config_ storage description
 	/// \note Handle this function carefully
 	void destroyStorage( const String& config_);
 
+#ifdef STRUS_BOOST_PYTHON
+	void destroyStorage_unicode( const WString& config_);
+#endif
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
 	/// \return the document class
 	DocumentClass detectDocumentClass( const String& content);
 
+#ifdef STRUS_BOOST_PYTHON
+	DocumentClass detectDocumentClass_unicode( const WString& content);
+#endif
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
 	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
 
 #ifdef STRUS_BOOST_PYTHON
+	DocumentAnalyzer createDocumentAnalyzer_unicode( const WString& segmentername_);
+
 	DocumentAnalyzer createDocumentAnalyzer_0()
 	{
 		return createDocumentAnalyzer();
 	}
-
 	DocumentAnalyzer createDocumentAnalyzer_1( const String& segmentername_)
 	{
 		return createDocumentAnalyzer( segmentername_);

@@ -136,17 +136,25 @@ $ignoreMethodMap{"addSearchIndexFeature"} = 1;
 $ignoreMethodMap{"pushExpression"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
+$ignoreMethodMap{"createStorageClient"} = 1;
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
 $renameMethodMap{"setMetaData_int"} = "setMetaData";
 $renameMethodMap{"setMetaData_uint"} = "setMetaData";
+$renameMethodMap{"setAttribute_unicode"} = "setAttribute";
+$renameMethodMap{"analyze_unicode_1"} = "analyze";
+$renameMethodMap{"analyze_unicode_2"} = "analyze";
 $renameMethodMap{"analyze_1"} = "analyze";
 $renameMethodMap{"analyze_2"} = "analyze";
+$renameMethodMap{"analyzePhrase_unicode"} = "analyzePhrase";
+$renameMethodMap{"analyzePhrase"} = "analyzePhrase";
+$renameMethodMap{"push_unicode"} = "push";
 $renameMethodMap{"defineParameter_string"} = "defineParameter";
 $renameMethodMap{"defineParameter_charp"} = "defineParameter";
 $renameMethodMap{"defineParameter_int"} = "defineParameter";
 $renameMethodMap{"defineParameter_uint"} = "defineParameter";
 $renameMethodMap{"defineParameter_double"} = "defineParameter";
+$renameMethodMap{"defineParameter_unicode"} = "defineParameter";
 $renameMethodMap{"defineMetaDataRestriction_double_3"} = "defineMetaDataRestriction";
 $renameMethodMap{"defineMetaDataRestriction_double_4"} = "defineMetaDataRestriction";
 $renameMethodMap{"defineMetaDataRestriction_int_3"} = "defineMetaDataRestriction";
@@ -157,11 +165,22 @@ $renameMethodMap{"addForwardIndexFeature_4"} = "addForwardIndexFeature";
 $renameMethodMap{"addForwardIndexFeature_5"} = "addForwardIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_4"} = "addSearchIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_5"} = "addSearchIndexFeature";
-$renameMethodMap{"pushExpression2"} = "pushExpression";
-$renameMethodMap{"pushExpression3"} = "pushExpression";
-$renameMethodMap{"pushExpression4"} = "pushExpression";
-$renameMethodMap{"defineFeature1"} = "defineFeature";
-$renameMethodMap{"defineFeature2"} = "defineFeature";
+$renameMethodMap{"pushTerm_unicode"} = "pushTerm";
+$renameMethodMap{"pushExpression_2"} = "pushExpression";
+$renameMethodMap{"pushExpression_3"} = "pushExpression";
+$renameMethodMap{"pushExpression_4"} = "pushExpression";
+$renameMethodMap{"attachVariable_unicode"} = "attachVariable";
+$renameMethodMap{"defineFeature_2"} = "defineFeature";
+$renameMethodMap{"defineFeature_3"} = "defineFeature";
+$renameMethodMap{"defineFeature_expr_2"} = "defineFeature";
+$renameMethodMap{"defineFeature_expr_3"} = "defineFeature";
+$renameMethodMap{"createStorageClient_0"} = "createStorageClient";
+$renameMethodMap{"createStorageClient_1"} = "createStorageClient";
+$renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
+$renameMethodMap{"createStorage_unicode"} = "createStorage";
+$renameMethodMap{"destroyStorage_unicode"} = "destroyStorage";
+$renameMethodMap{"detectDocumentClass_unicode"} = "detectDocumentClass";
+$renameMethodMap{"createDocumentAnalyzer_unicode"} = "createDocumentAnalyzer";
 $renameMethodMap{"createDocumentAnalyzer_0"} = "createDocumentAnalyzer";
 $renameMethodMap{"createDocumentAnalyzer_1"} = "createDocumentAnalyzer";
 $renameMethodMap{"defineMetaData_obj"} = "defineMetaData";
@@ -170,6 +189,11 @@ $renameMethodMap{"defineAttribute_obj"} = "defineAttribute";
 $renameMethodMap{"definePhraseType_obj"} = "definePhraseType";
 $renameMethodMap{"addSummarizer_obj"} = "addSummarizer";
 $renameMethodMap{"addWeightingFunction_obj"} = "addWeightingFunction";
+$renameMethodMap{"deleteDocument_unicode"} = "deleteDocument";
+$renameMethodMap{"deleteUserAccessRights_unicode"} = "deleteUserAccessRights";
+$renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
+$renameMethodMap{"addModulePath_unicode"} = "addModulePath";
+$renameMethodMap{"addUserName_unicode"} = "addUserName";
 
 sub parseType
 {
@@ -280,6 +304,15 @@ sub parseClass
 		{
 			--$bcnt;
 			nextToken();
+		}
+		elsif ($public == 0)
+		{
+			nextToken();
+			if ($tok eq '{')
+			{
+				++$bcnt;
+			}
+			next;
 		}
 		elsif ($tok eq '{')
 		{
@@ -417,7 +450,7 @@ sub parseClass
 			}
 			if ($methodname ne $classname)
 			{
-				if ($public != 0 && $operator == 0)
+				if ($operator == 0)
 				{
 					my $return_value_policy = "";
 					if ($returntype =~ m/const[&]/)
@@ -481,7 +514,11 @@ foreach $inputfile( @inputfiles)
 			my $interfacename = nextToken();
 			if (nextToken() eq "{")
 			{
-				parseClass( $interfacename);
+				if (nextToken() ne "}")
+				{
+					prevToken();
+					parseClass( $interfacename);
+				}
 			}
 		}
 		++$ti;
@@ -551,7 +588,17 @@ foreach $classdef( @classlist)
 
 	if (!$ignoreClassMap{$classname})
 	{
-		print OUTFILE "bp" . "::class_<$classname>(\"$classname\")\n";
+		if ($classname eq "Context")
+		{
+			print OUTFILE "bp" . '::class_<Context>("Context",bp::init<>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const std::string&>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const unsigned int>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const std::string&, unsigned int>())' . "\n";
+		}
+		else
+		{
+			print OUTFILE "bp" . "::class_<$classname>(\"$classname\")\n";
+		}
 		my $method;
 		foreach $method( @itemlist)
 		{

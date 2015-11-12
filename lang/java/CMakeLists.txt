@@ -26,7 +26,7 @@ set_target_properties(
 	SOVERSION "${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}"
  	VERSION ${STRUS_VERSION}
 )
-target_link_libraries( strus_java  strus_bindings ${JNI_LIBRARIES} )
+target_link_libraries( strus_java  strus_bindings ${JNI_LIBRARIES} ${JAVA_MAWT_LIBRARY} )
 
 add_subdirectory( net )
 

@@ -194,19 +194,42 @@ void Variant::assignText( const std::string& v)
 
 unsigned long Variant::getUInt() const
 {
+	switch (m_type)
+	{
+		case Variant_INT: if (m_value.INT>=0) return m_value.UINT; else break;
+		case Variant_UINT: return (int)m_value.UINT;
+		case Variant_UNDEFINED: break;
+		case Variant_FLOAT: break;
+		case Variant_TEXT: break;
+	}
+	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 	if (m_type == Variant_UINT) return m_value.UINT;
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
 long Variant::getInt() const
 {
-	if (m_type == Variant_INT) return m_value.INT;
+	switch (m_type)
+	{
+		case Variant_INT: return (int)m_value.INT;
+		case Variant_UINT: if (m_value.INT>=0) return (int)m_value.INT; else break;
+		case Variant_UNDEFINED: break;
+		case Variant_FLOAT: break;
+		case Variant_TEXT: break;
+	}
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
 double Variant::getFloat() const
 {
-	if (m_type == Variant_FLOAT) return m_value.FLOAT;
+	switch (m_type)
+	{
+		case Variant_INT: return (double)m_value.INT;
+		case Variant_UINT: return (double)m_value.UINT;
+		case Variant_FLOAT: return m_value.FLOAT;
+		case Variant_UNDEFINED: break;
+		case Variant_TEXT: break;
+	}
 	throw strus::runtime_error( _TXT( "illegal access of variant value"));
 }
 
@@ -761,7 +784,10 @@ StorageClient::StorageClient( const Reference& objbuilder, const Reference& erro
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	m_storage_impl.reset( objBuilder->createStorageClient( config_));
-	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("failed to create storage client: %s"), errorhnd->fetchError());
+	if (!m_storage_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create storage client: %s"), errorhnd->fetchError());
+	}
 }
 
 StorageClient::StorageClient( const StorageClient& o)
@@ -881,6 +907,12 @@ QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
 	,m_queryeval_impl(ReferenceDeleter<strus::QueryEvalInterface>::function)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	m_queryproc = objBuilder->getQueryProcessor();
+	if (!m_queryproc)
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+	}
 	m_queryeval_impl.reset( objBuilder->createQueryEval());
 	if (!m_queryeval_impl.get())
 	{
@@ -893,6 +925,7 @@ QueryEval::QueryEval( const QueryEval& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
+	,m_queryproc(o.m_queryproc)
 {}
 
 void QueryEval::addTerm(
@@ -930,9 +963,7 @@ void QueryEval::addSummarizer(
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	if (!queryproc) throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
 	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( name);
 	if (!sf) throw strus::runtime_error( _TXT("summarizer function not defined: '%s'"), name.c_str());
@@ -974,9 +1005,7 @@ void QueryEval::addWeightingFunction(
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	if (!queryproc) throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
 	if (!sf) throw strus::runtime_error( _TXT("weighting function not defined: '%s'"), name.c_str());
@@ -1018,9 +1047,68 @@ Query QueryEval::createQuery( const StorageClient& storage) const
 	query.reset( qe->createQuery( st));
 	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
 
-	return Query( m_objbuilder_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query);
+	return Query( m_objbuilder_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
 
+
+std::size_t QueryExpression::allocid( const std::string& str)
+{
+	std::size_t rt = m_strings.size()+1;
+	m_strings.push_back('\0');
+	m_strings.append( str);
+	return rt;
+}
+
+void QueryExpression::pushTerm( const std::string& type_, const std::string& value_)
+{
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void QueryExpression::pushExpression( const std::string& opname_, unsigned int argc_, int range_, unsigned int cardinality_)
+{
+	if (argc_ > (unsigned int)m_size)
+	{
+		throw strus::runtime_error( _TXT("illegal operation on stack of expression (%u > %u)"), argc_, (unsigned int)m_size);
+	}
+	StackOp op( StackOp::PushExpression, allocid( opname_), argc_, range_, cardinality_);
+	m_ops.push_back( op);
+	m_size -= argc_;
+	m_size += 1;
+}
+
+void QueryExpression::attachVariable( const std::string& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid( name_));
+	m_ops.push_back( op);
+}
+
+void QueryExpression::add( const QueryExpression& o)
+{
+	std::size_t strinc = m_strings.size();
+	m_strings.append( o.m_strings);
+	std::vector<StackOp>::const_iterator si = o.m_ops.begin(), se = o.m_ops.end();
+	for (; si != se; ++si)
+	{
+		StackOp op(*si);
+		switch (op.type)
+		{
+			case StackOp::PushTerm:
+				op.arg[ StackOp::Term_type] += strinc;
+				op.arg[ StackOp::Term_value] += strinc;
+				break;
+			case StackOp::PushExpression:
+				op.arg[ StackOp::Expression_opname] += strinc;
+				break;
+			case StackOp::AttachVariable:
+				op.arg[ StackOp::Variable_name] += strinc;
+				break;
+		}
+		m_ops.push_back( op);
+	}
+	m_size += o.m_size;
+}
 
 Query::Query( const Query& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
@@ -1028,42 +1116,51 @@ Query::Query( const Query& o)
 	,m_storage_impl(o.m_storage_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 	,m_query_impl(o.m_query_impl)
+	,m_queryproc(o.m_queryproc)
 {}
 
-void Query::pushTerm( const std::string& type_, const std::string& value_)
+void Query::defineFeature( const std::string& set_, const QueryExpression& expr_, double weight_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushTerm( type_, value_);
-}
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
-void Query::pushExpression( const std::string& opname_, unsigned int argc, int range_, unsigned int cardinality_)
-{
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
-	if (!queryproc) throw strus::runtime_error( _TXT("failed to get query processor: %s"), errorhnd->fetchError());
-	const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
-	if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_.c_str());
+	if (expr_.size() != 1)
+	{
+		throw strus::runtime_error( _TXT("the argument expression of defineFeature does not contain exactly one node (%u)"), (unsigned int)expr_.size());
+	}
+	std::vector<QueryExpression::StackOp>::const_iterator ei = expr_.m_ops.begin(), ee = expr_.m_ops.end();
+	for (; ei != ee; ++ei)
+	{
+		switch (ei->type)
+		{
+			case QueryExpression::StackOp::PushTerm:
+			{
+				const char* type_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_type];
+				const char* value_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_value];
+				THIS->pushTerm( type_, value_);
+				break;
+			}
+			case QueryExpression::StackOp::PushExpression:
+			{
+				const char* opname_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Expression_opname];
+				unsigned int argc_ = (unsigned int)ei->arg[ QueryExpression::StackOp::Expression_argc];
+				int range_ = (int)ei->arg[ QueryExpression::StackOp::Expression_range];
+				unsigned int cardinality_ = (unsigned int)ei->arg[ QueryExpression::StackOp::Expression_cardinality];
 
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushExpression( joinopr, argc, range_, cardinality_);
-}
+				const strus::PostingJoinOperatorInterface* joinopr = queryproc->getPostingJoinOperator( opname_);
+				if (!joinopr) throw strus::runtime_error( _TXT("posting join operator not defined: '%s'"), opname_);
 
-void Query::pushDuplicate()
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->pushDuplicate();
-}
-
-void Query::attachVariable( const std::string& name_)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->attachVariable( name_);
-}
-
-void Query::defineFeature( const std::string& set_, double weight_)
-{
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+				THIS->pushExpression( joinopr, argc_, range_, cardinality_);
+				break;
+			}
+			case QueryExpression::StackOp::AttachVariable:
+			{
+				const char* name_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Variable_name];
+				THIS->attachVariable( name_);
+				break;
+			}
+		}
+	}
 	THIS->defineFeature( set_, weight_);
 }
 
@@ -1185,6 +1282,26 @@ std::vector<Rank> Query::evaluate() const
 }
 
 
+Context::Context()
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+{
+	strus::ErrorBufferInterface* errorhnd;
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
+	if (!m_errorhnd_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
+	}
+	m_moduleloader_impl.reset( strus::createModuleLoader( errorhnd));
+	if (!m_moduleloader_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
+	}
+}
+
 Context::Context( unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
@@ -1205,7 +1322,26 @@ Context::Context( unsigned int maxNofThreads)
 	}
 }
 
-Context::Context( const char* connectionstring, unsigned int maxNofThreads)
+Context::Context( const std::string& connectionstring)
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+{
+	strus::ErrorBufferInterface* errorhnd;
+	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
+	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
+
+	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
+	messaging.reset( strus::createRpcClientMessaging( connectionstring.c_str(), errorhnd));
+	if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
+	m_rpc_impl.reset( strus::createRpcClient( messaging.get(), errorhnd));
+	if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
+	(void)messaging.release();
+}
+
+Context::Context( const std::string& connectionstring, unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
@@ -1217,7 +1353,7 @@ Context::Context( const char* connectionstring, unsigned int maxNofThreads)
 	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
 
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
-	messaging.reset( strus::createRpcClientMessaging( connectionstring, errorhnd));
+	messaging.reset( strus::createRpcClientMessaging( connectionstring.c_str(), errorhnd));
 	if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
 	m_rpc_impl.reset( strus::createRpcClient( messaging.get(), errorhnd));
 	if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
@@ -1332,6 +1468,12 @@ StorageClient Context::createStorageClient( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, config_);
+}
+
+StorageClient Context::createStorageClient()
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, std::string());
 }
 
 DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)

@@ -39,30 +39,32 @@ try:
 	
 	# First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
 	terms = analyzer.analyzePhrase( "word", queryphrase)
-	
+	if len(terms) == 0:
+		raise Exception("query is empty")
+
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:
+	selexpr = strus.QueryExpression()
+	
 	for term in terms:
+		expr = strus.QueryExpression()
 		# We push the query terms on the stack and create a query feature 'seek' 
 		# for each of it:
-		query.pushTerm( term.type(), term.value())
-		# Ever feature is duplicated on the stack, because we use them to 
-		# build the selection expression that selects all documents for ranking
-		# that contain all terms
-		query.pushDuplicate()
+		expr.pushTerm( term.type(), term.value())
+		print "expr size ", expr.size()
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
-		query.defineFeature( "seek", 1.0)
-	
-	# Create a selection feature 'select' that matches documents that contain all query terms:
-	if len(terms) > 0:
-		# Now we build the selection expression with the terms pushed as duplicates on
-		# the stack in the loop before:
-		query.pushExpression( "contains", len( terms))
-		# We assign the feature created to the set named 'select' because this is the
-		# name of the set defined as selection feature in the query evaluation configuration
-		# (QueryEval.addSelectionFeature):
-		query.defineFeature( "select")
+		query.defineFeature( "seek", expr, 1.0)
+		# Each query term is also part of the selection expressions
+		selexpr.pushTerm( term.type(), term.value())
+		print "term ", term.type()," ", term.value()," (",selexpr.size(),")"
+
+	# Create a selection feature 'select' that matches documents that contain all query terms.
+	selexpr.pushExpression( "contains", len( terms))
+	# We assign the feature created to the set named 'select' because this is the
+	# name of the set defined as selection feature in the query evaluation configuration
+	# (QueryEval.addSelectionFeature):
+	query.defineFeature( "select", selexpr)
 	
 	# Define the maximum number of best result (ranks) to return:
 	query.setMaxNofRanks( 20)
