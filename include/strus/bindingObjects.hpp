@@ -1588,7 +1588,8 @@ public:
 private:
 	friend class QueryEval;
 	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
-		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_){}
+		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
+	{}
 
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;

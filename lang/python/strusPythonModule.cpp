@@ -35,11 +35,37 @@
 #define FunctionObject boost::python::api::object
 #include "strus/bindingObjects.hpp"
 #include <string>
+#include <stdexcept>
 
 namespace bp = boost::python;
 
+namespace {
+void translate_runtime_error( std::runtime_error const& err)
+{
+	PyErr_SetString( PyExc_Exception, err.what());
+}
+void translate_bad_alloc( std::bad_alloc const& err)
+{
+	PyErr_SetString( PyExc_MemoryError, "out of memory");
+}
+void translate_logic_error( std::logic_error const& err)
+{
+	PyErr_SetString( PyExc_AssertionError, err.what());
+}
+void translate_exception( std::exception const& err)
+{
+	const char* errstr = err.what();
+	PyErr_SetString( PyExc_Exception, errstr);
+}
+}
+
 BOOST_PYTHON_MODULE(strus)
 {
+bp::register_exception_translator<std::runtime_error>( translate_runtime_error);
+bp::register_exception_translator<std::bad_alloc>( translate_bad_alloc);
+bp::register_exception_translator<std::logic_error>( translate_logic_error);
+bp::register_exception_translator<std::exception>( translate_exception);
+
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
 bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());

@@ -451,14 +451,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 				switch (state)
 				{
 					case Init:
-						try
-						{
-							itemstr = getString( item, temp_obj_varname);
-						}
-						catch (const std::exception& err)
-						{
-							throw strus::runtime_error( _TXT("error fetching first element of expression tuple: %s"), err.what());
-						}
+						itemstr = getString( item, temp_obj_varname);
 						if (itemstr[0] == '=')
 						{
 							varname = itemstr+1;
@@ -480,21 +473,37 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 					case Funcname:
 						try
 						{
-							funcname = getString( item, temp_obj_funcname);
+							try
+							{
+								funcname = getString( item, temp_obj_funcname);
+							}
+							catch (const std::runtime_error& err)
+							{
+								throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+							}
 							if (ii+1 == len)
 							{
 								result.pushTerm( funcname, "");
 								if (varname)
 								{
 									result.attachVariable( varname);
+									varname = 0;
 								}
 								funcname = 0;
 								break;
 							}
 						}
+						catch (const std::runtime_error& err)
+						{
+							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+						}
 						catch (const std::exception& err)
 						{
 							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+						}
+						catch (...)
+						{
+							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), "unknown exception");
 						}
 						state = Range;
 						break;
@@ -543,6 +552,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 										if (varname)
 										{
 											result.attachVariable( varname);
+											varname = 0;
 										}
 										funcname = 0;
 										break;
@@ -558,15 +568,8 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 								}
 							}
 						}
-						try
-						{
-							initQueryExpression( result, item);
-							++nof_arguments;
-						}
-						catch (const std::exception& err)
-						{
-							throw err;
-						}
+						initQueryExpression( result, item);
+						++nof_arguments;
 						break;
 				}
 			}
