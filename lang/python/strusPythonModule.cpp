@@ -54,8 +54,7 @@ void translate_logic_error( std::logic_error const& err)
 }
 void translate_exception( std::exception const& err)
 {
-	const char* errstr = err.what();
-	PyErr_SetString( PyExc_Exception, errstr);
+	PyErr_SetString( PyExc_Exception, err.what());
 }
 }
 

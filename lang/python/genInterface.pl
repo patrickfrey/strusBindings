@@ -572,21 +572,21 @@ print OUTFILE <<EOF;
 namespace bp = boost::python;
 
 namespace {
-void translate_runtime_error( std::runtime_error const& err )
+void translate_runtime_error( std::runtime_error const& err)
 {
-	PyErr_SetString( PyExc_Exception, err.what() );
+	PyErr_SetString( PyExc_Exception, err.what());
 }
-void translate_bad_alloc( std::bad_alloc const& err )
+void translate_bad_alloc( std::bad_alloc const& err)
 {
 	PyErr_SetString( PyExc_MemoryError, "out of memory");
 }
-void translate_logic_error( std::logic_error const& err )
+void translate_logic_error( std::logic_error const& err)
 {
-	PyErr_SetString( PyExc_AssertionError, err.what() );
+	PyErr_SetString( PyExc_AssertionError, err.what());
 }
-void translate_exception( std::exception const& err )
+void translate_exception( std::exception const& err)
 {
-	PyErr_SetString( PyExc_Exception, err.what() );
+	PyErr_SetString( PyExc_Exception, err.what());
 }
 }
 
