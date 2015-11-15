@@ -470,7 +470,7 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 				{
 					if (!range_defined)
 					{
-						long val = Z_LVAL_P( obj);
+						long val = Z_LVAL_PP( data);
 						if (val >= std::numeric_limits<int>::max() || val <= std::numeric_limits<int>::min())
 						{
 							THROW_EXCEPTION( "range parameter exceeds maximum size");
@@ -482,7 +482,7 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 					}
 					else if (!cardinality_defined)
 					{
-						long val = Z_LVAL_P( obj);
+						long val = Z_LVAL_PP( data);
 						if (val >= std::numeric_limits<unsigned int>::max())
 						{
 							THROW_EXCEPTION( "range parameter exceeds maximum size");
