@@ -663,7 +663,7 @@ public:
 	const StringVector& users() const			{return m_users;}
 	/// \brief Get the document identifier (docid) of the document
 	/// \return the document identifier
-	const String& docid()					{return m_docid;}
+	const String& docid() const				{return m_docid;}
 
 private:
 	std::vector<Term> m_searchIndexTerms;
