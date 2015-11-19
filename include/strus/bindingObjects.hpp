@@ -675,6 +675,9 @@ private:
 };
 
 
+/// \brief Forward declaration
+class DocumentAnalyzeQueue;
+
 /// \class DocumentAnalyzer
 /// \brief Analyzer object representing a program for segmenting, 
 ///	tokenizing and normalizing a document into atomic parts, that 
@@ -684,7 +687,8 @@ class DocumentAnalyzer
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	DocumentAnalyzer(){}
+	DocumentAnalyzer()
+		:m_textproc(0){}
 #endif
 	/// \brief Copy constructor
 	DocumentAnalyzer( const DocumentAnalyzer& o);
@@ -816,6 +820,14 @@ public:
 		const FunctionObject& normalizers_);
 #endif
 
+	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
+	/// \param[in] selectexpr an expression that defines the content of the sub document declared
+	/// \param[in] subDocumentTypeName type name assinged to this sub document
+	/// \remark Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
+	void defineDocument(
+		const std::string& subDocumentTypeName,
+		const std::string& selectexpr);
+
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze
 	Document analyze( const String& content);
@@ -831,14 +843,74 @@ public:
 	Document analyze_1( const String& content);
 	Document analyze_2( const String& content, const DocumentClass& dclass);
 #endif
+
+	/// \brief Creates a queue for multi document analysis
+	/// \return the queue
+	DocumentAnalyzeQueue createQueue() const;
+
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
-	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername);
+	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername, const void* textproc_);
 
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
+	const void* m_textproc;
+};
+
+
+/// \class DocumentAnalyzeQueue
+/// \brief Analyzer object implementing a queue of analyze document tasks.
+/// \remark Document analysis with this class reduces network roundtrips when using it as proxy
+class DocumentAnalyzeQueue
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	DocumentAnalyzeQueue()
+		:m_result_queue_idx(0),m_analyzerctx_queue_idx(0),m_textproc(0){}
+#endif
+	/// \brief Copy constructor
+	DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o);
+	/// \brief Destructor
+	~DocumentAnalyzeQueue(){}
+
+	/// \brief Push a document into the queue to analyze
+	/// \param[in] content content string of the document to analyze
+	void push( const String& content);
+	/// \brief Push a document into the queue to analyze
+	/// \param[in] content content string of the document to analyze
+	/// \param[in] dclass document class of the document to analyze
+	void push( const String& content, const DocumentClass& dclass);
+
+#ifdef STRUS_BOOST_PYTHON
+	void push_unicode_1( const WString& content);
+	void push_unicode_2( const WString& content, const DocumentClass& dclass);
+#endif
+	/// \brief Checks if there are more results to fetch
+	/// \return true, if yes
+	bool hasMore() const;
+
+	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
+	/// \return list of terms (query phrase analyzer result)
+	Document fetch();
+
+private:
+	void analyzeNext();
+
+private:
+	/// \brief Constructor used by Context
+	friend class DocumentAnalyzer;
+	explicit DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer, const void* textproc_);
+
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_analyzer_impl;
+	std::vector<Document> m_result_queue;
+	std::size_t m_result_queue_idx;
+	std::vector<Reference> m_analyzerctx_queue;
+	std::size_t m_analyzerctx_queue_idx;
+	const void* m_textproc;
 };
 
 
@@ -917,7 +989,8 @@ class QueryAnalyzeQueue
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	QueryAnalyzeQueue(){}
+	QueryAnalyzeQueue()
+		:m_result_queue_idx(0){}
 #endif
 	/// \brief Copy constructor
 	QueryAnalyzeQueue( const QueryAnalyzeQueue& o);
@@ -1726,6 +1799,7 @@ private:
 	Reference m_rpc_impl;
 	Reference m_storage_objbuilder_impl;
 	Reference m_analyzer_objbuilder_impl;
+	const void* m_textproc;
 };
 
 #ifdef DOXYGEN_LANG

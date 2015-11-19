@@ -331,10 +331,11 @@ void Document::setUserAccessRight( const std::string& username_)
 	m_users.push_back( username_);
 }
 
-DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const std::string& segmentername)
+DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const std::string& segmentername, const void* textproc_)
 	:m_errorhnd_impl(errorhnd)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::DocumentAnalyzerInterface>::function)
+	,m_textproc(textproc_)
 {
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmentername));
@@ -349,6 +350,7 @@ DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
+	,m_textproc(o.m_textproc)
 {}
 
 
@@ -571,11 +573,17 @@ static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
 	return rt;
 }
 
-static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const std::string& content, const strus::DocumentClass& dclass, strus::ErrorBufferInterface* errorhnd)
+void DocumentAnalyzer::defineDocument(
+	const std::string& subDocumentTypeName,
+	const std::string& selectexpr)
+{
+	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	THIS->defineSubDocument( subDocumentTypeName, selectexpr);
+}
+
+static Document mapDocument( const strus::analyzer::Document& doc)
 {
 	Document rt;
-	strus::analyzer::Document doc = THIS->analyze( content, dclass);
-
 	std::vector<strus::analyzer::Attribute>::const_iterator
 		ai = doc.attributes().begin(), ae = doc.attributes().end();
 	for (; ai != ae; ++ai)
@@ -611,6 +619,12 @@ static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const s
 	return rt;
 }
 
+static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const std::string& content, const strus::DocumentClass& dclass, strus::ErrorBufferInterface* errorhnd)
+{
+	strus::analyzer::Document doc = THIS->analyze( content, dclass);
+	return mapDocument( doc);
+}
+
 Document DocumentAnalyzer::analyze( const std::string& content)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -631,7 +645,12 @@ Document DocumentAnalyzer::analyze( const std::string& content)
 			throw strus::runtime_error( _TXT( "could not detect document class of document to analyze"));
 		}
 	}
-	return analyzeDocument( THIS, content, dclass, errorhnd);
+	Document rt( analyzeDocument( THIS, content, dclass, errorhnd));
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
+	}
+	return rt;
 }
 
 Document DocumentAnalyzer::analyze( const std::string& content, const DocumentClass& dclass)
@@ -640,9 +659,122 @@ Document DocumentAnalyzer::analyze( const std::string& content, const DocumentCl
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	strus::DocumentClass documentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
 
-	return analyzeDocument( THIS, content, documentClass, errorhnd);
+	Document rt( analyzeDocument( THIS, content, documentClass, errorhnd));
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
+	}
+	return rt;
 }
 
+DocumentAnalyzeQueue DocumentAnalyzer::createQueue() const
+{
+	return DocumentAnalyzeQueue( m_objbuilder_impl, m_errorhnd_impl, m_analyzer_impl, m_textproc);
+}
+
+DocumentAnalyzeQueue::DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_analyzer_impl(o.m_analyzer_impl)
+	,m_result_queue(o.m_result_queue)
+	,m_result_queue_idx(o.m_result_queue_idx)
+	,m_analyzerctx_queue(o.m_analyzerctx_queue)
+	,m_analyzerctx_queue_idx(o.m_analyzerctx_queue_idx)
+	,m_textproc(o.m_textproc)
+{}
+
+DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer, const void* textproc_)
+	:m_errorhnd_impl(errorhnd)
+	,m_objbuilder_impl(objbuilder)
+	,m_analyzer_impl(analyzer)
+	,m_result_queue()
+	,m_result_queue_idx(0)
+	,m_analyzerctx_queue()
+	,m_analyzerctx_queue_idx(0)
+	,m_textproc(textproc_)
+{}
+
+void DocumentAnalyzeQueue::push( const std::string& content)
+{
+	const strus::TextProcessorInterface* textproc = (const strus::TextProcessorInterface*)m_textproc;
+	strus::DocumentClass dclass;
+	if (!textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to detect document class: %s"), errorhnd->fetchError());
+	}
+	strus::DocumentAnalyzerInterface* analyzer = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	Reference analyzerContext_impl( ReferenceDeleter<strus::DocumentAnalyzerContextInterface>::function);
+	strus::DocumentAnalyzerContextInterface* analyzerContext;
+	analyzerContext_impl.reset( analyzerContext = analyzer->createContext( dclass));
+	analyzerContext->putInput( content.c_str(), content.size(), true);
+	m_analyzerctx_queue.push_back( analyzerContext_impl);
+	analyzeNext();
+}
+
+void DocumentAnalyzeQueue::analyzeNext()
+{
+	if (m_result_queue_idx == m_result_queue.size())
+	{
+		m_result_queue.clear();
+		for (; m_analyzerctx_queue_idx < m_analyzerctx_queue.size(); ++m_analyzerctx_queue_idx)
+		{
+			strus::DocumentAnalyzerContextInterface* analyzerContext = (strus::DocumentAnalyzerContextInterface*)m_analyzerctx_queue[ m_analyzerctx_queue_idx].get();
+			strus::analyzer::Document doc;
+			if (analyzerContext->analyzeNext( doc))
+			{
+				m_result_queue.push_back( mapDocument( doc));
+			}
+			else
+			{
+				strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+				if (errorhnd->hasError())
+				{
+					throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
+				}
+			}
+		}
+	}
+}
+
+void DocumentAnalyzeQueue::push( const std::string& content, const DocumentClass& dclass_)
+{
+	strus::DocumentClass dclass( dclass_.mimeType(), dclass_.encoding(), dclass_.scheme());
+	strus::DocumentAnalyzerInterface* analyzer = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	Reference analyzerContext_impl( ReferenceDeleter<strus::DocumentAnalyzerContextInterface>::function);
+	strus::DocumentAnalyzerContextInterface* analyzerContext;
+	analyzerContext_impl.reset( analyzerContext = analyzer->createContext( dclass));
+	analyzerContext->putInput( content.c_str(), content.size(), true);
+	m_analyzerctx_queue.push_back( analyzerContext_impl);
+	analyzeNext();
+}
+
+bool DocumentAnalyzeQueue::hasMore() const
+{
+	return (m_result_queue_idx < m_result_queue.size());
+}
+
+Document DocumentAnalyzeQueue::fetch()
+{
+	if (m_result_queue_idx < m_result_queue.size())
+	{
+		Document rt( m_result_queue[ m_result_queue_idx++]);
+		analyzeNext();
+		return rt;
+	}
+	else
+	{
+		m_result_queue.clear();
+		analyzeNext();
+		if (m_result_queue_idx == m_result_queue.size())
+		{
+			throw strus::runtime_error( _TXT("no results to fetch from query analyzer queue"));
+		}
+		Document rt( m_result_queue[ m_result_queue_idx++]);
+		analyzeNext();
+		return rt;
+	}
+}
 
 QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
@@ -1288,6 +1420,7 @@ Context::Context()
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_textproc(0)
 {
 	strus::ErrorBufferInterface* errorhnd;
 	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
@@ -1308,6 +1441,7 @@ Context::Context( unsigned int maxNofThreads)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_textproc(0)
 {
 	strus::ErrorBufferInterface* errorhnd;
 	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
@@ -1328,6 +1462,7 @@ Context::Context( const std::string& connectionstring)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_textproc(0)
 {
 	strus::ErrorBufferInterface* errorhnd;
 	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
@@ -1347,6 +1482,7 @@ Context::Context( const std::string& connectionstring, unsigned int maxNofThread
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_textproc(0)
 {
 	strus::ErrorBufferInterface* errorhnd;
 	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
@@ -1366,6 +1502,7 @@ Context::Context( const Context& o)
 	,m_rpc_impl(o.m_rpc_impl)
 	,m_storage_objbuilder_impl(o.m_storage_objbuilder_impl)
 	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
+	,m_textproc(o.m_textproc)
 {}
 
 void Context::loadModule( const std::string& name_)
@@ -1450,8 +1587,17 @@ DocumentClass Context::detectDocumentClass( const std::string& content)
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_analyzer_objbuilder_impl.get();
-	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-	if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+	const strus::TextProcessorInterface* textproc;
+	if (m_textproc)
+	{
+		textproc = (const strus::TextProcessorInterface*)m_textproc;
+	}
+	else
+	{
+		textproc = objBuilder->getTextProcessor();
+		m_textproc = textproc;
+		if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+	}
 	strus::DocumentClass dclass;
 	if (textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
 	{
@@ -1479,7 +1625,17 @@ StorageClient Context::createStorageClient()
 DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return DocumentAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl, segmentername_);
+	if (!m_textproc)
+	{
+		strus::AnalyzerObjectBuilderInterface* objBuilder = (strus::AnalyzerObjectBuilderInterface*)m_analyzer_objbuilder_impl.get();
+		m_textproc = objBuilder->getTextProcessor();
+		if (!m_textproc)
+		{
+			strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+			throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+		}
+	}
+	return DocumentAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl, segmentername_, m_textproc);
 }
 
 QueryAnalyzer Context::createQueryAnalyzer()

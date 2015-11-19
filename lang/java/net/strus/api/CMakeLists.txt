@@ -5,6 +5,7 @@ set( generated_java_source_files
 	Attribute.java
 	AttributeVector.java
 	DocumentAnalyzer.java
+	DocumentAnalyzeQueue.java
 	DocumentClass.java
 	Document.java
 	MetaData.java

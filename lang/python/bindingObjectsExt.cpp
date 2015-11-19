@@ -234,6 +234,17 @@ Document DocumentAnalyzer::analyze_2( const String& content, const DocumentClass
 	return analyze( content, dclass);
 }
 
+void DocumentAnalyzeQueue::push_unicode_1( const WString& content)
+{
+	return push( convert_UTF16_to_UTF8( content));
+}
+
+void DocumentAnalyzeQueue::push_unicode_2( const WString& content, const DocumentClass& dclass)
+{
+	return push( convert_UTF16_to_UTF8( content), dclass);
+}
+
+
 void QueryAnalyzer::definePhraseType_obj(
 	const String& phrasetype,
 	const String& selectexpr,
