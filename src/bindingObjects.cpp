@@ -363,7 +363,7 @@ static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
 
 	while (ci)
 	{
-		char const* cn = std::strchr( ci, ':');
+		char const* cn = std::strchr( ci, ',');
 		std::string item( cn?strus::utils::trim( std::string( ci, cn-ci)):strus::utils::trim( std::string( ci, ce-ci)));
 		if (item.empty())
 		{}
