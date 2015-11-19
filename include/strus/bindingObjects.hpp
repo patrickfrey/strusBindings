@@ -700,7 +700,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as string, elements separated by ':', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options as string, elements separated by ',', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 #if defined SWIGPHP
 	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
 	void addSearchIndexFeature(
@@ -737,7 +737,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as string, elements separated by ':', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options as string, elements separated by ',', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 #if defined SWIGPHP
 	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
 	void addForwardIndexFeature(
