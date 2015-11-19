@@ -27,7 +27,7 @@ void DocumentAnalyzer::addSearchIndexFeature_4(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	addSearchIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, StringVector());
+	addSearchIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, String());
 }
 
 void DocumentAnalyzer::addSearchIndexFeature_5(
@@ -35,7 +35,7 @@ void DocumentAnalyzer::addSearchIndexFeature_5(
 	const String& selectexpr,
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_,
-	const StringVector& options)
+	const String& options)
 {
 	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
 	if (tokenizer.check())
@@ -76,7 +76,7 @@ void DocumentAnalyzer::addForwardIndexFeature_4(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	addForwardIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, StringVector());
+	addForwardIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, String());
 }
 
 void DocumentAnalyzer::addForwardIndexFeature_5(
@@ -84,7 +84,7 @@ void DocumentAnalyzer::addForwardIndexFeature_5(
 	const String& selectexpr,
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_,
-	const StringVector& options)
+	const String& options)
 {
 	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
 	if (tokenizer.check())

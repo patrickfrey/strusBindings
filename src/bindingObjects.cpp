@@ -355,25 +355,31 @@ DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
 
 
 static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
-	const std::vector<std::string>& options)
+	const std::string& options)
 {
 	strus::DocumentAnalyzerInterface::FeatureOptions rt;
-	std::vector<std::string>::const_iterator
-		oi = options.begin(), oe = options.end();
-	for (; oi != oe; ++oi)
+	char const* ci = options.c_str();
+	const char* ce = options.c_str() + options.size();
+
+	while (ci)
 	{
-		if (strus::utils::caseInsensitiveEquals( *oi, "BindPosSucc"))
+		char const* cn = std::strchr( ci, ':');
+		std::string item( cn?strus::utils::trim( std::string( ci, cn-ci)):strus::utils::trim( std::string( ci, ce-ci)));
+		if (item.empty())
+		{}
+		else if (strus::utils::caseInsensitiveEquals( item, "BindPosSucc"))
 		{
 			rt.definePositionBind( strus::DocumentAnalyzerInterface::FeatureOptions::BindSuccessor);
 		}
-		else if (strus::utils::caseInsensitiveEquals( *oi, "BindPosPred"))
+		else if (strus::utils::caseInsensitiveEquals( item, "BindPosPred"))
 		{
 			rt.definePositionBind( strus::DocumentAnalyzerInterface::FeatureOptions::BindPredecessor);
 		}
 		else
 		{
-			throw strus::runtime_error( _TXT( "unknown feature option '%s'"), oi->c_str());
+			throw strus::runtime_error( _TXT( "unknown feature option '%s'"), item.c_str());
 		}
+		ci = cn?(cn+1):cn;
 	}
 	return rt;
 }
@@ -451,7 +457,7 @@ void DocumentAnalyzer::addSearchIndexFeature(
 	const std::string& selectexpr,
 	const Tokenizer& tokenizer,
 	const std::vector<Normalizer>& normalizers,
-	const std::vector<std::string>& options)
+	const std::string& options)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
@@ -467,7 +473,7 @@ void DocumentAnalyzer::addForwardIndexFeature(
 	const std::string& selectexpr,
 	const Tokenizer& tokenizer,
 	const std::vector<Normalizer>& normalizers,
-	const std::vector<std::string>& options)
+	const std::string& options)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);

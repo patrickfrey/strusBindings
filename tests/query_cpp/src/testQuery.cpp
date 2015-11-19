@@ -43,7 +43,7 @@ int main( int , const char** )
 		Context ctx;
 		DocumentAnalyzer documentAnalyzer( ctx.createDocumentAnalyzer());
 		// Define document analyzer:
-		std::vector<std::string> noopt;
+		std::string noopt;
 		std::vector<Normalizer> normalizer_stem;
 		normalizer_stem.push_back( Normalizer("stem", "de"));
 		std::vector<Normalizer> normalizer_orig;

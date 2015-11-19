@@ -700,7 +700,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options as string, elements separated by ':', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 #if defined SWIGPHP
 	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
 	void addSearchIndexFeature(
@@ -708,14 +708,14 @@ public:
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options);
+		const String& options);
 #else
 	void addSearchIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options=StringVector());
+		const String& options=String());
 #endif
 #ifdef STRUS_BOOST_PYTHON
 	void addSearchIndexFeature_4(
@@ -729,7 +729,7 @@ public:
 		const String& selectexpr,
 		const FunctionObject& tokenizer_,
 		const FunctionObject& normalizers_,
-		const StringVector& options);
+		const String& options);
 #endif
 
 	/// \brief Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
@@ -737,7 +737,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options as string, elements separated by ':', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 #if defined SWIGPHP
 	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
 	void addForwardIndexFeature(
@@ -745,14 +745,14 @@ public:
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options);
+		const String& options);
 #else
 	void addForwardIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options=StringVector());
+		const String& options=String());
 #endif
 #ifdef STRUS_BOOST_PYTHON
 	void addForwardIndexFeature_4(
@@ -766,7 +766,7 @@ public:
 		const String& selectexpr,
 		const FunctionObject& tokenizer_,
 		const FunctionObject& normalizers_,
-		const StringVector& options);
+		const String& options);
 #endif
 
 	/// \brief Define how a feature to insert as meta data is selected, tokenized and normalized
@@ -825,8 +825,8 @@ public:
 	/// \param[in] subDocumentTypeName type name assinged to this sub document
 	/// \remark Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
 	void defineDocument(
-		const std::string& subDocumentTypeName,
-		const std::string& selectexpr);
+		const String& subDocumentTypeName,
+		const String& selectexpr);
 
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze

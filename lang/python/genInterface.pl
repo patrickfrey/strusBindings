@@ -137,6 +137,8 @@ $ignoreMethodMap{"pushExpression"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
+$ignoreMethodMap{"push"} = 1;
+
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
 $renameMethodMap{"setMetaData_int"} = "setMetaData";
@@ -149,6 +151,8 @@ $renameMethodMap{"analyze_2"} = "analyze";
 $renameMethodMap{"analyzePhrase_unicode"} = "analyzePhrase";
 $renameMethodMap{"analyzePhrase"} = "analyzePhrase";
 $renameMethodMap{"push_unicode"} = "push";
+$renameMethodMap{"push_unicode_1"} = "push";
+$renameMethodMap{"push_unicode_2"} = "push";
 $renameMethodMap{"defineParameter_string"} = "defineParameter";
 $renameMethodMap{"defineParameter_charp"} = "defineParameter";
 $renameMethodMap{"defineParameter_int"} = "defineParameter";
