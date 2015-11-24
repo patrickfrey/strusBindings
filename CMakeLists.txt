@@ -6,8 +6,8 @@ include(cmake/install_prefix.cmake)
 # Project globals:
 project( StrusBindings )
 set( STRUS_MAJOR_VERSION 0 )
-set( STRUS_MINOR_VERSION 1 )
-set( STRUS_PATCH_VERSION 20 )
+set( STRUS_MINOR_VERSION 2 )
+set( STRUS_PATCH_VERSION 2 )
 set( STRUS_VERSION ${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}.${STRUS_PATCH_VERSION} )
 
 IF (NOT WITH_JAVA STREQUAL "YES")
@@ -95,6 +95,12 @@ configure_file( "${PROJECT_SOURCE_DIR}/src/version.hpp.in"  "${PROJECT_SOURCE_DI
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)
 configure_file( "${PROJECT_SOURCE_DIR}/src/internationalization.cpp.in"  "${PROJECT_SOURCE_DIR}/src/internationalization.cpp"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh.in"  "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD.in"  "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-Debian_7.0.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-Debian_7.0.dsc"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-xUbuntu_12.04.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-xUbuntu_12.04.dsc"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec.in"  "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec"  @ONLY )
 
 enable_testing()
 

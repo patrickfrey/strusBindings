@@ -118,9 +118,9 @@
 
 Summary: Language bindings for the strus text search engine
 Name: strusbindings
-%define main_version 0.1.7
+%define main_version @STRUS_VERSION@
 Version: %{main_version}
-Release: 0.1
+Release: @STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 License: GPLv3
 Group: Development/Libraries/C++
 
@@ -249,18 +249,18 @@ BuildRequires: swig2
 BuildRequires: swig
 %endif
 
-BuildRequires: strus-devel >= 0.1.6
-BuildRequires: strusanalyzer-devel >= 0.1.6
-BuildRequires: strusmodule-devel >= 0.1.5
-BuildRequires: strusrpc-devel >= 0.1.9
-BuildRequires: strus >= 0.1.6
-BuildRequires: strusanalyzer >= 0.1.6
-BuildRequires: strusmodule >= 0.1.5
-BuildRequires: strusrpc >= 0.1.9
-Requires: strus >= 0.1.6
-Requires: strusanalyzer >= 0.1.6
-Requires: strusmodule >= 0.1.5
-Requires: strusrpc >= 0.1.9
+BuildRequires: strus-devel >= %{main_version}
+BuildRequires: strusanalyzer-devel >= %{main_version}
+BuildRequires: strusmodule-devel >= %{main_version}
+BuildRequires: strusrpc-devel >= %{main_version}
+BuildRequires: strus >= %{main_version}
+BuildRequires: strusanalyzer >= %{main_version}
+BuildRequires: strusmodule >= %{main_version}
+BuildRequires: strusrpc >= %{main_version}
+Requires: strus >= %{main_version}
+Requires: strusanalyzer >= %{main_version}
+Requires: strusmodule >= %{main_version}
+Requires: strusrpc >= %{main_version}
 %if %{with_php}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
@@ -416,8 +416,8 @@ make test
 # TODO: should not be in libdir but in jni subdir (at
 # least on RHEL
 %{_libdir}/strus/libstrus_java.so
-%{_libdir}/strus/libstrus_java.so.0.1
-%{_libdir}/strus/libstrus_java.so.0.1.7
+%{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
+%{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@.@STRUS_PATCH_VERSION@
 %{_jnidir}/strus/strus_api.jar
 %endif
 

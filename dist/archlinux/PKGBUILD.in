@@ -3,14 +3,14 @@
 
 pkgbase=strusbindings
 pkgname=(strusbindings-php strusbindings-java)
-_mainpkgver=0.1.7
+_mainpkgver=@STRUS_VERSION@
 pkgver=${_mainpkgver}
 pkgrel=1
 pkgdesc='Language bindings for the strus text search engine.'
 license=('GPL3')
 arch=('i686' 'x86_64')
 url="http://project-strus.net"
-depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=0.1.6" "strusanalyzer>=0.1.6" "strusmodule>=0.1.5" "strusrpc>=0.1.9")
+depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=${_mainpkgver}" "strusanalyzer>=${_mainpkgver}" "strusmodule>=${_mainpkgver}" "strusrpc>=${_mainpkgver}")
 makedepends=('cmake' 'swig' 'php' 'java-environment')
 source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
