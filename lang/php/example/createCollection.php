@@ -19,8 +19,8 @@ $analyzer = $ctx->createDocumentAnalyzer();
 
 # Define the features and attributes to store:
 $analyzer->defineAttribute( "title", "/doc/title()", "content", "orig");
-$analyzer->addSearchIndexFeature( "word", "/doc/text()", "word", [["stem","en"],"lc",["convdia","en"]], []);
-$analyzer->addForwardIndexFeature( "orig", "/doc/text()", "split", "orig", []);
+$analyzer->addSearchIndexFeature( "word", "/doc/text()", "word", [["stem","en"],"lc",["convdia","en"]], "");
+$analyzer->addForwardIndexFeature( "orig", "/doc/text()", "split", "orig", "");
 
 # Read input files, analyze and insert them:
 $datadir = "./data/";
