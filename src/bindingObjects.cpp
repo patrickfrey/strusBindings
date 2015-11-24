@@ -277,6 +277,7 @@ Document::Document( const Document& o)
 	,m_metaData(o.m_metaData)
 	,m_attributes(o.m_attributes)
 	,m_users(o.m_users)
+	,m_docid(o.m_docid)
 {}
 
 void Document::addSearchIndexTerm(
@@ -723,7 +724,7 @@ void DocumentAnalyzeQueue::analyzeNext()
 	if (m_result_queue_idx == m_result_queue.size())
 	{
 		m_result_queue.clear();
-		for (; m_analyzerctx_queue_idx < m_analyzerctx_queue.size(); ++m_analyzerctx_queue_idx)
+		while (m_analyzerctx_queue_idx < m_analyzerctx_queue.size())
 		{
 			strus::DocumentAnalyzerContextInterface* analyzerContext = (strus::DocumentAnalyzerContextInterface*)m_analyzerctx_queue[ m_analyzerctx_queue_idx].get();
 			strus::analyzer::Document doc;
@@ -738,6 +739,7 @@ void DocumentAnalyzeQueue::analyzeNext()
 				{
 					throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
 				}
+				++m_analyzerctx_queue_idx;
 			}
 		}
 	}
