@@ -4,7 +4,7 @@ set( THISDIR "${PROJECT_SOURCE_DIR}/lang/php/example" )
 set( tests helloWorld createCollection query queryexpr status )
 
 foreach( test ${tests} )
-	add_test( NAME php_${test} COMMAND php ${test}.php WORKING_DIRECTORY ${THISDIR} )
+	add_test( NAME php_${test} COMMAND php -c ../php.ini ${test}.php WORKING_DIRECTORY ${THISDIR} )
 	set_tests_properties( php_${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lang/php" )
 endforeach( test )
 

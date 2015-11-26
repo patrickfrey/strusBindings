@@ -50,6 +50,7 @@ dist/obs/strusbindings.dsc
 dist/obs/strusbindings-Debian_7.0.dsc
 dist/obs/strusbindings-xUbuntu_12.04.dsc
 dist/redhat/strusbindings.spec
+lang/php/php.ini
 
 # Compiled programs
 tests/query_cpp/src/testQuery

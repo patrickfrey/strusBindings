@@ -1,0 +1,5 @@
+[PHP]
+open_basedir = @PROJECT_SOURCE_DIR@/lang/php
+extension_dir="@PROJECT_SOURCE_DIR@/lang/php"
+include_path = @PROJECT_SOURCE_DIR@/lang/php
+
