@@ -423,6 +423,9 @@ make test
 %endif
 
 %changelog
+* Thu Nov 26 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.4-0.1
+- incremented version to 0.2.4 to resolve OBS trouble with dependencies
+
 * Tue Nov 24 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.3-0.1
 - synchronize version number with strus core
 - adapted PHP test: Wrong argument type passed

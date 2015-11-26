@@ -1,9 +1,13 @@
-strusBindings (0.2.3-1) unstable; urgency=low
+strusbindings (0.2.4-1) unstable; urgency=low
+  * incremented version to 0.2.4 to resolve OBS trouble with dependencies
+ -- patrickfrey <patrickpfrey@yahoo.com>  Thu, 26 Nov 2015 09:09:14 +0100
+
+strusbindings (0.2.3-1) unstable; urgency=low
   * synchronize version number with strus core
   * adapted PHP test: Wrong argument type passed
  -- Patrick Frey <patrickpfrey@yahoo.com>  Tue, 24 Nov 2015 19:49:41 +0100
 
-strusBindings (0.2.2-1) unstable; urgency=low
+strusbindings (0.2.2-1) unstable; urgency=low
   * propagate version number of cmake files to packaging / set version to 0.2.2
   * fixed bug in Document copy constructor: docid was lost, fixed bug in DocumentAnalyzerQueue::analyzeNext(): lost documents, fixed bug in PHP bindings: C++ exceptions were not translated correctly to PHP exceptions -> this led to uncaught exceptions
   * change delimiter of feature options from ':' to ','
@@ -20,7 +24,7 @@ strusBindings (0.2.2-1) unstable; urgency=low
   * removed deprecated script
  -- Patrick Frey <patrickpfrey@yahoo.com>  Tue, 24 Nov 2015 14:37:45 +0100
 
-strusBindings (0.2.0-1) unstable; urgency=low
+strusbindings (0.2.0-1) unstable; urgency=low
   * fixed bugs in python bindings and bring up tests again
   * fixed PHP bindings to be able to handle parameters as objects as well as structure mapped by typemap
   * temporarily reverted changes in PHP and removed new test. Things do not work yet
@@ -81,7 +85,7 @@ strusBindings (0.2.0-1) unstable; urgency=low
   * added python support
  -- Patrick Frey <patrickpfrey@yahoo.com>  Wed, 11 Nov 2015 19:47:55 +0100
 
-strusBindings (0.1.7-1) unstable; urgency=low
+strusbindings (0.1.7-1) unstable; urgency=low
   * updated php documentation
   * documented java examples
   * added java bindings webpage
@@ -96,16 +100,16 @@ strusBindings (0.1.7-1) unstable; urgency=low
   * fixed occasional crash in PHP due to free of uninitialized variables (zval_dtor)
  -- Patrick Frey <patrickpfrey@yahoo.com>  Tue, 18 Aug 2015 12:34:00 +0200
 
-strusBindings (0.1.5-1) unstable; urgency=low
+strusbindings (0.1.5-1) unstable; urgency=low
   * added interface for bulk phrase analysis
  -- Patrick Frey <patrickpfrey@yahoo.com>  Sun, 2 Aug 2015 13:15:48 +0200
 
-strusBindings (0.1.4-1) unstable; urgency=low
+strusbindings (0.1.4-1) unstable; urgency=low
   * missing const cast broke SWIG bindings build
   * small fix in detect document class
  -- Patrick Frey <patrickpfrey@yahoo.com>  Fri, 24 Jul 2015 21:20:11 +0200
 
-strusBindings (0.1.3-1) unstable; urgency=low
+strusbindings (0.1.3-1) unstable; urgency=low
   * added DocumentClass passed to analyze or implicitely recognized
   * deleted some files that are part of docker images and not files for this project
   * test script to check web server php configuration
@@ -115,11 +119,11 @@ strusBindings (0.1.3-1) unstable; urgency=low
   * updated documentation
  -- Patrick Frey <patrickpfrey@yahoo.com>  Tue, 14 Jul 2015 11:31:08 +0200
 
-strusBindings (0.1.1-1) unstable; urgency=low
+strusbindings (0.1.1-1) unstable; urgency=low
   * added patch version
  -- Patrick Frey <patrickpfrey@yahoo.com>  Fri, 3 Jul 2015 15:23:10 +0200
 
-strusBindings (0.1.0-1) unstable; urgency=low
+strusbindings (0.1.0-1) unstable; urgency=low
   * Initial revision
  -- Patrick Frey <patrickpfrey@yahoo.com>  Sat, 27 Jun 2015 11:58:20 +0200
 
