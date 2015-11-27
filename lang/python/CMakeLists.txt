@@ -22,5 +22,7 @@ add_subdirectory( example )
 # INSTALLATION
 # ------------------------------
 install( TARGETS strus_python
-           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus/python )
+           LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES} )
+
+
 
