@@ -5,8 +5,8 @@
 ###
 
 %define with_php 1
-%define with_python 0
-%define with_java 1
+%define with_python 1
+%define with_java 0
 
 %define rhel 0
 %define rhel5 0
@@ -262,6 +262,7 @@ Requires: strus >= %{dep_version}
 Requires: strusanalyzer >= %{dep_version}
 Requires: strusmodule >= %{dep_version}
 Requires: strusrpc >= %{dep_version}
+
 %if %{with_php}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
@@ -278,7 +279,21 @@ BuildRequires: php-devel
 %endif
 
 %if %{with_java}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{centos5} || %{scilin5}
+# TODO: no /proc mount in local builds, we get:
+# java: error while loading shared libraries: libjli.so: cannot open shared object file: No such file or directory
+BuildRequires: java-1.7.0-openjdk-devel
+%endif
+%else
+%if %{rhel6} || %{centos6} || %{scilin6}
 BuildRequires: java-1.8.0-openjdk-devel
+%endif
+%endif
+%endif
+
+%if %{with_python}
+BuildRequires: python-devel
 %endif
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
@@ -316,14 +331,11 @@ Language bindings for the strus text search engine in Php
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
-BuildRequires: php-devel
 Requires: php
 %else
-BuildRequires: php-devel
 Requires: php
 %endif
 %else
-BuildRequires: php-devel
 Requires: php
 %endif
 
@@ -338,7 +350,6 @@ Group: Development/Libraries/Python
 %description python
 Language bindings for the strus text search engine in Python
 
-BuildRequires: python-devel
 Requires: python
 
 %endif
@@ -390,6 +401,12 @@ cd lang/java
 make DESTDIR=$RPM_BUILD_ROOT install
 cd ../..
 %endif
+
+%if %{with_python}
+cd lang/python
+make DESTDIR=$RPM_BUILD_ROOT install
+cd ../..
+%endif
   
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -421,6 +438,12 @@ make test
 %{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 %{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@.@STRUS_PATCH_VERSION@
 %{_jnidir}/strus/strus_api.jar
+%endif
+
+%if %{with_python}
+%files python
+%defattr( -, root, root )
+%{python_sitearch}/strus.so
 %endif
 
 %changelog
