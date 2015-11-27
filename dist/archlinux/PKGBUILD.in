@@ -2,7 +2,7 @@
 # Maintainer: Patrick Frey <patrickpfrey@yahoo.com> 
 
 pkgbase=strusbindings
-pkgname=(strusbindings-php strusbindings-java)
+pkgname=(strusbindings-php strusbindings-java strusbindings-python2)
 _deppkgver=@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 _mainpkgver=@STRUS_VERSION@
 pkgver=${_mainpkgver}
