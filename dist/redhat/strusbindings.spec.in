@@ -138,12 +138,9 @@
 %endif
 %endif
 
-# no /proc mount in local builds, we get:
-# java: error while loading shared libraries: libjli.so: cannot open shared object file: No such file or directory
 # Python cmake probing fails
 %if %{centos} || %{rhel} || %{scilin}
 %if %{centos5} || %{rhel5} || %{scilin5}
-%define with_java 0
 %define with_python 0
 %endif
 %endif
