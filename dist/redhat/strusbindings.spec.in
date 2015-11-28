@@ -6,7 +6,7 @@
 
 %define with_php 1
 %define with_python 1
-%define with_java 0
+%define with_java 1
 
 %define rhel 0
 %define rhel5 0
@@ -114,6 +114,49 @@
 %define dist sle12
 %define sles12 1
 %define sles 1
+%endif
+
+# Disable builds on certain platforms on OBS for now, reason:
+# - broken packages
+# - unsolved problems
+# - license issues (development packages not available)
+# no Php and OpenJDK development packages on OBS for modern Redhat systems
+%if %{rhel}
+%if %{rhel5}
+%define with_java 0
+%endif
+%if %{rhel7}
+%define with_php 0
+%define with_java 0
+%endif
+%endif
+
+# no openjdk anymore for modern distributions?
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%define with_java 0
+%endif
+%endif
+
+# no /proc mount in local builds, we get:
+# java: error while loading shared libraries: libjli.so: cannot open shared object file: No such file or directory
+# Python cmake probing fails
+%if %{centos} || %{rhel} || %{scilin}
+%if %{centos5} || %{rhel5} || %{scilin5}
+%define with_java 0
+%define with_python 0
+%endif
+%endif
+# most things on SLES 11 are broken, sorry..
+%if %{sles}
+%if %{sles11}
+# Python support in cmake broken:
+# -- Found PythonLibs: /usr/bin/python2.6
+# -- Found PythonLibs package
+%define with_python 0
+# ERROR: the files below contain java bytecode for something later than java 1.5 ?
+%define with_java 0
+%endif
 %endif
 
 Summary: Language bindings for the strus text search engine
@@ -246,8 +289,11 @@ BuildRequires: swig2
 BuildRequires: swig2
 %endif
 %endif
-%if %{fedora} || %{suse} || %{sles}
+%if %{fedora} || %{suse}
 BuildRequires: swig
+%endif
+%if %{sles}
+BuildRequires: swig2
 %endif
 
 BuildRequires: strus-devel >= %{dep_version}
@@ -281,14 +327,16 @@ BuildRequires: php-devel
 %if %{with_java}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel5} || %{centos5} || %{scilin5}
-# TODO: no /proc mount in local builds, we get:
-# java: error while loading shared libraries: libjli.so: cannot open shared object file: No such file or directory
 BuildRequires: java-1.7.0-openjdk-devel
-%endif
-%else
 %if %{rhel6} || %{centos6} || %{scilin6}
 BuildRequires: java-1.8.0-openjdk-devel
+%else
+BuildRequires: java-1.8.0-openjdk-devel
 %endif
+%endif
+%endif
+%if %{suse} || %{sles}
+BuildRequires: java-1.7.0-openjdk-devel
 %endif
 %endif
 
@@ -314,7 +362,17 @@ Group: Development/Libraries/Java
 %description java
 Language bindings for the strus text search enginge in Java
 
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{centos5} || %{scilin5}
+Requires: java-1.7.0-openjdk
+%endif
+%else
+%if %{rhel6} || %{centos6} || %{scilin6}
 Requires: java-1.8.0-openjdk
+%endif
+%else
+Requires: java-1.8.0-openjdk
+%endif
 
 %endif
 
