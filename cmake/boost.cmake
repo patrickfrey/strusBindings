@@ -1,4 +1,5 @@
-set(Boost_USE_MULTITHREADED ON)
+set( Boost_USE_MULTITHREADED ON)
+set( Boost_INCLUDE_DIR /usr/include )
 find_package( Boost 1.53.0 COMPONENTS atomic QUIET )
 if( Boost_ATOMIC_FOUND )
 	if( WITH_PYTHON STREQUAL "YES" )

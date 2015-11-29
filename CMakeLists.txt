@@ -73,7 +73,7 @@ endif()
 ENDIF (WITH_JAVA STREQUAL "YES")
 
 IF (WITH_PYTHON STREQUAL "YES")
-	find_package( PythonLibs REQUIRED )
+	find_package( PythonLibs 2.7 REQUIRED )
 	execute_process ( COMMAND /usr/bin/env python2 -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 IF (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Found PythonLibs package" )
