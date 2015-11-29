@@ -35,5 +35,3 @@ add_subdirectory( example )
 install( TARGETS strus_php
 	LIBRARY DESTINATION ${PHP_EXTENSION_DIR} )
 
-install( FILES strus.php DESTINATION /usr/share/php/ )
-

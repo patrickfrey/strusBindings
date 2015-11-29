@@ -5,7 +5,7 @@
 ###
 
 %define with_php 1
-%define with_python 0
+%define with_python 1
 %define with_java 1
 
 %define rhel 0
@@ -114,6 +114,46 @@
 %define dist sle12
 %define sles12 1
 %define sles 1
+%endif
+
+# Disable builds on certain platforms on OBS for now, reason:
+# - broken packages
+# - unsolved problems
+# - license issues (development packages not available)
+# no Php and OpenJDK development packages on OBS for modern Redhat systems
+%if %{rhel}
+%if %{rhel5}
+%define with_java 0
+%endif
+%if %{rhel7}
+%define with_php 0
+%define with_java 0
+%endif
+%endif
+
+# no openjdk anymore for modern distributions?
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%define with_java 0
+%endif
+%endif
+
+# Python cmake probing fails
+%if %{centos} || %{rhel} || %{scilin}
+%if %{centos5} || %{rhel5} || %{scilin5}
+%define with_python 0
+%endif
+%endif
+# most things on SLES 11 are broken, sorry..
+%if %{sles}
+%if %{sles11}
+# Python support in cmake broken:
+# -- Found PythonLibs: /usr/bin/python2.6
+# -- Found PythonLibs package
+%define with_python 0
+# ERROR: the files below contain java bytecode for something later than java 1.5 ?
+%define with_java 0
+%endif
 %endif
 
 Summary: Language bindings for the strus text search engine
@@ -246,8 +286,11 @@ BuildRequires: swig2
 BuildRequires: swig2
 %endif
 %endif
-%if %{fedora} || %{suse} || %{sles}
+%if %{fedora} || %{suse}
 BuildRequires: swig
+%endif
+%if %{sles}
+BuildRequires: swig2
 %endif
 
 BuildRequires: strus-devel >= %{dep_version}
@@ -262,6 +305,7 @@ Requires: strus >= %{dep_version}
 Requires: strusanalyzer >= %{dep_version}
 Requires: strusmodule >= %{dep_version}
 Requires: strusrpc >= %{dep_version}
+
 %if %{with_php}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
@@ -278,7 +322,23 @@ BuildRequires: php-devel
 %endif
 
 %if %{with_java}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{centos5} || %{scilin5}
+BuildRequires: java-1.7.0-openjdk-devel
+%if %{rhel6} || %{centos6} || %{scilin6}
 BuildRequires: java-1.8.0-openjdk-devel
+%else
+BuildRequires: java-1.8.0-openjdk-devel
+%endif
+%endif
+%endif
+%if %{suse} || %{sles}
+BuildRequires: java-1.7.0-openjdk-devel
+%endif
+%endif
+
+%if %{with_python}
+BuildRequires: python-devel
 %endif
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
@@ -299,7 +359,17 @@ Group: Development/Libraries/Java
 %description java
 Language bindings for the strus text search enginge in Java
 
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{centos5} || %{scilin5}
+Requires: java-1.7.0-openjdk
+%endif
+%else
+%if %{rhel6} || %{centos6} || %{scilin6}
 Requires: java-1.8.0-openjdk
+%endif
+%else
+Requires: java-1.8.0-openjdk
+%endif
 
 %endif
 
@@ -316,14 +386,11 @@ Language bindings for the strus text search engine in Php
 %if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
-BuildRequires: php-devel
 Requires: php
 %else
-BuildRequires: php-devel
 Requires: php
 %endif
 %else
-BuildRequires: php-devel
 Requires: php
 %endif
 
@@ -338,7 +405,6 @@ Group: Development/Libraries/Python
 %description python
 Language bindings for the strus text search engine in Python
 
-BuildRequires: python-devel
 Requires: python
 
 %endif
@@ -390,6 +456,12 @@ cd lang/java
 make DESTDIR=$RPM_BUILD_ROOT install
 cd ../..
 %endif
+
+%if %{with_python}
+cd lang/python
+make DESTDIR=$RPM_BUILD_ROOT install
+cd ../..
+%endif
   
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -421,6 +493,12 @@ make test
 %{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 %{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@.@STRUS_PATCH_VERSION@
 %{_jnidir}/strus/strus_api.jar
+%endif
+
+%if %{with_python}
+%files python
+%defattr( -, root, root )
+%{python_sitearch}/strus.so
 %endif
 
 %changelog

@@ -5,7 +5,8 @@ Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
 Build-Depends: debhelper (>= 4.1.16), cmake,
  libboost1.53-dev, libboost-thread1.53-dev, libboost-system1.53-dev,
  libboost-date-time1.53-dev, strus-dev, strusanalyzer-dev, strusmodule-dev,
- strusrpc-dev, swig, php5-dev, openjdk-7-jdk
+ strusrpc-dev, swig, php5-dev, openjdk-7-jdk,
+ libboost-python-dev, python-dev
 Standards-Version: 3.8.3
 Homepage: http://project-strus.net
 
@@ -20,3 +21,9 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: strusbindings for the Java language
  Language bindings for the strus text search engine in Java.
+
+Package: strusbindings-python
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: strusbindings for the Python language
+ Language bindings for the strus text search engine in Python 2.
