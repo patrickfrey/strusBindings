@@ -46,6 +46,7 @@
 #include "strus/moduleLoaderInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
+#include "strus/peerMessageQueueInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -1040,6 +1041,59 @@ void StorageClient::close()
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
 	THIS->close();
 }
+
+PeerMessageQueue StorageClient::createPeerMessageQueue() const
+{
+	return PeerMessageQueue( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
+}
+
+PeerMessageQueue::PeerMessageQueue( const PeerMessageQueue& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_msgqueue_impl(o.m_msgqueue_impl){}
+
+PeerMessageQueue::PeerMessageQueue( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_objbuilder_impl(objbuilder)
+	,m_storage_impl(storage_)
+	,m_msgqueue_impl(ReferenceDeleter<strus::PeerMessageQueueInterface>::function)
+
+{
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	m_msgqueue_impl.reset( storage->createPeerMessageQueue());
+}
+
+std::string PeerMessageQueue::push( const std::string& msg)
+{
+	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const char* outmsg;
+	std::size_t outmsgsize;
+	pmq->push( msg.c_str(), msg.size(), outmsg, outmsgsize);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error pushing message from peer storage: %s"), errorhnd->fetchError());
+	}
+	return std::string( outmsg, outmsgsize);
+}
+
+std::string PeerMessageQueue::fetch()
+{
+	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const char* outmsg;
+	std::size_t outmsgsize;
+	if (!pmq->fetch( outmsg, outmsgsize))
+	{
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error( _TXT("error fetching message for other peer storages: %s"), errorhnd->fetchError());
+		}
+	}
+	return std::string( outmsg, outmsgsize);
+}
+
 
 QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
 	:m_errorhnd_impl(errorhnd)

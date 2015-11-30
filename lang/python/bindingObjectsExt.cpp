@@ -306,6 +306,11 @@ void StorageClient::deleteUserAccessRights_unicode( const WString& username)
 	deleteUserAccessRights( convert_UTF16_to_UTF8( username));
 }
 
+String PeerMessageQueue::push_unicode( const WString& msg)
+{
+	return push( convert_UTF16_to_UTF8( msg));
+}
+
 WString RankAttribute::ucvalue() const
 {
 	return convert_UTF8_to_UTF16( m_value);

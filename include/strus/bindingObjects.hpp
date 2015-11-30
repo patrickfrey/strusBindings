@@ -1024,6 +1024,8 @@ private:
 	std::size_t m_result_queue_idx;
 };
 
+/// \brief Forward declaration
+class PeerMessageQueue;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -1071,6 +1073,9 @@ public:
 	/// \brief Close of the storage client
 	void close();
 
+	/// \brief Create a handler for processing distributed storage statistics
+	PeerMessageQueue createPeerMessageQueue() const;
+
 private:
 	friend class Context;
 	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
@@ -1081,6 +1086,40 @@ private:
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
+};
+
+
+/// \brief Pair of queues for messages to and from peer storages for distributing statistics
+class PeerMessageQueue
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerMessageQueue(){}
+#endif
+	/// \brief Copy constructor
+	PeerMessageQueue( const PeerMessageQueue& o);
+
+	/// \brief Push a message from another peer storage
+	/// \param[in] msg message from peer
+	/// \return message to reply to sender
+	String push( const String& msg);
+#ifdef STRUS_BOOST_PYTHON
+	String push_unicode( const WString& msg);
+#endif
+
+	/// \brief Fetches the next message to distribute to all other peers
+	/// \return empty string if there is no message left
+	String fetch();
+
+private:
+	friend class StorageClient;
+	PeerMessageQueue( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+	Reference m_msgqueue_impl;
 };
 
 

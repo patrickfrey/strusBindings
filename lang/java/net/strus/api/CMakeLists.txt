@@ -22,6 +22,7 @@ set( generated_java_source_files
 	Rank.java
 	RankVector.java
 	StorageClient.java
+	PeerMessageQueue.java
 	StringVector.java
 	Context.java
 	strus.java
