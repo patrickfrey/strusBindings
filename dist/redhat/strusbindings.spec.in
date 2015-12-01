@@ -502,6 +502,23 @@ make test
 %endif
 
 %changelog
+* Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.5-0.1
+- add PeerMessage object for introspection of peer messages
+- added peer message queue for distributing search index statistics
+- cmake: find_package PythonLibs with version (2.7), set Boost_INCLUDE_DIR /usr/include before call of find_package boost
+- preliminary fix for Python package building on Debian/Ubuntu
+- made most things work on newer SuSEs, disabled on older ones (Java, Python)
+- printing Python variables in cmake main file
+- removed install instructions for strus.php in CMakeLists.txt, cmake doesn't know where to install it properly, doing it in the SPEC/rule/PKGBUILD files
+- some work on redhat python packaging, disabled java for now
+- fixed testing for cmake 2.6
+- cleaned up boost python probing (make it depend on WITH_PYTHON="YES") probing python module library path now and installing strus.so to it some ArchLinux packaging fixes
+- added a 'test' parameter so we can avoid dist-gz which packs only the changes of the last git commit. This is for testing only!
+- fixed Python building on ArchLinux OBS
+- fixed tests for CentOS 6: old PHP array notation needed
+- in packages add dependency to php cli for the platforms that need it
+- make php tests run with local minimal php.ini and thus within the OSC build
+
 * Thu Nov 26 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.4-0.1
 - incremented version to 0.2.4 to resolve OBS trouble with dependencies
 
