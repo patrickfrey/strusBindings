@@ -8,6 +8,8 @@ set( generated_java_source_files
 	DocumentAnalyzeQueue.java
 	DocumentClass.java
 	Document.java
+	DocumentFrequencyChange.java
+	DocumentFrequencyChangeVector.java
 	MetaData.java
 	MetaDataVector.java
 	Normalizer.java
@@ -23,6 +25,7 @@ set( generated_java_source_files
 	RankVector.java
 	StorageClient.java
 	PeerMessageQueue.java
+	PeerMessage.java
 	StringVector.java
 	Context.java
 	strus.java

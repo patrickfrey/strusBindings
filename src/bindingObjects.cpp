@@ -1064,6 +1064,17 @@ PeerMessageQueue::PeerMessageQueue( const Reference& objbuilder, const Reference
 	m_msgqueue_impl.reset( storage->createPeerMessageQueue());
 }
 
+void PeerMessageQueue::start( bool sign)
+{
+	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	pmq->start( sign);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error populating initialization/deinitialization from storage: %s"), errorhnd->fetchError());
+	}
+}
+
 std::string PeerMessageQueue::push( const std::string& msg)
 {
 	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();

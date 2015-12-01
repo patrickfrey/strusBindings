@@ -64,6 +64,7 @@ typedef std::vector<std::string> StringVector;
 #define RankAttributeVector std::vector<RankAttribute>
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
+#define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
 #endif
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
@@ -1089,6 +1090,89 @@ private:
 };
 
 
+/// \brief Structure describing the document frequency change of one term in the collection
+class DocumentFrequencyChange
+{
+public:
+	/// \brief Constructor
+	DocumentFrequencyChange( const String& type_, const String& value_, const Index& position_, bool isnew_)
+		:m_type(type_),m_value(value_),m_position(position_),m_isnew(isnew_){}
+	/// \brief Copy constructor
+	DocumentFrequencyChange( const DocumentFrequencyChange& o)
+		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position),m_isnew(o.m_isnew){}
+	/// \brief Default constructor
+	DocumentFrequencyChange()
+		:m_position(0),m_isnew(false){}
+
+	/// \brief Get the term type name
+	const String& type() const			{return m_type;}
+	/// \brief Get the term value
+	const String& value() const			{return m_value;}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+#endif
+	/// \brief Get the term position
+	unsigned int position() const			{return m_position;}
+
+	/// \brief Eval if the document frequency change if for an unknown term
+	unsigned int isnew() const			{return m_isnew;}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const DocumentFrequencyChange& o) const
+	{
+		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position && m_isnew == o.m_isnew;
+	}
+	bool operator!=( const DocumentFrequencyChange& o) const
+	{
+		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position || m_isnew != o.m_isnew;
+	}
+#endif
+
+private:
+	std::string m_type;
+	std::string m_value;
+	Index m_position;
+	bool m_isnew;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<DocumentFrequencyChange> DocumentFrequencyChangeVector;
+#endif
+
+
+/// \brief Pair of queues for messages to and from peer storages for distributing statistics
+class PeerMessage
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerMessage(){}
+#endif
+	/// \brief Copy constructor
+	PeerMessage( const PeerMessage& o);
+	/// \brief Constructor from binary blob
+	explicit PeerMessage( const String& blob);
+	/// \brief Constructor from elements
+	PeerMessage( const std::vector<DocumentFrequencyChange>& dfchglist, int nofdocs);
+
+	/// \brief Return the change of number of documents inserted
+	/// \return the change of number of documents
+	int nofDocumentsInsertedChange() const
+	{
+		return m_nofDocumentsInsertedChange;
+	}
+
+	/// \brief Return the list of document frequency changes
+	/// \return the list of df changes
+	const std::vector<DocumentFrequencyChange>& documentFrequencyChangeList() const
+	{
+		return m_documentFrequencyChangeList;
+	}
+
+private:
+	int m_nofDocumentsInsertedChange;
+	std::vector<DocumentFrequencyChange> m_documentFrequencyChangeList;
+};
+
+
 /// \brief Pair of queues for messages to and from peer storages for distributing statistics
 class PeerMessageQueue
 {
@@ -1099,13 +1183,14 @@ public:
 	/// \brief Copy constructor
 	PeerMessageQueue( const PeerMessageQueue& o);
 
+	/// \brief Notify initialization/deinitialization, fetching local statistics to populate to other peers
+	/// \param[in] sign of the statistics to populate, true = positive (on initialization), false = negative (on deinitialization)
+	void start( bool sign);
+
 	/// \brief Push a message from another peer storage
 	/// \param[in] msg message from peer
 	/// \return message to reply to sender
 	String push( const String& msg);
-#ifdef STRUS_BOOST_PYTHON
-	String push_unicode( const WString& msg);
-#endif
 
 	/// \brief Fetches the next message to distribute to all other peers
 	/// \return empty string if there is no message left
