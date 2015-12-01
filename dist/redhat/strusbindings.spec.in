@@ -502,6 +502,9 @@ make test
 %endif
 
 %changelog
+* Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.6-0.1
+- adapted interface changes in core: added interfaces for introspection (user names, docids, term types, term values)
+
 * Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.5-0.1
 - add PeerMessage object for introspection of peer messages
 - added peer message queue for distributing search index statistics

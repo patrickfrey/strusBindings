@@ -406,6 +406,11 @@ StorageClient Context::createStorageClient_unicode( const WString& config_)
 	return createStorageClient( convert_UTF16_to_UTF8( config_));
 }
 
+WString DocumentFrequencyChange::ucvalue() const
+{
+	return convert_UTF8_to_UTF16( m_value);
+}
+
 void Context::addModulePath_unicode( const WString& paths_)
 {
 	addModulePath( convert_UTF16_to_UTF8( paths_));

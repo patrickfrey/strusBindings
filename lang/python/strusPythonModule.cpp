@@ -194,6 +194,24 @@ bp::class_<StorageClient>("StorageClient")
 	.def("deleteUserAccessRights", &StorageClient::deleteUserAccessRights_unicode)
 	.def("flush", &StorageClient::flush)
 	.def("close", &StorageClient::close)
+	.def("createPeerMessageQueue", &StorageClient::createPeerMessageQueue)
+;
+bp::class_<DocumentFrequencyChange>("DocumentFrequencyChange")
+	.def("type", &DocumentFrequencyChange::type, bp::return_value_policy<bp::copy_const_reference>())
+	.def("value", &DocumentFrequencyChange::value, bp::return_value_policy<bp::copy_const_reference>())
+	.def("ucvalue", &DocumentFrequencyChange::ucvalue)
+	.def("increment", &DocumentFrequencyChange::increment)
+	.def("isnew", &DocumentFrequencyChange::isnew)
+;
+bp::class_<PeerMessage>("PeerMessage")
+	.def("nofDocumentsInsertedChange", &PeerMessage::nofDocumentsInsertedChange)
+	.def("documentFrequencyChangeList", &PeerMessage::documentFrequencyChangeList, bp::return_value_policy<bp::copy_const_reference>())
+;
+bp::class_<PeerMessageQueue>("PeerMessageQueue")
+	.def("start", &PeerMessageQueue::start)
+	.def("fetch", &PeerMessageQueue::fetch)
+	.def("decode", &PeerMessageQueue::decode)
+	.def("encode", &PeerMessageQueue::encode)
 ;
 bp::class_<SummarizerConfig>("SummarizerConfig")
 ;

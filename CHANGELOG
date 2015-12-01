@@ -1,3 +1,7 @@
+strusbindings (0.2.6)
+  * adapted interface changes in core: added interfaces for introspection (user names, docids, term types, term values)
+ -- patrickfrey <patrickpfrey@yahoo.com>  Tue, 1 Dec 2015 20:54:00 +0100
+
 strusbindings (0.2.5)
   * add PeerMessage object for introspection of peer messages
   * added peer message queue for distributing search index statistics

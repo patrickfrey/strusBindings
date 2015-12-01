@@ -1095,14 +1095,14 @@ class DocumentFrequencyChange
 {
 public:
 	/// \brief Constructor
-	DocumentFrequencyChange( const String& type_, const String& value_, const Index& position_, bool isnew_)
-		:m_type(type_),m_value(value_),m_position(position_),m_isnew(isnew_){}
+	DocumentFrequencyChange( const String& type_, const String& value_, int increment_, bool isnew_)
+		:m_type(type_),m_value(value_),m_increment(increment_),m_isnew(isnew_){}
 	/// \brief Copy constructor
 	DocumentFrequencyChange( const DocumentFrequencyChange& o)
-		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position),m_isnew(o.m_isnew){}
+		:m_type(o.m_type),m_value(o.m_value),m_increment(o.m_increment),m_isnew(o.m_isnew){}
 	/// \brief Default constructor
 	DocumentFrequencyChange()
-		:m_position(0),m_isnew(false){}
+		:m_increment(0),m_isnew(false){}
 
 	/// \brief Get the term type name
 	const String& type() const			{return m_type;}
@@ -1111,8 +1111,8 @@ public:
 #if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
 	WString ucvalue() const;
 #endif
-	/// \brief Get the term position
-	unsigned int position() const			{return m_position;}
+	/// \brief Get the term increment
+	unsigned int increment() const			{return m_increment;}
 
 	/// \brief Eval if the document frequency change if for an unknown term
 	unsigned int isnew() const			{return m_isnew;}
@@ -1120,18 +1120,18 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const DocumentFrequencyChange& o) const
 	{
-		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position && m_isnew == o.m_isnew;
+		return m_type == o.m_type && m_value == o.m_value && m_increment == o.m_increment && m_isnew == o.m_isnew;
 	}
 	bool operator!=( const DocumentFrequencyChange& o) const
 	{
-		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position || m_isnew != o.m_isnew;
+		return m_type != o.m_type || m_value != o.m_value || m_increment != o.m_increment || m_isnew != o.m_isnew;
 	}
 #endif
 
 private:
 	std::string m_type;
 	std::string m_value;
-	Index m_position;
+	int m_increment;
 	bool m_isnew;
 };
 #ifdef STRUS_BOOST_PYTHON
@@ -1147,11 +1147,14 @@ public:
 	PeerMessage(){}
 #endif
 	/// \brief Copy constructor
-	PeerMessage( const PeerMessage& o);
-	/// \brief Constructor from binary blob
-	explicit PeerMessage( const String& blob);
+	PeerMessage( const PeerMessage& o)
+		:m_nofDocumentsInsertedChange(o.m_nofDocumentsInsertedChange)
+		,m_documentFrequencyChangeList(o.m_documentFrequencyChangeList){}
+
 	/// \brief Constructor from elements
-	PeerMessage( const std::vector<DocumentFrequencyChange>& dfchglist, int nofdocs);
+	PeerMessage( const std::vector<DocumentFrequencyChange>& dfchglist, int nofdocs)
+		:m_nofDocumentsInsertedChange(nofdocs)
+		,m_documentFrequencyChangeList(dfchglist){}
 
 	/// \brief Return the change of number of documents inserted
 	/// \return the change of number of documents
@@ -1189,12 +1192,22 @@ public:
 
 	/// \brief Push a message from another peer storage
 	/// \param[in] msg message from peer
-	/// \return message to reply to sender
+	/// \return message to reply to sender or empty blob if there is nothing to reply
 	String push( const String& msg);
 
 	/// \brief Fetches the next message to distribute to all other peers
-	/// \return empty string if there is no message left
+	/// \return message blob or empty string if there is no message left
 	String fetch();
+
+	/// \brief Decode a peer message blob for introspection
+	/// \param[in] blob peer message blob
+	/// \return the peer message
+	PeerMessage decode( const String& blob) const;
+
+	/// \brief Create binary blob to push from peer message structure
+	/// \param[in] msg peer message structure
+	/// \return the peer message blob
+	String encode( const PeerMessage& msg) const;
 
 private:
 	friend class StorageClient;

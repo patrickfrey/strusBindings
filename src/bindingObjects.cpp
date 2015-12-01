@@ -1105,6 +1105,55 @@ std::string PeerMessageQueue::fetch()
 	return std::string( outmsg, outmsgsize);
 }
 
+PeerMessage PeerMessageQueue::decode( const std::string& blob) const
+{
+	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::PeerMessageProcessorInterface* proc = pmq->getMessageProcessor();
+	std::auto_ptr<strus::PeerMessageViewerInterface> viewer( proc->createViewer( blob.c_str(), blob.size()));
+	std::vector<DocumentFrequencyChange> dflist;
+	strus::PeerMessageViewerInterface::DocumentFrequencyChange rec;
+	while (viewer->nextDfChange( rec))
+	{
+		dflist.push_back( DocumentFrequencyChange( rec.type, rec.value, rec.increment, rec.isnew));
+	}
+	int nofdocs = viewer->nofDocumentsInsertedChange();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "error peer message structure from blob: %s"), errorhnd->fetchError());
+	}
+	return PeerMessage( dflist, nofdocs);
+}
+
+std::string PeerMessageQueue::encode( const PeerMessage& msg) const
+{
+	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::PeerMessageProcessorInterface* proc = pmq->getMessageProcessor();
+	strus::PeerMessageProcessorInterface::BuilderOptions options;
+	std::auto_ptr<strus::PeerMessageBuilderInterface> builder( proc->createBuilder( options));
+	std::vector<DocumentFrequencyChange>::const_iterator
+			dfi = msg.documentFrequencyChangeList().begin(),
+			dfe = msg.documentFrequencyChangeList().end();
+	for (; dfi != dfe; ++dfi)
+	{
+		builder->addDfChange( dfi->type().c_str(), dfi->value().c_str(), dfi->increment(), dfi->isnew());
+	}
+	builder->setNofDocumentsInsertedChange( msg.nofDocumentsInsertedChange());
+	std::string rt;
+	const char* blk;
+	std::size_t blksize;
+	if (builder->fetchMessage( blk, blksize))
+	{
+		rt.append( blk, blksize);
+	}
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "error creating blob from peer message structure: %s"), errorhnd->fetchError());
+	}
+	return rt;
+}
+
 
 QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
