@@ -1658,6 +1658,15 @@ void Context::addResourcePath( const std::string& paths_)
 	moduleLoader->addResourcePath( paths_);
 }
 
+void Context::definePeerMessageProcessor( const std::string& name_)
+{
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
+	moduleLoader->definePeerMessageProcessor( name_);
+}
+
 void Context::initStorageObjBuilder()
 {
 	if (m_rpc_impl.get())

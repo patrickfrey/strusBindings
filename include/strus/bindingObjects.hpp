@@ -1859,6 +1859,11 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
+	/// \brief Define the peer message processor
+	/// \param[in] name_ the name of the peer message processor
+	/// \remark Only implemented in local mode with own module loader (see constructors)
+	void definePeerMessageProcessor( const String& name_);
+
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);
 #endif
