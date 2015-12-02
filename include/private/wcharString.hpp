@@ -30,8 +30,8 @@
 #define _STRUS_WCHAR_STRING_UTILITY_FUNCTIONS_HPP_INCLUDED
 #include <string>
 
-std::string convert_UTF16_to_UTF8( const std::wstring& val);
-std::wstring convert_UTF8_to_UTF16( const std::string& val);
+std::string convert_wstring_to_uft8string( const std::wstring& val);
+std::wstring convert_uft8string_to_wstring( const std::string& val);
 
 #endif
 
