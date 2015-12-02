@@ -1,4 +1,6 @@
 strusbindings (0.2.6)
+  * added transaction class to bindings
+  * make it possible to preallocate document numbers for insert
   * adapted interface changes in core: added interfaces for introspection (user names, docids, term types, term values)
  -- patrickfrey <patrickpfrey@yahoo.com>  Tue, 1 Dec 2015 20:54:00 +0100
 

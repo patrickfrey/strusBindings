@@ -503,6 +503,8 @@ make test
 
 %changelog
 * Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.6-0.1
+- added transaction class to bindings
+- make it possible to preallocate document numbers for insert
 - adapted interface changes in core: added interfaces for introspection (user names, docids, term types, term values)
 
 * Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.5-0.1
