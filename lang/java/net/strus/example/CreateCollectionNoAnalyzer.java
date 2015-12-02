@@ -6,7 +6,7 @@ import java.util.List;
 public class CreateCollectionNoAnalyzer
 {
 	// Insert a document defined by its parts passed as arguments:
-	public static void insertDoc( StorageClient storage, String docid, String[] searchIndex, String[] forwardIndex, String title)
+	public static void insertDoc( StorageTransaction transaction, String docid, String[] searchIndex, String[] forwardIndex, String title)
 	{
 		// Create the document to insert:
 		Document doc = new Document();
@@ -32,8 +32,8 @@ public class CreateCollectionNoAnalyzer
 		}
 		// Define the document title:
 		doc.setAttribute( "title", title);
-		// Prepare the document for insert (the insert will be finalized with storage.flush()):
-		storage.insertDocument( docid, doc);
+		// Prepare the document for insert (the insert will be finalized with transaction.commit()):
+		transaction.insertDocument( docid, doc, true);
 	}
 
 	public static void main( String []args) {
@@ -72,12 +72,13 @@ public class CreateCollectionNoAnalyzer
 		// Insert the test documents:
 		try
 		{
-			insertDoc( storage, "A", doc_A_searchIndex, doc_A_forwardIndex, doc_A_title);
-			insertDoc( storage, "B", doc_B_searchIndex, doc_B_forwardIndex, doc_B_title);
-			insertDoc( storage, "C", doc_C_searchIndex, doc_C_forwardIndex, doc_C_title);
+			StorageTransaction transaction = storage.createTransaction();
+			insertDoc( transaction, "A", doc_A_searchIndex, doc_A_forwardIndex, doc_A_title);
+			insertDoc( transaction, "B", doc_B_searchIndex, doc_B_forwardIndex, doc_B_title);
+			insertDoc( transaction, "C", doc_C_searchIndex, doc_C_forwardIndex, doc_C_title);
 
 			// Without this commit the documents wont be inserted:
-			storage.flush();
+			transaction.commit();
 		}
 		catch (Exception e)
 		{

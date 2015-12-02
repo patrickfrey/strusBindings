@@ -47,6 +47,7 @@
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/peerMessageQueueInterface.hpp"
+#include "strus/docnoRangeAllocatorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -920,7 +921,6 @@ StorageClient::StorageClient( const Reference& objbuilder, const Reference& erro
 	:m_errorhnd_impl(errorhnd_)
 	,m_objbuilder_impl( objbuilder)
 	,m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
-	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
@@ -935,13 +935,7 @@ StorageClient::StorageClient( const StorageClient& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
-	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
-{
-	if (o.m_transaction_impl.get())
-	{
-		throw strus::runtime_error(_TXT("try to create a storage interface clone of a storage with an open transaction"));
-	}
-}
+{}
 
 GlobalCounter StorageClient::nofDocumentsInserted() const
 {
@@ -949,17 +943,72 @@ GlobalCounter StorageClient::nofDocumentsInserted() const
 	return THIS->globalNofDocumentsInserted();
 }
 
-void StorageClient::insertDocument( const std::string& docid, const Document& doc)
+StorageTransaction StorageClient::createTransaction() const
+{
+	return StorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
+}
+
+void StorageClient::close()
+{
+	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
+	THIS->close();
+}
+
+StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& errorhnd_, const Reference& storage_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_objbuilder_impl(objbuilder_)
+	,m_storage_impl(storage_)
+	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
+	,m_docnoalloc_impl(ReferenceDeleter<strus::DocnoRangeAllocatorInterface>::function)
+{}
+
+void StorageTransaction::allocateDocnoRange( unsigned int nofDocuments)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	strus::DocnoRangeAllocatorInterface* dra = (strus::DocnoRangeAllocatorInterface*)m_docnoalloc_impl.get();
+	if (!dra)
+	{
+		m_docnoalloc_impl.reset( dra=(strus::DocnoRangeAllocatorInterface*)storage->createDocnoRangeAllocator());
+		if (!dra) throw strus::runtime_error( _TXT("failed to create docno range allocator transaction: %s"), errorhnd->fetchError());
+	}
+	unsigned int firstDocno = dra->allocDocnoRange( nofDocuments);
+	if (m_docnorangear.empty())
+	{
+		m_docnorangear.push_back( DocnoRange( firstDocno, nofDocuments));
+	}
+	else if (m_docnorangear.back().first + m_docnorangear.back().size == firstDocno)
+	{
+		m_docnorangear.back().size += nofDocuments;
+	}
+	else if (nofDocuments > 0)
+	{
+		m_docnorangear.push_back( DocnoRange( firstDocno, nofDocuments));
+	}
+}
+
+void StorageTransaction::insertDocument( const std::string& docid, const Document& doc, bool isnew)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
 	{
-		m_transaction_impl.reset( (strus::StorageTransactionInterface*)THIS->createTransaction());
+		m_transaction_impl.reset( (strus::StorageTransactionInterface*)storage->createTransaction());
 		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
 	}
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
-	std::auto_ptr<strus::StorageDocumentInterface> document( transaction->createDocument( docid));
+	strus::Index docno = 0;
+	if (isnew && m_docnorangear.size())
+	{
+		docno = (strus::Index)m_docnorangear[0].first;
+		m_docnorangear[0].first += 1;
+		m_docnorangear[0].size -= 1;
+		if (m_docnorangear[0].size == 0)
+		{
+			m_docnorangear.erase( m_docnorangear.begin());
+		}
+	}
+	std::auto_ptr<strus::StorageDocumentInterface> document( transaction->createDocument( docid, docno));
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
 	std::vector<Attribute>::const_iterator
@@ -995,33 +1044,33 @@ void StorageClient::insertDocument( const std::string& docid, const Document& do
 	document->done();
 }
 
-void StorageClient::deleteDocument( const std::string& docId)
+void StorageTransaction::deleteDocument( const std::string& docId)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
 	{
-		m_transaction_impl.reset( (strus::StorageTransactionInterface*)THIS->createTransaction());
+		m_transaction_impl.reset( (strus::StorageTransactionInterface*)storage->createTransaction());
 		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for deleting document: %s"), errorhnd->fetchError());
 	}
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
 	transaction->deleteDocument( docId);
 }
 
-void StorageClient::deleteUserAccessRights( const std::string& username)
+void StorageTransaction::deleteUserAccessRights( const std::string& username)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
 	{
-		m_transaction_impl.reset( (strus::StorageTransactionInterface*)THIS->createTransaction());
+		m_transaction_impl.reset( (strus::StorageTransactionInterface*)storage->createTransaction());
 		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for deleting user access rights: %s"), errorhnd->fetchError());
 	}
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
 	transaction->deleteUserAccessRights( username);
 }
 
-void StorageClient::flush()
+void StorageTransaction::commit()
 {
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
 	if (transaction)
@@ -1033,14 +1082,30 @@ void StorageClient::flush()
 			throw strus::runtime_error( _TXT("error flushing storage operations: %s"), errorhnd->fetchError());
 		}
 		m_transaction_impl.reset();
+		if (m_docnorangear.size())
+		{
+			strus::DocnoRangeAllocatorInterface* dra = (strus::DocnoRangeAllocatorInterface*)m_docnoalloc_impl.get();
+			if (dra && dra->deallocDocnoRange( m_docnorangear.back().first, m_docnorangear.back().size))
+			{
+				m_docnorangear.pop_back();
+			}
+		}
 	}
 }
 
-void StorageClient::close()
+void StorageTransaction::rollback()
 {
-	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
-	THIS->close();
+	m_transaction_impl.reset();
+	if (m_docnorangear.size())
+	{
+		strus::DocnoRangeAllocatorInterface* dra = (strus::DocnoRangeAllocatorInterface*)m_docnoalloc_impl.get();
+		if (dra && dra->deallocDocnoRange( m_docnorangear.back().first, m_docnorangear.back().size))
+		{
+			m_docnorangear.pop_back();
+		}
+	}
 }
+
 
 PeerMessageQueue StorageClient::createPeerMessageQueue() const
 {

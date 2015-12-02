@@ -72,6 +72,7 @@ public class CreateCollection
 		try
 		{
 			// Get the files to analyze and insert:
+			StorageTransaction transaction = storage.createTransaction();
 			String datadir = "./data/";
 			File folder = new File( datadir);
 			File[] listOfFiles = folder.listFiles();
@@ -85,12 +86,12 @@ public class CreateCollection
 						// Analyze and insert the document:
 						String docid = filename.substring( 0, filename.length()-4);
 						Document doc = analyzer.analyze( readFile( datadir + filename));
-						storage.insertDocument( docid, doc);
+						transaction.insertDocument( docid, doc, true);
 					}
 				}
 			}
 			// Without this the documents wont be inserted:
-			storage.flush();
+			transaction.commit();
 		}
 		catch (Exception e)
 		{

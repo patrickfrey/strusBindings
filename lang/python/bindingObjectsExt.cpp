@@ -296,12 +296,12 @@ void QueryAnalyzeQueue::push_unicode( const String& phraseType, const WString& p
 	push( phraseType, convert_wstring_to_uft8string( phraseContent));
 }
 
-void StorageClient::deleteDocument_unicode( const WString& docid)
+void StorageTransaction::deleteDocument_unicode( const WString& docid)
 {
 	deleteDocument( convert_wstring_to_uft8string( docid));
 }
 
-void StorageClient::deleteUserAccessRights_unicode( const WString& username)
+void StorageTransaction::deleteUserAccessRights_unicode( const WString& username)
 {
 	deleteUserAccessRights( convert_wstring_to_uft8string( username));
 }

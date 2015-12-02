@@ -1027,6 +1027,8 @@ private:
 
 /// \brief Forward declaration
 class PeerMessageQueue;
+/// \brief Forward declaration
+class StorageTransaction;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -1046,15 +1048,52 @@ public:
 	/// return the total number of documents
 	GlobalCounter nofDocumentsInserted() const;
 
+	/// \brief Create a transaction
+	/// return the transaction object created
+	StorageTransaction createTransaction() const;
+
+	/// \brief Create a handler for processing distributed storage statistics
+	/// return the peer message queue object created
+	PeerMessageQueue createPeerMessageQueue() const;
+
+	/// \brief Close of the storage client
+	void close();
+
+private:
+	friend class Context;
+	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
+
+	friend class Query;
+	friend class QueryEval;
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+};
+
+
+/// \brief Object representing a transaction of the storage 
+/// \remark The only way to construct a storage transaction instance is to call StorageClient::createTransaction()
+class StorageTransaction
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	StorageTransaction(){}
+#endif
+	/// \brief Destructor
+	~StorageTransaction(){}
+
+	/// \brief Preallocate a range of document numbers for new documents to insert
+	void allocateDocnoRange( unsigned int nofDocuments);
+
 	/// \brief Prepare the inserting a document into the storage
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert
-	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
-	void insertDocument( const String& docid, const Document& doc);
+	/// \remark The document is physically inserted with the call of 'commit()'
+	void insertDocument( const String& docid, const Document& doc, bool isnew);
 
 	/// \brief Prepare the deletion of a document from the storage
 	/// \param[in] docid the identifier of the document to delete
-	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
+	/// \remark The document is physically deleted with the call of 'commit()'
 	void deleteDocument( const String& docid);
 #ifdef STRUS_BOOST_PYTHON
 	void deleteDocument_unicode( const WString& docid);
@@ -1068,18 +1107,15 @@ public:
 	void deleteUserAccessRights_unicode( const WString& username);
 #endif
 
-	/// \brief Commit all insert or delete or user access right change statements open.
-	void flush();
+	/// \brief Commit all insert or delete or user access right change statements of this transaction.
+	void commit();
 
-	/// \brief Close of the storage client
-	void close();
-
-	/// \brief Create a handler for processing distributed storage statistics
-	PeerMessageQueue createPeerMessageQueue() const;
+	/// \brief Rollback all insert or delete or user access right change statements of this transaction.
+	void rollback();
 
 private:
-	friend class Context;
-	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
+	friend class StorageClient;
+	StorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
 
 	friend class Query;
 	friend class QueryEval;
@@ -1087,6 +1123,19 @@ private:
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
+	Reference m_docnoalloc_impl;
+
+	struct DocnoRange
+	{
+		DocnoRange( const DocnoRange& o)
+			:first(o.first),size(o.size){}
+		DocnoRange( unsigned int first_, unsigned int size_)
+			:first(first_),size(size_){}
+
+		unsigned int first;
+		unsigned int size;
+	};
+	std::vector<DocnoRange> m_docnorangear;
 };
 
 
