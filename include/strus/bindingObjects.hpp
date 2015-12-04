@@ -1026,7 +1026,9 @@ private:
 };
 
 /// \brief Forward declaration
-class PeerMessageQueue;
+class PeerMessageIterator;
+/// \brief Forward declaration
+class PeerStorageTransaction;
 /// \brief Forward declaration
 class StorageTransaction;
 
@@ -1052,9 +1054,18 @@ public:
 	/// return the transaction object created
 	StorageTransaction createTransaction() const;
 
-	/// \brief Create a handler for processing distributed storage statistics
-	/// return the peer message queue object created
-	PeerMessageQueue createPeerMessageQueue() const;
+	/// \brief Create an iterator on the storage statistics to distribute for initialization/deinitialization
+	/// \param[in] sign sign of the statistics value to distribute (true: all statistics are positive, specifying an increment, used for initialization, false: all statistics are negative, specifying a decrement, used for deinitialization)
+	/// return the peer message iterator object created
+	PeerMessageIterator createInitPeerMessageIterator( bool sign) const;
+
+	/// \brief Create an iterator on the storage statistics to distribute after storage updates
+	/// return the peer message iterator object created
+	PeerMessageIterator createUpdatePeerMessageIterator() const;
+
+	/// \brief Create a transaction object to update distributed storage statistics from another peer storage
+	/// return the peer transaction object created
+	PeerStorageTransaction createPeerStorageTransaction();
 
 	/// \brief Close of the storage client
 	void close();
@@ -1225,33 +1236,56 @@ private:
 };
 
 
-/// \brief Pair of queues for messages to and from peer storages for distributing statistics
-class PeerMessageQueue
+/// \brief Iterator on messages to send to other peer storages
+class PeerMessageIterator
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	PeerMessageQueue(){}
+	PeerMessageIterator(){}
 #endif
 	/// \brief Copy constructor
-	PeerMessageQueue( const PeerMessageQueue& o);
+	PeerMessageIterator( const PeerMessageIterator& o);
 
-	/// \brief Notify initialization/deinitialization, fetching local statistics to populate to other peers
-	/// \param[in] sign of the statistics to populate, true = positive (on initialization), false = negative (on deinitialization)
-	void start( bool sign);
-
-	/// \brief Push a message from another peer storage
-	/// \param[in] msg message from peer
-	/// \return message to reply to sender or empty blob if there is nothing to reply
-	String push( const String& msg);
-
-	/// \brief Fetches the next message to distribute to all other peers
+	/// \brief Fetches the next message to distribute other peers
 	/// \return message blob or empty string if there is no message left
-	String fetch();
+	String getNext();
 
 	/// \brief Decode a peer message blob for introspection
 	/// \param[in] blob peer message blob
 	/// \return the peer message
 	PeerMessage decode( const String& blob) const;
+
+private:
+	friend class StorageClient;
+	PeerMessageIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+	Reference m_iter_impl;
+};
+
+/// \brief Transation to update a storage with messages from other peer storages
+class PeerStorageTransaction
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerStorageTransaction(){}
+#endif
+	/// \brief Copy constructor
+	PeerStorageTransaction( const PeerStorageTransaction& o);
+
+	/// \brief Push a message from another peer storage
+	/// \param[in] msg message from peer
+	/// \return message to reply to sender or empty blob if there is nothing to reply
+	void push( const String& msg);
+
+	/// \brief Commit of the transaction
+	String commit();
+
+	/// \brief Rollback of the transaction
+	void rollback();
 
 	/// \brief Create binary blob to push from peer message structure
 	/// \param[in] msg peer message structure
@@ -1260,13 +1294,13 @@ public:
 
 private:
 	friend class StorageClient;
-	PeerMessageQueue( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
+	PeerStorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
 
 private:
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
-	Reference m_msgqueue_impl;
+	Reference m_transaction_impl;
 };
 
 
