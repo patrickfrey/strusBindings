@@ -137,6 +137,8 @@ $ignoreMethodMap{"pushExpression"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
+$ignoreMethodMap{"push"} = 1;
+
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
 $renameMethodMap{"setMetaData_int"} = "setMetaData";
@@ -149,6 +151,8 @@ $renameMethodMap{"analyze_2"} = "analyze";
 $renameMethodMap{"analyzePhrase_unicode"} = "analyzePhrase";
 $renameMethodMap{"analyzePhrase"} = "analyzePhrase";
 $renameMethodMap{"push_unicode"} = "push";
+$renameMethodMap{"push_unicode_1"} = "push";
+$renameMethodMap{"push_unicode_2"} = "push";
 $renameMethodMap{"defineParameter_string"} = "defineParameter";
 $renameMethodMap{"defineParameter_charp"} = "defineParameter";
 $renameMethodMap{"defineParameter_int"} = "defineParameter";
@@ -567,11 +571,36 @@ print OUTFILE <<EOF;
 #define FunctionObject boost::python::api::object
 #include "strus/bindingObjects.hpp"
 #include <string>
+#include <stdexcept>
 
 namespace bp = boost::python;
 
+namespace {
+void translate_runtime_error( std::runtime_error const& err)
+{
+	PyErr_SetString( PyExc_Exception, err.what());
+}
+void translate_bad_alloc( std::bad_alloc const& err)
+{
+	PyErr_SetString( PyExc_MemoryError, "out of memory");
+}
+void translate_logic_error( std::logic_error const& err)
+{
+	PyErr_SetString( PyExc_AssertionError, err.what());
+}
+void translate_exception( std::exception const& err)
+{
+	PyErr_SetString( PyExc_Exception, err.what());
+}
+}
+
 BOOST_PYTHON_MODULE(strus)
 {
+bp::register_exception_translator<std::runtime_error>( translate_runtime_error);
+bp::register_exception_translator<std::bad_alloc>( translate_bad_alloc);
+bp::register_exception_translator<std::logic_error>( translate_logic_error);
+bp::register_exception_translator<std::exception>( translate_exception);
+
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
 bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());

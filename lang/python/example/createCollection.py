@@ -27,21 +27,22 @@ analyzer = ctx.createDocumentAnalyzer()
 
 # Define the features and attributes to store:
 analyzer.addSearchIndexFeature( "word", "/doc/text()", "word", (("stem","en"),"lc",("convdia","en")))
-analyzer.addForwardIndexFeature( "orig", "/doc/text()", "split", "orig");
-analyzer.defineAttribute( "title", "/doc/title()", "content", "orig");
+analyzer.addForwardIndexFeature( "orig", "/doc/text()", "split", "orig")
+analyzer.defineAttribute( "title", "/doc/title()", "content", "orig")
 
 # Read input files, analyze and insert them:
-datadir = "./data/";
+transaction = storage.createTransaction()
+datadir = "./data/"
 for (dirpath, dirnames, filenames) in walk( datadir):
 	for idx, filename in enumerate( filenames):
 		if filename.endswith('.xml'):
 			print "%u process document %s" % (idx,filename)
 			docid = filename[0:-4]
 			doc = analyzer.analyze( readFile( datadir + filename))
-			storage.insertDocument( docid, doc)
+			transaction.insertDocument( docid, doc, True)
 
 # Without this the documents wont be inserted:
-storage.flush()
+transaction.commit()
 print "done"
 
 

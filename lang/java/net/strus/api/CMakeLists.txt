@@ -5,8 +5,11 @@ set( generated_java_source_files
 	Attribute.java
 	AttributeVector.java
 	DocumentAnalyzer.java
+	DocumentAnalyzeQueue.java
 	DocumentClass.java
 	Document.java
+	DocumentFrequencyChange.java
+	DocumentFrequencyChangeVector.java
 	MetaData.java
 	MetaDataVector.java
 	Normalizer.java
@@ -21,6 +24,9 @@ set( generated_java_source_files
 	Rank.java
 	RankVector.java
 	StorageClient.java
+	StorageTransaction.java
+	PeerMessageQueue.java
+	PeerMessage.java
 	StringVector.java
 	Context.java
 	strus.java

@@ -1,0 +1,635 @@
+# StrusBindings spec file
+
+# Set distribution based on some OpenSuse and distribution macros
+# this is only relevant when building on https://build.opensuse.org
+###
+
+%define with_php 1
+%define with_python 1
+%define with_java 1
+
+%define rhel 0
+%define rhel5 0
+%define rhel6 0
+%define rhel7 0
+%if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
+%define dist rhel5
+%define rhel 1
+%define rhel5 1
+%endif
+%if 0%{?rhel_version} >= 600 && 0%{?rhel_version} <= 699
+%define dist rhel6
+%define rhel 1
+%define rhel6 1
+%endif
+%if 0%{?rhel_version} >= 700 && 0%{?rhel_version} <= 799
+%define dist rhel7
+%define rhel 1
+%define rhel7 1
+%endif
+
+%define centos 0
+%define centos5 0
+%define centos6 0
+%define centos7 0
+%if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
+%define dist centos5
+%define centos 1
+%define centos5 1
+%endif
+%if 0%{?centos_version} >= 600 && 0%{?centos_version} <= 699
+%define dist centos6
+%define centos 1
+%define centos6 1
+%endif
+%if 0%{?centos_version} >= 700 && 0%{?centos_version} <= 799
+%define dist centos7
+%define centos 1
+%define centos7 1
+%endif
+
+%define scilin 0
+%define scilin5 0
+%define scilin6 0
+%define scilin7 0
+%if 0%{?scilin_version} >= 500 && 0%{?scilin_version} <= 599
+%define dist scilin5
+%define scilin 1
+%define scilin5 1
+%endif
+%if 0%{?scilin_version} >= 600 && 0%{?scilin_version} <= 699
+%define dist scilin6
+%define scilin 1
+%define scilin6 1
+%endif
+%if 0%{?scilin_version} >= 700 && 0%{?scilin_version} <= 799
+%define dist scilin7
+%define scilin 1
+%define scilin7 1
+%endif
+
+%define fedora 0
+%define fc21 0
+%define fc22 0
+%if 0%{?fedora_version} == 21
+%define dist fc21
+%define fc21 1
+%define fedora 1
+%endif
+%if 0%{?fedora_version} == 22
+%define dist fc22
+%define fc22 1
+%define fedora 1
+%endif
+
+%define suse 0
+%define osu131 0
+%define osu132 0
+%define osufactory 0
+%if 0%{?suse_version} == 1310
+%define dist osu131
+%define osu131 1
+%define suse 1
+%endif
+%if 0%{?suse_version} == 1320
+%define dist osu132
+%define osu132 1
+%define suse 1
+%endif
+%if 0%{?suse_version} > 1320
+%define dist osufactory
+%define osufactory 1
+%define suse 1
+%endif
+
+%define sles 0
+%define sles11 0
+%define sles12 0
+%if 0%{?suse_version} == 1110
+%define dist sle11
+%define sles11 1
+%define sles 1
+%endif
+%if 0%{?suse_version} == 1315 
+%define dist sle12
+%define sles12 1
+%define sles 1
+%endif
+
+# Disable builds on certain platforms on OBS for now, reason:
+# - broken packages
+# - unsolved problems
+# - license issues (development packages not available)
+# no Php and OpenJDK development packages on OBS for modern Redhat systems
+%if %{rhel}
+%if %{rhel5}
+%define with_java 0
+%endif
+%if %{rhel7}
+%define with_php 0
+%define with_java 0
+%endif
+%endif
+
+# no openjdk anymore for modern distributions?
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+%define with_java 0
+%endif
+%endif
+
+# Python cmake probing fails
+%if %{centos} || %{rhel} || %{scilin}
+%if %{centos5} || %{rhel5} || %{scilin5}
+%define with_python 0
+%endif
+%endif
+# most things on SLES 11 are broken, sorry..
+%if %{sles}
+%if %{sles11}
+# Python support in cmake broken:
+# -- Found PythonLibs: /usr/bin/python2.6
+# -- Found PythonLibs package
+%define with_python 0
+# ERROR: the files below contain java bytecode for something later than java 1.5 ?
+%define with_java 0
+%endif
+%endif
+
+Summary: Language bindings for the strus text search engine
+Name: strusbindings
+%define main_version @STRUS_VERSION@
+%define dep_version @STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
+Version: %{main_version}
+Release: @STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
+License: GPLv3
+Group: Development/Libraries/C++
+
+Source: %{name}_%{main_version}.tar.gz
+
+URL: http://project-strus.net
+
+BuildRoot: %{_tmppath}/%{name}-root
+
+# Installation directories
+###
+
+%if %{with_php}
+%if %{suse} || %{sles}
+%global phpdir php5
+%global php_extdir %{_libdir}/%{phpdir}/extensions
+%global php_inidir %{_sysconfdir}/%{phpdir}/conf.d
+%global php_datadir %{_datadir}/%{phpdir}
+%else
+%global phpdir php
+%global php_extdir %{_libdir}/%{phpdir}/modules
+%global php_inidir %{_sysconfdir}/php.d
+%global php_datadir %{_datadir}/%{phpdir}
+%endif
+
+%if %{suse} || %{sles} || %{rhel} || %{centos} || %{scilin}
+%global php_inifile strus.ini
+%else
+%global php_inifile 40-strus.ini
+%endif
+
+%endif
+
+# Build dependencies
+###
+
+# OBS doesn't install the minimal set of build tools automatically
+BuildRequires: gcc
+BuildRequires: gcc-c++
+BuildRequires: cmake
+
+# LinuxDistribution.cmake depends depends on the Linux release files in '/etc' or
+# LSB files
+%if %{rhel}
+BuildRequires: redhat-release
+%endif
+%if %{centos}
+BuildRequires: centos-release
+%endif
+%if %{scilin}
+BuildRequires: sl-release
+%endif
+%if %{fedora} && !0%{?opensuse_bs}
+BuildRequires: fedora-release
+%endif
+%if %{fedora} && 0%{?opensuse_bs}
+BuildRequires: generic-release
+%endif
+%if %{suse}
+BuildRequires: openSUSE-release
+%endif
+%if %{sles}
+%if %{sles12}
+#exists in sles12, missing on OBS!
+#BuildRequires: sles-release
+%else
+BuildRequires: sles-release
+%endif
+%endif
+
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
+Requires: boost153 >= 1.53.0
+BuildRequires: boost153-devel >= 1.53.0
+%else
+Requires: boost >= 1.53.0
+Requires: boost-thread >= 1.53.0
+Requires: boost-system >= 1.53.0
+Requires: boost-date-time >= 1.53.0
+BuildRequires: boost-devel
+%endif
+%endif
+
+%if %{suse} || %{sles}
+%if %{sles11}
+Requires: boost153 >= 1.53.0
+BuildRequires: boost153-devel >= 1.53.0
+%endif
+%if %{osu131}
+Requires: libboost_thread1_53_0 >= 1.53.0
+Requires: libboost_atomic1_53_0 >= 1.53.0
+Requires: libboost_system1_53_0 >= 1.53.0
+Requires: libboost_date_time1_53_0 >= 1.53.0
+BuildRequires: boost-devel
+# for some reason OBS doesn't pull in libboost_atomic1_53_0 automatically!?
+BuildRequires: libboost_atomic1_53_0 >= 1.53.0
+%endif
+%if %{osu132} || %{sles12}
+Requires: libboost_thread1_54_0 >= 1.54.0
+Requires: libboost_atomic1_54_0 >= 1.54.0
+Requires: libboost_system1_54_0 >= 1.54.0
+Requires: libboost_date_time1_54_0 >= 1.54.0
+BuildRequires: boost-devel
+%endif
+%if %{osufactory}
+Requires: libboost_thread1_58_0 >= 1.58.0
+Requires: libboost_atomic1_58_0 >= 1.58.0
+Requires: libboost_system1_58_0 >= 1.58.0
+Requires: libboost_date_time1_58_0 >= 1.58.0
+BuildRequires: boost-devel
+%endif
+%endif
+
+%if %{rhel} || %{centos} || %{scilin}
+%if %{rhel7} || %{centos7} || %{scilin7}
+BuildRequires: swig
+%endif
+%if %{rhel6} || %{centos6} || %{scilin6}
+BuildRequires: swig2
+%endif
+%if %{rhel5} || %{centos5} || %{scilin5}
+BuildRequires: swig2
+%endif
+%endif
+%if %{fedora} || %{suse}
+BuildRequires: swig
+%endif
+%if %{sles}
+BuildRequires: swig2
+%endif
+
+BuildRequires: strus-devel >= %{dep_version}
+BuildRequires: strusanalyzer-devel >= %{dep_version}
+BuildRequires: strusmodule-devel >= %{dep_version}
+BuildRequires: strusrpc-devel >= %{dep_version}
+BuildRequires: strus >= %{dep_version}
+BuildRequires: strusanalyzer >= %{dep_version}
+BuildRequires: strusmodule >= %{dep_version}
+BuildRequires: strusrpc >= %{dep_version}
+Requires: strus >= %{dep_version}
+Requires: strusanalyzer >= %{dep_version}
+Requires: strusmodule >= %{dep_version}
+Requires: strusrpc >= %{dep_version}
+
+%if %{with_php}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
+# Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
+# choosing your php)
+BuildRequires: php-devel
+BuildRequires: php-cli
+%else
+BuildRequires: php-devel
+%endif
+%else
+BuildRequires: php-devel
+%endif
+%endif
+
+%if %{with_java}
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{centos5} || %{scilin5}
+BuildRequires: java-1.7.0-openjdk-devel
+%if %{rhel6} || %{centos6} || %{scilin6}
+BuildRequires: java-1.8.0-openjdk-devel
+%else
+BuildRequires: java-1.8.0-openjdk-devel
+%endif
+%endif
+%endif
+%if %{suse} || %{sles}
+BuildRequires: java-1.7.0-openjdk-devel
+%endif
+%endif
+
+%if %{with_python}
+BuildRequires: python-devel
+%endif
+
+# Check if 'Distribution' is really set by OBS (as mentioned in bacula)
+%if ! 0%{?opensuse_bs}
+Distribution: %{dist}
+%endif
+
+Packager: Patrick Frey <patrickpfrey@yahoo.com>
+
+%description
+Library implementing the loading of dynalically loadable of a text search engine.
+
+%if %{with_java}
+%package java
+Summary: strus Java language bindings
+Group: Development/Libraries/Java
+
+%description java
+Language bindings for the strus text search enginge in Java
+
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{centos5} || %{scilin5}
+Requires: java-1.7.0-openjdk
+%endif
+%else
+%if %{rhel6} || %{centos6} || %{scilin6}
+Requires: java-1.8.0-openjdk
+%endif
+%else
+Requires: java-1.8.0-openjdk
+%endif
+
+%endif
+
+%if %{with_php}
+
+%package php
+Summary: strus Php language bindings
+Group: Development/Libraries/Php
+
+%description php
+Language bindings for the strus text search engine in Php
+
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
+# Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
+# choosing your php)
+Requires: php
+%else
+Requires: php
+%endif
+%else
+Requires: php
+%endif
+
+%endif
+
+%if %{with_python}
+
+%package python
+Summary: strus Python language bindings
+Group: Development/Libraries/Python
+
+%description python
+Language bindings for the strus text search engine in Python
+
+Requires: python
+
+%endif
+
+%prep
+%setup -n %{name}-%{main_version}
+
+%build
+
+# TODO: out-of-source build not possible currently!
+#mkdir build
+#cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=%{_lib} \
+%if %{with_php}
+	-DWITH_PHP="YES" \
+%endif
+%if %{with_java}
+	-DWITH_JAVA="YES" \
+	-DJAVA_LIB_INSTALL_DIR=%{_jnidir} \
+%endif
+%if %{with_python}
+	-DWITH_PYTHON="YES" \
+%endif
+	.
+# make -j2 breaks
+#make %{?_smp_mflags}
+make
+
+%install
+
+%if %{with_php}
+cd lang/php
+make DESTDIR=$RPM_BUILD_ROOT install
+cd ../..
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{phpdir}
+cp lang/php/strus.php $RPM_BUILD_ROOT/%{_datadir}/%{phpdir}/.
+
+mkdir -p $RPM_BUILD_ROOT/%{php_inidir}
+cat > $RPM_BUILD_ROOT/%{php_inidir}/%{php_inifile} <<EOF
+; Enable strus extensions module
+extension=strus.so
+EOF
+
+%endif
+
+%if %{with_java}
+cd lang/java
+make DESTDIR=$RPM_BUILD_ROOT install
+cd ../..
+%endif
+
+%if %{with_python}
+cd lang/python
+make DESTDIR=$RPM_BUILD_ROOT install
+cd ../..
+%endif
+  
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%check
+# TODO: out-of-source build not possible!
+#cd build
+
+make test
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%if %{with_php}
+%files php
+%defattr( -, root, root )
+%config(noreplace) %{php_inidir}/%{php_inifile}
+%{php_extdir}/strus.so
+%{_datadir}/%{phpdir}/strus.php
+%endif
+
+%if %{with_java}
+%files java
+%defattr( -, root, root )
+# TODO: should not be in libdir but in jni subdir (at
+# least on RHEL
+%{_libdir}/strus/libstrus_java.so
+%{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
+%{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@.@STRUS_PATCH_VERSION@
+%{_jnidir}/strus/strus_api.jar
+%endif
+
+%if %{with_python}
+%files python
+%defattr( -, root, root )
+%{python_sitearch}/strus.so
+%endif
+
+%changelog
+* Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.6-0.1
+- added transaction class to bindings
+- make it possible to preallocate document numbers for insert
+- adapted interface changes in core: added interfaces for introspection (user names, docids, term types, term values)
+
+* Tue Dec 1 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.5-0.1
+- add PeerMessage object for introspection of peer messages
+- added peer message queue for distributing search index statistics
+- cmake: find_package PythonLibs with version (2.7), set Boost_INCLUDE_DIR /usr/include before call of find_package boost
+- preliminary fix for Python package building on Debian/Ubuntu
+- made most things work on newer SuSEs, disabled on older ones (Java, Python)
+- printing Python variables in cmake main file
+- removed install instructions for strus.php in CMakeLists.txt, cmake doesn't know where to install it properly, doing it in the SPEC/rule/PKGBUILD files
+- some work on redhat python packaging, disabled java for now
+- fixed testing for cmake 2.6
+- cleaned up boost python probing (make it depend on WITH_PYTHON="YES") probing python module library path now and installing strus.so to it some ArchLinux packaging fixes
+- added a 'test' parameter so we can avoid dist-gz which packs only the changes of the last git commit. This is for testing only!
+- fixed Python building on ArchLinux OBS
+- fixed tests for CentOS 6: old PHP array notation needed
+- in packages add dependency to php cli for the platforms that need it
+- make php tests run with local minimal php.ini and thus within the OSC build
+
+* Thu Nov 26 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.4-0.1
+- incremented version to 0.2.4 to resolve OBS trouble with dependencies
+
+* Tue Nov 24 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.3-0.1
+- synchronize version number with strus core
+- adapted PHP test: Wrong argument type passed
+- define package dependency to strus* not to patch version but to minor version
+
+* Tue Nov 24 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.2-0.1
+- propagate version number of cmake files to packaging / set version to 0.2.2
+- fixed bug in Document copy constructor: docid was lost, fixed bug in DocumentAnalyzerQueue::analyzeNext(): lost documents, fixed bug in PHP bindings: C++ exceptions were not translated correctly to PHP exceptions -> this led to uncaught exceptions
+- change delimiter of feature options from ':' to ','
+- change type of feature options from string array to string
+- added support for indexing multipart documents
+- added analyzer queue for indexing multi part documents. added analyzer method to define multipart documents
+- fixed bug in PHP layer: illegal value extracted for range and cardilnality in query expression
+- fix bug in python exception handling: Swallowed exceptions
+- fix some small bugs in python bindings -- work in progress
+- bring up python again and update documentation
+
+* Wed Nov 11 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.2.0-0.1
+- incremented version number
+- fixed PHP bindings to be able to handle parameters as objects as well as structure mapped by typemap
+- temporarily reverted changes in PHP and removed new test. Things do not work yet
+- added typemap for php query expressions
+- adapted query interface changes and define new intermediate object query expression
+- reverting back to global makedepends on Archlinux for now
+- empty JAVA_MAWT_LIBRARY fix
+- removed some debugging code aruond libmawt.so
+- fixing libmawt.so not found problem in Java tests
+- fixed bug in python test
+- preliminary Debian/Ubuntu support for Java bindings
+- added query method swap elements
+- fixed python bindings
+- added new test for java: query using the analyzer
+- reorganize wchar string functions used in python. Put them into the common part of the bindings
+- fix bug in PHP binding caused by latest changes in python bondings
+- added textwolf library for wstring conversion in python bindings
+- added strusbindings-java for Java on RHEL systems
+- we should pass JAVA_LIB_INSTALL_DIR from PKGBUILD
+- install jars to JAVA_LIB_INSTALL_DIR not LIB_INSTALL_DIR
+- no WITH_XXX flags when calling 'make dist' and 'cmake' in OBS deploy script
+- added 'strusbindings-java' subpackage for ArchLinux on OBS
+- forgot a swig/php for Debian
+- adapted OBS build script to strus_php.so to strus.so and swig/php to lang/php renames
+- deleted deprecated documentation files
+- updated interface
+- rearanged documentation of language bindings
+- added examples to python bindings documentation
+- Added python interface documentation
+- updated documentation
+- removed traces of lang/python.swig
+- take out installation of php strus.so file from scripts/install_php.sh. It is done by cmake build
+- renamed build strus_php.so to strus.so as required by php
+- updated documentation
+- Implement python language bindings with help of boost-python. (Try to get away from SWIG)
+- changing generated objects from dictionary to object
+- handle python unicode strings correctly
+- explicit linking of libraries for test
+- added installation target for strus_php.so, guessing extension dir directly in CmakeLists.txt (no more manual installation of php module)
+- add_property_string needs an explicit const_cast in php bindings
+- do not deploy header files
+- more relaxed building rules for bindings due to generated swig code (gcc linguo and no pedantic)
+- updated OBS package build support
+- do not log error to stderr as default
+- change order of files in bindings library
+- adapted interface changes in storage: join operator cardinality
+- do not checkin cmake generated files
+- renamed objects (PHP all objects have prefix Strus and StrusContext renamed to Context
+- rename all objects in PHP to have prefix
+- fixing bugs to complete adaptions to exception free interfaces
+- working on exception free interfaces
+- fixed error in handling of vector<int> parameter in PHP/Python
+- added definition of document evaluation set to query
+- adapted changed interface (exception free)
+- renamed Normalizer to TokenNormalizer for PHP to avoid nameclash with built-in type in PHP >= 5.6
+- work on python bindings (work in progress)
+- added python support
+
+* Tue Aug 18 2015 Patrick Frey <patrickpfrey@yahoo.com> v0.1.7-0.1
+- updated php documentation
+- documented java examples
+- put common CMAKE stuff of all strus relaed projects into includes
+- make PHP binding work again with new code organization
+- added python bindings
+- added JAVA bindings
+- fixed occasional crash in PHP due to free of uninitialized variables (zval_dtor)
+
+* Sun Aug 2 2015 Patrick Frey <patrickpfrey@yahoo.com> v0.1.5-0.1
+- added interface for bulk phrase analysis
+
+* Fri Jul 24 2015 Patrick Frey <patrickpfrey@yahoo.com> v0.1.4-0.1
+- missing const cast broke SWIG bindings build
+- small fix in detect document class
+
+* Tue Jul 14 2015 Patrick Frey <patrickpfrey@yahoo.com> v0.1.3-0.1
+- added DocumentClass passed to analyze or implicitely recognized
+- deleted some files that are part of docker images and not files for this project
+- added HTML test page
+- test script to check web server php configuration
+- updated nginx configuration
+- added simple nginx configuration for docker images
+- updated documentation
+
+* Fri Jul 3 2015 Patrick Frey <patrickpfrey@yahoo.com> v0.1.1-0.1
+- incremented patch version
+
+* Sat Jun 27 2015 Patrick Frey <patrickpfrey@yahoo.com> v0.1-0.1
+- Initial revision

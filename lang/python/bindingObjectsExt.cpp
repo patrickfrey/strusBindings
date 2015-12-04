@@ -8,17 +8,17 @@
 
 WString Term::ucvalue() const
 {
-	return convert_UTF8_to_UTF16( m_value);
+	return convert_uft8string_to_wstring( m_value);
 }
 
 WString Attribute::ucvalue() const
 {
-	return convert_UTF8_to_UTF16( m_value);
+	return convert_uft8string_to_wstring( m_value);
 }
 
 void Document::setAttribute_unicode( const String& name, const WString& value)
 {
-	setAttribute( name, convert_UTF16_to_UTF8( value));
+	setAttribute( name, convert_wstring_to_uft8string( value));
 }
 
 void DocumentAnalyzer::addSearchIndexFeature_4(
@@ -27,7 +27,7 @@ void DocumentAnalyzer::addSearchIndexFeature_4(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	addSearchIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, StringVector());
+	addSearchIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, String());
 }
 
 void DocumentAnalyzer::addSearchIndexFeature_5(
@@ -35,7 +35,7 @@ void DocumentAnalyzer::addSearchIndexFeature_5(
 	const String& selectexpr,
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_,
-	const StringVector& options)
+	const String& options)
 {
 	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
 	if (tokenizer.check())
@@ -76,7 +76,7 @@ void DocumentAnalyzer::addForwardIndexFeature_4(
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
-	addForwardIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, StringVector());
+	addForwardIndexFeature_5( type, selectexpr, tokenizer_, normalizers_, String());
 }
 
 void DocumentAnalyzer::addForwardIndexFeature_5(
@@ -84,7 +84,7 @@ void DocumentAnalyzer::addForwardIndexFeature_5(
 	const String& selectexpr,
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_,
-	const StringVector& options)
+	const String& options)
 {
 	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
 	if (tokenizer.check())
@@ -216,12 +216,12 @@ void DocumentAnalyzer::defineAttribute_obj(
 
 Document DocumentAnalyzer::analyze_unicode_1( const WString& content)
 {
-	return analyze( convert_UTF16_to_UTF8( content));
+	return analyze( convert_wstring_to_uft8string( content));
 }
 
 Document DocumentAnalyzer::analyze_unicode_2( const WString& content, const DocumentClass& dclass)
 {
-	return analyze( convert_UTF16_to_UTF8( content), dclass);
+	return analyze( convert_wstring_to_uft8string( content), dclass);
 }
 
 Document DocumentAnalyzer::analyze_1( const String& content)
@@ -233,6 +233,17 @@ Document DocumentAnalyzer::analyze_2( const String& content, const DocumentClass
 {
 	return analyze( content, dclass);
 }
+
+void DocumentAnalyzeQueue::push_unicode_1( const WString& content)
+{
+	return push( convert_wstring_to_uft8string( content));
+}
+
+void DocumentAnalyzeQueue::push_unicode_2( const WString& content, const DocumentClass& dclass)
+{
+	return push( convert_wstring_to_uft8string( content), dclass);
+}
+
 
 void QueryAnalyzer::definePhraseType_obj(
 	const String& phrasetype,
@@ -277,27 +288,27 @@ TermVector QueryAnalyzer::analyzePhrase_unicode(
 		const String& phraseType,
 		const WString& phraseContent) const
 {
-	return analyzePhrase( phraseType, convert_UTF16_to_UTF8( phraseContent));
+	return analyzePhrase( phraseType, convert_wstring_to_uft8string( phraseContent));
 }
 
 void QueryAnalyzeQueue::push_unicode( const String& phraseType, const WString& phraseContent)
 {
-	push( phraseType, convert_UTF16_to_UTF8( phraseContent));
+	push( phraseType, convert_wstring_to_uft8string( phraseContent));
 }
 
-void StorageClient::deleteDocument_unicode( const WString& docid)
+void StorageTransaction::deleteDocument_unicode( const WString& docid)
 {
-	deleteDocument( convert_UTF16_to_UTF8( docid));
+	deleteDocument( convert_wstring_to_uft8string( docid));
 }
 
-void StorageClient::deleteUserAccessRights_unicode( const WString& username)
+void StorageTransaction::deleteUserAccessRights_unicode( const WString& username)
 {
-	deleteUserAccessRights( convert_UTF16_to_UTF8( username));
+	deleteUserAccessRights( convert_wstring_to_uft8string( username));
 }
 
 WString RankAttribute::ucvalue() const
 {
-	return convert_UTF8_to_UTF16( m_value);
+	return convert_uft8string_to_wstring( m_value);
 }
 
 
@@ -339,7 +350,7 @@ void QueryEval::addWeightingFunction_obj(
 
 std::size_t QueryExpression::allocid( const WString& str)
 {
-	return allocid( convert_UTF16_to_UTF8( str));
+	return allocid( convert_wstring_to_uft8string( str));
 }
 
 void QueryExpression::pushTerm_unicode( const String& type_, const WString& value_)
@@ -357,7 +368,7 @@ void QueryExpression::attachVariable_unicode( const WString& name_)
 
 void Query::addUserName_unicode( const WString& username_)
 {
-	addUserName( convert_UTF16_to_UTF8( username_));
+	addUserName( convert_wstring_to_uft8string( username_));
 }
 
 void Query::defineFeature_expr_2( const String& set_, const FunctionObject& expr_)
@@ -392,37 +403,42 @@ StorageClient Context::createStorageClient_1( const String& config_)
 
 StorageClient Context::createStorageClient_unicode( const WString& config_)
 {
-	return createStorageClient( convert_UTF16_to_UTF8( config_));
+	return createStorageClient( convert_wstring_to_uft8string( config_));
+}
+
+WString DocumentFrequencyChange::ucvalue() const
+{
+	return convert_uft8string_to_wstring( m_value);
 }
 
 void Context::addModulePath_unicode( const WString& paths_)
 {
-	addModulePath( convert_UTF16_to_UTF8( paths_));
+	addModulePath( convert_wstring_to_uft8string( paths_));
 }
 
 void Context::addResourcePath_unicode( const WString& paths_)
 {
-	addResourcePath( convert_UTF16_to_UTF8( paths_));
+	addResourcePath( convert_wstring_to_uft8string( paths_));
 }
 
 void Context::createStorage_unicode( const WString& config_)
 {
-	return createStorage( convert_UTF16_to_UTF8( config_));
+	return createStorage( convert_wstring_to_uft8string( config_));
 }
 
 void Context::destroyStorage_unicode( const WString& config_)
 {
-	return destroyStorage( convert_UTF16_to_UTF8( config_));
+	return destroyStorage( convert_wstring_to_uft8string( config_));
 }
 
 DocumentClass Context::detectDocumentClass_unicode( const WString& content)
 {
-	return detectDocumentClass( convert_UTF16_to_UTF8( content));
+	return detectDocumentClass( convert_wstring_to_uft8string( content));
 }
 
 DocumentAnalyzer Context::createDocumentAnalyzer_unicode( const WString& segmentername_)
 {
-	return createDocumentAnalyzer( convert_UTF16_to_UTF8( segmentername_));
+	return createDocumentAnalyzer( convert_wstring_to_uft8string( segmentername_));
 }
 
 

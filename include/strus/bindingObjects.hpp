@@ -64,6 +64,7 @@ typedef std::vector<std::string> StringVector;
 #define RankAttributeVector std::vector<RankAttribute>
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
+#define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
 #endif
 typedef unsigned int Index;
 typedef unsigned long GlobalCounter;
@@ -663,7 +664,7 @@ public:
 	const StringVector& users() const			{return m_users;}
 	/// \brief Get the document identifier (docid) of the document
 	/// \return the document identifier
-	const String& docid()					{return m_docid;}
+	const String& docid() const				{return m_docid;}
 
 private:
 	std::vector<Term> m_searchIndexTerms;
@@ -675,6 +676,9 @@ private:
 };
 
 
+/// \brief Forward declaration
+class DocumentAnalyzeQueue;
+
 /// \class DocumentAnalyzer
 /// \brief Analyzer object representing a program for segmenting, 
 ///	tokenizing and normalizing a document into atomic parts, that 
@@ -684,7 +688,8 @@ class DocumentAnalyzer
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	DocumentAnalyzer(){}
+	DocumentAnalyzer()
+		:m_textproc(0){}
 #endif
 	/// \brief Copy constructor
 	DocumentAnalyzer( const DocumentAnalyzer& o);
@@ -696,7 +701,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options as string, elements separated by ',', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 #if defined SWIGPHP
 	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
 	void addSearchIndexFeature(
@@ -704,14 +709,14 @@ public:
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options);
+		const String& options);
 #else
 	void addSearchIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options=StringVector());
+		const String& options=String());
 #endif
 #ifdef STRUS_BOOST_PYTHON
 	void addSearchIndexFeature_4(
@@ -725,7 +730,7 @@ public:
 		const String& selectexpr,
 		const FunctionObject& tokenizer_,
 		const FunctionObject& normalizers_,
-		const StringVector& options);
+		const String& options);
 #endif
 
 	/// \brief Define how a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
@@ -733,7 +738,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of options as strings, one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options as string, elements separated by ',', one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 #if defined SWIGPHP
 	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
 	void addForwardIndexFeature(
@@ -741,14 +746,14 @@ public:
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options);
+		const String& options);
 #else
 	void addForwardIndexFeature(
 		const String& type,
 		const String& selectexpr,
 		const Tokenizer& tokenizer,
 		const NormalizerVector& normalizers,
-		const StringVector& options=StringVector());
+		const String& options=String());
 #endif
 #ifdef STRUS_BOOST_PYTHON
 	void addForwardIndexFeature_4(
@@ -762,7 +767,7 @@ public:
 		const String& selectexpr,
 		const FunctionObject& tokenizer_,
 		const FunctionObject& normalizers_,
-		const StringVector& options);
+		const String& options);
 #endif
 
 	/// \brief Define how a feature to insert as meta data is selected, tokenized and normalized
@@ -816,6 +821,14 @@ public:
 		const FunctionObject& normalizers_);
 #endif
 
+	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
+	/// \param[in] selectexpr an expression that defines the content of the sub document declared
+	/// \param[in] subDocumentTypeName type name assinged to this sub document
+	/// \remark Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
+	void defineDocument(
+		const String& subDocumentTypeName,
+		const String& selectexpr);
+
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] content string (NOT a file name !) of the document to analyze
 	Document analyze( const String& content);
@@ -831,14 +844,74 @@ public:
 	Document analyze_1( const String& content);
 	Document analyze_2( const String& content, const DocumentClass& dclass);
 #endif
+
+	/// \brief Creates a queue for multi document analysis
+	/// \return the queue
+	DocumentAnalyzeQueue createQueue() const;
+
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
-	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername);
+	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername, const void* textproc_);
 
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
+	const void* m_textproc;
+};
+
+
+/// \class DocumentAnalyzeQueue
+/// \brief Analyzer object implementing a queue of analyze document tasks.
+/// \remark Document analysis with this class reduces network roundtrips when using it as proxy
+class DocumentAnalyzeQueue
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	DocumentAnalyzeQueue()
+		:m_result_queue_idx(0),m_analyzerctx_queue_idx(0),m_textproc(0){}
+#endif
+	/// \brief Copy constructor
+	DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o);
+	/// \brief Destructor
+	~DocumentAnalyzeQueue(){}
+
+	/// \brief Push a document into the queue to analyze
+	/// \param[in] content content string of the document to analyze
+	void push( const String& content);
+	/// \brief Push a document into the queue to analyze
+	/// \param[in] content content string of the document to analyze
+	/// \param[in] dclass document class of the document to analyze
+	void push( const String& content, const DocumentClass& dclass);
+
+#ifdef STRUS_BOOST_PYTHON
+	void push_unicode_1( const WString& content);
+	void push_unicode_2( const WString& content, const DocumentClass& dclass);
+#endif
+	/// \brief Checks if there are more results to fetch
+	/// \return true, if yes
+	bool hasMore() const;
+
+	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
+	/// \return list of terms (query phrase analyzer result)
+	Document fetch();
+
+private:
+	void analyzeNext();
+
+private:
+	/// \brief Constructor used by Context
+	friend class DocumentAnalyzer;
+	explicit DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer, const void* textproc_);
+
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_analyzer_impl;
+	std::vector<Document> m_result_queue;
+	std::size_t m_result_queue_idx;
+	std::vector<Reference> m_analyzerctx_queue;
+	std::size_t m_analyzerctx_queue_idx;
+	const void* m_textproc;
 };
 
 
@@ -917,7 +990,8 @@ class QueryAnalyzeQueue
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	QueryAnalyzeQueue(){}
+	QueryAnalyzeQueue()
+		:m_result_queue_idx(0){}
 #endif
 	/// \brief Copy constructor
 	QueryAnalyzeQueue( const QueryAnalyzeQueue& o);
@@ -951,6 +1025,10 @@ private:
 	std::size_t m_result_queue_idx;
 };
 
+/// \brief Forward declaration
+class PeerMessageQueue;
+/// \brief Forward declaration
+class StorageTransaction;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -970,30 +1048,13 @@ public:
 	/// return the total number of documents
 	GlobalCounter nofDocumentsInserted() const;
 
-	/// \brief Prepare the inserting a document into the storage
-	/// \param[in] docid the identifier of the document to insert
-	/// \param[in] doc the structure of the document to insert
-	/// \remark The document is physically inserted with the next implicit or explicit call of 'flush()'
-	void insertDocument( const String& docid, const Document& doc);
+	/// \brief Create a transaction
+	/// return the transaction object created
+	StorageTransaction createTransaction() const;
 
-	/// \brief Prepare the deletion of a document from the storage
-	/// \param[in] docid the identifier of the document to delete
-	/// \remark The document is physically deleted with the next implicit or explicit call of 'flush()'
-	void deleteDocument( const String& docid);
-#ifdef STRUS_BOOST_PYTHON
-	void deleteDocument_unicode( const WString& docid);
-#endif
-
-	/// \brief Prepare the deletion of all document access rights of a user
-	/// \param[in] username the name of the user to delete all access rights (in the local collection)
-	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
-	void deleteUserAccessRights( const String& username);
-#ifdef STRUS_BOOST_PYTHON
-	void deleteUserAccessRights_unicode( const WString& username);
-#endif
-
-	/// \brief Commit all insert or delete or user access right change statements open.
-	void flush();
+	/// \brief Create a handler for processing distributed storage statistics
+	/// return the peer message queue object created
+	PeerMessageQueue createPeerMessageQueue() const;
 
 	/// \brief Close of the storage client
 	void close();
@@ -1007,7 +1068,205 @@ private:
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
+};
+
+
+/// \brief Object representing a transaction of the storage 
+/// \remark The only way to construct a storage transaction instance is to call StorageClient::createTransaction()
+class StorageTransaction
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	StorageTransaction(){}
+#endif
+	/// \brief Destructor
+	~StorageTransaction(){}
+
+	/// \brief Preallocate a range of document numbers for new documents to insert
+	void allocateDocnoRange( unsigned int nofDocuments);
+
+	/// \brief Prepare the inserting a document into the storage
+	/// \param[in] docid the identifier of the document to insert
+	/// \param[in] doc the structure of the document to insert
+	/// \remark The document is physically inserted with the call of 'commit()'
+	void insertDocument( const String& docid, const Document& doc, bool isnew);
+
+	/// \brief Prepare the deletion of a document from the storage
+	/// \param[in] docid the identifier of the document to delete
+	/// \remark The document is physically deleted with the call of 'commit()'
+	void deleteDocument( const String& docid);
+#ifdef STRUS_BOOST_PYTHON
+	void deleteDocument_unicode( const WString& docid);
+#endif
+
+	/// \brief Prepare the deletion of all document access rights of a user
+	/// \param[in] username the name of the user to delete all access rights (in the local collection)
+	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
+	void deleteUserAccessRights( const String& username);
+#ifdef STRUS_BOOST_PYTHON
+	void deleteUserAccessRights_unicode( const WString& username);
+#endif
+
+	/// \brief Commit all insert or delete or user access right change statements of this transaction.
+	void commit();
+
+	/// \brief Rollback all insert or delete or user access right change statements of this transaction.
+	void rollback();
+
+private:
+	friend class StorageClient;
+	StorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
+
+	friend class Query;
+	friend class QueryEval;
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
 	Reference m_transaction_impl;
+	Reference m_docnoalloc_impl;
+
+	struct DocnoRange
+	{
+		DocnoRange( const DocnoRange& o)
+			:first(o.first),size(o.size){}
+		DocnoRange( unsigned int first_, unsigned int size_)
+			:first(first_),size(size_){}
+
+		unsigned int first;
+		unsigned int size;
+	};
+	std::vector<DocnoRange> m_docnorangear;
+};
+
+
+/// \brief Structure describing the document frequency change of one term in the collection
+class DocumentFrequencyChange
+{
+public:
+	/// \brief Constructor
+	DocumentFrequencyChange( const String& type_, const String& value_, int increment_, bool isnew_)
+		:m_type(type_),m_value(value_),m_increment(increment_),m_isnew(isnew_){}
+	/// \brief Copy constructor
+	DocumentFrequencyChange( const DocumentFrequencyChange& o)
+		:m_type(o.m_type),m_value(o.m_value),m_increment(o.m_increment),m_isnew(o.m_isnew){}
+	/// \brief Default constructor
+	DocumentFrequencyChange()
+		:m_increment(0),m_isnew(false){}
+
+	/// \brief Get the term type name
+	const String& type() const			{return m_type;}
+	/// \brief Get the term value
+	const String& value() const			{return m_value;}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+#endif
+	/// \brief Get the term increment
+	unsigned int increment() const			{return m_increment;}
+
+	/// \brief Eval if the document frequency change if for an unknown term
+	unsigned int isnew() const			{return m_isnew;}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const DocumentFrequencyChange& o) const
+	{
+		return m_type == o.m_type && m_value == o.m_value && m_increment == o.m_increment && m_isnew == o.m_isnew;
+	}
+	bool operator!=( const DocumentFrequencyChange& o) const
+	{
+		return m_type != o.m_type || m_value != o.m_value || m_increment != o.m_increment || m_isnew != o.m_isnew;
+	}
+#endif
+
+private:
+	std::string m_type;
+	std::string m_value;
+	int m_increment;
+	bool m_isnew;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<DocumentFrequencyChange> DocumentFrequencyChangeVector;
+#endif
+
+
+/// \brief Pair of queues for messages to and from peer storages for distributing statistics
+class PeerMessage
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerMessage(){}
+#endif
+	/// \brief Copy constructor
+	PeerMessage( const PeerMessage& o)
+		:m_nofDocumentsInsertedChange(o.m_nofDocumentsInsertedChange)
+		,m_documentFrequencyChangeList(o.m_documentFrequencyChangeList){}
+
+	/// \brief Constructor from elements
+	PeerMessage( const std::vector<DocumentFrequencyChange>& dfchglist, int nofdocs)
+		:m_nofDocumentsInsertedChange(nofdocs)
+		,m_documentFrequencyChangeList(dfchglist){}
+
+	/// \brief Return the change of number of documents inserted
+	/// \return the change of number of documents
+	int nofDocumentsInsertedChange() const
+	{
+		return m_nofDocumentsInsertedChange;
+	}
+
+	/// \brief Return the list of document frequency changes
+	/// \return the list of df changes
+	const std::vector<DocumentFrequencyChange>& documentFrequencyChangeList() const
+	{
+		return m_documentFrequencyChangeList;
+	}
+
+private:
+	int m_nofDocumentsInsertedChange;
+	std::vector<DocumentFrequencyChange> m_documentFrequencyChangeList;
+};
+
+
+/// \brief Pair of queues for messages to and from peer storages for distributing statistics
+class PeerMessageQueue
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerMessageQueue(){}
+#endif
+	/// \brief Copy constructor
+	PeerMessageQueue( const PeerMessageQueue& o);
+
+	/// \brief Notify initialization/deinitialization, fetching local statistics to populate to other peers
+	/// \param[in] sign of the statistics to populate, true = positive (on initialization), false = negative (on deinitialization)
+	void start( bool sign);
+
+	/// \brief Push a message from another peer storage
+	/// \param[in] msg message from peer
+	/// \return message to reply to sender or empty blob if there is nothing to reply
+	String push( const String& msg);
+
+	/// \brief Fetches the next message to distribute to all other peers
+	/// \return message blob or empty string if there is no message left
+	String fetch();
+
+	/// \brief Decode a peer message blob for introspection
+	/// \param[in] blob peer message blob
+	/// \return the peer message
+	PeerMessage decode( const String& blob) const;
+
+	/// \brief Create binary blob to push from peer message structure
+	/// \param[in] msg peer message structure
+	/// \return the peer message blob
+	String encode( const PeerMessage& msg) const;
+
+private:
+	friend class StorageClient;
+	PeerMessageQueue( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+	Reference m_msgqueue_impl;
 };
 
 
@@ -1588,7 +1847,8 @@ public:
 private:
 	friend class QueryEval;
 	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
-		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_){}
+		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
+	{}
 
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
@@ -1647,6 +1907,11 @@ public:
 	/// \param[in] paths_ semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
+
+	/// \brief Define the peer message processor
+	/// \param[in] name_ the name of the peer message processor
+	/// \remark Only implemented in local mode with own module loader (see constructors)
+	void definePeerMessageProcessor( const String& name_);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);
@@ -1725,6 +1990,7 @@ private:
 	Reference m_rpc_impl;
 	Reference m_storage_objbuilder_impl;
 	Reference m_analyzer_objbuilder_impl;
+	const void* m_textproc;
 };
 
 #ifdef DOXYGEN_LANG

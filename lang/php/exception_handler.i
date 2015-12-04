@@ -1,22 +1,23 @@
 %inline %{
 #include "objInitializers.hpp"
+/*[-]*/#include <iostream>
 %}
 
 %exception {
 	try {
 		$action
 	} catch (const std::runtime_error& e) {
-		zend_throw_exception( NULL, const_cast<char*>(e.what()), 0 TSRMLS_CC);
-		SWIG_fail;
+		SWIG_exception( SWIG_RuntimeError, e.what());
+		return;
 	} catch (const std::logic_error& e) {
-		zend_throw_exception( NULL, const_cast<char*>(e.what()), 0 TSRMLS_CC);
-		SWIG_fail;
+		SWIG_exception( SWIG_RuntimeError, e.what());
+		return;
 	} catch (const std::bad_alloc& e) {
-		zend_throw_exception( NULL, const_cast<char*>(e.what()), 0 TSRMLS_CC);
-		SWIG_fail;
+		SWIG_exception( SWIG_MemoryError, e.what());
+		return;
 	} catch (...) { 
-		zend_throw_exception( NULL, const_cast<char*>("unknown exception"), 0 TSRMLS_CC);
-		SWIG_fail;
+		SWIG_exception( SWIG_RuntimeError, "unknown exception");
+		return;
 	}
 }
 

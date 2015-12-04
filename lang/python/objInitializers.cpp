@@ -29,6 +29,48 @@
 #include "objInitializers.hpp"
 #include "private/internationalization.hpp"
 
+class PyObjectReference
+{
+public:
+	///\brief Constructor
+	PyObjectReference( PyObject* obj_=0)
+		:m_obj(obj_){}
+
+	///\brief Assignment operator
+	PyObjectReference& operator=( PyObject* obj_)
+	{
+		if (m_obj) Py_DECREF( m_obj);
+		m_obj = obj_;
+		return *this;
+	}
+
+	///\brief Destructor
+	~PyObjectReference()
+	{
+		if (m_obj) Py_DECREF( m_obj);
+	}
+
+	///\brief Cast operator
+	operator PyObject*()
+	{
+		return m_obj;
+	}
+
+	PyObject* ptr()
+	{
+		return m_obj;
+	}
+
+	operator bool()
+	{
+		return m_obj != 0;
+	}
+
+private:
+	PyObject* m_obj;
+};
+
+
 void initVariant( Variant& result, PyObject* obj)
 {
 	if (PyLong_Check( obj))
@@ -63,21 +105,14 @@ void initVariant( Variant& result, PyObject* obj)
 	else if (PyString_Check( obj))
 	{
 		char* objval = PyString_AS_STRING( obj);
+		/* ... borrowed referene */
 		result.assignText( std::string( objval));
 	}
 	else if (PyUnicode_Check( obj))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
-		try
-		{
-			initVariant( result, temp_obj);
-		}
-		catch (const std::exception& err)
-		{
-			Py_DECREF( temp_obj);
-			throw strus::runtime_error( _TXT("error initializing numeric variant: %s"), err.what());
-		}
-		Py_DECREF( temp_obj);
+		PyObjectReference temp_obj( PyUnicode_AsUTF8String( obj));
+		if (!temp_obj) throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+		initVariant( result, temp_obj);
 	}
 	else
 	{
@@ -95,77 +130,45 @@ static void initFunctionObject( Object& result, PyObject* obj)
 	}
 	else if (PyUnicode_Check( obj))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		PyObjectReference temp_obj( PyUnicode_AsUTF8String( obj));
 		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
-		try
-		{
-			initFunctionObject( result, temp_obj);
-		}
-		catch (const std::exception& err)
-		{
-			Py_DECREF( temp_obj);
-			throw strus::runtime_error( _TXT("error initializing function object: %s"), err.what());
-		}
-		Py_DECREF( temp_obj);
+		initFunctionObject( result, temp_obj);
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, _TXT("function definition expected as sequence"));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("function definition expected as sequence")));
 		if (seq)
 		{
 			Py_ssize_t ii=1,len = PySequence_Size( seq);
 			if (len == 0)
 			{
-				Py_DECREF( seq);
 				throw strus::runtime_error( _TXT( "function definition is empty (no name defined)"));
 			}
 			else
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, 0);
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), 0);
 				/* DON'T DECREF item here */
 				if (PyString_Check( item))
 				{
 					char* name = PyString_AS_STRING( item);
-					try
-					{
-						result.setName( name);
-					}
-					catch (const std::exception& err)
-					{
-						Py_DECREF( seq);
-						throw strus::runtime_error( _TXT( "error initializing function object: %s"), err.what());
-					}
+					result.setName( name);
 				}
 				else if (PyUnicode_Check( item))
 				{
-					PyObject *temp_obj = PyUnicode_AsUTF8String( item);
-					if (!temp_obj)
-					{
-						Py_DECREF( seq);
-						throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
-					}
-					char* name = PyString_AS_STRING( temp_obj);
-					try
-					{
-						result.setName( name);
-					}
-					catch (const std::exception& err)
-					{
-						Py_DECREF( temp_obj);
-						Py_DECREF( seq);
-						throw strus::runtime_error( _TXT( "error initializing function object: %s"), err.what());
-					}
-					Py_DECREF( temp_obj);
+					PyObjectReference temp_obj( PyUnicode_AsUTF8String( item));
+					if (!temp_obj) throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+
+					char* name = PyString_AS_STRING( temp_obj.ptr());
+					result.setName( name);
 				}
 				else
 				{
-					Py_DECREF( seq);
 					throw strus::runtime_error( _TXT( "first element of function definition is not a string (name of function)"));
 				}
 			}
 			for (; ii < len; ii++)
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 				/* DON'T DECREF item here */
 				try
 				{
@@ -191,36 +194,22 @@ static void initFunctionObject( Object& result, PyObject* obj)
 					}
 					else if (PyUnicode_Check( item))
 					{
-						PyObject *temp_obj = PyUnicode_AsUTF8String( item);
-						if (!temp_obj)
-						{
-							throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
-						}
-						char* itemval = PyString_AS_STRING( item);
-						try
-						{
-							result.addArgument( itemval);
-						}
-						catch (const std::exception& e)
-						{
-							Py_DECREF( temp_obj);
-							throw strus::runtime_error( _TXT( "error initializing function object: %s"), e.what());
-						}
-						Py_DECREF( temp_obj);
+						PyObjectReference temp_obj( PyUnicode_AsUTF8String( item));
+						if (!temp_obj) throw strus::runtime_error( _TXT( "error initializing function object: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+
+						char* itemval = PyString_AS_STRING( temp_obj.ptr());
+						result.addArgument( itemval);
 					}
 					else
 					{
-						Py_DECREF( seq);
 						throw strus::runtime_error( _TXT( "error initializing function object: %s"), "function argument is not a string or a numeric type");
 					}
 				}
 				catch (const std::exception& err)
 				{
-					Py_DECREF( seq);
 					throw strus::runtime_error( _TXT( "error initializing function object: %s"), err.what());
 				}
 			}
-			Py_DECREF( seq);
 		}
 		else
 		{
@@ -259,33 +248,23 @@ void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 	}
 	else if (PyUnicode_Check( obj))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		PyObjectReference temp_obj( PyUnicode_AsUTF8String( obj));
 		if (!temp_obj) throw strus::runtime_error( _TXT( "error initializing normalizer list: %s"), _TXT("failed to convert python unicode string to UTF-8"));
-		try
-		{
-			initNormalizerList( result, temp_obj);
-		}
-		catch (const std::exception& err)
-		{
-			Py_DECREF( temp_obj);
-			throw err;
-		}
-		Py_DECREF( temp_obj);
+		initNormalizerList( result, temp_obj);
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, _TXT("normalizer definition expected as sequence"));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("normalizer definition expected as sequence")));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
 			if (len == 0)
 			{
-				Py_DECREF( seq);
 				throw strus::runtime_error( _TXT( "normalizer list is empty"));
 			}
 			for (; ii < len; ii++)
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 				/* DON'T DECREF item here */
 				try
 				{
@@ -294,11 +273,9 @@ void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 				}
 				catch (const std::exception& err)
 				{
-					Py_DECREF( seq);
 					throw strus::runtime_error( _TXT( "error initializing normalizer list: %s"), err.what());
 				}
 			}
-			Py_DECREF( seq);
 		}
 	}
 	else
@@ -316,7 +293,7 @@ template <class Object>
 static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* keyitem, PyObject* valueitem)
 {
 	char* key;
-	PyObject *key_obj = 0;
+	PyObjectReference key_obj;
 	Variant value;
 
 	if (PyString_Check( keyitem))
@@ -326,15 +303,8 @@ static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* ke
 	else if (PyUnicode_Check( keyitem))
 	{
 		key_obj = PyUnicode_AsUTF8String( keyitem);
-		if (key_obj)
-		{
-			key = PyString_AS_STRING( key_obj);
-		}
-		else
-		{
-			Py_DECREF( key_obj);
-			throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
-		}
+		if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+		key = PyString_AS_STRING( key_obj.ptr());
 	}
 	else
 	{
@@ -345,7 +315,6 @@ static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* ke
 	{
 		if (value.type() != Variant_TEXT)
 		{
-			if (key_obj) Py_DECREF( key_obj);
 			throw strus::runtime_error( _TXT("string expected as query evaluation function feature parameter value"));
 		}
 		else try
@@ -355,7 +324,6 @@ static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* ke
 		}
 		catch (const std::exception& err)
 		{
-			if (key_obj) Py_DECREF( key_obj);
 			throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), err.what());
 		}
 	}
@@ -367,11 +335,9 @@ static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* ke
 		}
 		catch (const std::exception& err)
 		{
-			if (key_obj) Py_DECREF( key_obj);
 			throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), err.what());
 		}
 	}
-	if (key_obj) Py_DECREF( key_obj);
 }
 
 template <class Object>
@@ -389,13 +355,13 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary"));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary")));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq), elemlen = 0;
 			for (; ii<len; ++ii)
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 				/* DON'T DECREF item here */
 				if (PySequence_Check( item) && 2==(elemlen=PySequence_Size( item)))
 				{
@@ -431,7 +397,7 @@ void initWeightingConfig( WeightingConfig& result, PyObject* obj)
 	initQueryEvalFunctionConfig( result, obj);
 }
 
-static char* getString( PyObject* item, PyObject*& temp_obj)
+static char* getString( PyObject* item, PyObjectReference& temp_obj)
 {
 	if (PyString_Check( item))
 	{
@@ -439,11 +405,10 @@ static char* getString( PyObject* item, PyObject*& temp_obj)
 	}
 	else if (PyUnicode_Check( item))
 	{
-		if (temp_obj) Py_DECREF( temp_obj);
 		temp_obj = PyUnicode_AsUTF8String( item);
 		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
 
-		return PyString_AS_STRING( temp_obj);
+		return PyString_AS_STRING( temp_obj.ptr());
 	}
 	else
 	{
@@ -455,7 +420,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 {
 	if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary"));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary")));
 		if (seq)
 		{
 			enum {
@@ -474,27 +439,19 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 			unsigned int nof_arguments = 0;
 			int argcnt = 0;
 			char* itemstr;
-			PyObject* temp_obj_varname = 0;
-			PyObject* temp_obj_funcname = 0;
-			PyObject* temp_obj_termval = 0;
+			PyObjectReference temp_obj_varname;
+			PyObjectReference temp_obj_funcname;
+			PyObjectReference temp_obj_termval;
 
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
 			for (; ii<len; ++ii)
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				PyObject* item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 				/* DON'T DECREF item here */
 				switch (state)
 				{
 					case Init:
-						try
-						{
-							itemstr = getString( item, temp_obj_varname);
-						}
-						catch (const std::exception& err)
-						{
-							Py_DECREF( seq);
-							throw strus::runtime_error( _TXT("error fetching first element of expression tuple: %s"), err.what());
-						}
+						itemstr = getString( item, temp_obj_varname);
 						if (itemstr[0] == '=')
 						{
 							varname = itemstr+1;
@@ -502,29 +459,51 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 						}
 						else
 						{
-							funcname = itemstr;
-							state = Range;
+							if (ii+1 == len)
+							{
+								result.pushTerm( itemstr, "");
+							}
+							else
+							{
+								funcname = itemstr;
+								state = Range;
+							}
 						}
 						break;
 					case Funcname:
 						try
 						{
-							funcname = getString( item, temp_obj_funcname);
+							try
+							{
+								funcname = getString( item, temp_obj_funcname);
+							}
+							catch (const std::runtime_error& err)
+							{
+								throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+							}
 							if (ii+1 == len)
 							{
 								result.pushTerm( funcname, "");
 								if (varname)
 								{
 									result.attachVariable( varname);
+									varname = 0;
 								}
 								funcname = 0;
 								break;
 							}
 						}
+						catch (const std::runtime_error& err)
+						{
+							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+						}
 						catch (const std::exception& err)
 						{
-							Py_DECREF( seq);
 							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
+						}
+						catch (...)
+						{
+							throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), "unknown exception");
 						}
 						state = Range;
 						break;
@@ -537,7 +516,6 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 							{
 								if (itemval <= std::numeric_limits<int>::min() || itemval >= std::numeric_limits<int>::max())
 								{
-									Py_DECREF( seq);
 									throw strus::runtime_error( _TXT("range value exceeds size allowed"));
 								}
 								range = (int)itemval;
@@ -548,7 +526,6 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 								// ... state == Cardinality
 								if (itemval <= 0 || itemval >= std::numeric_limits<int>::max())
 								{
-									Py_DECREF( seq);
 									throw strus::runtime_error( _TXT("cardinality value exceeds size allowed"));
 								}
 								cardinality = (unsigned int)itemval;
@@ -575,6 +552,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 										if (varname)
 										{
 											result.attachVariable( varname);
+											varname = 0;
 										}
 										funcname = 0;
 										break;
@@ -586,21 +564,12 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 								}
 								catch (const std::exception& err)
 								{
-									Py_DECREF( seq);
 									throw strus::runtime_error( _TXT("error fetching term definition: %s"), err.what());
 								}
 							}
 						}
-						try
-						{
-							initQueryExpression( result, item);
-							++nof_arguments;
-						}
-						catch (const std::exception& err)
-						{
-							Py_DECREF( seq);
-							throw err;
-						}
+						initQueryExpression( result, item);
+						++nof_arguments;
 						break;
 				}
 			}
@@ -612,10 +581,10 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 					result.attachVariable( varname);
 				}
 			}
-			if (temp_obj_varname) Py_DECREF( temp_obj_varname);
-			if (temp_obj_funcname) Py_DECREF( temp_obj_funcname);
-			if (temp_obj_termval) Py_DECREF( temp_obj_termval);
-			Py_DECREF( seq);
+			else if (varname)
+			{
+				throw strus::runtime_error( _TXT("single variable reference without expression or term definition is ignored"));
+			}
 		}
 		else
 		{
@@ -637,18 +606,9 @@ void initString( std::string& result, PyObject* obj)
 	}
 	else if (PyUnicode_Check( obj))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		PyObjectReference temp_obj( PyUnicode_AsUTF8String( obj));
 		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
-		try
-		{
-			initString( result, temp_obj);
-		}
-		catch (const std::exception& err)
-		{
-			Py_DECREF( temp_obj);
-			throw err;
-		}
-		Py_DECREF( temp_obj);
+		initString( result, temp_obj.ptr());
 	}
 	else
 	{
@@ -665,29 +625,20 @@ void initStringVector( std::vector<std::string>& result, PyObject* obj)
 	}
 	else if (PyUnicode_Check( obj))
 	{
-		PyObject *temp_obj = PyUnicode_AsUTF8String( obj);
+		PyObjectReference temp_obj( PyUnicode_AsUTF8String( obj));
 		if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
-		try
-		{
-			initStringVector( result, temp_obj);
-		}
-		catch (const std::exception& err)
-		{
-			Py_DECREF( temp_obj);
-			throw err;
-		}
-		Py_DECREF( temp_obj);
+		initStringVector( result, temp_obj);
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, _TXT("string list expected as sequence"));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("string list expected as sequence")));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
 			result.reserve( result.size() + len); //... avoid bad_alloc exceptions in following push_back's
 			for (; ii < len; ii++)
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 				/* DON'T DECREF item here */
 				try
 				{
@@ -698,12 +649,11 @@ void initStringVector( std::vector<std::string>& result, PyObject* obj)
 					}
 					else if (PyUnicode_Check( item))
 					{
-						PyObject *temp_obj = PyUnicode_AsUTF8String( item);
+						PyObjectReference temp_obj( PyUnicode_AsUTF8String( item));
 						if (!temp_obj) throw strus::runtime_error( _TXT("failed to convert python unicode string to UTF-8"));
 
-						char* itemval = PyString_AS_STRING( temp_obj);
+						char* itemval = PyString_AS_STRING( temp_obj.ptr());
 						result.push_back( itemval); //... does never throw because we have reserved the memory before this loop
-						Py_DECREF( temp_obj);
 					}
 					else
 					{
@@ -712,11 +662,9 @@ void initStringVector( std::vector<std::string>& result, PyObject* obj)
 				}
 				catch (const std::exception& err)
 				{
-					Py_DECREF( seq);
 					throw strus::runtime_error( _TXT("error initializing string vector: %s"), err.what());
 				}
 			}
-			Py_DECREF( seq);
 		}
 		else
 		{
@@ -738,13 +686,13 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 	}
 	else if (PySequence_Check( obj))
 	{
-		PyObject* seq = PySequence_Fast( obj, _TXT("integer list expected as sequence"));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("integer list expected as sequence")));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
 			for (; ii < len; ii++)
 			{
-				PyObject *item = PySequence_Fast_GET_ITEM( seq, ii);
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 				/* DON'T DECREF item here */
 				try
 				{
@@ -760,11 +708,9 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 				}
 				catch (const std::exception& err)
 				{
-					Py_DECREF( seq);
 					throw strus::runtime_error( _TXT("failed to build vector of integers: %s"), err.what());
 				}
 			}
-			Py_DECREF( seq);
 		}
 		else
 		{

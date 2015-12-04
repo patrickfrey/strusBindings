@@ -35,11 +35,36 @@
 #define FunctionObject boost::python::api::object
 #include "strus/bindingObjects.hpp"
 #include <string>
+#include <stdexcept>
 
 namespace bp = boost::python;
 
+namespace {
+void translate_runtime_error( std::runtime_error const& err)
+{
+	PyErr_SetString( PyExc_Exception, err.what());
+}
+void translate_bad_alloc( std::bad_alloc const& err)
+{
+	PyErr_SetString( PyExc_MemoryError, "out of memory");
+}
+void translate_logic_error( std::logic_error const& err)
+{
+	PyErr_SetString( PyExc_AssertionError, err.what());
+}
+void translate_exception( std::exception const& err)
+{
+	PyErr_SetString( PyExc_Exception, err.what());
+}
+}
+
 BOOST_PYTHON_MODULE(strus)
 {
+bp::register_exception_translator<std::runtime_error>( translate_runtime_error);
+bp::register_exception_translator<std::bad_alloc>( translate_bad_alloc);
+bp::register_exception_translator<std::logic_error>( translate_logic_error);
+bp::register_exception_translator<std::exception>( translate_exception);
+
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
 bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());
@@ -136,10 +161,18 @@ bp::class_<DocumentAnalyzer>("DocumentAnalyzer")
 	.def("defineAggregatedMetaData", &DocumentAnalyzer::defineAggregatedMetaData_obj)
 	.def("defineAttribute", &DocumentAnalyzer::defineAttribute)
 	.def("defineAttribute", &DocumentAnalyzer::defineAttribute_obj)
+	.def("defineDocument", &DocumentAnalyzer::defineDocument)
 	.def("analyze", &DocumentAnalyzer::analyze_unicode_1)
 	.def("analyze", &DocumentAnalyzer::analyze_unicode_2)
 	.def("analyze", &DocumentAnalyzer::analyze_1)
 	.def("analyze", &DocumentAnalyzer::analyze_2)
+	.def("createQueue", &DocumentAnalyzer::createQueue)
+;
+bp::class_<DocumentAnalyzeQueue>("DocumentAnalyzeQueue")
+	.def("push", &DocumentAnalyzeQueue::push_unicode_1)
+	.def("push", &DocumentAnalyzeQueue::push_unicode_2)
+	.def("hasMore", &DocumentAnalyzeQueue::hasMore)
+	.def("fetch", &DocumentAnalyzeQueue::fetch)
 ;
 bp::class_<QueryAnalyzer>("QueryAnalyzer")
 	.def("definePhraseType", &QueryAnalyzer::definePhraseType)
@@ -149,19 +182,41 @@ bp::class_<QueryAnalyzer>("QueryAnalyzer")
 	.def("createQueue", &QueryAnalyzer::createQueue)
 ;
 bp::class_<QueryAnalyzeQueue>("QueryAnalyzeQueue")
-	.def("push", &QueryAnalyzeQueue::push)
 	.def("push", &QueryAnalyzeQueue::push_unicode)
 	.def("fetch", &QueryAnalyzeQueue::fetch)
 ;
 bp::class_<StorageClient>("StorageClient")
 	.def("nofDocumentsInserted", &StorageClient::nofDocumentsInserted)
-	.def("insertDocument", &StorageClient::insertDocument)
-	.def("deleteDocument", &StorageClient::deleteDocument)
-	.def("deleteDocument", &StorageClient::deleteDocument_unicode)
-	.def("deleteUserAccessRights", &StorageClient::deleteUserAccessRights)
-	.def("deleteUserAccessRights", &StorageClient::deleteUserAccessRights_unicode)
-	.def("flush", &StorageClient::flush)
+	.def("createTransaction", &StorageClient::createTransaction)
+	.def("createPeerMessageQueue", &StorageClient::createPeerMessageQueue)
 	.def("close", &StorageClient::close)
+;
+bp::class_<StorageTransaction>("StorageTransaction")
+	.def("allocateDocnoRange", &StorageTransaction::allocateDocnoRange)
+	.def("insertDocument", &StorageTransaction::insertDocument)
+	.def("deleteDocument", &StorageTransaction::deleteDocument)
+	.def("deleteDocument", &StorageTransaction::deleteDocument_unicode)
+	.def("deleteUserAccessRights", &StorageTransaction::deleteUserAccessRights)
+	.def("deleteUserAccessRights", &StorageTransaction::deleteUserAccessRights_unicode)
+	.def("commit", &StorageTransaction::commit)
+	.def("rollback", &StorageTransaction::rollback)
+;
+bp::class_<DocumentFrequencyChange>("DocumentFrequencyChange")
+	.def("type", &DocumentFrequencyChange::type, bp::return_value_policy<bp::copy_const_reference>())
+	.def("value", &DocumentFrequencyChange::value, bp::return_value_policy<bp::copy_const_reference>())
+	.def("ucvalue", &DocumentFrequencyChange::ucvalue)
+	.def("increment", &DocumentFrequencyChange::increment)
+	.def("isnew", &DocumentFrequencyChange::isnew)
+;
+bp::class_<PeerMessage>("PeerMessage")
+	.def("nofDocumentsInsertedChange", &PeerMessage::nofDocumentsInsertedChange)
+	.def("documentFrequencyChangeList", &PeerMessage::documentFrequencyChangeList, bp::return_value_policy<bp::copy_const_reference>())
+;
+bp::class_<PeerMessageQueue>("PeerMessageQueue")
+	.def("start", &PeerMessageQueue::start)
+	.def("fetch", &PeerMessageQueue::fetch)
+	.def("decode", &PeerMessageQueue::decode)
+	.def("encode", &PeerMessageQueue::encode)
 ;
 bp::class_<SummarizerConfig>("SummarizerConfig")
 ;
@@ -226,6 +281,7 @@ bp::class_<Context>("Context",bp::init<>())
 	.def("addModulePath", &Context::addModulePath)
 	.def("addModulePath", &Context::addModulePath_unicode)
 	.def("addResourcePath", &Context::addResourcePath)
+	.def("definePeerMessageProcessor", &Context::definePeerMessageProcessor)
 	.def("addResourcePath", &Context::addResourcePath_unicode)
 	.def("createStorageClient", &Context::createStorageClient_0)
 	.def("createStorageClient", &Context::createStorageClient_1)

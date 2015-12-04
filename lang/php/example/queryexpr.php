@@ -13,7 +13,7 @@ try
 
 	# Define the query analyzer to use:
 	$analyzer = $ctx->createQueryAnalyzer();
-	$analyzer->definePhraseType( "word", "word", "word", [["stem","en"],"lc",["convdia","en"]]);
+	$analyzer->definePhraseType( "word", "word", "word", array( array( "stem","en"),"lc",array( "convdia","en")));
 
 	# Define the query evaluation scheme:
 	$queryeval = $ctx->createQueryEval();
@@ -22,16 +22,16 @@ try
 	$queryeval->addSelectionFeature( "select");
 	
 	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
-	$queryeval->addWeightingFunction( 1.0, "BM25", ["k1"=>0.75, "b"=>2.1, "avgdoclen"=>1000, ".match"=>"seek"]);
-	
+	$queryeval->addWeightingFunction( 1.0, "BM25", array( "k1"=>0.75, "b"=>2.1, "avgdoclen"=>1000, ".match"=>"seek"));
+
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
 	# First we add a summarizer that extracts us the title of the document:
-	$queryeval->addSummarizer( "title", "attribute", ["name"=>"title"]);
+	$queryeval->addSummarizer( "title", "attribute", array( "name"=>"title"));
 
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
-	$queryeval->addSummarizer( "summary", "matchphrase", ["type"=>"orig","nof"=>4,"len"=>60,".match"=>"seek"]);
+	$queryeval->addSummarizer( "summary", "matchphrase", array( "type"=>"orig","nof"=>4,"len"=>60,".match"=>"seek"));
 
 	# Now we build the query to issue:
 	$query = $queryeval->createQuery( $storage);
@@ -44,15 +44,15 @@ try
 	}
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:
-	$selexpr = [ "contains" ];
+	$selexpr = array( "contains" );
 
 	foreach ($terms as &$term)
 	{
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
-		$query->defineFeature( "seek", [ $term->type,$term->value], 1.0 );
+		$query->defineFeature( "seek", array( $term->type,$term->value), 1.0 );
 		# Each query term is also part of the selection expressions
-		$selexpr[] = [ $term->type, $term->value ];
+		$selexpr[] = array( $term->type, $term->value );
 	}
 	# We assign the feature created to the set named 'select' because this is the
 	# name of the set defined as selection feature in the query evaluation configuration

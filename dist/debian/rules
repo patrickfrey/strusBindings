@@ -33,7 +33,7 @@ build-stamp:
 	# Add here commands to compile the package.
 	export JAVA_HOME=`readlink -f /usr/bin/javac | sed "s:/bin/javac::"` && \
 		cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib/$(DEB_HOST_MULTIARCH) \
-			-DWITH_PHP="YES" -DWITH_JAVA="YES" .
+			-DWITH_PHP="YES" -DWITH_JAVA="YES" -DWITH_PYTHON="YES" .
 	$(MAKE)
 ifeq "$(filter nocheck,$(DEB_BUILD_OPTIONS))" ""
 	$(MAKE) test
@@ -75,6 +75,10 @@ install: build
 
 	cd lang/java
 	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-java
+	cd ../..
+
+	cd lang/python
+	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-python
 	cd ../..
 	# --- end custom part for installing
 
