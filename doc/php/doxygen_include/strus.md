@@ -49,6 +49,7 @@ $analyzer->addForwardIndexFeature( "orig", "/doc/text()", "split", "orig", []);
 # Read input files, analyze and insert them:
 $datadir = "./data/";
 $datafiles = scandir( $datadir);
+$transaction = $storage->createTransaction();
 foreach ($datafiles as &$datafile)
 {
 	if ($datafile[0] != '.')
@@ -57,11 +58,11 @@ foreach ($datafiles as &$datafile)
 		$docid = substr( $datafile, 0, strlen($datafile) -4);
 		$fullname = $datadir . $datafile;
 		$doc = $analyzer->analyze( file_get_contents( $fullname));
-		$storage->insertDocument( $docid, $doc);
+		$transaction->insertDocument( $docid, $doc, True);
 	}
 }
 # Without this the documents wont be inserted:
-$storage->flush();
+$transaction->commit();
 print "done";
 ?>
 \endcode
