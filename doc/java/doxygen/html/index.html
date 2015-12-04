@@ -67,7 +67,7 @@ Create a collection of document (without using the strus analyzer)</h1>
 <div class="line"><span class="keyword">public</span> <span class="keyword">class </span>CreateCollectionNoAnalyzer</div>
 <div class="line">{</div>
 <div class="line">        <span class="comment">// Insert a document defined by its parts passed as arguments:</span></div>
-<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> insertDoc( StorageClient storage, String docid, String[] searchIndex, String[] forwardIndex, String title)</div>
+<div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> insertDoc( StorageTransaction transaction, String docid, String[] searchIndex, String[] forwardIndex, String title)</div>
 <div class="line">        {</div>
 <div class="line">                <span class="comment">// Create the document to insert:</span></div>
 <div class="line">                Document doc = <span class="keyword">new</span> Document();</div>
@@ -93,8 +93,8 @@ Create a collection of document (without using the strus analyzer)</h1>
 <div class="line">                }</div>
 <div class="line">                <span class="comment">// Define the document title:</span></div>
 <div class="line">                doc.setAttribute( <span class="stringliteral">&quot;title&quot;</span>, title);</div>
-<div class="line">                <span class="comment">// Prepare the document for insert (the insert will be finalized with storage.flush()):</span></div>
-<div class="line">                storage.insertDocument( docid, doc);</div>
+<div class="line">                <span class="comment">// Prepare the document for insert (the insert will be finalized with transaction.commit()):</span></div>
+<div class="line">                transaction.insertDocument( docid, doc);</div>
 <div class="line">        }</div>
 <div class="line"></div>
 <div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keywordtype">void</span> main( String []args) {</div>
@@ -133,12 +133,13 @@ Create a collection of document (without using the strus analyzer)</h1>
 <div class="line">                <span class="comment">// Insert the test documents:</span></div>
 <div class="line">                <span class="keywordflow">try</span></div>
 <div class="line">                {</div>
+<div class="line">                        StorageTransaction transaction = storage.createTransaction();</div>
 <div class="line">                        insertDoc( storage, <span class="stringliteral">&quot;A&quot;</span>, doc_A_searchIndex, doc_A_forwardIndex, doc_A_title);</div>
 <div class="line">                        insertDoc( storage, <span class="stringliteral">&quot;B&quot;</span>, doc_B_searchIndex, doc_B_forwardIndex, doc_B_title);</div>
 <div class="line">                        insertDoc( storage, <span class="stringliteral">&quot;C&quot;</span>, doc_C_searchIndex, doc_C_forwardIndex, doc_C_title);</div>
 <div class="line"></div>
 <div class="line">                        <span class="comment">// Without this commit the documents wont be inserted:</span></div>
-<div class="line">                        storage.flush();</div>
+<div class="line">                        transaction.commit();</div>
 <div class="line">                }</div>
 <div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
 <div class="line">                {</div>
@@ -223,6 +224,7 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                <span class="comment">// Read input files, analyze and insert them:</span></div>
 <div class="line">                <span class="keywordflow">try</span></div>
 <div class="line">                {</div>
+<div class="line">                        StorageTransaction transaction = storage.createTransaction();</div>
 <div class="line">                        <span class="comment">// Get the files to analyze and insert:</span></div>
 <div class="line">                        String datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
 <div class="line">                        File folder = <span class="keyword">new</span> File( datadir);</div>
@@ -237,12 +239,12 @@ Create a collection of documents (with strus analyzer)</h1>
 <div class="line">                                                <span class="comment">// Analyze and insert the document:</span></div>
 <div class="line">                                                String docid = filename.substring( 0, filename.length()-4);</div>
 <div class="line">                                                Document doc = analyzer.analyze( readFile( datadir + filename));</div>
-<div class="line">                                                storage.insertDocument( docid, doc);</div>
+<div class="line">                                                transaction.insertDocument( docid, doc);</div>
 <div class="line">                                        }</div>
 <div class="line">                                }</div>
 <div class="line">                        }</div>
 <div class="line">                        <span class="comment">// Without this the documents wont be inserted:</span></div>
-<div class="line">                        storage.flush();</div>
+<div class="line">                        transaction.commit();</div>
 <div class="line">                }</div>
 <div class="line">                <span class="keywordflow">catch</span> (Exception e)</div>
 <div class="line">                {</div>
@@ -367,7 +369,7 @@ Retrieve a ranklist with a simple query consisting of some terms (without analyz
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:27:27 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 09:50:35 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

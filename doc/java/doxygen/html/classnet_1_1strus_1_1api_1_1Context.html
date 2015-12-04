@@ -92,6 +92,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a175e50eb050af265414ea3a1c1eff937"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a175e50eb050af265414ea3a1c1eff937">addResourcePath</a> (const String &amp;paths_)</td></tr>
 <tr class="memdesc:a175e50eb050af265414ea3a1c1eff937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define where to load analyzer resource files from.  <a href="#a175e50eb050af265414ea3a1c1eff937">More...</a><br/></td></tr>
 <tr class="separator:a175e50eb050af265414ea3a1c1eff937"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb73024d3e0ebc6a724cf9099cdb9c6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#abb73024d3e0ebc6a724cf9099cdb9c6b">definePeerMessageProcessor</a> (const String &amp;name_)</td></tr>
+<tr class="memdesc:abb73024d3e0ebc6a724cf9099cdb9c6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the peer message processor.  <a href="#abb73024d3e0ebc6a724cf9099cdb9c6b">More...</a><br/></td></tr>
+<tr class="separator:abb73024d3e0ebc6a724cf9099cdb9c6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a559d2457ba700583f55dc4570610d883"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883">createStorageClient</a> ()</td></tr>
 <tr class="memdesc:a559d2457ba700583f55dc4570610d883"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a storage client instance of the the default remote storage of the RPC server.  <a href="#a559d2457ba700583f55dc4570610d883">More...</a><br/></td></tr>
 <tr class="separator:a559d2457ba700583f55dc4570610d883"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -477,6 +480,31 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="abb73024d3e0ebc6a724cf9099cdb9c6b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::Context::definePeerMessageProcessor </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>name_</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Define the peer message processor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name_</td><td>the name of the peer message processor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Only implemented in local mode with own module loader (see constructors) </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a5d6660602e01b29bb85c51d3e1e239db"></a>
 <div class="memitem">
 <div class="memproto">
@@ -559,7 +587,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:27:27 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 09:50:35 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
