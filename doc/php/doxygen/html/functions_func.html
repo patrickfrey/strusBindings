@@ -57,6 +57,7 @@
       <li><a href="#index_d"><span>d</span></a></li>
       <li><a href="#index_e"><span>e</span></a></li>
       <li><a href="#index_f"><span>f</span></a></li>
+      <li><a href="#index_h"><span>h</span></a></li>
       <li><a href="#index_i"><span>i</span></a></li>
       <li><a href="#index_l"><span>l</span></a></li>
       <li><a href="#index_m"><span>m</span></a></li>
@@ -87,7 +88,7 @@
 : <a class="el" href="classQueryEval.html#a306f7ac20500fdcbdbdad9e0d808b2bf">QueryEval</a>
 </li>
 <li>addForwardIndexFeature()
-: <a class="el" href="classDocumentAnalyzer.html#a0a0d75d50fe640d586a0179f4f3db530">DocumentAnalyzer</a>
+: <a class="el" href="classDocumentAnalyzer.html#a730f29d6452bef9027b959c243ebbf87">DocumentAnalyzer</a>
 </li>
 <li>addForwardIndexTerm()
 : <a class="el" href="classDocument.html#a0f4f2d222a37bef7c8a3b2b07ecd829e">Document</a>
@@ -102,7 +103,7 @@
 : <a class="el" href="classQueryEval.html#a5e1d5c854e41b111c95fd49f4a632c18">QueryEval</a>
 </li>
 <li>addSearchIndexFeature()
-: <a class="el" href="classDocumentAnalyzer.html#a4373490881c1eb0a116d58ba4fadbda4">DocumentAnalyzer</a>
+: <a class="el" href="classDocumentAnalyzer.html#a251c1fcd106e74750749f9c986d1026d">DocumentAnalyzer</a>
 </li>
 <li>addSearchIndexTerm()
 : <a class="el" href="classDocument.html#adbcfcb1b1808fdc82285b2cffbe8f36d">Document</a>
@@ -121,6 +122,9 @@
 </li>
 <li>addWeightingFunction()
 : <a class="el" href="classQueryEval.html#aab35396b8f99190a93c11b9f8df8bac9">QueryEval</a>
+</li>
+<li>allocateDocnoRange()
+: <a class="el" href="classStorageTransaction.html#a7fd8093239b2c58a95d4ff7b5d6210dd">StorageTransaction</a>
 </li>
 <li>analyze()
 : <a class="el" href="classDocumentAnalyzer.html#a9d2382c804131e11945e74845303ffad">DocumentAnalyzer</a>
@@ -146,11 +150,17 @@
 : <a class="el" href="classContext.html#a63db598c6f594f44ac25d9a46d3ed782">Context</a>
 , <a class="el" href="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3">StorageClient</a>
 </li>
+<li>commit()
+: <a class="el" href="classStorageTransaction.html#ab29ead31aace0753de705081681800c7">StorageTransaction</a>
+</li>
 <li>Context()
 : <a class="el" href="classContext.html#a652cdcd2eedc8dbd9110bd284c5d5cf0">Context</a>
 </li>
 <li>createDocumentAnalyzer()
 : <a class="el" href="classContext.html#a905301c75b5bb103fd1624e8d1420a1b">Context</a>
+</li>
+<li>createPeerMessageQueue()
+: <a class="el" href="classStorageClient.html#a9285a8eb74463db157986009b3516b3f">StorageClient</a>
 </li>
 <li>createQuery()
 : <a class="el" href="classQueryEval.html#a29969c238aa6bc45659e0fe37b994a7c">QueryEval</a>
@@ -162,23 +172,33 @@
 : <a class="el" href="classContext.html#a28ca03d0497780f6f7905fa8ee07d27a">Context</a>
 </li>
 <li>createQueue()
-: <a class="el" href="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6">QueryAnalyzer</a>
+: <a class="el" href="classDocumentAnalyzer.html#abf1fdb91e10903d734e144c6fb84d7f1">DocumentAnalyzer</a>
+, <a class="el" href="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6">QueryAnalyzer</a>
 </li>
 <li>createStorage()
 : <a class="el" href="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06">Context</a>
 </li>
 <li>createStorageClient()
-: <a class="el" href="classContext.html#a4fcb68f277db29c450666c31b5701e7c">Context</a>
+: <a class="el" href="classContext.html#a9053e31e9e159a0f7dc208d8fd5e8478">Context</a>
+</li>
+<li>createTransaction()
+: <a class="el" href="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01">StorageClient</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
+<li>decode()
+: <a class="el" href="classPeerMessageQueue.html#a6e750665843066aeb6936a9d678aa2a5">PeerMessageQueue</a>
+</li>
 <li>defineAggregatedMetaData()
 : <a class="el" href="classDocumentAnalyzer.html#ae81281a264b315f52e45a783173a2183">DocumentAnalyzer</a>
 </li>
 <li>defineAttribute()
 : <a class="el" href="classDocumentAnalyzer.html#aa3aa93d9f07adcabd1470724144693f5">DocumentAnalyzer</a>
+</li>
+<li>defineDocument()
+: <a class="el" href="classDocumentAnalyzer.html#a1b6ef4a85ab0ebcf1e1ed25e629b5af0">DocumentAnalyzer</a>
 </li>
 <li>defineFeature()
 : <a class="el" href="classQuery.html#ac1e198480abbed202f3e6fa99cbdc9e4">Query</a>
@@ -189,20 +209,23 @@
 : <a class="el" href="classDocumentAnalyzer.html#af9a2cd4173a8190fab3bd3769eac5cc7">DocumentAnalyzer</a>
 </li>
 <li>defineMetaDataRestriction()
-: <a class="el" href="classQuery.html#a87b624022d4cd810189b8148e22949f9">Query</a>
+: <a class="el" href="classQuery.html#a48be89ad411aca6d597301e5b05aff75">Query</a>
 </li>
 <li>defineParameter()
-: <a class="el" href="classSummarizerConfig.html#ab5c185d29cfe159f3f9ef1bf0f6579df">SummarizerConfig</a>
+: <a class="el" href="classSummarizerConfig.html#abc36c4c73ff7cec5b1ac59bfa7fd8829">SummarizerConfig</a>
 , <a class="el" href="classWeightingConfig.html#ae99b8e08cc2c7f11f782181cea9f5542">WeightingConfig</a>
+</li>
+<li>definePeerMessageProcessor()
+: <a class="el" href="classContext.html#ac2a3203df6a08583ad2bc9fb6b110e1b">Context</a>
 </li>
 <li>definePhraseType()
 : <a class="el" href="classQueryAnalyzer.html#a6418201f50897aa1c90a5f121e8418f0">QueryAnalyzer</a>
 </li>
 <li>deleteDocument()
-: <a class="el" href="classStorageClient.html#aeaa4bf1bb6a715b5c4e0d9c2126ecf97">StorageClient</a>
+: <a class="el" href="classStorageTransaction.html#acb4e693d289916c92ac8acaf3debcb2f">StorageTransaction</a>
 </li>
 <li>deleteUserAccessRights()
-: <a class="el" href="classStorageClient.html#af9f4465669e8ef6405872fa483fe2560">StorageClient</a>
+: <a class="el" href="classStorageTransaction.html#a47f806887776561e6d264e5a26c9c0ae">StorageTransaction</a>
 </li>
 <li>destroyStorage()
 : <a class="el" href="classContext.html#ad26133b438031f93002c4cbf638a591a">Context</a>
@@ -211,7 +234,7 @@
 : <a class="el" href="classContext.html#a0eb938370364cb61bf307c799125787c">Context</a>
 </li>
 <li>docid()
-: <a class="el" href="classDocument.html#a08700c2193b5a22258cc4c1e1ed75fd2">Document</a>
+: <a class="el" href="classDocument.html#a7d712b65fc810218fdf16c2ae93e0fa1">Document</a>
 </li>
 <li>docno()
 : <a class="el" href="classRank.html#a422f6b05f4e6fc11b8fa1e366a05ca35">Rank</a>
@@ -219,16 +242,28 @@
 <li>Document()
 : <a class="el" href="classDocument.html#acdbcbe550084e8c20f4f67eb229ad66a">Document</a>
 </li>
+<li>DocumentAnalyzeQueue()
+: <a class="el" href="classDocumentAnalyzeQueue.html#a97b6c5de25bc513c3be6c0ba94dba653">DocumentAnalyzeQueue</a>
+</li>
 <li>DocumentAnalyzer()
 : <a class="el" href="classDocumentAnalyzer.html#af149fcec73bc0d082631792eba3ec932">DocumentAnalyzer</a>
 </li>
 <li>DocumentClass()
-: <a class="el" href="classDocumentClass.html#a0e59d8a29a9a8ab7c747471a59169f5f">DocumentClass</a>
+: <a class="el" href="classDocumentClass.html#a97fcda19526c517d154fee54ea1e63cd">DocumentClass</a>
+</li>
+<li>DocumentFrequencyChange()
+: <a class="el" href="classDocumentFrequencyChange.html#aaa711c515053e16468c589325f90f7f8">DocumentFrequencyChange</a>
+</li>
+<li>documentFrequencyChangeList()
+: <a class="el" href="classPeerMessage.html#a83a399111b53d07a84c9d9b7d9d203ce">PeerMessage</a>
 </li>
 </ul>
 
 
 <h3><a class="anchor" id="index_e"></a>- e -</h3><ul>
+<li>encode()
+: <a class="el" href="classPeerMessageQueue.html#a0e6f536a109a3df0949145f866a8d4ad">PeerMessageQueue</a>
+</li>
 <li>encoding()
 : <a class="el" href="classDocumentClass.html#a7adac82c2466a9f2012c65030b06302c">DocumentClass</a>
 </li>
@@ -240,10 +275,9 @@
 
 <h3><a class="anchor" id="index_f"></a>- f -</h3><ul>
 <li>fetch()
-: <a class="el" href="classQueryAnalyzeQueue.html#afca2bf8ee8fcb8d5c1f3aa1a3dfb4f0f">QueryAnalyzeQueue</a>
-</li>
-<li>flush()
-: <a class="el" href="classStorageClient.html#a5a32aea2625f50441c2bbdf4e068a127">StorageClient</a>
+: <a class="el" href="classDocumentAnalyzeQueue.html#a922ad2b444e87f117461dba1fcd3cba1">DocumentAnalyzeQueue</a>
+, <a class="el" href="classPeerMessageQueue.html#ab4550c3b775dd2abb241a20712bc5fab">PeerMessageQueue</a>
+, <a class="el" href="classQueryAnalyzeQueue.html#afca2bf8ee8fcb8d5c1f3aa1a3dfb4f0f">QueryAnalyzeQueue</a>
 </li>
 <li>forwardIndexTerms()
 : <a class="el" href="classDocument.html#af2caf16403c3d5b18e3ed0b5633509d9">Document</a>
@@ -251,9 +285,22 @@
 </ul>
 
 
+<h3><a class="anchor" id="index_h"></a>- h -</h3><ul>
+<li>hasMore()
+: <a class="el" href="classDocumentAnalyzeQueue.html#aa72616739e8e4c8276133a76678810df">DocumentAnalyzeQueue</a>
+</li>
+</ul>
+
+
 <h3><a class="anchor" id="index_i"></a>- i -</h3><ul>
+<li>increment()
+: <a class="el" href="classDocumentFrequencyChange.html#a7eb333392562e38263d926c7bc80a861">DocumentFrequencyChange</a>
+</li>
 <li>insertDocument()
-: <a class="el" href="classStorageClient.html#ada338b974a910b3209d48c6840621f17">StorageClient</a>
+: <a class="el" href="classStorageTransaction.html#a44719926b5f6b35746296d6a8995b90e">StorageTransaction</a>
+</li>
+<li>isnew()
+: <a class="el" href="classDocumentFrequencyChange.html#ab7b14f8a350888d1a78ff1562ec80f9d">DocumentFrequencyChange</a>
 </li>
 </ul>
 
@@ -287,15 +334,26 @@
 <li>nofDocumentsInserted()
 : <a class="el" href="classStorageClient.html#a7de1e32ec44482d699fd19c95c807311">StorageClient</a>
 </li>
+<li>nofDocumentsInsertedChange()
+: <a class="el" href="classPeerMessage.html#a7b6935c513dc2bbbcd5bbb304df2a8e4">PeerMessage</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_p"></a>- p -</h3><ul>
+<li>PeerMessage()
+: <a class="el" href="classPeerMessage.html#a335d20068411572b598e547a6fab5e8e">PeerMessage</a>
+</li>
+<li>PeerMessageQueue()
+: <a class="el" href="classPeerMessageQueue.html#a451599f2ec8227291d486ae34cbec6e8">PeerMessageQueue</a>
+</li>
 <li>position()
 : <a class="el" href="classTerm.html#a18d4d01b91b5a5cbbf3d91d5cdbff32d">Term</a>
 </li>
 <li>push()
-: <a class="el" href="classQueryAnalyzeQueue.html#a4d49717b80b847fc6ebc70e73c0ffab3">QueryAnalyzeQueue</a>
+: <a class="el" href="classDocumentAnalyzeQueue.html#a4a60ef313b3d4f33fa2eaa791b6d4499">DocumentAnalyzeQueue</a>
+, <a class="el" href="classPeerMessageQueue.html#a9c3a4857e9d272e2b8d0a37497dbc583">PeerMessageQueue</a>
+, <a class="el" href="classQueryAnalyzeQueue.html#a4d49717b80b847fc6ebc70e73c0ffab3">QueryAnalyzeQueue</a>
 </li>
 <li>pushExpression()
 : <a class="el" href="classQueryExpression.html#a7f44683cb611793337df6802f800baf2">QueryExpression</a>
@@ -330,7 +388,10 @@
 : <a class="el" href="classRank.html#a49172e3a3cd9de174760c1d6a86db3f3">Rank</a>
 </li>
 <li>RankAttribute()
-: <a class="el" href="classRankAttribute.html#ab58c8235ddb1c504fa6d966ca8ad2d21">RankAttribute</a>
+: <a class="el" href="classRankAttribute.html#a84ffddbf8e637cf57f09daa6e18cfdee">RankAttribute</a>
+</li>
+<li>rollback()
+: <a class="el" href="classStorageTransaction.html#a1c5372f20b883f401034f9841fe5f7e5">StorageTransaction</a>
 </li>
 </ul>
 
@@ -355,7 +416,7 @@
 : <a class="el" href="classQuery.html#aa339bccb980d4c9ee5b33a92751e247b">Query</a>
 </li>
 <li>setMetaData()
-: <a class="el" href="classDocument.html#a7b4376769e026619ab2040f8a4dfea0c">Document</a>
+: <a class="el" href="classDocument.html#a9b7e7af03015d3e57038a6842f323c40">Document</a>
 </li>
 <li>setMimeType()
 : <a class="el" href="classDocumentClass.html#ad62dae22a8edb249d736e6657f0bd138">DocumentClass</a>
@@ -372,11 +433,14 @@
 <li>size()
 : <a class="el" href="classQueryExpression.html#ae7225d118d9799e1c5b5b7d9e1fc16e6">QueryExpression</a>
 </li>
+<li>start()
+: <a class="el" href="classPeerMessageQueue.html#a632779598d7055c2f193f4143bcb404e">PeerMessageQueue</a>
+</li>
 <li>StorageClient()
 : <a class="el" href="classStorageClient.html#a0a3a992c9827f6c97dc9c15d4e51807f">StorageClient</a>
 </li>
 <li>SummarizerConfig()
-: <a class="el" href="classSummarizerConfig.html#a879a3e0e5cd12252592e5fba2443d0f3">SummarizerConfig</a>
+: <a class="el" href="classSummarizerConfig.html#a0ea236a2348c0ba9a33c9afef12cd363">SummarizerConfig</a>
 </li>
 </ul>
 
@@ -386,7 +450,8 @@
 : <a class="el" href="classTerm.html#adadade9bd6b70232b1d7e9c7fedcad8e">Term</a>
 </li>
 <li>type()
-: <a class="el" href="classTerm.html#abe58e3d3c56422f184c0490c8bc170bb">Term</a>
+: <a class="el" href="classDocumentFrequencyChange.html#a74e4afa8e4aadfbe6097e624c22cf4de">DocumentFrequencyChange</a>
+, <a class="el" href="classTerm.html#abe58e3d3c56422f184c0490c8bc170bb">Term</a>
 </li>
 </ul>
 
@@ -404,6 +469,7 @@
 </li>
 <li>value()
 : <a class="el" href="classAttribute.html#a61d2f18d9c75af6dc315e71993d2871f">Attribute</a>
+, <a class="el" href="classDocumentFrequencyChange.html#a24d5045a1549ae7905fd8faa79854b5c">DocumentFrequencyChange</a>
 , <a class="el" href="classMetaData.html#ab6e00efcc3fb7ce0b1cc62a46d90b871">MetaData</a>
 , <a class="el" href="classRankAttribute.html#a03af897479650415036158e98324a409">RankAttribute</a>
 , <a class="el" href="classTerm.html#a6b037f71ed1b020b19dae596b42a4e2f">Term</a>
@@ -426,6 +492,9 @@
 <li>~Context()
 : <a class="el" href="classContext.html#a2d34e4556448e40693f61d15e091b604">Context</a>
 </li>
+<li>~DocumentAnalyzeQueue()
+: <a class="el" href="classDocumentAnalyzeQueue.html#a5d687fc1567b99927e45baa3f6823ccc">DocumentAnalyzeQueue</a>
+</li>
 <li>~DocumentAnalyzer()
 : <a class="el" href="classDocumentAnalyzer.html#a81e88b4b68cba30490e927ed0e57674a">DocumentAnalyzer</a>
 </li>
@@ -444,12 +513,15 @@
 <li>~StorageClient()
 : <a class="el" href="classStorageClient.html#a7d434cc199749f8e74d7ed0fe9619bd2">StorageClient</a>
 </li>
+<li>~StorageTransaction()
+: <a class="el" href="classStorageTransaction.html#a7fd35ee90a8d33df0690ac1d8289ee81">StorageTransaction</a>
+</li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:48:51 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 09:43:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

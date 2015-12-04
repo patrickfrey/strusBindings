@@ -75,6 +75,7 @@ Create a collection, analyze and insert 3 documents</h1>
 <div class="line"><span class="preprocessor"># Read input files, analyze and insert them:</span></div>
 <div class="line"><span class="preprocessor"></span>$datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
 <div class="line">$datafiles = scandir( $datadir);</div>
+<div class="line">$transaction = $storage-&gt;createTransaction();</div>
 <div class="line"><span class="keywordflow">foreach</span> ($datafiles as &amp;$datafile)</div>
 <div class="line">{</div>
 <div class="line">        <span class="keywordflow">if</span> ($datafile[0] != <span class="charliteral">&#39;.&#39;</span>)</div>
@@ -83,11 +84,11 @@ Create a collection, analyze and insert 3 documents</h1>
 <div class="line">                $docid = substr( $datafile, 0, strlen($datafile) -4);</div>
 <div class="line">                $fullname = $datadir . $datafile;</div>
 <div class="line">                $doc = $analyzer-&gt;analyze( file_get_contents( $fullname));</div>
-<div class="line">                $storage-&gt;insertDocument( $docid, $doc);</div>
+<div class="line">                $transaction-&gt;insertDocument( $docid, $doc, True);</div>
 <div class="line">        }</div>
 <div class="line">}</div>
 <div class="line"><span class="preprocessor"># Without this the documents wont be inserted:</span></div>
-<div class="line"><span class="preprocessor"></span>$storage-&gt;flush();</div>
+<div class="line"><span class="preprocessor"></span>$transaction-&gt;commit();</div>
 <div class="line">print <span class="stringliteral">&quot;done&quot;</span>;</div>
 <div class="line">?&gt;</div>
 </div><!-- fragment --><h1><a class="anchor" id="status"></a>
@@ -198,7 +199,7 @@ Issue a BM25 query on the created collection (first example) and show the best r
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:48:51 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 09:43:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

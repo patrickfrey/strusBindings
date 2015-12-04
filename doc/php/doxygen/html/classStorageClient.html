@@ -70,18 +70,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7de1e32ec44482d699fd19c95c807311"><td class="memItemLeft" align="right" valign="top"><a class="el" href="bindingObjects_8hpp.html#ae3831684f5704d18308e369b745d5533">GlobalCounter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a7de1e32ec44482d699fd19c95c807311">nofDocumentsInserted</a> () const </td></tr>
 <tr class="memdesc:a7de1e32ec44482d699fd19c95c807311"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of documents inserted into the storage return the total number of documents.  <a href="#a7de1e32ec44482d699fd19c95c807311">More...</a><br/></td></tr>
 <tr class="separator:a7de1e32ec44482d699fd19c95c807311"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada338b974a910b3209d48c6840621f17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#ada338b974a910b3209d48c6840621f17">insertDocument</a> (const String &amp;docid, const <a class="el" href="classDocument.html">Document</a> &amp;doc)</td></tr>
-<tr class="memdesc:ada338b974a910b3209d48c6840621f17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the inserting a document into the storage.  <a href="#ada338b974a910b3209d48c6840621f17">More...</a><br/></td></tr>
-<tr class="separator:ada338b974a910b3209d48c6840621f17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeaa4bf1bb6a715b5c4e0d9c2126ecf97"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#aeaa4bf1bb6a715b5c4e0d9c2126ecf97">deleteDocument</a> (const String &amp;docid)</td></tr>
-<tr class="memdesc:aeaa4bf1bb6a715b5c4e0d9c2126ecf97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the deletion of a document from the storage.  <a href="#aeaa4bf1bb6a715b5c4e0d9c2126ecf97">More...</a><br/></td></tr>
-<tr class="separator:aeaa4bf1bb6a715b5c4e0d9c2126ecf97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9f4465669e8ef6405872fa483fe2560"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#af9f4465669e8ef6405872fa483fe2560">deleteUserAccessRights</a> (const String &amp;username)</td></tr>
-<tr class="memdesc:af9f4465669e8ef6405872fa483fe2560"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the deletion of all document access rights of a user.  <a href="#af9f4465669e8ef6405872fa483fe2560">More...</a><br/></td></tr>
-<tr class="separator:af9f4465669e8ef6405872fa483fe2560"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a32aea2625f50441c2bbdf4e068a127"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a5a32aea2625f50441c2bbdf4e068a127">flush</a> ()</td></tr>
-<tr class="memdesc:a5a32aea2625f50441c2bbdf4e068a127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Commit all insert or delete or user access right change statements open.  <a href="#a5a32aea2625f50441c2bbdf4e068a127">More...</a><br/></td></tr>
-<tr class="separator:a5a32aea2625f50441c2bbdf4e068a127"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecb5fc624516eb042ba5fcf8d25d3f01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classStorageTransaction.html">StorageTransaction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01">createTransaction</a> () const </td></tr>
+<tr class="memdesc:aecb5fc624516eb042ba5fcf8d25d3f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a transaction return the transaction object created.  <a href="#aecb5fc624516eb042ba5fcf8d25d3f01">More...</a><br/></td></tr>
+<tr class="separator:aecb5fc624516eb042ba5fcf8d25d3f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9285a8eb74463db157986009b3516b3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPeerMessageQueue.html">PeerMessageQueue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a9285a8eb74463db157986009b3516b3f">createPeerMessageQueue</a> () const </td></tr>
+<tr class="memdesc:a9285a8eb74463db157986009b3516b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a handler for processing distributed storage statistics return the peer message queue object created.  <a href="#a9285a8eb74463db157986009b3516b3f">More...</a><br/></td></tr>
+<tr class="separator:a9285a8eb74463db157986009b3516b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a009ca60beeb8dcbf8f370bda6af817b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3">close</a> ()</td></tr>
 <tr class="memdesc:a009ca60beeb8dcbf8f370bda6af817b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close of the storage client.  <a href="#a009ca60beeb8dcbf8f370bda6af817b3">More...</a><br/></td></tr>
 <tr class="separator:a009ca60beeb8dcbf8f370bda6af817b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -160,106 +154,37 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aeaa4bf1bb6a715b5c4e0d9c2126ecf97"></a>
+<a class="anchor" id="a9285a8eb74463db157986009b3516b3f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void StorageClient::deleteDocument </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>docid</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Prepare the deletion of a document from the storage. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">docid</td><td>the identifier of the document to delete </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The document is physically deleted with the next implicit or explicit call of '<a class="el" href="classStorageClient.html#a5a32aea2625f50441c2bbdf4e068a127" title="Commit all insert or delete or user access right change statements open. ">flush()</a>' </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="af9f4465669e8ef6405872fa483fe2560"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void StorageClient::deleteUserAccessRights </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>username</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Prepare the deletion of all document access rights of a user. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">username</td><td>the name of the user to delete all access rights (in the local collection) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The user access rights are changed accordingly with the next implicit or explicit call of 'flush' </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a5a32aea2625f50441c2bbdf4e068a127"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void StorageClient::flush </td>
+          <td class="memname"><a class="el" href="classPeerMessageQueue.html">PeerMessageQueue</a> StorageClient::createPeerMessageQueue </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Commit all insert or delete or user access right change statements open. </p>
+<p>Create a handler for processing distributed storage statistics return the peer message queue object created. </p>
 
 </div>
 </div>
-<a class="anchor" id="ada338b974a910b3209d48c6840621f17"></a>
+<a class="anchor" id="aecb5fc624516eb042ba5fcf8d25d3f01"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void StorageClient::insertDocument </td>
+          <td class="memname"><a class="el" href="classStorageTransaction.html">StorageTransaction</a> StorageClient::createTransaction </td>
           <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>docid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classDocument.html">Document</a> &amp;&#160;</td>
-          <td class="paramname"><em>doc</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Prepare the inserting a document into the storage. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">docid</td><td>the identifier of the document to insert </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">doc</td><td>the structure of the document to insert </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The document is physically inserted with the next implicit or explicit call of '<a class="el" href="classStorageClient.html#a5a32aea2625f50441c2bbdf4e068a127" title="Commit all insert or delete or user access right change statements open. ">flush()</a>' </dd></dl>
+<p>Create a transaction return the transaction object created. </p>
 
 </div>
 </div>
@@ -348,7 +273,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:48:51 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 09:43:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
