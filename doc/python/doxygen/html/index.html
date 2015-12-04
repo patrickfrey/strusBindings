@@ -80,17 +80,18 @@ Create a collection, analyze and insert 3 documents</h1>
 <div class="line">analyzer.defineAttribute( <span class="stringliteral">&quot;title&quot;</span>, <span class="stringliteral">&quot;/doc/title()&quot;</span>, <span class="stringliteral">&quot;content&quot;</span>, <span class="stringliteral">&quot;orig&quot;</span>);</div>
 <div class="line"></div>
 <div class="line"><span class="preprocessor"># Read input files, analyze and insert them:</span></div>
-<div class="line"><span class="preprocessor"></span>datadir = <span class="stringliteral">&quot;./data/&quot;</span>;</div>
+<div class="line"><span class="preprocessor"></span>transaction = storage.createTransaction()</div>
+<div class="line">datadir = <span class="stringliteral">&quot;./data/&quot;</span></div>
 <div class="line"><span class="keywordflow">for</span> (dirpath, dirnames, filenames) in walk( datadir):</div>
 <div class="line">        for idx, filename in enumerate( filenames):</div>
 <div class="line">                if filename.endswith(<span class="stringliteral">&#39;.xml&#39;</span>):</div>
 <div class="line">                        print <span class="stringliteral">&quot;%u process document %s&quot;</span> % (idx,filename)</div>
 <div class="line">                        docid = filename[0:-4]</div>
 <div class="line">                        doc = analyzer.analyze( readFile( datadir + filename))</div>
-<div class="line">                        storage.insertDocument( docid, doc)</div>
+<div class="line">                        transaction.insertDocument( docid, doc, True)</div>
 <div class="line"></div>
 <div class="line"># Without this the documents wont be inserted:</div>
-<div class="line">storage.flush()</div>
+<div class="line">transaction.commit()</div>
 <div class="line">print <span class="stringliteral">&quot;done&quot;</span></div>
 </div><!-- fragment --><h1><a class="anchor" id="status"></a>
 Query some status info, the number of documents inserted</h1>
@@ -183,7 +184,7 @@ Issue a BM25 query on the created collection (first example) and show the best r
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:21:36 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 08:40:59 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

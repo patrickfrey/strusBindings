@@ -75,18 +75,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6fa995dfb577d6550ba465fe06ea0cb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacestrus.html#a4f77d2e758c29232093bfbf2c56672d6">GlobalCounter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a6fa995dfb577d6550ba465fe06ea0cb6">nofDocumentsInserted</a> () const </td></tr>
 <tr class="memdesc:a6fa995dfb577d6550ba465fe06ea0cb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of documents inserted into the storage return the total number of documents.  <a href="#a6fa995dfb577d6550ba465fe06ea0cb6">More...</a><br/></td></tr>
 <tr class="separator:a6fa995dfb577d6550ba465fe06ea0cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7701d18a5166d9c3d822ca411e9e7b13"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a7701d18a5166d9c3d822ca411e9e7b13">insertDocument</a> (const String &amp;docid, const <a class="el" href="classstrus_1_1Document.html">Document</a> &amp;doc)</td></tr>
-<tr class="memdesc:a7701d18a5166d9c3d822ca411e9e7b13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the inserting a document into the storage.  <a href="#a7701d18a5166d9c3d822ca411e9e7b13">More...</a><br/></td></tr>
-<tr class="separator:a7701d18a5166d9c3d822ca411e9e7b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adeadeea9eb22b0b8ffc83374abb3737e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#adeadeea9eb22b0b8ffc83374abb3737e">deleteDocument</a> (const String &amp;docid)</td></tr>
-<tr class="memdesc:adeadeea9eb22b0b8ffc83374abb3737e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the deletion of a document from the storage.  <a href="#adeadeea9eb22b0b8ffc83374abb3737e">More...</a><br/></td></tr>
-<tr class="separator:adeadeea9eb22b0b8ffc83374abb3737e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed8ddbf0335c883d0b725c8895737e20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#aed8ddbf0335c883d0b725c8895737e20">deleteUserAccessRights</a> (const String &amp;username)</td></tr>
-<tr class="memdesc:aed8ddbf0335c883d0b725c8895737e20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the deletion of all document access rights of a user.  <a href="#aed8ddbf0335c883d0b725c8895737e20">More...</a><br/></td></tr>
-<tr class="separator:aed8ddbf0335c883d0b725c8895737e20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90ec5c90483d3c35b72aac0826fa2dec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a90ec5c90483d3c35b72aac0826fa2dec">flush</a> ()</td></tr>
-<tr class="memdesc:a90ec5c90483d3c35b72aac0826fa2dec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Commit all insert or delete or user access right change statements open.  <a href="#a90ec5c90483d3c35b72aac0826fa2dec">More...</a><br/></td></tr>
-<tr class="separator:a90ec5c90483d3c35b72aac0826fa2dec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a761be597e01e2f7d52a17bedb85b2554"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstrus_1_1StorageTransaction.html">StorageTransaction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554">createTransaction</a> () const </td></tr>
+<tr class="memdesc:a761be597e01e2f7d52a17bedb85b2554"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a transaction return the transaction object created.  <a href="#a761be597e01e2f7d52a17bedb85b2554">More...</a><br/></td></tr>
+<tr class="separator:a761be597e01e2f7d52a17bedb85b2554"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99a2d0e0e55bcb56c6fa66ce9cc034a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstrus_1_1PeerMessageQueue.html">PeerMessageQueue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a99a2d0e0e55bcb56c6fa66ce9cc034a6">createPeerMessageQueue</a> () const </td></tr>
+<tr class="memdesc:a99a2d0e0e55bcb56c6fa66ce9cc034a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a handler for processing distributed storage statistics return the peer message queue object created.  <a href="#a99a2d0e0e55bcb56c6fa66ce9cc034a6">More...</a><br/></td></tr>
+<tr class="separator:a99a2d0e0e55bcb56c6fa66ce9cc034a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6ee829bcccaee1b7b8f5059ca3f53c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9">close</a> ()</td></tr>
 <tr class="memdesc:ae6ee829bcccaee1b7b8f5059ca3f53c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close of the storage client.  <a href="#ae6ee829bcccaee1b7b8f5059ca3f53c9">More...</a><br/></td></tr>
 <tr class="separator:ae6ee829bcccaee1b7b8f5059ca3f53c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,106 +159,37 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="adeadeea9eb22b0b8ffc83374abb3737e"></a>
+<a class="anchor" id="a99a2d0e0e55bcb56c6fa66ce9cc034a6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void strus::StorageClient::deleteDocument </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>docid</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Prepare the deletion of a document from the storage. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">docid</td><td>the identifier of the document to delete </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The document is physically deleted with the next implicit or explicit call of '<a class="el" href="classstrus_1_1StorageClient.html#a90ec5c90483d3c35b72aac0826fa2dec" title="Commit all insert or delete or user access right change statements open. ">flush()</a>' </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="aed8ddbf0335c883d0b725c8895737e20"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void strus::StorageClient::deleteUserAccessRights </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>username</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Prepare the deletion of all document access rights of a user. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">username</td><td>the name of the user to delete all access rights (in the local collection) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The user access rights are changed accordingly with the next implicit or explicit call of 'flush' </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a90ec5c90483d3c35b72aac0826fa2dec"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void strus::StorageClient::flush </td>
+          <td class="memname"><a class="el" href="classstrus_1_1PeerMessageQueue.html">PeerMessageQueue</a> strus::StorageClient::createPeerMessageQueue </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Commit all insert or delete or user access right change statements open. </p>
+<p>Create a handler for processing distributed storage statistics return the peer message queue object created. </p>
 
 </div>
 </div>
-<a class="anchor" id="a7701d18a5166d9c3d822ca411e9e7b13"></a>
+<a class="anchor" id="a761be597e01e2f7d52a17bedb85b2554"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void strus::StorageClient::insertDocument </td>
+          <td class="memname"><a class="el" href="classstrus_1_1StorageTransaction.html">StorageTransaction</a> strus::StorageClient::createTransaction </td>
           <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>docid</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classstrus_1_1Document.html">Document</a> &amp;&#160;</td>
-          <td class="paramname"><em>doc</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Prepare the inserting a document into the storage. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">docid</td><td>the identifier of the document to insert </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">doc</td><td>the structure of the document to insert </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>The document is physically inserted with the next implicit or explicit call of '<a class="el" href="classstrus_1_1StorageClient.html#a90ec5c90483d3c35b72aac0826fa2dec" title="Commit all insert or delete or user access right change statements open. ">flush()</a>' </dd></dl>
+<p>Create a transaction return the transaction object created. </p>
 
 </div>
 </div>
@@ -353,7 +278,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 13 2015 00:21:36 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 4 2015 08:40:59 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
