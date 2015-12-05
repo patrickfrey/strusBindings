@@ -73,9 +73,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aecb5fc624516eb042ba5fcf8d25d3f01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classStorageTransaction.html">StorageTransaction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01">createTransaction</a> () const </td></tr>
 <tr class="memdesc:aecb5fc624516eb042ba5fcf8d25d3f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a transaction return the transaction object created.  <a href="#aecb5fc624516eb042ba5fcf8d25d3f01">More...</a><br/></td></tr>
 <tr class="separator:aecb5fc624516eb042ba5fcf8d25d3f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9285a8eb74463db157986009b3516b3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPeerMessageQueue.html">PeerMessageQueue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a9285a8eb74463db157986009b3516b3f">createPeerMessageQueue</a> () const </td></tr>
-<tr class="memdesc:a9285a8eb74463db157986009b3516b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a handler for processing distributed storage statistics return the peer message queue object created.  <a href="#a9285a8eb74463db157986009b3516b3f">More...</a><br/></td></tr>
-<tr class="separator:a9285a8eb74463db157986009b3516b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75dcc7c3c84a44dbbb3148ab8e380acb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a75dcc7c3c84a44dbbb3148ab8e380acb">createInitPeerMessageIterator</a> () const </td></tr>
+<tr class="memdesc:a75dcc7c3c84a44dbbb3148ab8e380acb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization return the peer message iterator object created.  <a href="#a75dcc7c3c84a44dbbb3148ab8e380acb">More...</a><br/></td></tr>
+<tr class="separator:a75dcc7c3c84a44dbbb3148ab8e380acb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7767840c94f7a9fa747023e36379299d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a7767840c94f7a9fa747023e36379299d">createUpdatePeerMessageIterator</a> () const </td></tr>
+<tr class="memdesc:a7767840c94f7a9fa747023e36379299d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (relative value) to distribute after storage updates return the peer message iterator object created.  <a href="#a7767840c94f7a9fa747023e36379299d">More...</a><br/></td></tr>
+<tr class="separator:a7767840c94f7a9fa747023e36379299d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d05b7c1d90da0df21ed17a531301026"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classPeerStorageTransaction.html">PeerStorageTransaction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a3d05b7c1d90da0df21ed17a531301026">createPeerStorageTransaction</a> ()</td></tr>
+<tr class="memdesc:a3d05b7c1d90da0df21ed17a531301026"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a transaction object to update distributed storage statistics from another peer storage return the peer transaction object created.  <a href="#a3d05b7c1d90da0df21ed17a531301026">More...</a><br/></td></tr>
+<tr class="separator:a3d05b7c1d90da0df21ed17a531301026"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a009ca60beeb8dcbf8f370bda6af817b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3">close</a> ()</td></tr>
 <tr class="memdesc:a009ca60beeb8dcbf8f370bda6af817b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close of the storage client.  <a href="#a009ca60beeb8dcbf8f370bda6af817b3">More...</a><br/></td></tr>
 <tr class="separator:a009ca60beeb8dcbf8f370bda6af817b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,12 +160,12 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a9285a8eb74463db157986009b3516b3f"></a>
+<a class="anchor" id="a75dcc7c3c84a44dbbb3148ab8e380acb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classPeerMessageQueue.html">PeerMessageQueue</a> StorageClient::createPeerMessageQueue </td>
+          <td class="memname"><a class="el" href="classPeerMessageIterator.html">PeerMessageIterator</a> StorageClient::createInitPeerMessageIterator </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -167,7 +173,24 @@ Friends</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create a handler for processing distributed storage statistics return the peer message queue object created. </p>
+<p>Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization return the peer message iterator object created. </p>
+
+</div>
+</div>
+<a class="anchor" id="a3d05b7c1d90da0df21ed17a531301026"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classPeerStorageTransaction.html">PeerStorageTransaction</a> StorageClient::createPeerStorageTransaction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a transaction object to update distributed storage statistics from another peer storage return the peer transaction object created. </p>
 
 </div>
 </div>
@@ -185,6 +208,23 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Create a transaction return the transaction object created. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7767840c94f7a9fa747023e36379299d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classPeerMessageIterator.html">PeerMessageIterator</a> StorageClient::createUpdatePeerMessageIterator </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create an iterator on the storage statistics (relative value) to distribute after storage updates return the peer message iterator object created. </p>
 
 </div>
 </div>
@@ -273,7 +313,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Dec 4 2015 09:43:21 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Dec 5 2015 18:37:59 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

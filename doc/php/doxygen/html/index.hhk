@@ -45,7 +45,11 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3"><param name="Name" value="StorageClient"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#ab29ead31aace0753de705081681800c7"><param name="Name" value="commit"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#ad75d2500eb9418631482a3370451656b"><param name="Name" value="commit"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#ad75d2500eb9418631482a3370451656b"><param name="Name" value="PeerStorageTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#ab29ead31aace0753de705081681800c7"><param name="Name" value="StorageTransaction"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html"><param name="Name" value="Context"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a75d86a2b3ab56bd55f1380ed27f36c90"><param name="Name" value="addModulePath"></OBJECT>
@@ -68,7 +72,8 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a2d34e4556448e40693f61d15e091b604"><param name="Name" value="~Context"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a905301c75b5bb103fd1624e8d1420a1b"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a9285a8eb74463db157986009b3516b3f"><param name="Name" value="createPeerMessageQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a75dcc7c3c84a44dbbb3148ab8e380acb"><param name="Name" value="createInitPeerMessageIterator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a3d05b7c1d90da0df21ed17a531301026"><param name="Name" value="createPeerStorageTransaction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#a29969c238aa6bc45659e0fe37b994a7c"><param name="Name" value="createQuery"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a204d190bc923dd7e1a13b5b0fea6ec13"><param name="Name" value="createQueryAnalyzer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a28ca03d0497780f6f7905fa8ee07d27a"><param name="Name" value="createQueryEval"></OBJECT>
@@ -80,7 +85,8 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06"><param name="Name" value="createStorage"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4fcb68f277db29c450666c31b5701e7c"><param name="Name" value="createStorageClient"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01"><param name="Name" value="createTransaction"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a6e750665843066aeb6936a9d678aa2a5"><param name="Name" value="decode"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a7767840c94f7a9fa747023e36379299d"><param name="Name" value="createUpdatePeerMessageIterator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#afaaedebf2f5d89960e3f680aa7925135"><param name="Name" value="decode"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ae81281a264b315f52e45a783173a2183"><param name="Name" value="defineAggregatedMetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#aa3aa93d9f07adcabd1470724144693f5"><param name="Name" value="defineAttribute"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a1b6ef4a85ab0ebcf1e1ed25e629b5af0"><param name="Name" value="defineDocument"></OBJECT>
@@ -90,6 +96,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classSummarizerConfig.html#a6dab1975f86b3f14dc829881c0e4508e"><param name="Name" value="SummarizerConfig"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classWeightingConfig.html#ae6c8fcc980f42fe971511ef0a0a5704f"><param name="Name" value="WeightingConfig"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#af19ada0547eec00668606cd953021a6d"><param name="Name" value="defineGlobalStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#af9a2cd4173a8190fab3bd3769eac5cc7"><param name="Name" value="defineMetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a48be89ad411aca6d597301e5b05aff75"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classSummarizerConfig.html#ab5c185d29cfe159f3f9ef1bf0f6579df"><param name="Name" value="defineParameter"></OBJECT>
@@ -99,11 +106,13 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ac2a3203df6a08583ad2bc9fb6b110e1b"><param name="Name" value="definePeerMessageProcessor"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a6418201f50897aa1c90a5f121e8418f0"><param name="Name" value="definePhraseType"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a021e6aa0428d0263731008678ab9a0b4"><param name="Name" value="defineTermStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#acb4e693d289916c92ac8acaf3debcb2f"><param name="Name" value="deleteDocument"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a47f806887776561e6d264e5a26c9c0ae"><param name="Name" value="deleteUserAccessRights"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="deprecated.html"><param name="Name" value="Deprecated List"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ad26133b438031f93002c4cbf638a591a"><param name="Name" value="destroyStorage"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a0eb938370364cb61bf307c799125787c"><param name="Name" value="detectDocumentClass"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classTermStatistics.html#af2c9c82a45c28731dfa3c812371a7586"><param name="Name" value="df"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a7d712b65fc810218fdf16c2ae93e0fa1"><param name="Name" value="docid"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classRank.html#a422f6b05f4e6fc11b8fa1e366a05ca35"><param name="Name" value="docno"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html"><param name="Name" value="Document"></OBJECT>
@@ -166,17 +175,23 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a24d5045a1549ae7905fd8faa79854b5c"><param name="Name" value="value"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessage.html#a83a399111b53d07a84c9d9b7d9d203ce"><param name="Name" value="documentFrequencyChangeList"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a0e6f536a109a3df0949145f866a8d4ad"><param name="Name" value="encode"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a169d43e1576d5bab87cba721d2c82cce"><param name="Name" value="encode"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentClass.html#a7adac82c2466a9f2012c65030b06302c"><param name="Name" value="encoding"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#ae795ffa7330fbfd759ec8b2f7a0b7366"><param name="Name" value="evaluate"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#a922ad2b444e87f117461dba1fcd3cba1"><param name="Name" value="fetch"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#a922ad2b444e87f117461dba1fcd3cba1"><param name="Name" value="DocumentAnalyzeQueue"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#ab4550c3b775dd2abb241a20712bc5fab"><param name="Name" value="PeerMessageQueue"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzeQueue.html#afca2bf8ee8fcb8d5c1f3aa1a3dfb4f0f"><param name="Name" value="QueryAnalyzeQueue"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#af2caf16403c3d5b18e3ed0b5633509d9"><param name="Name" value="forwardIndexTerms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#ab9bb7f62b5a34e67e39a29af2854a219"><param name="Name" value="getNext"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ae3831684f5704d18308e369b745d5533"><param name="Name" value="GlobalCounter"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html"><param name="Name" value="GlobalStatistics"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html#ab5f4f6307223f93160ef648642e90ba1"><param name="Name" value="GlobalStatistics"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html#a289def8e260b472d3a3d626646e26b11"><param name="Name" value="nofdocs"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html#aa49e937fe614a6c6658f043d4697a90f"><param name="Name" value="set_nofdocs"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#aa72616739e8e4c8276133a76678810df"><param name="Name" value="hasMore"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a7eb333392562e38263d926c7bc80a861"><param name="Name" value="increment"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773"><param name="Name" value="Index"></OBJECT>
@@ -198,6 +213,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classMetaData.html#af773803d4331b8b89a8949af9e740f5c"><param name="Name" value="MetaData"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classRankAttribute.html#a277b9559c7d3834e50bf45f6ba452283"><param name="Name" value="RankAttribute"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html#a289def8e260b472d3a3d626646e26b11"><param name="Name" value="nofdocs"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a7de1e32ec44482d699fd19c95c807311"><param name="Name" value="nofDocumentsInserted"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessage.html#a7b6935c513dc2bbbcd5bbb304df2a8e4"><param name="Name" value="nofDocumentsInsertedChange"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classNormalizer.html"><param name="Name" value="Normalizer"></OBJECT>
@@ -208,21 +224,27 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessage.html#a7b6935c513dc2bbbcd5bbb304df2a8e4"><param name="Name" value="nofDocumentsInsertedChange"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessage.html#a335d20068411572b598e547a6fab5e8e"><param name="Name" value="PeerMessage"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html"><param name="Name" value="PeerMessageQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html"><param name="Name" value="PeerMessageIterator"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a6e750665843066aeb6936a9d678aa2a5"><param name="Name" value="decode"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a0e6f536a109a3df0949145f866a8d4ad"><param name="Name" value="encode"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#ab4550c3b775dd2abb241a20712bc5fab"><param name="Name" value="fetch"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a451599f2ec8227291d486ae34cbec6e8"><param name="Name" value="PeerMessageQueue"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a9c3a4857e9d272e2b8d0a37497dbc583"><param name="Name" value="push"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a632779598d7055c2f193f4143bcb404e"><param name="Name" value="start"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#afaaedebf2f5d89960e3f680aa7925135"><param name="Name" value="decode"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#ab9bb7f62b5a34e67e39a29af2854a219"><param name="Name" value="getNext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#a624fa3f77ecfe2e2093853a9faa03b4e"><param name="Name" value="PeerMessageIterator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html"><param name="Name" value="PeerStorageTransaction"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#ad75d2500eb9418631482a3370451656b"><param name="Name" value="commit"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a169d43e1576d5bab87cba721d2c82cce"><param name="Name" value="encode"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#aa99abf75f41d169a9a2b39ec5ca04643"><param name="Name" value="PeerStorageTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a71119b6557894d8237b6b2147adc8d38"><param name="Name" value="push"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a90334fab889a1c5459ea8b8c43f7bbf7"><param name="Name" value="rollback"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classTerm.html#a18d4d01b91b5a5cbbf3d91d5cdbff32d"><param name="Name" value="position"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#a4a60ef313b3d4f33fa2eaa791b6d4499"><param name="Name" value="push"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#a4a60ef313b3d4f33fa2eaa791b6d4499"><param name="Name" value="DocumentAnalyzeQueue"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a9c3a4857e9d272e2b8d0a37497dbc583"><param name="Name" value="PeerMessageQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a71119b6557894d8237b6b2147adc8d38"><param name="Name" value="PeerStorageTransaction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzeQueue.html#a4d49717b80b847fc6ebc70e73c0ffab3"><param name="Name" value="QueryAnalyzeQueue"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryExpression.html#a7f44683cb611793337df6802f800baf2"><param name="Name" value="pushExpression"></OBJECT>
@@ -232,7 +254,9 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a729fda0a198196332faa76ddae4e09be"><param name="Name" value="addDocumentEvaluationSet"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a331feb7688a327de6d553668244db807"><param name="Name" value="addUserName"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#ac1e198480abbed202f3e6fa99cbdc9e4"><param name="Name" value="defineFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#af19ada0547eec00668606cd953021a6d"><param name="Name" value="defineGlobalStatistics"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a48be89ad411aca6d597301e5b05aff75"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a021e6aa0428d0263731008678ab9a0b4"><param name="Name" value="defineTermStatistics"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#ae795ffa7330fbfd759ec8b2f7a0b7366"><param name="Name" value="evaluate"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a48f8be1896dc9af9e46505cf3afef17f"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
@@ -307,9 +331,15 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classRankAttribute.html#a03af897479650415036158e98324a409"><param name="Name" value="value"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classRankAttribute.html#a4b4adbb1a00f090f79283e1c994ba5b6"><param name="Name" value="weight"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a1c5372f20b883f401034f9841fe5f7e5"><param name="Name" value="rollback"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a90334fab889a1c5459ea8b8c43f7bbf7"><param name="Name" value="rollback"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a90334fab889a1c5459ea8b8c43f7bbf7"><param name="Name" value="PeerStorageTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a1c5372f20b883f401034f9841fe5f7e5"><param name="Name" value="StorageTransaction"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentClass.html#a3822ecddeda9eae5fadebbe13ba87296"><param name="Name" value="scheme"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#aa8a0627dd02f49e98dfddf703998d21d"><param name="Name" value="searchIndexTerms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classTermStatistics.html#accd8ca9e6a8d886bd7c5c7acd3a1f33a"><param name="Name" value="set_df"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html#aa49e937fe614a6c6658f043d4697a90f"><param name="Name" value="set_nofdocs"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a5c8a12e0c652bfe68e65f078dcaa232b"><param name="Name" value="setAttribute"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a78a8f0403ee4d4e4fdefcd15a14bf1a8"><param name="Name" value="setDocid"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentClass.html#a20a3a084c46948e0786711e4fc55cb7f"><param name="Name" value="setEncoding"></OBJECT>
@@ -320,15 +350,17 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentClass.html#a30542b36002ddfdde11bed15d30f3e14"><param name="Name" value="setScheme"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#aa6076f45ac9f3dabb9cf88161c2a2367"><param name="Name" value="setUserAccessRight"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryExpression.html#ae7225d118d9799e1c5b5b7d9e1fc16e6"><param name="Name" value="size"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a632779598d7055c2f193f4143bcb404e"><param name="Name" value="start"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html"><param name="Name" value="StorageClient"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3"><param name="Name" value="close"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="Context"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a9285a8eb74463db157986009b3516b3f"><param name="Name" value="createPeerMessageQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a75dcc7c3c84a44dbbb3148ab8e380acb"><param name="Name" value="createInitPeerMessageIterator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a3d05b7c1d90da0df21ed17a531301026"><param name="Name" value="createPeerStorageTransaction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01"><param name="Name" value="createTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a7767840c94f7a9fa747023e36379299d"><param name="Name" value="createUpdatePeerMessageIterator"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a7de1e32ec44482d699fd19c95c807311"><param name="Name" value="nofDocumentsInserted"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageQueue.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="PeerMessageQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="PeerMessageIterator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classPeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="PeerStorageTransaction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#a0a3a992c9827f6c97dc9c15d4e51807f"><param name="Name" value="StorageClient"></OBJECT>
@@ -361,6 +393,12 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classTerm.html#adadade9bd6b70232b1d7e9c7fedcad8e"><param name="Name" value="Term"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classTerm.html#abe58e3d3c56422f184c0490c8bc170bb"><param name="Name" value="type"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classTerm.html#a6b037f71ed1b020b19dae596b42a4e2f"><param name="Name" value="value"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classTermStatistics.html"><param name="Name" value="TermStatistics"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classTermStatistics.html#af2c9c82a45c28731dfa3c812371a7586"><param name="Name" value="df"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classTermStatistics.html#accd8ca9e6a8d886bd7c5c7acd3a1f33a"><param name="Name" value="set_df"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classTermStatistics.html#afd6db93ab355d693680a34fb4a6bf216"><param name="Name" value="TermStatistics"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classTokenizer.html"><param name="Name" value="Tokenizer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a74e4afa8e4aadfbe6097e624c22cf4de"><param name="Name" value="type"></OBJECT>
