@@ -943,18 +943,50 @@ StorageClient::StorageClient( const StorageClient& o)
 GlobalCounter StorageClient::nofDocumentsInserted() const
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->globalNofDocumentsInserted();
 }
 
 StorageTransaction StorageClient::createTransaction() const
 {
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return StorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
+}
+
+PeerMessageIterator StorageClient::createInitPeerMessageIterator( bool sign) const
+{
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
+	iter.reset( storage->createInitPeerMessageIterator( sign));
+	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+}
+
+PeerMessageIterator StorageClient::createUpdatePeerMessageIterator() const
+{
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
+	iter.reset( storage->createUpdatePeerMessageIterator());
+	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+}
+
+PeerStorageTransaction StorageClient::createPeerStorageTransaction()
+{
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	return PeerStorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
 void StorageClient::close()
 {
-	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
-	THIS->close();
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	bool preverr = errorhnd->hasError();
+	m_storage_impl.reset();
+	if (!preverr && errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error detected after calling storage client close: %s"), errorhnd->fetchError());
+	}
 }
 
 StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& errorhnd_, const Reference& storage_)
@@ -1107,28 +1139,6 @@ void StorageTransaction::rollback()
 			m_docnorangear.pop_back();
 		}
 	}
-}
-
-
-PeerMessageIterator StorageClient::createInitPeerMessageIterator( bool sign) const
-{
-	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
-	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
-	iter.reset( storage->createInitPeerMessageIterator( sign));
-	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
-}
-
-PeerMessageIterator StorageClient::createUpdatePeerMessageIterator() const
-{
-	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
-	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
-	iter.reset( storage->createUpdatePeerMessageIterator());
-	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
-}
-
-PeerStorageTransaction StorageClient::createPeerStorageTransaction()
-{
-	return PeerStorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
 PeerMessageIterator::PeerMessageIterator( const PeerMessageIterator& o)
@@ -1583,6 +1593,22 @@ void Query::defineMetaDataRestriction(
 		int value, bool newGroup)
 {
 	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+}
+
+void Query::defineTermStatistics( const std::string& type_, const std::string& value_, const TermStatistics& stats_)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	strus::TermStatistics stats;
+	stats.setDocumentFrequency( stats_.df());
+	THIS->defineTermStatistics( type_, value_, stats);
+}
+
+void Query::defineGlobalStatistics( const GlobalStatistics& stats_)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	strus::GlobalStatistics stats;
+	stats.setNofDocumentsInserted( stats_.nofdocs());
+	THIS->defineGlobalStatistics( stats);
 }
 
 void Query::addDocumentEvaluationSet(

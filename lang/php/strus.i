@@ -10,6 +10,8 @@
 #include "../include/strus/bindingObjects.hpp"
 %}
 
+%rename(StrusGlobalStatistics) GlobalStatistics;
+%rename(StrusTermStatistics) TermStatistics;
 %rename(TokenNormalizer) Normalizer;
 %rename(StrusTokenizer) Tokenizer;
 %rename(StrusNormalizer) Normalizer;
@@ -25,6 +27,10 @@
 %rename(StrusQueryAnalyzer) QueryAnalyzer;
 %rename(StrusQueryAnalyzeQueue) QueryAnalyzeQueue;
 %rename(StrusStorageClient) StorageClient;
+%rename(StrusStorageTransaction) StorageTransaction;
+%rename(StrusPeerStorageTransaction) PeerStorageTransaction;
+%rename(StrusPeerMessage) PeerMessage;
+%rename(StrusPeerMessageIterator) PeerMessageIterator;
 %rename(StrusSummarizerConfig) SummarizerConfig;
 %rename(StrusWeightingConfig) WeightingConfig;
 %rename(StrusQueryExpression) QueryExpression;
@@ -48,6 +54,7 @@
 %include "strus_summarizer.i"
 %include "strus_weighting.i"
 %include "strus_queryexpr.i"
+%include "strus_statistics.i"
 %include "../../include/strus/bindingObjects.hpp"
 
 

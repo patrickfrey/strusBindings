@@ -19,6 +19,8 @@ set( generated_java_source_files
 	QueryEval.java
 	Query.java
 	QueryExpression.java
+	TermStatistics.java
+	GlobalStatistics.java
 	RankAttribute.java
 	RankAttributeVector.java
 	Rank.java

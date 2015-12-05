@@ -43,5 +43,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj);
 void initString( std::string& result, PyObject* obj);
 void initStringVector( std::vector<std::string>& result, PyObject* obj);
 void initIntVector( std::vector<int>& result, PyObject* obj);
+void initTermStatistics( TermStatistics& result, PyObject* obj);
+void initGlobalStatistics( GlobalStatistics& result, PyObject* obj);
 
 #endif

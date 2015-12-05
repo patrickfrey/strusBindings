@@ -1733,6 +1733,57 @@ private:
 };
 
 
+/// \brief Structure holding the statistics of a term to be used in a query
+/// \note If values of this structure are undefined, then the storage values are used
+class TermStatistics
+{
+public:
+	/// \brief Constructor
+	TermStatistics()
+		:m_df(-1){}
+	/// \brief Constructor
+	TermStatistics( GlobalCounter df_)
+		:m_df(df_){}
+	/// \brief Copy constructor
+	TermStatistics( const TermStatistics& o)
+		:m_df(o.m_df){}
+
+	/// \brief Get the global document frequency
+	/// \return the global document frequency or -1 for undefined, if undefined then the value cache for the global dfs in the document frequency or what is stored in the local storage)
+	GlobalCounter df() const		{return m_df;}
+	/// \brief Set the global document frequency for a term in a query evaluation
+	/// \param[in] df_ the document frequency value to use
+	void set_df( GlobalCounter df_)		{m_df = df_;}
+
+private:
+	GlobalCounter m_df;		///< global document frequency (-1 for undefined, if undefined then the value cache for the global dfs in the document frequency or what is stored in the local storage)
+};
+
+/// \brief Global document statistics, if passed down with the query
+/// \note If values of this structure are undefined, then the storage values are used
+struct GlobalStatistics
+{
+	/// \brief Default constructor
+	GlobalStatistics()
+		:m_nofDocumentsInserted(-1){}
+	/// \brief Constructor
+	explicit GlobalStatistics( GlobalCounter nofDocumentsInserted_)
+		:m_nofDocumentsInserted(nofDocumentsInserted_){}
+	/// \brief Copy constructor
+	GlobalStatistics( const GlobalStatistics& o)
+		:m_nofDocumentsInserted(o.m_nofDocumentsInserted){}
+
+	/// \brief Get the global total number of documents in the collection
+	GlobalCounter nofdocs() const				{return m_nofDocumentsInserted;}
+	/// \brief Set the global total number of documents in the collection for a query evaluation
+	/// \param[in] nofdocs_ the total number of documents value to use
+	void set_nofdocs( GlobalCounter nofdocs_)		{m_nofDocumentsInserted = nofdocs_;}
+
+private:
+	GlobalCounter m_nofDocumentsInserted;	///< global number of documents inserted (-1 for undefined, if undefined then the storage value of the global number of documents is used)
+};
+
+
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
@@ -1850,6 +1901,22 @@ public:
 	{
 		defineMetaDataRestriction( compareOp, name, value, newGroup);
 	}
+#endif
+	/// \brief Define term statistics to use for a term for weighting it in this query
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
+	/// \param[in] stats_ the structure with the statistics to set
+	void defineTermStatistics( const String& type_, const String& value_, const TermStatistics& stats_);
+
+	/// \brief Define the global statistics to use for weighting in this query
+	/// \param[in] stats_ the structure with the statistics to set
+	void defineGlobalStatistics( const GlobalStatistics& stats_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_);
+	void defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& stats_);
+	void defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_);
+	void defineGlobalStatistics_struct( const FunctionObject& stats_);
 #endif
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
