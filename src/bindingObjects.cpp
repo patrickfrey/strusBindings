@@ -953,12 +953,12 @@ StorageTransaction StorageClient::createTransaction() const
 	return StorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
-PeerMessageIterator StorageClient::createInitPeerMessageIterator( bool sign) const
+PeerMessageIterator StorageClient::createInitPeerMessageIterator() const
 {
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
-	iter.reset( storage->createInitPeerMessageIterator( sign));
+	iter.reset( storage->createInitPeerMessageIterator());
 	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
@@ -1206,11 +1206,11 @@ PeerStorageTransaction::PeerStorageTransaction( const Reference& objbuilder, con
 	m_transaction_impl.reset( storage->createPeerStorageTransaction());
 }
 
-void PeerStorageTransaction::push( const std::string& msg)
+void PeerStorageTransaction::push( const std::string& msg, bool sign)
 {
 	strus::PeerStorageTransactionInterface* transaction = (strus::PeerStorageTransactionInterface*)m_transaction_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	transaction->push( msg.c_str(), msg.size());
+	transaction->push( msg.c_str(), msg.size(), sign);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error pushing message from peer storage: %s"), errorhnd->fetchError());

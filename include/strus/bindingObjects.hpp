@@ -1054,12 +1054,11 @@ public:
 	/// return the transaction object created
 	StorageTransaction createTransaction() const;
 
-	/// \brief Create an iterator on the storage statistics to distribute for initialization/deinitialization
-	/// \param[in] sign sign of the statistics value to distribute (true: all statistics are positive, specifying an increment, used for initialization, false: all statistics are negative, specifying a decrement, used for deinitialization)
+	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
 	/// return the peer message iterator object created
-	PeerMessageIterator createInitPeerMessageIterator( bool sign) const;
+	PeerMessageIterator createInitPeerMessageIterator() const;
 
-	/// \brief Create an iterator on the storage statistics to distribute after storage updates
+	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
 	/// return the peer message iterator object created
 	PeerMessageIterator createUpdatePeerMessageIterator() const;
 
@@ -1278,8 +1277,9 @@ public:
 
 	/// \brief Push a message from another peer storage
 	/// \param[in] msg message from peer
+	/// \param[in] sign true, if the sign of the increments is positive, false if negative (inverted sign, decrement)
 	/// \return message to reply to sender or empty blob if there is nothing to reply
-	void push( const String& msg);
+	void push( const String& msg, bool sign);
 
 	/// \brief Commit of the transaction
 	String commit();
