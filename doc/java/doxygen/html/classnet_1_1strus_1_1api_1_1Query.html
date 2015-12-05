@@ -84,6 +84,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adde53e522346bf3b27e5fe883eae5330"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#adde53e522346bf3b27e5fe883eae5330">defineMetaDataRestriction</a> (const char *compareOp, const String &amp;name, int value, bool newGroup=true)</td></tr>
 <tr class="memdesc:adde53e522346bf3b27e5fe883eae5330"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a meta data restriction.  <a href="#adde53e522346bf3b27e5fe883eae5330">More...</a><br/></td></tr>
 <tr class="separator:adde53e522346bf3b27e5fe883eae5330"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bd0cd5807bc8af47d9b8aa1d489b040"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#a7bd0cd5807bc8af47d9b8aa1d489b040">defineTermStatistics</a> (const String &amp;type_, const String &amp;value_, const <a class="el" href="classnet_1_1strus_1_1api_1_1TermStatistics.html">TermStatistics</a> &amp;stats_)</td></tr>
+<tr class="memdesc:a7bd0cd5807bc8af47d9b8aa1d489b040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define term statistics to use for a term for weighting it in this query.  <a href="#a7bd0cd5807bc8af47d9b8aa1d489b040">More...</a><br/></td></tr>
+<tr class="separator:a7bd0cd5807bc8af47d9b8aa1d489b040"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adff8cf429db88fb96201e05ae0b2f34c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#adff8cf429db88fb96201e05ae0b2f34c">defineGlobalStatistics</a> (const <a class="el" href="structnet_1_1strus_1_1api_1_1GlobalStatistics.html">GlobalStatistics</a> &amp;stats_)</td></tr>
+<tr class="memdesc:adff8cf429db88fb96201e05ae0b2f34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the global statistics to use for weighting in this query.  <a href="#adff8cf429db88fb96201e05ae0b2f34c">More...</a><br/></td></tr>
+<tr class="separator:adff8cf429db88fb96201e05ae0b2f34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9ef1bff1ef8761f05b902e65032c22b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#ae9ef1bff1ef8761f05b902e65032c22b">addDocumentEvaluationSet</a> (const IntVector &amp;docnolist_)</td></tr>
 <tr class="memdesc:ae9ef1bff1ef8761f05b902e65032c22b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage.  <a href="#ae9ef1bff1ef8761f05b902e65032c22b">More...</a><br/></td></tr>
 <tr class="separator:ae9ef1bff1ef8761f05b902e65032c22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -244,6 +250,30 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="adff8cf429db88fb96201e05ae0b2f34c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::Query::defineGlobalStatistics </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structnet_1_1strus_1_1api_1_1GlobalStatistics.html">GlobalStatistics</a> &amp;&#160;</td>
+          <td class="paramname"><em>stats_</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Define the global statistics to use for weighting in this query. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">stats_</td><td>the structure with the statistics to set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a4dee4a6fd92066b8a2b349646108ecd9"></a>
 <div class="memitem">
 <div class="memproto">
@@ -391,6 +421,48 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a7bd0cd5807bc8af47d9b8aa1d489b040"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::Query::defineTermStatistics </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>type_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>value_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnet_1_1strus_1_1api_1_1TermStatistics.html">TermStatistics</a> &amp;&#160;</td>
+          <td class="paramname"><em>stats_</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Define term statistics to use for a term for weighting it in this query. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">type_</td><td>query term type name </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">value_</td><td>query term value </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">stats_</td><td>the structure with the statistics to set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a087ed8d00de8e0a42e6edda7e11e330c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -485,7 +557,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Dec 4 2015 09:50:35 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Dec 5 2015 18:37:15 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

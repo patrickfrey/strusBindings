@@ -53,8 +53,10 @@ classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html
 classnet_1_1strus_1_1api_1_1DocumentFrequencyChange-members.html
 classnet_1_1strus_1_1api_1_1PeerMessage.html
 classnet_1_1strus_1_1api_1_1PeerMessage-members.html
-classnet_1_1strus_1_1api_1_1PeerMessageQueue.html
-classnet_1_1strus_1_1api_1_1PeerMessageQueue-members.html
+classnet_1_1strus_1_1api_1_1PeerMessageIterator.html
+classnet_1_1strus_1_1api_1_1PeerMessageIterator-members.html
+classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html
+classnet_1_1strus_1_1api_1_1PeerStorageTransaction-members.html
 classnet_1_1strus_1_1api_1_1SummarizerConfig.html
 classnet_1_1strus_1_1api_1_1SummarizerConfig-members.html
 classnet_1_1strus_1_1api_1_1WeightingConfig.html
@@ -67,6 +69,10 @@ classnet_1_1strus_1_1api_1_1Rank.html
 classnet_1_1strus_1_1api_1_1Rank-members.html
 classnet_1_1strus_1_1api_1_1QueryExpression.html
 classnet_1_1strus_1_1api_1_1QueryExpression-members.html
+classnet_1_1strus_1_1api_1_1TermStatistics.html
+classnet_1_1strus_1_1api_1_1TermStatistics-members.html
+structnet_1_1strus_1_1api_1_1GlobalStatistics.html
+structnet_1_1strus_1_1api_1_1GlobalStatistics-members.html
 classnet_1_1strus_1_1api_1_1Query.html
 classnet_1_1strus_1_1api_1_1Query-members.html
 classnet_1_1strus_1_1api_1_1Context.html
@@ -85,6 +91,7 @@ functions_c.html
 functions_d.html
 functions_e.html
 functions_f.html
+functions_g.html
 functions_h.html
 functions_i.html
 functions_l.html
@@ -104,6 +111,7 @@ functions_func_c.html
 functions_func_d.html
 functions_func_e.html
 functions_func_f.html
+functions_func_g.html
 functions_func_h.html
 functions_func_i.html
 functions_func_l.html
