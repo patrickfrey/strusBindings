@@ -49,8 +49,10 @@ classstrus_1_1DocumentFrequencyChange.html
 classstrus_1_1DocumentFrequencyChange-members.html
 classstrus_1_1PeerMessage.html
 classstrus_1_1PeerMessage-members.html
-classstrus_1_1PeerMessageQueue.html
-classstrus_1_1PeerMessageQueue-members.html
+classstrus_1_1PeerMessageIterator.html
+classstrus_1_1PeerMessageIterator-members.html
+classstrus_1_1PeerStorageTransaction.html
+classstrus_1_1PeerStorageTransaction-members.html
 classstrus_1_1SummarizerConfig.html
 classstrus_1_1SummarizerConfig-members.html
 classstrus_1_1WeightingConfig.html
@@ -63,6 +65,10 @@ classstrus_1_1Rank.html
 classstrus_1_1Rank-members.html
 classstrus_1_1QueryExpression.html
 classstrus_1_1QueryExpression-members.html
+classstrus_1_1TermStatistics.html
+classstrus_1_1TermStatistics-members.html
+structstrus_1_1GlobalStatistics.html
+structstrus_1_1GlobalStatistics-members.html
 classstrus_1_1Query.html
 classstrus_1_1Query-members.html
 classstrus_1_1Context.html
@@ -81,6 +87,7 @@ functions_c.html
 functions_d.html
 functions_e.html
 functions_f.html
+functions_g.html
 functions_h.html
 functions_i.html
 functions_l.html

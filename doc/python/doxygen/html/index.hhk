@@ -39,7 +39,11 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#ac1bf6f537be6769276aefa4dea02b837"><param name="Name" value="strus::Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9"><param name="Name" value="strus::StorageClient"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#a0b51d11296c6217e6f07096d506e78d2"><param name="Name" value="commit"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a314c02ab4df67597fb40c5f2a7a96787"><param name="Name" value="commit"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a314c02ab4df67597fb40c5f2a7a96787"><param name="Name" value="strus::PeerStorageTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#a0b51d11296c6217e6f07096d506e78d2"><param name="Name" value="strus::StorageTransaction"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a37f4fa7bd75d45c1b07736fa36b4df4a"><param name="Name" value="Context"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a37f4fa7bd75d45c1b07736fa36b4df4a"><param name="Name" value="strus::Context"></OBJECT>
@@ -49,7 +53,8 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="strus::StorageClient"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a3681d959a702209d8997b7b01978884b"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a99a2d0e0e55bcb56c6fa66ce9cc034a6"><param name="Name" value="createPeerMessageQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a906ceeca40850695f10cbbdf989b2291"><param name="Name" value="createInitPeerMessageIterator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a3c2fb140c2fd5603cf050c52c179e415"><param name="Name" value="createPeerStorageTransaction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryEval.html#adb7b382e572aaa347270f125a8b64ecd"><param name="Name" value="createQuery"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a6885f6707f776a23b8229b70e3eafec3"><param name="Name" value="createQueryAnalyzer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#af8545259660310ac9b676f9447721bfe"><param name="Name" value="createQueryEval"></OBJECT>
@@ -61,7 +66,8 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a359f2db0302551d36d67bd7384989c26"><param name="Name" value="createStorage"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#af521358f8ae603090a90fa97a789f52e"><param name="Name" value="createStorageClient"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554"><param name="Name" value="createTransaction"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a564e97f381c51e14e251771be49b4343"><param name="Name" value="decode"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#ac032c4382b9dc4410f821c7426165aea"><param name="Name" value="createUpdatePeerMessageIterator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#ab22cb2b5a639b0e4324f33372425e564"><param name="Name" value="decode"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzer.html#a9738f0bdd404f0ee840e62d2144c7a7e"><param name="Name" value="defineAggregatedMetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzer.html#aef7f6d4a26e01725d44007a519995bf4"><param name="Name" value="defineAttribute"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzer.html#a8458d32448090b1eb7a943de4d329aa9"><param name="Name" value="defineDocument"></OBJECT>
@@ -71,6 +77,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1SummarizerConfig.html#adbb998a0991ccdf49c6561106aa76341"><param name="Name" value="strus::SummarizerConfig"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1WeightingConfig.html#a85e692328897acb36ca854b3c4df423c"><param name="Name" value="strus::WeightingConfig"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a3a164053a7222cdbb4c9379c4e82bedc"><param name="Name" value="defineGlobalStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzer.html#aaeb6909e6cafc90e292e5bb92263d6e2"><param name="Name" value="defineMetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#ab1a6e55607bea31b777fb5260aa809f0"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1SummarizerConfig.html#af6ecc0eb08ed2aa7301f4ed75c87203a"><param name="Name" value="defineParameter"></OBJECT>
@@ -80,11 +87,13 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#aa3bac8061959fb649961b5c0c0e586ed"><param name="Name" value="definePeerMessageProcessor"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryAnalyzer.html#ade6afe56bb5d22737907a02b97b9384f"><param name="Name" value="definePhraseType"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#aee5cf363a3af2be087cb9e17b75a918d"><param name="Name" value="defineTermStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#a860c6e5fc426e24b835edcdfad818743"><param name="Name" value="deleteDocument"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#aabe294d231905c01e9b612e591a62362"><param name="Name" value="deleteUserAccessRights"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="deprecated.html"><param name="Name" value="Deprecated List"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a8ca6371b6f32bce3764eed2011937b14"><param name="Name" value="destroyStorage"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Context.html#a174f61256044789625965498ce6072d2"><param name="Name" value="detectDocumentClass"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html#abbbd0af5c4ee2b1c2a88e761d153548d"><param name="Name" value="df"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#a0ffacc48bf4216468f149c39dacb2266"><param name="Name" value="docid"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Rank.html#a4c7677c89ec54cb3dcc50bb69cee78ce"><param name="Name" value="docno"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#a858c7016b7dfd79da829d9349bb7bbe6"><param name="Name" value="Document"></OBJECT>
@@ -97,21 +106,22 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentClass.html#acb1eab345f64c241b38449ee231f242a"><param name="Name" value="DocumentClass"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentFrequencyChange.html#ad59963d58ccb1ba6b7d3a0f424a6a958"><param name="Name" value="DocumentFrequencyChange"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessage.html#a861862cd7f83df37fbc86598a51ed68f"><param name="Name" value="documentFrequencyChangeList"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#adb7ca410715756c3b0306760ddd1539e"><param name="Name" value="encode"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#ad30535c2b3f56297877266a9e9c41d68"><param name="Name" value="encode"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentClass.html#a1831cd72fe2f6b6cd03ab30b579da218"><param name="Name" value="encoding"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a87a4f7fba976217bf8f1640af52cbc1c"><param name="Name" value="evaluate"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzeQueue.html#af290cc494debe7cd5b5b7afb0108c1a0"><param name="Name" value="fetch"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzeQueue.html#af290cc494debe7cd5b5b7afb0108c1a0"><param name="Name" value="strus::DocumentAnalyzeQueue"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a3ee2c5b36ecac0666555e0480eec91f3"><param name="Name" value="strus::PeerMessageQueue"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryAnalyzeQueue.html#ad672f54d8de84cd94e205abd1ffa044e"><param name="Name" value="strus::QueryAnalyzeQueue"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#a304f93af2f6bb7a5dda8e53c33d83caf"><param name="Name" value="forwardIndexTerms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#adb58f6a2dc77f2b31d3ca57429c9a11c"><param name="Name" value="getNext"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacestrus.html#a4f77d2e758c29232093bfbf2c56672d6"><param name="Name" value="GlobalCounter"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacestrus.html#a4f77d2e758c29232093bfbf2c56672d6"><param name="Name" value="bindingObjects.hpp"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacestrus.html#a4f77d2e758c29232093bfbf2c56672d6"><param name="Name" value="strus"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html#a26d0a2167f130db954dea58b6f7ac199"><param name="Name" value="GlobalStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzeQueue.html#ae1f5dbe842fabfc6672998f1c825f433"><param name="Name" value="hasMore"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentFrequencyChange.html#aca3964d3debf36aaf1430529601857e2"><param name="Name" value="increment"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a"><param name="Name" value="Index"></OBJECT>
@@ -131,17 +141,19 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1MetaData.html#a2bca03e54100c5dd88809bb53cd15a8a"><param name="Name" value="strus::MetaData"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1RankAttribute.html#ae3653acc00d2f6dd38ea931ed2296a39"><param name="Name" value="strus::RankAttribute"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html#ac15e765fd417e2472cb73148a531df00"><param name="Name" value="nofdocs"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a6fa995dfb577d6550ba465fe06ea0cb6"><param name="Name" value="nofDocumentsInserted"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessage.html#aa3669d125b5108d08e31f58c58dcae4f"><param name="Name" value="nofDocumentsInsertedChange"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1RankAttribute.html#ab1d0e6282657010eca277f280e5deb64"><param name="Name" value="operator!="></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1RankAttribute.html#a844ebe5d1af5cac77f62f72f4f189416"><param name="Name" value="operator=="></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessage.html#ac889167f4c82ec79f17805d29ad73a6d"><param name="Name" value="PeerMessage"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#ad0b0908a670b1932827acbf22eb37195"><param name="Name" value="PeerMessageQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a704f0ebe8465fad9d839c39620dd691a"><param name="Name" value="PeerMessageIterator"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a80c47b3700a2ed34bcd39117b167ce30"><param name="Name" value="PeerStorageTransaction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Term.html#ab8af5bfd6bc4f89679d2a5e6c13f68dd"><param name="Name" value="position"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzeQueue.html#a5a7a2de9b14eaa0fa826b6bc444a9a55"><param name="Name" value="push"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentAnalyzeQueue.html#a5a7a2de9b14eaa0fa826b6bc444a9a55"><param name="Name" value="strus::DocumentAnalyzeQueue"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#acec51ddf5a548ca5f9fc5b2b523936ba"><param name="Name" value="strus::PeerMessageQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7a6e4fdc4d9ebe30c8a38994315e3748"><param name="Name" value="strus::PeerStorageTransaction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryAnalyzeQueue.html#a9f6fbbda0089750764f3881c4a08b8df"><param name="Name" value="strus::QueryAnalyzeQueue"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryExpression.html#a9bd39be8908ebb73573d7c616152ff64"><param name="Name" value="pushExpression"></OBJECT>
@@ -174,9 +186,15 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryExpression.html#a9692331e9e2f767c80ebd3c269332138"><param name="Name" value="QueryExpression"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Rank.html#aea5bf59fa0005eaf815f754c56ed8d46"><param name="Name" value="Rank"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1RankAttribute.html#ab30c561be2855a09920cc658eb92b15f"><param name="Name" value="RankAttribute"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#a3a0d0b946991fbe6450121c3c51ad1a5"><param name="Name" value="rollback"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a03a7c2c429edbfa88504e77df962a199"><param name="Name" value="rollback"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a03a7c2c429edbfa88504e77df962a199"><param name="Name" value="strus::PeerStorageTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#a3a0d0b946991fbe6450121c3c51ad1a5"><param name="Name" value="strus::StorageTransaction"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentClass.html#a957833fba0af1567c1be5e43cba9d31e"><param name="Name" value="scheme"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#adb2e34a965b40eb569f9a87f1d8bfa47"><param name="Name" value="searchIndexTerms"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html#ac7b03c6fef91925ca1f343c6645be3a7"><param name="Name" value="set_df"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html#a93e22735b37fba8a3318087011fb8d15"><param name="Name" value="set_nofdocs"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#a901cd3c334cf10c322537ae1722c737e"><param name="Name" value="setAttribute"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#a903ecb4b20a8d2535340222d0fca922b"><param name="Name" value="setDocid"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentClass.html#ac12443c66ad83e7faed97d755c43c692"><param name="Name" value="setEncoding"></OBJECT>
@@ -187,10 +205,10 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentClass.html#a0222fb0059b86a6c020b4308dfdfee22"><param name="Name" value="setScheme"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Document.html#ac7135d5389256ee3c8b6ba924c046a1a"><param name="Name" value="setUserAccessRight"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1QueryExpression.html#a8a7f99c4f025b37a8141232eaf7e77f6"><param name="Name" value="size"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a113dad5b977ceec3fdb626de5b706a0b"><param name="Name" value="start"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="strus::PeerMessageQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="strus::PeerMessageIterator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="strus::PeerStorageTransaction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#aee4038a73f1a9aff3ded22a53b77ea32"><param name="Name" value="strus::StorageClient"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="strus::StorageTransaction"></OBJECT>
   </UL>
@@ -279,6 +297,12 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentFrequencyChange.html#afec9b4adb2906c3b2b74457edfdcec31"><param name="Name" value="ucvalue"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentFrequencyChange.html#a17d0aa03f2d1f1767e39e9480c800e81"><param name="Name" value="value"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html"><param name="Name" value="strus::GlobalStatistics"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html#a26d0a2167f130db954dea58b6f7ac199"><param name="Name" value="GlobalStatistics"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html#ac15e765fd417e2472cb73148a531df00"><param name="Name" value="nofdocs"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="structstrus_1_1GlobalStatistics.html#a93e22735b37fba8a3318087011fb8d15"><param name="Name" value="set_nofdocs"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1MetaData.html"><param name="Name" value="strus::MetaData"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1MetaData.html#aa18041c8991bd8595f277268d2c0b18f"><param name="Name" value="MetaData"></OBJECT>
@@ -293,22 +317,30 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessage.html#aa3669d125b5108d08e31f58c58dcae4f"><param name="Name" value="nofDocumentsInsertedChange"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessage.html#ac889167f4c82ec79f17805d29ad73a6d"><param name="Name" value="PeerMessage"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html"><param name="Name" value="strus::PeerMessageQueue"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html"><param name="Name" value="strus::PeerMessageIterator"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a564e97f381c51e14e251771be49b4343"><param name="Name" value="decode"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#adb7ca410715756c3b0306760ddd1539e"><param name="Name" value="encode"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a3ee2c5b36ecac0666555e0480eec91f3"><param name="Name" value="fetch"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#ad0b0908a670b1932827acbf22eb37195"><param name="Name" value="PeerMessageQueue"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#acec51ddf5a548ca5f9fc5b2b523936ba"><param name="Name" value="push"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a113dad5b977ceec3fdb626de5b706a0b"><param name="Name" value="start"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageQueue.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#ab22cb2b5a639b0e4324f33372425e564"><param name="Name" value="decode"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#adb58f6a2dc77f2b31d3ca57429c9a11c"><param name="Name" value="getNext"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a704f0ebe8465fad9d839c39620dd691a"><param name="Name" value="PeerMessageIterator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
+  </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html"><param name="Name" value="strus::PeerStorageTransaction"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a314c02ab4df67597fb40c5f2a7a96787"><param name="Name" value="commit"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#ad30535c2b3f56297877266a9e9c41d68"><param name="Name" value="encode"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a80c47b3700a2ed34bcd39117b167ce30"><param name="Name" value="PeerStorageTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7a6e4fdc4d9ebe30c8a38994315e3748"><param name="Name" value="push"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a03a7c2c429edbfa88504e77df962a199"><param name="Name" value="rollback"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="Name" value="StorageClient"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html"><param name="Name" value="strus::Query"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a958f4ad03b268dc373f665307be4477a"><param name="Name" value="addDocumentEvaluationSet"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a1dc269bb656657c06171ff50ebdcd6e7"><param name="Name" value="addUserName"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a8ddb594ccee8db2bc0c238b29f9e4ce4"><param name="Name" value="defineFeature"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a3a164053a7222cdbb4c9379c4e82bedc"><param name="Name" value="defineGlobalStatistics"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#ab1a6e55607bea31b777fb5260aa809f0"><param name="Name" value="defineMetaDataRestriction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#aee5cf363a3af2be087cb9e17b75a918d"><param name="Name" value="defineTermStatistics"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a87a4f7fba976217bf8f1640af52cbc1c"><param name="Name" value="evaluate"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a719d5dd15a54415a4188b2f605cbba6b"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Query.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
@@ -380,8 +412,10 @@
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9"><param name="Name" value="close"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="Context"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a99a2d0e0e55bcb56c6fa66ce9cc034a6"><param name="Name" value="createPeerMessageQueue"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a906ceeca40850695f10cbbdf989b2291"><param name="Name" value="createInitPeerMessageIterator"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a3c2fb140c2fd5603cf050c52c179e415"><param name="Name" value="createPeerStorageTransaction"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554"><param name="Name" value="createTransaction"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#ac032c4382b9dc4410f821c7426165aea"><param name="Name" value="createUpdatePeerMessageIterator"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a6fa995dfb577d6550ba465fe06ea0cb6"><param name="Name" value="nofDocumentsInserted"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1StorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
@@ -416,6 +450,12 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Term.html#a31b1f8c969f7ccfc08bd41d82b36ef92"><param name="Name" value="ucvalue"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Term.html#aedb3c24f319f257cfa3e1c4d2008d780"><param name="Name" value="value"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html"><param name="Name" value="strus::TermStatistics"></OBJECT>
+  <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html#abbbd0af5c4ee2b1c2a88e761d153548d"><param name="Name" value="df"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html#ac7b03c6fef91925ca1f343c6645be3a7"><param name="Name" value="set_df"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html#a4e067de3763cead0757f5388beb800a8"><param name="Name" value="TermStatistics"></OBJECT>
+  </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Tokenizer.html"><param name="Name" value="strus::Tokenizer"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Variant.html"><param name="Name" value="strus::Variant"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1WeightingConfig.html"><param name="Name" value="strus::WeightingConfig"></OBJECT>
@@ -432,6 +472,7 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1SummarizerConfig.html#aa8d24b4fe3c52966504e546390cdd01a"><param name="Name" value="SummarizerConfig"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1Term.html#a9a8ae2873fe990739462061213ea3010"><param name="Name" value="Term"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1TermStatistics.html#a4e067de3763cead0757f5388beb800a8"><param name="Name" value="TermStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentFrequencyChange.html#ae5eefdda73057b7c53445333d5177003"><param name="Name" value="type"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classstrus_1_1DocumentFrequencyChange.html#ae5eefdda73057b7c53445333d5177003"><param name="Name" value="strus::DocumentFrequencyChange"></OBJECT>

@@ -58,6 +58,7 @@
       <li><a href="#index_d"><span>d</span></a></li>
       <li><a href="#index_e"><span>e</span></a></li>
       <li><a href="#index_f"><span>f</span></a></li>
+      <li><a href="#index_g"><span>g</span></a></li>
       <li><a href="#index_h"><span>h</span></a></li>
       <li><a href="#index_i"><span>i</span></a></li>
       <li><a href="#index_l"><span>l</span></a></li>
@@ -153,16 +154,20 @@
 , <a class="el" href="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9">strus::StorageClient</a>
 </li>
 <li>commit()
-: <a class="el" href="classstrus_1_1StorageTransaction.html#a0b51d11296c6217e6f07096d506e78d2">strus::StorageTransaction</a>
+: <a class="el" href="classstrus_1_1PeerStorageTransaction.html#a314c02ab4df67597fb40c5f2a7a96787">strus::PeerStorageTransaction</a>
+, <a class="el" href="classstrus_1_1StorageTransaction.html#a0b51d11296c6217e6f07096d506e78d2">strus::StorageTransaction</a>
 </li>
 <li>Context()
-: <a class="el" href="classstrus_1_1Context.html#a37f4fa7bd75d45c1b07736fa36b4df4a">strus::Context</a>
+: <a class="el" href="classstrus_1_1Context.html#aa019c0a74d26ab6f74b3c5cf54732232">strus::Context</a>
 </li>
 <li>createDocumentAnalyzer()
 : <a class="el" href="classstrus_1_1Context.html#a3681d959a702209d8997b7b01978884b">strus::Context</a>
 </li>
-<li>createPeerMessageQueue()
-: <a class="el" href="classstrus_1_1StorageClient.html#a99a2d0e0e55bcb56c6fa66ce9cc034a6">strus::StorageClient</a>
+<li>createInitPeerMessageIterator()
+: <a class="el" href="classstrus_1_1StorageClient.html#a906ceeca40850695f10cbbdf989b2291">strus::StorageClient</a>
+</li>
+<li>createPeerStorageTransaction()
+: <a class="el" href="classstrus_1_1StorageClient.html#a3c2fb140c2fd5603cf050c52c179e415">strus::StorageClient</a>
 </li>
 <li>createQuery()
 : <a class="el" href="classstrus_1_1QueryEval.html#adb7b382e572aaa347270f125a8b64ecd">strus::QueryEval</a>
@@ -186,12 +191,15 @@
 <li>createTransaction()
 : <a class="el" href="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554">strus::StorageClient</a>
 </li>
+<li>createUpdatePeerMessageIterator()
+: <a class="el" href="classstrus_1_1StorageClient.html#ac032c4382b9dc4410f821c7426165aea">strus::StorageClient</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
 <li>decode()
-: <a class="el" href="classstrus_1_1PeerMessageQueue.html#a564e97f381c51e14e251771be49b4343">strus::PeerMessageQueue</a>
+: <a class="el" href="classstrus_1_1PeerMessageIterator.html#ab22cb2b5a639b0e4324f33372425e564">strus::PeerMessageIterator</a>
 </li>
 <li>defineAggregatedMetaData()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a9738f0bdd404f0ee840e62d2144c7a7e">strus::DocumentAnalyzer</a>
@@ -207,6 +215,9 @@
 , <a class="el" href="classstrus_1_1SummarizerConfig.html#adbb998a0991ccdf49c6561106aa76341">strus::SummarizerConfig</a>
 , <a class="el" href="classstrus_1_1WeightingConfig.html#a85e692328897acb36ca854b3c4df423c">strus::WeightingConfig</a>
 </li>
+<li>defineGlobalStatistics()
+: <a class="el" href="classstrus_1_1Query.html#a3a164053a7222cdbb4c9379c4e82bedc">strus::Query</a>
+</li>
 <li>defineMetaData()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#aaeb6909e6cafc90e292e5bb92263d6e2">strus::DocumentAnalyzer</a>
 </li>
@@ -214,7 +225,7 @@
 : <a class="el" href="classstrus_1_1Query.html#ab1a6e55607bea31b777fb5260aa809f0">strus::Query</a>
 </li>
 <li>defineParameter()
-: <a class="el" href="classstrus_1_1SummarizerConfig.html#af6ecc0eb08ed2aa7301f4ed75c87203a">strus::SummarizerConfig</a>
+: <a class="el" href="classstrus_1_1SummarizerConfig.html#abcc959bf41076815e83a2d203d8ce589">strus::SummarizerConfig</a>
 , <a class="el" href="classstrus_1_1WeightingConfig.html#a0c693ea501d1e12d1c005f31bd3f15b3">strus::WeightingConfig</a>
 </li>
 <li>definePeerMessageProcessor()
@@ -222,6 +233,9 @@
 </li>
 <li>definePhraseType()
 : <a class="el" href="classstrus_1_1QueryAnalyzer.html#ade6afe56bb5d22737907a02b97b9384f">strus::QueryAnalyzer</a>
+</li>
+<li>defineTermStatistics()
+: <a class="el" href="classstrus_1_1Query.html#aee5cf363a3af2be087cb9e17b75a918d">strus::Query</a>
 </li>
 <li>deleteDocument()
 : <a class="el" href="classstrus_1_1StorageTransaction.html#a860c6e5fc426e24b835edcdfad818743">strus::StorageTransaction</a>
@@ -235,6 +249,9 @@
 <li>detectDocumentClass()
 : <a class="el" href="classstrus_1_1Context.html#a174f61256044789625965498ce6072d2">strus::Context</a>
 </li>
+<li>df()
+: <a class="el" href="classstrus_1_1TermStatistics.html#abbbd0af5c4ee2b1c2a88e761d153548d">strus::TermStatistics</a>
+</li>
 <li>docid()
 : <a class="el" href="classstrus_1_1Document.html#a0ffacc48bf4216468f149c39dacb2266">strus::Document</a>
 </li>
@@ -242,7 +259,7 @@
 : <a class="el" href="classstrus_1_1Rank.html#a4c7677c89ec54cb3dcc50bb69cee78ce">strus::Rank</a>
 </li>
 <li>Document()
-: <a class="el" href="classstrus_1_1Document.html#a858c7016b7dfd79da829d9349bb7bbe6">strus::Document</a>
+: <a class="el" href="classstrus_1_1Document.html#a50a6c5c74d5582898a7b850b6300d83a">strus::Document</a>
 </li>
 <li>DocumentAnalyzeQueue()
 : <a class="el" href="classstrus_1_1DocumentAnalyzeQueue.html#aa00f947a84eadad1b40eec466bb5e8c9">strus::DocumentAnalyzeQueue</a>
@@ -251,10 +268,10 @@
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a864eefb2a44380512f93f7d6b721249d">strus::DocumentAnalyzer</a>
 </li>
 <li>DocumentClass()
-: <a class="el" href="classstrus_1_1DocumentClass.html#acb1eab345f64c241b38449ee231f242a">strus::DocumentClass</a>
+: <a class="el" href="classstrus_1_1DocumentClass.html#a4f8916b4e6954687251305cb5eaaff36">strus::DocumentClass</a>
 </li>
 <li>DocumentFrequencyChange()
-: <a class="el" href="classstrus_1_1DocumentFrequencyChange.html#ad59963d58ccb1ba6b7d3a0f424a6a958">strus::DocumentFrequencyChange</a>
+: <a class="el" href="classstrus_1_1DocumentFrequencyChange.html#afa8fba9a9aab5806b9029d4082f2fbed">strus::DocumentFrequencyChange</a>
 </li>
 <li>documentFrequencyChangeList()
 : <a class="el" href="classstrus_1_1PeerMessage.html#a861862cd7f83df37fbc86598a51ed68f">strus::PeerMessage</a>
@@ -264,7 +281,7 @@
 
 <h3><a class="anchor" id="index_e"></a>- e -</h3><ul>
 <li>encode()
-: <a class="el" href="classstrus_1_1PeerMessageQueue.html#adb7ca410715756c3b0306760ddd1539e">strus::PeerMessageQueue</a>
+: <a class="el" href="classstrus_1_1PeerStorageTransaction.html#ad30535c2b3f56297877266a9e9c41d68">strus::PeerStorageTransaction</a>
 </li>
 <li>encoding()
 : <a class="el" href="classstrus_1_1DocumentClass.html#a1831cd72fe2f6b6cd03ab30b579da218">strus::DocumentClass</a>
@@ -278,11 +295,20 @@
 <h3><a class="anchor" id="index_f"></a>- f -</h3><ul>
 <li>fetch()
 : <a class="el" href="classstrus_1_1DocumentAnalyzeQueue.html#af290cc494debe7cd5b5b7afb0108c1a0">strus::DocumentAnalyzeQueue</a>
-, <a class="el" href="classstrus_1_1PeerMessageQueue.html#a3ee2c5b36ecac0666555e0480eec91f3">strus::PeerMessageQueue</a>
 , <a class="el" href="classstrus_1_1QueryAnalyzeQueue.html#ad672f54d8de84cd94e205abd1ffa044e">strus::QueryAnalyzeQueue</a>
 </li>
 <li>forwardIndexTerms()
 : <a class="el" href="classstrus_1_1Document.html#a304f93af2f6bb7a5dda8e53c33d83caf">strus::Document</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_g"></a>- g -</h3><ul>
+<li>getNext()
+: <a class="el" href="classstrus_1_1PeerMessageIterator.html#adb58f6a2dc77f2b31d3ca57429c9a11c">strus::PeerMessageIterator</a>
+</li>
+<li>GlobalStatistics()
+: <a class="el" href="structstrus_1_1GlobalStatistics.html#a01eddcf9d3e560a45a63512a7f3b0918">strus::GlobalStatistics</a>
 </li>
 </ul>
 
@@ -333,6 +359,9 @@
 , <a class="el" href="classstrus_1_1MetaData.html#a2bca03e54100c5dd88809bb53cd15a8a">strus::MetaData</a>
 , <a class="el" href="classstrus_1_1RankAttribute.html#ae3653acc00d2f6dd38ea931ed2296a39">strus::RankAttribute</a>
 </li>
+<li>nofdocs()
+: <a class="el" href="structstrus_1_1GlobalStatistics.html#ac15e765fd417e2472cb73148a531df00">strus::GlobalStatistics</a>
+</li>
 <li>nofDocumentsInserted()
 : <a class="el" href="classstrus_1_1StorageClient.html#a6fa995dfb577d6550ba465fe06ea0cb6">strus::StorageClient</a>
 </li>
@@ -356,15 +385,18 @@
 <li>PeerMessage()
 : <a class="el" href="classstrus_1_1PeerMessage.html#ac889167f4c82ec79f17805d29ad73a6d">strus::PeerMessage</a>
 </li>
-<li>PeerMessageQueue()
-: <a class="el" href="classstrus_1_1PeerMessageQueue.html#ad0b0908a670b1932827acbf22eb37195">strus::PeerMessageQueue</a>
+<li>PeerMessageIterator()
+: <a class="el" href="classstrus_1_1PeerMessageIterator.html#a704f0ebe8465fad9d839c39620dd691a">strus::PeerMessageIterator</a>
+</li>
+<li>PeerStorageTransaction()
+: <a class="el" href="classstrus_1_1PeerStorageTransaction.html#a80c47b3700a2ed34bcd39117b167ce30">strus::PeerStorageTransaction</a>
 </li>
 <li>position()
 : <a class="el" href="classstrus_1_1Term.html#ab8af5bfd6bc4f89679d2a5e6c13f68dd">strus::Term</a>
 </li>
 <li>push()
-: <a class="el" href="classstrus_1_1DocumentAnalyzeQueue.html#a5a7a2de9b14eaa0fa826b6bc444a9a55">strus::DocumentAnalyzeQueue</a>
-, <a class="el" href="classstrus_1_1PeerMessageQueue.html#acec51ddf5a548ca5f9fc5b2b523936ba">strus::PeerMessageQueue</a>
+: <a class="el" href="classstrus_1_1DocumentAnalyzeQueue.html#a87532c479f3bd1b2143ff935f0a927e3">strus::DocumentAnalyzeQueue</a>
+, <a class="el" href="classstrus_1_1PeerStorageTransaction.html#a7a6e4fdc4d9ebe30c8a38994315e3748">strus::PeerStorageTransaction</a>
 , <a class="el" href="classstrus_1_1QueryAnalyzeQueue.html#a9f6fbbda0089750764f3881c4a08b8df">strus::QueryAnalyzeQueue</a>
 </li>
 <li>pushExpression()
@@ -403,7 +435,8 @@
 : <a class="el" href="classstrus_1_1RankAttribute.html#ab30c561be2855a09920cc658eb92b15f">strus::RankAttribute</a>
 </li>
 <li>rollback()
-: <a class="el" href="classstrus_1_1StorageTransaction.html#a3a0d0b946991fbe6450121c3c51ad1a5">strus::StorageTransaction</a>
+: <a class="el" href="classstrus_1_1PeerStorageTransaction.html#a03a7c2c429edbfa88504e77df962a199">strus::PeerStorageTransaction</a>
+, <a class="el" href="classstrus_1_1StorageTransaction.html#a3a0d0b946991fbe6450121c3c51ad1a5">strus::StorageTransaction</a>
 </li>
 </ul>
 
@@ -414,6 +447,12 @@
 </li>
 <li>searchIndexTerms()
 : <a class="el" href="classstrus_1_1Document.html#adb2e34a965b40eb569f9a87f1d8bfa47">strus::Document</a>
+</li>
+<li>set_df()
+: <a class="el" href="classstrus_1_1TermStatistics.html#ac7b03c6fef91925ca1f343c6645be3a7">strus::TermStatistics</a>
+</li>
+<li>set_nofdocs()
+: <a class="el" href="structstrus_1_1GlobalStatistics.html#a93e22735b37fba8a3318087011fb8d15">strus::GlobalStatistics</a>
 </li>
 <li>setAttribute()
 : <a class="el" href="classstrus_1_1Document.html#a901cd3c334cf10c322537ae1722c737e">strus::Document</a>
@@ -445,9 +484,6 @@
 <li>size()
 : <a class="el" href="classstrus_1_1QueryExpression.html#a8a7f99c4f025b37a8141232eaf7e77f6">strus::QueryExpression</a>
 </li>
-<li>start()
-: <a class="el" href="classstrus_1_1PeerMessageQueue.html#a113dad5b977ceec3fdb626de5b706a0b">strus::PeerMessageQueue</a>
-</li>
 <li>StorageClient()
 : <a class="el" href="classstrus_1_1StorageClient.html#aee4038a73f1a9aff3ded22a53b77ea32">strus::StorageClient</a>
 </li>
@@ -460,6 +496,9 @@
 <h3><a class="anchor" id="index_t"></a>- t -</h3><ul>
 <li>Term()
 : <a class="el" href="classstrus_1_1Term.html#a9a8ae2873fe990739462061213ea3010">strus::Term</a>
+</li>
+<li>TermStatistics()
+: <a class="el" href="classstrus_1_1TermStatistics.html#a4e067de3763cead0757f5388beb800a8">strus::TermStatistics</a>
 </li>
 <li>type()
 : <a class="el" href="classstrus_1_1DocumentFrequencyChange.html#ae5eefdda73057b7c53445333d5177003">strus::DocumentFrequencyChange</a>
@@ -539,7 +578,7 @@
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Dec 4 2015 08:40:59 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Dec 5 2015 18:38:22 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
