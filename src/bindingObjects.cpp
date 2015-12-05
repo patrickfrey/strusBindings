@@ -46,7 +46,10 @@
 #include "strus/moduleLoaderInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
-#include "strus/peerMessageQueueInterface.hpp"
+#include "strus/peerMessageIteratorInterface.hpp"
+#include "strus/peerStorageTransactionInterface.hpp"
+#include "strus/peerMessageViewerInterface.hpp"
+#include "strus/peerMessageBuilderInterface.hpp"
 #include "strus/docnoRangeAllocatorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
@@ -940,18 +943,50 @@ StorageClient::StorageClient( const StorageClient& o)
 GlobalCounter StorageClient::nofDocumentsInserted() const
 {
 	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->globalNofDocumentsInserted();
 }
 
 StorageTransaction StorageClient::createTransaction() const
 {
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return StorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
+}
+
+PeerMessageIterator StorageClient::createInitPeerMessageIterator() const
+{
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
+	iter.reset( storage->createInitPeerMessageIterator());
+	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+}
+
+PeerMessageIterator StorageClient::createUpdatePeerMessageIterator() const
+{
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
+	iter.reset( storage->createUpdatePeerMessageIterator());
+	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+}
+
+PeerStorageTransaction StorageClient::createPeerStorageTransaction()
+{
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	return PeerStorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
 void StorageClient::close()
 {
-	strus::StorageClientInterface* THIS = (strus::StorageClientInterface*)m_storage_impl.get();
-	THIS->close();
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	bool preverr = errorhnd->hasError();
+	m_storage_impl.reset();
+	if (!preverr && errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error detected after calling storage client close: %s"), errorhnd->fetchError());
+	}
 }
 
 StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& errorhnd_, const Reference& storage_)
@@ -1106,61 +1141,26 @@ void StorageTransaction::rollback()
 	}
 }
 
-
-PeerMessageQueue StorageClient::createPeerMessageQueue() const
-{
-	return PeerMessageQueue( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
-}
-
-PeerMessageQueue::PeerMessageQueue( const PeerMessageQueue& o)
+PeerMessageIterator::PeerMessageIterator( const PeerMessageIterator& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
-	,m_msgqueue_impl(o.m_msgqueue_impl){}
+	,m_iter_impl(o.m_iter_impl){}
 
-PeerMessageQueue::PeerMessageQueue( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_)
+PeerMessageIterator::PeerMessageIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_objbuilder_impl(objbuilder)
 	,m_storage_impl(storage_)
-	,m_msgqueue_impl(ReferenceDeleter<strus::PeerMessageQueueInterface>::function)
+	,m_iter_impl(iter_)
+{}
 
+std::string PeerMessageIterator::getNext()
 {
-	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
-	m_msgqueue_impl.reset( storage->createPeerMessageQueue());
-}
-
-void PeerMessageQueue::start( bool sign)
-{
-	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	pmq->start( sign);
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT("error populating initialization/deinitialization from storage: %s"), errorhnd->fetchError());
-	}
-}
-
-std::string PeerMessageQueue::push( const std::string& msg)
-{
-	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::PeerMessageIteratorInterface* iter = (strus::PeerMessageIteratorInterface*)m_iter_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const char* outmsg;
 	std::size_t outmsgsize;
-	pmq->push( msg.c_str(), msg.size(), outmsg, outmsgsize);
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT("error pushing message from peer storage: %s"), errorhnd->fetchError());
-	}
-	return std::string( outmsg, outmsgsize);
-}
-
-std::string PeerMessageQueue::fetch()
-{
-	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const char* outmsg;
-	std::size_t outmsgsize;
-	if (!pmq->fetch( outmsg, outmsgsize))
+	if (!iter->getNext( outmsg, outmsgsize))
 	{
 		if (errorhnd->hasError())
 		{
@@ -1170,11 +1170,11 @@ std::string PeerMessageQueue::fetch()
 	return std::string( outmsg, outmsgsize);
 }
 
-PeerMessage PeerMessageQueue::decode( const std::string& blob) const
+PeerMessage PeerMessageIterator::decode( const std::string& blob) const
 {
-	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::PeerMessageProcessorInterface* proc = pmq->getMessageProcessor();
+	const strus::PeerMessageProcessorInterface* proc = storage->getPeerMessageProcessor();
 	std::auto_ptr<strus::PeerMessageViewerInterface> viewer( proc->createViewer( blob.c_str(), blob.size()));
 	std::vector<DocumentFrequencyChange> dflist;
 	strus::PeerMessageViewerInterface::DocumentFrequencyChange rec;
@@ -1190,11 +1190,64 @@ PeerMessage PeerMessageQueue::decode( const std::string& blob) const
 	return PeerMessage( dflist, nofdocs);
 }
 
-std::string PeerMessageQueue::encode( const PeerMessage& msg) const
+PeerStorageTransaction::PeerStorageTransaction( const PeerStorageTransaction& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_transaction_impl(o.m_transaction_impl){}
+
+PeerStorageTransaction::PeerStorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_objbuilder_impl(objbuilder)
+	,m_storage_impl(storage_)
+	,m_transaction_impl(ReferenceDeleter<strus::PeerStorageTransactionInterface>::function)
 {
-	strus::PeerMessageQueueInterface* pmq = (strus::PeerMessageQueueInterface*)m_msgqueue_impl.get();
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	m_transaction_impl.reset( storage->createPeerStorageTransaction());
+}
+
+void PeerStorageTransaction::push( const std::string& msg, bool sign)
+{
+	strus::PeerStorageTransactionInterface* transaction = (strus::PeerStorageTransactionInterface*)m_transaction_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::PeerMessageProcessorInterface* proc = pmq->getMessageProcessor();
+	transaction->push( msg.c_str(), msg.size(), sign);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error pushing message from peer storage: %s"), errorhnd->fetchError());
+	}
+}
+
+std::string PeerStorageTransaction::commit()
+{
+	strus::PeerStorageTransactionInterface* transaction = (strus::PeerStorageTransactionInterface*)m_transaction_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const char* outmsg;
+	std::size_t outmsgsize;
+	if (transaction->commit( outmsg, outmsgsize))
+	{
+		return std::string( outmsg, outmsgsize);
+	}
+	else if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error in peer storage transaction commit: %s"), errorhnd->fetchError());
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("unknown error in peer storage transaction"));
+	}
+}
+
+void PeerStorageTransaction::rollback()
+{
+	strus::PeerStorageTransactionInterface* transaction = (strus::PeerStorageTransactionInterface*)m_transaction_impl.get();
+	transaction->rollback();
+}
+
+std::string PeerStorageTransaction::encode( const PeerMessage& msg) const
+{
+	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::PeerMessageProcessorInterface* proc = storage->getPeerMessageProcessor();
 	strus::PeerMessageProcessorInterface::BuilderOptions options;
 	std::auto_ptr<strus::PeerMessageBuilderInterface> builder( proc->createBuilder( options));
 	std::vector<DocumentFrequencyChange>::const_iterator
@@ -1540,6 +1593,22 @@ void Query::defineMetaDataRestriction(
 		int value, bool newGroup)
 {
 	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+}
+
+void Query::defineTermStatistics( const std::string& type_, const std::string& value_, const TermStatistics& stats_)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	strus::TermStatistics stats;
+	stats.setDocumentFrequency( stats_.df());
+	THIS->defineTermStatistics( type_, value_, stats);
+}
+
+void Query::defineGlobalStatistics( const GlobalStatistics& stats_)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	strus::GlobalStatistics stats;
+	stats.setNofDocumentsInserted( stats_.nofdocs());
+	THIS->defineGlobalStatistics( stats);
 }
 
 void Query::addDocumentEvaluationSet(

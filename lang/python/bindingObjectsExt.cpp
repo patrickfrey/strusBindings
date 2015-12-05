@@ -391,6 +391,46 @@ void Query::defineFeature_expr_3( const String& set_, const FunctionObject& expr
 	}
 }
 
+void Query::defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_)
+{
+	defineTermStatistics( type_, convert_wstring_to_uft8string( value_), stats_);
+}
+
+void Query::defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& expr_)
+{
+	boost::python::extract<TermStatistics> expr(expr_);
+	if (expr.check())
+	{
+		defineTermStatistics( type_, value_, (const TermStatistics&)expr);
+	}
+	else
+	{
+		TermStatistics stats;
+		initTermStatistics( stats, expr_.ptr());
+		defineTermStatistics( type_, value_, stats);
+	}
+}
+
+void Query::defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_)
+{
+	defineTermStatistics_struct( type_, convert_wstring_to_uft8string( value_), stats_);
+}
+
+void Query::defineGlobalStatistics_struct( const FunctionObject& expr_)
+{
+	boost::python::extract<GlobalStatistics> expr(expr_);
+	if (expr.check())
+	{
+		defineGlobalStatistics( (const GlobalStatistics&)expr);
+	}
+	else
+	{
+		GlobalStatistics stats;
+		initGlobalStatistics( stats, expr_.ptr());
+		defineGlobalStatistics( stats);
+	}
+}
+
 StorageClient Context::createStorageClient_0()
 {
 	return createStorageClient();

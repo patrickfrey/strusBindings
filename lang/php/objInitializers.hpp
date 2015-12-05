@@ -42,6 +42,8 @@ int initWeightingConfig( WeightingConfig& result, zval* obj);
 int initQueryExpression( QueryExpression& result, zval* obj);
 int initStringVector( std::vector<std::string>& result, zval* obj);
 int initIntVector( std::vector<int>& result, zval* obj);
+int initGlobalStatistics( GlobalStatistics& result, zval* obj);
+int initTermStatistics( TermStatistics& result, zval* obj);
 
 int getTermVector( zval* result, const std::vector<Term>& ar);
 int getRankVector( zval* result, const std::vector<Rank>& ar);

@@ -28,6 +28,13 @@
 */
 #include "objInitializers.hpp"
 #include "private/internationalization.hpp"
+#include "private/internationalization.hpp"
+#include <boost/algorithm/string.hpp>
+
+static bool caseInsensitiveEquals( const std::string& val1, const std::string& val2)
+{
+	return boost::algorithm::iequals( val1, val2);
+}
 
 class PyObjectReference
 {
@@ -721,5 +728,108 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 	{
 		throw strus::runtime_error( _TXT("list of integers or single integer expected (check)"));
 	}
+}
+
+class TermStatisticsBuilder
+{
+public:
+	explicit TermStatisticsBuilder( TermStatistics* result_)
+		:m_result(result_){}
+
+	void set( const char* name, GlobalCounter value)
+	{
+		if (caseInsensitiveEquals( name, "df"))
+		{
+			m_result->set_df( value);
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("unknown term statistics identifier: %s (only 'df' known)"), name);
+		}
+	}
+
+private:
+	TermStatistics* m_result;
+};
+
+class GlobalStatisticsBuilder
+{
+public:
+	explicit GlobalStatisticsBuilder( GlobalStatistics* result_)
+		:m_result(result_){}
+
+	void set( const char* name, GlobalCounter value)
+	{
+		if (caseInsensitiveEquals( name, "nofdocs"))
+		{
+			m_result->set_nofdocs( value);
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("unknown global statistics identifier: %s (only 'nofdocs' known)"), name);
+		}
+	}
+
+private:
+	GlobalStatistics* m_result;
+};
+
+template <class Builder, class Result>
+void initStatistics( Result& result, PyObject* obj)
+{
+	Builder builder( &result);
+	if (PyDict_Check( obj))
+	{
+		PyObjectReference key_obj;
+		PyObject *keyitem, *valueitem;
+		Py_ssize_t pos = 0;
+		
+		while (PyDict_Next( obj, &pos, &keyitem, &valueitem))
+		{
+			const char* key = 0;
+			GlobalCounter value;
+			if (PyString_Check( keyitem))
+			{
+				key = PyString_AS_STRING( keyitem);
+			}
+			else if (PyUnicode_Check( keyitem))
+			{
+				key_obj = PyUnicode_AsUTF8String( keyitem);
+				if (!key_obj) throw strus::runtime_error( _TXT( "statistics element with non string key"));
+				key = PyString_AS_STRING( key_obj.ptr());
+			}
+			else
+			{
+				throw strus::runtime_error( _TXT("illegal key for statistics structure"), key);
+			}
+			if (PyLong_Check( valueitem))
+			{
+				value = PyInt_AS_LONG( valueitem);
+			}
+			else if (PyInt_Check( obj))
+			{
+				value = PyInt_AS_LONG( valueitem);
+			}
+			else
+			{
+				throw strus::runtime_error( _TXT("expected integer for statistics value of %s"), key);
+			}
+			builder.set( key, value);
+		}
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("expected dictionary for statistics"));
+	}
+}
+
+void initTermStatistics( TermStatistics& result, PyObject* obj)
+{
+	initStatistics<TermStatisticsBuilder,TermStatistics>( result, obj);
+}
+
+void initGlobalStatistics( GlobalStatistics& result, PyObject* obj)
+{
+	initStatistics<GlobalStatisticsBuilder,GlobalStatistics>( result, obj);
 }
 

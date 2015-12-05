@@ -1026,7 +1026,9 @@ private:
 };
 
 /// \brief Forward declaration
-class PeerMessageQueue;
+class PeerMessageIterator;
+/// \brief Forward declaration
+class PeerStorageTransaction;
 /// \brief Forward declaration
 class StorageTransaction;
 
@@ -1052,9 +1054,17 @@ public:
 	/// return the transaction object created
 	StorageTransaction createTransaction() const;
 
-	/// \brief Create a handler for processing distributed storage statistics
-	/// return the peer message queue object created
-	PeerMessageQueue createPeerMessageQueue() const;
+	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
+	/// return the peer message iterator object created
+	PeerMessageIterator createInitPeerMessageIterator() const;
+
+	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
+	/// return the peer message iterator object created
+	PeerMessageIterator createUpdatePeerMessageIterator() const;
+
+	/// \brief Create a transaction object to update distributed storage statistics from another peer storage
+	/// return the peer transaction object created
+	PeerStorageTransaction createPeerStorageTransaction();
 
 	/// \brief Close of the storage client
 	void close();
@@ -1225,33 +1235,57 @@ private:
 };
 
 
-/// \brief Pair of queues for messages to and from peer storages for distributing statistics
-class PeerMessageQueue
+/// \brief Iterator on messages to send to other peer storages
+class PeerMessageIterator
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	PeerMessageQueue(){}
+	PeerMessageIterator(){}
 #endif
 	/// \brief Copy constructor
-	PeerMessageQueue( const PeerMessageQueue& o);
+	PeerMessageIterator( const PeerMessageIterator& o);
 
-	/// \brief Notify initialization/deinitialization, fetching local statistics to populate to other peers
-	/// \param[in] sign of the statistics to populate, true = positive (on initialization), false = negative (on deinitialization)
-	void start( bool sign);
-
-	/// \brief Push a message from another peer storage
-	/// \param[in] msg message from peer
-	/// \return message to reply to sender or empty blob if there is nothing to reply
-	String push( const String& msg);
-
-	/// \brief Fetches the next message to distribute to all other peers
+	/// \brief Fetches the next message to distribute other peers
 	/// \return message blob or empty string if there is no message left
-	String fetch();
+	String getNext();
 
 	/// \brief Decode a peer message blob for introspection
 	/// \param[in] blob peer message blob
 	/// \return the peer message
 	PeerMessage decode( const String& blob) const;
+
+private:
+	friend class StorageClient;
+	PeerMessageIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+	Reference m_iter_impl;
+};
+
+/// \brief Transation to update a storage with messages from other peer storages
+class PeerStorageTransaction
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerStorageTransaction(){}
+#endif
+	/// \brief Copy constructor
+	PeerStorageTransaction( const PeerStorageTransaction& o);
+
+	/// \brief Push a message from another peer storage
+	/// \param[in] msg message from peer
+	/// \param[in] sign true, if the sign of the increments is positive, false if negative (inverted sign, decrement)
+	/// \return message to reply to sender or empty blob if there is nothing to reply
+	void push( const String& msg, bool sign);
+
+	/// \brief Commit of the transaction
+	String commit();
+
+	/// \brief Rollback of the transaction
+	void rollback();
 
 	/// \brief Create binary blob to push from peer message structure
 	/// \param[in] msg peer message structure
@@ -1260,13 +1294,13 @@ public:
 
 private:
 	friend class StorageClient;
-	PeerMessageQueue( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
+	PeerStorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
 
 private:
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
-	Reference m_msgqueue_impl;
+	Reference m_transaction_impl;
 };
 
 
@@ -1699,6 +1733,57 @@ private:
 };
 
 
+/// \brief Structure holding the statistics of a term to be used in a query
+/// \note If values of this structure are undefined, then the storage values are used
+class TermStatistics
+{
+public:
+	/// \brief Constructor
+	TermStatistics()
+		:m_df(-1){}
+	/// \brief Constructor
+	TermStatistics( GlobalCounter df_)
+		:m_df(df_){}
+	/// \brief Copy constructor
+	TermStatistics( const TermStatistics& o)
+		:m_df(o.m_df){}
+
+	/// \brief Get the global document frequency
+	/// \return the global document frequency or -1 for undefined, if undefined then the value cache for the global dfs in the document frequency or what is stored in the local storage)
+	GlobalCounter df() const		{return m_df;}
+	/// \brief Set the global document frequency for a term in a query evaluation
+	/// \param[in] df_ the document frequency value to use
+	void set_df( GlobalCounter df_)		{m_df = df_;}
+
+private:
+	GlobalCounter m_df;		///< global document frequency (-1 for undefined, if undefined then the value cache for the global dfs in the document frequency or what is stored in the local storage)
+};
+
+/// \brief Global document statistics, if passed down with the query
+/// \note If values of this structure are undefined, then the storage values are used
+struct GlobalStatistics
+{
+	/// \brief Default constructor
+	GlobalStatistics()
+		:m_nofDocumentsInserted(-1){}
+	/// \brief Constructor
+	explicit GlobalStatistics( GlobalCounter nofDocumentsInserted_)
+		:m_nofDocumentsInserted(nofDocumentsInserted_){}
+	/// \brief Copy constructor
+	GlobalStatistics( const GlobalStatistics& o)
+		:m_nofDocumentsInserted(o.m_nofDocumentsInserted){}
+
+	/// \brief Get the global total number of documents in the collection
+	GlobalCounter nofdocs() const				{return m_nofDocumentsInserted;}
+	/// \brief Set the global total number of documents in the collection for a query evaluation
+	/// \param[in] nofdocs_ the total number of documents value to use
+	void set_nofdocs( GlobalCounter nofdocs_)		{m_nofDocumentsInserted = nofdocs_;}
+
+private:
+	GlobalCounter m_nofDocumentsInserted;	///< global number of documents inserted (-1 for undefined, if undefined then the storage value of the global number of documents is used)
+};
+
+
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
@@ -1816,6 +1901,22 @@ public:
 	{
 		defineMetaDataRestriction( compareOp, name, value, newGroup);
 	}
+#endif
+	/// \brief Define term statistics to use for a term for weighting it in this query
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
+	/// \param[in] stats_ the structure with the statistics to set
+	void defineTermStatistics( const String& type_, const String& value_, const TermStatistics& stats_);
+
+	/// \brief Define the global statistics to use for weighting in this query
+	/// \param[in] stats_ the structure with the statistics to set
+	void defineGlobalStatistics( const GlobalStatistics& stats_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_);
+	void defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& stats_);
+	void defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_);
+	void defineGlobalStatistics_struct( const FunctionObject& stats_);
 #endif
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage

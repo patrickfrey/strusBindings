@@ -19,13 +19,16 @@ set( generated_java_source_files
 	QueryEval.java
 	Query.java
 	QueryExpression.java
+	TermStatistics.java
+	GlobalStatistics.java
 	RankAttribute.java
 	RankAttributeVector.java
 	Rank.java
 	RankVector.java
 	StorageClient.java
 	StorageTransaction.java
-	PeerMessageQueue.java
+	PeerStorageTransaction.java
+	PeerMessageIterator.java
 	PeerMessage.java
 	StringVector.java
 	Context.java

@@ -26,13 +26,19 @@
 
 --------------------------------------------------------------------
 */
+#include "objInitializers.hpp"
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>
 #include <limits>
-#include "objInitializers.hpp"
+#include <boost/algorithm/string.hpp>
 
 #define THROW_EXCEPTION( MSG) zend_throw_exception( NULL, const_cast<char*>( MSG), 0 TSRMLS_CC)
+
+static bool caseInsensitiveEquals( const std::string& val1, const std::string& val2)
+{
+	return boost::algorithm::iequals( val1, val2);
+}
 
 int initVariant( Variant& result, zval* obj)
 {
@@ -703,6 +709,149 @@ int initIntVector( std::vector<int>& result, zval* obj)
 			break;
 	}
 	return error;
+}
+
+
+class TermStatisticsBuilder
+{
+public:
+	explicit TermStatisticsBuilder( TermStatistics* result_)
+		:m_result(result_){}
+
+	void set( const std::string& name, GlobalCounter value)
+	{
+		if (caseInsensitiveEquals( name, "df"))
+		{
+			m_result->set_df( value);
+		}
+		else
+		{
+			throw std::runtime_error( "unknown term statistics identifier (only 'df' known)");
+		}
+	}
+
+private:
+	TermStatistics* m_result;
+};
+
+class GlobalStatisticsBuilder
+{
+public:
+	explicit GlobalStatisticsBuilder( GlobalStatistics* result_)
+		:m_result(result_){}
+
+	void set( const std::string& name, GlobalCounter value)
+	{
+		if (caseInsensitiveEquals( name, "nofdocs"))
+		{
+			m_result->set_nofdocs( value);
+		}
+		else
+		{
+			throw std::runtime_error( "unknown global statistics identifier (only 'nofdocs' known)");
+		}
+	}
+
+private:
+	GlobalStatistics* m_result;
+};
+
+template <class Builder, class Object>
+static int initStructureObject( Object& result, zval* obj)
+{
+	Builder builder( &result);
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			THROW_EXCEPTION( "unable to convert LONG to structure");
+			error = -1;
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to structure");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			THROW_EXCEPTION( "unable to convert DOUBLE to structure");
+			error = -1;
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to structure");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P( obj);
+			int argcnt = 0;
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
+			{
+				zval val;
+				INIT_ZVAL( val);
+				char *key;
+				unsigned int keysize;
+				unsigned long index;
+
+				if (!zend_hash_get_current_key_ex( hash, &key, &keysize, &index, 0, &ptr) == HASH_KEY_IS_STRING)
+				{
+					THROW_EXCEPTION( "key in structure is not a string (name of the item)");
+					error = -1;
+					break;
+				}
+				try
+				{
+					if (Z_TYPE_PP(data) != IS_LONG)
+					{
+						THROW_EXCEPTION( "integer value expected for element in statistics structure");
+					}
+					builder.set( std::string(key,keysize), Z_LVAL_PP( data));
+				}
+				catch (const std::runtime_error& err)
+				{
+					THROW_EXCEPTION( err.what());
+					error = -1;
+					break;
+				}
+				catch (const std::bad_alloc&)
+				{
+					THROW_EXCEPTION( "memory allocation error");
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to function object");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to function object");
+			error = -1;
+			break;
+		default: 
+			THROW_EXCEPTION( "unable to convert unknown type to function object");
+			error = -1;
+			break;
+	}
+	return error;
+}
+
+int initGlobalStatistics( GlobalStatistics& result, zval* obj)
+{
+	return initStructureObject<GlobalStatisticsBuilder,GlobalStatistics>( result, obj);
+}
+
+int initTermStatistics( TermStatistics& result, zval* obj)
+{
+	return initStructureObject<TermStatisticsBuilder,TermStatistics>( result, obj);
 }
 
 int getTermVector( zval* result, const std::vector<Term>& ar)
