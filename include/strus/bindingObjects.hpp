@@ -1055,8 +1055,9 @@ public:
 	StorageTransaction createTransaction() const;
 
 	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
+	/// \param[in] sign true = registration, false = deregistration
 	/// return the peer message iterator object created
-	PeerMessageIterator createInitPeerMessageIterator() const;
+	PeerMessageIterator createInitPeerMessageIterator( bool sign) const;
 
 	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
 	/// return the peer message iterator object created
@@ -1249,11 +1250,6 @@ public:
 	/// \return message blob or empty string if there is no message left
 	String getNext();
 
-	/// \brief Decode a peer message blob for introspection
-	/// \param[in] blob peer message blob
-	/// \return the peer message
-	PeerMessage decode( const String& blob) const;
-
 private:
 	friend class StorageClient;
 	PeerMessageIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
@@ -1277,20 +1273,14 @@ public:
 
 	/// \brief Push a message from another peer storage
 	/// \param[in] msg message from peer
-	/// \param[in] sign true, if the sign of the increments is positive, false if negative (inverted sign, decrement)
 	/// \return message to reply to sender or empty blob if there is nothing to reply
-	void push( const String& msg, bool sign);
+	void push( const String& msg);
 
 	/// \brief Commit of the transaction
 	String commit();
 
 	/// \brief Rollback of the transaction
 	void rollback();
-
-	/// \brief Create binary blob to push from peer message structure
-	/// \param[in] msg peer message structure
-	/// \return the peer message blob
-	String encode( const PeerMessage& msg) const;
 
 private:
 	friend class StorageClient;
@@ -1301,6 +1291,34 @@ private:
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
+};
+
+
+/// \brief Transation to update a storage with messages from other peer storages
+class PeerMessageProcessor
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	PeerMessageProcessor(){}
+#endif
+	/// \brief Decode a peer message blob for introspection
+	/// \param[in] blob peer message blob
+	/// \return the peer message
+	PeerMessage decode( const String& blob) const;
+	
+	/// \brief Create binary blob to push from peer message structure
+	/// \param[in] msg peer message structure
+	/// \return the peer message blob
+	String encode( const PeerMessage& msg) const;
+
+private:
+	friend class Context;
+	PeerMessageProcessor( const Reference& objbuilder_, const Reference& errorhnd_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	const void* m_msgproc;
 };
 
 
@@ -2013,6 +2031,10 @@ public:
 	/// \param[in] name_ the name of the peer message processor
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void definePeerMessageProcessor( const String& name_);
+
+	/// \brief Create a peer message processor instance
+	/// \return the processor
+	PeerMessageProcessor createPeerMessageProcessor();
 
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);

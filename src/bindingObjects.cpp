@@ -953,12 +953,12 @@ StorageTransaction StorageClient::createTransaction() const
 	return StorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
-PeerMessageIterator StorageClient::createInitPeerMessageIterator() const
+PeerMessageIterator StorageClient::createInitPeerMessageIterator( bool sign) const
 {
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::PeerMessageIteratorInterface>::function);
-	iter.reset( storage->createInitPeerMessageIterator());
+	iter.reset( storage->createInitPeerMessageIterator( sign));
 	return PeerMessageIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
@@ -1170,26 +1170,6 @@ std::string PeerMessageIterator::getNext()
 	return std::string( outmsg, outmsgsize);
 }
 
-PeerMessage PeerMessageIterator::decode( const std::string& blob) const
-{
-	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::PeerMessageProcessorInterface* proc = storage->getPeerMessageProcessor();
-	std::auto_ptr<strus::PeerMessageViewerInterface> viewer( proc->createViewer( blob.c_str(), blob.size()));
-	std::vector<DocumentFrequencyChange> dflist;
-	strus::PeerMessageViewerInterface::DocumentFrequencyChange rec;
-	while (viewer->nextDfChange( rec))
-	{
-		dflist.push_back( DocumentFrequencyChange( rec.type, rec.value, rec.increment, rec.isnew));
-	}
-	int nofdocs = viewer->nofDocumentsInsertedChange();
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error(_TXT( "error peer message structure from blob: %s"), errorhnd->fetchError());
-	}
-	return PeerMessage( dflist, nofdocs);
-}
-
 PeerStorageTransaction::PeerStorageTransaction( const PeerStorageTransaction& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
@@ -1206,11 +1186,11 @@ PeerStorageTransaction::PeerStorageTransaction( const Reference& objbuilder, con
 	m_transaction_impl.reset( storage->createPeerStorageTransaction());
 }
 
-void PeerStorageTransaction::push( const std::string& msg, bool sign)
+void PeerStorageTransaction::push( const std::string& msg)
 {
 	strus::PeerStorageTransactionInterface* transaction = (strus::PeerStorageTransactionInterface*)m_transaction_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	transaction->push( msg.c_str(), msg.size(), sign);
+	transaction->push( msg.c_str(), msg.size());
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error pushing message from peer storage: %s"), errorhnd->fetchError());
@@ -1243,11 +1223,47 @@ void PeerStorageTransaction::rollback()
 	transaction->rollback();
 }
 
-std::string PeerStorageTransaction::encode( const PeerMessage& msg) const
+PeerMessageProcessor::PeerMessageProcessor( const Reference& objbuilder_, const Reference& errorhnd_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_objbuilder_impl(objbuilder_)
+	,m_msgproc(0)
 {
-	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::PeerMessageProcessorInterface* proc = storage->getPeerMessageProcessor();
+	m_msgproc = objBuilder->getPeerMessageProcessor();
+	if (!m_msgproc)
+	{
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT( "error getting peer message processor: %s"), errorhnd->fetchError());
+		}
+		throw strus::runtime_error(_TXT( "error peer message processor not defined"));
+	}
+}
+
+PeerMessage PeerMessageProcessor::decode( const std::string& blob) const
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::PeerMessageProcessorInterface* proc = (const strus::PeerMessageProcessorInterface*)m_msgproc;
+	std::auto_ptr<strus::PeerMessageViewerInterface> viewer( proc->createViewer( blob.c_str(), blob.size()));
+	std::vector<DocumentFrequencyChange> dflist;
+	strus::PeerMessageViewerInterface::DocumentFrequencyChange rec;
+	while (viewer->nextDfChange( rec))
+	{
+		dflist.push_back( DocumentFrequencyChange( rec.type, rec.value, rec.increment, rec.isnew));
+	}
+	int nofdocs = viewer->nofDocumentsInsertedChange();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "error peer message structure from blob: %s"), errorhnd->fetchError());
+	}
+	return PeerMessage( dflist, nofdocs);
+}
+
+std::string PeerMessageProcessor::encode( const PeerMessage& msg) const
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::PeerMessageProcessorInterface* proc = (const strus::PeerMessageProcessorInterface*)m_msgproc;
 	strus::PeerMessageProcessorInterface::BuilderOptions options;
 	std::auto_ptr<strus::PeerMessageBuilderInterface> builder( proc->createBuilder( options));
 	std::vector<DocumentFrequencyChange>::const_iterator
@@ -1799,6 +1815,12 @@ void Context::definePeerMessageProcessor( const std::string& name_)
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->definePeerMessageProcessor( name_);
+}
+
+PeerMessageProcessor Context::createPeerMessageProcessor()
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	return PeerMessageProcessor( m_storage_objbuilder_impl, m_errorhnd_impl);
 }
 
 void Context::initStorageObjBuilder()

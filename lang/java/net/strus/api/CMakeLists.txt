@@ -29,6 +29,7 @@ set( generated_java_source_files
 	StorageTransaction.java
 	PeerStorageTransaction.java
 	PeerMessageIterator.java
+	PeerMessageProcessor.java
 	PeerMessage.java
 	StringVector.java
 	Context.java

@@ -30,6 +30,7 @@
 %rename(StrusStorageTransaction) StorageTransaction;
 %rename(StrusPeerStorageTransaction) PeerStorageTransaction;
 %rename(StrusPeerMessage) PeerMessage;
+%rename(StrusPeerMessageProcessor) PeerMessageProcessor;
 %rename(StrusPeerMessageIterator) PeerMessageIterator;
 %rename(StrusSummarizerConfig) SummarizerConfig;
 %rename(StrusWeightingConfig) WeightingConfig;
