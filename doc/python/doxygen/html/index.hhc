@@ -143,7 +143,7 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classstrus_1_1StorageClient.html#aee4038a73f1a9aff3ded22a53b77ea32"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="~StorageClient"><param name="Local" value="classstrus_1_1StorageClient.html#a082a01cf19e232a6878cd225d81f78a1"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitPeerMessageIterator"><param name="Local" value="classstrus_1_1StorageClient.html#a906ceeca40850695f10cbbdf989b2291"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitPeerMessageIterator"><param name="Local" value="classstrus_1_1StorageClient.html#a337b0d32eb42638cbacbd3e5fe564009"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerStorageTransaction"><param name="Local" value="classstrus_1_1StorageClient.html#a3c2fb140c2fd5603cf050c52c179e415"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createTransaction"><param name="Local" value="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createUpdatePeerMessageIterator"><param name="Local" value="classstrus_1_1StorageClient.html#ac032c4382b9dc4410f821c7426165aea"><param name="ImageNumber" value="11"></OBJECT>
@@ -186,7 +186,6 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a704f0ebe8465fad9d839c39620dd691a"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#ab22cb2b5a639b0e4324f33372425e564"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="getNext"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#adb58f6a2dc77f2b31d3ca57429c9a11c"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
@@ -194,10 +193,15 @@
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerStorageTransaction"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a80c47b3700a2ed34bcd39117b167ce30"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="commit"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a314c02ab4df67597fb40c5f2a7a96787"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#ad30535c2b3f56297877266a9e9c41d68"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="push"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7a6e4fdc4d9ebe30c8a38994315e3748"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="push"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a068d13b011efb1d755005e20d34086cc"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="rollback"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a03a7c2c429edbfa88504e77df962a199"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageProcessor"><param name="ImageNumber" value="1"></OBJECT>
+        <UL>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classstrus_1_1PeerMessageProcessor.html#aafcdd91c3ca03d0c11fa38e100f7ccca"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classstrus_1_1PeerMessageProcessor.html#afc34d1710c7bdf1120bec093722b0e99"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classstrus_1_1PeerMessageProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
@@ -318,6 +322,7 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="addResourcePath"><param name="Local" value="classstrus_1_1Context.html#a00aec90271bac5d784e686dc3862cd24"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classstrus_1_1Context.html#ac1bf6f537be6769276aefa4dea02b837"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createDocumentAnalyzer"><param name="Local" value="classstrus_1_1Context.html#a3681d959a702209d8997b7b01978884b"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerMessageProcessor"><param name="Local" value="classstrus_1_1Context.html#a20405d07a4e477ce7db3301980c191a2"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryAnalyzer"><param name="Local" value="classstrus_1_1Context.html#a6885f6707f776a23b8229b70e3eafec3"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryEval"><param name="Local" value="classstrus_1_1Context.html#af8545259660310ac9b676f9447721bfe"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorage"><param name="Local" value="classstrus_1_1Context.html#a359f2db0302551d36d67bd7384989c26"><param name="ImageNumber" value="11"></OBJECT>
@@ -485,7 +490,7 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classstrus_1_1StorageClient.html#aee4038a73f1a9aff3ded22a53b77ea32"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="~StorageClient"><param name="Local" value="classstrus_1_1StorageClient.html#a082a01cf19e232a6878cd225d81f78a1"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitPeerMessageIterator"><param name="Local" value="classstrus_1_1StorageClient.html#a906ceeca40850695f10cbbdf989b2291"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitPeerMessageIterator"><param name="Local" value="classstrus_1_1StorageClient.html#a337b0d32eb42638cbacbd3e5fe564009"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerStorageTransaction"><param name="Local" value="classstrus_1_1StorageClient.html#a3c2fb140c2fd5603cf050c52c179e415"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createTransaction"><param name="Local" value="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createUpdatePeerMessageIterator"><param name="Local" value="classstrus_1_1StorageClient.html#ac032c4382b9dc4410f821c7426165aea"><param name="ImageNumber" value="11"></OBJECT>
@@ -528,7 +533,6 @@
           <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a704f0ebe8465fad9d839c39620dd691a"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#ab22cb2b5a639b0e4324f33372425e564"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="getNext"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#adb58f6a2dc77f2b31d3ca57429c9a11c"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classstrus_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
@@ -536,10 +540,15 @@
             <UL>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerStorageTransaction"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a80c47b3700a2ed34bcd39117b167ce30"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="commit"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a314c02ab4df67597fb40c5f2a7a96787"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#ad30535c2b3f56297877266a9e9c41d68"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="push"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7a6e4fdc4d9ebe30c8a38994315e3748"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="push"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a068d13b011efb1d755005e20d34086cc"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="rollback"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a03a7c2c429edbfa88504e77df962a199"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classstrus_1_1PeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
+            </UL>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageProcessor"><param name="ImageNumber" value="1"></OBJECT>
+            <UL>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classstrus_1_1PeerMessageProcessor.html#aafcdd91c3ca03d0c11fa38e100f7ccca"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classstrus_1_1PeerMessageProcessor.html#afc34d1710c7bdf1120bec093722b0e99"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classstrus_1_1PeerMessageProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
@@ -660,6 +669,7 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="addResourcePath"><param name="Local" value="classstrus_1_1Context.html#a00aec90271bac5d784e686dc3862cd24"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classstrus_1_1Context.html#ac1bf6f537be6769276aefa4dea02b837"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createDocumentAnalyzer"><param name="Local" value="classstrus_1_1Context.html#a3681d959a702209d8997b7b01978884b"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerMessageProcessor"><param name="Local" value="classstrus_1_1Context.html#a20405d07a4e477ce7db3301980c191a2"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryAnalyzer"><param name="Local" value="classstrus_1_1Context.html#a6885f6707f776a23b8229b70e3eafec3"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryEval"><param name="Local" value="classstrus_1_1Context.html#af8545259660310ac9b676f9447721bfe"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorage"><param name="Local" value="classstrus_1_1Context.html#a359f2db0302551d36d67bd7384989c26"><param name="ImageNumber" value="11"></OBJECT>

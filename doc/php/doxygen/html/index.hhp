@@ -42,6 +42,8 @@ classPeerMessage.html
 classPeerMessage-members.html
 classPeerMessageIterator.html
 classPeerMessageIterator-members.html
+classPeerMessageProcessor.html
+classPeerMessageProcessor-members.html
 classPeerStorageTransaction.html
 classPeerStorageTransaction-members.html
 classQuery.html

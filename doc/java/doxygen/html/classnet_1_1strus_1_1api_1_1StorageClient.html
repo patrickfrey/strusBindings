@@ -78,9 +78,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0ed953e88baab2793be2b226d697a180"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageTransaction.html">StorageTransaction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#a0ed953e88baab2793be2b226d697a180">createTransaction</a> () const </td></tr>
 <tr class="memdesc:a0ed953e88baab2793be2b226d697a180"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a transaction return the transaction object created.  <a href="#a0ed953e88baab2793be2b226d697a180">More...</a><br/></td></tr>
 <tr class="separator:a0ed953e88baab2793be2b226d697a180"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95f6b1741cb8f2c74d465e9162f8ece9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#a95f6b1741cb8f2c74d465e9162f8ece9">createInitPeerMessageIterator</a> () const </td></tr>
-<tr class="memdesc:a95f6b1741cb8f2c74d465e9162f8ece9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization return the peer message iterator object created.  <a href="#a95f6b1741cb8f2c74d465e9162f8ece9">More...</a><br/></td></tr>
-<tr class="separator:a95f6b1741cb8f2c74d465e9162f8ece9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc32ec8bb4c7347f6e84fc031a77a4cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#afc32ec8bb4c7347f6e84fc031a77a4cf">createInitPeerMessageIterator</a> (bool sign) const </td></tr>
+<tr class="memdesc:afc32ec8bb4c7347f6e84fc031a77a4cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization.  <a href="#afc32ec8bb4c7347f6e84fc031a77a4cf">More...</a><br/></td></tr>
+<tr class="separator:afc32ec8bb4c7347f6e84fc031a77a4cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a116919a28f739993a60b7bfae1d19d32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#a116919a28f739993a60b7bfae1d19d32">createUpdatePeerMessageIterator</a> () const </td></tr>
 <tr class="memdesc:a116919a28f739993a60b7bfae1d19d32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (relative value) to distribute after storage updates return the peer message iterator object created.  <a href="#a116919a28f739993a60b7bfae1d19d32">More...</a><br/></td></tr>
 <tr class="separator:a116919a28f739993a60b7bfae1d19d32"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,20 +165,27 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a95f6b1741cb8f2c74d465e9162f8ece9"></a>
+<a class="anchor" id="afc32ec8bb4c7347f6e84fc031a77a4cf"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html">PeerMessageIterator</a> net::strus::api::StorageClient::createInitPeerMessageIterator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>sign</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization return the peer message iterator object created. </p>
+<p>Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sign</td><td>true = registration, false = deregistration return the peer message iterator object created </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -318,7 +325,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Dec 5 2015 18:37:15 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Dec 6 2015 14:25:45 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

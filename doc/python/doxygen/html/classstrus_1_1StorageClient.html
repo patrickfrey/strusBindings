@@ -78,9 +78,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a761be597e01e2f7d52a17bedb85b2554"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstrus_1_1StorageTransaction.html">StorageTransaction</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554">createTransaction</a> () const </td></tr>
 <tr class="memdesc:a761be597e01e2f7d52a17bedb85b2554"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a transaction return the transaction object created.  <a href="#a761be597e01e2f7d52a17bedb85b2554">More...</a><br/></td></tr>
 <tr class="separator:a761be597e01e2f7d52a17bedb85b2554"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a906ceeca40850695f10cbbdf989b2291"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstrus_1_1PeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a906ceeca40850695f10cbbdf989b2291">createInitPeerMessageIterator</a> () const </td></tr>
-<tr class="memdesc:a906ceeca40850695f10cbbdf989b2291"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization return the peer message iterator object created.  <a href="#a906ceeca40850695f10cbbdf989b2291">More...</a><br/></td></tr>
-<tr class="separator:a906ceeca40850695f10cbbdf989b2291"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a337b0d32eb42638cbacbd3e5fe564009"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstrus_1_1PeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#a337b0d32eb42638cbacbd3e5fe564009">createInitPeerMessageIterator</a> (bool sign) const </td></tr>
+<tr class="memdesc:a337b0d32eb42638cbacbd3e5fe564009"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization.  <a href="#a337b0d32eb42638cbacbd3e5fe564009">More...</a><br/></td></tr>
+<tr class="separator:a337b0d32eb42638cbacbd3e5fe564009"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac032c4382b9dc4410f821c7426165aea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classstrus_1_1PeerMessageIterator.html">PeerMessageIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1StorageClient.html#ac032c4382b9dc4410f821c7426165aea">createUpdatePeerMessageIterator</a> () const </td></tr>
 <tr class="memdesc:ac032c4382b9dc4410f821c7426165aea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an iterator on the storage statistics (relative value) to distribute after storage updates return the peer message iterator object created.  <a href="#ac032c4382b9dc4410f821c7426165aea">More...</a><br/></td></tr>
 <tr class="separator:ac032c4382b9dc4410f821c7426165aea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,20 +165,27 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a906ceeca40850695f10cbbdf989b2291"></a>
+<a class="anchor" id="a337b0d32eb42638cbacbd3e5fe564009"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classstrus_1_1PeerMessageIterator.html">PeerMessageIterator</a> strus::StorageClient::createInitPeerMessageIterator </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>sign</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization return the peer message iterator object created. </p>
+<p>Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sign</td><td>true = registration, false = deregistration return the peer message iterator object created </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -318,7 +325,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Dec 5 2015 18:38:21 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sun Dec 6 2015 14:26:07 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
