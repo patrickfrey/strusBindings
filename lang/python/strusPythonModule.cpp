@@ -216,12 +216,14 @@ bp::class_<PeerMessage>("PeerMessage")
 ;
 bp::class_<PeerMessageIterator>("PeerMessageIterator")
 	.def("getNext", &PeerMessageIterator::getNext)
-	.def("decode", &PeerMessageIterator::decode)
 ;
 bp::class_<PeerStorageTransaction>("PeerStorageTransaction")
 	.def("commit", &PeerStorageTransaction::commit)
 	.def("rollback", &PeerStorageTransaction::rollback)
-	.def("encode", &PeerStorageTransaction::encode)
+;
+bp::class_<PeerMessageProcessor>("PeerMessageProcessor")
+	.def("decode", &PeerMessageProcessor::decode)
+	.def("encode", &PeerMessageProcessor::encode)
 ;
 bp::class_<SummarizerConfig>("SummarizerConfig")
 ;
@@ -297,6 +299,7 @@ bp::class_<Context>("Context",bp::init<>())
 	.def("addModulePath", &Context::addModulePath_unicode)
 	.def("addResourcePath", &Context::addResourcePath)
 	.def("definePeerMessageProcessor", &Context::definePeerMessageProcessor)
+	.def("createPeerMessageProcessor", &Context::createPeerMessageProcessor)
 	.def("addResourcePath", &Context::addResourcePath_unicode)
 	.def("createStorageClient", &Context::createStorageClient_0)
 	.def("createStorageClient", &Context::createStorageClient_1)
