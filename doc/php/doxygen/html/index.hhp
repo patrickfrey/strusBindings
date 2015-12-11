@@ -38,14 +38,6 @@ classMetaData.html
 classMetaData-members.html
 classNormalizer.html
 classNormalizerVector.html
-classPeerMessage.html
-classPeerMessage-members.html
-classPeerMessageIterator.html
-classPeerMessageIterator-members.html
-classPeerMessageProcessor.html
-classPeerMessageProcessor-members.html
-classPeerStorageTransaction.html
-classPeerStorageTransaction-members.html
 classQuery.html
 classQuery-members.html
 classQueryAnalyzeQueue.html
@@ -60,6 +52,12 @@ classRank.html
 classRank-members.html
 classRankAttribute.html
 classRankAttribute-members.html
+classStatisticsIterator.html
+classStatisticsIterator-members.html
+classStatisticsMessage.html
+classStatisticsMessage-members.html
+classStatisticsProcessor.html
+classStatisticsProcessor-members.html
 classStorageClient.html
 classStorageClient-members.html
 classStorageTransaction.html

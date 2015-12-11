@@ -198,11 +198,10 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae04cbda2776770ea288dd5b798465a94"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="~StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aa5ddac4765d921647991c12ebf78d85f"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae0aa4e05fb9696c6892e54873eef6b0a"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitPeerMessageIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#afc32ec8bb4c7347f6e84fc031a77a4cf"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerStorageTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a738a9214ce1f8cb5ec3e96ddd8330857"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitStatisticsIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae1bf9d42074a40e6bfab78c55c5ad17b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0ed953e88baab2793be2b226d697a180"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createUpdatePeerMessageIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a116919a28f739993a60b7bfae1d19d32"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInserted"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aada576797c21f134f0c59b0eddde1391"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createUpdateStatisticsIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae9a0218d6684827d7deda0215d3b567c"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInserted"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a01003ae456a04b44ca72f72b3bb05aae"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Query"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="QueryEval"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="ImageNumber" value="11"></OBJECT>
@@ -230,32 +229,24 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="type"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a3e696bc0e2059e660509f62aeba076c3"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="value"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a86f4ad069d8509b94eda12c207ef162d"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessage"><param name="ImageNumber" value="1"></OBJECT>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsMessage"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#a834e118bcb2068f2c87fdb06e62f9a9d"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#adffa422fee55d01de75ab5208c93055c"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="documentFrequencyChangeList"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#a92f319ab973657bf68384358557e32ce"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInsertedChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#a1e19a607139c5af39763ec322a4d9f9a"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#a16234bb6417b8abf94950f0b9e5fa705"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#a4eacca15dc57003d17b58e6a4161e840"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="documentFrequencyChangeList"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#a17b2c66a15b8f72d9bb2a1613301ee0f"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInsertedChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#adb9c48b5feab152fe12dbc85a6796702"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="ImageNumber" value="1"></OBJECT>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsIterator"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html#aec48cea6249ae4cd793beefc71352ff8"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="getNext"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html#ab9282c21fb36c6d76a139b7668a79e6e"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsIterator.html#a4f8d4ad2db1891337df5af36f79781f6"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="getNext"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsIterator.html#a93b480324a18229208680fc9d4f01d25"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerStorageTransaction"><param name="ImageNumber" value="1"></OBJECT>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsProcessor"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerStorageTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a00f318407c9d0bb5fca17b983f0fa8c3"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="commit"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a1b87da3bcf2c85f266ab14447937965b"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="push"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a89d52a7aae2ae9c5aa8ddb2a1aa5546e"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="rollback"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a6dfa134b2a29f4ec7ae364993d0909b4"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
-            </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageProcessor"><param name="ImageNumber" value="1"></OBJECT>
-            <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageProcessor.html#a7cb71f459a6d46e2f5411dad0c30f424"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageProcessor.html#afd3a4ca4b436889d054a1c6a0ec37aba"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#a2e294fc45002779514b124928e1046cd"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#af8a9475076435af3d7896361c58d4f47"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
@@ -370,13 +361,13 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="addResourcePath"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a175e50eb050af265414ea3a1c1eff937"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#ad7dc6e64909441b8a4ae27f7a5241dff"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createDocumentAnalyzer"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#aae73ca54c14f4138647486dbe3e2517d"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerMessageProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a70974af76974895e1ab11ab77fa727fe"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryAnalyzer"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a6a13032a184055786702b702d18b400b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryEval"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a4770d9d387ee373716389f0ac6d2f59a"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createStatisticsProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a6a48d33272ce1458ec6b58282deccc08"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorage"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a7e3cd250043d863a6f599b73be3c6b51"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a74db731f256ec02628ddd738645043c2"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="definePeerMessageProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#abb73024d3e0ebc6a724cf9099cdb9c6b"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="defineStatisticsProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#aadcd8cbe69859442019e4b31bea7ae40"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="destroyStorage"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a5d6660602e01b29bb85c51d3e1e239db"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="detectDocumentClass"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a88d041e4de741ccaf840db1f8cb46e23"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="loadModule"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a29363b215a8fc1b7a44cccf096a275e0"><param name="ImageNumber" value="11"></OBJECT>
@@ -604,11 +595,10 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae04cbda2776770ea288dd5b798465a94"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="~StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aa5ddac4765d921647991c12ebf78d85f"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae0aa4e05fb9696c6892e54873eef6b0a"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitPeerMessageIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#afc32ec8bb4c7347f6e84fc031a77a4cf"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerStorageTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a738a9214ce1f8cb5ec3e96ddd8330857"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createInitStatisticsIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae1bf9d42074a40e6bfab78c55c5ad17b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0ed953e88baab2793be2b226d697a180"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createUpdatePeerMessageIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a116919a28f739993a60b7bfae1d19d32"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInserted"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#aada576797c21f134f0c59b0eddde1391"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createUpdateStatisticsIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ae9a0218d6684827d7deda0215d3b567c"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInserted"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a01003ae456a04b44ca72f72b3bb05aae"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Query"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="QueryEval"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="ImageNumber" value="11"></OBJECT>
@@ -636,32 +626,24 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="type"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a3e696bc0e2059e660509f62aeba076c3"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="value"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a86f4ad069d8509b94eda12c207ef162d"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessage"><param name="ImageNumber" value="1"></OBJECT>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsMessage"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#a834e118bcb2068f2c87fdb06e62f9a9d"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#adffa422fee55d01de75ab5208c93055c"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="documentFrequencyChangeList"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#a92f319ab973657bf68384358557e32ce"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInsertedChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessage.html#a1e19a607139c5af39763ec322a4d9f9a"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#a16234bb6417b8abf94950f0b9e5fa705"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsMessage"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#a4eacca15dc57003d17b58e6a4161e840"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="documentFrequencyChangeList"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#a17b2c66a15b8f72d9bb2a1613301ee0f"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="nofDocumentsInsertedChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsMessage.html#adb9c48b5feab152fe12dbc85a6796702"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="ImageNumber" value="1"></OBJECT>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsIterator"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html#aec48cea6249ae4cd793beefc71352ff8"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="getNext"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html#ab9282c21fb36c6d76a139b7668a79e6e"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsIterator"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsIterator.html#a4f8d4ad2db1891337df5af36f79781f6"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="getNext"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsIterator.html#a93b480324a18229208680fc9d4f01d25"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsIterator.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerStorageTransaction"><param name="ImageNumber" value="1"></OBJECT>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="StatisticsProcessor"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerStorageTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a00f318407c9d0bb5fca17b983f0fa8c3"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="commit"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a1b87da3bcf2c85f266ab14447937965b"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="push"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a89d52a7aae2ae9c5aa8ddb2a1aa5546e"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="rollback"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a6dfa134b2a29f4ec7ae364993d0909b4"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89"><param name="ImageNumber" value="11"></OBJECT>
-            </UL>
-          <LI><OBJECT type="text/sitemap"><param name="Name" value="PeerMessageProcessor"><param name="ImageNumber" value="1"></OBJECT>
-            <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageProcessor.html#a7cb71f459a6d46e2f5411dad0c30f424"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageProcessor.html#afd3a4ca4b436889d054a1c6a0ec37aba"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classnet_1_1strus_1_1api_1_1PeerMessageProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="decode"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#a2e294fc45002779514b124928e1046cd"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#af8a9475076435af3d7896361c58d4f47"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
@@ -776,13 +758,13 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="addResourcePath"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a175e50eb050af265414ea3a1c1eff937"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="close"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#ad7dc6e64909441b8a4ae27f7a5241dff"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createDocumentAnalyzer"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#aae73ca54c14f4138647486dbe3e2517d"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="createPeerMessageProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a70974af76974895e1ab11ab77fa727fe"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryAnalyzer"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a6a13032a184055786702b702d18b400b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQueryEval"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a4770d9d387ee373716389f0ac6d2f59a"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="createStatisticsProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a6a48d33272ce1458ec6b58282deccc08"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorage"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a7e3cd250043d863a6f599b73be3c6b51"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createStorageClient"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a74db731f256ec02628ddd738645043c2"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="definePeerMessageProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#abb73024d3e0ebc6a724cf9099cdb9c6b"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="defineStatisticsProcessor"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#aadcd8cbe69859442019e4b31bea7ae40"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="destroyStorage"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a5d6660602e01b29bb85c51d3e1e239db"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="detectDocumentClass"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a88d041e4de741ccaf840db1f8cb46e23"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="loadModule"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a29363b215a8fc1b7a44cccf096a275e0"><param name="ImageNumber" value="11"></OBJECT>
