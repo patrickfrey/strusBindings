@@ -27,10 +27,9 @@ set( generated_java_source_files
 	RankVector.java
 	StorageClient.java
 	StorageTransaction.java
-	PeerStorageTransaction.java
-	PeerMessageIterator.java
-	PeerMessageProcessor.java
-	PeerMessage.java
+	StatisticsIterator.java
+	StatisticsProcessor.java
+	StatisticsMessage.java
 	StringVector.java
 	Context.java
 	strus.java

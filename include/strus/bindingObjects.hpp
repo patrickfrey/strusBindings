@@ -1026,9 +1026,7 @@ private:
 };
 
 /// \brief Forward declaration
-class PeerMessageIterator;
-/// \brief Forward declaration
-class PeerStorageTransaction;
+class StatisticsIterator;
 /// \brief Forward declaration
 class StorageTransaction;
 
@@ -1048,7 +1046,7 @@ public:
 
 	/// \brief Get the number of documents inserted into the storage
 	/// return the total number of documents
-	GlobalCounter nofDocumentsInserted() const;
+	Index nofDocumentsInserted() const;
 
 	/// \brief Create a transaction
 	/// return the transaction object created
@@ -1056,16 +1054,12 @@ public:
 
 	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
 	/// \param[in] sign true = registration, false = deregistration
-	/// return the peer message iterator object created
-	PeerMessageIterator createInitPeerMessageIterator( bool sign) const;
+	/// return the statistics iterator object created
+	StatisticsIterator createInitStatisticsIterator( bool sign) const;
 
 	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
-	/// return the peer message iterator object created
-	PeerMessageIterator createUpdatePeerMessageIterator() const;
-
-	/// \brief Create a transaction object to update distributed storage statistics from another peer storage
-	/// return the peer transaction object created
-	PeerStorageTransaction createPeerStorageTransaction();
+	/// return the statistics message iterator object created
+	StatisticsIterator createUpdateStatisticsIterator() const;
 
 	/// \brief Close of the storage client
 	void close();
@@ -1199,20 +1193,20 @@ typedef std::vector<DocumentFrequencyChange> DocumentFrequencyChangeVector;
 #endif
 
 
-/// \brief Pair of queues for messages to and from peer storages for distributing statistics
-class PeerMessage
+/// \brief Message with storage statistics
+class StatisticsMessage
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	PeerMessage(){}
+	StatisticsMessage(){}
 #endif
 	/// \brief Copy constructor
-	PeerMessage( const PeerMessage& o)
+	StatisticsMessage( const StatisticsMessage& o)
 		:m_nofDocumentsInsertedChange(o.m_nofDocumentsInsertedChange)
 		,m_documentFrequencyChangeList(o.m_documentFrequencyChangeList){}
 
 	/// \brief Constructor from elements
-	PeerMessage( const std::vector<DocumentFrequencyChange>& dfchglist, int nofdocs)
+	StatisticsMessage( const std::vector<DocumentFrequencyChange>& dfchglist, int nofdocs)
 		:m_nofDocumentsInsertedChange(nofdocs)
 		,m_documentFrequencyChangeList(dfchglist){}
 
@@ -1236,23 +1230,23 @@ private:
 };
 
 
-/// \brief Iterator on messages to send to other peer storages
-class PeerMessageIterator
+/// \brief Iterator on messages with storage statistics
+class StatisticsIterator
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	PeerMessageIterator(){}
+	StatisticsIterator(){}
 #endif
 	/// \brief Copy constructor
-	PeerMessageIterator( const PeerMessageIterator& o);
+	StatisticsIterator( const StatisticsIterator& o);
 
-	/// \brief Fetches the next message to distribute other peers
+	/// \brief Fetches the next statistics message
 	/// \return message blob or empty string if there is no message left
 	String getNext();
 
 private:
 	friend class StorageClient;
-	PeerMessageIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
+	StatisticsIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
 
 private:
 	Reference m_errorhnd_impl;
@@ -1261,64 +1255,32 @@ private:
 	Reference m_iter_impl;
 };
 
-/// \brief Transation to update a storage with messages from other peer storages
-class PeerStorageTransaction
+
+/// \brief Transation to update a storage with statistics messages
+class StatisticsProcessor
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
-	PeerStorageTransaction(){}
+	StatisticsProcessor(){}
 #endif
-	/// \brief Copy constructor
-	PeerStorageTransaction( const PeerStorageTransaction& o);
-
-	/// \brief Push a message from another peer storage
-	/// \param[in] msg message from peer
-	/// \return message to reply to sender or empty blob if there is nothing to reply
-	void push( const String& msg);
-
-	/// \brief Commit of the transaction
-	String commit();
-
-	/// \brief Rollback of the transaction
-	void rollback();
-
-private:
-	friend class StorageClient;
-	PeerStorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
-
-private:
-	Reference m_errorhnd_impl;
-	Reference m_objbuilder_impl;
-	Reference m_storage_impl;
-	Reference m_transaction_impl;
-};
-
-
-/// \brief Transation to update a storage with messages from other peer storages
-class PeerMessageProcessor
-{
-public:
-#ifdef STRUS_BOOST_PYTHON
-	PeerMessageProcessor(){}
-#endif
-	/// \brief Decode a peer message blob for introspection
-	/// \param[in] blob peer message blob
-	/// \return the peer message
-	PeerMessage decode( const String& blob) const;
+	/// \brief Decode a statistics message blob for introspection
+	/// \param[in] blob statistics message blob
+	/// \return the statistics message
+	StatisticsMessage decode( const String& blob) const;
 	
-	/// \brief Create binary blob to push from peer message structure
-	/// \param[in] msg peer message structure
-	/// \return the peer message blob
-	String encode( const PeerMessage& msg) const;
+	/// \brief Create binary blob from statistics message
+	/// \param[in] msg statistics message structure
+	/// \return the statistics message blob
+	String encode( const StatisticsMessage& msg) const;
 
 private:
 	friend class Context;
-	PeerMessageProcessor( const Reference& objbuilder_, const Reference& errorhnd_);
+	StatisticsProcessor( const Reference& objbuilder_, const Reference& errorhnd_);
 
 private:
 	Reference m_errorhnd_impl;
 	Reference m_objbuilder_impl;
-	const void* m_msgproc;
+	const void* m_statsproc;
 };
 
 
@@ -2027,14 +1989,14 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
-	/// \brief Define the peer message processor
-	/// \param[in] name_ the name of the peer message processor
+	/// \brief Define the statistics message processor
+	/// \param[in] name_ the name of the statistics message processor
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void definePeerMessageProcessor( const String& name_);
+	void defineStatisticsProcessor( const String& name_);
 
-	/// \brief Create a peer message processor instance
+	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	PeerMessageProcessor createPeerMessageProcessor();
+	StatisticsProcessor createStatisticsProcessor();
 
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);
