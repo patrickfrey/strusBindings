@@ -207,7 +207,6 @@ bp::class_<DocumentFrequencyChange>("DocumentFrequencyChange")
 	.def("value", &DocumentFrequencyChange::value, bp::return_value_policy<bp::copy_const_reference>())
 	.def("ucvalue", &DocumentFrequencyChange::ucvalue)
 	.def("increment", &DocumentFrequencyChange::increment)
-	.def("isnew", &DocumentFrequencyChange::isnew)
 ;
 bp::class_<StatisticsMessage>("StatisticsMessage")
 	.def("nofDocumentsInsertedChange", &StatisticsMessage::nofDocumentsInsertedChange)

@@ -1190,7 +1190,7 @@ StatisticsMessage StatisticsProcessor::decode( const std::string& blob) const
 	strus::StatisticsViewerInterface::DocumentFrequencyChange rec;
 	while (viewer->nextDfChange( rec))
 	{
-		dflist.push_back( DocumentFrequencyChange( rec.type, rec.value, rec.increment, rec.isnew));
+		dflist.push_back( DocumentFrequencyChange( rec.type, rec.value, rec.increment));
 	}
 	int nofdocs = viewer->nofDocumentsInsertedChange();
 	if (errorhnd->hasError())
@@ -1211,7 +1211,7 @@ std::string StatisticsProcessor::encode( const StatisticsMessage& msg) const
 			dfe = msg.documentFrequencyChangeList().end();
 	for (; dfi != dfe; ++dfi)
 	{
-		builder->addDfChange( dfi->type().c_str(), dfi->value().c_str(), dfi->increment(), dfi->isnew());
+		builder->addDfChange( dfi->type().c_str(), dfi->value().c_str(), dfi->increment());
 	}
 	builder->setNofDocumentsInsertedChange( msg.nofDocumentsInsertedChange());
 	std::string rt;
