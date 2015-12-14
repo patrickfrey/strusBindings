@@ -39,7 +39,7 @@ for (dirpath, dirnames, filenames) in walk( datadir):
 			print "%u process document %s" % (idx,filename)
 			docid = filename[0:-4]
 			doc = analyzer.analyze( readFile( datadir + filename))
-			transaction.insertDocument( docid, doc, True)
+			transaction.insertDocument( docid, doc)
 
 # Without this the documents wont be inserted:
 transaction.commit()
