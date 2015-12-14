@@ -1091,7 +1091,7 @@ public:
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert
 	/// \remark The document is physically inserted with the call of 'commit()'
-	void insertDocument( const String& docid, const Document& doc, bool isnew);
+	void insertDocument( const String& docid, const Document& doc);
 
 	/// \brief Prepare the deletion of a document from the storage
 	/// \param[in] docid the identifier of the document to delete

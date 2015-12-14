@@ -988,7 +988,7 @@ StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Refe
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
 {}
 
-void StorageTransaction::insertDocument( const std::string& docid, const Document& doc, bool isnew)
+void StorageTransaction::insertDocument( const std::string& docid, const Document& doc)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
