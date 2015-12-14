@@ -193,7 +193,6 @@ bp::class_<StorageClient>("StorageClient")
 	.def("close", &StorageClient::close)
 ;
 bp::class_<StorageTransaction>("StorageTransaction")
-	.def("allocateDocnoRange", &StorageTransaction::allocateDocnoRange)
 	.def("insertDocument", &StorageTransaction::insertDocument)
 	.def("deleteDocument", &StorageTransaction::deleteDocument)
 	.def("deleteDocument", &StorageTransaction::deleteDocument_unicode)
