@@ -191,7 +191,7 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#aa72616739e8e4c8276133a76678810df"><param name="Name" value="hasMore"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a11086b1f6e60b1150c29f6a2ef46cb9b"><param name="Name" value="increment"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773"><param name="Name" value="Index"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a44719926b5f6b35746296d6a8995b90e"><param name="Name" value="insertDocument"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a775de1d281d0f29e8b056ce0c338f5f2"><param name="Name" value="insertDocument"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a3591b847c0c4885e8810bac481b3ff00"><param name="Name" value="loadModule"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classMetaData.html"><param name="Name" value="MetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a31c4f0b0b97af20658ad47549b412855"><param name="Name" value="metaData"></OBJECT>
@@ -356,7 +356,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#ab29ead31aace0753de705081681800c7"><param name="Name" value="commit"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#acb4e693d289916c92ac8acaf3debcb2f"><param name="Name" value="deleteDocument"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a47f806887776561e6d264e5a26c9c0ae"><param name="Name" value="deleteUserAccessRights"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a44719926b5f6b35746296d6a8995b90e"><param name="Name" value="insertDocument"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a775de1d281d0f29e8b056ce0c338f5f2"><param name="Name" value="insertDocument"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="Name" value="Query"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="Name" value="QueryEval"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a1c5372f20b883f401034f9841fe5f7e5"><param name="Name" value="rollback"></OBJECT>
