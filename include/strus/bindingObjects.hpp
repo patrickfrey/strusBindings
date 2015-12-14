@@ -1087,9 +1087,6 @@ public:
 	/// \brief Destructor
 	~StorageTransaction(){}
 
-	/// \brief Preallocate a range of document numbers for new documents to insert
-	void allocateDocnoRange( unsigned int nofDocuments);
-
 	/// \brief Prepare the inserting a document into the storage
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert
@@ -1128,19 +1125,6 @@ private:
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
-	Reference m_docnoalloc_impl;
-
-	struct DocnoRange
-	{
-		DocnoRange( const DocnoRange& o)
-			:first(o.first),size(o.size){}
-		DocnoRange( unsigned int first_, unsigned int size_)
-			:first(first_),size(size_){}
-
-		unsigned int first;
-		unsigned int size;
-	};
-	std::vector<DocnoRange> m_docnorangear;
 };
 
 

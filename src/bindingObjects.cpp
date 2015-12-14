@@ -49,7 +49,6 @@
 #include "strus/statisticsIteratorInterface.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
-#include "strus/docnoRangeAllocatorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -987,33 +986,7 @@ StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Refe
 	,m_objbuilder_impl(objbuilder_)
 	,m_storage_impl(storage_)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
-	,m_docnoalloc_impl(ReferenceDeleter<strus::DocnoRangeAllocatorInterface>::function)
 {}
-
-void StorageTransaction::allocateDocnoRange( unsigned int nofDocuments)
-{
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
-	strus::DocnoRangeAllocatorInterface* dra = (strus::DocnoRangeAllocatorInterface*)m_docnoalloc_impl.get();
-	if (!dra)
-	{
-		m_docnoalloc_impl.reset( dra=(strus::DocnoRangeAllocatorInterface*)storage->createDocnoRangeAllocator());
-		if (!dra) throw strus::runtime_error( _TXT("failed to create docno range allocator transaction: %s"), errorhnd->fetchError());
-	}
-	unsigned int firstDocno = dra->allocDocnoRange( nofDocuments);
-	if (m_docnorangear.empty())
-	{
-		m_docnorangear.push_back( DocnoRange( firstDocno, nofDocuments));
-	}
-	else if (m_docnorangear.back().first + m_docnorangear.back().size == firstDocno)
-	{
-		m_docnorangear.back().size += nofDocuments;
-	}
-	else if (nofDocuments > 0)
-	{
-		m_docnorangear.push_back( DocnoRange( firstDocno, nofDocuments));
-	}
-}
 
 void StorageTransaction::insertDocument( const std::string& docid, const Document& doc, bool isnew)
 {
@@ -1025,18 +998,7 @@ void StorageTransaction::insertDocument( const std::string& docid, const Documen
 		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
 	}
 	strus::StorageTransactionInterface* transaction = (strus::StorageTransactionInterface*)m_transaction_impl.get();
-	strus::Index docno = 0;
-	if (isnew && m_docnorangear.size())
-	{
-		docno = (strus::Index)m_docnorangear[0].first;
-		m_docnorangear[0].first += 1;
-		m_docnorangear[0].size -= 1;
-		if (m_docnorangear[0].size == 0)
-		{
-			m_docnorangear.erase( m_docnorangear.begin());
-		}
-	}
-	std::auto_ptr<strus::StorageDocumentInterface> document( transaction->createDocument( docid, docno));
+	std::auto_ptr<strus::StorageDocumentInterface> document( transaction->createDocument( docid));
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
 	std::vector<Attribute>::const_iterator
@@ -1110,28 +1072,12 @@ void StorageTransaction::commit()
 			throw strus::runtime_error( _TXT("error flushing storage operations: %s"), errorhnd->fetchError());
 		}
 		m_transaction_impl.reset();
-		if (m_docnorangear.size())
-		{
-			strus::DocnoRangeAllocatorInterface* dra = (strus::DocnoRangeAllocatorInterface*)m_docnoalloc_impl.get();
-			if (dra && dra->deallocDocnoRange( m_docnorangear.back().first, m_docnorangear.back().size))
-			{
-				m_docnorangear.pop_back();
-			}
-		}
 	}
 }
 
 void StorageTransaction::rollback()
 {
 	m_transaction_impl.reset();
-	if (m_docnorangear.size())
-	{
-		strus::DocnoRangeAllocatorInterface* dra = (strus::DocnoRangeAllocatorInterface*)m_docnoalloc_impl.get();
-		if (dra && dra->deallocDocnoRange( m_docnorangear.back().first, m_docnorangear.back().size))
-		{
-			m_docnorangear.pop_back();
-		}
-	}
 }
 
 StatisticsIterator::StatisticsIterator( const StatisticsIterator& o)
