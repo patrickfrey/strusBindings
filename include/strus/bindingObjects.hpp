@@ -1087,9 +1087,6 @@ public:
 	/// \brief Destructor
 	~StorageTransaction(){}
 
-	/// \brief Preallocate a range of document numbers for new documents to insert
-	void allocateDocnoRange( unsigned int nofDocuments);
-
 	/// \brief Prepare the inserting a document into the storage
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert
@@ -1128,19 +1125,6 @@ private:
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
-	Reference m_docnoalloc_impl;
-
-	struct DocnoRange
-	{
-		DocnoRange( const DocnoRange& o)
-			:first(o.first),size(o.size){}
-		DocnoRange( unsigned int first_, unsigned int size_)
-			:first(first_),size(size_){}
-
-		unsigned int first;
-		unsigned int size;
-	};
-	std::vector<DocnoRange> m_docnorangear;
 };
 
 
@@ -1149,14 +1133,17 @@ class DocumentFrequencyChange
 {
 public:
 	/// \brief Constructor
-	DocumentFrequencyChange( const String& type_, const String& value_, int increment_, bool isnew_)
-		:m_type(type_),m_value(value_),m_increment(increment_),m_isnew(isnew_){}
+	/// \param[in] type_ term type
+	/// \param[in] value_ term value
+	/// \param[in] increment_ df change increment/decrement
+	DocumentFrequencyChange( const String& type_, const String& value_, int increment_)
+		:m_type(type_),m_value(value_),m_increment(increment_){}
 	/// \brief Copy constructor
 	DocumentFrequencyChange( const DocumentFrequencyChange& o)
-		:m_type(o.m_type),m_value(o.m_value),m_increment(o.m_increment),m_isnew(o.m_isnew){}
+		:m_type(o.m_type),m_value(o.m_value),m_increment(o.m_increment){}
 	/// \brief Default constructor
 	DocumentFrequencyChange()
-		:m_increment(0),m_isnew(false){}
+		:m_increment(0){}
 
 	/// \brief Get the term type name
 	const String& type() const			{return m_type;}
@@ -1166,19 +1153,16 @@ public:
 	WString ucvalue() const;
 #endif
 	/// \brief Get the term increment
-	unsigned int increment() const			{return m_increment;}
-
-	/// \brief Eval if the document frequency change if for an unknown term
-	unsigned int isnew() const			{return m_isnew;}
+	int increment() const				{return m_increment;}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const DocumentFrequencyChange& o) const
 	{
-		return m_type == o.m_type && m_value == o.m_value && m_increment == o.m_increment && m_isnew == o.m_isnew;
+		return m_type == o.m_type && m_value == o.m_value && m_increment == o.m_increment;
 	}
 	bool operator!=( const DocumentFrequencyChange& o) const
 	{
-		return m_type != o.m_type || m_value != o.m_value || m_increment != o.m_increment || m_isnew != o.m_isnew;
+		return m_type != o.m_type || m_value != o.m_value || m_increment != o.m_increment;
 	}
 #endif
 
@@ -1186,7 +1170,6 @@ private:
 	std::string m_type;
 	std::string m_value;
 	int m_increment;
-	bool m_isnew;
 };
 #ifdef STRUS_BOOST_PYTHON
 typedef std::vector<DocumentFrequencyChange> DocumentFrequencyChangeVector;
