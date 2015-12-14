@@ -58,7 +58,7 @@ foreach ($datafiles as &$datafile)
 		$docid = substr( $datafile, 0, strlen($datafile) -4);
 		$fullname = $datadir . $datafile;
 		$doc = $analyzer->analyze( file_get_contents( $fullname));
-		$transaction->insertDocument( $docid, $doc, True);
+		$transaction->insertDocument( $docid, $doc);
 	}
 }
 # Without this the documents wont be inserted:
