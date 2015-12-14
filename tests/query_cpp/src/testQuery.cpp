@@ -82,27 +82,27 @@ int main( int , const char** )
 		Document doc;
 		doc = documentAnalyzer.analyze( "<doc id='X://doc_1'><title>Title_1</title><class>1</class><text>Bob likes to go to school</text></doc>");
 		doc.setUserAccessRight( "nobody");
-		transaction.insertDocument( "doc_1", doc, true);
+		transaction.insertDocument( "doc_1", doc);
 
 		doc = documentAnalyzer.analyze( "<doc id='X://doc_2'><title>Title_2</title><class>2</class><text>Alice has high marks in mathematics</text></doc>");
 		doc.setUserAccessRight( "nobody");
-		transaction.insertDocument( "doc_2", doc, true);
+		transaction.insertDocument( "doc_2", doc);
 
 		doc = documentAnalyzer.analyze( "<doc id='X://doc_3'><title>Title_3</title><class>3</class><text>Rose needs private tuition to improve here marks</text></doc>");
 		doc.setUserAccessRight( "nobody");
-		transaction.insertDocument( "doc_3", doc, true);
+		transaction.insertDocument( "doc_3", doc);
 
 		doc = documentAnalyzer.analyze( "<doc id='X://doc_4'><title>Title_4</title><class>4</class><text>Jack is good in sports</text></doc>");
 		doc.setUserAccessRight( "nobody");
-		transaction.insertDocument( "doc_4", doc, true);
+		transaction.insertDocument( "doc_4", doc);
 
 		doc = documentAnalyzer.analyze( "<doc id='X://doc_5'><title>Title_5</title><class>5</class><text>Tom has a very long walk to school</text></doc>");
 		doc.setUserAccessRight( "nobody");
-		transaction.insertDocument( "doc_5", doc, true);
+		transaction.insertDocument( "doc_5", doc);
 
 		doc = documentAnalyzer.analyze( "<doc id='X://doc_6'><title>Title_6</title><class>6</class><text>Martha loves all scientific subjects</text></doc>");
 		doc.setUserAccessRight( "nobody");
-		transaction.insertDocument( "doc_6", doc, true);
+		transaction.insertDocument( "doc_6", doc);
 
 		transaction.commit();
 
