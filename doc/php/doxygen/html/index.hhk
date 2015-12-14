@@ -20,7 +20,6 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a331feb7688a327de6d553668244db807"><param name="Name" value="addUserName"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryEval.html#aab35396b8f99190a93c11b9f8df8bac9"><param name="Name" value="addWeightingFunction"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classAggregator.html"><param name="Name" value="Aggregator"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a7fd8093239b2c58a95d4ff7b5d6210dd"><param name="Name" value="allocateDocnoRange"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#a9d2382c804131e11945e74845303ffad"><param name="Name" value="analyze"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a9b6f50e5a824397ebf55ef6e05e97923"><param name="Name" value="analyzePhrase"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryExpression.html#a5627b00f51d4fd5ede9d5a46139f5638"><param name="Name" value="attachVariable"></OBJECT>
@@ -166,9 +165,8 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html"><param name="Name" value="DocumentFrequencyChange"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#ae7c95a13aadcee84c964c7dbbb4387bc"><param name="Name" value="DocumentFrequencyChange"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a7eb333392562e38263d926c7bc80a861"><param name="Name" value="increment"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#ab7b14f8a350888d1a78ff1562ec80f9d"><param name="Name" value="isnew"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#af0cb2323503a4088b41d6d504cb3a143"><param name="Name" value="DocumentFrequencyChange"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a11086b1f6e60b1150c29f6a2ef46cb9b"><param name="Name" value="increment"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a74e4afa8e4aadfbe6097e624c22cf4de"><param name="Name" value="type"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a24d5045a1549ae7905fd8faa79854b5c"><param name="Name" value="value"></OBJECT>
   </UL>
@@ -191,10 +189,9 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="structGlobalStatistics.html#aa49e937fe614a6c6658f043d4697a90f"><param name="Name" value="set_nofdocs"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzeQueue.html#aa72616739e8e4c8276133a76678810df"><param name="Name" value="hasMore"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a7eb333392562e38263d926c7bc80a861"><param name="Name" value="increment"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#a11086b1f6e60b1150c29f6a2ef46cb9b"><param name="Name" value="increment"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773"><param name="Name" value="Index"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a44719926b5f6b35746296d6a8995b90e"><param name="Name" value="insertDocument"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentFrequencyChange.html#ab7b14f8a350888d1a78ff1562ec80f9d"><param name="Name" value="isnew"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a3591b847c0c4885e8810bac481b3ff00"><param name="Name" value="loadModule"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classMetaData.html"><param name="Name" value="MetaData"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocument.html#a31c4f0b0b97af20658ad47549b412855"><param name="Name" value="metaData"></OBJECT>
@@ -356,7 +353,6 @@
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html"><param name="Name" value="StorageTransaction"></OBJECT>
   <UL>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a7fd8093239b2c58a95d4ff7b5d6210dd"><param name="Name" value="allocateDocnoRange"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#ab29ead31aace0753de705081681800c7"><param name="Name" value="commit"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#acb4e693d289916c92ac8acaf3debcb2f"><param name="Name" value="deleteDocument"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#a47f806887776561e6d264e5a26c9c0ae"><param name="Name" value="deleteUserAccessRights"></OBJECT>

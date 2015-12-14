@@ -209,7 +209,6 @@
           <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageTransaction"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="~StorageTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a5191b00a8428f17727de01169e3a60b3"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="allocateDocnoRange"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#addef7ddbf8647e06f20d1181da239405"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="commit"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a19fb11b312c69510022596546ed685b4"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="deleteDocument"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#afca440c44ad31b9d10c357a57772e6f5"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="deleteUserAccessRights"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a08a55350cd3b2645172fc5006f65ba4e"><param name="ImageNumber" value="11"></OBJECT>
@@ -221,11 +220,10 @@
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a2a0b217d9e339cedbe87fe5bc9f0fb65"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a856bf70fc19c41b8b26f97ee1d62b576"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#ab4c4ee0ac8f5465b7d369a7a9850ac8e"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#aebd43987e6ac461ae43d3325bffcc418"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="increment"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a4d983cfed0f3c94902b6fd35cb25e207"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="isnew"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a88b672e65a594d052f9a75ef5365d992"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="increment"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a73c6fbcae93df66296736fc55eee6d28"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="type"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a3e696bc0e2059e660509f62aeba076c3"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="value"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a86f4ad069d8509b94eda12c207ef162d"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
@@ -606,7 +604,6 @@
           <LI><OBJECT type="text/sitemap"><param name="Name" value="StorageTransaction"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="~StorageTransaction"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a5191b00a8428f17727de01169e3a60b3"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="allocateDocnoRange"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#addef7ddbf8647e06f20d1181da239405"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="commit"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a19fb11b312c69510022596546ed685b4"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="deleteDocument"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#afca440c44ad31b9d10c357a57772e6f5"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="deleteUserAccessRights"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a08a55350cd3b2645172fc5006f65ba4e"><param name="ImageNumber" value="11"></OBJECT>
@@ -618,11 +615,10 @@
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a2a0b217d9e339cedbe87fe5bc9f0fb65"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a856bf70fc19c41b8b26f97ee1d62b576"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#ab4c4ee0ac8f5465b7d369a7a9850ac8e"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentFrequencyChange"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#aebd43987e6ac461ae43d3325bffcc418"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="increment"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a4d983cfed0f3c94902b6fd35cb25e207"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="isnew"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a88b672e65a594d052f9a75ef5365d992"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="increment"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a73c6fbcae93df66296736fc55eee6d28"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="type"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a3e696bc0e2059e660509f62aeba076c3"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="value"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentFrequencyChange.html#a86f4ad069d8509b94eda12c207ef162d"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
