@@ -84,7 +84,7 @@ Create a collection, analyze and insert 3 documents</h1>
 <div class="line">                $docid = substr( $datafile, 0, strlen($datafile) -4);</div>
 <div class="line">                $fullname = $datadir . $datafile;</div>
 <div class="line">                $doc = $analyzer-&gt;analyze( file_get_contents( $fullname));</div>
-<div class="line">                $transaction-&gt;insertDocument( $docid, $doc, True);</div>
+<div class="line">                $transaction-&gt;insertDocument( $docid, $doc);</div>
 <div class="line">        }</div>
 <div class="line">}</div>
 <div class="line"><span class="preprocessor"># Without this the documents wont be inserted:</span></div>
@@ -199,7 +199,7 @@ Issue a BM25 query on the created collection (first example) and show the best r
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Dec 14 2015 18:19:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Dec 14 2015 18:44:20 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
