@@ -1,3 +1,8 @@
+strusbindings (0.3.0-1) unstable; urgency=low
+  * adapted core interface changes: better introspection for functions
+  * adapted core interface changes: removed docno allocator interface and fdatasync on every new document insert when not using the docno allocator
+ -- patrickfrey <patrickpfrey@yahoo.com>  Fri, 18 Dec 2015 15:00:00 +0100
+
 strusbindings (0.2.6-1) unstable; urgency=low
   * added transaction class to bindings
   * make it possible to preallocate document numbers for insert
