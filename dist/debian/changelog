@@ -1,13 +1,17 @@
+strusbindings (0.3.1-1) unstable; urgency=low
+  * fixing versioning problems of the Open Suse build cluster 
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Mon, 21 Dec 2015 09:38:00 +0100
+
 strusbindings (0.3.0-1) unstable; urgency=low
   * adapted core interface changes: better introspection for functions
   * adapted core interface changes: removed docno allocator interface and fdatasync on every new document insert when not using the docno allocator
- -- patrickfrey <patrickpfrey@yahoo.com>  Fri, 18 Dec 2015 15:00:00 +0100
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Fri, 18 Dec 2015 15:00:00 +0100
 
 strusbindings (0.2.6-1) unstable; urgency=low
   * added transaction class to bindings
   * make it possible to preallocate document numbers for insert
   * adapted interface changes in core: added interfaces for introspection (user names, docids, term types, term values)
- -- patrickfrey <patrickpfrey@yahoo.com>  Tue, 1 Dec 2015 20:54:00 +0100
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Tue, 1 Dec 2015 20:54:00 +0100
 
 strusbindings (0.2.5-1) unstable; urgency=low
   * add PeerMessage object for introspection of peer messages
@@ -25,11 +29,11 @@ strusbindings (0.2.5-1) unstable; urgency=low
   * fixed tests for CentOS 6: old PHP array notation needed
   * in packages add dependency to php cli for the platforms that need it
   * make php tests run with local minimal php.ini and thus within the OSC build
- -- patrickfrey <patrickpfrey@yahoo.com>  Tue, 1 Dec 2015 13:20:35 +0100
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Tue, 1 Dec 2015 13:20:35 +0100
 
 strusbindings (0.2.4-1) unstable; urgency=low
   * incremented version to 0.2.4 to resolve OBS trouble with dependencies
- -- patrickfrey <patrickpfrey@yahoo.com>  Thu, 26 Nov 2015 09:09:14 +0100
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Thu, 26 Nov 2015 09:09:14 +0100
 
 strusbindings (0.2.3-1) unstable; urgency=low
   * synchronize version number with strus core
