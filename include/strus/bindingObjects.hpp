@@ -47,6 +47,8 @@ namespace api {
 namespace strus {
 #endif
 #elif (defined STRUS_BOOST_PYTHON)
+typedef boost::python::api::object FunctionObject;
+typedef boost::python::api::object DataBlob;
 typedef std::string String;
 typedef std::wstring WString;
 typedef std::vector<int> IntVector;
@@ -1250,7 +1252,9 @@ public:
 	/// \param[in] blob statistics message blob
 	/// \return the statistics message
 	StatisticsMessage decode( const String& blob) const;
-	
+#ifdef STRUS_BOOST_PYTHON
+	StatisticsMessage decode_datablob( const DataBlob& blob) const;
+#endif
 	/// \brief Create binary blob from statistics message
 	/// \param[in] msg statistics message structure
 	/// \return the statistics message blob

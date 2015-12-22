@@ -833,3 +833,32 @@ void initGlobalStatistics( GlobalStatistics& result, PyObject* obj)
 	initStatistics<GlobalStatisticsBuilder,GlobalStatistics>( result, obj);
 }
 
+void initDataBlob( std::string& result, PyObject* obj)
+{
+	if (PyString_Check( obj))
+	{
+		Py_ssize_t size = PyString_GET_SIZE( obj);
+		char* ptr = PyString_AS_STRING( obj);
+		result.clear();
+		result.append( ptr, size);
+	}
+	else if (PyBytes_Check( obj))
+	{
+		Py_ssize_t size = PyBytes_GET_SIZE(obj);
+		char* ptr = PyBytes_AS_STRING( obj);
+		result.clear();
+		result.append( ptr, size);
+	}
+	else if (PyByteArray_Check( obj))
+	{
+		Py_ssize_t size = PyByteArray_GET_SIZE( obj);
+		char* ptr = PyByteArray_AS_STRING( obj);
+		result.clear();
+		result.append( ptr, size);
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("expected byte array or bytes as DataBlob"));
+	}
+}
+
