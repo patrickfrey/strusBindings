@@ -502,6 +502,10 @@ make test
 %endif
 
 %changelog
+* Wed Dec 23 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.3.2-0.1
+- add (enable) python wrappers for adding statistics for query evaluation
+- allow decoding binary chunks (statistics) in python
+
 * Mon Dec 21 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.3.1-0.1
 - fixing versioning problems of the Open Suse build cluster 
 
