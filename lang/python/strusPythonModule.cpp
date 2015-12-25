@@ -32,7 +32,6 @@
 #define STRUS_BOOST_PYTHON
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#define FunctionObject boost::python::api::object
 #include "strus/bindingObjects.hpp"
 #include <string>
 #include <stdexcept>
@@ -71,6 +70,7 @@ bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing
 bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringVector>());
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
+bp::class_<DocumentFrequencyChangeVector>("DocumentFrequencyChangeVector") .def( bp::vector_indexing_suite<DocumentFrequencyChangeVector>());
 bp::class_<Tokenizer>("Tokenizer")
 	.def("name", &Tokenizer::name, bp::return_value_policy<bp::copy_const_reference>())
 	.def("arguments", &Tokenizer::arguments, bp::return_value_policy<bp::copy_const_reference>())
@@ -215,7 +215,7 @@ bp::class_<StatisticsIterator>("StatisticsIterator")
 	.def("getNext", &StatisticsIterator::getNext)
 ;
 bp::class_<StatisticsProcessor>("StatisticsProcessor")
-	.def("decode", &StatisticsProcessor::decode)
+	.def("decode", &StatisticsProcessor::decode_datablob)
 	.def("encode", &StatisticsProcessor::encode)
 ;
 bp::class_<SummarizerConfig>("SummarizerConfig")
@@ -272,10 +272,10 @@ bp::class_<Query>("Query")
 	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_int_4)
 	.def("defineTermStatistics", &Query::defineTermStatistics)
 	.def("defineGlobalStatistics", &Query::defineGlobalStatistics)
-	.def("defineTermStatistics_unicode", &Query::defineTermStatistics_unicode)
-	.def("defineTermStatistics_struct", &Query::defineTermStatistics_struct)
-	.def("defineTermStatistics_unicode_struct", &Query::defineTermStatistics_unicode_struct)
-	.def("defineGlobalStatistics_struct", &Query::defineGlobalStatistics_struct)
+	.def("defineTermStatistics", &Query::defineTermStatistics_unicode)
+	.def("defineTermStatistics", &Query::defineTermStatistics_struct)
+	.def("defineTermStatistics", &Query::defineTermStatistics_unicode_struct)
+	.def("defineGlobalStatistics", &Query::defineGlobalStatistics_struct)
 	.def("addDocumentEvaluationSet", &Query::addDocumentEvaluationSet)
 	.def("setMaxNofRanks", &Query::setMaxNofRanks)
 	.def("setMinRank", &Query::setMinRank)

@@ -31,6 +31,20 @@
 #include "private/internationalization.hpp"
 #include <boost/algorithm/string.hpp>
 
+#undef STRUS_LOWLEVEL_DEBUG
+
+#ifdef STRUS_LOWLEVEL_DEBUG
+static std::string getObjectTypeName( PyObject* obj)
+{
+	PyObject* typeobj = PyObject_Type(obj);
+	if (!typeobj) throw std::runtime_error(_TXT("object has no type"));
+	PyObject* typenam = PyObject_GetAttrString( typeobj, "__name__");
+	if (!typenam) throw std::runtime_error(_TXT("type object has no name"));
+	if (!PyString_Check( typenam)) throw std::runtime_error(_TXT("type object name is not a string"));
+	return std::string( PyString_AS_STRING( typenam));
+}
+#endif
+
 static bool caseInsensitiveEquals( const std::string& val1, const std::string& val2)
 {
 	return boost::algorithm::iequals( val1, val2);
@@ -76,7 +90,6 @@ public:
 private:
 	PyObject* m_obj;
 };
-
 
 void initVariant( Variant& result, PyObject* obj)
 {
@@ -806,13 +819,13 @@ void initStatistics( Result& result, PyObject* obj)
 			{
 				value = PyInt_AS_LONG( valueitem);
 			}
-			else if (PyInt_Check( obj))
+			else if (PyInt_Check( valueitem))
 			{
 				value = PyInt_AS_LONG( valueitem);
 			}
 			else
 			{
-				throw strus::runtime_error( _TXT("expected integer for statistics value of %s"), key);
+				throw strus::runtime_error( _TXT("expected int or long for statistics value of %s"), key);
 			}
 			builder.set( key, value);
 		}
@@ -831,5 +844,34 @@ void initTermStatistics( TermStatistics& result, PyObject* obj)
 void initGlobalStatistics( GlobalStatistics& result, PyObject* obj)
 {
 	initStatistics<GlobalStatisticsBuilder,GlobalStatistics>( result, obj);
+}
+
+void initDataBlob( std::string& result, PyObject* obj)
+{
+	if (PyString_Check( obj))
+	{
+		Py_ssize_t size = PyString_GET_SIZE( obj);
+		char* ptr = PyString_AS_STRING( obj);
+		result.clear();
+		result.append( ptr, size);
+	}
+	else if (PyBytes_Check( obj))
+	{
+		Py_ssize_t size = PyBytes_GET_SIZE(obj);
+		char* ptr = PyBytes_AS_STRING( obj);
+		result.clear();
+		result.append( ptr, size);
+	}
+	else if (PyByteArray_Check( obj))
+	{
+		Py_ssize_t size = PyByteArray_GET_SIZE( obj);
+		char* ptr = PyByteArray_AS_STRING( obj);
+		result.clear();
+		result.append( ptr, size);
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("expected byte array or bytes as DataBlob"));
+	}
 }
 

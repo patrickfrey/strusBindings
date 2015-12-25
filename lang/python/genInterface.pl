@@ -138,6 +138,7 @@ $ignoreMethodMap{"defineFeature"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
 $ignoreMethodMap{"push"} = 1;
+$ignoreMethodMap{"decode"} = 1;
 
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
@@ -178,6 +179,10 @@ $renameMethodMap{"defineFeature_2"} = "defineFeature";
 $renameMethodMap{"defineFeature_3"} = "defineFeature";
 $renameMethodMap{"defineFeature_expr_2"} = "defineFeature";
 $renameMethodMap{"defineFeature_expr_3"} = "defineFeature";
+$renameMethodMap{"defineTermStatistics_unicode"} = "defineTermStatistics";
+$renameMethodMap{"defineTermStatistics_struct"} = "defineTermStatistics";
+$renameMethodMap{"defineTermStatistics_unicode_struct"} = "defineTermStatistics";
+$renameMethodMap{"defineGlobalStatistics_struct"} = "defineGlobalStatistics";
 $renameMethodMap{"createStorageClient_0"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_1"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
@@ -198,6 +203,7 @@ $renameMethodMap{"deleteUserAccessRights_unicode"} = "deleteUserAccessRights";
 $renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
 $renameMethodMap{"addModulePath_unicode"} = "addModulePath";
 $renameMethodMap{"addUserName_unicode"} = "addUserName";
+$renameMethodMap{"decode_datablob"} = "decode";
 
 sub parseType
 {
@@ -568,7 +574,6 @@ print OUTFILE <<EOF;
 #define STRUS_BOOST_PYTHON
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#define FunctionObject boost::python::api::object
 #include "strus/bindingObjects.hpp"
 #include <string>
 #include <stdexcept>
@@ -607,6 +612,7 @@ bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing
 bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringVector>());
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
+bp::class_<DocumentFrequencyChangeVector>("DocumentFrequencyChangeVector") .def( bp::vector_indexing_suite<DocumentFrequencyChangeVector>());
 EOF
 
 my $classdef;

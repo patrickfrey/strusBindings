@@ -86,7 +86,7 @@ public class CreateCollection
 						// Analyze and insert the document:
 						String docid = filename.substring( 0, filename.length()-4);
 						Document doc = analyzer.analyze( readFile( datadir + filename));
-						transaction.insertDocument( docid, doc, true);
+						transaction.insertDocument( docid, doc);
 					}
 				}
 			}

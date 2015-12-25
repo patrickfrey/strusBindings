@@ -1,6 +1,5 @@
 #define STRUS_BOOST_PYTHON
 #include <boost/python.hpp>
-#define FunctionObject boost::python::api::object
 #include "strus/bindingObjects.hpp"
 #include "objInitializers.hpp"
 #include "private/internationalization.hpp"
@@ -479,6 +478,13 @@ DocumentClass Context::detectDocumentClass_unicode( const WString& content)
 DocumentAnalyzer Context::createDocumentAnalyzer_unicode( const WString& segmentername_)
 {
 	return createDocumentAnalyzer( convert_wstring_to_uft8string( segmentername_));
+}
+
+StatisticsMessage StatisticsProcessor::decode_datablob( const DataBlob& datablob) const
+{
+	std::string stringblob;
+	initDataBlob( stringblob, datablob.ptr());
+	return decode( stringblob);
 }
 
 

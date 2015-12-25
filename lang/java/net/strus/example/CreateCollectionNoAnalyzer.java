@@ -33,7 +33,7 @@ public class CreateCollectionNoAnalyzer
 		// Define the document title:
 		doc.setAttribute( "title", title);
 		// Prepare the document for insert (the insert will be finalized with transaction.commit()):
-		transaction.insertDocument( docid, doc, true);
+		transaction.insertDocument( docid, doc);
 	}
 
 	public static void main( String []args) {
