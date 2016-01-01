@@ -376,13 +376,11 @@ public:
 	/// \param[in] v the value to assign
 	void assignText( const String& v);
 
-#if !defined SWIGJAVA && !defined SWIGPHP
 	Variant& operator=( const Variant& o)
 	{
 		assign( o);
 		return *this;
 	}
-#endif
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Variant& o) const

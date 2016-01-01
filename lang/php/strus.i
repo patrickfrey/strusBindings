@@ -41,6 +41,7 @@
 %rename(StrusRank) Rank;
 %rename(StrusQuery) Query;
 %rename(StrusContext) Context;
+%rename(assign_operator) operator=;
 
 %include "ignore_declarations.i"
 %include "exception_handler.i"

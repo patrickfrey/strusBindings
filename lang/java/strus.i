@@ -39,6 +39,8 @@
 %typemap(javapackage) std::vector<Normalizer>  "net.strus.api.NormalizerVector"
 %template(NormalizerVector) std::vector<Normalizer>;
 
+%rename(assign_operator) operator=;
+
 %typemap(javacode) Context %{
 static {
 	System.loadLibrary( "strus_java");
