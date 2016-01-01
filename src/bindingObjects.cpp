@@ -1549,7 +1549,7 @@ std::vector<Rank> Query::evaluate() const
 	std::vector<strus::ResultDocument> res = THIS->evaluate();
 	if (res.empty() && errorhnd->hasError())
 	{
-		throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to evaluate query: %s"), errorhnd->fetchError());
 	}
 	std::vector<strus::ResultDocument>::const_iterator
 		ri = res.begin(), re = res.end();

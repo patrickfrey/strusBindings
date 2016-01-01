@@ -57,14 +57,14 @@ public class QueryWithAnalyzer
 		weighting.defineParameter( "avgdoclen", 1000);	//... average document length passed as parameter
 		weighting.defineFeature( "match", "seek");	//... we search for features of the set we call 'seek'
 		queryEval.addWeightingFunction( 1.0, "BM25", weighting);
-	
+
 		// Now we define what attributes of the documents are returned and how they are build.
 		// The functions that extract stuff from documents for presentation are called summarizers.
 		// First we add a summarizer that extracts us the title of the document:
 		SummarizerConfig sum_title = new SummarizerConfig();
 		sum_title.defineParameter( "name", "title");
 		queryEval.addSummarizer( "title", "attribute", sum_title);
-	
+
 		// Then we add a summarizer that collects the sections that enclose the best matches 
 		// in a ranked document:
 		SummarizerConfig sum_match = new SummarizerConfig();
