@@ -502,6 +502,9 @@ make test
 %endif
 
 %changelog
+* Sat Jan 2 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.4.0-0.1
+- adapt minor version number to strus core
+
 * Wed Dec 23 2015 Patrick Frey <patrickpfrey@yahoo.com> 0.3.2-0.1
 - add (enable) python wrappers for adding statistics for query evaluation
 - allow decoding binary chunks (statistics) in python
