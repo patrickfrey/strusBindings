@@ -1,6 +1,5 @@
 %inline %{
 #include "objInitializers.hpp"
-/*[-]*/#include <iostream>
 %}
 
 %exception {

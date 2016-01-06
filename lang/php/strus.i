@@ -8,6 +8,7 @@
 
 %{
 #include "../include/strus/bindingObjects.hpp"
+#include <zend_operators.h>
 %}
 
 %rename(StrusGlobalStatistics) GlobalStatistics;
