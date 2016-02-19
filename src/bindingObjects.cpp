@@ -1541,18 +1541,19 @@ void Query::addUserName( const std::string& username_)
 	THIS->addUserName( username_);
 }
 
-std::vector<Rank> Query::evaluate() const
+QueryResult Query::evaluate() const
 {
-	std::vector<Rank> rt;
+	std::vector<Rank> ranks;
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	std::vector<strus::ResultDocument> res = THIS->evaluate();
-	if (res.empty() && errorhnd->hasError())
+	strus::QueryResult res = THIS->evaluate();
+	if (res.ranks().empty() && errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("failed to evaluate query: %s"), errorhnd->fetchError());
 	}
+	QueryResult rt( res.evaluationPass(), res.nofDocumentsRanked(), res.nofDocumentsVisited());
 	std::vector<strus::ResultDocument>::const_iterator
-		ri = res.begin(), re = res.end();
+		ri = res.ranks().begin(), re = res.ranks().end();
 	for (;ri != re; ++ri)
 	{
 		Rank reselem;
@@ -1566,9 +1567,9 @@ std::vector<Rank> Query::evaluate() const
 			RankAttribute attr( ai->name(), ai->value(), ai->weight());
 			reselem.m_attributes.push_back( attr);
 		}
-		rt.push_back( reselem);
+		rt.m_ranks.push_back( reselem);
 	}
-	return rt;
+	return QueryResult( rt);
 }
 
 

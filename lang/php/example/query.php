@@ -75,7 +75,7 @@ try
 	# Now we evaluate the query and iterate on the result to display them:
 	$results = $query->evaluate();
 	$pos = 0;
-	foreach ($results as &$result)
+	foreach ($results->ranks() as &$result)
 	{
 		$pos += 1;
 		print "rank " . $pos . ": " . $result->docno . " " . $result->weight . ":\n";

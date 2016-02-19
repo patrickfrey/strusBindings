@@ -6,7 +6,7 @@ import java.util.List;
 public class QueryWithAnalyzer
 {
 	// Evaluate a query defined by some terms with a query evaluation scheme passed:
-	public static RankVector evaluateQuery( StorageClient storage, QueryEval queryEval, TermVector terms)
+	public static QueryResult evaluateQuery( StorageClient storage, QueryEval queryEval, TermVector terms)
 	{
 		// Empty queries are refused:
 		if (terms.size() == 0)
@@ -112,12 +112,12 @@ public class QueryWithAnalyzer
 		QueryEval queryEval = createQueryEval( ctx);
 
 		// Evaluate the query:
-		RankVector results = evaluateQuery( storage, queryEval, terms);
+		QueryResult results = evaluateQuery( storage, queryEval, terms);
 
 		// We iterate on the results returned and we print them:
-		System.out.println( "Number of results: " + results.size());
+		System.out.println( "Number of results (total " + results.nofDocumentsRanked() + "|" + results.nofDocumentsVisited() + "):" + results.ranks().size());
 		int pos = 0;
-		for (Rank result : results)
+		for (Rank result : results.ranks())
 		{
 			++pos;
 			System.out.println( "rank " + pos + ": " + result.docno() + " " + result.weight() + ":");

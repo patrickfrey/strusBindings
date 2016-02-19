@@ -259,6 +259,12 @@ bp::class_<TermStatistics>("TermStatistics")
 	.def("df", &TermStatistics::df)
 	.def("set_df", &TermStatistics::set_df)
 ;
+bp::class_<QueryResult>("QueryResult")
+	.def("evaluationPass", &QueryResult::evaluationPass)
+	.def("nofDocumentsRanked", &QueryResult::nofDocumentsRanked)
+	.def("nofDocumentsVisited", &QueryResult::nofDocumentsVisited)
+	.def("ranks", &QueryResult::ranks, bp::return_value_policy<bp::copy_const_reference>())
+;
 bp::class_<Query>("Query")
 	.def("defineFeature", &Query::defineFeature_2)
 	.def("defineFeature", &Query::defineFeature_3)

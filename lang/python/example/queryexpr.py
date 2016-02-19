@@ -31,7 +31,7 @@ try:
 
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
-	queryEval.addSummarizer( "summary", "matchphrase", (("type","orig"),("nof",4),("len",60),(".match","seek")))
+	queryEval.addSummarizer( "summary", "matchphrase", (("type","orig"),("sentencesize",40),("windowsize",30),(".match","seek")))
 
 	# Now we build the query to issue:
 	query = queryEval.createQuery( storage)
@@ -66,7 +66,7 @@ try:
 	# Now we evaluate the query and iterate on the result to display them:
 	results = query.evaluate()
 	pos = 0
-	for result in results:
+	for result in results.ranks():
 		pos += 1
 		print "rank ", pos, ": ", result.docno(), " ", result.weight(), ":"
 		attributes = result.attributes()

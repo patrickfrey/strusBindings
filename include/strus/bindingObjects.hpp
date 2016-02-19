@@ -1756,6 +1756,35 @@ private:
 	GlobalCounter m_nofDocumentsInserted;	///< global number of documents inserted (-1 for undefined, if undefined then the storage value of the global number of documents is used)
 };
 
+/// \brief Structure representing the result of a query
+class QueryResult
+{
+public:
+	/// \brief Default constructor
+	QueryResult()
+		:m_evaluationPass(0),m_nofDocumentsRanked(0),m_nofDocumentsVisited(0){}
+
+	/// \brief Get the last query evaluation pass used (level of selection features used)
+	unsigned int evaluationPass() const			{return m_evaluationPass;}
+	/// \brief Get the total number of matches that were ranked (after applying all query restrictions)
+	unsigned int nofDocumentsRanked() const			{return m_nofDocumentsRanked;}
+	/// \brief Get the total number of matches that were visited (after applying ACL restrictions, but before applying other restrictions)
+	unsigned int nofDocumentsVisited() const		{return m_nofDocumentsVisited;}
+
+	/// \brief Get the list of result elements
+	const RankVector& ranks() const				{return m_ranks;}
+
+private:
+	friend class Query;
+	QueryResult( unsigned int evaluationPass_, unsigned int nofDocumentsRanked_, unsigned int nofDocumentsVisited_)
+		:m_evaluationPass(evaluationPass_),m_nofDocumentsRanked(nofDocumentsRanked_),m_nofDocumentsVisited(nofDocumentsVisited_){}
+
+private:
+	unsigned int m_evaluationPass;		///< query evaluation passes used (level of selection features used)
+	unsigned int m_nofDocumentsRanked;	///< total number of matches for a query with applying restrictions (might be an estimate)
+	unsigned int m_nofDocumentsVisited;	///< total number of matches for a query without applying restrictions but ACL restrictions (might be an estimate)
+	RankVector m_ranks;			///< list of result documents (part of the total result)
+};
 
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
@@ -1916,7 +1945,7 @@ public:
 
 	/// \brief Evaluate this query and return the result
 	/// \return the result
-	RankVector evaluate() const;
+	QueryResult evaluate() const;
 
 private:
 	friend class QueryEval;
