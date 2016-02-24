@@ -243,6 +243,7 @@ bp::class_<SummaryElement>("SummaryElement")
 bp::class_<Rank>("Rank")
 	.def("docno", &Rank::docno)
 	.def("weight", &Rank::weight)
+	.def("summaryElements", &Rank::summaryElements_constref, bp::return_value_policy<bp::copy_const_reference>())
 ;
 bp::class_<QueryExpression>("QueryExpression")
 	.def("pushTerm", &QueryExpression::pushTerm)

@@ -1566,7 +1566,17 @@ public:
 	/// \brief Get the weight of the rank
 	double weight() const					{return m_weight;}
 	/// \brief Get the summary elements
+
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Get the summary elements
+	const SummaryElementVector& summaryElements_constref() const	{return m_summaryElements;}
+#elif defined SWIGPHP
+	/// \brief Get the summary elements
+	SummaryElementVector summaryElements() const		{return m_summaryElements;}
+#else
+	/// \brief Get the summary elements
 	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
+#endif
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Rank& o) const
