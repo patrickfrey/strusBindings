@@ -1565,7 +1565,7 @@ public:
 	Index docno() const					{return m_docno;}
 	/// \brief Get the weight of the rank
 	double weight() const					{return m_weight;}
-	/// \brief Get the attributes
+	/// \brief Get the summary elements
 	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
 
 #ifdef STRUS_BOOST_PYTHON
@@ -1771,13 +1771,21 @@ public:
 	/// \brief Get the total number of matches that were visited (after applying ACL restrictions, but before applying other restrictions)
 	unsigned int nofDocumentsVisited() const		{return m_nofDocumentsVisited;}
 
-	/// \brief Get the list of result elements
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Get the list of result elements
 	const RankVector& ranks_constref() const		{return m_ranks;}
+	/// \brief Get the summary elements
+	const SummaryElementVector& summaryElements_constref() const	{return m_summaryElements;}
 #elif defined SWIGPHP
+	/// \brief Get the list of result elements
 	RankVector ranks() const				{return m_ranks;}
+	/// \brief Get the summary elements
+	SummaryElementVector summaryElements() const		{return m_summaryElements;}
 #else
+	/// \brief Get the list of result elements
 	const RankVector& ranks() const				{return m_ranks;}
+	/// \brief Get the summary elements
+	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
 #endif
 private:
 	friend class Query;
@@ -1785,10 +1793,11 @@ private:
 		:m_evaluationPass(evaluationPass_),m_nofDocumentsRanked(nofDocumentsRanked_),m_nofDocumentsVisited(nofDocumentsVisited_){}
 
 private:
-	unsigned int m_evaluationPass;		///< query evaluation passes used (level of selection features used)
-	unsigned int m_nofDocumentsRanked;	///< total number of matches for a query with applying restrictions (might be an estimate)
-	unsigned int m_nofDocumentsVisited;	///< total number of matches for a query without applying restrictions but ACL restrictions (might be an estimate)
-	RankVector m_ranks;			///< list of result documents (part of the total result)
+	unsigned int m_evaluationPass;			///< query evaluation passes used (level of selection features used)
+	unsigned int m_nofDocumentsRanked;		///< total number of matches for a query with applying restrictions (might be an estimate)
+	unsigned int m_nofDocumentsVisited;		///< total number of matches for a query without applying restrictions but ACL restrictions (might be an estimate)
+	RankVector m_ranks;				///< list of result documents (part of the total result)
+	std::vector<SummaryElement> m_summaryElements;	///< Overall summary elements
 };
 
 /// \brief Query program object representing a retrieval method for documents in a storage.

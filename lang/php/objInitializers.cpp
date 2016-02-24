@@ -917,10 +917,16 @@ int getQueryResult( zval* result, const QueryResult& res)
 	add_property_long( result, "evaluationPass", res.evaluationPass());
 	add_property_long( result, "nofDocumentsRanked", res.nofDocumentsRanked());
 	add_property_long( result, "nofDocumentsVisited", res.nofDocumentsVisited());
+
 	zval* ranks;
 	MAKE_STD_ZVAL( ranks);
 	getRankVector( ranks, res.ranks());
 	add_property_zval( result, "ranks", ranks);
+
+	zval* summaryElements;
+	MAKE_STD_ZVAL( summaryElements);
+	getSummaryElementVector( summaryElements, res.summaryElements());
+	add_property_zval( result, "summaryElements", summaryElements);
 	return 0;
 }
 
