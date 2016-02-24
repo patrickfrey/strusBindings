@@ -47,5 +47,6 @@ int initTermStatistics( TermStatistics& result, zval* obj);
 
 int getTermVector( zval* result, const std::vector<Term>& ar);
 int getRankVector( zval* result, const std::vector<Rank>& ar);
+int getQueryResult( zval* result, const QueryResult& res);
 
 #endif

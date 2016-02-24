@@ -22,8 +22,8 @@ set( generated_java_source_files
 	QueryResult.java
 	TermStatistics.java
 	GlobalStatistics.java
-	RankAttribute.java
-	RankAttributeVector.java
+	SummaryElement.java
+	SummaryElementVector.java
 	Rank.java
 	RankVector.java
 	StorageClient.java

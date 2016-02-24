@@ -63,7 +63,7 @@ typedef std::vector<std::string> StringVector;
 #endif
 #define TermVector std::vector<Term>
 #define RankVector std::vector<Rank>
-#define RankAttributeVector std::vector<RankAttribute>
+#define SummaryElementVector std::vector<SummaryElement>
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
 #define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
@@ -1453,17 +1453,14 @@ public:
 	void addExclusionFeature( const String& set_);
 
 	/// \brief Declare a summarizer
-	/// \param[in] resultAttribute name of the result attribute this summarization result is assigned to
 	/// \param[in] name the name of the summarizer to add
 	/// \param[in] config the configuration of the summarizer to add
 	void addSummarizer(
-			const String& resultAttribute,
 			const String& name,
 			const SummarizerConfig& config);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addSummarizer_obj(
-		const String& resultAttribute,
 		const String& name,
 		const FunctionObject& config_);
 #endif
@@ -1502,36 +1499,38 @@ private:
 
 
 /// \brief Attribute of a query evaluation result element
-class RankAttribute
+class SummaryElement
 {
 public:
 	/// \brief Constructor
-	RankAttribute()
-		:m_weight(0.0){}
+	SummaryElement()
+		:m_weight(0.0),m_index(-1){}
 	/// \brief Constructor
-	RankAttribute( const String& name_, const String& value_, double weight_)
-		:m_name(name_),m_value(value_),m_weight(weight_){}
+	SummaryElement( const String& name_, const String& value_, double weight_, int index_)
+		:m_name(name_),m_value(value_),m_weight(weight_),m_index(index_){}
 	/// \brief Copy connstructor
-	RankAttribute( const RankAttribute& o)
-		:m_name(o.m_name),m_value(o.m_value),m_weight(o.m_weight){}
+	SummaryElement( const SummaryElement& o)
+		:m_name(o.m_name),m_value(o.m_value),m_weight(o.m_weight),m_index(o.m_index){}
 
-	/// \brief Get the name of this attribute
+	/// \brief Get the name of the summary element
 	const String& name() const		{return m_name;}
-	/// \brief Get the value of this attribute
+	/// \brief Get the value of the summary element
 	const String& value() const		{return m_value;}
-	/// \brief Get the weight of the attribute
+	/// \brief Get the weight of the summary element
 	double weight() const			{return m_weight;}
+	/// \brief Get the index (grouping) of the summary element if defined or -1
+	int index() const			{return m_index;}
 
 #if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
 	WString ucvalue() const;
 
-	bool operator==( const RankAttribute& o) const
+	bool operator==( const SummaryElement& o) const
 	{
-		if (m_name != o.m_name || m_value != o.m_value) return false;
+		if (m_name != o.m_name || m_value != o.m_value || m_index != o.m_index) return false;
 		double ww = m_weight - o.m_weight;
 		return (ww < 0.0)?(-ww<std::numeric_limits<double>::epsilon()):(ww<std::numeric_limits<double>::epsilon());
 	}
-	bool operator!=( const RankAttribute& o) const
+	bool operator!=( const SummaryElement& o) const
 	{
 		return !operator==(o);
 	}
@@ -1541,9 +1540,10 @@ private:
 	std::string m_name;
 	std::string m_value;
 	double m_weight;
+	int m_index;
 };
 #ifdef STRUS_BOOST_PYTHON
-typedef std::vector<RankAttribute> RankAttributeVector;
+typedef std::vector<SummaryElement> SummaryElementVector;
 #endif
 
 
@@ -1555,18 +1555,18 @@ public:
 	Rank()
 		:m_docno(0),m_weight(0.0){}
 	/// \brief Constructor
-	Rank( Index docno_, double weight_, const RankAttributeVector& attributes_)
-		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
+	Rank( Index docno_, double weight_, const SummaryElementVector& summaryElements_)
+		:m_docno(docno_),m_weight(weight_),m_summaryElements(summaryElements_){}
 	/// \brief Copy constructor
 	Rank( const Rank& o)
-		:m_docno(o.m_docno),m_weight(o.m_weight),m_attributes(o.m_attributes){}
+		:m_docno(o.m_docno),m_weight(o.m_weight),m_summaryElements(o.m_summaryElements){}
 
 	/// \brief Get the internal document nuber used
 	Index docno() const					{return m_docno;}
 	/// \brief Get the weight of the rank
 	double weight() const					{return m_weight;}
 	/// \brief Get the attributes
-	const RankAttributeVector& attributes() const		{return m_attributes;}
+	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Rank& o) const
@@ -1585,7 +1585,7 @@ private:
 	friend class Query;
 	Index m_docno;
 	double m_weight;
-	std::vector<RankAttribute> m_attributes;
+	std::vector<SummaryElement> m_summaryElements;
 };
 #ifdef STRUS_BOOST_PYTHON
 typedef std::vector<Rank> RankVector;
@@ -1772,8 +1772,13 @@ public:
 	unsigned int nofDocumentsVisited() const		{return m_nofDocumentsVisited;}
 
 	/// \brief Get the list of result elements
+#ifdef STRUS_BOOST_PYTHON
+	const RankVector& ranks_constref() const		{return m_ranks;}
+#elif defined SWIGPHP
+	RankVector ranks() const				{return m_ranks;}
+#else
 	const RankVector& ranks() const				{return m_ranks;}
-
+#endif
 private:
 	friend class Query;
 	QueryResult( unsigned int evaluationPass_, unsigned int nofDocumentsRanked_, unsigned int nofDocumentsVisited_)

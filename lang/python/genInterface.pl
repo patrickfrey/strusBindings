@@ -139,6 +139,7 @@ $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
 $ignoreMethodMap{"push"} = 1;
 $ignoreMethodMap{"decode"} = 1;
+$ignoreMethodMap{"ranks"} = 1;
 
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
@@ -204,6 +205,7 @@ $renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
 $renameMethodMap{"addModulePath_unicode"} = "addModulePath";
 $renameMethodMap{"addUserName_unicode"} = "addUserName";
 $renameMethodMap{"decode_datablob"} = "decode";
+$renameMethodMap{"ranks_constref"} = "ranks";
 
 sub parseType
 {
@@ -608,7 +610,7 @@ bp::register_exception_translator<std::exception>( translate_exception);
 
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
-bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());
+bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
 bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringVector>());
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());

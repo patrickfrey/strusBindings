@@ -305,27 +305,26 @@ void StorageTransaction::deleteUserAccessRights_unicode( const WString& username
 	deleteUserAccessRights( convert_wstring_to_uft8string( username));
 }
 
-WString RankAttribute::ucvalue() const
+WString SummaryElement::ucvalue() const
 {
 	return convert_uft8string_to_wstring( m_value);
 }
 
 
 void QueryEval::addSummarizer_obj(
-	const String& resultAttribute,
 	const String& name,
 	const FunctionObject& config_)
 {
 	boost::python::extract<SummarizerConfig> config(config_);
 	if (config.check())
 	{
-		addSummarizer( resultAttribute, name, (const SummarizerConfig&)config);
+		addSummarizer( name, (const SummarizerConfig&)config);
 	}
 	else
 	{
 		SummarizerConfig config;
 		initSummarizerConfig( config, config_.ptr());
-		addSummarizer( resultAttribute, name, config);
+		addSummarizer( name, config);
 	}
 }
 

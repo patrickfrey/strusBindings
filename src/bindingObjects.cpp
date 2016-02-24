@@ -1230,7 +1230,6 @@ void QueryEval::addExclusionFeature( const std::string& set_)
 }
 
 void QueryEval::addSummarizer(
-		const std::string& resultAttribute,
 		const std::string& name,
 		const SummarizerConfig& config)
 {
@@ -1266,8 +1265,7 @@ void QueryEval::addSummarizer(
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addSummarizerFunction(
-			name, function.get(), featureParameters, resultAttribute);
+	queryeval->addSummarizerFunction( name, function.get(), featureParameters);
 	function.release();
 }
 
@@ -1559,13 +1557,13 @@ QueryResult Query::evaluate() const
 		Rank reselem;
 		reselem.m_docno = (unsigned int)ri->docno();
 		reselem.m_weight = ri->weight();
-		std::vector<strus::ResultDocument::Attribute>::const_iterator
-			ai = ri->attributes().begin(), ae = ri->attributes().end();
+		std::vector<strus::SummaryElement>::const_iterator
+			ai = ri->summaryElements().begin(), ae = ri->summaryElements().end();
 	
 		for (;ai != ae; ++ai)
 		{
-			RankAttribute attr( ai->name(), ai->value(), ai->weight());
-			reselem.m_attributes.push_back( attr);
+			SummaryElement elem( ai->name(), ai->value(), ai->weight(), ai->index());
+			reselem.m_summaryElements.push_back( elem);
 		}
 		rt.m_ranks.push_back( reselem);
 	}

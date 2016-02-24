@@ -114,13 +114,13 @@ int main( int , const char** )
 
 		SummarizerConfig titlesum;
 		titlesum.defineParameter( "name", "title");
-		queryEval.addSummarizer( "title", "attribute", titlesum);
+		queryEval.addSummarizer( "attribute", titlesum);
 		SummarizerConfig docidsum;
 		docidsum.defineParameter( "name", "docid");
-		queryEval.addSummarizer( "docid", "attribute", docidsum);
+		queryEval.addSummarizer( "attribute", docidsum);
 		SummarizerConfig matchsum;
 		matchsum.defineFeature( "match", "weighted");
-		queryEval.addSummarizer( "match", "matchpos", matchsum);
+		queryEval.addSummarizer( "matchpos", matchsum);
 
 		WeightingConfig weightingConfig;
 		weightingConfig.defineParameter( "k1", 0.75);
@@ -165,12 +165,13 @@ int main( int , const char** )
 		{
 			std::string docid;
 			std::cout << "[" << ridx << "] docno=" << ri->docno() << ", weight=" << ri->weight() << std::endl;
-			std::vector<RankAttribute>::const_iterator
-				ai = ri->attributes().begin(), ae = ri->attributes().end();
+			std::vector<SummaryElement>::const_iterator
+				ai = ri->summaryElements().begin(), ae = ri->summaryElements().end();
 			for (std::size_t aidx=0; ai != ae; ++aidx,++ai)
 			{
 				if (aidx) std::cout << ", "; else std::cout << ' ';
-				std::cout << ai->name() << "=" << ai->value();
+				std::cout << ai->name() << "[" << ai->index() << "] = "
+						<< ai->value() << " " << ai->weight();
 				if (ai->name() == "docid") docid = ai->value();
 			}
 			if (docid.empty())

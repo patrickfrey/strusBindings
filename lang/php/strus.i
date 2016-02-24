@@ -41,6 +41,7 @@
 %rename(StrusRankAttribute) RankAttribute;
 %rename(StrusRank) Rank;
 %rename(StrusQuery) Query;
+%rename(StrusQueryResult) QueryResult;
 %rename(StrusContext) Context;
 %rename(assign_operator) operator=;
 
@@ -57,6 +58,7 @@
 %include "strus_summarizer.i"
 %include "strus_weighting.i"
 %include "strus_queryexpr.i"
+%include "strus_queryresult.i"
 %include "strus_statistics.i"
 %include "../../include/strus/bindingObjects.hpp"
 

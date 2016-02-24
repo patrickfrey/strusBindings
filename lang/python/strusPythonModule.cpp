@@ -66,7 +66,7 @@ bp::register_exception_translator<std::exception>( translate_exception);
 
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
-bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());
+bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
 bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringVector>());
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
@@ -233,16 +233,17 @@ bp::class_<QueryEval>("QueryEval")
 	.def("addWeightingFunction", &QueryEval::addWeightingFunction_obj)
 	.def("createQuery", &QueryEval::createQuery)
 ;
-bp::class_<RankAttribute>("RankAttribute")
-	.def("name", &RankAttribute::name, bp::return_value_policy<bp::copy_const_reference>())
-	.def("value", &RankAttribute::value, bp::return_value_policy<bp::copy_const_reference>())
-	.def("weight", &RankAttribute::weight)
-	.def("ucvalue", &RankAttribute::ucvalue)
+bp::class_<SummaryElement>("SummaryElement")
+	.def("name", &SummaryElement::name, bp::return_value_policy<bp::copy_const_reference>())
+	.def("value", &SummaryElement::value, bp::return_value_policy<bp::copy_const_reference>())
+	.def("weight", &SummaryElement::weight)
+	.def("index", &SummaryElement::index)
+	.def("ucvalue", &SummaryElement::ucvalue)
 ;
 bp::class_<Rank>("Rank")
 	.def("docno", &Rank::docno)
 	.def("weight", &Rank::weight)
-	.def("attributes", &Rank::attributes, bp::return_value_policy<bp::copy_const_reference>())
+	.def("summaryElements", &Rank::summaryElements, bp::return_value_policy<bp::copy_const_reference>())
 ;
 bp::class_<QueryExpression>("QueryExpression")
 	.def("pushTerm", &QueryExpression::pushTerm)
@@ -263,7 +264,7 @@ bp::class_<QueryResult>("QueryResult")
 	.def("evaluationPass", &QueryResult::evaluationPass)
 	.def("nofDocumentsRanked", &QueryResult::nofDocumentsRanked)
 	.def("nofDocumentsVisited", &QueryResult::nofDocumentsVisited)
-	.def("ranks", &QueryResult::ranks, bp::return_value_policy<bp::copy_const_reference>())
+	.def("ranks", &QueryResult::ranks_constref, bp::return_value_policy<bp::copy_const_reference>())
 ;
 bp::class_<Query>("Query")
 	.def("defineFeature", &Query::defineFeature_2)

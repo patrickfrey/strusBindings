@@ -871,10 +871,10 @@ int getTermVector( zval* result, const std::vector<Term>& ar)
 	return 0;
 }
 
-static int getRankAttributeVector( zval* result, const std::vector<RankAttribute>& ar)
+static int getSummaryElementVector( zval* result, const std::vector<SummaryElement>& ar)
 {
 	array_init( result);
-	std::vector<RankAttribute>::const_iterator ai = ar.begin(), ae = ar.end();
+	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
 	{
 		zval* attr;
@@ -902,13 +902,26 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 		object_init( rank);
 		add_property_long( rank, "docno", ri->docno());
 		add_property_double( rank, "weight", ri->weight());
-		getRankAttributeVector( rankattr, ri->attributes());
-		add_property_zval( rank, "attributes", rankattr);
+		getSummaryElementVector( rankattr, ri->summaryElements());
+		add_property_zval( rank, "summaryElements", rankattr);
 
 		add_next_index_zval( result, rank);
 	}
 	return 0;
 }
 
+int getQueryResult( zval* result, const QueryResult& res)
+{
+	object_init( result);
+
+	add_property_long( result, "evaluationPass", res.evaluationPass());
+	add_property_long( result, "nofDocumentsRanked", res.nofDocumentsRanked());
+	add_property_long( result, "nofDocumentsVisited", res.nofDocumentsVisited());
+	zval* ranks;
+	MAKE_STD_ZVAL( ranks);
+	getRankVector( ranks, res.ranks());
+	add_property_zval( result, "ranks", ranks);
+	return 0;
+}
 
 
