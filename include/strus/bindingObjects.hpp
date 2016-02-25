@@ -1784,18 +1784,12 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	/// \brief Get the list of result elements
 	const RankVector& ranks_constref() const		{return m_ranks;}
-	/// \brief Get the summary elements
-	const SummaryElementVector& summaryElements_constref() const	{return m_summaryElements;}
 #elif defined SWIGPHP
 	/// \brief Get the list of result elements
 	RankVector ranks() const				{return m_ranks;}
-	/// \brief Get the summary elements
-	SummaryElementVector summaryElements() const		{return m_summaryElements;}
 #else
 	/// \brief Get the list of result elements
 	const RankVector& ranks() const				{return m_ranks;}
-	/// \brief Get the summary elements
-	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
 #endif
 private:
 	friend class Query;
@@ -1807,7 +1801,6 @@ private:
 	unsigned int m_nofDocumentsRanked;		///< total number of matches for a query with applying restrictions (might be an estimate)
 	unsigned int m_nofDocumentsVisited;		///< total number of matches for a query without applying restrictions but ACL restrictions (might be an estimate)
 	RankVector m_ranks;				///< list of result documents (part of the total result)
-	std::vector<SummaryElement> m_summaryElements;	///< Overall summary elements
 };
 
 /// \brief Query program object representing a retrieval method for documents in a storage.
