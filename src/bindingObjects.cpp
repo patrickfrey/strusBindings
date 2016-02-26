@@ -49,6 +49,7 @@
 #include "strus/statisticsIteratorInterface.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
+#include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -1440,30 +1441,44 @@ void Query::defineMetaDataRestriction(
 		const char* compareOp, const std::string& name,
 		const Variant& operand, bool newGroup)
 {
-	strus::QueryInterface::CompareOperator cmpop;
-	if (std::strcmp( compareOp, "<") == 0)
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop;
+	if (compareOp[0] == '<')
 	{
-		cmpop = strus::QueryInterface::CompareLess;
+		if (compareOp[1] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareLess;
+		}
+		else if (compareOp[1] == '=' && compareOp[2] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareLessEqual;
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
+		}
 	}
-	else if (std::strcmp( compareOp, "<=") == 0)
+	else if (compareOp[0] == '>')
 	{
-		cmpop = strus::QueryInterface::CompareLessEqual;
+		if (compareOp[1] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareGreater;
+		}
+		else if (compareOp[1] == '=' && compareOp[2] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareGreaterEqual;
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
+		}
 	}
-	else if (std::strcmp( compareOp, "=") == 0)
+	else if (compareOp[0] == '=' && compareOp[1] == '\0')
 	{
-		cmpop = strus::QueryInterface::CompareEqual;
+		cmpop = strus::MetaDataRestrictionInterface::CompareEqual;
 	}
-	else if (std::strcmp( compareOp, "!=") == 0)
+	else if (compareOp[0] == '!' && compareOp[1] == '=' && compareOp[2] == '\0')
 	{
-		cmpop = strus::QueryInterface::CompareNotEqual;
-	}
-	else if (std::strcmp( compareOp, ">") == 0)
-	{
-		cmpop = strus::QueryInterface::CompareGreater;
-	}
-	else if (std::strcmp( compareOp, ">=") == 0)
-	{
-		cmpop = strus::QueryInterface::CompareGreaterEqual;
+		cmpop = strus::MetaDataRestrictionInterface::CompareNotEqual;
 	}
 	else
 	{
