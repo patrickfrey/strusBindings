@@ -140,8 +140,6 @@ $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
 $ignoreMethodMap{"push"} = 1;
 $ignoreMethodMap{"decode"} = 1;
-$ignoreMethodMap{"ranks"} = 1;
-$ignoreMethodMap{"summaryElements"} = 1;
 
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
@@ -205,8 +203,6 @@ $renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
 $renameMethodMap{"addModulePath_unicode"} = "addModulePath";
 $renameMethodMap{"addUserName_unicode"} = "addUserName";
 $renameMethodMap{"decode_datablob"} = "decode";
-$renameMethodMap{"ranks_constref"} = "ranks";
-$renameMethodMap{"summaryElements_constref"} = "summaryElements";
 
 sub parseType
 {

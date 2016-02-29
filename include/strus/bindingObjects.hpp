@@ -1583,16 +1583,8 @@ public:
 	double weight() const					{return m_weight;}
 	/// \brief Get the summary elements
 
-#ifdef STRUS_BOOST_PYTHON
-	/// \brief Get the summary elements
-	const SummaryElementVector& summaryElements_constref() const	{return m_summaryElements;}
-#elif defined SWIGPHP
-	/// \brief Get the summary elements
-	SummaryElementVector summaryElements() const		{return m_summaryElements;}
-#else
 	/// \brief Get the summary elements
 	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
-#endif
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Rank& o) const
@@ -1797,13 +1789,9 @@ public:
 	/// \brief Get the total number of matches that were visited (after applying ACL restrictions, but before applying other restrictions)
 	unsigned int nofDocumentsVisited() const		{return m_nofDocumentsVisited;}
 
-#ifdef STRUS_BOOST_PYTHON
-	/// \brief Get the list of result elements
-	const RankVector& ranks_constref() const		{return m_ranks;}
-#else
 	/// \brief Get the list of result elements
 	const RankVector& ranks() const				{return m_ranks;}
-#endif
+
 private:
 	friend class Query;
 	QueryResult( unsigned int evaluationPass_, unsigned int nofDocumentsRanked_, unsigned int nofDocumentsVisited_)
