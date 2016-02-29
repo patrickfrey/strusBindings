@@ -429,6 +429,21 @@ void Query::defineGlobalStatistics_struct( const FunctionObject& expr_)
 	}
 }
 
+void Query::addDocumentEvaluationSet_struct( const FunctionObject& docnolist_)
+{
+	boost::python::extract<std::vector<int> > expr(docnolist_);
+	if (expr.check())
+	{
+		addDocumentEvaluationSet( (const std::vector<int>&)expr);
+	}
+	else
+	{
+		std::vector<int> docnolist;
+		initIntVectorList( docnolist, docnolist_.ptr());
+		addDocumentEvaluationSet( docnolist);
+	}
+}
+
 StorageClient Context::createStorageClient_0()
 {
 	return createStorageClient();

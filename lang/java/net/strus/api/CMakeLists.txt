@@ -20,6 +20,7 @@ set( generated_java_source_files
 	Query.java
 	QueryExpression.java
 	QueryResult.java
+	DocumentBrowser.java
 	TermStatistics.java
 	GlobalStatistics.java
 	SummaryElement.java

@@ -77,6 +77,7 @@ class Reference
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	Reference()
 		:m_deleter(0){}
 #endif
@@ -696,6 +697,7 @@ class DocumentAnalyzer
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	DocumentAnalyzer()
 		:m_textproc(0){}
 #endif
@@ -876,6 +878,7 @@ class DocumentAnalyzeQueue
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	DocumentAnalyzeQueue()
 		:m_result_queue_idx(0),m_analyzerctx_queue_idx(0),m_textproc(0){}
 #endif
@@ -935,6 +938,7 @@ class QueryAnalyzer
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	QueryAnalyzer(){}
 #endif
 	/// \brief Copy constructor
@@ -998,6 +1002,7 @@ class QueryAnalyzeQueue
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	QueryAnalyzeQueue()
 		:m_result_queue_idx(0){}
 #endif
@@ -1037,6 +1042,8 @@ private:
 class StatisticsIterator;
 /// \brief Forward declaration
 class StorageTransaction;
+/// \brief Forward declaration
+class DocumentBrowser;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -1044,6 +1051,7 @@ class StorageClient
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StorageClient(){}
 #endif
 	/// \brief Copy constructor
@@ -1069,6 +1077,9 @@ public:
 	/// return the statistics message iterator object created
 	StatisticsIterator createUpdateStatisticsIterator() const;
 
+	/// \brief Create a document browser instance
+	DocumentBrowser createDocumentBrowser();
+
 	/// \brief Close of the storage client
 	void close();
 
@@ -1090,6 +1101,7 @@ class StorageTransaction
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StorageTransaction(){}
 #endif
 	/// \brief Destructor
@@ -1189,6 +1201,7 @@ class StatisticsMessage
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StatisticsMessage(){}
 #endif
 	/// \brief Copy constructor
@@ -1226,6 +1239,7 @@ class StatisticsIterator
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StatisticsIterator(){}
 #endif
 	/// \brief Copy constructor
@@ -1252,6 +1266,7 @@ class StatisticsProcessor
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StatisticsProcessor(){}
 #endif
 	/// \brief Decode a statistics message blob for introspection
@@ -1424,6 +1439,7 @@ class QueryEval
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	QueryEval(){}
 #endif
 	/// \brief Copy constructor
@@ -1808,6 +1824,7 @@ class Query
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	Query(){}
 #endif
 	/// \brief Copy constructor
@@ -1847,78 +1864,57 @@ public:
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			const Variant& value, bool newGroup=true);
+			const Variant& value, bool newGroup);
 #endif
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			double value, bool newGroup=true);
+			double value, bool newGroup);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			unsigned int value, bool newGroup=true);
+			unsigned int value, bool newGroup);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			int value, bool newGroup=true);
+			int value, bool newGroup);
 
 #ifdef STRUS_BOOST_PYTHON
-	void defineMetaDataRestriction_double_3(
-			const char* compareOp, const String& name,
-			double value)
-	{
-		defineMetaDataRestriction( compareOp, name, value, true);
-	}
-
-	void defineMetaDataRestriction_double_4(
+	void addMetaDataRestrictionCondition_double(
 			const char* compareOp, const String& name,
 			double value, bool newGroup)
 	{
-		defineMetaDataRestriction( compareOp, name, value, newGroup);
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
 	}
 
-	void defineMetaDataRestriction_uint_3(
-			const char* compareOp, const String& name,
-			unsigned int value)
-	{
-		defineMetaDataRestriction( compareOp, name, value, true);
-	}
-
-	void defineMetaDataRestriction_uint_4(
+	void addMetaDataRestrictionCondition_uint(
 			const char* compareOp, const String& name,
 			unsigned int value, bool newGroup)
 	{
-		defineMetaDataRestriction( compareOp, name, value, newGroup);
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
 	}
 
-	void defineMetaDataRestriction_int_3(
-			const char* compareOp, const String& name,
-			int value)
-	{
-		defineMetaDataRestriction( compareOp, name, value, true);
-	}
-
-	void defineMetaDataRestriction_int_4(
+	void addMetaDataRestrictionCondition_int(
 			const char* compareOp, const String& name,
 			int value, bool newGroup)
 	{
-		defineMetaDataRestriction( compareOp, name, value, newGroup);
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
 	}
 #endif
 	/// \brief Define term statistics to use for a term for weighting it in this query
@@ -1940,8 +1936,10 @@ public:
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
 	/// \param[in] docnolist_ list of documents to evaluate the query on
-	void addDocumentEvaluationSet(
-			const IntVector& docnolist_);
+	void addDocumentEvaluationSet( const IntVector& docnolist_);
+#ifdef STRUS_BOOST_PYTHON
+	void addDocumentEvaluationSet_struct( const FunctionObject& docnolist_);
+#endif
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query
@@ -1978,6 +1976,102 @@ private:
 	const void* m_queryproc;
 };
 
+///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata
+class DocumentBrowser
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	DocumentBrowser(){}
+#endif
+#ifndef DOXYGEN_JAVA
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			const Variant& value, bool newGroup);
+#endif
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			double value, bool newGroup);
+
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			unsigned int value, bool newGroup);
+
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			int value, bool newGroup);
+
+#ifdef STRUS_BOOST_PYTHON
+	void addMetaDataRestrictionCondition_double(
+			const char* compareOp, const String& name,
+			double value, bool newGroup)
+	{
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
+	}
+
+	void addMetaDataRestrictionCondition_uint(
+			const char* compareOp, const String& name,
+			unsigned int value, bool newGroup)
+	{
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
+	}
+
+	void addMetaDataRestrictionCondition_int(
+			const char* compareOp, const String& name,
+			int value, bool newGroup)
+	{
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
+	}
+#endif
+	///\brief Get the internal document number of the next document bigger or equal the document number passed
+	///\param[in] docno_ document number to get the matching least upperbound from
+	///\return the internal document number
+	Index skipDoc( const Index& docno_);
+
+	///\brief Get an attribute of the current document visited
+	///\return the internal document number or 0, if there is no one left
+	String attribute( const String& name);
+
+private:
+	friend class StorageClient;
+	DocumentBrowser(
+		const Reference& objbuilder_impl_,
+		const Reference& storage_impl_,
+		const Reference& errorhnd_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+	Reference m_restriction_impl;
+	Reference m_postingitr_impl;
+	Reference m_attributereader_impl;
+	Index m_docno;
+};
 
 /// \brief Object holding the global context of the strus information retrieval engine
 /// \note There a two modes of this context object operating on a different base.

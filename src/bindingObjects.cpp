@@ -50,6 +50,7 @@
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
+#include "strus/postingIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -970,6 +971,11 @@ StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
 	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
+DocumentBrowser StorageClient::createDocumentBrowser()
+{
+	return DocumentBrowser( m_objbuilder_impl, m_storage_impl, m_errorhnd_impl);
+}
+
 void StorageClient::close()
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
@@ -1437,9 +1443,7 @@ void Query::defineFeature( const std::string& set_, const QueryExpression& expr_
 	THIS->defineFeature( set_, weight_);
 }
 
-void Query::defineMetaDataRestriction(
-		const char* compareOp, const std::string& name,
-		const Variant& operand, bool newGroup)
+static strus::MetaDataRestrictionInterface::CompareOperator getCompareOp( const char* compareOp)
 {
 	strus::MetaDataRestrictionInterface::CompareOperator cmpop;
 	if (compareOp[0] == '<')
@@ -1484,30 +1488,37 @@ void Query::defineMetaDataRestriction(
 	{
 		throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
 	}
-
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->defineMetaDataRestriction( cmpop, name, arithmeticVariant(operand), newGroup);
+	return cmpop;
 }
 
-void Query::defineMetaDataRestriction(
+void Query::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		const Variant& operand, bool newGroup)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	THIS->addMetaDataRestrictionCondition( cmpop, name, arithmeticVariant(operand), newGroup);
+}
+
+void Query::addMetaDataRestrictionCondition(
 		const char* compareOp, const std::string& name,
 		double value, bool newGroup)
 {
-	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
 }
 
-void Query::defineMetaDataRestriction(
+void Query::addMetaDataRestrictionCondition(
 		const char* compareOp, const std::string& name,
 		unsigned int value, bool newGroup)
 {
-	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
 }
 
-void Query::defineMetaDataRestriction(
+void Query::addMetaDataRestrictionCondition(
 		const char* compareOp, const std::string& name,
 		int value, bool newGroup)
 {
-	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
 }
 
 void Query::defineTermStatistics( const std::string& type_, const std::string& value_, const TermStatistics& stats_)
@@ -1583,6 +1594,100 @@ QueryResult Query::evaluate() const
 		rt.m_ranks.push_back( reselem);
 	}
 	return QueryResult( rt);
+}
+
+DocumentBrowser::DocumentBrowser( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& errorhnd_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_objbuilder_impl(objbuilder_impl_)
+	,m_storage_impl(storage_impl_)
+	,m_restriction_impl( ReferenceDeleter<strus::MetaDataRestrictionInterface>::function)
+	,m_postingitr_impl( ReferenceDeleter<strus::PostingIteratorInterface>::function)
+	,m_attributereader_impl( ReferenceDeleter<strus::AttributeReaderInterface>::function)
+	,m_docno(0)
+{
+	const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+	m_restriction_impl.reset( storage->createMetaDataRestriction());
+	if (!m_restriction_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create meta data restriction interface for browsing documents"));
+	}
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		const Variant& value, bool newGroup)
+{
+	strus::MetaDataRestrictionInterface* restriction = (strus::MetaDataRestrictionInterface*)m_restriction_impl.get();
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	if (m_postingitr_impl.get())
+	{
+		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
+	}
+	restriction->addCondition( cmpop, name, arithmeticVariant(value), newGroup);
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		double value, bool newGroup)
+{
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		unsigned int value, bool newGroup)
+{
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		int value, bool newGroup)
+{
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
+}
+
+Index DocumentBrowser::skipDoc( const Index& docno_)
+{
+	if (!m_postingitr_impl.get())
+	{
+		const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+		strus::MetaDataRestrictionInterface* restriction = (strus::MetaDataRestrictionInterface*)m_restriction_impl.get();
+		m_postingitr_impl.reset( storage->createBrowsePostingIterator( restriction, 1));
+		if (!m_postingitr_impl.get())
+		{
+			throw strus::runtime_error( _TXT("failed to create posting iterator for document browser"));
+		}
+	}
+	strus::PostingIteratorInterface* itr = (strus::PostingIteratorInterface*)m_postingitr_impl.get();
+	return m_docno = itr->skipDoc( docno_);
+}
+
+std::string DocumentBrowser::attribute( const std::string& name)
+{
+	if (!m_attributereader_impl.get())
+	{
+		const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+		m_attributereader_impl.reset( storage->createAttributeReader());
+		if (!m_attributereader_impl.get())
+		{
+			throw strus::runtime_error( _TXT("failed to create attribute reader for document browser"));
+		}
+	}
+	if (m_docno)
+	{
+		const strus::AttributeReaderInterface* reader = (strus::AttributeReaderInterface*)m_attributereader_impl.get();
+		strus::Index elemhnd = reader->elementHandle( name.c_str());
+		if (!elemhnd)
+		{
+			throw strus::runtime_error( _TXT("document attribute name %s is not defined"), name.c_str());
+		}
+		return reader->getValue( elemhnd);
+	}
+	else
+	{
+		return std::string();
+	}
 }
 
 

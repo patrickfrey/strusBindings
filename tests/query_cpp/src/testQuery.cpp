@@ -147,8 +147,8 @@ int main( int , const char** )
 		query.defineFeature( "weighted", expr, 1.0);
 
 		// Evaluate the query and print the result:
-		query.defineMetaDataRestriction( "<=", "class", 5);
-		query.defineMetaDataRestriction( ">=", "class", 1);
+		query.addMetaDataRestrictionCondition( "<=", "class", 5, true);
+		query.addMetaDataRestrictionCondition( ">=", "class", 1, true);
 	
 		query.setMaxNofRanks( 10);
 		query.setMinRank( 0);
