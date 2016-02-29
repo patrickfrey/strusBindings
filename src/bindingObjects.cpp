@@ -50,6 +50,7 @@
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
+#include "strus/metaDataReaderInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
@@ -973,6 +974,7 @@ StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
 
 DocumentBrowser StorageClient::createDocumentBrowser()
 {
+	if (!m_objbuilder_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return DocumentBrowser( m_objbuilder_impl, m_storage_impl, m_errorhnd_impl);
 }
 
@@ -1596,6 +1598,16 @@ QueryResult Query::evaluate() const
 	return QueryResult( rt);
 }
 
+DocumentBrowser::DocumentBrowser( const DocumentBrowser& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_restriction_impl(o.m_restriction_impl)
+	,m_postingitr_impl(o.m_postingitr_impl)
+	,m_attributereader_impl(o.m_attributereader_impl)
+	,m_docno(o.m_docno)
+{}
+
 DocumentBrowser::DocumentBrowser( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_objbuilder_impl(objbuilder_impl_)
@@ -1618,11 +1630,11 @@ void DocumentBrowser::addMetaDataRestrictionCondition(
 		const Variant& value, bool newGroup)
 {
 	strus::MetaDataRestrictionInterface* restriction = (strus::MetaDataRestrictionInterface*)m_restriction_impl.get();
-	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	if (m_postingitr_impl.get())
+	if (!restriction)
 	{
 		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
 	}
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
 	restriction->addCondition( cmpop, name, arithmeticVariant(value), newGroup);
 }
 
@@ -1665,17 +1677,17 @@ Index DocumentBrowser::skipDoc( const Index& docno_)
 
 std::string DocumentBrowser::attribute( const std::string& name)
 {
-	if (!m_attributereader_impl.get())
-	{
-		const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
-		m_attributereader_impl.reset( storage->createAttributeReader());
-		if (!m_attributereader_impl.get())
-		{
-			throw strus::runtime_error( _TXT("failed to create attribute reader for document browser"));
-		}
-	}
 	if (m_docno)
 	{
+		if (!m_attributereader_impl.get())
+		{
+			const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+			m_attributereader_impl.reset( storage->createAttributeReader());
+			if (!m_attributereader_impl.get())
+			{
+				throw strus::runtime_error( _TXT("failed to create attribute reader for document browser"));
+			}
+		}
 		const strus::AttributeReaderInterface* reader = (strus::AttributeReaderInterface*)m_attributereader_impl.get();
 		strus::Index elemhnd = reader->elementHandle( name.c_str());
 		if (!elemhnd)

@@ -40,7 +40,7 @@ try
 	$terms = $analyzer->analyzePhrase( "word", $queryphrase);
 	if (count( $terms) == 0)
 	{
-		throw Exception("query is empty");
+		throw new Exception("query is empty");
 	}
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:

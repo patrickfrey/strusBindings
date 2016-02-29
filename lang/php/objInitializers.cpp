@@ -856,6 +856,7 @@ int initTermStatistics( TermStatistics& result, zval* obj)
 
 int getTermVector( zval* result, const std::vector<Term>& ar)
 {
+	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Term>::const_iterator ti = ar.begin(), te = ar.end();
 	for (; ti != te; ++ti)
@@ -873,6 +874,7 @@ int getTermVector( zval* result, const std::vector<Term>& ar)
 
 static int getSummaryElementVector( zval* result, const std::vector<SummaryElement>& ar)
 {
+	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
@@ -890,18 +892,17 @@ static int getSummaryElementVector( zval* result, const std::vector<SummaryEleme
 
 int getRankVector( zval* result, const std::vector<Rank>& ar)
 {
+	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Rank>::const_iterator ri = ar.begin(), re = ar.end();
 	for (; ri != re; ++ri)
 	{
 		zval* rank;
 		MAKE_STD_ZVAL( rank);
-		zval* rankattr;
-		MAKE_STD_ZVAL( rankattr);
-
 		object_init( rank);
 		add_property_long( rank, "docno", ri->docno());
 		add_property_double( rank, "weight", ri->weight());
+		zval* rankattr;
 		getSummaryElementVector( rankattr, ri->summaryElements());
 		add_property_zval( rank, "summaryElements", rankattr);
 
@@ -912,6 +913,7 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 
 int getQueryResult( zval* result, const QueryResult& res)
 {
+	MAKE_STD_ZVAL( result);
 	object_init( result);
 
 	add_property_long( result, "evaluationPass", res.evaluationPass());
@@ -919,7 +921,6 @@ int getQueryResult( zval* result, const QueryResult& res)
 	add_property_long( result, "nofDocumentsVisited", res.nofDocumentsVisited());
 
 	zval* ranks;
-	MAKE_STD_ZVAL( ranks);
 	getRankVector( ranks, res.ranks());
 	add_property_zval( result, "ranks", ranks);
 	return 0;

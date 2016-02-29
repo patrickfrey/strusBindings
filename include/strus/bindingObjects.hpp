@@ -1800,9 +1800,6 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	/// \brief Get the list of result elements
 	const RankVector& ranks_constref() const		{return m_ranks;}
-#elif defined SWIGPHP
-	/// \brief Get the list of result elements
-	RankVector ranks() const				{return m_ranks;}
 #else
 	/// \brief Get the list of result elements
 	const RankVector& ranks() const				{return m_ranks;}
@@ -1984,6 +1981,11 @@ public:
 	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	DocumentBrowser(){}
 #endif
+	/// \brief Copy constructor
+	DocumentBrowser( const DocumentBrowser& o);
+	/// \brief Destructor
+	~DocumentBrowser(){}
+
 #ifndef DOXYGEN_JAVA
 	/// \brief Define a meta data restriction condition on the documents visited
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
