@@ -536,7 +536,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 							{
 								if (itemval <= std::numeric_limits<int>::min() || itemval >= std::numeric_limits<int>::max())
 								{
-									throw strus::runtime_error( _TXT("range value exceeds size allowed"));
+									throw strus::runtime_error( _TXT("range value exceeds size allowed: %d"), itemval);
 								}
 								range = (int)itemval;
 								state = Cardinality;
@@ -544,9 +544,9 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 							else
 							{
 								// ... state == Cardinality
-								if (itemval <= 0 || itemval >= std::numeric_limits<int>::max())
+								if (itemval < 0 || itemval >= std::numeric_limits<int>::max())
 								{
-									throw strus::runtime_error( _TXT("cardinality value exceeds size allowed"));
+									throw strus::runtime_error( _TXT("cardinality value exceeds size allowed: %d"), itemval);
 								}
 								cardinality = (unsigned int)itemval;
 								state = Arguments;
