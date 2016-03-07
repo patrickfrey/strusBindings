@@ -960,6 +960,11 @@ StatisticsIterator StorageClient::createInitStatisticsIterator( bool sign) const
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::StatisticsIteratorInterface>::function);
 	iter.reset( storage->createInitStatisticsIterator( sign));
+	if (!iter.get())
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
+	}
 	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
@@ -969,6 +974,11 @@ StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::StatisticsIteratorInterface>::function);
 	iter.reset( storage->createUpdateStatisticsIterator());
+	if (!iter.get())
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
+	}
 	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
