@@ -28,11 +28,11 @@ try:
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
 	# First we add a summarizer that extracts us the title of the document:
-	queryEval.addSummarizer( "title", "attribute", [("name", "title")])
+	queryEval.addSummarizer( "attribute", [("name", "title")])
 	
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
-	queryEval.addSummarizer( "summary", "matchphrase", (("type","orig"),("nof",4),("len",60),(".match","seek")))
+	queryEval.addSummarizer( "matchphrase", (("type","orig"),("sentencesize",40),("windowsize",30),(".match","seek")))
 	
 	# Now we build the query to issue:
 	query = queryEval.createQuery( storage)
@@ -75,12 +75,12 @@ try:
 	# Now we evaluate the query and iterate on the result to display them:
 	results = query.evaluate()
 	pos = 0
-	for result in results:
+	for result in results.ranks():
 		pos += 1
 		print "rank ", pos, ": ", result.docno(), " ", result.weight(), ":"
-		attributes = result.attributes()
-		for attribute in attributes:
-			print "\t", attribute.name(), ": ", attribute.value()
+		summaryElements = result.summaryElements()
+		for se in summaryElements:
+			print "\t", se.name(), ": ", se.value()
 	print "done"
 except Exception,err:
 	print "Error: ", str(err)

@@ -3,19 +3,19 @@
     The C++ library strus implements basic operations to build
     a search engine for structured search on unstructured data.
 
-    Copyright (C) 2013,2014 Patrick Frey
+    Copyright (C) 2015 Patrick Frey
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
+    modify it under the terms of the GNU General Public
     License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+    version 3 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+    General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
@@ -536,7 +536,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 							{
 								if (itemval <= std::numeric_limits<int>::min() || itemval >= std::numeric_limits<int>::max())
 								{
-									throw strus::runtime_error( _TXT("range value exceeds size allowed"));
+									throw strus::runtime_error( _TXT("range value exceeds size allowed: %d"), itemval);
 								}
 								range = (int)itemval;
 								state = Cardinality;
@@ -544,9 +544,9 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 							else
 							{
 								// ... state == Cardinality
-								if (itemval <= 0 || itemval >= std::numeric_limits<int>::max())
+								if (itemval < 0 || itemval >= std::numeric_limits<int>::max())
 								{
-									throw strus::runtime_error( _TXT("cardinality value exceeds size allowed"));
+									throw strus::runtime_error( _TXT("cardinality value exceeds size allowed: %d"), itemval);
 								}
 								cardinality = (unsigned int)itemval;
 								state = Arguments;
@@ -874,4 +874,35 @@ void initDataBlob( std::string& result, PyObject* obj)
 		throw strus::runtime_error( _TXT("expected byte array or bytes as DataBlob"));
 	}
 }
+
+void initIntVectorList( std::vector<int>& result, PyObject* obj)
+{
+	if (PySequence_Check( obj))
+	{
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("list of integers expected")));
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii<len; ++ii)
+			{
+				PyObject* item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
+				if (PyLong_Check( item) || PyInt_Check( item))
+				{
+					long itemval = PyInt_AS_LONG( item);
+					result.push_back( itemval);
+				}
+			}
+		}
+	}
+	else if (PyLong_Check( obj) || PyInt_Check( obj))
+	{
+		long objval = PyInt_AS_LONG( obj);
+		result.push_back( objval);
+	}
+	else
+	{
+		throw strus::runtime_error( "not an integer or list of integer type");
+	}
+}
+
 

@@ -3,19 +3,19 @@
     The C++ library strus implements basic operations to build
     a search engine for structured search on unstructured data.
 
-    Copyright (C) 2013,2014 Patrick Frey
+    Copyright (C) 2015 Patrick Frey
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
+    modify it under the terms of the GNU General Public
     License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+    version 3 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+    General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
@@ -49,6 +49,9 @@
 #include "strus/statisticsIteratorInterface.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
+#include "strus/metaDataRestrictionInterface.hpp"
+#include "strus/metaDataReaderInterface.hpp"
+#include "strus/postingIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -957,6 +960,11 @@ StatisticsIterator StorageClient::createInitStatisticsIterator( bool sign) const
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::StatisticsIteratorInterface>::function);
 	iter.reset( storage->createInitStatisticsIterator( sign));
+	if (!iter.get())
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
+	}
 	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
@@ -966,7 +974,18 @@ StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::StatisticsIteratorInterface>::function);
 	iter.reset( storage->createUpdateStatisticsIterator());
+	if (!iter.get())
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
+	}
 	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+}
+
+DocumentBrowser StorageClient::createDocumentBrowser()
+{
+	if (!m_objbuilder_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	return DocumentBrowser( m_objbuilder_impl, m_storage_impl, m_errorhnd_impl);
 }
 
 void StorageClient::close()
@@ -1230,7 +1249,6 @@ void QueryEval::addExclusionFeature( const std::string& set_)
 }
 
 void QueryEval::addSummarizer(
-		const std::string& resultAttribute,
 		const std::string& name,
 		const SummarizerConfig& config)
 {
@@ -1266,8 +1284,7 @@ void QueryEval::addSummarizer(
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addSummarizerFunction(
-			name, function.get(), featureParameters, resultAttribute);
+	queryeval->addSummarizerFunction( name, function.get(), featureParameters);
 	function.release();
 }
 
@@ -1438,63 +1455,82 @@ void Query::defineFeature( const std::string& set_, const QueryExpression& expr_
 	THIS->defineFeature( set_, weight_);
 }
 
-void Query::defineMetaDataRestriction(
-		const char* compareOp, const std::string& name,
-		const Variant& operand, bool newGroup)
+static strus::MetaDataRestrictionInterface::CompareOperator getCompareOp( const char* compareOp)
 {
-	strus::QueryInterface::CompareOperator cmpop;
-	if (std::strcmp( compareOp, "<") == 0)
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop;
+	if (compareOp[0] == '<')
 	{
-		cmpop = strus::QueryInterface::CompareLess;
+		if (compareOp[1] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareLess;
+		}
+		else if (compareOp[1] == '=' && compareOp[2] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareLessEqual;
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
+		}
 	}
-	else if (std::strcmp( compareOp, "<=") == 0)
+	else if (compareOp[0] == '>')
 	{
-		cmpop = strus::QueryInterface::CompareLessEqual;
+		if (compareOp[1] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareGreater;
+		}
+		else if (compareOp[1] == '=' && compareOp[2] == '\0')
+		{
+			cmpop = strus::MetaDataRestrictionInterface::CompareGreaterEqual;
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
+		}
 	}
-	else if (std::strcmp( compareOp, "=") == 0)
+	else if (compareOp[0] == '=' && compareOp[1] == '\0')
 	{
-		cmpop = strus::QueryInterface::CompareEqual;
+		cmpop = strus::MetaDataRestrictionInterface::CompareEqual;
 	}
-	else if (std::strcmp( compareOp, "!=") == 0)
+	else if (compareOp[0] == '!' && compareOp[1] == '=' && compareOp[2] == '\0')
 	{
-		cmpop = strus::QueryInterface::CompareNotEqual;
-	}
-	else if (std::strcmp( compareOp, ">") == 0)
-	{
-		cmpop = strus::QueryInterface::CompareGreater;
-	}
-	else if (std::strcmp( compareOp, ">=") == 0)
-	{
-		cmpop = strus::QueryInterface::CompareGreaterEqual;
+		cmpop = strus::MetaDataRestrictionInterface::CompareNotEqual;
 	}
 	else
 	{
 		throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
 	}
-
-	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->defineMetaDataRestriction( cmpop, name, arithmeticVariant(operand), newGroup);
+	return cmpop;
 }
 
-void Query::defineMetaDataRestriction(
+void Query::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		const Variant& operand, bool newGroup)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	THIS->addMetaDataRestrictionCondition( cmpop, name, arithmeticVariant(operand), newGroup);
+}
+
+void Query::addMetaDataRestrictionCondition(
 		const char* compareOp, const std::string& name,
 		double value, bool newGroup)
 {
-	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
 }
 
-void Query::defineMetaDataRestriction(
+void Query::addMetaDataRestrictionCondition(
 		const char* compareOp, const std::string& name,
 		unsigned int value, bool newGroup)
 {
-	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
 }
 
-void Query::defineMetaDataRestriction(
+void Query::addMetaDataRestrictionCondition(
 		const char* compareOp, const std::string& name,
 		int value, bool newGroup)
 {
-	defineMetaDataRestriction( compareOp, name, Variant(value), newGroup);
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
 }
 
 void Query::defineTermStatistics( const std::string& type_, const std::string& value_, const TermStatistics& stats_)
@@ -1541,34 +1577,139 @@ void Query::addUserName( const std::string& username_)
 	THIS->addUserName( username_);
 }
 
-std::vector<Rank> Query::evaluate() const
+QueryResult Query::evaluate() const
 {
-	std::vector<Rank> rt;
+	std::vector<Rank> ranks;
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	std::vector<strus::ResultDocument> res = THIS->evaluate();
-	if (res.empty() && errorhnd->hasError())
+	strus::QueryResult res = THIS->evaluate();
+	if (res.ranks().empty() && errorhnd->hasError())
 	{
-		throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to evaluate query: %s"), errorhnd->fetchError());
 	}
+	QueryResult rt( res.evaluationPass(), res.nofDocumentsRanked(), res.nofDocumentsVisited());
 	std::vector<strus::ResultDocument>::const_iterator
-		ri = res.begin(), re = res.end();
+		ri = res.ranks().begin(), re = res.ranks().end();
 	for (;ri != re; ++ri)
 	{
 		Rank reselem;
 		reselem.m_docno = (unsigned int)ri->docno();
 		reselem.m_weight = ri->weight();
-		std::vector<strus::ResultDocument::Attribute>::const_iterator
-			ai = ri->attributes().begin(), ae = ri->attributes().end();
+		std::vector<strus::SummaryElement>::const_iterator
+			ai = ri->summaryElements().begin(), ae = ri->summaryElements().end();
 	
 		for (;ai != ae; ++ai)
 		{
-			RankAttribute attr( ai->name(), ai->value(), ai->weight());
-			reselem.m_attributes.push_back( attr);
+			SummaryElement elem( ai->name(), ai->value(), ai->weight(), ai->index());
+			reselem.m_summaryElements.push_back( elem);
 		}
-		rt.push_back( reselem);
+		rt.m_ranks.push_back( reselem);
 	}
-	return rt;
+	return QueryResult( rt);
+}
+
+DocumentBrowser::DocumentBrowser( const DocumentBrowser& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_restriction_impl(o.m_restriction_impl)
+	,m_postingitr_impl(o.m_postingitr_impl)
+	,m_attributereader_impl(o.m_attributereader_impl)
+	,m_docno(o.m_docno)
+{}
+
+DocumentBrowser::DocumentBrowser( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& errorhnd_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_objbuilder_impl(objbuilder_impl_)
+	,m_storage_impl(storage_impl_)
+	,m_restriction_impl( ReferenceDeleter<strus::MetaDataRestrictionInterface>::function)
+	,m_postingitr_impl( ReferenceDeleter<strus::PostingIteratorInterface>::function)
+	,m_attributereader_impl( ReferenceDeleter<strus::AttributeReaderInterface>::function)
+	,m_docno(0)
+{
+	const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+	m_restriction_impl.reset( storage->createMetaDataRestriction());
+	if (!m_restriction_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create meta data restriction interface for browsing documents"));
+	}
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		const Variant& value, bool newGroup)
+{
+	strus::MetaDataRestrictionInterface* restriction = (strus::MetaDataRestrictionInterface*)m_restriction_impl.get();
+	if (!restriction)
+	{
+		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
+	}
+	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	restriction->addCondition( cmpop, name, arithmeticVariant(value), newGroup);
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		double value, bool newGroup)
+{
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		unsigned int value, bool newGroup)
+{
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
+}
+
+void DocumentBrowser::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		int value, bool newGroup)
+{
+	addMetaDataRestrictionCondition( compareOp, name, Variant(value), newGroup);
+}
+
+Index DocumentBrowser::skipDoc( const Index& docno_)
+{
+	if (!m_postingitr_impl.get())
+	{
+		const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+		strus::MetaDataRestrictionInterface* restriction = (strus::MetaDataRestrictionInterface*)m_restriction_impl.get();
+		m_postingitr_impl.reset( storage->createBrowsePostingIterator( restriction, 1));
+		if (!m_postingitr_impl.get())
+		{
+			throw strus::runtime_error( _TXT("failed to create posting iterator for document browser"));
+		}
+	}
+	strus::PostingIteratorInterface* itr = (strus::PostingIteratorInterface*)m_postingitr_impl.get();
+	return m_docno = itr->skipDoc( docno_);
+}
+
+std::string DocumentBrowser::attribute( const std::string& name)
+{
+	if (m_docno)
+	{
+		if (!m_attributereader_impl.get())
+		{
+			const strus::StorageClientInterface* storage = (const strus::StorageClientInterface*)m_storage_impl.get();
+			m_attributereader_impl.reset( storage->createAttributeReader());
+			if (!m_attributereader_impl.get())
+			{
+				throw strus::runtime_error( _TXT("failed to create attribute reader for document browser"));
+			}
+		}
+		const strus::AttributeReaderInterface* reader = (strus::AttributeReaderInterface*)m_attributereader_impl.get();
+		strus::Index elemhnd = reader->elementHandle( name.c_str());
+		if (!elemhnd)
+		{
+			throw strus::runtime_error( _TXT("document attribute name %s is not defined"), name.c_str());
+		}
+		return reader->getValue( elemhnd);
+	}
+	else
+	{
+		return std::string();
+	}
 }
 
 

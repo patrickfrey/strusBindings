@@ -23,6 +23,6 @@ link_directories(
 # EXECUTABLES
 # --------------------------------------
 add_executable( testQuery ${source_files} )
-#target_link_libraries( testQuery strus_bindings )
 target_link_libraries( testQuery strus_bindings strus_module strus_rpc_client strus_rpc_client_socket strus_utils strus_error )
+
 

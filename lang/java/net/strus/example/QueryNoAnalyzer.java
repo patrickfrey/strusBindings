@@ -6,7 +6,7 @@ import java.util.List;
 public class QueryNoAnalyzer
 {
 	// Evaluate a query defined by some terms with a query evaluation scheme passed:
-	public static RankVector evaluateQuery( StorageClient storage, QueryEval queryEval, String[] terms)
+	public static QueryResult evaluateQuery( StorageClient storage, QueryEval queryEval, String[] terms)
 	{
 		// Empty queries are refused:
 		if (terms.length == 0)
@@ -63,7 +63,7 @@ public class QueryNoAnalyzer
 		// First we add a summarizer that extracts us the title of the document:
 		SummarizerConfig sum_title = new SummarizerConfig();
 		sum_title.defineParameter( "name", "title");
-		queryEval.addSummarizer( "title", "attribute", sum_title);
+		queryEval.addSummarizer( "attribute", sum_title);
 	
 		// Then we add a summarizer that collects the sections that enclose the best matches 
 		// in a ranked document:
@@ -72,7 +72,7 @@ public class QueryNoAnalyzer
 		sum_match.defineParameter( "nof", 4);
 		sum_match.defineParameter( "len", 60);
 		sum_match.defineFeature( "match", "seek");
-		queryEval.addSummarizer( "summary", "matchphrase", sum_match);
+		queryEval.addSummarizer( "matchphrase", sum_match);
 
 		// Now we are done:
 		return queryEval;
@@ -92,19 +92,22 @@ public class QueryNoAnalyzer
 		QueryEval queryEval = createQueryEval( ctx);
 
 		// Evaluate the query:
-		RankVector results = evaluateQuery( storage, queryEval, args);
+		QueryResult result = evaluateQuery( storage, queryEval, args);
 
 		// We iterate on the results returned and we print them:
-		System.out.println( "Number of results: " + results.size());
+		System.out.println( "Number of results (total "
+				+ result.nofDocumentsRanked()
+				+ "|" + result.nofDocumentsVisited()
+				+ ")");
 		int pos = 0;
-		for (Rank result : results)
+		for (Rank rank : result.ranks())
 		{
 			++pos;
-			System.out.println( "rank " + pos + ": " + result.docno() + " " + result.weight() + ":");
-			RankAttributeVector attributes = result.attributes();
-			for (RankAttribute attribute : attributes)
+			System.out.println( "rank " + pos + ": " + rank.docno() + " " + rank.weight() + ":");
+			SummaryElementVector sumelems = rank.summaryElements();
+			for (SummaryElement sumelem : sumelems)
 			{
-				System.out.println( "\t" + attribute.name() + ": " + attribute.value());
+				System.out.println( "\t" + sumelem.name() + ": " + sumelem.value());
 			}
 		}
 		System.out.println( "done");

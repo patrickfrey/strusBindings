@@ -3,19 +3,19 @@
     The C++ library strus implements basic operations to build
     a search engine for structured search on unstructured data.
 
-    Copyright (C) 2013,2014 Patrick Frey
+    Copyright (C) 2015 Patrick Frey
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
+    modify it under the terms of the GNU General Public
     License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+    version 3 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+    General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
@@ -479,7 +479,7 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 						long val = Z_LVAL_PP( data);
 						if (val >= std::numeric_limits<int>::max() || val <= std::numeric_limits<int>::min())
 						{
-							THROW_EXCEPTION( "range parameter exceeds maximum size");
+							THROW_EXCEPTION( "range parameter exceeds allowed domain");
 							error = -1;
 							break;
 						}
@@ -489,9 +489,9 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 					else if (!cardinality_defined)
 					{
 						long val = Z_LVAL_PP( data);
-						if (val >= (long)std::numeric_limits<unsigned int>::max())
+						if (val < 0 || val >= (long)std::numeric_limits<unsigned int>::max())
 						{
-							THROW_EXCEPTION( "range parameter exceeds maximum size");
+							THROW_EXCEPTION( "cardinality parameter exceeds allowed domain");
 							error = -1;
 							break;
 						}
@@ -856,6 +856,7 @@ int initTermStatistics( TermStatistics& result, zval* obj)
 
 int getTermVector( zval* result, const std::vector<Term>& ar)
 {
+	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Term>::const_iterator ti = ar.begin(), te = ar.end();
 	for (; ti != te; ++ti)
@@ -871,10 +872,11 @@ int getTermVector( zval* result, const std::vector<Term>& ar)
 	return 0;
 }
 
-static int getRankAttributeVector( zval* result, const std::vector<RankAttribute>& ar)
+static int getSummaryElementVector( zval* result, const std::vector<SummaryElement>& ar)
 {
+	MAKE_STD_ZVAL( result);
 	array_init( result);
-	std::vector<RankAttribute>::const_iterator ai = ar.begin(), ae = ar.end();
+	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
 	{
 		zval* attr;
@@ -890,25 +892,38 @@ static int getRankAttributeVector( zval* result, const std::vector<RankAttribute
 
 int getRankVector( zval* result, const std::vector<Rank>& ar)
 {
+	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Rank>::const_iterator ri = ar.begin(), re = ar.end();
 	for (; ri != re; ++ri)
 	{
 		zval* rank;
 		MAKE_STD_ZVAL( rank);
-		zval* rankattr;
-		MAKE_STD_ZVAL( rankattr);
-
 		object_init( rank);
 		add_property_long( rank, "docno", ri->docno());
 		add_property_double( rank, "weight", ri->weight());
-		getRankAttributeVector( rankattr, ri->attributes());
-		add_property_zval( rank, "attributes", rankattr);
+		zval* rankattr;
+		getSummaryElementVector( rankattr, ri->summaryElements());
+		add_property_zval( rank, "summaryElements", rankattr);
 
 		add_next_index_zval( result, rank);
 	}
 	return 0;
 }
 
+int getQueryResult( zval* result, const QueryResult& res)
+{
+	MAKE_STD_ZVAL( result);
+	object_init( result);
+
+	add_property_long( result, "evaluationPass", res.evaluationPass());
+	add_property_long( result, "nofDocumentsRanked", res.nofDocumentsRanked());
+	add_property_long( result, "nofDocumentsVisited", res.nofDocumentsVisited());
+
+	zval* ranks;
+	getRankVector( ranks, res.ranks());
+	add_property_zval( result, "ranks", ranks);
+	return 0;
+}
 
 

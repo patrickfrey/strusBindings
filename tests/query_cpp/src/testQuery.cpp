@@ -114,13 +114,13 @@ int main( int , const char** )
 
 		SummarizerConfig titlesum;
 		titlesum.defineParameter( "name", "title");
-		queryEval.addSummarizer( "title", "attribute", titlesum);
+		queryEval.addSummarizer( "attribute", titlesum);
 		SummarizerConfig docidsum;
 		docidsum.defineParameter( "name", "docid");
-		queryEval.addSummarizer( "docid", "attribute", docidsum);
+		queryEval.addSummarizer( "attribute", docidsum);
 		SummarizerConfig matchsum;
 		matchsum.defineFeature( "match", "weighted");
-		queryEval.addSummarizer( "match", "matchpos", matchsum);
+		queryEval.addSummarizer( "matchpos", matchsum);
 
 		WeightingConfig weightingConfig;
 		weightingConfig.defineParameter( "k1", 0.75);
@@ -147,35 +147,43 @@ int main( int , const char** )
 		query.defineFeature( "weighted", expr, 1.0);
 
 		// Evaluate the query and print the result:
-		query.defineMetaDataRestriction( "<=", "class", 5);
-		query.defineMetaDataRestriction( ">=", "class", 1);
+		query.addMetaDataRestrictionCondition( "<=", "class", 5, true);
+		query.addMetaDataRestrictionCondition( ">=", "class", 1, true);
 	
 		query.setMaxNofRanks( 10);
 		query.setMinRank( 0);
 
 		query.addUserName( "nobody");
 
-		std::set<unsigned int> expected;
-		expected.insert( 1);
-		expected.insert( 5);
+		std::set<std::string> expected;
+		expected.insert( "X://doc_1");
+		expected.insert( "X://doc_5");
 
-		std::vector<Rank> result = query.evaluate();
-		std::vector<Rank>::const_iterator ri = result.begin(), re = result.end();
+		QueryResult result = query.evaluate();
+		std::vector<Rank>::const_iterator ri = result.ranks().begin(), re = result.ranks().end();
 		for (std::size_t ridx=1; ri != re; ++ridx,++ri)
 		{
-			std::cout << "[" << ridx << "] docno=" << ri->docno() << ", weight=" << ri->weight();
-			if (expected.find( ri->docno()) == expected.end())
-			{
-				throw std::runtime_error( "found document not expected");
-			}
-			expected.erase( ri->docno());
-			std::vector<RankAttribute>::const_iterator
-				ai = ri->attributes().begin(), ae = ri->attributes().end();
+			std::string docid;
+			std::cout << "[" << ridx << "] docno=" << ri->docno() << ", weight=" << ri->weight() << std::endl;
+			std::vector<SummaryElement>::const_iterator
+				ai = ri->summaryElements().begin(), ae = ri->summaryElements().end();
 			for (std::size_t aidx=0; ai != ae; ++aidx,++ai)
 			{
 				if (aidx) std::cout << ", "; else std::cout << ' ';
-				std::cout << ai->name() << "=" << ai->value();
+				std::cout << ai->name() << "[" << ai->index() << "] = "
+						<< ai->value() << " " << ai->weight();
+				if (ai->name() == "docid") docid = ai->value();
 			}
+			if (docid.empty())
+			{
+				throw std::runtime_error( "found document has no docid defined");
+			}
+			std::set<std::string>::iterator ei = expected.find( docid);
+			if (ei == expected.end())
+			{
+				throw std::runtime_error( "found document not expected");
+			}
+			expected.erase( ei);
 			std::cout << std::endl;
 		}
 		if (!expected.empty())

@@ -27,20 +27,20 @@ try
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
 	# First we add a summarizer that extracts us the title of the document:
-	$queryeval->addSummarizer( "title", "attribute", array( "name"=>"title"));
+	$queryeval->addSummarizer( "attribute", array( "name"=>"title"));
 
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
-	$queryeval->addSummarizer( "summary", "matchphrase", array( "type"=>"orig","nof"=>4,"len"=>60,".match"=>"seek"));
+	$queryeval->addSummarizer( "matchphrase", array( "type"=>"orig","sentencesize"=>40,"windowsize"=>60,".match"=>"seek"));
 
 	# Now we build the query to issue:
 	$query = $queryeval->createQuery( $storage);
-	
+
 	# First we analyze the query phrase to get the terms to find in the form as they are stored in the storage:
 	$terms = $analyzer->analyzePhrase( "word", $queryphrase);
 	if (count( $terms) == 0)
 	{
-		throw Exception("query is empty");
+		throw new Exception("query is empty");
 	}
 	# Then we iterate on the terms and create a single term feature for each term and collect
 	# all terms to create a selection expression out of them:
@@ -68,13 +68,13 @@ try
 	# Now we evaluate the query and iterate on the result to display them:
 	$results = $query->evaluate();
 	$pos = 0;
-	foreach ($results as &$result)
+	foreach ($results->ranks as &$rank)
 	{
 		$pos += 1;
-		print "rank " . $pos . ": " . $result->docno . " " . $result->weight . ":\n";
-		foreach ($result->attributes as &$attribute)
+		print "rank " . $pos . ": " . $rank->docno . " " . $rank->weight . ":\n";
+		foreach ($rank->summaryElements as &$sumelem)
 		{
-			print "\t" . $attribute->name . ": " . $attribute->value . "\n";
+			print "\t" . $sumelem->name . ": " . $sumelem->value . "\n";
 		}
 	}
 	print "done\n";

@@ -130,11 +130,12 @@ my %ignoreMethodMap = ();
 $ignoreMethodMap{"setMetaData"} = 1;
 $ignoreMethodMap{"analyze"} = 1;
 $ignoreMethodMap{"defineParameter"} = 1;
-$ignoreMethodMap{"defineMetaDataRestriction"} = 1;
+$ignoreMethodMap{"addMetaDataRestrictionCondition"} = 1;
 $ignoreMethodMap{"addForwardIndexFeature"} = 1;
 $ignoreMethodMap{"addSearchIndexFeature"} = 1;
 $ignoreMethodMap{"pushExpression"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
+$ignoreMethodMap{"addDocumentEvaluationSet"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
 $ignoreMethodMap{"push"} = 1;
@@ -160,12 +161,9 @@ $renameMethodMap{"defineParameter_int"} = "defineParameter";
 $renameMethodMap{"defineParameter_uint"} = "defineParameter";
 $renameMethodMap{"defineParameter_double"} = "defineParameter";
 $renameMethodMap{"defineParameter_unicode"} = "defineParameter";
-$renameMethodMap{"defineMetaDataRestriction_double_3"} = "defineMetaDataRestriction";
-$renameMethodMap{"defineMetaDataRestriction_double_4"} = "defineMetaDataRestriction";
-$renameMethodMap{"defineMetaDataRestriction_int_3"} = "defineMetaDataRestriction";
-$renameMethodMap{"defineMetaDataRestriction_int_4"} = "defineMetaDataRestriction";
-$renameMethodMap{"defineMetaDataRestriction_uint_3"} = "defineMetaDataRestriction";
-$renameMethodMap{"defineMetaDataRestriction_uint_4"} = "defineMetaDataRestriction";
+$renameMethodMap{"addMetaDataRestrictionCondition_double"} = "addMetaDataRestrictionCondition";
+$renameMethodMap{"addMetaDataRestrictionCondition_int"} = "addMetaDataRestrictionCondition";
+$renameMethodMap{"addMetaDataRestrictionCondition_uint"} = "addMetaDataRestrictionCondition";
 $renameMethodMap{"addForwardIndexFeature_4"} = "addForwardIndexFeature";
 $renameMethodMap{"addForwardIndexFeature_5"} = "addForwardIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_4"} = "addSearchIndexFeature";
@@ -183,6 +181,7 @@ $renameMethodMap{"defineTermStatistics_unicode"} = "defineTermStatistics";
 $renameMethodMap{"defineTermStatistics_struct"} = "defineTermStatistics";
 $renameMethodMap{"defineTermStatistics_unicode_struct"} = "defineTermStatistics";
 $renameMethodMap{"defineGlobalStatistics_struct"} = "defineGlobalStatistics";
+$renameMethodMap{"addDocumentEvaluationSet_struct"} = "addDocumentEvaluationSet";
 $renameMethodMap{"createStorageClient_0"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_1"} = "createStorageClient";
 $renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
@@ -548,19 +547,19 @@ print OUTFILE <<EOF;
     The C++ library strus implements basic operations to build
     a search engine for structured search on unstructured data.
 
-    Copyright (C) 2013,2014 Patrick Frey
+    Copyright (C) 2015 Patrick Frey
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
+    modify it under the terms of the GNU General Public
     License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+    version 3 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+    General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
@@ -608,7 +607,7 @@ bp::register_exception_translator<std::exception>( translate_exception);
 
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
-bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());
+bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
 bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringVector>());
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());

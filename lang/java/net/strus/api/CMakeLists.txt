@@ -19,10 +19,12 @@ set( generated_java_source_files
 	QueryEval.java
 	Query.java
 	QueryExpression.java
+	QueryResult.java
+	DocumentBrowser.java
 	TermStatistics.java
 	GlobalStatistics.java
-	RankAttribute.java
-	RankAttributeVector.java
+	SummaryElement.java
+	SummaryElementVector.java
 	Rank.java
 	RankVector.java
 	StorageClient.java

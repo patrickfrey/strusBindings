@@ -27,8 +27,8 @@
 %typemap(javapackage) std::vector<Rank>  "net.strus.api.RankVector"
 %template(RankVector) std::vector<Rank>;
 
-%typemap(javapackage) std::vector<RankAttribute>  "net.strus.api.RankAttributeVector"
-%template(RankAttributeVector) std::vector<RankAttribute>;
+%typemap(javapackage) std::vector<SummaryElement>  "net.strus.api.SummaryElementVector"
+%template(SummaryElementVector) std::vector<SummaryElement>;
 
 %typemap(javapackage) std::vector<Attribute>  "net.strus.api.AttributeVector"
 %template(AttributeVector) std::vector<Attribute>;
@@ -38,6 +38,8 @@
 
 %typemap(javapackage) std::vector<Normalizer>  "net.strus.api.NormalizerVector"
 %template(NormalizerVector) std::vector<Normalizer>;
+
+%rename(assign_operator) operator=;
 
 %typemap(javacode) Context %{
 static {

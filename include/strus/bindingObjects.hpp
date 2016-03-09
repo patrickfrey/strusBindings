@@ -3,19 +3,19 @@
     The C++ library strus implements basic operations to build
     a search engine for structured search on unstructured data.
 
-    Copyright (C) 2013,2014 Patrick Frey
+    Copyright (C) 2015 Patrick Frey
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
+    modify it under the terms of the GNU General Public
     License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+    version 3 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+    General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
@@ -63,7 +63,7 @@ typedef std::vector<std::string> StringVector;
 #endif
 #define TermVector std::vector<Term>
 #define RankVector std::vector<Rank>
-#define RankAttributeVector std::vector<RankAttribute>
+#define SummaryElementVector std::vector<SummaryElement>
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
 #define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
@@ -77,6 +77,7 @@ class Reference
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	Reference()
 		:m_deleter(0){}
 #endif
@@ -375,6 +376,12 @@ public:
 	/// \brief Assign a value to this variant
 	/// \param[in] v the value to assign
 	void assignText( const String& v);
+
+	Variant& operator=( const Variant& o)
+	{
+		assign( o);
+		return *this;
+	}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Variant& o) const
@@ -690,6 +697,7 @@ class DocumentAnalyzer
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	DocumentAnalyzer()
 		:m_textproc(0){}
 #endif
@@ -870,6 +878,7 @@ class DocumentAnalyzeQueue
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	DocumentAnalyzeQueue()
 		:m_result_queue_idx(0),m_analyzerctx_queue_idx(0),m_textproc(0){}
 #endif
@@ -929,6 +938,7 @@ class QueryAnalyzer
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	QueryAnalyzer(){}
 #endif
 	/// \brief Copy constructor
@@ -992,6 +1002,7 @@ class QueryAnalyzeQueue
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	QueryAnalyzeQueue()
 		:m_result_queue_idx(0){}
 #endif
@@ -1031,6 +1042,8 @@ private:
 class StatisticsIterator;
 /// \brief Forward declaration
 class StorageTransaction;
+/// \brief Forward declaration
+class DocumentBrowser;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -1038,6 +1051,7 @@ class StorageClient
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StorageClient(){}
 #endif
 	/// \brief Copy constructor
@@ -1063,6 +1077,9 @@ public:
 	/// return the statistics message iterator object created
 	StatisticsIterator createUpdateStatisticsIterator() const;
 
+	/// \brief Create a document browser instance
+	DocumentBrowser createDocumentBrowser();
+
 	/// \brief Close of the storage client
 	void close();
 
@@ -1084,6 +1101,7 @@ class StorageTransaction
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StorageTransaction(){}
 #endif
 	/// \brief Destructor
@@ -1183,6 +1201,7 @@ class StatisticsMessage
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StatisticsMessage(){}
 #endif
 	/// \brief Copy constructor
@@ -1220,6 +1239,7 @@ class StatisticsIterator
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StatisticsIterator(){}
 #endif
 	/// \brief Copy constructor
@@ -1246,6 +1266,7 @@ class StatisticsProcessor
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	StatisticsProcessor(){}
 #endif
 	/// \brief Decode a statistics message blob for introspection
@@ -1418,6 +1439,7 @@ class QueryEval
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	QueryEval(){}
 #endif
 	/// \brief Copy constructor
@@ -1447,17 +1469,14 @@ public:
 	void addExclusionFeature( const String& set_);
 
 	/// \brief Declare a summarizer
-	/// \param[in] resultAttribute name of the result attribute this summarization result is assigned to
 	/// \param[in] name the name of the summarizer to add
 	/// \param[in] config the configuration of the summarizer to add
 	void addSummarizer(
-			const String& resultAttribute,
 			const String& name,
 			const SummarizerConfig& config);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addSummarizer_obj(
-		const String& resultAttribute,
 		const String& name,
 		const FunctionObject& config_);
 #endif
@@ -1496,36 +1515,38 @@ private:
 
 
 /// \brief Attribute of a query evaluation result element
-class RankAttribute
+class SummaryElement
 {
 public:
 	/// \brief Constructor
-	RankAttribute()
-		:m_weight(0.0){}
+	SummaryElement()
+		:m_weight(0.0),m_index(-1){}
 	/// \brief Constructor
-	RankAttribute( const String& name_, const String& value_, double weight_)
-		:m_name(name_),m_value(value_),m_weight(weight_){}
+	SummaryElement( const String& name_, const String& value_, double weight_, int index_)
+		:m_name(name_),m_value(value_),m_weight(weight_),m_index(index_){}
 	/// \brief Copy connstructor
-	RankAttribute( const RankAttribute& o)
-		:m_name(o.m_name),m_value(o.m_value),m_weight(o.m_weight){}
+	SummaryElement( const SummaryElement& o)
+		:m_name(o.m_name),m_value(o.m_value),m_weight(o.m_weight),m_index(o.m_index){}
 
-	/// \brief Get the name of this attribute
+	/// \brief Get the name of the summary element
 	const String& name() const		{return m_name;}
-	/// \brief Get the value of this attribute
+	/// \brief Get the value of the summary element
 	const String& value() const		{return m_value;}
-	/// \brief Get the weight of the attribute
+	/// \brief Get the weight of the summary element
 	double weight() const			{return m_weight;}
+	/// \brief Get the index (grouping) of the summary element if defined or -1
+	int index() const			{return m_index;}
 
 #if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
 	WString ucvalue() const;
 
-	bool operator==( const RankAttribute& o) const
+	bool operator==( const SummaryElement& o) const
 	{
-		if (m_name != o.m_name || m_value != o.m_value) return false;
+		if (m_name != o.m_name || m_value != o.m_value || m_index != o.m_index) return false;
 		double ww = m_weight - o.m_weight;
 		return (ww < 0.0)?(-ww<std::numeric_limits<double>::epsilon()):(ww<std::numeric_limits<double>::epsilon());
 	}
-	bool operator!=( const RankAttribute& o) const
+	bool operator!=( const SummaryElement& o) const
 	{
 		return !operator==(o);
 	}
@@ -1535,9 +1556,10 @@ private:
 	std::string m_name;
 	std::string m_value;
 	double m_weight;
+	int m_index;
 };
 #ifdef STRUS_BOOST_PYTHON
-typedef std::vector<RankAttribute> RankAttributeVector;
+typedef std::vector<SummaryElement> SummaryElementVector;
 #endif
 
 
@@ -1549,18 +1571,20 @@ public:
 	Rank()
 		:m_docno(0),m_weight(0.0){}
 	/// \brief Constructor
-	Rank( Index docno_, double weight_, const RankAttributeVector& attributes_)
-		:m_docno(docno_),m_weight(weight_),m_attributes(attributes_){}
+	Rank( Index docno_, double weight_, const SummaryElementVector& summaryElements_)
+		:m_docno(docno_),m_weight(weight_),m_summaryElements(summaryElements_){}
 	/// \brief Copy constructor
 	Rank( const Rank& o)
-		:m_docno(o.m_docno),m_weight(o.m_weight),m_attributes(o.m_attributes){}
+		:m_docno(o.m_docno),m_weight(o.m_weight),m_summaryElements(o.m_summaryElements){}
 
 	/// \brief Get the internal document nuber used
 	Index docno() const					{return m_docno;}
 	/// \brief Get the weight of the rank
 	double weight() const					{return m_weight;}
-	/// \brief Get the attributes
-	const RankAttributeVector& attributes() const		{return m_attributes;}
+	/// \brief Get the summary elements
+
+	/// \brief Get the summary elements
+	const SummaryElementVector& summaryElements() const	{return m_summaryElements;}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Rank& o) const
@@ -1579,7 +1603,7 @@ private:
 	friend class Query;
 	Index m_docno;
 	double m_weight;
-	std::vector<RankAttribute> m_attributes;
+	std::vector<SummaryElement> m_summaryElements;
 };
 #ifdef STRUS_BOOST_PYTHON
 typedef std::vector<Rank> RankVector;
@@ -1750,12 +1774,42 @@ private:
 	GlobalCounter m_nofDocumentsInserted;	///< global number of documents inserted (-1 for undefined, if undefined then the storage value of the global number of documents is used)
 };
 
+/// \brief Structure representing the result of a query
+class QueryResult
+{
+public:
+	/// \brief Default constructor
+	QueryResult()
+		:m_evaluationPass(0),m_nofDocumentsRanked(0),m_nofDocumentsVisited(0){}
+
+	/// \brief Get the last query evaluation pass used (level of selection features used)
+	unsigned int evaluationPass() const			{return m_evaluationPass;}
+	/// \brief Get the total number of matches that were ranked (after applying all query restrictions)
+	unsigned int nofDocumentsRanked() const			{return m_nofDocumentsRanked;}
+	/// \brief Get the total number of matches that were visited (after applying ACL restrictions, but before applying other restrictions)
+	unsigned int nofDocumentsVisited() const		{return m_nofDocumentsVisited;}
+
+	/// \brief Get the list of result elements
+	const RankVector& ranks() const				{return m_ranks;}
+
+private:
+	friend class Query;
+	QueryResult( unsigned int evaluationPass_, unsigned int nofDocumentsRanked_, unsigned int nofDocumentsVisited_)
+		:m_evaluationPass(evaluationPass_),m_nofDocumentsRanked(nofDocumentsRanked_),m_nofDocumentsVisited(nofDocumentsVisited_){}
+
+private:
+	unsigned int m_evaluationPass;			///< query evaluation passes used (level of selection features used)
+	unsigned int m_nofDocumentsRanked;		///< total number of matches for a query with applying restrictions (might be an estimate)
+	unsigned int m_nofDocumentsVisited;		///< total number of matches for a query without applying restrictions but ACL restrictions (might be an estimate)
+	RankVector m_ranks;				///< list of result documents (part of the total result)
+};
 
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class Query
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
 	Query(){}
 #endif
 	/// \brief Copy constructor
@@ -1795,78 +1849,57 @@ public:
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			const Variant& value, bool newGroup=true);
+			const Variant& value, bool newGroup);
 #endif
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			double value, bool newGroup=true);
+			double value, bool newGroup);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			unsigned int value, bool newGroup=true);
+			unsigned int value, bool newGroup);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
 	/// \param[in] name of the meta data field (left side of comparison operator)
 	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
 	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void defineMetaDataRestriction(
+	void addMetaDataRestrictionCondition(
 			const char* compareOp, const String& name,
-			int value, bool newGroup=true);
+			int value, bool newGroup);
 
 #ifdef STRUS_BOOST_PYTHON
-	void defineMetaDataRestriction_double_3(
-			const char* compareOp, const String& name,
-			double value)
-	{
-		defineMetaDataRestriction( compareOp, name, value, true);
-	}
-
-	void defineMetaDataRestriction_double_4(
+	void addMetaDataRestrictionCondition_double(
 			const char* compareOp, const String& name,
 			double value, bool newGroup)
 	{
-		defineMetaDataRestriction( compareOp, name, value, newGroup);
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
 	}
 
-	void defineMetaDataRestriction_uint_3(
-			const char* compareOp, const String& name,
-			unsigned int value)
-	{
-		defineMetaDataRestriction( compareOp, name, value, true);
-	}
-
-	void defineMetaDataRestriction_uint_4(
+	void addMetaDataRestrictionCondition_uint(
 			const char* compareOp, const String& name,
 			unsigned int value, bool newGroup)
 	{
-		defineMetaDataRestriction( compareOp, name, value, newGroup);
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
 	}
 
-	void defineMetaDataRestriction_int_3(
-			const char* compareOp, const String& name,
-			int value)
-	{
-		defineMetaDataRestriction( compareOp, name, value, true);
-	}
-
-	void defineMetaDataRestriction_int_4(
+	void addMetaDataRestrictionCondition_int(
 			const char* compareOp, const String& name,
 			int value, bool newGroup)
 	{
-		defineMetaDataRestriction( compareOp, name, value, newGroup);
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
 	}
 #endif
 	/// \brief Define term statistics to use for a term for weighting it in this query
@@ -1888,8 +1921,10 @@ public:
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
 	/// \param[in] docnolist_ list of documents to evaluate the query on
-	void addDocumentEvaluationSet(
-			const IntVector& docnolist_);
+	void addDocumentEvaluationSet( const IntVector& docnolist_);
+#ifdef STRUS_BOOST_PYTHON
+	void addDocumentEvaluationSet_struct( const FunctionObject& docnolist_);
+#endif
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks_ maximum number of results to return by this query
@@ -1910,7 +1945,7 @@ public:
 
 	/// \brief Evaluate this query and return the result
 	/// \return the result
-	RankVector evaluate() const;
+	QueryResult evaluate() const;
 
 private:
 	friend class QueryEval;
@@ -1926,6 +1961,107 @@ private:
 	const void* m_queryproc;
 };
 
+///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata
+class DocumentBrowser
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	DocumentBrowser(){}
+#endif
+	/// \brief Copy constructor
+	DocumentBrowser( const DocumentBrowser& o);
+	/// \brief Destructor
+	~DocumentBrowser(){}
+
+#ifndef DOXYGEN_JAVA
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			const Variant& value, bool newGroup);
+#endif
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			double value, bool newGroup);
+
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			unsigned int value, bool newGroup);
+
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const String& name,
+			int value, bool newGroup);
+
+#ifdef STRUS_BOOST_PYTHON
+	void addMetaDataRestrictionCondition_double(
+			const char* compareOp, const String& name,
+			double value, bool newGroup)
+	{
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
+	}
+
+	void addMetaDataRestrictionCondition_uint(
+			const char* compareOp, const String& name,
+			unsigned int value, bool newGroup)
+	{
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
+	}
+
+	void addMetaDataRestrictionCondition_int(
+			const char* compareOp, const String& name,
+			int value, bool newGroup)
+	{
+		addMetaDataRestrictionCondition( compareOp, name, value, newGroup);
+	}
+#endif
+	///\brief Get the internal document number of the next document bigger or equal the document number passed
+	///\param[in] docno_ document number to get the matching least upperbound from
+	///\return the internal document number
+	Index skipDoc( const Index& docno_);
+
+	///\brief Get an attribute of the current document visited
+	///\return the internal document number or 0, if there is no one left
+	String attribute( const String& name);
+
+private:
+	friend class StorageClient;
+	DocumentBrowser(
+		const Reference& objbuilder_impl_,
+		const Reference& storage_impl_,
+		const Reference& errorhnd_);
+
+private:
+	Reference m_errorhnd_impl;
+	Reference m_objbuilder_impl;
+	Reference m_storage_impl;
+	Reference m_restriction_impl;
+	Reference m_postingitr_impl;
+	Reference m_attributereader_impl;
+	Index m_docno;
+};
 
 /// \brief Object holding the global context of the strus information retrieval engine
 /// \note There a two modes of this context object operating on a different base.

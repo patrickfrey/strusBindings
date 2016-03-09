@@ -6,7 +6,7 @@ import java.util.List;
 public class QueryWithAnalyzer
 {
 	// Evaluate a query defined by some terms with a query evaluation scheme passed:
-	public static RankVector evaluateQuery( StorageClient storage, QueryEval queryEval, TermVector terms)
+	public static QueryResult evaluateQuery( StorageClient storage, QueryEval queryEval, TermVector terms)
 	{
 		// Empty queries are refused:
 		if (terms.size() == 0)
@@ -57,14 +57,14 @@ public class QueryWithAnalyzer
 		weighting.defineParameter( "avgdoclen", 1000);	//... average document length passed as parameter
 		weighting.defineFeature( "match", "seek");	//... we search for features of the set we call 'seek'
 		queryEval.addWeightingFunction( 1.0, "BM25", weighting);
-	
+
 		// Now we define what attributes of the documents are returned and how they are build.
 		// The functions that extract stuff from documents for presentation are called summarizers.
 		// First we add a summarizer that extracts us the title of the document:
 		SummarizerConfig sum_title = new SummarizerConfig();
 		sum_title.defineParameter( "name", "title");
-		queryEval.addSummarizer( "title", "attribute", sum_title);
-	
+		queryEval.addSummarizer( "attribute", sum_title);
+
 		// Then we add a summarizer that collects the sections that enclose the best matches 
 		// in a ranked document:
 		SummarizerConfig sum_match = new SummarizerConfig();
@@ -72,7 +72,7 @@ public class QueryWithAnalyzer
 		sum_match.defineParameter( "nof", 4);
 		sum_match.defineParameter( "len", 60);
 		sum_match.defineFeature( "match", "seek");
-		queryEval.addSummarizer( "summary", "matchphrase", sum_match);
+		queryEval.addSummarizer( "matchphrase", sum_match);
 
 		// Now we are done:
 		return queryEval;
@@ -112,19 +112,21 @@ public class QueryWithAnalyzer
 		QueryEval queryEval = createQueryEval( ctx);
 
 		// Evaluate the query:
-		RankVector results = evaluateQuery( storage, queryEval, terms);
+		QueryResult results = evaluateQuery( storage, queryEval, terms);
 
 		// We iterate on the results returned and we print them:
-		System.out.println( "Number of results: " + results.size());
+		System.out.println( "Number of results (total "
+					+ results.nofDocumentsRanked()
+					+ "|" + results.nofDocumentsVisited() + ")");
 		int pos = 0;
-		for (Rank result : results)
+		for (Rank result : results.ranks())
 		{
 			++pos;
 			System.out.println( "rank " + pos + ": " + result.docno() + " " + result.weight() + ":");
-			RankAttributeVector attributes = result.attributes();
-			for (RankAttribute attribute : attributes)
+			SummaryElementVector sumelems = result.summaryElements();
+			for (SummaryElement sumelem : sumelems)
 			{
-				System.out.println( "\t" + attribute.name() + ": " + attribute.value());
+				System.out.println( "\t" + sumelem.name() + ": " + sumelem.value());
 			}
 		}
 		System.out.println( "done");

@@ -6,19 +6,19 @@
     The C++ library strus implements basic operations to build
     a search engine for structured search on unstructured data.
 
-    Copyright (C) 2013,2014 Patrick Frey
+    Copyright (C) 2015 Patrick Frey
 
     This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
+    modify it under the terms of the GNU General Public
     License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+    version 3 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+    General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
+    You should have received a copy of the GNU General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
@@ -66,7 +66,7 @@ bp::register_exception_translator<std::exception>( translate_exception);
 
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
-bp::class_<RankAttributeVector>("RankAttributeVector") .def( bp::vector_indexing_suite<RankAttributeVector>());
+bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
 bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringVector>());
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
@@ -190,6 +190,7 @@ bp::class_<StorageClient>("StorageClient")
 	.def("createTransaction", &StorageClient::createTransaction)
 	.def("createInitStatisticsIterator", &StorageClient::createInitStatisticsIterator)
 	.def("createUpdateStatisticsIterator", &StorageClient::createUpdateStatisticsIterator)
+	.def("createDocumentBrowser", &StorageClient::createDocumentBrowser)
 	.def("close", &StorageClient::close)
 ;
 bp::class_<StorageTransaction>("StorageTransaction")
@@ -233,16 +234,17 @@ bp::class_<QueryEval>("QueryEval")
 	.def("addWeightingFunction", &QueryEval::addWeightingFunction_obj)
 	.def("createQuery", &QueryEval::createQuery)
 ;
-bp::class_<RankAttribute>("RankAttribute")
-	.def("name", &RankAttribute::name, bp::return_value_policy<bp::copy_const_reference>())
-	.def("value", &RankAttribute::value, bp::return_value_policy<bp::copy_const_reference>())
-	.def("weight", &RankAttribute::weight)
-	.def("ucvalue", &RankAttribute::ucvalue)
+bp::class_<SummaryElement>("SummaryElement")
+	.def("name", &SummaryElement::name, bp::return_value_policy<bp::copy_const_reference>())
+	.def("value", &SummaryElement::value, bp::return_value_policy<bp::copy_const_reference>())
+	.def("weight", &SummaryElement::weight)
+	.def("index", &SummaryElement::index)
+	.def("ucvalue", &SummaryElement::ucvalue)
 ;
 bp::class_<Rank>("Rank")
 	.def("docno", &Rank::docno)
 	.def("weight", &Rank::weight)
-	.def("attributes", &Rank::attributes, bp::return_value_policy<bp::copy_const_reference>())
+	.def("summaryElements", &Rank::summaryElements, bp::return_value_policy<bp::copy_const_reference>())
 ;
 bp::class_<QueryExpression>("QueryExpression")
 	.def("pushTerm", &QueryExpression::pushTerm)
@@ -259,29 +261,39 @@ bp::class_<TermStatistics>("TermStatistics")
 	.def("df", &TermStatistics::df)
 	.def("set_df", &TermStatistics::set_df)
 ;
+bp::class_<QueryResult>("QueryResult")
+	.def("evaluationPass", &QueryResult::evaluationPass)
+	.def("nofDocumentsRanked", &QueryResult::nofDocumentsRanked)
+	.def("nofDocumentsVisited", &QueryResult::nofDocumentsVisited)
+	.def("ranks", &QueryResult::ranks, bp::return_value_policy<bp::copy_const_reference>())
+;
 bp::class_<Query>("Query")
 	.def("defineFeature", &Query::defineFeature_2)
 	.def("defineFeature", &Query::defineFeature_3)
 	.def("defineFeature", &Query::defineFeature_expr_2)
 	.def("defineFeature", &Query::defineFeature_expr_3)
-	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_double_3)
-	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_double_4)
-	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_uint_3)
-	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_uint_4)
-	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_int_3)
-	.def("defineMetaDataRestriction", &Query::defineMetaDataRestriction_int_4)
+	.def("addMetaDataRestrictionCondition", &Query::addMetaDataRestrictionCondition_double)
+	.def("addMetaDataRestrictionCondition", &Query::addMetaDataRestrictionCondition_uint)
+	.def("addMetaDataRestrictionCondition", &Query::addMetaDataRestrictionCondition_int)
 	.def("defineTermStatistics", &Query::defineTermStatistics)
 	.def("defineGlobalStatistics", &Query::defineGlobalStatistics)
 	.def("defineTermStatistics", &Query::defineTermStatistics_unicode)
 	.def("defineTermStatistics", &Query::defineTermStatistics_struct)
 	.def("defineTermStatistics", &Query::defineTermStatistics_unicode_struct)
 	.def("defineGlobalStatistics", &Query::defineGlobalStatistics_struct)
-	.def("addDocumentEvaluationSet", &Query::addDocumentEvaluationSet)
+	.def("addDocumentEvaluationSet", &Query::addDocumentEvaluationSet_struct)
 	.def("setMaxNofRanks", &Query::setMaxNofRanks)
 	.def("setMinRank", &Query::setMinRank)
 	.def("addUserName", &Query::addUserName)
 	.def("addUserName", &Query::addUserName_unicode)
 	.def("evaluate", &Query::evaluate)
+;
+bp::class_<DocumentBrowser>("DocumentBrowser")
+	.def("addMetaDataRestrictionCondition", &DocumentBrowser::addMetaDataRestrictionCondition_double)
+	.def("addMetaDataRestrictionCondition", &DocumentBrowser::addMetaDataRestrictionCondition_uint)
+	.def("addMetaDataRestrictionCondition", &DocumentBrowser::addMetaDataRestrictionCondition_int)
+	.def("skipDoc", &DocumentBrowser::skipDoc)
+	.def("attribute", &DocumentBrowser::attribute)
 ;
 bp::class_<Context>("Context",bp::init<>())
 	.def(bp::init<const std::string&>())
