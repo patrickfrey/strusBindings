@@ -162,7 +162,7 @@ Name: strusbindings
 %define dep_version @STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 Version: %{main_version}
 Release: @STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
-License: GPLv3
+License: MPLv2
 Group: Development/Libraries/C++
 
 Source: %{name}_%{main_version}.tar.gz
@@ -502,6 +502,9 @@ make test
 %endif
 
 %changelog
+* Mon Mar 21 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.6.0-0.1
+- changed license from GPLv3 to MPLv2 (Mozilla Public License, Version 2)
+
 * Sun Mar 6 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.5.0-0.1
 - adapted core interface changes
 
