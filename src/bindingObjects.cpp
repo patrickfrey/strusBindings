@@ -539,9 +539,9 @@ static Variant getNumericVariantFromDouble( double value)
 	}
 }
 
-static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
+static strus::NumericVariant numericVariant( const Variant& val)
 {
-	strus::ArithmeticVariant rt;
+	strus::NumericVariant rt;
 	switch (val.type())
 	{
 		case Variant_UNDEFINED:
@@ -1009,7 +1009,7 @@ void StorageTransaction::insertDocument( const std::string& docid, const Documen
 		mi = doc.metaData().begin(), me = doc.metaData().end();
 	for (; mi != me; ++mi)
 	{
-		document->setMetaData( mi->name(), arithmeticVariant( mi->value()));
+		document->setMetaData( mi->name(), numericVariant( mi->value()));
 	}
 	std::vector<Term>::const_iterator
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
@@ -1253,7 +1253,7 @@ void QueryEval::addSummarizer(
 		}
 		else
 		{
-			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
+			function->addNumericParameter( pi->first, numericVariant( pi->second));
 		}
 	}
 	std::vector<FeatureParameter> featureParameters;
@@ -1294,7 +1294,7 @@ void QueryEval::addWeightingFunction(
 		}
 		else
 		{
-			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
+			function->addNumericParameter( pi->first, numericVariant( pi->second));
 		}
 	}
 	std::vector<FeatureParameter> featureParameters;
@@ -1488,7 +1488,7 @@ void Query::addMetaDataRestrictionCondition(
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	THIS->addMetaDataRestrictionCondition( cmpop, name, arithmeticVariant(operand), newGroup);
+	THIS->addMetaDataRestrictionCondition( cmpop, name, numericVariant(operand), newGroup);
 }
 
 void Query::addMetaDataRestrictionCondition(
@@ -1624,7 +1624,7 @@ void DocumentBrowser::addMetaDataRestrictionCondition(
 		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
 	}
 	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	restriction->addCondition( cmpop, name, arithmeticVariant(value), newGroup);
+	restriction->addCondition( cmpop, name, numericVariant(value), newGroup);
 }
 
 void DocumentBrowser::addMetaDataRestrictionCondition(
