@@ -1472,6 +1472,9 @@ public:
 		const String& name,
 		const FunctionObject& config_);
 #endif
+	/// \brief Add a weighting formula to use for calculating the total weight from the weighting function results
+	/// \param[in] source scalar function expression as string
+	void addWeightingFormula( const String& source);
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on

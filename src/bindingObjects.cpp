@@ -31,6 +31,8 @@
 #include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
+#include "strus/scalarFunctionInterface.hpp"
+#include "strus/scalarFunctionParserInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -1305,6 +1307,22 @@ void QueryEval::addWeightingFunction(
 	}
 	queryeval->addWeightingFunction( name, function.get(), featureParameters);
 	function.release();
+}
+
+void QueryEval::addWeightingFormula( const std::string& source)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
+
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
+	const strus::ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser("");
+	std::auto_ptr<strus::ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source));
+	if (!scalarfunc.get())
+	{
+		throw strus::runtime_error(_TXT( "failed to create scalar function (weighting formula) from source: %s"), errorhnd->fetchError());
+	}
+	qe->defineWeightingFormula( scalarfunc.get());
+	scalarfunc.release();
 }
 
 Query QueryEval::createQuery( const StorageClient& storage) const
