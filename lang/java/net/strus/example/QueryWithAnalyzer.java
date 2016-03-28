@@ -56,7 +56,7 @@ public class QueryWithAnalyzer
 		weighting.defineParameter( "b", 2.1);		//... b paramater of BM25
 		weighting.defineParameter( "avgdoclen", 1000);	//... average document length passed as parameter
 		weighting.defineFeature( "match", "seek");	//... we search for features of the set we call 'seek'
-		queryEval.addWeightingFunction( 1.0, "BM25", weighting);
+		queryEval.addWeightingFunction( "BM25", weighting);
 
 		// Now we define what attributes of the documents are returned and how they are build.
 		// The functions that extract stuff from documents for presentation are called summarizers.

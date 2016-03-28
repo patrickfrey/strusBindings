@@ -336,20 +336,19 @@ void QueryEval::addSummarizer_obj(
 }
 
 void QueryEval::addWeightingFunction_obj(
-	double weight,
 	const String& name,
 	const FunctionObject& config_)
 {
 	boost::python::extract<WeightingConfig> config(config_);
 	if (config.check())
 	{
-		addWeightingFunction( weight, name, (const WeightingConfig&)config);
+		addWeightingFunction( name, (const WeightingConfig&)config);
 	}
 	else
 	{
 		WeightingConfig config;
 		initWeightingConfig( config, config_.ptr());
-		addWeightingFunction( weight, name, config);
+		addWeightingFunction( name, config);
 	}
 }
 

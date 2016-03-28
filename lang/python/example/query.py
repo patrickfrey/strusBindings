@@ -23,7 +23,7 @@ try:
 	queryEval.addSelectionFeature( "select")
 	
 	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
-	queryEval.addWeightingFunction( 1.0, "BM25", (("k1",0.75), ("b",2.1), ("avgdoclen", 1000), (".match", "seek")))
+	queryEval.addWeightingFunction( "BM25", (("k1",0.75), ("b",2.1), ("avgdoclen", 1000), (".match", "seek")))
 	
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.

@@ -1268,7 +1268,6 @@ void QueryEval::addSummarizer(
 }
 
 void QueryEval::addWeightingFunction(
-		double weight,
 		const std::string& name,
 		const WeightingConfig& config)
 {
@@ -1304,7 +1303,7 @@ void QueryEval::addWeightingFunction(
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addWeightingFunction( name, function.get(), featureParameters, weight);
+	queryeval->addWeightingFunction( name, function.get(), featureParameters);
 	function.release();
 }
 

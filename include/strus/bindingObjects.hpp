@@ -1461,17 +1461,14 @@ public:
 #endif
 
 	/// \brief Add a weighting function to use as summand of the total document weight
-	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	/// \param[in] name the name of the weighting function to add
 	/// \param[in] config the configuration of the function to add
 	void addWeightingFunction(
-			double weight,
 			const String& name,
 			const WeightingConfig& config);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFunction_obj(
-		double weight,
 		const String& name,
 		const FunctionObject& config_);
 #endif

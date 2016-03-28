@@ -105,7 +105,7 @@ int main( int , const char** )
 		weightingConfig.defineParameter( "k1", 0.75);
 		weightingConfig.defineParameter( "b", 2.1);
 		weightingConfig.defineParameter( "avgdoclen", 8);
-		queryEval.addWeightingFunction( 1.0, "BM25", weightingConfig);
+		queryEval.addWeightingFunction( "BM25", weightingConfig);
 
 		// Create a query from a phrase:
 		Query query( queryEval.createQuery( storage));
