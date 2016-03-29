@@ -196,6 +196,9 @@ bp::class_<StatisticsProcessor>("StatisticsProcessor")
 	.def("decode", &StatisticsProcessor::decode_datablob)
 	.def("encode", &StatisticsProcessor::encode)
 ;
+bp::class_<FunctionVariableConfig>("FunctionVariableConfig")
+	.def("defineVariable", &FunctionVariableConfig::defineVariable)
+;
 bp::class_<SummarizerConfig>("SummarizerConfig")
 ;
 bp::class_<WeightingConfig>("WeightingConfig")
@@ -209,6 +212,8 @@ bp::class_<QueryEval>("QueryEval")
 	.def("addSummarizer", &QueryEval::addSummarizer_obj)
 	.def("addWeightingFunction", &QueryEval::addWeightingFunction)
 	.def("addWeightingFunction", &QueryEval::addWeightingFunction_obj)
+	.def("addWeightingFormula", &QueryEval::addWeightingFormula)
+	.def("addWeightingFormula", &QueryEval::addWeightingFormula_obj)
 	.def("createQuery", &QueryEval::createQuery)
 ;
 bp::class_<SummaryElement>("SummaryElement")
@@ -263,6 +268,8 @@ bp::class_<Query>("Query")
 	.def("setMinRank", &Query::setMinRank)
 	.def("addUserName", &Query::addUserName)
 	.def("addUserName", &Query::addUserName_unicode)
+	.def("setWeightingVariables", &Query::setWeightingVariables)
+	.def("setWeightingVariables", &Query::setWeightingVariables_obj)
 	.def("evaluate", &Query::evaluate)
 ;
 bp::class_<DocumentBrowser>("DocumentBrowser")

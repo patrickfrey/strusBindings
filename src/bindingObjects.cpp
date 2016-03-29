@@ -1309,7 +1309,7 @@ void QueryEval::addWeightingFunction(
 	function.release();
 }
 
-void QueryEval::addWeightingFormula( const std::string& source)
+void QueryEval::addWeightingFormula( const std::string& source, const FunctionVariableConfig& defaultParameter)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -1320,6 +1320,13 @@ void QueryEval::addWeightingFormula( const std::string& source)
 	if (!scalarfunc.get())
 	{
 		throw strus::runtime_error(_TXT( "failed to create scalar function (weighting formula) from source: %s"), errorhnd->fetchError());
+	}
+	std::map<std::string,double>::const_iterator
+		vi = defaultParameter.m_variables.begin(),
+		ve = defaultParameter.m_variables.end();
+	for (; vi != ve; ++vi)
+	{
+		scalarfunc->setDefaultVariableValue( vi->first, vi->second);
 	}
 	qe->defineWeightingFormula( scalarfunc.get());
 	scalarfunc.release();
@@ -1571,6 +1578,19 @@ void Query::addUserName( const std::string& username_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->addUserName( username_);
+}
+
+void Query::setWeightingVariables(
+		const FunctionVariableConfig& parameter)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	std::map<std::string,double>::const_iterator
+		vi = parameter.m_variables.begin(),
+		ve = parameter.m_variables.end();
+	for (; vi != ve; ++vi)
+	{
+		THIS->setWeightingVariableValue( vi->first, vi->second);
+	}
 }
 
 QueryResult Query::evaluate() const

@@ -1271,6 +1271,30 @@ private:
 };
 
 
+/// \brief Configuration describing a scalar function variable value
+class FunctionVariableConfig
+{
+public:
+	/// \brief Default constructor
+	FunctionVariableConfig(){}
+	/// \brief Copy constructor
+	FunctionVariableConfig( const FunctionVariableConfig& o)
+		:m_variables(o.m_variables){}
+
+	/// \brief Define a variable value
+	/// \param[in] name name of the variable
+	/// \param[in] value value of the variable
+	void defineVariable( const String& name, double value)
+	{
+		m_variables[ name] = value;
+	}
+
+private:
+	friend class Query;
+	friend class QueryEval;
+	std::map<std::string,double> m_variables;
+};
+
 /// \brief Configuration describing the values passed to a summarizer function
 class SummarizerConfig
 {
@@ -1456,8 +1480,8 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	void addSummarizer_obj(
-		const String& name,
-		const FunctionObject& config_);
+			const String& name,
+			const FunctionObject& config_);
 #endif
 
 	/// \brief Add a weighting function to use as summand of the total document weight
@@ -1469,12 +1493,19 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFunction_obj(
-		const String& name,
-		const FunctionObject& config_);
+			const String& name,
+			const FunctionObject& config_);
 #endif
 	/// \brief Add a weighting formula to use for calculating the total weight from the weighting function results
-	/// \param[in] source scalar function expression as string
-	void addWeightingFormula( const String& source);
+	/// \param[in] defaultParameter default parameter values
+	void addWeightingFormula(
+			const String& source,
+			const FunctionVariableConfig& defaultParameter);
+#ifdef STRUS_BOOST_PYTHON
+	void addWeightingFormula_obj(
+			const WString& source,
+			const FunctionObject& defaultParameter_);
+#endif
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
@@ -1920,6 +1951,14 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	void addUserName_unicode( const WString& username_);
+#endif
+	/// \brief Assign values to variables of the weighting formula
+	/// \param[in] parameter parameter values
+	void setWeightingVariables(
+			const FunctionVariableConfig& parameter);
+#ifdef STRUS_BOOST_PYTHON
+	void setWeightingVariables_obj(
+			const FunctionObject& parameter_);
 #endif
 
 	/// \brief Evaluate this query and return the result

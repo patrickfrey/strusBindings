@@ -224,6 +224,105 @@ int initAggregator( Aggregator& result, zval* obj)
 	return initFunctionObject( result, obj);
 }
 
+static int initFunctionVariable( FunctionVariableConfig& result, const char* key, std::size_t keylen, zval* valueitem)
+{
+	int error = 0;
+	try
+	{
+		switch (Z_TYPE_P(valueitem))
+		{
+			case IS_LONG:
+				result.defineVariable( std::string( key, keylen), (double)Z_LVAL_P( valueitem));
+				break;
+			case IS_STRING:
+				THROW_EXCEPTION( "number expected as scalar function variable value");
+				break;
+			case IS_DOUBLE:
+				result.defineVariable( std::string( key, keylen), (double)Z_DVAL_P( valueitem));
+				break;
+			case IS_BOOL:
+				result.defineVariable( std::string( key, keylen), (double)Z_BVAL_P( valueitem));
+				break;
+			default:
+				THROW_EXCEPTION( "bad scalar function variable value");
+				error = -1;
+		}
+	}
+	catch (...)
+	{
+		THROW_EXCEPTION( "memory allocation error");
+		error = -1;
+	}
+	return error;
+}
+
+int initFunctionVariableConfig( FunctionVariableConfig& result, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			THROW_EXCEPTION( "unable to convert LONG to scalar function config");
+			error = -1;
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to scalar function config");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			THROW_EXCEPTION( "unable to convert DOUBLE to scalar function config");
+			error = -1;
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to scalar function config");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P(obj);
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr))
+			{
+				char *name = 0;
+				unsigned int name_len = 0;// length of string including 0 byte !
+				unsigned long index;
+				if (!zend_hash_get_current_key_ex( hash, &name, &name_len, &index, 0, &ptr) == HASH_KEY_IS_STRING)
+				{
+					THROW_EXCEPTION( "illegal key of sumarizer element (not a string)");
+					error = -1;
+					break;
+				}
+				if (0!=initFunctionVariable( result, name, name_len-1, *data))
+				{
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to scalar function config");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to scalar function config");
+			error = -1;
+			break;
+		default: 
+			THROW_EXCEPTION( "unable to convert unknown type to scalar function config");
+			error = -1;
+			break;
+	}
+	return error;
+}
+
 template <class Object>
 static int defineQueryEvaluationFunctionParameter( Object& result, const char* key, std::size_t keylen, zval* valueitem)
 {
@@ -271,19 +370,19 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 	switch (obj->type)
 	{
 		case IS_LONG:
-			THROW_EXCEPTION( "unable to convert LONG to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert LONG to function configuration");
 			error = -1;
 			break;
 		case IS_STRING:
-			THROW_EXCEPTION( "unable to convert STRING to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert STRING to function configuration");
 			error = -1;
 			break;
 		case IS_DOUBLE:
-			THROW_EXCEPTION( "unable to convert DOUBLE to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert DOUBLE to function configuration");
 			error = -1;
 			break;
 		case IS_BOOL:
-			THROW_EXCEPTION( "unable to convert BOOL to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert BOOL to function configuration");
 			error = -1;
 			break;
 		case IS_NULL:
@@ -317,15 +416,15 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 			break;
 		}
 		case IS_OBJECT:
-			THROW_EXCEPTION( "unable to convert OBJECT to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert OBJECT to function configuration");
 			error = -1;
 			break;
 		case IS_RESOURCE:
-			THROW_EXCEPTION( "unable to convert RESOURCE to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert RESOURCE to function configuration");
 			error = -1;
 			break;
 		default: 
-			THROW_EXCEPTION( "unable to convert unknown type to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert unknown type to function configuration");
 			error = -1;
 			break;
 	}

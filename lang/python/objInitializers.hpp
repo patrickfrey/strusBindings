@@ -18,6 +18,7 @@ void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj);
 void initAggregator( Aggregator& result, PyObject* obj);
 void initSummarizerConfig( SummarizerConfig& result, PyObject* obj);
 void initWeightingConfig( WeightingConfig& result, PyObject* obj);
+void initFunctionVariableConfig( FunctionVariableConfig& result, PyObject* obj);
 void initQueryExpression( QueryExpression& result, PyObject* obj);
 void initString( std::string& result, PyObject* obj);
 void initStringVector( std::vector<std::string>& result, PyObject* obj);

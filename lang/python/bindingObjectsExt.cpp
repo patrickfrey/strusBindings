@@ -352,6 +352,23 @@ void QueryEval::addWeightingFunction_obj(
 	}
 }
 
+void QueryEval::addWeightingFormula_obj(
+	const WString& source,
+	const FunctionObject& config_)
+{
+	boost::python::extract<FunctionVariableConfig> config(config_);
+	if (config.check())
+	{
+		addWeightingFormula( convert_wstring_to_uft8string( source), (const FunctionVariableConfig&)config);
+	}
+	else
+	{
+		FunctionVariableConfig config;
+		initFunctionVariableConfig( config, config_.ptr());
+		addWeightingFormula( convert_wstring_to_uft8string( source), config);
+	}
+}
+
 std::size_t QueryExpression::allocid( const WString& str)
 {
 	return allocid( convert_wstring_to_uft8string( str));
@@ -449,6 +466,23 @@ void Query::addDocumentEvaluationSet_struct( const FunctionObject& docnolist_)
 		addDocumentEvaluationSet( docnolist);
 	}
 }
+
+void Query::setWeightingVariables_obj(
+	const FunctionObject& config_)
+{
+	boost::python::extract<FunctionVariableConfig> config(config_);
+	if (config.check())
+	{
+		setWeightingVariables( (const FunctionVariableConfig&)config);
+	}
+	else
+	{
+		FunctionVariableConfig config;
+		initFunctionVariableConfig( config, config_.ptr());
+		setWeightingVariables( config);
+	}
+}
+
 
 StorageClient Context::createStorageClient_0()
 {

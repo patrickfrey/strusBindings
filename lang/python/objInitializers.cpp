@@ -119,6 +119,80 @@ void initVariant( Variant& result, PyObject* obj)
 	}
 }
 
+static void initFunctionVariable( FunctionVariableConfig& result, PyObject* keyitem, PyObject* valueitem)
+{
+	char* key;
+	PyObjectReference key_obj;
+	Variant value;
+
+	if (PyString_Check( keyitem))
+	{
+		key = PyString_AS_STRING( keyitem);
+	}
+	else if (PyUnicode_Check( keyitem))
+	{
+		key_obj = PyUnicode_AsUTF8String( keyitem);
+		if (!key_obj) throw strus::runtime_error( _TXT( "cannot define scalar function variable: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+		key = PyString_AS_STRING( key_obj.ptr());
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("cannot define scalar function variable: %s"), _TXT( "string expected as scalar function variable name"));
+	}
+	initVariant( value, valueitem);
+	if (value.type() == Variant_TEXT)
+	{
+		throw strus::runtime_error( _TXT("cannot define scalar function variable: %s"), _TXT( "number expected as scalar function variable value"));
+	}
+	result.defineVariable( key, value.getFloat());
+}
+
+void initFunctionVariableConfig( FunctionVariableConfig& result, PyObject* obj)
+{
+	if (PyDict_Check( obj))
+	{
+		PyObject *keyitem, *valueitem;
+		Py_ssize_t pos = 0;
+		
+		while (PyDict_Next( obj, &pos, &keyitem, &valueitem))
+		{
+			initFunctionVariable( result, keyitem, valueitem);
+		}
+	}
+	else if (PySequence_Check( obj))
+	{
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("scalar function parameter config definition expected as sequence of pairs or as dictionary")));
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq), elemlen = 0;
+			for (; ii<len; ++ii)
+			{
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
+				/* DON'T DECREF item here */
+				if (PySequence_Check( item) && 2==(elemlen=PySequence_Size( item)))
+				{
+					PyObject* keyitem = PySequence_Fast_GET_ITEM( item, 0);
+					PyObject* valueitem = PySequence_Fast_GET_ITEM( item, 1);
+
+					initFunctionVariable( result, keyitem, valueitem);
+				}
+				else
+				{
+					throw strus::runtime_error( _TXT("scalar function parameter config definition sequence elements must be pairs"));
+				}
+			}
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("scalar function parameter config definition expected a sequence of pairs or as dictionary"));
+		}
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("dictionary or list of pairs expected as scalar function parameter config definition"));
+	}
+}
+
 template <class Object>
 static void initFunctionObject( Object& result, PyObject* obj)
 {

@@ -35,6 +35,8 @@
 %rename(StrusPeerMessageIterator) PeerMessageIterator;
 %rename(StrusSummarizerConfig) SummarizerConfig;
 %rename(StrusWeightingConfig) WeightingConfig;
+%rename(StrusWeightingConfig) WeightingConfig;
+%rename(StrusFunctionVariableConfig) FunctionVariableConfig;
 %rename(StrusQueryExpression) QueryExpression;
 %rename(StrusQuery) Query;
 %rename(StrusQueryEval) QueryEval;
@@ -57,6 +59,7 @@
 %include "strus_aggregator.i"
 %include "strus_summarizer.i"
 %include "strus_weighting.i"
+%include "strus_scalarfunc.i"
 %include "strus_queryexpr.i"
 %include "strus_queryresult.i"
 %include "strus_statistics.i"
