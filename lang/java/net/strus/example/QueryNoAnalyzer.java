@@ -69,8 +69,8 @@ public class QueryNoAnalyzer
 		// in a ranked document:
 		SummarizerConfig sum_match = new SummarizerConfig();
 		sum_match.defineParameter( "type", "orig");
-		sum_match.defineParameter( "nof", 4);
-		sum_match.defineParameter( "len", 60);
+		sum_match.defineParameter( "sentencesize", 40);
+		sum_match.defineParameter( "windowsize", 30);
 		sum_match.defineFeature( "match", "seek");
 		queryEval.addSummarizer( "matchphrase", sum_match);
 
