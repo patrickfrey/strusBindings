@@ -10,6 +10,8 @@
 #include <zend_API.h>
 #include <zend_exceptions.h>
 #include <limits>
+#include <iostream>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 
 #define THROW_EXCEPTION( MSG) zend_throw_exception( NULL, const_cast<char*>( MSG), 0 TSRMLS_CC)
@@ -34,6 +36,86 @@ int initVariant( Variant& result, zval* obj)
 	}
 	THROW_EXCEPTION( "unable to convert unknown type to strus Variant type");
 	return -1;
+}
+
+static void dumpObject_( std::ostream& out, zval* obj, int indent)
+{
+	switch (obj->type)
+	{
+		case IS_LONG:
+			out << (long)Z_LVAL_P( obj);
+			break;
+		case IS_STRING:
+			out << "'" << std::string( Z_STRVAL_P( obj)) << "'";
+			break;
+		case IS_DOUBLE:
+			out << (double)Z_DVAL_P( obj);
+			break;
+		case IS_BOOL:
+			out << (Z_BVAL_P( obj)?"True":"False");
+			break;
+		case IS_NULL:
+			out << "NULL";
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P( obj);
+			int argcnt = 0;
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
+			{
+				if (argcnt) out << std::endl << std::string( indent, '\t');
+				dumpObject_( out, *data, indent+1);
+			}
+			break;
+		}
+		case IS_OBJECT:
+		{
+			HashTable *objht = Z_OBJPROP_P( obj);
+			char *key;
+			unsigned int keysize;
+			zval **data;
+			HashPosition pos;
+
+			unsigned int nofelements = zend_hash_num_elements( objht);
+			zend_hash_internal_pointer_reset_ex(objht, &pos);
+			for (unsigned int elemidx=0; elemidx<nofelements; zend_hash_move_forward_ex(objht, &pos),++elemidx)
+			{
+				unsigned long idx;
+				int keytype = zend_hash_get_current_key_ex( objht, &key, &keysize, &idx, 0, &pos);
+				if (keytype == HASH_KEY_NON_EXISTANT) continue;
+
+				if (zend_hash_get_current_data_ex(objht, (void **) &data, &pos) == SUCCESS)
+				{
+					if (keytype == HASH_KEY_IS_STRING)
+					{
+						if (elemidx) out << std::endl << std::string( indent, '\t');
+						out << "[" << std::string(key,keysize-1) << "] ";
+						dumpObject_( out, *data, indent+1);
+					}
+				}
+			}
+			break;
+		}
+		case IS_RESOURCE:
+			out << "<resource>";
+			break;
+		default:
+			out << "<unknown>";
+			break;
+	}
+}
+
+std::string dumpObject( zval* obj)
+{
+	std::ostringstream out;
+	dumpObject_( out, obj, 0);
+	return out.str();
 }
 
 template <class Object>
@@ -932,9 +1014,8 @@ int initTermStatistics( TermStatistics& result, zval* obj)
 	return initStructureObject<TermStatisticsBuilder,TermStatistics>( result, obj);
 }
 
-int getTermVector( zval* result, const std::vector<Term>& ar)
+int getTermVector( zval*& result, const std::vector<Term>& ar)
 {
-	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Term>::const_iterator ti = ar.begin(), te = ar.end();
 	for (; ti != te; ++ti)
@@ -950,9 +1031,8 @@ int getTermVector( zval* result, const std::vector<Term>& ar)
 	return 0;
 }
 
-static int getSummaryElementVector( zval* result, const std::vector<SummaryElement>& ar)
+static int getSummaryElementVector( zval*& result, const std::vector<SummaryElement>& ar)
 {
-	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
@@ -968,9 +1048,8 @@ static int getSummaryElementVector( zval* result, const std::vector<SummaryEleme
 	return 0;
 }
 
-int getRankVector( zval* result, const std::vector<Rank>& ar)
+int getRankVector( zval*& result, const std::vector<Rank>& ar)
 {
-	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Rank>::const_iterator ri = ar.begin(), re = ar.end();
 	for (; ri != re; ++ri)
@@ -981,6 +1060,7 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 		add_property_long( rank, "docno", ri->docno());
 		add_property_double( rank, "weight", ri->weight());
 		zval* rankattr;
+		MAKE_STD_ZVAL( rankattr);
 		getSummaryElementVector( rankattr, ri->summaryElements());
 		add_property_zval( rank, "summaryElements", rankattr);
 
@@ -989,9 +1069,8 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 	return 0;
 }
 
-int getQueryResult( zval* result, const QueryResult& res)
+int getQueryResult( zval*& result, const QueryResult& res)
 {
-	MAKE_STD_ZVAL( result);
 	object_init( result);
 
 	add_property_long( result, "evaluationPass", res.evaluationPass());
@@ -999,6 +1078,7 @@ int getQueryResult( zval* result, const QueryResult& res)
 	add_property_long( result, "nofDocumentsVisited", res.nofDocumentsVisited());
 
 	zval* ranks;
+	MAKE_STD_ZVAL( ranks);
 	getRankVector( ranks, res.ranks());
 	add_property_zval( result, "ranks", ranks);
 	return 0;

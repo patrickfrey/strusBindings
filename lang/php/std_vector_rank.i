@@ -8,7 +8,7 @@ namespace std {
 
 %typemap(out) std::vector<Rank>
 {
-	if (getRankVector( return_value, $1))
+	if (getRankVector( $result, $1))
 	{
 		SWIG_fail;
 	}

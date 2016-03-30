@@ -8,7 +8,7 @@ namespace std {
 
 %typemap(out) std::vector<Term>
 {
-	if (getTermVector( return_value, $1))
+	if (getTermVector( $result, $1))
 	{
 		SWIG_fail;
 	}

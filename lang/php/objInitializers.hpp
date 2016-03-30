@@ -25,8 +25,10 @@ int initIntVector( std::vector<int>& result, zval* obj);
 int initGlobalStatistics( GlobalStatistics& result, zval* obj);
 int initTermStatistics( TermStatistics& result, zval* obj);
 
-int getTermVector( zval* result, const std::vector<Term>& ar);
-int getRankVector( zval* result, const std::vector<Rank>& ar);
-int getQueryResult( zval* result, const QueryResult& res);
+int getTermVector( zval*& result, const std::vector<Term>& ar);
+int getRankVector( zval*& result, const std::vector<Rank>& ar);
+int getQueryResult( zval*& result, const QueryResult& res);
+
+std::string dumpObject( zval* obj);
 
 #endif

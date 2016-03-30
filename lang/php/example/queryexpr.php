@@ -78,10 +78,12 @@ try
 		}
 	}
 	print "done\n";
+	exit(0);
 }
 catch (Exception $err)
 {
 	print "Error: " . $err . "\n";
+	exit(1);
 }
 ?>
 
