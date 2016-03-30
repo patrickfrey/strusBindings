@@ -1,31 +1,10 @@
 /*
----------------------------------------------------------------------
-    The C++ library strus implements basic operations to build
-    a search engine for structured search on unstructured data.
-
-    Copyright (C) 2015 Patrick Frey
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
---------------------------------------------------------------------
-
-	The latest version of strus can be found at 'http://github.com/patrickfrey/strus'
-	For documentation see 'http://patrickfrey.github.com/strus'
-
---------------------------------------------------------------------
-*/
+ * Copyright (c) 2014 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #ifndef _STRUS_BINDING_OBJECTS_HPP_INCLUDED
 #define _STRUS_BINDING_OBJECTS_HPP_INCLUDED
 #include <limits>
@@ -1292,6 +1271,30 @@ private:
 };
 
 
+/// \brief Configuration describing a scalar function variable value
+class FunctionVariableConfig
+{
+public:
+	/// \brief Default constructor
+	FunctionVariableConfig(){}
+	/// \brief Copy constructor
+	FunctionVariableConfig( const FunctionVariableConfig& o)
+		:m_variables(o.m_variables){}
+
+	/// \brief Define a variable value
+	/// \param[in] name name of the variable
+	/// \param[in] value value of the variable
+	void defineVariable( const String& name, double value)
+	{
+		m_variables[ name] = value;
+	}
+
+private:
+	friend class Query;
+	friend class QueryEval;
+	std::map<std::string,double> m_variables;
+};
+
 /// \brief Configuration describing the values passed to a summarizer function
 class SummarizerConfig
 {
@@ -1477,24 +1480,31 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	void addSummarizer_obj(
-		const String& name,
-		const FunctionObject& config_);
+			const String& name,
+			const FunctionObject& config_);
 #endif
 
 	/// \brief Add a weighting function to use as summand of the total document weight
-	/// \param[in] weight additive weight of the feature (compared with other weighting functions added)
 	/// \param[in] name the name of the weighting function to add
 	/// \param[in] config the configuration of the function to add
 	void addWeightingFunction(
-			double weight,
 			const String& name,
 			const WeightingConfig& config);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFunction_obj(
-		double weight,
-		const String& name,
-		const FunctionObject& config_);
+			const String& name,
+			const FunctionObject& config_);
+#endif
+	/// \brief Add a weighting formula to use for calculating the total weight from the weighting function results
+	/// \param[in] defaultParameter default parameter values
+	void addWeightingFormula(
+			const String& source,
+			const FunctionVariableConfig& defaultParameter);
+#ifdef STRUS_BOOST_PYTHON
+	void addWeightingFormula_obj(
+			const WString& source,
+			const FunctionObject& defaultParameter_);
 #endif
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
@@ -1941,6 +1951,14 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	void addUserName_unicode( const WString& username_);
+#endif
+	/// \brief Assign values to variables of the weighting formula
+	/// \param[in] parameter parameter values
+	void setWeightingVariables(
+			const FunctionVariableConfig& parameter);
+#ifdef STRUS_BOOST_PYTHON
+	void setWeightingVariables_obj(
+			const FunctionObject& parameter_);
 #endif
 
 	/// \brief Evaluate this query and return the result

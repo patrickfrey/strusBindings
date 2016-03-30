@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #define STRUS_BOOST_PYTHON
 #include <boost/python.hpp>
 #include "strus/bindingObjects.hpp"
@@ -329,20 +336,36 @@ void QueryEval::addSummarizer_obj(
 }
 
 void QueryEval::addWeightingFunction_obj(
-	double weight,
 	const String& name,
 	const FunctionObject& config_)
 {
 	boost::python::extract<WeightingConfig> config(config_);
 	if (config.check())
 	{
-		addWeightingFunction( weight, name, (const WeightingConfig&)config);
+		addWeightingFunction( name, (const WeightingConfig&)config);
 	}
 	else
 	{
 		WeightingConfig config;
 		initWeightingConfig( config, config_.ptr());
-		addWeightingFunction( weight, name, config);
+		addWeightingFunction( name, config);
+	}
+}
+
+void QueryEval::addWeightingFormula_obj(
+	const WString& source,
+	const FunctionObject& config_)
+{
+	boost::python::extract<FunctionVariableConfig> config(config_);
+	if (config.check())
+	{
+		addWeightingFormula( convert_wstring_to_uft8string( source), (const FunctionVariableConfig&)config);
+	}
+	else
+	{
+		FunctionVariableConfig config;
+		initFunctionVariableConfig( config, config_.ptr());
+		addWeightingFormula( convert_wstring_to_uft8string( source), config);
 	}
 }
 
@@ -443,6 +466,23 @@ void Query::addDocumentEvaluationSet_struct( const FunctionObject& docnolist_)
 		addDocumentEvaluationSet( docnolist);
 	}
 }
+
+void Query::setWeightingVariables_obj(
+	const FunctionObject& config_)
+{
+	boost::python::extract<FunctionVariableConfig> config(config_);
+	if (config.check())
+	{
+		setWeightingVariables( (const FunctionVariableConfig&)config);
+	}
+	else
+	{
+		FunctionVariableConfig config;
+		initFunctionVariableConfig( config, config_.ptr());
+		setWeightingVariables( config);
+	}
+}
+
 
 StorageClient Context::createStorageClient_0()
 {

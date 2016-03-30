@@ -22,8 +22,11 @@ try
 	$queryeval->addSelectionFeature( "select");
 	
 	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
-	$queryeval->addWeightingFunction( 1.0, "BM25", array( "k1"=>0.75, "b"=>2.1, "avgdoclen"=>1000, ".match"=>"seek"));
-	
+	$queryeval->addWeightingFunction( "BM25", array( "k1"=>1.5, "b"=>0.75, "avgdoclen"=>5, ".match"=>"seek"));
+
+	# Here we define a weighting formula to combine all weighting functions to one value:
+	$queryeval->addWeightingFormula( "((x + y + 0.1) * _0)", array( "x"=>0.4, "y"=>0.6));
+
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
 	# First we add a summarizer that extracts us the title of the document:
@@ -35,7 +38,7 @@ try
 
 	# Now we build the query to issue:
 	$query = $queryeval->createQuery( $storage);
-	
+
 	# First we analyze the query phrase to get the terms to find in the form as they are stored in the storage:
 	$terms = $analyzer->analyzePhrase( "word", $queryphrase);
 	if (count( $terms) == 0)
@@ -65,7 +68,10 @@ try
 	# name of the set defined as selection feature in the query evaluation configuration
 	# ($queryeval->addSelectionFeature):
 	$query->defineFeature( "select", $selexpr, 1.0);
-	
+
+	# Redefine a weighting function variable:
+	$query->setWeightingVariables( array( "x"=>0.2));
+
 	# Define the maximum number of best result (ranks) to return:
 	$query->setMaxNofRanks( 20);
 	# Define the index of the first rank (for implementing scrolling: 0 for the first, 
@@ -85,9 +91,11 @@ try
 		}
 	}
 	print "done\n";
+	exit(0);
 }
 catch (Exception $err)
 {
 	print "Error: " . $err . "\n";
+	exit(-1);
 }
 

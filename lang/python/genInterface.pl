@@ -197,6 +197,8 @@ $renameMethodMap{"defineAttribute_obj"} = "defineAttribute";
 $renameMethodMap{"definePhraseType_obj"} = "definePhraseType";
 $renameMethodMap{"addSummarizer_obj"} = "addSummarizer";
 $renameMethodMap{"addWeightingFunction_obj"} = "addWeightingFunction";
+$renameMethodMap{"addWeightingFormula_obj"} = "addWeightingFormula";
+$renameMethodMap{"setWeightingVariables_obj"} = "setWeightingVariables";
 $renameMethodMap{"deleteDocument_unicode"} = "deleteDocument";
 $renameMethodMap{"deleteUserAccessRights_unicode"} = "deleteUserAccessRights";
 $renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
@@ -539,37 +541,14 @@ my $outputfile = "strusPythonModule.cpp";
 open( OUTFILE, ">$outputfile") or die "Couldn't open file $outputfile, $!";
 
 print OUTFILE <<EOF;
+// ! THIS IS A GENERATED FILE. DO NOT MODYFY IT. CALL genInterface.sh TO RECREATE IT !
 /*
-
-! THIS IS A GENERATED FILE. DO NOT MODYFY IT. CALL genInterface.sh TO RECREATE IT !
-
----------------------------------------------------------------------
-    The C++ library strus implements basic operations to build
-    a search engine for structured search on unstructured data.
-
-    Copyright (C) 2015 Patrick Frey
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
---------------------------------------------------------------------
-
-	The latest version of strus can be found at 'http://github.com/patrickfrey/strus'
-	For documentation see 'http://patrickfrey.github.com/strus'
-
---------------------------------------------------------------------
-*/
+ * Copyright (c) 2014 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #define STRUS_BOOST_PYTHON
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>

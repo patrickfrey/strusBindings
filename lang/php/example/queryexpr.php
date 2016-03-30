@@ -20,9 +20,9 @@ try
 
 	# Here we define what query features decide, what is ranked for the result:
 	$queryeval->addSelectionFeature( "select");
-	
+
 	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
-	$queryeval->addWeightingFunction( 1.0, "BM25", array( "k1"=>0.75, "b"=>2.1, "avgdoclen"=>1000, ".match"=>"seek"));
+	$queryeval->addWeightingFunction( "BM25", array( "k1"=>0.75, "b"=>2.1, "avgdoclen"=>1000, ".match"=>"seek"));
 
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
@@ -78,10 +78,12 @@ try
 		}
 	}
 	print "done\n";
+	exit(0);
 }
 catch (Exception $err)
 {
 	print "Error: " . $err . "\n";
+	exit(1);
 }
 ?>
 

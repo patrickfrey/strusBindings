@@ -44,6 +44,7 @@ set( generated_java_source_files
 	VariantType.java
 	VariantValue.java
 	WeightingConfig.java
+	FunctionVariableConfig.java
 )
 set( CMAKE_JAVA_TARGET_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api )
 add_jar( strus_api ${generated_java_source_files} OUTPUT_DIR ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api)

@@ -1,34 +1,11 @@
+// ! THIS IS A GENERATED FILE. DO NOT MODYFY IT. CALL genInterface.sh TO RECREATE IT !
 /*
-
-! THIS IS A GENERATED FILE. DO NOT MODYFY IT. CALL genInterface.sh TO RECREATE IT !
-
----------------------------------------------------------------------
-    The C++ library strus implements basic operations to build
-    a search engine for structured search on unstructured data.
-
-    Copyright (C) 2015 Patrick Frey
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
---------------------------------------------------------------------
-
-	The latest version of strus can be found at 'http://github.com/patrickfrey/strus'
-	For documentation see 'http://patrickfrey.github.com/strus'
-
---------------------------------------------------------------------
-*/
+ * Copyright (c) 2014 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #define STRUS_BOOST_PYTHON
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -219,6 +196,9 @@ bp::class_<StatisticsProcessor>("StatisticsProcessor")
 	.def("decode", &StatisticsProcessor::decode_datablob)
 	.def("encode", &StatisticsProcessor::encode)
 ;
+bp::class_<FunctionVariableConfig>("FunctionVariableConfig")
+	.def("defineVariable", &FunctionVariableConfig::defineVariable)
+;
 bp::class_<SummarizerConfig>("SummarizerConfig")
 ;
 bp::class_<WeightingConfig>("WeightingConfig")
@@ -232,6 +212,8 @@ bp::class_<QueryEval>("QueryEval")
 	.def("addSummarizer", &QueryEval::addSummarizer_obj)
 	.def("addWeightingFunction", &QueryEval::addWeightingFunction)
 	.def("addWeightingFunction", &QueryEval::addWeightingFunction_obj)
+	.def("addWeightingFormula", &QueryEval::addWeightingFormula)
+	.def("addWeightingFormula", &QueryEval::addWeightingFormula_obj)
 	.def("createQuery", &QueryEval::createQuery)
 ;
 bp::class_<SummaryElement>("SummaryElement")
@@ -286,6 +268,8 @@ bp::class_<Query>("Query")
 	.def("setMinRank", &Query::setMinRank)
 	.def("addUserName", &Query::addUserName)
 	.def("addUserName", &Query::addUserName_unicode)
+	.def("setWeightingVariables", &Query::setWeightingVariables)
+	.def("setWeightingVariables", &Query::setWeightingVariables_obj)
 	.def("evaluate", &Query::evaluate)
 ;
 bp::class_<DocumentBrowser>("DocumentBrowser")

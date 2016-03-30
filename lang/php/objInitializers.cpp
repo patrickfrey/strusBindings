@@ -1,36 +1,17 @@
 /*
----------------------------------------------------------------------
-    The C++ library strus implements basic operations to build
-    a search engine for structured search on unstructured data.
-
-    Copyright (C) 2015 Patrick Frey
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
---------------------------------------------------------------------
-
-	The latest version of strus can be found at 'http://github.com/patrickfrey/strus'
-	For documentation see 'http://patrickfrey.github.com/strus'
-
---------------------------------------------------------------------
-*/
+ * Copyright (c) 2014 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #include "objInitializers.hpp"
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>
 #include <limits>
+#include <iostream>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 
 #define THROW_EXCEPTION( MSG) zend_throw_exception( NULL, const_cast<char*>( MSG), 0 TSRMLS_CC)
@@ -55,6 +36,86 @@ int initVariant( Variant& result, zval* obj)
 	}
 	THROW_EXCEPTION( "unable to convert unknown type to strus Variant type");
 	return -1;
+}
+
+static void dumpObject_( std::ostream& out, zval* obj, int indent)
+{
+	switch (obj->type)
+	{
+		case IS_LONG:
+			out << (long)Z_LVAL_P( obj);
+			break;
+		case IS_STRING:
+			out << "'" << std::string( Z_STRVAL_P( obj)) << "'";
+			break;
+		case IS_DOUBLE:
+			out << (double)Z_DVAL_P( obj);
+			break;
+		case IS_BOOL:
+			out << (Z_BVAL_P( obj)?"True":"False");
+			break;
+		case IS_NULL:
+			out << "NULL";
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P( obj);
+			int argcnt = 0;
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
+			{
+				if (argcnt) out << std::endl << std::string( indent, '\t');
+				dumpObject_( out, *data, indent+1);
+			}
+			break;
+		}
+		case IS_OBJECT:
+		{
+			HashTable *objht = Z_OBJPROP_P( obj);
+			char *key;
+			unsigned int keysize;
+			zval **data;
+			HashPosition pos;
+
+			unsigned int nofelements = zend_hash_num_elements( objht);
+			zend_hash_internal_pointer_reset_ex(objht, &pos);
+			for (unsigned int elemidx=0; elemidx<nofelements; zend_hash_move_forward_ex(objht, &pos),++elemidx)
+			{
+				unsigned long idx;
+				int keytype = zend_hash_get_current_key_ex( objht, &key, &keysize, &idx, 0, &pos);
+				if (keytype == HASH_KEY_NON_EXISTANT) continue;
+
+				if (zend_hash_get_current_data_ex(objht, (void **) &data, &pos) == SUCCESS)
+				{
+					if (keytype == HASH_KEY_IS_STRING)
+					{
+						if (elemidx) out << std::endl << std::string( indent, '\t');
+						out << "[" << std::string(key,keysize-1) << "] ";
+						dumpObject_( out, *data, indent+1);
+					}
+				}
+			}
+			break;
+		}
+		case IS_RESOURCE:
+			out << "<resource>";
+			break;
+		default:
+			out << "<unknown>";
+			break;
+	}
+}
+
+std::string dumpObject( zval* obj)
+{
+	std::ostringstream out;
+	dumpObject_( out, obj, 0);
+	return out.str();
 }
 
 template <class Object>
@@ -245,6 +306,105 @@ int initAggregator( Aggregator& result, zval* obj)
 	return initFunctionObject( result, obj);
 }
 
+static int initFunctionVariable( FunctionVariableConfig& result, const char* key, std::size_t keylen, zval* valueitem)
+{
+	int error = 0;
+	try
+	{
+		switch (Z_TYPE_P(valueitem))
+		{
+			case IS_LONG:
+				result.defineVariable( std::string( key, keylen), (double)Z_LVAL_P( valueitem));
+				break;
+			case IS_STRING:
+				THROW_EXCEPTION( "number expected as scalar function variable value");
+				break;
+			case IS_DOUBLE:
+				result.defineVariable( std::string( key, keylen), (double)Z_DVAL_P( valueitem));
+				break;
+			case IS_BOOL:
+				result.defineVariable( std::string( key, keylen), (double)Z_BVAL_P( valueitem));
+				break;
+			default:
+				THROW_EXCEPTION( "bad scalar function variable value");
+				error = -1;
+		}
+	}
+	catch (...)
+	{
+		THROW_EXCEPTION( "memory allocation error");
+		error = -1;
+	}
+	return error;
+}
+
+int initFunctionVariableConfig( FunctionVariableConfig& result, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			THROW_EXCEPTION( "unable to convert LONG to scalar function config");
+			error = -1;
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to scalar function config");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			THROW_EXCEPTION( "unable to convert DOUBLE to scalar function config");
+			error = -1;
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to scalar function config");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P(obj);
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr))
+			{
+				char *name = 0;
+				unsigned int name_len = 0;// length of string including 0 byte !
+				unsigned long index;
+				if (!zend_hash_get_current_key_ex( hash, &name, &name_len, &index, 0, &ptr) == HASH_KEY_IS_STRING)
+				{
+					THROW_EXCEPTION( "illegal key of sumarizer element (not a string)");
+					error = -1;
+					break;
+				}
+				if (0!=initFunctionVariable( result, name, name_len-1, *data))
+				{
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to scalar function config");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to scalar function config");
+			error = -1;
+			break;
+		default: 
+			THROW_EXCEPTION( "unable to convert unknown type to scalar function config");
+			error = -1;
+			break;
+	}
+	return error;
+}
+
 template <class Object>
 static int defineQueryEvaluationFunctionParameter( Object& result, const char* key, std::size_t keylen, zval* valueitem)
 {
@@ -292,19 +452,19 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 	switch (obj->type)
 	{
 		case IS_LONG:
-			THROW_EXCEPTION( "unable to convert LONG to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert LONG to function configuration");
 			error = -1;
 			break;
 		case IS_STRING:
-			THROW_EXCEPTION( "unable to convert STRING to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert STRING to function configuration");
 			error = -1;
 			break;
 		case IS_DOUBLE:
-			THROW_EXCEPTION( "unable to convert DOUBLE to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert DOUBLE to function configuration");
 			error = -1;
 			break;
 		case IS_BOOL:
-			THROW_EXCEPTION( "unable to convert BOOL to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert BOOL to function configuration");
 			error = -1;
 			break;
 		case IS_NULL:
@@ -338,15 +498,15 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 			break;
 		}
 		case IS_OBJECT:
-			THROW_EXCEPTION( "unable to convert OBJECT to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert OBJECT to function configuration");
 			error = -1;
 			break;
 		case IS_RESOURCE:
-			THROW_EXCEPTION( "unable to convert RESOURCE to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert RESOURCE to function configuration");
 			error = -1;
 			break;
 		default: 
-			THROW_EXCEPTION( "unable to convert unknown type to SummarizerConfig");
+			THROW_EXCEPTION( "unable to convert unknown type to function configuration");
 			error = -1;
 			break;
 	}
@@ -854,9 +1014,8 @@ int initTermStatistics( TermStatistics& result, zval* obj)
 	return initStructureObject<TermStatisticsBuilder,TermStatistics>( result, obj);
 }
 
-int getTermVector( zval* result, const std::vector<Term>& ar)
+int getTermVector( zval*& result, const std::vector<Term>& ar)
 {
-	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Term>::const_iterator ti = ar.begin(), te = ar.end();
 	for (; ti != te; ++ti)
@@ -872,9 +1031,8 @@ int getTermVector( zval* result, const std::vector<Term>& ar)
 	return 0;
 }
 
-static int getSummaryElementVector( zval* result, const std::vector<SummaryElement>& ar)
+static int getSummaryElementVector( zval*& result, const std::vector<SummaryElement>& ar)
 {
-	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
@@ -890,9 +1048,8 @@ static int getSummaryElementVector( zval* result, const std::vector<SummaryEleme
 	return 0;
 }
 
-int getRankVector( zval* result, const std::vector<Rank>& ar)
+int getRankVector( zval*& result, const std::vector<Rank>& ar)
 {
-	MAKE_STD_ZVAL( result);
 	array_init( result);
 	std::vector<Rank>::const_iterator ri = ar.begin(), re = ar.end();
 	for (; ri != re; ++ri)
@@ -903,6 +1060,7 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 		add_property_long( rank, "docno", ri->docno());
 		add_property_double( rank, "weight", ri->weight());
 		zval* rankattr;
+		MAKE_STD_ZVAL( rankattr);
 		getSummaryElementVector( rankattr, ri->summaryElements());
 		add_property_zval( rank, "summaryElements", rankattr);
 
@@ -911,9 +1069,8 @@ int getRankVector( zval* result, const std::vector<Rank>& ar)
 	return 0;
 }
 
-int getQueryResult( zval* result, const QueryResult& res)
+int getQueryResult( zval*& result, const QueryResult& res)
 {
-	MAKE_STD_ZVAL( result);
 	object_init( result);
 
 	add_property_long( result, "evaluationPass", res.evaluationPass());
@@ -921,6 +1078,7 @@ int getQueryResult( zval* result, const QueryResult& res)
 	add_property_long( result, "nofDocumentsVisited", res.nofDocumentsVisited());
 
 	zval* ranks;
+	MAKE_STD_ZVAL( ranks);
 	getRankVector( ranks, res.ranks());
 	add_property_zval( result, "ranks", ranks);
 	return 0;

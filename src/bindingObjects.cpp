@@ -1,31 +1,10 @@
 /*
----------------------------------------------------------------------
-    The C++ library strus implements basic operations to build
-    a search engine for structured search on unstructured data.
-
-    Copyright (C) 2015 Patrick Frey
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public
-    License as published by the Free Software Foundation; either
-    version 3 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
---------------------------------------------------------------------
-
-	The latest version of strus can be found at 'http://github.com/patrickfrey/strus'
-	For documentation see 'http://patrickfrey.github.com/strus'
-
---------------------------------------------------------------------
-*/
+ * Copyright (c) 2014 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #include "strus/bindingObjects.hpp"
 #undef String
 #undef StringVector
@@ -52,6 +31,8 @@
 #include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
+#include "strus/scalarFunctionInterface.hpp"
+#include "strus/scalarFunctionParserInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/private/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -560,9 +541,9 @@ static Variant getNumericVariantFromDouble( double value)
 	}
 }
 
-static strus::ArithmeticVariant arithmeticVariant( const Variant& val)
+static strus::NumericVariant numericVariant( const Variant& val)
 {
-	strus::ArithmeticVariant rt;
+	strus::NumericVariant rt;
 	switch (val.type())
 	{
 		case Variant_UNDEFINED:
@@ -1030,7 +1011,7 @@ void StorageTransaction::insertDocument( const std::string& docid, const Documen
 		mi = doc.metaData().begin(), me = doc.metaData().end();
 	for (; mi != me; ++mi)
 	{
-		document->setMetaData( mi->name(), arithmeticVariant( mi->value()));
+		document->setMetaData( mi->name(), numericVariant( mi->value()));
 	}
 	std::vector<Term>::const_iterator
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
@@ -1274,7 +1255,7 @@ void QueryEval::addSummarizer(
 		}
 		else
 		{
-			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
+			function->addNumericParameter( pi->first, numericVariant( pi->second));
 		}
 	}
 	std::vector<FeatureParameter> featureParameters;
@@ -1289,7 +1270,6 @@ void QueryEval::addSummarizer(
 }
 
 void QueryEval::addWeightingFunction(
-		double weight,
 		const std::string& name,
 		const WeightingConfig& config)
 {
@@ -1315,7 +1295,7 @@ void QueryEval::addWeightingFunction(
 		}
 		else
 		{
-			function->addNumericParameter( pi->first, arithmeticVariant( pi->second));
+			function->addNumericParameter( pi->first, numericVariant( pi->second));
 		}
 	}
 	std::vector<FeatureParameter> featureParameters;
@@ -1325,8 +1305,31 @@ void QueryEval::addWeightingFunction(
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addWeightingFunction( name, function.get(), featureParameters, weight);
+	queryeval->addWeightingFunction( name, function.get(), featureParameters);
 	function.release();
+}
+
+void QueryEval::addWeightingFormula( const std::string& source, const FunctionVariableConfig& defaultParameter)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
+
+	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
+	const strus::ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser("");
+	std::auto_ptr<strus::ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source));
+	if (!scalarfunc.get())
+	{
+		throw strus::runtime_error(_TXT( "failed to create scalar function (weighting formula) from source: %s"), errorhnd->fetchError());
+	}
+	std::map<std::string,double>::const_iterator
+		vi = defaultParameter.m_variables.begin(),
+		ve = defaultParameter.m_variables.end();
+	for (; vi != ve; ++vi)
+	{
+		scalarfunc->setDefaultVariableValue( vi->first, vi->second);
+	}
+	qe->defineWeightingFormula( scalarfunc.get());
+	scalarfunc.release();
 }
 
 Query QueryEval::createQuery( const StorageClient& storage) const
@@ -1509,7 +1512,7 @@ void Query::addMetaDataRestrictionCondition(
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	THIS->addMetaDataRestrictionCondition( cmpop, name, arithmeticVariant(operand), newGroup);
+	THIS->addMetaDataRestrictionCondition( cmpop, name, numericVariant(operand), newGroup);
 }
 
 void Query::addMetaDataRestrictionCondition(
@@ -1575,6 +1578,19 @@ void Query::addUserName( const std::string& username_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	THIS->addUserName( username_);
+}
+
+void Query::setWeightingVariables(
+		const FunctionVariableConfig& parameter)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	std::map<std::string,double>::const_iterator
+		vi = parameter.m_variables.begin(),
+		ve = parameter.m_variables.end();
+	for (; vi != ve; ++vi)
+	{
+		THIS->setWeightingVariableValue( vi->first, vi->second);
+	}
 }
 
 QueryResult Query::evaluate() const
@@ -1645,7 +1661,7 @@ void DocumentBrowser::addMetaDataRestrictionCondition(
 		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
 	}
 	strus::MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	restriction->addCondition( cmpop, name, arithmeticVariant(value), newGroup);
+	restriction->addCondition( cmpop, name, numericVariant(value), newGroup);
 }
 
 void DocumentBrowser::addMetaDataRestrictionCondition(
