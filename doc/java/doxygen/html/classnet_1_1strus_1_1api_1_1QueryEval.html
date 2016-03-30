@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.5</span>
+   &#160;<span id="projectnumber">0.7</span>
    </div>
   </td>
  </tr>
@@ -87,9 +87,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0666e5b38e08aacfde7ec0249e6134ae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryEval.html#a0666e5b38e08aacfde7ec0249e6134ae">addSummarizer</a> (const String &amp;name, const <a class="el" href="classnet_1_1strus_1_1api_1_1SummarizerConfig.html">SummarizerConfig</a> &amp;config)</td></tr>
 <tr class="memdesc:a0666e5b38e08aacfde7ec0249e6134ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a summarizer.  <a href="#a0666e5b38e08aacfde7ec0249e6134ae">More...</a><br/></td></tr>
 <tr class="separator:a0666e5b38e08aacfde7ec0249e6134ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6d6d85ffd62eeaed53862192d5d250b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryEval.html#ab6d6d85ffd62eeaed53862192d5d250b">addWeightingFunction</a> (double weight, const String &amp;name, const <a class="el" href="classnet_1_1strus_1_1api_1_1WeightingConfig.html">WeightingConfig</a> &amp;config)</td></tr>
-<tr class="memdesc:ab6d6d85ffd62eeaed53862192d5d250b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a weighting function to use as summand of the total document weight.  <a href="#ab6d6d85ffd62eeaed53862192d5d250b">More...</a><br/></td></tr>
-<tr class="separator:ab6d6d85ffd62eeaed53862192d5d250b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab190e0b26281ae83b4f735467d2c3667"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryEval.html#ab190e0b26281ae83b4f735467d2c3667">addWeightingFunction</a> (const String &amp;name, const <a class="el" href="classnet_1_1strus_1_1api_1_1WeightingConfig.html">WeightingConfig</a> &amp;config)</td></tr>
+<tr class="memdesc:ab190e0b26281ae83b4f735467d2c3667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a weighting function to use as summand of the total document weight.  <a href="#ab190e0b26281ae83b4f735467d2c3667">More...</a><br/></td></tr>
+<tr class="separator:ab190e0b26281ae83b4f735467d2c3667"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3b9c78c601ac0016e37dbcca568ea00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryEval.html#ae3b9c78c601ac0016e37dbcca568ea00">addWeightingFormula</a> (const String &amp;source, const <a class="el" href="classnet_1_1strus_1_1api_1_1FunctionVariableConfig.html">FunctionVariableConfig</a> &amp;defaultParameter)</td></tr>
+<tr class="memdesc:ae3b9c78c601ac0016e37dbcca568ea00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a weighting formula to use for calculating the total weight from the weighting function results.  <a href="#ae3b9c78c601ac0016e37dbcca568ea00">More...</a><br/></td></tr>
+<tr class="separator:ae3b9c78c601ac0016e37dbcca568ea00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5388ae842fbc082013a30e4ac9f5c31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html">Query</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryEval.html#ae5388ae842fbc082013a30e4ac9f5c31">createQuery</a> (const <a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> &amp;storage) const </td></tr>
 <tr class="memdesc:ae5388ae842fbc082013a30e4ac9f5c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a query to instantiate based on this query evaluation scheme.  <a href="#ae5388ae842fbc082013a30e4ac9f5c31">More...</a><br/></td></tr>
 <tr class="separator:ae5388ae842fbc082013a30e4ac9f5c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -298,19 +301,47 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab6d6d85ffd62eeaed53862192d5d250b"></a>
+<a class="anchor" id="ae3b9c78c601ac0016e37dbcca568ea00"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::QueryEval::addWeightingFormula </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnet_1_1strus_1_1api_1_1FunctionVariableConfig.html">FunctionVariableConfig</a> &amp;&#160;</td>
+          <td class="paramname"><em>defaultParameter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add a weighting formula to use for calculating the total weight from the weighting function results. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">defaultParameter</td><td>default parameter values </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab190e0b26281ae83b4f735467d2c3667"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void net::strus::api::QueryEval::addWeightingFunction </td>
           <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>weight</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const String &amp;&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
@@ -331,7 +362,6 @@ Friends</h2></td></tr>
 <p>Add a weighting function to use as summand of the total document weight. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>additive weight of the feature (compared with other weighting functions added) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>the name of the weighting function to add </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">config</td><td>the configuration of the function to add </td></tr>
   </table>
@@ -414,7 +444,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 9 2016 11:05:55 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 31 2016 01:12:05 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

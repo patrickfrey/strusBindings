@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.5</span>
+   &#160;<span id="projectnumber">0.7</span>
    </div>
   </td>
  </tr>
@@ -82,9 +82,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2a4374821f4ffd9060b2040b3e63d368"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryEval.html#a2a4374821f4ffd9060b2040b3e63d368">addSummarizer</a> (const String &amp;name, const <a class="el" href="classSummarizerConfig.html">SummarizerConfig</a> &amp;config)</td></tr>
 <tr class="memdesc:a2a4374821f4ffd9060b2040b3e63d368"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a summarizer.  <a href="#a2a4374821f4ffd9060b2040b3e63d368">More...</a><br/></td></tr>
 <tr class="separator:a2a4374821f4ffd9060b2040b3e63d368"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab35396b8f99190a93c11b9f8df8bac9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryEval.html#aab35396b8f99190a93c11b9f8df8bac9">addWeightingFunction</a> (double weight, const String &amp;name, const <a class="el" href="classWeightingConfig.html">WeightingConfig</a> &amp;config)</td></tr>
-<tr class="memdesc:aab35396b8f99190a93c11b9f8df8bac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a weighting function to use as summand of the total document weight.  <a href="#aab35396b8f99190a93c11b9f8df8bac9">More...</a><br/></td></tr>
-<tr class="separator:aab35396b8f99190a93c11b9f8df8bac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5e4d55bea531b1c3f61c318fc938cba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryEval.html#ab5e4d55bea531b1c3f61c318fc938cba">addWeightingFunction</a> (const String &amp;name, const <a class="el" href="classWeightingConfig.html">WeightingConfig</a> &amp;config)</td></tr>
+<tr class="memdesc:ab5e4d55bea531b1c3f61c318fc938cba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a weighting function to use as summand of the total document weight.  <a href="#ab5e4d55bea531b1c3f61c318fc938cba">More...</a><br/></td></tr>
+<tr class="separator:ab5e4d55bea531b1c3f61c318fc938cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad80286ddf98d8ce3fc8e944799cf378a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryEval.html#ad80286ddf98d8ce3fc8e944799cf378a">addWeightingFormula</a> (const String &amp;source, const <a class="el" href="classFunctionVariableConfig.html">FunctionVariableConfig</a> &amp;defaultParameter)</td></tr>
+<tr class="memdesc:ad80286ddf98d8ce3fc8e944799cf378a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a weighting formula to use for calculating the total weight from the weighting function results.  <a href="#ad80286ddf98d8ce3fc8e944799cf378a">More...</a><br/></td></tr>
+<tr class="separator:ad80286ddf98d8ce3fc8e944799cf378a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29969c238aa6bc45659e0fe37b994a7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQuery.html">Query</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryEval.html#a29969c238aa6bc45659e0fe37b994a7c">createQuery</a> (const <a class="el" href="classStorageClient.html">StorageClient</a> &amp;storage) const </td></tr>
 <tr class="memdesc:a29969c238aa6bc45659e0fe37b994a7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a query to instantiate based on this query evaluation scheme.  <a href="#a29969c238aa6bc45659e0fe37b994a7c">More...</a><br/></td></tr>
 <tr class="separator:a29969c238aa6bc45659e0fe37b994a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -293,19 +296,47 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aab35396b8f99190a93c11b9f8df8bac9"></a>
+<a class="anchor" id="ad80286ddf98d8ce3fc8e944799cf378a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QueryEval::addWeightingFormula </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classFunctionVariableConfig.html">FunctionVariableConfig</a> &amp;&#160;</td>
+          <td class="paramname"><em>defaultParameter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add a weighting formula to use for calculating the total weight from the weighting function results. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">defaultParameter</td><td>default parameter values </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab5e4d55bea531b1c3f61c318fc938cba"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void QueryEval::addWeightingFunction </td>
           <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>weight</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const String &amp;&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
@@ -326,7 +357,6 @@ Friends</h2></td></tr>
 <p>Add a weighting function to use as summand of the total document weight. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>additive weight of the feature (compared with other weighting functions added) </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>the name of the weighting function to add </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">config</td><td>the configuration of the function to add </td></tr>
   </table>
@@ -409,7 +439,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 9 2016 11:05:51 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 31 2016 01:12:10 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

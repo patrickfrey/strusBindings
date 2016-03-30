@@ -193,6 +193,14 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classstrus_1_1StatisticsProcessor.html#a079bb18e5d551dde7b33fa52770e79db"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classstrus_1_1StatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="FunctionVariableConfig"><param name="ImageNumber" value="1"></OBJECT>
+        <UL>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="FunctionVariableConfig"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a3259697aff3b1ba56d7221d15557ac46"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="FunctionVariableConfig"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a8e51200ea2c730b80519b2a5ecd9d29c"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="defineVariable"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a00995da54898b45a0cecf1daa50b6b30"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Query"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="QueryEval"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="ImageNumber" value="11"></OBJECT>
+        </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="Local" value="classstrus_1_1SummarizerConfig.html#aa8d24b4fe3c52966504e546390cdd01a"><param name="ImageNumber" value="11"></OBJECT>
@@ -227,7 +235,8 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="addSelectionFeature"><param name="Local" value="classstrus_1_1QueryEval.html#acb210aa6e8d42832283ff3aaadeef99e"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="addSummarizer"><param name="Local" value="classstrus_1_1QueryEval.html#af340f39c0a37936fb6c8dfbdf1396a9f"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="addTerm"><param name="Local" value="classstrus_1_1QueryEval.html#a4498781a52ff4d1c86ac2a2f5aada4f9"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="addWeightingFunction"><param name="Local" value="classstrus_1_1QueryEval.html#a3dccf1742661b8d094c2d1e84a455ba9"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="addWeightingFormula"><param name="Local" value="classstrus_1_1QueryEval.html#a2de198b2981001fd29a1aa98bf95aa46"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="addWeightingFunction"><param name="Local" value="classstrus_1_1QueryEval.html#afdb6deae74c1b5102043bcb7e53eb197"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="createQuery"><param name="Local" value="classstrus_1_1QueryEval.html#adb7b382e572aaa347270f125a8b64ecd"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classstrus_1_1QueryEval.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Query"><param name="Local" value="classstrus_1_1QueryEval.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="ImageNumber" value="11"></OBJECT>
@@ -308,6 +317,7 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="evaluate"><param name="Local" value="classstrus_1_1Query.html#ae900d1d7cb5728734fd97e7b176e2e3c"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="setMaxNofRanks"><param name="Local" value="classstrus_1_1Query.html#ac3b20697a83a69a79bac3517c8b9fd27"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="setMinRank"><param name="Local" value="classstrus_1_1Query.html#a48c5d4bbe48d4351a30633a1fe02b7b5"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="setWeightingVariables"><param name="Local" value="classstrus_1_1Query.html#a9c7c05c63b259eb0d300e3647cd2e624"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="QueryEval"><param name="Local" value="classstrus_1_1Query.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentBrowser"><param name="ImageNumber" value="1"></OBJECT>
@@ -575,6 +585,14 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="encode"><param name="Local" value="classstrus_1_1StatisticsProcessor.html#a079bb18e5d551dde7b33fa52770e79db"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classstrus_1_1StatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
+          <LI><OBJECT type="text/sitemap"><param name="Name" value="FunctionVariableConfig"><param name="ImageNumber" value="1"></OBJECT>
+            <UL>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="FunctionVariableConfig"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a3259697aff3b1ba56d7221d15557ac46"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="FunctionVariableConfig"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a8e51200ea2c730b80519b2a5ecd9d29c"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="defineVariable"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a00995da54898b45a0cecf1daa50b6b30"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="Query"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="QueryEval"><param name="Local" value="classstrus_1_1FunctionVariableConfig.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="ImageNumber" value="11"></OBJECT>
+            </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="ImageNumber" value="1"></OBJECT>
             <UL>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="SummarizerConfig"><param name="Local" value="classstrus_1_1SummarizerConfig.html#aa8d24b4fe3c52966504e546390cdd01a"><param name="ImageNumber" value="11"></OBJECT>
@@ -609,7 +627,8 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="addSelectionFeature"><param name="Local" value="classstrus_1_1QueryEval.html#acb210aa6e8d42832283ff3aaadeef99e"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="addSummarizer"><param name="Local" value="classstrus_1_1QueryEval.html#af340f39c0a37936fb6c8dfbdf1396a9f"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="addTerm"><param name="Local" value="classstrus_1_1QueryEval.html#a4498781a52ff4d1c86ac2a2f5aada4f9"><param name="ImageNumber" value="11"></OBJECT>
-            <LI><OBJECT type="text/sitemap"><param name="Name" value="addWeightingFunction"><param name="Local" value="classstrus_1_1QueryEval.html#a3dccf1742661b8d094c2d1e84a455ba9"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="addWeightingFormula"><param name="Local" value="classstrus_1_1QueryEval.html#a2de198b2981001fd29a1aa98bf95aa46"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="addWeightingFunction"><param name="Local" value="classstrus_1_1QueryEval.html#afdb6deae74c1b5102043bcb7e53eb197"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="createQuery"><param name="Local" value="classstrus_1_1QueryEval.html#adb7b382e572aaa347270f125a8b64ecd"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Context"><param name="Local" value="classstrus_1_1QueryEval.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="Query"><param name="Local" value="classstrus_1_1QueryEval.html#a0de80064a367adf51ab09f7a9b6de05a"><param name="ImageNumber" value="11"></OBJECT>
@@ -690,6 +709,7 @@
             <LI><OBJECT type="text/sitemap"><param name="Name" value="evaluate"><param name="Local" value="classstrus_1_1Query.html#ae900d1d7cb5728734fd97e7b176e2e3c"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="setMaxNofRanks"><param name="Local" value="classstrus_1_1Query.html#ac3b20697a83a69a79bac3517c8b9fd27"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="setMinRank"><param name="Local" value="classstrus_1_1Query.html#a48c5d4bbe48d4351a30633a1fe02b7b5"><param name="ImageNumber" value="11"></OBJECT>
+            <LI><OBJECT type="text/sitemap"><param name="Name" value="setWeightingVariables"><param name="Local" value="classstrus_1_1Query.html#a9c7c05c63b259eb0d300e3647cd2e624"><param name="ImageNumber" value="11"></OBJECT>
             <LI><OBJECT type="text/sitemap"><param name="Name" value="QueryEval"><param name="Local" value="classstrus_1_1Query.html#a94ca67b0c1c7ea574a07c9a23640d111"><param name="ImageNumber" value="11"></OBJECT>
             </UL>
           <LI><OBJECT type="text/sitemap"><param name="Name" value="DocumentBrowser"><param name="ImageNumber" value="1"></OBJECT>
