@@ -1316,7 +1316,7 @@ void QueryEval::addWeightingFormula( const std::string& source, const FunctionVa
 
 	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 	const strus::ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser("");
-	std::auto_ptr<strus::ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source));
+	std::auto_ptr<strus::ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source, std::vector<std::string>()));
 	if (!scalarfunc.get())
 	{
 		throw strus::runtime_error(_TXT( "failed to create scalar function (weighting formula) from source: %s"), errorhnd->fetchError());
