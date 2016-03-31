@@ -1281,7 +1281,7 @@ void QueryEval::addWeightingFunction(
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
 	if (!sf) throw strus::runtime_error( _TXT("weighting function not defined: '%s'"), name.c_str());
 
-	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance());
+	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance( queryproc));
 	if (!function.get()) throw strus::runtime_error( _TXT("error creating weighting function instance '%s': '%s'"), name.c_str(), errorhnd->fetchError());
 
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
