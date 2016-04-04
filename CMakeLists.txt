@@ -20,10 +20,25 @@ IF (NOT WITH_PHP STREQUAL "YES")
 MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=\"YES\" to enable it." )
 ENDIF (NOT WITH_PHP STREQUAL "YES")
 
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+find_package(Threads REQUIRED)
+    
 include( cmake/dist.cmake )
 include( cmake/LinuxDistribution.cmake )
 include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
+include( cmake/intl.cmake )
+
+IF (WITH_JAVA STREQUAL "YES" OR WITH_PHP STREQUAL "YES")
+   # findSWIG is a little bit broken
+   # findSWIG()
+   find_package(SWIG REQUIRED)
+   if(NOT SWIG_FOUND)
+      MESSAGE( STATUS  "SWIG is required")
+   else()
+      MESSAGE( STATUS  "SWIG binary is: ${SWIG_EXECUTABLE}")
+   endif()
+ENDIF()
 
 IF (WITH_JAVA STREQUAL "YES")
 find_package( Java REQUIRED )
