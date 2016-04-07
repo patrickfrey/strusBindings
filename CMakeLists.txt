@@ -77,12 +77,19 @@ if(UNIX)
   MESSAGE( STATUS "JAVA_HOME: ${JAVA_HOME}" )
 
   # avoid errors like 'libmawt.so: cannot open shared object file' (for
-  # instance on Debian)
-  set(JAVA_MAWT_LIBRARY "")
+  # instance on Debian), do not use the one in 'headless', it seems not
+  # to work properly
   find_library(JAVA_MAWT_LIBRARY NAMES mawt
-    PATHS ${JAVA_HOME}/jre/lib/amd64/xawt
-          ${JAVA_HOME}/jre/lib/i386/xawt
+      PATHS "${JAVA_HOME}/jre/lib/amd64/xawt"
+            "${JAVA_HOME}/jre/lib/i386/xawt"
+            "${JavaProp_SUN_BOOT_LIBRARY_PATH}/xawt"
   )
+  if(JAVA_MAWT_LIBRARY-NOT-FOUND)
+    set(JAVA_MAWT_LIBRARY "")
+    MESSAGE( STATUS "No mawt library found, hope we can do without" )
+  else()
+    MESSAGE( STATUS "JAVA_MAWT_LIBRARY: ${JAVA_MAWT_LIBRARY}")
+  endif()
 endif()
 
 ENDIF (WITH_JAVA STREQUAL "YES")
