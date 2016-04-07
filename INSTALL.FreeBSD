@@ -48,6 +48,11 @@ Java bindings
 You must install 'openjdk' as package or from the ports.
 You'll also need the 'swig' package or port.
 
+Before calling cmake with -DWITH_JAVA="YES" make sure
+to set the environment variable:
+
+setenv JAVA_HOME /usr/local/openjdk7/
+
 Php bindings
 ------------
 
