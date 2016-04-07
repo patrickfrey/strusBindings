@@ -82,13 +82,12 @@ if(UNIX)
   find_library(JAVA_MAWT_LIBRARY NAMES mawt
       PATHS "${JAVA_HOME}/jre/lib/amd64/xawt"
             "${JAVA_HOME}/jre/lib/i386/xawt"
-            "${JavaProp_SUN_BOOT_LIBRARY_PATH}/xawt"
   )
-  if(JAVA_MAWT_LIBRARY-NOT-FOUND)
+  if(${JAVA_MAWT_LIBRARY})
+    MESSAGE( STATUS "JAVA_MAWT_LIBRARY: ${JAVA_MAWT_LIBRARY}")
+  else()
     set(JAVA_MAWT_LIBRARY "")
     MESSAGE( STATUS "No mawt library found, hope we can do without" )
-  else()
-    MESSAGE( STATUS "JAVA_MAWT_LIBRARY: ${JAVA_MAWT_LIBRARY}")
   endif()
 endif()
 
