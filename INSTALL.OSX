@@ -19,7 +19,10 @@ ln -s /usr/local/opt/gettext/bin/* /usr/local/bin/.
 Build strus with:
 
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
-	-DWITH_JAVA="YES" -DWITH_PHP="YES" -DWITH_PYTHON="YES" .
+	-DWITH_JAVA="YES" -DWITH_PHP="YES" -DWITH_PYTHON="YES" \
+	-DPYTHON_LIBRARY="/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" \
+	.
+
 xcodebuild -configuration Release -target ALL_BUILD
 xcodebuild -configuration Release -target install
 
@@ -32,3 +35,10 @@ Python bindings
 
 brew install python
 brek install boost-python
+
+Make sure you call cmake pointing to the brew version of
+the Python library:
+
+cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
+        -DWITH_PYTHON="YES" \
+	-DPYTHON_LIBRARY="/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" .
