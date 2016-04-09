@@ -8,6 +8,15 @@ string( REPLACE "-I"  ""  PHP_INCLUDES  ${PHP_INCLUDES}  )
 string( STRIP  ${PHP_INCLUDES}  PHP_INCLUDES )
 string( REPLACE " "  ";"  PHP_INCLUDES  ${PHP_INCLUDES}  )
 MESSAGE( "PHP includes: ${PHP_INCLUDES}" )
+
+execute_process( COMMAND  php-config --ldflags  OUTPUT_VARIABLE PHP_LDFLAGS )
+string( STRIP  ${PHP_LDFLAGS}  PHP_LDFLAGS )
+MESSAGE( "PHP linker flags: ${PHP_LDFLAGS}" )
+
+execute_process( COMMAND  php-config --libs OUTPUT_VARIABLE PHP_LIBS )
+string( STRIP  ${PHP_LIBS}  PHP_LIBS )  
+MESSAGE( "PHP libraries: ${PHP_LIBS}" )
+
 execute_process( COMMAND  php-config --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 MESSAGE( STATUS  "PHP module path: ${PHP_EXTENSION_DIR}" )
 include_directories( "${PROJECT_SOURCE_DIR}/include"  "${PROJECT_SOURCE_DIR}/lang/php"  ${PHP_INCLUDES} "${Boost_INCLUDE_DIRS}")
@@ -25,7 +34,12 @@ add_custom_command(
 
 add_library( strus_php MODULE strus_wrap.cpp objInitializers.cpp )
 set_target_properties( strus_php PROPERTIES PREFIX "" OUTPUT_NAME strus )
-target_link_libraries( strus_php  strus_bindings )
+if(APPLE)
+	set_target_properties( strus_php PROPERTIES LINK_FLAGS "${PHP_LDFLAGS} -Wl,-undefined,dynamic_lookup" )
+else(APPLE)
+	set_target_properties( strus_php PROPERTIES LINK_FLAGS "${PHP_LDFLAGS}" )
+endif(APPLE)
+target_link_libraries( strus_php  strus_bindings ${PHP_LIBS} )
 
 add_subdirectory( example )
 

@@ -42,3 +42,9 @@ the Python library:
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
         -DWITH_PYTHON="YES" \
 	-DPYTHON_LIBRARY="/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" .
+
+Php bindings
+------------
+
+brew install homebrew/php/php56
+brew install swig
