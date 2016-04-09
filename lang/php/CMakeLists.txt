@@ -39,7 +39,9 @@ if(APPLE)
 else(APPLE)
 	set_target_properties( strus_php PROPERTIES LINK_FLAGS "${PHP_LDFLAGS}" )
 endif(APPLE)
-target_link_libraries( strus_php  strus_bindings ${PHP_LIBS} )
+if(APPLE)
+	target_link_libraries( strus_php  strus_bindings ${PHP_LIBS} )
+endif(APPLE)
 
 add_subdirectory( example )
 
