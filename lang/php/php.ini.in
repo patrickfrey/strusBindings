@@ -1,5 +1,5 @@
 [PHP]
 open_basedir = "@PROJECT_SOURCE_DIR@/lang/php"
-extension_dir="@PROJECT_SOURCE_DIR@/lang/php/@CMAKE_BUILD_TYPE@"
+extension_dir= "@PHP_EXTENSION_DIR@"
 include_path = "@PROJECT_SOURCE_DIR@/lang/php"
 
