@@ -41,6 +41,8 @@ else(APPLE)
 endif(APPLE)
 if(APPLE)
 	target_link_libraries( strus_php  strus_bindings ${PHP_LIBS} )
+else(APPLE)
+	target_link_libraries( strus_php  strus_bindings )
 endif(APPLE)
 
 add_subdirectory( example )
