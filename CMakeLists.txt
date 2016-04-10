@@ -65,7 +65,8 @@ ELSE (${JNI_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Could not locate JNI package: ${JNI_FOUND} ")
 ENDIF (${JNI_FOUND} STREQUAL "TRUE")
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
+  MESSAGE( STATUS "Is UNIX" )
   # make sure we always have a JAVA_HOME variable set
   IF ("$ENV{JAVA_HOME}" STREQUAL "")
     EXECUTE_PROCESS(
