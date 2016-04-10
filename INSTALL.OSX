@@ -42,3 +42,20 @@ the Python library:
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
         -DWITH_PYTHON="YES" \
 	-DPYTHON_LIBRARY="/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" .
+
+Php bindings
+------------
+
+brew install homebrew/php/php56
+brew install swig
+
+Java bindings
+-------------
+
+Install the official Java package.
+
+Set JAVA_HOME before calling cmake:
+
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_77.jdk/Contents/Home/jre/
+cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
+	-DWITH_JAVA="YES"
