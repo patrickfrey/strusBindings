@@ -29,6 +29,14 @@ include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
 include( cmake/intl.cmake )
 
+IF( WITH_PHP STREQUAL "YES" )
+	if( APPLE OR WIN32 )
+		set( PHP_EXTENSION_DIR "${PROJECT_SOURCE_DIR}/lang/php/${CMAKE_BUILD_TYPE}" )
+	else( APPLE OR WIN32 )
+		set( PHP_EXTENSION_DIR "${PROJECT_SOURCE_DIR}/lang/php" )
+	endif( APPLE OR WIN32 )
+ENDIF( WITH_PHP STREQUAL "YES" )
+
 IF (WITH_JAVA STREQUAL "YES" OR WITH_PHP STREQUAL "YES")
    # findSWIG is a little bit broken
    # findSWIG()
@@ -57,7 +65,8 @@ ELSE (${JNI_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Could not locate JNI package: ${JNI_FOUND} ")
 ENDIF (${JNI_FOUND} STREQUAL "TRUE")
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
+  MESSAGE( STATUS "Is UNIX" )
   # make sure we always have a JAVA_HOME variable set
   IF ("$ENV{JAVA_HOME}" STREQUAL "")
     EXECUTE_PROCESS(

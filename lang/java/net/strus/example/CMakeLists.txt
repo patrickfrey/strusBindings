@@ -21,7 +21,12 @@ add_custom_target( run ALL DEPENDS HelloWorld.class CreateCollection.class Creat
 set( THISDIR "${PROJECT_SOURCE_DIR}/lang/java/net/strus/example" )
 
 foreach( test ${tests} )
-	add_test( NAME java_${test} COMMAND java -classpath ../../.. net.strus.example.${test} WORKING_DIRECTORY ${THISDIR} )
-	set_tests_properties( java_${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lang/java" )
+	if( APPLE OR WIN32 )
+		set( JNI_NATIVE_CODE_DIR "${PROJECT_SOURCE_DIR}/lang/java/${CMAKE_BUILD_TYPE}" )
+	else( APPLE OR WIN32 )
+		set( JNI_NATIVE_CODE_DIR "${PROJECT_SOURCE_DIR}/lang/java" )
+	endif( APPLE OR WIN32 )
+	add_test( NAME java_${test} COMMAND java -Djava.library.path=${JNI_NATIVE_CODE_DIR} -classpath ../../.. net.strus.example.${test} WORKING_DIRECTORY ${THISDIR} )
+#	set_tests_properties( java_${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${JNI_NATIVE_CODE_DIR}" )
 endforeach( test )
 
