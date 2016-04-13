@@ -2111,6 +2111,10 @@ public:
 	/// \brief Destructor
 	~Context(){}
 
+	/// \brief Check if there has an error occurred and throw if yes
+	/// \remark Some bindings have coroutines and with a coroutine switch an error message might get lost, because error context is per thread. So if a coroutine switch is done without the last error fetched it might happen that the second coroutine gets the error of the first one. Call this function after calling some method without return value before a state where a context switch is possible.
+	void checkErrors() const;
+
 	/// \brief Load a module
 	/// \param[in] name_ name of the module to load
 	/// \remark Only implemented in local mode with own module loader (see constructors)

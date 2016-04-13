@@ -1820,6 +1820,15 @@ Context::Context( const Context& o)
 	,m_textproc(o.m_textproc)
 {}
 
+void Context::checkErrors() const
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("unhandled error: %s"), errorhnd->fetchError());
+	}
+}
+
 void Context::loadModule( const std::string& name_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot load modules in RPC client mode"));
