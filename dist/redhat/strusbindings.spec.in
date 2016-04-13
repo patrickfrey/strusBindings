@@ -502,6 +502,10 @@ make test
 %endif
 
 %changelog
+* Wed Apr 13 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.8.0-0.1
+- adapt interface changes from strus core
+- added dependency to strusbase
+
 * Sun Apr 3 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.7.1-0.1
 - adapted interface changes from strus core
 

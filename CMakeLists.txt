@@ -6,8 +6,8 @@ include(cmake/install_prefix.cmake)
 # Project globals:
 project( StrusBindings )
 set( STRUS_MAJOR_VERSION 0 )
-set( STRUS_MINOR_VERSION 7 )
-set( STRUS_PATCH_VERSION 1 )
+set( STRUS_MINOR_VERSION 8 )
+set( STRUS_PATCH_VERSION 0 )
 set( STRUS_VERSION ${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}.${STRUS_PATCH_VERSION} )
 
 IF (NOT WITH_JAVA STREQUAL "YES")
@@ -116,6 +116,7 @@ ENDIF (WITH_PYTHON STREQUAL "YES")
 
 include( cmake/find_strus_package.cmake )
 
+find_strus_package( base )
 find_strus_package( core )
 find_strus_package( analyzer )
 find_strus_package( module )

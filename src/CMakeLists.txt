@@ -13,6 +13,7 @@ set( source_files
 include_directories(
 	"${PROJECT_SOURCE_DIR}/3rdParty/textwolf/include"
 	"${PROJECT_SOURCE_DIR}/include"
+	"${strusbase_INCLUDE_DIRS}"
 	"${strus_INCLUDE_DIRS}"
 	"${strusanalyzer_INCLUDE_DIRS}"
 	"${strusmodule_INCLUDE_DIRS}"
@@ -26,6 +27,6 @@ link_directories(
 
 
 add_library( strus_bindings STATIC ${source_files} )
-target_link_libraries( strus_bindings strus_module strus_rpc_client strus_rpc_client_socket strus_utils strus_error )
+target_link_libraries( strus_bindings strus_module strus_rpc_client strus_rpc_client_socket strus_base strus_error )
 
 

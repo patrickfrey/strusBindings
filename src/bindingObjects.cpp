@@ -34,7 +34,7 @@
 #include "strus/scalarFunctionInterface.hpp"
 #include "strus/scalarFunctionParserInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "strus/private/configParser.hpp"
+#include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
 #include "utils.hpp"
 #include <cmath>
