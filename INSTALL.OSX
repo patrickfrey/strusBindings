@@ -49,13 +49,15 @@ Php bindings
 brew install homebrew/php/php56
 brew install swig
 
+Call cmake with:
+
+cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
+	-DWITH_PHP="YES"
+
 Java bindings
 -------------
 
 Install the official Java package.
 
-Set JAVA_HOME before calling cmake:
-
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_77.jdk/Contents/Home/jre/
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
 	-DWITH_JAVA="YES"
