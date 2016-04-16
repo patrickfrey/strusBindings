@@ -1,5 +1,11 @@
-Library dependencies of strus:
+Library dependencies of strusBindings:
+	- boost (headers and -lboost_system)
+
+Program dependencies of strusBindings:
+	- SWIG (/usr/bin/swig2.0)
 
 Ubuntu:
+	sudo apt-get install liboost-all-dev
+	sudo apt-get install swig2.0
 
 

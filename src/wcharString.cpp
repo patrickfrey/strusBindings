@@ -12,7 +12,6 @@
 #include "textwolf/xmlscanner.hpp"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
-#include <stdint.h>
 
 #define MAXDUMPSIZE 2000
 

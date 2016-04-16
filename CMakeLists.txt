@@ -6,7 +6,7 @@ include(cmake/install_prefix.cmake)
 # Project globals:
 project( StrusBindings )
 set( STRUS_MAJOR_VERSION 0 )
-set( STRUS_MINOR_VERSION 7 )
+set( STRUS_MINOR_VERSION 8 )
 set( STRUS_PATCH_VERSION 0 )
 set( STRUS_VERSION ${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}.${STRUS_PATCH_VERSION} )
 
@@ -20,10 +20,33 @@ IF (NOT WITH_PHP STREQUAL "YES")
 MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=\"YES\" to enable it." )
 ENDIF (NOT WITH_PHP STREQUAL "YES")
 
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+find_package(Threads REQUIRED)
+    
 include( cmake/dist.cmake )
 include( cmake/LinuxDistribution.cmake )
 include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
+include( cmake/intl.cmake )
+
+IF( WITH_PHP STREQUAL "YES" )
+	if( APPLE OR WIN32 )
+		set( PHP_EXTENSION_DIR "${PROJECT_SOURCE_DIR}/lang/php/${CMAKE_BUILD_TYPE}" )
+	else( APPLE OR WIN32 )
+		set( PHP_EXTENSION_DIR "${PROJECT_SOURCE_DIR}/lang/php" )
+	endif( APPLE OR WIN32 )
+ENDIF( WITH_PHP STREQUAL "YES" )
+
+IF (WITH_JAVA STREQUAL "YES" OR WITH_PHP STREQUAL "YES")
+   # findSWIG is a little bit broken
+   # findSWIG()
+   find_package(SWIG REQUIRED)
+   if(NOT SWIG_FOUND)
+      MESSAGE( STATUS  "SWIG is required")
+   else()
+      MESSAGE( STATUS  "SWIG binary is: ${SWIG_EXECUTABLE}")
+   endif()
+ENDIF()
 
 IF (WITH_JAVA STREQUAL "YES")
 find_package( Java REQUIRED )
@@ -42,7 +65,8 @@ ELSE (${JNI_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Could not locate JNI package: ${JNI_FOUND} ")
 ENDIF (${JNI_FOUND} STREQUAL "TRUE")
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
+  MESSAGE( STATUS "Is UNIX" )
   # make sure we always have a JAVA_HOME variable set
   IF ("$ENV{JAVA_HOME}" STREQUAL "")
     EXECUTE_PROCESS(
@@ -62,12 +86,18 @@ if(UNIX)
   MESSAGE( STATUS "JAVA_HOME: ${JAVA_HOME}" )
 
   # avoid errors like 'libmawt.so: cannot open shared object file' (for
-  # instance on Debian)
-  set(JAVA_MAWT_LIBRARY "")
+  # instance on Debian), do not use the one in 'headless', it seems not
+  # to work properly
   find_library(JAVA_MAWT_LIBRARY NAMES mawt
-    PATHS ${JAVA_HOME}/jre/lib/amd64/xawt
-          ${JAVA_HOME}/jre/lib/i386/xawt
+      PATHS "${JAVA_HOME}/jre/lib/amd64/xawt"
+            "${JAVA_HOME}/jre/lib/i386/xawt"
   )
+  if(JAVA_MAWT_LIBRARY)
+    MESSAGE( STATUS "JAVA_MAWT_LIBRARY: ${JAVA_MAWT_LIBRARY}")
+  else()
+    set(JAVA_MAWT_LIBRARY "")
+    MESSAGE( STATUS "No mawt library found, hope we can do without" )
+  endif()
 endif()
 
 ENDIF (WITH_JAVA STREQUAL "YES")
@@ -86,6 +116,7 @@ ENDIF (WITH_PYTHON STREQUAL "YES")
 
 include( cmake/find_strus_package.cmake )
 
+find_strus_package( base )
 find_strus_package( core )
 find_strus_package( analyzer )
 find_strus_package( module )

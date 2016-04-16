@@ -34,7 +34,7 @@
 #include "strus/scalarFunctionInterface.hpp"
 #include "strus/scalarFunctionParserInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "strus/private/configParser.hpp"
+#include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
 #include "utils.hpp"
 #include <cmath>
@@ -1281,7 +1281,7 @@ void QueryEval::addWeightingFunction(
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
 	if (!sf) throw strus::runtime_error( _TXT("weighting function not defined: '%s'"), name.c_str());
 
-	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance());
+	strus::Reference<strus::WeightingFunctionInstanceInterface> function( sf->createInstance( queryproc));
 	if (!function.get()) throw strus::runtime_error( _TXT("error creating weighting function instance '%s': '%s'"), name.c_str(), errorhnd->fetchError());
 
 	strus::QueryEvalInterface* queryeval = (strus::QueryEvalInterface*)m_queryeval_impl.get();
@@ -1316,7 +1316,7 @@ void QueryEval::addWeightingFormula( const std::string& source, const FunctionVa
 
 	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 	const strus::ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser("");
-	std::auto_ptr<strus::ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source));
+	std::auto_ptr<strus::ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source, std::vector<std::string>()));
 	if (!scalarfunc.get())
 	{
 		throw strus::runtime_error(_TXT( "failed to create scalar function (weighting formula) from source: %s"), errorhnd->fetchError());
@@ -1819,6 +1819,15 @@ Context::Context( const Context& o)
 	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
 	,m_textproc(o.m_textproc)
 {}
+
+void Context::checkErrors() const
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("unhandled error: %s"), errorhnd->fetchError());
+	}
+}
 
 void Context::loadModule( const std::string& name_)
 {
