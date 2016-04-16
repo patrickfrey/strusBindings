@@ -45,6 +45,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ae3831684f5704d18308e369b745d5533"><param name="Name" value="GlobalCounter"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773"><param name="Name" value="Index"></OBJECT>
   </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a133851922abb5252df167463da9bc3b3"><param name="Name" value="checkErrors"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="close"></OBJECT>
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="Context"></OBJECT>
@@ -55,6 +56,7 @@
   <UL>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a75d86a2b3ab56bd55f1380ed27f36c90"><param name="Name" value="addModulePath"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#abb7e9ae15fb9ca920da19c1ca8e8f3b8"><param name="Name" value="addResourcePath"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a133851922abb5252df167463da9bc3b3"><param name="Name" value="checkErrors"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a63db598c6f594f44ac25d9a46d3ed782"><param name="Name" value="close"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a652cdcd2eedc8dbd9110bd284c5d5cf0"><param name="Name" value="Context"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a905301c75b5bb103fd1624e8d1420a1b"><param name="Name" value="createDocumentAnalyzer"></OBJECT>

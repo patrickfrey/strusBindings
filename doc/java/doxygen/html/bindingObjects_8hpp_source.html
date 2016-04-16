@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.7</span>
+   &#160;<span id="projectnumber">0.8</span>
    </div>
   </td>
  </tr>
@@ -1607,93 +1607,95 @@
 <div class="line"><a name="l02110"></a><span class="lineno"> 2110</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1Context.html">Context</a>( <span class="keyword">const</span> <a class="code" href="classnet_1_1strus_1_1api_1_1Context.html">Context</a>&amp; o);</div>
 <div class="line"><a name="l02112"></a><span class="lineno"><a class="line" href="classnet_1_1strus_1_1api_1_1Context.html#a2ee0f79de74be2efa62b8eb13d977bf0"> 2112</a></span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1Context.html#a2ee0f79de74be2efa62b8eb13d977bf0">~Context</a>(){}</div>
 <div class="line"><a name="l02113"></a><span class="lineno"> 2113</span>&#160;</div>
-<div class="line"><a name="l02117"></a><span class="lineno"> 2117</span>&#160;        <span class="keywordtype">void</span> loadModule( <span class="keyword">const</span> String&amp; name_);</div>
-<div class="line"><a name="l02118"></a><span class="lineno"> 2118</span>&#160;</div>
-<div class="line"><a name="l02122"></a><span class="lineno"> 2122</span>&#160;        <span class="keywordtype">void</span> addModulePath( <span class="keyword">const</span> String&amp; paths_);</div>
-<div class="line"><a name="l02123"></a><span class="lineno"> 2123</span>&#160;</div>
-<div class="line"><a name="l02124"></a><span class="lineno"> 2124</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02125"></a><span class="lineno"> 2125</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> addModulePath_unicode( <span class="keyword">const</span> WString&amp; paths_);</div>
-<div class="line"><a name="l02126"></a><span class="lineno"> 2126</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02127"></a><span class="lineno"> 2127</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l02131"></a><span class="lineno"> 2131</span>&#160;        <span class="keywordtype">void</span> addResourcePath( <span class="keyword">const</span> String&amp; paths_);</div>
-<div class="line"><a name="l02132"></a><span class="lineno"> 2132</span>&#160;</div>
-<div class="line"><a name="l02136"></a><span class="lineno"> 2136</span>&#160;        <span class="keywordtype">void</span> defineStatisticsProcessor( <span class="keyword">const</span> String&amp; name_);</div>
-<div class="line"><a name="l02137"></a><span class="lineno"> 2137</span>&#160;</div>
-<div class="line"><a name="l02140"></a><span class="lineno"> 2140</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a> createStatisticsProcessor();</div>
+<div class="line"><a name="l02116"></a><span class="lineno"> 2116</span>&#160;        <span class="keywordtype">void</span> checkErrors() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l02117"></a><span class="lineno"> 2117</span>&#160;</div>
+<div class="line"><a name="l02121"></a><span class="lineno"> 2121</span>&#160;        <span class="keywordtype">void</span> loadModule( <span class="keyword">const</span> String&amp; name_);</div>
+<div class="line"><a name="l02122"></a><span class="lineno"> 2122</span>&#160;</div>
+<div class="line"><a name="l02126"></a><span class="lineno"> 2126</span>&#160;        <span class="keywordtype">void</span> addModulePath( <span class="keyword">const</span> String&amp; paths_);</div>
+<div class="line"><a name="l02127"></a><span class="lineno"> 2127</span>&#160;</div>
+<div class="line"><a name="l02128"></a><span class="lineno"> 2128</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02129"></a><span class="lineno"> 2129</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> addModulePath_unicode( <span class="keyword">const</span> WString&amp; paths_);</div>
+<div class="line"><a name="l02130"></a><span class="lineno"> 2130</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02131"></a><span class="lineno"> 2131</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l02135"></a><span class="lineno"> 2135</span>&#160;        <span class="keywordtype">void</span> addResourcePath( <span class="keyword">const</span> String&amp; paths_);</div>
+<div class="line"><a name="l02136"></a><span class="lineno"> 2136</span>&#160;</div>
+<div class="line"><a name="l02140"></a><span class="lineno"> 2140</span>&#160;        <span class="keywordtype">void</span> defineStatisticsProcessor( <span class="keyword">const</span> String&amp; name_);</div>
 <div class="line"><a name="l02141"></a><span class="lineno"> 2141</span>&#160;</div>
-<div class="line"><a name="l02142"></a><span class="lineno"> 2142</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02143"></a><span class="lineno"> 2143</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> addResourcePath_unicode( <span class="keyword">const</span> WString&amp; paths_);</div>
-<div class="line"><a name="l02144"></a><span class="lineno"> 2144</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02145"></a><span class="lineno"> 2145</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l02147"></a><span class="lineno"> 2147</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient();</div>
-<div class="line"><a name="l02148"></a><span class="lineno"> 2148</span>&#160;</div>
-<div class="line"><a name="l02151"></a><span class="lineno"> 2151</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient( <span class="keyword">const</span> String&amp; config_);</div>
+<div class="line"><a name="l02144"></a><span class="lineno"> 2144</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a> createStatisticsProcessor();</div>
+<div class="line"><a name="l02145"></a><span class="lineno"> 2145</span>&#160;</div>
+<div class="line"><a name="l02146"></a><span class="lineno"> 2146</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02147"></a><span class="lineno"> 2147</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> addResourcePath_unicode( <span class="keyword">const</span> WString&amp; paths_);</div>
+<div class="line"><a name="l02148"></a><span class="lineno"> 2148</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02149"></a><span class="lineno"> 2149</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l02151"></a><span class="lineno"> 2151</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient();</div>
 <div class="line"><a name="l02152"></a><span class="lineno"> 2152</span>&#160;</div>
-<div class="line"><a name="l02153"></a><span class="lineno"> 2153</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02154"></a><span class="lineno"> 2154</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient_0();</div>
-<div class="line"><a name="l02155"></a><span class="lineno"> 2155</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient_1( <span class="keyword">const</span> String&amp; config_);</div>
-<div class="line"><a name="l02156"></a><span class="lineno"> 2156</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient_unicode( <span class="keyword">const</span> WString&amp; config_);</div>
-<div class="line"><a name="l02157"></a><span class="lineno"> 2157</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02158"></a><span class="lineno"> 2158</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l02162"></a><span class="lineno"> 2162</span>&#160;        <span class="keywordtype">void</span> createStorage( <span class="keyword">const</span> String&amp; config_);</div>
-<div class="line"><a name="l02163"></a><span class="lineno"> 2163</span>&#160;</div>
-<div class="line"><a name="l02164"></a><span class="lineno"> 2164</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02165"></a><span class="lineno"> 2165</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> createStorage_unicode( <span class="keyword">const</span> WString&amp; config_);</div>
-<div class="line"><a name="l02166"></a><span class="lineno"> 2166</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02167"></a><span class="lineno"> 2167</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> destroyStorage( <span class="keyword">const</span> String&amp; config_);</div>
-<div class="line"><a name="l02171"></a><span class="lineno"> 2171</span>&#160;</div>
-<div class="line"><a name="l02172"></a><span class="lineno"> 2172</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02173"></a><span class="lineno"> 2173</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> destroyStorage_unicode( <span class="keyword">const</span> WString&amp; config_);</div>
-<div class="line"><a name="l02174"></a><span class="lineno"> 2174</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02175"></a><span class="lineno"> 2175</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentClass.html">DocumentClass</a> detectDocumentClass( <span class="keyword">const</span> String&amp; content);</div>
-<div class="line"><a name="l02179"></a><span class="lineno"> 2179</span>&#160;</div>
-<div class="line"><a name="l02180"></a><span class="lineno"> 2180</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02181"></a><span class="lineno"> 2181</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentClass.html">DocumentClass</a> detectDocumentClass_unicode( <span class="keyword">const</span> WString&amp; content);</div>
-<div class="line"><a name="l02182"></a><span class="lineno"> 2182</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02183"></a><span class="lineno"> 2183</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html">DocumentAnalyzer</a> createDocumentAnalyzer( <span class="keyword">const</span> String&amp; segmentername_=<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a name="l02186"></a><span class="lineno"> 2186</span>&#160;</div>
-<div class="line"><a name="l02187"></a><span class="lineno"> 2187</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
-<div class="line"><a name="l02188"></a><span class="lineno"> 2188</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html">DocumentAnalyzer</a> createDocumentAnalyzer_unicode( <span class="keyword">const</span> WString&amp; segmentername_);</div>
-<div class="line"><a name="l02189"></a><span class="lineno"> 2189</span>&#160;</div>
-<div class="line"><a name="l02190"></a><span class="lineno"> 2190</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html">DocumentAnalyzer</a> createDocumentAnalyzer_0()</div>
-<div class="line"><a name="l02191"></a><span class="lineno"> 2191</span>&#160;        {</div>
-<div class="line"><a name="l02192"></a><span class="lineno"> 2192</span>&#160;                <span class="keywordflow">return</span> createDocumentAnalyzer();</div>
-<div class="line"><a name="l02193"></a><span class="lineno"> 2193</span>&#160;        }</div>
-<div class="line"><a name="l02194"></a><span class="lineno"> 2194</span>&#160;        DocumentAnalyzer createDocumentAnalyzer_1( <span class="keyword">const</span> String&amp; segmentername_)</div>
+<div class="line"><a name="l02155"></a><span class="lineno"> 2155</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient( <span class="keyword">const</span> String&amp; config_);</div>
+<div class="line"><a name="l02156"></a><span class="lineno"> 2156</span>&#160;</div>
+<div class="line"><a name="l02157"></a><span class="lineno"> 2157</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02158"></a><span class="lineno"> 2158</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient_0();</div>
+<div class="line"><a name="l02159"></a><span class="lineno"> 2159</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient_1( <span class="keyword">const</span> String&amp; config_);</div>
+<div class="line"><a name="l02160"></a><span class="lineno"> 2160</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a> createStorageClient_unicode( <span class="keyword">const</span> WString&amp; config_);</div>
+<div class="line"><a name="l02161"></a><span class="lineno"> 2161</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02162"></a><span class="lineno"> 2162</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l02166"></a><span class="lineno"> 2166</span>&#160;        <span class="keywordtype">void</span> createStorage( <span class="keyword">const</span> String&amp; config_);</div>
+<div class="line"><a name="l02167"></a><span class="lineno"> 2167</span>&#160;</div>
+<div class="line"><a name="l02168"></a><span class="lineno"> 2168</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02169"></a><span class="lineno"> 2169</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> createStorage_unicode( <span class="keyword">const</span> WString&amp; config_);</div>
+<div class="line"><a name="l02170"></a><span class="lineno"> 2170</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02171"></a><span class="lineno"> 2171</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> destroyStorage( <span class="keyword">const</span> String&amp; config_);</div>
+<div class="line"><a name="l02175"></a><span class="lineno"> 2175</span>&#160;</div>
+<div class="line"><a name="l02176"></a><span class="lineno"> 2176</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02177"></a><span class="lineno"> 2177</span>&#160;<span class="preprocessor"></span>        <span class="keywordtype">void</span> destroyStorage_unicode( <span class="keyword">const</span> WString&amp; config_);</div>
+<div class="line"><a name="l02178"></a><span class="lineno"> 2178</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02179"></a><span class="lineno"> 2179</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentClass.html">DocumentClass</a> detectDocumentClass( <span class="keyword">const</span> String&amp; content);</div>
+<div class="line"><a name="l02183"></a><span class="lineno"> 2183</span>&#160;</div>
+<div class="line"><a name="l02184"></a><span class="lineno"> 2184</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02185"></a><span class="lineno"> 2185</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentClass.html">DocumentClass</a> detectDocumentClass_unicode( <span class="keyword">const</span> WString&amp; content);</div>
+<div class="line"><a name="l02186"></a><span class="lineno"> 2186</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02187"></a><span class="lineno"> 2187</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html">DocumentAnalyzer</a> createDocumentAnalyzer( <span class="keyword">const</span> String&amp; segmentername_=<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a name="l02190"></a><span class="lineno"> 2190</span>&#160;</div>
+<div class="line"><a name="l02191"></a><span class="lineno"> 2191</span>&#160;<span class="preprocessor">#ifdef STRUS_BOOST_PYTHON</span></div>
+<div class="line"><a name="l02192"></a><span class="lineno"> 2192</span>&#160;<span class="preprocessor"></span>        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html">DocumentAnalyzer</a> createDocumentAnalyzer_unicode( <span class="keyword">const</span> WString&amp; segmentername_);</div>
+<div class="line"><a name="l02193"></a><span class="lineno"> 2193</span>&#160;</div>
+<div class="line"><a name="l02194"></a><span class="lineno"> 2194</span>&#160;        <a class="code" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html">DocumentAnalyzer</a> createDocumentAnalyzer_0()</div>
 <div class="line"><a name="l02195"></a><span class="lineno"> 2195</span>&#160;        {</div>
-<div class="line"><a name="l02196"></a><span class="lineno"> 2196</span>&#160;                <span class="keywordflow">return</span> createDocumentAnalyzer( segmentername_);</div>
+<div class="line"><a name="l02196"></a><span class="lineno"> 2196</span>&#160;                <span class="keywordflow">return</span> createDocumentAnalyzer();</div>
 <div class="line"><a name="l02197"></a><span class="lineno"> 2197</span>&#160;        }</div>
-<div class="line"><a name="l02198"></a><span class="lineno"> 2198</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02199"></a><span class="lineno"> 2199</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l02201"></a><span class="lineno"> 2201</span>&#160;        QueryAnalyzer createQueryAnalyzer();</div>
-<div class="line"><a name="l02202"></a><span class="lineno"> 2202</span>&#160;</div>
-<div class="line"><a name="l02204"></a><span class="lineno"> 2204</span>&#160;        QueryEval createQueryEval();</div>
-<div class="line"><a name="l02205"></a><span class="lineno"> 2205</span>&#160;</div>
-<div class="line"><a name="l02207"></a><span class="lineno"> 2207</span>&#160;        <span class="keywordtype">void</span> close();</div>
-<div class="line"><a name="l02208"></a><span class="lineno"> 2208</span>&#160;</div>
-<div class="line"><a name="l02209"></a><span class="lineno"> 2209</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l02210"></a><span class="lineno"> 2210</span>&#160;        <span class="keywordtype">void</span> initStorageObjBuilder();</div>
-<div class="line"><a name="l02211"></a><span class="lineno"> 2211</span>&#160;        <span class="keywordtype">void</span> initAnalyzerObjBuilder();</div>
+<div class="line"><a name="l02198"></a><span class="lineno"> 2198</span>&#160;        DocumentAnalyzer createDocumentAnalyzer_1( <span class="keyword">const</span> String&amp; segmentername_)</div>
+<div class="line"><a name="l02199"></a><span class="lineno"> 2199</span>&#160;        {</div>
+<div class="line"><a name="l02200"></a><span class="lineno"> 2200</span>&#160;                <span class="keywordflow">return</span> createDocumentAnalyzer( segmentername_);</div>
+<div class="line"><a name="l02201"></a><span class="lineno"> 2201</span>&#160;        }</div>
+<div class="line"><a name="l02202"></a><span class="lineno"> 2202</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02203"></a><span class="lineno"> 2203</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l02205"></a><span class="lineno"> 2205</span>&#160;        QueryAnalyzer createQueryAnalyzer();</div>
+<div class="line"><a name="l02206"></a><span class="lineno"> 2206</span>&#160;</div>
+<div class="line"><a name="l02208"></a><span class="lineno"> 2208</span>&#160;        QueryEval createQueryEval();</div>
+<div class="line"><a name="l02209"></a><span class="lineno"> 2209</span>&#160;</div>
+<div class="line"><a name="l02211"></a><span class="lineno"> 2211</span>&#160;        <span class="keywordtype">void</span> close();</div>
 <div class="line"><a name="l02212"></a><span class="lineno"> 2212</span>&#160;</div>
 <div class="line"><a name="l02213"></a><span class="lineno"> 2213</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l02214"></a><span class="lineno"> 2214</span>&#160;        Reference m_errorhnd_impl;</div>
-<div class="line"><a name="l02215"></a><span class="lineno"> 2215</span>&#160;        Reference m_moduleloader_impl;</div>
-<div class="line"><a name="l02216"></a><span class="lineno"> 2216</span>&#160;        Reference m_rpc_impl;</div>
-<div class="line"><a name="l02217"></a><span class="lineno"> 2217</span>&#160;        Reference m_storage_objbuilder_impl;</div>
-<div class="line"><a name="l02218"></a><span class="lineno"> 2218</span>&#160;        Reference m_analyzer_objbuilder_impl;</div>
-<div class="line"><a name="l02219"></a><span class="lineno"> 2219</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">void</span>* m_textproc;</div>
-<div class="line"><a name="l02220"></a><span class="lineno"> 2220</span>&#160;};</div>
-<div class="line"><a name="l02221"></a><span class="lineno"> 2221</span>&#160;</div>
-<div class="line"><a name="l02222"></a><span class="lineno"> 2222</span>&#160;<span class="preprocessor">#ifdef DOXYGEN_LANG</span></div>
-<div class="line"><a name="l02223"></a><span class="lineno"> 2223</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if defined DOXYGEN_JAVA</span></div>
-<div class="line"><a name="l02224"></a><span class="lineno"> 2224</span>&#160;<span class="preprocessor"></span>}}}</div>
-<div class="line"><a name="l02225"></a><span class="lineno"> 2225</span>&#160;<span class="preprocessor">#elif defined DOXYGEN_PYTHON</span></div>
-<div class="line"><a name="l02226"></a><span class="lineno"> 2226</span>&#160;<span class="preprocessor"></span>}</div>
-<div class="line"><a name="l02227"></a><span class="lineno"> 2227</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02228"></a><span class="lineno"> 2228</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02229"></a><span class="lineno"> 2229</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l02230"></a><span class="lineno"> 2230</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l02231"></a><span class="lineno"> 2231</span>&#160;</div>
+<div class="line"><a name="l02214"></a><span class="lineno"> 2214</span>&#160;        <span class="keywordtype">void</span> initStorageObjBuilder();</div>
+<div class="line"><a name="l02215"></a><span class="lineno"> 2215</span>&#160;        <span class="keywordtype">void</span> initAnalyzerObjBuilder();</div>
+<div class="line"><a name="l02216"></a><span class="lineno"> 2216</span>&#160;</div>
+<div class="line"><a name="l02217"></a><span class="lineno"> 2217</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l02218"></a><span class="lineno"> 2218</span>&#160;        Reference m_errorhnd_impl;</div>
+<div class="line"><a name="l02219"></a><span class="lineno"> 2219</span>&#160;        Reference m_moduleloader_impl;</div>
+<div class="line"><a name="l02220"></a><span class="lineno"> 2220</span>&#160;        Reference m_rpc_impl;</div>
+<div class="line"><a name="l02221"></a><span class="lineno"> 2221</span>&#160;        Reference m_storage_objbuilder_impl;</div>
+<div class="line"><a name="l02222"></a><span class="lineno"> 2222</span>&#160;        Reference m_analyzer_objbuilder_impl;</div>
+<div class="line"><a name="l02223"></a><span class="lineno"> 2223</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">void</span>* m_textproc;</div>
+<div class="line"><a name="l02224"></a><span class="lineno"> 2224</span>&#160;};</div>
+<div class="line"><a name="l02225"></a><span class="lineno"> 2225</span>&#160;</div>
+<div class="line"><a name="l02226"></a><span class="lineno"> 2226</span>&#160;<span class="preprocessor">#ifdef DOXYGEN_LANG</span></div>
+<div class="line"><a name="l02227"></a><span class="lineno"> 2227</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#if defined DOXYGEN_JAVA</span></div>
+<div class="line"><a name="l02228"></a><span class="lineno"> 2228</span>&#160;<span class="preprocessor"></span>}}}</div>
+<div class="line"><a name="l02229"></a><span class="lineno"> 2229</span>&#160;<span class="preprocessor">#elif defined DOXYGEN_PYTHON</span></div>
+<div class="line"><a name="l02230"></a><span class="lineno"> 2230</span>&#160;<span class="preprocessor"></span>}</div>
+<div class="line"><a name="l02231"></a><span class="lineno"> 2231</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02232"></a><span class="lineno"> 2232</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02233"></a><span class="lineno"> 2233</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l02234"></a><span class="lineno"> 2234</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l02235"></a><span class="lineno"> 2235</span>&#160;</div>
 <div class="ttc" id="classnet_1_1strus_1_1api_1_1SummaryElement_html_a047215278be34a7ea1f6c2d7412eaffa"><div class="ttname"><a href="classnet_1_1strus_1_1api_1_1SummaryElement.html#a047215278be34a7ea1f6c2d7412eaffa">net::strus::api::SummaryElement::SummaryElement</a></div><div class="ttdeci">SummaryElement(const String &amp;name_, const String &amp;value_, double weight_, int index_)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> bindingObjects.hpp:1535</div></div>
 <div class="ttc" id="classnet_1_1strus_1_1api_1_1SummarizerConfig_html_ad58f3b9fc3099bd4a93c23e695c788b2"><div class="ttname"><a href="classnet_1_1strus_1_1api_1_1SummarizerConfig.html#ad58f3b9fc3099bd4a93c23e695c788b2">net::strus::api::SummarizerConfig::defineParameter</a></div><div class="ttdeci">void defineParameter(const String &amp;name, int value)</div><div class="ttdoc">Define a summarizer parameter. </div><div class="ttdef"><b>Definition:</b> bindingObjects.hpp:1328</div></div>
 <div class="ttc" id="classnet_1_1strus_1_1api_1_1DocumentAnalyzer_html_ad1f0e74e7c7d820907e93ba501878cea"><div class="ttname"><a href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#ad1f0e74e7c7d820907e93ba501878cea">net::strus::api::DocumentAnalyzer::~DocumentAnalyzer</a></div><div class="ttdeci">~DocumentAnalyzer()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> bindingObjects.hpp:686</div></div>
@@ -1861,7 +1863,7 @@
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 31 2016 01:12:05 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Apr 16 2016 16:58:33 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

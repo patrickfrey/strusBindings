@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.7</span>
+   &#160;<span id="projectnumber">0.8</span>
    </div>
   </td>
  </tr>
@@ -78,6 +78,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2d34e4556448e40693f61d15e091b604"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContext.html#a2d34e4556448e40693f61d15e091b604">~Context</a> ()</td></tr>
 <tr class="memdesc:a2d34e4556448e40693f61d15e091b604"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#a2d34e4556448e40693f61d15e091b604">More...</a><br/></td></tr>
 <tr class="separator:a2d34e4556448e40693f61d15e091b604"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a133851922abb5252df167463da9bc3b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContext.html#a133851922abb5252df167463da9bc3b3">checkErrors</a> () const </td></tr>
+<tr class="memdesc:a133851922abb5252df167463da9bc3b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there has an error occurred and throw if yes.  <a href="#a133851922abb5252df167463da9bc3b3">More...</a><br/></td></tr>
+<tr class="separator:a133851922abb5252df167463da9bc3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3591b847c0c4885e8810bac481b3ff00"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classContext.html#a3591b847c0c4885e8810bac481b3ff00">loadModule</a> (const String &amp;name_)</td></tr>
 <tr class="memdesc:a3591b847c0c4885e8810bac481b3ff00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load a module.  <a href="#a3591b847c0c4885e8810bac481b3ff00">More...</a><br/></td></tr>
 <tr class="separator:a3591b847c0c4885e8810bac481b3ff00"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -334,6 +337,24 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Only implemented in local mode with own module loader (see constructors) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a133851922abb5252df167463da9bc3b3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Context::checkErrors </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if there has an error occurred and throw if yes. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>Some bindings have coroutines and with a coroutine switch an error message might get lost, because error context is per thread. So if a coroutine switch is done without the last error fetched it might happen that the second coroutine gets the error of the first one. Call this function after calling some method without return value before a state where a context switch is possible. </dd></dl>
 
 </div>
 </div>
@@ -603,7 +624,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Mar 31 2016 01:12:09 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Apr 16 2016 16:58:36 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
