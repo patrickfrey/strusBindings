@@ -1,3 +1,7 @@
+strusBindings (0.8.2)
+  * fix broken package
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Sun, 24 Apr 2016 21:00:00 +0100
+
 strusBindings (0.8.1)
   * adapt interface changes from strus core
  -- Patrick Frey <patrickpfrey@yahoo.com>  Sun, 24 Apr 2016 20:30:00 +0100

@@ -505,6 +505,9 @@ make test
 %endif
 
 %changelog
+* Sun Apr 24 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.8.2-0.1
+- fix broken package
+
 * Sun Apr 24 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.8.1-0.1
 - adapt interface changes from strus core
 
