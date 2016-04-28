@@ -28,6 +28,6 @@ link_directories(
 
 
 add_library( strus_bindings STATIC ${source_files} )
-target_link_libraries( strus_bindings strus_module strus_rpc_client strus_rpc_client_socket strus_base strus_error )
+target_link_libraries( strus_bindings strus_storage_objbuild strus_module strus_rpc_client strus_rpc_client_socket strus_base strus_error )
 
 
