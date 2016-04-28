@@ -1,3 +1,7 @@
+strusbindings (0.9.0-1) unstable; urgency=low
+  * changes in the object builder interfaces
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Thu, 28 Apr 2016 16:00:00 +0100
+
 strusbindings (0.8.2-1) unstable; urgency=low
   * fix broken package
  -- Patrick Frey <patrickpfrey@yahoo.com>  Sun, 24 Apr 2016 21:00:00 +0100
