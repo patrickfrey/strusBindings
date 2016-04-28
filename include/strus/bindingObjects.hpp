@@ -2136,7 +2136,7 @@ public:
 
 	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	StatisticsProcessor createStatisticsProcessor( const std::string& name);
+	StatisticsProcessor createStatisticsProcessor( const std::string& name="");
 
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);
