@@ -1,3 +1,15 @@
+strusBindings (0.9.0)
+  * changes in the object builder interfaces
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Thu, 28 Apr 2016 16:00:00 +0100
+
+strusBindings (0.8.2)
+  * fix broken package
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Sun, 24 Apr 2016 21:00:00 +0100
+
+strusBindings (0.8.1)
+  * adapt interface changes from strus core
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Sun, 24 Apr 2016 20:30:00 +0100
+
 strusBindings (0.8.0)
   * adapt interface changes from strus core
   * added dependency to strusbase

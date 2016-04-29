@@ -1240,7 +1240,7 @@ private:
 };
 
 
-/// \brief Transation to update a storage with statistics messages
+/// \brief Translation to update a storage with statistics messages
 class StatisticsProcessor
 {
 public:
@@ -1262,7 +1262,7 @@ public:
 
 private:
 	friend class Context;
-	StatisticsProcessor( const Reference& objbuilder_, const Reference& errorhnd_);
+	StatisticsProcessor( const Reference& objbuilder_, const std::string& name_, const Reference& errorhnd_);
 
 private:
 	Reference m_errorhnd_impl;
@@ -2134,14 +2134,9 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
-	/// \brief Define the statistics message processor
-	/// \param[in] name_ the name of the statistics message processor
-	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void defineStatisticsProcessor( const String& name_);
-
 	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	StatisticsProcessor createStatisticsProcessor();
+	StatisticsProcessor createStatisticsProcessor( const std::string& name="");
 
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);

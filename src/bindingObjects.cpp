@@ -19,6 +19,7 @@
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"
 #include "strus/lib/module.hpp"
+#include "strus/lib/storage_objbuild.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/rpcClientInterface.hpp"
 #include "strus/rpcClientMessagingInterface.hpp"
@@ -326,7 +327,8 @@ DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference
 	,m_textproc(textproc_)
 {
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
-	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmentername));
+	const strus::SegmenterInterface* segmenter = objBuilder->getSegmenter( segmentername);
+	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmenter));
 	if (!m_analyzer_impl.get())
 	{
 		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -909,7 +911,8 @@ StorageClient::StorageClient( const Reference& objbuilder, const Reference& erro
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	m_storage_impl.reset( objBuilder->createStorageClient( config_));
+
+	m_storage_impl.reset( strus::createStorageClient( objBuilder, errorhnd, config_));
 	if (!m_storage_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create storage client: %s"), errorhnd->fetchError());
@@ -1109,14 +1112,14 @@ std::string StatisticsIterator::getNext()
 	return std::string( outmsg, outmsgsize);
 }
 
-StatisticsProcessor::StatisticsProcessor( const Reference& objbuilder_, const Reference& errorhnd_)
+StatisticsProcessor::StatisticsProcessor( const Reference& objbuilder_, const std::string& name_, const Reference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_objbuilder_impl(objbuilder_)
 	,m_statsproc(0)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	m_statsproc = objBuilder->getStatisticsProcessor();
+	m_statsproc = objBuilder->getStatisticsProcessor( name_);
 	if (!m_statsproc)
 	{
 		if (errorhnd->hasError())
@@ -1860,19 +1863,10 @@ void Context::addResourcePath( const std::string& paths_)
 	moduleLoader->addResourcePath( paths_);
 }
 
-void Context::defineStatisticsProcessor( const std::string& name_)
-{
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
-	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-	moduleLoader->defineStatisticsProcessor( name_);
-}
-
-StatisticsProcessor Context::createStatisticsProcessor()
+StatisticsProcessor Context::createStatisticsProcessor( const std::string& name)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return StatisticsProcessor( m_storage_objbuilder_impl, m_errorhnd_impl);
+	return StatisticsProcessor( m_storage_objbuilder_impl, name, m_errorhnd_impl);
 }
 
 void Context::initStorageObjBuilder()
