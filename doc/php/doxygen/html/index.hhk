@@ -62,10 +62,9 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a905301c75b5bb103fd1624e8d1420a1b"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a204d190bc923dd7e1a13b5b0fea6ec13"><param name="Name" value="createQueryAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a28ca03d0497780f6f7905fa8ee07d27a"><param name="Name" value="createQueryEval"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ac396db71acdae75ea066595af1ef5643"><param name="Name" value="createStatisticsProcessor"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a93d6103f88d02e91758e082636b6b9bd"><param name="Name" value="createStatisticsProcessor"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06"><param name="Name" value="createStorage"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4fcb68f277db29c450666c31b5701e7c"><param name="Name" value="createStorageClient"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a5c53d85da3178778b16b07b396de6693"><param name="Name" value="defineStatisticsProcessor"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ad26133b438031f93002c4cbf638a591a"><param name="Name" value="destroyStorage"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a0eb938370364cb61bf307c799125787c"><param name="Name" value="detectDocumentClass"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b"><param name="Name" value="DocumentAnalyzer"></OBJECT>
@@ -87,7 +86,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classDocumentAnalyzer.html#abf1fdb91e10903d734e144c6fb84d7f1"><param name="Name" value="DocumentAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6"><param name="Name" value="QueryAnalyzer"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#ac396db71acdae75ea066595af1ef5643"><param name="Name" value="createStatisticsProcessor"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a93d6103f88d02e91758e082636b6b9bd"><param name="Name" value="createStatisticsProcessor"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06"><param name="Name" value="createStorage"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a4fcb68f277db29c450666c31b5701e7c"><param name="Name" value="createStorageClient"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01"><param name="Name" value="createTransaction"></OBJECT>
@@ -110,7 +109,6 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classWeightingConfig.html#ae99b8e08cc2c7f11f782181cea9f5542"><param name="Name" value="WeightingConfig"></OBJECT>
   </UL>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQueryAnalyzer.html#a6418201f50897aa1c90a5f121e8418f0"><param name="Name" value="definePhraseType"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classContext.html#a5c53d85da3178778b16b07b396de6693"><param name="Name" value="defineStatisticsProcessor"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classQuery.html#a021e6aa0428d0263731008678ab9a0b4"><param name="Name" value="defineTermStatistics"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classFunctionVariableConfig.html#a1d16754b285643c81078b2a630d0d665"><param name="Name" value="defineVariable"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classStorageTransaction.html#acb4e693d289916c92ac8acaf3debcb2f"><param name="Name" value="deleteDocument"></OBJECT>

@@ -95,12 +95,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a175e50eb050af265414ea3a1c1eff937"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a175e50eb050af265414ea3a1c1eff937">addResourcePath</a> (const String &amp;paths_)</td></tr>
 <tr class="memdesc:a175e50eb050af265414ea3a1c1eff937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define where to load analyzer resource files from.  <a href="#a175e50eb050af265414ea3a1c1eff937">More...</a><br/></td></tr>
 <tr class="separator:a175e50eb050af265414ea3a1c1eff937"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadcd8cbe69859442019e4b31bea7ae40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#aadcd8cbe69859442019e4b31bea7ae40">defineStatisticsProcessor</a> (const String &amp;name_)</td></tr>
-<tr class="memdesc:aadcd8cbe69859442019e4b31bea7ae40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the statistics message processor.  <a href="#aadcd8cbe69859442019e4b31bea7ae40">More...</a><br/></td></tr>
-<tr class="separator:aadcd8cbe69859442019e4b31bea7ae40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a48d33272ce1458ec6b58282deccc08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a6a48d33272ce1458ec6b58282deccc08">createStatisticsProcessor</a> ()</td></tr>
-<tr class="memdesc:a6a48d33272ce1458ec6b58282deccc08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a statistics message processor instance.  <a href="#a6a48d33272ce1458ec6b58282deccc08">More...</a><br/></td></tr>
-<tr class="separator:a6a48d33272ce1458ec6b58282deccc08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe6df728bf4c2b265bf5554cb76fbd44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#abe6df728bf4c2b265bf5554cb76fbd44">createStatisticsProcessor</a> (const std::string &amp;name=&quot;&quot;)</td></tr>
+<tr class="memdesc:abe6df728bf4c2b265bf5554cb76fbd44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a statistics message processor instance.  <a href="#abe6df728bf4c2b265bf5554cb76fbd44">More...</a><br/></td></tr>
+<tr class="separator:abe6df728bf4c2b265bf5554cb76fbd44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a559d2457ba700583f55dc4570610d883"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883">createStorageClient</a> ()</td></tr>
 <tr class="memdesc:a559d2457ba700583f55dc4570610d883"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a storage client instance of the the default remote storage of the RPC server.  <a href="#a559d2457ba700583f55dc4570610d883">More...</a><br/></td></tr>
 <tr class="separator:a559d2457ba700583f55dc4570610d883"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -438,14 +435,15 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6a48d33272ce1458ec6b58282deccc08"></a>
+<a class="anchor" id="abe6df728bf4c2b265bf5554cb76fbd44"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a> net::strus::api::Context::createStatisticsProcessor </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;&quot;</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -519,31 +517,6 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="aadcd8cbe69859442019e4b31bea7ae40"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void net::strus::api::Context::defineStatisticsProcessor </td>
-          <td>(</td>
-          <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>name_</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Define the statistics message processor. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">name_</td><td>the name of the statistics message processor </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section remark"><dt>Remarks</dt><dd>Only implemented in local mode with own module loader (see constructors) </dd></dl>
 
 </div>
 </div>
@@ -629,7 +602,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Apr 16 2016 16:58:33 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 29 2016 06:00:54 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
