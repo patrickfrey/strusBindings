@@ -604,8 +604,9 @@ foreach $classdef( @classlist)
 		if ($classname eq "Context")
 		{
 			print OUTFILE "bp" . '::class_<Context>("Context",bp::init<>())' . "\n";
-			print OUTFILE "\t" . '.def(bp::init<const std::string&>())' . "\n";
 			print OUTFILE "\t" . '.def(bp::init<const unsigned int>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const unsigned int, const std::string&>())' . "\n";
+			print OUTFILE "\t" . '.def(bp::init<const std::string&>())' . "\n";
 			print OUTFILE "\t" . '.def(bp::init<const std::string&, unsigned int>())' . "\n";
 		}
 		else

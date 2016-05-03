@@ -841,9 +841,10 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
-	DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const String& segmentername, const void* textproc_);
+	DocumentAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const String& segmentername, const void* textproc_);
 
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 	const void* m_textproc;
@@ -892,9 +893,10 @@ private:
 private:
 	/// \brief Constructor used by Context
 	friend class DocumentAnalyzer;
-	explicit DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer, const void* textproc_);
+	explicit DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer, const void* textproc_);
 
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 	std::vector<Document> m_result_queue;
@@ -966,9 +968,10 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
-	QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd);
+	QueryAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd);
 
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 };
@@ -1007,9 +1010,10 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class QueryAnalyzer;
-	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer);
+	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer);
 
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
 	std::vector<Term> m_phrase_queue;
@@ -1064,11 +1068,12 @@ public:
 
 private:
 	friend class Context;
-	StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const String& config);
+	StorageClient( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const String& config);
 
 	friend class Query;
 	friend class QueryEval;
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 };
@@ -1116,11 +1121,12 @@ public:
 
 private:
 	friend class StorageClient;
-	StorageTransaction( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_);
+	StorageTransaction( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const Reference& storage_);
 
 	friend class Query;
 	friend class QueryEval;
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_transaction_impl;
@@ -1230,10 +1236,11 @@ public:
 
 private:
 	friend class StorageClient;
-	StatisticsIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
+	StatisticsIterator( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_);
 
 private:
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_iter_impl;
@@ -1262,10 +1269,11 @@ public:
 
 private:
 	friend class Context;
-	StatisticsProcessor( const Reference& objbuilder_, const std::string& name_, const Reference& errorhnd_);
+	StatisticsProcessor( const Reference& objbuilder_, const Reference& trace_, const std::string& name_, const Reference& errorhnd_);
 
 private:
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	const void* m_statsproc;
 };
@@ -1514,10 +1522,11 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
-	QueryEval( const Reference& objbuilder, const Reference& errorhnd);
+	QueryEval( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd);
 
 	friend class Query;
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_queryeval_impl;
 	const void* m_queryproc;
@@ -1967,11 +1976,12 @@ public:
 
 private:
 	friend class QueryEval;
-	Query( const Reference& objbuilder_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
-		:m_errorhnd_impl(errorhnd_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
+	Query( const Reference& objbuilder_impl_, const Reference& trace_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
 	{}
 
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_queryeval_impl;
@@ -2068,11 +2078,13 @@ private:
 	friend class StorageClient;
 	DocumentBrowser(
 		const Reference& objbuilder_impl_,
+		const Reference& trace_impl_,
 		const Reference& storage_impl_,
 		const Reference& errorhnd_);
 
 private:
 	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_storage_impl;
 	Reference m_restriction_impl;
@@ -2096,16 +2108,20 @@ public:
 	Context();
 	/// \brief Constructor for local mode with own module loader
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
-	explicit Context( unsigned int maxNofThreads, const String& tracecfg="");
+	explicit Context( unsigned int maxNofThreads);
+	/// \brief Constructor for local mode with own module loader and logging of all method call traces
+	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
+	/// \param[in] tracecfg configuration for generating method call traces
+	explicit Context( unsigned int maxNofThreads, const String& tracecfg);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	explicit Context( const std::string& connectionstring, const String& tracecfg="");
+	explicit Context( const std::string& connectionstring);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	Context( const std::string& connectionstring, unsigned int maxNofThreads, const String& tracecfg="");
+	Context( const String& connectionstring, unsigned int maxNofThreads);
 	/// \brief Copy constructor
 	Context( const Context& o);
 	/// \brief Destructor
@@ -2140,7 +2156,7 @@ public:
 
 	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	StatisticsProcessor createStatisticsProcessor( const std::string& name="");
+	StatisticsProcessor createStatisticsProcessor( const std::string& name);
 
 	/// \brief Create a storage client instance of the the default remote storage of the RPC server
 	StorageClient createStorageClient();

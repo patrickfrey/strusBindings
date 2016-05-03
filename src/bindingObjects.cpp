@@ -321,8 +321,9 @@ void Document::setUserAccessRight( const std::string& username_)
 	m_users.push_back( username_);
 }
 
-DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& errorhnd, const std::string& segmentername, const void* textproc_)
+DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const std::string& segmentername, const void* textproc_)
 	:m_errorhnd_impl(errorhnd)
+	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::DocumentAnalyzerInterface>::function)
 	,m_textproc(textproc_)
@@ -339,6 +340,7 @@ DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference
 
 DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 	,m_textproc(o.m_textproc)
@@ -666,11 +668,12 @@ Document DocumentAnalyzer::analyze( const std::string& content, const DocumentCl
 
 DocumentAnalyzeQueue DocumentAnalyzer::createQueue() const
 {
-	return DocumentAnalyzeQueue( m_objbuilder_impl, m_errorhnd_impl, m_analyzer_impl, m_textproc);
+	return DocumentAnalyzeQueue( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_analyzer_impl, m_textproc);
 }
 
 DocumentAnalyzeQueue::DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 	,m_result_queue(o.m_result_queue)
@@ -680,8 +683,9 @@ DocumentAnalyzeQueue::DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o)
 	,m_textproc(o.m_textproc)
 {}
 
-DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer, const void* textproc_)
+DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer, const void* textproc_)
 	:m_errorhnd_impl(errorhnd)
+	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(analyzer)
 	,m_result_queue()
@@ -774,8 +778,9 @@ Document DocumentAnalyzeQueue::fetch()
 	}
 }
 
-QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& errorhnd)
+QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
+	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::QueryAnalyzerInterface>::function)
 {
@@ -790,6 +795,7 @@ QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& erro
 
 QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 
@@ -797,7 +803,7 @@ QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
 
 QueryAnalyzeQueue QueryAnalyzer::createQueue() const
 {
-	return QueryAnalyzeQueue( m_objbuilder_impl, m_errorhnd_impl, m_analyzer_impl);
+	return QueryAnalyzeQueue( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_analyzer_impl);
 }
 
 void QueryAnalyzer::definePhraseType(
@@ -839,6 +845,7 @@ std::vector<Term> QueryAnalyzer::analyzePhrase(
 
 QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
 	,m_phrase_queue(o.m_phrase_queue)
@@ -846,8 +853,9 @@ QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
 	,m_result_queue_idx(o.m_result_queue_idx)
 {}
 
-QueryAnalyzeQueue::QueryAnalyzeQueue( const Reference& objbuilder, const Reference& errorhnd, const Reference& analyzer)
+QueryAnalyzeQueue::QueryAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer)
 	:m_errorhnd_impl(errorhnd)
+	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(analyzer)
 	,m_result_queue_idx(0)
@@ -905,8 +913,9 @@ std::vector<Term> QueryAnalyzeQueue::fetch()
 }
 
 
-StorageClient::StorageClient( const Reference& objbuilder, const Reference& errorhnd_, const std::string& config_)
+StorageClient::StorageClient( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const std::string& config_)
 	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
 	,m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
 {
@@ -922,6 +931,7 @@ StorageClient::StorageClient( const Reference& objbuilder, const Reference& erro
 
 StorageClient::StorageClient( const StorageClient& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 {}
@@ -936,7 +946,7 @@ Index StorageClient::nofDocumentsInserted() const
 StorageTransaction StorageClient::createTransaction() const
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	return StorageTransaction( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
+	return StorageTransaction( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl);
 }
 
 StatisticsIterator StorageClient::createInitStatisticsIterator( bool sign) const
@@ -950,7 +960,7 @@ StatisticsIterator StorageClient::createInitStatisticsIterator( bool sign) const
 		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
-	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+	return StatisticsIterator( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
 StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
@@ -964,13 +974,13 @@ StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
 		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
-	return StatisticsIterator( m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
+	return StatisticsIterator( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
 DocumentBrowser StorageClient::createDocumentBrowser()
 {
 	if (!m_objbuilder_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	return DocumentBrowser( m_objbuilder_impl, m_storage_impl, m_errorhnd_impl);
+	return DocumentBrowser( m_objbuilder_impl, m_trace_impl, m_storage_impl, m_errorhnd_impl);
 }
 
 void StorageClient::close()
@@ -985,8 +995,9 @@ void StorageClient::close()
 	}
 }
 
-StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& errorhnd_, const Reference& storage_)
+StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& trace_, const Reference& errorhnd_, const Reference& storage_)
 	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
 	,m_storage_impl(storage_)
 	,m_transaction_impl(ReferenceDeleter<strus::StorageTransactionInterface>::function)
@@ -1086,12 +1097,14 @@ void StorageTransaction::rollback()
 
 StatisticsIterator::StatisticsIterator( const StatisticsIterator& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_iter_impl(o.m_iter_impl){}
 
-StatisticsIterator::StatisticsIterator( const Reference& objbuilder, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_)
+StatisticsIterator::StatisticsIterator( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_)
 	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_storage_impl(storage_)
 	,m_iter_impl(iter_)
@@ -1113,8 +1126,9 @@ std::string StatisticsIterator::getNext()
 	return std::string( outmsg, outmsgsize);
 }
 
-StatisticsProcessor::StatisticsProcessor( const Reference& objbuilder_, const std::string& name_, const Reference& errorhnd_)
+StatisticsProcessor::StatisticsProcessor( const Reference& objbuilder_, const Reference& trace_, const std::string& name_, const Reference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
 	,m_statsproc(0)
 {
@@ -1179,8 +1193,9 @@ std::string StatisticsProcessor::encode( const StatisticsMessage& msg) const
 }
 
 
-QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
+QueryEval::QueryEval( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
+	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_queryeval_impl(ReferenceDeleter<strus::QueryEvalInterface>::function)
 {
@@ -1201,6 +1216,7 @@ QueryEval::QueryEval( const Reference& objbuilder, const Reference& errorhnd)
 
 QueryEval::QueryEval( const QueryEval& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
 	,m_queryproc(o.m_queryproc)
@@ -1345,7 +1361,7 @@ Query QueryEval::createQuery( const StorageClient& storage) const
 	query.reset( qe->createQuery( st));
 	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
 
-	return Query( m_objbuilder_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query, m_queryproc);
+	return Query( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
 
 
@@ -1410,6 +1426,7 @@ void QueryExpression::add( const QueryExpression& o)
 
 Query::Query( const Query& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_queryeval_impl(o.m_queryeval_impl)
@@ -1630,6 +1647,7 @@ QueryResult Query::evaluate() const
 
 DocumentBrowser::DocumentBrowser( const DocumentBrowser& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_storage_impl(o.m_storage_impl)
 	,m_restriction_impl(o.m_restriction_impl)
@@ -1638,8 +1656,9 @@ DocumentBrowser::DocumentBrowser( const DocumentBrowser& o)
 	,m_docno(o.m_docno)
 {}
 
-DocumentBrowser::DocumentBrowser( const Reference& objbuilder_impl_, const Reference& storage_impl_, const Reference& errorhnd_)
+DocumentBrowser::DocumentBrowser( const Reference& objbuilder_impl_, const Reference& trace_impl_, const Reference& storage_impl_, const Reference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl(trace_impl_)
 	,m_objbuilder_impl(objbuilder_impl_)
 	,m_storage_impl(storage_impl_)
 	,m_restriction_impl( ReferenceDeleter<strus::MetaDataRestrictionInterface>::function)
@@ -1733,6 +1752,26 @@ std::string DocumentBrowser::attribute( const std::string& name)
 }
 
 
+static strus::ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
+{
+	strus::ErrorBufferInterface* errorhnd = strus::createErrorBuffer_standard( 0, maxNofThreads);
+	if (!errorhnd)
+	{
+		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
+	}
+	return errorhnd;
+}
+
+static strus::ModuleLoaderInterface* createModuleLoader_( strus::ErrorBufferInterface* errorhnd)
+{
+	strus::ModuleLoaderInterface* rt = strus::createModuleLoader( errorhnd);
+	if (!rt)
+	{
+		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
+	}
+	return rt;
+}
+
 Context::Context()
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
@@ -1742,17 +1781,25 @@ Context::Context()
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
 {
-	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
-	if (!m_errorhnd_impl.get())
-	{
-		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
-	}
-	m_moduleloader_impl.reset( strus::createModuleLoader( errorhnd));
-	if (!m_moduleloader_impl.get())
-	{
-		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
-	}
+	strus::ErrorBufferInterface* errorhnd = createErrorBuffer_( 0);
+	m_errorhnd_impl.reset( errorhnd);
+	strus::ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
+	m_moduleloader_impl.reset( moduleLoader);
+}
+
+Context::Context( unsigned int maxNofThreads)
+	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
+	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
+	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_trace_impl( ReferenceDeleter<strus::TraceProxy>::function)
+	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
+	,m_textproc(0)
+{
+	strus::ErrorBufferInterface* errorhnd = createErrorBuffer_( maxNofThreads);
+	m_errorhnd_impl.reset( errorhnd);
+	strus::ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
+	m_moduleloader_impl.reset( moduleLoader);
 }
 
 Context::Context( unsigned int maxNofThreads, const std::string& tracecfg)
@@ -1764,25 +1811,17 @@ Context::Context( unsigned int maxNofThreads, const std::string& tracecfg)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
 {
-	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
-	if (!m_errorhnd_impl.get())
-	{
-		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
-	}
-	strus::ModuleLoaderInterface* moduleLoader = strus::createModuleLoader( errorhnd);
+	strus::ErrorBufferInterface* errorhnd = createErrorBuffer_( maxNofThreads);
+	m_errorhnd_impl.reset( errorhnd);
+	strus::ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
 	m_moduleloader_impl.reset( moduleLoader);
-	if (!m_moduleloader_impl.get())
-	{
-		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
-	}
 	if (!tracecfg.empty())
 	{
 		m_trace_impl.reset( new strus::TraceProxy( moduleLoader, tracecfg, errorhnd));
 	}
 }
 
-Context::Context( const std::string& connectionstring, const std::string& tracecfg)
+Context::Context( const std::string& connectionstring)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
@@ -1791,9 +1830,8 @@ Context::Context( const std::string& connectionstring, const std::string& tracec
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
 {
-	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, 0));
-	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
+	strus::ErrorBufferInterface* errorhnd = createErrorBuffer_( 0);
+	m_errorhnd_impl.reset( errorhnd);
 
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
 	messaging.reset( strus::createRpcClientMessaging( connectionstring.c_str(), errorhnd));
@@ -1803,7 +1841,7 @@ Context::Context( const std::string& connectionstring, const std::string& tracec
 	(void)messaging.release();
 }
 
-Context::Context( const std::string& connectionstring, unsigned int maxNofThreads, const std::string& tracecfg)
+Context::Context( const std::string& connectionstring, unsigned int maxNofThreads)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
@@ -1812,9 +1850,8 @@ Context::Context( const std::string& connectionstring, unsigned int maxNofThread
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
 {
-	strus::ErrorBufferInterface* errorhnd;
-	m_errorhnd_impl.reset( errorhnd=strus::createErrorBuffer_standard( 0, maxNofThreads));
-	if (!errorhnd) throw strus::runtime_error(_TXT("failed to create error buffer"));
+	strus::ErrorBufferInterface* errorhnd = createErrorBuffer_( maxNofThreads);
+	m_errorhnd_impl.reset( errorhnd);
 
 	std::auto_ptr<strus::RpcClientMessagingInterface> messaging;
 	messaging.reset( strus::createRpcClientMessaging( connectionstring.c_str(), errorhnd));
@@ -1877,7 +1914,7 @@ void Context::addResourcePath( const std::string& paths_)
 StatisticsProcessor Context::createStatisticsProcessor( const std::string& name)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return StatisticsProcessor( m_storage_objbuilder_impl, name, m_errorhnd_impl);
+	return StatisticsProcessor( m_storage_objbuilder_impl, m_trace_impl, name, m_errorhnd_impl);
 }
 
 void Context::initStorageObjBuilder()
@@ -1983,13 +2020,13 @@ DocumentClass Context::detectDocumentClass( const std::string& content)
 StorageClient Context::createStorageClient( const std::string& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, config_);
+	return StorageClient( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, config_);
 }
 
 StorageClient Context::createStorageClient()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return StorageClient( m_storage_objbuilder_impl, m_errorhnd_impl, std::string());
+	return StorageClient( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, std::string());
 }
 
 DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)
@@ -2005,19 +2042,19 @@ DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmenterna
 			throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 		}
 	}
-	return DocumentAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl, segmentername_, m_textproc);
+	return DocumentAnalyzer( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl, segmentername_, m_textproc);
 }
 
 QueryAnalyzer Context::createQueryAnalyzer()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return QueryAnalyzer( m_analyzer_objbuilder_impl, m_errorhnd_impl);
+	return QueryAnalyzer( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl);
 }
 
 QueryEval Context::createQueryEval()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return QueryEval( m_storage_objbuilder_impl, m_errorhnd_impl);
+	return QueryEval( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl);
 }
 
 void Context::createStorage( const std::string& config_)
