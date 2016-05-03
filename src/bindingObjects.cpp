@@ -38,6 +38,7 @@
 #include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
 #include "utils.hpp"
+#include "private/traceUtils.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
@@ -1736,6 +1737,7 @@ Context::Context()
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_trace_impl( ReferenceDeleter<strus::TraceProxy>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
@@ -1753,10 +1755,11 @@ Context::Context()
 	}
 }
 
-Context::Context( unsigned int maxNofThreads)
+Context::Context( unsigned int maxNofThreads, const std::string& tracecfg)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_trace_impl( ReferenceDeleter<strus::TraceProxy>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
@@ -1767,17 +1770,23 @@ Context::Context( unsigned int maxNofThreads)
 	{
 		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
 	}
-	m_moduleloader_impl.reset( strus::createModuleLoader( errorhnd));
+	strus::ModuleLoaderInterface* moduleLoader = strus::createModuleLoader( errorhnd);
+	m_moduleloader_impl.reset( moduleLoader);
 	if (!m_moduleloader_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
 	}
+	if (!tracecfg.empty())
+	{
+		m_trace_impl.reset( new strus::TraceProxy( moduleLoader, tracecfg, errorhnd));
+	}
 }
 
-Context::Context( const std::string& connectionstring)
+Context::Context( const std::string& connectionstring, const std::string& tracecfg)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_trace_impl( ReferenceDeleter<strus::TraceProxy>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
@@ -1794,10 +1803,11 @@ Context::Context( const std::string& connectionstring)
 	(void)messaging.release();
 }
 
-Context::Context( const std::string& connectionstring, unsigned int maxNofThreads)
+Context::Context( const std::string& connectionstring, unsigned int maxNofThreads, const std::string& tracecfg)
 	:m_errorhnd_impl( ReferenceDeleter<strus::ErrorBufferInterface>::function)
 	,m_moduleloader_impl( ReferenceDeleter<strus::ModuleLoaderInterface>::function)
 	,m_rpc_impl( ReferenceDeleter<strus::RpcClientInterface>::function)
+	,m_trace_impl( ReferenceDeleter<strus::TraceProxy>::function)
 	,m_storage_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_analyzer_objbuilder_impl( ReferenceDeleter<strus::StorageObjectBuilderInterface>::function)
 	,m_textproc(0)
@@ -1818,6 +1828,7 @@ Context::Context( const Context& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_moduleloader_impl(o.m_moduleloader_impl)
 	,m_rpc_impl(o.m_rpc_impl)
+	,m_trace_impl( o.m_trace_impl)
 	,m_storage_objbuilder_impl(o.m_storage_objbuilder_impl)
 	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
 	,m_textproc(o.m_textproc)
@@ -1857,8 +1868,8 @@ void Context::addModulePath( const std::string& paths_)
 void Context::addResourcePath( const std::string& paths_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	moduleLoader->addResourcePath( paths_);
 }
@@ -1871,48 +1882,74 @@ StatisticsProcessor Context::createStatisticsProcessor( const std::string& name)
 
 void Context::initStorageObjBuilder()
 {
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::StorageObjectBuilderInterface* storageObjectBuilder = 0;
 	if (m_rpc_impl.get())
 	{
 		strus::RpcClientInterface* client = (strus::RpcClientInterface*)m_rpc_impl.get();
-		m_storage_objbuilder_impl.reset( client->createStorageObjectBuilder());
+		storageObjectBuilder = client->createStorageObjectBuilder();
 	}
 	else if (m_moduleloader_impl.get())
 	{
 		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_storage_objbuilder_impl.reset( moduleLoader->createStorageObjectBuilder());
+		storageObjectBuilder = moduleLoader->createStorageObjectBuilder();
 	}
 	else
 	{
 		throw strus::runtime_error( _TXT("bad state, no context initialized"));
 	}
-	if (!m_storage_objbuilder_impl.get())
+	if (!storageObjectBuilder)
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 		throw strus::runtime_error(_TXT("failed to create storage object builder: %s"), errorhnd->fetchError());
 	}
+	strus::TraceProxy* tp = (strus::TraceProxy*)m_trace_impl.get();
+	if (tp)
+	{
+		strus::StorageObjectBuilderInterface* storageObjectBuilder_proxy = tp->createProxy( storageObjectBuilder);
+		if (!storageObjectBuilder_proxy)
+		{
+			delete storageObjectBuilder;
+			throw strus::runtime_error(_TXT("failed to create storage object builder trace proxy: %s"), errorhnd->fetchError());
+		}
+		storageObjectBuilder = storageObjectBuilder_proxy;
+	}
+	m_storage_objbuilder_impl.reset( storageObjectBuilder);
 }
 
 void Context::initAnalyzerObjBuilder()
 {
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::AnalyzerObjectBuilderInterface* analyzerObjectBuilder = 0;
 	if (m_rpc_impl.get())
 	{
 		strus::RpcClientInterface* client = (strus::RpcClientInterface*)m_rpc_impl.get();
-		m_analyzer_objbuilder_impl.reset( client->createAnalyzerObjectBuilder());
+		analyzerObjectBuilder = client->createAnalyzerObjectBuilder();
 	}
 	else if (m_moduleloader_impl.get())
 	{
 		strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
-		m_analyzer_objbuilder_impl.reset( moduleLoader->createAnalyzerObjectBuilder());
+		analyzerObjectBuilder = moduleLoader->createAnalyzerObjectBuilder();
 	}
 	else
 	{
 		throw strus::runtime_error( _TXT("bad state, no context initialized"));
 	}
-	if (!m_analyzer_objbuilder_impl.get())
+	if (!analyzerObjectBuilder)
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-		throw strus::runtime_error(_TXT("failed to create analyzer object builder: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to create analyzer object builder: %s"), errorhnd->fetchError());
 	}
+	strus::TraceProxy* tp = (strus::TraceProxy*)m_trace_impl.get();
+	if (tp)
+	{
+		strus::AnalyzerObjectBuilderInterface* analyzerObjectBuilder_proxy = tp->createProxy( analyzerObjectBuilder);
+		if (!analyzerObjectBuilder_proxy)
+		{
+			delete analyzerObjectBuilder;
+			throw strus::runtime_error(_TXT("failed to create storage object builder trace proxy: %s"), errorhnd->fetchError());
+		}
+		analyzerObjectBuilder = analyzerObjectBuilder_proxy;
+	}
+	m_analyzer_objbuilder_impl.reset( analyzerObjectBuilder);
 }
 
 DocumentClass Context::detectDocumentClass( const std::string& content)

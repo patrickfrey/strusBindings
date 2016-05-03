@@ -2096,16 +2096,16 @@ public:
 	Context();
 	/// \brief Constructor for local mode with own module loader
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
-	explicit Context( unsigned int maxNofThreads);
+	explicit Context( unsigned int maxNofThreads, const String& tracecfg="");
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	explicit Context( const std::string& connectionstring);
+	explicit Context( const std::string& connectionstring, const String& tracecfg="");
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	Context( const std::string& connectionstring, unsigned int maxNofThreads);
+	Context( const std::string& connectionstring, unsigned int maxNofThreads, const String& tracecfg="");
 	/// \brief Copy constructor
 	Context( const Context& o);
 	/// \brief Destructor
@@ -2134,13 +2134,13 @@ public:
 	/// \remark Only implemented in local mode with own module loader (see constructors)
 	void addResourcePath( const String& paths_);
 
-	/// \brief Create a statistics message processor instance
-	/// \return the processor
-	StatisticsProcessor createStatisticsProcessor( const std::string& name="");
-
 #ifdef STRUS_BOOST_PYTHON
 	void addResourcePath_unicode( const WString& paths_);
 #endif
+
+	/// \brief Create a statistics message processor instance
+	/// \return the processor
+	StatisticsProcessor createStatisticsProcessor( const std::string& name="");
 
 	/// \brief Create a storage client instance of the the default remote storage of the RPC server
 	StorageClient createStorageClient();
@@ -2213,6 +2213,7 @@ private:
 	Reference m_errorhnd_impl;
 	Reference m_moduleloader_impl;
 	Reference m_rpc_impl;
+	Reference m_trace_impl;
 	Reference m_storage_objbuilder_impl;
 	Reference m_analyzer_objbuilder_impl;
 	const void* m_textproc;
