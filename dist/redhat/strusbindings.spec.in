@@ -508,6 +508,9 @@ make test
 %endif
 
 %changelog
+* Tue Jul 5 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.10.0-0.1
+- increment version number as in other strus projects (dependencies)
+
 * Thu Apr 28 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.9.0-0.1
 - changes in the object builder interfaces
 
