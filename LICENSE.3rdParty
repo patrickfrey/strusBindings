@@ -8,11 +8,12 @@ Table of Contents
     boost
 
 textwolf
---------
-    LGPL
+----------
+   LGPL
+   Copyright (c) 2010 Patrick P. Frey
 
 boost
------
+-------
     http://www.boost.org/LICENSE_1_0.txt
 
 SWIG 3.0 library

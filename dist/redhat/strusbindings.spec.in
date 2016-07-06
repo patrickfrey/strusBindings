@@ -296,16 +296,19 @@ BuildRequires: swig2
 BuildRequires: strusbase-devel >= %{dep_version}
 BuildRequires: strus-devel >= %{dep_version}
 BuildRequires: strusanalyzer-devel >= %{dep_version}
+BuildRequires: strustrace-devel >= %{dep_version}
 BuildRequires: strusmodule-devel >= %{dep_version}
 BuildRequires: strusrpc-devel >= %{dep_version}
 BuildRequires: strusbase >= %{dep_version}
 BuildRequires: strus >= %{dep_version}
 BuildRequires: strusanalyzer >= %{dep_version}
+BuildRequires: strustrace >= %{dep_version}
 BuildRequires: strusmodule >= %{dep_version}
 BuildRequires: strusrpc >= %{dep_version}
 Requires: strusbase >= %{dep_version}
 Requires: strus >= %{dep_version}
 Requires: strusanalyzer >= %{dep_version}
+Requires: strustrace >= %{dep_version}
 Requires: strusmodule >= %{dep_version}
 Requires: strusrpc >= %{dep_version}
 
@@ -505,6 +508,9 @@ make test
 %endif
 
 %changelog
+* Tue Jul 5 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.10.0-0.1
+- increment version number as in other strus projects (dependencies)
+
 * Thu Apr 28 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.9.0-0.1
 - changes in the object builder interfaces
 
