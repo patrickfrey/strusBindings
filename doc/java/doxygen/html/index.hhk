@@ -88,7 +88,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#afbad631861f1855abd31901697fdc284"><param name="Name" value="net::strus::api::DocumentAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a02c8509f7802b1ad2003bcd0927d8ade"><param name="Name" value="net::strus::api::QueryAnalyzer"></OBJECT>
   </UL>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#abe6df728bf4c2b265bf5554cb76fbd44"><param name="Name" value="createStatisticsProcessor"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a4aa0f9d01b9106fa836a9936d24953a0"><param name="Name" value="createStatisticsProcessor"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a7e3cd250043d863a6f599b73be3c6b51"><param name="Name" value="createStorage"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883"><param name="Name" value="createStorageClient"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1StorageClient.html#a0ed953e88baab2793be2b226d697a180"><param name="Name" value="createTransaction"></OBJECT>
@@ -205,7 +205,7 @@
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#aae73ca54c14f4138647486dbe3e2517d"><param name="Name" value="createDocumentAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a6a13032a184055786702b702d18b400b"><param name="Name" value="createQueryAnalyzer"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a4770d9d387ee373716389f0ac6d2f59a"><param name="Name" value="createQueryEval"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#abe6df728bf4c2b265bf5554cb76fbd44"><param name="Name" value="createStatisticsProcessor"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a4aa0f9d01b9106fa836a9936d24953a0"><param name="Name" value="createStatisticsProcessor"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a7e3cd250043d863a6f599b73be3c6b51"><param name="Name" value="createStorage"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883"><param name="Name" value="createStorageClient"></OBJECT>
     <LI><OBJECT type="text/sitemap"><param name="Local" value="classnet_1_1strus_1_1api_1_1Context.html#a5d6660602e01b29bb85c51d3e1e239db"><param name="Name" value="destroyStorage"></OBJECT>
