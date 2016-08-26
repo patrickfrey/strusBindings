@@ -28,6 +28,7 @@ namespace strus {
 #elif (defined STRUS_BOOST_PYTHON)
 typedef boost::python::api::object FunctionObject;
 typedef boost::python::api::object DataBlob;
+typedef boost::python::api::object StringObject;
 typedef std::string String;
 typedef std::wstring WString;
 typedef std::vector<int> IntVector;
@@ -625,7 +626,7 @@ public:
 	/// \param[in] value value of the document attribute
 	void setAttribute( const String& name, const String& value);
 #ifdef STRUS_BOOST_PYTHON
-	void setAttribute_unicode( const String& name, const WString& value);
+	void setAttribute_obj( const String& name, const StringObject& value);
 #endif
 	/// \brief Allow a user to access the document
 	/// \param[in] username name of the user to be allowed to access this document
@@ -828,10 +829,8 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
-	Document analyze_unicode_1( const WString& content);
-	Document analyze_unicode_2( const WString& content, const DocumentClass& dclass);
-	Document analyze_1( const String& content);
-	Document analyze_2( const String& content, const DocumentClass& dclass);
+	Document analyze_obj_1( const StringObject& content);
+	Document analyze_obj_2( const StringObject& content, const DocumentClass& dclass);
 #endif
 
 	/// \brief Creates a queue for multi document analysis
@@ -876,8 +875,8 @@ public:
 	void push( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
-	void push_unicode_1( const WString& content);
-	void push_unicode_2( const WString& content, const DocumentClass& dclass);
+	void push_obj_1( const StringObject& content);
+	void push_obj_2( const StringObject& content, const DocumentClass& dclass);
 #endif
 	/// \brief Checks if there are more results to fetch
 	/// \return true, if yes
@@ -956,9 +955,9 @@ public:
 			const String& phraseContent) const;
 
 #ifdef STRUS_BOOST_PYTHON
-	TermVector analyzePhrase_unicode(
+	TermVector analyzePhrase_obj(
 			const String& phraseType,
-			const WString& phraseContent) const;
+			const StringObject& phraseContent) const;
 #endif
 
 	/// \brief Creates a queue for phrase bulk analysis
@@ -1000,7 +999,7 @@ public:
 			const String& phraseType,
 			const String& phraseContent);
 #ifdef STRUS_BOOST_PYTHON
-	void push_unicode( const String& phraseType, const WString& phraseContent);
+	void push_obj( const String& phraseType, const StringObject& phraseContent);
 #endif
 
 	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
@@ -1102,7 +1101,7 @@ public:
 	/// \remark The document is physically deleted with the call of 'commit()'
 	void deleteDocument( const String& docid);
 #ifdef STRUS_BOOST_PYTHON
-	void deleteDocument_unicode( const WString& docid);
+	void deleteDocument_obj( const StringObject& docid);
 #endif
 
 	/// \brief Prepare the deletion of all document access rights of a user
@@ -1110,7 +1109,7 @@ public:
 	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const String& username);
 #ifdef STRUS_BOOST_PYTHON
-	void deleteUserAccessRights_unicode( const WString& username);
+	void deleteUserAccessRights_obj( const StringObject& username);
 #endif
 
 	/// \brief Commit all insert or delete or user access right change statements of this transaction.
@@ -1511,7 +1510,7 @@ public:
 			const FunctionVariableConfig& defaultParameter);
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFormula_obj(
-			const WString& source,
+			const StringObject& source,
 			const FunctionObject& defaultParameter_);
 #endif
 
@@ -1644,7 +1643,7 @@ public:
 	void pushTerm( const String& type_, const String& value_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void pushTerm_unicode( const String& type_, const WString& value_);
+	void pushTerm_obj( const String& type_, const StringObject& value_);
 #endif
 	/// \brief Add operation "Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack"
 	/// \param[in] opname_ name of the expression operator
@@ -1674,7 +1673,7 @@ public:
 	/// \remark The stack is not changed
 	void attachVariable( const String& name_);
 #ifdef STRUS_BOOST_PYTHON
-	void attachVariable_unicode( const WString& name_);
+	void attachVariable_obj( const StringObject& name_);
 #endif
 
 	/// \brief Appends the operations of 'o' to this
@@ -1733,7 +1732,7 @@ private:
 	};
 	std::size_t allocid( const String& str);
 #ifdef STRUS_BOOST_PYTHON
-	std::size_t allocid( const WString& str);
+	std::size_t allocid_obj( const StringObject& str);
 #endif
 
 private:
@@ -1932,9 +1931,7 @@ public:
 	void defineGlobalStatistics( const GlobalStatistics& stats_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_);
-	void defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& stats_);
-	void defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_);
+	void defineTermStatistics_obj_struct( const String& type_, const StringObject& value_, const FunctionObject& stats_);
 	void defineGlobalStatistics_struct( const FunctionObject& stats_);
 #endif
 
@@ -1959,7 +1956,7 @@ public:
 	void addUserName( const String& username_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addUserName_unicode( const WString& username_);
+	void addUserName_obj( const StringObject& username_);
 #endif
 	/// \brief Assign values to variables of the weighting formula
 	/// \param[in] parameter parameter values
@@ -2142,7 +2139,7 @@ public:
 	void addModulePath( const String& paths_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addModulePath_unicode( const WString& paths_);
+	void addModulePath_obj( const StringObject& paths_);
 #endif
 
 	/// \brief Define where to load analyzer resource files from
@@ -2151,7 +2148,7 @@ public:
 	void addResourcePath( const String& paths_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addResourcePath_unicode( const WString& paths_);
+	void addResourcePath_obj( const StringObject& paths_);
 #endif
 
 	/// \brief Create a statistics message processor instance
@@ -2167,8 +2164,7 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	StorageClient createStorageClient_0();
-	StorageClient createStorageClient_1( const String& config_);
-	StorageClient createStorageClient_unicode( const WString& config_);
+	StorageClient createStorageClient_obj( const StringObject& config_);
 #endif
 
 	/// \brief Create a new storage (physically) described by config
@@ -2177,7 +2173,7 @@ public:
 	void createStorage( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void createStorage_unicode( const WString& config_);
+	void createStorage_obj( const StringObject& config_);
 #endif
 	/// \brief Delete the storage (physically) described by config
 	/// \param[in] config_ storage description
@@ -2185,7 +2181,7 @@ public:
 	void destroyStorage( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void destroyStorage_unicode( const WString& config_);
+	void destroyStorage_obj( const StringObject& config_);
 #endif
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
@@ -2193,23 +2189,16 @@ public:
 	DocumentClass detectDocumentClass( const String& content);
 
 #ifdef STRUS_BOOST_PYTHON
-	DocumentClass detectDocumentClass_unicode( const WString& content);
+	DocumentClass detectDocumentClass_obj( const StringObject& content);
 #endif
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
 	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
 
 #ifdef STRUS_BOOST_PYTHON
-	DocumentAnalyzer createDocumentAnalyzer_unicode( const WString& segmentername_);
+	DocumentAnalyzer createDocumentAnalyzer_obj( const StringObject& segmentername_);
 
-	DocumentAnalyzer createDocumentAnalyzer_0()
-	{
-		return createDocumentAnalyzer();
-	}
-	DocumentAnalyzer createDocumentAnalyzer_1( const String& segmentername_)
-	{
-		return createDocumentAnalyzer( segmentername_);
-	}
+	DocumentAnalyzer createDocumentAnalyzer_0();
 #endif
 
 	/// \brief Create a query analyzer instance

@@ -22,9 +22,11 @@ WString Attribute::ucvalue() const
 	return convert_uft8string_to_wstring( m_value);
 }
 
-void Document::setAttribute_unicode( const String& name, const WString& value)
+void Document::setAttribute_obj( const String& name, const StringObject& value_)
 {
-	setAttribute( name, convert_wstring_to_uft8string( value));
+	std::string value;
+	initString( value, value_.ptr());
+	setAttribute( name, value);
 }
 
 void DocumentAnalyzer::addSearchIndexFeature_4(
@@ -220,34 +222,32 @@ void DocumentAnalyzer::defineAttribute_obj(
 	}
 }
 
-Document DocumentAnalyzer::analyze_unicode_1( const WString& content)
+Document DocumentAnalyzer::analyze_obj_1( const StringObject& value_)
 {
-	return analyze( convert_wstring_to_uft8string( content));
+	std::string value;
+	initString( value, value_.ptr());
+	return analyze( value);
 }
 
-Document DocumentAnalyzer::analyze_unicode_2( const WString& content, const DocumentClass& dclass)
+Document DocumentAnalyzer::analyze_obj_2( const StringObject& value_, const DocumentClass& dclass)
 {
-	return analyze( convert_wstring_to_uft8string( content), dclass);
+	std::string value;
+	initString( value, value_.ptr());
+	return analyze( value, dclass);
 }
 
-Document DocumentAnalyzer::analyze_1( const String& content)
+void DocumentAnalyzeQueue::push_obj_1( const StringObject& value_)
 {
-	return analyze( content);
+	std::string value;
+	initString( value, value_.ptr());
+	return push( value);
 }
 
-Document DocumentAnalyzer::analyze_2( const String& content, const DocumentClass& dclass)
+void DocumentAnalyzeQueue::push_obj_2( const StringObject& value_, const DocumentClass& dclass)
 {
-	return analyze( content, dclass);
-}
-
-void DocumentAnalyzeQueue::push_unicode_1( const WString& content)
-{
-	return push( convert_wstring_to_uft8string( content));
-}
-
-void DocumentAnalyzeQueue::push_unicode_2( const WString& content, const DocumentClass& dclass)
-{
-	return push( convert_wstring_to_uft8string( content), dclass);
+	std::string value;
+	initString( value, value_.ptr());
+	return push( value, dclass);
 }
 
 
@@ -290,26 +290,34 @@ void QueryAnalyzer::definePhraseType_obj(
 	}
 }
 
-TermVector QueryAnalyzer::analyzePhrase_unicode(
+TermVector QueryAnalyzer::analyzePhrase_obj(
 		const String& phraseType,
-		const WString& phraseContent) const
+		const StringObject& phraseContent) const
 {
-	return analyzePhrase( phraseType, convert_wstring_to_uft8string( phraseContent));
+	std::string value;
+	initString( value, phraseContent.ptr());
+	return analyzePhrase( phraseType, value);
 }
 
-void QueryAnalyzeQueue::push_unicode( const String& phraseType, const WString& phraseContent)
+void QueryAnalyzeQueue::push_obj( const String& phraseType, const StringObject& phraseContent)
 {
-	push( phraseType, convert_wstring_to_uft8string( phraseContent));
+	std::string value;
+	initString( value, phraseContent.ptr());
+	push( phraseType, value);
 }
 
-void StorageTransaction::deleteDocument_unicode( const WString& docid)
+void StorageTransaction::deleteDocument_obj( const StringObject& docid)
 {
-	deleteDocument( convert_wstring_to_uft8string( docid));
+	std::string value;
+	initString( value, docid.ptr());
+	deleteDocument( value);
 }
 
-void StorageTransaction::deleteUserAccessRights_unicode( const WString& username)
+void StorageTransaction::deleteUserAccessRights_obj( const StringObject& username)
 {
-	deleteUserAccessRights( convert_wstring_to_uft8string( username));
+	std::string value;
+	initString( value, username.ptr());
+	deleteUserAccessRights( value);
 }
 
 WString SummaryElement::ucvalue() const
@@ -353,43 +361,51 @@ void QueryEval::addWeightingFunction_obj(
 }
 
 void QueryEval::addWeightingFormula_obj(
-	const WString& source,
+	const StringObject& source_,
 	const FunctionObject& config_)
 {
 	boost::python::extract<FunctionVariableConfig> config(config_);
 	if (config.check())
 	{
-		addWeightingFormula( convert_wstring_to_uft8string( source), (const FunctionVariableConfig&)config);
+		std::string source;
+		initString( source, source_.ptr());
+		addWeightingFormula( source, (const FunctionVariableConfig&)config);
 	}
 	else
 	{
 		FunctionVariableConfig config;
 		initFunctionVariableConfig( config, config_.ptr());
-		addWeightingFormula( convert_wstring_to_uft8string( source), config);
+		std::string source;
+		initString( source, source_.ptr());
+		addWeightingFormula( source, config);
 	}
 }
 
-std::size_t QueryExpression::allocid( const WString& str)
+std::size_t QueryExpression::allocid_obj( const StringObject& str)
 {
-	return allocid( convert_wstring_to_uft8string( str));
+	std::string value;
+	initString( value, str.ptr());
+	return allocid( value);
 }
 
-void QueryExpression::pushTerm_unicode( const String& type_, const WString& value_)
+void QueryExpression::pushTerm_obj( const String& type_, const StringObject& value_)
 {
-	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid_obj( value_));
 	m_ops.push_back(op);
 	m_size += 1;
 }
 
-void QueryExpression::attachVariable_unicode( const WString& name_)
+void QueryExpression::attachVariable_obj( const StringObject& name_)
 {
-	StackOp op( StackOp::AttachVariable, allocid( name_));
+	StackOp op( StackOp::AttachVariable, allocid_obj( name_));
 	m_ops.push_back(op);
 }
 
-void Query::addUserName_unicode( const WString& username_)
+void Query::addUserName_obj( const StringObject& username_)
 {
-	addUserName( convert_wstring_to_uft8string( username_));
+	std::string value;
+	initString( value, username_.ptr());
+	addUserName( value);
 }
 
 void Query::defineFeature_expr_2( const String& set_, const FunctionObject& expr_)
@@ -412,29 +428,22 @@ void Query::defineFeature_expr_3( const String& set_, const FunctionObject& expr
 	}
 }
 
-void Query::defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_)
+void Query::defineTermStatistics_obj_struct( const String& type_, const StringObject& value_, const FunctionObject& stats_)
 {
-	defineTermStatistics( type_, convert_wstring_to_uft8string( value_), stats_);
-}
-
-void Query::defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& expr_)
-{
-	boost::python::extract<TermStatistics> expr(expr_);
-	if (expr.check())
+	std::string value;
+	initString( value, value_.ptr());
+ 
+	boost::python::extract<TermStatistics> stats(stats_);
+	if (stats.check())
 	{
-		defineTermStatistics( type_, value_, (const TermStatistics&)expr);
+		defineTermStatistics( type_, value, (const TermStatistics&)stats);
 	}
 	else
 	{
 		TermStatistics stats;
-		initTermStatistics( stats, expr_.ptr());
-		defineTermStatistics( type_, value_, stats);
+		initTermStatistics( stats, stats_.ptr());
+		defineTermStatistics( type_, value, stats);
 	}
-}
-
-void Query::defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_)
-{
-	defineTermStatistics_struct( type_, convert_wstring_to_uft8string( value_), stats_);
 }
 
 void Query::defineGlobalStatistics_struct( const FunctionObject& expr_)
@@ -489,14 +498,11 @@ StorageClient Context::createStorageClient_0()
 	return createStorageClient();
 }
 
-StorageClient Context::createStorageClient_1( const String& config_)
+StorageClient Context::createStorageClient_obj( const StringObject& config_)
 {
-	return createStorageClient( config_);
-}
-
-StorageClient Context::createStorageClient_unicode( const WString& config_)
-{
-	return createStorageClient( convert_wstring_to_uft8string( config_));
+	std::string value;
+	initString( value, config_.ptr());
+	return createStorageClient( value);
 }
 
 WString DocumentFrequencyChange::ucvalue() const
@@ -504,34 +510,51 @@ WString DocumentFrequencyChange::ucvalue() const
 	return convert_uft8string_to_wstring( m_value);
 }
 
-void Context::addModulePath_unicode( const WString& paths_)
+void Context::addModulePath_obj( const StringObject& paths_)
 {
-	addModulePath( convert_wstring_to_uft8string( paths_));
+	std::string value;
+	initString( value, paths_.ptr());
+	addModulePath( value);
 }
 
-void Context::addResourcePath_unicode( const WString& paths_)
+void Context::addResourcePath_obj( const StringObject& paths_)
 {
-	addResourcePath( convert_wstring_to_uft8string( paths_));
+	std::string value;
+	initString( value, paths_.ptr());
+	addResourcePath( value);
 }
 
-void Context::createStorage_unicode( const WString& config_)
+void Context::createStorage_obj( const StringObject& config_)
 {
-	return createStorage( convert_wstring_to_uft8string( config_));
+	std::string value;
+	initString( value, config_.ptr());
+	return createStorage( value);
 }
 
-void Context::destroyStorage_unicode( const WString& config_)
+void Context::destroyStorage_obj( const StringObject& config_)
 {
-	return destroyStorage( convert_wstring_to_uft8string( config_));
+	std::string value;
+	initString( value, config_.ptr());
+	return destroyStorage( value);
 }
 
-DocumentClass Context::detectDocumentClass_unicode( const WString& content)
+DocumentClass Context::detectDocumentClass_obj( const StringObject& content)
 {
-	return detectDocumentClass( convert_wstring_to_uft8string( content));
+	std::string value;
+	initString( value, content.ptr());
+	return detectDocumentClass( value);
 }
 
-DocumentAnalyzer Context::createDocumentAnalyzer_unicode( const WString& segmentername_)
+DocumentAnalyzer Context::createDocumentAnalyzer_obj( const StringObject& segmentername_)
 {
-	return createDocumentAnalyzer( convert_wstring_to_uft8string( segmentername_));
+	std::string value;
+	initString( value, segmentername_.ptr());
+	return createDocumentAnalyzer( value);
+}
+
+DocumentAnalyzer Context::createDocumentAnalyzer_0()
+{
+	return createDocumentAnalyzer();
 }
 
 StatisticsMessage StatisticsProcessor::decode_datablob( const DataBlob& datablob) const
