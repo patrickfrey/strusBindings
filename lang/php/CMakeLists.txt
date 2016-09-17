@@ -3,21 +3,24 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing" )
 
-execute_process( COMMAND  php-config --includes  OUTPUT_VARIABLE  PHP_INCLUDES )
+find_program( PHP_CONFIG_EXECUTABLE NAMES php-config-5.6 php-config5 php-config )
+MESSAGE( "PHP php-config executable: ${PHP_CONFIG_EXECUTABLE}" )
+
+execute_process( COMMAND  ${PHP_CONFIG_EXECUTABLE} --includes  OUTPUT_VARIABLE  PHP_INCLUDES )
 string( REPLACE "-I"  ""  PHP_INCLUDES  ${PHP_INCLUDES}  )
 string( STRIP  ${PHP_INCLUDES}  PHP_INCLUDES )
 string( REPLACE " "  ";"  PHP_INCLUDES  ${PHP_INCLUDES}  )
 MESSAGE( "PHP includes: ${PHP_INCLUDES}" )
 
-execute_process( COMMAND  php-config --ldflags  OUTPUT_VARIABLE PHP_LDFLAGS )
+execute_process( COMMAND  ${PHP_CONFIG_EXECUTABLE} --ldflags  OUTPUT_VARIABLE PHP_LDFLAGS )
 string( STRIP  ${PHP_LDFLAGS}  PHP_LDFLAGS )
 MESSAGE( "PHP linker flags: ${PHP_LDFLAGS}" )
 
-execute_process( COMMAND  php-config --libs OUTPUT_VARIABLE PHP_LIBS )
+execute_process( COMMAND  ${PHP_CONFIG_EXECUTABLE} --libs OUTPUT_VARIABLE PHP_LIBS )
 string( STRIP  ${PHP_LIBS}  PHP_LIBS )  
 MESSAGE( "PHP libraries: ${PHP_LIBS}" )
 
-execute_process( COMMAND  php-config --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process( COMMAND  ${PHP_CONFIG_EXECUTABLE} --extension-dir OUTPUT_VARIABLE  PHP_EXTENSION_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 MESSAGE( STATUS  "PHP module path: ${PHP_EXTENSION_DIR}" )
 include_directories( "${PROJECT_SOURCE_DIR}/include"  "${PROJECT_SOURCE_DIR}/lang/php"  ${PHP_INCLUDES} "${Boost_INCLUDE_DIRS}")
 link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" "${strusrpc_LIBRARY_DIRS}" )
