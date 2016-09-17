@@ -1,0 +1,41 @@
+OpenBSD 6.0
+-----------
+
+Use 'lang/gcc/4.9' from ports (package 'gcc' and 'g++', the base gcc is too old).
+
+Install 'gcc' 'g++' 'cmake', 'gmake', 'boost', 'gettext', 'gettext-tools' and 'leveldb' as
+packages or from the ports collection.
+
+Build strusBindings with:
+
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib \
+        -DCMAKE_CXX_FLAGS=-g -DBOOST_INCLUDEDIR=/usr/local/include \
+        -DCMAKE_CXX_COMPILER=eg++ -DCMAKE_C_COMPILER=egcc \
+	-DCMAKE_MAKE_PROGRAM=/usr/local/bin/gmake .
+gmake
+
+We must use 'gcc' (4.9, same toolchain) as 'boost' and 'leveldb' require features from newer
+gcc's!
+
+Running the tests:
+
+gmake test
+doas gmake install
+
+Python bindings
+---------------
+
+The boost python bindings are part of the 'boost' package.
+
+Java bindings
+-------------
+
+Java on OpenBSD is sort of a nogo, there is no official port
+or package. You can try to build Java on your own though.
+
+Php bindings
+------------
+
+You must install a Php package 'php' package or port
+(5.6.23 is known to work, 7 is known not to be supported by swig).
+You'll also need the 'swig' package or port.
