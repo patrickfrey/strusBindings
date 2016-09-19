@@ -1645,6 +1645,18 @@ QueryResult Query::evaluate() const
 	return QueryResult( rt);
 }
 
+std::string Query::tostring() const
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	std::string rt( THIS->tostring());
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("failed to map query to string: %s"), errorhnd->fetchError());
+	}
+	return rt;
+}
+
 DocumentBrowser::DocumentBrowser( const DocumentBrowser& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_trace_impl(o.m_trace_impl)
