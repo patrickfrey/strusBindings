@@ -258,6 +258,7 @@ bp::class_<Query>("Query")
 	.def("setWeightingVariables", &Query::setWeightingVariables)
 	.def("setWeightingVariables", &Query::setWeightingVariables_obj)
 	.def("evaluate", &Query::evaluate)
+	.def("tostring", &Query::tostring)
 ;
 bp::class_<DocumentBrowser>("DocumentBrowser")
 	.def("addMetaDataRestrictionCondition", &DocumentBrowser::addMetaDataRestrictionCondition_double)
