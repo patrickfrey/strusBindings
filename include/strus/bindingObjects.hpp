@@ -1971,6 +1971,10 @@ public:
 	/// \return the result
 	QueryResult evaluate() const;
 
+	/// \brief Map the contents of the query to a readable string
+	/// \return the string
+	std::string tostring() const;
+
 private:
 	friend class QueryEval;
 	Query( const Reference& objbuilder_impl_, const Reference& trace_impl_, const Reference& errorhnd_, const Reference& storage_impl_, const Reference& queryeval_impl_, const Reference& query_impl_, const void* queryproc_)
