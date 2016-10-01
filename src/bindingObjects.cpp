@@ -362,11 +362,11 @@ static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
 		{}
 		else if (strus::utils::caseInsensitiveEquals( item, "BindPosSucc"))
 		{
-			rt.definePositionBind( strus::DocumentAnalyzerInterface::FeatureOptions::BindSuccessor);
+			rt.definePositionBind( strus::analyzer::BindSuccessor);
 		}
 		else if (strus::utils::caseInsensitiveEquals( item, "BindPosPred"))
 		{
-			rt.definePositionBind( strus::DocumentAnalyzerInterface::FeatureOptions::BindPredecessor);
+			rt.definePositionBind( strus::analyzer::BindPredecessor);
 		}
 		else
 		{
@@ -618,7 +618,7 @@ static Document mapDocument( const strus::analyzer::Document& doc)
 	return rt;
 }
 
-static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const std::string& content, const strus::DocumentClass& dclass, strus::ErrorBufferInterface* errorhnd)
+static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const std::string& content, const strus::analyzer::DocumentClass& dclass, strus::ErrorBufferInterface* errorhnd)
 {
 	strus::analyzer::Document doc = THIS->analyze( content, dclass);
 	return mapDocument( doc);
@@ -628,7 +628,7 @@ Document DocumentAnalyzer::analyze( const std::string& content)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
-	strus::DocumentClass dclass;
+	strus::analyzer::DocumentClass dclass;
 
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
@@ -656,7 +656,7 @@ Document DocumentAnalyzer::analyze( const std::string& content, const DocumentCl
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
-	strus::DocumentClass documentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
+	strus::analyzer::DocumentClass documentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
 
 	Document rt( analyzeDocument( THIS, content, documentClass, errorhnd));
 	if (errorhnd->hasError())
@@ -698,7 +698,7 @@ DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const R
 void DocumentAnalyzeQueue::push( const std::string& content)
 {
 	const strus::TextProcessorInterface* textproc = (const strus::TextProcessorInterface*)m_textproc;
-	strus::DocumentClass dclass;
+	strus::analyzer::DocumentClass dclass;
 	if (!textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
 	{
 		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -741,7 +741,7 @@ void DocumentAnalyzeQueue::analyzeNext()
 
 void DocumentAnalyzeQueue::push( const std::string& content, const DocumentClass& dclass_)
 {
-	strus::DocumentClass dclass( dclass_.mimeType(), dclass_.encoding(), dclass_.scheme());
+	strus::analyzer::DocumentClass dclass( dclass_.mimeType(), dclass_.encoding(), dclass_.scheme());
 	strus::DocumentAnalyzerInterface* analyzer = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	Reference analyzerContext_impl( ReferenceDeleter<strus::DocumentAnalyzerContextInterface>::function);
 	strus::DocumentAnalyzerContextInterface* analyzerContext;
@@ -2017,7 +2017,7 @@ DocumentClass Context::detectDocumentClass( const std::string& content)
 		m_textproc = textproc;
 		if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 	}
-	strus::DocumentClass dclass;
+	strus::analyzer::DocumentClass dclass;
 	if (textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
 	{
 		return DocumentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
