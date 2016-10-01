@@ -508,6 +508,9 @@ make test
 %endif
 
 %changelog
+* Sat Oct 1 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.12.0-0.1
+- adapt interface changes in strus analyzer
+
 * Wed Sep 28 2016 Patrick Frey <patrickpfrey@yahoo.com> 0.11.0-0.1
 - adapt interface changes of strus core
 
