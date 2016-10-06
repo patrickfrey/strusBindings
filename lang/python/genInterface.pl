@@ -639,7 +639,7 @@ foreach $classdef( @classlist)
 	}
 }
 print OUTFILE <<EOF;
-};
+}
 EOF
 close OUTFILE;
 
