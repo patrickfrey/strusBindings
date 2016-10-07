@@ -288,4 +288,4 @@ bp::class_<Context>("Context",bp::init<>())
 	.def("createQueryEval", &Context::createQueryEval)
 	.def("close", &Context::close)
 ;
-};
+}
