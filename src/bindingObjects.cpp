@@ -2071,49 +2071,33 @@ QueryEval Context::createQueryEval()
 
 void Context::createStorage( const std::string& config_)
 {
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	std::string dbname;
+	std::string storagecfg( config_);
+	(void)strus::extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
-	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
+	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
 	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
 	const strus::StorageInterface* sti = objBuilder->getStorage();
 	if (!sti) throw strus::runtime_error( _TXT("failed to get storage: %s"), errorhnd->fetchError());
-
-	std::string dbname;
-	std::string databasecfg( config_);
-	(void)strus::extractStringFromConfigString( dbname, databasecfg, "database", errorhnd);
-	std::string storagecfg( databasecfg);
-
-	strus::removeKeysFromConfigString(
-			databasecfg,
-			sti->getConfigParameters( strus::StorageInterface::CmdCreateClient), errorhnd);
-	//... In database_cfg is now the pure database configuration without the storage settings
-
-	strus::removeKeysFromConfigString(
-			storagecfg,
-			dbi->getConfigParameters( strus::DatabaseInterface::CmdCreateClient), errorhnd);
-	//... In storage_cfg is now the pure storage configuration without the database settings
-	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
-
-	if (!dbi->createDatabase( databasecfg)) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
-
-	std::auto_ptr<strus::DatabaseClientInterface>
-		database( dbi->createClient( databasecfg));
-	if (!database.get()) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
-
-	if (!sti->createStorage( storagecfg, database.get())) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
+	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 }
 
 void Context::destroyStorage( const std::string& config_)
 {
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	std::string dbname;
+	std::string storagecfg( config_);
+	(void)strus::extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
+
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
 	if (!objBuilder) throw strus::runtime_error( _TXT("failed to get object builder: %s"), errorhnd->fetchError());
-	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( config_);
+	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
 	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
-	if (!dbi->destroyDatabase( config_)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
+	if (!dbi->destroyDatabase( storagecfg)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
 }
 
 void Context::close()
