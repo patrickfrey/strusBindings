@@ -885,13 +885,13 @@ std::vector<Term> QueryAnalyzeQueue::fetch()
 		phraseBulk.push_back( strus::QueryAnalyzerInterface::Phrase( pi->type(), pi->value()));
 	}
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
-	std::vector<strus::analyzer::TermVector>
+	std::vector<strus::analyzer::TermArray>
 		results = THIS->analyzePhraseBulk( phraseBulk);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error in query analyze queue fetch: %s"), errorhnd->fetchError());
 	}
-	std::vector<strus::analyzer::TermVector>::const_iterator
+	std::vector<strus::analyzer::TermArray>::const_iterator
 		ri = results.begin(), re = results.end();
 	for (; ri != re; ++ri)
 	{
