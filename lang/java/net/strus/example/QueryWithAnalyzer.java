@@ -102,9 +102,9 @@ public class QueryWithAnalyzer
 		stem_normalizer.set( 1, new Normalizer( "lc"));		//... lowercase
 		stem_normalizer.set( 2, new Normalizer( "convdia", "en"));//... convert diachritical characters
 
-		analyzer.definePhraseType( "queryphrase", "word", word_tokenizer, stem_normalizer);
+		analyzer.addSearchIndexElement( "word", "queryphrase", word_tokenizer, stem_normalizer);
 
-		TermVector terms = analyzer.analyzePhrase( "queryphrase", querystr);
+		TermVector terms = analyzer.analyzeField( "queryphrase", querystr);
 
 		String config = "path=storage";
 		StorageClient storage = ctx.createStorageClient( config);

@@ -42,6 +42,7 @@ typedef std::vector<std::string> StringVector;
 #define NormalizerVector std::vector<Normalizer>
 #endif
 #define TermVector std::vector<Term>
+#define QueryTermVector std::vector<QueryTerm>
 #define RankVector std::vector<Rank>
 #define SummaryElementVector std::vector<SummaryElement>
 #define AttributeVector std::vector<Attribute>
@@ -882,8 +883,8 @@ public:
 	/// \return true, if yes
 	bool hasMore() const;
 
-	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
-	/// \return list of terms (query phrase analyzer result)
+	/// \brief Processes the next field of the queue for fields to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the field type given.
+	/// \return list of terms (query field analyzer result)
 	Document fetch();
 
 private:
@@ -907,10 +908,10 @@ private:
 
 
 /// \brief Forward declaration
-class QueryAnalyzeQueue;
+class QueryAnalyzeContext;
 
 /// \class QueryAnalyzer
-/// \brief Analyzer object representing a set of function for transforming a phrase,
+/// \brief Analyzer object representing a set of function for transforming a field,
 ///	the smallest unit in any query language, to a set of terms that can be used
 ///	to build a query.
 /// \remark The only way to construct a query analyzer instance is to call Context::createQueryAnalyzer()
@@ -926,43 +927,42 @@ public:
 	/// \brief Destructor
 	~QueryAnalyzer(){}
 
-	/// \brief Defines a phrase type by name. Phrases can be passed together with this name
-	///		to the query analyzer to get the terms for building query.
-	/// \param[in] phraseType name of the phrase type defined
-	/// \param[in] featureType feature type name assigned to the features created by this phrase type
-	/// \param[in] tokenizer tokenizer function description to use for the features of this phrase type
-	/// \param[in] normalizers list of normalizer function description to use for the features of this phrase type in the ascending order of appearance
-	void definePhraseType(
-			const String& phraseType,
+	/// \brief Defines a search index element.
+	/// \param[in] featureType element feature type created from this field type
+	/// \param[in] fieldType name of the field type defined
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	void addSearchIndexElement(
 			const String& featureType,
+			const String& fieldType,
 			const Tokenizer& tokenizer,
 			const NormalizerVector& normalizers);
 
 #ifdef STRUS_BOOST_PYTHON
-	void definePhraseType_obj(
-		const String& phrasetype,
-		const String& selectexpr,
-		const FunctionObject& tokenizer_,
-		const FunctionObject& normalizers_);
+	void addSearchIndexElement_obj(
+			const String& featureType,
+			const String& fieldType,
+			const FunctionObject& tokenizer_,
+			const FunctionObject& normalizers_);
 #endif
 
-	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
-	/// \param[in] phraseType name of the phrase type to use for analysis
-	/// \param[in] phraseContent content string of the query phrase to analyze
-	/// \deprecated
-	TermVector analyzePhrase(
-			const String& phraseType,
-			const String& phraseContent) const;
+	/// \brief Tokenizes and normalizes a query field and creates some typed terms out of it according the definition of the field type given.
+	/// \param[in] fieldType name of the field type to use for analysis
+	/// \param[in] fieldContent content string of the query field to analyze
+	/// \note This is a very simplistic method to analyze a query. For multi field queries the object QueryAnalyzeContext is more appropriate
+	TermVector analyzeField(
+			const String& fieldType,
+			const String& fieldContent) const;
 
 #ifdef STRUS_BOOST_PYTHON
-	TermVector analyzePhrase_obj(
-			const String& phraseType,
-			const StringObject& phraseContent) const;
+	TermVector analyzeField_obj(
+			const String& fieldType,
+			const StringObject& fieldContent) const;
 #endif
 
-	/// \brief Creates a queue for phrase bulk analysis
+	/// \brief Creates a context for analyzing a multipart query
 	/// \return the queue
-	QueryAnalyzeQueue createQueue() const;
+	QueryAnalyzeContext createContext() const;
 
 private:
 	/// \brief Constructor used by Context
@@ -976,48 +976,86 @@ private:
 };
 
 
-/// \class QueryAnalyzeQueue
-/// \brief Analyzer object implementing a queue of analyze phrase tasks.
-/// \remark Query analysis with this class reduces network roundtrips when using it as proxy
-class QueryAnalyzeQueue
+/// \class QueryTerm
+/// \brief Query analyzer term with info about the field it originated from.
+class QueryTerm :public Term
+{
+public:
+	/// \brief Constructor
+	QueryTerm( const Index& field_, const String& type_, const String& value_, const Index& position_)
+		:Term(type_,value_,position_),m_field(field_){}
+	/// \brief Copy constructor
+	QueryTerm( const QueryTerm& o)
+		:Term(o),m_field(o.m_field){}
+	/// \brief Default constructor
+	QueryTerm()
+		:Term(),m_field(0){}
+
+	/// \brief Get the term position
+	unsigned int field() const			{return m_field;}
+	/// \brief Get the term type name
+	const String& type() const			{return Term::type();}
+	/// \brief Get the term value
+	const String& value() const			{return Term::value();}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const				{return Term::ucvalue();}
+#endif
+	/// \brief Get the term position
+	unsigned int position() const			{return Term::position();}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const QueryTerm& o) const	{return Term::operator==( o);}
+	bool operator!=( const QueryTerm& o) const	{return Term::operator!=( o);}
+#endif
+
+private:
+	Index m_field;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<QueryTerm> QueryTermVector;
+#endif
+
+
+/// \class QueryAnalyzeContext
+/// \brief Query analyzer context for analysing a multipart query.
+class QueryAnalyzeContext
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
 	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
-	QueryAnalyzeQueue()
-		:m_result_queue_idx(0){}
+	QueryAnalyzeContext(){}
 #endif
 	/// \brief Copy constructor
-	QueryAnalyzeQueue( const QueryAnalyzeQueue& o);
+	QueryAnalyzeContext( const QueryAnalyzeContext& o);
 	/// \brief Destructor
-	~QueryAnalyzeQueue(){}
+	~QueryAnalyzeContext(){}
 
-	/// \brief Push a phrase into the queue for phrases to tokenize and normalize
-	/// \param[in] phraseType name of the phrase type to use for analysis
-	/// \param[in] phraseContent content string of the query phrase to analyze
-	void push(
-			const String& phraseType,
-			const String& phraseContent);
+	/// \brief Define a query field
+	/// \param[in] fieldNo index given to the field by the caller, to identify its results
+	/// \param[in] fieldType name of the field type to use for analysis
+	/// \param[in] fieldContent content string of the query field to analyze
+	void putField(
+			unsigned int fieldNo, 
+			const String& fieldType,
+			const String& fieldContent);
 #ifdef STRUS_BOOST_PYTHON
-	void push_obj( const String& phraseType, const StringObject& phraseContent);
+	void putField_obj( unsigned int fieldNo, const String& fieldType, const StringObject& fieldContent);
 #endif
 
-	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
-	/// \return list of terms (query phrase analyzer result)
-	TermVector fetch();
+	/// \brief Processes the next field of the queue for fields to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the field type given.
+	/// \return list of terms (query field analyzer result)
+	QueryTermVector analyze();
 
 private:
 	/// \brief Constructor used by Context
 	friend class QueryAnalyzer;
-	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer);
+	explicit QueryAnalyzeContext( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer);
 
 	Reference m_errorhnd_impl;
 	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
-	std::vector<Term> m_phrase_queue;
-	std::vector<std::vector<Term> > m_result_queue;
-	std::size_t m_result_queue_idx;
+	Reference m_analyzer_ctx_impl;
 };
 
 /// \brief Forward declaration
@@ -1457,7 +1495,7 @@ public:
 	/// \brief Destructor
 	~QueryEval(){}
 
-	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match phrases summarization)
+	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match fields summarization)
 	/// \param[in] set_ identifier of the term set that is used to address the terms
 	/// \param[in] type_ feature type of the of the term
 	/// \param[in] value_ feature value of the of the term

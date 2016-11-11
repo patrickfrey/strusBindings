@@ -43,8 +43,8 @@ int main( int , const char** )
 
 		// Define query analyzer:
 		QueryAnalyzer queryAnalyzer( ctx.createQueryAnalyzer());
-		queryAnalyzer.definePhraseType(
-			"default", "word", Tokenizer("word"), normalizer_stem);
+		queryAnalyzer.addSearchIndexElement(
+			"word", "default", Tokenizer("word"), normalizer_stem);
 
 		// Create storage:
 		try
@@ -109,7 +109,7 @@ int main( int , const char** )
 
 		// Create a query from a phrase:
 		Query query( queryEval.createQuery( storage));
-		std::vector<Term> queryterms = queryAnalyzer.analyzePhrase( "default", "to school");
+		std::vector<Term> queryterms = queryAnalyzer.analyzeField( "default", "to school");
 		std::vector<Term>::const_iterator qi = queryterms.begin(), qe = queryterms.end();
 		std::size_t qidx = 0;
 		unsigned int maxpos = 0;
