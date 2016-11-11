@@ -13,7 +13,7 @@ try:
 
 	# Define the query analyzer to use:
 	analyzer = ctx.createQueryAnalyzer()
-	analyzer.definePhraseType( "word", "word", "word", (("stem","en"),"lc",("convdia","en")))
+	analyzer.addSearchIndexElement( "word", "word", "word", (("stem","en"),"lc",("convdia","en")))
 
 	# Define the query evaluation scheme:
 	queryEval = ctx.createQueryEval()
@@ -37,7 +37,7 @@ try:
 	query = queryEval.createQuery( storage)
 
 	# First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
-	terms = analyzer.analyzePhrase( "word", queryphrase)
+	terms = analyzer.analyzeField( "word", queryphrase)
 	if len(terms) == 0:
 		raise Exception("query is empty")
 

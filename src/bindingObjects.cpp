@@ -34,6 +34,7 @@
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/scalarFunctionInterface.hpp"
 #include "strus/scalarFunctionParserInterface.hpp"
+#include "strus/queryAnalyzerContextInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -347,10 +348,10 @@ DocumentAnalyzer::DocumentAnalyzer( const DocumentAnalyzer& o)
 {}
 
 
-static strus::DocumentAnalyzerInterface::FeatureOptions getFeatureOptions(
+static strus::analyzer::FeatureOptions getFeatureOptions(
 	const std::string& options)
 {
-	strus::DocumentAnalyzerInterface::FeatureOptions rt;
+	strus::analyzer::FeatureOptions rt;
 	char const* ci = options.c_str();
 	const char* ce = options.c_str() + options.size();
 
@@ -798,17 +799,16 @@ QueryAnalyzer::QueryAnalyzer( const QueryAnalyzer& o)
 	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
-
 {}
 
-QueryAnalyzeQueue QueryAnalyzer::createQueue() const
+QueryAnalyzeContext QueryAnalyzer::createContext() const
 {
-	return QueryAnalyzeQueue( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_analyzer_impl);
+	return QueryAnalyzeContext( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_analyzer_impl);
 }
 
-void QueryAnalyzer::definePhraseType(
-		const std::string& phraseType,
+void QueryAnalyzer::addSearchIndexElement(
 		const std::string& featureType,
+		const std::string& fieldType,
 		const Tokenizer& tokenizer,
 		const std::vector<Normalizer>& normalizers)
 {
@@ -816,100 +816,113 @@ void QueryAnalyzer::definePhraseType(
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
-	THIS->definePhraseType(
-		phraseType, featureType, funcdef.tokenizer.get(), funcdef.normalizers);
+	THIS->addSearchIndexElement(
+		featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
 }
 
-std::vector<Term> QueryAnalyzer::analyzePhrase(
-		const std::string& phraseType,
-		const std::string& phraseContent) const
+std::vector<Term> QueryAnalyzer::analyzeField(
+		const std::string& fieldType,
+		const std::string& fieldContent) const
 {
 	std::vector<Term> rt;
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
-	std::vector<strus::analyzer::Term>
-		terms = THIS->analyzePhrase( phraseType, phraseContent);
-	if (errorhnd->hasError())
+	std::auto_ptr<strus::QueryAnalyzerContextInterface> anactx( THIS->createContext());
+	if (!anactx.get()) throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
+	anactx->putField( 1/*field no*/, fieldType, fieldContent);
+	strus::analyzer::Query qry = anactx->analyze();
+	if (qry.empty() && errorhnd->hasError())
 	{
-		throw strus::runtime_error( _TXT("error in analyze phrase: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("error in analyze query field: %s"), errorhnd->fetchError());
 	}
-	std::vector<strus::analyzer::Term>::const_iterator
-		ti = terms.begin(), te = terms.end();
-	for (; ti != te; ++ti)
+	std::vector<strus::analyzer::Query::Element>::const_iterator
+		ei = qry.elements().begin(), ee = qry.elements().end();
+	for (; ei != ee; ++ei)
 	{
-		rt.push_back( Term( ti->type(), ti->value(), ti->pos()));
+		switch (ei->type())
+		{
+			case strus::analyzer::Query::Element::MetaData:
+			{
+				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
+				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->position()));
+				break;
+			}
+			case strus::analyzer::Query::Element::SearchIndexTerm:
+			{
+				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
+				rt.push_back( Term( term.type(), term.value(), term.pos()));
+				break;
+			}
+		}
 	}
 	return rt;
 }
 
-QueryAnalyzeQueue::QueryAnalyzeQueue( const QueryAnalyzeQueue& o)
+QueryAnalyzeContext::QueryAnalyzeContext( const QueryAnalyzeContext& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_analyzer_impl(o.m_analyzer_impl)
-	,m_phrase_queue(o.m_phrase_queue)
-	,m_result_queue(o.m_result_queue)
-	,m_result_queue_idx(o.m_result_queue_idx)
+	,m_analyzer_ctx_impl(o.m_analyzer_ctx_impl)
 {}
 
-QueryAnalyzeQueue::QueryAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer)
+QueryAnalyzeContext::QueryAnalyzeContext( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(analyzer)
-	,m_result_queue_idx(0)
-{}
-
-
-void QueryAnalyzeQueue::push(
-		const std::string& phraseType,
-		const std::string& phraseContent)
+	,m_analyzer_ctx_impl(ReferenceDeleter<strus::QueryAnalyzerContextInterface>::function)
 {
-	m_phrase_queue.push_back( Term( phraseType, phraseContent, 0));
+	const strus::QueryAnalyzerInterface* qai = (const strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	m_analyzer_ctx_impl.reset( qai->createContext());
+	if (!m_analyzer_ctx_impl.get())
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
+	}
 }
 
-std::vector<Term> QueryAnalyzeQueue::fetch()
+void QueryAnalyzeContext::putField(
+		unsigned int fieldNo, 
+		const std::string& fieldType,
+		const std::string& fieldContent)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	if (m_result_queue_idx < m_result_queue.size())
-	{
-		return m_result_queue[ m_result_queue_idx++];
-	}
-	m_result_queue.clear();
+	strus::QueryAnalyzerContextInterface* anactx = (strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
+	anactx->putField( fieldNo, fieldType, fieldContent);
+}
 
-	std::vector<strus::QueryAnalyzerInterface::Phrase> phraseBulk;
-	std::vector<Term>::const_iterator pi = m_phrase_queue.begin(), pe = m_phrase_queue.end();
-	for (; pi != pe; ++pi)
+std::vector<QueryTerm> QueryAnalyzeContext::analyze()
+{
+	std::vector<QueryTerm> rt;
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::QueryAnalyzerContextInterface* anactx = (const strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
+	strus::analyzer::Query qry = anactx->analyze();
+	if (qry.empty() && errorhnd->hasError())
 	{
-		phraseBulk.push_back( strus::QueryAnalyzerInterface::Phrase( pi->type(), pi->value()));
+		throw strus::runtime_error( _TXT("error in analyze query: %s"), errorhnd->fetchError());
 	}
-	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
-	std::vector<strus::analyzer::TermArray>
-		results = THIS->analyzePhraseBulk( phraseBulk);
-	if (errorhnd->hasError())
+	std::vector<strus::analyzer::Query::Element>::const_iterator
+		ei = qry.elements().begin(), ee = qry.elements().end();
+	for (; ei != ee; ++ei)
 	{
-		throw strus::runtime_error( _TXT("error in query analyze queue fetch: %s"), errorhnd->fetchError());
-	}
-	std::vector<strus::analyzer::TermArray>::const_iterator
-		ri = results.begin(), re = results.end();
-	for (; ri != re; ++ri)
-	{
-		m_result_queue.push_back( std::vector<Term>());
-		std::vector<strus::analyzer::Term>::const_iterator ti = ri->begin(), te = re->end();
-		for (; ti != te; ++ti)
+		switch (ei->type())
 		{
-			m_result_queue.back().push_back( Term( ti->type(), ti->value(), ti->pos()));
+			case strus::analyzer::Query::Element::MetaData:
+			{
+				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
+				rt.push_back( QueryTerm( ei->fieldNo(), md.name(), md.value().tostring().c_str(), ei->position()));
+				break;
+			}
+			case strus::analyzer::Query::Element::SearchIndexTerm:
+			{
+				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
+				rt.push_back( QueryTerm( ei->fieldNo(), term.type(), term.value(), term.pos()));
+				break;
+			}
 		}
 	}
-	if (m_result_queue_idx < m_result_queue.size())
-	{
-		return m_result_queue[ m_result_queue_idx++];
-	}
-	else
-	{
-		throw strus::runtime_error( _TXT("no results to fetch from query analyzer queue"));
-	}
+	return rt;
 }
 
 

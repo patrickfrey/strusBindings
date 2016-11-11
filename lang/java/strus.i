@@ -21,6 +21,9 @@
 %typemap(javapackage) std::vector<Term>  "net.strus.api.TermVector"
 %template(TermVector) std::vector<Term>;
 
+%typemap(javapackage) std::vector<QueryTerm>  "net.strus.api.TermVector"
+%template(QueryTermVector) std::vector<QueryTerm>;
+
 %typemap(javapackage) std::vector<Term>  "net.strus.api.DocumentFrequencyChangeVector"
 %template(DocumentFrequencyChangeVector) std::vector<DocumentFrequencyChange>;
 

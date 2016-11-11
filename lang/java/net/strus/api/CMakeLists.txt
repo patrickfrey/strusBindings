@@ -14,7 +14,7 @@ set( generated_java_source_files
 	MetaDataVector.java
 	Normalizer.java
 	NormalizerVector.java
-	QueryAnalyzeQueue.java
+	QueryAnalyzeContext.java
 	QueryAnalyzer.java
 	QueryEval.java
 	Query.java
@@ -39,6 +39,8 @@ set( generated_java_source_files
 	SummarizerConfig.java
 	Term.java
 	TermVector.java
+	QueryTerm.java
+	QueryTermVector.java
 	Tokenizer.java
 	Variant.java
 	VariantType.java
