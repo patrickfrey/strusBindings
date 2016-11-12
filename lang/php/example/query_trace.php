@@ -13,7 +13,7 @@ try
 
 	# Define the query analyzer to use:
 	$analyzer = $ctx->createQueryAnalyzer();
-	$analyzer->definePhraseType( "word", "word", "word", array( array( "stem","en"),"lc",array( "convdia","en")));
+	$analyzer->addSearchIndexElement( "word", "word", "word", array( array( "stem","en"),"lc",array( "convdia","en")));
 
 	# Define the query evaluation scheme:
 	$queryeval = $ctx->createQueryEval();
@@ -40,7 +40,7 @@ try
 	$query = $queryeval->createQuery( $storage);
 
 	# First we analyze the query phrase to get the terms to find in the form as they are stored in the storage:
-	$terms = $analyzer->analyzePhrase( "word", $queryphrase);
+	$terms = $analyzer->analyzeField( "word", $queryphrase);
 	if (count( $terms) == 0)
 	{
 		throw new Exception("query is empty");

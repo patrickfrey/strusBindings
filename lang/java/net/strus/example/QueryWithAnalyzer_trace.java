@@ -102,10 +102,15 @@ public class QueryWithAnalyzer_trace
 		stem_normalizer.set( 1, new Normalizer( "lc"));		//... lowercase
 		stem_normalizer.set( 2, new Normalizer( "convdia", "en"));//... convert diachritical characters
 
-		analyzer.definePhraseType( "queryphrase", "word", word_tokenizer, stem_normalizer);
-
-		TermVector terms = analyzer.analyzePhrase( "queryphrase", querystr);
-
+		analyzer.addSearchIndexElement( "word", "queryphrase", word_tokenizer, stem_normalizer);
+		QueryAnalyzeContext anactx = analyzer.createContext();
+		anactx.putField( 1, "queryphrase", querystr);
+		QueryTermVector qterms = anactx.analyze();
+		TermVector terms = new TermVector();
+		for (QueryTerm term : qterms) {
+			System.out.println( "GOT " + term.type() + " " + term.value());
+			terms.push_back( new Term( term.type(), term.value(), term.position()));
+		}
 		String config = "path=storage";
 		StorageClient storage = ctx.createStorageClient( config);
 		// Create the query evaluation scheme:

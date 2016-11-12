@@ -251,9 +251,9 @@ void DocumentAnalyzeQueue::push_obj_2( const StringObject& value_, const Documen
 }
 
 
-void QueryAnalyzer::definePhraseType_obj(
-	const String& phrasetype,
-	const String& selectexpr,
+void QueryAnalyzer::addSearchIndexElement_obj(
+	const String& featureType,
+	const String& fieldType,
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
@@ -263,13 +263,13 @@ void QueryAnalyzer::definePhraseType_obj(
 		boost::python::extract<NormalizerVector> normalizers(normalizers_);
 		if (normalizers.check())
 		{
-			definePhraseType( phrasetype, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+			addSearchIndexElement( featureType, fieldType, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
 		}
 		else
 		{
 			NormalizerVector normalizers;
 			initNormalizerList( normalizers, normalizers_.ptr());
-			definePhraseType( phrasetype, selectexpr, (const Tokenizer&)tokenizer, normalizers);
+			addSearchIndexElement( featureType, fieldType, (const Tokenizer&)tokenizer, normalizers);
 		}
 	}
 	else
@@ -279,31 +279,31 @@ void QueryAnalyzer::definePhraseType_obj(
 		boost::python::extract<NormalizerVector> normalizers(normalizers_);
 		if (normalizers.check())
 		{
-			definePhraseType( phrasetype, selectexpr, tokenizer, (const NormalizerVector&)normalizers);
+			addSearchIndexElement( featureType, fieldType, tokenizer, (const NormalizerVector&)normalizers);
 		}
 		else
 		{
 			NormalizerVector normalizers;
 			initNormalizerList( normalizers, normalizers_.ptr());
-			definePhraseType( phrasetype, selectexpr, tokenizer, normalizers);
+			addSearchIndexElement( featureType, fieldType, tokenizer, normalizers);
 		}
 	}
 }
 
-TermVector QueryAnalyzer::analyzePhrase_obj(
-		const String& phraseType,
-		const StringObject& phraseContent) const
+TermVector QueryAnalyzer::analyzeField_obj(
+		const String& fieldType,
+		const StringObject& fieldContent) const
 {
 	std::string value;
-	initString( value, phraseContent.ptr());
-	return analyzePhrase( phraseType, value);
+	initString( value, fieldContent.ptr());
+	return analyzeField( fieldType, value);
 }
 
-void QueryAnalyzeQueue::push_obj( const String& phraseType, const StringObject& phraseContent)
+void QueryAnalyzeContext::putField_obj( unsigned int fieldNo, const String& fieldType, const StringObject& fieldContent)
 {
 	std::string value;
-	initString( value, phraseContent.ptr());
-	push( phraseType, value);
+	initString( value, fieldContent.ptr());
+	putField( fieldNo, fieldType, value);
 }
 
 void StorageTransaction::deleteDocument_obj( const StringObject& docid)
