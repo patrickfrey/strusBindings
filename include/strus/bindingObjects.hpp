@@ -2155,7 +2155,7 @@ public:
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	explicit Context( const std::string& connectionstring);
+	explicit Context( const String& connectionstring);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
