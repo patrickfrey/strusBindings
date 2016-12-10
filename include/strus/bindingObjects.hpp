@@ -952,12 +952,12 @@ public:
 	/// \note This is a very simplistic method to analyze a query. For multi field queries the object QueryAnalyzeContext is more appropriate
 	TermVector analyzeField(
 			const String& fieldType,
-			const String& fieldContent) const;
+			const String& fieldContent);
 
 #ifdef STRUS_BOOST_PYTHON
 	TermVector analyzeField_obj(
 			const String& fieldType,
-			const StringObject& fieldContent) const;
+			const StringObject& fieldContent);
 #endif
 
 	/// \brief Creates a context for analyzing a multipart query
