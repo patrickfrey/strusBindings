@@ -823,7 +823,7 @@ void QueryAnalyzer::addSearchIndexElement(
 
 std::vector<Term> QueryAnalyzer::analyzeField(
 		const std::string& fieldType,
-		const std::string& fieldContent) const
+		const std::string& fieldContent)
 {
 	std::vector<Term> rt;
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -896,7 +896,7 @@ std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 {
 	std::vector<QueryTerm> rt;
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::QueryAnalyzerContextInterface* anactx = (const strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
+	strus::QueryAnalyzerContextInterface* anactx = (strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
 	strus::analyzer::Query qry = anactx->analyze();
 	if (qry.empty() && errorhnd->hasError())
 	{

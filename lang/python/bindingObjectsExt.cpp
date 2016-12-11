@@ -292,7 +292,7 @@ void QueryAnalyzer::addSearchIndexElement_obj(
 
 TermVector QueryAnalyzer::analyzeField_obj(
 		const String& fieldType,
-		const StringObject& fieldContent) const
+		const StringObject& fieldContent)
 {
 	std::string value;
 	initString( value, fieldContent.ptr());
