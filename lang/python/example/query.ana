@@ -1,0 +1,5 @@
+[SearchIndex]
+	word = stem("en"):lc word docfeat;
+	word = stem("en"):lc word selfeat;
+
+
