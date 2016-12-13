@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing -Wno-unused-label -Wno-unused-variable" )
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing -Wno-unused-label -Wno-unused-variable" )
 
-find_program( PHP_CONFIG_EXECUTABLE NAMES php-config-5.6 php-config5 php-config )
+find_program( PHP_CONFIG_EXECUTABLE NAMES php-config-5.6 php-config5 php-config php-config56 )
 MESSAGE( "PHP php-config executable: ${PHP_CONFIG_EXECUTABLE}" )
 
 execute_process( COMMAND  ${PHP_CONFIG_EXECUTABLE} --includes  OUTPUT_VARIABLE  PHP_INCLUDES )

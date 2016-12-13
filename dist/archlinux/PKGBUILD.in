@@ -2,7 +2,7 @@
 # Maintainer: Patrick Frey <patrickpfrey@yahoo.com> 
 
 pkgbase=strusbindings
-pkgname=(strusbindings-php strusbindings-java strusbindings-python2)
+pkgname=(strusbindings-php5 strusbindings-java strusbindings-python2)
 _deppkgver=@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 _mainpkgver=@STRUS_VERSION@
 pkgver=${_mainpkgver}
@@ -12,7 +12,7 @@ license=('MPL2')
 arch=('i686' 'x86_64')
 url="http://project-strus.net"
 depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=${_deppkgver}" "strusanalyzer>=${_deppkgver}" "strusmodule>=${_deppkgver}" "strusrpc>=${_deppkgver}")
-makedepends=('cmake' 'swig' 'php' 'java-environment' 'python2')
+makedepends=('cmake' 'swig' 'php56' 'java-environment' 'python2')
 source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
 build() {
@@ -28,19 +28,19 @@ build() {
   make
 }
 
-package_strusbindings-php() {
+package_strusbindings-php5() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
-  msg "Installing Php bindings.."
+  msg "Installing Php5 bindings.."
   cd lang/php
   make DESTDIR=${pkgdir} install
   cd ../..
   
-  mkdir -p ${pkgdir}/usr/share/php
-  cp lang/php/strus.php ${pkgdir}/usr/share/php/.
+  mkdir -p ${pkgdir}/usr/share/php56
+  cp lang/php/strus.php ${pkgdir}/usr/share/php56/.
   
-  mkdir -p ${pkgdir}/etc/php/conf.d
-  cat > ${pkgdir}/etc/php/conf.d/strus.ini << EOF
+  mkdir -p ${pkgdir}/etc/php56/conf.d
+  cat > ${pkgdir}/etc/php56/conf.d/strus.ini << EOF
 ; Enable strus extensions module
 extension=strus.so
 EOF
