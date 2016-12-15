@@ -9,14 +9,8 @@
 %define with_java 1
 
 %define rhel 0
-%define rhel5 0
 %define rhel6 0
 %define rhel7 0
-%if 0%{?rhel_version} >= 500 && 0%{?rhel_version} <= 599
-%define dist rhel5
-%define rhel 1
-%define rhel5 1
-%endif
 %if 0%{?rhel_version} >= 600 && 0%{?rhel_version} <= 699
 %define dist rhel6
 %define rhel 1
@@ -29,14 +23,8 @@
 %endif
 
 %define centos 0
-%define centos5 0
 %define centos6 0
 %define centos7 0
-%if 0%{?centos_version} >= 500 && 0%{?centos_version} <= 599
-%define dist centos5
-%define centos 1
-%define centos5 1
-%endif
 %if 0%{?centos_version} >= 600 && 0%{?centos_version} <= 699
 %define dist centos6
 %define centos 1
@@ -49,14 +37,8 @@
 %endif
 
 %define scilin 0
-%define scilin5 0
 %define scilin6 0
 %define scilin7 0
-%if 0%{?scilin_version} >= 500 && 0%{?scilin_version} <= 599
-%define dist scilin5
-%define scilin 1
-%define scilin5 1
-%endif
 %if 0%{?scilin_version} >= 600 && 0%{?scilin_version} <= 699
 %define dist scilin6
 %define scilin 1
@@ -83,19 +65,7 @@
 %endif
 
 %define suse 0
-%define osu131 0
-%define osu132 0
 %define osufactory 0
-%if 0%{?suse_version} == 1310
-%define dist osu131
-%define osu131 1
-%define suse 1
-%endif
-%if 0%{?suse_version} == 1320
-%define dist osu132
-%define osu132 1
-%define suse 1
-%endif
 %if 0%{?suse_version} > 1320
 %define dist osufactory
 %define osufactory 1
@@ -122,9 +92,6 @@
 # - license issues (development packages not available)
 # no Php and OpenJDK development packages on OBS for modern Redhat systems
 %if %{rhel}
-%if %{rhel5}
-%define with_java 0
-%endif
 %if %{rhel7}
 %define with_php 0
 %define with_java 0
@@ -133,17 +100,12 @@
 
 # no openjdk anymore for modern distributions?
 %if %{rhel} || %{centos} || %{scilin}
-%if %{rhel7} || %{centos7} || %{scilin7}
+%if %{centos7} || %{scilin7}
 %define with_java 0
 %endif
 %endif
 
 # Python cmake probing fails
-%if %{centos} || %{rhel} || %{scilin}
-%if %{centos5} || %{rhel5} || %{scilin5}
-%define with_python 0
-%endif
-%endif
 # most things on SLES 11 are broken, sorry..
 %if %{sles}
 %if %{sles11}
@@ -233,9 +195,9 @@ BuildRequires: sles-release
 %endif
 
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
-Requires: boost153 >= 1.53.0
-BuildRequires: boost153-devel >= 1.53.0
+%if %{rhel6} || %{centos6} || %{scilin6}
+Requires: strusboost >= 1.53.0
+BuildRequires: strusboost-devel >= 1.53.0
 %else
 Requires: boost >= 1.53.0
 Requires: boost-thread >= 1.53.0
@@ -247,19 +209,10 @@ BuildRequires: boost-devel
 
 %if %{suse} || %{sles}
 %if %{sles11}
-Requires: boost153 >= 1.53.0
-BuildRequires: boost153-devel >= 1.53.0
+Requires: strusboost >= 1.53.0
+BuildRequires: strusboost-devel >= 1.53.0
 %endif
-%if %{osu131}
-Requires: libboost_thread1_53_0 >= 1.53.0
-Requires: libboost_atomic1_53_0 >= 1.53.0
-Requires: libboost_system1_53_0 >= 1.53.0
-Requires: libboost_date_time1_53_0 >= 1.53.0
-BuildRequires: boost-devel
-# for some reason OBS doesn't pull in libboost_atomic1_53_0 automatically!?
-BuildRequires: libboost_atomic1_53_0 >= 1.53.0
-%endif
-%if %{osu132} || %{sles12}
+%if %{sles12}
 Requires: libboost_thread1_54_0 >= 1.54.0
 Requires: libboost_atomic1_54_0 >= 1.54.0
 Requires: libboost_system1_54_0 >= 1.54.0
@@ -267,10 +220,10 @@ Requires: libboost_date_time1_54_0 >= 1.54.0
 BuildRequires: boost-devel
 %endif
 %if %{osufactory}
-Requires: libboost_thread1_61_0 >= 1.61.0
-Requires: libboost_atomic1_61_0 >= 1.61.0
-Requires: libboost_system1_61_0 >= 1.61.0
-Requires: libboost_date_time1_61_0 >= 1.61.0
+Requires: libboost_thread1_62_0 >= 1.62.0
+Requires: libboost_atomic1_62_0 >= 1.62.0
+Requires: libboost_system1_62_0 >= 1.62.0
+Requires: libboost_date_time1_62_0 >= 1.62.0
 BuildRequires: boost-devel
 %endif
 %endif
@@ -280,9 +233,6 @@ BuildRequires: boost-devel
 BuildRequires: swig
 %endif
 %if %{rhel6} || %{centos6} || %{scilin6}
-BuildRequires: swig2
-%endif
-%if %{rhel5} || %{centos5} || %{scilin5}
 BuildRequires: swig2
 %endif
 %endif
@@ -314,7 +264,7 @@ Requires: strusrpc >= %{dep_version}
 
 %if %{with_php}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
+%if %{rhel6} || %{centos6} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
 BuildRequires: php-devel
@@ -329,14 +279,11 @@ BuildRequires: php-devel
 
 %if %{with_java}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel5} || %{centos5} || %{scilin5}
-BuildRequires: java-1.7.0-openjdk-devel
 %if %{rhel6} || %{centos6} || %{scilin6}
 BuildRequires: java-1.8.0-openjdk-devel
+%endif
 %else
 BuildRequires: java-1.8.0-openjdk-devel
-%endif
-%endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: java-1.7.0-openjdk-devel
@@ -366,10 +313,6 @@ Group: Development/Libraries/Java
 Language bindings for the strus text search enginge in Java
 
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel5} || %{centos5} || %{scilin5}
-Requires: java-1.7.0-openjdk
-%endif
-%else
 %if %{rhel6} || %{centos6} || %{scilin6}
 Requires: java-1.8.0-openjdk
 %endif
@@ -389,7 +332,7 @@ Group: Development/Libraries/Php
 Language bindings for the strus text search engine in Php
 
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel5} || %{rhel6} || %{centos5} || %{centos6} || %{scilin5} || %{scilin6}
+%if %{rhel6} || %{centos6} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
 Requires: php
