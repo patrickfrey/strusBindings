@@ -276,6 +276,7 @@ BuildRequires: php-devel
 %if %{suse} || %{sles}
 BuildRequires: php5-devel
 %endif
+%endif
 
 %if %{with_java}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
