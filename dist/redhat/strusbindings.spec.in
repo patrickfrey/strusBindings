@@ -272,18 +272,18 @@ BuildRequires: php-cli
 %else
 BuildRequires: php-devel
 %endif
-%else
-BuildRequires: php-devel
 %endif
+%if %{suse} || %{sles}
+BuildRequires: php5-devel
 %endif
 
 %if %{with_java}
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel6} || %{centos6} || %{scilin6}
 BuildRequires: java-1.8.0-openjdk-devel
-%endif
 %else
 BuildRequires: java-1.8.0-openjdk-devel
+%endif
 %endif
 %if %{suse} || %{sles}
 BuildRequires: java-1.7.0-openjdk-devel
