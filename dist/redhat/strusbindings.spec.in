@@ -106,6 +106,14 @@
 %endif
 
 # Python cmake probing fails
+# Centos 6, Python 2.6 is too old, there is a python27 on EPEL but this requires
+# strusboost to be built against python27 EPEL, currenty disabled
+%if %{rhel} || %{centos} || %{scilin} || %{fedora}
+%if %{rhel6} || %{centos6} || %{scilin6}
+%define with_python 0
+%endif
+%endif
+
 # most things on SLES 11 are broken, sorry..
 %if %{sles}
 %if %{sles11}
@@ -115,6 +123,8 @@
 %define with_python 0
 # ERROR: the files below contain java bytecode for something later than java 1.5 ?
 %define with_java 0
+# Too old:
+%define with_php 0
 %endif
 %endif
 
@@ -437,6 +447,10 @@ make test
 %if %{with_java}
 %files java
 %defattr( -, root, root )
+%if %{suse} || %{sles}
+%dir %{_jnidir}
+%dir %{_jnidir}/strus
+%endif
 # TODO: should not be in libdir but in jni subdir (at
 # least on RHEL
 %{_libdir}/strus/libstrus_java.so
