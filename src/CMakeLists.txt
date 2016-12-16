@@ -12,6 +12,8 @@ set( source_files
 )
 
 include_directories(
+	"${Boost_INCLUDE_DIRS}"
+	"${Intl_INCLUDE_DIRS}"
 	"${PROJECT_SOURCE_DIR}/3rdParty/textwolf/include"
 	"${PROJECT_SOURCE_DIR}/include"
 	"${strusbase_INCLUDE_DIRS}"
@@ -22,6 +24,7 @@ include_directories(
 )
 
 link_directories(
+	"${Boost_LIBRARY_DIRS}"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"
