@@ -1,6 +1,6 @@
 Format: 3.0 (quilt)
 Source: strusbindings
-Version: @STRUS_VERSION@-Debian_8.0
+Version: @STRUS_VERSION@-Debian8.0
 Binary: strusbindings
 Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
 Architecture: any
