@@ -910,6 +910,142 @@ private:
 /// \brief Forward declaration
 class QueryAnalyzeContext;
 
+/// \brief Object representing a pattern match program
+class PatternMatcher
+{
+public:
+	PatternMatcher( const PatternMatcher& o)
+		:m_ops(o.m_ops),m_strings(o.m_strings),m_size(o.m_size){}
+	PatternMatcher()
+		:m_size(0){}
+
+	/// \brief Add operation push term
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
+	void pushTerm( const String& type_, const String& value_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushTerm_obj( const String& type_, const StringObject& value_);
+#endif
+
+	/// \brief Add operation push term
+	/// \param[in] name_ name of the referenced pattern
+	void pushPattern( const String& name_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushPattern_obj( const StringObject& name_);
+#endif
+
+	/// \brief Add operation push expression
+	/// \param[in] opname_ name of the expression operator
+	/// \param[in] argc_ number of operands (topmost elements from stack) of the expression
+	/// \param[in] range_ range number for the expression span in the document
+	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
+	void pushExpression( const String& opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushExpression_2( const String& opname_, unsigned int argc)
+	{
+		pushExpression( opname_, argc, 0, 0);
+	}
+	void pushExpression_3( const String& opname_, unsigned int argc, int range_)
+	{
+		pushExpression( opname_, argc, range_, 0);
+	}
+	void pushExpression_4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
+	{
+		pushExpression( opname_, argc, range_, cardinality_);
+	}
+#endif
+	/// \brief Add operation push pattern
+	/// \param[in] name_ name of the pattern created
+	void definePattern( const String& name_, bool visible);
+#ifdef STRUS_BOOST_PYTHON
+	void definePattern_obj( const StringObject& name_, bool visible);
+#endif
+
+	/// \brief Add operation attach variable
+	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
+	/// \param[in] name_ name of the variable attached
+	/// \remark The stack is not changed
+	void attachVariable( const String& name_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void attachVariable_obj( const StringObject& name_);
+#endif
+
+	/// \brief Appends the operations of 'o' to this
+	/// \param[in] o expression to copy
+	void add( const PatternMatcher& o);
+
+	/// \brief Get the number of items (sub expressions) on the stack as result of this expression
+	/// \return the number of items (sub expressions)
+	std::size_t size() const
+	{
+		return m_size;
+	}
+
+private:
+	friend class Query;
+
+	struct StackOp
+	{
+		enum Type
+		{
+			PushTerm,
+			PushPattern,
+			PushExpression,
+			DefinePattern,
+			AttachVariable
+		};
+		enum ArgIndex
+		{
+			Term_type=0x0,
+			Term_value=0x1,
+			Expression_opname=0x0,
+			Expression_argc=0x1,
+			Expression_range=0x2,
+			Expression_cardinality=0x3,
+			Variable_name=0x0,
+			Pattern_name=0x0,
+			Pattern_visible=0x1
+		};
+		Type type;
+		int arg[4];
+
+		StackOp( Type type_, int arg0_, int arg1_=0, int arg2_=0, int arg3_=0)
+			:type(type_)
+		{
+			arg[0] = arg0_;
+			arg[1] = arg1_;
+			arg[2] = arg2_;
+			arg[3] = arg3_;
+		}
+
+		StackOp()
+			:type(PushTerm)
+		{
+			std::memset( arg, 0, sizeof(arg));
+		}
+		StackOp( const StackOp& o)
+		{
+			std::memcpy( this, &o, sizeof(*this));
+		}
+	};
+
+	std::size_t allocid( const String& str);
+#ifdef STRUS_BOOST_PYTHON
+	std::size_t allocid_obj( const StringObject& str);
+#endif
+
+private:
+	friend class QueryAnalyzer;
+	std::vector<StackOp> m_ops;
+	std::string m_strings;
+	std::size_t m_size;
+};
+
+
 /// \class QueryAnalyzer
 /// \brief Analyzer object representing a set of function for transforming a field,
 ///	the smallest unit in any query language, to a set of terms that can be used
@@ -937,13 +1073,46 @@ public:
 			const String& fieldType,
 			const Tokenizer& tokenizer,
 			const NormalizerVector& normalizers);
-
 #ifdef STRUS_BOOST_PYTHON
 	void addSearchIndexElement_obj(
 			const String& featureType,
 			const String& fieldType,
 			const FunctionObject& tokenizer_,
 			const FunctionObject& normalizers_);
+#endif
+
+	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of query analysis
+	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
+	/// \param[in] fieldtype type of the field of this element in the query
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	void addPatternLexem(
+			const std::string& termtype,
+			const std::string& fieldtype,
+			const Tokenizer& tokenizer,
+			const NormalizerVector& normalizers);
+#ifdef STRUS_BOOST_PYTHON
+	void addPatternLexem_obj(
+			const String& featureType,
+			const String& fieldType,
+			const FunctionObject& tokenizer_,
+			const FunctionObject& normalizers_);
+#endif
+
+	/// \brief Declare a pattern matcher on the query features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] patterns structure with all patterns
+	void definePatternMatcherPostProc(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const PatternMatcher& patterns);
+
+#ifdef STRUS_BOOST_PYTHON
+	void definePatternMatcherPostProc_expr(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const FunctionObject& expr_);
 #endif
 
 	/// \brief Tokenizes and normalizes a query field and creates some typed terms out of it according the definition of the field type given.

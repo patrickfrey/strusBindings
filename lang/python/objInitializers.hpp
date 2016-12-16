@@ -27,5 +27,6 @@ void initTermStatistics( TermStatistics& result, PyObject* obj);
 void initGlobalStatistics( GlobalStatistics& result, PyObject* obj);
 void initDataBlob( std::string& result, PyObject* obj);
 void initIntVectorList( std::vector<int>& result, PyObject* obj);
+void initPatternMatcher( PatternMatcher& matcher, PyObject* obj);
 
 #endif

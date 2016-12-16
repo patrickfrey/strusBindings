@@ -35,6 +35,10 @@
 #include "strus/scalarFunctionInterface.hpp"
 #include "strus/scalarFunctionParserInterface.hpp"
 #include "strus/queryAnalyzerContextInterface.hpp"
+#include "strus/patternMatcherInterface.hpp"
+#include "strus/patternMatcherInstanceInterface.hpp"
+#include "strus/patternTermFeederInterface.hpp"
+#include "strus/patternTermFeederInstanceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -779,6 +783,86 @@ Document DocumentAnalyzeQueue::fetch()
 	}
 }
 
+void PatternMatcher::pushTerm( const std::string& type_, const std::string& value_)
+{
+	StackOp op( StackOp::PushPattern, allocid( type_), allocid( value_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void PatternMatcher::pushPattern( const std::string& name_)
+{
+	StackOp op( StackOp::PushPattern, allocid( name_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void PatternMatcher::pushExpression( const std::string& opname_, unsigned int argc_, int range_, unsigned int cardinality_)
+{
+	if (argc_ > (unsigned int)m_size)
+	{
+		throw strus::runtime_error( _TXT("illegal operation on stack of expression (%u > %u)"), argc_, (unsigned int)m_size);
+	}
+	StackOp op( StackOp::PushExpression, allocid( opname_), argc_, range_, cardinality_);
+	m_ops.push_back( op);
+	m_size -= argc_;
+	m_size += 1;
+}
+
+void PatternMatcher::definePattern( const std::string& name_, bool visible_)
+{
+	StackOp op( StackOp::PushPattern, allocid( name_), visible_?1:0);
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void PatternMatcher::attachVariable( const std::string& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid( name_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void PatternMatcher::add( const PatternMatcher& o)
+{
+	std::size_t strinc = m_strings.size();
+	m_strings.append( o.m_strings);
+	std::vector<StackOp>::const_iterator si = o.m_ops.begin(), se = o.m_ops.end();
+	for (; si != se; ++si)
+	{
+		StackOp op(*si);
+		switch (op.type)
+		{
+			case StackOp::PushTerm:
+				op.arg[ StackOp::Term_type] += strinc;
+				op.arg[ StackOp::Term_value] += strinc;
+				break;
+			case StackOp::PushPattern:
+				op.arg[ StackOp::Pattern_name] += strinc;
+				break;
+			case StackOp::PushExpression:
+				op.arg[ StackOp::Expression_opname] += strinc;
+				break;
+			case StackOp::DefinePattern:
+				op.arg[ StackOp::Pattern_name] += strinc;
+				break;
+			case StackOp::AttachVariable:
+				op.arg[ StackOp::Variable_name] += strinc;
+				break;
+		}
+		m_ops.push_back( op);
+	}
+	m_size += o.m_size;
+}
+
+std::size_t PatternMatcher::allocid( const std::string& str)
+{
+	std::size_t rt = m_strings.size()+1;
+	m_strings.push_back('\0');
+	m_strings.append( str);
+	return rt;
+}
+
 QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
@@ -819,6 +903,156 @@ void QueryAnalyzer::addSearchIndexElement(
 	THIS->addSearchIndexElement(
 		featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
+}
+
+void QueryAnalyzer::addPatternLexem(
+		const std::string& featureType,
+		const std::string& fieldType,
+		const Tokenizer& tokenizer,
+		const std::vector<Normalizer>& normalizers)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+
+	THIS->addPatternLexem( featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
+	funcdef.release();
+}
+
+static strus::PatternMatcherInstanceInterface::JoinOperation patternMatcherJoinOp( const char* opname)
+{
+	if (std::strcmp( opname, "sequence") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpSequence;
+	}
+	else if (std::strcmp( opname, "sequence_imm") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpSequenceImm;
+	}
+	else if (std::strcmp( opname, "sequence_struct") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpSequenceStruct;
+	}
+	else if (std::strcmp( opname, "within") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpWithin;
+	}
+	else if (std::strcmp( opname, "within_struct") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpWithinStruct;
+	}
+	else if (std::strcmp( opname, "any") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpAny;
+	}
+	else if (std::strcmp( opname, "and") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpAnd;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("unknown operator '%s' in pattern expression"), opname);
+	}
+}
+
+void QueryAnalyzer::definePatternMatcherPostProc(
+		const std::string& patternTypeName,
+		const std::string& patternMatcherModule,
+		const PatternMatcher& patterns)
+{
+	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	const strus::PatternMatcherInterface* matcher = textproc->getPatternMatcher( patternMatcherModule);
+	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
+	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance( matcher->createInstance());
+	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance( feeder->createInstance());
+	unsigned int termtypeidcnt = 0;
+	enum {MaxTermTypeId=(1<<24)};
+	unsigned int symbolidcnt = MaxTermTypeId;
+	std::vector<PatternMatcher::StackOp>::const_iterator oi = patterns.m_ops.begin(), oe = patterns.m_ops.end();
+	for (; oi != oe; ++oi)
+	{
+		switch (oi->type)
+		{
+			case PatternMatcher::StackOp::PushTerm:
+			{
+				const char* type_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Term_type];
+				const char* value_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Term_value];
+				if (!value_[0] && type_[0] == '~')
+				{
+					matcherInstance->pushPattern( type_ +1);
+				}
+				else
+				{
+					unsigned int termtypeid = feederInstance->getLexem( type_);
+					if (!termtypeid)
+					{
+						if (++termtypeidcnt >= MaxTermTypeId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
+						feederInstance->defineLexem( termtypeidcnt, type_);
+						if (!value_[0])
+						{
+							matcherInstance->pushTerm( termtypeidcnt);
+						}
+						else
+						{
+							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
+							feederInstance->defineSymbol( termtypeidcnt, symbolidcnt, value_);
+							matcherInstance->pushTerm( symbolidcnt);
+						}
+					}
+					else if (!value_[0])
+					{
+						matcherInstance->pushTerm( termtypeid);
+					}
+					else
+					{
+						unsigned int symbolid = feederInstance->getSymbol( termtypeid, value_);
+						if (!symbolid)
+						{
+							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
+							feederInstance->defineSymbol( termtypeid, symbolidcnt, value_);
+							symbolid = symbolidcnt;
+						}
+						matcherInstance->pushTerm( symbolid);
+					}
+				}
+				break;
+			}
+			case PatternMatcher::StackOp::PushPattern:
+			{
+				const char* name_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Pattern_name];
+				matcherInstance->pushPattern( name_);
+				break;
+			}
+			case PatternMatcher::StackOp::PushExpression:
+			{
+				const char* opname_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Expression_opname];
+				unsigned int argc_ = (unsigned int)oi->arg[ PatternMatcher::StackOp::Expression_argc];
+				int range_ = (int)oi->arg[ PatternMatcher::StackOp::Expression_range];
+				unsigned int cardinality_ = (unsigned int)oi->arg[ PatternMatcher::StackOp::Expression_cardinality];
+				strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( opname_);
+				matcherInstance->pushExpression( joinop, argc_, range_, cardinality_);
+				break;
+			}
+			case PatternMatcher::StackOp::DefinePattern:
+			{
+				const char* name_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Pattern_name];
+				bool visible_ = (int)oi->arg[ PatternMatcher::StackOp::Pattern_visible];
+				matcherInstance->definePattern( name_, visible_);
+				break;
+			}
+			case PatternMatcher::StackOp::AttachVariable:
+			{
+				const char* name_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Variable_name];
+				matcherInstance->attachVariable( name_, 1.0);
+				break;
+			}
+		}
+	}
+	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
+	matcherInstance.release();
+	feederInstance.release();
 }
 
 std::vector<Term> QueryAnalyzer::analyzeField(

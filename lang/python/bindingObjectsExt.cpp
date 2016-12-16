@@ -290,6 +290,24 @@ void QueryAnalyzer::addSearchIndexElement_obj(
 	}
 }
 
+void QueryAnalyzer::definePatternMatcherPostProc_expr(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const FunctionObject& expr_)
+{
+	boost::python::extract<PatternMatcher> expr(expr_);
+	if (expr.check())
+	{
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, (PatternMatcher&)expr);
+	}
+	else
+	{
+		PatternMatcher matcher;
+		initPatternMatcher( matcher, expr_.ptr());
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, matcher);
+	}
+}
+
 TermVector QueryAnalyzer::analyzeField_obj(
 		const String& fieldType,
 		const StringObject& fieldContent)
@@ -395,10 +413,43 @@ void QueryExpression::pushTerm_obj( const String& type_, const StringObject& val
 	m_size += 1;
 }
 
+void PatternMatcher::pushPattern_obj( const StringObject& name_)
+{
+	StackOp op( StackOp::PushPattern, allocid_obj( name_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
 void QueryExpression::attachVariable_obj( const StringObject& name_)
 {
 	StackOp op( StackOp::AttachVariable, allocid_obj( name_));
 	m_ops.push_back(op);
+}
+
+std::size_t PatternMatcher::allocid_obj( const StringObject& str)
+{
+	std::string value;
+	initString( value, str.ptr());
+	return allocid( value);
+}
+
+void PatternMatcher::attachVariable_obj( const StringObject& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid_obj( name_));
+	m_ops.push_back(op);
+}
+
+void PatternMatcher::definePattern_obj( const StringObject& name_, bool visible_)
+{
+	StackOp op( StackOp::PushPattern, allocid_obj( name_), visible_?1:0);
+	m_ops.push_back(op);
+}
+
+void PatternMatcher::pushTerm_obj( const String& type_, const StringObject& value_)
+{
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid_obj( value_));
+	m_ops.push_back(op);
+	m_size += 1;
 }
 
 void Query::addUserName_obj( const StringObject& username_)

@@ -489,11 +489,12 @@ static char* getString( PyObject* item, PyObjectReference& temp_obj)
 	}
 }
 
-void initQueryExpression( QueryExpression& result, PyObject* obj)
+template <class Expression>
+static void initExpressionStructure( Expression& result, PyObject* obj)
 {
 	if (PySequence_Check( obj))
 	{
-		PyObjectReference seq( PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary")));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("expression function object definition expected as sequence of pairs or as dictionary")));
 		if (seq)
 		{
 			enum {
@@ -641,7 +642,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 								}
 							}
 						}
-						initQueryExpression( result, item);
+						initExpressionStructure( result, item);
 						++nof_arguments;
 						break;
 				}
@@ -669,6 +670,12 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 		throw strus::runtime_error( _TXT("query expression object definition expected as sequence of tuples"));
 	}
 }
+
+void initQueryExpression( QueryExpression& result, PyObject* obj)
+{
+	initExpressionStructure( result, obj);
+}
+
 
 void initString( std::string& result, PyObject* obj)
 {
@@ -955,6 +962,44 @@ void initIntVectorList( std::vector<int>& result, PyObject* obj)
 	else
 	{
 		throw strus::runtime_error( "not an integer or list of integer type");
+	}
+}
+
+void initPatternMatcher( PatternMatcher& matcher, PyObject* obj)
+{
+	if (PySequence_Check( obj))
+	{
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("expression function object definition expected as sequence of pairs or as dictionary")));
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii<len; ++ii)
+			{
+				PyObjectReference temp_obj_varname;
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
+				/* DON'T DECREF item here */
+				if (PySequence_Check( item) && 2==PySequence_Size( item))
+				{
+					PyObject* nameitem = PySequence_Fast_GET_ITEM( item, 0);
+					PyObject* patternitem = PySequence_Fast_GET_ITEM( item, 1);
+
+					initExpressionStructure( matcher, patternitem);
+					char* patternname = getString( nameitem, temp_obj_varname);
+					if (patternname[0] == '-')
+					{
+						matcher.definePattern( patternname+1, false);
+					}
+					else
+					{
+						matcher.definePattern( patternname, true);
+					}
+				}
+				else
+				{
+					throw strus::runtime_error( _TXT("patterns must be pairs of pattern name and expression"));
+				}
+			}
+		}
 	}
 }
 
