@@ -1393,6 +1393,13 @@ void QueryExpression::pushTerm( const std::string& type_, const std::string& val
 	m_size += 1;
 }
 
+void QueryExpression::pushDocField( const std::string& metadata_start_, const std::string& metadata_end_)
+{
+	StackOp op( StackOp::PushDocField, allocid( metadata_start_), allocid( metadata_end_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
 void QueryExpression::pushExpression( const std::string& opname_, unsigned int argc_, int range_, unsigned int cardinality_)
 {
 	if (argc_ > (unsigned int)m_size)
@@ -1424,6 +1431,10 @@ void QueryExpression::add( const QueryExpression& o)
 			case StackOp::PushTerm:
 				op.arg[ StackOp::Term_type] += strinc;
 				op.arg[ StackOp::Term_value] += strinc;
+				break;
+			case StackOp::PushDocField:
+				op.arg[ StackOp::Term_metastart] += strinc;
+				op.arg[ StackOp::Term_metaend] += strinc;
 				break;
 			case StackOp::PushExpression:
 				op.arg[ StackOp::Expression_opname] += strinc;
@@ -1468,6 +1479,13 @@ void Query::defineFeature( const std::string& set_, const QueryExpression& expr_
 				THIS->pushTerm( type_, value_);
 				break;
 			}
+			case QueryExpression::StackOp::PushDocField:
+			{
+				const char* start_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_metastart];
+				const char* end_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_metaend];
+				THIS->pushDocField( start_, end_);
+				break;
+			}
 			case QueryExpression::StackOp::PushExpression:
 			{
 				const char* opname_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Expression_opname];
@@ -1490,6 +1508,13 @@ void Query::defineFeature( const std::string& set_, const QueryExpression& expr_
 		}
 	}
 	THIS->defineFeature( set_, weight_);
+}
+
+void Query::defineDocFieldFeature( const std::string& set_, const std::string& metadataStart, const std::string& metadataEnd)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	THIS->pushDocField( metadataStart, metadataEnd);
+	THIS->defineFeature( set_, 1.0);
 }
 
 static strus::MetaDataRestrictionInterface::CompareOperator getCompareOp( const char* compareOp)

@@ -1680,6 +1680,11 @@ public:
 	/// \param[in] value_ query term value
 	void pushTerm( const String& type_, const String& value_);
 
+	/// \brief Add operation "Push a single document field specification on the stack"
+	/// \param[in] metadata_start_ name of meta data element that defines the start of the document field, assumed as 1 if name is empty
+	/// \param[in] metadata_end_ name of meta data element that defines the end of the document field, assumed as max value if name is empty
+	void pushDocField( const String& metadata_start_, const String& metadata_end_);
+
 #ifdef STRUS_BOOST_PYTHON
 	void pushTerm_obj( const String& type_, const StringObject& value_);
 #endif
@@ -1733,6 +1738,7 @@ private:
 		enum Type
 		{
 			PushTerm,
+			PushDocField,
 			PushExpression,
 			AttachVariable
 		};
@@ -1740,6 +1746,8 @@ private:
 		{
 			Term_type=0x0,
 			Term_value=0x1,
+			Term_metastart=0x0,
+			Term_metaend=0x1,
 			Expression_opname=0x0,
 			Expression_argc=0x1,
 			Expression_range=0x2,
@@ -1898,6 +1906,12 @@ public:
 	void defineFeature_expr_2( const String& set_, const FunctionObject& expr_);
 	void defineFeature_expr_3( const String& set_, const FunctionObject& expr_, double weight_);
 #endif
+
+	/// \brief Define a posting iterator describing a document field addressable as feature
+	/// \param[in] set_ name of the feature set, this feature is addressed with
+	/// \param[in] metadataStart name of meta data element that defines the start of the document field, assumed as 1 if name is empty
+	/// \param[in] metadataEnd name of meta data element that defines the end of the document field, assumed as max value if name is empty
+	void defineDocFieldFeature( const String& set_, const String& metadataStart, const String& metadataEnd);
 
 #ifndef DOXYGEN_JAVA
 	/// \brief Define a meta data restriction
