@@ -38,6 +38,7 @@
 %rename(StrusWeightingConfig) WeightingConfig;
 %rename(StrusFunctionVariableConfig) FunctionVariableConfig;
 %rename(StrusQueryExpression) QueryExpression;
+%rename(StrusPatternMatcher) PatternMatcher;
 %rename(StrusQuery) Query;
 %rename(StrusQueryEval) QueryEval;
 %rename(StrusRankAttribute) RankAttribute;
@@ -62,6 +63,7 @@
 %include "strus_scalarfunc.i"
 %include "strus_queryexpr.i"
 %include "strus_queryresult.i"
+%include "strus_patternmatcher.i"
 %include "strus_statistics.i"
 %include "../../include/strus/bindingObjects.hpp"
 

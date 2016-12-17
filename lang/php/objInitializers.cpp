@@ -523,7 +523,8 @@ int initWeightingConfig( WeightingConfig& result, zval* obj)
 	return initQueryEvalFunctionConfig( result, obj);
 }
 
-int initQueryExpression( QueryExpression& result, zval* obj)
+template <class Expression>
+static int initExpressionStructure( Expression& result, zval* obj)
 {
 	int error = 0;
 	switch (obj->type)
@@ -677,7 +678,7 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 				zend_hash_move_forward_ex( hash,&ptr))
 			{
 				++argcnt;
-				error = initQueryExpression( result, *data);
+				error = initExpressionStructure( result, *data);
 				if (error) break;
 			}
 			if (error) break;
@@ -704,6 +705,11 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 			break;
 	}
 	return error;
+}
+
+int initQueryExpression( QueryExpression& result, zval* obj)
+{
+	initExpressionStructure( result, obj);
 }
 
 int initStringVector( std::vector<std::string>& result, zval* obj)
@@ -1083,5 +1089,92 @@ int getQueryResult( zval*& result, const QueryResult& res)
 	add_property_zval( result, "ranks", ranks);
 	return 0;
 }
+
+int initPatternMatcher( PatternMatcher& matcher, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			THROW_EXCEPTION( "unable to convert LONG to pattern matcher");
+			error = -1;
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to pattern matcher");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			THROW_EXCEPTION( "unable to convert DOUBLE to pattern matcher");
+			error = -1;
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to pattern matcher");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P( obj);
+			int argcnt = 0;
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
+			{
+				char *name = 0;
+				unsigned int name_len = 0;// length of string including 0 byte !
+				unsigned long index;
+				if (!zend_hash_get_current_key_ex( hash, &name, &name_len, &index, 0, &ptr) == HASH_KEY_IS_STRING)
+				{
+					THROW_EXCEPTION( "illegal key of sumarizer element (not a string)");
+					error = -1;
+					break;
+				}
+				if (0!=initExpressionStructure( matcher, *data))
+				{
+					error = -1;
+					break;
+				}
+				try
+				{
+					if (name[0] == '-')
+					{
+						std::string ptname( name+1, name_len-1);
+						matcher.definePattern( ptname.c_str(), false);
+					}
+					else
+					{
+						std::string ptname( name, name_len);
+						matcher.definePattern( ptname.c_str(), true);
+					}
+				}
+				catch (const std::bad_alloc&)
+				{
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to pattern matcher");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to pattern matcher");
+			error = -1;
+			break;
+		default:
+			THROW_EXCEPTION( "unable to convert unknown type to pattern matcher");
+			error = -1;
+			break;
+	}
+	return 0;
+}
+
 
 
