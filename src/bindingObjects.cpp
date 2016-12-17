@@ -441,6 +441,20 @@ struct FeatureFuncDef
 		tokenizer = getTokenizer( tokenizer_, textproc, errorhnd);
 	}
 
+	FeatureFuncDef( const Reference& objbuilder_impl,
+			const std::vector<Normalizer>& normalizers_,
+			strus::ErrorBufferInterface* errorhnd)
+	{
+		const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)objbuilder_impl.get();
+		const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+		if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor object: %s"), errorhnd->fetchError());
+
+		normalizers_ref = getNormalizers( normalizers_, textproc, errorhnd);
+		std::vector<strus::Reference<strus::NormalizerFunctionInstanceInterface> >::iterator
+			ni = normalizers_ref.begin(), ne = normalizers_ref.end();
+		for (; ni != ne; ++ni) normalizers.push_back( ni->get());
+	}
+
 	void release()
 	{
 		(void)tokenizer.release();
@@ -902,6 +916,19 @@ void QueryAnalyzer::addSearchIndexElement(
 
 	THIS->addSearchIndexElement(
 		featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
+	funcdef.release();
+}
+
+void QueryAnalyzer::addSearchIndexElementFromPatternMatch(
+		const std::string& type,
+		const std::string& patternTypeName,
+		const std::vector<Normalizer>& normalizers)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
+
+	THIS->addSearchIndexElementFromPatternMatch( type, patternTypeName, funcdef.normalizers);
 	funcdef.release();
 }
 

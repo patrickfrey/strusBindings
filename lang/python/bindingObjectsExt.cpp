@@ -290,6 +290,24 @@ void QueryAnalyzer::addSearchIndexElement_obj(
 	}
 }
 
+void QueryAnalyzer::addSearchIndexElementFromPatternMatch_obj(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_)
+{
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		addSearchIndexElementFromPatternMatch( type, patternTypeName, (const NormalizerVector&)normalizers);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		addSearchIndexElementFromPatternMatch( type, patternTypeName, normalizers);
+	}
+}
+
 void QueryAnalyzer::addPatternLexem_obj(
 		const String& featureType,
 		const String& fieldType,

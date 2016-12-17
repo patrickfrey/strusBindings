@@ -1080,6 +1080,21 @@ public:
 			const FunctionObject& tokenizer_,
 			const FunctionObject& normalizers_);
 #endif
+	/// \brief Defines a search index element from a pattern matching result.
+	/// \param[in] type element type created from this pattern match result type
+	/// \param[in] patternTypeName name of the pattern match result item
+	/// \param[in] normalizers list of normalizer functions
+	void addSearchIndexElementFromPatternMatch(
+			const std::string& type,
+			const std::string& patternTypeName,
+			const NormalizerVector& normalizers);
+
+#ifdef STRUS_BOOST_PYTHON
+	void addSearchIndexElementFromPatternMatch_obj(
+			const String& type,
+			const String& patternTypeName,
+			const FunctionObject& normalizers_);
+#endif
 
 	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of query analysis
 	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
