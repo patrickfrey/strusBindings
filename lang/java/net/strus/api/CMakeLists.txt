@@ -16,6 +16,7 @@ set( generated_java_source_files
 	NormalizerVector.java
 	QueryAnalyzeContext.java
 	QueryAnalyzer.java
+	PatternMatcher.java
 	QueryEval.java
 	Query.java
 	QueryExpression.java

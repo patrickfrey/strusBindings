@@ -290,6 +290,45 @@ void QueryAnalyzer::addSearchIndexElement_obj(
 	}
 }
 
+void QueryAnalyzer::addPatternLexem_obj(
+		const String& featureType,
+		const String& fieldType,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_)
+{
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addPatternLexem( featureType, fieldType, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addPatternLexem( featureType, fieldType, (const Tokenizer&)tokenizer, normalizers);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addPatternLexem( featureType, fieldType, tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addPatternLexem( featureType, fieldType, tokenizer, normalizers);
+		}
+	}
+}
+
 void QueryAnalyzer::definePatternMatcherPostProc_expr(
 		const String& patternTypeName,
 		const String& patternMatcherModule,
