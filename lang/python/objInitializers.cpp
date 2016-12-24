@@ -983,8 +983,8 @@ void initPatternMatcher( PatternMatcher& matcher, PyObject* obj)
 					PyObject* nameitem = PySequence_Fast_GET_ITEM( item, 0);
 					PyObject* patternitem = PySequence_Fast_GET_ITEM( item, 1);
 
-					initExpressionStructure( matcher, patternitem);
 					char* patternname = getString( nameitem, temp_obj_varname);
+					initExpressionStructure( matcher, patternitem);
 					if (patternname[0] == '-')
 					{
 						matcher.definePattern( patternname+1, false);

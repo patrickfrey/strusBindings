@@ -709,7 +709,7 @@ static int initExpressionStructure( Expression& result, zval* obj)
 
 int initQueryExpression( QueryExpression& result, zval* obj)
 {
-	initExpressionStructure( result, obj);
+	return initExpressionStructure( result, obj);
 }
 
 int initStringVector( std::vector<std::string>& result, zval* obj)
@@ -1173,7 +1173,7 @@ int initPatternMatcher( PatternMatcher& matcher, zval* obj)
 			error = -1;
 			break;
 	}
-	return 0;
+	return error;
 }
 
 

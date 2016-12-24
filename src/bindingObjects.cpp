@@ -799,7 +799,7 @@ Document DocumentAnalyzeQueue::fetch()
 
 void PatternMatcher::pushTerm( const std::string& type_, const std::string& value_)
 {
-	StackOp op( StackOp::PushPattern, allocid( type_), allocid( value_));
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
 	m_ops.push_back( op);
 	m_size += 1;
 }
@@ -825,7 +825,7 @@ void PatternMatcher::pushExpression( const std::string& opname_, unsigned int ar
 
 void PatternMatcher::definePattern( const std::string& name_, bool visible_)
 {
-	StackOp op( StackOp::PushPattern, allocid( name_), visible_?1:0);
+	StackOp op( StackOp::DefinePattern, allocid( name_), visible_?1:0);
 	m_ops.push_back( op);
 	m_size += 1;
 }
@@ -987,10 +987,12 @@ void QueryAnalyzer::definePatternMatcherPostProc(
 		const std::string& patternMatcherModule,
 		const PatternMatcher& patterns)
 {
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 	const strus::PatternMatcherInterface* matcher = textproc->getPatternMatcher( patternMatcherModule);
+	if (!matcher) throw strus::runtime_error(_TXT("failed to load matcher module: %s"), errorhnd->fetchError());
 	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
 	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance( matcher->createInstance());
 	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance( feeder->createInstance());
@@ -1024,7 +1026,7 @@ void QueryAnalyzer::definePatternMatcherPostProc(
 						else
 						{
 							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
-							feederInstance->defineSymbol( termtypeidcnt, symbolidcnt, value_);
+							feederInstance->defineSymbol( symbolidcnt, termtypeidcnt, value_);
 							matcherInstance->pushTerm( symbolidcnt);
 						}
 					}
@@ -1038,7 +1040,7 @@ void QueryAnalyzer::definePatternMatcherPostProc(
 						if (!symbolid)
 						{
 							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
-							feederInstance->defineSymbol( termtypeid, symbolidcnt, value_);
+							feederInstance->defineSymbol( symbolidcnt, termtypeid, value_);
 							symbolid = symbolidcnt;
 						}
 						matcherInstance->pushTerm( symbolid);
