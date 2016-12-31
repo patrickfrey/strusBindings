@@ -139,6 +139,13 @@ $ignoreMethodMap{"defineParameter"} = 1;
 $ignoreMethodMap{"addMetaDataRestrictionCondition"} = 1;
 $ignoreMethodMap{"addForwardIndexFeature"} = 1;
 $ignoreMethodMap{"addSearchIndexFeature"} = 1;
+$ignoreMethodMap{"addForwardIndexFeatureFromPatternMatch"} = 1;
+$ignoreMethodMap{"addSearchIndexFeatureFromPatternMatch"} = 1;
+$ignoreMethodMap{"defineMetaData"} = 1;
+$ignoreMethodMap{"defineMetaDataFromPatternMatch"} = 1;
+$ignoreMethodMap{"defineAggregatedMetaData"} = 1;
+$ignoreMethodMap{"defineAttribute"} = 1;
+$ignoreMethodMap{"defineAttributeFromPatternMatch"} = 1;
 $ignoreMethodMap{"pushExpression"} = 1;
 $ignoreMethodMap{"pushPattern"} = 1;
 $ignoreMethodMap{"definePattern"} = 1;
@@ -179,6 +186,12 @@ $renameMethodMap{"addForwardIndexFeature_4"} = "addForwardIndexFeature";
 $renameMethodMap{"addForwardIndexFeature_5"} = "addForwardIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_4"} = "addSearchIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_5"} = "addSearchIndexFeature";
+$renameMethodMap{"addSearchIndexFeatureFromPatternMatch_3"} = "addSearchIndexFeatureFromPatternMatch";
+$renameMethodMap{"addSearchIndexFeatureFromPatternMatch_4"} = "addSearchIndexFeatureFromPatternMatch";
+$renameMethodMap{"addForwardIndexFeatureFromPatternMatch_3"} = "addForwardIndexFeatureFromPatternMatch";
+$renameMethodMap{"addForwardIndexFeatureFromPatternMatch_4"} = "addForwardIndexFeatureFromPatternMatch";
+$renameMethodMap{"defineMetaDataFromPatternMatch_obj"} = "defineMetaDataFromPatternMatch";
+$renameMethodMap{"defineAttributeFromPatternMatch_obj"} = "defineAttributeFromPatternMatch";
 $renameMethodMap{"pushTerm_obj"} = "pushTerm";
 $renameMethodMap{"pushPattern_obj"} = "pushPattern";
 $renameMethodMap{"pushExpression_2"} = "pushExpression";
@@ -412,7 +425,7 @@ sub parseClass
 			}
 			if ($tok ne "(")
 			{
-				die "syntax error parsing method: start of argument list expected";
+				die "syntax error parsing method: start of argument list expected instead of '" . $tok . "' at " . $methodname;
 			}
 			while (nextToken() ne ")")
 			{

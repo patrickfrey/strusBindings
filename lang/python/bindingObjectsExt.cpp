@@ -222,6 +222,96 @@ void DocumentAnalyzer::defineAttribute_obj(
 	}
 }
 
+void DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch_3(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_)
+{
+	addSearchIndexFeatureFromPatternMatch_4( type, patternTypeName, normalizers_, String());
+}
+
+void DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch_4(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_,
+	const String& options)
+{
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		addSearchIndexFeatureFromPatternMatch( type, patternTypeName, (const NormalizerVector&)normalizers, options);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		addSearchIndexFeatureFromPatternMatch( type, patternTypeName, normalizers, options);
+	}
+}
+
+void DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch_3(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_)
+{
+	addForwardIndexFeatureFromPatternMatch_4( type, patternTypeName, normalizers_, String());
+}
+
+void DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch_4(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_,
+	const String& options)
+{
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		addForwardIndexFeatureFromPatternMatch( type, patternTypeName, (const NormalizerVector&)normalizers, options);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		addForwardIndexFeatureFromPatternMatch( type, patternTypeName, normalizers, options);
+	}
+}
+
+void DocumentAnalyzer::defineMetaDataFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_)
+{
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		defineMetaDataFromPatternMatch( fieldname, patternTypeName, (const NormalizerVector&)normalizers);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		defineMetaDataFromPatternMatch( fieldname, patternTypeName, normalizers);
+	}
+}
+
+void DocumentAnalyzer::defineAttributeFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_)
+{
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		defineAttributeFromPatternMatch( fieldname, patternTypeName, (const NormalizerVector&)normalizers);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		defineAttributeFromPatternMatch( fieldname, patternTypeName, normalizers);
+	}
+}
+
 Document DocumentAnalyzer::analyze_obj_1( const StringObject& value_)
 {
 	std::string value;
@@ -234,6 +324,24 @@ Document DocumentAnalyzer::analyze_obj_2( const StringObject& value_, const Docu
 	std::string value;
 	initString( value, value_.ptr());
 	return analyze( value, dclass);
+}
+
+void DocumentAnalyzer::definePatternMatcherPostProc_expr(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const FunctionObject& expr_)
+{
+	boost::python::extract<PatternMatcher> expr(expr_);
+	if (expr.check())
+	{
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, (PatternMatcher&)expr);
+	}
+	else
+	{
+		PatternMatcher matcher;
+		initPatternMatcher( matcher, expr_.ptr());
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, matcher);
+	}
 }
 
 void DocumentAnalyzeQueue::push_obj_1( const StringObject& value_)

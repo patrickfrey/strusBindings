@@ -668,6 +668,8 @@ private:
 
 /// \brief Forward declaration
 class DocumentAnalyzeQueue;
+/// \brief Forward declaration
+class PatternMatcher;
 
 /// \class DocumentAnalyzer
 /// \brief Analyzer object representing a program for segmenting, 
@@ -810,6 +812,96 @@ public:
 		const String& selectexpr,
 		const FunctionObject& tokenizer_,
 		const FunctionObject& normalizers_);
+#endif
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addSearchIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options);
+#else
+	void addSearchIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options=String());
+#endif
+#ifdef STRUS_BOOST_PYTHON
+	void addSearchIndexFeatureFromPatternMatch_3(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+
+	void addSearchIndexFeatureFromPatternMatch_4(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_,
+		const String& options);
+#endif
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addForwardIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options);
+#else
+	void addForwardIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options=String());
+#endif
+#ifdef STRUS_BOOST_PYTHON
+	void addForwardIndexFeatureFromPatternMatch_3(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+
+	void addForwardIndexFeatureFromPatternMatch_4(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_,
+		const String& options);
+#endif
+	void defineMetaDataFromPatternMatch(
+		const String& fieldname,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineMetaDataFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+#endif
+	void defineAttributeFromPatternMatch(
+		const String& attribname,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineAttributeFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+#endif
+
+	/// \brief Declare a pattern matcher on the document features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] patterns structure with all patterns
+	void definePatternMatcherPostProc(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const PatternMatcher& patterns);
+
+#ifdef STRUS_BOOST_PYTHON
+	void definePatternMatcherPostProc_expr(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const FunctionObject& expr_);
 #endif
 
 	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
@@ -1032,7 +1124,16 @@ private:
 			std::memcpy( this, &o, sizeof(*this));
 		}
 	};
+	const std::vector<StackOp>& ops() const
+	{
+		return m_ops;
+	}
+	const std::string& strings() const
+	{
+		return m_strings;
+	}
 
+private:
 	std::size_t allocid( const String& str);
 #ifdef STRUS_BOOST_PYTHON
 	std::size_t allocid_obj( const StringObject& str);
@@ -1040,6 +1141,8 @@ private:
 
 private:
 	friend class QueryAnalyzer;
+	friend class DocumentAnalyzer;
+	friend class PatternMatchLoader;
 	std::vector<StackOp> m_ops;
 	std::string m_strings;
 	std::size_t m_size;

@@ -546,6 +546,62 @@ void DocumentAnalyzer::defineAttribute(
 	funcdef.release();
 }
 
+void DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch(
+	const std::string& type,
+	const std::string& patternTypeName,
+	const std::vector<Normalizer>& normalizers,
+	const std::string& options)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
+
+	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeatureFromPatternMatch(
+		type, patternTypeName, funcdef.normalizers,
+		getFeatureOptions( options));
+	funcdef.release();
+}
+
+void DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch(
+	const std::string& type,
+	const std::string& patternTypeName,
+	const std::vector<Normalizer>& normalizers,
+	const std::string& options)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
+
+	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeatureFromPatternMatch(
+		type, patternTypeName, funcdef.normalizers,
+		getFeatureOptions( options));
+	funcdef.release();
+}
+
+void DocumentAnalyzer::defineMetaDataFromPatternMatch(
+	const std::string& fieldname,
+	const std::string& patternTypeName,
+	const std::vector<Normalizer>& normalizers)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
+
+	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaDataFromPatternMatch(
+		fieldname, patternTypeName, funcdef.normalizers);
+	funcdef.release();
+}
+
+void DocumentAnalyzer::defineAttributeFromPatternMatch(
+	const std::string& attribname,
+	const std::string& patternTypeName,
+	const std::vector<Normalizer>& normalizers)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
+
+	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAttributeFromPatternMatch(
+		attribname, patternTypeName, funcdef.normalizers);
+	funcdef.release();
+}
+
 static Variant getNumericVariantFromDouble( double value)
 {
 	if (value - std::floor( value) < std::numeric_limits<double>::epsilon())
@@ -589,6 +645,161 @@ static strus::NumericVariant numericVariant( const Variant& val)
 			break;
 	}
 	return rt;
+}
+
+static strus::PatternMatcherInstanceInterface::JoinOperation patternMatcherJoinOp( const char* opname)
+{
+	if (std::strcmp( opname, "sequence") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpSequence;
+	}
+	else if (std::strcmp( opname, "sequence_imm") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpSequenceImm;
+	}
+	else if (std::strcmp( opname, "sequence_struct") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpSequenceStruct;
+	}
+	else if (std::strcmp( opname, "within") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpWithin;
+	}
+	else if (std::strcmp( opname, "within_struct") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpWithinStruct;
+	}
+	else if (std::strcmp( opname, "any") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpAny;
+	}
+	else if (std::strcmp( opname, "and") == 0)
+	{
+		return strus::PatternMatcherInstanceInterface::OpAnd;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("unknown operator '%s' in pattern expression"), opname);
+	}
+}
+
+class PatternMatchLoader
+{
+public:
+static void loadPatterMatcher(
+	strus::Reference<strus::PatternMatcherInstanceInterface>& matcherInstance, 
+	strus::Reference<strus::PatternTermFeederInstanceInterface>& feederInstance, 
+	const strus::TextProcessorInterface* textproc,
+	const std::string& patternMatcherModule,
+	const PatternMatcher& patternMatcher,
+	strus::ErrorBufferInterface* errorhnd)
+{
+	const strus::PatternMatcherInterface* matcher = textproc->getPatternMatcher( patternMatcherModule);
+	if (!matcher) throw strus::runtime_error(_TXT("failed to load matcher module: %s"), errorhnd->fetchError());
+	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
+	matcherInstance.reset( matcher->createInstance());
+	feederInstance.reset( feeder->createInstance());
+	unsigned int termtypeidcnt = 0;
+	enum {MaxTermTypeId=(1<<24)};
+	unsigned int symbolidcnt = MaxTermTypeId;
+	std::vector<PatternMatcher::StackOp>::const_iterator oi = patternMatcher.ops().begin(), oe = patternMatcher.ops().end();
+	for (; oi != oe; ++oi)
+	{
+		switch (oi->type)
+		{
+			case PatternMatcher::StackOp::PushTerm:
+			{
+				const char* type_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Term_type];
+				const char* value_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Term_value];
+				if (!value_[0] && type_[0] == '~')
+				{
+					matcherInstance->pushPattern( type_ +1);
+				}
+				else
+				{
+					unsigned int termtypeid = feederInstance->getLexem( type_);
+					if (!termtypeid)
+					{
+						if (++termtypeidcnt >= MaxTermTypeId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
+						feederInstance->defineLexem( termtypeidcnt, type_);
+						if (!value_[0])
+						{
+							matcherInstance->pushTerm( termtypeidcnt);
+						}
+						else
+						{
+							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
+							feederInstance->defineSymbol( symbolidcnt, termtypeidcnt, value_);
+							matcherInstance->pushTerm( symbolidcnt);
+						}
+					}
+					else if (!value_[0])
+					{
+						matcherInstance->pushTerm( termtypeid);
+					}
+					else
+					{
+						unsigned int symbolid = feederInstance->getSymbol( termtypeid, value_);
+						if (!symbolid)
+						{
+							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
+							feederInstance->defineSymbol( symbolidcnt, termtypeid, value_);
+							symbolid = symbolidcnt;
+						}
+						matcherInstance->pushTerm( symbolid);
+					}
+				}
+				break;
+			}
+			case PatternMatcher::StackOp::PushPattern:
+			{
+				const char* name_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Pattern_name];
+				matcherInstance->pushPattern( name_);
+				break;
+			}
+			case PatternMatcher::StackOp::PushExpression:
+			{
+				const char* opname_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Expression_opname];
+				unsigned int argc_ = (unsigned int)oi->arg[ PatternMatcher::StackOp::Expression_argc];
+				int range_ = (int)oi->arg[ PatternMatcher::StackOp::Expression_range];
+				unsigned int cardinality_ = (unsigned int)oi->arg[ PatternMatcher::StackOp::Expression_cardinality];
+				strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( opname_);
+				matcherInstance->pushExpression( joinop, argc_, range_, cardinality_);
+				break;
+			}
+			case PatternMatcher::StackOp::DefinePattern:
+			{
+				const char* name_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Pattern_name];
+				bool visible_ = (int)oi->arg[ PatternMatcher::StackOp::Pattern_visible];
+				matcherInstance->definePattern( name_, visible_);
+				break;
+			}
+			case PatternMatcher::StackOp::AttachVariable:
+			{
+				const char* name_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Variable_name];
+				matcherInstance->attachVariable( name_, 1.0);
+				break;
+			}
+		}
+	}
+}
+};
+
+void DocumentAnalyzer::definePatternMatcherPostProc(
+		const std::string& patternTypeName,
+		const std::string& patternMatcherModule,
+		const PatternMatcher& patterns)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance;
+	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance;
+	PatternMatchLoader::loadPatterMatcher( matcherInstance, feederInstance, textproc, patternMatcherModule, patterns, errorhnd);
+	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
+	matcherInstance.release();
+	feederInstance.release();
 }
 
 void DocumentAnalyzer::defineDocument(
@@ -946,42 +1157,6 @@ void QueryAnalyzer::addPatternLexem(
 	funcdef.release();
 }
 
-static strus::PatternMatcherInstanceInterface::JoinOperation patternMatcherJoinOp( const char* opname)
-{
-	if (std::strcmp( opname, "sequence") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpSequence;
-	}
-	else if (std::strcmp( opname, "sequence_imm") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpSequenceImm;
-	}
-	else if (std::strcmp( opname, "sequence_struct") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpSequenceStruct;
-	}
-	else if (std::strcmp( opname, "within") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpWithin;
-	}
-	else if (std::strcmp( opname, "within_struct") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpWithinStruct;
-	}
-	else if (std::strcmp( opname, "any") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpAny;
-	}
-	else if (std::strcmp( opname, "and") == 0)
-	{
-		return strus::PatternMatcherInstanceInterface::OpAnd;
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("unknown operator '%s' in pattern expression"), opname);
-	}
-}
-
 void QueryAnalyzer::definePatternMatcherPostProc(
 		const std::string& patternTypeName,
 		const std::string& patternMatcherModule,
@@ -991,94 +1166,9 @@ void QueryAnalyzer::definePatternMatcherPostProc(
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-	const strus::PatternMatcherInterface* matcher = textproc->getPatternMatcher( patternMatcherModule);
-	if (!matcher) throw strus::runtime_error(_TXT("failed to load matcher module: %s"), errorhnd->fetchError());
-	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
-	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance( matcher->createInstance());
-	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance( feeder->createInstance());
-	unsigned int termtypeidcnt = 0;
-	enum {MaxTermTypeId=(1<<24)};
-	unsigned int symbolidcnt = MaxTermTypeId;
-	std::vector<PatternMatcher::StackOp>::const_iterator oi = patterns.m_ops.begin(), oe = patterns.m_ops.end();
-	for (; oi != oe; ++oi)
-	{
-		switch (oi->type)
-		{
-			case PatternMatcher::StackOp::PushTerm:
-			{
-				const char* type_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Term_type];
-				const char* value_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Term_value];
-				if (!value_[0] && type_[0] == '~')
-				{
-					matcherInstance->pushPattern( type_ +1);
-				}
-				else
-				{
-					unsigned int termtypeid = feederInstance->getLexem( type_);
-					if (!termtypeid)
-					{
-						if (++termtypeidcnt >= MaxTermTypeId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
-						feederInstance->defineLexem( termtypeidcnt, type_);
-						if (!value_[0])
-						{
-							matcherInstance->pushTerm( termtypeidcnt);
-						}
-						else
-						{
-							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
-							feederInstance->defineSymbol( symbolidcnt, termtypeidcnt, value_);
-							matcherInstance->pushTerm( symbolidcnt);
-						}
-					}
-					else if (!value_[0])
-					{
-						matcherInstance->pushTerm( termtypeid);
-					}
-					else
-					{
-						unsigned int symbolid = feederInstance->getSymbol( termtypeid, value_);
-						if (!symbolid)
-						{
-							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
-							feederInstance->defineSymbol( symbolidcnt, termtypeid, value_);
-							symbolid = symbolidcnt;
-						}
-						matcherInstance->pushTerm( symbolid);
-					}
-				}
-				break;
-			}
-			case PatternMatcher::StackOp::PushPattern:
-			{
-				const char* name_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Pattern_name];
-				matcherInstance->pushPattern( name_);
-				break;
-			}
-			case PatternMatcher::StackOp::PushExpression:
-			{
-				const char* opname_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Expression_opname];
-				unsigned int argc_ = (unsigned int)oi->arg[ PatternMatcher::StackOp::Expression_argc];
-				int range_ = (int)oi->arg[ PatternMatcher::StackOp::Expression_range];
-				unsigned int cardinality_ = (unsigned int)oi->arg[ PatternMatcher::StackOp::Expression_cardinality];
-				strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( opname_);
-				matcherInstance->pushExpression( joinop, argc_, range_, cardinality_);
-				break;
-			}
-			case PatternMatcher::StackOp::DefinePattern:
-			{
-				const char* name_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Pattern_name];
-				bool visible_ = (int)oi->arg[ PatternMatcher::StackOp::Pattern_visible];
-				matcherInstance->definePattern( name_, visible_);
-				break;
-			}
-			case PatternMatcher::StackOp::AttachVariable:
-			{
-				const char* name_ = patterns.m_strings.c_str() + oi->arg[ PatternMatcher::StackOp::Variable_name];
-				matcherInstance->attachVariable( name_, 1.0);
-				break;
-			}
-		}
-	}
+	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance;
+	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance;
+	PatternMatchLoader::loadPatterMatcher( matcherInstance, feederInstance, textproc, patternMatcherModule, patterns, errorhnd);
 	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
 	matcherInstance.release();
 	feederInstance.release();

@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/lang/python/example" )
-set( tests helloWorld createCollection query query_trace queryexpr status )
+set( tests helloWorld createCollection query query_trace queryexpr querypattern status )
 
 if( CMAKE_MAJOR_VERSION GREATER 2 OR CMAKE_MINOR_VERSION GREATER 6 )
 	foreach( test ${tests} )
@@ -24,6 +24,7 @@ else( CMAKE_MAJOR_VERSION GREATER 2 OR CMAKE_MINOR_VERSION GREATER 6 )
 	set_tests_properties( python_query PROPERTIES ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/lang/python" )
 	set_tests_properties( python_query_trace PROPERTIES ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/lang/python" )
 	set_tests_properties( python_queryexpr PROPERTIES ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/lang/python" )
+	set_tests_properties( python_querypattern PROPERTIES ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/lang/python" )
 	set_tests_properties( python_status PROPERTIES ENVIRONMENT "PYTHONPATH=${PROJECT_SOURCE_DIR}/lang/python" )
 endif( CMAKE_MAJOR_VERSION GREATER 2 OR CMAKE_MINOR_VERSION GREATER 6 )
 

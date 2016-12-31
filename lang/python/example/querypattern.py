@@ -16,8 +16,8 @@ try:
 	analyzer = ctx.createQueryAnalyzer()
 	analyzer.addSearchIndexElement( "word", "word", "word", (("stem","en"),"lc",("convdia","en")))
 	analyzer.addPatternLexem( "lexem", "word", "word", "lc");
-	analyzer.addSearchIndexElementFromPatternMatch( "concept", "coresult", "lc");
-	analyzer.definePatternMatcherPostProc( "coresult", "pattern_std", (
+	analyzer.addSearchIndexElementFromPatternMatch( "word", "coresult", "lc");
+	analyzer.definePatternMatcherPostProc( "coresult", "std", (
 		("city_that_is", ("sequence", 3, ["word","citi"],["word","that"],["word","is"])),
 		("city_that", ("sequence", 2, ["word","citi"],["word","that"])),
 		("city_with", ("sequence", 2, ["word","citi"],["word","with"]))
