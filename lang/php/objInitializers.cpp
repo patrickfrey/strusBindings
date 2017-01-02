@@ -1130,7 +1130,7 @@ int initPatternMatcher( PatternMatcher& matcher, zval* obj)
 				unsigned long index;
 				if (!zend_hash_get_current_key_ex( hash, &name, &name_len, &index, 0, &ptr) == HASH_KEY_IS_STRING)
 				{
-					THROW_EXCEPTION( "illegal key of sumarizer element (not a string)");
+					THROW_EXCEPTION( "illegal key of element (not a string)");
 					error = -1;
 					break;
 				}
