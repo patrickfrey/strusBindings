@@ -112,7 +112,7 @@ int main( int , const char** )
 		std::vector<Term> queryterms = queryAnalyzer.analyzeField( "default", "to school");
 		std::vector<Term>::const_iterator qi = queryterms.begin(), qe = queryterms.end();
 		std::size_t qidx = 0;
-		unsigned int maxpos = 0;
+		Index maxpos = 0;
 		QueryExpression expr;
 		for (; qi != qe; ++qidx,++qi)
 		{

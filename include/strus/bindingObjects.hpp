@@ -31,26 +31,29 @@ typedef boost::python::api::object DataBlob;
 typedef boost::python::api::object StringObject;
 typedef std::string String;
 typedef std::wstring WString;
-typedef std::vector<int> IntVector;
+typedef std::vector<int> IndexVector;
+typedef std::vector<double> FloatVector;
 typedef std::vector<std::string> StringVector;
 #else
 #define String std::string
 #define WString std::wstring
-#define IntVector std::vector<int>
+#define IndexVector std::vector<int>
 #define StringVector std::vector<std::string>
+#define FloatVector std::vector<double>
 #if !defined DOXYGEN_PHP && !defined DOXYGEN_PYTHON
 #define NormalizerVector std::vector<Normalizer>
 #endif
 #define TermVector std::vector<Term>
 #define QueryTermVector std::vector<QueryTerm>
 #define RankVector std::vector<Rank>
+#define VecRankVector std::vector<VecRank>
 #define SummaryElementVector std::vector<SummaryElement>
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
 #define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
 #endif
-typedef unsigned int Index;
-typedef unsigned long GlobalCounter;
+typedef int Index;
+typedef long GlobalCounter;
 
 #ifndef DOXYGEN_LANG
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
@@ -412,7 +415,7 @@ public:
 	WString ucvalue() const;
 #endif
 	/// \brief Get the term position
-	unsigned int position() const			{return m_position;}
+	Index position() const				{return m_position;}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Term& o) const
@@ -1288,7 +1291,7 @@ public:
 	WString ucvalue() const				{return Term::ucvalue();}
 #endif
 	/// \brief Get the term position
-	unsigned int position() const			{return Term::position();}
+	Index position() const				{return Term::position();}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const QueryTerm& o) const	{return Term::operator==( o);}
@@ -1600,6 +1603,156 @@ private:
 	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	const void* m_statsproc;
+};
+
+
+/// \brief Weighted vector (result of a query vector storage search)
+class VecRank
+{
+public:
+	/// \brief Constructor
+	VecRank()
+		:m_index(0),m_weight(0.0){}
+	/// \brief Constructor
+	VecRank( Index index_, double weight_)
+		:m_index(index_),m_weight(weight_){}
+	/// \brief Copy constructor
+	VecRank( const VecRank& o)
+		:m_index(o.m_index),m_weight(o.m_weight){}
+
+	/// \brief Get the feature number ( >= 0) from this
+	Index index() const					{return m_index;}
+	/// \brief Get the weight of the vector rank
+	double weight() const					{return m_weight;}
+	/// \brief Get the summary elements
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const VecRank& o) const
+	{
+		if (m_index != o.m_index) return false;
+		double ww = (m_weight - o.m_weight);
+		return (ww < 0.0)?(-ww < std::numeric_limits<double>::epsilon()):(ww < std::numeric_limits<double>::epsilon());
+	}
+	bool operator!=( const VecRank& o) const
+	{
+		return !operator==( o);
+	}
+#endif
+
+private:
+	Index m_index;
+	double m_weight;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<VecRank> VecRankVector;
+#endif
+
+class VectorStorageSearcher
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	VectorStorageSearcher(){}
+#endif
+	/// \brief Copy constructor
+	VectorStorageSearcher( const VectorStorageSearcher& o);
+
+	/// \brief Destructor
+	~VectorStorageSearcher(){}
+
+	/// \brief Get the vector assigned to a feature addressed by index
+	/// \param[in] index index of the feature (number >= 0)
+	/// return the vector
+	VecRankVector findSimilar( const std::vector<double>& vec, unsigned int maxNofResults) const;
+
+	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	void close();
+
+private:
+	friend class VectorStorageClient;
+	VectorStorageSearcher( const Reference& storage, const Reference& trace, const Index& range_from, const Index& range_to, const Reference& errorhnd_);
+
+	Reference m_errorhnd_impl;
+	Reference m_searcher_impl;
+	Reference m_trace_impl;
+};
+
+/// \brief Object representing a client connection to a vector storage 
+/// \remark The only way to construct a vector storage client instance is to call Context::createVectorStorageClient(const std::string&)
+class VectorStorageClient
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	VectorStorageClient(){}
+#endif
+	/// \brief Copy constructor
+	VectorStorageClient( const VectorStorageClient& o);
+
+	/// \brief Destructor
+	~VectorStorageClient(){}
+
+	/// \brief Create a searcher object for scanning the vectors for similarity
+	/// \param[in] range_from start range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \param[in] range_to end of range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \return the vector search interface (with ownership)
+	VectorStorageSearcher createSearcher( const Index& range_from, const Index& range_to) const;
+
+	/// \brief Get the list of concept class names defined
+	/// \return the list
+	StringVector conceptClassNames() const;
+
+	/// \brief Get the list of indices of features represented by a learnt concept feature
+	/// \param[in] conceptClass name identifying a class of concepts learnt
+	/// \param[in] conceptid index (indices of learnt concepts starting from 1) 
+	/// \return the resulting vector indices (index is order of insertion starting from 0)
+	IndexVector conceptFeatures( const String& conceptClass, const Index& conceptid) const;
+
+	/// \brief Get the number of concept features learned for a class
+	/// \param[in] conceptClass name identifying a class of concepts learnt.
+	/// \return the number of concept features and also the maximum number assigned to a feature (starting with 1)
+	unsigned int nofConcepts( const String& conceptClass) const;
+
+	/// \brief Get the set of learnt concepts of a class for a feature defined
+	/// \param[in] conceptClass name identifying a class of concepts learnt
+	/// \param[in] index index of vector in the order of insertion starting from 0
+	/// \return the resulting concept feature indices (indices of learnt concepts starting from 1)
+	IndexVector featureConcepts( const String& conceptClass, const Index& index) const;
+
+	/// \brief Get the vector assigned to a feature addressed by index
+	/// \param[in] index index of the feature (starting from 0)
+	/// return the vector
+	FloatVector featureVector( const Index& index) const;
+
+	/// \brief Get the name of a feature by its index starting from 0
+	/// \param[in] index index of the feature (starting from 0)
+	/// \return the name of the feature defined with VectorStorageBuilderInterface::addFeature(const std::string& name,const std::vector<double>&)
+	String featureName( const Index& index) const;
+
+	/// \brief Get the index starting from 0 of a feature by its name
+	/// \param[in] name name of the feature
+	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion with VectorStorageBuilderInterface::addFeature(const std::string& name, const std::vector<double>& vec) starting from 0)
+	Index featureIndex( const String& name) const;
+
+	/// \brief Get the number of feature vectors defined
+	/// \return the number of features
+	unsigned int nofFeatures() const;
+
+	/// \brief Get the configuration of this model
+	/// \return the configuration string
+	String config() const;
+
+	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	void close();
+
+private:
+	friend class Context;
+	VectorStorageClient( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const String& config);
+
+	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
+	Reference m_objbuilder_impl;
+	Reference m_vector_storage_impl;
 };
 
 
@@ -2276,7 +2429,7 @@ public:
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
 	/// \param[in] docnolist_ list of documents to evaluate the query on
-	void addDocumentEvaluationSet( const IntVector& docnolist_);
+	void addDocumentEvaluationSet( const IndexVector& docnolist_);
 #ifdef STRUS_BOOST_PYTHON
 	void addDocumentEvaluationSet_struct( const FunctionObject& docnolist_);
 #endif
@@ -2498,7 +2651,7 @@ public:
 	/// \return the processor
 	StatisticsProcessor createStatisticsProcessor( const std::string& name);
 
-	/// \brief Create a storage client instance of the the default remote storage of the RPC server
+	/// \brief Create a storage client instance of the the default storage
 	StorageClient createStorageClient();
 
 	/// \brief Create a storage client instance
@@ -2508,6 +2661,17 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	StorageClient createStorageClient_0();
 	StorageClient createStorageClient_obj( const StringObject& config_);
+#endif
+	/// \brief Create a storage client instance of the the default remote storage of the RPC server
+	VectorStorageClient createVectorStorageClient();
+
+	/// \brief Create a vector storage client instance
+	/// \param[in] config_ configuration string of the storage client or empty for the default storage
+	VectorStorageClient createVectorStorageClient( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	VectorStorageClient createVectorStorageClient_0();
+	VectorStorageClient createVectorStorageClient_obj( const StringObject& config_);
 #endif
 
 	/// \brief Create a new storage (physically) described by config

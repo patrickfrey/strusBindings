@@ -721,6 +721,18 @@ StorageClient Context::createStorageClient_obj( const StringObject& config_)
 	return createStorageClient( value);
 }
 
+VectorStorageClient Context::createVectorStorageClient_0()
+{
+	return createVectorStorageClient();
+}
+
+VectorStorageClient Context::createVectorStorageClient_obj( const StringObject& config_)
+{
+	std::string value;
+	initString( value, config_.ptr());
+	return createVectorStorageClient( value);
+}
+
 WString DocumentFrequencyChange::ucvalue() const
 {
 	return convert_uft8string_to_wstring( m_value);

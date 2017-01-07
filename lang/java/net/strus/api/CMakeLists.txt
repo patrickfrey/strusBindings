@@ -1,9 +1,12 @@
 cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 set( generated_java_source_files
+	StringVector.java
 	Aggregator.java
 	Attribute.java
 	AttributeVector.java
+	VecRank.java
+	VecRankVector.java
 	DocumentAnalyzer.java
 	DocumentAnalyzeQueue.java
 	DocumentClass.java
@@ -30,10 +33,11 @@ set( generated_java_source_files
 	RankVector.java
 	StorageClient.java
 	StorageTransaction.java
+	VectorStorageClient.java
+	VectorStorageSearcher.java
 	StatisticsIterator.java
 	StatisticsProcessor.java
 	StatisticsMessage.java
-	StringVector.java
 	Context.java
 	strus.java
 	strusJNI.java

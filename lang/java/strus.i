@@ -14,6 +14,7 @@
 %include "java_heap.i"
 %include "ignore_declarations.i"
 %include "exception_handler.i"
+%include "std_vector.i"
 
 %typemap(javapackage) std::vector<std::string>  "net.strus.api.StringVector"
 %template(StringVector) std::vector<std::string>;
@@ -21,7 +22,7 @@
 %typemap(javapackage) std::vector<Term>  "net.strus.api.TermVector"
 %template(TermVector) std::vector<Term>;
 
-%typemap(javapackage) std::vector<QueryTerm>  "net.strus.api.TermVector"
+%typemap(javapackage) std::vector<QueryTerm>  "net.strus.api.QueryTermVector"
 %template(QueryTermVector) std::vector<QueryTerm>;
 
 %typemap(javapackage) std::vector<Term>  "net.strus.api.DocumentFrequencyChangeVector"
@@ -41,6 +42,9 @@
 
 %typemap(javapackage) std::vector<Normalizer>  "net.strus.api.NormalizerVector"
 %template(NormalizerVector) std::vector<Normalizer>;
+
+%typemap(javapackage) std::vector<VecRank>  "net.strus.api.VecRankVector"
+%template(VecRankVector) std::vector<VecRank>;
 
 %rename(assign_operator) operator=;
 
