@@ -41,6 +41,7 @@
 #include "strus/patternTermFeederInstanceInterface.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
+#include "strus/vectorStorageBuilderInterface.hpp"
 #include "strus/vectorStorageInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
@@ -1594,6 +1595,89 @@ VectorStorageClient::VectorStorageClient( const Reference& objbuilder, const Ref
 	}
 }
 
+VectorStorageBuilder::VectorStorageBuilder( const VectorStorageBuilder& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_vector_builder_impl(o.m_vector_builder_impl)
+{}
+
+void VectorStorageBuilder::addFeature( const std::string& name, const std::vector<double>& vec)
+{
+	strus::VectorStorageBuilderInterface* storage = (strus::VectorStorageBuilderInterface*)m_vector_builder_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+
+	storage->addFeature( name, vec);
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to add feature to vector storage builder: %s"), errorhnd->fetchError());
+	}
+}
+
+bool VectorStorageBuilder::done()
+{
+	strus::VectorStorageBuilderInterface* storage = (strus::VectorStorageBuilderInterface*)m_vector_builder_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+
+	bool rt = storage->done();
+	if (!rt)
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT("failed to complete vector storage building (done): %s"), errorhnd->fetchError());
+		}
+	}
+	return rt;
+}
+
+bool VectorStorageBuilder::run( const std::string& command)
+{
+	strus::VectorStorageBuilderInterface* storage = (strus::VectorStorageBuilderInterface*)m_vector_builder_impl.get();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+
+	bool rt = storage->run( command);
+	if (!rt)
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT("failed to run vector storage builder command: %s"), errorhnd->fetchError());
+		}
+	}
+	return rt;
+}
+
+void VectorStorageBuilder::close()
+{
+	if (!m_vector_builder_impl.get()) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	bool preverr = errorhnd->hasError();
+	m_vector_builder_impl.reset();
+	if (!preverr && errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error detected after calling vector storage client close: %s"), errorhnd->fetchError());
+	}
+}
+
+VectorStorageBuilder::VectorStorageBuilder( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const std::string& config)
+	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl( trace)
+	,m_objbuilder_impl( objbuilder)
+	,m_vector_builder_impl(ReferenceDeleter<strus::VectorStorageBuilderInterface>::function)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+
+	m_vector_builder_impl.reset( strus::createVectorStorageBuilder( objBuilder, errorhnd, config));
+	if (!m_vector_builder_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create vector storage builder: %s"), errorhnd->fetchError());
+	}
+}
+
+
 StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& trace_, const Reference& errorhnd_, const Reference& storage_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_)
@@ -2675,6 +2759,12 @@ VectorStorageClient Context::createVectorStorageClient( const std::string& confi
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return VectorStorageClient( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, config_);
+}
+
+VectorStorageBuilder Context::createVectorStorageBuilder( const std::string& config_)
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	return VectorStorageBuilder( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, config_);
 }
 
 DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)

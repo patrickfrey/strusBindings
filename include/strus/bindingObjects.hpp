@@ -1726,12 +1726,12 @@ public:
 
 	/// \brief Get the name of a feature by its index starting from 0
 	/// \param[in] index index of the feature (starting from 0)
-	/// \return the name of the feature defined with VectorStorageBuilderInterface::addFeature(const std::string& name,const std::vector<double>&)
+	/// \return the name of the feature defined 
 	String featureName( const Index& index) const;
 
 	/// \brief Get the index starting from 0 of a feature by its name
 	/// \param[in] name name of the feature
-	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion with VectorStorageBuilderInterface::addFeature(const std::string& name, const std::vector<double>& vec) starting from 0)
+	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion starting with 0)
 	Index featureIndex( const String& name) const;
 
 	/// \brief Get the number of feature vectors defined
@@ -1753,6 +1753,40 @@ private:
 	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_vector_storage_impl;
+};
+
+class VectorStorageBuilder
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	VectorStorageBuilder(){}
+#endif
+	/// \brief Copy constructor
+	VectorStorageBuilder( const VectorStorageBuilder& o);
+
+	~VectorStorageBuilder(){}
+
+	void addFeature( const std::string& name, const std::vector<double>& vec);
+#ifdef STRUS_BOOST_PYTHON
+	void addFeature_obj( const StringObject& name, const std::vector<double>& vec);
+#endif
+
+	bool done();
+
+	bool run( const std::string& command);
+
+	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	void close();
+
+private:
+	friend class Context;
+	VectorStorageBuilder( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const String& config);
+
+	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
+	Reference m_objbuilder_impl;
+	Reference m_vector_builder_impl;
 };
 
 
@@ -2672,6 +2706,13 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	VectorStorageClient createVectorStorageClient_0();
 	VectorStorageClient createVectorStorageClient_obj( const StringObject& config_);
+#endif
+	/// \brief Create a vector storage builder instance
+	/// \param[in] config_ configuration string of the storage client
+	VectorStorageBuilder createVectorStorageBuilder( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	VectorStorageBuilder createVectorStorageBuilder_obj( const StringObject& config_);
 #endif
 
 	/// \brief Create a new storage (physically) described by config

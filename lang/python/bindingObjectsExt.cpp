@@ -708,6 +708,12 @@ void Query::setWeightingVariables_obj(
 	}
 }
 
+void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const std::vector<double>& vec)
+{
+	std::string name;
+	initString( name, name_.ptr());
+	addFeature( name, vec);
+}
 
 StorageClient Context::createStorageClient_0()
 {
@@ -731,6 +737,13 @@ VectorStorageClient Context::createVectorStorageClient_obj( const StringObject& 
 	std::string value;
 	initString( value, config_.ptr());
 	return createVectorStorageClient( value);
+}
+
+VectorStorageBuilder Context::createVectorStorageBuilder_obj( const StringObject& config_)
+{
+	std::string value;
+	initString( value, config_.ptr());
+	return createVectorStorageBuilder( value);
 }
 
 WString DocumentFrequencyChange::ucvalue() const

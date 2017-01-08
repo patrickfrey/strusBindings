@@ -35,6 +35,7 @@ set( generated_java_source_files
 	StorageTransaction.java
 	VectorStorageClient.java
 	VectorStorageSearcher.java
+	VectorStorageBuilder.java
 	StatisticsIterator.java
 	StatisticsProcessor.java
 	StatisticsMessage.java
