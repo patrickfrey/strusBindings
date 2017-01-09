@@ -2818,8 +2818,10 @@ void Context::createVectorStorage( const std::string& config_)
 	std::string storagename;
 	std::string storagecfg( config_);
 	(void)strus::extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
-	(void)strus::extractStringFromConfigString( dbname, storagename, "storage", errorhnd);
-
+	if (!strus::extractStringFromConfigString( dbname, storagename, "storage", errorhnd))
+	{
+		storagename = strus::Constants::standard_vector_storage_module();
+	}
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
 	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
