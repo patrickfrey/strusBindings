@@ -759,7 +759,7 @@ void initStringVector( std::vector<std::string>& result, PyObject* obj)
 
 void initIntVector( std::vector<int>& result, PyObject* obj)
 {
-	if (PyInt_Check( obj))
+	if (PyInt_Check( obj) || PyLong_Check( obj))
 	{
 		int item = PyInt_AS_LONG( obj);
 		result.push_back( item);
@@ -776,7 +776,7 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 				/* DON'T DECREF item here */
 				try
 				{
-					if (PyInt_Check( item))
+					if (PyInt_Check( item) || PyLong_Check( item))
 					{
 						int itemval = PyInt_AS_LONG( item);
 						result.push_back( itemval);
@@ -978,36 +978,6 @@ void initDataBlob( std::string& result, PyObject* obj)
 	else
 	{
 		throw strus::runtime_error( _TXT("expected byte array or bytes as DataBlob"));
-	}
-}
-
-void initIntVectorList( std::vector<int>& result, PyObject* obj)
-{
-	if (PySequence_Check( obj))
-	{
-		PyObjectReference seq( PySequence_Fast( obj, _TXT("list of integers expected")));
-		if (seq)
-		{
-			Py_ssize_t ii=0,len = PySequence_Size( seq);
-			for (; ii<len; ++ii)
-			{
-				PyObject* item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
-				if (PyLong_Check( item) || PyInt_Check( item))
-				{
-					long itemval = PyInt_AS_LONG( item);
-					result.push_back( itemval);
-				}
-			}
-		}
-	}
-	else if (PyLong_Check( obj) || PyInt_Check( obj))
-	{
-		long objval = PyInt_AS_LONG( obj);
-		result.push_back( objval);
-	}
-	else
-	{
-		throw strus::runtime_error( "not an integer or list of integer type");
 	}
 }
 

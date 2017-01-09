@@ -687,7 +687,7 @@ void Query::addDocumentEvaluationSet_struct( const FunctionObject& docnolist_)
 	else
 	{
 		std::vector<int> docnolist;
-		initIntVectorList( docnolist, docnolist_.ptr());
+		initIntVector( docnolist, docnolist_.ptr());
 		addDocumentEvaluationSet( docnolist);
 	}
 }
@@ -721,7 +721,7 @@ void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const Func
 	else
 	{
 		std::vector<double> vec;
-		initFloatVectorList( vec, vec_.ptr());
+		initFloatVector( vec, vec_.ptr());
 		addFeature( name, vec);
 	}
 }
