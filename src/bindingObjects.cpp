@@ -2811,6 +2811,24 @@ void Context::createStorage( const std::string& config_)
 	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
 }
 
+void Context::createVectorStorage( const std::string& config_)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	std::string dbname;
+	std::string storagename;
+	std::string storagecfg( config_);
+	(void)strus::extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
+	(void)strus::extractStringFromConfigString( dbname, storagename, "storage", errorhnd);
+
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	strus::StorageObjectBuilderInterface* objBuilder = (strus::StorageObjectBuilderInterface*)m_storage_objbuilder_impl.get();
+	const strus::DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
+	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
+	const strus::VectorStorageInterface* sti = objBuilder->getVectorStorage( storagename);
+	if (!sti) throw strus::runtime_error( _TXT("failed to get vector storage: %s"), errorhnd->fetchError());
+	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( _TXT("failed to create vector storage: %s"), errorhnd->fetchError());
+}
+
 void Context::destroyStorage( const std::string& config_)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();

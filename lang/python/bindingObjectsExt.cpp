@@ -772,6 +772,13 @@ void Context::createStorage_obj( const StringObject& config_)
 	return createStorage( value);
 }
 
+void Context::createVectorStorage_obj( const StringObject& config_)
+{
+	std::string value;
+	initString( value, config_.ptr());
+	return createVectorStorage( value);
+}
+
 void Context::destroyStorage_obj( const StringObject& config_)
 {
 	std::string value;

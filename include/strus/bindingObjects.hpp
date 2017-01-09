@@ -2723,7 +2723,17 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	void createStorage_obj( const StringObject& config_);
 #endif
+
+	/// \brief Create a new storage (physically) described by config
+	/// \param[in] config_ storage configuration
+ 	/// \remark Fails if the storage already exists
+	void createVectorStorage( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void createVectorStorage_obj( const StringObject& config_);
+#endif
 	/// \brief Delete the storage (physically) described by config
+	/// \note works also on vector storages
 	/// \param[in] config_ storage description
 	/// \note Handle this function carefully
 	void destroyStorage( const String& config_);
