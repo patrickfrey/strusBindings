@@ -708,11 +708,22 @@ void Query::setWeightingVariables_obj(
 	}
 }
 
-void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const std::vector<double>& vec)
+void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const FunctionObject& vec_)
 {
 	std::string name;
 	initString( name, name_.ptr());
-	addFeature( name, vec);
+
+	boost::python::extract<std::vector<double> > expr(vec_);
+	if (expr.check())
+	{
+		addFeature( name, (const std::vector<double>&)expr);
+	}
+	else
+	{
+		std::vector<double> vec;
+		initFloatVectorList( vec, vec_.ptr());
+		addFeature( name, vec);
+	}
 }
 
 StorageClient Context::createStorageClient_0()

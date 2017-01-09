@@ -22,6 +22,7 @@ int initFunctionVariableConfig( FunctionVariableConfig& result, zval* obj);
 int initQueryExpression( QueryExpression& result, zval* obj);
 int initStringVector( std::vector<std::string>& result, zval* obj);
 int initIntVector( std::vector<int>& result, zval* obj);
+int initFloatVector( std::vector<double>& result, zval* obj);
 int initGlobalStatistics( GlobalStatistics& result, zval* obj);
 int initTermStatistics( TermStatistics& result, zval* obj);
 int initPatternMatcher( PatternMatcher& matcher, zval* obj);

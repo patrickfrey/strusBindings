@@ -1663,7 +1663,7 @@ public:
 	/// \brief Get the vector assigned to a feature addressed by index
 	/// \param[in] index index of the feature (number >= 0)
 	/// return the vector
-	VecRankVector findSimilar( const std::vector<double>& vec, unsigned int maxNofResults) const;
+	VecRankVector findSimilar( const FloatVector& vec, unsigned int maxNofResults) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
@@ -1767,9 +1767,9 @@ public:
 
 	~VectorStorageBuilder(){}
 
-	void addFeature( const std::string& name, const std::vector<double>& vec);
+	void addFeature( const std::string& name, const FloatVector& vec);
 #ifdef STRUS_BOOST_PYTHON
-	void addFeature_obj( const StringObject& name, const std::vector<double>& vec);
+	void addFeature_obj( const StringObject& name, const FunctionObject& vec);
 #endif
 
 	bool done();

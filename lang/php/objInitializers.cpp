@@ -877,6 +877,88 @@ int initIntVector( std::vector<int>& result, zval* obj)
 	return error;
 }
 
+int initFloatVector( std::vector<double>& result, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			try
+			{
+				result.push_back( Z_LVAL_P( obj));
+			}
+			catch (...)
+			{
+				THROW_EXCEPTION( "memory allocation error");
+				error = -1;
+			}
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to std::vector<int>");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			try
+			{
+				result.push_back( Z_DVAL_P( obj));
+			}
+			catch (...)
+			{
+				THROW_EXCEPTION( "memory allocation error");
+				error = -1;
+			}
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to std::vector<int>");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P(obj);
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr))
+			{
+				if (Z_TYPE_PP(data) != IS_DOUBLE)
+				{
+					THROW_EXCEPTION( "expected array of double precision floats");
+					error = -1;
+					break;
+				}
+				try
+				{
+					result.push_back( Z_DVAL_PP( data));
+				}
+				catch (...)
+				{
+					THROW_EXCEPTION( "memory allocation error");
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to std::vector<int>");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to std::vector<int>");
+			error = -1;
+			break;
+		default: 
+			THROW_EXCEPTION( "unable to convert unknown type to std::vector<int>");
+			error = -1;
+			break;
+	}
+	return error;
+}
 
 class TermStatisticsBuilder
 {

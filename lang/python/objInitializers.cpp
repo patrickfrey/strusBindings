@@ -803,6 +803,52 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 	}
 }
 
+void initFloatVector( std::vector<double>& result, PyObject* obj)
+{
+	if (PyFloat_Check( obj))
+	{
+		double item = PyFloat_AsDouble( obj);
+		result.push_back( item);
+	}
+	else if (PySequence_Check( obj))
+	{
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("float (double) list expected as sequence")));
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii < len; ii++)
+			{
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
+				/* DON'T DECREF item here */
+				try
+				{
+					if (PyFloat_Check( item))
+					{
+						double itemval = PyFloat_AsDouble( item);
+						result.push_back( itemval);
+					}
+					else
+					{
+						throw strus::runtime_error( _TXT("double precision float expected as element of float list"));
+					}
+				}
+				catch (const std::exception& err)
+				{
+					throw strus::runtime_error( _TXT("failed to build vector of double precision floats: %s"), err.what());
+				}
+			}
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("list of double precision floats expected"));
+		}
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("list of double precision floats or double precision float expected (check)"));
+	}
+}
+
 class TermStatisticsBuilder
 {
 public:
