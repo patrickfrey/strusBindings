@@ -2,6 +2,12 @@ cmake_minimum_required( VERSION 2.6 FATAL_ERROR )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/lang/php/example" )
 set( tests helloWorld createCollection query query_trace queryexpr status )
+IF (WITH_STRUS_PATTERN STREQUAL "YES")
+set( tests ${tests} querypattern )
+ENDIF (WITH_STRUS_PATTERN STREQUAL "YES")
+IF (WITH_STRUS_VECTOR STREQUAL "YES")
+set( tests ${tests} vectors )
+ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
 if( CMAKE_MAJOR_VERSION GREATER 2 OR CMAKE_MINOR_VERSION GREATER 6 )
 	foreach( test ${tests} )
