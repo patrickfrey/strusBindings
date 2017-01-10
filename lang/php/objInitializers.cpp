@@ -1104,7 +1104,7 @@ int initTermStatistics( TermStatistics& result, zval* obj)
 
 int getTermVector( zval*& result, const std::vector<Term>& ar)
 {
-	array_init( result);
+	array_init_size( result, ar.size());
 	std::vector<Term>::const_iterator ti = ar.begin(), te = ar.end();
 	for (; ti != te; ++ti)
 	{
@@ -1121,7 +1121,7 @@ int getTermVector( zval*& result, const std::vector<Term>& ar)
 
 static int getSummaryElementVector( zval*& result, const std::vector<SummaryElement>& ar)
 {
-	array_init( result);
+	array_init_size( result, ar.size());
 	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
 	{
@@ -1138,7 +1138,7 @@ static int getSummaryElementVector( zval*& result, const std::vector<SummaryElem
 
 int getRankVector( zval*& result, const std::vector<Rank>& ar)
 {
-	array_init( result);
+	array_init_size( result, ar.size());
 	std::vector<Rank>::const_iterator ri = ar.begin(), re = ar.end();
 	for (; ri != re; ++ri)
 	{
@@ -1155,6 +1155,59 @@ int getRankVector( zval*& result, const std::vector<Rank>& ar)
 		add_next_index_zval( result, rank);
 	}
 	return 0;
+}
+
+int getVecRankVector( zval*& result, const std::vector<VecRank>& ar)
+{
+	array_init_size( result, ar.size());
+	std::vector<VecRank>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		zval* rank;
+		MAKE_STD_ZVAL( rank);
+		object_init( rank);
+		add_property_long( rank, "index", ri->index());
+		add_property_double( rank, "weight", ri->weight());
+
+		add_next_index_zval( result, rank);
+	}
+	return 0;
+}
+
+int getStringVector( zval*& result, const std::vector<std::string>& ar)
+{
+	int error = 0;
+	array_init_size( result, ar.size());
+	std::vector<std::string>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		error |= add_next_index_stringl( result, ri->c_str(), ri->size(), 1);
+	}
+	return error;
+}
+
+int getFloatVector( zval*& result, const std::vector<double>& ar)
+{
+	int error = 0;
+	array_init_size( result, ar.size());
+	std::vector<double>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		error |= add_next_index_double( result, *ri);
+	}
+	return error;
+}
+
+int getIntVector( zval*& result, const std::vector<int>& ar)
+{
+	int error = 0;
+	array_init_size( result, ar.size());
+	std::vector<int>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		error |= add_next_index_long( result, *ri);
+	}
+	return error;
 }
 
 int getQueryResult( zval*& result, const QueryResult& res)

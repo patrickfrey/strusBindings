@@ -41,6 +41,8 @@ bp::register_exception_translator<std::bad_alloc>( translate_bad_alloc);
 bp::register_exception_translator<std::logic_error>( translate_logic_error);
 bp::register_exception_translator<std::exception>( translate_exception);
 
+bp::class_<IndexVector>("IndexVector") .def( bp::vector_indexing_suite<IndexVector>());
+bp::class_<FloatVector>("FloatVector") .def( bp::vector_indexing_suite<FloatVector>());
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
 bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
@@ -48,6 +50,7 @@ bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringV
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
 bp::class_<DocumentFrequencyChangeVector>("DocumentFrequencyChangeVector") .def( bp::vector_indexing_suite<DocumentFrequencyChangeVector>());
+bp::class_<VecRankVector>("VecRankVector") .def( bp::vector_indexing_suite<VecRankVector>());
 bp::class_<Tokenizer>("Tokenizer")
 	.def("name", &Tokenizer::name, bp::return_value_policy<bp::copy_const_reference>())
 	.def("arguments", &Tokenizer::arguments, bp::return_value_policy<bp::copy_const_reference>())
@@ -212,7 +215,7 @@ bp::class_<VecRank>("VecRank")
 	.def("weight", &VecRank::weight)
 ;
 bp::class_<VectorStorageSearcher>("VectorStorageSearcher")
-	.def("findSimilar", &VectorStorageSearcher::findSimilar)
+	.def("findSimilar", &VectorStorageSearcher::findSimilar_obj)
 	.def("close", &VectorStorageSearcher::close)
 ;
 bp::class_<VectorStorageClient>("VectorStorageClient")

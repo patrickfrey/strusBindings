@@ -153,6 +153,7 @@ $ignoreMethodMap{"pushTerm"} = 1;
 $ignoreMethodMap{"push"} = 1;
 $ignoreMethodMap{"attachVariable"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
+$ignoreMethodMap{"findSimilar"} = 1;
 $ignoreMethodMap{"addFeature"} = 1;
 $ignoreMethodMap{"defineTermStatistics"} = 1;
 $ignoreMethodMap{"defineGlobalStatistics"} = 1;
@@ -207,6 +208,7 @@ $renameMethodMap{"defineFeature_3"} = "defineFeature";
 $renameMethodMap{"defineFeature_expr_2"} = "defineFeature";
 $renameMethodMap{"defineFeature_expr_3"} = "defineFeature";
 $renameMethodMap{"addFeature_obj"} = "addFeature";
+$renameMethodMap{"findSimilar_obj"} = "findSimilar";
 $renameMethodMap{"defineTermStatistics_obj_struct"} = "defineTermStatistics";
 $renameMethodMap{"defineGlobalStatistics_struct"} = "defineGlobalStatistics";
 $renameMethodMap{"addDocumentEvaluationSet_struct"} = "addDocumentEvaluationSet";
@@ -616,6 +618,8 @@ bp::register_exception_translator<std::bad_alloc>( translate_bad_alloc);
 bp::register_exception_translator<std::logic_error>( translate_logic_error);
 bp::register_exception_translator<std::exception>( translate_exception);
 
+bp::class_<IndexVector>("IndexVector") .def( bp::vector_indexing_suite<IndexVector>());
+bp::class_<FloatVector>("FloatVector") .def( bp::vector_indexing_suite<FloatVector>());
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
 bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
@@ -623,6 +627,7 @@ bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringV
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
 bp::class_<DocumentFrequencyChangeVector>("DocumentFrequencyChangeVector") .def( bp::vector_indexing_suite<DocumentFrequencyChangeVector>());
+bp::class_<VecRankVector>("VecRankVector") .def( bp::vector_indexing_suite<VecRankVector>());
 EOF
 
 my $classdef;

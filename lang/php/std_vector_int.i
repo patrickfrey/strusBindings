@@ -17,3 +17,12 @@ namespace std {
 		$1 = &temp;
 	}
 }
+
+%typemap(out) std::vector<int>
+{
+	if (getIntVector( $result, $1))
+	{
+		SWIG_fail;
+	}
+}
+

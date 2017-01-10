@@ -60,7 +60,7 @@ try
 		$query->defineFeature( "seek", $expr, 1.0);
 		# Each query term is also part of the selection expressions
 		$selexpr->pushTerm( $term->type, $term->value);
-		print "term " . $term->type . " " . $term->value . " (" . $selexpr->size() . ")";
+		print "term " . $term->type . " " . $term->value . " (" . $selexpr->size() . ")\n";
 	}
 	# Create a selection feature 'select' that matches documents that contain all query terms.
 	$selexpr->pushExpression( "contains", count( $terms));

@@ -708,6 +708,21 @@ void Query::setWeightingVariables_obj(
 	}
 }
 
+VecRankVector VectorStorageSearcher::findSimilar_obj( const FunctionObject& vec_, unsigned int maxNofResults) const
+{
+	boost::python::extract<std::vector<double> > expr(vec_);
+	if (expr.check())
+	{
+		return findSimilar( (const std::vector<double>&)expr, maxNofResults);
+	}
+	else
+	{
+		std::vector<double> vec;
+		initFloatVector( vec, vec_.ptr());
+		return findSimilar( vec, maxNofResults);
+	}
+}
+
 void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const FunctionObject& vec_)
 {
 	std::string name;
