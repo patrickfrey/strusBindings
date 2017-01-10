@@ -45,6 +45,8 @@
 #include "strus/vectorStorageInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/base/utf8.hpp"
+#include "strus/base/symbolTable.hpp"
 #include "private/internationalization.hpp"
 #include "utils.hpp"
 #include "private/traceUtils.hpp"
@@ -687,6 +689,8 @@ static strus::PatternMatcherInstanceInterface::JoinOperation patternMatcherJoinO
 	}
 }
 
+enum {MaxPatternTermNameId=(1<<24)};
+
 class PatternMatchLoader
 {
 public:
@@ -703,9 +707,10 @@ static void loadPatterMatcher(
 	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
 	matcherInstance.reset( matcher->createInstance());
 	feederInstance.reset( feeder->createInstance());
-	unsigned int termtypeidcnt = 0;
-	enum {MaxTermTypeId=(1<<24)};
-	unsigned int symbolidcnt = MaxTermTypeId;
+
+	strus::SymbolTable termsymtab;
+	strus::SymbolTable termtypetab;
+
 	std::vector<PatternMatcher::StackOp>::const_iterator oi = patternMatcher.ops().begin(), oe = patternMatcher.ops().end();
 	for (; oi != oe; ++oi)
 	{
@@ -721,36 +726,25 @@ static void loadPatterMatcher(
 				}
 				else
 				{
-					unsigned int termtypeid = feederInstance->getLexem( type_);
-					if (!termtypeid)
+					uint32_t termtypeid = termtypetab.getOrCreate( type_);
+					if (termtypetab.isNew())
 					{
-						if (++termtypeidcnt >= MaxTermTypeId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
-						feederInstance->defineLexem( termtypeidcnt, type_);
-						if (!value_[0])
-						{
-							matcherInstance->pushTerm( termtypeidcnt);
-						}
-						else
-						{
-							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
-							feederInstance->defineSymbol( symbolidcnt, termtypeidcnt, value_);
-							matcherInstance->pushTerm( symbolidcnt);
-						}
+						if (termtypeid >= MaxPatternTermNameId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
+						feederInstance->defineLexem( termtypeid, type_);
 					}
-					else if (!value_[0])
+					if (!value_[0])
 					{
 						matcherInstance->pushTerm( termtypeid);
 					}
 					else
 					{
-						unsigned int symbolid = feederInstance->getSymbol( termtypeid, value_);
-						if (!symbolid)
+						uint32_t termsymid = termsymtab.getOrCreate(
+							termSymbolKey( termtypeid, value_));
+						if (termsymtab.isNew())
 						{
-							if (++symbolidcnt == 0) throw strus::runtime_error(_TXT("too many symbols defined in pattern match program"));
-							feederInstance->defineSymbol( symbolidcnt, termtypeid, value_);
-							symbolid = symbolidcnt;
+							feederInstance->defineSymbol( termsymid, termtypeid, value_);
 						}
-						matcherInstance->pushTerm( symbolid);
+						matcherInstance->pushTerm( termsymid);
 					}
 				}
 				break;
@@ -786,6 +780,15 @@ static void loadPatterMatcher(
 			}
 		}
 	}
+}
+private:
+static std::string termSymbolKey( unsigned int termid, const std::string& name)
+{
+	char termidbuf[ 16];
+	std::size_t termidsize = strus::utf8encode( termidbuf, termid+1);
+	std::string symkey( termidbuf, termidsize);
+	symkey.append( name);
+	return symkey;
 }
 };
 
