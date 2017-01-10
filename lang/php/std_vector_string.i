@@ -18,3 +18,11 @@ namespace std {
 	}
 }
 
+%typemap(out) std::vector<std::string>
+{
+	if (getStringVector( $result, $1))
+	{
+		SWIG_fail;
+	}
+}
+

@@ -1664,6 +1664,9 @@ public:
 	/// \param[in] index index of the feature (number >= 0)
 	/// return the vector
 	VecRankVector findSimilar( const FloatVector& vec, unsigned int maxNofResults) const;
+#ifdef STRUS_BOOST_PYTHON
+	VecRankVector findSimilar_obj( const FunctionObject& vec, unsigned int maxNofResults) const;
+#endif
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();

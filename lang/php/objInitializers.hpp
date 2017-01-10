@@ -29,7 +29,11 @@ int initPatternMatcher( PatternMatcher& matcher, zval* obj);
 
 int getTermVector( zval*& result, const std::vector<Term>& ar);
 int getRankVector( zval*& result, const std::vector<Rank>& ar);
+int getVecRankVector( zval*& result, const std::vector<VecRank>& ar);
 int getQueryResult( zval*& result, const QueryResult& res);
+int getStringVector( zval*& result, const std::vector<std::string>& ar);
+int getFloatVector( zval*& result, const std::vector<double>& ar);
+int getIntVector( zval*& result, const std::vector<int>& ar);
 
 std::string dumpObject( zval* obj);
 
