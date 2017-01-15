@@ -2227,6 +2227,10 @@ static strus::MetaDataRestrictionInterface::CompareOperator getCompareOp( const 
 	{
 		cmpop = strus::MetaDataRestrictionInterface::CompareEqual;
 	}
+	else if (compareOp[0] == '=' && compareOp[1] == '=' && compareOp[2] == '\0')
+	{
+		cmpop = strus::MetaDataRestrictionInterface::CompareEqual;
+	}
 	else if (compareOp[0] == '!' && compareOp[1] == '=' && compareOp[2] == '\0')
 	{
 		cmpop = strus::MetaDataRestrictionInterface::CompareNotEqual;
