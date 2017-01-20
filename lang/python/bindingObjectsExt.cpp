@@ -344,6 +344,16 @@ void DocumentAnalyzer::definePatternMatcherPostProc_expr(
 	}
 }
 
+void DocumentAnalyzer::definePatternMatcherPostProcFromFile_obj(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const StringObject& serializedPatternFile_)
+{
+	std::string serializedPatternFile;
+	initString( serializedPatternFile, serializedPatternFile_.ptr());
+	definePatternMatcherPostProcFromFile( patternTypeName, patternMatcherModule, serializedPatternFile);
+}
+
 void DocumentAnalyzeQueue::push_obj_1( const StringObject& value_)
 {
 	std::string value;
@@ -471,6 +481,16 @@ void QueryAnalyzer::definePatternMatcherPostProc_expr(
 		initPatternMatcher( matcher, expr_.ptr());
 		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, matcher);
 	}
+}
+
+void QueryAnalyzer::definePatternMatcherPostProcFromFile_obj(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const StringObject& serializedPatternFile_)
+{
+	std::string serializedPatternFile;
+	initString( serializedPatternFile, serializedPatternFile_.ptr());
+	definePatternMatcherPostProcFromFile( patternTypeName, patternMatcherModule, serializedPatternFile);
 }
 
 TermVector QueryAnalyzer::analyzeField_obj(

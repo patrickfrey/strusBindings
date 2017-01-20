@@ -21,6 +21,7 @@
 #include "strus/lib/module.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/lib/error.hpp"
+#include "strus/lib/pattern_serialize.hpp"
 #include "strus/rpcClientInterface.hpp"
 #include "strus/rpcClientMessagingInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
@@ -47,6 +48,7 @@
 #include "strus/base/configParser.hpp"
 #include "strus/base/utf8.hpp"
 #include "strus/base/symbolTable.hpp"
+#include "strus/base/fileio.hpp"
 #include "private/internationalization.hpp"
 #include "utils.hpp"
 #include "private/traceUtils.hpp"
@@ -707,6 +709,8 @@ static void loadPatterMatcher(
 	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
 	matcherInstance.reset( matcher->createInstance());
 	feederInstance.reset( feeder->createInstance());
+	if (!feederInstance.get()) throw strus::runtime_error(_TXT("failed to create pattern feeder: %s"), errorhnd->fetchError());
+	if (!matcherInstance.get()) throw strus::runtime_error(_TXT("failed to create pattern matcher: %s"), errorhnd->fetchError());
 
 	strus::SymbolTable termsymtab;
 	strus::SymbolTable termtypetab;
@@ -790,6 +794,31 @@ static std::string termSymbolKey( unsigned int termid, const std::string& name)
 	symkey.append( name);
 	return symkey;
 }
+public:
+static void loadPatterMatcherFromFile(
+	strus::Reference<strus::PatternMatcherInstanceInterface>& matcherInstance, 
+	strus::Reference<strus::PatternTermFeederInstanceInterface>& feederInstance, 
+	const strus::TextProcessorInterface* textproc,
+	const std::string& patternMatcherModule,
+	const std::string& filename,
+	strus::ErrorBufferInterface* errorhnd)
+{
+	const strus::PatternMatcherInterface* matcher = textproc->getPatternMatcher( patternMatcherModule);
+	if (!matcher) throw strus::runtime_error(_TXT("failed to load matcher module: %s"), errorhnd->fetchError());
+	const strus::PatternTermFeederInterface* feeder = textproc->getPatternTermFeeder();
+	matcherInstance.reset( matcher->createInstance());
+	feederInstance.reset( feeder->createInstance());
+	if (!feederInstance.get()) throw strus::runtime_error(_TXT("failed to create pattern feeder: %s"), errorhnd->fetchError());
+	if (!matcherInstance.get()) throw strus::runtime_error(_TXT("failed to create pattern matcher: %s"), errorhnd->fetchError());
+	std::string filepath( textproc->getResourcePath( filename));
+	std::string content;
+	unsigned int ec = strus::readFile( filepath, content);
+	if (!ec) throw strus::runtime_error(_TXT("failed to read serialized patterns from file '%s': %s"), filepath.c_str(), ::strerror(ec));
+	if (!strus::loadPatternMatcherFromSerialization( content, feederInstance.get(), matcherInstance.get(), errorhnd))
+	{
+		throw strus::runtime_error(_TXT("failed to load pattern matcher from serialization: %s"), errorhnd->fetchError());
+	}
+}
 };
 
 void DocumentAnalyzer::definePatternMatcherPostProc(
@@ -804,6 +833,25 @@ void DocumentAnalyzer::definePatternMatcherPostProc(
 	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance;
 	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance;
 	PatternMatchLoader::loadPatterMatcher( matcherInstance, feederInstance, textproc, patternMatcherModule, patterns, errorhnd);
+	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
+	matcherInstance.release();
+	feederInstance.release();
+}
+
+void DocumentAnalyzer::definePatternMatcherPostProcFromFile(
+		const std::string& patternTypeName,
+		const std::string& patternMatcherModule,
+		const std::string& serializedPatternFile)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance;
+	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance;
+	PatternMatchLoader::loadPatterMatcherFromFile(
+		matcherInstance, feederInstance, 
+		textproc, patternMatcherModule, serializedPatternFile, errorhnd);
 	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
 	matcherInstance.release();
 	feederInstance.release();
@@ -1176,6 +1224,25 @@ void QueryAnalyzer::definePatternMatcherPostProc(
 	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance;
 	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance;
 	PatternMatchLoader::loadPatterMatcher( matcherInstance, feederInstance, textproc, patternMatcherModule, patterns, errorhnd);
+	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
+	matcherInstance.release();
+	feederInstance.release();
+}
+
+void QueryAnalyzer::definePatternMatcherPostProcFromFile(
+		const std::string& patternTypeName,
+		const std::string& patternMatcherModule,
+		const std::string& serializedPatternFile)
+{
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
+	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+	strus::Reference<strus::PatternMatcherInstanceInterface> matcherInstance;
+	strus::Reference<strus::PatternTermFeederInstanceInterface> feederInstance;
+	PatternMatchLoader::loadPatterMatcherFromFile(
+		matcherInstance, feederInstance, 
+		textproc, patternMatcherModule, serializedPatternFile, errorhnd);
 	THIS->definePatternMatcherPostProc( patternTypeName, matcherInstance.get(), feederInstance.get());
 	matcherInstance.release();
 	feederInstance.release();

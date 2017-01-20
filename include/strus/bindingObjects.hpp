@@ -900,11 +900,25 @@ public:
 			const String& patternMatcherModule,
 			const PatternMatcher& patterns);
 
+	/// \brief Declare a pattern matcher on the document features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
+	void definePatternMatcherPostProcFromFile(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const String& serializedPatternFile);
+
 #ifdef STRUS_BOOST_PYTHON
 	void definePatternMatcherPostProc_expr(
 			const String& patternTypeName,
 			const String& patternMatcherModule,
 			const FunctionObject& expr_);
+
+	void definePatternMatcherPostProcFromFile_obj(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const StringObject& serializedPatternFile);
 #endif
 
 	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
@@ -1229,11 +1243,25 @@ public:
 			const String& patternMatcherModule,
 			const PatternMatcher& patterns);
 
+	/// \brief Declare a pattern matcher on the query features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
+	void definePatternMatcherPostProcFromFile(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const String& serializedPatternFile);
+
 #ifdef STRUS_BOOST_PYTHON
 	void definePatternMatcherPostProc_expr(
 			const String& patternTypeName,
 			const String& patternMatcherModule,
 			const FunctionObject& expr_);
+
+	void definePatternMatcherPostProcFromFile_obj(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const StringObject& serializedPatternFile);
 #endif
 
 	/// \brief Tokenizes and normalizes a query field and creates some typed terms out of it according the definition of the field type given.
