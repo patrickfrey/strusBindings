@@ -813,7 +813,7 @@ static void loadPatterMatcherFromFile(
 	std::string filepath( textproc->getResourcePath( filename));
 	std::string content;
 	unsigned int ec = strus::readFile( filepath, content);
-	if (!ec) throw strus::runtime_error(_TXT("failed to read serialized patterns from file '%s': %s"), filepath.c_str(), ::strerror(ec));
+	if (ec) throw strus::runtime_error(_TXT("failed to read serialized patterns from file '%s': %s"), filepath.c_str(), ::strerror(ec));
 	if (!strus::loadPatternMatcherFromSerialization( content, feederInstance.get(), matcherInstance.get(), errorhnd))
 	{
 		throw strus::runtime_error(_TXT("failed to load pattern matcher from serialization: %s"), errorhnd->fetchError());
