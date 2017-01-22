@@ -811,6 +811,10 @@ static void loadPatterMatcherFromFile(
 	if (!feederInstance.get()) throw strus::runtime_error(_TXT("failed to create pattern feeder: %s"), errorhnd->fetchError());
 	if (!matcherInstance.get()) throw strus::runtime_error(_TXT("failed to create pattern matcher: %s"), errorhnd->fetchError());
 	std::string filepath( textproc->getResourcePath( filename));
+	if (filepath.empty())
+	{
+		throw strus::runtime_error(_TXT("path of file '%s' not found: %s"), filename.c_str(), errorhnd->fetchError());
+	}
 	std::string content;
 	unsigned int ec = strus::readFile( filepath, content);
 	if (ec) throw strus::runtime_error(_TXT("failed to read serialized patterns from file '%s': %s"), filepath.c_str(), ::strerror(ec));
