@@ -331,10 +331,6 @@ void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
-			if (len == 0)
-			{
-				throw strus::runtime_error( _TXT( "normalizer list is empty"));
-			}
 			for (; ii < len; ii++)
 			{
 				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
