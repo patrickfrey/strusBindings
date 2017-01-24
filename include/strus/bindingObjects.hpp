@@ -1708,6 +1708,9 @@ private:
 	Reference m_trace_impl;
 };
 
+/// \brief Forward declaration
+class VectorStorageTransaction;
+
 /// \brief Object representing a client connection to a vector storage 
 /// \remark The only way to construct a vector storage client instance is to call Context::createVectorStorageClient(const std::string&)
 class VectorStorageClient
@@ -1729,6 +1732,9 @@ public:
 	/// \return the vector search interface (with ownership)
 	VectorStorageSearcher createSearcher( const Index& range_from, const Index& range_to) const;
 
+	/// \brief Create a vector storage transaction instance
+	VectorStorageTransaction createTransaction();
+	
 	/// \brief Get the list of concept class names defined
 	/// \return the list
 	StringVector conceptClassNames() const;
@@ -1784,40 +1790,46 @@ private:
 	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_vector_storage_impl;
+	std::string m_config;
 };
 
-class VectorStorageBuilder
+class VectorStorageTransaction
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
 	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
-	VectorStorageBuilder(){}
+	VectorStorageTransaction(){}
 #endif
 	/// \brief Copy constructor
-	VectorStorageBuilder( const VectorStorageBuilder& o);
+	VectorStorageTransaction( const VectorStorageTransaction& o);
 
-	~VectorStorageBuilder(){}
+	~VectorStorageTransaction(){}
 
-	void addFeature( const std::string& name, const FloatVector& vec);
+	void addFeature( const String& name, const FloatVector& vec);
 #ifdef STRUS_BOOST_PYTHON
 	void addFeature_obj( const StringObject& name, const FunctionObject& vec);
 #endif
+	void defineFeatureConceptRelation( const String& relationTypeName, const Index& featidx, const Index& conidx);
+#ifdef STRUS_BOOST_PYTHON
+	void defineFeatureConceptRelation_obj( const StringObject& relationTypeName, const Index& featidx, const Index& conidx);
+#endif
 
-	bool done();
+	bool commit();
 
-	bool run( const std::string& command);
+	void rollback();
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
 
 private:
-	friend class Context;
-	VectorStorageBuilder( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const String& config);
+	friend class VectorStorageClient;
+	VectorStorageTransaction( const Reference& objbuilder, const Reference& storage, const Reference& trace, const Reference& errorhnd_, const String& config);
 
 	Reference m_errorhnd_impl;
 	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
-	Reference m_vector_builder_impl;
+	Reference m_vector_storage_impl;	
+	Reference m_vector_transaction_impl;
 };
 
 
@@ -2530,7 +2542,7 @@ public:
 
 	/// \brief Map the contents of the query to a readable string
 	/// \return the string
-	std::string tostring() const;
+	String tostring() const;
 
 private:
 	friend class QueryEval;
@@ -2714,7 +2726,7 @@ public:
 
 	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	StatisticsProcessor createStatisticsProcessor( const std::string& name);
+	StatisticsProcessor createStatisticsProcessor( const String& name);
 
 	/// \brief Create a storage client instance of the the default storage
 	StorageClient createStorageClient();
@@ -2737,13 +2749,6 @@ public:
 #ifdef STRUS_BOOST_PYTHON
 	VectorStorageClient createVectorStorageClient_0();
 	VectorStorageClient createVectorStorageClient_obj( const StringObject& config_);
-#endif
-	/// \brief Create a vector storage builder instance
-	/// \param[in] config_ configuration string of the storage client
-	VectorStorageBuilder createVectorStorageBuilder( const String& config_);
-
-#ifdef STRUS_BOOST_PYTHON
-	VectorStorageBuilder createVectorStorageBuilder_obj( const StringObject& config_);
 #endif
 
 	/// \brief Create a new storage (physically) described by config

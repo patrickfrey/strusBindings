@@ -743,7 +743,7 @@ VecRankVector VectorStorageSearcher::findSimilar_obj( const FunctionObject& vec_
 	}
 }
 
-void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const FunctionObject& vec_)
+void VectorStorageTransaction::addFeature_obj( const StringObject& name_, const FunctionObject& vec_)
 {
 	std::string name;
 	initString( name, name_.ptr());
@@ -759,6 +759,13 @@ void VectorStorageBuilder::addFeature_obj( const StringObject& name_, const Func
 		initFloatVector( vec, vec_.ptr());
 		addFeature( name, vec);
 	}
+}
+
+void VectorStorageTransaction::defineFeatureConceptRelation_obj( const StringObject& relationTypeName_, const Index& featidx, const Index& conidx)
+{
+	std::string relationTypeName;
+	initString( relationTypeName, relationTypeName_.ptr());
+	defineFeatureConceptRelation( relationTypeName, featidx, conidx);
 }
 
 StorageClient Context::createStorageClient_0()
@@ -783,13 +790,6 @@ VectorStorageClient Context::createVectorStorageClient_obj( const StringObject& 
 	std::string value;
 	initString( value, config_.ptr());
 	return createVectorStorageClient( value);
-}
-
-VectorStorageBuilder Context::createVectorStorageBuilder_obj( const StringObject& config_)
-{
-	std::string value;
-	initString( value, config_.ptr());
-	return createVectorStorageBuilder( value);
 }
 
 WString DocumentFrequencyChange::ucvalue() const

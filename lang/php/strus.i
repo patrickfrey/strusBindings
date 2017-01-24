@@ -29,7 +29,7 @@
 %rename(StrusQueryAnalyzeQueue) QueryAnalyzeQueue;
 %rename(StrusStorageClient) StorageClient;
 %rename(StrusStorageTransaction) StorageTransaction;
-%rename(StrusVectorStorageBuilder) VectorStorageBuilder;
+%rename(StrusVectorStorageTransaction) VectorStorageTransaction;
 %rename(StrusVectorStorageClient) VectorStorageClient;
 %rename(StrusVectorStorageSearcher) VectorStorageSearcher;
 %rename(StrusPeerStorageTransaction) PeerStorageTransaction;

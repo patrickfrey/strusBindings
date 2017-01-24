@@ -42,7 +42,7 @@
 #include "strus/patternTermFeederInstanceInterface.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
-#include "strus/vectorStorageBuilderInterface.hpp"
+#include "strus/vectorStorageTransactionInterface.hpp"
 #include "strus/vectorStorageInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
@@ -1498,6 +1498,7 @@ VectorStorageClient::VectorStorageClient( const VectorStorageClient& o)
 	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
 	,m_vector_storage_impl(o.m_vector_storage_impl)
+	,m_config(o.m_config)
 {}
 
 void VectorStorageClient::close()
@@ -1515,6 +1516,11 @@ void VectorStorageClient::close()
 VectorStorageSearcher VectorStorageClient::createSearcher( const Index& range_from, const Index& range_to) const
 {
 	return VectorStorageSearcher( m_vector_storage_impl, m_trace_impl, range_from, range_to, m_errorhnd_impl);
+}
+
+VectorStorageTransaction VectorStorageClient::createTransaction()
+{
+	return VectorStorageTransaction( m_objbuilder_impl, m_vector_storage_impl, m_trace_impl, m_errorhnd_impl, m_config);
 }
 
 std::vector<std::string> VectorStorageClient::conceptClassNames() const
@@ -1658,6 +1664,7 @@ VectorStorageClient::VectorStorageClient( const Reference& objbuilder, const Ref
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
 	,m_vector_storage_impl(ReferenceDeleter<strus::VectorStorageClientInterface>::function)
+	,m_config(config)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
@@ -1669,32 +1676,56 @@ VectorStorageClient::VectorStorageClient( const Reference& objbuilder, const Ref
 	}
 }
 
-VectorStorageBuilder::VectorStorageBuilder( const VectorStorageBuilder& o)
+VectorStorageTransaction::VectorStorageTransaction( const VectorStorageTransaction& o)
 	:m_errorhnd_impl(o.m_errorhnd_impl)
 	,m_trace_impl(o.m_trace_impl)
 	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_vector_builder_impl(o.m_vector_builder_impl)
+	,m_vector_storage_impl(o.m_vector_storage_impl)
+	,m_vector_transaction_impl(o.m_vector_transaction_impl)
 {}
 
-void VectorStorageBuilder::addFeature( const std::string& name, const std::vector<double>& vec)
+void VectorStorageTransaction::addFeature( const std::string& name, const std::vector<double>& vec)
 {
-	strus::VectorStorageBuilderInterface* storage = (strus::VectorStorageBuilderInterface*)m_vector_builder_impl.get();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
-
-	storage->addFeature( name, vec);
+	strus::VectorStorageTransactionInterface* transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (!transaction)
+	{
+		strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_vector_storage_impl.get();
+		m_vector_transaction_impl.reset( (strus::StorageTransactionInterface*)storage->createTransaction());
+		if (!m_vector_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
+		transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
+	}
+	transaction->addFeature( name, vec);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to add feature to vector storage builder: %s"), errorhnd->fetchError());
 	}
 }
 
-bool VectorStorageBuilder::done()
+void VectorStorageTransaction::defineFeatureConceptRelation( const std::string& relationTypeName, const Index& featidx, const Index& conidx)
 {
-	strus::VectorStorageBuilderInterface* storage = (strus::VectorStorageBuilderInterface*)m_vector_builder_impl.get();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	strus::VectorStorageTransactionInterface* transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (!transaction)
+	{
+		strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_vector_storage_impl.get();
+		m_vector_transaction_impl.reset( (strus::StorageTransactionInterface*)storage->createTransaction());
+		if (!m_vector_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
+		transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
+	}
+	transaction->defineFeatureConceptRelation( relationTypeName, featidx, conidx);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to add feature to vector storage builder: %s"), errorhnd->fetchError());
+	}
+}
 
-	bool rt = storage->done();
+bool VectorStorageTransaction::commit()
+{
+	strus::VectorStorageTransactionInterface* transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
+	if (!transaction) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+
+	bool rt = transaction->commit();
 	if (!rt)
 	{
 		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
@@ -1706,51 +1737,41 @@ bool VectorStorageBuilder::done()
 	return rt;
 }
 
-bool VectorStorageBuilder::run( const std::string& command)
+void VectorStorageTransaction::rollback()
 {
-	strus::VectorStorageBuilderInterface* storage = (strus::VectorStorageBuilderInterface*)m_vector_builder_impl.get();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
-
-	bool rt = storage->run( command);
-	if (!rt)
-	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-		if (errorhnd->hasError())
-		{
-			throw strus::runtime_error(_TXT("failed to run vector storage builder command: %s"), errorhnd->fetchError());
-		}
-	}
-	return rt;
+	strus::VectorStorageTransactionInterface* transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
+	if (!transaction) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	transaction->rollback();
 }
 
-void VectorStorageBuilder::close()
+void VectorStorageTransaction::close()
 {
-	if (!m_vector_builder_impl.get()) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	if (!m_vector_transaction_impl.get()) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	bool preverr = errorhnd->hasError();
-	m_vector_builder_impl.reset();
+	m_vector_transaction_impl.reset();
 	if (!preverr && errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error detected after calling vector storage client close: %s"), errorhnd->fetchError());
 	}
 }
 
-VectorStorageBuilder::VectorStorageBuilder( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const std::string& config)
+VectorStorageTransaction::VectorStorageTransaction( const Reference& objbuilder, const Reference& storageref, const Reference& trace, const Reference& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
-	,m_trace_impl( trace)
-	,m_objbuilder_impl( objbuilder)
-	,m_vector_builder_impl(ReferenceDeleter<strus::VectorStorageBuilderInterface>::function)
+	,m_trace_impl(trace)
+	,m_objbuilder_impl(objbuilder)
+	,m_vector_storage_impl(storageref)
+	,m_vector_transaction_impl(ReferenceDeleter<strus::VectorStorageTransactionInterface>::function)
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
-	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
+	strus::VectorStorageClientInterface* storage = (strus::VectorStorageClientInterface*)m_vector_storage_impl.get();
 
-	m_vector_builder_impl.reset( strus::createVectorStorageBuilder( objBuilder, errorhnd, config));
-	if (!m_vector_builder_impl.get())
+	m_vector_transaction_impl.reset( storage->createTransaction());
+	if (!m_vector_transaction_impl.get())
 	{
-		throw strus::runtime_error( _TXT("failed to create vector storage builder: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to create vector storage transaction: %s"), errorhnd->fetchError());
 	}
 }
-
 
 StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& trace_, const Reference& errorhnd_, const Reference& storage_)
 	:m_errorhnd_impl(errorhnd_)
@@ -2837,12 +2858,6 @@ VectorStorageClient Context::createVectorStorageClient( const std::string& confi
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return VectorStorageClient( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, config_);
-}
-
-VectorStorageBuilder Context::createVectorStorageBuilder( const std::string& config_)
-{
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return VectorStorageBuilder( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, config_);
 }
 
 DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmentername_)

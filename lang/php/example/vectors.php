@@ -16,18 +16,18 @@ $ctx->createVectorStorage( $config);
 
 # Add the vectors:
 $config="path=vsm;dim=7;bit=3;var=32;maxdist=5;probsim=yes;simdist=5;probdist=8;raddist=5;eqdist=1;singletons=yes";
-$builder = $ctx->createVectorStorageBuilder( $config);
-$builder->addFeature( "A", array( 0.1, 0.2, 0.3, 0.1, 0.1, 0.1, 0.1) );
-$builder->addFeature( "B", array( 0.15, 0.25, 0.35, 0.09, 0.11, 0.12, 0.1) );
-$builder->addFeature( "C", array( 0.3, 0.2, 0.1, 0.12, 0.07, 0.09, 0.11) );
-$builder->addFeature( "D", array( 0.35, 0.25, 0.15, 0.13, 0.13, 0.12, 0.13) );
-$builder->addFeature( "E", array( 0.25, 0.2, 0.2, 0.12, 0.13, 0.13, 0.13) );
-$builder->addFeature( "F", array( 0.2, 0.25, 0.2, 0.11, 0.09, 0.08, 0.12) );
-$builder->addFeature( "G", array( 0.2, 0.2, 0.25, 0.12, 0.1, 0.08, 0.12) );
-$builder->run( "");
 
 # Get a client for the new created storage:
 $storage = $ctx->createVectorStorageClient( $config);
+$transaction = $storage->createTransaction();
+$transaction->addFeature( "A", array( 0.1, 0.2, 0.3, 0.1, 0.1, 0.1, 0.1) );
+$transaction->addFeature( "B", array( 0.15, 0.25, 0.35, 0.09, 0.11, 0.12, 0.1) );
+$transaction->addFeature( "C", array( 0.3, 0.2, 0.1, 0.12, 0.07, 0.09, 0.11) );
+$transaction->addFeature( "D", array( 0.35, 0.25, 0.15, 0.13, 0.13, 0.12, 0.13) );
+$transaction->addFeature( "E", array( 0.25, 0.2, 0.2, 0.12, 0.13, 0.13, 0.13) );
+$transaction->addFeature( "F", array( 0.2, 0.25, 0.2, 0.11, 0.09, 0.08, 0.12) );
+$transaction->addFeature( "G", array( 0.2, 0.2, 0.25, 0.12, 0.1, 0.08, 0.12) );
+$transaction->commit();
 
 print "storage config: " . $storage->config() . "\n";
 
