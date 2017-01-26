@@ -1481,6 +1481,26 @@ std::vector<VecRank> VectorStorageSearcher::findSimilar( const std::vector<doubl
 	return rt;
 }
 
+std::vector<VecRank> VectorStorageSearcher::findSimilarFromSelection( const IndexVector& featidxlist, const FloatVector& vec, unsigned int maxNofResults) const
+{
+	strus::VectorStorageSearchInterface* searcher = (strus::VectorStorageSearchInterface*)m_searcher_impl.get();
+	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
+
+	std::vector<strus::VectorStorageSearchInterface::Result> res = searcher->findSimilarFromSelection( featidxlist, vec, maxNofResults);
+	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("error in find similar features of vector: %s"), errorhnd->fetchError());
+	}
+	std::vector<VecRank> rt;
+	std::vector<strus::VectorStorageSearchInterface::Result>::const_iterator ri = res.begin(), re = res.end();
+	for (; ri != re; ++ri)
+	{
+		rt.push_back( VecRank( ri->featidx(), ri->weight()));
+	}
+	return rt;
+}
+
 void VectorStorageSearcher::close()
 {
 	if (!m_searcher_impl.get()) throw strus::runtime_error( _TXT("calling storage searcher method after close"));

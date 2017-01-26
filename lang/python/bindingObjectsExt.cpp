@@ -743,6 +743,32 @@ VecRankVector VectorStorageSearcher::findSimilar_obj( const FunctionObject& vec_
 	}
 }
 
+VecRankVector VectorStorageSearcher::findSimilarFromSelection_obj( const FunctionObject& featidxlist_, const FunctionObject& vec_, unsigned int maxNofResults) const
+{
+	std::vector<Index> featidxlist;
+	std::vector<Index> const* featidxlist_ref = &featidxlist;
+	boost::python::extract<std::vector<Index> > featidxlist_expr(featidxlist_);
+	if (featidxlist_expr.check())
+	{
+		featidxlist_ref = &(const std::vector<Index>&)featidxlist_expr;
+	}
+	else
+	{
+		initIntVector( featidxlist, featidxlist_.ptr());
+	}
+	boost::python::extract<std::vector<double> > expr(vec_);
+	if (expr.check())
+	{
+		return findSimilarFromSelection( *featidxlist_ref, (const std::vector<double>&)expr, maxNofResults);
+	}
+	else
+	{
+		std::vector<double> vec;
+		initFloatVector( vec, vec_.ptr());
+		return findSimilarFromSelection( *featidxlist_ref, vec, maxNofResults);
+	}
+}
+
 void VectorStorageTransaction::addFeature_obj( const StringObject& name_, const FunctionObject& vec_)
 {
 	std::string name;

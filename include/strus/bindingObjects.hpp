@@ -1688,12 +1688,23 @@ public:
 	/// \brief Destructor
 	~VectorStorageSearcher(){}
 
-	/// \brief Get the vector assigned to a feature addressed by index
-	/// \param[in] index index of the feature (number >= 0)
-	/// return the vector
+	/// \brief Find the most similar vectors to vector
+	/// \param[in] vec vector to search for
+	/// \param[in] maxNofResults maximum number of results to return
+	/// return the list of most similar vectors
 	VecRankVector findSimilar( const FloatVector& vec, unsigned int maxNofResults) const;
 #ifdef STRUS_BOOST_PYTHON
 	VecRankVector findSimilar_obj( const FunctionObject& vec, unsigned int maxNofResults) const;
+#endif
+
+	/// \brief Find the most similar vectors to vector in a selection of features addressed by index
+	/// \param[in] featidxlist list of candidate indices
+	/// \param[in] vec vector to search for
+	/// \param[in] maxNofResults maximum number of results to return
+	/// return the list of most similar vectors
+	VecRankVector findSimilarFromSelection( const IndexVector& featidxlist, const FloatVector& vec, unsigned int maxNofResults) const;
+#ifdef STRUS_BOOST_PYTHON
+	VecRankVector findSimilarFromSelection_obj( const FunctionObject& featidxlist, const FunctionObject& vec, unsigned int maxNofResults) const;
 #endif
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)

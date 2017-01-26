@@ -218,6 +218,7 @@ bp::class_<VecRank>("VecRank")
 ;
 bp::class_<VectorStorageSearcher>("VectorStorageSearcher")
 	.def("findSimilar", &VectorStorageSearcher::findSimilar_obj)
+	.def("findSimilarFromSelection", &VectorStorageSearcher::findSimilarFromSelection_obj)
 	.def("close", &VectorStorageSearcher::close)
 ;
 bp::class_<VectorStorageClient>("VectorStorageClient")
