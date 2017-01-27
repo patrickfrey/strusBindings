@@ -1927,10 +1927,19 @@ public:
 		m_features[ sumtype] = set;
 	}
 
+	/// \brief Rename a result (each summarizer result has a default name that can be changed with this method)
+	/// \param[in] origname original name of the result
+	/// \param[in] newname defined name of the result
+	void defineResultName( const String& origname, const String& newname)
+	{
+		m_resultnamemap[ origname] = newname;
+	}
+
 private:
 	friend class QueryEval;
 	std::map<std::string,Variant> m_parameters;
 	std::map<std::string,std::string> m_features;
+	std::map<std::string,std::string> m_resultnamemap;
 };
 
 /// \brief Configuration describing the values passed to a weighting function

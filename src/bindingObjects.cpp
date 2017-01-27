@@ -2083,6 +2083,12 @@ void QueryEval::addSummarizer(
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
+	std::map<std::string,std::string>::const_iterator
+		ri = config.m_resultnamemap.begin(), re = config.m_resultnamemap.end();
+	for (; ri != re; ++ri)
+	{
+		function->defineResultName( ri->first, ri->second);
+	}
 	queryeval->addSummarizerFunction( name, function.get(), featureParameters);
 	function.release();
 }

@@ -358,27 +358,10 @@ void initAggregator( Aggregator& result, PyObject* obj)
 	initFunctionObject( result, obj);
 }
 
-template <class Object>
-static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* keyitem, PyObject* valueitem)
+static void defineQueryEvaluationFunctionParameter( WeightingConfig& result, const char* key, PyObject* valueitem)
 {
-	char* key;
-	PyObjectReference key_obj;
 	Variant value;
 
-	if (PyString_Check( keyitem))
-	{
-		key = PyString_AS_STRING( keyitem);
-	}
-	else if (PyUnicode_Check( keyitem))
-	{
-		key_obj = PyUnicode_AsUTF8String( keyitem);
-		if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
-		key = PyString_AS_STRING( key_obj.ptr());
-	}
-	else
-	{
-		throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
-	}
 	initVariant( value, valueitem);
 	if (key[0] == '.')
 	{
@@ -409,8 +392,58 @@ static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* ke
 	}
 }
 
+static void defineSummarizationFunctionParameter( SummarizerConfig& result, const char* key, PyObject* valueitem)
+{
+	Variant value;
+
+	initVariant( value, valueitem);
+	if (key[0] == '.')
+	{
+		if (value.type() != Variant_TEXT)
+		{
+			throw strus::runtime_error( _TXT("string expected as query evaluation function feature parameter value"));
+		}
+		else try
+		{
+			const char* valuestr = value.getText();
+			result.defineFeature( std::string( key+1), valuestr);
+		}
+		catch (const std::exception& err)
+		{
+			throw strus::runtime_error( _TXT("cannot define summarization function parameter: %s"), err.what());
+		}
+	}
+	else if (key[0] == '$')
+	{
+		if (value.type() != Variant_TEXT)
+		{
+			throw strus::runtime_error( _TXT("string expected as summarization function feature parameter value"));
+		}
+		else try
+		{
+			const char* valuestr = value.getText();
+			result.defineResultName( std::string( key+1), valuestr);
+		}
+		catch (const std::exception& err)
+		{
+			throw strus::runtime_error( _TXT("cannot define query summarization function parameter: %s"), err.what());
+		}
+	}
+	else
+	{
+		try
+		{
+			result.defineParameter( std::string( key), value);
+		}
+		catch (const std::exception& err)
+		{
+			throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), err.what());
+		}
+	}
+}
+
 template <class Object>
-static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
+static void initQueryEvalFunctionConfig( Object& result, PyObject* obj, void (*DefineParameter)( Object&, const char*, PyObject*))
 {
 	if (PyDict_Check( obj))
 	{
@@ -419,7 +452,23 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 		
 		while (PyDict_Next( obj, &pos, &keyitem, &valueitem))
 		{
-			defineQueryEvaluationFunctionParameter( result, keyitem, valueitem);
+			char* key;
+			PyObjectReference key_obj;
+			if (PyString_Check( keyitem))
+			{
+				key = PyString_AS_STRING( keyitem);
+			}
+			else if (PyUnicode_Check( keyitem))
+			{
+				key_obj = PyUnicode_AsUTF8String( keyitem);
+				if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+				key = PyString_AS_STRING( key_obj.ptr());
+			}
+			else
+			{
+				throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
+			}
+			DefineParameter( result, key, valueitem);
 		}
 	}
 	else if (PySequence_Check( obj))
@@ -437,7 +486,23 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 					PyObject* keyitem = PySequence_Fast_GET_ITEM( item, 0);
 					PyObject* valueitem = PySequence_Fast_GET_ITEM( item, 1);
 
-					defineQueryEvaluationFunctionParameter( result, keyitem, valueitem);
+					char* key;
+					PyObjectReference key_obj;
+					if (PyString_Check( keyitem))
+					{
+						key = PyString_AS_STRING( keyitem);
+					}
+					else if (PyUnicode_Check( keyitem))
+					{
+						key_obj = PyUnicode_AsUTF8String( keyitem);
+						if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+						key = PyString_AS_STRING( key_obj.ptr());
+					}
+					else
+					{
+						throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
+					}
+					DefineParameter( result, key, valueitem);
 				}
 				else
 				{
@@ -458,12 +523,12 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 
 void initSummarizerConfig( SummarizerConfig& result, PyObject* obj)
 {
-	initQueryEvalFunctionConfig( result, obj);
+	initQueryEvalFunctionConfig( result, obj, defineSummarizationFunctionParameter);
 }
 
 void initWeightingConfig( WeightingConfig& result, PyObject* obj)
 {
-	initQueryEvalFunctionConfig( result, obj);
+	initQueryEvalFunctionConfig( result, obj, defineQueryEvaluationFunctionParameter);
 }
 
 static char* getString( PyObject* item, PyObjectReference& temp_obj)

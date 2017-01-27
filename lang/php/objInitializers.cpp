@@ -405,8 +405,7 @@ int initFunctionVariableConfig( FunctionVariableConfig& result, zval* obj)
 	return error;
 }
 
-template <class Object>
-static int defineQueryEvaluationFunctionParameter( Object& result, const char* key, std::size_t keylen, zval* valueitem)
+static int defineQueryEvaluationFunctionParameter( WeightingConfig& result, const char* key, std::size_t keylen, zval* valueitem)
 {
 	int error = 0;
 	try
@@ -445,8 +444,51 @@ static int defineQueryEvaluationFunctionParameter( Object& result, const char* k
 	return error;
 }
 
+static int defineSummarizationFunctionParameter( SummarizerConfig& result, const char* key, std::size_t keylen, zval* valueitem)
+{
+	int error = 0;
+	try
+	{
+		if (keylen && key[0] == '.')
+		{
+			result.defineFeature( std::string( key+1, keylen-1), std::string( Z_STRVAL_P( valueitem)));
+		}
+		else if (keylen && key[0] == '$')
+		{
+			result.defineResultName( std::string( key+1, keylen-1), std::string( Z_STRVAL_P( valueitem)));
+		}
+		else
+		{
+			switch (Z_TYPE_P(valueitem))
+			{
+				case IS_LONG:
+					result.defineParameter( std::string( key, keylen), Variant( (int)Z_LVAL_P( valueitem)));
+					break;
+				case IS_STRING:
+					result.defineParameter( std::string( key, keylen), Variant( (char*)Z_STRVAL_P( valueitem)));
+					break;
+				case IS_DOUBLE:
+					result.defineParameter( std::string( key, keylen), Variant( (double)Z_DVAL_P( valueitem)));
+					break;
+				case IS_BOOL:
+					result.defineParameter( std::string( key, keylen), Variant( (int)Z_BVAL_P( valueitem)));
+					break;
+				default:
+					THROW_EXCEPTION( "bad query evaluation function parameter value");
+					error = -1;
+			}
+		}
+	}
+	catch (...)
+	{
+		THROW_EXCEPTION( "memory allocation error");
+		error = -1;
+	}
+	return error;
+}
+
 template <class Object>
-static int initQueryEvalFunctionConfig( Object& result, zval* obj)
+static int initQueryEvalFunctionConfig( Object& result, zval* obj, int (*DefineParameter)( Object& result, const char* key, std::size_t keylen, zval* valueitem))
 {
 	int error = 0;
 	switch (obj->type)
@@ -489,7 +531,7 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 					error = -1;
 					break;
 				}
-				if (0!=defineQueryEvaluationFunctionParameter( result, name, name_len-1, *data))
+				if (0!=DefineParameter( result, name, name_len-1, *data))
 				{
 					error = -1;
 					break;
@@ -515,12 +557,12 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 
 int initSummarizerConfig( SummarizerConfig& result, zval* obj)
 {
-	return initQueryEvalFunctionConfig( result, obj);
+	return initQueryEvalFunctionConfig( result, obj, &defineSummarizationFunctionParameter);
 }
 
 int initWeightingConfig( WeightingConfig& result, zval* obj)
 {
-	return initQueryEvalFunctionConfig( result, obj);
+	return initQueryEvalFunctionConfig( result, obj, defineQueryEvaluationFunctionParameter);
 }
 
 template <class Expression>
