@@ -94,6 +94,7 @@ bp::class_<Term>("Term")
 	.def("value", &Term::value, bp::return_value_policy<bp::copy_const_reference>())
 	.def("ucvalue", &Term::ucvalue)
 	.def("position", &Term::position)
+	.def("length", &Term::length)
 ;
 bp::class_<MetaData>("MetaData")
 	.def("name", &MetaData::name, bp::return_value_policy<bp::copy_const_reference>())
@@ -246,6 +247,7 @@ bp::class_<FunctionVariableConfig>("FunctionVariableConfig")
 	.def("defineVariable", &FunctionVariableConfig::defineVariable)
 ;
 bp::class_<SummarizerConfig>("SummarizerConfig")
+	.def("defineResultName", &SummarizerConfig::defineResultName)
 ;
 bp::class_<WeightingConfig>("WeightingConfig")
 ;
