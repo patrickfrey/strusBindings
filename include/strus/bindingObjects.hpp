@@ -398,14 +398,14 @@ class Term
 {
 public:
 	/// \brief Constructor
-	Term( const String& type_, const String& value_, const Index& position_)
-		:m_type(type_),m_value(value_),m_position(position_){}
+	Term( const String& type_, const String& value_, const Index& position_, const Index& length_)
+		:m_type(type_),m_value(value_),m_position(position_),m_length(length_){}
 	/// \brief Copy constructor
 	Term( const Term& o)
-		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position){}
+		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position),m_length(o.m_length){}
 	/// \brief Default constructor
 	Term()
-		:m_position(0){}
+		:m_position(0),m_length(0){}
 
 	/// \brief Get the term type name
 	const String& type() const			{return m_type;}
@@ -416,15 +416,17 @@ public:
 #endif
 	/// \brief Get the term position
 	Index position() const				{return m_position;}
+	/// \brief Get the term length
+	Index length() const				{return m_length;}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Term& o) const
 	{
-		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position ;
+		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position && m_length == o.m_length;
 	}
 	bool operator!=( const Term& o) const
 	{
-		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position;
+		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position || m_length != o.m_length;
 	}
 #endif
 
@@ -432,6 +434,7 @@ private:
 	std::string m_type;
 	std::string m_value;
 	Index m_position;
+	Index m_length;
 };
 #ifdef STRUS_BOOST_PYTHON
 typedef std::vector<Term> TermVector;
@@ -1300,8 +1303,8 @@ class QueryTerm :public Term
 {
 public:
 	/// \brief Constructor
-	QueryTerm( const Index& field_, const String& type_, const String& value_, const Index& position_)
-		:Term(type_,value_,position_),m_field(field_){}
+	QueryTerm( const Index& field_, const String& type_, const String& value_, const Index& position_, const Index& length_)
+		:Term(type_,value_,position_, length_),m_field(field_){}
 	/// \brief Copy constructor
 	QueryTerm( const QueryTerm& o)
 		:Term(o),m_field(o.m_field){}

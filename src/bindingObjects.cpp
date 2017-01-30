@@ -287,7 +287,7 @@ void Document::addSearchIndexTerm(
 		const std::string& value_,
 		const Index& position_)
 {
-	m_searchIndexTerms.push_back( Term( type_,value_,position_));
+	m_searchIndexTerms.push_back( Term( type_,value_,position_, 1/*length*/));
 }
 
 void Document::addForwardIndexTerm(
@@ -295,7 +295,7 @@ void Document::addForwardIndexTerm(
 		const std::string& value_,
 		const Index& position_)
 {
-	m_forwardIndexTerms.push_back( Term( type_,value_,position_));
+	m_forwardIndexTerms.push_back( Term( type_,value_,position_, 1/*length*/));
 }
 
 void Document::setMetaData( const std::string& name_, const Variant& value_)
@@ -1276,13 +1276,13 @@ std::vector<Term> QueryAnalyzer::analyzeField(
 			case strus::analyzer::Query::Element::MetaData:
 			{
 				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->position()));
+				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->position(), 1/*length*/));
 				break;
 			}
 			case strus::analyzer::Query::Element::SearchIndexTerm:
 			{
 				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
-				rt.push_back( Term( term.type(), term.value(), term.pos()));
+				rt.push_back( Term( term.type(), term.value(), term.pos(), term.len()));
 				break;
 			}
 		}
@@ -1342,13 +1342,13 @@ std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 			case strus::analyzer::Query::Element::MetaData:
 			{
 				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( QueryTerm( ei->fieldNo(), md.name(), md.value().tostring().c_str(), ei->position()));
+				rt.push_back( QueryTerm( ei->fieldNo(), md.name(), md.value().tostring().c_str(), ei->position(), ei->length()));
 				break;
 			}
 			case strus::analyzer::Query::Element::SearchIndexTerm:
 			{
 				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
-				rt.push_back( QueryTerm( ei->fieldNo(), term.type(), term.value(), term.pos()));
+				rt.push_back( QueryTerm( ei->fieldNo(), term.type(), term.value(), term.pos(), ei->position()));
 				break;
 			}
 		}
