@@ -1287,6 +1287,7 @@ std::vector<Term> QueryAnalyzer::analyzeField(
 			}
 		}
 	}
+	std::sort( rt.begin(), rt.end());
 	return rt;
 }
 

@@ -429,7 +429,28 @@ public:
 		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position || m_length != o.m_length;
 	}
 #endif
-
+#ifndef SWIG
+	bool operator < (const Term& o) const
+	{
+		if (m_position == o.m_position)
+		{
+			if (m_length == o.m_length)
+			{
+				return (m_type == o.m_type)
+					? m_value < o.m_value
+					: m_type < o.m_type;
+			}
+			else
+			{
+				return m_length < o.m_length;
+			}
+		}
+		else
+		{
+			return m_position < o.m_position;
+		}
+	}
+#endif
 private:
 	std::string m_type;
 	std::string m_value;
