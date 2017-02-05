@@ -550,6 +550,31 @@ static char* getString( PyObject* item, PyObjectReference& temp_obj)
 	}
 }
 
+struct ExpressionMethods
+{
+	template <class Expression>
+	static void pushTerm( Expression&, const std::string&, const std::string&, unsigned int);
+};
+
+template <class Expression>
+void ExpressionMethods::pushTerm( Expression&, const std::string&, const std::string&, unsigned int)
+{
+	throw std::logic_error( "unknown expression type");
+}
+
+template <>
+void ExpressionMethods::pushTerm<QueryExpression>( QueryExpression& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	THIS.pushTerm( type, value, length);
+}
+
+template <>
+void ExpressionMethods::pushTerm<PatternMatcher>( PatternMatcher& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	if (length != 1) throw strus::runtime_error(_TXT("length attribute not supported for pattern matcher term"));
+	THIS.pushTerm( type, value);
+}
+
 template <class Expression>
 static void initExpressionStructure( Expression& result, PyObject* obj)
 {
@@ -596,7 +621,7 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 						{
 							if (ii+1 == len)
 							{
-								result.pushTerm( itemstr, "");
+								ExpressionMethods::pushTerm( result, itemstr, "", 1);
 							}
 							else
 							{
@@ -608,6 +633,7 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 					case Funcname:
 						try
 						{
+							unsigned int item_len = 1;
 							try
 							{
 								funcname = getString( item, temp_obj_funcname);
@@ -616,9 +642,18 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 							{
 								throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
 							}
+							if (ii+2 == len)
+							{
+								PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii+1);
+								if (PyLong_Check( item_len_obj) || PyInt_Check( item_len_obj))
+								{
+									item_len = PyInt_AS_LONG( item);
+									++ii;
+								}
+							}
 							if (ii+1 == len)
 							{
-								result.pushTerm( funcname, "");
+								ExpressionMethods::pushTerm( result, funcname, "", item_len);
 								if (varname)
 								{
 									result.attachVariable( varname);
@@ -671,19 +706,29 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 						state = Arguments;
 						/*no break here!*/
 					case Arguments:
-						if (argcnt++ == 0)
+						if (argcnt++ == 0 && cardinality == 0 && range == 0)
 						{
 							if (PyString_Check( item))
 							{
 								// [A] handle special case of 1 or 2-tuple of strings, that defines a term:
 								try
 								{
+									unsigned int termlen = 1;
 									termtype = funcname;
 									termval = getString( item, temp_obj_termval);
 									++ii;
+									if (ii+1 == len)
+									{
+										PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii+1);
+										if (PyLong_Check( item_len_obj) || PyInt_Check( item_len_obj))
+										{
+											termlen = PyInt_AS_LONG( item);
+											++ii;
+										}
+									}
 									if (ii == len)
 									{
-										result.pushTerm( termtype, termval);
+										ExpressionMethods::pushTerm( result, termtype, termval, termlen);
 										if (varname)
 										{
 											result.attachVariable( varname);
@@ -694,6 +739,7 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 									}
 									else
 									{
+										
 										throw strus::runtime_error( _TXT("term definition has too many arguments"));
 									}
 								}

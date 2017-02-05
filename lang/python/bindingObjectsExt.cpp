@@ -591,9 +591,9 @@ std::size_t QueryExpression::allocid_obj( const StringObject& str)
 	return allocid( value);
 }
 
-void QueryExpression::pushTerm_obj( const String& type_, const StringObject& value_)
+void QueryExpression::pushTerm_obj( const String& type_, const StringObject& value_, const Index& length_)
 {
-	StackOp op( StackOp::PushTerm, allocid( type_), allocid_obj( value_));
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid_obj( value_), length_);
 	m_ops.push_back(op);
 	m_size += 1;
 }

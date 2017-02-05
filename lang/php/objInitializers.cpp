@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "objInitializers.hpp"
+#include "private/internationalization.hpp"
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>
@@ -565,6 +566,31 @@ int initWeightingConfig( WeightingConfig& result, zval* obj)
 	return initQueryEvalFunctionConfig( result, obj, defineQueryEvaluationFunctionParameter);
 }
 
+struct ExpressionMethods
+{
+	template <class Expression>
+	static void pushTerm( Expression&, const std::string&, const std::string&, unsigned int);
+};
+
+template <class Expression>
+void ExpressionMethods::pushTerm( Expression&, const std::string&, const std::string&, unsigned int)
+{
+	throw std::logic_error( "unknown expression type");
+}
+
+template <>
+void ExpressionMethods::pushTerm<QueryExpression>( QueryExpression& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	THIS.pushTerm( type, value, length);
+}
+
+template <>
+void ExpressionMethods::pushTerm<PatternMatcher>( PatternMatcher& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	if (length != 1) throw strus::runtime_error(_TXT("length attribute not supported for pattern matcher term"));
+	THIS.pushTerm( type, value);
+}
+
 template <class Expression>
 static int initExpressionStructure( Expression& result, zval* obj)
 {
@@ -599,6 +625,7 @@ static int initExpressionStructure( Expression& result, zval* obj)
 			hash = Z_ARRVAL_P( obj);
 			unsigned int arraysize = zend_hash_num_elements( hash);
 			unsigned int aridx = 0;
+			unsigned int length = 1;
 
 			// [1] Initialize header:
 			zend_hash_internal_pointer_reset_ex( hash, &ptr);
@@ -643,11 +670,11 @@ static int initExpressionStructure( Expression& result, zval* obj)
 				break;
 			}
 			// [2] Check if token definition, and push the token if it is:
-			if (arraysize <= 2)
+			if (arraysize <= 3)
 			{
 				// Check, if we got a token definition
 				const char* tokvalue = 0;
-				if (zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS)
+				if (arraysize < 2 || zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS)
 				{
 					tokvalue = "";
 				}
@@ -657,7 +684,21 @@ static int initExpressionStructure( Expression& result, zval* obj)
 				}
 				if (tokvalue)
 				{
-					result.pushTerm( funcname, tokvalue);
+					if (arraysize == 3)
+					{
+						zend_hash_move_forward_ex( hash,&ptr);
+						++aridx;
+						if (zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS
+						|| Z_TYPE_PP(data) != IS_LONG)
+						{
+							THROW_EXCEPTION( "length (unsigned integer) as third element of token definition expected");
+						}
+						else
+						{
+							length = Z_LVAL_PP( data);
+						}
+					}
+					ExpressionMethods::pushTerm( result, funcname, tokvalue, length);
 					if (variablename)
 					{
 						result.attachVariable( variablename);

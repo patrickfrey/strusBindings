@@ -272,6 +272,26 @@ bool Variant::isEqual( const Variant& o) const
 	return false;
 }
 
+bool Term::operator < (const Term& o) const
+{
+	if (m_position == o.m_position)
+	{
+		if (m_length == o.m_length)
+		{
+			return (m_type == o.m_type)
+				? m_value < o.m_value
+				: m_type < o.m_type;
+		}
+		else
+		{
+			return m_length < o.m_length;
+		}
+	}
+	else
+	{
+		return m_position < o.m_position;
+	}
+}
 
 Document::Document( const Document& o)
 	:m_searchIndexTerms(o.m_searchIndexTerms)
@@ -2178,9 +2198,9 @@ std::size_t QueryExpression::allocid( const std::string& str)
 	return rt;
 }
 
-void QueryExpression::pushTerm( const std::string& type_, const std::string& value_)
+void QueryExpression::pushTerm( const std::string& type_, const std::string& value_, const Index& length_)
 {
-	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_), length_);
 	m_ops.push_back( op);
 	m_size += 1;
 }
@@ -2268,7 +2288,8 @@ void Query::defineFeature( const std::string& set_, const QueryExpression& expr_
 			{
 				const char* type_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_type];
 				const char* value_ = expr_.m_strings.c_str() + ei->arg[ QueryExpression::StackOp::Term_value];
-				THIS->pushTerm( type_, value_);
+				Index length_ = ei->arg[ QueryExpression::StackOp::Term_length];
+				THIS->pushTerm( type_, value_, length_);
 				break;
 			}
 			case QueryExpression::StackOp::PushDocField:

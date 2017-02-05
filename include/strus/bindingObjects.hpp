@@ -430,26 +430,7 @@ public:
 	}
 #endif
 #ifndef SWIG
-	bool operator < (const Term& o) const
-	{
-		if (m_position == o.m_position)
-		{
-			if (m_length == o.m_length)
-			{
-				return (m_type == o.m_type)
-					? m_value < o.m_value
-					: m_type < o.m_type;
-			}
-			else
-			{
-				return m_length < o.m_length;
-			}
-		}
-		else
-		{
-			return m_position < o.m_position;
-		}
-	}
+	bool operator < (const Term& o) const;
 #endif
 private:
 	std::string m_type;
@@ -2239,7 +2220,8 @@ public:
 	/// \brief Add operation "Push a single term on the stack"
 	/// \param[in] type_ query term type name
 	/// \param[in] value_ query term value
-	void pushTerm( const String& type_, const String& value_);
+	/// \param[in] length_ length of the feature (ordinal position count)
+	void pushTerm( const String& type_, const String& value_, const Index& length_);
 
 	/// \brief Add operation "Push a single document field specification on the stack"
 	/// \param[in] metadata_start_ name of meta data element that defines the start of the document field, assumed as 1 if name is empty
@@ -2247,7 +2229,7 @@ public:
 	void pushDocField( const String& metadata_start_, const String& metadata_end_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void pushTerm_obj( const String& type_, const StringObject& value_);
+	void pushTerm_obj( const String& type_, const StringObject& value_, const Index& length_);
 #endif
 	/// \brief Add operation "Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack"
 	/// \param[in] opname_ name of the expression operator
@@ -2307,6 +2289,7 @@ private:
 		{
 			Term_type=0x0,
 			Term_value=0x1,
+			Term_length=0x2,
 			Term_metastart=0x0,
 			Term_metaend=0x1,
 			Expression_opname=0x0,

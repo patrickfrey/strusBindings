@@ -116,7 +116,7 @@ int main( int , const char** )
 		QueryExpression expr;
 		for (; qi != qe; ++qidx,++qi)
 		{
-			expr.pushTerm( qi->type(), qi->value());
+			expr.pushTerm( qi->type(), qi->value(), qi->length());
 			if (qi->position() > maxpos)
 			{
 				maxpos = qi->position();
