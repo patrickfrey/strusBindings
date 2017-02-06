@@ -23,8 +23,8 @@ public class QueryWithAnalyzer
 			// for each of it:
 			System.out.println( "query term " + term.type() + " '" + term.value() + "'");
 			QueryExpression expr = new QueryExpression();
-			expr.pushTerm( term.type(), term.value());
-			selectexpr.pushTerm( term.type(), term.value());
+			expr.pushTerm( term.type(), term.value(), 1);
+			selectexpr.pushTerm( term.type(), term.value(), 1);
 			// We assign the features created to the set named 'seek' because they are 
 			// referenced with this name in the query evaluation:
 			query.defineFeature( "seek", expr, 1.0);
@@ -102,9 +102,9 @@ public class QueryWithAnalyzer
 		stem_normalizer.set( 1, new Normalizer( "lc"));		//... lowercase
 		stem_normalizer.set( 2, new Normalizer( "convdia", "en"));//... convert diachritical characters
 
-		analyzer.definePhraseType( "queryphrase", "word", word_tokenizer, stem_normalizer);
+		analyzer.addSearchIndexElement( "word", "queryphrase", word_tokenizer, stem_normalizer);
 
-		TermVector terms = analyzer.analyzePhrase( "queryphrase", querystr);
+		TermVector terms = analyzer.analyzeField( "queryphrase", querystr);
 
 		String config = "path=storage";
 		StorageClient storage = ctx.createStorageClient( config);

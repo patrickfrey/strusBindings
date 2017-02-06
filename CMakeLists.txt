@@ -6,7 +6,7 @@ include(cmake/install_prefix.cmake)
 # Project globals:
 project( StrusBindings )
 set( STRUS_MAJOR_VERSION 0 )
-set( STRUS_MINOR_VERSION 10 )
+set( STRUS_MINOR_VERSION 13 )
 set( STRUS_PATCH_VERSION 0 )
 set( STRUS_VERSION ${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}.${STRUS_PATCH_VERSION} )
 
@@ -104,15 +104,24 @@ ENDIF (WITH_JAVA STREQUAL "YES")
 
 IF (WITH_PYTHON STREQUAL "YES")
 	find_package( PythonLibs 2.7 REQUIRED )
-	execute_process ( COMMAND /usr/bin/env python2 -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+	find_program( PYTHON_EXECUTABLE NAMES python2.7 python2 )
+	execute_process ( COMMAND /usr/bin/env ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
 IF (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Found PythonLibs package" )
+   MESSAGE( STATUS  "Using python binary: ${PYTHON_EXECUTABLE}" )
    MESSAGE( STATUS  "Python include dirs: ${PYTHON_INCLUDE_DIRS}" )
    MESSAGE( STATUS  "Python libraries: ${PYTHON_LIBRARIES}" )
 ELSE (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
    MESSAGE( STATUS  "Could not locate PythonLibs package: ${PYTHONLIBS_FOUND} ")
 ENDIF (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
 ENDIF (WITH_PYTHON STREQUAL "YES")
+
+IF (WITH_STRUS_VECTOR STREQUAL "YES")
+MESSAGE( STATUS  "Tests for strusVector enabled." )
+ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
+IF (WITH_STRUS_PATTERN STREQUAL "YES")
+MESSAGE( STATUS  "Tests for strusPattern enabled." )
+ENDIF (WITH_STRUS_PATTERN STREQUAL "YES")
 
 include( cmake/find_strus_package.cmake )
 
@@ -123,7 +132,6 @@ find_strus_package( module )
 find_strus_package( rpc )
 
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
-set( CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON )
 configure_file( "${PROJECT_SOURCE_DIR}/src/version.hpp.in"   "${PROJECT_SOURCE_DIR}/src/version.hpp"   @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/lang/php/php.ini.in"  "${PROJECT_SOURCE_DIR}/lang/php/php.ini"  @ONLY )
 
@@ -133,8 +141,8 @@ configure_file( "${PROJECT_SOURCE_DIR}/src/internationalization.cpp.in"  "${PROJ
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh.in"  "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD.in"  "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc"  @ONLY )
-configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-Debian_7.0.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-Debian_7.0.dsc"  @ONLY )
-configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-xUbuntu_12.04.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-xUbuntu_12.04.dsc"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-xUbuntu_14.04.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-xUbuntu_14.04.dsc"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-Debian_8.0.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings-Debian_8.0.dsc"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec.in"  "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec"  @ONLY )
 
 enable_testing()

@@ -331,10 +331,6 @@ void initNormalizerList( std::vector<Normalizer>& result, PyObject* obj)
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
-			if (len == 0)
-			{
-				throw strus::runtime_error( _TXT( "normalizer list is empty"));
-			}
 			for (; ii < len; ii++)
 			{
 				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
@@ -362,27 +358,10 @@ void initAggregator( Aggregator& result, PyObject* obj)
 	initFunctionObject( result, obj);
 }
 
-template <class Object>
-static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* keyitem, PyObject* valueitem)
+static void defineQueryEvaluationFunctionParameter( WeightingConfig& result, const char* key, PyObject* valueitem)
 {
-	char* key;
-	PyObjectReference key_obj;
 	Variant value;
 
-	if (PyString_Check( keyitem))
-	{
-		key = PyString_AS_STRING( keyitem);
-	}
-	else if (PyUnicode_Check( keyitem))
-	{
-		key_obj = PyUnicode_AsUTF8String( keyitem);
-		if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
-		key = PyString_AS_STRING( key_obj.ptr());
-	}
-	else
-	{
-		throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
-	}
 	initVariant( value, valueitem);
 	if (key[0] == '.')
 	{
@@ -413,8 +392,58 @@ static void defineQueryEvaluationFunctionParameter( Object& result, PyObject* ke
 	}
 }
 
+static void defineSummarizationFunctionParameter( SummarizerConfig& result, const char* key, PyObject* valueitem)
+{
+	Variant value;
+
+	initVariant( value, valueitem);
+	if (key[0] == '.')
+	{
+		if (value.type() != Variant_TEXT)
+		{
+			throw strus::runtime_error( _TXT("string expected as query evaluation function feature parameter value"));
+		}
+		else try
+		{
+			const char* valuestr = value.getText();
+			result.defineFeature( std::string( key+1), valuestr);
+		}
+		catch (const std::exception& err)
+		{
+			throw strus::runtime_error( _TXT("cannot define summarization function parameter: %s"), err.what());
+		}
+	}
+	else if (key[0] == '$')
+	{
+		if (value.type() != Variant_TEXT)
+		{
+			throw strus::runtime_error( _TXT("string expected as summarization function feature parameter value"));
+		}
+		else try
+		{
+			const char* valuestr = value.getText();
+			result.defineResultName( std::string( key+1), valuestr);
+		}
+		catch (const std::exception& err)
+		{
+			throw strus::runtime_error( _TXT("cannot define query summarization function parameter: %s"), err.what());
+		}
+	}
+	else
+	{
+		try
+		{
+			result.defineParameter( std::string( key), value);
+		}
+		catch (const std::exception& err)
+		{
+			throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), err.what());
+		}
+	}
+}
+
 template <class Object>
-static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
+static void initQueryEvalFunctionConfig( Object& result, PyObject* obj, void (*DefineParameter)( Object&, const char*, PyObject*))
 {
 	if (PyDict_Check( obj))
 	{
@@ -423,7 +452,23 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 		
 		while (PyDict_Next( obj, &pos, &keyitem, &valueitem))
 		{
-			defineQueryEvaluationFunctionParameter( result, keyitem, valueitem);
+			char* key;
+			PyObjectReference key_obj;
+			if (PyString_Check( keyitem))
+			{
+				key = PyString_AS_STRING( keyitem);
+			}
+			else if (PyUnicode_Check( keyitem))
+			{
+				key_obj = PyUnicode_AsUTF8String( keyitem);
+				if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+				key = PyString_AS_STRING( key_obj.ptr());
+			}
+			else
+			{
+				throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
+			}
+			DefineParameter( result, key, valueitem);
 		}
 	}
 	else if (PySequence_Check( obj))
@@ -441,7 +486,23 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 					PyObject* keyitem = PySequence_Fast_GET_ITEM( item, 0);
 					PyObject* valueitem = PySequence_Fast_GET_ITEM( item, 1);
 
-					defineQueryEvaluationFunctionParameter( result, keyitem, valueitem);
+					char* key;
+					PyObjectReference key_obj;
+					if (PyString_Check( keyitem))
+					{
+						key = PyString_AS_STRING( keyitem);
+					}
+					else if (PyUnicode_Check( keyitem))
+					{
+						key_obj = PyUnicode_AsUTF8String( keyitem);
+						if (!key_obj) throw strus::runtime_error( _TXT( "cannot define query evaluation function parameter: %s"), _TXT("failed to convert python unicode string to UTF-8"));
+						key = PyString_AS_STRING( key_obj.ptr());
+					}
+					else
+					{
+						throw strus::runtime_error( _TXT("cannot define query evaluation function parameter: %s"), _TXT( "string expected as query evaluation function parameter name"));
+					}
+					DefineParameter( result, key, valueitem);
 				}
 				else
 				{
@@ -462,12 +523,12 @@ static void initQueryEvalFunctionConfig( Object& result, PyObject* obj)
 
 void initSummarizerConfig( SummarizerConfig& result, PyObject* obj)
 {
-	initQueryEvalFunctionConfig( result, obj);
+	initQueryEvalFunctionConfig( result, obj, defineSummarizationFunctionParameter);
 }
 
 void initWeightingConfig( WeightingConfig& result, PyObject* obj)
 {
-	initQueryEvalFunctionConfig( result, obj);
+	initQueryEvalFunctionConfig( result, obj, defineQueryEvaluationFunctionParameter);
 }
 
 static char* getString( PyObject* item, PyObjectReference& temp_obj)
@@ -489,11 +550,37 @@ static char* getString( PyObject* item, PyObjectReference& temp_obj)
 	}
 }
 
-void initQueryExpression( QueryExpression& result, PyObject* obj)
+struct ExpressionMethods
+{
+	template <class Expression>
+	static void pushTerm( Expression&, const std::string&, const std::string&, unsigned int);
+};
+
+template <class Expression>
+void ExpressionMethods::pushTerm( Expression&, const std::string&, const std::string&, unsigned int)
+{
+	throw std::logic_error( "unknown expression type");
+}
+
+template <>
+void ExpressionMethods::pushTerm<QueryExpression>( QueryExpression& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	THIS.pushTerm( type, value, length);
+}
+
+template <>
+void ExpressionMethods::pushTerm<PatternMatcher>( PatternMatcher& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	if (length != 1) throw strus::runtime_error(_TXT("length attribute not supported for pattern matcher term"));
+	THIS.pushTerm( type, value);
+}
+
+template <class Expression>
+static void initExpressionStructure( Expression& result, PyObject* obj)
 {
 	if (PySequence_Check( obj))
 	{
-		PyObjectReference seq( PySequence_Fast( obj, _TXT("query evaluation function object definition expected as sequence of pairs or as dictionary")));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("expression function object definition expected as sequence of pairs or as dictionary")));
 		if (seq)
 		{
 			enum {
@@ -534,7 +621,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 						{
 							if (ii+1 == len)
 							{
-								result.pushTerm( itemstr, "");
+								ExpressionMethods::pushTerm( result, itemstr, "", 1);
 							}
 							else
 							{
@@ -546,6 +633,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 					case Funcname:
 						try
 						{
+							unsigned int item_len = 1;
 							try
 							{
 								funcname = getString( item, temp_obj_funcname);
@@ -554,9 +642,18 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 							{
 								throw strus::runtime_error( _TXT("error fetching element after variable assignment in expression tuple: %s"), err.what());
 							}
+							if (ii+2 == len)
+							{
+								PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii+1);
+								if (PyLong_Check( item_len_obj) || PyInt_Check( item_len_obj))
+								{
+									item_len = PyInt_AS_LONG( item);
+									++ii;
+								}
+							}
 							if (ii+1 == len)
 							{
-								result.pushTerm( funcname, "");
+								ExpressionMethods::pushTerm( result, funcname, "", item_len);
 								if (varname)
 								{
 									result.attachVariable( varname);
@@ -609,19 +706,29 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 						state = Arguments;
 						/*no break here!*/
 					case Arguments:
-						if (argcnt++ == 0)
+						if (argcnt++ == 0 && cardinality == 0 && range == 0)
 						{
 							if (PyString_Check( item))
 							{
 								// [A] handle special case of 1 or 2-tuple of strings, that defines a term:
 								try
 								{
+									unsigned int termlen = 1;
 									termtype = funcname;
 									termval = getString( item, temp_obj_termval);
 									++ii;
+									if (ii+1 == len)
+									{
+										PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii+1);
+										if (PyLong_Check( item_len_obj) || PyInt_Check( item_len_obj))
+										{
+											termlen = PyInt_AS_LONG( item);
+											++ii;
+										}
+									}
 									if (ii == len)
 									{
-										result.pushTerm( termtype, termval);
+										ExpressionMethods::pushTerm( result, termtype, termval, termlen);
 										if (varname)
 										{
 											result.attachVariable( varname);
@@ -632,6 +739,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 									}
 									else
 									{
+										
 										throw strus::runtime_error( _TXT("term definition has too many arguments"));
 									}
 								}
@@ -641,7 +749,7 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 								}
 							}
 						}
-						initQueryExpression( result, item);
+						initExpressionStructure( result, item);
 						++nof_arguments;
 						break;
 				}
@@ -669,6 +777,12 @@ void initQueryExpression( QueryExpression& result, PyObject* obj)
 		throw strus::runtime_error( _TXT("query expression object definition expected as sequence of tuples"));
 	}
 }
+
+void initQueryExpression( QueryExpression& result, PyObject* obj)
+{
+	initExpressionStructure( result, obj);
+}
+
 
 void initString( std::string& result, PyObject* obj)
 {
@@ -752,7 +866,7 @@ void initStringVector( std::vector<std::string>& result, PyObject* obj)
 
 void initIntVector( std::vector<int>& result, PyObject* obj)
 {
-	if (PyInt_Check( obj))
+	if (PyInt_Check( obj) || PyLong_Check( obj))
 	{
 		int item = PyInt_AS_LONG( obj);
 		result.push_back( item);
@@ -769,7 +883,7 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 				/* DON'T DECREF item here */
 				try
 				{
-					if (PyInt_Check( item))
+					if (PyInt_Check( item) || PyLong_Check( item))
 					{
 						int itemval = PyInt_AS_LONG( item);
 						result.push_back( itemval);
@@ -793,6 +907,52 @@ void initIntVector( std::vector<int>& result, PyObject* obj)
 	else
 	{
 		throw strus::runtime_error( _TXT("list of integers or single integer expected (check)"));
+	}
+}
+
+void initFloatVector( std::vector<double>& result, PyObject* obj)
+{
+	if (PyFloat_Check( obj))
+	{
+		double item = PyFloat_AsDouble( obj);
+		result.push_back( item);
+	}
+	else if (PySequence_Check( obj))
+	{
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("float (double) list expected as sequence")));
+		if (seq)
+		{
+			Py_ssize_t ii=0,len = PySequence_Size( seq);
+			for (; ii < len; ii++)
+			{
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
+				/* DON'T DECREF item here */
+				try
+				{
+					if (PyFloat_Check( item))
+					{
+						double itemval = PyFloat_AsDouble( item);
+						result.push_back( itemval);
+					}
+					else
+					{
+						throw strus::runtime_error( _TXT("double precision float expected as element of float list"));
+					}
+				}
+				catch (const std::exception& err)
+				{
+					throw strus::runtime_error( _TXT("failed to build vector of double precision floats: %s"), err.what());
+				}
+			}
+		}
+		else
+		{
+			throw strus::runtime_error( _TXT("list of double precision floats expected"));
+		}
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("list of double precision floats or double precision float expected (check)"));
 	}
 }
 
@@ -928,33 +1088,41 @@ void initDataBlob( std::string& result, PyObject* obj)
 	}
 }
 
-void initIntVectorList( std::vector<int>& result, PyObject* obj)
+void initPatternMatcher( PatternMatcher& matcher, PyObject* obj)
 {
 	if (PySequence_Check( obj))
 	{
-		PyObjectReference seq( PySequence_Fast( obj, _TXT("list of integers expected")));
+		PyObjectReference seq( PySequence_Fast( obj, _TXT("expression function object definition expected as sequence of pairs or as dictionary")));
 		if (seq)
 		{
 			Py_ssize_t ii=0,len = PySequence_Size( seq);
 			for (; ii<len; ++ii)
 			{
-				PyObject* item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
-				if (PyLong_Check( item) || PyInt_Check( item))
+				PyObjectReference temp_obj_varname;
+				PyObject *item = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
+				/* DON'T DECREF item here */
+				if (PySequence_Check( item) && 2==PySequence_Size( item))
 				{
-					long itemval = PyInt_AS_LONG( item);
-					result.push_back( itemval);
+					PyObject* nameitem = PySequence_Fast_GET_ITEM( item, 0);
+					PyObject* patternitem = PySequence_Fast_GET_ITEM( item, 1);
+
+					char* patternname = getString( nameitem, temp_obj_varname);
+					initExpressionStructure( matcher, patternitem);
+					if (patternname[0] == '-')
+					{
+						matcher.definePattern( patternname+1, false);
+					}
+					else
+					{
+						matcher.definePattern( patternname, true);
+					}
+				}
+				else
+				{
+					throw strus::runtime_error( _TXT("patterns must be pairs of pattern name and expression"));
 				}
 			}
 		}
-	}
-	else if (PyLong_Check( obj) || PyInt_Check( obj))
-	{
-		long objval = PyInt_AS_LONG( obj);
-		result.push_back( objval);
-	}
-	else
-	{
-		throw strus::runtime_error( "not an integer or list of integer type");
 	}
 }
 

@@ -49,6 +49,8 @@ dist/archlinux/PKGBUILD
 dist/obs/strusbindings.dsc
 dist/obs/strusbindings-Debian_7.0.dsc
 dist/obs/strusbindings-xUbuntu_12.04.dsc
+dist/obs/strusbindings-Debian_8.0.dsc
+dist/obs/strusbindings-xUbuntu_14.04.dsc
 dist/redhat/strusbindings.spec
 lang/php/php.ini
 
@@ -60,8 +62,11 @@ lang/java/net/strus/api/*.class
 # Generated test data
 tests/query_cpp/storage/
 lang/java/net/strus/example/storage/
+lang/java/net/strus/example/vsm/
 lang/python/example/storage/
+lang/python/example/vsm/
 lang/php/example/storage/
+lang/php/example/vsm/
 
 # SWIG generated code
 lang/strusPYTHON_wrap.cxx

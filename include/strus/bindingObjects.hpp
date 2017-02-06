@@ -28,27 +28,32 @@ namespace strus {
 #elif (defined STRUS_BOOST_PYTHON)
 typedef boost::python::api::object FunctionObject;
 typedef boost::python::api::object DataBlob;
+typedef boost::python::api::object StringObject;
 typedef std::string String;
 typedef std::wstring WString;
-typedef std::vector<int> IntVector;
+typedef std::vector<int> IndexVector;
+typedef std::vector<double> FloatVector;
 typedef std::vector<std::string> StringVector;
 #else
 #define String std::string
 #define WString std::wstring
-#define IntVector std::vector<int>
+#define IndexVector std::vector<int>
 #define StringVector std::vector<std::string>
+#define FloatVector std::vector<double>
 #if !defined DOXYGEN_PHP && !defined DOXYGEN_PYTHON
 #define NormalizerVector std::vector<Normalizer>
 #endif
 #define TermVector std::vector<Term>
+#define QueryTermVector std::vector<QueryTerm>
 #define RankVector std::vector<Rank>
+#define VecRankVector std::vector<VecRank>
 #define SummaryElementVector std::vector<SummaryElement>
 #define AttributeVector std::vector<Attribute>
 #define MetaDataVector std::vector<MetaData>
 #define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
 #endif
-typedef unsigned int Index;
-typedef unsigned long GlobalCounter;
+typedef int Index;
+typedef long GlobalCounter;
 
 #ifndef DOXYGEN_LANG
 /// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
@@ -393,14 +398,14 @@ class Term
 {
 public:
 	/// \brief Constructor
-	Term( const String& type_, const String& value_, const Index& position_)
-		:m_type(type_),m_value(value_),m_position(position_){}
+	Term( const String& type_, const String& value_, const Index& position_, const Index& length_)
+		:m_type(type_),m_value(value_),m_position(position_),m_length(length_){}
 	/// \brief Copy constructor
 	Term( const Term& o)
-		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position){}
+		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position),m_length(o.m_length){}
 	/// \brief Default constructor
 	Term()
-		:m_position(0){}
+		:m_position(0),m_length(0){}
 
 	/// \brief Get the term type name
 	const String& type() const			{return m_type;}
@@ -410,23 +415,28 @@ public:
 	WString ucvalue() const;
 #endif
 	/// \brief Get the term position
-	unsigned int position() const			{return m_position;}
+	Index position() const				{return m_position;}
+	/// \brief Get the term length
+	Index length() const				{return m_length;}
 
 #ifdef STRUS_BOOST_PYTHON
 	bool operator==( const Term& o) const
 	{
-		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position ;
+		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position && m_length == o.m_length;
 	}
 	bool operator!=( const Term& o) const
 	{
-		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position;
+		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position || m_length != o.m_length;
 	}
 #endif
-
+#ifndef SWIG
+	bool operator < (const Term& o) const;
+#endif
 private:
 	std::string m_type;
 	std::string m_value;
 	Index m_position;
+	Index m_length;
 };
 #ifdef STRUS_BOOST_PYTHON
 typedef std::vector<Term> TermVector;
@@ -625,7 +635,7 @@ public:
 	/// \param[in] value value of the document attribute
 	void setAttribute( const String& name, const String& value);
 #ifdef STRUS_BOOST_PYTHON
-	void setAttribute_unicode( const String& name, const WString& value);
+	void setAttribute_obj( const String& name, const StringObject& value);
 #endif
 	/// \brief Allow a user to access the document
 	/// \param[in] username name of the user to be allowed to access this document
@@ -666,6 +676,8 @@ private:
 
 /// \brief Forward declaration
 class DocumentAnalyzeQueue;
+/// \brief Forward declaration
+class PatternMatcher;
 
 /// \class DocumentAnalyzer
 /// \brief Analyzer object representing a program for segmenting, 
@@ -809,6 +821,110 @@ public:
 		const FunctionObject& tokenizer_,
 		const FunctionObject& normalizers_);
 #endif
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addSearchIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options);
+#else
+	void addSearchIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options=String());
+#endif
+#ifdef STRUS_BOOST_PYTHON
+	void addSearchIndexFeatureFromPatternMatch_3(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+
+	void addSearchIndexFeatureFromPatternMatch_4(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_,
+		const String& options);
+#endif
+#if defined SWIGPHP
+	// ... SWIG PHP implementation cannot handle signatures with typemaps and default parameters (!)
+	void addForwardIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options);
+#else
+	void addForwardIndexFeatureFromPatternMatch(
+		const String& type,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers,
+		const String& options=String());
+#endif
+#ifdef STRUS_BOOST_PYTHON
+	void addForwardIndexFeatureFromPatternMatch_3(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+
+	void addForwardIndexFeatureFromPatternMatch_4(
+		const String& type,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_,
+		const String& options);
+#endif
+	void defineMetaDataFromPatternMatch(
+		const String& fieldname,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineMetaDataFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+#endif
+	void defineAttributeFromPatternMatch(
+		const String& attribname,
+		const String& patternTypeName,
+		const NormalizerVector& normalizers);
+
+#ifdef STRUS_BOOST_PYTHON
+	void defineAttributeFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_);
+#endif
+
+	/// \brief Declare a pattern matcher on the document features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] patterns structure with all patterns
+	void definePatternMatcherPostProc(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const PatternMatcher& patterns);
+
+	/// \brief Declare a pattern matcher on the document features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
+	void definePatternMatcherPostProcFromFile(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const String& serializedPatternFile);
+
+#ifdef STRUS_BOOST_PYTHON
+	void definePatternMatcherPostProc_expr(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const FunctionObject& expr_);
+
+	void definePatternMatcherPostProcFromFile_obj(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const StringObject& serializedPatternFile);
+#endif
 
 	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
 	/// \param[in] selectexpr an expression that defines the content of the sub document declared
@@ -828,10 +944,8 @@ public:
 	Document analyze( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
-	Document analyze_unicode_1( const WString& content);
-	Document analyze_unicode_2( const WString& content, const DocumentClass& dclass);
-	Document analyze_1( const String& content);
-	Document analyze_2( const String& content, const DocumentClass& dclass);
+	Document analyze_obj_1( const StringObject& content);
+	Document analyze_obj_2( const StringObject& content, const DocumentClass& dclass);
 #endif
 
 	/// \brief Creates a queue for multi document analysis
@@ -876,15 +990,15 @@ public:
 	void push( const String& content, const DocumentClass& dclass);
 
 #ifdef STRUS_BOOST_PYTHON
-	void push_unicode_1( const WString& content);
-	void push_unicode_2( const WString& content, const DocumentClass& dclass);
+	void push_obj_1( const StringObject& content);
+	void push_obj_2( const StringObject& content, const DocumentClass& dclass);
 #endif
 	/// \brief Checks if there are more results to fetch
 	/// \return true, if yes
 	bool hasMore() const;
 
-	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
-	/// \return list of terms (query phrase analyzer result)
+	/// \brief Processes the next field of the queue for fields to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the field type given.
+	/// \return list of terms (query field analyzer result)
 	Document fetch();
 
 private:
@@ -908,10 +1022,157 @@ private:
 
 
 /// \brief Forward declaration
-class QueryAnalyzeQueue;
+class QueryAnalyzeContext;
+
+/// \brief Object representing a pattern match program
+class PatternMatcher
+{
+public:
+	PatternMatcher( const PatternMatcher& o)
+		:m_ops(o.m_ops),m_strings(o.m_strings),m_size(o.m_size){}
+	PatternMatcher()
+		:m_size(0){}
+
+	/// \brief Add operation push term
+	/// \param[in] type_ query term type name
+	/// \param[in] value_ query term value
+	void pushTerm( const String& type_, const String& value_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushTerm_obj( const String& type_, const StringObject& value_);
+#endif
+
+	/// \brief Add operation push term
+	/// \param[in] name_ name of the referenced pattern
+	void pushPattern( const String& name_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushPattern_obj( const StringObject& name_);
+#endif
+
+	/// \brief Add operation push expression
+	/// \param[in] opname_ name of the expression operator
+	/// \param[in] argc_ number of operands (topmost elements from stack) of the expression
+	/// \param[in] range_ range number for the expression span in the document
+	/// \param[in] cardinality_ number that specifies the minimum size of a subset or subset permutation to match
+	void pushExpression( const String& opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0);
+
+#ifdef STRUS_BOOST_PYTHON
+	void pushExpression_2( const String& opname_, unsigned int argc)
+	{
+		pushExpression( opname_, argc, 0, 0);
+	}
+	void pushExpression_3( const String& opname_, unsigned int argc, int range_)
+	{
+		pushExpression( opname_, argc, range_, 0);
+	}
+	void pushExpression_4( const String& opname_, unsigned int argc, int range_, unsigned int cardinality_)
+	{
+		pushExpression( opname_, argc, range_, cardinality_);
+	}
+#endif
+	/// \brief Add operation push pattern
+	/// \param[in] name_ name of the pattern created
+	void definePattern( const String& name_, bool visible);
+#ifdef STRUS_BOOST_PYTHON
+	void definePattern_obj( const StringObject& name_, bool visible);
+#endif
+
+	/// \brief Add operation attach variable
+	/// \note The positions of the query matches of the referenced term or expression can be accessed through this variable in summarization.
+	/// \param[in] name_ name of the variable attached
+	/// \remark The stack is not changed
+	void attachVariable( const String& name_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void attachVariable_obj( const StringObject& name_);
+#endif
+
+	/// \brief Appends the operations of 'o' to this
+	/// \param[in] o expression to copy
+	void add( const PatternMatcher& o);
+
+	/// \brief Get the number of items (sub expressions) on the stack as result of this expression
+	/// \return the number of items (sub expressions)
+	std::size_t size() const
+	{
+		return m_size;
+	}
+
+private:
+	friend class Query;
+
+	struct StackOp
+	{
+		enum Type
+		{
+			PushTerm,
+			PushPattern,
+			PushExpression,
+			DefinePattern,
+			AttachVariable
+		};
+		enum ArgIndex
+		{
+			Term_type=0x0,
+			Term_value=0x1,
+			Expression_opname=0x0,
+			Expression_argc=0x1,
+			Expression_range=0x2,
+			Expression_cardinality=0x3,
+			Variable_name=0x0,
+			Pattern_name=0x0,
+			Pattern_visible=0x1
+		};
+		Type type;
+		int arg[4];
+
+		StackOp( Type type_, int arg0_, int arg1_=0, int arg2_=0, int arg3_=0)
+			:type(type_)
+		{
+			arg[0] = arg0_;
+			arg[1] = arg1_;
+			arg[2] = arg2_;
+			arg[3] = arg3_;
+		}
+
+		StackOp()
+			:type(PushTerm)
+		{
+			std::memset( arg, 0, sizeof(arg));
+		}
+		StackOp( const StackOp& o)
+		{
+			std::memcpy( this, &o, sizeof(*this));
+		}
+	};
+	const std::vector<StackOp>& ops() const
+	{
+		return m_ops;
+	}
+	const std::string& strings() const
+	{
+		return m_strings;
+	}
+
+private:
+	std::size_t allocid( const String& str);
+#ifdef STRUS_BOOST_PYTHON
+	std::size_t allocid_obj( const StringObject& str);
+#endif
+
+private:
+	friend class QueryAnalyzer;
+	friend class DocumentAnalyzer;
+	friend class PatternMatchLoader;
+	std::vector<StackOp> m_ops;
+	std::string m_strings;
+	std::size_t m_size;
+};
+
 
 /// \class QueryAnalyzer
-/// \brief Analyzer object representing a set of function for transforming a phrase,
+/// \brief Analyzer object representing a set of function for transforming a field,
 ///	the smallest unit in any query language, to a set of terms that can be used
 ///	to build a query.
 /// \remark The only way to construct a query analyzer instance is to call Context::createQueryAnalyzer()
@@ -927,43 +1188,104 @@ public:
 	/// \brief Destructor
 	~QueryAnalyzer(){}
 
-	/// \brief Defines a phrase type by name. Phrases can be passed together with this name
-	///		to the query analyzer to get the terms for building query.
-	/// \param[in] phraseType name of the phrase type defined
-	/// \param[in] featureType feature type name assigned to the features created by this phrase type
-	/// \param[in] tokenizer tokenizer function description to use for the features of this phrase type
-	/// \param[in] normalizers list of normalizer function description to use for the features of this phrase type in the ascending order of appearance
-	void definePhraseType(
-			const String& phraseType,
+	/// \brief Defines a search index element.
+	/// \param[in] featureType element feature type created from this field type
+	/// \param[in] fieldType name of the field type defined
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	void addSearchIndexElement(
 			const String& featureType,
+			const String& fieldType,
 			const Tokenizer& tokenizer,
+			const NormalizerVector& normalizers);
+#ifdef STRUS_BOOST_PYTHON
+	void addSearchIndexElement_obj(
+			const String& featureType,
+			const String& fieldType,
+			const FunctionObject& tokenizer_,
+			const FunctionObject& normalizers_);
+#endif
+	/// \brief Defines a search index element from a pattern matching result.
+	/// \param[in] type element type created from this pattern match result type
+	/// \param[in] patternTypeName name of the pattern match result item
+	/// \param[in] normalizers list of normalizer functions
+	void addSearchIndexElementFromPatternMatch(
+			const std::string& type,
+			const std::string& patternTypeName,
 			const NormalizerVector& normalizers);
 
 #ifdef STRUS_BOOST_PYTHON
-	void definePhraseType_obj(
-		const String& phrasetype,
-		const String& selectexpr,
-		const FunctionObject& tokenizer_,
-		const FunctionObject& normalizers_);
+	void addSearchIndexElementFromPatternMatch_obj(
+			const String& type,
+			const String& patternTypeName,
+			const FunctionObject& normalizers_);
 #endif
 
-	/// \brief Tokenizes and normalizes a phrase and creates some typed terms out of it according the definition of the phrase type given.
-	/// \param[in] phraseType name of the phrase type to use for analysis
-	/// \param[in] phraseContent content string of the query phrase to analyze
-	/// \deprecated
-	TermVector analyzePhrase(
-			const String& phraseType,
-			const String& phraseContent) const;
+	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of query analysis
+	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
+	/// \param[in] fieldtype type of the field of this element in the query
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	void addPatternLexem(
+			const std::string& termtype,
+			const std::string& fieldtype,
+			const Tokenizer& tokenizer,
+			const NormalizerVector& normalizers);
+#ifdef STRUS_BOOST_PYTHON
+	void addPatternLexem_obj(
+			const String& featureType,
+			const String& fieldType,
+			const FunctionObject& tokenizer_,
+			const FunctionObject& normalizers_);
+#endif
+
+	/// \brief Declare a pattern matcher on the query features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] patterns structure with all patterns
+	void definePatternMatcherPostProc(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const PatternMatcher& patterns);
+
+	/// \brief Declare a pattern matcher on the query features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
+	void definePatternMatcherPostProcFromFile(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const String& serializedPatternFile);
 
 #ifdef STRUS_BOOST_PYTHON
-	TermVector analyzePhrase_unicode(
-			const String& phraseType,
-			const WString& phraseContent) const;
+	void definePatternMatcherPostProc_expr(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const FunctionObject& expr_);
+
+	void definePatternMatcherPostProcFromFile_obj(
+			const String& patternTypeName,
+			const String& patternMatcherModule,
+			const StringObject& serializedPatternFile);
 #endif
 
-	/// \brief Creates a queue for phrase bulk analysis
+	/// \brief Tokenizes and normalizes a query field and creates some typed terms out of it according the definition of the field type given.
+	/// \param[in] fieldType name of the field type to use for analysis
+	/// \param[in] fieldContent content string of the query field to analyze
+	/// \note This is a very simplistic method to analyze a query. For multi field queries the object QueryAnalyzeContext is more appropriate
+	TermVector analyzeField(
+			const String& fieldType,
+			const String& fieldContent);
+
+#ifdef STRUS_BOOST_PYTHON
+	TermVector analyzeField_obj(
+			const String& fieldType,
+			const StringObject& fieldContent);
+#endif
+
+	/// \brief Creates a context for analyzing a multipart query
 	/// \return the queue
-	QueryAnalyzeQueue createQueue() const;
+	QueryAnalyzeContext createContext() const;
 
 private:
 	/// \brief Constructor used by Context
@@ -977,48 +1299,86 @@ private:
 };
 
 
-/// \class QueryAnalyzeQueue
-/// \brief Analyzer object implementing a queue of analyze phrase tasks.
-/// \remark Query analysis with this class reduces network roundtrips when using it as proxy
-class QueryAnalyzeQueue
+/// \class QueryTerm
+/// \brief Query analyzer term with info about the field it originated from.
+class QueryTerm :public Term
+{
+public:
+	/// \brief Constructor
+	QueryTerm( const Index& field_, const String& type_, const String& value_, const Index& position_, const Index& length_)
+		:Term(type_,value_,position_, length_),m_field(field_){}
+	/// \brief Copy constructor
+	QueryTerm( const QueryTerm& o)
+		:Term(o),m_field(o.m_field){}
+	/// \brief Default constructor
+	QueryTerm()
+		:Term(),m_field(0){}
+
+	/// \brief Get the term position
+	unsigned int field() const			{return m_field;}
+	/// \brief Get the term type name
+	const String& type() const			{return Term::type();}
+	/// \brief Get the term value
+	const String& value() const			{return Term::value();}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const				{return Term::ucvalue();}
+#endif
+	/// \brief Get the term position
+	Index position() const				{return Term::position();}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const QueryTerm& o) const	{return Term::operator==( o);}
+	bool operator!=( const QueryTerm& o) const	{return Term::operator!=( o);}
+#endif
+
+private:
+	Index m_field;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<QueryTerm> QueryTermVector;
+#endif
+
+
+/// \class QueryAnalyzeContext
+/// \brief Query analyzer context for analysing a multipart query.
+class QueryAnalyzeContext
 {
 public:
 #ifdef STRUS_BOOST_PYTHON
 	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
-	QueryAnalyzeQueue()
-		:m_result_queue_idx(0){}
+	QueryAnalyzeContext(){}
 #endif
 	/// \brief Copy constructor
-	QueryAnalyzeQueue( const QueryAnalyzeQueue& o);
+	QueryAnalyzeContext( const QueryAnalyzeContext& o);
 	/// \brief Destructor
-	~QueryAnalyzeQueue(){}
+	~QueryAnalyzeContext(){}
 
-	/// \brief Push a phrase into the queue for phrases to tokenize and normalize
-	/// \param[in] phraseType name of the phrase type to use for analysis
-	/// \param[in] phraseContent content string of the query phrase to analyze
-	void push(
-			const String& phraseType,
-			const String& phraseContent);
+	/// \brief Define a query field
+	/// \param[in] fieldNo index given to the field by the caller, to identify its results
+	/// \param[in] fieldType name of the field type to use for analysis
+	/// \param[in] fieldContent content string of the query field to analyze
+	void putField(
+			unsigned int fieldNo, 
+			const String& fieldType,
+			const String& fieldContent);
 #ifdef STRUS_BOOST_PYTHON
-	void push_unicode( const String& phraseType, const WString& phraseContent);
+	void putField_obj( unsigned int fieldNo, const String& fieldType, const StringObject& fieldContent);
 #endif
 
-	/// \brief Processes the next phrase of the queue for phrases to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the phrase type given.
-	/// \return list of terms (query phrase analyzer result)
-	TermVector fetch();
+	/// \brief Processes the next field of the queue for fields to analyzer. Does the tokenization and normalization and creates some typed terms out of it according the definition of the field type given.
+	/// \return list of terms (query field analyzer result)
+	QueryTermVector analyze();
 
 private:
 	/// \brief Constructor used by Context
 	friend class QueryAnalyzer;
-	explicit QueryAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer);
+	explicit QueryAnalyzeContext( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer);
 
 	Reference m_errorhnd_impl;
 	Reference m_trace_impl;
 	Reference m_objbuilder_impl;
 	Reference m_analyzer_impl;
-	std::vector<Term> m_phrase_queue;
-	std::vector<std::vector<Term> > m_result_queue;
-	std::size_t m_result_queue_idx;
+	Reference m_analyzer_ctx_impl;
 };
 
 /// \brief Forward declaration
@@ -1102,7 +1462,7 @@ public:
 	/// \remark The document is physically deleted with the call of 'commit()'
 	void deleteDocument( const String& docid);
 #ifdef STRUS_BOOST_PYTHON
-	void deleteDocument_unicode( const WString& docid);
+	void deleteDocument_obj( const StringObject& docid);
 #endif
 
 	/// \brief Prepare the deletion of all document access rights of a user
@@ -1110,7 +1470,7 @@ public:
 	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const String& username);
 #ifdef STRUS_BOOST_PYTHON
-	void deleteUserAccessRights_unicode( const WString& username);
+	void deleteUserAccessRights_obj( const StringObject& username);
 #endif
 
 	/// \brief Commit all insert or delete or user access right change statements of this transaction.
@@ -1279,6 +1639,216 @@ private:
 };
 
 
+/// \brief Weighted vector (result of a query vector storage search)
+class VecRank
+{
+public:
+	/// \brief Constructor
+	VecRank()
+		:m_index(0),m_weight(0.0){}
+	/// \brief Constructor
+	VecRank( Index index_, double weight_)
+		:m_index(index_),m_weight(weight_){}
+	/// \brief Copy constructor
+	VecRank( const VecRank& o)
+		:m_index(o.m_index),m_weight(o.m_weight){}
+
+	/// \brief Get the feature number ( >= 0) from this
+	Index index() const					{return m_index;}
+	/// \brief Get the weight of the vector rank
+	double weight() const					{return m_weight;}
+	/// \brief Get the summary elements
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const VecRank& o) const
+	{
+		if (m_index != o.m_index) return false;
+		double ww = (m_weight - o.m_weight);
+		return (ww < 0.0)?(-ww < std::numeric_limits<double>::epsilon()):(ww < std::numeric_limits<double>::epsilon());
+	}
+	bool operator!=( const VecRank& o) const
+	{
+		return !operator==( o);
+	}
+#endif
+
+private:
+	Index m_index;
+	double m_weight;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<VecRank> VecRankVector;
+#endif
+
+class VectorStorageSearcher
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	VectorStorageSearcher(){}
+#endif
+	/// \brief Copy constructor
+	VectorStorageSearcher( const VectorStorageSearcher& o);
+
+	/// \brief Destructor
+	~VectorStorageSearcher(){}
+
+	/// \brief Find the most similar vectors to vector
+	/// \param[in] vec vector to search for
+	/// \param[in] maxNofResults maximum number of results to return
+	/// return the list of most similar vectors
+	VecRankVector findSimilar( const FloatVector& vec, unsigned int maxNofResults) const;
+#ifdef STRUS_BOOST_PYTHON
+	VecRankVector findSimilar_obj( const FunctionObject& vec, unsigned int maxNofResults) const;
+#endif
+
+	/// \brief Find the most similar vectors to vector in a selection of features addressed by index
+	/// \param[in] featidxlist list of candidate indices
+	/// \param[in] vec vector to search for
+	/// \param[in] maxNofResults maximum number of results to return
+	/// return the list of most similar vectors
+	VecRankVector findSimilarFromSelection( const IndexVector& featidxlist, const FloatVector& vec, unsigned int maxNofResults) const;
+#ifdef STRUS_BOOST_PYTHON
+	VecRankVector findSimilarFromSelection_obj( const FunctionObject& featidxlist, const FunctionObject& vec, unsigned int maxNofResults) const;
+#endif
+
+	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	void close();
+
+private:
+	friend class VectorStorageClient;
+	VectorStorageSearcher( const Reference& storage, const Reference& trace, const Index& range_from, const Index& range_to, const Reference& errorhnd_);
+
+	Reference m_errorhnd_impl;
+	Reference m_searcher_impl;
+	Reference m_trace_impl;
+};
+
+/// \brief Forward declaration
+class VectorStorageTransaction;
+
+/// \brief Object representing a client connection to a vector storage 
+/// \remark The only way to construct a vector storage client instance is to call Context::createVectorStorageClient(const std::string&)
+class VectorStorageClient
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	VectorStorageClient(){}
+#endif
+	/// \brief Copy constructor
+	VectorStorageClient( const VectorStorageClient& o);
+
+	/// \brief Destructor
+	~VectorStorageClient(){}
+
+	/// \brief Create a searcher object for scanning the vectors for similarity
+	/// \param[in] range_from start range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \param[in] range_to end of range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \return the vector search interface (with ownership)
+	VectorStorageSearcher createSearcher( const Index& range_from, const Index& range_to) const;
+
+	/// \brief Create a vector storage transaction instance
+	VectorStorageTransaction createTransaction();
+	
+	/// \brief Get the list of concept class names defined
+	/// \return the list
+	StringVector conceptClassNames() const;
+
+	/// \brief Get the list of indices of features represented by a learnt concept feature
+	/// \param[in] conceptClass name identifying a class of concepts learnt
+	/// \param[in] conceptid index (indices of learnt concepts starting from 1) 
+	/// \return the resulting vector indices (index is order of insertion starting from 0)
+	IndexVector conceptFeatures( const String& conceptClass, const Index& conceptid) const;
+
+	/// \brief Get the number of concept features learned for a class
+	/// \param[in] conceptClass name identifying a class of concepts learnt.
+	/// \return the number of concept features and also the maximum number assigned to a feature (starting with 1)
+	unsigned int nofConcepts( const String& conceptClass) const;
+
+	/// \brief Get the set of learnt concepts of a class for a feature defined
+	/// \param[in] conceptClass name identifying a class of concepts learnt
+	/// \param[in] index index of vector in the order of insertion starting from 0
+	/// \return the resulting concept feature indices (indices of learnt concepts starting from 1)
+	IndexVector featureConcepts( const String& conceptClass, const Index& index) const;
+
+	/// \brief Get the vector assigned to a feature addressed by index
+	/// \param[in] index index of the feature (starting from 0)
+	/// return the vector
+	FloatVector featureVector( const Index& index) const;
+
+	/// \brief Get the name of a feature by its index starting from 0
+	/// \param[in] index index of the feature (starting from 0)
+	/// \return the name of the feature defined 
+	String featureName( const Index& index) const;
+
+	/// \brief Get the index starting from 0 of a feature by its name
+	/// \param[in] name name of the feature
+	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion starting with 0)
+	Index featureIndex( const String& name) const;
+
+	/// \brief Get the number of feature vectors defined
+	/// \return the number of features
+	unsigned int nofFeatures() const;
+
+	/// \brief Get the configuration of this model
+	/// \return the configuration string
+	String config() const;
+
+	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	void close();
+
+private:
+	friend class Context;
+	VectorStorageClient( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const String& config);
+
+	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
+	Reference m_objbuilder_impl;
+	Reference m_vector_storage_impl;
+	std::string m_config;
+};
+
+class VectorStorageTransaction
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	VectorStorageTransaction(){}
+#endif
+	/// \brief Copy constructor
+	VectorStorageTransaction( const VectorStorageTransaction& o);
+
+	~VectorStorageTransaction(){}
+
+	void addFeature( const String& name, const FloatVector& vec);
+#ifdef STRUS_BOOST_PYTHON
+	void addFeature_obj( const StringObject& name, const FunctionObject& vec);
+#endif
+	void defineFeatureConceptRelation( const String& relationTypeName, const Index& featidx, const Index& conidx);
+#ifdef STRUS_BOOST_PYTHON
+	void defineFeatureConceptRelation_obj( const StringObject& relationTypeName, const Index& featidx, const Index& conidx);
+#endif
+
+	bool commit();
+
+	void rollback();
+
+	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	void close();
+
+private:
+	friend class VectorStorageClient;
+	VectorStorageTransaction( const Reference& objbuilder, const Reference& storage, const Reference& trace, const Reference& errorhnd_, const String& config);
+
+	Reference m_errorhnd_impl;
+	Reference m_trace_impl;
+	Reference m_objbuilder_impl;
+	Reference m_vector_storage_impl;	
+	Reference m_vector_transaction_impl;
+};
+
+
 /// \brief Configuration describing a scalar function variable value
 class FunctionVariableConfig
 {
@@ -1362,10 +1932,19 @@ public:
 		m_features[ sumtype] = set;
 	}
 
+	/// \brief Rename a result (each summarizer result has a default name that can be changed with this method)
+	/// \param[in] origname original name of the result
+	/// \param[in] newname defined name of the result
+	void defineResultName( const String& origname, const String& newname)
+	{
+		m_resultnamemap[ origname] = newname;
+	}
+
 private:
 	friend class QueryEval;
 	std::map<std::string,Variant> m_parameters;
 	std::map<std::string,std::string> m_features;
+	std::map<std::string,std::string> m_resultnamemap;
 };
 
 /// \brief Configuration describing the values passed to a weighting function
@@ -1458,7 +2037,7 @@ public:
 	/// \brief Destructor
 	~QueryEval(){}
 
-	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match phrases summarization)
+	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match fields summarization)
 	/// \param[in] set_ identifier of the term set that is used to address the terms
 	/// \param[in] type_ feature type of the of the term
 	/// \param[in] value_ feature value of the of the term
@@ -1511,7 +2090,7 @@ public:
 			const FunctionVariableConfig& defaultParameter);
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFormula_obj(
-			const WString& source,
+			const StringObject& source,
 			const FunctionObject& defaultParameter_);
 #endif
 
@@ -1641,10 +2220,16 @@ public:
 	/// \brief Add operation "Push a single term on the stack"
 	/// \param[in] type_ query term type name
 	/// \param[in] value_ query term value
-	void pushTerm( const String& type_, const String& value_);
+	/// \param[in] length_ length of the feature (ordinal position count)
+	void pushTerm( const String& type_, const String& value_, const Index& length_);
+
+	/// \brief Add operation "Push a single document field specification on the stack"
+	/// \param[in] metadata_start_ name of meta data element that defines the start of the document field, assumed as 1 if name is empty
+	/// \param[in] metadata_end_ name of meta data element that defines the end of the document field, assumed as max value if name is empty
+	void pushDocField( const String& metadata_start_, const String& metadata_end_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void pushTerm_unicode( const String& type_, const WString& value_);
+	void pushTerm_obj( const String& type_, const StringObject& value_, const Index& length_);
 #endif
 	/// \brief Add operation "Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack"
 	/// \param[in] opname_ name of the expression operator
@@ -1674,7 +2259,7 @@ public:
 	/// \remark The stack is not changed
 	void attachVariable( const String& name_);
 #ifdef STRUS_BOOST_PYTHON
-	void attachVariable_unicode( const WString& name_);
+	void attachVariable_obj( const StringObject& name_);
 #endif
 
 	/// \brief Appends the operations of 'o' to this
@@ -1696,6 +2281,7 @@ private:
 		enum Type
 		{
 			PushTerm,
+			PushDocField,
 			PushExpression,
 			AttachVariable
 		};
@@ -1703,6 +2289,9 @@ private:
 		{
 			Term_type=0x0,
 			Term_value=0x1,
+			Term_length=0x2,
+			Term_metastart=0x0,
+			Term_metaend=0x1,
 			Expression_opname=0x0,
 			Expression_argc=0x1,
 			Expression_range=0x2,
@@ -1733,7 +2322,7 @@ private:
 	};
 	std::size_t allocid( const String& str);
 #ifdef STRUS_BOOST_PYTHON
-	std::size_t allocid( const WString& str);
+	std::size_t allocid_obj( const StringObject& str);
 #endif
 
 private:
@@ -1862,6 +2451,12 @@ public:
 	void defineFeature_expr_3( const String& set_, const FunctionObject& expr_, double weight_);
 #endif
 
+	/// \brief Define a posting iterator describing a document field addressable as feature
+	/// \param[in] set_ name of the feature set, this feature is addressed with
+	/// \param[in] metadataStart name of meta data element that defines the start of the document field, assumed as 1 if name is empty
+	/// \param[in] metadataEnd name of meta data element that defines the end of the document field, assumed as max value if name is empty
+	void defineDocFieldFeature( const String& set_, const String& metadataStart, const String& metadataEnd);
+
 #ifndef DOXYGEN_JAVA
 	/// \brief Define a meta data restriction
 	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
@@ -1932,15 +2527,13 @@ public:
 	void defineGlobalStatistics( const GlobalStatistics& stats_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_);
-	void defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& stats_);
-	void defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_);
+	void defineTermStatistics_obj_struct( const String& type_, const StringObject& value_, const FunctionObject& stats_);
 	void defineGlobalStatistics_struct( const FunctionObject& stats_);
 #endif
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
 	/// \param[in] docnolist_ list of documents to evaluate the query on
-	void addDocumentEvaluationSet( const IntVector& docnolist_);
+	void addDocumentEvaluationSet( const IndexVector& docnolist_);
 #ifdef STRUS_BOOST_PYTHON
 	void addDocumentEvaluationSet_struct( const FunctionObject& docnolist_);
 #endif
@@ -1959,7 +2552,7 @@ public:
 	void addUserName( const String& username_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addUserName_unicode( const WString& username_);
+	void addUserName_obj( const StringObject& username_);
 #endif
 	/// \brief Assign values to variables of the weighting formula
 	/// \param[in] parameter parameter values
@@ -1973,6 +2566,10 @@ public:
 	/// \brief Evaluate this query and return the result
 	/// \return the result
 	QueryResult evaluate() const;
+
+	/// \brief Map the contents of the query to a readable string
+	/// \return the string
+	String tostring() const;
 
 private:
 	friend class QueryEval;
@@ -2116,7 +2713,7 @@ public:
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \warning The RPC mode is only desinged for trusted clients. It is highly insecure if not strictly used in a private network only.
-	explicit Context( const std::string& connectionstring);
+	explicit Context( const String& connectionstring);
 	/// \brief Constructor for remote mode (objects of the context are living on a server connected via RPC)
 	/// \param[in] connectionstring RPC server connection string
 	/// \param[in] maxNofThreads the maximum number of threads used (for error handler context), 0 for default
@@ -2142,7 +2739,7 @@ public:
 	void addModulePath( const String& paths_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addModulePath_unicode( const WString& paths_);
+	void addModulePath_obj( const StringObject& paths_);
 #endif
 
 	/// \brief Define where to load analyzer resource files from
@@ -2151,14 +2748,14 @@ public:
 	void addResourcePath( const String& paths_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void addResourcePath_unicode( const WString& paths_);
+	void addResourcePath_obj( const StringObject& paths_);
 #endif
 
 	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	StatisticsProcessor createStatisticsProcessor( const std::string& name);
+	StatisticsProcessor createStatisticsProcessor( const String& name);
 
-	/// \brief Create a storage client instance of the the default remote storage of the RPC server
+	/// \brief Create a storage client instance of the the default storage
 	StorageClient createStorageClient();
 
 	/// \brief Create a storage client instance
@@ -2167,8 +2764,18 @@ public:
 
 #ifdef STRUS_BOOST_PYTHON
 	StorageClient createStorageClient_0();
-	StorageClient createStorageClient_1( const String& config_);
-	StorageClient createStorageClient_unicode( const WString& config_);
+	StorageClient createStorageClient_obj( const StringObject& config_);
+#endif
+	/// \brief Create a storage client instance of the the default remote storage of the RPC server
+	VectorStorageClient createVectorStorageClient();
+
+	/// \brief Create a vector storage client instance
+	/// \param[in] config_ configuration string of the storage client or empty for the default storage
+	VectorStorageClient createVectorStorageClient( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	VectorStorageClient createVectorStorageClient_0();
+	VectorStorageClient createVectorStorageClient_obj( const StringObject& config_);
 #endif
 
 	/// \brief Create a new storage (physically) described by config
@@ -2177,15 +2784,25 @@ public:
 	void createStorage( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void createStorage_unicode( const WString& config_);
+	void createStorage_obj( const StringObject& config_);
+#endif
+
+	/// \brief Create a new storage (physically) described by config
+	/// \param[in] config_ storage configuration
+ 	/// \remark Fails if the storage already exists
+	void createVectorStorage( const String& config_);
+
+#ifdef STRUS_BOOST_PYTHON
+	void createVectorStorage_obj( const StringObject& config_);
 #endif
 	/// \brief Delete the storage (physically) described by config
+	/// \note works also on vector storages
 	/// \param[in] config_ storage description
 	/// \note Handle this function carefully
 	void destroyStorage( const String& config_);
 
 #ifdef STRUS_BOOST_PYTHON
-	void destroyStorage_unicode( const WString& config_);
+	void destroyStorage_obj( const StringObject& config_);
 #endif
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
@@ -2193,23 +2810,16 @@ public:
 	DocumentClass detectDocumentClass( const String& content);
 
 #ifdef STRUS_BOOST_PYTHON
-	DocumentClass detectDocumentClass_unicode( const WString& content);
+	DocumentClass detectDocumentClass_obj( const StringObject& content);
 #endif
 	/// \brief Create a document analyzer instance
 	/// \param[in] segmentername_ name of the segmenter to use (if empty then the default segmenter is used)
 	DocumentAnalyzer createDocumentAnalyzer( const String& segmentername_="");
 
 #ifdef STRUS_BOOST_PYTHON
-	DocumentAnalyzer createDocumentAnalyzer_unicode( const WString& segmentername_);
+	DocumentAnalyzer createDocumentAnalyzer_obj( const StringObject& segmentername_);
 
-	DocumentAnalyzer createDocumentAnalyzer_0()
-	{
-		return createDocumentAnalyzer();
-	}
-	DocumentAnalyzer createDocumentAnalyzer_1( const String& segmentername_)
-	{
-		return createDocumentAnalyzer( segmentername_);
-	}
+	DocumentAnalyzer createDocumentAnalyzer_0();
 #endif
 
 	/// \brief Create a query analyzer instance

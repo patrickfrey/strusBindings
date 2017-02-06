@@ -22,12 +22,18 @@ int initFunctionVariableConfig( FunctionVariableConfig& result, zval* obj);
 int initQueryExpression( QueryExpression& result, zval* obj);
 int initStringVector( std::vector<std::string>& result, zval* obj);
 int initIntVector( std::vector<int>& result, zval* obj);
+int initFloatVector( std::vector<double>& result, zval* obj);
 int initGlobalStatistics( GlobalStatistics& result, zval* obj);
 int initTermStatistics( TermStatistics& result, zval* obj);
+int initPatternMatcher( PatternMatcher& matcher, zval* obj);
 
 int getTermVector( zval*& result, const std::vector<Term>& ar);
 int getRankVector( zval*& result, const std::vector<Rank>& ar);
+int getVecRankVector( zval*& result, const std::vector<VecRank>& ar);
 int getQueryResult( zval*& result, const QueryResult& res);
+int getStringVector( zval*& result, const std::vector<std::string>& ar);
+int getFloatVector( zval*& result, const std::vector<double>& ar);
+int getIntVector( zval*& result, const std::vector<int>& ar);
 
 std::string dumpObject( zval* obj);
 

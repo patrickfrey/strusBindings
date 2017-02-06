@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "objInitializers.hpp"
+#include "private/internationalization.hpp"
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>
@@ -405,8 +406,7 @@ int initFunctionVariableConfig( FunctionVariableConfig& result, zval* obj)
 	return error;
 }
 
-template <class Object>
-static int defineQueryEvaluationFunctionParameter( Object& result, const char* key, std::size_t keylen, zval* valueitem)
+static int defineQueryEvaluationFunctionParameter( WeightingConfig& result, const char* key, std::size_t keylen, zval* valueitem)
 {
 	int error = 0;
 	try
@@ -445,8 +445,51 @@ static int defineQueryEvaluationFunctionParameter( Object& result, const char* k
 	return error;
 }
 
+static int defineSummarizationFunctionParameter( SummarizerConfig& result, const char* key, std::size_t keylen, zval* valueitem)
+{
+	int error = 0;
+	try
+	{
+		if (keylen && key[0] == '.')
+		{
+			result.defineFeature( std::string( key+1, keylen-1), std::string( Z_STRVAL_P( valueitem)));
+		}
+		else if (keylen && key[0] == '$')
+		{
+			result.defineResultName( std::string( key+1, keylen-1), std::string( Z_STRVAL_P( valueitem)));
+		}
+		else
+		{
+			switch (Z_TYPE_P(valueitem))
+			{
+				case IS_LONG:
+					result.defineParameter( std::string( key, keylen), Variant( (int)Z_LVAL_P( valueitem)));
+					break;
+				case IS_STRING:
+					result.defineParameter( std::string( key, keylen), Variant( (char*)Z_STRVAL_P( valueitem)));
+					break;
+				case IS_DOUBLE:
+					result.defineParameter( std::string( key, keylen), Variant( (double)Z_DVAL_P( valueitem)));
+					break;
+				case IS_BOOL:
+					result.defineParameter( std::string( key, keylen), Variant( (int)Z_BVAL_P( valueitem)));
+					break;
+				default:
+					THROW_EXCEPTION( "bad query evaluation function parameter value");
+					error = -1;
+			}
+		}
+	}
+	catch (...)
+	{
+		THROW_EXCEPTION( "memory allocation error");
+		error = -1;
+	}
+	return error;
+}
+
 template <class Object>
-static int initQueryEvalFunctionConfig( Object& result, zval* obj)
+static int initQueryEvalFunctionConfig( Object& result, zval* obj, int (*DefineParameter)( Object& result, const char* key, std::size_t keylen, zval* valueitem))
 {
 	int error = 0;
 	switch (obj->type)
@@ -489,7 +532,7 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 					error = -1;
 					break;
 				}
-				if (0!=defineQueryEvaluationFunctionParameter( result, name, name_len-1, *data))
+				if (0!=DefineParameter( result, name, name_len-1, *data))
 				{
 					error = -1;
 					break;
@@ -515,15 +558,41 @@ static int initQueryEvalFunctionConfig( Object& result, zval* obj)
 
 int initSummarizerConfig( SummarizerConfig& result, zval* obj)
 {
-	return initQueryEvalFunctionConfig( result, obj);
+	return initQueryEvalFunctionConfig( result, obj, &defineSummarizationFunctionParameter);
 }
 
 int initWeightingConfig( WeightingConfig& result, zval* obj)
 {
-	return initQueryEvalFunctionConfig( result, obj);
+	return initQueryEvalFunctionConfig( result, obj, defineQueryEvaluationFunctionParameter);
 }
 
-int initQueryExpression( QueryExpression& result, zval* obj)
+struct ExpressionMethods
+{
+	template <class Expression>
+	static void pushTerm( Expression&, const std::string&, const std::string&, unsigned int);
+};
+
+template <class Expression>
+void ExpressionMethods::pushTerm( Expression&, const std::string&, const std::string&, unsigned int)
+{
+	throw std::logic_error( "unknown expression type");
+}
+
+template <>
+void ExpressionMethods::pushTerm<QueryExpression>( QueryExpression& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	THIS.pushTerm( type, value, length);
+}
+
+template <>
+void ExpressionMethods::pushTerm<PatternMatcher>( PatternMatcher& THIS, const std::string& type, const std::string& value, unsigned int length)
+{
+	if (length != 1) throw strus::runtime_error(_TXT("length attribute not supported for pattern matcher term"));
+	THIS.pushTerm( type, value);
+}
+
+template <class Expression>
+static int initExpressionStructure( Expression& result, zval* obj)
 {
 	int error = 0;
 	switch (obj->type)
@@ -556,6 +625,7 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 			hash = Z_ARRVAL_P( obj);
 			unsigned int arraysize = zend_hash_num_elements( hash);
 			unsigned int aridx = 0;
+			unsigned int length = 1;
 
 			// [1] Initialize header:
 			zend_hash_internal_pointer_reset_ex( hash, &ptr);
@@ -600,11 +670,11 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 				break;
 			}
 			// [2] Check if token definition, and push the token if it is:
-			if (arraysize <= 2)
+			if (arraysize <= 3)
 			{
 				// Check, if we got a token definition
 				const char* tokvalue = 0;
-				if (zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS)
+				if (arraysize < 2 || zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS)
 				{
 					tokvalue = "";
 				}
@@ -614,7 +684,21 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 				}
 				if (tokvalue)
 				{
-					result.pushTerm( funcname, tokvalue);
+					if (arraysize == 3)
+					{
+						zend_hash_move_forward_ex( hash,&ptr);
+						++aridx;
+						if (zend_hash_get_current_data_ex( hash,(void**)&data,&ptr) != SUCCESS
+						|| Z_TYPE_PP(data) != IS_LONG)
+						{
+							THROW_EXCEPTION( "length (unsigned integer) as third element of token definition expected");
+						}
+						else
+						{
+							length = Z_LVAL_PP( data);
+						}
+					}
+					ExpressionMethods::pushTerm( result, funcname, tokvalue, length);
 					if (variablename)
 					{
 						result.attachVariable( variablename);
@@ -677,7 +761,7 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 				zend_hash_move_forward_ex( hash,&ptr))
 			{
 				++argcnt;
-				error = initQueryExpression( result, *data);
+				error = initExpressionStructure( result, *data);
 				if (error) break;
 			}
 			if (error) break;
@@ -704,6 +788,11 @@ int initQueryExpression( QueryExpression& result, zval* obj)
 			break;
 	}
 	return error;
+}
+
+int initQueryExpression( QueryExpression& result, zval* obj)
+{
+	return initExpressionStructure( result, obj);
 }
 
 int initStringVector( std::vector<std::string>& result, zval* obj)
@@ -871,6 +960,88 @@ int initIntVector( std::vector<int>& result, zval* obj)
 	return error;
 }
 
+int initFloatVector( std::vector<double>& result, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			try
+			{
+				result.push_back( Z_LVAL_P( obj));
+			}
+			catch (...)
+			{
+				THROW_EXCEPTION( "memory allocation error");
+				error = -1;
+			}
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to std::vector<int>");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			try
+			{
+				result.push_back( Z_DVAL_P( obj));
+			}
+			catch (...)
+			{
+				THROW_EXCEPTION( "memory allocation error");
+				error = -1;
+			}
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to std::vector<int>");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P(obj);
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr))
+			{
+				if (Z_TYPE_PP(data) != IS_DOUBLE)
+				{
+					THROW_EXCEPTION( "expected array of double precision floats");
+					error = -1;
+					break;
+				}
+				try
+				{
+					result.push_back( Z_DVAL_PP( data));
+				}
+				catch (...)
+				{
+					THROW_EXCEPTION( "memory allocation error");
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to std::vector<int>");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to std::vector<int>");
+			error = -1;
+			break;
+		default: 
+			THROW_EXCEPTION( "unable to convert unknown type to std::vector<int>");
+			error = -1;
+			break;
+	}
+	return error;
+}
 
 class TermStatisticsBuilder
 {
@@ -1016,7 +1187,7 @@ int initTermStatistics( TermStatistics& result, zval* obj)
 
 int getTermVector( zval*& result, const std::vector<Term>& ar)
 {
-	array_init( result);
+	array_init_size( result, ar.size());
 	std::vector<Term>::const_iterator ti = ar.begin(), te = ar.end();
 	for (; ti != te; ++ti)
 	{
@@ -1033,7 +1204,7 @@ int getTermVector( zval*& result, const std::vector<Term>& ar)
 
 static int getSummaryElementVector( zval*& result, const std::vector<SummaryElement>& ar)
 {
-	array_init( result);
+	array_init_size( result, ar.size());
 	std::vector<SummaryElement>::const_iterator ai = ar.begin(), ae = ar.end();
 	for (; ai != ae; ++ai)
 	{
@@ -1050,7 +1221,7 @@ static int getSummaryElementVector( zval*& result, const std::vector<SummaryElem
 
 int getRankVector( zval*& result, const std::vector<Rank>& ar)
 {
-	array_init( result);
+	array_init_size( result, ar.size());
 	std::vector<Rank>::const_iterator ri = ar.begin(), re = ar.end();
 	for (; ri != re; ++ri)
 	{
@@ -1069,6 +1240,59 @@ int getRankVector( zval*& result, const std::vector<Rank>& ar)
 	return 0;
 }
 
+int getVecRankVector( zval*& result, const std::vector<VecRank>& ar)
+{
+	array_init_size( result, ar.size());
+	std::vector<VecRank>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		zval* rank;
+		MAKE_STD_ZVAL( rank);
+		object_init( rank);
+		add_property_long( rank, "index", ri->index());
+		add_property_double( rank, "weight", ri->weight());
+
+		add_next_index_zval( result, rank);
+	}
+	return 0;
+}
+
+int getStringVector( zval*& result, const std::vector<std::string>& ar)
+{
+	int error = 0;
+	array_init_size( result, ar.size());
+	std::vector<std::string>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		error |= add_next_index_stringl( result, ri->c_str(), ri->size(), 1);
+	}
+	return error;
+}
+
+int getFloatVector( zval*& result, const std::vector<double>& ar)
+{
+	int error = 0;
+	array_init_size( result, ar.size());
+	std::vector<double>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		error |= add_next_index_double( result, *ri);
+	}
+	return error;
+}
+
+int getIntVector( zval*& result, const std::vector<int>& ar)
+{
+	int error = 0;
+	array_init_size( result, ar.size());
+	std::vector<int>::const_iterator ri = ar.begin(), re = ar.end();
+	for (; ri != re; ++ri)
+	{
+		error |= add_next_index_long( result, *ri);
+	}
+	return error;
+}
+
 int getQueryResult( zval*& result, const QueryResult& res)
 {
 	object_init( result);
@@ -1083,5 +1307,92 @@ int getQueryResult( zval*& result, const QueryResult& res)
 	add_property_zval( result, "ranks", ranks);
 	return 0;
 }
+
+int initPatternMatcher( PatternMatcher& matcher, zval* obj)
+{
+	int error = 0;
+	switch (obj->type)
+	{
+		case IS_LONG:
+			THROW_EXCEPTION( "unable to convert LONG to pattern matcher");
+			error = -1;
+			break;
+		case IS_STRING:
+			THROW_EXCEPTION( "unable to convert STRING to pattern matcher");
+			error = -1;
+			break;
+		case IS_DOUBLE:
+			THROW_EXCEPTION( "unable to convert DOUBLE to pattern matcher");
+			error = -1;
+			break;
+		case IS_BOOL:
+			THROW_EXCEPTION( "unable to convert BOOL to pattern matcher");
+			error = -1;
+			break;
+		case IS_NULL:
+			break;
+		case IS_ARRAY:
+		{
+			zval **data;
+			HashTable *hash;
+			HashPosition ptr;
+			hash = Z_ARRVAL_P( obj);
+			int argcnt = 0;
+			for(
+				zend_hash_internal_pointer_reset_ex(hash,&ptr);
+				zend_hash_get_current_data_ex(hash,(void**)&data,&ptr) == SUCCESS;
+				zend_hash_move_forward_ex(hash,&ptr),++argcnt)
+			{
+				char *name = 0;
+				unsigned int name_len = 0;// length of string including 0 byte !
+				unsigned long index;
+				if (!zend_hash_get_current_key_ex( hash, &name, &name_len, &index, 0, &ptr) == HASH_KEY_IS_STRING)
+				{
+					THROW_EXCEPTION( "illegal key of element (not a string)");
+					error = -1;
+					break;
+				}
+				if (0!=initExpressionStructure( matcher, *data))
+				{
+					error = -1;
+					break;
+				}
+				try
+				{
+					if (name[0] == '-')
+					{
+						std::string ptname( name+1, name_len-1);
+						matcher.definePattern( ptname.c_str(), false);
+					}
+					else
+					{
+						std::string ptname( name, name_len);
+						matcher.definePattern( ptname.c_str(), true);
+					}
+				}
+				catch (const std::bad_alloc&)
+				{
+					error = -1;
+					break;
+				}
+			}
+			break;
+		}
+		case IS_OBJECT:
+			THROW_EXCEPTION( "unable to convert OBJECT to pattern matcher");
+			error = -1;
+			break;
+		case IS_RESOURCE:
+			THROW_EXCEPTION( "unable to convert RESOURCE to pattern matcher");
+			error = -1;
+			break;
+		default:
+			THROW_EXCEPTION( "unable to convert unknown type to pattern matcher");
+			error = -1;
+			break;
+	}
+	return error;
+}
+
 
 

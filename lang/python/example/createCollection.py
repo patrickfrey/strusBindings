@@ -11,6 +11,8 @@ def readFile( path ):
 
 config = "path=storage; metadata=doclen UINT16"
 ctx = strus.Context()
+ctx.loadModule( "analyzer_pattern");
+
 try:
 	ctx.destroyStorage( config)
 	# ... delete the storage files if they already exists
@@ -29,6 +31,13 @@ analyzer = ctx.createDocumentAnalyzer()
 analyzer.addSearchIndexFeature( "word", "/doc/text()", "word", (("stem","en"),"lc",("convdia","en")))
 analyzer.addForwardIndexFeature( "orig", "/doc/text()", "split", "orig")
 analyzer.defineAttribute( "title", "/doc/title()", "content", "orig")
+
+analyzer.definePatternMatcherPostProc( "coresult", "std", (
+	("city_that_is", ("sequence", 3, ["word","citi"],["word","that"],["word","is"])),
+	("city_that", ("sequence", 2, ["word","citi"],["word","that"])),
+	("city_with", ("sequence", 2, ["word","citi"],["word","with"]))
+));
+analyzer.addSearchIndexFeatureFromPatternMatch( "word", "coresult", ("lc"))
 
 # Read input files, analyze and insert them:
 transaction = storage.createTransaction()

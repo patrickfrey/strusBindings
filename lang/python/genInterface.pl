@@ -128,39 +128,64 @@ my %ignoreClassMap = ();
 $ignoreClassMap{"Reference"} = 1;
 my %ignoreMethodMap = ();
 $ignoreMethodMap{"setMetaData"} = 1;
+$ignoreMethodMap{"setAttribute"} = 1;
+$ignoreMethodMap{"addSearchIndexElement"} = 1;
+$ignoreMethodMap{"addSearchIndexElementFromPatternMatch"} = 1;
 $ignoreMethodMap{"analyze"} = 1;
+$ignoreMethodMap{"analyzeField"} = 1;
+$ignoreMethodMap{"definePatternMatcherPostProc"} = 1;
+$ignoreMethodMap{"definePatternMatcherPostProcFromFile"} = 1;
+$ignoreMethodMap{"addPatternLexem"} = 1;
 $ignoreMethodMap{"defineParameter"} = 1;
 $ignoreMethodMap{"addMetaDataRestrictionCondition"} = 1;
 $ignoreMethodMap{"addForwardIndexFeature"} = 1;
 $ignoreMethodMap{"addSearchIndexFeature"} = 1;
+$ignoreMethodMap{"addForwardIndexFeatureFromPatternMatch"} = 1;
+$ignoreMethodMap{"addSearchIndexFeatureFromPatternMatch"} = 1;
+$ignoreMethodMap{"defineMetaData"} = 1;
+$ignoreMethodMap{"defineMetaDataFromPatternMatch"} = 1;
+$ignoreMethodMap{"defineAggregatedMetaData"} = 1;
+$ignoreMethodMap{"defineAttribute"} = 1;
+$ignoreMethodMap{"defineAttributeFromPatternMatch"} = 1;
 $ignoreMethodMap{"pushExpression"} = 1;
+$ignoreMethodMap{"pushPattern"} = 1;
+$ignoreMethodMap{"definePattern"} = 1;
+$ignoreMethodMap{"pushTerm"} = 1;
+$ignoreMethodMap{"push"} = 1;
+$ignoreMethodMap{"attachVariable"} = 1;
 $ignoreMethodMap{"defineFeature"} = 1;
+$ignoreMethodMap{"findSimilar"} = 1;
+$ignoreMethodMap{"findSimilarFromSelection"} = 1;
+$ignoreMethodMap{"addFeature"} = 1;
+$ignoreMethodMap{"defineFeatureConceptRelation"} = 1;
+$ignoreMethodMap{"defineTermStatistics"} = 1;
+$ignoreMethodMap{"defineGlobalStatistics"} = 1;
 $ignoreMethodMap{"addDocumentEvaluationSet"} = 1;
 $ignoreMethodMap{"createDocumentAnalyzer"} = 1;
 $ignoreMethodMap{"createStorageClient"} = 1;
-$ignoreMethodMap{"push"} = 1;
+$ignoreMethodMap{"createStorage"} = 1;
+$ignoreMethodMap{"createVectorStorageClient"} = 1;
+$ignoreMethodMap{"createVectorStorage"} = 1;
+$ignoreMethodMap{"destroyStorage"} = 1;
+$ignoreMethodMap{"detectDocumentClass"} = 1;
+$ignoreMethodMap{"deleteDocument"} = 1;
+$ignoreMethodMap{"deleteUserAccessRights"} = 1;
+$ignoreMethodMap{"addResourcePath"} = 1;
+$ignoreMethodMap{"addModulePath"} = 1;
+$ignoreMethodMap{"addUserName"} = 1;
 $ignoreMethodMap{"decode"} = 1;
 
 my %renameMethodMap = ();
 $renameMethodMap{"setMetaData_double"} = "setMetaData";
 $renameMethodMap{"setMetaData_int"} = "setMetaData";
 $renameMethodMap{"setMetaData_uint"} = "setMetaData";
-$renameMethodMap{"setAttribute_unicode"} = "setAttribute";
-$renameMethodMap{"analyze_unicode_1"} = "analyze";
-$renameMethodMap{"analyze_unicode_2"} = "analyze";
-$renameMethodMap{"analyze_1"} = "analyze";
-$renameMethodMap{"analyze_2"} = "analyze";
-$renameMethodMap{"analyzePhrase_unicode"} = "analyzePhrase";
-$renameMethodMap{"analyzePhrase"} = "analyzePhrase";
-$renameMethodMap{"push_unicode"} = "push";
-$renameMethodMap{"push_unicode_1"} = "push";
-$renameMethodMap{"push_unicode_2"} = "push";
-$renameMethodMap{"defineParameter_string"} = "defineParameter";
-$renameMethodMap{"defineParameter_charp"} = "defineParameter";
-$renameMethodMap{"defineParameter_int"} = "defineParameter";
-$renameMethodMap{"defineParameter_uint"} = "defineParameter";
-$renameMethodMap{"defineParameter_double"} = "defineParameter";
-$renameMethodMap{"defineParameter_unicode"} = "defineParameter";
+$renameMethodMap{"setAttribute_obj"} = "setAttribute";
+$renameMethodMap{"analyze_obj_1"} = "analyze";
+$renameMethodMap{"analyze_obj_2"} = "analyze";
+$renameMethodMap{"analyzeField_obj"} = "analyzeField";
+$renameMethodMap{"push_obj"} = "push";
+$renameMethodMap{"push_obj_1"} = "push";
+$renameMethodMap{"push_obj_2"} = "push";
 $renameMethodMap{"addMetaDataRestrictionCondition_double"} = "addMetaDataRestrictionCondition";
 $renameMethodMap{"addMetaDataRestrictionCondition_int"} = "addMetaDataRestrictionCondition";
 $renameMethodMap{"addMetaDataRestrictionCondition_uint"} = "addMetaDataRestrictionCondition";
@@ -168,42 +193,57 @@ $renameMethodMap{"addForwardIndexFeature_4"} = "addForwardIndexFeature";
 $renameMethodMap{"addForwardIndexFeature_5"} = "addForwardIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_4"} = "addSearchIndexFeature";
 $renameMethodMap{"addSearchIndexFeature_5"} = "addSearchIndexFeature";
-$renameMethodMap{"pushTerm_unicode"} = "pushTerm";
+$renameMethodMap{"addSearchIndexFeatureFromPatternMatch_3"} = "addSearchIndexFeatureFromPatternMatch";
+$renameMethodMap{"addSearchIndexFeatureFromPatternMatch_4"} = "addSearchIndexFeatureFromPatternMatch";
+$renameMethodMap{"addForwardIndexFeatureFromPatternMatch_3"} = "addForwardIndexFeatureFromPatternMatch";
+$renameMethodMap{"addForwardIndexFeatureFromPatternMatch_4"} = "addForwardIndexFeatureFromPatternMatch";
+$renameMethodMap{"defineMetaDataFromPatternMatch_obj"} = "defineMetaDataFromPatternMatch";
+$renameMethodMap{"defineAttributeFromPatternMatch_obj"} = "defineAttributeFromPatternMatch";
+$renameMethodMap{"pushTerm_obj"} = "pushTerm";
+$renameMethodMap{"pushPattern_obj"} = "pushPattern";
 $renameMethodMap{"pushExpression_2"} = "pushExpression";
 $renameMethodMap{"pushExpression_3"} = "pushExpression";
 $renameMethodMap{"pushExpression_4"} = "pushExpression";
-$renameMethodMap{"attachVariable_unicode"} = "attachVariable";
+$renameMethodMap{"definePattern_obj"} = "definePattern";
+$renameMethodMap{"attachVariable_obj"} = "attachVariable";
 $renameMethodMap{"defineFeature_2"} = "defineFeature";
 $renameMethodMap{"defineFeature_3"} = "defineFeature";
 $renameMethodMap{"defineFeature_expr_2"} = "defineFeature";
 $renameMethodMap{"defineFeature_expr_3"} = "defineFeature";
-$renameMethodMap{"defineTermStatistics_unicode"} = "defineTermStatistics";
-$renameMethodMap{"defineTermStatistics_struct"} = "defineTermStatistics";
-$renameMethodMap{"defineTermStatistics_unicode_struct"} = "defineTermStatistics";
+$renameMethodMap{"addFeature_obj"} = "addFeature";
+$renameMethodMap{"defineFeatureConceptRelation_obj"} = "defineFeatureConceptRelation";
+$renameMethodMap{"findSimilar_obj"} = "findSimilar";
+$renameMethodMap{"findSimilarFromSelection_obj"} = "findSimilarFromSelection";
+$renameMethodMap{"defineTermStatistics_obj_struct"} = "defineTermStatistics";
 $renameMethodMap{"defineGlobalStatistics_struct"} = "defineGlobalStatistics";
 $renameMethodMap{"addDocumentEvaluationSet_struct"} = "addDocumentEvaluationSet";
 $renameMethodMap{"createStorageClient_0"} = "createStorageClient";
-$renameMethodMap{"createStorageClient_1"} = "createStorageClient";
-$renameMethodMap{"createStorageClient_unicode"} = "createStorageClient";
-$renameMethodMap{"createStorage_unicode"} = "createStorage";
-$renameMethodMap{"destroyStorage_unicode"} = "destroyStorage";
-$renameMethodMap{"detectDocumentClass_unicode"} = "detectDocumentClass";
-$renameMethodMap{"createDocumentAnalyzer_unicode"} = "createDocumentAnalyzer";
+$renameMethodMap{"createStorageClient_obj"} = "createStorageClient";
+$renameMethodMap{"createStorage_obj"} = "createStorage";
+$renameMethodMap{"createVectorStorageClient_0"} = "createVectorStorageClient";
+$renameMethodMap{"createVectorStorageClient_obj"} = "createVectorStorageClient";
+$renameMethodMap{"createVectorStorage_obj"} = "createVectorStorage";
+$renameMethodMap{"destroyStorage_obj"} = "destroyStorage";
+$renameMethodMap{"detectDocumentClass_obj"} = "detectDocumentClass";
+$renameMethodMap{"createDocumentAnalyzer_obj"} = "createDocumentAnalyzer";
 $renameMethodMap{"createDocumentAnalyzer_0"} = "createDocumentAnalyzer";
-$renameMethodMap{"createDocumentAnalyzer_1"} = "createDocumentAnalyzer";
 $renameMethodMap{"defineMetaData_obj"} = "defineMetaData";
 $renameMethodMap{"defineAggregatedMetaData_obj"} = "defineAggregatedMetaData";
 $renameMethodMap{"defineAttribute_obj"} = "defineAttribute";
-$renameMethodMap{"definePhraseType_obj"} = "definePhraseType";
+$renameMethodMap{"addSearchIndexElement_obj"} = "addSearchIndexElement";
+$renameMethodMap{"addSearchIndexElementFromPatternMatch_obj"} = "addSearchIndexElementFromPatternMatch";
+$renameMethodMap{"definePatternMatcherPostProc_expr"} = "definePatternMatcherPostProc";
+$renameMethodMap{"definePatternMatcherPostProcFromFile_obj"} = "definePatternMatcherPostProcFromFile";
+$renameMethodMap{"addPatternLexem_obj"} = "addPatternLexem";
 $renameMethodMap{"addSummarizer_obj"} = "addSummarizer";
 $renameMethodMap{"addWeightingFunction_obj"} = "addWeightingFunction";
 $renameMethodMap{"addWeightingFormula_obj"} = "addWeightingFormula";
 $renameMethodMap{"setWeightingVariables_obj"} = "setWeightingVariables";
-$renameMethodMap{"deleteDocument_unicode"} = "deleteDocument";
-$renameMethodMap{"deleteUserAccessRights_unicode"} = "deleteUserAccessRights";
-$renameMethodMap{"addResourcePath_unicode"} = "addResourcePath";
-$renameMethodMap{"addModulePath_unicode"} = "addModulePath";
-$renameMethodMap{"addUserName_unicode"} = "addUserName";
+$renameMethodMap{"deleteDocument_obj"} = "deleteDocument";
+$renameMethodMap{"deleteUserAccessRights_obj"} = "deleteUserAccessRights";
+$renameMethodMap{"addResourcePath_obj"} = "addResourcePath";
+$renameMethodMap{"addModulePath_obj"} = "addModulePath";
+$renameMethodMap{"addUserName_obj"} = "addUserName";
 $renameMethodMap{"decode_datablob"} = "decode";
 
 sub parseType
@@ -400,7 +440,7 @@ sub parseClass
 			}
 			if ($tok ne "(")
 			{
-				die "syntax error parsing method: start of argument list expected";
+				die "syntax error parsing method: start of argument list expected instead of '" . $tok . "' at " . $methodname;
 			}
 			while (nextToken() ne ")")
 			{
@@ -584,6 +624,8 @@ bp::register_exception_translator<std::bad_alloc>( translate_bad_alloc);
 bp::register_exception_translator<std::logic_error>( translate_logic_error);
 bp::register_exception_translator<std::exception>( translate_exception);
 
+bp::class_<IndexVector>("IndexVector") .def( bp::vector_indexing_suite<IndexVector>());
+bp::class_<FloatVector>("FloatVector") .def( bp::vector_indexing_suite<FloatVector>());
 bp::class_<TermVector>("TermVector") .def( bp::vector_indexing_suite<TermVector>());
 bp::class_<RankVector>("RankVector") .def( bp::vector_indexing_suite<RankVector>());
 bp::class_<SummaryElementVector>("SummaryElementVector") .def( bp::vector_indexing_suite<SummaryElementVector>());
@@ -591,6 +633,7 @@ bp::class_<StringVector>("StringVector") .def( bp::vector_indexing_suite<StringV
 bp::class_<AttributeVector>("AttributeVector") .def( bp::vector_indexing_suite<AttributeVector>());
 bp::class_<MetaDataVector>("MetaDataVector") .def( bp::vector_indexing_suite<MetaDataVector>());
 bp::class_<DocumentFrequencyChangeVector>("DocumentFrequencyChangeVector") .def( bp::vector_indexing_suite<DocumentFrequencyChangeVector>());
+bp::class_<VecRankVector>("VecRankVector") .def( bp::vector_indexing_suite<VecRankVector>());
 EOF
 
 my $classdef;
@@ -638,7 +681,7 @@ foreach $classdef( @classlist)
 	}
 }
 print OUTFILE <<EOF;
-};
+}
 EOF
 close OUTFILE;
 

@@ -2,10 +2,11 @@
 import strus
 from os import walk
 
-queryphrase = "city"
+queryphrase = "city that is"
 
 config = "path=storage"
 ctx = strus.Context()
+ctx.loadModule( "analyzer_pattern");
 
 try:
 	# Get a client for the storage:
@@ -14,6 +15,13 @@ try:
 	# Define the query analyzer to use:
 	analyzer = ctx.createQueryAnalyzer()
 	analyzer.addSearchIndexElement( "word", "word", "word", (("stem","en"),"lc",("convdia","en")))
+	analyzer.addPatternLexem( "lexem", "word", "word", "lc");
+	analyzer.addSearchIndexElementFromPatternMatch( "word", "coresult", "lc");
+	analyzer.definePatternMatcherPostProc( "coresult", "std", (
+		("city_that_is", ("sequence", 3, ["word","citi"],["word","that"],["word","is"])),
+		("city_that", ("sequence", 2, ["word","citi"],["word","that"])),
+		("city_with", ("sequence", 2, ["word","citi"],["word","with"]))
+	));
 
 	# Define the query evaluation scheme:
 	queryEval = ctx.createQueryEval()

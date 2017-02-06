@@ -23,9 +23,10 @@ void initQueryExpression( QueryExpression& result, PyObject* obj);
 void initString( std::string& result, PyObject* obj);
 void initStringVector( std::vector<std::string>& result, PyObject* obj);
 void initIntVector( std::vector<int>& result, PyObject* obj);
+void initFloatVector( std::vector<double>& result, PyObject* obj);
 void initTermStatistics( TermStatistics& result, PyObject* obj);
 void initGlobalStatistics( GlobalStatistics& result, PyObject* obj);
 void initDataBlob( std::string& result, PyObject* obj);
-void initIntVectorList( std::vector<int>& result, PyObject* obj);
+void initPatternMatcher( PatternMatcher& matcher, PyObject* obj);
 
 #endif

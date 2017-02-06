@@ -8,7 +8,8 @@ set( source_files
 )
 
 include_directories(
-    "${Intl_INCLUDE_DIRS}"
+	"${Boost_INCLUDE_DIRS}"
+	"${Intl_INCLUDE_DIRS}"
 	"${PROJECT_SOURCE_DIR}/include"
 	"${strus_INCLUDE_DIRS}"
 	"${strusanalyzer_INCLUDE_DIRS}"
@@ -16,6 +17,7 @@ include_directories(
 	"${strusrpc_INCLUDE_DIRS}"
 )
 link_directories(
+	"${Boost_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"
 )

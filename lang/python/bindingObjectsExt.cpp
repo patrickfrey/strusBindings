@@ -22,9 +22,11 @@ WString Attribute::ucvalue() const
 	return convert_uft8string_to_wstring( m_value);
 }
 
-void Document::setAttribute_unicode( const String& name, const WString& value)
+void Document::setAttribute_obj( const String& name, const StringObject& value_)
 {
-	setAttribute( name, convert_wstring_to_uft8string( value));
+	std::string value;
+	initString( value, value_.ptr());
+	setAttribute( name, value);
 }
 
 void DocumentAnalyzer::addSearchIndexFeature_4(
@@ -220,40 +222,156 @@ void DocumentAnalyzer::defineAttribute_obj(
 	}
 }
 
-Document DocumentAnalyzer::analyze_unicode_1( const WString& content)
+void DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch_3(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_)
 {
-	return analyze( convert_wstring_to_uft8string( content));
+	addSearchIndexFeatureFromPatternMatch_4( type, patternTypeName, normalizers_, String());
 }
 
-Document DocumentAnalyzer::analyze_unicode_2( const WString& content, const DocumentClass& dclass)
+void DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch_4(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_,
+	const String& options)
 {
-	return analyze( convert_wstring_to_uft8string( content), dclass);
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		addSearchIndexFeatureFromPatternMatch( type, patternTypeName, (const NormalizerVector&)normalizers, options);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		addSearchIndexFeatureFromPatternMatch( type, patternTypeName, normalizers, options);
+	}
 }
 
-Document DocumentAnalyzer::analyze_1( const String& content)
+void DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch_3(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_)
 {
-	return analyze( content);
+	addForwardIndexFeatureFromPatternMatch_4( type, patternTypeName, normalizers_, String());
 }
 
-Document DocumentAnalyzer::analyze_2( const String& content, const DocumentClass& dclass)
+void DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch_4(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_,
+	const String& options)
 {
-	return analyze( content, dclass);
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		addForwardIndexFeatureFromPatternMatch( type, patternTypeName, (const NormalizerVector&)normalizers, options);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		addForwardIndexFeatureFromPatternMatch( type, patternTypeName, normalizers, options);
+	}
 }
 
-void DocumentAnalyzeQueue::push_unicode_1( const WString& content)
+void DocumentAnalyzer::defineMetaDataFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_)
 {
-	return push( convert_wstring_to_uft8string( content));
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		defineMetaDataFromPatternMatch( fieldname, patternTypeName, (const NormalizerVector&)normalizers);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		defineMetaDataFromPatternMatch( fieldname, patternTypeName, normalizers);
+	}
 }
 
-void DocumentAnalyzeQueue::push_unicode_2( const WString& content, const DocumentClass& dclass)
+void DocumentAnalyzer::defineAttributeFromPatternMatch_obj(
+		const String& fieldname,
+		const String& patternTypeName,
+		const FunctionObject& normalizers_)
 {
-	return push( convert_wstring_to_uft8string( content), dclass);
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		defineAttributeFromPatternMatch( fieldname, patternTypeName, (const NormalizerVector&)normalizers);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		defineAttributeFromPatternMatch( fieldname, patternTypeName, normalizers);
+	}
+}
+
+Document DocumentAnalyzer::analyze_obj_1( const StringObject& value_)
+{
+	std::string value;
+	initString( value, value_.ptr());
+	return analyze( value);
+}
+
+Document DocumentAnalyzer::analyze_obj_2( const StringObject& value_, const DocumentClass& dclass)
+{
+	std::string value;
+	initString( value, value_.ptr());
+	return analyze( value, dclass);
+}
+
+void DocumentAnalyzer::definePatternMatcherPostProc_expr(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const FunctionObject& expr_)
+{
+	boost::python::extract<PatternMatcher> expr(expr_);
+	if (expr.check())
+	{
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, (PatternMatcher&)expr);
+	}
+	else
+	{
+		PatternMatcher matcher;
+		initPatternMatcher( matcher, expr_.ptr());
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, matcher);
+	}
+}
+
+void DocumentAnalyzer::definePatternMatcherPostProcFromFile_obj(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const StringObject& serializedPatternFile_)
+{
+	std::string serializedPatternFile;
+	initString( serializedPatternFile, serializedPatternFile_.ptr());
+	definePatternMatcherPostProcFromFile( patternTypeName, patternMatcherModule, serializedPatternFile);
+}
+
+void DocumentAnalyzeQueue::push_obj_1( const StringObject& value_)
+{
+	std::string value;
+	initString( value, value_.ptr());
+	return push( value);
+}
+
+void DocumentAnalyzeQueue::push_obj_2( const StringObject& value_, const DocumentClass& dclass)
+{
+	std::string value;
+	initString( value, value_.ptr());
+	return push( value, dclass);
 }
 
 
-void QueryAnalyzer::definePhraseType_obj(
-	const String& phrasetype,
-	const String& selectexpr,
+void QueryAnalyzer::addSearchIndexElement_obj(
+	const String& featureType,
+	const String& fieldType,
 	const FunctionObject& tokenizer_,
 	const FunctionObject& normalizers_)
 {
@@ -263,13 +381,13 @@ void QueryAnalyzer::definePhraseType_obj(
 		boost::python::extract<NormalizerVector> normalizers(normalizers_);
 		if (normalizers.check())
 		{
-			definePhraseType( phrasetype, selectexpr, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+			addSearchIndexElement( featureType, fieldType, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
 		}
 		else
 		{
 			NormalizerVector normalizers;
 			initNormalizerList( normalizers, normalizers_.ptr());
-			definePhraseType( phrasetype, selectexpr, (const Tokenizer&)tokenizer, normalizers);
+			addSearchIndexElement( featureType, fieldType, (const Tokenizer&)tokenizer, normalizers);
 		}
 	}
 	else
@@ -279,37 +397,130 @@ void QueryAnalyzer::definePhraseType_obj(
 		boost::python::extract<NormalizerVector> normalizers(normalizers_);
 		if (normalizers.check())
 		{
-			definePhraseType( phrasetype, selectexpr, tokenizer, (const NormalizerVector&)normalizers);
+			addSearchIndexElement( featureType, fieldType, tokenizer, (const NormalizerVector&)normalizers);
 		}
 		else
 		{
 			NormalizerVector normalizers;
 			initNormalizerList( normalizers, normalizers_.ptr());
-			definePhraseType( phrasetype, selectexpr, tokenizer, normalizers);
+			addSearchIndexElement( featureType, fieldType, tokenizer, normalizers);
 		}
 	}
 }
 
-TermVector QueryAnalyzer::analyzePhrase_unicode(
-		const String& phraseType,
-		const WString& phraseContent) const
+void QueryAnalyzer::addSearchIndexElementFromPatternMatch_obj(
+	const String& type,
+	const String& patternTypeName,
+	const FunctionObject& normalizers_)
 {
-	return analyzePhrase( phraseType, convert_wstring_to_uft8string( phraseContent));
+	boost::python::extract<NormalizerVector> normalizers(normalizers_);
+	if (normalizers.check())
+	{
+		addSearchIndexElementFromPatternMatch( type, patternTypeName, (const NormalizerVector&)normalizers);
+	}
+	else
+	{
+		NormalizerVector normalizers;
+		initNormalizerList( normalizers, normalizers_.ptr());
+		addSearchIndexElementFromPatternMatch( type, patternTypeName, normalizers);
+	}
 }
 
-void QueryAnalyzeQueue::push_unicode( const String& phraseType, const WString& phraseContent)
+void QueryAnalyzer::addPatternLexem_obj(
+		const String& featureType,
+		const String& fieldType,
+		const FunctionObject& tokenizer_,
+		const FunctionObject& normalizers_)
 {
-	push( phraseType, convert_wstring_to_uft8string( phraseContent));
+	boost::python::extract<Tokenizer> tokenizer(tokenizer_);
+	if (tokenizer.check())
+	{
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addPatternLexem( featureType, fieldType, (const Tokenizer&)tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addPatternLexem( featureType, fieldType, (const Tokenizer&)tokenizer, normalizers);
+		}
+	}
+	else
+	{
+		Tokenizer tokenizer;
+		initTokenizer( tokenizer, tokenizer_.ptr());
+		boost::python::extract<NormalizerVector> normalizers(normalizers_);
+		if (normalizers.check())
+		{
+			addPatternLexem( featureType, fieldType, tokenizer, (const NormalizerVector&)normalizers);
+		}
+		else
+		{
+			NormalizerVector normalizers;
+			initNormalizerList( normalizers, normalizers_.ptr());
+			addPatternLexem( featureType, fieldType, tokenizer, normalizers);
+		}
+	}
 }
 
-void StorageTransaction::deleteDocument_unicode( const WString& docid)
+void QueryAnalyzer::definePatternMatcherPostProc_expr(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const FunctionObject& expr_)
 {
-	deleteDocument( convert_wstring_to_uft8string( docid));
+	boost::python::extract<PatternMatcher> expr(expr_);
+	if (expr.check())
+	{
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, (PatternMatcher&)expr);
+	}
+	else
+	{
+		PatternMatcher matcher;
+		initPatternMatcher( matcher, expr_.ptr());
+		definePatternMatcherPostProc( patternTypeName, patternMatcherModule, matcher);
+	}
 }
 
-void StorageTransaction::deleteUserAccessRights_unicode( const WString& username)
+void QueryAnalyzer::definePatternMatcherPostProcFromFile_obj(
+		const String& patternTypeName,
+		const String& patternMatcherModule,
+		const StringObject& serializedPatternFile_)
 {
-	deleteUserAccessRights( convert_wstring_to_uft8string( username));
+	std::string serializedPatternFile;
+	initString( serializedPatternFile, serializedPatternFile_.ptr());
+	definePatternMatcherPostProcFromFile( patternTypeName, patternMatcherModule, serializedPatternFile);
+}
+
+TermVector QueryAnalyzer::analyzeField_obj(
+		const String& fieldType,
+		const StringObject& fieldContent)
+{
+	std::string value;
+	initString( value, fieldContent.ptr());
+	return analyzeField( fieldType, value);
+}
+
+void QueryAnalyzeContext::putField_obj( unsigned int fieldNo, const String& fieldType, const StringObject& fieldContent)
+{
+	std::string value;
+	initString( value, fieldContent.ptr());
+	putField( fieldNo, fieldType, value);
+}
+
+void StorageTransaction::deleteDocument_obj( const StringObject& docid)
+{
+	std::string value;
+	initString( value, docid.ptr());
+	deleteDocument( value);
+}
+
+void StorageTransaction::deleteUserAccessRights_obj( const StringObject& username)
+{
+	std::string value;
+	initString( value, username.ptr());
+	deleteUserAccessRights( value);
 }
 
 WString SummaryElement::ucvalue() const
@@ -353,43 +564,84 @@ void QueryEval::addWeightingFunction_obj(
 }
 
 void QueryEval::addWeightingFormula_obj(
-	const WString& source,
+	const StringObject& source_,
 	const FunctionObject& config_)
 {
 	boost::python::extract<FunctionVariableConfig> config(config_);
 	if (config.check())
 	{
-		addWeightingFormula( convert_wstring_to_uft8string( source), (const FunctionVariableConfig&)config);
+		std::string source;
+		initString( source, source_.ptr());
+		addWeightingFormula( source, (const FunctionVariableConfig&)config);
 	}
 	else
 	{
 		FunctionVariableConfig config;
 		initFunctionVariableConfig( config, config_.ptr());
-		addWeightingFormula( convert_wstring_to_uft8string( source), config);
+		std::string source;
+		initString( source, source_.ptr());
+		addWeightingFormula( source, config);
 	}
 }
 
-std::size_t QueryExpression::allocid( const WString& str)
+std::size_t QueryExpression::allocid_obj( const StringObject& str)
 {
-	return allocid( convert_wstring_to_uft8string( str));
+	std::string value;
+	initString( value, str.ptr());
+	return allocid( value);
 }
 
-void QueryExpression::pushTerm_unicode( const String& type_, const WString& value_)
+void QueryExpression::pushTerm_obj( const String& type_, const StringObject& value_, const Index& length_)
 {
-	StackOp op( StackOp::PushTerm, allocid( type_), allocid( value_));
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid_obj( value_), length_);
 	m_ops.push_back(op);
 	m_size += 1;
 }
 
-void QueryExpression::attachVariable_unicode( const WString& name_)
+void PatternMatcher::pushPattern_obj( const StringObject& name_)
 {
-	StackOp op( StackOp::AttachVariable, allocid( name_));
+	StackOp op( StackOp::PushPattern, allocid_obj( name_));
+	m_ops.push_back( op);
+	m_size += 1;
+}
+
+void QueryExpression::attachVariable_obj( const StringObject& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid_obj( name_));
 	m_ops.push_back(op);
 }
 
-void Query::addUserName_unicode( const WString& username_)
+std::size_t PatternMatcher::allocid_obj( const StringObject& str)
 {
-	addUserName( convert_wstring_to_uft8string( username_));
+	std::string value;
+	initString( value, str.ptr());
+	return allocid( value);
+}
+
+void PatternMatcher::attachVariable_obj( const StringObject& name_)
+{
+	StackOp op( StackOp::AttachVariable, allocid_obj( name_));
+	m_ops.push_back(op);
+}
+
+void PatternMatcher::definePattern_obj( const StringObject& name_, bool visible_)
+{
+	StackOp op( StackOp::PushPattern, allocid_obj( name_), visible_?1:0);
+	m_ops.push_back(op);
+}
+
+void PatternMatcher::pushTerm_obj( const String& type_, const StringObject& value_)
+{
+	StackOp op( StackOp::PushTerm, allocid( type_), allocid_obj( value_));
+	m_ops.push_back(op);
+	m_size += 1;
+}
+
+void Query::addUserName_obj( const StringObject& username_)
+{
+	std::string value;
+	initString( value, username_.ptr());
+	addUserName( value);
 }
 
 void Query::defineFeature_expr_2( const String& set_, const FunctionObject& expr_)
@@ -412,29 +664,22 @@ void Query::defineFeature_expr_3( const String& set_, const FunctionObject& expr
 	}
 }
 
-void Query::defineTermStatistics_unicode( const String& type_, const WString& value_, const TermStatistics& stats_)
+void Query::defineTermStatistics_obj_struct( const String& type_, const StringObject& value_, const FunctionObject& stats_)
 {
-	defineTermStatistics( type_, convert_wstring_to_uft8string( value_), stats_);
-}
-
-void Query::defineTermStatistics_struct( const String& type_, const String& value_, const FunctionObject& expr_)
-{
-	boost::python::extract<TermStatistics> expr(expr_);
-	if (expr.check())
+	std::string value;
+	initString( value, value_.ptr());
+ 
+	boost::python::extract<TermStatistics> stats(stats_);
+	if (stats.check())
 	{
-		defineTermStatistics( type_, value_, (const TermStatistics&)expr);
+		defineTermStatistics( type_, value, (const TermStatistics&)stats);
 	}
 	else
 	{
 		TermStatistics stats;
-		initTermStatistics( stats, expr_.ptr());
-		defineTermStatistics( type_, value_, stats);
+		initTermStatistics( stats, stats_.ptr());
+		defineTermStatistics( type_, value, stats);
 	}
-}
-
-void Query::defineTermStatistics_unicode_struct( const String& type_, const WString& value_, const FunctionObject& stats_)
-{
-	defineTermStatistics_struct( type_, convert_wstring_to_uft8string( value_), stats_);
 }
 
 void Query::defineGlobalStatistics_struct( const FunctionObject& expr_)
@@ -462,7 +707,7 @@ void Query::addDocumentEvaluationSet_struct( const FunctionObject& docnolist_)
 	else
 	{
 		std::vector<int> docnolist;
-		initIntVectorList( docnolist, docnolist_.ptr());
+		initIntVector( docnolist, docnolist_.ptr());
 		addDocumentEvaluationSet( docnolist);
 	}
 }
@@ -483,20 +728,94 @@ void Query::setWeightingVariables_obj(
 	}
 }
 
+VecRankVector VectorStorageSearcher::findSimilar_obj( const FunctionObject& vec_, unsigned int maxNofResults) const
+{
+	boost::python::extract<std::vector<double> > expr(vec_);
+	if (expr.check())
+	{
+		return findSimilar( (const std::vector<double>&)expr, maxNofResults);
+	}
+	else
+	{
+		std::vector<double> vec;
+		initFloatVector( vec, vec_.ptr());
+		return findSimilar( vec, maxNofResults);
+	}
+}
+
+VecRankVector VectorStorageSearcher::findSimilarFromSelection_obj( const FunctionObject& featidxlist_, const FunctionObject& vec_, unsigned int maxNofResults) const
+{
+	std::vector<Index> featidxlist;
+	std::vector<Index> const* featidxlist_ref = &featidxlist;
+	boost::python::extract<std::vector<Index> > featidxlist_expr(featidxlist_);
+	if (featidxlist_expr.check())
+	{
+		featidxlist_ref = &(const std::vector<Index>&)featidxlist_expr;
+	}
+	else
+	{
+		initIntVector( featidxlist, featidxlist_.ptr());
+	}
+	boost::python::extract<std::vector<double> > expr(vec_);
+	if (expr.check())
+	{
+		return findSimilarFromSelection( *featidxlist_ref, (const std::vector<double>&)expr, maxNofResults);
+	}
+	else
+	{
+		std::vector<double> vec;
+		initFloatVector( vec, vec_.ptr());
+		return findSimilarFromSelection( *featidxlist_ref, vec, maxNofResults);
+	}
+}
+
+void VectorStorageTransaction::addFeature_obj( const StringObject& name_, const FunctionObject& vec_)
+{
+	std::string name;
+	initString( name, name_.ptr());
+
+	boost::python::extract<std::vector<double> > expr(vec_);
+	if (expr.check())
+	{
+		addFeature( name, (const std::vector<double>&)expr);
+	}
+	else
+	{
+		std::vector<double> vec;
+		initFloatVector( vec, vec_.ptr());
+		addFeature( name, vec);
+	}
+}
+
+void VectorStorageTransaction::defineFeatureConceptRelation_obj( const StringObject& relationTypeName_, const Index& featidx, const Index& conidx)
+{
+	std::string relationTypeName;
+	initString( relationTypeName, relationTypeName_.ptr());
+	defineFeatureConceptRelation( relationTypeName, featidx, conidx);
+}
 
 StorageClient Context::createStorageClient_0()
 {
 	return createStorageClient();
 }
 
-StorageClient Context::createStorageClient_1( const String& config_)
+StorageClient Context::createStorageClient_obj( const StringObject& config_)
 {
-	return createStorageClient( config_);
+	std::string value;
+	initString( value, config_.ptr());
+	return createStorageClient( value);
 }
 
-StorageClient Context::createStorageClient_unicode( const WString& config_)
+VectorStorageClient Context::createVectorStorageClient_0()
 {
-	return createStorageClient( convert_wstring_to_uft8string( config_));
+	return createVectorStorageClient();
+}
+
+VectorStorageClient Context::createVectorStorageClient_obj( const StringObject& config_)
+{
+	std::string value;
+	initString( value, config_.ptr());
+	return createVectorStorageClient( value);
 }
 
 WString DocumentFrequencyChange::ucvalue() const
@@ -504,34 +823,58 @@ WString DocumentFrequencyChange::ucvalue() const
 	return convert_uft8string_to_wstring( m_value);
 }
 
-void Context::addModulePath_unicode( const WString& paths_)
+void Context::addModulePath_obj( const StringObject& paths_)
 {
-	addModulePath( convert_wstring_to_uft8string( paths_));
+	std::string value;
+	initString( value, paths_.ptr());
+	addModulePath( value);
 }
 
-void Context::addResourcePath_unicode( const WString& paths_)
+void Context::addResourcePath_obj( const StringObject& paths_)
 {
-	addResourcePath( convert_wstring_to_uft8string( paths_));
+	std::string value;
+	initString( value, paths_.ptr());
+	addResourcePath( value);
 }
 
-void Context::createStorage_unicode( const WString& config_)
+void Context::createStorage_obj( const StringObject& config_)
 {
-	return createStorage( convert_wstring_to_uft8string( config_));
+	std::string value;
+	initString( value, config_.ptr());
+	return createStorage( value);
 }
 
-void Context::destroyStorage_unicode( const WString& config_)
+void Context::createVectorStorage_obj( const StringObject& config_)
 {
-	return destroyStorage( convert_wstring_to_uft8string( config_));
+	std::string value;
+	initString( value, config_.ptr());
+	return createVectorStorage( value);
 }
 
-DocumentClass Context::detectDocumentClass_unicode( const WString& content)
+void Context::destroyStorage_obj( const StringObject& config_)
 {
-	return detectDocumentClass( convert_wstring_to_uft8string( content));
+	std::string value;
+	initString( value, config_.ptr());
+	return destroyStorage( value);
 }
 
-DocumentAnalyzer Context::createDocumentAnalyzer_unicode( const WString& segmentername_)
+DocumentClass Context::detectDocumentClass_obj( const StringObject& content)
 {
-	return createDocumentAnalyzer( convert_wstring_to_uft8string( segmentername_));
+	std::string value;
+	initString( value, content.ptr());
+	return detectDocumentClass( value);
+}
+
+DocumentAnalyzer Context::createDocumentAnalyzer_obj( const StringObject& segmentername_)
+{
+	std::string value;
+	initString( value, segmentername_.ptr());
+	return createDocumentAnalyzer( value);
+}
+
+DocumentAnalyzer Context::createDocumentAnalyzer_0()
+{
+	return createDocumentAnalyzer();
 }
 
 StatisticsMessage StatisticsProcessor::decode_datablob( const DataBlob& datablob) const

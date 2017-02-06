@@ -29,6 +29,9 @@
 %rename(StrusQueryAnalyzeQueue) QueryAnalyzeQueue;
 %rename(StrusStorageClient) StorageClient;
 %rename(StrusStorageTransaction) StorageTransaction;
+%rename(StrusVectorStorageTransaction) VectorStorageTransaction;
+%rename(StrusVectorStorageClient) VectorStorageClient;
+%rename(StrusVectorStorageSearcher) VectorStorageSearcher;
 %rename(StrusPeerStorageTransaction) PeerStorageTransaction;
 %rename(StrusPeerMessage) PeerMessage;
 %rename(StrusPeerMessageProcessor) PeerMessageProcessor;
@@ -38,10 +41,12 @@
 %rename(StrusWeightingConfig) WeightingConfig;
 %rename(StrusFunctionVariableConfig) FunctionVariableConfig;
 %rename(StrusQueryExpression) QueryExpression;
+%rename(StrusPatternMatcher) PatternMatcher;
 %rename(StrusQuery) Query;
 %rename(StrusQueryEval) QueryEval;
 %rename(StrusRankAttribute) RankAttribute;
 %rename(StrusRank) Rank;
+%rename(StrusVecRank) VecRank;
 %rename(StrusQuery) Query;
 %rename(StrusQueryResult) QueryResult;
 %rename(StrusContext) Context;
@@ -51,8 +56,10 @@
 %include "exception_handler.i"
 %include "std_vector_string.i"
 %include "std_vector_int.i"
+%include "std_vector_double.i"
 %include "std_vector_term.i"
 %include "std_vector_rank.i"
+%include "std_vector_vecrank.i"
 %include "strus_variant.i"
 %include "strus_tokenizer.i"
 %include "strus_normalizer.i"
@@ -62,6 +69,7 @@
 %include "strus_scalarfunc.i"
 %include "strus_queryexpr.i"
 %include "strus_queryresult.i"
+%include "strus_patternmatcher.i"
 %include "strus_statistics.i"
 %include "../../include/strus/bindingObjects.hpp"
 
