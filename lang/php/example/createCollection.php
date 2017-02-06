@@ -23,7 +23,6 @@ $analyzer = $ctx->createDocumentAnalyzer();
 $analyzer->defineAttribute( "title", "/doc/title()", "content", "orig");
 $analyzer->addSearchIndexFeature( "word", "/doc/text()", "word", array( array( "stem","en"),"lc",array( "convdia","en")), "");
 $analyzer->addForwardIndexFeature( "orig", "/doc/text()", "split", "orig", "");
-
 $analyzer->definePatternMatcherPostProc( "coresult", "std", array(
 	"city_that_is" => array( "sequence", 3, 
 					array( "word", "citi"),

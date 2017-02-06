@@ -50,13 +50,13 @@ try:
 		expr = strus.QueryExpression()
 		# We push the query terms on the stack and create a query feature 'seek' 
 		# for each of it:
-		expr.pushTerm( term.type(), term.value())
+		expr.pushTerm( term.type(), term.value(), term.length())
 		print "expr size ", expr.size()
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
 		query.defineFeature( "seek", expr, 1.0)
 		# Each query term is also part of the selection expressions
-		selexpr.pushTerm( term.type(), term.value())
+		selexpr.pushTerm( term.type(), term.value(), term.length())
 		print "term ", term.type()," ", term.value()," (",selexpr.size(),")"
 
 	# Create a selection feature 'select' that matches documents that contain all query terms.

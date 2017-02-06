@@ -22,8 +22,8 @@ public class QueryNoAnalyzer
 			// We push the query terms on the stack and create a query feature 'seek' 
 			// for each of it:
 			QueryExpression expr = new QueryExpression();
-			expr.pushTerm( "word", term);
-			selectexpr.pushTerm( "word", term);
+			expr.pushTerm( "word", term, 1);
+			selectexpr.pushTerm( "word", term, 1);
 
 			// We assign the features created to the set named 'seek' because they are 
 			// referenced with this name in the query evaluation:

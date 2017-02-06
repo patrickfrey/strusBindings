@@ -23,8 +23,8 @@ public class QueryWithAnalyzer
 			// for each of it:
 			System.out.println( "query term " + term.type() + " '" + term.value() + "'");
 			QueryExpression expr = new QueryExpression();
-			expr.pushTerm( term.type(), term.value());
-			selectexpr.pushTerm( term.type(), term.value());
+			expr.pushTerm( term.type(), term.value(), 1);
+			selectexpr.pushTerm( term.type(), term.value(), 1);
 			// We assign the features created to the set named 'seek' because they are 
 			// referenced with this name in the query evaluation:
 			query.defineFeature( "seek", expr, 1.0);
