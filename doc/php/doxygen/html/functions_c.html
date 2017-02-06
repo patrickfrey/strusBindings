@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -63,6 +63,7 @@
       <li><a href="functions_l.html#index_l"><span>l</span></a></li>
       <li><a href="functions_m.html#index_m"><span>m</span></a></li>
       <li><a href="functions_n.html#index_n"><span>n</span></a></li>
+      <li><a href="functions_o.html#index_o"><span>o</span></a></li>
       <li><a href="functions_p.html#index_p"><span>p</span></a></li>
       <li><a href="functions_q.html#index_q"><span>q</span></a></li>
       <li><a href="functions_r.html#index_r"><span>r</span></a></li>
@@ -85,9 +86,22 @@
 <li>close()
 : <a class="el" href="classContext.html#a63db598c6f594f44ac25d9a46d3ed782">Context</a>
 , <a class="el" href="classStorageClient.html#a009ca60beeb8dcbf8f370bda6af817b3">StorageClient</a>
+, <a class="el" href="classVectorStorageClient.html#ae3e265a01b4d70d1345e2ef50a30fc68">VectorStorageClient</a>
+, <a class="el" href="classVectorStorageSearcher.html#a6d9b3258aecd96e466975959e9f1917d">VectorStorageSearcher</a>
+, <a class="el" href="classVectorStorageTransaction.html#a53768b8168cff4c789af1489cd5e26be">VectorStorageTransaction</a>
 </li>
 <li>commit()
 : <a class="el" href="classStorageTransaction.html#ab29ead31aace0753de705081681800c7">StorageTransaction</a>
+, <a class="el" href="classVectorStorageTransaction.html#aeee88094e9d6e7734c11cb539f691e57">VectorStorageTransaction</a>
+</li>
+<li>conceptClassNames()
+: <a class="el" href="classVectorStorageClient.html#a61e437cc135480eb80754fe282a1d9cd">VectorStorageClient</a>
+</li>
+<li>conceptFeatures()
+: <a class="el" href="classVectorStorageClient.html#a9816022bba4eb47d6fcff1b6436cd56e">VectorStorageClient</a>
+</li>
+<li>config()
+: <a class="el" href="classVectorStorageClient.html#ab9c839eb4181436cdad3b641df1f6106">VectorStorageClient</a>
 </li>
 <li>Context()
 : <a class="el" href="classContext.html#a652cdcd2eedc8dbd9110bd284c5d5cf0">Context</a>
@@ -96,6 +110,10 @@
 , <a class="el" href="classQueryEval.html#ac26c806e60ca4a0547680edb68f6e39b">QueryEval</a>
 , <a class="el" href="classStatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b">StatisticsProcessor</a>
 , <a class="el" href="classStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b">StorageClient</a>
+, <a class="el" href="classVectorStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b">VectorStorageClient</a>
+</li>
+<li>createContext()
+: <a class="el" href="classQueryAnalyzer.html#a50c4b7a58644fc2be66057033c113474">QueryAnalyzer</a>
 </li>
 <li>createDocumentAnalyzer()
 : <a class="el" href="classContext.html#a905301c75b5bb103fd1624e8d1420a1b">Context</a>
@@ -117,10 +135,12 @@
 </li>
 <li>createQueue()
 : <a class="el" href="classDocumentAnalyzer.html#abf1fdb91e10903d734e144c6fb84d7f1">DocumentAnalyzer</a>
-, <a class="el" href="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6">QueryAnalyzer</a>
+</li>
+<li>createSearcher()
+: <a class="el" href="classVectorStorageClient.html#a31bc16f425440d5121d73031e98de95c">VectorStorageClient</a>
 </li>
 <li>createStatisticsProcessor()
-: <a class="el" href="classContext.html#a5170e80170de2d4101babe1356a481f7">Context</a>
+: <a class="el" href="classContext.html#a77da214df9876d74b5caaef2f9ecea63">Context</a>
 </li>
 <li>createStorage()
 : <a class="el" href="classContext.html#a4d5ec3ad631903a72b40caeddbc55c06">Context</a>
@@ -130,16 +150,23 @@
 </li>
 <li>createTransaction()
 : <a class="el" href="classStorageClient.html#aecb5fc624516eb042ba5fcf8d25d3f01">StorageClient</a>
+, <a class="el" href="classVectorStorageClient.html#a0eac6fbcf53e4ba533d446f5b2b71559">VectorStorageClient</a>
 </li>
 <li>createUpdateStatisticsIterator()
 : <a class="el" href="classStorageClient.html#af8639edafcf4caba885a60f830a239d7">StorageClient</a>
+</li>
+<li>createVectorStorage()
+: <a class="el" href="classContext.html#ad99a5177e788483d5bda8b4d81352a30">Context</a>
+</li>
+<li>createVectorStorageClient()
+: <a class="el" href="classContext.html#a9c6c3c2b1aef47e9d2ad07f400f7d1d8">Context</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

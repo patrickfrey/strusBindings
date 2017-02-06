@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -57,17 +57,21 @@
 
 <p>This is the complete list of members for <a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a>, including all inherited members.</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a8169da1d36a1a7468c37427ad2dd97fb">analyzePhrase</a>(const String &amp;phraseType, const String &amp;phraseContent) const </td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b">Context</a> class</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a112d3391559597d8e38f6dee1b1325ec">createQueue</a>() const </td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#ade6afe56bb5d22737907a02b97b9384f">definePhraseType</a>(const String &amp;phraseType, const String &amp;featureType, const Tokenizer &amp;tokenizer, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a61a0d02798d95d53b4a69e25b059ef53">addPatternLexem</a>(const std::string &amp;termtype, const std::string &amp;fieldtype, const Tokenizer &amp;tokenizer, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a0296ea4b90eb55d876d1ed55902c920e">addSearchIndexElement</a>(const String &amp;featureType, const String &amp;fieldType, const Tokenizer &amp;tokenizer, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a19ad6b66d01efbcbfda1ecab49086b08">addSearchIndexElementFromPatternMatch</a>(const std::string &amp;type, const std::string &amp;patternTypeName, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a4ffecc7fcef4c45220db31a934453e37">analyzeField</a>(const String &amp;fieldType, const String &amp;fieldContent)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b">Context</a> class</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a5d8b069e386a8fa3c951c8bed03328ca">createContext</a>() const </td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a4ad7bb40ce6ee668530e5989866e334c">definePatternMatcherPostProc</a>(const String &amp;patternTypeName, const String &amp;patternMatcherModule, const PatternMatcher &amp;patterns)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a7bc54748486860c93eeeded8a728ed6e">definePatternMatcherPostProcFromFile</a>(const String &amp;patternTypeName, const String &amp;patternMatcherModule, const String &amp;serializedPatternFile)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#a382ab187ca1f20e8ac4ff62086749492">QueryAnalyzer</a>(const QueryAnalyzer &amp;o)</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html#adb52af30d579b922e312938d67baafd5">~QueryAnalyzer</a>()</td><td class="entry"><a class="el" href="classstrus_1_1QueryAnalyzer.html">strus::QueryAnalyzer</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

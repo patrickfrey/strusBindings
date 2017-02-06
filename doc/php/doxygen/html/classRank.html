@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -64,13 +64,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a49172e3a3cd9de174760c1d6a86db3f3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#a49172e3a3cd9de174760c1d6a86db3f3">Rank</a> ()</td></tr>
 <tr class="memdesc:a49172e3a3cd9de174760c1d6a86db3f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a49172e3a3cd9de174760c1d6a86db3f3">More...</a><br/></td></tr>
 <tr class="separator:a49172e3a3cd9de174760c1d6a86db3f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4df382bd711f52934f76da9bd1f9462d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#a4df382bd711f52934f76da9bd1f9462d">Rank</a> (<a class="el" href="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773">Index</a> docno_, double weight_, const SummaryElementVector &amp;summaryElements_)</td></tr>
+<tr class="memitem:a4df382bd711f52934f76da9bd1f9462d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#a4df382bd711f52934f76da9bd1f9462d">Rank</a> (<a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a> docno_, double weight_, const SummaryElementVector &amp;summaryElements_)</td></tr>
 <tr class="memdesc:a4df382bd711f52934f76da9bd1f9462d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a4df382bd711f52934f76da9bd1f9462d">More...</a><br/></td></tr>
 <tr class="separator:a4df382bd711f52934f76da9bd1f9462d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae963b670fcf089136ee9ad267d7257db"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#ae963b670fcf089136ee9ad267d7257db">Rank</a> (const <a class="el" href="classRank.html">Rank</a> &amp;o)</td></tr>
 <tr class="memdesc:ae963b670fcf089136ee9ad267d7257db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="#ae963b670fcf089136ee9ad267d7257db">More...</a><br/></td></tr>
 <tr class="separator:ae963b670fcf089136ee9ad267d7257db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a422f6b05f4e6fc11b8fa1e366a05ca35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#a422f6b05f4e6fc11b8fa1e366a05ca35">docno</a> () const </td></tr>
+<tr class="memitem:a422f6b05f4e6fc11b8fa1e366a05ca35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#a422f6b05f4e6fc11b8fa1e366a05ca35">docno</a> () const </td></tr>
 <tr class="memdesc:a422f6b05f4e6fc11b8fa1e366a05ca35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the internal document nuber used.  <a href="#a422f6b05f4e6fc11b8fa1e366a05ca35">More...</a><br/></td></tr>
 <tr class="separator:a422f6b05f4e6fc11b8fa1e366a05ca35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afde88ed3e30c3b385513dbdb9327629b"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRank.html#afde88ed3e30c3b385513dbdb9327629b">weight</a> () const </td></tr>
@@ -123,7 +123,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">Rank::Rank </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773">Index</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a>&#160;</td>
           <td class="paramname"><em>docno_</em>, </td>
         </tr>
         <tr>
@@ -190,7 +190,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773">Index</a> Rank::docno </td>
+          <td class="memname"><a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a> Rank::docno </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -286,7 +286,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

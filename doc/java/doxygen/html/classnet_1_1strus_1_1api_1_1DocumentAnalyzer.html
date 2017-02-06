@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -87,6 +87,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1816b654f3d9b39b937e330bc0f7b82a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a1816b654f3d9b39b937e330bc0f7b82a">defineAttribute</a> (const String &amp;attribname, const String &amp;selectexpr, const <a class="el" href="classnet_1_1strus_1_1api_1_1Tokenizer.html">Tokenizer</a> &amp;tokenizer, const NormalizerVector &amp;normalizers)</td></tr>
 <tr class="memdesc:a1816b654f3d9b39b937e330bc0f7b82a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define how a feature to insert as document attribute (for summarization) is selected, tokenized and normalized.  <a href="#a1816b654f3d9b39b937e330bc0f7b82a">More...</a><br/></td></tr>
 <tr class="separator:a1816b654f3d9b39b937e330bc0f7b82a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a506bd481d2e0f3a9564bbc2a04cc85be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a506bd481d2e0f3a9564bbc2a04cc85be">addSearchIndexFeatureFromPatternMatch</a> (const String &amp;type, const String &amp;patternTypeName, const NormalizerVector &amp;normalizers, const String &amp;options=String())</td></tr>
+<tr class="separator:a506bd481d2e0f3a9564bbc2a04cc85be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab2696a094e18dd5cf2f62f3398a8487"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#aab2696a094e18dd5cf2f62f3398a8487">addForwardIndexFeatureFromPatternMatch</a> (const String &amp;type, const String &amp;patternTypeName, const NormalizerVector &amp;normalizers, const String &amp;options=String())</td></tr>
+<tr class="separator:aab2696a094e18dd5cf2f62f3398a8487"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a353d82c3955682e07aa0abb874f08fdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a353d82c3955682e07aa0abb874f08fdb">defineMetaDataFromPatternMatch</a> (const String &amp;fieldname, const String &amp;patternTypeName, const NormalizerVector &amp;normalizers)</td></tr>
+<tr class="separator:a353d82c3955682e07aa0abb874f08fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4499981c44158555176e18be68c6fa1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a4499981c44158555176e18be68c6fa1e">defineAttributeFromPatternMatch</a> (const String &amp;attribname, const String &amp;patternTypeName, const NormalizerVector &amp;normalizers)</td></tr>
+<tr class="separator:a4499981c44158555176e18be68c6fa1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d9a0c797ddbe56b5a0de1b3526122d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a4d9a0c797ddbe56b5a0de1b3526122d6">definePatternMatcherPostProc</a> (const String &amp;patternTypeName, const String &amp;patternMatcherModule, const <a class="el" href="classnet_1_1strus_1_1api_1_1PatternMatcher.html">PatternMatcher</a> &amp;patterns)</td></tr>
+<tr class="memdesc:a4d9a0c797ddbe56b5a0de1b3526122d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a pattern matcher on the document features after other query analysis.  <a href="#a4d9a0c797ddbe56b5a0de1b3526122d6">More...</a><br/></td></tr>
+<tr class="separator:a4d9a0c797ddbe56b5a0de1b3526122d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87add4c24dabf124ff63dd6e133f7df9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a87add4c24dabf124ff63dd6e133f7df9">definePatternMatcherPostProcFromFile</a> (const String &amp;patternTypeName, const String &amp;patternMatcherModule, const String &amp;serializedPatternFile)</td></tr>
+<tr class="memdesc:a87add4c24dabf124ff63dd6e133f7df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a pattern matcher on the document features after other query analysis.  <a href="#a87add4c24dabf124ff63dd6e133f7df9">More...</a><br/></td></tr>
+<tr class="separator:a87add4c24dabf124ff63dd6e133f7df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88b134ec5cadd36a98fed7faea0065b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#a88b134ec5cadd36a98fed7faea0065b7">defineDocument</a> (const String &amp;subDocumentTypeName, const String &amp;selectexpr)</td></tr>
 <tr class="memdesc:a88b134ec5cadd36a98fed7faea0065b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare a sub document for the handling of multi part documents in an analyzed content.  <a href="#a88b134ec5cadd36a98fed7faea0065b7">More...</a><br/></td></tr>
 <tr class="separator:a88b134ec5cadd36a98fed7faea0065b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -210,6 +224,44 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aab2696a094e18dd5cf2f62f3398a8487"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternTypeName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const NormalizerVector &amp;&#160;</td>
+          <td class="paramname"><em>normalizers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>options</em> = <code>String()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="afa95aec303139bf4bb3e84635364c072"></a>
 <div class="memitem">
 <div class="memproto">
@@ -263,6 +315,44 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a506bd481d2e0f3a9564bbc2a04cc85be"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternTypeName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const NormalizerVector &amp;&#160;</td>
+          <td class="paramname"><em>normalizers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>options</em> = <code>String()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -427,6 +517,38 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a4499981c44158555176e18be68c6fa1e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::DocumentAnalyzer::defineAttributeFromPatternMatch </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>attribname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternTypeName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const NormalizerVector &amp;&#160;</td>
+          <td class="paramname"><em>normalizers</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a88b134ec5cadd36a98fed7faea0065b7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -512,6 +634,122 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a353d82c3955682e07aa0abb874f08fdb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::DocumentAnalyzer::defineMetaDataFromPatternMatch </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>fieldname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternTypeName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const NormalizerVector &amp;&#160;</td>
+          <td class="paramname"><em>normalizers</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4d9a0c797ddbe56b5a0de1b3526122d6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::DocumentAnalyzer::definePatternMatcherPostProc </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternTypeName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternMatcherModule</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classnet_1_1strus_1_1api_1_1PatternMatcher.html">PatternMatcher</a> &amp;&#160;</td>
+          <td class="paramname"><em>patterns</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Declare a pattern matcher on the document features after other query analysis. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">patternTypeName</td><td>name of the type to assign to the pattern matching results </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">patternMatcherModule</td><td>module id of pattern matcher to use (empty string for default) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">patterns</td><td>structure with all patterns </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a87add4c24dabf124ff63dd6e133f7df9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::DocumentAnalyzer::definePatternMatcherPostProcFromFile </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternTypeName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>patternMatcherModule</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>serializedPatternFile</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Declare a pattern matcher on the document features after other query analysis. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">patternTypeName</td><td>name of the type to assign to the pattern matching results </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">patternMatcherModule</td><td>module id of pattern matcher to use (empty string for default) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">serializedPatternFile</td><td>path to file with serialized (binary) patterns </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
 <a class="anchor" id="ac26c806e60ca4a0547680edb68f6e39b"></a>
 <div class="memitem">
@@ -542,7 +780,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:16:22 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

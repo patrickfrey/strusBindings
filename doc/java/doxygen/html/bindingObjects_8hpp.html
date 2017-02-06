@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -102,11 +101,17 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzeQueue.html">net::strus::api::DocumentAnalyzeQueue</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object implementing a queue of analyze document tasks.  <a href="classnet_1_1strus_1_1api_1_1DocumentAnalyzeQueue.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html">net::strus::api::QueryAnalyzer</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object representing a set of function for transforming a phrase, the smallest unit in any query language, to a set of terms that can be used to build a query.  <a href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1PatternMatcher.html">net::strus::api::PatternMatcher</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object representing a pattern match program.  <a href="classnet_1_1strus_1_1api_1_1PatternMatcher.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html">net::strus::api::QueryAnalyzeQueue</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object implementing a queue of analyze phrase tasks.  <a href="classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html">net::strus::api::QueryAnalyzer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object representing a set of function for transforming a field, the smallest unit in any query language, to a set of terms that can be used to build a query.  <a href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryTerm.html">net::strus::api::QueryTerm</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html" title="Query program object representing a retrieval method for documents in a storage. ">Query</a> analyzer term with info about the field it originated from.  <a href="classnet_1_1strus_1_1api_1_1QueryTerm.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzeContext.html">net::strus::api::QueryAnalyzeContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html" title="Query program object representing a retrieval method for documents in a storage. ">Query</a> analyzer context for analysing a multipart query.  <a href="classnet_1_1strus_1_1api_1_1QueryAnalyzeContext.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html">net::strus::api::StorageClient</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object representing a client connection to the storage.  <a href="classnet_1_1strus_1_1api_1_1StorageClient.html#details">More...</a><br/></td></tr>
@@ -125,6 +130,16 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">net::strus::api::StatisticsProcessor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translation to update a storage with statistics messages.  <a href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1VecRank.html">net::strus::api::VecRank</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted vector (result of a query vector storage search)  <a href="classnet_1_1strus_1_1api_1_1VecRank.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageSearcher.html">net::strus::api::VectorStorageSearcher</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html">net::strus::api::VectorStorageClient</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object representing a client connection to a vector storage.  <a href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageTransaction.html">net::strus::api::VectorStorageTransaction</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1FunctionVariableConfig.html">net::strus::api::FunctionVariableConfig</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration describing a scalar function variable value.  <a href="classnet_1_1strus_1_1api_1_1FunctionVariableConfig.html#details">More...</a><br/></td></tr>
@@ -177,16 +192,16 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:aef185b8df53f196d028b118ab9ff3485"><td class="memItemLeft" align="right" valign="top">typedef unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485">net::strus::api::Index</a></td></tr>
-<tr class="separator:aef185b8df53f196d028b118ab9ff3485"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3bca9074f870772f57bbe3edf2108c5"><td class="memItemLeft" align="right" valign="top">typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacenet_1_1strus_1_1api.html#ac3bca9074f870772f57bbe3edf2108c5">net::strus::api::GlobalCounter</a></td></tr>
-<tr class="separator:ac3bca9074f870772f57bbe3edf2108c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c9cbdd6e77ad5754596ef4f7c22fd6f"><td class="memItemLeft" align="right" valign="top">typedef int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacenet_1_1strus_1_1api.html#a1c9cbdd6e77ad5754596ef4f7c22fd6f">net::strus::api::Index</a></td></tr>
+<tr class="separator:a1c9cbdd6e77ad5754596ef4f7c22fd6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1be4aad27f1108ddee1a7f59bc157ec"><td class="memItemLeft" align="right" valign="top">typedef long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacenet_1_1strus_1_1api.html#ae1be4aad27f1108ddee1a7f59bc157ec">net::strus::api::GlobalCounter</a></td></tr>
+<tr class="separator:ae1be4aad27f1108ddee1a7f59bc157ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:16:22 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

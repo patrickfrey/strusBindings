@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -63,6 +63,7 @@
       <li><a href="functions_l.html#index_l"><span>l</span></a></li>
       <li><a href="functions_m.html#index_m"><span>m</span></a></li>
       <li><a href="functions_n.html#index_n"><span>n</span></a></li>
+      <li><a href="functions_o.html#index_o"><span>o</span></a></li>
       <li><a href="functions_p.html#index_p"><span>p</span></a></li>
       <li><a href="functions_q.html#index_q"><span>q</span></a></li>
       <li><a href="functions_r.html#index_r"><span>r</span></a></li>
@@ -80,26 +81,36 @@
 
 <h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
 <li>add()
-: <a class="el" href="classQueryExpression.html#a266163c576cb8351f33471dccf974093">QueryExpression</a>
+: <a class="el" href="classPatternMatcher.html#aa1077a5e51ae2182c2380e759b7e0c63">PatternMatcher</a>
+, <a class="el" href="classQueryExpression.html#a266163c576cb8351f33471dccf974093">QueryExpression</a>
 </li>
 <li>addDocumentEvaluationSet()
-: <a class="el" href="classQuery.html#a729fda0a198196332faa76ddae4e09be">Query</a>
+: <a class="el" href="classQuery.html#a3b5da217b6442a66e65e480da6dfa13c">Query</a>
 </li>
 <li>addExclusionFeature()
 : <a class="el" href="classQueryEval.html#a306f7ac20500fdcbdbdad9e0d808b2bf">QueryEval</a>
 </li>
+<li>addFeature()
+: <a class="el" href="classVectorStorageTransaction.html#ae1776fc7c721276fbfaada8786cb9998">VectorStorageTransaction</a>
+</li>
 <li>addForwardIndexFeature()
 : <a class="el" href="classDocumentAnalyzer.html#a730f29d6452bef9027b959c243ebbf87">DocumentAnalyzer</a>
+</li>
+<li>addForwardIndexFeatureFromPatternMatch()
+: <a class="el" href="classDocumentAnalyzer.html#a23b9d1f01f1f8a01057793befc15ba00">DocumentAnalyzer</a>
 </li>
 <li>addForwardIndexTerm()
 : <a class="el" href="classDocument.html#a0f4f2d222a37bef7c8a3b2b07ecd829e">Document</a>
 </li>
 <li>addMetaDataRestrictionCondition()
-: <a class="el" href="classDocumentBrowser.html#abc2df14fe03f1650017c53efbba228ae">DocumentBrowser</a>
-, <a class="el" href="classQuery.html#a721553e2a8f81109b9a28d5e06506799">Query</a>
+: <a class="el" href="classDocumentBrowser.html#ac258c21b5cf673fe7a4505b1d980d4d3">DocumentBrowser</a>
+, <a class="el" href="classQuery.html#a624a5a1225a44eb0d61377156756cd2b">Query</a>
 </li>
 <li>addModulePath()
 : <a class="el" href="classContext.html#a75d86a2b3ab56bd55f1380ed27f36c90">Context</a>
+</li>
+<li>addPatternLexem()
+: <a class="el" href="classQueryAnalyzer.html#a42077d0d98444988ef7b3a179e220175">QueryAnalyzer</a>
 </li>
 <li>addResourcePath()
 : <a class="el" href="classContext.html#abb7e9ae15fb9ca920da19c1ca8e8f3b8">Context</a>
@@ -107,8 +118,17 @@
 <li>addRestrictionFeature()
 : <a class="el" href="classQueryEval.html#a5e1d5c854e41b111c95fd49f4a632c18">QueryEval</a>
 </li>
+<li>addSearchIndexElement()
+: <a class="el" href="classQueryAnalyzer.html#aa5d6a5de40bc0d83d046c5c43a3eb34e">QueryAnalyzer</a>
+</li>
+<li>addSearchIndexElementFromPatternMatch()
+: <a class="el" href="classQueryAnalyzer.html#adcf99856ebc85d623b906252d8d5b110">QueryAnalyzer</a>
+</li>
 <li>addSearchIndexFeature()
 : <a class="el" href="classDocumentAnalyzer.html#a251c1fcd106e74750749f9c986d1026d">DocumentAnalyzer</a>
+</li>
+<li>addSearchIndexFeatureFromPatternMatch()
+: <a class="el" href="classDocumentAnalyzer.html#aa1b006ed5417b5a17d2a57dac5ff86dd">DocumentAnalyzer</a>
 </li>
 <li>addSearchIndexTerm()
 : <a class="el" href="classDocument.html#adbcfcb1b1808fdc82285b2cffbe8f36d">Document</a>
@@ -132,13 +152,15 @@
 : <a class="el" href="classQueryEval.html#ab5e4d55bea531b1c3f61c318fc938cba">QueryEval</a>
 </li>
 <li>analyze()
-: <a class="el" href="classDocumentAnalyzer.html#aa00b3d1bb453318566960da53be5209e">DocumentAnalyzer</a>
+: <a class="el" href="classDocumentAnalyzer.html#a9d2382c804131e11945e74845303ffad">DocumentAnalyzer</a>
+, <a class="el" href="classQueryAnalyzeContext.html#aa9d4a629f6b973cbbd913f7ccf8af4be">QueryAnalyzeContext</a>
 </li>
-<li>analyzePhrase()
-: <a class="el" href="classQueryAnalyzer.html#a9b6f50e5a824397ebf55ef6e05e97923">QueryAnalyzer</a>
+<li>analyzeField()
+: <a class="el" href="classQueryAnalyzer.html#ab8f2753623c94c9f8a50ba74a0ce8d78">QueryAnalyzer</a>
 </li>
 <li>attachVariable()
-: <a class="el" href="classQueryExpression.html#a5627b00f51d4fd5ede9d5a46139f5638">QueryExpression</a>
+: <a class="el" href="classPatternMatcher.html#aededa8dbe604f5fcfaefc69d44fc1e44">PatternMatcher</a>
+, <a class="el" href="classQueryExpression.html#a5627b00f51d4fd5ede9d5a46139f5638">QueryExpression</a>
 </li>
 <li>Attribute()
 : <a class="el" href="classAttribute.html#a8ba4e5a507aef352563e1e56f1930e66">Attribute</a>
@@ -154,7 +176,7 @@
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

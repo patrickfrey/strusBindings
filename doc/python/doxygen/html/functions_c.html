@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -87,9 +87,22 @@
 <li>close()
 : <a class="el" href="classstrus_1_1Context.html#ac1bf6f537be6769276aefa4dea02b837">strus::Context</a>
 , <a class="el" href="classstrus_1_1StorageClient.html#ae6ee829bcccaee1b7b8f5059ca3f53c9">strus::StorageClient</a>
+, <a class="el" href="classstrus_1_1VectorStorageClient.html#a386d225542ce453f298232afa05596f6">strus::VectorStorageClient</a>
+, <a class="el" href="classstrus_1_1VectorStorageSearcher.html#ac0e65d0bec53e54ba82f8b220db3d485">strus::VectorStorageSearcher</a>
+, <a class="el" href="classstrus_1_1VectorStorageTransaction.html#a0cb45e79ceb5a9879747cc1ab7808820">strus::VectorStorageTransaction</a>
 </li>
 <li>commit()
 : <a class="el" href="classstrus_1_1StorageTransaction.html#a0b51d11296c6217e6f07096d506e78d2">strus::StorageTransaction</a>
+, <a class="el" href="classstrus_1_1VectorStorageTransaction.html#a1e251b7a97071dd06ad79fbb50dc7925">strus::VectorStorageTransaction</a>
+</li>
+<li>conceptClassNames()
+: <a class="el" href="classstrus_1_1VectorStorageClient.html#a379d2e0c376566544e28ef70b961a348">strus::VectorStorageClient</a>
+</li>
+<li>conceptFeatures()
+: <a class="el" href="classstrus_1_1VectorStorageClient.html#ab4d817712688d5bb3fa0006b1686b232">strus::VectorStorageClient</a>
+</li>
+<li>config()
+: <a class="el" href="classstrus_1_1VectorStorageClient.html#a2139cda83b9fb11667bd463102914e74">strus::VectorStorageClient</a>
 </li>
 <li>Context()
 : <a class="el" href="classstrus_1_1Context.html#a37f4fa7bd75d45c1b07736fa36b4df4a">strus::Context</a>
@@ -98,6 +111,10 @@
 , <a class="el" href="classstrus_1_1QueryEval.html#ac26c806e60ca4a0547680edb68f6e39b">strus::QueryEval</a>
 , <a class="el" href="classstrus_1_1StatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b">strus::StatisticsProcessor</a>
 , <a class="el" href="classstrus_1_1StorageClient.html#ac26c806e60ca4a0547680edb68f6e39b">strus::StorageClient</a>
+, <a class="el" href="classstrus_1_1VectorStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b">strus::VectorStorageClient</a>
+</li>
+<li>createContext()
+: <a class="el" href="classstrus_1_1QueryAnalyzer.html#a5d8b069e386a8fa3c951c8bed03328ca">strus::QueryAnalyzer</a>
 </li>
 <li>createDocumentAnalyzer()
 : <a class="el" href="classstrus_1_1Context.html#a3681d959a702209d8997b7b01978884b">strus::Context</a>
@@ -119,10 +136,12 @@
 </li>
 <li>createQueue()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#ab02e7845fb4ce961bd3aef4577b778d8">strus::DocumentAnalyzer</a>
-, <a class="el" href="classstrus_1_1QueryAnalyzer.html#a112d3391559597d8e38f6dee1b1325ec">strus::QueryAnalyzer</a>
+</li>
+<li>createSearcher()
+: <a class="el" href="classstrus_1_1VectorStorageClient.html#a3b2af05d4d5a7b7b4cb246a70c3a534a">strus::VectorStorageClient</a>
 </li>
 <li>createStatisticsProcessor()
-: <a class="el" href="classstrus_1_1Context.html#a6d5d113d33ee089c1444ba800bc2744d">strus::Context</a>
+: <a class="el" href="classstrus_1_1Context.html#a047ef251f889783f50032525e1e822c1">strus::Context</a>
 </li>
 <li>createStorage()
 : <a class="el" href="classstrus_1_1Context.html#a359f2db0302551d36d67bd7384989c26">strus::Context</a>
@@ -132,16 +151,23 @@
 </li>
 <li>createTransaction()
 : <a class="el" href="classstrus_1_1StorageClient.html#a761be597e01e2f7d52a17bedb85b2554">strus::StorageClient</a>
+, <a class="el" href="classstrus_1_1VectorStorageClient.html#a8dd0a68b0c0718e90e78a956b904192c">strus::VectorStorageClient</a>
 </li>
 <li>createUpdateStatisticsIterator()
 : <a class="el" href="classstrus_1_1StorageClient.html#a5eec6097b1d1a980463cbb4466390e07">strus::StorageClient</a>
+</li>
+<li>createVectorStorage()
+: <a class="el" href="classstrus_1_1Context.html#ae0cac114a1e4c294aab879fcb992c78f">strus::Context</a>
+</li>
+<li>createVectorStorageClient()
+: <a class="el" href="classstrus_1_1Context.html#add5cb41d23f93075833a6292c94feb99">strus::Context</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

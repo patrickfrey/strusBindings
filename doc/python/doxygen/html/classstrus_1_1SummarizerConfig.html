@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -90,6 +90,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adbb998a0991ccdf49c6561106aa76341"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1SummarizerConfig.html#adbb998a0991ccdf49c6561106aa76341">defineFeature</a> (const String &amp;sumtype, const String &amp;set)</td></tr>
 <tr class="memdesc:adbb998a0991ccdf49c6561106aa76341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a summarizer feature.  <a href="#adbb998a0991ccdf49c6561106aa76341">More...</a><br/></td></tr>
 <tr class="separator:adbb998a0991ccdf49c6561106aa76341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbdaa31c68317b956c01b09999ecc1c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1SummarizerConfig.html#afbdaa31c68317b956c01b09999ecc1c3">defineResultName</a> (const String &amp;origname, const String &amp;newname)</td></tr>
+<tr class="memdesc:afbdaa31c68317b956c01b09999ecc1c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rename a result (each summarizer result has a default name that can be changed with this method)  <a href="#afbdaa31c68317b956c01b09999ecc1c3">More...</a><br/></td></tr>
+<tr class="separator:afbdaa31c68317b956c01b09999ecc1c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -409,6 +412,49 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="afbdaa31c68317b956c01b09999ecc1c3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void strus::SummarizerConfig::defineResultName </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>origname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>newname</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Rename a result (each summarizer result has a default name that can be changed with this method) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">origname</td><td>original name of the result </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">newname</td><td>defined name of the result </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
 <a class="anchor" id="a94ca67b0c1c7ea574a07c9a23640d111"></a>
 <div class="memitem">
@@ -437,7 +483,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

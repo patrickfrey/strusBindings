@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -52,27 +52,29 @@
 
 <p>This is the complete list of members for <a class="el" href="classQuery.html">Query</a>, including all inherited members.</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a729fda0a198196332faa76ddae4e09be">addDocumentEvaluationSet</a>(const IntVector &amp;docnolist_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a3b5da217b6442a66e65e480da6dfa13c">addDocumentEvaluationSet</a>(const IndexVector &amp;docnolist_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classQuery.html#a624a5a1225a44eb0d61377156756cd2b">addMetaDataRestrictionCondition</a>(const char *compareOp, const String &amp;name, const Variant &amp;value, bool newGroup)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classQuery.html#acfb52f4bab11d9848ed8315e8f5b8556">addMetaDataRestrictionCondition</a>(const char *compareOp, const String &amp;name, double value, bool newGroup)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classQuery.html#a721553e2a8f81109b9a28d5e06506799">addMetaDataRestrictionCondition</a>(const char *compareOp, const String &amp;name, unsigned int value, bool newGroup)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a9b9e9f57ad578eed4c360238552305fb">addMetaDataRestrictionCondition</a>(const char *compareOp, const String &amp;name, int value, bool newGroup)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classQuery.html#a331feb7688a327de6d553668244db807">addUserName</a>(const String &amp;username_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#ac1e198480abbed202f3e6fa99cbdc9e4">defineFeature</a>(const String &amp;set_, const QueryExpression &amp;expr_, double weight_=1.0)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQuery.html#af19ada0547eec00668606cd953021a6d">defineGlobalStatistics</a>(const GlobalStatistics &amp;stats_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a021e6aa0428d0263731008678ab9a0b4">defineTermStatistics</a>(const String &amp;type_, const String &amp;value_, const TermStatistics &amp;stats_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQuery.html#a779570d3bec59abf9fb36436d8b8dd01">evaluate</a>() const </td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a48f8be1896dc9af9e46505cf3afef17f">Query</a>(const Query &amp;o)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQuery.html#a94ca67b0c1c7ea574a07c9a23640d111">QueryEval</a> class</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#aa339bccb980d4c9ee5b33a92751e247b">setMaxNofRanks</a>(unsigned int maxNofRanks_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQuery.html#af915dbbb5a787813c2421f5b405cabbc">setMinRank</a>(unsigned int minRank_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#aab7e55cebb1a0d6715f6d867d340727f">setWeightingVariables</a>(const FunctionVariableConfig &amp;parameter)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a7087aaa3239072676eeabc393d95cceb">defineDocFieldFeature</a>(const String &amp;set_, const String &amp;metadataStart, const String &amp;metadataEnd)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQuery.html#ac1e198480abbed202f3e6fa99cbdc9e4">defineFeature</a>(const String &amp;set_, const QueryExpression &amp;expr_, double weight_=1.0)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#af19ada0547eec00668606cd953021a6d">defineGlobalStatistics</a>(const GlobalStatistics &amp;stats_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQuery.html#a021e6aa0428d0263731008678ab9a0b4">defineTermStatistics</a>(const String &amp;type_, const String &amp;value_, const TermStatistics &amp;stats_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a779570d3bec59abf9fb36436d8b8dd01">evaluate</a>() const </td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQuery.html#a48f8be1896dc9af9e46505cf3afef17f">Query</a>(const Query &amp;o)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#a94ca67b0c1c7ea574a07c9a23640d111">QueryEval</a> class</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classQuery.html#aa339bccb980d4c9ee5b33a92751e247b">setMaxNofRanks</a>(unsigned int maxNofRanks_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#af915dbbb5a787813c2421f5b405cabbc">setMinRank</a>(unsigned int minRank_)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQuery.html#aab7e55cebb1a0d6715f6d867d340727f">setWeightingVariables</a>(const FunctionVariableConfig &amp;parameter)</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQuery.html#ae1fe4239d5e1523cf4dd3f59d2d08e5c">tostring</a>() const </td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classQuery.html#aad0c964335e9809cc7e22af34e9e8410">~Query</a>()</td><td class="entry"><a class="el" href="classQuery.html">Query</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

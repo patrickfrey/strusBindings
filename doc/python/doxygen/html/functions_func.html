@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -82,26 +82,36 @@
 
 <h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
 <li>add()
-: <a class="el" href="classstrus_1_1QueryExpression.html#aa253ff9b6797116fe5803bde132b9c3d">strus::QueryExpression</a>
+: <a class="el" href="classstrus_1_1PatternMatcher.html#aa6c8ee0d4f3737cdb00e23902597d4e2">strus::PatternMatcher</a>
+, <a class="el" href="classstrus_1_1QueryExpression.html#aa253ff9b6797116fe5803bde132b9c3d">strus::QueryExpression</a>
 </li>
 <li>addDocumentEvaluationSet()
-: <a class="el" href="classstrus_1_1Query.html#a958f4ad03b268dc373f665307be4477a">strus::Query</a>
+: <a class="el" href="classstrus_1_1Query.html#ab2bb3321008ce482d5542b709096652c">strus::Query</a>
 </li>
 <li>addExclusionFeature()
 : <a class="el" href="classstrus_1_1QueryEval.html#a252980e3f6a9ce89d0764ee8b91db598">strus::QueryEval</a>
 </li>
+<li>addFeature()
+: <a class="el" href="classstrus_1_1VectorStorageTransaction.html#abe92b00846b0fd78c1addb78b142b88f">strus::VectorStorageTransaction</a>
+</li>
 <li>addForwardIndexFeature()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#ae1edbcf0dc43085aa693c300d51fa851">strus::DocumentAnalyzer</a>
+</li>
+<li>addForwardIndexFeatureFromPatternMatch()
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a8f8d80107f50f06b7b06172fc0594cc1">strus::DocumentAnalyzer</a>
 </li>
 <li>addForwardIndexTerm()
 : <a class="el" href="classstrus_1_1Document.html#a51a0f9c2c0f459dae353dd62f280fe96">strus::Document</a>
 </li>
 <li>addMetaDataRestrictionCondition()
-: <a class="el" href="classstrus_1_1DocumentBrowser.html#aa575719cb9860cebf915c129cb0d266a">strus::DocumentBrowser</a>
-, <a class="el" href="classstrus_1_1Query.html#a16432f82a44a908bc34f92da79efd888">strus::Query</a>
+: <a class="el" href="classstrus_1_1DocumentBrowser.html#a368051273bb158784895a3f8069272bf">strus::DocumentBrowser</a>
+, <a class="el" href="classstrus_1_1Query.html#ab624d5feba4132669d2e207fd4b8e38f">strus::Query</a>
 </li>
 <li>addModulePath()
 : <a class="el" href="classstrus_1_1Context.html#ab3863e0abddd62eaafe4eff24b870188">strus::Context</a>
+</li>
+<li>addPatternLexem()
+: <a class="el" href="classstrus_1_1QueryAnalyzer.html#a61a0d02798d95d53b4a69e25b059ef53">strus::QueryAnalyzer</a>
 </li>
 <li>addResourcePath()
 : <a class="el" href="classstrus_1_1Context.html#a00aec90271bac5d784e686dc3862cd24">strus::Context</a>
@@ -109,8 +119,17 @@
 <li>addRestrictionFeature()
 : <a class="el" href="classstrus_1_1QueryEval.html#a466fc1fad78e3d8beac00d7dae39477c">strus::QueryEval</a>
 </li>
+<li>addSearchIndexElement()
+: <a class="el" href="classstrus_1_1QueryAnalyzer.html#a0296ea4b90eb55d876d1ed55902c920e">strus::QueryAnalyzer</a>
+</li>
+<li>addSearchIndexElementFromPatternMatch()
+: <a class="el" href="classstrus_1_1QueryAnalyzer.html#a19ad6b66d01efbcbfda1ecab49086b08">strus::QueryAnalyzer</a>
+</li>
 <li>addSearchIndexFeature()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a84d7643eb994d5cb43102f366e1db79b">strus::DocumentAnalyzer</a>
+</li>
+<li>addSearchIndexFeatureFromPatternMatch()
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#aca4ba99ef10d638596014146a551a741">strus::DocumentAnalyzer</a>
 </li>
 <li>addSearchIndexTerm()
 : <a class="el" href="classstrus_1_1Document.html#a5c3d74fdfe59736d7c0b05ed1a2fce0c">strus::Document</a>
@@ -134,13 +153,15 @@
 : <a class="el" href="classstrus_1_1QueryEval.html#afdb6deae74c1b5102043bcb7e53eb197">strus::QueryEval</a>
 </li>
 <li>analyze()
-: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a533487109d464e180afd133097335efc">strus::DocumentAnalyzer</a>
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#afb4def92afffc559daebc5cb8bfb0519">strus::DocumentAnalyzer</a>
+, <a class="el" href="classstrus_1_1QueryAnalyzeContext.html#ad0495e10a0a0e0e0262b007df549472d">strus::QueryAnalyzeContext</a>
 </li>
-<li>analyzePhrase()
-: <a class="el" href="classstrus_1_1QueryAnalyzer.html#a8169da1d36a1a7468c37427ad2dd97fb">strus::QueryAnalyzer</a>
+<li>analyzeField()
+: <a class="el" href="classstrus_1_1QueryAnalyzer.html#a4ffecc7fcef4c45220db31a934453e37">strus::QueryAnalyzer</a>
 </li>
 <li>attachVariable()
-: <a class="el" href="classstrus_1_1QueryExpression.html#ac073ad75cfd25c5f2c16f6f3241d7d7a">strus::QueryExpression</a>
+: <a class="el" href="classstrus_1_1PatternMatcher.html#a47750a76c3fa02db900c112151a4d051">strus::PatternMatcher</a>
+, <a class="el" href="classstrus_1_1QueryExpression.html#ac073ad75cfd25c5f2c16f6f3241d7d7a">strus::QueryExpression</a>
 </li>
 <li>Attribute()
 : <a class="el" href="classstrus_1_1Attribute.html#a2d45700f84a15f5e2cd297ec30a26af0">strus::Attribute</a>
@@ -156,7 +177,7 @@
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

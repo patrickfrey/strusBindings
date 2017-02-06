@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -71,10 +71,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a50a6c5c74d5582898a7b850b6300d83a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Document.html#a50a6c5c74d5582898a7b850b6300d83a">Document</a> (const <a class="el" href="classstrus_1_1Document.html">Document</a> &amp;o)</td></tr>
 <tr class="memdesc:a50a6c5c74d5582898a7b850b6300d83a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="#a50a6c5c74d5582898a7b850b6300d83a">More...</a><br/></td></tr>
 <tr class="separator:a50a6c5c74d5582898a7b850b6300d83a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c3d74fdfe59736d7c0b05ed1a2fce0c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Document.html#a5c3d74fdfe59736d7c0b05ed1a2fce0c">addSearchIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a">Index</a> &amp;position)</td></tr>
+<tr class="memitem:a5c3d74fdfe59736d7c0b05ed1a2fce0c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Document.html#a5c3d74fdfe59736d7c0b05ed1a2fce0c">addSearchIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;position)</td></tr>
 <tr class="memdesc:a5c3d74fdfe59736d7c0b05ed1a2fce0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a single term occurrence to the document for retrieval.  <a href="#a5c3d74fdfe59736d7c0b05ed1a2fce0c">More...</a><br/></td></tr>
 <tr class="separator:a5c3d74fdfe59736d7c0b05ed1a2fce0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51a0f9c2c0f459dae353dd62f280fe96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Document.html#a51a0f9c2c0f459dae353dd62f280fe96">addForwardIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a">Index</a> &amp;position)</td></tr>
+<tr class="memitem:a51a0f9c2c0f459dae353dd62f280fe96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Document.html#a51a0f9c2c0f459dae353dd62f280fe96">addForwardIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;position)</td></tr>
 <tr class="memdesc:a51a0f9c2c0f459dae353dd62f280fe96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a single term occurrence to the document for use in the summary of a retrieval result.  <a href="#a51a0f9c2c0f459dae353dd62f280fe96">More...</a><br/></td></tr>
 <tr class="separator:a51a0f9c2c0f459dae353dd62f280fe96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addeb232f8499bc3050e82f32656a4a02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Document.html#addeb232f8499bc3050e82f32656a4a02">setMetaData</a> (const String &amp;name, const <a class="el" href="classstrus_1_1Variant.html">Variant</a> &amp;value)</td></tr>
@@ -183,7 +183,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a">Index</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>
@@ -225,7 +225,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a">Index</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>
@@ -635,7 +635,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

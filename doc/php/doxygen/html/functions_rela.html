@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -50,21 +50,51 @@
       <li class="current"><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
     </ul>
   </div>
+  <div id="navrow4" class="tabs3">
+    <ul class="tablist">
+      <li><a href="#index_c"><span>c</span></a></li>
+      <li><a href="#index_d"><span>d</span></a></li>
+      <li><a href="#index_p"><span>p</span></a></li>
+      <li><a href="#index_q"><span>q</span></a></li>
+      <li><a href="#index_s"><span>s</span></a></li>
+      <li class="current"><a href="#index_v"><span>v</span></a></li>
+    </ul>
+  </div>
 </div><!-- top -->
 <div class="contents">
-&#160;<ul>
+&#160;
+
+<h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
 <li>Context
 : <a class="el" href="classDocumentAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b">DocumentAnalyzer</a>
 , <a class="el" href="classQueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b">QueryAnalyzer</a>
 , <a class="el" href="classQueryEval.html#ac26c806e60ca4a0547680edb68f6e39b">QueryEval</a>
 , <a class="el" href="classStatisticsProcessor.html#ac26c806e60ca4a0547680edb68f6e39b">StatisticsProcessor</a>
 , <a class="el" href="classStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b">StorageClient</a>
+, <a class="el" href="classVectorStorageClient.html#ac26c806e60ca4a0547680edb68f6e39b">VectorStorageClient</a>
 </li>
+</ul>
+
+
+<h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
 <li>DocumentAnalyzer
 : <a class="el" href="classDocumentAnalyzeQueue.html#a4d56b0b39ff48491c3b70afd3ee5b2ed">DocumentAnalyzeQueue</a>
+, <a class="el" href="classPatternMatcher.html#a4d56b0b39ff48491c3b70afd3ee5b2ed">PatternMatcher</a>
 </li>
+</ul>
+
+
+<h3><a class="anchor" id="index_p"></a>- p -</h3><ul>
+<li>PatternMatchLoader
+: <a class="el" href="classPatternMatcher.html#a54abecdd1db54cef9e6074ec6db4b14c">PatternMatcher</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_q"></a>- q -</h3><ul>
 <li>Query
 : <a class="el" href="classFunctionVariableConfig.html#a0de80064a367adf51ab09f7a9b6de05a">FunctionVariableConfig</a>
+, <a class="el" href="classPatternMatcher.html#a0de80064a367adf51ab09f7a9b6de05a">PatternMatcher</a>
 , <a class="el" href="classQueryEval.html#a0de80064a367adf51ab09f7a9b6de05a">QueryEval</a>
 , <a class="el" href="classQueryExpression.html#a0de80064a367adf51ab09f7a9b6de05a">QueryExpression</a>
 , <a class="el" href="classQueryResult.html#a0de80064a367adf51ab09f7a9b6de05a">QueryResult</a>
@@ -74,7 +104,8 @@
 , <a class="el" href="classSummaryElement.html#a0de80064a367adf51ab09f7a9b6de05a">SummaryElement</a>
 </li>
 <li>QueryAnalyzer
-: <a class="el" href="classQueryAnalyzeQueue.html#a7c7867773f5714f21bdc7c2a576df966">QueryAnalyzeQueue</a>
+: <a class="el" href="classPatternMatcher.html#a7c7867773f5714f21bdc7c2a576df966">PatternMatcher</a>
+, <a class="el" href="classQueryAnalyzeContext.html#a7c7867773f5714f21bdc7c2a576df966">QueryAnalyzeContext</a>
 </li>
 <li>QueryEval
 : <a class="el" href="classFunctionVariableConfig.html#a94ca67b0c1c7ea574a07c9a23640d111">FunctionVariableConfig</a>
@@ -84,17 +115,29 @@
 , <a class="el" href="classSummarizerConfig.html#a94ca67b0c1c7ea574a07c9a23640d111">SummarizerConfig</a>
 , <a class="el" href="classWeightingConfig.html#a94ca67b0c1c7ea574a07c9a23640d111">WeightingConfig</a>
 </li>
+</ul>
+
+
+<h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
 <li>StorageClient
 : <a class="el" href="classDocumentBrowser.html#a7880c6748cb647d7fce48924d00bed89">DocumentBrowser</a>
 , <a class="el" href="classStatisticsIterator.html#a7880c6748cb647d7fce48924d00bed89">StatisticsIterator</a>
 , <a class="el" href="classStorageTransaction.html#a7880c6748cb647d7fce48924d00bed89">StorageTransaction</a>
 </li>
 </ul>
+
+
+<h3><a class="anchor" id="index_v"></a>- v -</h3><ul>
+<li>VectorStorageClient
+: <a class="el" href="classVectorStorageSearcher.html#ac0e4a47ab0b577ed9f363a901c29ad65">VectorStorageSearcher</a>
+, <a class="el" href="classVectorStorageTransaction.html#ac0e4a47ab0b577ed9f363a901c29ad65">VectorStorageTransaction</a>
+</li>
+</ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

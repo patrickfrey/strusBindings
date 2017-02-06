@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -66,9 +66,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a7794f1cf9c1cdbabdfafd6bdee090af5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae89776d8827f056362c91184e73b3363"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryExpression.html#ae89776d8827f056362c91184e73b3363">QueryExpression</a> ()</td></tr>
 <tr class="separator:ae89776d8827f056362c91184e73b3363"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7de62667df1bdb72938a52088207cf21"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryExpression.html#a7de62667df1bdb72938a52088207cf21">pushTerm</a> (const String &amp;type_, const String &amp;value_)</td></tr>
-<tr class="memdesc:a7de62667df1bdb72938a52088207cf21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add operation "Push a single term on the stack".  <a href="#a7de62667df1bdb72938a52088207cf21">More...</a><br/></td></tr>
-<tr class="separator:a7de62667df1bdb72938a52088207cf21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86610dcb6690972dc831db8ab1c99119"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryExpression.html#a86610dcb6690972dc831db8ab1c99119">pushTerm</a> (const String &amp;type_, const String &amp;value_, const <a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a> &amp;length_)</td></tr>
+<tr class="memdesc:a86610dcb6690972dc831db8ab1c99119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add operation "Push a single term on the stack".  <a href="#a86610dcb6690972dc831db8ab1c99119">More...</a><br/></td></tr>
+<tr class="separator:a86610dcb6690972dc831db8ab1c99119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a124241cb23f7aabf8a85f899a4dbb086"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryExpression.html#a124241cb23f7aabf8a85f899a4dbb086">pushDocField</a> (const String &amp;metadata_start_, const String &amp;metadata_end_)</td></tr>
+<tr class="memdesc:a124241cb23f7aabf8a85f899a4dbb086"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add operation "Push a single document field specification on the stack".  <a href="#a124241cb23f7aabf8a85f899a4dbb086">More...</a><br/></td></tr>
+<tr class="separator:a124241cb23f7aabf8a85f899a4dbb086"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f44683cb611793337df6802f800baf2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryExpression.html#a7f44683cb611793337df6802f800baf2">pushExpression</a> (const String &amp;opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0)</td></tr>
 <tr class="memdesc:a7f44683cb611793337df6802f800baf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add operation "Create an expression from the topmost 'argc' elements of the stack, pop them from the stack and push the expression as single unit on the stack".  <a href="#a7f44683cb611793337df6802f800baf2">More...</a><br/></td></tr>
 <tr class="separator:a7f44683cb611793337df6802f800baf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -188,6 +191,41 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a124241cb23f7aabf8a85f899a4dbb086"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QueryExpression::pushDocField </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>metadata_start_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>metadata_end_</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add operation "Push a single document field specification on the stack". </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadata_start_</td><td>name of meta data element that defines the start of the document field, assumed as 1 if name is empty </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadata_end_</td><td>name of meta data element that defines the end of the document field, assumed as max value if name is empty </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a7f44683cb611793337df6802f800baf2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -237,7 +275,7 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a7de62667df1bdb72938a52088207cf21"></a>
+<a class="anchor" id="a86610dcb6690972dc831db8ab1c99119"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -251,7 +289,13 @@ Friends</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const String &amp;&#160;</td>
-          <td class="paramname"><em>value_</em>&#160;</td>
+          <td class="paramname"><em>value_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a> &amp;&#160;</td>
+          <td class="paramname"><em>length_</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -266,6 +310,7 @@ Friends</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">type_</td><td>query term type name </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">value_</td><td>query term value </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">length_</td><td>length of the feature (ordinal position count) </td></tr>
   </table>
   </dd>
 </dl>
@@ -326,7 +371,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

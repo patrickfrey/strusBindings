@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -63,6 +63,7 @@
       <li><a href="functions_func_l.html#index_l"><span>l</span></a></li>
       <li><a href="functions_func_m.html#index_m"><span>m</span></a></li>
       <li><a href="functions_func_n.html#index_n"><span>n</span></a></li>
+      <li><a href="functions_func_o.html#index_o"><span>o</span></a></li>
       <li><a href="functions_func_p.html#index_p"><span>p</span></a></li>
       <li><a href="functions_func_q.html#index_q"><span>q</span></a></li>
       <li><a href="functions_func_r.html#index_r"><span>r</span></a></li>
@@ -88,6 +89,12 @@
 <li>defineAttribute()
 : <a class="el" href="classDocumentAnalyzer.html#aa3aa93d9f07adcabd1470724144693f5">DocumentAnalyzer</a>
 </li>
+<li>defineAttributeFromPatternMatch()
+: <a class="el" href="classDocumentAnalyzer.html#aa6b805dd9718c7142f1d9b61d1fe3a10">DocumentAnalyzer</a>
+</li>
+<li>defineDocFieldFeature()
+: <a class="el" href="classQuery.html#a7087aaa3239072676eeabc393d95cceb">Query</a>
+</li>
 <li>defineDocument()
 : <a class="el" href="classDocumentAnalyzer.html#a1b6ef4a85ab0ebcf1e1ed25e629b5af0">DocumentAnalyzer</a>
 </li>
@@ -96,18 +103,35 @@
 , <a class="el" href="classSummarizerConfig.html#a6dab1975f86b3f14dc829881c0e4508e">SummarizerConfig</a>
 , <a class="el" href="classWeightingConfig.html#ae6c8fcc980f42fe971511ef0a0a5704f">WeightingConfig</a>
 </li>
+<li>defineFeatureConceptRelation()
+: <a class="el" href="classVectorStorageTransaction.html#a57c509abc4836faa155f518377c21c77">VectorStorageTransaction</a>
+</li>
 <li>defineGlobalStatistics()
 : <a class="el" href="classQuery.html#af19ada0547eec00668606cd953021a6d">Query</a>
 </li>
 <li>defineMetaData()
 : <a class="el" href="classDocumentAnalyzer.html#af9a2cd4173a8190fab3bd3769eac5cc7">DocumentAnalyzer</a>
 </li>
-<li>defineParameter()
-: <a class="el" href="classSummarizerConfig.html#ab5c185d29cfe159f3f9ef1bf0f6579df">SummarizerConfig</a>
-, <a class="el" href="classWeightingConfig.html#a82904028cc4ae5db736026859b367ffb">WeightingConfig</a>
+<li>defineMetaDataFromPatternMatch()
+: <a class="el" href="classDocumentAnalyzer.html#aa1d25653b362ccf93827e5ffe84cdd4a">DocumentAnalyzer</a>
 </li>
-<li>definePhraseType()
-: <a class="el" href="classQueryAnalyzer.html#a6418201f50897aa1c90a5f121e8418f0">QueryAnalyzer</a>
+<li>defineParameter()
+: <a class="el" href="classSummarizerConfig.html#abc36c4c73ff7cec5b1ac59bfa7fd8829">SummarizerConfig</a>
+, <a class="el" href="classWeightingConfig.html#ae99b8e08cc2c7f11f782181cea9f5542">WeightingConfig</a>
+</li>
+<li>definePattern()
+: <a class="el" href="classPatternMatcher.html#adacc693512320d9ce46955a9d4e2ccb4">PatternMatcher</a>
+</li>
+<li>definePatternMatcherPostProc()
+: <a class="el" href="classDocumentAnalyzer.html#a2c6c460039ac9dbefc54e44b4b6c0499">DocumentAnalyzer</a>
+, <a class="el" href="classQueryAnalyzer.html#a2a3a721f8ba77d419026f6754e07f588">QueryAnalyzer</a>
+</li>
+<li>definePatternMatcherPostProcFromFile()
+: <a class="el" href="classDocumentAnalyzer.html#aed9662a4908a603071c5dcf9cd172212">DocumentAnalyzer</a>
+, <a class="el" href="classQueryAnalyzer.html#a2e8bb44762aa50c35b348d2089735a99">QueryAnalyzer</a>
+</li>
+<li>defineResultName()
+: <a class="el" href="classSummarizerConfig.html#ab6c22f28ffd9806ff2d0649dfd3855c5">SummarizerConfig</a>
 </li>
 <li>defineTermStatistics()
 : <a class="el" href="classQuery.html#a021e6aa0428d0263731008678ab9a0b4">Query</a>
@@ -137,7 +161,7 @@
 : <a class="el" href="classRank.html#a422f6b05f4e6fc11b8fa1e366a05ca35">Rank</a>
 </li>
 <li>Document()
-: <a class="el" href="classDocument.html#ad1fddb2de952cb134040daa4736589de">Document</a>
+: <a class="el" href="classDocument.html#acdbcbe550084e8c20f4f67eb229ad66a">Document</a>
 </li>
 <li>DocumentAnalyzeQueue()
 : <a class="el" href="classDocumentAnalyzeQueue.html#a97b6c5de25bc513c3be6c0ba94dba653">DocumentAnalyzeQueue</a>
@@ -149,10 +173,10 @@
 : <a class="el" href="classDocumentBrowser.html#a4a77dc3caa41c427c75b21cb97222906">DocumentBrowser</a>
 </li>
 <li>DocumentClass()
-: <a class="el" href="classDocumentClass.html#ad9eb3b618968e361989d5531dfe0503b">DocumentClass</a>
+: <a class="el" href="classDocumentClass.html#a0e59d8a29a9a8ab7c747471a59169f5f">DocumentClass</a>
 </li>
 <li>DocumentFrequencyChange()
-: <a class="el" href="classDocumentFrequencyChange.html#aaa711c515053e16468c589325f90f7f8">DocumentFrequencyChange</a>
+: <a class="el" href="classDocumentFrequencyChange.html#af0cb2323503a4088b41d6d504cb3a143">DocumentFrequencyChange</a>
 </li>
 <li>documentFrequencyChangeList()
 : <a class="el" href="classStatisticsMessage.html#aead9defd16bc4dc7c0af1fe3f4b40649">StatisticsMessage</a>
@@ -162,7 +186,7 @@
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

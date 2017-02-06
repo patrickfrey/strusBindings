@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -104,11 +103,17 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDocumentAnalyzeQueue.html">DocumentAnalyzeQueue</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object implementing a queue of analyze document tasks.  <a href="classDocumentAnalyzeQueue.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object representing a set of function for transforming a phrase, the smallest unit in any query language, to a set of terms that can be used to build a query.  <a href="classQueryAnalyzer.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPatternMatcher.html">PatternMatcher</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object representing a pattern match program.  <a href="classPatternMatcher.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryAnalyzeQueue.html">QueryAnalyzeQueue</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object implementing a queue of analyze phrase tasks.  <a href="classQueryAnalyzeQueue.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzer object representing a set of function for transforming a field, the smallest unit in any query language, to a set of terms that can be used to build a query.  <a href="classQueryAnalyzer.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryTerm.html">QueryTerm</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classQuery.html" title="Query program object representing a retrieval method for documents in a storage. ">Query</a> analyzer term with info about the field it originated from.  <a href="classQueryTerm.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQueryAnalyzeContext.html">QueryAnalyzeContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classQuery.html" title="Query program object representing a retrieval method for documents in a storage. ">Query</a> analyzer context for analysing a multipart query.  <a href="classQueryAnalyzeContext.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStorageClient.html">StorageClient</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object representing a client connection to the storage.  <a href="classStorageClient.html#details">More...</a><br/></td></tr>
@@ -127,6 +132,16 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classStatisticsProcessor.html">StatisticsProcessor</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Translation to update a storage with statistics messages.  <a href="classStatisticsProcessor.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVecRank.html">VecRank</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weighted vector (result of a query vector storage search)  <a href="classVecRank.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVectorStorageSearcher.html">VectorStorageSearcher</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVectorStorageClient.html">VectorStorageClient</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object representing a client connection to a vector storage.  <a href="classVectorStorageClient.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVectorStorageTransaction.html">VectorStorageTransaction</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunctionVariableConfig.html">FunctionVariableConfig</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration describing a scalar function variable value.  <a href="classFunctionVariableConfig.html#details">More...</a><br/></td></tr>
@@ -170,30 +185,30 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:ad53d6229d7ec28555a9c9c2fd9abf773"><td class="memItemLeft" align="right" valign="top">typedef unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773">Index</a></td></tr>
-<tr class="separator:ad53d6229d7ec28555a9c9c2fd9abf773"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3831684f5704d18308e369b745d5533"><td class="memItemLeft" align="right" valign="top">typedef unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bindingObjects_8hpp.html#ae3831684f5704d18308e369b745d5533">GlobalCounter</a></td></tr>
-<tr class="separator:ae3831684f5704d18308e369b745d5533"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a0e50e01fef3e431767a928c2631cab"><td class="memItemLeft" align="right" valign="top">typedef int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a></td></tr>
+<tr class="separator:a4a0e50e01fef3e431767a928c2631cab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06731bcdced9bdde4734177cdb5167ca"><td class="memItemLeft" align="right" valign="top">typedef long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bindingObjects_8hpp.html#a06731bcdced9bdde4734177cdb5167ca">GlobalCounter</a></td></tr>
+<tr class="separator:a06731bcdced9bdde4734177cdb5167ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a class="anchor" id="ae3831684f5704d18308e369b745d5533"></a>
+<a class="anchor" id="a06731bcdced9bdde4734177cdb5167ca"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef unsigned long <a class="el" href="bindingObjects_8hpp.html#ae3831684f5704d18308e369b745d5533">GlobalCounter</a></td>
+          <td class="memname">typedef long <a class="el" href="bindingObjects_8hpp.html#a06731bcdced9bdde4734177cdb5167ca">GlobalCounter</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="ad53d6229d7ec28555a9c9c2fd9abf773"></a>
+<a class="anchor" id="a4a0e50e01fef3e431767a928c2631cab"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef unsigned int <a class="el" href="bindingObjects_8hpp.html#ad53d6229d7ec28555a9c9c2fd9abf773">Index</a></td>
+          <td class="memname">typedef int <a class="el" href="bindingObjects_8hpp.html#a4a0e50e01fef3e431767a928c2631cab">Index</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -204,7 +219,7 @@ Typedefs</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

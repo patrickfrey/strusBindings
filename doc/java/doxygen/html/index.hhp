@@ -16,7 +16,6 @@ main="strusJava","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,
 bindingObjects_8hpp_source.html
 strus_8md.html
 bindingObjects_8hpp.html
-deprecated.html
 namespacenet.html
 namespacenet_1_1strus.html
 namespacenet_1_1strus_1_1api.html
@@ -41,10 +40,14 @@ classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html
 classnet_1_1strus_1_1api_1_1DocumentAnalyzer-members.html
 classnet_1_1strus_1_1api_1_1DocumentAnalyzeQueue.html
 classnet_1_1strus_1_1api_1_1DocumentAnalyzeQueue-members.html
+classnet_1_1strus_1_1api_1_1PatternMatcher.html
+classnet_1_1strus_1_1api_1_1PatternMatcher-members.html
 classnet_1_1strus_1_1api_1_1QueryAnalyzer.html
 classnet_1_1strus_1_1api_1_1QueryAnalyzer-members.html
-classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue.html
-classnet_1_1strus_1_1api_1_1QueryAnalyzeQueue-members.html
+classnet_1_1strus_1_1api_1_1QueryTerm.html
+classnet_1_1strus_1_1api_1_1QueryTerm-members.html
+classnet_1_1strus_1_1api_1_1QueryAnalyzeContext.html
+classnet_1_1strus_1_1api_1_1QueryAnalyzeContext-members.html
 classnet_1_1strus_1_1api_1_1StorageClient.html
 classnet_1_1strus_1_1api_1_1StorageClient-members.html
 classnet_1_1strus_1_1api_1_1StorageTransaction.html
@@ -57,6 +60,14 @@ classnet_1_1strus_1_1api_1_1StatisticsIterator.html
 classnet_1_1strus_1_1api_1_1StatisticsIterator-members.html
 classnet_1_1strus_1_1api_1_1StatisticsProcessor.html
 classnet_1_1strus_1_1api_1_1StatisticsProcessor-members.html
+classnet_1_1strus_1_1api_1_1VecRank.html
+classnet_1_1strus_1_1api_1_1VecRank-members.html
+classnet_1_1strus_1_1api_1_1VectorStorageSearcher.html
+classnet_1_1strus_1_1api_1_1VectorStorageSearcher-members.html
+classnet_1_1strus_1_1api_1_1VectorStorageClient.html
+classnet_1_1strus_1_1api_1_1VectorStorageClient-members.html
+classnet_1_1strus_1_1api_1_1VectorStorageTransaction.html
+classnet_1_1strus_1_1api_1_1VectorStorageTransaction-members.html
 classnet_1_1strus_1_1api_1_1FunctionVariableConfig.html
 classnet_1_1strus_1_1api_1_1FunctionVariableConfig-members.html
 classnet_1_1strus_1_1api_1_1SummarizerConfig.html
@@ -86,12 +97,12 @@ classnet_1_1strus_1_1api_1_1Context-members.html
 dir_d44c64559bbebec7f509842c48db8b23.html
 dir_4c7fe52541d540b59710786f705b50e0.html
 index.html
-pages.html
 namespaces.html
 namespacemembers.html
 namespacemembers_type.html
 annotated.html
 classes.html
+hierarchy.html
 functions.html
 functions_c.html
 functions_d.html
@@ -103,6 +114,7 @@ functions_i.html
 functions_l.html
 functions_m.html
 functions_n.html
+functions_o.html
 functions_p.html
 functions_q.html
 functions_r.html
@@ -123,6 +135,7 @@ functions_func_i.html
 functions_func_l.html
 functions_func_m.html
 functions_func_n.html
+functions_func_o.html
 functions_func_p.html
 functions_func_q.html
 functions_func_r.html
@@ -163,3 +176,5 @@ ftv2plastnode.png
 ftv2pnode.png
 ftv2vertline.png
 ftv2splitbar.png
+classnet_1_1strus_1_1api_1_1Term.png
+classnet_1_1strus_1_1api_1_1QueryTerm.png

@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -52,17 +52,21 @@
 
 <p>This is the complete list of members for <a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a>, including all inherited members.</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#a9b6f50e5a824397ebf55ef6e05e97923">analyzePhrase</a>(const String &amp;phraseType, const String &amp;phraseContent) const </td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b">Context</a> class</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#aed00dca048139d38d0619f47513903b6">createQueue</a>() const </td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#a6418201f50897aa1c90a5f121e8418f0">definePhraseType</a>(const String &amp;phraseType, const String &amp;featureType, const Tokenizer &amp;tokenizer, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#a42077d0d98444988ef7b3a179e220175">addPatternLexem</a>(const std::string &amp;termtype, const std::string &amp;fieldtype, const Tokenizer &amp;tokenizer, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#aa5d6a5de40bc0d83d046c5c43a3eb34e">addSearchIndexElement</a>(const String &amp;featureType, const String &amp;fieldType, const Tokenizer &amp;tokenizer, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#adcf99856ebc85d623b906252d8d5b110">addSearchIndexElementFromPatternMatch</a>(const std::string &amp;type, const std::string &amp;patternTypeName, const NormalizerVector &amp;normalizers)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#ab8f2753623c94c9f8a50ba74a0ce8d78">analyzeField</a>(const String &amp;fieldType, const String &amp;fieldContent)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#ac26c806e60ca4a0547680edb68f6e39b">Context</a> class</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#a50c4b7a58644fc2be66057033c113474">createContext</a>() const </td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#a2a3a721f8ba77d419026f6754e07f588">definePatternMatcherPostProc</a>(const String &amp;patternTypeName, const String &amp;patternMatcherModule, const PatternMatcher &amp;patterns)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#a2e8bb44762aa50c35b348d2089735a99">definePatternMatcherPostProcFromFile</a>(const String &amp;patternTypeName, const String &amp;patternMatcherModule, const String &amp;serializedPatternFile)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classQueryAnalyzer.html#a8d6aade542d15d90e1fb82a3b6c5299b">QueryAnalyzer</a>(const QueryAnalyzer &amp;o)</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classQueryAnalyzer.html#a0af34b0fee4a6d41ce71f778f7d152b2">~QueryAnalyzer</a>()</td><td class="entry"><a class="el" href="classQueryAnalyzer.html">QueryAnalyzer</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

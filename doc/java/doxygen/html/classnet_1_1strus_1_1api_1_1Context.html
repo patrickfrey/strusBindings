@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -74,9 +74,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6345a8d27f7e2dac481b2b59e7c3393d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a6345a8d27f7e2dac481b2b59e7c3393d">Context</a> (unsigned int maxNofThreads, const String &amp;tracecfg)</td></tr>
 <tr class="memdesc:a6345a8d27f7e2dac481b2b59e7c3393d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for local mode with own module loader and logging of all method call traces.  <a href="#a6345a8d27f7e2dac481b2b59e7c3393d">More...</a><br/></td></tr>
 <tr class="separator:a6345a8d27f7e2dac481b2b59e7c3393d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a793afcae96cc8f275572d5c521c24844"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a793afcae96cc8f275572d5c521c24844">Context</a> (const std::string &amp;connectionstring)</td></tr>
-<tr class="memdesc:a793afcae96cc8f275572d5c521c24844"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for remote mode (objects of the context are living on a server connected via RPC)  <a href="#a793afcae96cc8f275572d5c521c24844">More...</a><br/></td></tr>
-<tr class="separator:a793afcae96cc8f275572d5c521c24844"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9a6008c769a110edf34d6cae157dd53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#ae9a6008c769a110edf34d6cae157dd53">Context</a> (const String &amp;connectionstring)</td></tr>
+<tr class="memdesc:ae9a6008c769a110edf34d6cae157dd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for remote mode (objects of the context are living on a server connected via RPC)  <a href="#ae9a6008c769a110edf34d6cae157dd53">More...</a><br/></td></tr>
+<tr class="separator:ae9a6008c769a110edf34d6cae157dd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae795b539e594b04ff4398b9df16eb3ef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#ae795b539e594b04ff4398b9df16eb3ef">Context</a> (const String &amp;connectionstring, unsigned int maxNofThreads)</td></tr>
 <tr class="memdesc:ae795b539e594b04ff4398b9df16eb3ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for remote mode (objects of the context are living on a server connected via RPC)  <a href="#ae795b539e594b04ff4398b9df16eb3ef">More...</a><br/></td></tr>
 <tr class="separator:ae795b539e594b04ff4398b9df16eb3ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,18 +98,27 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a175e50eb050af265414ea3a1c1eff937"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a175e50eb050af265414ea3a1c1eff937">addResourcePath</a> (const String &amp;paths_)</td></tr>
 <tr class="memdesc:a175e50eb050af265414ea3a1c1eff937"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define where to load analyzer resource files from.  <a href="#a175e50eb050af265414ea3a1c1eff937">More...</a><br/></td></tr>
 <tr class="separator:a175e50eb050af265414ea3a1c1eff937"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4aa0f9d01b9106fa836a9936d24953a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a4aa0f9d01b9106fa836a9936d24953a0">createStatisticsProcessor</a> (const std::string &amp;name)</td></tr>
-<tr class="memdesc:a4aa0f9d01b9106fa836a9936d24953a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a statistics message processor instance.  <a href="#a4aa0f9d01b9106fa836a9936d24953a0">More...</a><br/></td></tr>
-<tr class="separator:a4aa0f9d01b9106fa836a9936d24953a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a930b6c45e1611c091cfc8d5d13d6ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a8a930b6c45e1611c091cfc8d5d13d6ad">createStatisticsProcessor</a> (const String &amp;name)</td></tr>
+<tr class="memdesc:a8a930b6c45e1611c091cfc8d5d13d6ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a statistics message processor instance.  <a href="#a8a930b6c45e1611c091cfc8d5d13d6ad">More...</a><br/></td></tr>
+<tr class="separator:a8a930b6c45e1611c091cfc8d5d13d6ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a559d2457ba700583f55dc4570610d883"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a559d2457ba700583f55dc4570610d883">createStorageClient</a> ()</td></tr>
-<tr class="memdesc:a559d2457ba700583f55dc4570610d883"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a storage client instance of the the default remote storage of the RPC server.  <a href="#a559d2457ba700583f55dc4570610d883">More...</a><br/></td></tr>
+<tr class="memdesc:a559d2457ba700583f55dc4570610d883"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a storage client instance of the the default storage.  <a href="#a559d2457ba700583f55dc4570610d883">More...</a><br/></td></tr>
 <tr class="separator:a559d2457ba700583f55dc4570610d883"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74db731f256ec02628ddd738645043c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html">StorageClient</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a74db731f256ec02628ddd738645043c2">createStorageClient</a> (const String &amp;config_)</td></tr>
 <tr class="memdesc:a74db731f256ec02628ddd738645043c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a storage client instance.  <a href="#a74db731f256ec02628ddd738645043c2">More...</a><br/></td></tr>
 <tr class="separator:a74db731f256ec02628ddd738645043c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57762cd539a64db5b5f7650f17d5110a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html">VectorStorageClient</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a57762cd539a64db5b5f7650f17d5110a">createVectorStorageClient</a> ()</td></tr>
+<tr class="memdesc:a57762cd539a64db5b5f7650f17d5110a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a storage client instance of the the default remote storage of the RPC server.  <a href="#a57762cd539a64db5b5f7650f17d5110a">More...</a><br/></td></tr>
+<tr class="separator:a57762cd539a64db5b5f7650f17d5110a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae053ccf381855256daf9450dcde599cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html">VectorStorageClient</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#ae053ccf381855256daf9450dcde599cd">createVectorStorageClient</a> (const String &amp;config_)</td></tr>
+<tr class="memdesc:ae053ccf381855256daf9450dcde599cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a vector storage client instance.  <a href="#ae053ccf381855256daf9450dcde599cd">More...</a><br/></td></tr>
+<tr class="separator:ae053ccf381855256daf9450dcde599cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e3cd250043d863a6f599b73be3c6b51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a7e3cd250043d863a6f599b73be3c6b51">createStorage</a> (const String &amp;config_)</td></tr>
 <tr class="memdesc:a7e3cd250043d863a6f599b73be3c6b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new storage (physically) described by config.  <a href="#a7e3cd250043d863a6f599b73be3c6b51">More...</a><br/></td></tr>
 <tr class="separator:a7e3cd250043d863a6f599b73be3c6b51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b1068523c70d1775d4970d5e8a424ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a8b1068523c70d1775d4970d5e8a424ef">createVectorStorage</a> (const String &amp;config_)</td></tr>
+<tr class="memdesc:a8b1068523c70d1775d4970d5e8a424ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new storage (physically) described by config.  <a href="#a8b1068523c70d1775d4970d5e8a424ef">More...</a><br/></td></tr>
+<tr class="separator:a8b1068523c70d1775d4970d5e8a424ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d6660602e01b29bb85c51d3e1e239db"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a5d6660602e01b29bb85c51d3e1e239db">destroyStorage</a> (const String &amp;config_)</td></tr>
 <tr class="memdesc:a5d6660602e01b29bb85c51d3e1e239db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the storage (physically) described by config.  <a href="#a5d6660602e01b29bb85c51d3e1e239db">More...</a><br/></td></tr>
 <tr class="separator:a5d6660602e01b29bb85c51d3e1e239db"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -225,7 +234,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a793afcae96cc8f275572d5c521c24844"></a>
+<a class="anchor" id="ae9a6008c769a110edf34d6cae157dd53"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -235,7 +244,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">net::strus::api::Context::Context </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const String &amp;&#160;</td>
           <td class="paramname"><em>connectionstring</em></td><td>)</td>
           <td></td>
         </tr>
@@ -481,14 +490,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4aa0f9d01b9106fa836a9936d24953a0"></a>
+<a class="anchor" id="a8a930b6c45e1611c091cfc8d5d13d6ad"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classnet_1_1strus_1_1api_1_1StatisticsProcessor.html">StatisticsProcessor</a> net::strus::api::Context::createStatisticsProcessor </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const String &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
           <td></td>
         </tr>
@@ -538,7 +547,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Create a storage client instance of the the default remote storage of the RPC server. </p>
+<p>Create a storage client instance of the the default storage. </p>
 
 </div>
 </div>
@@ -566,6 +575,72 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a8b1068523c70d1775d4970d5e8a424ef"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::Context::createVectorStorage </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>config_</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a new storage (physically) described by config. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">config_</td><td>storage configuration </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Fails if the storage already exists </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a57762cd539a64db5b5f7650f17d5110a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html">VectorStorageClient</a> net::strus::api::Context::createVectorStorageClient </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a storage client instance of the the default remote storage of the RPC server. </p>
+
+</div>
+</div>
+<a class="anchor" id="ae053ccf381855256daf9450dcde599cd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html">VectorStorageClient</a> net::strus::api::Context::createVectorStorageClient </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>config_</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Create a vector storage client instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">config_</td><td>configuration string of the storage client or empty for the default storage </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a5d6660602e01b29bb85c51d3e1e239db"></a>
 <div class="memitem">
 <div class="memproto">
@@ -581,6 +656,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Delete the storage (physically) described by config. </p>
+<dl class="section note"><dt>Note</dt><dd>works also on vector storages </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">config_</td><td>storage description </td></tr>
@@ -648,7 +724,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:16:22 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

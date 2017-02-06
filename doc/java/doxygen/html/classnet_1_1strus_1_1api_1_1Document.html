@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -71,10 +71,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab738338512510271f47e47e871e2e6cb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Document.html#ab738338512510271f47e47e871e2e6cb">Document</a> (const <a class="el" href="classnet_1_1strus_1_1api_1_1Document.html">Document</a> &amp;o)</td></tr>
 <tr class="memdesc:ab738338512510271f47e47e871e2e6cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="#ab738338512510271f47e47e871e2e6cb">More...</a><br/></td></tr>
 <tr class="separator:ab738338512510271f47e47e871e2e6cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8678495ae0f7fa13257c99c2b436effe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Document.html#a8678495ae0f7fa13257c99c2b436effe">addSearchIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485">Index</a> &amp;position)</td></tr>
+<tr class="memitem:a8678495ae0f7fa13257c99c2b436effe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Document.html#a8678495ae0f7fa13257c99c2b436effe">addSearchIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacenet_1_1strus_1_1api.html#a1c9cbdd6e77ad5754596ef4f7c22fd6f">Index</a> &amp;position)</td></tr>
 <tr class="memdesc:a8678495ae0f7fa13257c99c2b436effe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a single term occurrence to the document for retrieval.  <a href="#a8678495ae0f7fa13257c99c2b436effe">More...</a><br/></td></tr>
 <tr class="separator:a8678495ae0f7fa13257c99c2b436effe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adaff0f1dbfd184d4edd9819aade65b2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Document.html#adaff0f1dbfd184d4edd9819aade65b2e">addForwardIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485">Index</a> &amp;position)</td></tr>
+<tr class="memitem:adaff0f1dbfd184d4edd9819aade65b2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Document.html#adaff0f1dbfd184d4edd9819aade65b2e">addForwardIndexTerm</a> (const String &amp;type, const String &amp;value, const <a class="el" href="namespacenet_1_1strus_1_1api.html#a1c9cbdd6e77ad5754596ef4f7c22fd6f">Index</a> &amp;position)</td></tr>
 <tr class="memdesc:adaff0f1dbfd184d4edd9819aade65b2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a single term occurrence to the document for use in the summary of a retrieval result.  <a href="#adaff0f1dbfd184d4edd9819aade65b2e">More...</a><br/></td></tr>
 <tr class="separator:adaff0f1dbfd184d4edd9819aade65b2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7650ca67309880c549c4b5a0b1a1c22c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Document.html#a7650ca67309880c549c4b5a0b1a1c22c">setMetaData</a> (const String &amp;name, double value)</td></tr>
@@ -180,7 +180,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485">Index</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacenet_1_1strus_1_1api.html#a1c9cbdd6e77ad5754596ef4f7c22fd6f">Index</a> &amp;&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>
@@ -222,7 +222,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacenet_1_1strus_1_1api.html#aef185b8df53f196d028b118ab9ff3485">Index</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacenet_1_1strus_1_1api.html#a1c9cbdd6e77ad5754596ef4f7c22fd6f">Index</a> &amp;&#160;</td>
           <td class="paramname"><em>position</em>&#160;</td>
         </tr>
         <tr>
@@ -597,7 +597,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:16:22 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

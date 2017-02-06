@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -70,6 +70,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac1e198480abbed202f3e6fa99cbdc9e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#ac1e198480abbed202f3e6fa99cbdc9e4">defineFeature</a> (const String &amp;set_, const <a class="el" href="classQueryExpression.html">QueryExpression</a> &amp;expr_, double weight_=1.0)</td></tr>
 <tr class="memdesc:ac1e198480abbed202f3e6fa99cbdc9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a feature from the query expression passed.  <a href="#ac1e198480abbed202f3e6fa99cbdc9e4">More...</a><br/></td></tr>
 <tr class="separator:ac1e198480abbed202f3e6fa99cbdc9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7087aaa3239072676eeabc393d95cceb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a7087aaa3239072676eeabc393d95cceb">defineDocFieldFeature</a> (const String &amp;set_, const String &amp;metadataStart, const String &amp;metadataEnd)</td></tr>
+<tr class="memdesc:a7087aaa3239072676eeabc393d95cceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a posting iterator describing a document field addressable as feature.  <a href="#a7087aaa3239072676eeabc393d95cceb">More...</a><br/></td></tr>
+<tr class="separator:a7087aaa3239072676eeabc393d95cceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a624a5a1225a44eb0d61377156756cd2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a624a5a1225a44eb0d61377156756cd2b">addMetaDataRestrictionCondition</a> (const char *compareOp, const String &amp;name, const <a class="el" href="classVariant.html">Variant</a> &amp;value, bool newGroup)</td></tr>
 <tr class="memdesc:a624a5a1225a44eb0d61377156756cd2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a meta data restriction.  <a href="#a624a5a1225a44eb0d61377156756cd2b">More...</a><br/></td></tr>
 <tr class="separator:a624a5a1225a44eb0d61377156756cd2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -88,9 +91,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af19ada0547eec00668606cd953021a6d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#af19ada0547eec00668606cd953021a6d">defineGlobalStatistics</a> (const <a class="el" href="structGlobalStatistics.html">GlobalStatistics</a> &amp;stats_)</td></tr>
 <tr class="memdesc:af19ada0547eec00668606cd953021a6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the global statistics to use for weighting in this query.  <a href="#af19ada0547eec00668606cd953021a6d">More...</a><br/></td></tr>
 <tr class="separator:af19ada0547eec00668606cd953021a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a729fda0a198196332faa76ddae4e09be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a729fda0a198196332faa76ddae4e09be">addDocumentEvaluationSet</a> (const IntVector &amp;docnolist_)</td></tr>
-<tr class="memdesc:a729fda0a198196332faa76ddae4e09be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage.  <a href="#a729fda0a198196332faa76ddae4e09be">More...</a><br/></td></tr>
-<tr class="separator:a729fda0a198196332faa76ddae4e09be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b5da217b6442a66e65e480da6dfa13c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a3b5da217b6442a66e65e480da6dfa13c">addDocumentEvaluationSet</a> (const IndexVector &amp;docnolist_)</td></tr>
+<tr class="memdesc:a3b5da217b6442a66e65e480da6dfa13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage.  <a href="#a3b5da217b6442a66e65e480da6dfa13c">More...</a><br/></td></tr>
+<tr class="separator:a3b5da217b6442a66e65e480da6dfa13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa339bccb980d4c9ee5b33a92751e247b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#aa339bccb980d4c9ee5b33a92751e247b">setMaxNofRanks</a> (unsigned int maxNofRanks_)</td></tr>
 <tr class="memdesc:aa339bccb980d4c9ee5b33a92751e247b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)  <a href="#aa339bccb980d4c9ee5b33a92751e247b">More...</a><br/></td></tr>
 <tr class="separator:aa339bccb980d4c9ee5b33a92751e247b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -106,6 +109,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a779570d3bec59abf9fb36436d8b8dd01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQueryResult.html">QueryResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#a779570d3bec59abf9fb36436d8b8dd01">evaluate</a> () const </td></tr>
 <tr class="memdesc:a779570d3bec59abf9fb36436d8b8dd01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate this query and return the result.  <a href="#a779570d3bec59abf9fb36436d8b8dd01">More...</a><br/></td></tr>
 <tr class="separator:a779570d3bec59abf9fb36436d8b8dd01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1fe4239d5e1523cf4dd3f59d2d08e5c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQuery.html#ae1fe4239d5e1523cf4dd3f59d2d08e5c">tostring</a> () const </td></tr>
+<tr class="memdesc:ae1fe4239d5e1523cf4dd3f59d2d08e5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map the contents of the query to a readable string.  <a href="#ae1fe4239d5e1523cf4dd3f59d2d08e5c">More...</a><br/></td></tr>
+<tr class="separator:ae1fe4239d5e1523cf4dd3f59d2d08e5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -159,14 +165,14 @@ Friends</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a729fda0a198196332faa76ddae4e09be"></a>
+<a class="anchor" id="a3b5da217b6442a66e65e480da6dfa13c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void Query::addDocumentEvaluationSet </td>
           <td>(</td>
-          <td class="paramtype">const IntVector &amp;&#160;</td>
+          <td class="paramtype">const IndexVector &amp;&#160;</td>
           <td class="paramname"><em>docnolist_</em></td><td>)</td>
           <td></td>
         </tr>
@@ -404,6 +410,48 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a7087aaa3239072676eeabc393d95cceb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Query::defineDocFieldFeature </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>set_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>metadataStart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>metadataEnd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Define a posting iterator describing a document field addressable as feature. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">set_</td><td>name of the feature set, this feature is addressed with </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadataStart</td><td>name of meta data element that defines the start of the document field, assumed as 1 if name is empty </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadataEnd</td><td>name of meta data element that defines the end of the document field, assumed as max value if name is empty </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ac1e198480abbed202f3e6fa99cbdc9e4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -603,6 +651,24 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ae1fe4239d5e1523cf4dd3f59d2d08e5c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String Query::tostring </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Map the contents of the query to a readable string. </p>
+<dl class="section return"><dt>Returns</dt><dd>the string </dd></dl>
+
+</div>
+</div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
 <a class="anchor" id="a94ca67b0c1c7ea574a07c9a23640d111"></a>
 <div class="memitem">
@@ -631,7 +697,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

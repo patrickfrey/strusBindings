@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -62,12 +62,21 @@
  <a href="classstrus_1_1Term.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="bindingObjects_8hpp_source.html">bindingObjects.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for strus::Term:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classstrus_1_1Term.png" usemap="#strus::Term_map" alt=""/>
+  <map id="strus::Term_map" name="strus::Term_map">
+<area href="classstrus_1_1QueryTerm.html" title="Query analyzer term with info about the field it originated from. " alt="strus::QueryTerm" shape="rect" coords="0,56,109,80"/>
+</map>
+ </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9a8ae2873fe990739462061213ea3010"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#a9a8ae2873fe990739462061213ea3010">Term</a> (const String &amp;type_, const String &amp;value_, const <a class="el" href="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a">Index</a> &amp;position_)</td></tr>
-<tr class="memdesc:a9a8ae2873fe990739462061213ea3010"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a9a8ae2873fe990739462061213ea3010">More...</a><br/></td></tr>
-<tr class="separator:a9a8ae2873fe990739462061213ea3010"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa10ed0c1bba0fbf772e8934d12ccaa15"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#aa10ed0c1bba0fbf772e8934d12ccaa15">Term</a> (const String &amp;type_, const String &amp;value_, const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;position_, const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;length_)</td></tr>
+<tr class="memdesc:aa10ed0c1bba0fbf772e8934d12ccaa15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#aa10ed0c1bba0fbf772e8934d12ccaa15">More...</a><br/></td></tr>
+<tr class="separator:aa10ed0c1bba0fbf772e8934d12ccaa15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2258267f0be6c43cacc62944f457c973"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#a2258267f0be6c43cacc62944f457c973">Term</a> (const <a class="el" href="classstrus_1_1Term.html">Term</a> &amp;o)</td></tr>
 <tr class="memdesc:a2258267f0be6c43cacc62944f457c973"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <a href="#a2258267f0be6c43cacc62944f457c973">More...</a><br/></td></tr>
 <tr class="separator:a2258267f0be6c43cacc62944f457c973"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -82,14 +91,19 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aedb3c24f319f257cfa3e1c4d2008d780"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31b1f8c969f7ccfc08bd41d82b36ef92"><td class="memItemLeft" align="right" valign="top">WString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#a31b1f8c969f7ccfc08bd41d82b36ef92">ucvalue</a> () const </td></tr>
 <tr class="separator:a31b1f8c969f7ccfc08bd41d82b36ef92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8af5bfd6bc4f89679d2a5e6c13f68dd"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#ab8af5bfd6bc4f89679d2a5e6c13f68dd">position</a> () const </td></tr>
-<tr class="memdesc:ab8af5bfd6bc4f89679d2a5e6c13f68dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the term position.  <a href="#ab8af5bfd6bc4f89679d2a5e6c13f68dd">More...</a><br/></td></tr>
-<tr class="separator:ab8af5bfd6bc4f89679d2a5e6c13f68dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac22175afb38e0dd624b2cbd3cf979ec9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#ac22175afb38e0dd624b2cbd3cf979ec9">position</a> () const </td></tr>
+<tr class="memdesc:ac22175afb38e0dd624b2cbd3cf979ec9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the term position.  <a href="#ac22175afb38e0dd624b2cbd3cf979ec9">More...</a><br/></td></tr>
+<tr class="separator:ac22175afb38e0dd624b2cbd3cf979ec9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16788743b8baee74921ea2fff2f8108b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#a16788743b8baee74921ea2fff2f8108b">length</a> () const </td></tr>
+<tr class="memdesc:a16788743b8baee74921ea2fff2f8108b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the term length.  <a href="#a16788743b8baee74921ea2fff2f8108b">More...</a><br/></td></tr>
+<tr class="separator:a16788743b8baee74921ea2fff2f8108b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66c4c03b11280434e3776f0493d93ac7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classstrus_1_1Term.html#a66c4c03b11280434e3776f0493d93ac7">operator&lt;</a> (const <a class="el" href="classstrus_1_1Term.html">Term</a> &amp;o) const </td></tr>
+<tr class="separator:a66c4c03b11280434e3776f0493d93ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>One typed term occurrence in a document or a query. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a9a8ae2873fe990739462061213ea3010"></a>
+<a class="anchor" id="aa10ed0c1bba0fbf772e8934d12ccaa15"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -111,8 +125,14 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="namespacestrus.html#a12b60ce837676c138f74b9c9bfbbbf9a">Index</a> &amp;&#160;</td>
-          <td class="paramname"><em>position_</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;&#160;</td>
+          <td class="paramname"><em>position_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> &amp;&#160;</td>
+          <td class="paramname"><em>length_</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -183,7 +203,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ab8af5bfd6bc4f89679d2a5e6c13f68dd"></a>
+<a class="anchor" id="a16788743b8baee74921ea2fff2f8108b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -191,7 +211,48 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned int strus::Term::position </td>
+          <td class="memname"><a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> strus::Term::length </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the term length. </p>
+
+</div>
+</div>
+<a class="anchor" id="a66c4c03b11280434e3776f0493d93ac7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool strus::Term::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classstrus_1_1Term.html">Term</a> &amp;&#160;</td>
+          <td class="paramname"><em>o</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac22175afb38e0dd624b2cbd3cf979ec9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacestrus.html#a437ce4ba557d0f8563192761cbf6dcfa">Index</a> strus::Term::position </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -280,7 +341,7 @@ Public Member Functions</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

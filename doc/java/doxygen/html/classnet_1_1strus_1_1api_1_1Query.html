@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -75,6 +75,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0662551df1cbb81b76cbbc1a4c11fefb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#a0662551df1cbb81b76cbbc1a4c11fefb">defineFeature</a> (const String &amp;set_, const <a class="el" href="classnet_1_1strus_1_1api_1_1QueryExpression.html">QueryExpression</a> &amp;expr_, double weight_=1.0)</td></tr>
 <tr class="memdesc:a0662551df1cbb81b76cbbc1a4c11fefb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a feature from the query expression passed.  <a href="#a0662551df1cbb81b76cbbc1a4c11fefb">More...</a><br/></td></tr>
 <tr class="separator:a0662551df1cbb81b76cbbc1a4c11fefb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad634ac0b8ed87cf95bfa31e29ad89e1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#ad634ac0b8ed87cf95bfa31e29ad89e1c">defineDocFieldFeature</a> (const String &amp;set_, const String &amp;metadataStart, const String &amp;metadataEnd)</td></tr>
+<tr class="memdesc:ad634ac0b8ed87cf95bfa31e29ad89e1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a posting iterator describing a document field addressable as feature.  <a href="#ad634ac0b8ed87cf95bfa31e29ad89e1c">More...</a><br/></td></tr>
+<tr class="separator:ad634ac0b8ed87cf95bfa31e29ad89e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61c60933146ad24df41cc3a387fe3675"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#a61c60933146ad24df41cc3a387fe3675">addMetaDataRestrictionCondition</a> (const char *compareOp, const String &amp;name, double value, bool newGroup)</td></tr>
 <tr class="memdesc:a61c60933146ad24df41cc3a387fe3675"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a meta data restriction.  <a href="#a61c60933146ad24df41cc3a387fe3675">More...</a><br/></td></tr>
 <tr class="separator:a61c60933146ad24df41cc3a387fe3675"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -90,9 +93,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adff8cf429db88fb96201e05ae0b2f34c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#adff8cf429db88fb96201e05ae0b2f34c">defineGlobalStatistics</a> (const <a class="el" href="structnet_1_1strus_1_1api_1_1GlobalStatistics.html">GlobalStatistics</a> &amp;stats_)</td></tr>
 <tr class="memdesc:adff8cf429db88fb96201e05ae0b2f34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the global statistics to use for weighting in this query.  <a href="#adff8cf429db88fb96201e05ae0b2f34c">More...</a><br/></td></tr>
 <tr class="separator:adff8cf429db88fb96201e05ae0b2f34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae9ef1bff1ef8761f05b902e65032c22b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#ae9ef1bff1ef8761f05b902e65032c22b">addDocumentEvaluationSet</a> (const IntVector &amp;docnolist_)</td></tr>
-<tr class="memdesc:ae9ef1bff1ef8761f05b902e65032c22b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage.  <a href="#ae9ef1bff1ef8761f05b902e65032c22b">More...</a><br/></td></tr>
-<tr class="separator:ae9ef1bff1ef8761f05b902e65032c22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa90c9fb3d137615e13d84cd1fbd14b4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#aa90c9fb3d137615e13d84cd1fbd14b4a">addDocumentEvaluationSet</a> (const IndexVector &amp;docnolist_)</td></tr>
+<tr class="memdesc:aa90c9fb3d137615e13d84cd1fbd14b4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage.  <a href="#aa90c9fb3d137615e13d84cd1fbd14b4a">More...</a><br/></td></tr>
+<tr class="separator:aa90c9fb3d137615e13d84cd1fbd14b4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ace0f4feabf00c1f24ef70d492098f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#a3ace0f4feabf00c1f24ef70d492098f2">setMaxNofRanks</a> (unsigned int maxNofRanks_)</td></tr>
 <tr class="memdesc:a3ace0f4feabf00c1f24ef70d492098f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)  <a href="#a3ace0f4feabf00c1f24ef70d492098f2">More...</a><br/></td></tr>
 <tr class="separator:a3ace0f4feabf00c1f24ef70d492098f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,6 +111,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aea553a7646d297c8ef91fa0cbd02471e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnet_1_1strus_1_1api_1_1QueryResult.html">QueryResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#aea553a7646d297c8ef91fa0cbd02471e">evaluate</a> () const </td></tr>
 <tr class="memdesc:aea553a7646d297c8ef91fa0cbd02471e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate this query and return the result.  <a href="#aea553a7646d297c8ef91fa0cbd02471e">More...</a><br/></td></tr>
 <tr class="separator:aea553a7646d297c8ef91fa0cbd02471e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1303f3de5431460abb9ebb54767b4022"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnet_1_1strus_1_1api_1_1Query.html#a1303f3de5431460abb9ebb54767b4022">tostring</a> () const </td></tr>
+<tr class="memdesc:a1303f3de5431460abb9ebb54767b4022"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map the contents of the query to a readable string.  <a href="#a1303f3de5431460abb9ebb54767b4022">More...</a><br/></td></tr>
+<tr class="separator:a1303f3de5431460abb9ebb54767b4022"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -161,14 +167,14 @@ Friends</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ae9ef1bff1ef8761f05b902e65032c22b"></a>
+<a class="anchor" id="aa90c9fb3d137615e13d84cd1fbd14b4a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void net::strus::api::Query::addDocumentEvaluationSet </td>
           <td>(</td>
-          <td class="paramtype">const IntVector &amp;&#160;</td>
+          <td class="paramtype">const IndexVector &amp;&#160;</td>
           <td class="paramname"><em>docnolist_</em></td><td>)</td>
           <td></td>
         </tr>
@@ -354,6 +360,48 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>the user restriction applies if no user role specified in the query is allowed to see the document. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad634ac0b8ed87cf95bfa31e29ad89e1c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void net::strus::api::Query::defineDocFieldFeature </td>
+          <td>(</td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>set_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>metadataStart</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const String &amp;&#160;</td>
+          <td class="paramname"><em>metadataEnd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Define a posting iterator describing a document field addressable as feature. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">set_</td><td>name of the feature set, this feature is addressed with </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadataStart</td><td>name of meta data element that defines the start of the document field, assumed as 1 if name is empty </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadataEnd</td><td>name of meta data element that defines the end of the document field, assumed as max value if name is empty </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -556,6 +604,24 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a1303f3de5431460abb9ebb54767b4022"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String net::strus::api::Query::tostring </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Map the contents of the query to a readable string. </p>
+<dl class="section return"><dt>Returns</dt><dd>the string </dd></dl>
+
+</div>
+</div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
 <a class="anchor" id="a94ca67b0c1c7ea574a07c9a23640d111"></a>
 <div class="memitem">
@@ -584,7 +650,7 @@ Friends</h2></td></tr>
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:16:22 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

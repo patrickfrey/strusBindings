@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPython
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -90,6 +90,12 @@
 <li>defineAttribute()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#aef7f6d4a26e01725d44007a519995bf4">strus::DocumentAnalyzer</a>
 </li>
+<li>defineAttributeFromPatternMatch()
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a66b4fa7fa89f087994ff5cf7332432a7">strus::DocumentAnalyzer</a>
+</li>
+<li>defineDocFieldFeature()
+: <a class="el" href="classstrus_1_1Query.html#a061823c1e5bbfcecded9142011f6317e">strus::Query</a>
+</li>
 <li>defineDocument()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a8458d32448090b1eb7a943de4d329aa9">strus::DocumentAnalyzer</a>
 </li>
@@ -98,18 +104,35 @@
 , <a class="el" href="classstrus_1_1SummarizerConfig.html#adbb998a0991ccdf49c6561106aa76341">strus::SummarizerConfig</a>
 , <a class="el" href="classstrus_1_1WeightingConfig.html#a85e692328897acb36ca854b3c4df423c">strus::WeightingConfig</a>
 </li>
+<li>defineFeatureConceptRelation()
+: <a class="el" href="classstrus_1_1VectorStorageTransaction.html#a5cd6a0451e9e29a1da73eaee427318e0">strus::VectorStorageTransaction</a>
+</li>
 <li>defineGlobalStatistics()
 : <a class="el" href="classstrus_1_1Query.html#a3a164053a7222cdbb4c9379c4e82bedc">strus::Query</a>
 </li>
 <li>defineMetaData()
 : <a class="el" href="classstrus_1_1DocumentAnalyzer.html#aaeb6909e6cafc90e292e5bb92263d6e2">strus::DocumentAnalyzer</a>
 </li>
-<li>defineParameter()
-: <a class="el" href="classstrus_1_1SummarizerConfig.html#af6ecc0eb08ed2aa7301f4ed75c87203a">strus::SummarizerConfig</a>
-, <a class="el" href="classstrus_1_1WeightingConfig.html#a12a4d42ba36ddefa9373ac2f96977bf9">strus::WeightingConfig</a>
+<li>defineMetaDataFromPatternMatch()
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a55b1c7f9c0592fffa586b2777b3e5899">strus::DocumentAnalyzer</a>
 </li>
-<li>definePhraseType()
-: <a class="el" href="classstrus_1_1QueryAnalyzer.html#ade6afe56bb5d22737907a02b97b9384f">strus::QueryAnalyzer</a>
+<li>defineParameter()
+: <a class="el" href="classstrus_1_1SummarizerConfig.html#abcc959bf41076815e83a2d203d8ce589">strus::SummarizerConfig</a>
+, <a class="el" href="classstrus_1_1WeightingConfig.html#a0c693ea501d1e12d1c005f31bd3f15b3">strus::WeightingConfig</a>
+</li>
+<li>definePattern()
+: <a class="el" href="classstrus_1_1PatternMatcher.html#a5aa97582c3aa3c8cc2334b3729df1c06">strus::PatternMatcher</a>
+</li>
+<li>definePatternMatcherPostProc()
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a9092e934e5a36baf6b52ed404081b3b5">strus::DocumentAnalyzer</a>
+, <a class="el" href="classstrus_1_1QueryAnalyzer.html#a4ad7bb40ce6ee668530e5989866e334c">strus::QueryAnalyzer</a>
+</li>
+<li>definePatternMatcherPostProcFromFile()
+: <a class="el" href="classstrus_1_1DocumentAnalyzer.html#aa6d168f246b2ea9a0e8cad037478225a">strus::DocumentAnalyzer</a>
+, <a class="el" href="classstrus_1_1QueryAnalyzer.html#a7bc54748486860c93eeeded8a728ed6e">strus::QueryAnalyzer</a>
+</li>
+<li>defineResultName()
+: <a class="el" href="classstrus_1_1SummarizerConfig.html#afbdaa31c68317b956c01b09999ecc1c3">strus::SummarizerConfig</a>
 </li>
 <li>defineTermStatistics()
 : <a class="el" href="classstrus_1_1Query.html#aee5cf363a3af2be087cb9e17b75a918d">strus::Query</a>
@@ -147,15 +170,16 @@
 <li>DocumentAnalyzer
 : <a class="el" href="classstrus_1_1DocumentAnalyzeQueue.html#a4d56b0b39ff48491c3b70afd3ee5b2ed">strus::DocumentAnalyzeQueue</a>
 , <a class="el" href="classstrus_1_1DocumentAnalyzer.html#a864eefb2a44380512f93f7d6b721249d">strus::DocumentAnalyzer</a>
+, <a class="el" href="classstrus_1_1PatternMatcher.html#a4d56b0b39ff48491c3b70afd3ee5b2ed">strus::PatternMatcher</a>
 </li>
 <li>DocumentBrowser()
 : <a class="el" href="classstrus_1_1DocumentBrowser.html#af3e1f10f1a3bbe28772aecfdb02b466d">strus::DocumentBrowser</a>
 </li>
 <li>DocumentClass()
-: <a class="el" href="classstrus_1_1DocumentClass.html#a9bb869e98dbd7f8a95afc47715620443">strus::DocumentClass</a>
+: <a class="el" href="classstrus_1_1DocumentClass.html#a0b5e2e13b24a2ccc9f70f63c7f4340f5">strus::DocumentClass</a>
 </li>
 <li>DocumentFrequencyChange()
-: <a class="el" href="classstrus_1_1DocumentFrequencyChange.html#afa8fba9a9aab5806b9029d4082f2fbed">strus::DocumentFrequencyChange</a>
+: <a class="el" href="classstrus_1_1DocumentFrequencyChange.html#ae89ce51cf3cdb72487b778311cd0cd57">strus::DocumentFrequencyChange</a>
 </li>
 <li>documentFrequencyChangeList()
 : <a class="el" href="classstrus_1_1StatisticsMessage.html#abd8f1f72a5a21f2c32f9bbfa101de150">strus::StatisticsMessage</a>
@@ -165,7 +189,7 @@
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:18:42 for strusPython by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

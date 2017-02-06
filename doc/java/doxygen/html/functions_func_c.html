@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusJava
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -41,6 +40,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li class="current"><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -64,6 +64,7 @@
       <li><a href="functions_func_l.html#index_l"><span>l</span></a></li>
       <li><a href="functions_func_m.html#index_m"><span>m</span></a></li>
       <li><a href="functions_func_n.html#index_n"><span>n</span></a></li>
+      <li><a href="functions_func_o.html#index_o"><span>o</span></a></li>
       <li><a href="functions_func_p.html#index_p"><span>p</span></a></li>
       <li><a href="functions_func_q.html#index_q"><span>q</span></a></li>
       <li><a href="functions_func_r.html#index_r"><span>r</span></a></li>
@@ -86,12 +87,28 @@
 <li>close()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#ad7dc6e64909441b8a4ae27f7a5241dff">net::strus::api::Context</a>
 , <a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#ae0aa4e05fb9696c6892e54873eef6b0a">net::strus::api::StorageClient</a>
+, <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#afa49098f4f311720baf4cb66b3eaaa1c">net::strus::api::VectorStorageClient</a>
+, <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageSearcher.html#ad47b2bbbeb0d04ca539acb001003c5ac">net::strus::api::VectorStorageSearcher</a>
+, <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageTransaction.html#ac5d481649f8f0874f5d9247a1d2d50d0">net::strus::api::VectorStorageTransaction</a>
 </li>
 <li>commit()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1StorageTransaction.html#a19fb11b312c69510022596546ed685b4">net::strus::api::StorageTransaction</a>
+, <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageTransaction.html#a288baffa3a0291cc955864ff2c4d6f60">net::strus::api::VectorStorageTransaction</a>
+</li>
+<li>conceptClassNames()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#aab2a22ecd80383dfc755a8e8aa1692be">net::strus::api::VectorStorageClient</a>
+</li>
+<li>conceptFeatures()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#a1951beedd73eb2bd1d58ce9cd2e57ab2">net::strus::api::VectorStorageClient</a>
+</li>
+<li>config()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#abe913862fc7d1e2303352aee75d2f0b8">net::strus::api::VectorStorageClient</a>
 </li>
 <li>Context()
-: <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a793afcae96cc8f275572d5c521c24844">net::strus::api::Context</a>
+: <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#ae795b539e594b04ff4398b9df16eb3ef">net::strus::api::Context</a>
+</li>
+<li>createContext()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a2396410eedc966f905aa4267d0f25d77">net::strus::api::QueryAnalyzer</a>
 </li>
 <li>createDocumentAnalyzer()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#aae73ca54c14f4138647486dbe3e2517d">net::strus::api::Context</a>
@@ -113,10 +130,12 @@
 </li>
 <li>createQueue()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1DocumentAnalyzer.html#afbad631861f1855abd31901697fdc284">net::strus::api::DocumentAnalyzer</a>
-, <a class="el" href="classnet_1_1strus_1_1api_1_1QueryAnalyzer.html#a02c8509f7802b1ad2003bcd0927d8ade">net::strus::api::QueryAnalyzer</a>
+</li>
+<li>createSearcher()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#a98e6b4cf3fe5053d017d70c53eab228d">net::strus::api::VectorStorageClient</a>
 </li>
 <li>createStatisticsProcessor()
-: <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a4aa0f9d01b9106fa836a9936d24953a0">net::strus::api::Context</a>
+: <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a8a930b6c45e1611c091cfc8d5d13d6ad">net::strus::api::Context</a>
 </li>
 <li>createStorage()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a7e3cd250043d863a6f599b73be3c6b51">net::strus::api::Context</a>
@@ -126,16 +145,23 @@
 </li>
 <li>createTransaction()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#a0ed953e88baab2793be2b226d697a180">net::strus::api::StorageClient</a>
+, <a class="el" href="classnet_1_1strus_1_1api_1_1VectorStorageClient.html#a792f800484265e533c357f7bbaf30764">net::strus::api::VectorStorageClient</a>
 </li>
 <li>createUpdateStatisticsIterator()
 : <a class="el" href="classnet_1_1strus_1_1api_1_1StorageClient.html#ae9a0218d6684827d7deda0215d3b567c">net::strus::api::StorageClient</a>
+</li>
+<li>createVectorStorage()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a8b1068523c70d1775d4970d5e8a424ef">net::strus::api::Context</a>
+</li>
+<li>createVectorStorageClient()
+: <a class="el" href="classnet_1_1strus_1_1api_1_1Context.html#a57762cd539a64db5b5f7650f17d5110a">net::strus::api::Context</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:31 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:16:22 for strusJava by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

@@ -19,7 +19,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">strusPHP
-   &#160;<span id="projectnumber">0.10</span>
+   &#160;<span id="projectnumber">0.13</span>
    </div>
   </td>
  </tr>
@@ -31,7 +31,6 @@
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
     </ul>
@@ -40,6 +39,7 @@
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
@@ -54,17 +54,18 @@
 <table class="directory">
   <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#a266163c576cb8351f33471dccf974093">add</a>(const QueryExpression &amp;o)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classQueryExpression.html#a5627b00f51d4fd5ede9d5a46139f5638">attachVariable</a>(const String &amp;name_)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#a7f44683cb611793337df6802f800baf2">pushExpression</a>(const String &amp;opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classQueryExpression.html#a7de62667df1bdb72938a52088207cf21">pushTerm</a>(const String &amp;type_, const String &amp;value_)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#a0de80064a367adf51ab09f7a9b6de05a">Query</a> class</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classQueryExpression.html#a7794f1cf9c1cdbabdfafd6bdee090af5">QueryExpression</a>(const QueryExpression &amp;o)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#ae89776d8827f056362c91184e73b3363">QueryExpression</a>()</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classQueryExpression.html#ae7225d118d9799e1c5b5b7d9e1fc16e6">size</a>() const </td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#a124241cb23f7aabf8a85f899a4dbb086">pushDocField</a>(const String &amp;metadata_start_, const String &amp;metadata_end_)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryExpression.html#a7f44683cb611793337df6802f800baf2">pushExpression</a>(const String &amp;opname_, unsigned int argc_, int range_=0, unsigned int cardinality_=0)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#a86610dcb6690972dc831db8ab1c99119">pushTerm</a>(const String &amp;type_, const String &amp;value_, const Index &amp;length_)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryExpression.html#a0de80064a367adf51ab09f7a9b6de05a">Query</a> class</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">friend</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#a7794f1cf9c1cdbabdfafd6bdee090af5">QueryExpression</a>(const QueryExpression &amp;o)</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classQueryExpression.html#ae89776d8827f056362c91184e73b3363">QueryExpression</a>()</td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classQueryExpression.html#ae7225d118d9799e1c5b5b7d9e1fc16e6">size</a>() const </td><td class="entry"><a class="el" href="classQueryExpression.html">QueryExpression</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.6-->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 6 2016 10:48:30 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 6 2017 18:17:17 for strusPHP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>

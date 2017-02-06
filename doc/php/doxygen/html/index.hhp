@@ -16,7 +16,6 @@ main="strusPHP","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,0
 bindingObjects_8hpp_source.html
 strus_8md.html
 bindingObjects_8hpp.html
-deprecated.html
 classAggregator.html
 classAttribute.html
 classAttribute-members.html
@@ -42,10 +41,12 @@ classMetaData.html
 classMetaData-members.html
 classNormalizer.html
 classNormalizerVector.html
+classPatternMatcher.html
+classPatternMatcher-members.html
 classQuery.html
 classQuery-members.html
-classQueryAnalyzeQueue.html
-classQueryAnalyzeQueue-members.html
+classQueryAnalyzeContext.html
+classQueryAnalyzeContext-members.html
 classQueryAnalyzer.html
 classQueryAnalyzer-members.html
 classQueryEval.html
@@ -54,6 +55,8 @@ classQueryExpression.html
 classQueryExpression-members.html
 classQueryResult.html
 classQueryResult-members.html
+classQueryTerm.html
+classQueryTerm-members.html
 classRank.html
 classRank-members.html
 classStatisticsIterator.html
@@ -76,14 +79,22 @@ classTermStatistics.html
 classTermStatistics-members.html
 classTokenizer.html
 classVariant.html
+classVecRank.html
+classVecRank-members.html
+classVectorStorageClient.html
+classVectorStorageClient-members.html
+classVectorStorageSearcher.html
+classVectorStorageSearcher-members.html
+classVectorStorageTransaction.html
+classVectorStorageTransaction-members.html
 classWeightingConfig.html
 classWeightingConfig-members.html
 dir_d44c64559bbebec7f509842c48db8b23.html
 dir_4c7fe52541d540b59710786f705b50e0.html
 index.html
-pages.html
 annotated.html
 classes.html
+hierarchy.html
 functions.html
 functions_c.html
 functions_d.html
@@ -95,6 +106,7 @@ functions_i.html
 functions_l.html
 functions_m.html
 functions_n.html
+functions_o.html
 functions_p.html
 functions_q.html
 functions_r.html
@@ -115,6 +127,7 @@ functions_func_i.html
 functions_func_l.html
 functions_func_m.html
 functions_func_n.html
+functions_func_o.html
 functions_func_p.html
 functions_func_q.html
 functions_func_r.html
@@ -157,3 +170,5 @@ ftv2plastnode.png
 ftv2pnode.png
 ftv2vertline.png
 ftv2splitbar.png
+classQueryTerm.png
+classTerm.png
