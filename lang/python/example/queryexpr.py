@@ -47,7 +47,7 @@ try:
 	for term in terms:
 		# We assign the features created to the set named 'seek' because they are 
 		# referenced with this name in the query evaluation:
-		query.defineFeature( "seek", [term.type(), term.value()], 1.0)
+		query.defineFeature( "seek", [term.type(), term.value(), 1], 1.0)
 		# Each query term is also part of the selection expressions
 		selexpr.append( [term.type(), term.value()] )
 		print "term ", term.type()," ", term.value()

@@ -644,7 +644,7 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 							}
 							if (ii+2 == len)
 							{
-								PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii+1);
+								PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 								if (PyLong_Check( item_len_obj) || PyInt_Check( item_len_obj))
 								{
 									item_len = PyInt_AS_LONG( item);
@@ -719,7 +719,7 @@ static void initExpressionStructure( Expression& result, PyObject* obj)
 									++ii;
 									if (ii+1 == len)
 									{
-										PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii+1);
+										PyObject* item_len_obj = PySequence_Fast_GET_ITEM( seq.ptr(), ii);
 										if (PyLong_Check( item_len_obj) || PyInt_Check( item_len_obj))
 										{
 											termlen = PyInt_AS_LONG( item);
