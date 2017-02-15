@@ -466,6 +466,9 @@ make test
 %endif
 
 %changelog
+* Wed Feb 15 2017 Patrick Frey <patrickpfrey@yahoo.com> 0.14.0-0.1
+- adapt interface changes in strus core
+
 * Mon Feb 6 2017 Patrick Frey <patrickpfrey@yahoo.com> 0.13.0-0.1
 - adapt interface changes in strus analyzer and core
 - integrate vector and pattern matching interfaces
