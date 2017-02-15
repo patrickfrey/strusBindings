@@ -54,8 +54,11 @@ set( generated_java_source_files
 	WeightingConfig.java
 	FunctionVariableConfig.java
 )
-set( CMAKE_JAVA_TARGET_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api )
-add_jar( strus_api ${generated_java_source_files} OUTPUT_DIR ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api)
+
+string(REGEX REPLACE "([^;]+)" "${PROJECT_BINARY_DIR}/lang/java/net/strus/api/\\1" generated_java_source_files_abs "${generated_java_source_files}")
+
+set( CMAKE_JAVA_TARGET_OUTPUT_DIR ${PROJECT_BINARY_DIR}/lang/java/net/strus/api )
+add_jar( strus_api ${generated_java_source_files_abs} OUTPUT_DIR ${PROJECT_BINARY_DIR}/lang/java/net/strus/api)
 
 # ------------------------------
 # INSTALLATION
