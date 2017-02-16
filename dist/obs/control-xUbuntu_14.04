@@ -10,6 +10,12 @@ Build-Depends: debhelper (>= 4.1.16), cmake,
 Standards-Version: 3.8.3
 Homepage: http://project-strus.net
 
+Package: strusbindings-python
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: strusbindings for the Python language
+ Language bindings for the strus text search engine in Python 2.
+
 Package: strusbindings-php
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -21,9 +27,3 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: strusbindings for the Java language
  Language bindings for the strus text search engine in Java.
-
-Package: strusbindings-python
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: strusbindings for the Python language
- Language bindings for the strus text search engine in Python 2.

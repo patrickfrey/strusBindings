@@ -19,12 +19,14 @@ build() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Building..."
+  mkdir build
+  cd build
   JAVA_HOME=/usr/lib/jvm/default \
 	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib \
 	-DWITH_PHP="YES" -DWITH_JAVA="YES" -DWITH_PYTHON="YES" \
 	-DJAVA_LIB_INSTALL_DIR=/usr/share/java \
 	-DPYTHON_LIBRARY=/usr/bin/python2.7 -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 \
-	.
+	..
   make
 }
 
@@ -32,6 +34,8 @@ package_strusbindings-php5() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Installing Php5 bindings.."
+  cd build
+
   cd lang/php
   make DESTDIR=${pkgdir} install
   cd ../..
@@ -50,6 +54,7 @@ package_strusbindings-java() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Installing Java bindings.."
+  cd build
   cd lang/java
   make DESTDIR=${pkgdir} install
   cd ../..  
@@ -59,6 +64,7 @@ package_strusbindings-python2() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
   
   msg "Installing Python2 bindings.."
+  cd build
   cd lang/python
   make DESTDIR=${pkgdir} install
   cd ../..
@@ -68,5 +74,6 @@ check() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
   msg "Testing..."
+  cd build
   make test
 }
