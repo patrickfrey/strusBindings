@@ -30,15 +30,15 @@ link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" "${s
 
 # Php:
 add_custom_command(
-	OUTPUT strus_wrap.cpp strus.php php_strus.h
+	OUTPUT ${PROJECT_BINARY_DIR}/lang/php/strus_wrap.cpp ${PROJECT_BINARY_DIR}/lang/php/strus.php ${PROJECT_BINARY_DIR}/lang/php/php_strus.h
 	PRE_BUILD
-	COMMAND  ${SWIG_EXECUTABLE} -Werror -php -c++ -outdir ${PROJECT_SOURCE_DIR}/lang/php strus.i
-	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lang/php"
+	COMMAND  ${SWIG_EXECUTABLE} -Werror -php -c++ -outcurrentdir -outdir ${PROJECT_BINARY_DIR}/lang/php ${PROJECT_SOURCE_DIR}/lang/php/strus.i
+	WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/lang/php"
 	COMMENT "build PHP5 bindings" VERBATIM
 	DEPENDS  strus.i strus_variant.i strus_tokenizer.i strus_normalizer.i strus_aggregator.i std_vector_string.i std_vector_int.i std_vector_rank.i std_vector_term.i exception_handler.i  strus_weighting.i strus_summarizer.i ignore_declarations.i "${PROJECT_SOURCE_DIR}/include/strus/bindingObjects.hpp"
 )
 
-add_library( strus_php MODULE strus_wrap.cpp objInitializers.cpp )
+add_library( strus_php MODULE ${PROJECT_BINARY_DIR}/lang/php/strus_wrap.cpp objInitializers.cpp )
 set_target_properties( strus_php PROPERTIES PREFIX "" OUTPUT_NAME strus )
 if(APPLE)
 	set_target_properties( strus_php PROPERTIES LINK_FLAGS "${PHP_LDFLAGS} -Wl,-undefined,dynamic_lookup" )
