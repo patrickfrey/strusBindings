@@ -17,4 +17,3 @@ foreach( test ${tests} )
 		set_tests_properties( php_${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lang/php" )
 	endif(APPLE OR WIN32)
 endforeach( test )
-

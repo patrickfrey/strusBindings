@@ -8,9 +8,9 @@ link_directories( "${PROJECT_SOURCE_DIR}/src" "${strusmodule_LIBRARY_DIRS}" "${s
 
 # Java:
 add_custom_command(
-	OUTPUT strus_wrap.cxx java_strus.h
+	OUTPUT ${PROJECT_BINARY_DIR}/lang/java/strus_wrap.cxx
 	PRE_BUILD
-	COMMAND  ${SWIG_EXECUTABLE} -Werror -java -package net.strus.api -c++ -outdir ${PROJECT_SOURCE_DIR}/lang/java/net/strus/api -o strus_wrap.cxx strus.i
+	COMMAND  ${SWIG_EXECUTABLE} -Werror -java -package net.strus.api -c++ -outdir ${PROJECT_BINARY_DIR}/lang/java/net/strus/api -o ${PROJECT_BINARY_DIR}/lang/java/strus_wrap.cxx strus.i
 	WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/lang/java"
 	COMMENT "build Java bindings" VERBATIM
 	DEPENDS  strus.i exception_handler.i  ignore_declarations.i  java_heap.i

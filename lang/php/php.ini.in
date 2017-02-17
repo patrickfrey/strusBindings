@@ -1,5 +1,5 @@
 [PHP]
-open_basedir = "@PROJECT_SOURCE_DIR@/lang/php"
+open_basedir = "@PROJECT_BINARY_DIR@/lang/php"
 extension_dir= "@PHP_EXTENSION_DIR@"
-include_path = "@PROJECT_SOURCE_DIR@/lang/php"
+include_path = "@PROJECT_BINARY_DIR@/lang/php"
 
