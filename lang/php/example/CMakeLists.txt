@@ -10,7 +10,7 @@ set( tests ${tests} vectors )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
 foreach( test ${tests} )
-	add_test( NAME php_${test} COMMAND ${PHP_EXECUTABLE} -c ../php.ini ${test}.php WORKING_DIRECTORY ${THISDIR} )
+	add_test( NAME php_${test} COMMAND ${PHP_EXECUTABLE} -c ${PROJECT_BINARY_DIR}/lang/php/php.ini ${test}.php WORKING_DIRECTORY ${THISDIR} )
 	if(APPLE OR WIN32)
 		set_tests_properties( php_${test} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${PROJECT_SOURCE_DIR}/lang/php/${CMAKE_BUILD_TYPE}" )
 	else(APPLE OR WIN32)
