@@ -23,11 +23,13 @@ ENDIF (NOT WITH_PHP STREQUAL "YES")
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
     
+if(NOT STRUS_ALL)
 include( cmake/dist.cmake )
 include( cmake/LinuxDistribution.cmake )
 include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
 include( cmake/intl.cmake )
+endif()
 
 IF( WITH_PHP STREQUAL "YES" )
 	if( APPLE OR WIN32 )
@@ -123,7 +125,9 @@ IF (WITH_STRUS_PATTERN STREQUAL "YES")
 MESSAGE( STATUS  "Tests for strusPattern enabled." )
 ENDIF (WITH_STRUS_PATTERN STREQUAL "YES")
 
+if(NOT STRUS_ALL)
 include( cmake/find_strus_package.cmake )
+endif()
 
 find_strus_package( base )
 find_strus_package( core )
@@ -152,8 +156,11 @@ add_subdirectory( src )
 add_subdirectory( lang )
 add_subdirectory( tests )
   
+if(NOT STRUS_ALL)
 include( cmake/report_build_settings.cmake )
+endif()
 
+if(NOT STRUS_ALL)
 include( cmake/standard_targets.cmake )
-
+endif()
 
