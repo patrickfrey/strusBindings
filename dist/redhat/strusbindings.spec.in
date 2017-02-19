@@ -230,10 +230,10 @@ Requires: libboost_date_time1_54_0 >= 1.54.0
 BuildRequires: boost-devel
 %endif
 %if %{osufactory}
-Requires: libboost_thread1_62_0 >= 1.62.0
-Requires: libboost_atomic1_62_0 >= 1.62.0
-Requires: libboost_system1_62_0 >= 1.62.0
-Requires: libboost_date_time1_62_0 >= 1.62.0
+Requires: libboost_thread1_63_0 >= 1.63.0
+Requires: libboost_atomic1_63_0 >= 1.63.0
+Requires: libboost_system1_63_0 >= 1.63.0
+Requires: libboost_date_time1_63_0 >= 1.63.0
 BuildRequires: boost-devel
 %endif
 %endif
@@ -374,9 +374,8 @@ Requires: python
 
 %build
 
-# TODO: out-of-source build not possible currently!
-#mkdir build
-#cd build
+mkdir build
+cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=%{_lib} \
 %if %{with_php}
 	-DWITH_PHP="YES" \
@@ -388,12 +387,12 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=%
 %if %{with_python}
 	-DWITH_PYTHON="YES" \
 %endif
-	.
-# make -j2 breaks
-#make %{?_smp_mflags}
-make
+	..
+make %{?_smp_mflags}
 
 %install
+
+cd build
 
 %if %{with_php}
 cd lang/php
@@ -427,8 +426,7 @@ cd ../..
 rm -rf $RPM_BUILD_ROOT
 
 %check
-# TODO: out-of-source build not possible!
-#cd build
+cd build
 
 make test
 
