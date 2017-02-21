@@ -536,13 +536,13 @@ void QueryEval::addSummarizer_obj(
 	boost::python::extract<SummarizerConfig> config(config_);
 	if (config.check())
 	{
-		addSummarizer( name, (const SummarizerConfig&)config);
+		addSummarizer( name, (const SummarizerConfig&)config, std::string());
 	}
 	else
 	{
 		SummarizerConfig config;
 		initSummarizerConfig( config, config_.ptr());
-		addSummarizer( name, config);
+		addSummarizer( name, config, std::string());
 	}
 }
 
@@ -571,13 +571,13 @@ void QueryEval::addWeightingFunction_obj(
 	boost::python::extract<WeightingConfig> config(config_);
 	if (config.check())
 	{
-		addWeightingFunction( name, (const WeightingConfig&)config);
+		addWeightingFunction( name, (const WeightingConfig&)config, std::string());
 	}
 	else
 	{
 		WeightingConfig config;
 		initWeightingConfig( config, config_.ptr());
-		addWeightingFunction( name, config);
+		addWeightingFunction( name, config, std::string());
 	}
 }
 

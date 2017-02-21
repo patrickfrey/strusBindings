@@ -2064,7 +2064,7 @@ public:
 	void addSummarizer(
 			const String& name,
 			const SummarizerConfig& config,
-			const String& debugAttributeName=std::string());
+			const String& debugAttributeName);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addSummarizer_obj(
@@ -2082,7 +2082,7 @@ public:
 	void addWeightingFunction(
 			const String& name,
 			const WeightingConfig& config,
-			const String& debugAttributeName=std::string());
+			const String& debugAttributeName);
 
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFunction_obj(

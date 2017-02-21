@@ -56,14 +56,14 @@ public class QueryNoAnalyzer
 		weighting.defineParameter( "b", 2.1);		//... b paramater of BM25
 		weighting.defineParameter( "avgdoclen", 1000);	//... average document length passed as parameter
 		weighting.defineFeature( "match", "seek");	//... we search for features of the set we call 'seek'
-		queryEval.addWeightingFunction( "BM25", weighting);
+		queryEval.addWeightingFunction( "BM25", weighting, "");
 	
 		// Now we define what attributes of the documents are returned and how they are build.
 		// The functions that extract stuff from documents for presentation are called summarizers.
 		// First we add a summarizer that extracts us the title of the document:
 		SummarizerConfig sum_title = new SummarizerConfig();
 		sum_title.defineParameter( "name", "title");
-		queryEval.addSummarizer( "attribute", sum_title);
+		queryEval.addSummarizer( "attribute", sum_title, "");
 	
 		// Then we add a summarizer that collects the sections that enclose the best matches 
 		// in a ranked document:
@@ -72,7 +72,7 @@ public class QueryNoAnalyzer
 		sum_match.defineParameter( "sentencesize", 40);
 		sum_match.defineParameter( "windowsize", 30);
 		sum_match.defineFeature( "match", "seek");
-		queryEval.addSummarizer( "matchphrase", sum_match);
+		queryEval.addSummarizer( "matchphrase", sum_match, "");
 
 		// Now we are done:
 		return queryEval;

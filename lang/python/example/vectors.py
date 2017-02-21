@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
 import strus
-from os import walk
+import os
+from testCollection import createCollection
 
-config="path=vsm;dim=7;bit=3;var=32;maxdist=5;probsim=yes;simdist=5;probdist=8;raddist=5;eqdist=1;singletons=yes"
+storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
+config="path=%s;dim=7;bit=3;var=32;maxdist=5;probsim=yes;simdist=5;probdist=8;raddist=5;eqdist=1;singletons=yes" % (storagePath)
+
 ctx = strus.Context()
 ctx.loadModule( "storage_vector_std")
 

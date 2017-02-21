@@ -1,8 +1,14 @@
 #!/usr/bin/python
 
 import strus
+import os
+from testCollection import createCollection
 
-config = "path=storage"
+createCollection()
+
+storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
+config = "path=%s" % (storagePath)
+
 ctx = strus.Context()
 storage = ctx.createStorageClient( config)
 # Query the number of documents inserted:

@@ -58,6 +58,7 @@ lang/php/php.ini
 tests/query_cpp/src/testBindingsQuery
 lang/java/net/strus/example/*.class
 lang/java/net/strus/api/*.class
+*.pyc
 
 # Generated test data
 tests/query_cpp/storage/

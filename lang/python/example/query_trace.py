@@ -1,11 +1,15 @@
 #!/usr/bin/python
 
 import strus
-from os import walk
+import os
+from testCollection import createCollection
 
 queryphrase = "city"
+createCollection()
 
-config = "path=storage"
+storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
+config = "path=%s" % (storagePath)
+
 ctx = strus.Context( 0, "log=dump;file=stdout" )
 
 try:
