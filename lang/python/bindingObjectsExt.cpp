@@ -546,6 +546,24 @@ void QueryEval::addSummarizer_obj(
 	}
 }
 
+void QueryEval::addSummarizer_obj_debug(
+	const String& name,
+	const FunctionObject& config_,
+	const String& debugAttributeName)
+{
+	boost::python::extract<SummarizerConfig> config(config_);
+	if (config.check())
+	{
+		addSummarizer( name, (const SummarizerConfig&)config, debugAttributeName);
+	}
+	else
+	{
+		SummarizerConfig config;
+		initSummarizerConfig( config, config_.ptr());
+		addSummarizer( name, config, debugAttributeName);
+	}
+}
+
 void QueryEval::addWeightingFunction_obj(
 	const String& name,
 	const FunctionObject& config_)
@@ -560,6 +578,24 @@ void QueryEval::addWeightingFunction_obj(
 		WeightingConfig config;
 		initWeightingConfig( config, config_.ptr());
 		addWeightingFunction( name, config);
+	}
+}
+
+void QueryEval::addWeightingFunction_obj_debug(
+	const String& name,
+	const FunctionObject& config_,
+	const String& debugAttributeName)
+{
+	boost::python::extract<WeightingConfig> config(config_);
+	if (config.check())
+	{
+		addWeightingFunction( name, (const WeightingConfig&)config, debugAttributeName);
+	}
+	else
+	{
+		WeightingConfig config;
+		initWeightingConfig( config, config_.ptr());
+		addWeightingFunction( name, config, debugAttributeName);
 	}
 }
 

@@ -2070,7 +2070,8 @@ void QueryEval::addExclusionFeature( const std::string& set_)
 
 void QueryEval::addSummarizer(
 		const std::string& name,
-		const SummarizerConfig& config)
+		const SummarizerConfig& config,
+		const std::string& debugAttributeName)
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
@@ -2110,13 +2111,14 @@ void QueryEval::addSummarizer(
 	{
 		function->defineResultName( ri->first, ri->second);
 	}
-	queryeval->addSummarizerFunction( name, function.get(), featureParameters);
+	queryeval->addSummarizerFunction( name, function.get(), featureParameters, debugAttributeName);
 	function.release();
 }
 
 void QueryEval::addWeightingFunction(
 		const std::string& name,
-		const WeightingConfig& config)
+		const WeightingConfig& config,
+		const std::string& debugAttributeName)
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
@@ -2150,7 +2152,7 @@ void QueryEval::addWeightingFunction(
 	{
 		featureParameters.push_back( FeatureParameter( fi->first, fi->second));
 	}
-	queryeval->addWeightingFunction( name, function.get(), featureParameters);
+	queryeval->addWeightingFunction( name, function.get(), featureParameters, debugAttributeName);
 	function.release();
 }
 
@@ -2467,6 +2469,12 @@ void Query::setWeightingVariables(
 	{
 		THIS->setWeightingVariableValue( vi->first, vi->second);
 	}
+}
+
+void Query::setDebugMode( bool debug)
+{
+	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
+	THIS->setDebugMode( debug);
 }
 
 QueryResult Query::evaluate() const

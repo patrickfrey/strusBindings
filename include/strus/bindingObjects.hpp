@@ -2063,12 +2063,17 @@ public:
 	/// \param[in] config the configuration of the summarizer to add
 	void addSummarizer(
 			const String& name,
-			const SummarizerConfig& config);
+			const SummarizerConfig& config,
+			const String& debugAttributeName=std::string());
 
 #ifdef STRUS_BOOST_PYTHON
 	void addSummarizer_obj(
 			const String& name,
 			const FunctionObject& config_);
+	void addSummarizer_obj_debug(
+			const String& name,
+			const FunctionObject& config,
+			const String& debugAttributeName);
 #endif
 
 	/// \brief Add a weighting function to use as summand of the total document weight
@@ -2076,12 +2081,17 @@ public:
 	/// \param[in] config the configuration of the function to add
 	void addWeightingFunction(
 			const String& name,
-			const WeightingConfig& config);
+			const WeightingConfig& config,
+			const String& debugAttributeName=std::string());
 
 #ifdef STRUS_BOOST_PYTHON
 	void addWeightingFunction_obj(
 			const String& name,
-			const FunctionObject& config_);
+			const FunctionObject& config);
+	void addWeightingFunction_obj_debug(
+			const String& name,
+			const FunctionObject& config,
+			const String& debugAttributeName);
 #endif
 	/// \brief Add a weighting formula to use for calculating the total weight from the weighting function results
 	/// \param[in] defaultParameter default parameter values
@@ -2562,6 +2572,10 @@ public:
 	void setWeightingVariables_obj(
 			const FunctionObject& parameter_);
 #endif
+	/// \brief Switch on debug mode that creates debug info of query evaluation methods and summarization as attributes of the query result
+	/// \param[in] debug true if switched on, false if switched off (default off)
+	/// \note Debug attributes are specified in the declaration of summarizers and weighting functions (3rd parameter of QueryEval::addSummarizer and QueryEval::addWeightingFunction)
+	void setDebugMode( bool debug);
 
 	/// \brief Evaluate this query and return the result
 	/// \return the result
