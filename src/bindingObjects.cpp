@@ -362,7 +362,13 @@ DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference
 	,m_textproc(textproc_)
 {
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::SegmenterInterface* segmenter = objBuilder->getSegmenter( segmentername);
+	const strus::TextProcessorInterface* textproc = (const strus::TextProcessorInterface*)m_textproc;
+	const strus::SegmenterInterface* segmenter = textproc->getSegmenterByName( segmentername);
+	if (!segmenter)
+	{
+		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		throw strus::runtime_error( _TXT("failed to get document document segmenter by name: %s"), errorhnd->fetchError());
+	}
 	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmenter));
 	if (!m_analyzer_impl.get())
 	{
