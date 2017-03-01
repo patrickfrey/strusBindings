@@ -4,7 +4,7 @@ import strus
 import os
 from testCollection import createCollection
 
-queryphrase = "city"
+queryphrase = "New York dimensions imagine"
 createCollection()
 
 storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
@@ -33,9 +33,9 @@ try:
 	queryEval.addWeightingFunction( "BM25pff", {
 							"k1": 1.2, "b": 0.75, "avgdoclen": 1000,
 							"metadata_doclen": "doclen",
-							"titleinc": 4.0, "windowsize": 40, 'cardinality': 2,
-							"ffbase": 0.4, "fftie": 20,
-							"proxffbias": 0.3, "proxfftie": 30, "maxdf": 0.2,
+							"titleinc": 4.0, "windowsize": 40, 'cardinality': "70%",
+							"ffbase": 0.4,
+							"maxdf": 0.9,
 							".para": "para", ".struct": "sentence", ".match": "seek",
 							".title": "titlefield"
 						}, "debug_BM25pff")
@@ -51,7 +51,7 @@ try:
 					(("type","orig"),
 					("sentencesize",40),
 					("windowsize",30),
-					(".match","seek")),
+					(".match","seek"),(".title","titlefield")),
 				"debug_matchphrase")
 
 	# Now we build the query to issue:
