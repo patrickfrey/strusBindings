@@ -3,6 +3,9 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # SOURCES AND INCLUDES
 # --------------------------------------
+# Subdirectories:
+add_subdirectory( filter )
+
 set( source_files
 	bindingObjects.cpp
 	utils.cpp

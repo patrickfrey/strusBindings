@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Patrick P. Frey
+ * Copyright (c) 2014 Patrick P. Frey
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,9 +7,576 @@
  */
 #ifndef _STRUS_BINDING_OBJECTS_HPP_INCLUDED
 #define _STRUS_BINDING_OBJECTS_HPP_INCLUDED
-#include "strus/bindingLanguageInterface.hpp"
-#include "strus/bindingFilterInterface.hpp"
+#include <limits>
+#include <string>
+#include <vector>
+#include <map>
+#include <cstring>
+#include <stdexcept>
 #include <boost/shared_ptr.hpp>
+
+#ifdef DOXYGEN_LANG
+#include "swig.hpp"
+// ... doxygen needs this for creating alternative interface descriptions for different languages
+#if defined DOXYGEN_JAVA
+namespace net {
+namespace strus {
+namespace api {
+#elif defined DOXYGEN_PYTHON
+namespace strus {
+#endif
+#elif (defined STRUS_BOOST_PYTHON)
+typedef boost::python::api::object FunctionObject;
+typedef boost::python::api::object DataBlob;
+typedef boost::python::api::object StringObject;
+typedef std::string String;
+typedef std::wstring WString;
+typedef std::vector<int> IndexVector;
+typedef std::vector<double> FloatVector;
+typedef std::vector<std::string> StringVector;
+#else
+#define String std::string
+#define WString std::wstring
+#define IndexVector std::vector<int>
+#define StringVector std::vector<std::string>
+#define FloatVector std::vector<double>
+#if !defined DOXYGEN_PHP && !defined DOXYGEN_PYTHON
+#define NormalizerVector std::vector<Normalizer>
+#endif
+#define TermVector std::vector<Term>
+#define QueryTermVector std::vector<QueryTerm>
+#define RankVector std::vector<Rank>
+#define VecRankVector std::vector<VecRank>
+#define SummaryElementVector std::vector<SummaryElement>
+#define AttributeVector std::vector<Attribute>
+#define MetaDataVector std::vector<MetaData>
+#define DocumentFrequencyChangeVector std::vector<DocumentFrequencyChange> 
+#endif
+typedef int Index;
+typedef long GlobalCounter;
+
+#ifndef DOXYGEN_LANG
+/// \brief Reference to an object used for making objects independent and save from garbage collecting in an interpreter context
+class Reference
+{
+public:
+#ifdef STRUS_BOOST_PYTHON
+	/// \brief Empty constructor needed for Boost Python to work. Do not use this constructor !
+	Reference()
+		:m_deleter(0){}
+#endif
+	typedef void (*Deleter)( void* obj);
+
+	/// \brief Default constructor
+	explicit Reference( Deleter deleter_)
+		:m_ptr(),m_deleter(deleter_){}
+
+	/// \brief Copy constructor
+	Reference( const Reference& o)
+		:m_ptr(o.m_ptr),m_deleter(o.m_deleter){}
+
+	/// \brief Destructor
+	~Reference(){}
+
+	void reset( void* obj_=0)
+	{
+		m_ptr.reset( obj_, m_deleter);
+	}
+
+	/// \brief Assignment operator
+	Reference& operator = (const Reference& o)
+	{
+		m_ptr = o.m_ptr;
+		m_deleter = o.m_deleter;
+		return *this;
+	}
+
+	/// \brief Object access as function
+	const void* get() const				{return m_ptr.get();}
+	/// \brief Object access as function
+	void* get()					{return m_ptr.get();}
+
+private:
+	boost::shared_ptr<void> m_ptr;
+	void (*m_deleter)( void* obj);
+};
+#endif
+
+
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief Object epresenting a configuration of a tokenizer as single string naming a tokenizer without arguments or a tuple of strings consisting of the tokenizer name followed by the arguments
+#error DOXYGEN_PYTHON
+class Tokenizer
+{
+};
+#else
+/// \brief Object representing a tokenizer function definition
+class Tokenizer
+{
+public:
+	Tokenizer(){}
+	Tokenizer( const Tokenizer& o)
+		:m_name(o.m_name),m_arguments(o.m_arguments){}
+	Tokenizer( const String& name_, const StringVector& arg_)
+		:m_name(name_),m_arguments(arg_){}
+	Tokenizer( const String& name_, const String& arg_)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg_);
+	}
+	Tokenizer( const String& name_, const String& arg1_, const String& arg2_)
+		:m_name(name_),m_arguments()
+	{
+		m_arguments.push_back( arg1_);
+		m_arguments.push_back( arg2_);
+	}
+	Tokenizer( const String& name_)
+		:m_name(name_),m_arguments(){}
+
+	const String& name() const				{return m_name;}
+	const StringVector& arguments() const			{return m_arguments;}
+
+	void setName( const String& name_)			{m_name = name_;}
+	void addArgument( const String& arg_)			{m_arguments.push_back( arg_);}
+	void addArgumentInt( long arg_);
+	void addArgumentFloat( double arg_);
+
+private:
+	std::string m_name;
+	std::vector<std::string> m_arguments;
+};
+#endif
+
+
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief Object representing a configuration of a normalizer as single string naming a normalizer without arguments or a tuple of strings consisting of the normalizer name followed by the arguments
+class Normalizer
+{
+};
+#else
+/// \brief Object representing a normalizer function definition
+class Normalizer
+{
+public:
+	Normalizer(){}
+	Normalizer( const Normalizer& o)
+		:m_name(o.m_name),m_arguments(o.m_arguments){}
+	Normalizer( const String& name_, const StringVector& arg_)
+		:m_name(name_),m_arguments(arg_){}
+	Normalizer( const String& name_, const String& arg_)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg_);
+	}
+	Normalizer( const String& name_, const String& arg1_, const String& arg2_)
+		:m_name(name_),m_arguments()
+	{
+		m_arguments.push_back( arg1_);
+		m_arguments.push_back( arg2_);
+	}
+	Normalizer( const String& name_)
+		:m_name(name_),m_arguments(){}
+
+	~Normalizer(){}
+
+	const String& name() const			{return m_name;}
+	const StringVector& arguments() const		{return m_arguments;}
+
+	void setName( const String& name_)		{m_name = name_;}
+	void addArgument( const String& arg_)		{m_arguments.push_back( arg_);}
+	void addArgumentInt( long arg_);
+	void addArgumentFloat( double arg_);
+
+private:
+	friend class QueryAnalyzer;
+	friend class DocumentAnalyzer;
+
+	std::string m_name;
+	std::vector<std::string> m_arguments;
+};
+#endif
+
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Normalizer> NormalizerVector;
+#endif
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief A sequence of normalizer definitions represented as single string naming a normalizer without arguments or list of strings tuples consisting of the normalizer name followed by the arguments
+class NormalizerVector
+{
+};
+#endif
+
+#if defined DOXYGEN_PHP || defined DOXYGEN_PYTHON
+/// \brief Object representing a configuration of an aggregator function as single string naming an aggregator without arguments or a tuple of strings consisting of the aggregator name followed by the arguments
+class Aggregator
+{
+};
+#else
+/// \brief Object representing a aggregator function definition
+class Aggregator
+{
+public:
+	/// \brief Default constructor
+	Aggregator(){}
+	/// \brief Copy constructor
+	Aggregator( const Aggregator& o)
+		:m_name(o.m_name),m_arguments(o.m_arguments){}
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	/// \param[in] arg_ arguments of the aggregator function
+	Aggregator( const String& name_, const StringVector& arg_)
+		:m_name(name_),m_arguments(arg_){}
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	/// \param[in] arg_ single argument of the aggregator function
+	Aggregator( const String& name_, const String& arg_)
+		:m_name(name_)
+	{
+		m_arguments.push_back( arg_);
+	}
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	/// \param[in] arg1_ first argument of the aggregator function
+	/// \param[in] arg2_ second argument of the aggregator function
+	Aggregator( const String& name_, const String& arg1_, const String& arg2_)
+		:m_name(name_),m_arguments()
+	{
+		m_arguments.push_back( arg1_);
+		m_arguments.push_back( arg2_);
+	}
+	/// \brief Constructor
+	/// \param[in] name_ name of the aggregator function
+	Aggregator( const String& name_)
+		:m_name(name_),m_arguments(){}
+
+	/// \brief Destructor
+	~Aggregator(){}
+
+	/// \brief Get the name of the aggregator function
+	/// \return the name
+	const String& name() const			{return m_name;}
+	/// \brief Get the arguments of the aggregator function
+	/// \return the arguments
+	const StringVector& arguments() const		{return m_arguments;}
+
+	/// \brief Set the name of the aggregator function
+	/// \param[in] name_ the name
+	void setName( const String& name_)		{m_name = name_;}
+	/// \brief Add an argument to the aggregator function
+	/// \param[in] arg_ the argument to add
+	void addArgument( const String& arg_)		{m_arguments.push_back( arg_);}
+	/// \brief Add a numeric argument to the aggregator function
+	/// \param[in] arg_ the argument to add
+	void addArgumentInt( long arg_);
+	/// \brief Add a numeric argument to the aggregator function
+	/// \param[in] arg_ the argument to add
+	void addArgumentFloat( double arg_);
+
+private:
+	friend class DocumentAnalyzer;
+
+	std::string m_name;
+	std::vector<std::string> m_arguments;
+};
+#endif
+
+#if defined DOXYGEN_LANG
+/// \brief Object representing a string or a numeric value of the binding language
+class Variant
+{
+};
+#else
+/// \brief Enumeration for defining internal variant representation
+enum VariantType
+{
+	Variant_UNDEFINED,
+	Variant_UINT,
+	Variant_INT,
+	Variant_FLOAT,
+	Variant_TEXT
+};
+
+/// \brief Union for internal variant value representation
+union VariantValue
+{
+	unsigned int UINT;
+	int INT;
+	double FLOAT;
+	const char* TEXT;
+};
+
+/// \brief Variant type for passing parameter values of arbitrary type
+class Variant
+{
+public:
+	/// \brief Default constructor
+	Variant();
+	/// \brief Copy constructor
+	Variant( const Variant& o);
+	/// \brief Constructor from a nonnegative integer
+	Variant( unsigned int v);
+	/// \brief Constructor from an integer
+	Variant( int v);
+	/// \brief Constructor from a floating point number
+	Variant( double v);
+	/// \brief Constructor from a string
+	Variant( const String& v);
+	/// \brief Constructor from a string pointer
+	Variant( const char* v);
+
+	/// \brief Check if the variant is defined (not NULL)
+	/// \return true, if yes, false if not
+	bool defined() const				{return m_type != Variant_UNDEFINED;}
+	/// \brief Get the type of the variant 
+	/// \return the type
+	VariantType type() const			{return m_type;}
+	/// \brief Get the value of the variant as nonnegative integer
+	/// \return the value
+	unsigned long getUInt() const;
+	/// \brief Get the value of the variant as integer
+	/// \return the value
+	long getInt() const;
+	/// \brief Get the value of the variant as floating point number
+	/// \return the value
+	double getFloat() const;
+	/// \brief Get the value of the variant as pointer to a string
+	/// \return the value
+	const char* getText() const;
+
+	/// \brief Initialize this value as undefined (NULL)
+	void init();
+	/// \brief Assign a value to this variant
+	/// \param[in] o the value to assign
+	void assign( const Variant& o);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
+	void assignUint( unsigned long v);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
+	void assignInt( long v);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
+	void assignFloat( double v);
+	/// \brief Assign a value to this variant
+	/// \param[in] v the value to assign
+	void assignText( const String& v);
+
+	Variant& operator=( const Variant& o)
+	{
+		assign( o);
+		return *this;
+	}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Variant& o) const
+	{
+		return isEqual( o);
+	}
+	bool operator!=( const Variant& o) const
+	{
+		return !isEqual( o);
+	}
+#endif
+private:
+	bool isEqual( const Variant& o) const;
+
+private:
+	friend class Storage;
+	friend class Summarizer;
+	friend class WeightingFunction;
+	friend class QueryEval;
+	friend class DocumentAnalyzer;
+	VariantType m_type;
+	VariantValue m_value;
+	std::string m_buf;
+};
+#endif
+
+
+/// \brief One typed term occurrence in a document or a query
+class Term
+{
+public:
+	/// \brief Constructor
+	Term( const String& type_, const String& value_, const Index& position_, const Index& length_)
+		:m_type(type_),m_value(value_),m_position(position_),m_length(length_){}
+	/// \brief Copy constructor
+	Term( const Term& o)
+		:m_type(o.m_type),m_value(o.m_value),m_position(o.m_position),m_length(o.m_length){}
+	/// \brief Default constructor
+	Term()
+		:m_position(0),m_length(0){}
+
+	/// \brief Get the term type name
+	const String& type() const			{return m_type;}
+	/// \brief Get the term value
+	const String& value() const			{return m_value;}
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+#endif
+	/// \brief Get the term position
+	Index position() const				{return m_position;}
+	/// \brief Get the term length
+	Index length() const				{return m_length;}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Term& o) const
+	{
+		return m_type == o.m_type && m_value == o.m_value && m_position == o.m_position && m_length == o.m_length;
+	}
+	bool operator!=( const Term& o) const
+	{
+		return m_type != o.m_type || m_value != o.m_value || m_position != o.m_position || m_length != o.m_length;
+	}
+#endif
+#ifndef SWIG
+	bool operator < (const Term& o) const;
+#endif
+private:
+	std::string m_type;
+	std::string m_value;
+	Index m_position;
+	Index m_length;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Term> TermVector;
+#endif
+
+
+/// \brief Data object that represents single numeric property of a document that
+///	can be subject of retrieval or act as search restriction.
+class MetaData
+{
+public:
+	/// \brief Constructor
+	MetaData( const String& name_, const Variant& value_)
+		:m_name(name_),m_value(value_){}
+	/// \brief Copy constructor
+	MetaData( const MetaData& o)
+		:m_name(o.m_name),m_value(o.m_value){}
+	/// \brief Default constructor
+	MetaData()
+		:m_name(0),m_value(){}
+
+	/// \brief Get the type name of this meta data field:
+	const String& name() const			{return m_name;}
+	/// \brief Get the value of this meta data field:
+	double value() const				{return m_value.getFloat();}
+
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const MetaData& o) const
+	{
+		return (m_name == o.m_name && m_value == o.m_value);
+	}
+	bool operator!=( const MetaData& o) const
+	{
+		return (m_name != o.m_name || m_value != o.m_value);
+	}
+#endif
+private:
+	std::string m_name;
+	Variant m_value;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<MetaData> MetaDataVector;
+#endif
+
+
+/// \brief Data object that describes a single property of a document
+///	that is not subject of retrieval. It acts as description of the
+///	document that can be shown as a result of retrieval.
+class Attribute
+{
+public:
+	/// \brief Constructor
+	Attribute( const String& name_, const String& value_)
+		:m_name(name_),m_value(value_){}
+	/// \brief Constructor
+	Attribute( const Attribute& o)
+		:m_name(o.m_name),m_value(o.m_value){}
+	/// \brief Constructor
+	Attribute()
+		:m_name(0){}
+
+	/// \brief Get the unique type name of this attribute
+	const String& name() const		{return m_name;}
+	/// \brief Get the type value of this attribute
+	const String& value() const		{return m_value;}
+
+#if defined STRUS_BOOST_PYTHON || defined DOXYGEN_PYTHON
+	WString ucvalue() const;
+#endif
+	
+#ifdef STRUS_BOOST_PYTHON
+	bool operator==( const Attribute& o) const
+	{
+		return m_name == o.m_name && m_value == o.m_value;
+	}
+	bool operator!=( const Attribute& o) const
+	{
+		return m_name != o.m_name || m_value != o.m_value;
+	}
+#endif
+private:
+	std::string m_name;
+	std::string m_value;
+};
+#ifdef STRUS_BOOST_PYTHON
+typedef std::vector<Attribute> AttributeVector;
+#endif
+
+
+/// \brief Defines a description of the properties of a document content processed by the analyzer
+class DocumentClass
+{
+public:
+	/// \brief Default constructor
+	DocumentClass(){}
+	/// \brief Constructor
+	explicit DocumentClass(
+			const String& mimeType_)	:m_mimeType(mimeType_){}
+	/// \brief Constructor
+	DocumentClass(
+			const String& mimeType_,
+			const String& encoding_)	:m_mimeType(mimeType_),m_encoding(encoding_){}
+	/// \brief Constructor
+	DocumentClass(
+			const String& mimeType_,
+			const String& encoding_,
+			const String& scheme_)		:m_mimeType(mimeType_),m_scheme(scheme_),m_encoding(encoding_){}
+	/// \brief Copy constructor
+	DocumentClass( const DocumentClass& o)		:m_mimeType(o.m_mimeType),m_scheme(o.m_scheme),m_encoding(o.m_encoding){}
+
+	/// \brief Check if this document class is valid
+	/// \return true, if yes
+	bool valid() const				{return !m_mimeType.empty();}
+
+	/// \brief Set the MIME type of the document class
+	/// \param[in] mimeType_ the document MIME type string
+	void setMimeType( const String& mimeType_)	{m_mimeType = mimeType_;}
+	/// \brief Set the scheme identifier of the document class
+	/// \param[in] scheme_ the document scheme identifier
+	void setScheme( const String& scheme_)		{m_scheme = scheme_;}
+	/// \brief Set the character set encoding of the document class
+	/// \param[in] encoding_ the character set encoding as string
+	void setEncoding( const String& encoding_)	{m_encoding = encoding_;}
+
+	/// \brief Get the MIME type of the document class
+	/// \return the document MIME type string
+	const String& mimeType() const			{return m_mimeType;}
+	/// \brief Get the scheme identifier of the document class
+	/// \return the document scheme identifier
+	const String& scheme() const			{return m_scheme;}
+	/// \brief Get the character set encoding of the document class
+	/// \return the character set encoding string
+	const String& encoding() const			{return m_encoding;}
+
+private:
+	std::string m_mimeType;
+	std::string m_scheme;
+	std::string m_encoding;
+};
+
 
 /// \brief Document object representing one item of retrieval. A document can be
 ///	manually composed of its sub parts or it can be the result of an analyzer run.
@@ -98,7 +665,12 @@ public:
 	const String& docid() const				{return m_docid;}
 
 private:
-	analyzer::Document m_doc;
+	std::vector<Term> m_searchIndexTerms;
+	std::vector<Term> m_forwardIndexTerms;
+	std::vector<MetaData> m_metaData;
+	std::vector<Attribute> m_attributes;
+	std::vector<std::string> m_users;
+	std::string m_docid;
 };
 
 
