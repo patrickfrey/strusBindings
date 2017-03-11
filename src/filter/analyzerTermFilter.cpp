@@ -5,45 +5,224 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Iterator on the structure of an analyzer term created as result of a document analysis
 /// \file analyzerTermFilter.cpp
 #include "analyzerTermFilter.hpp"
 
 using namespace strus;
-static const char* g_element_names[] = {"type", "value", "pos", "len", 0 };
-static const filter::StructElementArray g_elements( g_element_names);
 
-enum State {
-	StateType,
-	StateValue,
-	StatePos,
-	StateLen,
-	StateEnd
+static const char* g_element_names[] = {"type", "value", "pos", "len", 0 };
+static const filter::StructElementArray g_struct_elements( g_element_names);
+
+enum TermState {
+	StateEnd,
+	StateTypeOpen,
+	StateTypeValue,
+	StateTypeClose,
+	StateValueOpen,
+	StateValueValue,
+	StateValueClose,
+	StatePosOpen,
+	StatePosValue,
+	StatePosClose,
+	StateLenOpen,
+	StateLenValue,
+	StateLenClose,
+	StateEndOpen,
+	StateEndValue,
+	StateEndClose
 };
 
-binding::ValueVariant AnalyzerTermAccess::get( unsigned int state, const analyzer::Term& term)
+enum TermArrayState {
+	StateArrayEnd,
+	StateArrayIndex,
+	StateArrayTypeOpen,
+	StateArrayTypeValue,
+	StateArrayTypeClose,
+	StateArrayValueOpen,
+	StateArrayValueValue,
+	StateArrayValueClose,
+	StateArrayPosOpen,
+	StateArrayPosValue,
+	StateArrayPosClose,
+	StateArrayLenOpen,
+	StateArrayLenValue,
+	StateArrayLenClose,
+	StateArrayEndOpen,
+	StateArrayEndValue,
+	StateArrayEndClose
+};
+
+#define _OPEN	BindingFilterInterface::Open
+#define _CLOSE	BindingFilterInterface::Close
+#define _INDEX	BindingFilterInterface::Index
+#define _VALUE	BindingFilterInterface::Value
+#define _NULL	filter::StateTable::NullValue
+#define _TAG	filter::StateTable::TagValue
+#define _ELEM	filter::StateTable::ElementValue
+
+
+// Element: index, nextState, skipState, valueType, tableIndex, valueIndex
+static const filter::StateTable::Element g_struct_statetable[] = {
+	{StateEnd,		_CLOSE, StateEnd,		StateEnd,		_NULL,	 0, 0},
+	{StateTypeOpen,		_OPEN,  StateTypeValue,		StateValueOpen,		_TAG,	 0, 0},
+	{StateTypeValue,	_VALUE, StateTypeClose,		StateValueOpen,		_ELEM,	 0, 0},
+	{StateTypeClose,	_CLOSE, StateValueOpen,		StateValueOpen,		_NULL,	 0, 0},
+	{StateValueOpen,	_OPEN,  StateValueValue,	StatePosOpen,		_TAG,	 0, 1},
+	{StateValueValue,	_VALUE, StateValueClose,	StatePosOpen,		_ELEM,	 0, 1},
+	{StateValueClose,	_CLOSE, StatePosOpen,		StatePosOpen,		_NULL,	 0, 1},
+	{StatePosOpen,		_OPEN,  StatePosValue,		StateLenOpen,		_TAG,	 0, 2},
+	{StatePosValue,		_VALUE, StatePosClose,		StateLenOpen,		_ELEM,	 0, 2},
+	{StatePosClose,		_CLOSE, StateLenOpen,		StateLenOpen,		_NULL,	 0, 2},
+	{StateLenOpen,		_OPEN,  StateLenValue,		StateEnd,		_TAG,	 0, 3},
+	{StateLenValue,		_VALUE, StateLenClose,		StateEnd,		_ELEM,	 0, 3},
+	{StateLenClose,		_CLOSE, StateEnd,		StateEnd,		_NULL,	 0, 3},
+};
+
+static const filter::StateTable::Element g_array_statetable[] = {
+	{StateArrayEnd,		_CLOSE, StateArrayEnd,		StateArrayEnd,		_NULL,	 0, 0},
+	{StateArrayIndex,	_INDEX, StateArrayTypeOpen,	StateArrayIndex,	_TAG,	 1, 0},
+	{StateArrayTypeOpen,	_OPEN,  StateArrayTypeValue,	StateArrayValueOpen,	_TAG,	 0, 0},
+	{StateArrayTypeValue,	_VALUE, StateArrayTypeClose,	StateArrayValueOpen,	_ELEM,	 0, 0},
+	{StateArrayTypeClose,	_CLOSE, StateArrayValueOpen,	StateArrayValueOpen,	_NULL,	 0, 0},
+	{StateArrayValueOpen,	_OPEN,  StateArrayValueValue,	StateArrayPosOpen,	_TAG,	 0, 1},
+	{StateArrayValueValue,	_VALUE, StateArrayValueClose,	StateArrayPosOpen,	_ELEM,	 0, 1},
+	{StateArrayValueClose,	_CLOSE, StateArrayPosOpen,	StateArrayPosOpen,	_NULL,	 0, 1},
+	{StateArrayPosOpen,	_OPEN,  StateArrayPosValue,	StateArrayLenOpen,	_TAG,	 0, 2},
+	{StateArrayPosValue,	_VALUE, StateArrayPosClose,	StateArrayLenOpen,	_ELEM,	 0, 2},
+	{StateArrayPosClose,	_CLOSE, StateArrayLenOpen,	StateArrayLenOpen,	_NULL,	 0, 2},
+	{StateArrayLenOpen,	_OPEN,  StateArrayLenValue,	StateArrayIndex,	_TAG,	 0, 3},
+	{StateArrayLenValue,	_VALUE, StateArrayLenClose,	StateArrayIndex,	_ELEM,	 0, 3},
+	{StateArrayLenClose,	_CLOSE, StateArrayIndex,	StateArrayIndex,	_NULL,	 0, 3},
+};
+
+AnalyzerTermFilter::AnalyzerTermFilter()
+	:m_impl(0),m_ownership(0),m_state(0){}
+
+AnalyzerTermFilter::AnalyzerTermFilter( const AnalyzerTermFilter& o)
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
+
+AnalyzerTermFilter::AnalyzerTermFilter( const analyzer::Term* impl)
+	:m_impl(impl),m_ownership(0),m_state(1){}
+
+AnalyzerTermFilter::AnalyzerTermFilter( analyzer::Term* impl, bool withOwnership)
+	:m_impl(impl),m_ownership(impl),m_state(1){}
+
+AnalyzerTermFilter::~AnalyzerTermFilter()
 {
-	switch ((State)state)
+	if (m_ownership) delete( m_ownership);
+}
+
+static binding::ValueVariant getElementValue( const analyzer::Term& elem, int valueIndex)
+{
+	switch (valueIndex)
 	{
-		case StateType:
-			return binding::ValueVariant( term.type().c_str(), term.type().size());
-		case StateValue:
-			return binding::ValueVariant( term.value().c_str(), term.type().size());
-		case StatePos:
-			return binding::ValueVariant( (binding::ValueVariant::UIntType)term.pos());
-		case StateLen:
-			return binding::ValueVariant( (binding::ValueVariant::UIntType)term.len());
-		case StateEnd:
-			break;
+		case 0:
+			return binding::ValueVariant( elem.type().c_str(), elem.type().size());
+		case 1:
+			return binding::ValueVariant( elem.value().c_str(), elem.type().size());
+		case 2:
+			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.pos());
+		case 3:
+			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.len());
 	}
 	return binding::ValueVariant();
 }
 
-AnalyzerTermFilter::AnalyzerTermFilter( const analyzer::Term* impl)
-	:Parent( impl, g_elements){}
+BindingFilterInterface::Tag AnalyzerTermFilter::getNext( binding::ValueVariant& val)
+{
+	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
+	Tag rt = st.tag;
+	if (!m_impl)
+	{
+		val.clear();
+		return rt;
+	}
+	switch (st.valueType)
+	{
+		case _NULL:
+			val.clear();
+			break;
+		case _TAG:
+			val = g_struct_elements[ st.valueIndex];
+			break;
+		case _ELEM:
+			val = getElementValue( *m_impl, st.valueIndex);
+			break;
+	}
+	m_state = st.nextState;
+	return rt;
+}
+
+void AnalyzerTermFilter::skip()
+{
+	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
+	m_state = st.skipState;
+}
+
+BindingFilterInterface* AnalyzerTermFilter::createCopy() const
+{
+	return new AnalyzerTermFilter(*this);
+}
+
+AnalyzerTermVectorFilter::AnalyzerTermVectorFilter()
+	:m_impl(0),m_ownership(0),m_state(0),m_index(0){}
+
+AnalyzerTermVectorFilter::AnalyzerTermVectorFilter( const AnalyzerTermVectorFilter& o)
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state),m_index(o.m_index){}
 
 AnalyzerTermVectorFilter::AnalyzerTermVectorFilter( const std::vector<analyzer::Term>* impl)
-	:Parent( impl, g_elements){}
+	:m_impl(impl),m_ownership(0),m_state(1),m_index(0){}
+
+AnalyzerTermVectorFilter::AnalyzerTermVectorFilter( std::vector<analyzer::Term>* impl, bool withOwnership)
+	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
+
+
+BindingFilterInterface::Tag AnalyzerTermVectorFilter::getNext( binding::ValueVariant& val)
+{
+	const filter::StateTable::Element& st = g_array_statetable[ m_state];
+	Tag rt = st.tag;
+	if (!m_impl || m_index >= m_impl->size())
+	{
+		val.clear();
+		return rt;
+	}
+
+	switch (st.valueType)
+	{
+		case _NULL:
+			val.clear();
+			break;
+		case _TAG:
+			val = g_struct_elements[ st.valueIndex];
+			break;
+		case _ELEM:
+			val = getElementValue( (*m_impl)[ m_index], st.valueIndex);
+			break;
+	}
+	m_state = st.nextState;
+	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
+	{
+		m_state = 1;
+		++m_index;
+	}
+	return rt;
+}
+
+void AnalyzerTermVectorFilter::skip()
+{
+	const filter::StateTable::Element& st = g_array_statetable[ m_state];
+	m_state = st.skipState;
+	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
+	{
+		m_state = 1;
+		++m_index;
+	}
+}
+
+BindingFilterInterface* AnalyzerTermVectorFilter::createCopy() const
+{
+	return new AnalyzerTermVectorFilter(*this);
+}
 
 
 

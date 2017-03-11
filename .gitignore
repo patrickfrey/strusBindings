@@ -55,6 +55,7 @@ dist/redhat/strusbindings.spec
 lang/php/php.ini
 
 # Compiled programs
+src/parser/strusBindingsGen
 tests/query_cpp/src/testBindingsQuery
 lang/java/net/strus/example/*.class
 lang/java/net/strus/api/*.class

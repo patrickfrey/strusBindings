@@ -4,11 +4,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # SOURCES AND INCLUDES
 # --------------------------------------
 set( source_files
-#	analyzerDocumentFilter.cpp
 	analyzerTermFilter.cpp
-	analyzerAttributeFilter.cpp
-	analyzerMetaDataFilter.cpp
-	templates/stateMachines.cpp
 )
 
 include_directories(

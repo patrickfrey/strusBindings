@@ -50,7 +50,7 @@ public:
 
 	/// \brief Create a copy of the current filter state
 	/// \return a copy of the current filter state
-	virtual BindingFilterInterface* createCopy( BindingFilterMem* mem) const=0;
+	virtual BindingFilterInterface* createCopy() const=0;
 };
 
 }//namespace

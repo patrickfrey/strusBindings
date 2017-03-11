@@ -7,13 +7,12 @@
  */
 #ifndef _STRUS_BINDING_ANALYZER_TERM_FILTER_HPP_INCLUDED
 #define _STRUS_BINDING_ANALYZER_TERM_FILTER_HPP_INCLUDED
-/// \brief Iterator on the structure of an analyzer document term created as result of a document analysis
 /// \file analyzerTermFilter.hpp
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/analyzer/term.hpp"
 #include "strus/reference.hpp"
-#include "templates/structFilter.hpp"
-#include "templates/structVectorFilter.hpp"
+#include "stateTable.hpp"
+#include "structElementArray.hpp"
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -23,32 +22,50 @@ struct AnalyzerTermAccess
 	static binding::ValueVariant get( unsigned int state, const analyzer::Term& st);
 };
 
-/// \brief Iterator on the structure of an analyzer document term created as result of a document analysis
 class AnalyzerTermFilter
-	:public StructFilter<analyzer::Term, AnalyzerTermAccess>
+	:public BindingFilterInterface
 {
 public:
-	typedef StructFilter<analyzer::Term, AnalyzerTermAccess> Parent;
-
-public:
-	AnalyzerTermFilter(){}
-	AnalyzerTermFilter( const AnalyzerTermFilter& o) :Parent(o){}
-
+	AnalyzerTermFilter();
+	AnalyzerTermFilter( const AnalyzerTermFilter& o);
 	explicit AnalyzerTermFilter( const analyzer::Term* impl);
+	AnalyzerTermFilter( analyzer::Term* impl, bool withOwnership);
+
+	virtual ~AnalyzerTermFilter();
+	virtual Tag getNext( binding::ValueVariant& val);
+
+	virtual void skip();
+
+	virtual BindingFilterInterface* createCopy() const;
+	
+private:
+	const analyzer::Term* m_impl;
+	analyzer::Term* m_ownership;
+	unsigned int m_state;
 };
 
-/// \brief Iterator on a vector of structures of analyzer document terms created as result of a document analysis
+
 class AnalyzerTermVectorFilter
-	:public StructVectorFilter<analyzer::Term, AnalyzerTermAccess>
+	:public BindingFilterInterface
 {
 public:
-	typedef StructVectorFilter<analyzer::Term, AnalyzerTermAccess> Parent;
-
-public:
-	AnalyzerTermVectorFilter(){}
+	AnalyzerTermVectorFilter();
 	AnalyzerTermVectorFilter( const AnalyzerTermVectorFilter& o);
-
 	explicit AnalyzerTermVectorFilter( const std::vector<analyzer::Term>* impl);
+	AnalyzerTermVectorFilter( std::vector<analyzer::Term>* impl, bool withOwnership);
+	virtual ~AnalyzerTermVectorFilter();
+
+	virtual Tag getNext( binding::ValueVariant& val);
+
+	virtual void skip();
+
+	virtual BindingFilterInterface* createCopy() const;
+
+private:
+	const std::vector<analyzer::Term>* m_impl;
+	std::vector<analyzer::Term>* m_ownership;
+	unsigned int m_state;
+	unsigned int m_index;
 };
 
 }//namespace
