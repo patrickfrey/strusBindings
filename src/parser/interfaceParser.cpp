@@ -798,8 +798,12 @@ void InterfacesDef::addSource( const std::string& source)
 	
 						if (endsWith( className, "Interface"))
 						{
-							std::string interfacename( className.c_str(),className.size()-9);
-							parseClass( interfacename, si, endClass-1);
+							std::string interfacename( className.c_str(),className.size()-9/*sizeof("Interface")*/);
+							parseClass( interfacename, true, si, endClass-1);
+						}
+						else
+						{
+							parseClass( className, false, si, endClass-1);
 						}
 						si = endClass;
 					}
@@ -841,7 +845,7 @@ static std::string guessMethodName( const char* si, const char* se)
 	return parseIdentifier( xi, se);
 }
 
-void InterfacesDef::parseClass( const std::string& className, char const*& si, const char* se)
+void InterfacesDef::parseClass( const std::string& className, bool isInterface, char const*& si, const char* se)
 {
 	ClassDef classDef( className);
 	while (si != se)
@@ -879,7 +883,29 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 			}
 			else if (ident == "class")
 			{
-				skipStructure( si, se);
+				char const* sn = si;
+				skipStructure( sn, se);
+				std::string subClassName( className);
+				if (isInterface) subClassName.append( "Interface");
+				subClassName.append( "::");
+				subClassName.append( parseIdentifier( si, sn));
+				skipSpacesAndComments( si, se);
+				if (si == se)
+				{
+					throw std::runtime_error("unexpected end of source after sub class name definition");
+				}
+				if (*si == ';') continue;
+				if (*si == '{')
+				{
+					char const* endClass = si++;
+					skipBrackets( endClass, sn, '{', '}');
+					parseClass( className, false, si, endClass-1);
+				}
+				skipSpacesAndComments( si, sn);
+				if (si != sn)
+				{
+					throw std::runtime_error("unexpected token after subclass definition");
+				}
 			}
 			else if (ident == "virtual")
 			{
@@ -945,7 +971,14 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 						++si;
 					}
 				}
-				classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst));
+				if (isInterface)
+				{
+					classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst));
+				}
+				else
+				{
+					
+				}
 			}
 		}
 		else

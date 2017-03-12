@@ -5,30 +5,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDING_HOST_OBJECT_REFERENCE_HPP_INCLUDED
-#define _STRUS_BINDING_HOST_OBJECT_REFERENCE_HPP_INCLUDED
+#ifndef _STRUS_BINDINGS_HOST_REFERENCE_HPP_INCLUDED
+#define _STRUS_BINDINGS_HOST_REFERENCE_HPP_INCLUDED
 /// \brief Reference to host object from the scripting language
 /// \file strus/binding/hostObjectReference.hpp
 #include <boost/shared_ptr.hpp>
 
 namespace strus {
-namespace binding {
+namespace bindings {
 
-class HostObjectReference
+class HostReference
 {
 public:
 	typedef void (*Deleter)( void* obj);
 
 	/// \brief Default constructor
-	explicit HostObjectReference( Deleter deleter_)
+	explicit HostReference( Deleter deleter_)
 		:m_ptr(),m_deleter(deleter_){}
 
 	/// \brief Copy constructor
-	HostObjectReference( const HostObjectReference& o)
+	HostReference( const HostReference& o)
 		:m_ptr(o.m_ptr),m_deleter(o.m_deleter){}
 
 	/// \brief Destructor
-	~HostObjectReference(){}
+	~HostReference(){}
 
 	void reset( void* obj_=0)
 	{
@@ -36,7 +36,7 @@ public:
 	}
 
 	/// \brief Assignment operator
-	HostObjectReference& operator = (const HostObjectReference& o)
+	HostReference& operator = (const HostReference& o)
 	{
 		m_ptr = o.m_ptr;
 		m_deleter = o.m_deleter;

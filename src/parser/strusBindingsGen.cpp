@@ -20,7 +20,7 @@
 #include <sstream>
 #include <cerrno>
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 
 /// \brief List of interface files parsed without path
 std::vector<std::string> g_inputFiles;

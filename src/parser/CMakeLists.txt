@@ -30,4 +30,10 @@ link_directories(
 add_executable( strusBindingsGen strusBindingsGen.cpp ${source_files} )
 target_link_libraries( strusBindingsGen strus_base ${CMAKE_DL_LIBS} ${Intl_LIBRARIES} )
 
+# ------------------------------
+# INSTALLATION
+# ------------------------------
+install( TARGETS strusBindingsGen
+           RUNTIME DESTINATION bin )
+
 

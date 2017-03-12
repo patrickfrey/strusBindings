@@ -135,6 +135,54 @@ private:
 	std::vector<MethodDef> m_methodar;
 };
 
+class StructDef
+{
+public:
+	StructDef( const std::string& id_, const std::string& origtype_)
+		:m_id(id_),m_origtype(origtype_),m_elements(){}
+	StructDef( const StructDef& o)
+		:m_id(o.m_id),m_origtype(o.m_origtype),m_elements(o.m_elements){}
+
+	class Element
+	{
+	public:
+		enum Type
+		{
+			Atomic,
+			Struct
+		};
+
+		Element( Type type_, const std::string& id_, const std::string& origtype_)
+			:m_type(type_),m_id(id_),m_origtype(origtype_){}
+		Element( const Element& o)
+			:m_type(o.m_type),m_id(o.m_id),m_origtype(o.m_origtype){}
+
+		Type type() const			{return m_type;}
+		const std::string& id() const		{return m_id;}
+		const std::string& origtype() const	{return m_origtype;}
+
+	private:
+		Type m_type;
+		std::string m_id;
+		std::string m_origtype;
+	};
+
+	void addElement( Type type_, const std::string& id_, const std::string& origtype_)
+	{
+		m_elements.push_back( Element( type_, id_, origtype_));
+	}
+
+	const std::string& id() const			{return m_id;}
+	const std::string& origtype() const		{return m_origtype;}
+	const std::vector<Element>& elements() const	{return m_elements;}
+
+private:
+	std::string m_id;
+	std::string m_origtype;
+	std::vector<Element> m_elements;
+};
+
+
 class InterfacesDef
 {
 public:
@@ -152,7 +200,12 @@ public:
 	std::string tostring() const;
 
 private:
-	void parseClass( const std::string& className, char const*& si, const char* se);
+	void addStructDef( const StructDef& def)
+	{
+		m_structdefar.push_back( def);
+	}
+
+	void parseClass( const std::string& className, bool isInterface, char const*& si, const char* se);
 	std::vector<VariableValue> parseParameters(
 			const std::string& scope_class,
 			const std::string& scope_method,
@@ -161,6 +214,7 @@ private:
 private:
 	const TypeSystem* m_typeSystem;
 	std::vector<ClassDef> m_classdefar;
+	std::vector<StructDef> m_structdefar;
 };
 } //namespace
 #endif

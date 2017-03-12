@@ -2174,7 +2174,7 @@ void QueryEval::addWeightingFormula( const std::string& source, const FunctionVa
 	{
 		throw strus::runtime_error(_TXT( "failed to create scalar function (weighting formula) from source: %s"), errorhnd->fetchError());
 	}
-	std::map<std::string,double>::const_iterator
+	std::map<std::pair<std::string,double> >::const_iterator
 		vi = defaultParameter.m_variables.begin(),
 		ve = defaultParameter.m_variables.end();
 	for (; vi != ve; ++vi)
@@ -2468,7 +2468,7 @@ void Query::setWeightingVariables(
 		const FunctionVariableConfig& parameter)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	std::map<std::string,double>::const_iterator
+	std::map<std::pair<std::string,double> >::const_iterator
 		vi = parameter.m_variables.begin(),
 		ve = parameter.m_variables.end();
 	for (; vi != ve; ++vi)
