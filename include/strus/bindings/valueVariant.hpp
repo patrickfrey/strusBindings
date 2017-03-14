@@ -37,15 +37,15 @@ struct ValueVariant
 	typedef double FloatType;
 	typedef uint16_t WCharType;
 
-	ValueVariant( const ValueVariant& o)		{value = o.value; type = o.type; attr.length = o.attr.length;}
-	ValueVariant()					{value.Int = 0; type = Void; attr.length = 0;}
-	ValueVariant( double Double_)			{value.Double = Double_; type = Double; attr.length = 0;}
-	ValueVariant( uint64_t UInt_)			{value.UInt = UInt_; type = UInt; attr.length = 0;}
-	ValueVariant( int64_t Int_)			{value.Int = Int_; type = Int; attr.length = 0;}
-	ValueVariant( const char* string_)		{value.string = string_; type = String; attr.length = std::strlen(string_);}
-	ValueVariant( const char* s, std::size_t l)	{value.string = s; type = String; attr.length = l;}
-	ValueVariant( const uint16_t* s, std::size_t l)	{value.wstring = s; type = WString; attr.length = l;}
-	ValueVariant( const StrusObjectType* s_, StrusObjectDeleter d_)	{value.strusObject = s_; type = StrusObject; attr.deleter = d_;}
+	ValueVariant()						{type = Void;}
+
+	void init( double Double_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.Double = Double_; type = Double;}
+	void init( uint64_t UInt_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.UInt = UInt_; type = UInt;}
+	void init( int64_t Int_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.Int = Int_; type = Int;}
+	void init( const char* string_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.string = string_; type = String; attr.length = std::strlen(string_);}
+	void init( const char* s, std::size_t l)		{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.string = s; type = String; attr.length = l;}
+	void init( const uint16_t* s, std::size_t l)		{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.wstring = s; type = WString; attr.length = l;}
+	void init( StrusObjectType* s_, StrusObjectDeleter d_)	{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.strusObject = s_; type = StrusObject; attr.deleter = d_;}
 
 	ValueVariant( const NumericVariant& num)
 	{
@@ -69,7 +69,6 @@ struct ValueVariant
 		if (type == StrusObject && attr.deleter)
 		{
 			attr.deleter( value.strusObject);
-			value.deleter = 0;
 		}
 	}
 
@@ -83,13 +82,16 @@ struct ValueVariant
 		int64_t Int;
 		const char* string;
 		const uint16_t* wstring;
-		const StrusObjectType* strusObject;
-		const void* langObject;
+		const Object* strusObject;
 	} value;
 	union {
 		std::size_t length;
 		StrusObjectDeleter deleter;
 	} attr;
+
+private:
+	ValueVariant( const ValueVariant&){}		//< non copyable
+	void operator=( const ValueVariant&){}		//< non copyable
 };
 
 }}//namespace

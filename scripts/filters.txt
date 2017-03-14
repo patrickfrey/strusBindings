@@ -58,13 +58,13 @@ PUBLIC STRUCT strus::analyzer::Query strus/analyzer/query.hpp
 	strus::analyzer::Query::Instruction[] instructions
 END
 
-PRIVATE STRUCT DocumentFrequencyChange strus/bindings/documentFrequencyChange.hpp
+PRIVATE STRUCT strus::bindings::DocumentFrequencyChange strus/bindings/statisticsMessage.hpp
 	string type
 	string value
 	int increment
 END
 
-PUBLIC STRUCT StatisticsMessage strus/bindings/statisticsMessage.hpp
+PUBLIC STRUCT strus::bindings::StatisticsMessage strus/bindings/statisticsMessage.hpp
 	DocumentFrequencyChange[] df
 	int nofdocs
 END
@@ -95,14 +95,4 @@ PUBLIC QueryResult include strus/summaryElement.hpp
 	uint nofVisited
 	const RankVector[] ranks
 END
-
-
-
-
-
-
-
-
-
-
 
