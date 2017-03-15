@@ -1979,7 +1979,7 @@ StatisticsMessage StatisticsProcessor::decode( const std::string& blob) const
 	strus::StatisticsViewerInterface::DocumentFrequencyChange rec;
 	while (viewer->nextDfChange( rec))
 	{
-		dflist.push_back( DocumentFrequencyChange( rec.type, rec.value, rec.increment));
+		dflist.push_back( DocumentFrequencyChange( rec.type(), rec.value(), rec.increment()));
 	}
 	int nofdocs = viewer->nofDocumentsInsertedChange();
 	if (errorhnd->hasError())
@@ -2493,7 +2493,7 @@ QueryResult Query::evaluate() const
 	{
 		throw strus::runtime_error( _TXT("failed to evaluate query: %s"), errorhnd->fetchError());
 	}
-	QueryResult rt( res.evaluationPass(), res.nofDocumentsRanked(), res.nofDocumentsVisited());
+	QueryResult rt( res.evaluationPass(), res.nofRanked(), res.nofVisited());
 	std::vector<strus::ResultDocument>::const_iterator
 		ri = res.ranks().begin(), re = res.ranks().end();
 	for (;ri != re; ++ri)
