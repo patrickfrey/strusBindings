@@ -20,7 +20,7 @@ namespace bindings {
 struct ValueVariant
 {
 	typedef void* StrusObjectType;
-	typedef void (*StrusObjectDeleter)( StrusObjectType* strusObject);
+	typedef void (*StrusObjectDeleter)( void* strusObject);
 
 	/// \brief Enumeration of value type identifiers
 	enum Type {
@@ -82,7 +82,7 @@ struct ValueVariant
 		int64_t Int;
 		const char* string;
 		const uint16_t* wstring;
-		const Object* strusObject;
+		StrusObjectType* strusObject;
 	} value;
 	union {
 		std::size_t length;

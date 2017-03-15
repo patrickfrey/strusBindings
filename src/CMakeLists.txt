@@ -8,6 +8,7 @@ add_subdirectory( parser )
 add_subdirectory( filter )
 
 set( source_files
+	testcheck.cpp
 	bindingObjects.cpp
 	utils.cpp
 	traceUtils.cpp

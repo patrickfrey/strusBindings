@@ -9,6 +9,9 @@
 #define _STRUS_BINDING_VARIANT_VALUE_TEMPLATE_HPP_INCLUDED
 /// \file analyzerTermFilter.hpp
 #include "strus/bindings/valueVariant.hpp"
+{% for incfile in includes %}#include {{incfile}}
+{% endfor %}
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -17,16 +20,16 @@ namespace bindings {
 template <typename TYPE>
 struct VariantValueTemplate
 {
-	static bindings::ValueVariant get( const TYPE& val);
+	static void init( bindings::ValueVariant& res, const TYPE& val);
 };
 
-{% for tp in atomictypes %}
+{% for key,tp in atomictypes.items() %}
 template <>
 struct VariantValueTemplate<{{tp.fullname}}>
 {
-	static bindings::ValueVariant get( const TYPE& val)
+	static void init( bindings::ValueVariant& res, {% if "paramname" in tp %}{{tp.paramname}}{% else %}const {{tp.fullname}}& {% endif %}val)
 	{
-		return bindings::ValueVariant( static_cast<{{tp.basictype}}>( val));
+		res.init( {% if "basictype" in tp %}static_cast<{{tp.basictype}}>( val){% endif %}{% if "variantcast" in tp %}{{tp.variantcast}}{% endif %});
 	}
 };
 {% endfor %}

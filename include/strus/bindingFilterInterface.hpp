@@ -10,7 +10,7 @@
 /// \brief Iterator on the abstraction of an object in the scripting language
 /// \file bindingFilterInterface.hpp
 #include "strus/base/stdint.h"
-#include "strus/binding/valueVariant.hpp"
+#include "strus/bindings/valueVariant.hpp"
 #include <cstring>
 
 namespace strus {
@@ -42,7 +42,7 @@ public:
 	/// \brief Get current element and skip to next
 	/// \param[out] current element value
 	/// \return current element tag or Close if no elements left
-	virtual Tag getNext( binding::ValueVariant& val)=0;
+	virtual Tag getNext( bindings::ValueVariant& val)=0;
 
 	/// \brief Skip to the close of the current scope
 	/// \note This means skipping to the next close that increments the number of 'Close' found by one more than the number of 'Open' found
