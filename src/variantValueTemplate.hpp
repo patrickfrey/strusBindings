@@ -11,7 +11,6 @@
 #include "strus/bindings/valueVariant.hpp"
 #include <string>
 #include "strus/numericVariant.hpp"
-#include "strus/index.hpp"
 
 #include <vector>
 
@@ -27,38 +26,11 @@ struct VariantValueTemplate
 
 
 template <>
-struct VariantValueTemplate<strus::Index>
-{
-	static void init( bindings::ValueVariant& res, const strus::Index& val)
-	{
-		res.init( static_cast<int>( val));
-	}
-};
-
-template <>
-struct VariantValueTemplate<unsigned int>
-{
-	static void init( bindings::ValueVariant& res, const unsigned int& val)
-	{
-		res.init( static_cast<unsigned int>( val));
-	}
-};
-
-template <>
 struct VariantValueTemplate<std::string>
 {
 	static void init( bindings::ValueVariant& res, const std::string& val)
 	{
-		res.init( bindings::ValueVariant( val.c_str(), val.size()));
-	}
-};
-
-template <>
-struct VariantValueTemplate<const char*>
-{
-	static void init( bindings::ValueVariant& res, const char*val)
-	{
-		res.init( static_cast<const char*>( val));
+		res.init( val.c_str(), val.size());
 	}
 };
 
@@ -67,7 +39,7 @@ struct VariantValueTemplate<int>
 {
 	static void init( bindings::ValueVariant& res, const int& val)
 	{
-		res.init( static_cast<int>( val));
+		res.init( (bindings::ValueVariant::IntType)val);
 	}
 };
 
@@ -75,15 +47,6 @@ template <>
 struct VariantValueTemplate<double>
 {
 	static void init( bindings::ValueVariant& res, const double& val)
-	{
-		res.init( static_cast<double>( val));
-	}
-};
-
-template <>
-struct VariantValueTemplate<strus::NumericVariant>
-{
-	static void init( bindings::ValueVariant& res, const strus::NumericVariant& val)
 	{
 		res.init( val);
 	}
@@ -94,7 +57,34 @@ struct VariantValueTemplate<bool>
 {
 	static void init( bindings::ValueVariant& res, const bool& val)
 	{
-		res.init( static_cast<int>( val));
+		res.init( (bindings::ValueVariant::IntType)val);
+	}
+};
+
+template <>
+struct VariantValueTemplate<const char*>
+{
+	static void init( bindings::ValueVariant& res, const char*val)
+	{
+		res.init( val);
+	}
+};
+
+template <>
+struct VariantValueTemplate<unsigned int>
+{
+	static void init( bindings::ValueVariant& res, const unsigned int& val)
+	{
+		res.init( (bindings::ValueVariant::UIntType)val);
+	}
+};
+
+template <>
+struct VariantValueTemplate<strus::NumericVariant>
+{
+	static void init( bindings::ValueVariant& res, const strus::NumericVariant& val)
+	{
+		res.init( val);
 	}
 };
 

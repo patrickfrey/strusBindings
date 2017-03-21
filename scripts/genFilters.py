@@ -3,90 +3,135 @@ from jinja2 import Template
 from sets import Set
 
 atomictypes = {
-        "Index": {
-                "variantcast": "bindings::ValueVariant( (bindings::ValueVariant::Int)val)",
-                "fullname": 'strus::Index',
-                "include": '"strus/index.hpp"'
-        },
         "double": {
-                "variantcast": "bindings::ValueVariant( val)",
+                "variantcast": "val",
                 "fullname": 'double'
         },
         "uint": {
-                "variantcast": "bindings::ValueVariant( (bindings::ValueVariant::UInt)val)",
+                "variantcast": "(bindings::ValueVariant::UIntType)val",
                 "fullname": 'unsigned int'
         },
         "int": {
-                "variantcast": "bindings::ValueVariant( (bindings::ValueVariant::Int)val)",
+                "variantcast": "(bindings::ValueVariant::IntType)val",
                 "fullname": 'int'
         },
         "bool": {
-                "variantcast": "bindings::ValueVariant( (bindings::ValueVariant::Int)val)",
+                "variantcast": "(bindings::ValueVariant::IntType)val",
                 "fullname": 'bool'
         },
         "charp": {
-                "variantcast": "bindings::ValueVariant( val)",
+                "variantcast": "val",
                 "paramname": "const char*",
                 "fullname": 'const char*'
         },
         "string": {
-                "variantcast": "bindings::ValueVariant( val.c_str(), val.size())",
+                "variantcast": "val.c_str(), val.size()",
                 "fullname": 'std::string',
-                "include": '<string>'
+                "includes": ['<string>']
         },
         "NumericVariant": {
                 "variantcast": "val",
                 "fullname": 'strus::NumericVariant',
-                "include": '"strus/numericVariant.hpp"'
+                "includes": ['"strus/numericVariant.hpp"']
         }
 }
 
 structtypes = {
-       "StrusObjectType": {
+        "Term": {
+                "fullname": 'strus::analyzer::Term',
+                "includes": ['"strus/analyzer/term.hpp"'],
+                "elements": [
+                       { "name": 'type', "type": "string" },
+                       { "name": 'value', "type": "string" },
+                       { "name": 'pos', "type": "uint" },
+                       { "name": 'len', "type": "uint" }
+                ]
+        },
+        "Attribute": {
+                "fullname": 'strus::analyzer::Attribute',
+                "includes": ['"strus/analyzer/attribute.hpp"'],
+                "elements": [
+                       { "name": 'name', "type": "string" },
+                       { "name": 'value', "type": "string" }
+                ]
+        },
+        "MetaData": {
+                "fullname": 'strus::analyzer::MetaData',
+                "includes": ['"strus/analyzer/metaData.hpp"'],
+                "elements": [
+                       { "name": 'name', "type": "string" },
+                       { "name": 'value', "type": "NumericVariant" }
+                ]
+        },
+        "QueryElement": {
+                "fullname": 'strus::analyzer::Query::Element',
+                "includes": ['"strus/analyzer/query.hpp"'],
+                "elements": [
+                       { "name": 'type', "type": "string" },
+                       { "name": 'idx', "type": "uint" },
+                       { "name": 'position', "type": "uint" },
+                       { "name": 'length', "type": "uint" },
+                       { "name": 'fieldNo', "type": "uint" }
+                ]
+        },
+        "QueryInstruction": {
+                "fullname": 'strus::analyzer::Query::Instruction',
+                "includes": ['"strus/analyzer/query.hpp"'],
+                "elements": [
+                       { "name": 'opCode', "type": "string" },
+                       { "name": 'idx', "type": "uint" },
+                       { "name": 'nofOperands', "type": "uint" }
+                ]
+        },
+        "DocumentFrequencyChange": {
+                "fullname": 'strus::bindings::DocumentFrequencyChange',
+                "includes": ['"strus/bindings/statisticsMessage.hpp"'],
+                "elements": [
+                       { "name": 'type', "type": "charp" },
+                       { "name": 'value', "type": "charp" },
+                       { "name": 'increment', "type": "int" }
+                ]
+        },
+        "VectorRank": {
+                "fullname": 'VectorStorageSearchInterface::Result',
+                "includes": ['"strus/vectorStorageSearchInterface.hpp"'],
+                "elements": [
+                       { "name": 'featidx', "type": "Index" },
+                       { "name": 'weight', "type": "double" }
+                ]
+        },
+        "SummaryElement": {
+                "fullname": 'strus::SummaryElement',
+                "includes": ['"strus/summaryElement.hpp"'],
+                "elements": [
+                       { "name": 'name', "type": "string" },
+                       { "name": 'value', "type": "string" },
+                       { "name": 'weight', "type": "double" },
+                       { "name": 'index', "type": "int" }
+                ]
+        }
+}
+
+complextypes = {
+        "StrusObjectType": {
                "fullname": 'strus::bindings::StrusObjectType',
-               "include": '"strus/bindings/hostReference.hpp"'
-       },
-       "Term": {
-               "fullname": 'strus::analyzer::Term',
-               "include": '"strus/analyzer/term.hpp"',
-               "elements": [
-                      { "name": 'type', "type": "string" },
-                      { "name": 'value', "type": "string" },
-                      { "name": 'pos', "type": "uint" },
-                      { "name": 'len', "type": "uint" }
-               ]
+               "includes": ['"strus/bindings/hostReference.hpp"']
        },
        "TermList"      : {
                "fullname": 'std::vector<strus::analyzer::Term>',
-               "include": '"strus/analyzer/term.hpp"'
-       },
-       "MetaData": {
-               "fullname": 'strus::analyzer::MetaData',
-               "include": '"strus/analyzer/metaData.hpp"',
-               "elements": [
-                      { "name": 'name', "type": "string" },
-                      { "name": 'value', "type": "NumericVariant" }
-               ]
+               "includes": ['"strus/analyzer/term.hpp"']
        },
        "MetaDataList": {
                "fullname": 'std::vector<strus::analyzer::MetaData>',
-               "include": '"strus/analyzer/metaData.hpp"'
-       },
-       "Attribute": {
-               "fullname": 'strus::analyzer::Attribute',
-               "include": '"strus/analyzer/attribute.hpp"',
-               "elements": [
-                      { "name": 'name', "type": "string" },
-                      { "name": 'value', "type": "string" }
-               ]
+               "includes": ['"strus/analyzer/metaData.hpp"']
        },
        "AttributeList": {
                "fullname": 'std::vector<strus::analyzer::Attribute>',
-               "include": '"strus/analyzer/attribute.hpp"'
+               "includes": ['"strus/analyzer/attribute.hpp"']
        },
        "Document": {
                "fullname": 'strus::analyzer::Document',
-               "include": '"strus/analyzer/document.hpp"',
+               "includes": ['"strus/analyzer/document.hpp"'],
                "elements": [
                       { "name": 'subDocumentTypeName', "type": "string" },
                       { "name": 'metadata', "type": "MetaData[]" },
@@ -95,29 +140,9 @@ structtypes = {
                       { "name": 'forwardTerms', "type": "Term[]" }
                ]
        },
-       "QueryElement": {
-               "fullname": 'strus::analyzer::Query::Element',
-               "include": '"strus/analyzer/query.hpp"',
-               "elements": [
-                      { "name": 'type', "type": "string" },
-                      { "name": 'idx', "type": "uint" },
-                      { "name": 'position', "type": "uint" },
-                      { "name": 'length', "type": "uint" },
-                      { "name": 'fieldNo', "type": "uint" }
-               ]
-       },
-       "QueryInstruction": {
-               "fullname": 'strus::analyzer::Query::Instruction',
-               "include": '"strus/analyzer/query.hpp"',
-               "elements": [
-                      { "name": 'opCode', "type": "string" },
-                      { "name": 'idx', "type": "uint" },
-                      { "name": 'nofOperands', "type": "uint" }
-               ]
-       },
        "Query": {
                "fullname": 'strus::analyzer::Query',
-               "include": '"strus/analyzer/query.hpp"',
+               "includes": ['"strus/analyzer/query.hpp"'],
                "elements": [
                       { "name": 'metadata', "type": "MetaData[]" },
                       { "name": 'searchTerms', "type": "Term[]" },
@@ -125,52 +150,25 @@ structtypes = {
                       { "name": 'instructions', "type": "QueryInstruction[]" }
                ]
        },
-       "DocumentFrequencyChange": {
-               "fullname": 'strus::bindings::DocumentFrequencyChange',
-               "include": '"strus/bindings/statisticsMessage.hpp"',
-               "elements": [
-                      { "name": 'type', "type": "charp" },
-                      { "name": 'value', "type": "charp" },
-                      { "name": 'increment', "type": "int" }
-               ]
-       },
        "StatisticsMessage": {
                "fullname": 'strus::bindings::StatisticsMessage',
-               "include": '"strus/bindings/statisticsMessage.hpp"',
+               "includes": ['"strus/bindings/statisticsMessage.hpp"'],
                "elements": [
                       { "name": 'df', "type": "DocumentFrequencyChange[]" },
                       { "name": 'nofdocs', "type": "int" }
                ]
        },
-       "VectorRank": {
-               "fullname": 'VectorStorageSearchInterface::Result',
-               "include": '"strus/vectorStorageSearchInterface.hpp"',
-               "elements": [
-                      { "name": 'featidx', "type": "Index" },
-                      { "name": 'weight', "type": "double" }
-               ]
-       },
        "VectorRankList": {
                "fullname": 'std::vector<VectorStorageSearchInterface::Result>',
-               "include": '"strus/vectorStorageSearchInterface.hpp"',
-       },
-       "SummaryElement": {
-               "fullname": 'strus::SummaryElement',
-               "include": '"strus/summaryElement.hpp"',
-               "elements": [
-                      { "name": 'name', "type": "string" },
-                      { "name": 'value', "type": "string" },
-                      { "name": 'weight', "type": "double" },
-                      { "name": 'index', "type": "int" }
-               ]
+               "includes": ['"strus/vectorStorageSearchInterface.hpp"'],
        },
        "SummaryElementList": {
                "fullname": 'std::vector<strus::SummaryElement>',
-               "include": '"strus/summaryElement.hpp"'
+               "includes": ['"strus/summaryElement.hpp"']
        },
        "DocumentRank": {
                "fullname": 'strus::ResultDocument',
-               "include": '"strus/resultDocument.hpp"',
+               "includes": ['"strus/resultDocument.hpp"'],
                "elements": [
                       { "name": 'docno', "type": "Index" },
                       { "name": 'weight', "type": "double" },
@@ -179,11 +177,11 @@ structtypes = {
        },
        "DocumentRankList": {
                "fullname": 'std::vector<strus::ResultDocument>',
-               "include": '"strus/resultDocument.hpp"'
+               "includes": ['"strus/resultDocument.hpp"']
        },
        "QueryResult": {
                "fullname": 'strus::QueryResult',
-               "include": '"strus/queryResult.hpp"',
+               "includes": ['"strus/queryResult.hpp"'],
                "elements": [
                       { "name": 'evaluationPass', "type": "uint" },
                       { "name": 'nofRanked', "type": "uint" },
@@ -193,21 +191,35 @@ structtypes = {
        }
 }
 
-mainTemplate = "scripts/variantValueTemplate.hpp.tpl"
-mainOutput = "src/variantValueTemplate.hpp"
-
-def mapMainTemplate():
-    tplfile = open( mainTemplate, 'r')
+def mapTemplateFile( outFilename, tplFilename, **kwargs):
+    tplfile = open( tplFilename, 'r')
     content = tplfile.read()
     template = Template( content)
-    includes = Set()
-    for tpkey,tp in atomictypes.items():
-        if "include" in tp:
-            includes.add( tp['include'])
-    output = template.render( atomictypes=atomictypes, includes=includes)
-    outfile = open( mainOutput, 'w')
+    output = template.render( **kwargs)
+    outfile = open( outFilename, 'w')
     outfile.write( output)
 
-mapMainTemplate()
+def mapMainTemplate( mainOutput, mainTemplate):
+    includes = Set()
+    for tpkey,tp in atomictypes.items():
+        if "includes" in tp:
+            for incfile in tp['includes']:
+                includes.add( incfile)
+    mapTemplateFile( mainOutput, mainTemplate, atomictypes=atomictypes, includes=includes)
 
+def mapStructFilterTemplates():
+    for tpkey,tp in structtypes.items():
+        hpp_templatefile = "scripts/structTypeFilter.hpp.tpl"
+        cpp_templatefile = "scripts/structTypeFilter.cpp.tpl"
+        hpp_outputfile = tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
+        cpp_outputfile = tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp.includes, structname=tpkey, fullname=tp.fullname, elements=tp.elements)
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp.includes, structname=tpkey, fullname=tp.fullname, elements=tp.elements)
+
+mapMainTemplate(
+        "src/variantValueTemplate.hpp",
+        "scripts/variantValueTemplate.hpp.tpl"
+)
+
+mapStructFilterTemplates()
 

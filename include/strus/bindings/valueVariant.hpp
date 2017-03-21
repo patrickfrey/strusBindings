@@ -46,8 +46,7 @@ struct ValueVariant
 	void init( const char* s, std::size_t l)		{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.string = s; type = String; attr.length = l;}
 	void init( const uint16_t* s, std::size_t l)		{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.wstring = s; type = WString; attr.length = l;}
 	void init( StrusObjectType* s_, StrusObjectDeleter d_)	{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.strusObject = s_; type = StrusObject; attr.deleter = d_;}
-
-	ValueVariant( const NumericVariant& num)
+	void init( const NumericVariant& num)
 	{
 		switch (num.type)
 		{
