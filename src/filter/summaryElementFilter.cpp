@@ -13,11 +13,13 @@
  */
 /// \file summaryElementFilter.cpp
 #include "summaryElementFilter.hpp"
-#include "filter/structElementArray.hpp"
+#include "structElementArray.hpp"
+#include "stateTable.hpp"
+#include "variantValueTemplate.hpp"
 
 using namespace strus;
 
-static const char* g_element_names[] = "name", "value", "weight", "index", 0};
+static const char* g_element_names[] = { "name","value","weight","index", 0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
@@ -123,27 +125,27 @@ SummaryElementFilter::~SummaryElementFilter()
 	if (m_ownership) delete( m_ownership);
 }
 
-static binding::ValueVariant getElementValue( const SummaryElement& elem, int valueIndex)
+static bindings::ValueVariant getElementValue( const SummaryElement& elem, int valueIndex)
 {
 	switch (valueIndex) {
-	
+
 		case 0:
-			return binding::ValueVariant( elem.name().c_str(), elem.name().size());
-		
+			return filter::VariantValueTemplate<std::string>::get( elem.name());
+
 		case 1:
-			return binding::ValueVariant( elem.value().c_str(), elem.value().size());
-		
+			return filter::VariantValueTemplate<std::string>::get( elem.value());
+
 		case 2:
-			return binding::ValueVariant( (double)elem.weight());
-		
+			return filter::VariantValueTemplate<double>::get( elem.weight());
+
 		case 3:
-			return binding::ValueVariant( (binding::ValueVariant::IntType)elem.index());
-		
+			return filter::VariantValueTemplate<int>::get( elem.index());
+
 	}
-	return binding::ValueVariant();
+	return bindings::ValueVariant();
 }
 
-BindingFilterInterface::Tag SummaryElementFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag SummaryElementFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -192,7 +194,7 @@ SummaryElementVectorFilter::SummaryElementVectorFilter( std::vector<SummaryEleme
 	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
 
 
-BindingFilterInterface::Tag SummaryElementVectorFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag SummaryElementVectorFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_array_statetable[ m_state];
 	Tag rt = st.tag;

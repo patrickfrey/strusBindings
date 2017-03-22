@@ -17,6 +17,7 @@
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/summaryElement.hpp"
 
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -31,7 +32,7 @@ public:
 	SummaryElementFilter( SummaryElement* impl, bool withOwnership);
 
 	virtual ~SummaryElementFilter();
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
@@ -54,7 +55,7 @@ public:
 	SummaryElementVectorFilter( std::vector<SummaryElement>* impl, bool withOwnership);
 	virtual ~SummaryElementVectorFilter();
 
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 

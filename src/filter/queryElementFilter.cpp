@@ -13,11 +13,13 @@
  */
 /// \file queryElementFilter.cpp
 #include "queryElementFilter.hpp"
-#include "filter/structElementArray.hpp"
+#include "structElementArray.hpp"
+#include "stateTable.hpp"
+#include "variantValueTemplate.hpp"
 
 using namespace strus;
 
-static const char* g_element_names[] = "type", "idx", "position", "length", "fieldNo", 0};
+static const char* g_element_names[] = { "type","idx","position","length","fieldNo", 0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
@@ -84,9 +86,9 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StatePositionValue,	_VALUE, StatePositionClose,		StateLengthOpen,	_ELEM,	 0, 2},
 	{StatePositionClose,	_CLOSE, StateLengthOpen,	StateLengthOpen,	_NULL,	 0, 2},
 	
-	{StateLengthOpen,	_OPEN,  StateLengthValue,		StateFieldnoOpen,	_TAG,	 0, 3},
-	{StateLengthValue,	_VALUE, StateLengthClose,		StateFieldnoOpen,	_ELEM,	 0, 3},
-	{StateLengthClose,	_CLOSE, StateFieldnoOpen,	StateFieldnoOpen,	_NULL,	 0, 3},
+	{StateLengthOpen,	_OPEN,  StateLengthValue,		StateFieldNoOpen,	_TAG,	 0, 3},
+	{StateLengthValue,	_VALUE, StateLengthClose,		StateFieldNoOpen,	_ELEM,	 0, 3},
+	{StateLengthClose,	_CLOSE, StateFieldNoOpen,	StateFieldNoOpen,	_NULL,	 0, 3},
 	
 	{StateFieldNoOpen,	_OPEN,  StateFieldNoValue,		StateEnd,	_TAG,	 0, 4},
 	{StateFieldNoValue,	_VALUE, StateFieldNoClose,		StateEnd,	_ELEM,	 0, 4},
@@ -110,9 +112,9 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayPositionValue,	_VALUE, StateArrayPositionClose,		StateArrayLengthOpen,	_ELEM,	 0, 2},
 	{StateArrayPositionClose,	_CLOSE, StateArrayLengthOpen,	StateArrayLengthOpen,	_NULL,	 0, 2},
 	
-	{StateArrayLengthOpen,	_OPEN,  StateArrayLengthValue,		StateArrayFieldnoOpen,	_TAG,	 0, 3},
-	{StateArrayLengthValue,	_VALUE, StateArrayLengthClose,		StateArrayFieldnoOpen,	_ELEM,	 0, 3},
-	{StateArrayLengthClose,	_CLOSE, StateArrayFieldnoOpen,	StateArrayFieldnoOpen,	_NULL,	 0, 3},
+	{StateArrayLengthOpen,	_OPEN,  StateArrayLengthValue,		StateArrayFieldNoOpen,	_TAG,	 0, 3},
+	{StateArrayLengthValue,	_VALUE, StateArrayLengthClose,		StateArrayFieldNoOpen,	_ELEM,	 0, 3},
+	{StateArrayLengthClose,	_CLOSE, StateArrayFieldNoOpen,	StateArrayFieldNoOpen,	_NULL,	 0, 3},
 	
 	{StateArrayFieldNoOpen,	_OPEN,  StateArrayFieldNoValue,		StateArrayIndex,	_TAG,	 0, 4},
 	{StateArrayFieldNoValue,	_VALUE, StateArrayFieldNoClose,		StateArrayIndex,	_ELEM,	 0, 4},
@@ -137,30 +139,30 @@ QueryElementFilter::~QueryElementFilter()
 	if (m_ownership) delete( m_ownership);
 }
 
-static binding::ValueVariant getElementValue( const analyzer::Query::Element& elem, int valueIndex)
+static bindings::ValueVariant getElementValue( const analyzer::Query::Element& elem, int valueIndex)
 {
 	switch (valueIndex) {
-	
+
 		case 0:
-			return binding::ValueVariant( elem.type().c_str(), elem.type().size());
-		
+			return filter::VariantValueTemplate<analyzer::Query::Element::Type>::get( elem.type());
+
 		case 1:
-			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.idx());
-		
+			return filter::VariantValueTemplate<unsigned int>::get( elem.idx());
+
 		case 2:
-			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.position());
-		
+			return filter::VariantValueTemplate<unsigned int>::get( elem.position());
+
 		case 3:
-			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.length());
-		
+			return filter::VariantValueTemplate<unsigned int>::get( elem.length());
+
 		case 4:
-			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.fieldNo());
-		
+			return filter::VariantValueTemplate<unsigned int>::get( elem.fieldNo());
+
 	}
-	return binding::ValueVariant();
+	return bindings::ValueVariant();
 }
 
-BindingFilterInterface::Tag QueryElementFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag QueryElementFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -209,7 +211,7 @@ QueryElementVectorFilter::QueryElementVectorFilter( std::vector<analyzer::Query:
 	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
 
 
-BindingFilterInterface::Tag QueryElementVectorFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag QueryElementVectorFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_array_statetable[ m_state];
 	Tag rt = st.tag;

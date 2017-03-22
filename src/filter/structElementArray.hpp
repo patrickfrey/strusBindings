@@ -9,7 +9,7 @@
 #define _STRUS_BINDING_FILTER_STRUCTELEMENT_ARRAY_HPP_INCLUDED
 /// \brief Array of structure element names for filters
 /// \file structElementArray.hpp
-#include "strus/binding/valueVariant.hpp"
+#include "strus/bindings/valueVariant.hpp"
 #include <vector>
 
 /// \brief strus toplevel namespace
@@ -22,17 +22,17 @@ class StructElementArray
 public:
 	StructElementArray()
 	{
-		m_ar.push_back( binding::ValueVariant());
+		m_ar.push_back( bindings::ValueVariant());
 	}
 
 	StructElementArray( const char** names)
 	{
 		char const** nitr = names;
-		for (; *nitr; ++nitr) m_ar.push_back( *nitr);
-		m_ar.push_back( binding::ValueVariant());
+		for (; *nitr; ++nitr) m_ar.push_back( bindings::ValueVariant(*nitr));
+		m_ar.push_back( bindings::ValueVariant());
 	}
 
-	const binding::ValueVariant& operator[]( std::size_t idx) const
+	const bindings::ValueVariant& operator[]( std::size_t idx) const
 	{
 		return m_ar[ idx];
 	}
@@ -43,7 +43,7 @@ public:
 	}
 
 private:
-	std::vector<binding::ValueVariant> m_ar;
+	std::vector<bindings::ValueVariant> m_ar;
 };
 
 }}//namespace

@@ -17,6 +17,7 @@
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/analyzer/query.hpp"
 
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -31,7 +32,7 @@ public:
 	QueryElementFilter( analyzer::Query::Element* impl, bool withOwnership);
 
 	virtual ~QueryElementFilter();
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
@@ -54,7 +55,7 @@ public:
 	QueryElementVectorFilter( std::vector<analyzer::Query::Element>* impl, bool withOwnership);
 	virtual ~QueryElementVectorFilter();
 
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 

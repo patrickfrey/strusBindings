@@ -1,4 +1,4 @@
-#include "variantValueTemplate.hpp"
+#include "filter/variantValueTemplate.hpp"
 #include "strus/bindings/valueVariant.hpp"
 #include "strus/index.hpp"
 

@@ -17,6 +17,7 @@
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/analyzer/attribute.hpp"
 
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -31,7 +32,7 @@ public:
 	AttributeFilter( analyzer::Attribute* impl, bool withOwnership);
 
 	virtual ~AttributeFilter();
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
@@ -54,7 +55,7 @@ public:
 	AttributeVectorFilter( std::vector<analyzer::Attribute>* impl, bool withOwnership);
 	virtual ~AttributeVectorFilter();
 
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 

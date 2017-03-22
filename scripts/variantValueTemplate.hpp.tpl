@@ -15,7 +15,7 @@
 
 /// \brief strus toplevel namespace
 namespace strus {
-namespace bindings {
+namespace filter {
 
 template <typename TYPE>
 struct VariantValueTemplate
@@ -30,6 +30,10 @@ struct VariantValueTemplate<{{tp.fullname}}>
 	static void init( bindings::ValueVariant& res, {% if "paramname" in tp %}{{tp.paramname}}{% else %}const {{tp.fullname}}& {% endif %}val)
 	{
 		res.init( {% if "basictype" in tp %}static_cast<{{tp.basictype}}>( val){% endif %}{% if "variantcast" in tp %}{{tp.variantcast}}{% endif %});
+	}
+	static bindings::ValueVariant get( {% if "paramname" in tp %}{{tp.paramname}}{% else %}const {{tp.fullname}}& {% endif %}val)
+	{
+		return bindings::ValueVariant( {% if "basictype" in tp %}static_cast<{{tp.basictype}}>( val){% endif %}{% if "variantcast" in tp %}{{tp.variantcast}}{% endif %});
 	}
 };
 {% endfor %}

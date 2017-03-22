@@ -17,6 +17,7 @@
 #include "strus/bindingFilterInterface.hpp"
 {% for incfile in includes %}#include {{incfile}}
 {% endfor %}
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -31,7 +32,7 @@ public:
 	{{structname}}Filter( {{fullname}}* impl, bool withOwnership);
 
 	virtual ~{{structname}}Filter();
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
@@ -54,7 +55,7 @@ public:
 	{{structname}}VectorFilter( std::vector<{{fullname}}>* impl, bool withOwnership);
 	virtual ~{{structname}}VectorFilter();
 
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 

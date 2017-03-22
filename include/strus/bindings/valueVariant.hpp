@@ -16,7 +16,7 @@
 namespace strus {
 namespace bindings {
 
-/// \brief Representation of a typed value
+/// \brief Representation of a typed value const reference or an owned object with reference count
 struct ValueVariant
 {
 	typedef void* StrusObjectType;
@@ -37,16 +37,88 @@ struct ValueVariant
 	typedef double FloatType;
 	typedef uint16_t WCharType;
 
-	ValueVariant()						{type = Void;}
+	ValueVariant()							{value.string = 0; type = Void; attr.length = 0; deleter = 0;}
+	ValueVariant( double Double_)					{value.Double = Double_; type = Double; attr.length = 0; deleter = 0;}
+	ValueVariant( uint64_t UInt_)					{value.UInt = UInt_; type = UInt; attr.length = 0; deleter = 0;}
+	ValueVariant( int64_t Int_)					{value.Int = Int_; type = Int; attr.length = 0; deleter = 0;}
+	ValueVariant( const char* string_)				{value.string = string_; type = String; attr.length = std::strlen(string_); deleter = 0;}
+	ValueVariant( const char* s, std::size_t l)			{value.string = s; type = String; attr.length = l; deleter = 0;}
+	ValueVariant( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; attr.length = l; deleter = 0;}
+	ValueVariant( StrusObjectType* s_, StrusObjectDeleter d_)	{value.strusObject = s_; type = StrusObject; deleter = d_; attr.refcnt=!!deleter;}
+	ValueVariant( const NumericVariant& num)
+	{
+		assign( num);
+	}
 
-	void init( double Double_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.Double = Double_; type = Double;}
-	void init( uint64_t UInt_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.UInt = UInt_; type = UInt;}
-	void init( int64_t Int_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.Int = Int_; type = Int;}
-	void init( const char* string_)				{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.string = string_; type = String; attr.length = std::strlen(string_);}
-	void init( const char* s, std::size_t l)		{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.string = s; type = String; attr.length = l;}
-	void init( const uint16_t* s, std::size_t l)		{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.wstring = s; type = WString; attr.length = l;}
-	void init( StrusObjectType* s_, StrusObjectDeleter d_)	{if (type == StrusObject && attr.deleter) attr.deleter(value.strusObject); value.strusObject = s_; type = StrusObject; attr.deleter = d_;}
+	void init( double Double_)					{reset(); value.Double = Double_; type = Double;}
+	void init( uint64_t UInt_)					{reset(); value.UInt = UInt_; type = UInt;}
+	void init( int64_t Int_)					{reset(); value.Int = Int_; type = Int;}
+	void init( const char* string_)					{reset(); value.string = string_; type = String; attr.length = std::strlen(string_);}
+	void init( const char* s, std::size_t l)			{reset(); value.string = s; type = String; attr.length = l;}
+	void init( const uint16_t* s, std::size_t l)			{reset(); value.wstring = s; type = WString; attr.length = l;}
+	void init( StrusObjectType* s_, StrusObjectDeleter d_)		{reset(); value.strusObject = s_; type = StrusObject; deleter = d_; if (deleter) attr.refcnt=1;}
 	void init( const NumericVariant& num)
+	{
+		reset();
+		assign( num);
+	}
+
+	ValueVariant( const ValueVariant& o)
+	{
+		assign( o);
+	}
+	void operator=( const ValueVariant& o)
+	{
+		assign( o);
+	}
+	~ValueVariant()
+	{
+		reset();
+	}
+
+	void clear()
+	{
+		reset(); value.Int = 0; type = Void; attr.length = 0;
+	}
+	void release()
+	{
+		if (type == StrusObject) {deleter = 0; attr.refcnt=0;}
+	}
+
+	Type type;
+	union {
+		double Double;
+		uint64_t UInt;
+		int64_t Int;
+		const char* string;
+		const uint16_t* wstring;
+		StrusObjectType* strusObject;
+	} value;
+	union {
+		int length;
+		mutable int refcnt;
+	} attr;
+	StrusObjectDeleter deleter;
+
+private:
+	void reset()
+	{
+		if (type == StrusObject && deleter)
+		{
+			if (!--attr.refcnt) deleter(value.strusObject);
+			deleter=0;
+		}
+	}
+	void assign( const ValueVariant& o)
+	{
+		type = o.type;
+		value = o.value;
+		attr = o.attr;
+		deleter = o.deleter;
+		if (deleter) ++o.attr.refcnt;
+		attr.refcnt = o.attr.refcnt;
+	}
+	void assign( const NumericVariant& num)
 	{
 		switch (num.type)
 		{
@@ -63,34 +135,6 @@ struct ValueVariant
 		}
 		value.Int = 0; type = Void; attr.length = 0; 
 	}
-	~ValueVariant()
-	{
-		if (type == StrusObject && attr.deleter)
-		{
-			attr.deleter( value.strusObject);
-		}
-	}
-
-	void clear()					{if (type == StrusObject && attr.deleter) attr.deleter( value.strusObject); value.Int = 0; type = Void; attr.length = 0;}
-	void release()					{if (type == StrusObject) attr.deleter = 0;}
-
-	Type type;
-	union {
-		double Double;
-		uint64_t UInt;
-		int64_t Int;
-		const char* string;
-		const uint16_t* wstring;
-		StrusObjectType* strusObject;
-	} value;
-	union {
-		std::size_t length;
-		StrusObjectDeleter deleter;
-	} attr;
-
-private:
-	ValueVariant( const ValueVariant&){}		//< non copyable
-	void operator=( const ValueVariant&){}		//< non copyable
 };
 
 }}//namespace

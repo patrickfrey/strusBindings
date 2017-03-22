@@ -48,6 +48,16 @@ atomictypes = {
                 "variantcast": "val",
                 "fullname": 'NumericVariant',
                 "includes": ['"strus/numericVariant.hpp"']
+        },
+        "QueryOpCode": {
+                "variantcast": "analyzer::Query::Instruction::opCodeName( val)",
+                "fullname": 'analyzer::Query::Instruction::OpCode',
+                "includes": ['"strus/analyzer/query.hpp"']
+        },
+        "QueryElementType": {
+                "variantcast": "analyzer::Query::Element::typeName( val)",
+                "fullname": 'analyzer::Query::Element::Type',
+                "includes": ['"strus/analyzer/query.hpp"']
         }
 }
 
@@ -82,7 +92,7 @@ structtypes = {
                 "fullname": 'analyzer::Query::Element',
                 "includes": ['"strus/analyzer/query.hpp"'],
                 "elements": [
-                       { "name": 'type', "type": "string" },
+                       { "name": 'type', "type": "QueryElementType" },
                        { "name": 'idx', "type": "uint" },
                        { "name": 'position', "type": "uint" },
                        { "name": 'length', "type": "uint" },
@@ -93,7 +103,7 @@ structtypes = {
                 "fullname": 'analyzer::Query::Instruction',
                 "includes": ['"strus/analyzer/query.hpp"'],
                 "elements": [
-                       { "name": 'opCode', "type": "string" },
+                       { "name": 'opCode', "type": "QueryOpCode" },
                        { "name": 'idx', "type": "uint" },
                        { "name": 'nofOperands', "type": "uint" }
                 ]
@@ -111,7 +121,7 @@ structtypes = {
                 "fullname": 'VectorStorageSearchInterface::Result',
                 "includes": ['"strus/vectorStorageSearchInterface.hpp"'],
                 "elements": [
-                       { "name": 'featidx', "type": "Index" },
+                       { "name": 'featidx', "type": "int" },
                        { "name": 'weight', "type": "double" }
                 ]
         },
@@ -209,12 +219,12 @@ def mapStructFilterTemplates():
         cpp_templatefile = "scripts/structTypeFilter.cpp.tpl"
         hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
         cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
-        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'])
-        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'])
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], atomictypes=atomictypes)
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], atomictypes=atomictypes)
 
 # Main:
 mapMainTemplate(
-        "src/variantValueTemplate.hpp",
+        "src/filter/variantValueTemplate.hpp",
         "scripts/variantValueTemplate.hpp.tpl"
 )
 

@@ -17,6 +17,7 @@
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/bindings/statisticsMessage.hpp"
 
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -31,7 +32,7 @@ public:
 	DocumentFrequencyChangeFilter( bindings::DocumentFrequencyChange* impl, bool withOwnership);
 
 	virtual ~DocumentFrequencyChangeFilter();
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
@@ -54,7 +55,7 @@ public:
 	DocumentFrequencyChangeVectorFilter( std::vector<bindings::DocumentFrequencyChange>* impl, bool withOwnership);
 	virtual ~DocumentFrequencyChangeVectorFilter();
 
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 

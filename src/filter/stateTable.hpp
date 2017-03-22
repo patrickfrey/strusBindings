@@ -9,7 +9,7 @@
 #define _STRUS_BINDING_FILTER_STATETABLE_HPP_INCLUDED
 /// \brief Array of structure elements
 /// \file structElementArray.hpp
-#include "strus/binding/valueVariant.hpp"
+#include "strus/bindings/valueVariant.hpp"
 #include "strus/bindingFilterInterface.hpp"
 #include <vector>
 

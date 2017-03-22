@@ -11,6 +11,7 @@
 /// \file statisticsMessage.hpp
 #include "strus/statisticsViewerInterface.hpp"
 #include <boost/shared_ptr.hpp>
+#include <vector>
 
 namespace strus {
 namespace bindings {
@@ -40,5 +41,3 @@ private:
 }}//namespace
 #endif
 
-
-}

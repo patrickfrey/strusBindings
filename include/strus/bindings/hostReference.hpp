@@ -8,7 +8,7 @@
 #ifndef _STRUS_BINDINGS_HOST_REFERENCE_HPP_INCLUDED
 #define _STRUS_BINDINGS_HOST_REFERENCE_HPP_INCLUDED
 /// \brief Reference to host object from the scripting language
-/// \file strus/binding/hostObjectReference.hpp
+/// \file strus/bindings/hostObjectReference.hpp
 #include <boost/shared_ptr.hpp>
 
 namespace strus {

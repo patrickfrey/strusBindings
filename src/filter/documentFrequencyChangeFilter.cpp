@@ -13,11 +13,13 @@
  */
 /// \file documentFrequencyChangeFilter.cpp
 #include "documentFrequencyChangeFilter.hpp"
-#include "filter/structElementArray.hpp"
+#include "structElementArray.hpp"
+#include "stateTable.hpp"
+#include "variantValueTemplate.hpp"
 
 using namespace strus;
 
-static const char* g_element_names[] = "type", "value", "increment", 0};
+static const char* g_element_names[] = { "type","value","increment", 0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
@@ -109,24 +111,24 @@ DocumentFrequencyChangeFilter::~DocumentFrequencyChangeFilter()
 	if (m_ownership) delete( m_ownership);
 }
 
-static binding::ValueVariant getElementValue( const bindings::DocumentFrequencyChange& elem, int valueIndex)
+static bindings::ValueVariant getElementValue( const bindings::DocumentFrequencyChange& elem, int valueIndex)
 {
 	switch (valueIndex) {
-	
+
 		case 0:
-			return binding::ValueVariant( (const char*)elem.type());
-		
+			return filter::VariantValueTemplate<const char*>::get( elem.type());
+
 		case 1:
-			return binding::ValueVariant( (const char*)elem.value());
-		
+			return filter::VariantValueTemplate<const char*>::get( elem.value());
+
 		case 2:
-			return binding::ValueVariant( (binding::ValueVariant::IntType)elem.increment());
-		
+			return filter::VariantValueTemplate<int>::get( elem.increment());
+
 	}
-	return binding::ValueVariant();
+	return bindings::ValueVariant();
 }
 
-BindingFilterInterface::Tag DocumentFrequencyChangeFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag DocumentFrequencyChangeFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -175,7 +177,7 @@ DocumentFrequencyChangeVectorFilter::DocumentFrequencyChangeVectorFilter( std::v
 	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
 
 
-BindingFilterInterface::Tag DocumentFrequencyChangeVectorFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag DocumentFrequencyChangeVectorFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_array_statetable[ m_state];
 	Tag rt = st.tag;

@@ -13,11 +13,13 @@
  */
 /// \file metaDataFilter.cpp
 #include "metaDataFilter.hpp"
-#include "filter/structElementArray.hpp"
+#include "structElementArray.hpp"
+#include "stateTable.hpp"
+#include "variantValueTemplate.hpp"
 
 using namespace strus;
 
-static const char* g_element_names[] = "name", "value", 0};
+static const char* g_element_names[] = { "name","value", 0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
@@ -95,21 +97,21 @@ MetaDataFilter::~MetaDataFilter()
 	if (m_ownership) delete( m_ownership);
 }
 
-static binding::ValueVariant getElementValue( const analyzer::MetaData& elem, int valueIndex)
+static bindings::ValueVariant getElementValue( const analyzer::MetaData& elem, int valueIndex)
 {
 	switch (valueIndex) {
-	
+
 		case 0:
-			return binding::ValueVariant( elem.name().c_str(), elem.name().size());
-		
+			return filter::VariantValueTemplate<std::string>::get( elem.name());
+
 		case 1:
-			return binding::ValueVariant( elem.value());
-		
+			return filter::VariantValueTemplate<NumericVariant>::get( elem.value());
+
 	}
-	return binding::ValueVariant();
+	return bindings::ValueVariant();
 }
 
-BindingFilterInterface::Tag MetaDataFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag MetaDataFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -158,7 +160,7 @@ MetaDataVectorFilter::MetaDataVectorFilter( std::vector<analyzer::MetaData>* imp
 	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
 
 
-BindingFilterInterface::Tag MetaDataVectorFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag MetaDataVectorFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_array_statetable[ m_state];
 	Tag rt = st.tag;

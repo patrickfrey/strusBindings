@@ -17,6 +17,7 @@
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
 
+#include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
@@ -31,7 +32,7 @@ public:
 	VectorRankFilter( VectorStorageSearchInterface::Result* impl, bool withOwnership);
 
 	virtual ~VectorRankFilter();
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
@@ -54,7 +55,7 @@ public:
 	VectorRankVectorFilter( std::vector<VectorStorageSearchInterface::Result>* impl, bool withOwnership);
 	virtual ~VectorRankVectorFilter();
 
-	virtual Tag getNext( binding::ValueVariant& val);
+	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
 
