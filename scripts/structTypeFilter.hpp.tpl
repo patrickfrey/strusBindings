@@ -5,9 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+/*
+ * DO NOT MODIFY THIS FILE !!!
+ * 
+ * This file has been generated with the script scripts/genFilters.py
+ * Modifications on this file will be lost!
+ */
 #ifndef _STRUS_BINDING_{{structname.upper()}}_FILTER_HPP_INCLUDED
 #define _STRUS_BINDING_{{structname.upper()}}_FILTER_HPP_INCLUDED
-/// \file {{structname}}Filter.hpp
+/// \file {{structname[:1].lower() + structname[1:]}}Filter.hpp
 #include "strus/bindingFilterInterface.hpp"
 {% for incfile in includes %}#include {{incfile}}
 {% endfor %}
@@ -15,16 +21,16 @@
 /// \brief strus toplevel namespace
 namespace strus {
 
-class {{structname.title()}}Filter
+class {{structname}}Filter
 	:public BindingFilterInterface
 {
 public:
-	{{structname.title()}}Filter();
-	{{structname.title()}}Filter( const {{structname.title()}}Filter& o);
-	explicit {{structname.title()}}Filter( const {{fullname}}* impl);
-	{{structname.title()}}Filter( {{fullname}}* impl, bool withOwnership);
+	{{structname}}Filter();
+	{{structname}}Filter( const {{structname}}Filter& o);
+	explicit {{structname}}Filter( const {{fullname}}* impl);
+	{{structname}}Filter( {{fullname}}* impl, bool withOwnership);
 
-	virtual ~{{structname.title()}}Filter();
+	virtual ~{{structname}}Filter();
 	virtual Tag getNext( binding::ValueVariant& val);
 
 	virtual void skip();
@@ -38,15 +44,15 @@ private:
 };
 
 
-class {{structname.title()}}VectorFilter
+class {{structname}}VectorFilter
 	:public BindingFilterInterface
 {
 public:
-	{{structname.title()}}VectorFilter();
-	{{structname.title()}}VectorFilter( const {{structname.title()}}VectorFilter& o);
-	explicit {{structname.title()}}VectorFilter( const std::vector<{{fullname}}>* impl);
-	{{structname.title()}}VectorFilter( std::vector<{{fullname}}>* impl, bool withOwnership);
-	virtual ~{{structname.title()}}VectorFilter();
+	{{structname}}VectorFilter();
+	{{structname}}VectorFilter( const {{structname}}VectorFilter& o);
+	explicit {{structname}}VectorFilter( const std::vector<{{fullname}}>* impl);
+	{{structname}}VectorFilter( std::vector<{{fullname}}>* impl, bool withOwnership);
+	virtual ~{{structname}}VectorFilter();
 
 	virtual Tag getNext( binding::ValueVariant& val);
 

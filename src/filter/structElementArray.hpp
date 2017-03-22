@@ -7,7 +7,7 @@
  */
 #ifndef _STRUS_BINDING_FILTER_STRUCTELEMENT_ARRAY_HPP_INCLUDED
 #define _STRUS_BINDING_FILTER_STRUCTELEMENT_ARRAY_HPP_INCLUDED
-/// \brief Array of structure elements
+/// \brief Array of structure element names for filters
 /// \file structElementArray.hpp
 #include "strus/binding/valueVariant.hpp"
 #include <vector>

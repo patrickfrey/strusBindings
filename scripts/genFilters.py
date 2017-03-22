@@ -1,4 +1,18 @@
 #!/usr/bin/python
+#
+#  Copyright (c) 2017 Patrick P. Frey
+# 
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+# 
+#  This script is used to generate some source articacts for the strus bindings
+#  It is called manually when interface changes occurr and the generated artefacts
+#  are checked in. Do not call this script until you know what you are doing!
+# 
+
 from jinja2 import Template
 from sets import Set
 import sys
@@ -32,14 +46,14 @@ atomictypes = {
         },
         "NumericVariant": {
                 "variantcast": "val",
-                "fullname": 'strus::NumericVariant',
+                "fullname": 'NumericVariant',
                 "includes": ['"strus/numericVariant.hpp"']
         }
 }
 
 structtypes = {
         "Term": {
-                "fullname": 'strus::analyzer::Term',
+                "fullname": 'analyzer::Term',
                 "includes": ['"strus/analyzer/term.hpp"'],
                 "elements": [
                        { "name": 'type', "type": "string" },
@@ -49,7 +63,7 @@ structtypes = {
                 ]
         },
         "Attribute": {
-                "fullname": 'strus::analyzer::Attribute',
+                "fullname": 'analyzer::Attribute',
                 "includes": ['"strus/analyzer/attribute.hpp"'],
                 "elements": [
                        { "name": 'name', "type": "string" },
@@ -57,7 +71,7 @@ structtypes = {
                 ]
         },
         "MetaData": {
-                "fullname": 'strus::analyzer::MetaData',
+                "fullname": 'analyzer::MetaData',
                 "includes": ['"strus/analyzer/metaData.hpp"'],
                 "elements": [
                        { "name": 'name', "type": "string" },
@@ -65,7 +79,7 @@ structtypes = {
                 ]
         },
         "QueryElement": {
-                "fullname": 'strus::analyzer::Query::Element',
+                "fullname": 'analyzer::Query::Element',
                 "includes": ['"strus/analyzer/query.hpp"'],
                 "elements": [
                        { "name": 'type', "type": "string" },
@@ -76,7 +90,7 @@ structtypes = {
                 ]
         },
         "QueryInstruction": {
-                "fullname": 'strus::analyzer::Query::Instruction',
+                "fullname": 'analyzer::Query::Instruction',
                 "includes": ['"strus/analyzer/query.hpp"'],
                 "elements": [
                        { "name": 'opCode', "type": "string" },
@@ -85,7 +99,7 @@ structtypes = {
                 ]
         },
         "DocumentFrequencyChange": {
-                "fullname": 'strus::bindings::DocumentFrequencyChange',
+                "fullname": 'bindings::DocumentFrequencyChange',
                 "includes": ['"strus/bindings/statisticsMessage.hpp"'],
                 "elements": [
                        { "name": 'type', "type": "charp" },
@@ -102,7 +116,7 @@ structtypes = {
                 ]
         },
         "SummaryElement": {
-                "fullname": 'strus::SummaryElement',
+                "fullname": 'SummaryElement',
                 "includes": ['"strus/summaryElement.hpp"'],
                 "elements": [
                        { "name": 'name', "type": "string" },
@@ -114,24 +128,8 @@ structtypes = {
 }
 
 complextypes = {
-        "StrusObjectType": {
-               "fullname": 'strus::bindings::StrusObjectType',
-               "includes": ['"strus/bindings/hostReference.hpp"']
-       },
-       "TermList"      : {
-               "fullname": 'std::vector<strus::analyzer::Term>',
-               "includes": ['"strus/analyzer/term.hpp"']
-       },
-       "MetaDataList": {
-               "fullname": 'std::vector<strus::analyzer::MetaData>',
-               "includes": ['"strus/analyzer/metaData.hpp"']
-       },
-       "AttributeList": {
-               "fullname": 'std::vector<strus::analyzer::Attribute>',
-               "includes": ['"strus/analyzer/attribute.hpp"']
-       },
        "Document": {
-               "fullname": 'strus::analyzer::Document',
+               "fullname": 'analyzer::Document',
                "includes": ['"strus/analyzer/document.hpp"'],
                "elements": [
                       { "name": 'subDocumentTypeName', "type": "string" },
@@ -142,7 +140,7 @@ complextypes = {
                ]
        },
        "Query": {
-               "fullname": 'strus::analyzer::Query',
+               "fullname": 'analyzer::Query',
                "includes": ['"strus/analyzer/query.hpp"'],
                "elements": [
                       { "name": 'metadata', "type": "MetaData[]" },
@@ -152,23 +150,19 @@ complextypes = {
                ]
        },
        "StatisticsMessage": {
-               "fullname": 'strus::bindings::StatisticsMessage',
+               "fullname": 'bindings::StatisticsMessage',
                "includes": ['"strus/bindings/statisticsMessage.hpp"'],
                "elements": [
                       { "name": 'df', "type": "DocumentFrequencyChange[]" },
                       { "name": 'nofdocs', "type": "int" }
                ]
        },
-       "VectorRankList": {
-               "fullname": 'std::vector<VectorStorageSearchInterface::Result>',
-               "includes": ['"strus/vectorStorageSearchInterface.hpp"'],
-       },
        "SummaryElementList": {
-               "fullname": 'std::vector<strus::SummaryElement>',
+               "fullname": 'std::vector<SummaryElement>',
                "includes": ['"strus/summaryElement.hpp"']
        },
        "DocumentRank": {
-               "fullname": 'strus::ResultDocument',
+               "fullname": 'ResultDocument',
                "includes": ['"strus/resultDocument.hpp"'],
                "elements": [
                       { "name": 'docno', "type": "Index" },
@@ -177,11 +171,11 @@ complextypes = {
                ]
        },
        "DocumentRankList": {
-               "fullname": 'std::vector<strus::ResultDocument>',
+               "fullname": 'std::vector<ResultDocument>',
                "includes": ['"strus/resultDocument.hpp"']
        },
        "QueryResult": {
-               "fullname": 'strus::QueryResult',
+               "fullname": 'QueryResult',
                "includes": ['"strus/queryResult.hpp"'],
                "elements": [
                       { "name": 'evaluationPass', "type": "uint" },

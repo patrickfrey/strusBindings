@@ -5,28 +5,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \file {{structname}}Filter.cpp
-#include "{{structname}}Filter.hpp"
+/*
+ * DO NOT MODIFY THIS FILE !!!
+ * 
+ * This file has been generated with the script scripts/genFilters.py
+ * Modifications on this file will be lost!
+ */
+/// \file {{structname[:1].lower() + structname[1:]}}Filter.cpp
+#include "{{structname[:1].lower() + structname[1:]}}Filter.hpp"
 #include "filter/structElementArray.hpp"
 
 using namespace strus;
 
-static const char* g_element_names[] = {% for element in elements %}"{{element.name}}",{% endfor %}0};
+static const char* g_element_names[] = {% for element in elements %}"{{element.name}}", {% endfor %}0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd{% for element in elements %},
-	State{{element.name.title()}}Open,
-	State{{element.name.title()}}Value,
-	State{{element.name.title()}}Close{% endfor %}}
+	State{{element.name[:1].upper() + element.name[1:]}}Open,
+	State{{element.name[:1].upper() + element.name[1:]}}Value,
+	State{{element.name[:1].upper() + element.name[1:]}}Close{% endfor %}
 };
 
 enum TermArrayState {
 	StateArrayEnd,
 	StateArrayIndex{% for element in elements %},
-	StateArray{{element.name.title()}}Open,
-	StateArray{{element.name.title()}}Value,
-	StateArray{{element.name.title()}}Close{% endfor %}
+	StateArray{{element.name[:1].upper() + element.name[1:]}}Open,
+	StateArray{{element.name[:1].upper() + element.name[1:]}}Value,
+	StateArray{{element.name[:1].upper() + element.name[1:]}}Close{% endfor %}
 };
 
 #define _OPEN	BindingFilterInterface::Open
@@ -42,9 +48,9 @@ enum TermArrayState {
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd,		_CLOSE, StateEnd,		StateEnd,		_NULL,	 0, 0},
 	{% for element in elements %}
-	{State{{element.name.title()}}Open,	_OPEN,  State{{element.name.title()}}Value,		State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
-	{State{{element.name.title()}}Value,	_VALUE, State{{element.name.title()}}Close,		State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
-	{State{{element.name.title()}}Close,	_CLOSE, State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
+	{State{{element.name[:1].upper() + element.name[1:]}}Open,	_OPEN,  State{{element.name[:1].upper() + element.name[1:]}}Value,		State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
+	{State{{element.name[:1].upper() + element.name[1:]}}Value,	_VALUE, State{{element.name[:1].upper() + element.name[1:]}}Close,		State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
+	{State{{element.name[:1].upper() + element.name[1:]}}Close,	_CLOSE, State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
 	{% endfor %}
 };
 
@@ -52,51 +58,51 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd,		_CLOSE, StateArrayEnd,		StateArrayEnd,		_NULL,	 0, 0},
 	{StateArrayIndex,	_INDEX, StateArray{{elements[0].name.title()}}Open,	StateArrayIndex,	_TAG,	 1, 0},
 	{% for element in elements %}
-	{StateArray{{element.name.title()}}Open,	_OPEN,  StateArray{{element.name.title()}}Value,		StateArray{% if loop.index0 +1 == elements.len() %}StateArrayEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
-	{StateArray{{element.name.title()}}Value,	_VALUE, StateArray{{element.name.title()}}Close,		StateArray{% if loop.index0 +1 == elements.len() %}StateArrayEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
-	{StateArray{{element.name.title()}}Close,	_CLOSE, StateArray{% if loop.index0 +1 == elements.len() %}StateArrayEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
+	{StateArray{{element.name[:1].upper() + element.name[1:]}}Open,	_OPEN,  StateArray{{element.name[:1].upper() + element.name[1:]}}Value,		StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
+	{StateArray{{element.name[:1].upper() + element.name[1:]}}Value,	_VALUE, StateArray{{element.name[:1].upper() + element.name[1:]}}Close,		StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
+	{StateArray{{element.name[:1].upper() + element.name[1:]}}Close,	_CLOSE, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
 	{% endfor %}
 };
 
-{{structname.title()}}Filter::{{structname.title()}}Filter()
+{{structname}}Filter::{{structname}}Filter()
 	:m_impl(0),m_ownership(0),m_state(0){}
 
-{{structname.title()}}Filter::{{structname.title()}}Filter( const {{structname.title()}}Filter& o)
+{{structname}}Filter::{{structname}}Filter( const {{structname}}Filter& o)
 	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
 
-{{structname.title()}}Filter::{{structname.title()}}Filter( const {{fullname}}* impl)
+{{structname}}Filter::{{structname}}Filter( const {{fullname}}* impl)
 	:m_impl(impl),m_ownership(0),m_state(1){}
 
-{{structname.title()}}Filter::{{structname.title()}}Filter( {{fullname}}* impl, bool withOwnership)
+{{structname}}Filter::{{structname}}Filter( {{fullname}}* impl, bool withOwnership)
 	:m_impl(impl),m_ownership(impl),m_state(1){}
 
-{{structname.title()}}Filter::~{{structname.title()}}Filter()
+{{structname}}Filter::~{{structname}}Filter()
 {
 	if (m_ownership) delete( m_ownership);
 }
 
 static binding::ValueVariant getElementValue( const {{fullname}}& elem, int valueIndex)
 {
-	switch (valueIndex)
-	{{% for element in elements %}{% if elem.type == "string" %}
-		case {{loop.index0}}:
+	switch (valueIndex) {
+	{% for element in elements %}
+		case {{loop.index0}}:{% if element.type == "string" %}
 			return binding::ValueVariant( elem.{{element.name}}().c_str(), elem.{{element.name}}().size());
-		{% endif %}{% if elem.type == "charp" %}
-			return binding::ValueVariant( elem.{{element.name}}());
-		{% endif %}{% if elem.type == "uint" %}
+		{% endif %}{% if element.type == "charp" %}
+			return binding::ValueVariant( (const char*)elem.{{element.name}}());
+		{% endif %}{% if element.type == "uint" %}
 			return binding::ValueVariant( (binding::ValueVariant::UIntType)elem.{{element.name}}());
-		{% endif %}{% if elem.type == "int" %}
+		{% endif %}{% if element.type == "int" %}
 			return binding::ValueVariant( (binding::ValueVariant::IntType)elem.{{element.name}}());
-		{% endif %}{% if elem.type == "double" %}
+		{% endif %}{% if element.type == "double" %}
 			return binding::ValueVariant( (double)elem.{{element.name}}());
-		{% endif %}{% if elem.type == "NumericVariant" %}
+		{% endif %}{% if element.type == "NumericVariant" %}
 			return binding::ValueVariant( elem.{{element.name}}());
-		{% endfor %}
+		{% endif %}{% endfor %}
 	}
 	return binding::ValueVariant();
 }
 
-BindingFilterInterface::Tag {{structname.title()}}Filter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag {{structname}}Filter::getNext( binding::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -121,31 +127,31 @@ BindingFilterInterface::Tag {{structname.title()}}Filter::getNext( binding::Valu
 	return rt;
 }
 
-void {{structname.title()}}Filter::skip()
+void {{structname}}Filter::skip()
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	m_state = st.skipState;
 }
 
-BindingFilterInterface* {{structname.title()}}Filter::createCopy() const
+BindingFilterInterface* {{structname}}Filter::createCopy() const
 {
-	return new {{structname.title()}}Filter(*this);
+	return new {{structname}}Filter(*this);
 }
 
-{{structname.title()}}VectorFilter::{{structname.title()}}VectorFilter()
+{{structname}}VectorFilter::{{structname}}VectorFilter()
 	:m_impl(0),m_ownership(0),m_state(0),m_index(0){}
 
-{{structname.title()}}VectorFilter::{{structname.title()}}VectorFilter( const {{structname.title()}}VectorFilter& o)
+{{structname}}VectorFilter::{{structname}}VectorFilter( const {{structname}}VectorFilter& o)
 	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state),m_index(o.m_index){}
 
-{{structname.title()}}VectorFilter::{{structname.title()}}VectorFilter( const std::vector<{{fullname}}>* impl)
+{{structname}}VectorFilter::{{structname}}VectorFilter( const std::vector<{{fullname}}>* impl)
 	:m_impl(impl),m_ownership(0),m_state(1),m_index(0){}
 
-{{structname.title()}}VectorFilter::{{structname.title()}}VectorFilter( std::vector<{{fullname}}>* impl, bool withOwnership)
+{{structname}}VectorFilter::{{structname}}VectorFilter( std::vector<{{fullname}}>* impl, bool withOwnership)
 	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
 
 
-BindingFilterInterface::Tag {{structname.title()}}VectorFilter::getNext( binding::ValueVariant& val)
+BindingFilterInterface::Tag {{structname}}VectorFilter::getNext( binding::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_array_statetable[ m_state];
 	Tag rt = st.tag;
@@ -176,7 +182,7 @@ BindingFilterInterface::Tag {{structname.title()}}VectorFilter::getNext( binding
 	return rt;
 }
 
-void {{structname.title()}}VectorFilter::skip()
+void {{structname}}VectorFilter::skip()
 {
 	const filter::StateTable::Element& st = g_array_statetable[ m_state];
 	m_state = st.skipState;
@@ -186,8 +192,8 @@ void {{structname.title()}}VectorFilter::skip()
 	}
 }
 
-BindingFilterInterface* {{structname.title()}}VectorFilter::createCopy() const
+BindingFilterInterface* {{structname}}VectorFilter::createCopy() const
 {
-	return new {{structname.title()}}VectorFilter(*this);
+	return new {{structname}}VectorFilter(*this);
 }
 

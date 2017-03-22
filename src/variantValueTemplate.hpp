@@ -80,9 +80,9 @@ struct VariantValueTemplate<unsigned int>
 };
 
 template <>
-struct VariantValueTemplate<strus::NumericVariant>
+struct VariantValueTemplate<NumericVariant>
 {
-	static void init( bindings::ValueVariant& res, const strus::NumericVariant& val)
+	static void init( bindings::ValueVariant& res, const NumericVariant& val)
 	{
 		res.init( val);
 	}

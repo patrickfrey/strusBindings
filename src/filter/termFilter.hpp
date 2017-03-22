@@ -5,33 +5,32 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDING_ANALYZER_TERM_FILTER_HPP_INCLUDED
-#define _STRUS_BINDING_ANALYZER_TERM_FILTER_HPP_INCLUDED
-/// \file analyzerTermFilter.hpp
+/*
+ * DO NOT MODIFY THIS FILE !!!
+ * 
+ * This file has been generated with the script scripts/genFilters.py
+ * Modifications on this file will be lost!
+ */
+#ifndef _STRUS_BINDING_TERM_FILTER_HPP_INCLUDED
+#define _STRUS_BINDING_TERM_FILTER_HPP_INCLUDED
+/// \file termFilter.hpp
 #include "strus/bindingFilterInterface.hpp"
 #include "strus/analyzer/term.hpp"
-#include "strus/reference.hpp"
-#include "stateTable.hpp"
-#include "structElementArray.hpp"
+
 
 /// \brief strus toplevel namespace
 namespace strus {
 
-struct AnalyzerTermAccess
-{
-	static binding::ValueVariant get( unsigned int state, const analyzer::Term& st);
-};
-
-class AnalyzerTermFilter
+class TermFilter
 	:public BindingFilterInterface
 {
 public:
-	AnalyzerTermFilter();
-	AnalyzerTermFilter( const AnalyzerTermFilter& o);
-	explicit AnalyzerTermFilter( const analyzer::Term* impl);
-	AnalyzerTermFilter( analyzer::Term* impl, bool withOwnership);
+	TermFilter();
+	TermFilter( const TermFilter& o);
+	explicit TermFilter( const analyzer::Term* impl);
+	TermFilter( analyzer::Term* impl, bool withOwnership);
 
-	virtual ~AnalyzerTermFilter();
+	virtual ~TermFilter();
 	virtual Tag getNext( binding::ValueVariant& val);
 
 	virtual void skip();
@@ -45,15 +44,15 @@ private:
 };
 
 
-class AnalyzerTermVectorFilter
+class TermVectorFilter
 	:public BindingFilterInterface
 {
 public:
-	AnalyzerTermVectorFilter();
-	AnalyzerTermVectorFilter( const AnalyzerTermVectorFilter& o);
-	explicit AnalyzerTermVectorFilter( const std::vector<analyzer::Term>* impl);
-	AnalyzerTermVectorFilter( std::vector<analyzer::Term>* impl, bool withOwnership);
-	virtual ~AnalyzerTermVectorFilter();
+	TermVectorFilter();
+	TermVectorFilter( const TermVectorFilter& o);
+	explicit TermVectorFilter( const std::vector<analyzer::Term>* impl);
+	TermVectorFilter( std::vector<analyzer::Term>* impl, bool withOwnership);
+	virtual ~TermVectorFilter();
 
 	virtual Tag getNext( binding::ValueVariant& val);
 
@@ -70,4 +69,3 @@ private:
 
 }//namespace
 #endif
-
