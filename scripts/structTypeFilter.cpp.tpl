@@ -41,20 +41,20 @@ enum TermArrayState {
 // Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd,		_CLOSE, StateEnd,		StateEnd,		_NULL,	 0, 0},
-	{% for eidx,element in enumerate(elements) %}
-	{State{{element.name.title()}}Open,	_OPEN,  State{{element.name.title()}}Value,		State{% if eidx +1 == elements.len() %}StateEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	_TAG,	 0, {{eidx}}},
-	{State{{element.name.title()}}Value,	_VALUE, State{{element.name.title()}}Close,		State{% if eidx +1 == elements.len() %}StateEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{eidx}}},
-	{State{{element.name.title()}}Close,	_CLOSE, State{% if eidx +1 == elements.len() %}StateEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	State{% if eidx +1 == elements.len() %}StateEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	_NULL,	 0, {{eidx}}},
+	{% for element in elements %}
+	{State{{element.name.title()}}Open,	_OPEN,  State{{element.name.title()}}Value,		State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
+	{State{{element.name.title()}}Value,	_VALUE, State{{element.name.title()}}Close,		State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
+	{State{{element.name.title()}}Close,	_CLOSE, State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
 	{% endfor %}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd,		_CLOSE, StateArrayEnd,		StateArrayEnd,		_NULL,	 0, 0},
 	{StateArrayIndex,	_INDEX, StateArray{{elements[0].name.title()}}Open,	StateArrayIndex,	_TAG,	 1, 0},
-	{% for eidx,element in enumerate(elements) %}
-	{StateArray{{element.name.title()}}Open,	_OPEN,  StateArray{{element.name.title()}}Value,		StateArray{% if eidx +1 == elements.len() %}StateArrayEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	_TAG,	 0, {{eidx}}},
-	{StateArray{{element.name.title()}}Value,	_VALUE, StateArray{{element.name.title()}}Close,		StateArray{% if eidx +1 == elements.len() %}StateArrayEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{eidx}}},
-	{StateArray{{element.name.title()}}Close,	_CLOSE, StateArray{% if eidx +1 == elements.len() %}StateArrayEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	State{% if eidx +1 == elements.len() %}StateEnd{% else %}{{elements[eidx+1].name.title()}}Open{% endif %},	_NULL,	 0, {{eidx}}},
+	{% for element in elements %}
+	{StateArray{{element.name.title()}}Open,	_OPEN,  StateArray{{element.name.title()}}Value,		StateArray{% if loop.index0 +1 == elements.len() %}StateArrayEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
+	{StateArray{{element.name.title()}}Value,	_VALUE, StateArray{{element.name.title()}}Close,		StateArray{% if loop.index0 +1 == elements.len() %}StateArrayEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
+	{StateArray{{element.name.title()}}Close,	_CLOSE, StateArray{% if loop.index0 +1 == elements.len() %}StateArrayEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	State{% if loop.index0 +1 == elements.len() %}StateEnd{% else %}{{elements[loop.index0+1].name.title()}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
 	{% endfor %}
 };
 
@@ -78,8 +78,8 @@ static const filter::StateTable::Element g_array_statetable[] = {
 static binding::ValueVariant getElementValue( const {{fullname}}& elem, int valueIndex)
 {
 	switch (valueIndex)
-	{{% for eidx,element in enumerate(elements) %}{% if elem.type == "string" %}
-		case {{eidx}}:
+	{{% for element in elements %}{% if elem.type == "string" %}
+		case {{loop.index0}}:
 			return binding::ValueVariant( elem.{{element.name}}().c_str(), elem.{{element.name}}().size());
 		{% endif %}{% if elem.type == "charp" %}
 			return binding::ValueVariant( elem.{{element.name}}());

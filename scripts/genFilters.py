@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from jinja2 import Template
 from sets import Set
+import sys
 
 atomictypes = {
         "double": {
@@ -209,13 +210,15 @@ def mapMainTemplate( mainOutput, mainTemplate):
 
 def mapStructFilterTemplates():
     for tpkey,tp in structtypes.items():
+        print >> sys.stderr, "map struct '%s'" % tpkey
         hpp_templatefile = "scripts/structTypeFilter.hpp.tpl"
         cpp_templatefile = "scripts/structTypeFilter.cpp.tpl"
-        hpp_outputfile = tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
-        cpp_outputfile = tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
-        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp.includes, structname=tpkey, fullname=tp.fullname, elements=tp.elements)
-        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp.includes, structname=tpkey, fullname=tp.fullname, elements=tp.elements)
+        hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
+        cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'])
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'])
 
+# Main:
 mapMainTemplate(
         "src/variantValueTemplate.hpp",
         "scripts/variantValueTemplate.hpp.tpl"
