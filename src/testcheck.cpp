@@ -8,5 +8,5 @@ void bla()
 {
 	strus::Index val_index;
 	bindings::ValueVariant vv;
-	bindings::VariantValueTemplate<int>::init( vv, val_index);
+	filter::VariantValueTemplate<int>::init( vv, val_index);
 }
