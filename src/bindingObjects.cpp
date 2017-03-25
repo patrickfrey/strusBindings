@@ -407,6 +407,14 @@ static strus::analyzer::FeatureOptions getFeatureOptions(
 		{
 			rt.definePositionBind( strus::analyzer::BindPredecessor);
 		}
+		else if (strus::utils::caseInsensitiveEquals( item, "BindPosContent"))
+		{
+			rt.definePositionBind( strus::analyzer::BindContent);
+		}
+		else if (strus::utils::caseInsensitiveEquals( item, "BindPosUnique"))
+		{
+			rt.definePositionBind( strus::analyzer::BindUnique);
+		}
 		else
 		{
 			throw strus::runtime_error( _TXT( "unknown feature option '%s'"), item.c_str());
