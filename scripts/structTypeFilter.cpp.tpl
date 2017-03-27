@@ -19,22 +19,17 @@
 
 using namespace strus;
 
-static const char* g_element_names[] = { {% for element in elements %}"{{element.name}}",{% endfor %} 0};
+static const char* g_element_names[] = { {% for name in func("memberlist")(structname) %}"{{name}}",{% endfor %} 0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
-	StateEnd{% for element in elements %},
-	State{{element.name[:1].upper() + element.name[1:]}}Open,
-	State{{element.name[:1].upper() + element.name[1:]}}Value,
-	State{{element.name[:1].upper() + element.name[1:]}}Close{% endfor %}
+	StateEnd{% for state in func("statelist")( "State", structname) %},
+	{{state}}{% endfor %}
 };
 
 enum TermArrayState {
-	StateArrayEnd,
-	StateArrayIndex{% for element in elements %},
-	StateArray{{element.name[:1].upper() + element.name[1:]}}Open,
-	StateArray{{element.name[:1].upper() + element.name[1:]}}Value,
-	StateArray{{element.name[:1].upper() + element.name[1:]}}Close{% endfor %}
+	StateArrayEnd{% for state in func("statelist")( "State", structname + "[]") %},
+	{{state}}{% endfor %}
 };
 
 #define _OPEN	BindingFilterInterface::Open
@@ -48,21 +43,21 @@ enum TermArrayState {
 
 // Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
-	{StateEnd,		_CLOSE, StateEnd,		StateEnd,		_NULL,	 0, 0},
+	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
 	{% for element in elements %}
-	{State{{element.name[:1].upper() + element.name[1:]}}Open,	_OPEN,  State{{element.name[:1].upper() + element.name[1:]}}Value,		State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
-	{State{{element.name[:1].upper() + element.name[1:]}}Value,	_VALUE, State{{element.name[:1].upper() + element.name[1:]}}Close,		State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
-	{State{{element.name[:1].upper() + element.name[1:]}}Close,	_CLOSE, State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	State{% if loop.index0 +1 == elements |length %}End{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
+	{State{{func("uc1")(element.name)}}Open, _OPEN, State{{func("uc1")(element.name)}}Value, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _TAG, 0, {{loop.index0}}},
+	{State{{func("uc1")(element.name)}}Value, _VALUE, State{{func("uc1")(element.name)}}Close, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _ELEM, 0, {{loop.index0}}},
+	{State{{func("uc1")(element.name)}}Close, _CLOSE, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _NULL, 0, {{loop.index0}}},
 	{% endfor %}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd,		_CLOSE, StateArrayEnd,		StateArrayEnd,		_NULL,	 0, 0},
-	{StateArrayIndex,	_INDEX, StateArray{{elements[0].name[:1].upper() + elements[0].name[1:]}}Open,	StateArrayIndex,	_TAG,	 1, 0},
+	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
+	{StateArrayIndex, _INDEX, StateArray{{func("uc1")(elements[0].name)}}Open,	StateArrayIndex, _TAG, 1, 0},
 	{% for element in elements %}
-	{StateArray{{element.name[:1].upper() + element.name[1:]}}Open,	_OPEN,  StateArray{{element.name[:1].upper() + element.name[1:]}}Value,		StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	_TAG,	 0, {{loop.index0}}},
-	{StateArray{{element.name[:1].upper() + element.name[1:]}}Value,	_VALUE, StateArray{{element.name[:1].upper() + element.name[1:]}}Close,		StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	_ELEM,	 0, {{loop.index0}}},
-	{StateArray{{element.name[:1].upper() + element.name[1:]}}Close,	_CLOSE, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{elements[loop.index0+1].name[:1].upper() + elements[loop.index0+1].name[1:]}}Open{% endif %},	_NULL,	 0, {{loop.index0}}},
+	{StateArray{{func("uc1")(element.name)}}Open, _OPEN, StateArray{{func("uc1")(element.name)}}Value, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _TAG, 0, {{loop.index0}}},
+	{StateArray{{func("uc1")(element.name)}}Value, _VALUE, StateArray{{func("uc1")(element.name)}}Close, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _ELEM, 0, {{loop.index0}}},
+	{StateArray{{func("uc1")(element.name)}}Close, _CLOSE, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _NULL, 0, {{loop.index0}}},
 	{% endfor %}
 };
 

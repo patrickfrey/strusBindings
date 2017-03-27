@@ -66,45 +66,45 @@ enum TermArrayState {
 
 // Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
-	{StateEnd,		_CLOSE, StateEnd,		StateEnd,		_NULL,	 0, 0},
+	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
 	
-	{StateTypeOpen,	_OPEN,  StateTypeValue,		StateValueOpen,	_TAG,	 0, 0},
-	{StateTypeValue,	_VALUE, StateTypeClose,		StateValueOpen,	_ELEM,	 0, 0},
-	{StateTypeClose,	_CLOSE, StateValueOpen,	StateValueOpen,	_NULL,	 0, 0},
+	{StateTypeOpen, _OPEN, StateTypeValue, StateValueOpen, _TAG, 0, 0},
+	{StateTypeValue, _VALUE, StateTypeClose, StateValueOpen, _ELEM, 0, 0},
+	{StateTypeClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, 0, 0},
 	
-	{StateValueOpen,	_OPEN,  StateValueValue,		StatePosOpen,	_TAG,	 0, 1},
-	{StateValueValue,	_VALUE, StateValueClose,		StatePosOpen,	_ELEM,	 0, 1},
-	{StateValueClose,	_CLOSE, StatePosOpen,	StatePosOpen,	_NULL,	 0, 1},
+	{StateValueOpen, _OPEN, StateValueValue, StatePosOpen, _TAG, 0, 1},
+	{StateValueValue, _VALUE, StateValueClose, StatePosOpen, _ELEM, 0, 1},
+	{StateValueClose, _CLOSE, StatePosOpen, StatePosOpen, _NULL, 0, 1},
 	
-	{StatePosOpen,	_OPEN,  StatePosValue,		StateLenOpen,	_TAG,	 0, 2},
-	{StatePosValue,	_VALUE, StatePosClose,		StateLenOpen,	_ELEM,	 0, 2},
-	{StatePosClose,	_CLOSE, StateLenOpen,	StateLenOpen,	_NULL,	 0, 2},
+	{StatePosOpen, _OPEN, StatePosValue, StateLenOpen, _TAG, 0, 2},
+	{StatePosValue, _VALUE, StatePosClose, StateLenOpen, _ELEM, 0, 2},
+	{StatePosClose, _CLOSE, StateLenOpen, StateLenOpen, _NULL, 0, 2},
 	
-	{StateLenOpen,	_OPEN,  StateLenValue,		StateEnd,	_TAG,	 0, 3},
-	{StateLenValue,	_VALUE, StateLenClose,		StateEnd,	_ELEM,	 0, 3},
-	{StateLenClose,	_CLOSE, StateEnd,	StateEnd,	_NULL,	 0, 3},
+	{StateLenOpen, _OPEN, StateLenValue, StateEnd, _TAG, 0, 3},
+	{StateLenValue, _VALUE, StateLenClose, StateEnd, _ELEM, 0, 3},
+	{StateLenClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 3},
 	
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd,		_CLOSE, StateArrayEnd,		StateArrayEnd,		_NULL,	 0, 0},
-	{StateArrayIndex,	_INDEX, StateArrayTypeOpen,	StateArrayIndex,	_TAG,	 1, 0},
+	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
+	{StateArrayIndex, _INDEX, StateArrayTypeOpen,	StateArrayIndex, _TAG, 1, 0},
 	
-	{StateArrayTypeOpen,	_OPEN,  StateArrayTypeValue,		StateArrayValueOpen,	_TAG,	 0, 0},
-	{StateArrayTypeValue,	_VALUE, StateArrayTypeClose,		StateArrayValueOpen,	_ELEM,	 0, 0},
-	{StateArrayTypeClose,	_CLOSE, StateArrayValueOpen,	StateArrayValueOpen,	_NULL,	 0, 0},
+	{StateArrayTypeOpen, _OPEN, StateArrayTypeValue, StateArrayValueOpen, _TAG, 0, 0},
+	{StateArrayTypeValue, _VALUE, StateArrayTypeClose, StateArrayValueOpen, _ELEM, 0, 0},
+	{StateArrayTypeClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, 0, 0},
 	
-	{StateArrayValueOpen,	_OPEN,  StateArrayValueValue,		StateArrayPosOpen,	_TAG,	 0, 1},
-	{StateArrayValueValue,	_VALUE, StateArrayValueClose,		StateArrayPosOpen,	_ELEM,	 0, 1},
-	{StateArrayValueClose,	_CLOSE, StateArrayPosOpen,	StateArrayPosOpen,	_NULL,	 0, 1},
+	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayPosOpen, _TAG, 0, 1},
+	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayPosOpen, _ELEM, 0, 1},
+	{StateArrayValueClose, _CLOSE, StateArrayPosOpen, StateArrayPosOpen, _NULL, 0, 1},
 	
-	{StateArrayPosOpen,	_OPEN,  StateArrayPosValue,		StateArrayLenOpen,	_TAG,	 0, 2},
-	{StateArrayPosValue,	_VALUE, StateArrayPosClose,		StateArrayLenOpen,	_ELEM,	 0, 2},
-	{StateArrayPosClose,	_CLOSE, StateArrayLenOpen,	StateArrayLenOpen,	_NULL,	 0, 2},
+	{StateArrayPosOpen, _OPEN, StateArrayPosValue, StateArrayLenOpen, _TAG, 0, 2},
+	{StateArrayPosValue, _VALUE, StateArrayPosClose, StateArrayLenOpen, _ELEM, 0, 2},
+	{StateArrayPosClose, _CLOSE, StateArrayLenOpen, StateArrayLenOpen, _NULL, 0, 2},
 	
-	{StateArrayLenOpen,	_OPEN,  StateArrayLenValue,		StateArrayIndex,	_TAG,	 0, 3},
-	{StateArrayLenValue,	_VALUE, StateArrayLenClose,		StateArrayIndex,	_ELEM,	 0, 3},
-	{StateArrayLenClose,	_CLOSE, StateArrayIndex,	StateArrayIndex,	_NULL,	 0, 3},
+	{StateArrayLenOpen, _OPEN, StateArrayLenValue, StateArrayIndex, _TAG, 0, 3},
+	{StateArrayLenValue, _VALUE, StateArrayLenClose, StateArrayIndex, _ELEM, 0, 3},
+	{StateArrayLenClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 3},
 	
 };
 
