@@ -78,7 +78,7 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StatePosClose, _CLOSE, StateLenOpen, StateLenOpen, _NULL, 0, 2},
 	{StateLenOpen, _OPEN, StateLenValue, StateEnd, _TAG, 0, 3},
 	{StateLenValue, _VALUE, StateLenClose, StateEnd, _ELEM, 0, 3},
-	{StateLenClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 3},
+	{StateLenClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 3}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {

@@ -224,13 +224,13 @@ def getFunction( funcname):
             for element in structtypes[etype]['elements']:
                 rt += statelist( prefix + uc1(element["name"]), element["type"])
             return rt
-    def statestructlist( prefix, etype, nextstate):
+    def statestructlist( prefix, etype, nextstate, tableIndex, valueIndex):
         if etype[-2:] == "[]":
-            return [ prefix + "ArrayIndex" ] + statestructlist( prefix + "Array", etype[:-2], nextstate)
+            return [ prefix + "ArrayIndex" ] + statestructlist( prefix + "Array", etype[:-2], nextstate, elemindex, tableIndex, valueIndex)
         if etype in atomictypes:
-            return ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, 0, 0}",
-                    "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, 0, 0}",
-                    "{" + prefix + "Close, _VALUE, " + nextstate + ", " + nextstate + ", _NULL, 0, 0}"]
+            return ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, %u, %u}" % (tableIndex, valueIndex),
+                    "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, %u, %u}" % (tableIndex, valueIndex),
+                    "{" + prefix + "Close, _CLOSE, " + nextstate + ", " + nextstate + ", _NULL, %u, %u}" % (tableIndex, valueIndex) ]
         if etype in structtypes:
             rt = []
             elements = structtypes[etype]['elements']
@@ -239,7 +239,7 @@ def getFunction( funcname):
                     followstate = nextstate
                 else:
                     followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
-                rt += statestructlist( prefix + uc1(element["name"]), element["type"], followstate)
+                rt += statestructlist( prefix + uc1(element["name"]), element["type"], followstate, 0, eidx)
             return rt
     def memberlist( etype):
         if etype[-2:] == "[]":

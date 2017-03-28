@@ -60,7 +60,7 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateFeatidxClose, _CLOSE, StateWeightOpen, StateWeightOpen, _NULL, 0, 0},
 	{StateWeightOpen, _OPEN, StateWeightValue, StateEnd, _TAG, 0, 1},
 	{StateWeightValue, _VALUE, StateWeightClose, StateEnd, _ELEM, 0, 1},
-	{StateWeightClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 1},
+	{StateWeightClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 1}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {

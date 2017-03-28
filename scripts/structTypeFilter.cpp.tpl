@@ -43,10 +43,8 @@ enum TermArrayState {
 
 // Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
-	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},{% for element in elements %}
-	{State{{func("uc1")(element.name)}}Open, _OPEN, State{{func("uc1")(element.name)}}Value, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _TAG, 0, {{loop.index0}}},
-	{State{{func("uc1")(element.name)}}Value, _VALUE, State{{func("uc1")(element.name)}}Close, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _ELEM, 0, {{loop.index0}}},
-	{State{{func("uc1")(element.name)}}Close, _CLOSE, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, State{% if loop.index0 +1 == elements |length %}End{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _NULL, 0, {{loop.index0}}},{% endfor %}
+	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0}{% for statestruct in func("statestructlist")( "State", structname, "StateEnd", 0, 0) %},
+	{{statestruct}}{% endfor %}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {

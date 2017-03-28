@@ -69,7 +69,7 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateValueClose, _CLOSE, StateIncrementOpen, StateIncrementOpen, _NULL, 0, 1},
 	{StateIncrementOpen, _OPEN, StateIncrementValue, StateEnd, _TAG, 0, 2},
 	{StateIncrementValue, _VALUE, StateIncrementClose, StateEnd, _ELEM, 0, 2},
-	{StateIncrementClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 2},
+	{StateIncrementClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 2}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
