@@ -228,9 +228,13 @@ def getFunction( funcname):
         class closurevar:
             tagnameIndex = 0
             valueIndex = 0
+            arrayIndex = -1
         def statestructlist_( prefix, etype, nextstate):
             if etype[-2:] == "[]":
-                return [ prefix + "ArrayIndex" ] + statestructlist_( prefix + "Array", etype[:-2], nextstate)
+                closurevar.arrayIndex += 1
+                rt = [ prefix + "ArrayIndex" ] + statestructlist_( prefix + "Array", etype[:-2], nextstate)
+                closurevar.arrayIndex -= 1
+                return rt
             if etype in atomictypes:
                 rt = ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex,
                       "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, -1, %u}" % closurevar.valueIndex,
@@ -250,6 +254,7 @@ def getFunction( funcname):
                 return rt
         closurevar.tagnameIndex = 0
         closurevar.valueIndex = 0
+        closurevar.arrayIndex = -1
         return statestructlist_( prefix, etype, nextstate)
     def memberlist( etype):
         if etype[-2:] == "[]":
