@@ -228,9 +228,9 @@ def getFunction( funcname):
         if etype[-2:] == "[]":
             return [ prefix + "ArrayIndex" ] + statestructlist( prefix + "Array", etype[:-2], nextstate)
         if etype in atomictypes:
-            return [prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, 0, 0",
-                    prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, 0, 0",
-                    prefix + "Close, _VALUE, " + nextstate + ", " + nextstate + ", _NULL, 0, 0"]
+            return ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, 0, 0}",
+                    "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, 0, 0}",
+                    "{" + prefix + "Close, _VALUE, " + nextstate + ", " + nextstate + ", _NULL, 0, 0}"]
         if etype in structtypes:
             rt = []
             elements = structtypes[etype]['elements']
@@ -238,8 +238,8 @@ def getFunction( funcname):
                 if eidx+1 == len(elements):
                     followstate = nextstate
                 else:
-                    followstate = elements[ eidx+1]
-                rt += statelist( prefix + uc1(element["name"]), element["type"], followstate)
+                    followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
+                rt += statestructlist( prefix + uc1(element["name"]), element["type"], followstate)
             return rt
     def memberlist( etype):
         if etype[-2:] == "[]":
@@ -255,8 +255,11 @@ def getFunction( funcname):
         return uc1
     if funcname == "statelist":
         return statelist
+    if funcname == "statestructlist":
+        return statestructlist
     if funcname == "memberlist":
         return memberlist
+    return None
 
 def mapStructFilterTemplates():
     for tpkey,tp in structtypes.items():

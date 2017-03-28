@@ -55,29 +55,23 @@ enum TermArrayState {
 // Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
-	
 	{StateFeatidxOpen, _OPEN, StateFeatidxValue, StateWeightOpen, _TAG, 0, 0},
 	{StateFeatidxValue, _VALUE, StateFeatidxClose, StateWeightOpen, _ELEM, 0, 0},
 	{StateFeatidxClose, _CLOSE, StateWeightOpen, StateWeightOpen, _NULL, 0, 0},
-	
 	{StateWeightOpen, _OPEN, StateWeightValue, StateEnd, _TAG, 0, 1},
 	{StateWeightValue, _VALUE, StateWeightClose, StateEnd, _ELEM, 0, 1},
 	{StateWeightClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 1},
-	
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayFeatidxOpen,	StateArrayIndex, _TAG, 1, 0},
-	
+	{StateArrayIndex, _INDEX, StateArrayFeatidxOpen, StateArrayIndex, _TAG, 1, 0},
 	{StateArrayFeatidxOpen, _OPEN, StateArrayFeatidxValue, StateArrayWeightOpen, _TAG, 0, 0},
 	{StateArrayFeatidxValue, _VALUE, StateArrayFeatidxClose, StateArrayWeightOpen, _ELEM, 0, 0},
 	{StateArrayFeatidxClose, _CLOSE, StateArrayWeightOpen, StateArrayWeightOpen, _NULL, 0, 0},
-	
 	{StateArrayWeightOpen, _OPEN, StateArrayWeightValue, StateArrayIndex, _TAG, 0, 1},
 	{StateArrayWeightValue, _VALUE, StateArrayWeightClose, StateArrayIndex, _ELEM, 0, 1},
 	{StateArrayWeightClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 1},
-	
 };
 
 VectorRankFilter::VectorRankFilter()
