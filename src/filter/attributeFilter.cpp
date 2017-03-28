@@ -52,26 +52,26 @@ enum TermArrayState {
 #define _ELEM	filter::StateTable::ElementValue
 
 
-// Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
+// Element: index, tag, nextState, skipState, valueType, tagnameIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
-	{StateNameOpen, _OPEN, StateNameValue, StateValueOpen, _TAG, 0, 0},
-	{StateNameValue, _VALUE, StateNameClose, StateValueOpen, _ELEM, 0, 0},
-	{StateNameClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, 0, 0},
-	{StateValueOpen, _OPEN, StateValueValue, StateEnd, _TAG, 0, 1},
-	{StateValueValue, _VALUE, StateValueClose, StateEnd, _ELEM, 0, 1},
-	{StateValueClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 1}
+	{StateNameOpen, _OPEN, StateNameValue, StateValueOpen, _TAG, 0, -1},
+	{StateNameValue, _VALUE, StateNameClose, StateValueOpen, _ELEM, -1, 0},
+	{StateNameClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, -1, -1},
+	{StateValueOpen, _OPEN, StateValueValue, StateEnd, _TAG, 1, -1},
+	{StateValueValue, _VALUE, StateValueClose, StateEnd, _ELEM, -1, 1},
+	{StateValueClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
 	{StateArrayIndex, _INDEX, StateArrayNameOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayNameOpen, _OPEN, StateArrayNameValue, StateArrayValueOpen, _TAG, 0, 0},
-	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayValueOpen, _ELEM, 0, 0},
-	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, 0, 0},
-	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIndex, _TAG, 0, 1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayIndex, _ELEM, 0, 1},
-	{StateArrayValueClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 1}
+	{StateArrayNameOpen, _OPEN, StateArrayNameValue, StateArrayValueOpen, _TAG, 0, -1},
+	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayValueOpen, _ELEM, -1, 0},
+	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
+	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIndex, _TAG, 1, -1},
+	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayIndex, _ELEM, -1, 1},
+	{StateArrayValueClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
 };
 
 AttributeFilter::AttributeFilter()
@@ -120,7 +120,7 @@ BindingFilterInterface::Tag AttributeFilter::getNext( bindings::ValueVariant& va
 			val.clear();
 			break;
 		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
+			val = g_struct_elements[ st.tagnameIndex];
 			break;
 		case _ELEM:
 			val = getElementValue( *m_impl, st.valueIndex);

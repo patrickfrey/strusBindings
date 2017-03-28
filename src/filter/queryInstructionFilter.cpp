@@ -58,32 +58,32 @@ enum TermArrayState {
 #define _ELEM	filter::StateTable::ElementValue
 
 
-// Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
+// Element: index, tag, nextState, skipState, valueType, tagnameIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
-	{StateOpCodeOpen, _OPEN, StateOpCodeValue, StateIdxOpen, _TAG, 0, 0},
-	{StateOpCodeValue, _VALUE, StateOpCodeClose, StateIdxOpen, _ELEM, 0, 0},
-	{StateOpCodeClose, _CLOSE, StateIdxOpen, StateIdxOpen, _NULL, 0, 0},
-	{StateIdxOpen, _OPEN, StateIdxValue, StateNofOperandsOpen, _TAG, 0, 1},
-	{StateIdxValue, _VALUE, StateIdxClose, StateNofOperandsOpen, _ELEM, 0, 1},
-	{StateIdxClose, _CLOSE, StateNofOperandsOpen, StateNofOperandsOpen, _NULL, 0, 1},
-	{StateNofOperandsOpen, _OPEN, StateNofOperandsValue, StateEnd, _TAG, 0, 2},
-	{StateNofOperandsValue, _VALUE, StateNofOperandsClose, StateEnd, _ELEM, 0, 2},
-	{StateNofOperandsClose, _CLOSE, StateEnd, StateEnd, _NULL, 0, 2}
+	{StateOpCodeOpen, _OPEN, StateOpCodeValue, StateIdxOpen, _TAG, 0, -1},
+	{StateOpCodeValue, _VALUE, StateOpCodeClose, StateIdxOpen, _ELEM, -1, 0},
+	{StateOpCodeClose, _CLOSE, StateIdxOpen, StateIdxOpen, _NULL, -1, -1},
+	{StateIdxOpen, _OPEN, StateIdxValue, StateNofOperandsOpen, _TAG, 1, -1},
+	{StateIdxValue, _VALUE, StateIdxClose, StateNofOperandsOpen, _ELEM, -1, 1},
+	{StateIdxClose, _CLOSE, StateNofOperandsOpen, StateNofOperandsOpen, _NULL, -1, -1},
+	{StateNofOperandsOpen, _OPEN, StateNofOperandsValue, StateEnd, _TAG, 2, -1},
+	{StateNofOperandsValue, _VALUE, StateNofOperandsClose, StateEnd, _ELEM, -1, 2},
+	{StateNofOperandsClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
 	{StateArrayIndex, _INDEX, StateArrayOpCodeOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayOpCodeOpen, _OPEN, StateArrayOpCodeValue, StateArrayIdxOpen, _TAG, 0, 0},
-	{StateArrayOpCodeValue, _VALUE, StateArrayOpCodeClose, StateArrayIdxOpen, _ELEM, 0, 0},
-	{StateArrayOpCodeClose, _CLOSE, StateArrayIdxOpen, StateArrayIdxOpen, _NULL, 0, 0},
-	{StateArrayIdxOpen, _OPEN, StateArrayIdxValue, StateArrayNofOperandsOpen, _TAG, 0, 1},
-	{StateArrayIdxValue, _VALUE, StateArrayIdxClose, StateArrayNofOperandsOpen, _ELEM, 0, 1},
-	{StateArrayIdxClose, _CLOSE, StateArrayNofOperandsOpen, StateArrayNofOperandsOpen, _NULL, 0, 1},
-	{StateArrayNofOperandsOpen, _OPEN, StateArrayNofOperandsValue, StateArrayIndex, _TAG, 0, 2},
-	{StateArrayNofOperandsValue, _VALUE, StateArrayNofOperandsClose, StateArrayIndex, _ELEM, 0, 2},
-	{StateArrayNofOperandsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 2}
+	{StateArrayOpCodeOpen, _OPEN, StateArrayOpCodeValue, StateArrayIdxOpen, _TAG, 0, -1},
+	{StateArrayOpCodeValue, _VALUE, StateArrayOpCodeClose, StateArrayIdxOpen, _ELEM, -1, 0},
+	{StateArrayOpCodeClose, _CLOSE, StateArrayIdxOpen, StateArrayIdxOpen, _NULL, -1, -1},
+	{StateArrayIdxOpen, _OPEN, StateArrayIdxValue, StateArrayNofOperandsOpen, _TAG, 1, -1},
+	{StateArrayIdxValue, _VALUE, StateArrayIdxClose, StateArrayNofOperandsOpen, _ELEM, -1, 1},
+	{StateArrayIdxClose, _CLOSE, StateArrayNofOperandsOpen, StateArrayNofOperandsOpen, _NULL, -1, -1},
+	{StateArrayNofOperandsOpen, _OPEN, StateArrayNofOperandsValue, StateArrayIndex, _TAG, 2, -1},
+	{StateArrayNofOperandsValue, _VALUE, StateArrayNofOperandsClose, StateArrayIndex, _ELEM, -1, 2},
+	{StateArrayNofOperandsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
 };
 
 QueryInstructionFilter::QueryInstructionFilter()
@@ -135,7 +135,7 @@ BindingFilterInterface::Tag QueryInstructionFilter::getNext( bindings::ValueVari
 			val.clear();
 			break;
 		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
+			val = g_struct_elements[ st.tagnameIndex];
 			break;
 		case _ELEM:
 			val = getElementValue( *m_impl, st.valueIndex);

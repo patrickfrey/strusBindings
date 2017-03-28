@@ -41,15 +41,15 @@ enum TermArrayState {
 #define _ELEM	filter::StateTable::ElementValue
 
 
-// Element: index, tag, nextState, skipState, valueType, tableIndex, valueIndex
+// Element: index, tag, nextState, skipState, valueType, tagnameIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
-	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0}{% for statestruct in func("statestructlist")( "State", structname, "StateEnd", 0, 0) %},
+	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0}{% for statestruct in func("statestructlist")( "State", structname, "StateEnd") %},
 	{{statestruct}}{% endfor %}
 };
 
 static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArray{{func("uc1")(elements[0].name)}}Open, StateArrayIndex, _TAG, 1, 0}{% for statestruct in func("statestructlist")( "StateArray", structname, "StateArrayIndex", 0, 0) %},
+	{StateArrayIndex, _INDEX, StateArray{{func("uc1")(elements[0].name)}}Open, StateArrayIndex, _TAG, 1, 0}{% for statestruct in func("statestructlist")( "StateArray", structname, "StateArrayIndex") %},
 	{{statestruct}}{% endfor %}
 };
 
@@ -96,7 +96,7 @@ BindingFilterInterface::Tag {{structname}}Filter::getNext( bindings::ValueVarian
 			val.clear();
 			break;
 		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
+			val = g_struct_elements[ st.tagnameIndex];
 			break;
 		case _ELEM:
 			val = getElementValue( *m_impl, st.valueIndex);

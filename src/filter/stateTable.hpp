@@ -31,13 +31,13 @@ public:
 
 	struct Element
 	{
-		int index;
-		Tag tag;
-		int nextState;
-		int skipState;
-		ValueType valueType;
-		int tableIndex;
-		int valueIndex;
+		int index;			///< index in state machine for verification and local decisions
+		Tag tag;			///< tag operation
+		int nextState;			///< follow state on get next
+		int skipState;			///< follow state on skip
+		ValueType valueType;		///< value type
+		int tagnameIndex;		///< index of tag name
+		int valueIndex;			///< index of element in structure
 	};
 
 	explicit StateTable( const Element* elements_)

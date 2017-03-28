@@ -224,23 +224,33 @@ def getFunction( funcname):
             for element in structtypes[etype]['elements']:
                 rt += statelist( prefix + uc1(element["name"]), element["type"])
             return rt
-    def statestructlist( prefix, etype, nextstate, tableIndex, valueIndex):
-        if etype[-2:] == "[]":
-            return [ prefix + "ArrayIndex" ] + statestructlist( prefix + "Array", etype[:-2], nextstate, elemindex, tableIndex, valueIndex)
-        if etype in atomictypes:
-            return ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, %u, %u}" % (tableIndex, valueIndex),
-                    "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, %u, %u}" % (tableIndex, valueIndex),
-                    "{" + prefix + "Close, _CLOSE, " + nextstate + ", " + nextstate + ", _NULL, %u, %u}" % (tableIndex, valueIndex) ]
-        if etype in structtypes:
-            rt = []
-            elements = structtypes[etype]['elements']
-            for eidx,element in enumerate( elements):
-                if eidx+1 == len(elements):
-                    followstate = nextstate
-                else:
-                    followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
-                rt += statestructlist( prefix + uc1(element["name"]), element["type"], followstate, 0, eidx)
-            return rt
+    def statestructlist( prefix, etype, nextstate):
+        class closurevar:
+            tagnameIndex = 0
+            valueIndex = 0
+        def statestructlist_( prefix, etype, nextstate):
+            if etype[-2:] == "[]":
+                return [ prefix + "ArrayIndex" ] + statestructlist_( prefix + "Array", etype[:-2], nextstate)
+            if etype in atomictypes:
+                rt = ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex,
+                      "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, -1, %u}" % closurevar.valueIndex,
+                      "{" + prefix + "Close, _CLOSE, " + nextstate + ", " + nextstate + ", _NULL, -1, -1}" ]
+                closurevar.valueIndex += 1
+                return rt
+            if etype in structtypes:
+                rt = []
+                elements = structtypes[etype]['elements']
+                for eidx,element in enumerate( elements):
+                    if eidx+1 == len(elements):
+                        followstate = nextstate
+                    else:
+                        followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
+                    rt += statestructlist_( prefix + uc1(element["name"]), element["type"], followstate)
+                    closurevar.tagnameIndex += 1
+                return rt
+        closurevar.tagnameIndex = 0
+        closurevar.valueIndex = 0
+        return statestructlist_( prefix, etype, nextstate)
     def memberlist( etype):
         if etype[-2:] == "[]":
             return namelist( etype[:-2])
