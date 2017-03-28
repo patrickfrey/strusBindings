@@ -83,7 +83,7 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayValueClose, _CLOSE, StateArrayIncrementOpen, StateArrayIncrementOpen, _NULL, 0, 1},
 	{StateArrayIncrementOpen, _OPEN, StateArrayIncrementValue, StateArrayIndex, _TAG, 0, 2},
 	{StateArrayIncrementValue, _VALUE, StateArrayIncrementClose, StateArrayIndex, _ELEM, 0, 2},
-	{StateArrayIncrementClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 2},
+	{StateArrayIncrementClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 2}
 };
 
 DocumentFrequencyChangeFilter::DocumentFrequencyChangeFilter()

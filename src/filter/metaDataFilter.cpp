@@ -71,7 +71,7 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, 0, 0},
 	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIndex, _TAG, 0, 1},
 	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayIndex, _ELEM, 0, 1},
-	{StateArrayValueClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 1},
+	{StateArrayValueClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 1}
 };
 
 MetaDataFilter::MetaDataFilter()

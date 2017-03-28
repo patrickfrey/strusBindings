@@ -95,7 +95,7 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayWeightClose, _CLOSE, StateArrayIndexOpen, StateArrayIndexOpen, _NULL, 0, 2},
 	{StateArrayIndexOpen, _OPEN, StateArrayIndexValue, StateArrayIndex, _TAG, 0, 3},
 	{StateArrayIndexValue, _VALUE, StateArrayIndexClose, StateArrayIndex, _ELEM, 0, 3},
-	{StateArrayIndexClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 3},
+	{StateArrayIndexClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 3}
 };
 
 SummaryElementFilter::SummaryElementFilter()

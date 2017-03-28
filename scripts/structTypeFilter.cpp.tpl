@@ -49,10 +49,8 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 
 static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArray{{func("uc1")(elements[0].name)}}Open, StateArrayIndex, _TAG, 1, 0},{% for element in elements %}
-	{StateArray{{func("uc1")(element.name)}}Open, _OPEN, StateArray{{func("uc1")(element.name)}}Value, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _TAG, 0, {{loop.index0}}},
-	{StateArray{{func("uc1")(element.name)}}Value, _VALUE, StateArray{{func("uc1")(element.name)}}Close, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _ELEM, 0, {{loop.index0}}},
-	{StateArray{{func("uc1")(element.name)}}Close, _CLOSE, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, StateArray{% if loop.index0 +1 == elements |length %}Index{% else %}{{func("uc1")(elements[loop.index0+1].name)}}Open{% endif %}, _NULL, 0, {{loop.index0}}},{% endfor %}
+	{StateArrayIndex, _INDEX, StateArray{{func("uc1")(elements[0].name)}}Open, StateArrayIndex, _TAG, 1, 0}{% for statestruct in func("statestructlist")( "StateArray", structname, "StateArrayIndex", 0, 0) %},
+	{{statestruct}}{% endfor %}
 };
 
 {{structname}}Filter::{{structname}}Filter()

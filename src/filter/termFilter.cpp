@@ -95,7 +95,7 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayPosClose, _CLOSE, StateArrayLenOpen, StateArrayLenOpen, _NULL, 0, 2},
 	{StateArrayLenOpen, _OPEN, StateArrayLenValue, StateArrayIndex, _TAG, 0, 3},
 	{StateArrayLenValue, _VALUE, StateArrayLenClose, StateArrayIndex, _ELEM, 0, 3},
-	{StateArrayLenClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 3},
+	{StateArrayLenClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 3}
 };
 
 TermFilter::TermFilter()

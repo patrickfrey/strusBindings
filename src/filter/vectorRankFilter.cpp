@@ -71,7 +71,7 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayFeatidxClose, _CLOSE, StateArrayWeightOpen, StateArrayWeightOpen, _NULL, 0, 0},
 	{StateArrayWeightOpen, _OPEN, StateArrayWeightValue, StateArrayIndex, _TAG, 0, 1},
 	{StateArrayWeightValue, _VALUE, StateArrayWeightClose, StateArrayIndex, _ELEM, 0, 1},
-	{StateArrayWeightClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 1},
+	{StateArrayWeightClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 1}
 };
 
 VectorRankFilter::VectorRankFilter()

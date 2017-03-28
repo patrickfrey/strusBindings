@@ -83,7 +83,7 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayIdxClose, _CLOSE, StateArrayNofOperandsOpen, StateArrayNofOperandsOpen, _NULL, 0, 1},
 	{StateArrayNofOperandsOpen, _OPEN, StateArrayNofOperandsValue, StateArrayIndex, _TAG, 0, 2},
 	{StateArrayNofOperandsValue, _VALUE, StateArrayNofOperandsClose, StateArrayIndex, _ELEM, 0, 2},
-	{StateArrayNofOperandsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 2},
+	{StateArrayNofOperandsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, 0, 2}
 };
 
 QueryInstructionFilter::QueryInstructionFilter()
