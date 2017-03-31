@@ -300,11 +300,5 @@ def mapStructFilterTemplates():
         mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], atomictypes=atomictypes, func=getFunction)
         mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], atomictypes=atomictypes, func=getFunction)
 
-# Main:
-mapMainTemplate(
-        "src/filter/variantValueTemplate.hpp",
-        "scripts/variantValueTemplate.hpp.tpl"
-)
-
 mapStructFilterTemplates()
 
