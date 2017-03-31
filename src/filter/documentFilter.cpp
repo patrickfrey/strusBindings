@@ -15,7 +15,6 @@
 #include "documentFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
 #include <cstring>
 
 using namespace strus;
@@ -25,62 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateSubDocumentTypeNameOpen,
-	StateSubDocumentTypeNameValue,
-	StateSubDocumentTypeNameClose,
-	StateMetadataOpen,
-	StateMetadataIndex,
-	StateMetadataNameOpen,
-	StateMetadataNameValue,
-	StateMetadataNameClose,
-	StateMetadataValueOpen,
-	StateMetadataValueValue,
-	StateMetadataValueClose,
-	StateMetadataClose,
-	StateAttributesOpen,
-	StateAttributesIndex,
-	StateAttributesNameOpen,
-	StateAttributesNameValue,
-	StateAttributesNameClose,
-	StateAttributesValueOpen,
-	StateAttributesValueValue,
-	StateAttributesValueClose,
-	StateAttributesClose,
-	StateSearchTermsOpen,
-	StateSearchTermsIndex,
-	StateSearchTermsTypeOpen,
-	StateSearchTermsTypeValue,
-	StateSearchTermsTypeClose,
-	StateSearchTermsValueOpen,
-	StateSearchTermsValueValue,
-	StateSearchTermsValueClose,
-	StateSearchTermsPosOpen,
-	StateSearchTermsPosValue,
-	StateSearchTermsPosClose,
-	StateSearchTermsLenOpen,
-	StateSearchTermsLenValue,
-	StateSearchTermsLenClose,
-	StateSearchTermsClose,
-	StateForwardTermsOpen,
-	StateForwardTermsIndex,
-	StateForwardTermsTypeOpen,
-	StateForwardTermsTypeValue,
-	StateForwardTermsTypeClose,
-	StateForwardTermsValueOpen,
-	StateForwardTermsValueValue,
-	StateForwardTermsValueClose,
-	StateForwardTermsPosOpen,
-	StateForwardTermsPosValue,
-	StateForwardTermsPosClose,
-	StateForwardTermsLenOpen,
-	StateForwardTermsLenValue,
-	StateForwardTermsLenClose,
-	StateForwardTermsClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateSubDocumentTypeNameOpen,
 	StateSubDocumentTypeNameValue,
 	StateSubDocumentTypeNameClose,
@@ -199,62 +142,6 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateForwardTermsClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArraySubDocumentTypeNameOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArraySubDocumentTypeNameOpen, _OPEN, StateArraySubDocumentTypeNameValue, StateArrayMetadataOpen, _TAG, 0, -1},
-	{StateArraySubDocumentTypeNameValue, _VALUE, StateArraySubDocumentTypeNameClose, StateArraySubDocumentTypeNameClose, _ELEM, -1, 0},
-	{StateArraySubDocumentTypeNameClose, _CLOSE, StateArrayMetadataOpen, StateArrayMetadataOpen, _NULL, -1, -1},
-	{StateArrayMetadataOpen, _OPEN, StateArrayMetadataIndex, StateArrayAttributesOpen, _TAG, 1, -1},
-	{StateArrayMetadataIndex, _INDEX, StateArrayMetadataNameOpen, StateArrayMetadataIndex, _TAG, -1, -1},
-	{StateArrayMetadataNameOpen, _OPEN, StateArrayMetadataNameValue, StateArrayMetadataValueOpen, _TAG, 2, -1},
-	{StateArrayMetadataNameValue, _VALUE, StateArrayMetadataNameClose, StateArrayMetadataNameClose, _ELEM, -1, 0},
-	{StateArrayMetadataNameClose, _CLOSE, StateArrayMetadataValueOpen, StateArrayMetadataValueOpen, _NULL, -1, -1},
-	{StateArrayMetadataValueOpen, _OPEN, StateArrayMetadataValueValue, StateArrayMetadataIndex, _TAG, 3, -1},
-	{StateArrayMetadataValueValue, _VALUE, StateArrayMetadataValueClose, StateArrayMetadataValueClose, _ELEM, -1, 1},
-	{StateArrayMetadataValueClose, _CLOSE, StateArrayMetadataIndex, StateArrayMetadataIndex, _NULL, -1, -1},
-	{StateArrayMetadataClose, _CLOSE, StateArrayAttributesOpen, StateArrayAttributesOpen, _NULL, -1, -1},
-	{StateArrayAttributesOpen, _OPEN, StateArrayAttributesIndex, StateArraySearchTermsOpen, _TAG, 4, -1},
-	{StateArrayAttributesIndex, _INDEX, StateArrayAttributesNameOpen, StateArrayAttributesIndex, _TAG, -1, -1},
-	{StateArrayAttributesNameOpen, _OPEN, StateArrayAttributesNameValue, StateArrayAttributesValueOpen, _TAG, 5, -1},
-	{StateArrayAttributesNameValue, _VALUE, StateArrayAttributesNameClose, StateArrayAttributesNameClose, _ELEM, -1, 0},
-	{StateArrayAttributesNameClose, _CLOSE, StateArrayAttributesValueOpen, StateArrayAttributesValueOpen, _NULL, -1, -1},
-	{StateArrayAttributesValueOpen, _OPEN, StateArrayAttributesValueValue, StateArrayAttributesIndex, _TAG, 6, -1},
-	{StateArrayAttributesValueValue, _VALUE, StateArrayAttributesValueClose, StateArrayAttributesValueClose, _ELEM, -1, 1},
-	{StateArrayAttributesValueClose, _CLOSE, StateArrayAttributesIndex, StateArrayAttributesIndex, _NULL, -1, -1},
-	{StateArrayAttributesClose, _CLOSE, StateArraySearchTermsOpen, StateArraySearchTermsOpen, _NULL, -1, -1},
-	{StateArraySearchTermsOpen, _OPEN, StateArraySearchTermsIndex, StateArrayForwardTermsOpen, _TAG, 7, -1},
-	{StateArraySearchTermsIndex, _INDEX, StateArraySearchTermsTypeOpen, StateArraySearchTermsIndex, _TAG, -1, -1},
-	{StateArraySearchTermsTypeOpen, _OPEN, StateArraySearchTermsTypeValue, StateArraySearchTermsValueOpen, _TAG, 8, -1},
-	{StateArraySearchTermsTypeValue, _VALUE, StateArraySearchTermsTypeClose, StateArraySearchTermsTypeClose, _ELEM, -1, 0},
-	{StateArraySearchTermsTypeClose, _CLOSE, StateArraySearchTermsValueOpen, StateArraySearchTermsValueOpen, _NULL, -1, -1},
-	{StateArraySearchTermsValueOpen, _OPEN, StateArraySearchTermsValueValue, StateArraySearchTermsPosOpen, _TAG, 9, -1},
-	{StateArraySearchTermsValueValue, _VALUE, StateArraySearchTermsValueClose, StateArraySearchTermsValueClose, _ELEM, -1, 1},
-	{StateArraySearchTermsValueClose, _CLOSE, StateArraySearchTermsPosOpen, StateArraySearchTermsPosOpen, _NULL, -1, -1},
-	{StateArraySearchTermsPosOpen, _OPEN, StateArraySearchTermsPosValue, StateArraySearchTermsLenOpen, _TAG, 10, -1},
-	{StateArraySearchTermsPosValue, _VALUE, StateArraySearchTermsPosClose, StateArraySearchTermsPosClose, _ELEM, -1, 2},
-	{StateArraySearchTermsPosClose, _CLOSE, StateArraySearchTermsLenOpen, StateArraySearchTermsLenOpen, _NULL, -1, -1},
-	{StateArraySearchTermsLenOpen, _OPEN, StateArraySearchTermsLenValue, StateArraySearchTermsIndex, _TAG, 11, -1},
-	{StateArraySearchTermsLenValue, _VALUE, StateArraySearchTermsLenClose, StateArraySearchTermsLenClose, _ELEM, -1, 3},
-	{StateArraySearchTermsLenClose, _CLOSE, StateArraySearchTermsIndex, StateArraySearchTermsIndex, _NULL, -1, -1},
-	{StateArraySearchTermsClose, _CLOSE, StateArrayForwardTermsOpen, StateArrayForwardTermsOpen, _NULL, -1, -1},
-	{StateArrayForwardTermsOpen, _OPEN, StateArrayForwardTermsIndex, StateArrayIndex, _TAG, 12, -1},
-	{StateArrayForwardTermsIndex, _INDEX, StateArrayForwardTermsTypeOpen, StateArrayForwardTermsIndex, _TAG, -1, -1},
-	{StateArrayForwardTermsTypeOpen, _OPEN, StateArrayForwardTermsTypeValue, StateArrayForwardTermsValueOpen, _TAG, 13, -1},
-	{StateArrayForwardTermsTypeValue, _VALUE, StateArrayForwardTermsTypeClose, StateArrayForwardTermsTypeClose, _ELEM, -1, 0},
-	{StateArrayForwardTermsTypeClose, _CLOSE, StateArrayForwardTermsValueOpen, StateArrayForwardTermsValueOpen, _NULL, -1, -1},
-	{StateArrayForwardTermsValueOpen, _OPEN, StateArrayForwardTermsValueValue, StateArrayForwardTermsPosOpen, _TAG, 14, -1},
-	{StateArrayForwardTermsValueValue, _VALUE, StateArrayForwardTermsValueClose, StateArrayForwardTermsValueClose, _ELEM, -1, 1},
-	{StateArrayForwardTermsValueClose, _CLOSE, StateArrayForwardTermsPosOpen, StateArrayForwardTermsPosOpen, _NULL, -1, -1},
-	{StateArrayForwardTermsPosOpen, _OPEN, StateArrayForwardTermsPosValue, StateArrayForwardTermsLenOpen, _TAG, 15, -1},
-	{StateArrayForwardTermsPosValue, _VALUE, StateArrayForwardTermsPosClose, StateArrayForwardTermsPosClose, _ELEM, -1, 2},
-	{StateArrayForwardTermsPosClose, _CLOSE, StateArrayForwardTermsLenOpen, StateArrayForwardTermsLenOpen, _NULL, -1, -1},
-	{StateArrayForwardTermsLenOpen, _OPEN, StateArrayForwardTermsLenValue, StateArrayForwardTermsIndex, _TAG, 16, -1},
-	{StateArrayForwardTermsLenValue, _VALUE, StateArrayForwardTermsLenClose, StateArrayForwardTermsLenClose, _ELEM, -1, 3},
-	{StateArrayForwardTermsLenClose, _CLOSE, StateArrayForwardTermsIndex, StateArrayForwardTermsIndex, _NULL, -1, -1},
-	{StateArrayForwardTermsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 DocumentFilter::DocumentFilter()
 	:m_impl(0),m_ownership(0),m_state(0)
 {
@@ -327,7 +214,7 @@ static bindings::ValueVariant getElementValue( const analyzer::Document& elem, i
 		case 12:
 			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).forwardTerms()[m_index[0]].len());
 
-		}
+	}
 	return bindings::ValueVariant();
 }
 

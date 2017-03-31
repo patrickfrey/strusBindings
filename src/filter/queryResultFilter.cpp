@@ -15,7 +15,6 @@
 #include "queryResultFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
 #include <cstring>
 
 using namespace strus;
@@ -25,44 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateEvaluationPassOpen,
-	StateEvaluationPassValue,
-	StateEvaluationPassClose,
-	StateNofRankedOpen,
-	StateNofRankedValue,
-	StateNofRankedClose,
-	StateNofVisitedOpen,
-	StateNofVisitedValue,
-	StateNofVisitedClose,
-	StateRanksOpen,
-	StateRanksIndex,
-	StateRanksDocnoOpen,
-	StateRanksDocnoValue,
-	StateRanksDocnoClose,
-	StateRanksWeightOpen,
-	StateRanksWeightValue,
-	StateRanksWeightClose,
-	StateRanksSummaryElementsOpen,
-	StateRanksSummaryElementsIndex,
-	StateRanksSummaryElementsNameOpen,
-	StateRanksSummaryElementsNameValue,
-	StateRanksSummaryElementsNameClose,
-	StateRanksSummaryElementsValueOpen,
-	StateRanksSummaryElementsValueValue,
-	StateRanksSummaryElementsValueClose,
-	StateRanksSummaryElementsWeightOpen,
-	StateRanksSummaryElementsWeightValue,
-	StateRanksSummaryElementsWeightClose,
-	StateRanksSummaryElementsIndexOpen,
-	StateRanksSummaryElementsIndexValue,
-	StateRanksSummaryElementsIndexClose,
-	StateRanksSummaryElementsClose,
-	StateRanksClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateEvaluationPassOpen,
 	StateEvaluationPassValue,
 	StateEvaluationPassClose,
@@ -145,44 +106,6 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateRanksClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayEvaluationPassOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayEvaluationPassOpen, _OPEN, StateArrayEvaluationPassValue, StateArrayNofRankedOpen, _TAG, 0, -1},
-	{StateArrayEvaluationPassValue, _VALUE, StateArrayEvaluationPassClose, StateArrayEvaluationPassClose, _ELEM, -1, 0},
-	{StateArrayEvaluationPassClose, _CLOSE, StateArrayNofRankedOpen, StateArrayNofRankedOpen, _NULL, -1, -1},
-	{StateArrayNofRankedOpen, _OPEN, StateArrayNofRankedValue, StateArrayNofVisitedOpen, _TAG, 1, -1},
-	{StateArrayNofRankedValue, _VALUE, StateArrayNofRankedClose, StateArrayNofRankedClose, _ELEM, -1, 1},
-	{StateArrayNofRankedClose, _CLOSE, StateArrayNofVisitedOpen, StateArrayNofVisitedOpen, _NULL, -1, -1},
-	{StateArrayNofVisitedOpen, _OPEN, StateArrayNofVisitedValue, StateArrayRanksOpen, _TAG, 2, -1},
-	{StateArrayNofVisitedValue, _VALUE, StateArrayNofVisitedClose, StateArrayNofVisitedClose, _ELEM, -1, 2},
-	{StateArrayNofVisitedClose, _CLOSE, StateArrayRanksOpen, StateArrayRanksOpen, _NULL, -1, -1},
-	{StateArrayRanksOpen, _OPEN, StateArrayRanksIndex, StateArrayIndex, _TAG, 3, -1},
-	{StateArrayRanksIndex, _INDEX, StateArrayRanksDocnoOpen, StateArrayRanksIndex, _TAG, -1, -1},
-	{StateArrayRanksDocnoOpen, _OPEN, StateArrayRanksDocnoValue, StateArrayRanksWeightOpen, _TAG, 4, -1},
-	{StateArrayRanksDocnoValue, _VALUE, StateArrayRanksDocnoClose, StateArrayRanksDocnoClose, _ELEM, -1, 0},
-	{StateArrayRanksDocnoClose, _CLOSE, StateArrayRanksWeightOpen, StateArrayRanksWeightOpen, _NULL, -1, -1},
-	{StateArrayRanksWeightOpen, _OPEN, StateArrayRanksWeightValue, StateArrayRanksSummaryElementsOpen, _TAG, 5, -1},
-	{StateArrayRanksWeightValue, _VALUE, StateArrayRanksWeightClose, StateArrayRanksWeightClose, _ELEM, -1, 1},
-	{StateArrayRanksWeightClose, _CLOSE, StateArrayRanksSummaryElementsOpen, StateArrayRanksSummaryElementsOpen, _NULL, -1, -1},
-	{StateArrayRanksSummaryElementsOpen, _OPEN, StateArrayRanksSummaryElementsIndex, StateArrayRanksIndex, _TAG, 6, -1},
-	{StateArrayRanksSummaryElementsIndex, _INDEX, StateArrayRanksSummaryElementsNameOpen, StateArrayRanksSummaryElementsIndex, _TAG, -1, -1},
-	{StateArrayRanksSummaryElementsNameOpen, _OPEN, StateArrayRanksSummaryElementsNameValue, StateArrayRanksSummaryElementsValueOpen, _TAG, 7, -1},
-	{StateArrayRanksSummaryElementsNameValue, _VALUE, StateArrayRanksSummaryElementsNameClose, StateArrayRanksSummaryElementsNameClose, _ELEM, -1, 0},
-	{StateArrayRanksSummaryElementsNameClose, _CLOSE, StateArrayRanksSummaryElementsValueOpen, StateArrayRanksSummaryElementsValueOpen, _NULL, -1, -1},
-	{StateArrayRanksSummaryElementsValueOpen, _OPEN, StateArrayRanksSummaryElementsValueValue, StateArrayRanksSummaryElementsWeightOpen, _TAG, 8, -1},
-	{StateArrayRanksSummaryElementsValueValue, _VALUE, StateArrayRanksSummaryElementsValueClose, StateArrayRanksSummaryElementsValueClose, _ELEM, -1, 1},
-	{StateArrayRanksSummaryElementsValueClose, _CLOSE, StateArrayRanksSummaryElementsWeightOpen, StateArrayRanksSummaryElementsWeightOpen, _NULL, -1, -1},
-	{StateArrayRanksSummaryElementsWeightOpen, _OPEN, StateArrayRanksSummaryElementsWeightValue, StateArrayRanksSummaryElementsIndexOpen, _TAG, 9, -1},
-	{StateArrayRanksSummaryElementsWeightValue, _VALUE, StateArrayRanksSummaryElementsWeightClose, StateArrayRanksSummaryElementsWeightClose, _ELEM, -1, 2},
-	{StateArrayRanksSummaryElementsWeightClose, _CLOSE, StateArrayRanksSummaryElementsIndexOpen, StateArrayRanksSummaryElementsIndexOpen, _NULL, -1, -1},
-	{StateArrayRanksSummaryElementsIndexOpen, _OPEN, StateArrayRanksSummaryElementsIndexValue, StateArrayRanksSummaryElementsIndex, _TAG, 10, -1},
-	{StateArrayRanksSummaryElementsIndexValue, _VALUE, StateArrayRanksSummaryElementsIndexClose, StateArrayRanksSummaryElementsIndexClose, _ELEM, -1, 3},
-	{StateArrayRanksSummaryElementsIndexClose, _CLOSE, StateArrayRanksSummaryElementsIndex, StateArrayRanksSummaryElementsIndex, _NULL, -1, -1},
-	{StateArrayRanksSummaryElementsClose, _CLOSE, StateArrayRanksIndex, StateArrayRanksIndex, _NULL, -1, -1},
-	{StateArrayRanksClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 QueryResultFilter::QueryResultFilter()
 	:m_impl(0),m_ownership(0),m_state(0)
 {
@@ -243,7 +166,7 @@ static bindings::ValueVariant getElementValue( const QueryResult& elem, int valu
 		case 8:
 			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl).ranks()[m_index[0]].summaryElements()[m_index[1]].index());
 
-		}
+	}
 	return bindings::ValueVariant();
 }
 

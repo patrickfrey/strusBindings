@@ -15,7 +15,7 @@
 #include "metaDataFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
+#include <cstring>
 
 using namespace strus;
 
@@ -24,17 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateNameOpen,
-	StateNameValue,
-	StateNameClose,
-	StateValueOpen,
-	StateValueValue,
-	StateValueClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateNameOpen,
 	StateNameValue,
 	StateNameClose,
@@ -63,28 +52,29 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateValueClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayNameOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayNameOpen, _OPEN, StateArrayNameValue, StateArrayValueOpen, _TAG, 0, -1},
-	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayNameClose, _ELEM, -1, 0},
-	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
-	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIndex, _TAG, 1, -1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayValueClose, _ELEM, -1, 1},
-	{StateArrayValueClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 MetaDataFilter::MetaDataFilter()
-	:m_impl(0),m_ownership(0),m_state(0){}
+	:m_impl(0),m_ownership(0),m_state(0)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 MetaDataFilter::MetaDataFilter( const MetaDataFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
+{
+	std::memcpy( m_index, o.m_index, sizeof(m_index));
+}
 
 MetaDataFilter::MetaDataFilter( const analyzer::MetaData* impl)
-	:m_impl(impl),m_ownership(0),m_state(1){}
+	:m_impl(impl),m_ownership(0),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 MetaDataFilter::MetaDataFilter( analyzer::MetaData* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1){}
+	:m_impl(impl),m_ownership(impl),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 MetaDataFilter::~MetaDataFilter()
 {
@@ -141,61 +131,3 @@ BindingFilterInterface* MetaDataFilter::createCopy() const
 	return new MetaDataFilter(*this);
 }
 
-MetaDataVectorFilter::MetaDataVectorFilter()
-	:m_impl(0),m_ownership(0),m_state(0),m_index(0){}
-
-MetaDataVectorFilter::MetaDataVectorFilter( const MetaDataVectorFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state),m_index(o.m_index){}
-
-MetaDataVectorFilter::MetaDataVectorFilter( const std::vector<analyzer::MetaData>* impl)
-	:m_impl(impl),m_ownership(0),m_state(1),m_index(0){}
-
-MetaDataVectorFilter::MetaDataVectorFilter( std::vector<analyzer::MetaData>* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
-
-
-BindingFilterInterface::Tag MetaDataVectorFilter::getNext( bindings::ValueVariant& val)
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	Tag rt = st.tag;
-	if (!m_impl || m_index >= m_impl->size())
-	{
-		val.clear();
-		return rt;
-	}
-
-	switch (st.valueType)
-	{
-		case _NULL:
-			val.clear();
-			break;
-		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
-			break;
-		case _ELEM:
-			val = getElementValue( (*m_impl)[ m_index], st.valueIndex);
-			break;
-	}
-	m_state = st.nextState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		m_state = 1;
-		++m_index;
-	}
-	return rt;
-}
-
-void MetaDataVectorFilter::skip()
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	m_state = st.skipState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		++m_index;
-	}
-}
-
-BindingFilterInterface* MetaDataVectorFilter::createCopy() const
-{
-	return new MetaDataVectorFilter(*this);
-}

@@ -11,8 +11,8 @@
  * This file has been generated with the script scripts/genFilters.py
  * Modifications on this file will be lost!
  */
-/// \file termFilter.cpp
-#include "termFilter.hpp"
+/// \file termArrayFilter.cpp
+#include "termArrayFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
 #include <cstring>
@@ -24,6 +24,7 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
+	StateIndex,
 	StateTypeOpen,
 	StateTypeValue,
 	StateTypeClose,
@@ -50,6 +51,7 @@ enum TermState {
 // Element: index, tag, nextState, skipState, valueType, tagnameIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
+	{StateIndex, _INDEX, StateTypeOpen, StateIndex, _TAG, -1, -1},
 	{StateTypeOpen, _OPEN, StateTypeValue, StateValueOpen, _TAG, 0, -1},
 	{StateTypeValue, _VALUE, StateTypeClose, StateTypeClose, _ELEM, -1, 0},
 	{StateTypeClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, -1, -1},
@@ -59,61 +61,61 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StatePosOpen, _OPEN, StatePosValue, StateLenOpen, _TAG, 2, -1},
 	{StatePosValue, _VALUE, StatePosClose, StatePosClose, _ELEM, -1, 2},
 	{StatePosClose, _CLOSE, StateLenOpen, StateLenOpen, _NULL, -1, -1},
-	{StateLenOpen, _OPEN, StateLenValue, StateEnd, _TAG, 3, -1},
+	{StateLenOpen, _OPEN, StateLenValue, StateIndex, _TAG, 3, -1},
 	{StateLenValue, _VALUE, StateLenClose, StateLenClose, _ELEM, -1, 3},
-	{StateLenClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
+	{StateLenClose, _CLOSE, StateIndex, StateIndex, _NULL, -1, -1}
 };
 
-TermFilter::TermFilter()
+TermArrayFilter::TermArrayFilter()
 	:m_impl(0),m_ownership(0),m_state(0)
 {
 	std::memset( m_index, 0, sizeof(m_index));
 }
 
-TermFilter::TermFilter( const TermFilter& o)
+TermArrayFilter::TermArrayFilter( const TermArrayFilter& o)
 	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
 {
 	std::memcpy( m_index, o.m_index, sizeof(m_index));
 }
 
-TermFilter::TermFilter( const analyzer::Term* impl)
+TermArrayFilter::TermArrayFilter( const std::vector<analyzer::Term>* impl)
 	:m_impl(impl),m_ownership(0),m_state(1)
 {
 	std::memset( m_index, 0, sizeof(m_index));
 }
 
-TermFilter::TermFilter( analyzer::Term* impl, bool withOwnership)
+TermArrayFilter::TermArrayFilter( std::vector<analyzer::Term>* impl, bool withOwnership)
 	:m_impl(impl),m_ownership(impl),m_state(1)
 {
 	std::memset( m_index, 0, sizeof(m_index));
 }
 
-TermFilter::~TermFilter()
+TermArrayFilter::~TermArrayFilter()
 {
 	if (m_ownership) delete( m_ownership);
 }
 
-static bindings::ValueVariant getElementValue( const analyzer::Term& elem, int valueIndex)
+static bindings::ValueVariant getElementValue( const std::vector<analyzer::Term>& elem, int valueIndex)
 {
 	switch (valueIndex) {
 
 		case 0:
-			return bindings::ValueVariant( (*m_impl).type());
+			return bindings::ValueVariant( (*m_impl)[m_index[0]].type());
 
 		case 1:
-			return bindings::ValueVariant( (*m_impl).value());
+			return bindings::ValueVariant( (*m_impl)[m_index[0]].value());
 
 		case 2:
-			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).pos());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl)[m_index[0]].pos());
 
 		case 3:
-			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).len());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl)[m_index[0]].len());
 
 	}
 	return bindings::ValueVariant();
 }
 
-BindingFilterInterface::Tag TermFilter::getNext( bindings::ValueVariant& val)
+BindingFilterInterface::Tag TermArrayFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -138,14 +140,14 @@ BindingFilterInterface::Tag TermFilter::getNext( bindings::ValueVariant& val)
 	return rt;
 }
 
-void TermFilter::skip()
+void TermArrayFilter::skip()
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	m_state = st.skipState;
 }
 
-BindingFilterInterface* TermFilter::createCopy() const
+BindingFilterInterface* TermArrayFilter::createCopy() const
 {
-	return new TermFilter(*this);
+	return new TermArrayFilter(*this);
 }
 

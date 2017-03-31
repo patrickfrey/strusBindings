@@ -15,7 +15,6 @@
 #include "resultDocumentFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
 #include <cstring>
 
 using namespace strus;
@@ -25,32 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateDocnoOpen,
-	StateDocnoValue,
-	StateDocnoClose,
-	StateWeightOpen,
-	StateWeightValue,
-	StateWeightClose,
-	StateSummaryElementsOpen,
-	StateSummaryElementsIndex,
-	StateSummaryElementsNameOpen,
-	StateSummaryElementsNameValue,
-	StateSummaryElementsNameClose,
-	StateSummaryElementsValueOpen,
-	StateSummaryElementsValueValue,
-	StateSummaryElementsValueClose,
-	StateSummaryElementsWeightOpen,
-	StateSummaryElementsWeightValue,
-	StateSummaryElementsWeightClose,
-	StateSummaryElementsIndexOpen,
-	StateSummaryElementsIndexValue,
-	StateSummaryElementsIndexClose,
-	StateSummaryElementsClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateDocnoOpen,
 	StateDocnoValue,
 	StateDocnoClose,
@@ -109,32 +82,6 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateSummaryElementsClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayDocnoOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayDocnoOpen, _OPEN, StateArrayDocnoValue, StateArrayWeightOpen, _TAG, 0, -1},
-	{StateArrayDocnoValue, _VALUE, StateArrayDocnoClose, StateArrayDocnoClose, _ELEM, -1, 0},
-	{StateArrayDocnoClose, _CLOSE, StateArrayWeightOpen, StateArrayWeightOpen, _NULL, -1, -1},
-	{StateArrayWeightOpen, _OPEN, StateArrayWeightValue, StateArraySummaryElementsOpen, _TAG, 1, -1},
-	{StateArrayWeightValue, _VALUE, StateArrayWeightClose, StateArrayWeightClose, _ELEM, -1, 1},
-	{StateArrayWeightClose, _CLOSE, StateArraySummaryElementsOpen, StateArraySummaryElementsOpen, _NULL, -1, -1},
-	{StateArraySummaryElementsOpen, _OPEN, StateArraySummaryElementsIndex, StateArrayIndex, _TAG, 2, -1},
-	{StateArraySummaryElementsIndex, _INDEX, StateArraySummaryElementsNameOpen, StateArraySummaryElementsIndex, _TAG, -1, -1},
-	{StateArraySummaryElementsNameOpen, _OPEN, StateArraySummaryElementsNameValue, StateArraySummaryElementsValueOpen, _TAG, 3, -1},
-	{StateArraySummaryElementsNameValue, _VALUE, StateArraySummaryElementsNameClose, StateArraySummaryElementsNameClose, _ELEM, -1, 0},
-	{StateArraySummaryElementsNameClose, _CLOSE, StateArraySummaryElementsValueOpen, StateArraySummaryElementsValueOpen, _NULL, -1, -1},
-	{StateArraySummaryElementsValueOpen, _OPEN, StateArraySummaryElementsValueValue, StateArraySummaryElementsWeightOpen, _TAG, 4, -1},
-	{StateArraySummaryElementsValueValue, _VALUE, StateArraySummaryElementsValueClose, StateArraySummaryElementsValueClose, _ELEM, -1, 1},
-	{StateArraySummaryElementsValueClose, _CLOSE, StateArraySummaryElementsWeightOpen, StateArraySummaryElementsWeightOpen, _NULL, -1, -1},
-	{StateArraySummaryElementsWeightOpen, _OPEN, StateArraySummaryElementsWeightValue, StateArraySummaryElementsIndexOpen, _TAG, 5, -1},
-	{StateArraySummaryElementsWeightValue, _VALUE, StateArraySummaryElementsWeightClose, StateArraySummaryElementsWeightClose, _ELEM, -1, 2},
-	{StateArraySummaryElementsWeightClose, _CLOSE, StateArraySummaryElementsIndexOpen, StateArraySummaryElementsIndexOpen, _NULL, -1, -1},
-	{StateArraySummaryElementsIndexOpen, _OPEN, StateArraySummaryElementsIndexValue, StateArraySummaryElementsIndex, _TAG, 6, -1},
-	{StateArraySummaryElementsIndexValue, _VALUE, StateArraySummaryElementsIndexClose, StateArraySummaryElementsIndexClose, _ELEM, -1, 3},
-	{StateArraySummaryElementsIndexClose, _CLOSE, StateArraySummaryElementsIndex, StateArraySummaryElementsIndex, _NULL, -1, -1},
-	{StateArraySummaryElementsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 ResultDocumentFilter::ResultDocumentFilter()
 	:m_impl(0),m_ownership(0),m_state(0)
 {
@@ -186,7 +133,7 @@ static bindings::ValueVariant getElementValue( const ResultDocument& elem, int v
 		case 5:
 			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl).summaryElements()[m_index[0]].index());
 
-		}
+	}
 	return bindings::ValueVariant();
 }
 

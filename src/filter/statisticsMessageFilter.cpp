@@ -15,7 +15,6 @@
 #include "statisticsMessageFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
 #include <cstring>
 
 using namespace strus;
@@ -25,26 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateDfOpen,
-	StateDfIndex,
-	StateDfTypeOpen,
-	StateDfTypeValue,
-	StateDfTypeClose,
-	StateDfValueOpen,
-	StateDfValueValue,
-	StateDfValueClose,
-	StateDfIncrementOpen,
-	StateDfIncrementValue,
-	StateDfIncrementClose,
-	StateDfClose,
-	StateNofdocsOpen,
-	StateNofdocsValue,
-	StateNofdocsClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateDfOpen,
 	StateDfIndex,
 	StateDfTypeOpen,
@@ -89,26 +68,6 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateNofdocsOpen, _OPEN, StateNofdocsValue, StateEnd, _TAG, 4, -1},
 	{StateNofdocsValue, _VALUE, StateNofdocsClose, StateNofdocsClose, _ELEM, -1, 1},
 	{StateNofdocsClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
-};
-
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayDfOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayDfOpen, _OPEN, StateArrayDfIndex, StateArrayNofdocsOpen, _TAG, 0, -1},
-	{StateArrayDfIndex, _INDEX, StateArrayDfTypeOpen, StateArrayDfIndex, _TAG, -1, -1},
-	{StateArrayDfTypeOpen, _OPEN, StateArrayDfTypeValue, StateArrayDfValueOpen, _TAG, 1, -1},
-	{StateArrayDfTypeValue, _VALUE, StateArrayDfTypeClose, StateArrayDfTypeClose, _ELEM, -1, 0},
-	{StateArrayDfTypeClose, _CLOSE, StateArrayDfValueOpen, StateArrayDfValueOpen, _NULL, -1, -1},
-	{StateArrayDfValueOpen, _OPEN, StateArrayDfValueValue, StateArrayDfIncrementOpen, _TAG, 2, -1},
-	{StateArrayDfValueValue, _VALUE, StateArrayDfValueClose, StateArrayDfValueClose, _ELEM, -1, 1},
-	{StateArrayDfValueClose, _CLOSE, StateArrayDfIncrementOpen, StateArrayDfIncrementOpen, _NULL, -1, -1},
-	{StateArrayDfIncrementOpen, _OPEN, StateArrayDfIncrementValue, StateArrayDfIndex, _TAG, 3, -1},
-	{StateArrayDfIncrementValue, _VALUE, StateArrayDfIncrementClose, StateArrayDfIncrementClose, _ELEM, -1, 2},
-	{StateArrayDfIncrementClose, _CLOSE, StateArrayDfIndex, StateArrayDfIndex, _NULL, -1, -1},
-	{StateArrayDfClose, _CLOSE, StateArrayNofdocsOpen, StateArrayNofdocsOpen, _NULL, -1, -1},
-	{StateArrayNofdocsOpen, _OPEN, StateArrayNofdocsValue, StateArrayIndex, _TAG, 4, -1},
-	{StateArrayNofdocsValue, _VALUE, StateArrayNofdocsClose, StateArrayNofdocsClose, _ELEM, -1, 1},
-	{StateArrayNofdocsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
 };
 
 StatisticsMessageFilter::StatisticsMessageFilter()
@@ -156,7 +115,7 @@ static bindings::ValueVariant getElementValue( const bindings::StatisticsMessage
 		case 3:
 			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl).nofdocs());
 
-		}
+	}
 	return bindings::ValueVariant();
 }
 

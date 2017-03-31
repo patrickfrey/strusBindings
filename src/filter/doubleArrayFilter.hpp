@@ -11,27 +11,26 @@
  * This file has been generated with the script scripts/genFilters.py
  * Modifications on this file will be lost!
  */
-#ifndef _STRUS_BINDING_DOCUMENTFREQUENCYCHANGE_FILTER_HPP_INCLUDED
-#define _STRUS_BINDING_DOCUMENTFREQUENCYCHANGE_FILTER_HPP_INCLUDED
-/// \file documentFrequencyChangeFilter.hpp
+#ifndef _STRUS_BINDING_DOUBLEARRAY_FILTER_HPP_INCLUDED
+#define _STRUS_BINDING_DOUBLEARRAY_FILTER_HPP_INCLUDED
+/// \file doubleArrayFilter.hpp
 #include "strus/bindingFilterInterface.hpp"
-#include "strus/bindings/statisticsMessage.hpp"
 
 #include <vector>
 
 /// \brief strus toplevel namespace
 namespace strus {
 
-class DocumentFrequencyChangeFilter
+class doubleArrayFilter
 	:public BindingFilterInterface
 {
 public:
-	DocumentFrequencyChangeFilter();
-	DocumentFrequencyChangeFilter( const DocumentFrequencyChangeFilter& o);
-	explicit DocumentFrequencyChangeFilter( const bindings::DocumentFrequencyChange* impl);
-	DocumentFrequencyChangeFilter( bindings::DocumentFrequencyChange* impl, bool withOwnership);
+	doubleArrayFilter();
+	doubleArrayFilter( const doubleArrayFilter& o);
+	explicit doubleArrayFilter( const std::vector<double>* impl);
+	doubleArrayFilter( std::vector<double>* impl, bool withOwnership);
 
-	virtual ~DocumentFrequencyChangeFilter();
+	virtual ~doubleArrayFilter();
 	virtual Tag getNext( bindings::ValueVariant& val);
 
 	virtual void skip();
@@ -42,8 +41,8 @@ private:
 	enum {MaxDepth=8};
 
 private:
-	const bindings::DocumentFrequencyChange* m_impl;
-	bindings::DocumentFrequencyChange* m_ownership;
+	const std::vector<double>* m_impl;
+	std::vector<double>* m_ownership;
 	unsigned int m_state;
 	unsigned int m_index[ MaxDepth];
 };

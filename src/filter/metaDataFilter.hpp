@@ -37,35 +37,15 @@ public:
 	virtual void skip();
 
 	virtual BindingFilterInterface* createCopy() const;
-	
+
+private:
+	enum {MaxDepth=8};
+
 private:
 	const analyzer::MetaData* m_impl;
 	analyzer::MetaData* m_ownership;
 	unsigned int m_state;
-};
-
-
-class MetaDataVectorFilter
-	:public BindingFilterInterface
-{
-public:
-	MetaDataVectorFilter();
-	MetaDataVectorFilter( const MetaDataVectorFilter& o);
-	explicit MetaDataVectorFilter( const std::vector<analyzer::MetaData>* impl);
-	MetaDataVectorFilter( std::vector<analyzer::MetaData>* impl, bool withOwnership);
-	virtual ~MetaDataVectorFilter();
-
-	virtual Tag getNext( bindings::ValueVariant& val);
-
-	virtual void skip();
-
-	virtual BindingFilterInterface* createCopy() const;
-
-private:
-	const std::vector<analyzer::MetaData>* m_impl;
-	std::vector<analyzer::MetaData>* m_ownership;
-	unsigned int m_state;
-	unsigned int m_index;
+	unsigned int m_index[ MaxDepth];
 };
 
 }//namespace

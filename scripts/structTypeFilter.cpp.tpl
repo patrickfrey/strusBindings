@@ -15,7 +15,6 @@
 #include "{{structname[:1].lower() + structname[1:]}}Filter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
 
 using namespace strus;
 

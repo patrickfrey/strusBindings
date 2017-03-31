@@ -37,35 +37,15 @@ public:
 	virtual void skip();
 
 	virtual BindingFilterInterface* createCopy() const;
-	
+
+private:
+	enum {MaxDepth=8};
+
 private:
 	const analyzer::Term* m_impl;
 	analyzer::Term* m_ownership;
 	unsigned int m_state;
-};
-
-
-class TermVectorFilter
-	:public BindingFilterInterface
-{
-public:
-	TermVectorFilter();
-	TermVectorFilter( const TermVectorFilter& o);
-	explicit TermVectorFilter( const std::vector<analyzer::Term>* impl);
-	TermVectorFilter( std::vector<analyzer::Term>* impl, bool withOwnership);
-	virtual ~TermVectorFilter();
-
-	virtual Tag getNext( bindings::ValueVariant& val);
-
-	virtual void skip();
-
-	virtual BindingFilterInterface* createCopy() const;
-
-private:
-	const std::vector<analyzer::Term>* m_impl;
-	std::vector<analyzer::Term>* m_ownership;
-	unsigned int m_state;
-	unsigned int m_index;
+	unsigned int m_index[ MaxDepth];
 };
 
 }//namespace

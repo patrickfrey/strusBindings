@@ -37,35 +37,15 @@ public:
 	virtual void skip();
 
 	virtual BindingFilterInterface* createCopy() const;
-	
+
+private:
+	enum {MaxDepth=8};
+
 private:
 	const SummaryElement* m_impl;
 	SummaryElement* m_ownership;
 	unsigned int m_state;
-};
-
-
-class SummaryElementVectorFilter
-	:public BindingFilterInterface
-{
-public:
-	SummaryElementVectorFilter();
-	SummaryElementVectorFilter( const SummaryElementVectorFilter& o);
-	explicit SummaryElementVectorFilter( const std::vector<SummaryElement>* impl);
-	SummaryElementVectorFilter( std::vector<SummaryElement>* impl, bool withOwnership);
-	virtual ~SummaryElementVectorFilter();
-
-	virtual Tag getNext( bindings::ValueVariant& val);
-
-	virtual void skip();
-
-	virtual BindingFilterInterface* createCopy() const;
-
-private:
-	const std::vector<SummaryElement>* m_impl;
-	std::vector<SummaryElement>* m_ownership;
-	unsigned int m_state;
-	unsigned int m_index;
+	unsigned int m_index[ MaxDepth];
 };
 
 }//namespace

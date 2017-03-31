@@ -15,7 +15,7 @@
 #include "summaryElementFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
+#include <cstring>
 
 using namespace strus;
 
@@ -24,23 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateNameOpen,
-	StateNameValue,
-	StateNameClose,
-	StateValueOpen,
-	StateValueValue,
-	StateValueClose,
-	StateWeightOpen,
-	StateWeightValue,
-	StateWeightClose,
-	StateIndexOpen,
-	StateIndexValue,
-	StateIndexClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateNameOpen,
 	StateNameValue,
 	StateNameClose,
@@ -81,34 +64,29 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateIndexClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayNameOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayNameOpen, _OPEN, StateArrayNameValue, StateArrayValueOpen, _TAG, 0, -1},
-	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayNameClose, _ELEM, -1, 0},
-	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
-	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayWeightOpen, _TAG, 1, -1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayValueClose, _ELEM, -1, 1},
-	{StateArrayValueClose, _CLOSE, StateArrayWeightOpen, StateArrayWeightOpen, _NULL, -1, -1},
-	{StateArrayWeightOpen, _OPEN, StateArrayWeightValue, StateArrayIndexOpen, _TAG, 2, -1},
-	{StateArrayWeightValue, _VALUE, StateArrayWeightClose, StateArrayWeightClose, _ELEM, -1, 2},
-	{StateArrayWeightClose, _CLOSE, StateArrayIndexOpen, StateArrayIndexOpen, _NULL, -1, -1},
-	{StateArrayIndexOpen, _OPEN, StateArrayIndexValue, StateArrayIndex, _TAG, 3, -1},
-	{StateArrayIndexValue, _VALUE, StateArrayIndexClose, StateArrayIndexClose, _ELEM, -1, 3},
-	{StateArrayIndexClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 SummaryElementFilter::SummaryElementFilter()
-	:m_impl(0),m_ownership(0),m_state(0){}
+	:m_impl(0),m_ownership(0),m_state(0)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 SummaryElementFilter::SummaryElementFilter( const SummaryElementFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
+{
+	std::memcpy( m_index, o.m_index, sizeof(m_index));
+}
 
 SummaryElementFilter::SummaryElementFilter( const SummaryElement* impl)
-	:m_impl(impl),m_ownership(0),m_state(1){}
+	:m_impl(impl),m_ownership(0),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 SummaryElementFilter::SummaryElementFilter( SummaryElement* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1){}
+	:m_impl(impl),m_ownership(impl),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 SummaryElementFilter::~SummaryElementFilter()
 {
@@ -171,61 +149,3 @@ BindingFilterInterface* SummaryElementFilter::createCopy() const
 	return new SummaryElementFilter(*this);
 }
 
-SummaryElementVectorFilter::SummaryElementVectorFilter()
-	:m_impl(0),m_ownership(0),m_state(0),m_index(0){}
-
-SummaryElementVectorFilter::SummaryElementVectorFilter( const SummaryElementVectorFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state),m_index(o.m_index){}
-
-SummaryElementVectorFilter::SummaryElementVectorFilter( const std::vector<SummaryElement>* impl)
-	:m_impl(impl),m_ownership(0),m_state(1),m_index(0){}
-
-SummaryElementVectorFilter::SummaryElementVectorFilter( std::vector<SummaryElement>* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
-
-
-BindingFilterInterface::Tag SummaryElementVectorFilter::getNext( bindings::ValueVariant& val)
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	Tag rt = st.tag;
-	if (!m_impl || m_index >= m_impl->size())
-	{
-		val.clear();
-		return rt;
-	}
-
-	switch (st.valueType)
-	{
-		case _NULL:
-			val.clear();
-			break;
-		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
-			break;
-		case _ELEM:
-			val = getElementValue( (*m_impl)[ m_index], st.valueIndex);
-			break;
-	}
-	m_state = st.nextState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		m_state = 1;
-		++m_index;
-	}
-	return rt;
-}
-
-void SummaryElementVectorFilter::skip()
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	m_state = st.skipState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		++m_index;
-	}
-}
-
-BindingFilterInterface* SummaryElementVectorFilter::createCopy() const
-{
-	return new SummaryElementVectorFilter(*this);
-}

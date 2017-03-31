@@ -37,35 +37,15 @@ public:
 	virtual void skip();
 
 	virtual BindingFilterInterface* createCopy() const;
-	
+
+private:
+	enum {MaxDepth=8};
+
 private:
 	const analyzer::Query::Instruction* m_impl;
 	analyzer::Query::Instruction* m_ownership;
 	unsigned int m_state;
-};
-
-
-class QueryInstructionVectorFilter
-	:public BindingFilterInterface
-{
-public:
-	QueryInstructionVectorFilter();
-	QueryInstructionVectorFilter( const QueryInstructionVectorFilter& o);
-	explicit QueryInstructionVectorFilter( const std::vector<analyzer::Query::Instruction>* impl);
-	QueryInstructionVectorFilter( std::vector<analyzer::Query::Instruction>* impl, bool withOwnership);
-	virtual ~QueryInstructionVectorFilter();
-
-	virtual Tag getNext( bindings::ValueVariant& val);
-
-	virtual void skip();
-
-	virtual BindingFilterInterface* createCopy() const;
-
-private:
-	const std::vector<analyzer::Query::Instruction>* m_impl;
-	std::vector<analyzer::Query::Instruction>* m_ownership;
-	unsigned int m_state;
-	unsigned int m_index;
+	unsigned int m_index[ MaxDepth];
 };
 
 }//namespace

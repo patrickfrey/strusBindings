@@ -15,7 +15,7 @@
 #include "queryInstructionFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
+#include <cstring>
 
 using namespace strus;
 
@@ -24,20 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateOpCodeOpen,
-	StateOpCodeValue,
-	StateOpCodeClose,
-	StateIdxOpen,
-	StateIdxValue,
-	StateIdxClose,
-	StateNofOperandsOpen,
-	StateNofOperandsValue,
-	StateNofOperandsClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateOpCodeOpen,
 	StateOpCodeValue,
 	StateOpCodeClose,
@@ -72,31 +58,29 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateNofOperandsClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayOpCodeOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayOpCodeOpen, _OPEN, StateArrayOpCodeValue, StateArrayIdxOpen, _TAG, 0, -1},
-	{StateArrayOpCodeValue, _VALUE, StateArrayOpCodeClose, StateArrayOpCodeClose, _ELEM, -1, 0},
-	{StateArrayOpCodeClose, _CLOSE, StateArrayIdxOpen, StateArrayIdxOpen, _NULL, -1, -1},
-	{StateArrayIdxOpen, _OPEN, StateArrayIdxValue, StateArrayNofOperandsOpen, _TAG, 1, -1},
-	{StateArrayIdxValue, _VALUE, StateArrayIdxClose, StateArrayIdxClose, _ELEM, -1, 1},
-	{StateArrayIdxClose, _CLOSE, StateArrayNofOperandsOpen, StateArrayNofOperandsOpen, _NULL, -1, -1},
-	{StateArrayNofOperandsOpen, _OPEN, StateArrayNofOperandsValue, StateArrayIndex, _TAG, 2, -1},
-	{StateArrayNofOperandsValue, _VALUE, StateArrayNofOperandsClose, StateArrayNofOperandsClose, _ELEM, -1, 2},
-	{StateArrayNofOperandsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 QueryInstructionFilter::QueryInstructionFilter()
-	:m_impl(0),m_ownership(0),m_state(0){}
+	:m_impl(0),m_ownership(0),m_state(0)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 QueryInstructionFilter::QueryInstructionFilter( const QueryInstructionFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
+{
+	std::memcpy( m_index, o.m_index, sizeof(m_index));
+}
 
 QueryInstructionFilter::QueryInstructionFilter( const analyzer::Query::Instruction* impl)
-	:m_impl(impl),m_ownership(0),m_state(1){}
+	:m_impl(impl),m_ownership(0),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 QueryInstructionFilter::QueryInstructionFilter( analyzer::Query::Instruction* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1){}
+	:m_impl(impl),m_ownership(impl),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 QueryInstructionFilter::~QueryInstructionFilter()
 {
@@ -156,61 +140,3 @@ BindingFilterInterface* QueryInstructionFilter::createCopy() const
 	return new QueryInstructionFilter(*this);
 }
 
-QueryInstructionVectorFilter::QueryInstructionVectorFilter()
-	:m_impl(0),m_ownership(0),m_state(0),m_index(0){}
-
-QueryInstructionVectorFilter::QueryInstructionVectorFilter( const QueryInstructionVectorFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state),m_index(o.m_index){}
-
-QueryInstructionVectorFilter::QueryInstructionVectorFilter( const std::vector<analyzer::Query::Instruction>* impl)
-	:m_impl(impl),m_ownership(0),m_state(1),m_index(0){}
-
-QueryInstructionVectorFilter::QueryInstructionVectorFilter( std::vector<analyzer::Query::Instruction>* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
-
-
-BindingFilterInterface::Tag QueryInstructionVectorFilter::getNext( bindings::ValueVariant& val)
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	Tag rt = st.tag;
-	if (!m_impl || m_index >= m_impl->size())
-	{
-		val.clear();
-		return rt;
-	}
-
-	switch (st.valueType)
-	{
-		case _NULL:
-			val.clear();
-			break;
-		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
-			break;
-		case _ELEM:
-			val = getElementValue( (*m_impl)[ m_index], st.valueIndex);
-			break;
-	}
-	m_state = st.nextState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		m_state = 1;
-		++m_index;
-	}
-	return rt;
-}
-
-void QueryInstructionVectorFilter::skip()
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	m_state = st.skipState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		++m_index;
-	}
-}
-
-BindingFilterInterface* QueryInstructionVectorFilter::createCopy() const
-{
-	return new QueryInstructionVectorFilter(*this);
-}

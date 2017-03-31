@@ -134,64 +134,63 @@ structtypes = {
                        { "name": 'weight', "type": "double" },
                        { "name": 'index', "type": "int" }
                 ]
-        }
-}
-
-complextypes = {
-       "Document": {
-               "fullname": 'analyzer::Document',
-               "includes": ['"strus/analyzer/document.hpp"',
-                            '"strus/analyzer/metaData.hpp"',
-                            '"strus/analyzer/attribute.hpp"',
-                            '"strus/analyzer/term.hpp"'],
-               "elements": [
+        },
+        "Document": {
+                "fullname": 'analyzer::Document',
+                "includes": ['"strus/analyzer/document.hpp"',
+                             '"strus/analyzer/metaData.hpp"',
+                             '"strus/analyzer/attribute.hpp"',
+                             '"strus/analyzer/term.hpp"'],
+                "elements": [
                       { "name": 'subDocumentTypeName', "type": "string" },
                       { "name": 'metadata', "type": "MetaData[]" },
                       { "name": 'attributes', "type": "Attribute[]" },
                       { "name": 'searchTerms', "type": "Term[]" },
                       { "name": 'forwardTerms', "type": "Term[]" }
-               ]
-       },
-       "Query": {
-               "fullname": 'analyzer::Query',
-               "includes": ['"strus/analyzer/query.hpp"',
-                            '"strus/analyzer/metaData.hpp"',
-                            '"strus/analyzer/term.hpp"'],
-               "elements": [
+                ]
+        },
+        "Query": {
+                "fullname": 'analyzer::Query',
+                "includes": ['"strus/analyzer/query.hpp"',
+                             '"strus/analyzer/metaData.hpp"',
+                             '"strus/analyzer/term.hpp"'],
+                "elements": [
                       { "name": 'metadata', "type": "MetaData[]" },
                       { "name": 'searchTerms', "type": "Term[]" },
                       { "name": 'elements', "type": "QueryElement[]" },
                       { "name": 'instructions', "type": "QueryInstruction[]" }
-               ]
-       },
-       "StatisticsMessage": {
-               "fullname": 'bindings::StatisticsMessage',
-               "includes": ['"strus/bindings/statisticsMessage.hpp"'],
-               "elements": [
+                ]
+        },
+        "StatisticsMessage": {
+                "fullname": 'bindings::StatisticsMessage',
+                "includes": ['"strus/bindings/statisticsMessage.hpp"'],
+                "elements": [
                       { "name": 'df', "type": "DocumentFrequencyChange[]" },
                       { "name": 'nofdocs', "type": "int" }
-               ]
-       },
-       "ResultDocument": {
-               "fullname": 'ResultDocument',
-               "includes": ['"strus/resultDocument.hpp"'],
-               "elements": [
+                ]
+        },
+        "ResultDocument": {
+                "fullname": 'ResultDocument',
+                "includes": ['"strus/resultDocument.hpp"'],
+                "elements": [
                       { "name": 'docno', "type": "int" },
                       { "name": 'weight', "type": "double" },
                       { "name": 'summaryElements', "type": "SummaryElement[]" }
-               ]
-       },
-       "QueryResult": {
-               "fullname": 'QueryResult',
-               "includes": ['"strus/queryResult.hpp"'],
-               "elements": [
+                ]
+        },
+        "QueryResult": {
+                "fullname": 'QueryResult',
+                "includes": ['"strus/queryResult.hpp"'],
+                "elements": [
                       { "name": 'evaluationPass', "type": "uint" },
                       { "name": 'nofRanked', "type": "uint" },
                       { "name": 'nofVisited', "type": "uint" },
                       { "name": 'ranks', "type": "ResultDocument[]" }
-               ]
-       }
+                ]
+        }
 }
+
+arraytypes = { "VectorRank", "Term", "string", "int", "double" }
 
 def mapTemplateFile( outFilename, tplFilename, **kwargs):
     tplfile = open( tplFilename, 'r')
@@ -217,30 +216,21 @@ def getFunction( funcname):
             return prefix + "Index"
         if etype in atomictypes:
             return prefix + "Value"
-        elif etype in structtypes or etype in complextypes:
-            if etype in structtypes:
-                elements = structtypes[etype]['elements']
-            else:
-                elements = complextypes[etype]['elements']
+        elif etype in structtypes:
+            elements = structtypes[etype]['elements']
             if elements:
                 return prefix + uc1(elements[0]["name"]) + "Open"
             else:
                 return None
         raise Exception("type %s not defined" % etype)
     def statelist( prefix, etype):
-        indexState = []
         if etype[-2:] == "[]":
-            indexState = [prefix + "Index"]
-            etype = etype[:-2]
-        if etype in atomictypes:
-            return indexState + [prefix + "Value"]
-        elif etype in structtypes or etype in complextypes:
-            if etype in structtypes:
-                elements = structtypes[etype]['elements']
-            else:
-                elements = complextypes[etype]['elements']
-
-            rt = indexState
+            return [prefix + "Index"] + statelist( prefix, etype[:-2])
+        elif etype in atomictypes:
+            return [prefix + "Value"]
+        elif etype in structtypes:
+            elements = structtypes[etype]['elements']
+            rt = []
             for element in elements:
                 subprefix = prefix + uc1(element["name"])
                 rt += [subprefix + "Open"] + statelist( subprefix, element["type"]) +  [subprefix + "Close"]
@@ -260,11 +250,8 @@ def getFunction( funcname):
                     rt += ["{" + prefix + "Index, _INDEX, " + prefix + "Index, " + prefix + "Index, _TAG, -1, -1}"]
             elif etype in atomictypes:
                 rt += ["{" + prefix + "Value, _VALUE, " + nextstate + ", " + nextstate + ", _ELEM, -1, %u}" % valueIndex]
-            elif etype in structtypes or etype in complextypes:
-                if etype in structtypes:
-                    elements = structtypes[etype]['elements']
-                else:
-                    elements = complextypes[etype]['elements']
+            elif etype in structtypes:
+                elements = structtypes[etype]['elements']
                 for eidx,element in enumerate( elements):
                     closurevar.tagnameIndex += 1
                     if eidx+1 == len(elements):
@@ -296,11 +283,6 @@ def getFunction( funcname):
                 elements = structtypes[etype]['elements']
                 for eidx,element in enumerate(elements):
                     rt += valueaccesslist_( prefix + "." + element["name"] + "()", element["type"], arrayIndex)
-            elif etype in complextypes:
-                rt = []
-                elements = complextypes[etype]['elements']
-                for eidx,element in enumerate(elements):
-                    rt += valueaccesslist_( prefix + "." + element["name"] + "()", element["type"], arrayIndex)
             return rt
         return valueaccesslist_( prefix, etype, 0)
     def memberlist( etype):
@@ -309,15 +291,11 @@ def getFunction( funcname):
             rt = memberlist( etype[:-2])
         elif etype in atomictypes:
             rt = []
-        elif etype in structtypes or etype in complextypes:
-            if etype in structtypes:
-                elements = structtypes[etype]['elements']
-            else:
-                elements = complextypes[etype]['elements']
+        elif etype in structtypes:
+            elements = structtypes[etype]['elements']
             for element in elements:
                 rt.append( element["name"])
                 rt += memberlist( element["type"])
-            print "++++ GET MEMBERS: %s {%s}" % (etype,rt)
         else:
             raise Exception("type %s not defined" % etype)
         return rt
@@ -336,23 +314,33 @@ def getFunction( funcname):
 def mapStructFilterTemplates():
     for tpkey,tp in structtypes.items():
         print >> sys.stderr, "map struct '%s'" % tpkey
-        hpp_templatefile = "scripts/structTypeFilter.hpp.tpl"
-        cpp_templatefile = "scripts/structTypeFilter.cpp.tpl"
-        hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
-        cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
-        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
-        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
-
-def mapComplexFilterTemplates():
-    for tpkey,tp in complextypes.items():
-        print >> sys.stderr, "map complex struct '%s'" % tpkey
         hpp_templatefile = "scripts/complexTypeFilter.hpp.tpl"
         cpp_templatefile = "scripts/complexTypeFilter.cpp.tpl"
         hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
         cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
-        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
-        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, typename=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, typename=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
+
+def mapArrayFilterTemplates():
+    for tpkey in arraytypes:
+        if tpkey in atomictypes:
+            tp = atomictypes[tpkey]
+        else:
+            tp = structtypes[tpkey]
+        print >> sys.stderr, "map array '%s'" % tpkey
+        hpp_templatefile = "scripts/complexTypeFilter.hpp.tpl"
+        cpp_templatefile = "scripts/complexTypeFilter.cpp.tpl"
+        hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "ArrayFilter.hpp"
+        cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "ArrayFilter.cpp"
+        includes = []
+        if 'includes' in tp:
+            includes = tp['includes']
+        elements = []
+        if 'elements' in tp:
+            elements = tp['elements']
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=includes, structname=tpkey+"Array", typename=tpkey+"[]", fullname='std::vector<' + tp['fullname'] + '>', elements=elements, func=getFunction)
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=includes, structname=tpkey+"Array", typename=tpkey+"[]", fullname='std::vector<' + tp['fullname'] + '>', elements=elements, func=getFunction)
 
 mapStructFilterTemplates()
-mapComplexFilterTemplates()
+mapArrayFilterTemplates()
 

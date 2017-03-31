@@ -11,20 +11,21 @@
  * This file has been generated with the script scripts/genFilters.py
  * Modifications on this file will be lost!
  */
-/// \file {{structname[:1].lower() + structname[1:]}}Filter.cpp
-#include "{{structname[:1].lower() + structname[1:]}}Filter.hpp"
+/// \file intArrayFilter.cpp
+#include "intArrayFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
 #include <cstring>
 
 using namespace strus;
 
-static const char* g_element_names[] = { {% for name in func("memberlist")(typename) %}"{{name}}",{% endfor %} 0};
+static const char* g_element_names[] = {  0};
 static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
-	StateEnd{% for state in func("statelist")( "State", typename) %},
-	{{state}}{% endfor %}
+	StateEnd,
+	StateIndex,
+	StateValue
 };
 
 #define _OPEN	BindingFilterInterface::Open
@@ -38,51 +39,52 @@ enum TermState {
 
 // Element: index, tag, nextState, skipState, valueType, tagnameIndex, valueIndex
 static const filter::StateTable::Element g_struct_statetable[] = {
-	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0}{% for statestruct in func("statestructlist")( "State", typename, "StateEnd") %},
-	{{statestruct}}{% endfor %}
+	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
+	{StateIndex, _INDEX, StateValue, StateIndex, _TAG, -1, -1},
+	{StateValue, _VALUE, StateIndex, StateIndex, _ELEM, -1, 0}
 };
 
-{{structname}}Filter::{{structname}}Filter()
+intArrayFilter::intArrayFilter()
 	:m_impl(0),m_ownership(0),m_state(0)
 {
 	std::memset( m_index, 0, sizeof(m_index));
 }
 
-{{structname}}Filter::{{structname}}Filter( const {{structname}}Filter& o)
+intArrayFilter::intArrayFilter( const intArrayFilter& o)
 	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
 {
 	std::memcpy( m_index, o.m_index, sizeof(m_index));
 }
 
-{{structname}}Filter::{{structname}}Filter( const {{fullname}}* impl)
+intArrayFilter::intArrayFilter( const std::vector<int>* impl)
 	:m_impl(impl),m_ownership(0),m_state(1)
 {
 	std::memset( m_index, 0, sizeof(m_index));
 }
 
-{{structname}}Filter::{{structname}}Filter( {{fullname}}* impl, bool withOwnership)
+intArrayFilter::intArrayFilter( std::vector<int>* impl, bool withOwnership)
 	:m_impl(impl),m_ownership(impl),m_state(1)
 {
 	std::memset( m_index, 0, sizeof(m_index));
 }
 
-{{structname}}Filter::~{{structname}}Filter()
+intArrayFilter::~intArrayFilter()
 {
 	if (m_ownership) delete( m_ownership);
 }
 
-static bindings::ValueVariant getElementValue( const {{fullname}}& elem, int valueIndex)
+static bindings::ValueVariant getElementValue( const std::vector<int>& elem, int valueIndex)
 {
 	switch (valueIndex) {
-{% for vaccess in func("valueaccesslist")( "(*m_impl)", typename) %}
-		case {{loop.index0}}:
-			return bindings::ValueVariant( {{vaccess}});
-{% endfor %}
+
+		case 0:
+			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl)[m_index[0]]);
+
 	}
 	return bindings::ValueVariant();
 }
 
-BindingFilterInterface::Tag {{structname}}Filter::getNext( bindings::ValueVariant& val)
+BindingFilterInterface::Tag intArrayFilter::getNext( bindings::ValueVariant& val)
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	Tag rt = st.tag;
@@ -107,15 +109,14 @@ BindingFilterInterface::Tag {{structname}}Filter::getNext( bindings::ValueVarian
 	return rt;
 }
 
-void {{structname}}Filter::skip()
+void intArrayFilter::skip()
 {
 	const filter::StateTable::Element& st = g_struct_statetable[ m_state];
 	m_state = st.skipState;
 }
 
-BindingFilterInterface* {{structname}}Filter::createCopy() const
+BindingFilterInterface* intArrayFilter::createCopy() const
 {
-	return new {{structname}}Filter(*this);
+	return new intArrayFilter(*this);
 }
-
 

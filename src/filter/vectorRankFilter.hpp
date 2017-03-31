@@ -37,35 +37,15 @@ public:
 	virtual void skip();
 
 	virtual BindingFilterInterface* createCopy() const;
-	
+
+private:
+	enum {MaxDepth=8};
+
 private:
 	const VectorStorageSearchInterface::Result* m_impl;
 	VectorStorageSearchInterface::Result* m_ownership;
 	unsigned int m_state;
-};
-
-
-class VectorRankVectorFilter
-	:public BindingFilterInterface
-{
-public:
-	VectorRankVectorFilter();
-	VectorRankVectorFilter( const VectorRankVectorFilter& o);
-	explicit VectorRankVectorFilter( const std::vector<VectorStorageSearchInterface::Result>* impl);
-	VectorRankVectorFilter( std::vector<VectorStorageSearchInterface::Result>* impl, bool withOwnership);
-	virtual ~VectorRankVectorFilter();
-
-	virtual Tag getNext( bindings::ValueVariant& val);
-
-	virtual void skip();
-
-	virtual BindingFilterInterface* createCopy() const;
-
-private:
-	const std::vector<VectorStorageSearchInterface::Result>* m_impl;
-	std::vector<VectorStorageSearchInterface::Result>* m_ownership;
-	unsigned int m_state;
-	unsigned int m_index;
+	unsigned int m_index[ MaxDepth];
 };
 
 }//namespace

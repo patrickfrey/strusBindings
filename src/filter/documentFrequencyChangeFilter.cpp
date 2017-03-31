@@ -15,7 +15,7 @@
 #include "documentFrequencyChangeFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
+#include <cstring>
 
 using namespace strus;
 
@@ -24,20 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateTypeOpen,
-	StateTypeValue,
-	StateTypeClose,
-	StateValueOpen,
-	StateValueValue,
-	StateValueClose,
-	StateIncrementOpen,
-	StateIncrementValue,
-	StateIncrementClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateTypeOpen,
 	StateTypeValue,
 	StateTypeClose,
@@ -72,31 +58,29 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateIncrementClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayTypeOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayTypeOpen, _OPEN, StateArrayTypeValue, StateArrayValueOpen, _TAG, 0, -1},
-	{StateArrayTypeValue, _VALUE, StateArrayTypeClose, StateArrayTypeClose, _ELEM, -1, 0},
-	{StateArrayTypeClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
-	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIncrementOpen, _TAG, 1, -1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayValueClose, _ELEM, -1, 1},
-	{StateArrayValueClose, _CLOSE, StateArrayIncrementOpen, StateArrayIncrementOpen, _NULL, -1, -1},
-	{StateArrayIncrementOpen, _OPEN, StateArrayIncrementValue, StateArrayIndex, _TAG, 2, -1},
-	{StateArrayIncrementValue, _VALUE, StateArrayIncrementClose, StateArrayIncrementClose, _ELEM, -1, 2},
-	{StateArrayIncrementClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 DocumentFrequencyChangeFilter::DocumentFrequencyChangeFilter()
-	:m_impl(0),m_ownership(0),m_state(0){}
+	:m_impl(0),m_ownership(0),m_state(0)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 DocumentFrequencyChangeFilter::DocumentFrequencyChangeFilter( const DocumentFrequencyChangeFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
+{
+	std::memcpy( m_index, o.m_index, sizeof(m_index));
+}
 
 DocumentFrequencyChangeFilter::DocumentFrequencyChangeFilter( const bindings::DocumentFrequencyChange* impl)
-	:m_impl(impl),m_ownership(0),m_state(1){}
+	:m_impl(impl),m_ownership(0),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 DocumentFrequencyChangeFilter::DocumentFrequencyChangeFilter( bindings::DocumentFrequencyChange* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1){}
+	:m_impl(impl),m_ownership(impl),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 DocumentFrequencyChangeFilter::~DocumentFrequencyChangeFilter()
 {
@@ -156,61 +140,3 @@ BindingFilterInterface* DocumentFrequencyChangeFilter::createCopy() const
 	return new DocumentFrequencyChangeFilter(*this);
 }
 
-DocumentFrequencyChangeVectorFilter::DocumentFrequencyChangeVectorFilter()
-	:m_impl(0),m_ownership(0),m_state(0),m_index(0){}
-
-DocumentFrequencyChangeVectorFilter::DocumentFrequencyChangeVectorFilter( const DocumentFrequencyChangeVectorFilter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state),m_index(o.m_index){}
-
-DocumentFrequencyChangeVectorFilter::DocumentFrequencyChangeVectorFilter( const std::vector<bindings::DocumentFrequencyChange>* impl)
-	:m_impl(impl),m_ownership(0),m_state(1),m_index(0){}
-
-DocumentFrequencyChangeVectorFilter::DocumentFrequencyChangeVectorFilter( std::vector<bindings::DocumentFrequencyChange>* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1),m_index(0){}
-
-
-BindingFilterInterface::Tag DocumentFrequencyChangeVectorFilter::getNext( bindings::ValueVariant& val)
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	Tag rt = st.tag;
-	if (!m_impl || m_index >= m_impl->size())
-	{
-		val.clear();
-		return rt;
-	}
-
-	switch (st.valueType)
-	{
-		case _NULL:
-			val.clear();
-			break;
-		case _TAG:
-			val = g_struct_elements[ st.valueIndex];
-			break;
-		case _ELEM:
-			val = getElementValue( (*m_impl)[ m_index], st.valueIndex);
-			break;
-	}
-	m_state = st.nextState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		m_state = 1;
-		++m_index;
-	}
-	return rt;
-}
-
-void DocumentFrequencyChangeVectorFilter::skip()
-{
-	const filter::StateTable::Element& st = g_array_statetable[ m_state];
-	m_state = st.skipState;
-	if (m_state == StateArrayIndex && m_impl && m_index < m_impl->size())
-	{
-		++m_index;
-	}
-}
-
-BindingFilterInterface* DocumentFrequencyChangeVectorFilter::createCopy() const
-{
-	return new DocumentFrequencyChangeVectorFilter(*this);
-}

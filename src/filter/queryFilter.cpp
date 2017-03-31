@@ -15,7 +15,6 @@
 #include "queryFilter.hpp"
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
-#include "variantValueTemplate.hpp"
 #include <cstring>
 
 using namespace strus;
@@ -25,65 +24,6 @@ static const filter::StructElementArray g_struct_elements( g_element_names);
 
 enum TermState {
 	StateEnd,
-	StateMetadataOpen,
-	StateMetadataIndex,
-	StateMetadataNameOpen,
-	StateMetadataNameValue,
-	StateMetadataNameClose,
-	StateMetadataValueOpen,
-	StateMetadataValueValue,
-	StateMetadataValueClose,
-	StateMetadataClose,
-	StateSearchTermsOpen,
-	StateSearchTermsIndex,
-	StateSearchTermsTypeOpen,
-	StateSearchTermsTypeValue,
-	StateSearchTermsTypeClose,
-	StateSearchTermsValueOpen,
-	StateSearchTermsValueValue,
-	StateSearchTermsValueClose,
-	StateSearchTermsPosOpen,
-	StateSearchTermsPosValue,
-	StateSearchTermsPosClose,
-	StateSearchTermsLenOpen,
-	StateSearchTermsLenValue,
-	StateSearchTermsLenClose,
-	StateSearchTermsClose,
-	StateElementsOpen,
-	StateElementsIndex,
-	StateElementsTypeOpen,
-	StateElementsTypeValue,
-	StateElementsTypeClose,
-	StateElementsIdxOpen,
-	StateElementsIdxValue,
-	StateElementsIdxClose,
-	StateElementsPositionOpen,
-	StateElementsPositionValue,
-	StateElementsPositionClose,
-	StateElementsLengthOpen,
-	StateElementsLengthValue,
-	StateElementsLengthClose,
-	StateElementsFieldNoOpen,
-	StateElementsFieldNoValue,
-	StateElementsFieldNoClose,
-	StateElementsClose,
-	StateInstructionsOpen,
-	StateInstructionsIndex,
-	StateInstructionsOpCodeOpen,
-	StateInstructionsOpCodeValue,
-	StateInstructionsOpCodeClose,
-	StateInstructionsIdxOpen,
-	StateInstructionsIdxValue,
-	StateInstructionsIdxClose,
-	StateInstructionsNofOperandsOpen,
-	StateInstructionsNofOperandsValue,
-	StateInstructionsNofOperandsClose,
-	StateInstructionsClose
-};
-
-enum TermArrayState {
-	StateArrayEnd,
-	StateIndex,
 	StateMetadataOpen,
 	StateMetadataIndex,
 	StateMetadataNameOpen,
@@ -208,65 +148,6 @@ static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateInstructionsClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
-static const filter::StateTable::Element g_array_statetable[] = {
-	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
-	{StateArrayIndex, _INDEX, StateArrayMetadataOpen, StateArrayIndex, _TAG, 1, 0},
-	{StateArrayMetadataOpen, _OPEN, StateArrayMetadataIndex, StateArraySearchTermsOpen, _TAG, 0, -1},
-	{StateArrayMetadataIndex, _INDEX, StateArrayMetadataNameOpen, StateArrayMetadataIndex, _TAG, -1, -1},
-	{StateArrayMetadataNameOpen, _OPEN, StateArrayMetadataNameValue, StateArrayMetadataValueOpen, _TAG, 1, -1},
-	{StateArrayMetadataNameValue, _VALUE, StateArrayMetadataNameClose, StateArrayMetadataNameClose, _ELEM, -1, 0},
-	{StateArrayMetadataNameClose, _CLOSE, StateArrayMetadataValueOpen, StateArrayMetadataValueOpen, _NULL, -1, -1},
-	{StateArrayMetadataValueOpen, _OPEN, StateArrayMetadataValueValue, StateArrayMetadataIndex, _TAG, 2, -1},
-	{StateArrayMetadataValueValue, _VALUE, StateArrayMetadataValueClose, StateArrayMetadataValueClose, _ELEM, -1, 1},
-	{StateArrayMetadataValueClose, _CLOSE, StateArrayMetadataIndex, StateArrayMetadataIndex, _NULL, -1, -1},
-	{StateArrayMetadataClose, _CLOSE, StateArraySearchTermsOpen, StateArraySearchTermsOpen, _NULL, -1, -1},
-	{StateArraySearchTermsOpen, _OPEN, StateArraySearchTermsIndex, StateArrayElementsOpen, _TAG, 3, -1},
-	{StateArraySearchTermsIndex, _INDEX, StateArraySearchTermsTypeOpen, StateArraySearchTermsIndex, _TAG, -1, -1},
-	{StateArraySearchTermsTypeOpen, _OPEN, StateArraySearchTermsTypeValue, StateArraySearchTermsValueOpen, _TAG, 4, -1},
-	{StateArraySearchTermsTypeValue, _VALUE, StateArraySearchTermsTypeClose, StateArraySearchTermsTypeClose, _ELEM, -1, 0},
-	{StateArraySearchTermsTypeClose, _CLOSE, StateArraySearchTermsValueOpen, StateArraySearchTermsValueOpen, _NULL, -1, -1},
-	{StateArraySearchTermsValueOpen, _OPEN, StateArraySearchTermsValueValue, StateArraySearchTermsPosOpen, _TAG, 5, -1},
-	{StateArraySearchTermsValueValue, _VALUE, StateArraySearchTermsValueClose, StateArraySearchTermsValueClose, _ELEM, -1, 1},
-	{StateArraySearchTermsValueClose, _CLOSE, StateArraySearchTermsPosOpen, StateArraySearchTermsPosOpen, _NULL, -1, -1},
-	{StateArraySearchTermsPosOpen, _OPEN, StateArraySearchTermsPosValue, StateArraySearchTermsLenOpen, _TAG, 6, -1},
-	{StateArraySearchTermsPosValue, _VALUE, StateArraySearchTermsPosClose, StateArraySearchTermsPosClose, _ELEM, -1, 2},
-	{StateArraySearchTermsPosClose, _CLOSE, StateArraySearchTermsLenOpen, StateArraySearchTermsLenOpen, _NULL, -1, -1},
-	{StateArraySearchTermsLenOpen, _OPEN, StateArraySearchTermsLenValue, StateArraySearchTermsIndex, _TAG, 7, -1},
-	{StateArraySearchTermsLenValue, _VALUE, StateArraySearchTermsLenClose, StateArraySearchTermsLenClose, _ELEM, -1, 3},
-	{StateArraySearchTermsLenClose, _CLOSE, StateArraySearchTermsIndex, StateArraySearchTermsIndex, _NULL, -1, -1},
-	{StateArraySearchTermsClose, _CLOSE, StateArrayElementsOpen, StateArrayElementsOpen, _NULL, -1, -1},
-	{StateArrayElementsOpen, _OPEN, StateArrayElementsIndex, StateArrayInstructionsOpen, _TAG, 8, -1},
-	{StateArrayElementsIndex, _INDEX, StateArrayElementsTypeOpen, StateArrayElementsIndex, _TAG, -1, -1},
-	{StateArrayElementsTypeOpen, _OPEN, StateArrayElementsTypeValue, StateArrayElementsIdxOpen, _TAG, 9, -1},
-	{StateArrayElementsTypeValue, _VALUE, StateArrayElementsTypeClose, StateArrayElementsTypeClose, _ELEM, -1, 0},
-	{StateArrayElementsTypeClose, _CLOSE, StateArrayElementsIdxOpen, StateArrayElementsIdxOpen, _NULL, -1, -1},
-	{StateArrayElementsIdxOpen, _OPEN, StateArrayElementsIdxValue, StateArrayElementsPositionOpen, _TAG, 10, -1},
-	{StateArrayElementsIdxValue, _VALUE, StateArrayElementsIdxClose, StateArrayElementsIdxClose, _ELEM, -1, 1},
-	{StateArrayElementsIdxClose, _CLOSE, StateArrayElementsPositionOpen, StateArrayElementsPositionOpen, _NULL, -1, -1},
-	{StateArrayElementsPositionOpen, _OPEN, StateArrayElementsPositionValue, StateArrayElementsLengthOpen, _TAG, 11, -1},
-	{StateArrayElementsPositionValue, _VALUE, StateArrayElementsPositionClose, StateArrayElementsPositionClose, _ELEM, -1, 2},
-	{StateArrayElementsPositionClose, _CLOSE, StateArrayElementsLengthOpen, StateArrayElementsLengthOpen, _NULL, -1, -1},
-	{StateArrayElementsLengthOpen, _OPEN, StateArrayElementsLengthValue, StateArrayElementsFieldNoOpen, _TAG, 12, -1},
-	{StateArrayElementsLengthValue, _VALUE, StateArrayElementsLengthClose, StateArrayElementsLengthClose, _ELEM, -1, 3},
-	{StateArrayElementsLengthClose, _CLOSE, StateArrayElementsFieldNoOpen, StateArrayElementsFieldNoOpen, _NULL, -1, -1},
-	{StateArrayElementsFieldNoOpen, _OPEN, StateArrayElementsFieldNoValue, StateArrayElementsIndex, _TAG, 13, -1},
-	{StateArrayElementsFieldNoValue, _VALUE, StateArrayElementsFieldNoClose, StateArrayElementsFieldNoClose, _ELEM, -1, 4},
-	{StateArrayElementsFieldNoClose, _CLOSE, StateArrayElementsIndex, StateArrayElementsIndex, _NULL, -1, -1},
-	{StateArrayElementsClose, _CLOSE, StateArrayInstructionsOpen, StateArrayInstructionsOpen, _NULL, -1, -1},
-	{StateArrayInstructionsOpen, _OPEN, StateArrayInstructionsIndex, StateArrayIndex, _TAG, 14, -1},
-	{StateArrayInstructionsIndex, _INDEX, StateArrayInstructionsOpCodeOpen, StateArrayInstructionsIndex, _TAG, -1, -1},
-	{StateArrayInstructionsOpCodeOpen, _OPEN, StateArrayInstructionsOpCodeValue, StateArrayInstructionsIdxOpen, _TAG, 15, -1},
-	{StateArrayInstructionsOpCodeValue, _VALUE, StateArrayInstructionsOpCodeClose, StateArrayInstructionsOpCodeClose, _ELEM, -1, 0},
-	{StateArrayInstructionsOpCodeClose, _CLOSE, StateArrayInstructionsIdxOpen, StateArrayInstructionsIdxOpen, _NULL, -1, -1},
-	{StateArrayInstructionsIdxOpen, _OPEN, StateArrayInstructionsIdxValue, StateArrayInstructionsNofOperandsOpen, _TAG, 16, -1},
-	{StateArrayInstructionsIdxValue, _VALUE, StateArrayInstructionsIdxClose, StateArrayInstructionsIdxClose, _ELEM, -1, 1},
-	{StateArrayInstructionsIdxClose, _CLOSE, StateArrayInstructionsNofOperandsOpen, StateArrayInstructionsNofOperandsOpen, _NULL, -1, -1},
-	{StateArrayInstructionsNofOperandsOpen, _OPEN, StateArrayInstructionsNofOperandsValue, StateArrayInstructionsIndex, _TAG, 17, -1},
-	{StateArrayInstructionsNofOperandsValue, _VALUE, StateArrayInstructionsNofOperandsClose, StateArrayInstructionsNofOperandsClose, _ELEM, -1, 2},
-	{StateArrayInstructionsNofOperandsClose, _CLOSE, StateArrayInstructionsIndex, StateArrayInstructionsIndex, _NULL, -1, -1},
-	{StateArrayInstructionsClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
-};
-
 QueryFilter::QueryFilter()
 	:m_impl(0),m_ownership(0),m_state(0)
 {
@@ -342,7 +223,7 @@ static bindings::ValueVariant getElementValue( const analyzer::Query& elem, int 
 		case 13:
 			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).instructions()[m_index[0]].nofOperands());
 
-		}
+	}
 	return bindings::ValueVariant();
 }
 
