@@ -34,13 +34,13 @@ enum TermState {
 
 enum TermArrayState {
 	StateArrayEnd,
-	StateArrayIndex,
-	StateArrayNameOpen,
-	StateArrayNameValue,
-	StateArrayNameClose,
-	StateArrayValueOpen,
-	StateArrayValueValue,
-	StateArrayValueClose
+	StateIndex,
+	StateNameOpen,
+	StateNameValue,
+	StateNameClose,
+	StateValueOpen,
+	StateValueValue,
+	StateValueClose
 };
 
 #define _OPEN	BindingFilterInterface::Open
@@ -56,10 +56,10 @@ enum TermArrayState {
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
 	{StateNameOpen, _OPEN, StateNameValue, StateValueOpen, _TAG, 0, -1},
-	{StateNameValue, _VALUE, StateNameClose, StateValueOpen, _ELEM, -1, 0},
+	{StateNameValue, _VALUE, StateNameClose, StateNameClose, _ELEM, -1, 0},
 	{StateNameClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, -1, -1},
 	{StateValueOpen, _OPEN, StateValueValue, StateEnd, _TAG, 1, -1},
-	{StateValueValue, _VALUE, StateValueClose, StateEnd, _ELEM, -1, 1},
+	{StateValueValue, _VALUE, StateValueClose, StateValueClose, _ELEM, -1, 1},
 	{StateValueClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
@@ -67,10 +67,10 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
 	{StateArrayIndex, _INDEX, StateArrayNameOpen, StateArrayIndex, _TAG, 1, 0},
 	{StateArrayNameOpen, _OPEN, StateArrayNameValue, StateArrayValueOpen, _TAG, 0, -1},
-	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayValueOpen, _ELEM, -1, 0},
+	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayNameClose, _ELEM, -1, 0},
 	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
 	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIndex, _TAG, 1, -1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayIndex, _ELEM, -1, 1},
+	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayValueClose, _ELEM, -1, 1},
 	{StateArrayValueClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
 };
 

@@ -37,16 +37,16 @@ enum TermState {
 
 enum TermArrayState {
 	StateArrayEnd,
-	StateArrayIndex,
-	StateArrayTypeOpen,
-	StateArrayTypeValue,
-	StateArrayTypeClose,
-	StateArrayValueOpen,
-	StateArrayValueValue,
-	StateArrayValueClose,
-	StateArrayIncrementOpen,
-	StateArrayIncrementValue,
-	StateArrayIncrementClose
+	StateIndex,
+	StateTypeOpen,
+	StateTypeValue,
+	StateTypeClose,
+	StateValueOpen,
+	StateValueValue,
+	StateValueClose,
+	StateIncrementOpen,
+	StateIncrementValue,
+	StateIncrementClose
 };
 
 #define _OPEN	BindingFilterInterface::Open
@@ -62,13 +62,13 @@ enum TermArrayState {
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
 	{StateTypeOpen, _OPEN, StateTypeValue, StateValueOpen, _TAG, 0, -1},
-	{StateTypeValue, _VALUE, StateTypeClose, StateValueOpen, _ELEM, -1, 0},
+	{StateTypeValue, _VALUE, StateTypeClose, StateTypeClose, _ELEM, -1, 0},
 	{StateTypeClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, -1, -1},
 	{StateValueOpen, _OPEN, StateValueValue, StateIncrementOpen, _TAG, 1, -1},
-	{StateValueValue, _VALUE, StateValueClose, StateIncrementOpen, _ELEM, -1, 1},
+	{StateValueValue, _VALUE, StateValueClose, StateValueClose, _ELEM, -1, 1},
 	{StateValueClose, _CLOSE, StateIncrementOpen, StateIncrementOpen, _NULL, -1, -1},
 	{StateIncrementOpen, _OPEN, StateIncrementValue, StateEnd, _TAG, 2, -1},
-	{StateIncrementValue, _VALUE, StateIncrementClose, StateEnd, _ELEM, -1, 2},
+	{StateIncrementValue, _VALUE, StateIncrementClose, StateIncrementClose, _ELEM, -1, 2},
 	{StateIncrementClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
@@ -76,13 +76,13 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
 	{StateArrayIndex, _INDEX, StateArrayTypeOpen, StateArrayIndex, _TAG, 1, 0},
 	{StateArrayTypeOpen, _OPEN, StateArrayTypeValue, StateArrayValueOpen, _TAG, 0, -1},
-	{StateArrayTypeValue, _VALUE, StateArrayTypeClose, StateArrayValueOpen, _ELEM, -1, 0},
+	{StateArrayTypeValue, _VALUE, StateArrayTypeClose, StateArrayTypeClose, _ELEM, -1, 0},
 	{StateArrayTypeClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
 	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayIncrementOpen, _TAG, 1, -1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayIncrementOpen, _ELEM, -1, 1},
+	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayValueClose, _ELEM, -1, 1},
 	{StateArrayValueClose, _CLOSE, StateArrayIncrementOpen, StateArrayIncrementOpen, _NULL, -1, -1},
 	{StateArrayIncrementOpen, _OPEN, StateArrayIncrementValue, StateArrayIndex, _TAG, 2, -1},
-	{StateArrayIncrementValue, _VALUE, StateArrayIncrementClose, StateArrayIndex, _ELEM, -1, 2},
+	{StateArrayIncrementValue, _VALUE, StateArrayIncrementClose, StateArrayIncrementClose, _ELEM, -1, 2},
 	{StateArrayIncrementClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
 };
 

@@ -176,7 +176,7 @@ complextypes = {
                "fullname": 'ResultDocument',
                "includes": ['"strus/resultDocument.hpp"'],
                "elements": [
-                      { "name": 'docno', "type": "Index" },
+                      { "name": 'docno', "type": "int" },
                       { "name": 'weight', "type": "double" },
                       { "name": 'summaryElements', "type": "SummaryElement[]" }
                ]
@@ -212,53 +212,83 @@ def mapMainTemplate( mainOutput, mainTemplate):
 def getFunction( funcname):
     def uc1( str):
         return str[:1].upper() + str[1:]
-    def statelist( prefix, etype):
+    def firststate( prefix, etype):
         if etype[-2:] == "[]":
-            return [ prefix + "ArrayIndex" ] + statelist( prefix + "Array", etype[:-2])
+            return prefix + "Index"
         if etype in atomictypes:
-            return [prefix + "Open",
-                    prefix + "Value",
-                    prefix + "Close"]
-        if etype in structtypes:
-            rt = []
-            for element in structtypes[etype]['elements']:
-                rt += statelist( prefix + uc1(element["name"]), element["type"])
+            return prefix + "Value"
+        elif etype in structtypes or etype in complextypes:
+            if etype in structtypes:
+                elements = structtypes[etype]['elements']
+            else:
+                elements = complextypes[etype]['elements']
+            if elements:
+                return prefix + uc1(elements[0]["name"]) + "Open"
+            else:
+                return None
+        raise Exception("type %s not defined" % etype)
+    def statelist( prefix, etype):
+        indexState = []
+        if etype[-2:] == "[]":
+            indexState = [prefix + "Index"]
+            etype = etype[:-2]
+        if etype in atomictypes:
+            return indexState + [prefix + "Value"]
+        elif etype in structtypes or etype in complextypes:
+            if etype in structtypes:
+                elements = structtypes[etype]['elements']
+            else:
+                elements = complextypes[etype]['elements']
+
+            rt = indexState
+            for element in elements:
+                subprefix = prefix + uc1(element["name"])
+                rt += [subprefix + "Open"] + statelist( subprefix, element["type"]) +  [subprefix + "Close"]
             return rt
     def statestructlist( prefix, etype, nextstate):
         class closurevar:
-            tagnameIndex = 0
+            tagnameIndex = -1
             arrayIndex = -1
         def statestructlist_( prefix, etype, nextstate, valueIndex):
+            rt = []
             if etype[-2:] == "[]":
-                closurevar.arrayIndex += 1
-                rt = [ prefix + "ArrayIndex" ] + statestructlist_( prefix + "Array", etype[:-2], nextstate, 0)
-                closurevar.arrayIndex -= 1
-                return rt
-            if etype in atomictypes:
-                rt = ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex,
-                      "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, -1, %u}" % valueIndex,
-                      "{" + prefix + "Close, _CLOSE, " + nextstate + ", " + nextstate + ", _NULL, -1, -1}" ]
-                return rt
-            if etype in structtypes:
-                rt = []
-                elements = structtypes[etype]['elements']
+                startstate = firststate( prefix, etype[:-2])
+                if startstate:
+                    rt += ["{" + prefix + "Index, _INDEX, " + startstate + ", " + prefix + "Index, _TAG, -1, -1}"]
+                    rt += statestructlist_( prefix, etype[:-2], prefix + "Index", valueIndex)
+                else:
+                    rt += ["{" + prefix + "Index, _INDEX, " + prefix + "Index, " + prefix + "Index, _TAG, -1, -1}"]
+            elif etype in atomictypes:
+                rt += ["{" + prefix + "Value, _VALUE, " + nextstate + ", " + nextstate + ", _ELEM, -1, %u}" % valueIndex]
+            elif etype in structtypes or etype in complextypes:
+                if etype in structtypes:
+                    elements = structtypes[etype]['elements']
+                else:
+                    elements = complextypes[etype]['elements']
                 for eidx,element in enumerate( elements):
+                    closurevar.tagnameIndex += 1
                     if eidx+1 == len(elements):
                         followstate = nextstate
                     else:
                         followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
-                    rt += statestructlist_( prefix + uc1(element["name"]), element["type"], followstate, eidx)
-                    closurevar.tagnameIndex += 1
-                closurevar.valueIndex = 0
-                return rt
-        closurevar.tagnameIndex = 0
+                    subprefix = prefix + uc1(element["name"])
+                    startstate = firststate(subprefix, element["type"])
+                    if startstate:
+                        rt += ["{" + subprefix + "Open, _OPEN, " + startstate + ", " + followstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex]
+                        rt += statestructlist_( subprefix, element["type"], subprefix + "Close", eidx)
+                        rt += ["{" + subprefix + "Close, _CLOSE, " + followstate + ", " + followstate + ", _NULL, -1, -1}"]
+                    else:
+                        rt += ["{" + subprefix + "Open, _OPEN, " + subprefix + "Close, " + followstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex]
+                        rt += ["{" + subprefix + "Close, _CLOSE, " + followstate + ", " + followstate + ", _NULL, -1, -1}"]
+            return rt
+        closurevar.tagnameIndex = -1
         closurevar.arrayIndex = -1
         return statestructlist_( prefix, etype, nextstate, 0)
     def valueaccesslist( prefix, etype):
         def valueaccesslist_( prefix, etype, arrayIndex):
             rt = []
             if etype[-2:] == "[]":
-                rt += valueaccesslist_( prefix + "[m_index[" +  str(arrayIndex) + "]]", etype[:-2])
+                rt += valueaccesslist_( prefix + "[m_index[" +  str(arrayIndex) + "]]", etype[:-2], arrayIndex+1)
             elif etype in atomictypes:
                 rt.append( atomictypes[etype]['variantcast'] % prefix)
             elif etype in structtypes:
@@ -266,18 +296,31 @@ def getFunction( funcname):
                 elements = structtypes[etype]['elements']
                 for eidx,element in enumerate(elements):
                     rt += valueaccesslist_( prefix + "." + element["name"] + "()", element["type"], arrayIndex)
+            elif etype in complextypes:
+                rt = []
+                elements = complextypes[etype]['elements']
+                for eidx,element in enumerate(elements):
+                    rt += valueaccesslist_( prefix + "." + element["name"] + "()", element["type"], arrayIndex)
             return rt
         return valueaccesslist_( prefix, etype, 0)
     def memberlist( etype):
+        rt = []
         if etype[-2:] == "[]":
-            return namelist( etype[:-2])
-        if etype in atomictypes:
-            return None
-        if etype in structtypes:
+            rt = memberlist( etype[:-2])
+        elif etype in atomictypes:
             rt = []
-            for element in structtypes[etype]['elements']:
+        elif etype in structtypes or etype in complextypes:
+            if etype in structtypes:
+                elements = structtypes[etype]['elements']
+            else:
+                elements = complextypes[etype]['elements']
+            for element in elements:
                 rt.append( element["name"])
-            return rt
+                rt += memberlist( element["type"])
+            print "++++ GET MEMBERS: %s {%s}" % (etype,rt)
+        else:
+            raise Exception("type %s not defined" % etype)
+        return rt
     if funcname == "uc1":
         return uc1
     if funcname == "statelist":
@@ -297,8 +340,19 @@ def mapStructFilterTemplates():
         cpp_templatefile = "scripts/structTypeFilter.cpp.tpl"
         hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
         cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
-        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], atomictypes=atomictypes, func=getFunction)
-        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], atomictypes=atomictypes, func=getFunction)
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
+
+def mapComplexFilterTemplates():
+    for tpkey,tp in complextypes.items():
+        print >> sys.stderr, "map complex struct '%s'" % tpkey
+        hpp_templatefile = "scripts/complexTypeFilter.hpp.tpl"
+        cpp_templatefile = "scripts/complexTypeFilter.cpp.tpl"
+        hpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.hpp"
+        cpp_outputfile = "src/filter/" + tpkey[:1].lower() + tpkey[1:] + "Filter.cpp"
+        mapTemplateFile( hpp_outputfile, hpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
+        mapTemplateFile( cpp_outputfile, cpp_templatefile, includes=tp['includes'], structname=tpkey, fullname=tp['fullname'], elements=tp['elements'], func=getFunction)
 
 mapStructFilterTemplates()
+mapComplexFilterTemplates()
 

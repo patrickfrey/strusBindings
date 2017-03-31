@@ -40,19 +40,19 @@ enum TermState {
 
 enum TermArrayState {
 	StateArrayEnd,
-	StateArrayIndex,
-	StateArrayNameOpen,
-	StateArrayNameValue,
-	StateArrayNameClose,
-	StateArrayValueOpen,
-	StateArrayValueValue,
-	StateArrayValueClose,
-	StateArrayWeightOpen,
-	StateArrayWeightValue,
-	StateArrayWeightClose,
-	StateArrayIndexOpen,
-	StateArrayIndexValue,
-	StateArrayIndexClose
+	StateIndex,
+	StateNameOpen,
+	StateNameValue,
+	StateNameClose,
+	StateValueOpen,
+	StateValueValue,
+	StateValueClose,
+	StateWeightOpen,
+	StateWeightValue,
+	StateWeightClose,
+	StateIndexOpen,
+	StateIndexValue,
+	StateIndexClose
 };
 
 #define _OPEN	BindingFilterInterface::Open
@@ -68,16 +68,16 @@ enum TermArrayState {
 static const filter::StateTable::Element g_struct_statetable[] = {
 	{StateEnd, _CLOSE, StateEnd, StateEnd, _NULL, 0, 0},
 	{StateNameOpen, _OPEN, StateNameValue, StateValueOpen, _TAG, 0, -1},
-	{StateNameValue, _VALUE, StateNameClose, StateValueOpen, _ELEM, -1, 0},
+	{StateNameValue, _VALUE, StateNameClose, StateNameClose, _ELEM, -1, 0},
 	{StateNameClose, _CLOSE, StateValueOpen, StateValueOpen, _NULL, -1, -1},
 	{StateValueOpen, _OPEN, StateValueValue, StateWeightOpen, _TAG, 1, -1},
-	{StateValueValue, _VALUE, StateValueClose, StateWeightOpen, _ELEM, -1, 1},
+	{StateValueValue, _VALUE, StateValueClose, StateValueClose, _ELEM, -1, 1},
 	{StateValueClose, _CLOSE, StateWeightOpen, StateWeightOpen, _NULL, -1, -1},
 	{StateWeightOpen, _OPEN, StateWeightValue, StateIndexOpen, _TAG, 2, -1},
-	{StateWeightValue, _VALUE, StateWeightClose, StateIndexOpen, _ELEM, -1, 2},
+	{StateWeightValue, _VALUE, StateWeightClose, StateWeightClose, _ELEM, -1, 2},
 	{StateWeightClose, _CLOSE, StateIndexOpen, StateIndexOpen, _NULL, -1, -1},
 	{StateIndexOpen, _OPEN, StateIndexValue, StateEnd, _TAG, 3, -1},
-	{StateIndexValue, _VALUE, StateIndexClose, StateEnd, _ELEM, -1, 3},
+	{StateIndexValue, _VALUE, StateIndexClose, StateIndexClose, _ELEM, -1, 3},
 	{StateIndexClose, _CLOSE, StateEnd, StateEnd, _NULL, -1, -1}
 };
 
@@ -85,16 +85,16 @@ static const filter::StateTable::Element g_array_statetable[] = {
 	{StateArrayEnd, _CLOSE, StateArrayEnd, StateArrayEnd, _NULL, 0, 0},
 	{StateArrayIndex, _INDEX, StateArrayNameOpen, StateArrayIndex, _TAG, 1, 0},
 	{StateArrayNameOpen, _OPEN, StateArrayNameValue, StateArrayValueOpen, _TAG, 0, -1},
-	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayValueOpen, _ELEM, -1, 0},
+	{StateArrayNameValue, _VALUE, StateArrayNameClose, StateArrayNameClose, _ELEM, -1, 0},
 	{StateArrayNameClose, _CLOSE, StateArrayValueOpen, StateArrayValueOpen, _NULL, -1, -1},
 	{StateArrayValueOpen, _OPEN, StateArrayValueValue, StateArrayWeightOpen, _TAG, 1, -1},
-	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayWeightOpen, _ELEM, -1, 1},
+	{StateArrayValueValue, _VALUE, StateArrayValueClose, StateArrayValueClose, _ELEM, -1, 1},
 	{StateArrayValueClose, _CLOSE, StateArrayWeightOpen, StateArrayWeightOpen, _NULL, -1, -1},
 	{StateArrayWeightOpen, _OPEN, StateArrayWeightValue, StateArrayIndexOpen, _TAG, 2, -1},
-	{StateArrayWeightValue, _VALUE, StateArrayWeightClose, StateArrayIndexOpen, _ELEM, -1, 2},
+	{StateArrayWeightValue, _VALUE, StateArrayWeightClose, StateArrayWeightClose, _ELEM, -1, 2},
 	{StateArrayWeightClose, _CLOSE, StateArrayIndexOpen, StateArrayIndexOpen, _NULL, -1, -1},
 	{StateArrayIndexOpen, _OPEN, StateArrayIndexValue, StateArrayIndex, _TAG, 3, -1},
-	{StateArrayIndexValue, _VALUE, StateArrayIndexClose, StateArrayIndex, _ELEM, -1, 3},
+	{StateArrayIndexValue, _VALUE, StateArrayIndexClose, StateArrayIndexClose, _ELEM, -1, 3},
 	{StateArrayIndexClose, _CLOSE, StateArrayIndex, StateArrayIndex, _NULL, -1, -1}
 };
 
