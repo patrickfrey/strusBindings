@@ -11,6 +11,7 @@
 /// \file valueVariant.hpp
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
+#include <string>
 #include <cstring>
 
 namespace strus {
@@ -43,6 +44,7 @@ struct ValueVariant
 	ValueVariant( int64_t Int_)					{value.Int = Int_; type = Int; attr.length = 0; deleter = 0;}
 	ValueVariant( const char* string_)				{value.string = string_; type = String; attr.length = std::strlen(string_); deleter = 0;}
 	ValueVariant( const char* s, std::size_t l)			{value.string = s; type = String; attr.length = l; deleter = 0;}
+	ValueVariant( const std::string& s)				{value.string = s.c_str(); type = String; attr.length = s.size(); deleter = 0;}
 	ValueVariant( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; attr.length = l; deleter = 0;}
 	ValueVariant( StrusObjectType* s_, StrusObjectDeleter d_)	{value.strusObject = s_; type = StrusObject; deleter = d_; attr.refcnt=!!deleter;}
 	ValueVariant( const NumericVariant& num)
@@ -55,6 +57,7 @@ struct ValueVariant
 	void init( int64_t Int_)					{reset(); value.Int = Int_; type = Int;}
 	void init( const char* string_)					{reset(); value.string = string_; type = String; attr.length = std::strlen(string_);}
 	void init( const char* s, std::size_t l)			{reset(); value.string = s; type = String; attr.length = l;}
+	void init( const std::string& s)				{reset(); value.string = s.c_str(); type = String; attr.length = s.size(); deleter = 0;}
 	void init( const uint16_t* s, std::size_t l)			{reset(); value.wstring = s; type = WString; attr.length = l;}
 	void init( StrusObjectType* s_, StrusObjectDeleter d_)		{reset(); value.strusObject = s_; type = StrusObject; deleter = d_; if (deleter) attr.refcnt=1;}
 	void init( const NumericVariant& num)

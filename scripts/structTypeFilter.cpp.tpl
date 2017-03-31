@@ -73,9 +73,9 @@ static const filter::StateTable::Element g_array_statetable[] = {
 static bindings::ValueVariant getElementValue( const {{fullname}}& elem, int valueIndex)
 {
 	switch (valueIndex) {
-{% for element in elements %}
+{% for vaccess in func("valueaccesslist")( "(*m_impl)", structname) %}
 		case {{loop.index0}}:
-			return filter::VariantValueTemplate<{{atomictypes[ element['type']]['fullname']}}>::get( elem.{{element.name}}());
+			return bindings::ValueVariant( {{vaccess}});
 {% endfor %}
 	}
 	return bindings::ValueVariant();

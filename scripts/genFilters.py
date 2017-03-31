@@ -19,43 +19,43 @@ import sys
 
 atomictypes = {
         "double": {
-                "variantcast": "val",
+                "variantcast": "%s",
                 "fullname": 'double'
         },
         "uint": {
-                "variantcast": "(bindings::ValueVariant::UIntType)val",
+                "variantcast": "(bindings::ValueVariant::UIntType)%s",
                 "fullname": 'unsigned int'
         },
         "int": {
-                "variantcast": "(bindings::ValueVariant::IntType)val",
+                "variantcast": "(bindings::ValueVariant::IntType)%s",
                 "fullname": 'int'
         },
         "bool": {
-                "variantcast": "(bindings::ValueVariant::IntType)val",
+                "variantcast": "(bindings::ValueVariant::IntType)%s",
                 "fullname": 'bool'
         },
         "charp": {
-                "variantcast": "val",
+                "variantcast": "%s",
                 "paramname": "const char*",
                 "fullname": 'const char*'
         },
         "string": {
-                "variantcast": "val.c_str(), val.size()",
+                "variantcast": "%s",
                 "fullname": 'std::string',
                 "includes": ['<string>']
         },
         "NumericVariant": {
-                "variantcast": "val",
+                "variantcast": "%s",
                 "fullname": 'NumericVariant',
                 "includes": ['"strus/numericVariant.hpp"']
         },
         "QueryOpCode": {
-                "variantcast": "analyzer::Query::Instruction::opCodeName( val)",
+                "variantcast": "analyzer::Query::Instruction::opCodeName( %s)",
                 "fullname": 'analyzer::Query::Instruction::OpCode',
                 "includes": ['"strus/analyzer/query.hpp"']
         },
         "QueryElementType": {
-                "variantcast": "analyzer::Query::Element::typeName( val)",
+                "variantcast": "analyzer::Query::Element::typeName( %s)",
                 "fullname": 'analyzer::Query::Element::Type',
                 "includes": ['"strus/analyzer/query.hpp"']
         }
@@ -227,19 +227,17 @@ def getFunction( funcname):
     def statestructlist( prefix, etype, nextstate):
         class closurevar:
             tagnameIndex = 0
-            valueIndex = 0
             arrayIndex = -1
-        def statestructlist_( prefix, etype, nextstate):
+        def statestructlist_( prefix, etype, nextstate, valueIndex):
             if etype[-2:] == "[]":
                 closurevar.arrayIndex += 1
-                rt = [ prefix + "ArrayIndex" ] + statestructlist_( prefix + "Array", etype[:-2], nextstate)
+                rt = [ prefix + "ArrayIndex" ] + statestructlist_( prefix + "Array", etype[:-2], nextstate, 0)
                 closurevar.arrayIndex -= 1
                 return rt
             if etype in atomictypes:
                 rt = ["{" + prefix + "Open, _OPEN, " + prefix + "Value, " + nextstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex,
-                      "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, -1, %u}" % closurevar.valueIndex,
+                      "{" + prefix + "Value, _VALUE, " + prefix + "Close, " + nextstate + ", _ELEM, -1, %u}" % valueIndex,
                       "{" + prefix + "Close, _CLOSE, " + nextstate + ", " + nextstate + ", _NULL, -1, -1}" ]
-                closurevar.valueIndex += 1
                 return rt
             if etype in structtypes:
                 rt = []
@@ -249,13 +247,27 @@ def getFunction( funcname):
                         followstate = nextstate
                     else:
                         followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
-                    rt += statestructlist_( prefix + uc1(element["name"]), element["type"], followstate)
+                    rt += statestructlist_( prefix + uc1(element["name"]), element["type"], followstate, eidx)
                     closurevar.tagnameIndex += 1
+                closurevar.valueIndex = 0
                 return rt
         closurevar.tagnameIndex = 0
-        closurevar.valueIndex = 0
         closurevar.arrayIndex = -1
-        return statestructlist_( prefix, etype, nextstate)
+        return statestructlist_( prefix, etype, nextstate, 0)
+    def valueaccesslist( prefix, etype):
+        def valueaccesslist_( prefix, etype, arrayIndex):
+            rt = []
+            if etype[-2:] == "[]":
+                rt += valueaccesslist_( prefix + "[m_index[" +  str(arrayIndex) + "]]", etype[:-2])
+            elif etype in atomictypes:
+                rt.append( atomictypes[etype]['variantcast'] % prefix)
+            elif etype in structtypes:
+                rt = []
+                elements = structtypes[etype]['elements']
+                for eidx,element in enumerate(elements):
+                    rt += valueaccesslist_( prefix + "." + element["name"] + "()", element["type"], arrayIndex)
+            return rt
+        return valueaccesslist_( prefix, etype, 0)
     def memberlist( etype):
         if etype[-2:] == "[]":
             return namelist( etype[:-2])
@@ -272,6 +284,8 @@ def getFunction( funcname):
         return statelist
     if funcname == "statestructlist":
         return statestructlist
+    if funcname == "valueaccesslist":
+        return valueaccesslist
     if funcname == "memberlist":
         return memberlist
     return None

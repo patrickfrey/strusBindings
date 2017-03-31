@@ -120,16 +120,16 @@ static bindings::ValueVariant getElementValue( const analyzer::Term& elem, int v
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<std::string>::get( elem.type());
+			return bindings::ValueVariant( (*m_impl).type());
 
 		case 1:
-			return filter::VariantValueTemplate<std::string>::get( elem.value());
+			return bindings::ValueVariant( (*m_impl).value());
 
 		case 2:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.pos());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).pos());
 
 		case 3:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.len());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).len());
 
 	}
 	return bindings::ValueVariant();

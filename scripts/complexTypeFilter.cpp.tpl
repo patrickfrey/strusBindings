@@ -16,6 +16,7 @@
 #include "structElementArray.hpp"
 #include "stateTable.hpp"
 #include "variantValueTemplate.hpp"
+#include <cstring>
 
 using namespace strus;
 
@@ -54,16 +55,28 @@ static const filter::StateTable::Element g_array_statetable[] = {
 };
 
 {{structname}}Filter::{{structname}}Filter()
-	:m_impl(0),m_ownership(0),m_state(0){}
+	:m_impl(0),m_ownership(0),m_state(0)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 {{structname}}Filter::{{structname}}Filter( const {{structname}}Filter& o)
-	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state){}
+	:m_impl(o.m_impl),m_ownership(o.m_ownership),m_state(o.m_state)
+{
+	std::memcpy( m_index, o.m_index, sizeof(m_index));
+}
 
 {{structname}}Filter::{{structname}}Filter( const {{fullname}}* impl)
-	:m_impl(impl),m_ownership(0),m_state(1){}
+	:m_impl(impl),m_ownership(0),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 {{structname}}Filter::{{structname}}Filter( {{fullname}}* impl, bool withOwnership)
-	:m_impl(impl),m_ownership(impl),m_state(1){}
+	:m_impl(impl),m_ownership(impl),m_state(1)
+{
+	std::memset( m_index, 0, sizeof(m_index));
+}
 
 {{structname}}Filter::~{{structname}}Filter()
 {
@@ -73,11 +86,11 @@ static const filter::StateTable::Element g_array_statetable[] = {
 static bindings::ValueVariant getElementValue( const {{fullname}}& elem, int valueIndex)
 {
 	switch (valueIndex) {
-{% for element in elements %}
+{% for vaccess in func("valueaccesslist")( "(*m_impl)", structname) %}
 		case {{loop.index0}}:
-			return filter::VariantValueTemplate<{{atomictypes[ element['type']]['fullname']}}>::get( elem.{{element.name}}());
+			return bindings::ValueVariant( {{vaccess}});
 {% endfor %}
-	}
+		}
 	return bindings::ValueVariant();
 }
 

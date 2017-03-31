@@ -96,10 +96,10 @@ static bindings::ValueVariant getElementValue( const VectorStorageSearchInterfac
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<int>::get( elem.featidx());
+			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl).featidx());
 
 		case 1:
-			return filter::VariantValueTemplate<double>::get( elem.weight());
+			return bindings::ValueVariant( (*m_impl).weight());
 
 	}
 	return bindings::ValueVariant();

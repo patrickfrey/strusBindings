@@ -44,11 +44,11 @@ struct VariantValueTemplate<std::string>
 {
 	static void init( bindings::ValueVariant& res, const std::string& val)
 	{
-		res.init( val.c_str(), val.size());
+		res.init( val);
 	}
 	static bindings::ValueVariant get( const std::string& val)
 	{
-		return bindings::ValueVariant( val.c_str(), val.size());
+		return bindings::ValueVariant( val);
 	}
 };
 

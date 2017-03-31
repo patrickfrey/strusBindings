@@ -108,13 +108,13 @@ static bindings::ValueVariant getElementValue( const analyzer::Query::Instructio
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<analyzer::Query::Instruction::OpCode>::get( elem.opCode());
+			return bindings::ValueVariant( analyzer::Query::Instruction::opCodeName( (*m_impl).opCode()));
 
 		case 1:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.idx());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).idx());
 
 		case 2:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.nofOperands());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).nofOperands());
 
 	}
 	return bindings::ValueVariant();

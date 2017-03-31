@@ -120,16 +120,16 @@ static bindings::ValueVariant getElementValue( const SummaryElement& elem, int v
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<std::string>::get( elem.name());
+			return bindings::ValueVariant( (*m_impl).name());
 
 		case 1:
-			return filter::VariantValueTemplate<std::string>::get( elem.value());
+			return bindings::ValueVariant( (*m_impl).value());
 
 		case 2:
-			return filter::VariantValueTemplate<double>::get( elem.weight());
+			return bindings::ValueVariant( (*m_impl).weight());
 
 		case 3:
-			return filter::VariantValueTemplate<int>::get( elem.index());
+			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl).index());
 
 	}
 	return bindings::ValueVariant();

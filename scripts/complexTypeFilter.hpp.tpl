@@ -37,11 +37,15 @@ public:
 	virtual void skip();
 
 	virtual BindingFilterInterface* createCopy() const;
-	
+
+private:
+	enum {MaxDepth=8};
+
 private:
 	const {{fullname}}* m_impl;
 	{{fullname}}* m_ownership;
 	unsigned int m_state;
+	unsigned int m_index[ MaxDepth];
 };
 
 }//namespace

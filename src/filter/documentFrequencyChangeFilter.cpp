@@ -108,13 +108,13 @@ static bindings::ValueVariant getElementValue( const bindings::DocumentFrequency
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<const char*>::get( elem.type());
+			return bindings::ValueVariant( (*m_impl).type());
 
 		case 1:
-			return filter::VariantValueTemplate<const char*>::get( elem.value());
+			return bindings::ValueVariant( (*m_impl).value());
 
 		case 2:
-			return filter::VariantValueTemplate<int>::get( elem.increment());
+			return bindings::ValueVariant( (bindings::ValueVariant::IntType)(*m_impl).increment());
 
 	}
 	return bindings::ValueVariant();

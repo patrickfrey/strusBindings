@@ -96,10 +96,10 @@ static bindings::ValueVariant getElementValue( const analyzer::MetaData& elem, i
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<std::string>::get( elem.name());
+			return bindings::ValueVariant( (*m_impl).name());
 
 		case 1:
-			return filter::VariantValueTemplate<NumericVariant>::get( elem.value());
+			return bindings::ValueVariant( (*m_impl).value());
 
 	}
 	return bindings::ValueVariant();

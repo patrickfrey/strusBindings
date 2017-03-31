@@ -96,10 +96,10 @@ static bindings::ValueVariant getElementValue( const analyzer::Attribute& elem, 
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<std::string>::get( elem.name());
+			return bindings::ValueVariant( (*m_impl).name());
 
 		case 1:
-			return filter::VariantValueTemplate<std::string>::get( elem.value());
+			return bindings::ValueVariant( (*m_impl).value());
 
 	}
 	return bindings::ValueVariant();

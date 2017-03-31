@@ -132,19 +132,19 @@ static bindings::ValueVariant getElementValue( const analyzer::Query::Element& e
 	switch (valueIndex) {
 
 		case 0:
-			return filter::VariantValueTemplate<analyzer::Query::Element::Type>::get( elem.type());
+			return bindings::ValueVariant( analyzer::Query::Element::typeName( (*m_impl).type()));
 
 		case 1:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.idx());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).idx());
 
 		case 2:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.position());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).position());
 
 		case 3:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.length());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).length());
 
 		case 4:
-			return filter::VariantValueTemplate<unsigned int>::get( elem.fieldNo());
+			return bindings::ValueVariant( (bindings::ValueVariant::UIntType)(*m_impl).fieldNo());
 
 	}
 	return bindings::ValueVariant();
