@@ -211,104 +211,50 @@ def mapMainTemplate( mainOutput, mainTemplate):
 def getFunction( funcname):
     def uc1( str):
         return str[:1].upper() + str[1:]
-    def firststate( prefix, etype):
-        if etype[-2:] == "[]":
-            return prefix + "Index"
+
+    def c_iteratortype( etype):
         if etype in atomictypes:
-            return prefix + "Value"
+            return "std::vector<" + atomictypes[ etype] + ">::const_iterator"
         elif etype in structtypes:
-            elements = structtypes[etype]['elements']
-            if elements:
-                return prefix + uc1(elements[0]["name"]) + "Open"
-            else:
-                return None
-        raise Exception("type %s not defined" % etype)
-    def statelist( prefix, etype):
-        if etype[-2:] == "[]":
-            return [prefix + "Index"] + statelist( prefix, etype[:-2])
-        elif etype in atomictypes:
-            return [prefix + "Value"]
-        elif etype in structtypes:
-            elements = structtypes[etype]['elements']
-            rt = []
-            for element in elements:
-                subprefix = prefix + uc1(element["name"])
-                rt += [subprefix + "Open"] + statelist( subprefix, element["type"]) +  [subprefix + "Close"]
-            return rt
-    def statestructlist( prefix, etype, nextstate):
-        class closurevar:
-            tagnameIndex = -1
-            arrayIndex = -1
-        def statestructlist_( prefix, etype, nextstate, valueIndex):
-            rt = []
-            if etype[-2:] == "[]":
-                startstate = firststate( prefix, etype[:-2])
-                if startstate:
-                    rt += ["{" + prefix + "Index, _INDEX, " + startstate + ", " + prefix + "Index, _TAG, -1, -1}"]
-                    rt += statestructlist_( prefix, etype[:-2], prefix + "Index", valueIndex)
-                else:
-                    rt += ["{" + prefix + "Index, _INDEX, " + prefix + "Index, " + prefix + "Index, _TAG, -1, -1}"]
-            elif etype in atomictypes:
-                rt += ["{" + prefix + "Value, _VALUE, " + nextstate + ", " + nextstate + ", _ELEM, -1, %u}" % valueIndex]
-            elif etype in structtypes:
-                elements = structtypes[etype]['elements']
-                for eidx,element in enumerate( elements):
-                    closurevar.tagnameIndex += 1
-                    if eidx+1 == len(elements):
-                        followstate = nextstate
-                    else:
-                        followstate = prefix + uc1(elements[ eidx+1]["name"] + "Open")
-                    subprefix = prefix + uc1(element["name"])
-                    startstate = firststate(subprefix, element["type"])
-                    if startstate:
-                        rt += ["{" + subprefix + "Open, _OPEN, " + startstate + ", " + followstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex]
-                        rt += statestructlist_( subprefix, element["type"], subprefix + "Close", eidx)
-                        rt += ["{" + subprefix + "Close, _CLOSE, " + followstate + ", " + followstate + ", _NULL, -1, -1}"]
-                    else:
-                        rt += ["{" + subprefix + "Open, _OPEN, " + subprefix + "Close, " + followstate + ", _TAG, %u, -1}" % closurevar.tagnameIndex]
-                        rt += ["{" + subprefix + "Close, _CLOSE, " + followstate + ", " + followstate + ", _NULL, -1, -1}"]
-            return rt
-        closurevar.tagnameIndex = -1
-        closurevar.arrayIndex = -1
-        return statestructlist_( prefix, etype, nextstate, 0)
-    def valueaccesslist( prefix, etype):
-        def valueaccesslist_( prefix, etype, arrayIndex):
-            rt = []
-            if etype[-2:] == "[]":
-                rt += valueaccesslist_( prefix + "[m_index[" +  str(arrayIndex) + "]]", etype[:-2], arrayIndex+1)
-            elif etype in atomictypes:
-                rt.append( atomictypes[etype]['variantcast'] % prefix)
-            elif etype in structtypes:
-                rt = []
-                elements = structtypes[etype]['elements']
-                for eidx,element in enumerate(elements):
-                    rt += valueaccesslist_( prefix + "." + element["name"] + "()", element["type"], arrayIndex)
-            return rt
-        return valueaccesslist_( prefix, etype, 0)
-    def memberlist( etype):
-        rt = []
-        if etype[-2:] == "[]":
-            rt = memberlist( etype[:-2])
-        elif etype in atomictypes:
-            rt = []
-        elif etype in structtypes:
-            elements = structtypes[etype]['elements']
-            for element in elements:
-                rt.append( element["name"])
-                rt += memberlist( element["type"])
+            return "std::vector<" + structtypes[etype]['fullname'] + ">::const_iterator"
         else:
             raise Exception("type %s not defined" % etype)
-        return rt
+
+    def serialization( resultname, srcelem, etype):
+        class closurevar:
+            varIndex = 0
+            resultname = "res"
+        def serialization_( srcelem, etype):
+            rt = []
+            if etype[-2:] == "[]":
+                subtype = etype[:-2]
+                itr = c_iteratortype( subtype)
+                closurevar.varIndex += 1
+                vidx = closurevar.varIndex
+                rt += ["%s ii%u = %s.begin(), ie%u = %s.end(); " % (itr,vidx,srcelem,vidx,srcelem) ]
+                rt += ["for (; ii%u != ie%u; ++ii%u)" % (vidx,vidx,vidx),"{",">>","%s.pushIndex();" % closurevar.resultname ]
+                rt += serialization_( "(*%u)" % vidx, subtype)
+                rt += ["<<","}"]
+            elif etype in atomictypes:
+                rt += ["%s.pushValue( %s);" % (closurevar.resultname,srcelem) ]
+            elif etype in structtypes:
+                elements = structtypes[etype]['elements']
+                for element in elements:
+                    subsrcelem = srcelem + "." + element["name"]
+                    subtype = element["type"]
+                    rt += [ "%s.pushOpen(\"%s\");" % (closurevar.resultname, element["name"]) ]
+                    rt += serialization_( subsrcelem, subtype)
+                    rt += [ "%s.pushClose();" % (closurevar.resultname) ]
+            else:
+                raise Exception("type %s not defined" % etype)
+            return rt
+        closurevar.varIndex = 0
+        closurevar.resultname = resultname
+        return serialization_( srcelem, etype)
     if funcname == "uc1":
         return uc1
-    if funcname == "statelist":
-        return statelist
-    if funcname == "statestructlist":
-        return statestructlist
-    if funcname == "valueaccesslist":
-        return valueaccesslist
-    if funcname == "memberlist":
-        return memberlist
+    if funcname == "serialization":
+        return serialization
     return None
 
 def mapStructFilterTemplates():

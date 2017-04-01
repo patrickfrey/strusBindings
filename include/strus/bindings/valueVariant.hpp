@@ -51,6 +51,18 @@ struct ValueVariant
 	{
 		assign( num);
 	}
+	ValueVariant( const ValueVariant& o)
+	{
+		assign( o);
+	}
+	void operator=( const ValueVariant& o)
+	{
+		assign( o);
+	}
+	~ValueVariant()
+	{
+		reset();
+	}
 
 	void init( double Double_)					{reset(); value.Double = Double_; type = Double;}
 	void init( uint64_t UInt_)					{reset(); value.UInt = UInt_; type = UInt;}
@@ -64,19 +76,6 @@ struct ValueVariant
 	{
 		reset();
 		assign( num);
-	}
-
-	ValueVariant( const ValueVariant& o)
-	{
-		assign( o);
-	}
-	void operator=( const ValueVariant& o)
-	{
-		assign( o);
-	}
-	~ValueVariant()
-	{
-		reset();
 	}
 
 	void clear()
