@@ -38,13 +38,25 @@ public:
 	{
 		result.pushValue( ValueVariant( val));
 	}
+	static inline void serialize_int( Serialization& result, const ValueVariant::IntType& val)
+	{
+		result.pushValue( ValueVariant( (ValueVariant::IntType)val));
+	}
 	static inline void serialize( Serialization& result, const ValueVariant::UIntType& val)
 	{
 		result.pushValue( ValueVariant( val));
 	}
+	static inline void serialize_uint( Serialization& result, const ValueVariant::UIntType& val)
+	{
+		result.pushValue( ValueVariant( (ValueVariant::UIntType)val));
+	}
 	static inline void serialize( Serialization& result, const bool& val)
 	{
-		result.pushValue( ValueVariant( val));
+		result.pushValue( ValueVariant( (ValueVariant::IntType)val));
+	}
+	static inline void serialize_bool( Serialization& result, const bool& val)
+	{
+		result.pushValue( ValueVariant( (ValueVariant::IntType)val));
 	}
 	static inline void serialize( Serialization& result, const std::string& val)
 	{
@@ -90,23 +102,15 @@ public:
 	static void serialize( Serialization& result, const analyzer::Query::Element& val)
 	{
 		serializeStructMember( result, "type", val.type());
-		serializeStructMember( result, "idx", val.idx());
-		serializeStructMember( result, "pos", (ValueVariant::UIntType)val.pos());
-		serializeStructMember( result, "len", (ValueVariant::UIntType)val.len());
-		serializeStructMember( result, "fieldno", (ValueVariant::UIntType)val.fieldNo());
-	}
-	static void serialize( Serialization& result, const analyzer::Query::Element& val)
-	{
-		serializeStructMember( result, "type", val.type());
-		serializeStructMember( result, "idx", val.idx());
+		serializeStructMember( result, "idx", (ValueVariant::UIntType)val.idx());
 		serializeStructMember( result, "pos", (ValueVariant::UIntType)val.pos());
 		serializeStructMember( result, "len", (ValueVariant::UIntType)val.len());
 		serializeStructMember( result, "field", (ValueVariant::UIntType)val.field());
 	}
 	static void serialize( Serialization& result, const analyzer::Query::Instruction& val)
 	{
-		serializeStructMember( result, "type", val.type());
-		serializeStructMember( result, "idx", val.idx());
+		serializeStructMember( result, "opcode", val.opCode());
+		serializeStructMember( result, "idx", (ValueVariant::UIntType)val.idx());
 		serializeStructMember( result, "nofOperands", (ValueVariant::UIntType)val.nofOperands());
 	}
 	static void serialize( Serialization& result, const VectorStorageSearchInterface::Result& val)
@@ -126,13 +130,13 @@ public:
 		serializeStructMember( result, "subDocumentTypeName", val.subDocumentTypeName());
 		serializeStructMemberArray( result, "metadata", val.metadata());
 		serializeStructMemberArray( result, "attributes", val.attributes());
-		serializeStructMemberArray( result, "searchTerms", val.searchTerms());
-		serializeStructMemberArray( result, "forwardTerms", val.forwardTerms());
+		serializeStructMemberArray( result, "searchIndexTerms", val.searchIndexTerms());
+		serializeStructMemberArray( result, "forwardIndexTerms", val.forwardIndexTerms());
 	}
 	static void serialize( Serialization& result, const analyzer::Query& val)
 	{
 		serializeStructMemberArray( result, "metadata", val.metadata());
-		serializeStructMemberArray( result, "searchTerms", val.searchTerms());
+		serializeStructMemberArray( result, "searchIndexTerms", val.searchIndexTerms());
 		serializeStructMemberArray( result, "elements", val.elements());
 		serializeStructMemberArray( result, "instructions", val.instructions());
 	}
@@ -174,7 +178,7 @@ public:
 	}
 	static void serialize( Serialization& result, const std::vector<int>& val)
 	{
-		serializeArray<ValueVariant::IntType>( result, val);
+		serializeIntArray( result, val);
 	}
 	static void serialize( Serialization& result, const std::vector<double>& val)
 	{
@@ -192,11 +196,20 @@ private:
 	template <typename TYPE>
 	static void serializeArray( Serialization& result, const std::vector<TYPE>& val)
 	{
-		std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
+		typename std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
 			result.pushIndex();
 			serialize( result, *vi);
+		}
+	}
+	static void serializeIntArray( Serialization& result, const std::vector<int>& val)
+	{
+		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
+		for (; vi != ve; ++vi)
+		{
+			result.pushIndex();
+			serialize( result, (ValueVariant::IntType)*vi);
 		}
 	}
 	template <typename TYPE>
