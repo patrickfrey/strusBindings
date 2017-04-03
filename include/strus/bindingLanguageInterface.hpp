@@ -9,7 +9,8 @@
 #define _STRUS_BINDING_LANGUAGE_INTERFACE_HPP_INCLUDED
 /// \brief Interface for accessing the scripting language types and object descriptions
 /// \file bindingLanguageInterface.hpp
-#include "strus/bindingFilterInterface.hpp"
+#include "strus/bindings/valueVariant.hpp"
+#include "strus/bindings/callResult.hpp"
 #include <cstring>
 
 namespace strus {
