@@ -167,7 +167,7 @@ public:
 		std::string m_origtype;
 	};
 
-	void addElement( Type type_, const std::string& id_, const std::string& origtype_)
+	void addElement( Element::Type type_, const std::string& id_, const std::string& origtype_)
 	{
 		m_elements.push_back( Element( type_, id_, origtype_));
 	}
@@ -205,7 +205,7 @@ private:
 		m_structdefar.push_back( def);
 	}
 
-	void parseClass( const std::string& className, bool isInterface, char const*& si, const char* se);
+	void parseClass( const std::string& className, char const*& si, const char* se);
 	std::vector<VariableValue> parseParameters(
 			const std::string& scope_class,
 			const std::string& scope_method,

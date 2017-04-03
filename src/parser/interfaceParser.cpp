@@ -796,15 +796,7 @@ void InterfacesDef::addSource( const std::string& source)
 						char const* endClass = si++;
 						skipBrackets( endClass, se, '{', '}');
 	
-						if (endsWith( className, "Interface"))
-						{
-							std::string interfacename( className.c_str(),className.size()-9/*sizeof("Interface")*/);
-							parseClass( interfacename, true, si, endClass-1);
-						}
-						else
-						{
-							parseClass( className, false, si, endClass-1);
-						}
+						parseClass( className, si, endClass-1);
 						si = endClass;
 					}
 				}
@@ -845,7 +837,7 @@ static std::string guessMethodName( const char* si, const char* se)
 	return parseIdentifier( xi, se);
 }
 
-void InterfacesDef::parseClass( const std::string& className, bool isInterface, char const*& si, const char* se)
+void InterfacesDef::parseClass( const std::string& className, char const*& si, const char* se)
 {
 	ClassDef classDef( className);
 	while (si != se)
@@ -886,11 +878,10 @@ void InterfacesDef::parseClass( const std::string& className, bool isInterface, 
 				char const* sn = si;
 				skipStructure( sn, se);
 				std::string subClassName( className);
-				if (isInterface) subClassName.append( "Interface");
 				subClassName.append( "::");
 				subClassName.append( parseIdentifier( si, sn));
-				skipSpacesAndComments( si, se);
-				if (si == se)
+				skipSpacesAndComments( si, sn);
+				if (si == sn)
 				{
 					throw std::runtime_error("unexpected end of source after sub class name definition");
 				}
@@ -899,7 +890,7 @@ void InterfacesDef::parseClass( const std::string& className, bool isInterface, 
 				{
 					char const* endClass = si++;
 					skipBrackets( endClass, sn, '{', '}');
-					parseClass( className, false, si, endClass-1);
+					parseClass( subClassName, si, endClass-1);
 				}
 				skipSpacesAndComments( si, sn);
 				if (si != sn)
@@ -971,14 +962,7 @@ void InterfacesDef::parseClass( const std::string& className, bool isInterface, 
 						++si;
 					}
 				}
-				if (isInterface)
-				{
-					classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst));
-				}
-				else
-				{
-					
-				}
+				classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst));
 			}
 		}
 		else
