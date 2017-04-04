@@ -12,7 +12,6 @@
 #include "strus/bindings/statisticsMessage.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/analyzer/document.hpp"
-#include "strus/textProcessorInterface.hpp"
 
 /// \brief Forward declaration
 class DocumentAnalyzeQueue;
@@ -20,6 +19,14 @@ class DocumentAnalyzeQueue;
 class PatternMatcher;
 
 namespace strus {
+
+/// \brief Forward declaration
+class StatisticsProcessorInterface;
+/// \brief Forward declaration
+class TextProcessorInterface;
+/// \brief Forward declaration
+class QueryProcessorInterface;
+
 namespace bindings {
 
 /// \class DocumentAnalyzer
@@ -177,7 +184,7 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class Context;
-	DocumentAnalyzer( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const void* textproc_);
+	DocumentAnalyzer( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_);
 
 	HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;
@@ -221,7 +228,7 @@ private:
 private:
 	/// \brief Constructor used by Context
 	friend class DocumentAnalyzer;
-	explicit DocumentAnalyzeQueue( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const HostObjectReference& analyzer, const void* textproc_);
+	explicit DocumentAnalyzeQueue( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const HostObjectReference& analyzer, const TextProcessorInterface* textproc_);
 
 	HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;
@@ -626,7 +633,7 @@ private:
 	HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;
 	HostObjectReference m_objbuilder_impl;
-	const void* m_statsproc;
+	const StatisticsProcessorInterface* m_statsproc;
 };
 
 class VectorStorageSearcher
@@ -860,7 +867,7 @@ private:
 	HostObjectReference m_trace_impl;
 	HostObjectReference m_objbuilder_impl;
 	HostObjectReference m_queryeval_impl;
-	const void* m_queryproc;
+	const QueryProcessorInterface* m_queryproc;
 };
 
 /// \brief Query program object representing a retrieval method for documents in a storage.
@@ -880,7 +887,7 @@ public:
 	void defineFeature( 
 			const std::string& set_,
 			const ValueVariant& expr_,
-			double weight_=1.0);
+			double weight_=1);
 
 	/// \brief Define a posting iterator describing a document field addressable as feature
 	/// \param[in] set_ name of the feature set, this feature is addressed with
@@ -899,7 +906,7 @@ public:
 	void addMetaDataRestrictionCondition(
 			const char* compareOp,
 			const std::string& name,
-			NumericVariant value,
+			const NumericVariant& value,
 			bool newGroup);
 
 	/// \brief Define a meta data restriction
@@ -972,7 +979,7 @@ public:
 
 private:
 	friend class QueryEval;
-	Query( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& errorhnd_, const HostObjectReference& storage_impl_, const HostObjectReference& queryeval_impl_, const HostObjectReference& query_impl_, const void* queryproc_)
+	Query( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& errorhnd_, const HostObjectReference& storage_impl_, const HostObjectReference& queryeval_impl_, const HostObjectReference& query_impl_, const QueryProcessorInterface* queryproc_)
 		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
 	{}
 
@@ -982,7 +989,7 @@ private:
 	HostObjectReference m_storage_impl;
 	HostObjectReference m_queryeval_impl;
 	HostObjectReference m_query_impl;
-	const void* m_queryproc;
+	const QueryProcessorInterface* m_queryproc;
 };
 
 ///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata

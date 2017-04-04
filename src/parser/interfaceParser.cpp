@@ -150,7 +150,7 @@ static std::string parseNumericValue( char const*& si, const char* se)
 }
 static bool isOperator( char ch)
 {
-	static const char* ar = "<>()*&::,";
+	static const char* ar = "<>()*&:,=\"";
 	return std::strchr( ar, ch) != 0;
 }
 static void skipBrackets( char const*& si, const char* se, char sb, char eb)
@@ -179,6 +179,26 @@ static void skipBrackets( char const*& si, const char* se, char sb, char eb)
 	}
 	throw std::runtime_error("unbalanced brackets in source");
 }
+static void skipBrackets( char const*& si, const char* se)
+{
+	if (*si == '<')
+	{
+		skipBrackets( si, se, '<', '>');
+	}
+	else if (*si == '[')
+	{
+		skipBrackets( si, se, '[', ']');
+	}
+	else if (*si == '(')
+	{
+		skipBrackets( si, se, '(', ')');
+	}
+	else if (*si == '{')
+	{
+		skipBrackets( si, se, '{', '}');
+	}
+}
+
 static void skipStructure( char const*& si, const char* se)
 {
 	skipSpacesAndComments( si, se);
@@ -201,7 +221,7 @@ static void skipStructure( char const*& si, const char* se)
 		skipBrackets( si, se, '{', '}');
 		skipSpacesAndComments( si, se);
 	}
-	if (*si == ';')
+	else if (*si == ';')
 	{
 		++si;
 	}
@@ -377,7 +397,7 @@ public:
 
 		while (si != se)
 		{
-			if (isAlpha(*si))
+			if (isAlnum(*si))
 			{
 				m_tokendefs.push_back( TokenDef( TokenIdentifier, parseIdentifier( si, se)));
 			}
@@ -625,14 +645,30 @@ std::string VariableValue::tostring() const
 std::string MethodDef::tostring() const
 {
 	std::ostringstream out;
-	out << "{ " << m_returnvalue.tostring() << "} METHOD " << m_name << "( ";
+	out << "METHOD " << m_name << std::endl;
+	out << "\tRETURN { " << m_returnvalue.tostring() << "}" << std::endl;
+	out << "\tPARAMS ( ";
 	std::vector<VariableValue>::const_iterator pi = m_param.begin(), pe = m_param.end();
 	for (int pidx=0; pi != pe; ++pi,++pidx)
 	{
 		out << "{ " << pi->tostring() << " }";
 	}
 	out << " )";
-	if (m_isconst) out << "const" << std::endl;
+	if (m_isconst) out << "const";
+	out << std::endl;
+	return out.str();
+}
+
+std::string ConstructorDef::tostring() const
+{
+	std::ostringstream out;
+	out << "CONSTRUCTOR" << "( ";
+	std::vector<VariableValue>::const_iterator pi = m_param.begin(), pe = m_param.end();
+	for (int pidx=0; pi != pe; ++pi,++pidx)
+	{
+		out << "{ " << pi->tostring() << " }";
+	}
+	out << " )";
 	return out.str();
 }
 
@@ -640,6 +676,11 @@ std::string ClassDef::tostring() const
 {
 	std::ostringstream out;
 	out << "CLASS " << m_name << std::endl;
+	std::vector<ConstructorDef>::const_iterator ci = m_constructorar.begin(), ce = m_constructorar.end();
+	for (; ci != ce; ++ci)
+	{
+		out << ci->tostring();
+	}
 	std::vector<MethodDef>::const_iterator mi = m_methodar.begin(), me = m_methodar.end();
 	for (; mi != me; ++mi)
 	{
@@ -790,13 +831,25 @@ void InterfacesDef::addSource( const std::string& source)
 					{
 						throw std::runtime_error("unexpected end of source after class name definition");
 					}
-					if (*si == ';') continue;
+					if (*si == ':')
+					{
+						for (++si; si != se && *si != ';' && *si != '{'; ++si,skipSpacesAndComments( si,se)){}
+					}
+					if (*si == ';')
+					{
+						std::map<std::string,int>::const_iterator ci = m_classdefmap.find( className);
+						if (ci == m_classdefmap.end())
+						{
+							m_classdefmap[ className] = -1;
+						}
+						continue;
+					}
 					if (*si == '{')
 					{
 						char const* endClass = si++;
 						skipBrackets( endClass, se, '{', '}');
-	
-						parseClass( className, si, endClass-1);
+
+						parseClass( className, "", si, endClass-1);
 						si = endClass;
 					}
 				}
@@ -825,6 +878,15 @@ void InterfacesDef::addSource( const std::string& source)
 	}
 }
 
+void InterfacesDef::checkUnresolved() const
+{
+	std::map<std::string,int>::const_iterator ci = m_classdefmap.begin(), ce = m_classdefmap.end();
+	for (; ci != ce; ++ci)
+	{
+		if (ci->second < 0) throw std::runtime_error( std::string("unresolved class definition '") + ci->first + "'");
+	}
+}
+
 static std::string guessMethodName( const char* si, const char* se)
 {
 	char const* xi = (char const*)std::memchr( si, '(', se-si);
@@ -837,9 +899,14 @@ static std::string guessMethodName( const char* si, const char* se)
 	return parseIdentifier( xi, se);
 }
 
-void InterfacesDef::parseClass( const std::string& className, char const*& si, const char* se)
+void InterfacesDef::parseClass( const std::string& className, const std::string& classScope, char const*& si, const char* se)
 {
+	bool privateScope = false;
 	ClassDef classDef( className);
+	std::map<std::string,int>::const_iterator ci = m_classdefmap.find( className);
+	if (ci != m_classdefmap.end() && ci->second >= 0) throw std::runtime_error( std::string("duplicate definition of class '") + className + "'");
+
+	m_classdefmap[ className] = -1;
 	while (si != se)
 	{
 		skipSpacesAndComments( si, se);
@@ -857,9 +924,39 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 		{
 			char const* start = si;
 			std::string ident = parseIdentifier( si,se);
-			if (ident == "namespace")
+			if (ident == className)
+			{
+				//... constructor
+				skipSpacesAndComments( si, se);
+				if (si == se || *si != '(')
+				{
+					throw std::runtime_error("open bracket '(' expected after method name");
+				}
+				char const* endParams = si;
+				skipBrackets( endParams, se, '(', ')');
+				++si;
+				std::vector<VariableValue>
+					params = parseParameters( className, "constructor", si, endParams-1);
+				si = endParams;
+				skipSpacesAndComments( si, se);
+
+				if (*si == ':')
+				{
+					for (++si; si != se && *si != ';' && *si != '{'; ++si,skipSpacesAndComments( si,se)){}
+				}
+				if (si != se && *si == '{')
+				{
+					skipStructure( si, se);
+				}
+				classDef.addConstructor( ConstructorDef( params));
+			}
+			else if (ident == "namespace")
 			{
 				skipStructure( si, se);
+			}
+			else if (ident == "friend")
+			{
+				continue;
 			}
 			else if (ident == "enum")
 			{
@@ -873,24 +970,27 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 			{
 				skipStructure( si, se);
 			}
-			else if (ident == "class")
+			else if (ident == "class" && !privateScope)
 			{
 				char const* sn = si;
 				skipStructure( sn, se);
-				std::string subClassName( className);
-				subClassName.append( "::");
-				subClassName.append( parseIdentifier( si, sn));
+				std::string subClassName = parseIdentifier( si, sn);
+				std::string subClassScope = classScope.empty()?className:(classScope + "::" + className);
 				skipSpacesAndComments( si, sn);
 				if (si == sn)
 				{
 					throw std::runtime_error("unexpected end of source after sub class name definition");
+				}
+				if (*si == ':')
+				{
+					for (++si; si != sn && *si != ';' && *si != '{'; ++si,skipSpacesAndComments( si,sn)){}
 				}
 				if (*si == ';') continue;
 				if (*si == '{')
 				{
 					char const* endClass = si++;
 					skipBrackets( endClass, sn, '{', '}');
-					parseClass( subClassName, si, endClass-1);
+					parseClass( subClassName, subClassScope, si, endClass-1);
 				}
 				skipSpacesAndComments( si, sn);
 				if (si != sn)
@@ -903,6 +1003,7 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 			}
 			else if (ident == "private" || ident == "public" || ident == "protected")
 			{
+				privateScope = ident != "public";
 				skipSpacesAndComments( si, se);
 				if (si == se)
 				{
@@ -913,6 +1014,37 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 					throw std::runtime_error("expected ':' after private/public/protected");
 				}
 				++si;
+			}
+			else if (privateScope)
+			{
+				for (;;)
+				{
+					if (si != se && isAlpha( *si))
+					{
+						std::string ident( parseIdentifier(si,se));
+						if (ident == "public")
+						{
+							if (si != se && *si == ':')
+							{
+								privateScope = false;
+								break;
+							}
+						}
+					}
+					else if (*si == '{' || *si == '<' || *si == '[' || *si == '(')
+					{
+						skipBrackets( si, se);
+					}
+					else if (si == se || *si == '}')
+					{
+						break;
+					}
+					else
+					{
+						++si;
+						skipSpacesAndComments( si, se);
+					}
+				}
 			}
 			else
 			{
@@ -963,6 +1095,10 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 					}
 				}
 				classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst));
+				if (*si == '{')
+				{
+					skipStructure( si, se);
+				}
 			}
 		}
 		else
@@ -971,29 +1107,8 @@ void InterfacesDef::parseClass( const std::string& className, char const*& si, c
 		}
 		skipSpacesAndComments( si, se);
 	}
+	m_classdefmap[ className] = m_classdefar.size();
 	m_classdefar.push_back( classDef);
-}
-
-static void skipDefaultParameterValue( char const*& si, const char* se)
-{
-	skipSpacesAndComments( si, se);
-	if (si == se)
-	{
-		throw std::runtime_error("expected value after '=' in method parameter declaration");
-	}
-	if (isAlpha(*si))
-	{
-		(void)parseStructureIdentifier( si, se);
-		if (si != se && *si == '(')
-		{
-			skipBrackets( si, se, '(', ')');
-			skipSpacesAndComments( si, se);
-		}
-	}
-	else if (isDigit(*si) || *si == '-' || *si == '+')
-	{
-		(void)parseNumericValue( si, se);
-	}
 }
 
 std::vector<VariableValue> InterfacesDef::parseParameters(
@@ -1012,11 +1127,6 @@ std::vector<VariableValue> InterfacesDef::parseParameters(
 		{
 			(void)parseIdentifier(si,se);	//... name of parameter is not interesting
 			skipSpacesAndComments( si, se);
-			if (si != se && *si == '=')
-			{
-				++si;
-				skipDefaultParameterValue( si, se);
-			}
 		}
 		skipSpacesAndComments( si, se);
 		if (si != se)

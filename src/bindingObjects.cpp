@@ -44,6 +44,7 @@
 #include "strus/vectorStorageSearchInterface.hpp"
 #include "strus/vectorStorageTransactionInterface.hpp"
 #include "strus/vectorStorageInterface.hpp"
+#include "strus/textProcessorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/utf8.hpp"
@@ -354,7 +355,7 @@ void Document::setUserAccessRight( const std::string& username_)
 	m_users.push_back( username_);
 }
 
-DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const std::string& segmentername, const void* textproc_)
+DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -998,7 +999,7 @@ DocumentAnalyzeQueue::DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o)
 	,m_textproc(o.m_textproc)
 {}
 
-DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer, const void* textproc_)
+DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)

@@ -13,48 +13,39 @@
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
 
-#define MAXDUMPSIZE 2000
-
 #ifdef _MSC_VER
 #define IS_BIG_ENDIAN  0
-#define IS_WCHAR_UCS4  0
 #elif __GNUC__
 #define IS_BIG_ENDIAN  (__ORDER_BIG_ENDIAN__)
-#define IS_WCHAR_UCS4  (__SIZEOF_WCHAR_T__ == 4)
 #else
 #error Cannot determine endianness of platform
 #endif
 
-std::wstring convert_uft8string_to_wstring( const std::string& val)
+#if IS_BIG_ENDIAN
+#define W16CHARSET textwolf::charset::UTF16BE
+#else
+#define W16CHARSET textwolf::charset::UTF16LE
+#endif
+
+using namespace strus;
+
+std::basic_string<uint16_t> strus::convert_uft8string_to_w16string( const char* str, std::size_t strsize)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,textwolf::charset::UTF8> ScannerUTF8;
-	ScannerUTF8 itr(val);
+	ScannerUTF8 itr( textwolf::CStringIterator( str, strsize));
 
 	char cbuf[ 32];
-#if __SIZEOF_WCHAR_T__ == 4
-#if __ORDER_BIG_ENDIAN__
-	textwolf::charset::UCS4BE wcout;
-#else
-	textwolf::charset::UCS4LE wcout;
-#endif
-#else
-#if __ORDER_BIG_ENDIAN__
-	textwolf::charset::UTF16BE wcout;
-#else
-	textwolf::charset::UTF16LE wcout;
-#endif
-#endif
-	std::wstring rt;
-	rt.reserve( val.size());
+
+	W16CHARSET wcout;
+	std::basic_string<uint16_t> rt;
+	rt.reserve( strsize + (strsize >> 4));
 	textwolf::StaticBuffer sb( cbuf, sizeof(cbuf));
 
 	textwolf::UChar chr;
 	for (; 0!=(chr=*itr); ++itr)
 	{
-		if (chr == 0xFFFF)
-		{
-			throw strus::runtime_error( _TXT("multibyte to wide character conversion error"));
-		}
+		if (chr == 0xFFFF) continue;
+
 		wcout.print( chr, sb);
 		wchar_t const* wp = (wchar_t*)(void*)cbuf;
 		for (std::size_t ii=0; ii < sb.size(); ii += sizeof(wchar_t), ++wp)
@@ -66,17 +57,31 @@ std::wstring convert_uft8string_to_wstring( const std::string& val)
 	return rt;
 }
 
-std::string convert_wstring_to_uft8string( const std::wstring& val)
+std::basic_string<uint16_t> strus::convert_uft8string_to_w16string( const std::string& val)
 {
-	std::string rt;
-	rt.reserve( val.size());
-	textwolf::charset::UTF8 out;
+	return convert_uft8string_to_w16string( val.c_str(), val.size());
+}
 
-	std::wstring::const_iterator vi = val.begin(), ve = val.end();
-	for (; vi < ve; ++vi)
+std::string strus::convert_w16string_to_uft8string( const uint16_t* str, std::size_t strsize)
+{
+	typedef textwolf::TextScanner<textwolf::CStringIterator,W16CHARSET> ScannerW16String;
+	ScannerW16String itr( textwolf::CStringIterator( reinterpret_cast<const char*>(str), strsize*2));
+
+	std::string rt;
+	rt.reserve( strsize + (strsize >> 4));
+
+	textwolf::charset::UTF8 u8out;
+
+	textwolf::UChar chr;
+	for (; 0!=(chr=*itr); ++itr)
 	{
-		out.print( *vi, rt);
+		u8out.print( chr, rt);
 	}
 	return rt;
+}
+
+std::string strus::convert_w16string_to_uft8string( const std::basic_string<uint16_t>& val)
+{
+	return convert_w16string_to_uft8string( val.c_str(), val.size());
 }
 

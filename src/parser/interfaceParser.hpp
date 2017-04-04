@@ -108,17 +108,37 @@ private:
 	bool m_isconst;
 };
 
+class ConstructorDef
+{
+public:
+	explicit ConstructorDef( const std::vector<VariableValue>& param_)
+		:m_param(param_){}
+	ConstructorDef( const ConstructorDef& o)
+		:m_param(o.m_param){}
+
+	const std::vector<VariableValue>& parameters() const	{return m_param;}
+
+	std::string tostring() const;
+
+private:
+	std::vector<VariableValue> m_param;
+};
+
 class ClassDef
 {
 public:
 	ClassDef( const ClassDef& o)
-		:m_name(o.m_name),m_methodar(o.m_methodar){}
+		:m_name(o.m_name),m_constructorar(o.m_constructorar),m_methodar(o.m_methodar){}
 	explicit ClassDef( const std::string& name_)
-		:m_name(name_){}
+		:m_name(name_),m_constructorar(),m_methodar(){}
 
 	void addMethod( const MethodDef& method)
 	{
 		m_methodar.push_back( method);
+	}
+	void addConstructor( const ConstructorDef& constructor)
+	{
+		m_constructorar.push_back( constructor);
 	}
 	const std::string& name() const
 	{
@@ -132,6 +152,7 @@ public:
 
 private:
 	std::string m_name;
+	std::vector<ConstructorDef> m_constructorar;
 	std::vector<MethodDef> m_methodar;
 };
 
@@ -187,11 +208,12 @@ class InterfacesDef
 {
 public:
 	InterfacesDef( const InterfacesDef& o)
-		:m_typeSystem(o.m_typeSystem),m_classdefar(o.m_classdefar){}
+		:m_typeSystem(o.m_typeSystem),m_classdefar(o.m_classdefar),m_classdefmap(o.m_classdefmap){}
 	explicit InterfacesDef( const TypeSystem* typeSystem_)
-		:m_typeSystem(typeSystem_),m_classdefar(){}
+		:m_typeSystem(typeSystem_),m_classdefar(),m_classdefmap(){}
 
 	void addSource( const std::string& source);
+	void checkUnresolved() const;
 
 	const std::vector<ClassDef>& classDefs() const
 	{
@@ -205,7 +227,7 @@ private:
 		m_structdefar.push_back( def);
 	}
 
-	void parseClass( const std::string& className, char const*& si, const char* se);
+	void parseClass( const std::string& className, const std::string& classScope, char const*& si, const char* se);
 	std::vector<VariableValue> parseParameters(
 			const std::string& scope_class,
 			const std::string& scope_method,
@@ -215,6 +237,7 @@ private:
 	const TypeSystem* m_typeSystem;
 	std::vector<ClassDef> m_classdefar;
 	std::vector<StructDef> m_structdefar;
+	std::map<std::string,int> m_classdefmap;
 };
 } //namespace
 #endif

@@ -7,10 +7,16 @@
  */
 #ifndef _STRUS_WCHAR_STRING_UTILITY_FUNCTIONS_HPP_INCLUDED
 #define _STRUS_WCHAR_STRING_UTILITY_FUNCTIONS_HPP_INCLUDED
+#include "strus/base/stdint.h"
 #include <string>
 
-std::string convert_wstring_to_uft8string( const std::wstring& val);
-std::wstring convert_uft8string_to_wstring( const std::string& val);
+namespace strus {
 
+std::basic_string<uint16_t> convert_uft8string_to_w16string( const std::string& val);
+std::basic_string<uint16_t> convert_uft8string_to_w16string( const char* str, std::size_t strsize);
+std::string convert_w16string_to_uft8string( const std::basic_string<uint16_t>& val);
+std::string convert_w16string_to_uft8string( const uint16_t* str, std::size_t strsize);
+
+}//namespace
 #endif
 

@@ -20,7 +20,7 @@
 #include <sstream>
 #include <cerrno>
 
-#undef STRUS_LOWLEVEL_DEBUG
+#define STRUS_LOWLEVEL_DEBUG
 
 /// \brief List of interface files parsed without path
 std::vector<std::string> g_inputFiles;
@@ -99,6 +99,8 @@ int main( int argc, const char* argv[])
 			}
 			std::cerr << "processed file " << argv[argi] << std::endl;
 		}
+		interfaceDef.checkUnresolved();
+
 		//Output:
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::cout << interfaceDef.tostring() << std::endl;
