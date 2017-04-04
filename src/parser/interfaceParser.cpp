@@ -835,12 +835,20 @@ void InterfacesDef::addSource( const std::string& source)
 					{
 						for (++si; si != se && *si != ';' && *si != '{'; ++si,skipSpacesAndComments( si,se)){}
 					}
+					std::string interfacename;
+					if (endsWith( className, "Impl"))
+					{
+						interfacename = std::string( className.c_str(),className.size()-4);
+					}
 					if (*si == ';')
 					{
-						std::map<std::string,int>::const_iterator ci = m_classdefmap.find( className);
-						if (ci == m_classdefmap.end())
+						if (!interfacename.empty())
 						{
-							m_classdefmap[ className] = -1;
+							std::map<std::string,int>::const_iterator ci = m_classdefmap.find( interfacename);
+							if (ci == m_classdefmap.end())
+							{
+								m_classdefmap[ interfacename] = -1;
+							}
 						}
 						continue;
 					}
@@ -849,7 +857,10 @@ void InterfacesDef::addSource( const std::string& source)
 						char const* endClass = si++;
 						skipBrackets( endClass, se, '{', '}');
 
-						parseClass( className, "", si, endClass-1);
+						if (!interfacename.empty())
+						{
+							parseClass( interfacename, "", si, endClass-1);
+						}
 						si = endClass;
 					}
 				}
@@ -924,7 +935,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 		{
 			char const* start = si;
 			std::string ident = parseIdentifier( si,se);
-			if (ident == className)
+			if (ident == className || ident == className + "Impl")
 			{
 				//... constructor
 				skipSpacesAndComments( si, se);
@@ -958,6 +969,10 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 			{
 				continue;
 			}
+			else if (ident == "explicit")
+			{
+				continue;
+			}
 			else if (ident == "enum")
 			{
 				skipStructure( si, se);
@@ -988,9 +1003,8 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				if (*si == ';') continue;
 				if (*si == '{')
 				{
-					char const* endClass = si++;
-					skipBrackets( endClass, sn, '{', '}');
-					parseClass( subClassName, subClassScope, si, endClass-1);
+					++si;
+					skipBrackets( si, sn, '{', '}');
 				}
 				skipSpacesAndComments( si, sn);
 				if (si != sn)

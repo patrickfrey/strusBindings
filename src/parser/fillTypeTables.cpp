@@ -51,9 +51,9 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "const char*")
 	;
-	typesystem.defineType( "$objid")
+	typesystem.defineType( "$objid~Impl")
 	;
-	typesystem.defineType( "const $objid&")
+	typesystem.defineType( "const $objid~Impl&")
 	;
 	typesystem.defineType( "const TextProcessorInterface*")
 	;

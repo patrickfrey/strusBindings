@@ -9,6 +9,7 @@ add_subdirectory( parser )
 set( source_files
 	testcheck.cpp
 	wcharString.cpp
+	bindingObjectsImpl.cpp
 	bindingObjects.cpp
 	utils.cpp
 	traceUtils.cpp

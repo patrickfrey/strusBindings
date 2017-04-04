@@ -40,6 +40,14 @@ static void printOutput( const char* filename, PrintInterface print, const strus
 		print( out, interfaceDef);
 		out.close();
 	}
+	catch (const std::bad_alloc&)
+	{
+		throw std::runtime_error( std::string("out of memory writing file '") + filename + "'");
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw std::runtime_error( std::string("could not write file '") + filename + "': " + err.what());
+	}
 	catch (const std::exception& err)
 	{
 		throw std::runtime_error( std::string("could not write file '") + filename + "'");
@@ -49,16 +57,99 @@ static void printOutput( const char* filename, PrintInterface print, const strus
 static std::string expandIndent( const std::string& indent, const std::string& source)
 {
 	std::string rt ( indent);
-	std::string::const_iterator si = source.begin(), se = source.end();
-	for (; si != se; ++si)
+	char const* si = source.c_str();
+	for (; *si; ++si)
 	{
-		rt.push_back( *si);
-		if (*si == '\n')
+		char const* seol = si;
+		for (; *seol && *seol != '\n'; ++seol){}
+		if (seol != si)
+		{
+			rt.append( "\n");
+			++si;
+		}
+		else
 		{
 			rt.append( indent);
+			rt.append( si, seol-si);
+			if (!*seol) break;
+			si = seol;
 		}
 	}
 	return rt;
+}
+
+static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
+{
+	strus::printHppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
+	out << "#include \"strus/bindings/valueVariant.hpp\"" << std::endl;
+	out << "#include \"strus/bindings/callResult.hpp\"" << std::endl;
+	out << "#include \"strus/bindings/serialization.hpp\"" << std::endl;
+	out << "#include \"strus/bindings/hostObjectReference.hpp\"" << std::endl;
+	out << "#include <cstddef>" << std::endl;
+	out
+		<< std::endl
+		<< "namespace strus {" << std::endl
+		<< "namespace bindings {" << std::endl
+		<< std::endl;
+
+	std::vector<strus::ClassDef>::const_iterator
+		ci = interfaceDef.classDefs().begin(),
+		ce = interfaceDef.classDefs().end();
+	for (; ci != ce; ++ci)
+	{
+		std::vector<strus::MethodDef>::const_iterator
+			mi = ci->methodDefs().begin(),
+			me = ci->methodDefs().end();
+		for (; mi != me; ++mi)
+		{
+			out 
+			<< "bool " << ci->name() << "__" << mi->name()
+			<< "( const HostObjectReference& self, callResult& retval, "
+			<< "std::size_t argc, ValueVariant* argv);" << std::endl;
+		}
+	}
+	out
+		<< std::endl
+		<< "}}//namespace" << std::endl;
+	strus::printHppFrameTail( out);
+}
+
+static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
+{
+	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
+	out << "#include \"strus/bindings/bindingObjects.hpp\"" << std::endl;
+	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
+	out
+		<< std::endl
+		<< "using namespace strus;" << std::endl
+		<< std::endl;
+
+	std::vector<strus::ClassDef>::const_iterator
+		ci = interfaceDef.classDefs().begin(),
+		ce = interfaceDef.classDefs().end();
+	for (; ci != ce; ++ci)
+	{
+		std::vector<strus::MethodDef>::const_iterator
+			mi = ci->methodDefs().begin(),
+			me = ci->methodDefs().end();
+		for (; mi != me; ++mi)
+		{
+			out 
+			<< "DLL_PUBLIC bool bindings::" << ci->name() << "__" << mi->name()
+			<< "( const HostObjectReference& self, callResult& retval, "
+			<< "std::size_t argc, ValueVariant* argv)" << std::endl;
+			out
+			<< "{" << std::endl
+			<< "\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl
+			<< "\tTHIS->" << mi->name() << "( " << ");" << std::endl;
+			out
+			<< "}" << std::endl;
+		}
+	}
+	out
+		<< std::endl
+		<< "}}//namespace" << std::endl;
+	strus::printHppFrameTail( out);
 }
 
 int main( int argc, const char* argv[])
@@ -105,6 +196,8 @@ int main( int argc, const char* argv[])
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::cout << interfaceDef.tostring() << std::endl;
 #endif
+		printOutput( "include/strus/bindingObjects.hpp", &print_BindingObjectsHpp, interfaceDef);
+
 		std::cerr << "done." << std::endl;
 		return 0;
 	}
