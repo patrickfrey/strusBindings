@@ -1310,7 +1310,7 @@ std::vector<Term> QueryAnalyzer::analyzeField(
 			case strus::analyzer::Query::Element::MetaData:
 			{
 				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->position(), 1/*length*/));
+				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->pos(), 1/*length*/));
 				break;
 			}
 			case strus::analyzer::Query::Element::SearchIndexTerm:
@@ -1377,13 +1377,13 @@ std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 			case strus::analyzer::Query::Element::MetaData:
 			{
 				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( QueryTerm( ei->fieldNo(), md.name(), md.value().tostring().c_str(), ei->position(), ei->length()));
+				rt.push_back( QueryTerm( ei->field(), md.name(), md.value().tostring().c_str(), ei->pos(), ei->len()));
 				break;
 			}
 			case strus::analyzer::Query::Element::SearchIndexTerm:
 			{
 				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
-				rt.push_back( QueryTerm( ei->fieldNo(), term.type(), term.value(), term.pos(), ei->position()));
+				rt.push_back( QueryTerm( ei->field(), term.type(), term.value(), term.pos(), ei->pos()));
 				break;
 			}
 		}
