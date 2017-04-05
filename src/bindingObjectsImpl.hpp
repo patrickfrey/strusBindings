@@ -10,7 +10,6 @@
 #include "strus/bindings/hostObjectReference.hpp"
 #include "strus/bindings/valueVariant.hpp"
 #include "strus/numericVariant.hpp"
-#include "strus/analyzer/document.hpp"
 
 /// \brief Forward declaration
 class DocumentAnalyzeQueueImpl;
@@ -231,7 +230,7 @@ private:
 	HostObjectReference m_trace_impl;
 	HostObjectReference m_objbuilder_impl;
 	HostObjectReference m_analyzer_impl;
-	std::vector<analyzer::Document> m_result_queue;
+	std::vector<CallResult> m_result_queue;
 	std::size_t m_result_queue_idx;
 	std::vector<HostObjectReference> m_analyzerctx_queue;
 	std::size_t m_analyzerctx_queue_idx;

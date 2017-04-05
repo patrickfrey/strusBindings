@@ -52,319 +52,28 @@
 #include <cstdlib>
 #include <limits>
 
-template <class Object>
-struct ReferenceDeleter
-{
-	static void function( void* obj)
-	{
-		delete (Object*)obj;
-	}
-};
+using namespace strus;
+using namespace strus::bindings;
 
-void Tokenizer::addArgumentInt( long arg_)
-{
-	addArgument( strus::utils::tostring( arg_));
-}
-
-void Tokenizer::addArgumentFloat( double arg_)
-{
-	addArgument( strus::utils::tostring( (float)arg_));
-}
-
-void Normalizer::addArgumentInt( long arg_)
-{
-	addArgument( strus::utils::tostring( arg_));
-}
-
-void Normalizer::addArgumentFloat( double arg_)
-{
-	addArgument( strus::utils::tostring( (float)arg_));
-}
-
-void Aggregator::addArgumentInt( long arg_)
-{
-	addArgument( strus::utils::tostring( arg_));
-}
-
-void Aggregator::addArgumentFloat( double arg_)
-{
-	addArgument( strus::utils::tostring( (float)arg_));
-}
-
-Variant::Variant()
-	:m_type(Variant_UNDEFINED){}
-
-Variant::Variant( const Variant& o)
-	:m_type(o.m_type),m_buf(o.m_buf)
-{
-	if (m_type == Variant_TEXT)
-	{
-		m_value.TEXT = m_buf.c_str();
-	}
-	else
-	{
-		std::memcpy( &m_value, &o.m_value, sizeof(m_value));
-	}
-}
-
-Variant::Variant( unsigned int v)
-	:m_type(Variant_UINT)
-{
-	m_value.UINT = v;
-}
-
-Variant::Variant( int v)
-	:m_type(Variant_INT)
-{
-	m_value.INT = v;
-}
-
-Variant::Variant( double v)
-	:m_type(Variant_FLOAT)
-{
-	m_value.FLOAT = v;
-}
-
-Variant::Variant( const std::string& v)
-	:m_type(Variant_TEXT),m_buf(v)
-{
-	m_value.TEXT = m_buf.c_str();
-}
-
-Variant::Variant( const char* v)
-	:m_type(Variant_TEXT),m_buf(v)
-{
-	m_value.TEXT = m_buf.c_str();
-}
-
-void Variant::init()
-{
-	m_type = Variant_UNDEFINED;
-	m_value.INT = 0;
-	m_buf.clear();
-}
-
-void Variant::assign( const Variant& o)
-{
-	m_type = o.m_type;
-	m_buf = o.m_buf;
-	if (m_type == Variant_TEXT)
-	{
-		m_value.TEXT = m_buf.c_str();
-	}
-	else
-	{
-		std::memcpy( &m_value, &o.m_value, sizeof(m_value));
-	}
-}
-
-void Variant::assignUint( unsigned long v)
-{
-	m_type = Variant_UINT;
-	m_value.UINT = v;
-	m_buf.clear();
-}
-
-void Variant::assignInt( long v)
-{
-	m_type = Variant_INT;
-	m_value.INT = v;
-	m_buf.clear();
-}
-
-void Variant::assignFloat( double v)
-{
-	m_type = Variant_FLOAT;
-	m_value.FLOAT = v;
-	m_buf.clear();
-}
-
-void Variant::assignText( const std::string& v)
-{
-	m_buf = v;
-	m_type = Variant_TEXT;
-	m_value.TEXT = m_buf.c_str();
-}
-
-unsigned long Variant::getUInt() const
-{
-	switch (m_type)
-	{
-		case Variant_INT: if (m_value.INT>=0) return m_value.UINT; else break;
-		case Variant_UINT: return (int)m_value.UINT;
-		case Variant_UNDEFINED: break;
-		case Variant_FLOAT: break;
-		case Variant_TEXT: break;
-	}
-	throw strus::runtime_error( _TXT( "illegal access of variant value"));
-	if (m_type == Variant_UINT) return m_value.UINT;
-	throw strus::runtime_error( _TXT( "illegal access of variant value"));
-}
-
-long Variant::getInt() const
-{
-	switch (m_type)
-	{
-		case Variant_INT: return (int)m_value.INT;
-		case Variant_UINT: if (m_value.INT>=0) return (int)m_value.INT; else break;
-		case Variant_UNDEFINED: break;
-		case Variant_FLOAT: break;
-		case Variant_TEXT: break;
-	}
-	throw strus::runtime_error( _TXT( "illegal access of variant value"));
-}
-
-double Variant::getFloat() const
-{
-	switch (m_type)
-	{
-		case Variant_INT: return (double)m_value.INT;
-		case Variant_UINT: return (double)m_value.UINT;
-		case Variant_FLOAT: return m_value.FLOAT;
-		case Variant_UNDEFINED: break;
-		case Variant_TEXT: break;
-	}
-	throw strus::runtime_error( _TXT( "illegal access of variant value"));
-}
-
-const char* Variant::getText() const
-{
-	if (m_type == Variant_TEXT) return m_value.TEXT;
-	throw strus::runtime_error( _TXT( "illegal access of variant value"));
-}
-
-bool Variant::isEqual( const Variant& o) const
-{
-	if (m_type != o.m_type)
-	{
-		if (m_type == Variant_UINT)
-		{
-			if (o.m_type == Variant_INT)
-			{
-				if (o.m_value.INT >= 0) return (unsigned int)o.m_value.INT == m_value.UINT;
-			}
-		}
-		else if (m_type == Variant_INT)
-		{
-			if (o.m_type == Variant_UINT)
-			{
-				if (m_value.INT >= 0) return (unsigned int)m_value.INT == o.m_value.UINT;
-			}
-		}
-		return false;
-	}
-	switch (m_type)
-	{
-		case Variant_UNDEFINED: return true;
-		case Variant_UINT: return m_value.UINT == o.m_value.UINT;
-		case Variant_INT: return m_value.INT == o.m_value.INT;
-		case Variant_FLOAT: {double ww = m_value.FLOAT - o.m_value.FLOAT; return (ww < 0.0)?(-ww<std::numeric_limits<double>::epsilon()):(ww<std::numeric_limits<double>::epsilon());}
-		case Variant_TEXT: return (m_value.TEXT && o.m_value.TEXT)?(std::strcmp( m_value.TEXT, o.m_value.TEXT)==0):(m_value.TEXT==o.m_value.TEXT);
-	}
-	return false;
-}
-
-bool Term::operator < (const Term& o) const
-{
-	if (m_position == o.m_position)
-	{
-		if (m_length == o.m_length)
-		{
-			return (m_type == o.m_type)
-				? m_value < o.m_value
-				: m_type < o.m_type;
-		}
-		else
-		{
-			return m_length < o.m_length;
-		}
-	}
-	else
-	{
-		return m_position < o.m_position;
-	}
-}
-
-Document::Document( const Document& o)
-	:m_searchIndexTerms(o.m_searchIndexTerms)
-	,m_forwardIndexTerms(o.m_forwardIndexTerms)
-	,m_metaData(o.m_metaData)
-	,m_attributes(o.m_attributes)
-	,m_users(o.m_users)
-	,m_docid(o.m_docid)
-{}
-
-void Document::addSearchIndexTerm(
-		const std::string& type_,
-		const std::string& value_,
-		const Index& position_)
-{
-	m_searchIndexTerms.push_back( Term( type_,value_,position_, 1/*length*/));
-}
-
-void Document::addForwardIndexTerm(
-		const std::string& type_,
-		const std::string& value_,
-		const Index& position_)
-{
-	m_forwardIndexTerms.push_back( Term( type_,value_,position_, 1/*length*/));
-}
-
-void Document::setMetaData( const std::string& name_, const Variant& value_)
-{
-	m_metaData.push_back( MetaData( name_,value_));
-}
-
-void Document::setMetaData( const std::string& name_, double value_)
-{
-	m_metaData.push_back( MetaData( name_,Variant(value_)));
-}
-
-void Document::setMetaData( const std::string& name_, int value_)
-{
-	m_metaData.push_back( MetaData( name_,Variant(value_)));
-}
-
-void Document::setMetaData( const std::string& name_, unsigned int value_)
-{
-	m_metaData.push_back( MetaData( name_,Variant(value_)));
-}
-
-void Document::setAttribute( const std::string& name_, const std::string& value_)
-{
-	m_attributes.push_back( Attribute( name_, value_));
-}
-
-void Document::setDocid( const std::string& docid_)
-{
-	m_docid = docid_;
-	m_attributes.push_back( Attribute( "docid", docid_));
-}
-
-void Document::setUserAccessRight( const std::string& username_)
-{
-	m_users.push_back( username_);
-}
-
-DocumentAnalyzer::DocumentAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_)
+DocumentAnalyzer::DocumentAnalyzer( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl(ReferenceDeleter<strus::DocumentAnalyzerInterface>::function)
 	,m_textproc(textproc_)
 {
-	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
-	const strus::TextProcessorInterface* textproc = (const strus::TextProcessorInterface*)m_textproc;
+	const strus::AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<strus::AnalyzerObjectBuilderInterface>();
+	const strus::TextProcessorInterface* textproc = m_textproc;
 	const strus::SegmenterInterface* segmenter = textproc->getSegmenterByName( segmentername);
 	if (!segmenter)
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to get document document segmenter by name: %s"), errorhnd->fetchError());
 	}
-	m_analyzer_impl.reset( objBuilder->createDocumentAnalyzer( segmenter));
+	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter));
 	if (!m_analyzer_impl.get())
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create document analyzer: %s"), errorhnd->fetchError());
 	}
 }
@@ -451,7 +160,7 @@ struct FeatureFuncDef
 	std::vector<strus::NormalizerFunctionInstanceInterface*> normalizers;
 	strus::Reference<strus::TokenizerFunctionInstanceInterface> tokenizer;
 
-	FeatureFuncDef( const Reference& objbuilder_impl,
+	FeatureFuncDef( const HostObjectReference& objbuilder_impl,
 			const Tokenizer& tokenizer_,
 			const std::vector<Normalizer>& normalizers_,
 			strus::ErrorBufferInterface* errorhnd)
@@ -467,7 +176,7 @@ struct FeatureFuncDef
 		tokenizer = getTokenizer( tokenizer_, textproc, errorhnd);
 	}
 
-	FeatureFuncDef( const Reference& objbuilder_impl,
+	FeatureFuncDef( const HostObjectReference& objbuilder_impl,
 			const std::vector<Normalizer>& normalizers_,
 			strus::ErrorBufferInterface* errorhnd)
 	{
@@ -497,7 +206,7 @@ void DocumentAnalyzer::addSearchIndexFeature(
 	const std::vector<Normalizer>& normalizers,
 	const std::string& options)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeature(
@@ -513,7 +222,7 @@ void DocumentAnalyzer::addForwardIndexFeature(
 	const std::vector<Normalizer>& normalizers,
 	const std::string& options)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeature(
@@ -528,7 +237,7 @@ void DocumentAnalyzer::defineMetaData(
 	const Tokenizer& tokenizer,
 	const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaData(
@@ -540,7 +249,7 @@ void DocumentAnalyzer::defineAggregatedMetaData(
 	const std::string& fieldname,
 	const Aggregator& function)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 	if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
@@ -564,7 +273,7 @@ void DocumentAnalyzer::defineAttribute(
 	const Tokenizer& tokenizer,
 	const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAttribute(
@@ -578,7 +287,7 @@ void DocumentAnalyzer::addSearchIndexFeatureFromPatternMatch(
 	const std::vector<Normalizer>& normalizers,
 	const std::string& options)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addSearchIndexFeatureFromPatternMatch(
@@ -593,7 +302,7 @@ void DocumentAnalyzer::addForwardIndexFeatureFromPatternMatch(
 	const std::vector<Normalizer>& normalizers,
 	const std::string& options)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->addForwardIndexFeatureFromPatternMatch(
@@ -607,7 +316,7 @@ void DocumentAnalyzer::defineMetaDataFromPatternMatch(
 	const std::string& patternTypeName,
 	const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineMetaDataFromPatternMatch(
@@ -620,7 +329,7 @@ void DocumentAnalyzer::defineAttributeFromPatternMatch(
 	const std::string& patternTypeName,
 	const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
 
 	((strus::DocumentAnalyzerInterface*)m_analyzer_impl.get())->defineAttributeFromPatternMatch(
@@ -848,7 +557,7 @@ void DocumentAnalyzer::definePatternMatcherPostProc(
 		const std::string& patternMatcherModule,
 		const PatternMatcher& patterns)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
@@ -865,7 +574,7 @@ void DocumentAnalyzer::definePatternMatcherPostProcFromFile(
 		const std::string& patternMatcherModule,
 		const std::string& serializedPatternFile)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
@@ -933,7 +642,7 @@ static Document analyzeDocument( strus::DocumentAnalyzerInterface* THIS, const s
 
 Document DocumentAnalyzer::analyze( const std::string& content)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	strus::analyzer::DocumentClass dclass;
 
@@ -961,7 +670,7 @@ Document DocumentAnalyzer::analyze( const std::string& content)
 
 Document DocumentAnalyzer::analyze( const std::string& content, const DocumentClass& dclass)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::DocumentAnalyzerInterface* THIS = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
 	strus::analyzer::DocumentClass documentClass( dclass.mimeType(), dclass.encoding(), dclass.scheme());
 
@@ -990,7 +699,7 @@ DocumentAnalyzeQueue::DocumentAnalyzeQueue( const DocumentAnalyzeQueue& o)
 	,m_textproc(o.m_textproc)
 {}
 
-DocumentAnalyzeQueue::DocumentAnalyzeQueue( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer, const TextProcessorInterface* textproc_)
+DocumentAnalyzeQueue::DocumentAnalyzeQueue( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const HostObjectReference& analyzer, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -1008,7 +717,7 @@ void DocumentAnalyzeQueue::push( const std::string& content)
 	strus::analyzer::DocumentClass dclass;
 	if (!textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to detect document class: %s"), errorhnd->fetchError());
 	}
 	strus::DocumentAnalyzerInterface* analyzer = (strus::DocumentAnalyzerInterface*)m_analyzer_impl.get();
@@ -1035,7 +744,7 @@ void DocumentAnalyzeQueue::analyzeNext()
 			}
 			else
 			{
-				strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+				strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 				if (errorhnd->hasError())
 				{
 					throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
@@ -1165,7 +874,7 @@ std::size_t PatternMatcher::allocid( const std::string& str)
 	return rt;
 }
 
-QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd)
+QueryAnalyzer::QueryAnalyzer( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -1175,7 +884,7 @@ QueryAnalyzer::QueryAnalyzer( const Reference& objbuilder, const Reference& trac
 	m_analyzer_impl.reset( objBuilder->createQueryAnalyzer());
 	if (!m_analyzer_impl.get())
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create query analyzer: %s"), errorhnd->fetchError());
 	}
 }
@@ -1198,7 +907,7 @@ void QueryAnalyzer::addSearchIndexElement(
 		const Tokenizer& tokenizer,
 		const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
@@ -1212,7 +921,7 @@ void QueryAnalyzer::addSearchIndexElementFromPatternMatch(
 		const std::string& patternTypeName,
 		const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
 
@@ -1226,7 +935,7 @@ void QueryAnalyzer::addPatternLexem(
 		const Tokenizer& tokenizer,
 		const std::vector<Normalizer>& normalizers)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
@@ -1239,7 +948,7 @@ void QueryAnalyzer::definePatternMatcherPostProc(
 		const std::string& patternMatcherModule,
 		const PatternMatcher& patterns)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
@@ -1256,7 +965,7 @@ void QueryAnalyzer::definePatternMatcherPostProcFromFile(
 		const std::string& patternMatcherModule,
 		const std::string& serializedPatternFile)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc = objBuilder->getTextProcessor();
@@ -1275,7 +984,7 @@ std::vector<Term> QueryAnalyzer::analyzeField(
 		const std::string& fieldContent)
 {
 	std::vector<Term> rt;
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	std::auto_ptr<strus::QueryAnalyzerContextInterface> anactx( THIS->createContext());
 	if (!anactx.get()) throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
@@ -1317,7 +1026,7 @@ QueryAnalyzeContext::QueryAnalyzeContext( const QueryAnalyzeContext& o)
 	,m_analyzer_ctx_impl(o.m_analyzer_ctx_impl)
 {}
 
-QueryAnalyzeContext::QueryAnalyzeContext( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd, const Reference& analyzer)
+QueryAnalyzeContext::QueryAnalyzeContext( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const HostObjectReference& analyzer)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -1328,7 +1037,7 @@ QueryAnalyzeContext::QueryAnalyzeContext( const Reference& objbuilder, const Ref
 	m_analyzer_ctx_impl.reset( qai->createContext());
 	if (!m_analyzer_ctx_impl.get())
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
 	}
 }
@@ -1345,7 +1054,7 @@ void QueryAnalyzeContext::putField(
 std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 {
 	std::vector<QueryTerm> rt;
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryAnalyzerContextInterface* anactx = (strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
 	strus::analyzer::Query qry = anactx->analyze();
 	if (qry.empty() && errorhnd->hasError())
@@ -1376,13 +1085,13 @@ std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 }
 
 
-StorageClient::StorageClient( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const std::string& config_)
+StorageClient::StorageClient( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
 	,m_storage_impl(ReferenceDeleter<strus::StorageClientInterface>::function)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 
 	m_storage_impl.reset( strus::createStorageClient( objBuilder, errorhnd, config_));
@@ -1420,7 +1129,7 @@ StatisticsIterator StorageClient::createInitStatisticsIterator( bool sign) const
 	iter.reset( storage->createInitStatisticsIterator( sign));
 	if (!iter.get())
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
 	return StatisticsIterator( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter);
@@ -1434,7 +1143,7 @@ StatisticsIterator StorageClient::createUpdateStatisticsIterator() const
 	iter.reset( storage->createUpdateStatisticsIterator());
 	if (!iter.get())
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
 	return StatisticsIterator( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter);
@@ -1449,7 +1158,7 @@ DocumentBrowser StorageClient::createDocumentBrowser()
 void StorageClient::close()
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_storage_impl.reset();
 	if (!preverr && errorhnd->hasError())
@@ -1458,12 +1167,12 @@ void StorageClient::close()
 	}
 }
 
-VectorStorageSearcher::VectorStorageSearcher( const Reference& storageref, const Reference& trace, const Index& range_from, const Index& range_to, const Reference& errorhnd_)
+VectorStorageSearcher::VectorStorageSearcher( const HostObjectReference& storageref, const HostObjectReference& trace, const Index& range_from, const Index& range_to, const HostObjectReference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_searcher_impl(ReferenceDeleter<strus::VectorStorageSearchInterface>::function)
 	,m_trace_impl( trace)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::VectorStorageClientInterface* storage = (strus::VectorStorageClientInterface*)storageref.get();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
@@ -1486,7 +1195,7 @@ std::vector<VecRank> VectorStorageSearcher::findSimilar( const std::vector<doubl
 	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
 
 	std::vector<strus::VectorStorageSearchInterface::Result> res = searcher->findSimilar( vec, maxNofResults);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("error in find similar features of vector: %s"), errorhnd->fetchError());
@@ -1506,7 +1215,7 @@ std::vector<VecRank> VectorStorageSearcher::findSimilarFromSelection( const Inde
 	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
 
 	std::vector<strus::VectorStorageSearchInterface::Result> res = searcher->findSimilarFromSelection( featidxlist, vec, maxNofResults);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("error in find similar features of vector: %s"), errorhnd->fetchError());
@@ -1523,7 +1232,7 @@ std::vector<VecRank> VectorStorageSearcher::findSimilarFromSelection( const Inde
 void VectorStorageSearcher::close()
 {
 	if (!m_searcher_impl.get()) throw strus::runtime_error( _TXT("calling storage searcher method after close"));
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_searcher_impl.reset();
 	if (!preverr && errorhnd->hasError())
@@ -1543,7 +1252,7 @@ VectorStorageClient::VectorStorageClient( const VectorStorageClient& o)
 void VectorStorageClient::close()
 {
 	if (!m_vector_storage_impl.get()) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_vector_storage_impl.reset();
 	if (!preverr && errorhnd->hasError())
@@ -1567,7 +1276,7 @@ std::vector<std::string> VectorStorageClient::conceptClassNames() const
 	strus::VectorStorageClientInterface* storage = (strus::VectorStorageClientInterface*)m_vector_storage_impl.get();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 	std::vector<std::string> rt = storage->conceptClassNames();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get concept class names: %s"), errorhnd->fetchError());
@@ -1580,7 +1289,7 @@ std::vector<Index> VectorStorageClient::conceptFeatures( const std::string& conc
 	strus::VectorStorageClientInterface* storage = (strus::VectorStorageClientInterface*)m_vector_storage_impl.get();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 	std::vector<strus::Index> res = storage->conceptFeatures( conceptClass, conceptid);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get concept features: %s"), errorhnd->fetchError());
@@ -1600,7 +1309,7 @@ unsigned int VectorStorageClient::nofConcepts( const std::string& conceptClass) 
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	unsigned int rt = storage->nofConcepts( conceptClass);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get number of concepts: %s"), errorhnd->fetchError());
@@ -1614,7 +1323,7 @@ std::vector<Index> VectorStorageClient::featureConcepts( const std::string& conc
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	std::vector<strus::Index> res = storage->featureConcepts( conceptClass, index);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get feature concepts: %s"), errorhnd->fetchError());
@@ -1634,7 +1343,7 @@ std::vector<double> VectorStorageClient::featureVector( const Index& index) cons
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	std::vector<double> rt = storage->featureVector( index);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get feature vector of %u: %s"), index, errorhnd->fetchError());
@@ -1648,7 +1357,7 @@ std::string VectorStorageClient::featureName( const Index& index) const
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	std::string rt = storage->featureName( index);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get feature name of %u: %s"), index, errorhnd->fetchError());
@@ -1662,7 +1371,7 @@ Index VectorStorageClient::featureIndex( const std::string& name) const
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	Index rt = storage->featureIndex( name);
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get feature name of %s: %s"), name.c_str(), errorhnd->fetchError());
@@ -1676,7 +1385,7 @@ unsigned int VectorStorageClient::nofFeatures() const
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	unsigned int rt = storage->nofFeatures();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get number of features defined: %s"), errorhnd->fetchError());
@@ -1690,7 +1399,7 @@ std::string VectorStorageClient::config() const
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
 	std::string rt = storage->config();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get the storage configuration string: %s"), errorhnd->fetchError());
@@ -1698,14 +1407,14 @@ std::string VectorStorageClient::config() const
 	return rt;
 }
 
-VectorStorageClient::VectorStorageClient( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const std::string& config)
+VectorStorageClient::VectorStorageClient( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
 	,m_vector_storage_impl(ReferenceDeleter<strus::VectorStorageClientInterface>::function)
 	,m_config(config)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
 
 	m_vector_storage_impl.reset( strus::createVectorStorageClient( objBuilder, errorhnd, config));
@@ -1726,7 +1435,7 @@ VectorStorageTransaction::VectorStorageTransaction( const VectorStorageTransacti
 void VectorStorageTransaction::addFeature( const std::string& name, const std::vector<double>& vec)
 {
 	strus::VectorStorageTransactionInterface* transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (!transaction)
 	{
 		strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_vector_storage_impl.get();
@@ -1744,7 +1453,7 @@ void VectorStorageTransaction::addFeature( const std::string& name, const std::v
 void VectorStorageTransaction::defineFeatureConceptRelation( const std::string& relationTypeName, const Index& featidx, const Index& conidx)
 {
 	strus::VectorStorageTransactionInterface* transaction = (strus::VectorStorageTransactionInterface*)m_vector_transaction_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (!transaction)
 	{
 		strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_vector_storage_impl.get();
@@ -1767,7 +1476,7 @@ bool VectorStorageTransaction::commit()
 	bool rt = transaction->commit();
 	if (!rt)
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		if (errorhnd->hasError())
 		{
 			throw strus::runtime_error(_TXT("failed to complete vector storage building (done): %s"), errorhnd->fetchError());
@@ -1786,7 +1495,7 @@ void VectorStorageTransaction::rollback()
 void VectorStorageTransaction::close()
 {
 	if (!m_vector_transaction_impl.get()) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_vector_transaction_impl.reset();
 	if (!preverr && errorhnd->hasError())
@@ -1795,14 +1504,14 @@ void VectorStorageTransaction::close()
 	}
 }
 
-VectorStorageTransaction::VectorStorageTransaction( const Reference& objbuilder, const Reference& storageref, const Reference& trace, const Reference& errorhnd_, const std::string& config)
+VectorStorageTransaction::VectorStorageTransaction( const HostObjectReference& objbuilder, const HostObjectReference& storageref, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_vector_storage_impl(storageref)
 	,m_vector_transaction_impl(ReferenceDeleter<strus::VectorStorageTransactionInterface>::function)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::VectorStorageClientInterface* storage = (strus::VectorStorageClientInterface*)m_vector_storage_impl.get();
 
 	m_vector_transaction_impl.reset( storage->createTransaction());
@@ -1812,7 +1521,7 @@ VectorStorageTransaction::VectorStorageTransaction( const Reference& objbuilder,
 	}
 }
 
-StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Reference& trace_, const Reference& errorhnd_, const Reference& storage_)
+StorageTransaction::StorageTransaction( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const HostObjectReference& errorhnd_, const HostObjectReference& storage_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
@@ -1822,7 +1531,7 @@ StorageTransaction::StorageTransaction( const Reference& objbuilder_, const Refe
 
 void StorageTransaction::insertDocument( const std::string& docid, const Document& doc)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
 	{
@@ -1868,7 +1577,7 @@ void StorageTransaction::insertDocument( const std::string& docid, const Documen
 
 void StorageTransaction::deleteDocument( const std::string& docId)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
 	{
@@ -1881,7 +1590,7 @@ void StorageTransaction::deleteDocument( const std::string& docId)
 
 void StorageTransaction::deleteUserAccessRights( const std::string& username)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!m_transaction_impl.get())
 	{
@@ -1900,7 +1609,7 @@ void StorageTransaction::commit()
 		if (!transaction->commit())
 		{
 			m_transaction_impl.reset();
-			strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+			strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 			throw strus::runtime_error( _TXT("error flushing storage operations: %s"), errorhnd->fetchError());
 		}
 		m_transaction_impl.reset();
@@ -1919,7 +1628,7 @@ StatisticsIterator::StatisticsIterator( const StatisticsIterator& o)
 	,m_storage_impl(o.m_storage_impl)
 	,m_iter_impl(o.m_iter_impl){}
 
-StatisticsIterator::StatisticsIterator( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd_, const Reference& storage_, const Reference& iter_)
+StatisticsIterator::StatisticsIterator( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_, const HostObjectReference& iter_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -1930,7 +1639,7 @@ StatisticsIterator::StatisticsIterator( const Reference& objbuilder, const Refer
 std::string StatisticsIterator::getNext()
 {
 	strus::StatisticsIteratorInterface* iter = (strus::StatisticsIteratorInterface*)m_iter_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const char* outmsg;
 	std::size_t outmsgsize;
 	if (!iter->getNext( outmsg, outmsgsize))
@@ -1943,14 +1652,14 @@ std::string StatisticsIterator::getNext()
 	return std::string( outmsg, outmsgsize);
 }
 
-StatisticsProcessor::StatisticsProcessor( const Reference& objbuilder_, const Reference& trace_, const std::string& name_, const Reference& errorhnd_)
+StatisticsProcessor::StatisticsProcessor( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const std::string& name_, const HostObjectReference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
 	,m_statsproc(0)
 {
 	const strus::StorageObjectBuilderInterface* objBuilder = (const strus::StorageObjectBuilderInterface*)m_objbuilder_impl.get();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	m_statsproc = objBuilder->getStatisticsProcessor( name_);
 	if (!m_statsproc)
 	{
@@ -1964,7 +1673,7 @@ StatisticsProcessor::StatisticsProcessor( const Reference& objbuilder_, const Re
 
 StatisticsMessage StatisticsProcessor::decode( const std::string& blob) const
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::StatisticsProcessorInterface* proc = (const strus::StatisticsProcessorInterface*)m_statsproc;
 	std::auto_ptr<strus::StatisticsViewerInterface> viewer( proc->createViewer( blob.c_str(), blob.size()));
 	std::vector<DocumentFrequencyChange> dflist;
@@ -1983,7 +1692,7 @@ StatisticsMessage StatisticsProcessor::decode( const std::string& blob) const
 
 std::string StatisticsProcessor::encode( const StatisticsMessage& msg) const
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::StatisticsProcessorInterface* proc = (const strus::StatisticsProcessorInterface*)m_statsproc;
 	strus::StatisticsProcessorInterface::BuilderOptions options;
 	std::auto_ptr<strus::StatisticsBuilderInterface> builder( proc->createBuilder( options));
@@ -2010,7 +1719,7 @@ std::string StatisticsProcessor::encode( const StatisticsMessage& msg) const
 }
 
 
-QueryEval::QueryEval( const Reference& objbuilder, const Reference& trace, const Reference& errorhnd)
+QueryEval::QueryEval( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -2020,13 +1729,13 @@ QueryEval::QueryEval( const Reference& objbuilder, const Reference& trace, const
 	m_queryproc = objBuilder->getQueryProcessor();
 	if (!m_queryproc)
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
 	}
 	m_queryeval_impl.reset( objBuilder->createQueryEval());
 	if (!m_queryeval_impl.get())
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("error creating query eval: %s"), errorhnd->fetchError());
 	}
 }
@@ -2073,7 +1782,7 @@ void QueryEval::addSummarizer(
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
 	const strus::SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( name);
@@ -2120,7 +1829,7 @@ void QueryEval::addWeightingFunction(
 {
 	typedef strus::QueryEvalInterface::FeatureParameter FeatureParameter;
 
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
 
 	const strus::WeightingFunctionInterface* sf = queryproc->getWeightingFunction( name);
@@ -2156,7 +1865,7 @@ void QueryEval::addWeightingFunction(
 
 void QueryEval::addWeightingFormula( const std::string& source, const FunctionVariableConfig& defaultParameter)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 
 	const strus::QueryProcessorInterface* queryproc = (const strus::QueryProcessorInterface*)m_queryproc;
@@ -2179,7 +1888,7 @@ void QueryEval::addWeightingFormula( const std::string& source, const FunctionVa
 
 Query QueryEval::createQuery( const StorageClient& storage) const
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryEvalInterface* qe = (strus::QueryEvalInterface*)m_queryeval_impl.get();
 	strus::StorageClientInterface* st = (strus::StorageClientInterface*)storage.m_storage_impl.get();
 	Reference query( ReferenceDeleter<strus::QueryInterface>::function);
@@ -2478,7 +2187,7 @@ void Query::setDebugMode( bool debug)
 QueryResult Query::evaluate() const
 {
 	std::vector<Rank> ranks;
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	strus::QueryResult res = THIS->evaluate();
 	if (res.ranks().empty() && errorhnd->hasError())
@@ -2510,7 +2219,7 @@ std::string Query::tostring() const
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
 	std::string rt( THIS->tostring());
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("failed to map query to string: %s"), errorhnd->fetchError());
@@ -2529,7 +2238,7 @@ DocumentBrowser::DocumentBrowser( const DocumentBrowser& o)
 	,m_docno(o.m_docno)
 {}
 
-DocumentBrowser::DocumentBrowser( const Reference& objbuilder_impl_, const Reference& trace_impl_, const Reference& storage_impl_, const Reference& errorhnd_)
+DocumentBrowser::DocumentBrowser( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& storage_impl_, const HostObjectReference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_impl_)
 	,m_objbuilder_impl(objbuilder_impl_)
@@ -2746,7 +2455,7 @@ Context::Context( const Context& o)
 
 void Context::checkErrors() const
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("unhandled error: %s"), errorhnd->fetchError());
@@ -2761,7 +2470,7 @@ void Context::loadModule( const std::string& name_)
 	strus::ModuleLoaderInterface* moduleLoader = (strus::ModuleLoaderInterface*)m_moduleloader_impl.get();
 	if (!moduleLoader->loadModule( name_))
 	{
-		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+		strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 		throw strus::runtime_error(_TXT("failed to load module: %s"), errorhnd->fetchError());
 	}
 }
@@ -2792,7 +2501,7 @@ StatisticsProcessor Context::createStatisticsProcessor( const std::string& name)
 
 void Context::initStorageObjBuilder()
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::StorageObjectBuilderInterface* storageObjectBuilder = 0;
 	if (m_rpc_impl.get())
 	{
@@ -2828,7 +2537,7 @@ void Context::initStorageObjBuilder()
 
 void Context::initAnalyzerObjBuilder()
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	strus::AnalyzerObjectBuilderInterface* analyzerObjectBuilder = 0;
 	if (m_rpc_impl.get())
 	{
@@ -2865,7 +2574,7 @@ void Context::initAnalyzerObjBuilder()
 DocumentClass Context::detectDocumentClass( const std::string& content)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	const strus::AnalyzerObjectBuilderInterface* objBuilder = (const strus::AnalyzerObjectBuilderInterface*)m_analyzer_objbuilder_impl.get();
 	const strus::TextProcessorInterface* textproc;
 	if (m_textproc)
@@ -2923,7 +2632,7 @@ DocumentAnalyzer Context::createDocumentAnalyzer( const std::string& segmenterna
 		m_textproc = objBuilder->getTextProcessor();
 		if (!m_textproc)
 		{
-			strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+			strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 			throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 		}
 	}
@@ -2944,7 +2653,7 @@ QueryEval Context::createQueryEval()
 
 void Context::createStorage( const std::string& config_)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	std::string dbname;
 	std::string storagecfg( config_);
 	(void)strus::extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
@@ -2960,7 +2669,7 @@ void Context::createStorage( const std::string& config_)
 
 void Context::createVectorStorage( const std::string& config_)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	std::string dbname;
 	std::string storagename;
 	std::string storagecfg( config_);
@@ -2980,7 +2689,7 @@ void Context::createVectorStorage( const std::string& config_)
 
 void Context::destroyStorage( const std::string& config_)
 {
-	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
+	strus::ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<strus::ErrorBufferInterface>();
 	std::string dbname;
 	std::string storagecfg( config_);
 	(void)strus::extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
