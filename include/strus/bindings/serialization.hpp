@@ -26,48 +26,36 @@ public:
 		Value,		///< Atomic value
 		Close		///< Closes a scope
 	};
-	struct Node
+	struct Node :public ValueVariant
 	{
 		Tag tag;
-		union
-		{
-			int index;
-			const char* name;
-		} value;
 
-		Node( const Tag& tag_, const char* name_)
-			:tag(tag_)
-		{
-			value.name = name_;
-		}
-		Node( const Tag& tag_, int index_)
-			:tag(tag_)
-		{
-			value.index = index_;
-		}
+		Node( const Tag& tag_, const ValueVariant& value_)
+			:ValueVariant(value_),tag(tag_)
+		{}
+		Node( const Tag& tag_, const char* value_)
+			:ValueVariant(value_),tag(tag_)
+		{}
+		Node( const Tag& tag_, const int value_)
+			:ValueVariant((ValueVariant::IntType)value_),tag(tag_)
+		{}
 		Node( const Tag& tag_)
-			:tag(tag_)
-		{
-			value.index = 0;
-		}
+			:ValueVariant(),tag(tag_)
+		{}
 		Node( const Node& o)
-			:tag(o.tag)
-		{
-			value.name = o.value.name;
-		}
+			:ValueVariant(o),tag(o.tag)
+		{}
 	};
 
 	Serialization()
-		:m_ar(),m_valuear(){}
+		:m_ar(){}
 	Serialization( const Serialization& o)
-		:m_ar(o.m_ar),m_valuear(o.m_valuear){}
+		:m_ar(o.m_ar){}
 
 	void clear()
 	{
 		m_ar.clear();
-		m_valuear.clear();
 	}
-
 	void pushOpen( const char* tagname)
 	{
 		m_ar.push_back( Node( Open, tagname));
@@ -82,34 +70,19 @@ public:
 	}
 	void pushValue( const ValueVariant& val)
 	{
-		m_ar.push_back( Node( Value, m_valuear.size()));
-		m_valuear.push_back( val);
+		m_ar.push_back( Node( Value, val));
 	}
 
-	class const_iterator
-	{
-	public:
-		const_iterator( const std::vector<Node>& ar, const std::vector<ValueVariant>& var_, bool start)
-			:m_ni(start?ar.begin():ar.end()),m_var(var_.data()){}
-		const_iterator( const const_iterator& o)
-			:m_ni(o.m_ni),m_var(o.m_var){}
+	typedef std::vector<Node>::const_iterator const_iterator;
 
-		bool operator==( const const_iterator& o) const		{return m_ni == o.m_ni;}
-		bool operator!=( const const_iterator& o) const		{return m_ni != o.m_ni;}
+	const_iterator begin() const			{return m_ar.begin();}
+	const_iterator end() const			{return m_ar.end();}
 
-		const_iterator& operator++()				{++m_ni; return *this;}
-		const_iterator operator++(int)				{const_iterator rt(*this); ++m_ni; return rt;}
-		const_iterator& operator--()				{--m_ni; return *this;}
-		const_iterator operator--(int)				{const_iterator rt(*this); --m_ni; return rt;}
-
-	private:
-		std::vector<Node>::const_iterator m_ni;
-		ValueVariant const* m_var;
-	};
+	std::size_t size() const			{return m_ar.size();}
+	const Node& operator[]( std::size_t i) const	{return m_ar[i];}
 
 private:
 	std::vector<Node> m_ar;
-	std::vector<ValueVariant> m_valuear;
 };
 
 }}//namespace

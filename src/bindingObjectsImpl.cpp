@@ -41,9 +41,9 @@
 #include "strus/base/utf8.hpp"
 #include "strus/base/symbolTable.hpp"
 #include "strus/base/fileio.hpp"
-#include "private/internationalization.hpp"
+#include "internationalization.hpp"
 #include "utils.hpp"
-#include "private/traceUtils.hpp"
+#include "traceUtils.hpp"
 #include <cmath>
 #include <stdexcept>
 #include <iostream>

@@ -140,8 +140,57 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			<< "std::size_t argc, ValueVariant* argv)" << std::endl;
 			out
 			<< "{" << std::endl
-			<< "\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl
-			<< "\tTHIS->" << mi->name() << "( " << ");" << std::endl;
+			<< "\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl;
+			std::vector<strus::VariableValue>::const_iterator
+				pi = mi->parameters().begin(),
+				pe = mi->parameters().end();
+			std::vector<bool> param_converted;
+			for (int pidx=0; pi != pe; ++pi,++pidx)
+			{
+				char namebuf[ 128];
+				char valuebuf[ 128];
+				snprintf( namebuf, sizeof( namebuf), "p%d", pidx);
+				snprintf( valuebuf, sizeof( valuebuf), "argv[ %d]", pidx);
+				std::string param_decl( pi->expand( "param_decl", namebuf, valuebuf));
+				if (param_decl.empty())
+				{
+					param_converted.push_back( false);
+				}
+				else
+				{
+					param_converted.push_back( true);
+					out << expandIndent( "\t", param_decl);
+				}
+			}
+			out
+			<< "\tTHIS->" << mi->name() << "( ";
+			pi = mi->parameters().begin();
+			for (int pidx=0; pi != pe; ++pi,++pidx)
+			{
+				if (pidx)
+				{
+					out << ", ";
+				}
+				char namebuf[ 128];
+				char valuebuf[ 128];
+				snprintf( namebuf, sizeof( namebuf), "p%d", pidx);
+				snprintf( valuebuf, sizeof( valuebuf), "argv[ %d]", pidx);
+				std::string param_value( pi->expand( "param_value", namebuf, valuebuf));
+				if (param_value.empty())
+				{
+					if (!param_converted[pidx])
+					{
+						throw std::runtime_error( std::string("member 'param_value' not defined for '") + valuebuf + "' in method '" + mi->name());
+					}
+					out << namebuf;
+				}
+				else
+				{
+					out << param_value;
+				}
+			}
+			out
+			<< ");" << std::endl;
 			out
 			<< "}" << std::endl;
 		}
@@ -197,6 +246,7 @@ int main( int argc, const char* argv[])
 		std::cout << interfaceDef.tostring() << std::endl;
 #endif
 		printOutput( "include/strus/bindingObjects.hpp", &print_BindingObjectsHpp, interfaceDef);
+		printOutput( "src/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
 
 		std::cerr << "done." << std::endl;
 		return 0;

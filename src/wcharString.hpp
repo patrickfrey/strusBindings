@@ -12,6 +12,9 @@
 
 namespace strus {
 
+typedef uint16_t WChar;
+typedef std::basic_string<uint16_t> WCharString;
+
 std::basic_string<uint16_t> convert_uft8string_to_w16string( const std::string& val);
 std::basic_string<uint16_t> convert_uft8string_to_w16string( const char* str, std::size_t strsize);
 std::string convert_w16string_to_uft8string( const std::basic_string<uint16_t>& val);

@@ -241,7 +241,7 @@ private:
 /// \brief Forward declaration
 class QueryAnalyzeContextImpl;
 
-/// \class QueryAnalyzer
+/// \class QueryAnalyzerImpl
 /// \brief Analyzer object representing a set of function for transforming a field,
 ///	the smallest unit in any query language, to a set of terms that can be used
 ///	to build a query.
@@ -318,7 +318,7 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	QueryAnalyzer( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
+	QueryAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
 
 	HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;
@@ -405,7 +405,7 @@ public:
 
 private:
 	friend class ContextImpl;
-	StorageClient( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config);
+	StorageClientImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config);
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;

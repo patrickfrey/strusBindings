@@ -7,6 +7,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 add_subdirectory( parser )
 
 set( source_files
+        valueVariantConv.cpp
 	testcheck.cpp
 	wcharString.cpp
 	bindingObjectsImpl.cpp

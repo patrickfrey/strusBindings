@@ -5,13 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#include "private/traceUtils.hpp"
+#include "traceUtils.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/traceObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
-#include "private/internationalization.hpp"
+#include "internationalization.hpp"
 #include <memory>
 
 using namespace strus;

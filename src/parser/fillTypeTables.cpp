@@ -18,22 +18,23 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	typesystem.defineType( "void")
 	;
 	typesystem.defineType( "std::size_t")
+		("param_value", "parambuf.packDouble($name);")
 	;
 	typesystem.defineType( "bool")
 	;
 	typesystem.defineType( "int")
 	;
-	typesystem.defineType( "int $name=0")
+	typesystem.defineType( "int $val=0")
 	;
 	typesystem.defineType( "unsigned int")
 	;
-	typesystem.defineType( "unsigned int $name=0")
+	typesystem.defineType( "unsigned int $val=0")
 	;
 	typesystem.defineType( "float")
 	;
 	typesystem.defineType( "double")
 	;
-	typesystem.defineType( "double $name=1")
+	typesystem.defineType( "double $val=1")
 	;
 	typesystem.defineType( "const ValueVariant&")
 	;
@@ -45,7 +46,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "std::string")
 	;
-	typesystem.defineType( "const std::string& $name=\"\"")
+	typesystem.defineType( "const std::string& $val=\"\"")
 	;
 	typesystem.defineType( "const std::string&")
 	;

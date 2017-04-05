@@ -12,11 +12,9 @@
 #define _STRUS_BINDINGS_PARSER_bindingObjects_HPP_INCLUDED
 #include "strus/bindings/valueVariant.hpp"
 #include "strus/bindings/callResult.hpp"
-#include "traceObject.hpp"
 #include "strus/bindings/serialization.hpp"
 #include "strus/bindings/hostObjectReference.hpp"
-#include <string>
-#include <vector>
+#include <cstddef>
 
 namespace strus {
 namespace bindings {
