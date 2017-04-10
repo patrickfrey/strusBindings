@@ -9,7 +9,9 @@
 #define _STRUS_BINDING_OBJECTS_HPP_INCLUDED
 #include "strus/bindings/hostObjectReference.hpp"
 #include "strus/bindings/valueVariant.hpp"
+#include "strus/bindings/callResult.hpp"
 #include "strus/numericVariant.hpp"
+#include <vector>
 
 /// \brief Forward declaration
 class DocumentAnalyzeQueueImpl;
@@ -56,7 +58,7 @@ public:
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
-	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of options (strus::analyzer::FeatureOptions), one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
 	void addForwardIndexFeature(
 		const std::string& type,
 		const std::string& selectexpr,

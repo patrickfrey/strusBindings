@@ -14,6 +14,7 @@
 #include "internationalization.hpp"
 #include "strus/bindings/serialization.hpp"
 #include <string>
+#include <cstring>
 #include <inttypes.h>
 
 using namespace strus;
@@ -22,7 +23,7 @@ using namespace bindings;
 #define FORMAT_UINT "%" PRIu64
 #define FORMAT_INT "%" PRId64
 
-std::string ValueVariantConv::tostring( std::string& buf, const ValueVariant& val)
+std::string ValueVariantConv::tostring( const ValueVariant& val)
 {
 	if (val.type == ValueVariant::String)
 	{
@@ -30,10 +31,11 @@ std::string ValueVariantConv::tostring( std::string& buf, const ValueVariant& va
 	}
 	else
 	{
-		Slice slice( toslice( buf, val));
-		if (slice.ptr == buf.c_str())
+		std::string rt;
+		Slice slice( toslice( rt, val));
+		if (slice.ptr == rt.c_str())
 		{
-			return buf;
+			return rt;
 		}
 		else
 		{
@@ -81,7 +83,7 @@ ValueVariantConv::Slice ValueVariantConv::toslice( std::string& buf, const Value
 	throw strus::runtime_error(_TXT("cannot convert value variant to %s: %s"), "slice of basic string", _TXT("unknown type"));
 }
 
-std::basic_string<uint16_t> ValueVariantConv::towstring( std::basic_string<uint16_t>& buf, const ValueVariant& val)
+std::basic_string<uint16_t> ValueVariantConv::towstring( const ValueVariant& val)
 {
 	if (val.type == ValueVariant::WString)
 	{
@@ -89,10 +91,11 @@ std::basic_string<uint16_t> ValueVariantConv::towstring( std::basic_string<uint1
 	}
 	else
 	{
-		SliceW16 slice( towslice( buf, val));
-		if (slice.ptr == buf.c_str())
+		std::basic_string<uint16_t> rt;
+		SliceW16 slice( towslice( rt, val));
+		if (slice.ptr == rt.c_str())
 		{
-			return buf;
+			return rt;
 		}
 		else
 		{
@@ -112,17 +115,26 @@ static std::basic_string<uint16_t> print2uint16string( const char* fmt, TYPE val
 	return rt;
 }
 
-static std::size_t map2ascii( char* destbuf, std::size_t destbufsize,const uint16_t* src, std::size_t srcsize, const char* where)
+static bool try_map2ascii( char* destbuf, std::size_t destbufsize, const uint16_t* src, std::size_t srcsize)
 {
 	std::size_t ii = 0;
-	if (srcsize+1 >= destbufsize) throw strus::runtime_error( _TXT("error in %s: cannot convert string to ASCII (string too long)"), where);
+	if (srcsize+1 >= destbufsize) return false;
 	for (; ii<srcsize; ++ii)
 	{
-		if (src[ii] > 128) throw strus::runtime_error( _TXT("error in %s: cannot convert string to ASCII (invalid characters)"), where);
+		if (src[ii] > 128) return false;
 		destbuf[ ii] = src[ii];
 	}
 	destbuf[ ii] = 0;
 	return ii;
+}
+
+static std::size_t map2ascii( char* destbuf, std::size_t destbufsize,const uint16_t* src, std::size_t srcsize, const char* where)
+{
+	if (!try_map2ascii( destbuf, destbufsize, src, srcsize))
+	{ 
+		throw strus::runtime_error( _TXT("error in %s: cannot convert string to ASCII"), where);
+	}
+	return srcsize;
 }
 
 ValueVariantConv::SliceW16 ValueVariantConv::towslice( std::basic_string<uint16_t>& buf, const ValueVariant& val)
@@ -368,4 +380,105 @@ bool ValueVariantConv::tobool( const ValueVariant& val)
 	return !!rt;
 }
 
+bool ValueVariantConv::isequal_ascii( const ValueVariant& val, const char* value)
+{
+	if (val.type == ValueVariant::String)
+	{
+		return (std::strlen( value) == (std::size_t)val.length
+			&& std::memcmp( val.value.string, value, val.length) == 0);
+	}
+	else if (val.type == ValueVariant::WString)
+	{
+		std::size_t wi = 0, we = val.length;
+		for (; wi != we; ++wi)
+		{
+			if (val.value.wstring[wi] != (ValueVariant::WCharType)(unsigned char)value[wi])
+			{
+				return false;
+			}
+		}
+		return (0==value[wi]);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+static bool try_convertStringToNumber( ValueVariant& val, const char* str, std::size_t strsize)
+{
+	bool sign = false;
+	std::size_t si = 0, se = strsize;
+	if (str[si] == '-')
+	{
+		++si;
+		sign = true;
+	}
+	if (str[si] >= '0' && str[si] <= '9')
+	{
+		for (++si; si != se && str[si] >= '0' && str[si] <= '9'; ++si){}
+	}
+	else
+	{
+		return false;
+	}
+	if (si == se)
+	{
+		if (sign)
+		{
+			NumParseError err;
+			int64_t res = uintFromString( str, strsize, std::numeric_limits<int64_t>::max(), err);
+			if (err == NumParserOk)
+			{
+				val.init( -res);
+				return true;
+			}
+		}
+		else
+		{
+			NumParseError err;
+			uint64_t res = uintFromString( str, strsize, std::numeric_limits<uint64_t>::max(), err);
+			if (err == NumParserOk)
+			{
+				val.init( res);
+				return true;
+			}
+		}
+	}
+	else if (str[si] == '.')
+	{
+		++si;
+		for (; si != se && str[si] >= '0' && str[si] <= '9'; ++si){}
+		if (si == se)
+		{
+			NumParseError err;
+			double res = doubleFromString( str, strsize, err);
+			if (err == NumParserOk)
+			{
+				val.init( sign?(-res):res);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool ValueVariantConv::try_convertToNumber( ValueVariant& val)
+{
+	if (!val.isAtomicType()) return false;
+	if (!val.isNumericType()) return true;
+	if (val.type == ValueVariant::String && val.length < 64)
+	{
+		return try_convertStringToNumber( val, val.value.string, val.length);
+	}
+	if (val.type == ValueVariant::String && val.length < 64)
+	{
+		char buf[ 128];
+		if (try_map2ascii( buf, sizeof(buf), val.value.wstring, val.length))
+		{
+			return try_convertStringToNumber( val, buf, val.length);
+		}
+	}
+	return false;
+}
 

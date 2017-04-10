@@ -8,6 +8,8 @@ add_subdirectory( parser )
 
 set( source_files
         valueVariantConv.cpp
+	expressionBuilder.cpp
+	bindingUtils.cpp
 	testcheck.cpp
 	wcharString.cpp
 	bindingObjectsImpl.cpp

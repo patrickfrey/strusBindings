@@ -12,6 +12,7 @@
 #include "strus/bindings/valueVariant.hpp"
 #include "strus/base/stdint.h"
 #include <string>
+#include <cstring>
 
 namespace strus {
 namespace bindings {
@@ -28,6 +29,11 @@ public:
 		Slice() :ptr(0),size(0){}
 		Slice( const char* ptr_, std::size_t size_) :ptr(ptr_),size(size_){}
 		Slice( const Slice& o) :ptr(o.ptr),size(o.size){}
+
+		bool operator==( const std::string& o)
+		{
+			return o.size() == size && 0==std::memcmp( ptr, o.c_str(), size);
+		}
 	};
 	/// \brief slice of chars (UTF16)
 	struct SliceW16
@@ -40,10 +46,10 @@ public:
 		SliceW16( const SliceW16& o) :ptr(o.ptr),size(o.size){}
 	};
 
-	static std::string tostring( std::string& buf, const ValueVariant& val);
+	static std::string tostring( const ValueVariant& val);
 	static Slice toslice( std::string& buf, const ValueVariant& val);
 
-	static std::basic_string<uint16_t> towstring( std::basic_string<uint16_t>& buf, const ValueVariant& val);
+	static std::basic_string<uint16_t> towstring( const ValueVariant& val);
 	static SliceW16 towslice( std::basic_string<uint16_t>& buf, const ValueVariant& val);
 
 	static double todouble( const ValueVariant& val);
@@ -52,6 +58,9 @@ public:
 	static int64_t toint64( const ValueVariant& val);
 	static uint64_t touint64( const ValueVariant& val);
 	static bool tobool( const ValueVariant& val);
+
+	static bool isequal_ascii( const ValueVariant& val, const char* value);
+	static bool try_convertToNumber( ValueVariant& val);
 };
 
 }}//namespace

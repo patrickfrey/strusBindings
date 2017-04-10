@@ -35,6 +35,12 @@ struct ValueVariant
 		StrusObject		= 0x06,
 		StrusSerialization	= 0x07
 	};
+	enum {
+		NumericTypeMask = (1U<<(unsigned int)UInt)|(1U<<(unsigned int)Int)|(1U<<(unsigned int)Double),
+		StringTypeMask  = (1U<<(unsigned int)UInt)|(1U<<(unsigned int)Int)|(1U<<(unsigned int)Double),
+		AtomicTypeMask  = (unsigned int)NumericTypeMask | (unsigned int)StringTypeMask
+	};
+
 	typedef uint64_t UIntType;
 	typedef int64_t IntType;
 	typedef double FloatType;
@@ -79,6 +85,10 @@ struct ValueVariant
 	{
 		value.Int = 0; type = Void; length = 0;
 	}
+	bool defined() const
+	{
+		return type != Void;
+	}
 
 	Type type;
 	union {
@@ -91,6 +101,19 @@ struct ValueVariant
 		const Serialization* serialization;
 	} value;
 	int length;
+
+	bool isNumericType()
+	{
+		return (type & NumericTypeMask) != 0;
+	}
+	bool isStringType()
+	{
+		return (type & StringTypeMask) != 0;
+	}
+	bool isAtomicType()
+	{
+		return (type & AtomicTypeMask) != 0;
+	}
 
 private:
 	void assign( const ValueVariant& o)
