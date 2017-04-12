@@ -61,6 +61,9 @@ public:
 
 	static bool isequal_ascii( const ValueVariant& val, const char* value);
 	static bool try_convertToNumber( ValueVariant& val);
+
+	static bool try_map2ascii( char* destbuf, std::size_t destbufsize, const uint16_t* src, std::size_t srcsize);
+	static std::size_t map2ascii( char* destbuf, std::size_t destbufsize,const uint16_t* src, std::size_t srcsize, const char* where);
 };
 
 }}//namespace

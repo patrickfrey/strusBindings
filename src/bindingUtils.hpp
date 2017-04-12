@@ -29,14 +29,24 @@ namespace bindings {
 
 struct Deserializer
 {
-	static const ValueVariant& getValueWithOptionalName(
-			const char* ascii_name,
+	static void consumeClose(
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
 
-	static std::string getStringWithOptionalName(
-			const char* ascii_name,
-			Serialization::const_iterator& si,
+	static bool isStringWithPrefix(
+			const ValueVariant& val,
+			unsigned char prefix);
+
+	static int getStringPrefix(
+			const ValueVariant& val,
+			const char* prefixList);
+
+	static std::string getPrefixStringValue(
+			const ValueVariant& val,
+			unsigned char prefix);
+
+	static bool skipStructure(
+			Serialization::const_iterator si,
 			const Serialization::const_iterator& se);
 
 	static std::string getString(
@@ -46,6 +56,20 @@ struct Deserializer
 	static std::vector<std::string> getStringList(
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
+
+	static std::vector<std::string> getStringList(
+			const ValueVariant& val);
+
+	static unsigned int getUint(
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
+
+	static unsigned int getInt(
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
+
+	static analyzer::DocumentClass getDocumentClass(
+			const ValueVariant& val);
 
 	static analyzer::FeatureOptions getFeatureOptions(
 			Serialization::const_iterator& si,
@@ -87,38 +111,18 @@ struct Deserializer
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
-	static void buildPatternLexems(
-			PreProcPatternExpressionBuilder& builder,
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se,
-			ErrorBufferInterface* errorhnd);
-
-	static void buildPatternLexems(
-			PreProcPatternExpressionBuilder& builder,
-			const ValueVariant& regexdefs,
-			ErrorBufferInterface* errorhnd);
-
 	static void buildExpression(
 			ExpressionBuilder& builder,
 			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se,
-			ErrorBufferInterface* errorhnd);
+			const Serialization::const_iterator& se);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
-			const ValueVariant& expression,
-			ErrorBufferInterface* errorhnd);
-	
-	static void buildFeatures(
-			ExpressionBuilder& builder,
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se,
-			ErrorBufferInterface* errorhnd);
+			const ValueVariant& expression);
 
-	static void buildFeatures(
+	static void buildPatterns(
 			ExpressionBuilder& builder,
-			const ValueVariant& expressions,
-			ErrorBufferInterface* errorhnd);
+			const ValueVariant& patterns);
 };
 
 }}//namespace

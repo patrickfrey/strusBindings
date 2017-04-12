@@ -26,16 +26,13 @@ class ExpressionBuilder
 {
 public:
 	virtual ~ExpressionBuilder();
-	virtual void pushTerm( const std::string& type, const std::string& value, int length)=0;
+	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length)=0;
 	virtual void pushTerm( const std::string& type, const std::string& value)=0;
+	virtual void pushTerm( const std::string& type)=0;
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)=0;
-	virtual void pushReference( const std::string& name)=0;
 	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality)=0;
-	virtual void defineItem( const std::string& name)=0;
-	virtual void defineFeature( const std::string& name, double weight)=0;
-	virtual void definePattern( const std::string& name, bool visible)=0;
-	virtual void attachVariable( const std::string& name, double weight)=0;
 	virtual void attachVariable( const std::string& name)=0;
+	virtual void definePattern( const std::string& name, bool visible)=0;
 };
 
 class PostProcPatternExpressionBuilder
@@ -46,17 +43,16 @@ public:
 		:m_errorhnd(errorhnd_),m_matcher(matcher_),m_feeder(feeder_){}
 
 	virtual ~PostProcPatternExpressionBuilder(){}
-	virtual void pushTerm( const std::string& type, const std::string& value, int length);
+	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
+	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
-	virtual void pushReference( const std::string& name);
 	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality);
-	virtual void defineItem( const std::string& name);
-	virtual void defineFeature( const std::string& name, double weight);
-	virtual void definePattern( const std::string& name, bool visible);
-	virtual void attachVariable( const std::string& name, double weight);
 	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, bool visible);
 
+	void defineLexem( const std::string& name);
+	
 private:
 	PostProcPatternExpressionBuilder( const PostProcPatternExpressionBuilder&){}	//< non copyable
 	void operator=( const PostProcPatternExpressionBuilder&){}			//< non copyable
@@ -77,16 +73,13 @@ public:
 		:m_errorhnd(errorhnd_),m_matcher(matcher_),m_lexer(lexer_){}
 
 	virtual ~PreProcPatternExpressionBuilder(){}
-	virtual void pushTerm( const std::string& type, const std::string& value, int length);
+	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
+	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
-	virtual void pushReference( const std::string& name);
 	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality);
-	virtual void defineItem( const std::string& name);
-	virtual void defineFeature( const std::string& name, double weight);
-	virtual void definePattern( const std::string& name, bool visible);
-	virtual void attachVariable( const std::string& name, double weight);
 	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, bool visible);
 
 	void defineLexem(
 			const std::string& name,
@@ -116,14 +109,11 @@ public:
 	virtual ~QueryExpressionBuilder(){}
 	virtual void pushTerm( const std::string& type, const std::string& value, int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
+	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
-	virtual void pushReference( const std::string& name);
 	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality);
-	virtual void defineItem( const std::string& name);
-	virtual void defineFeature( const std::string& name, double weight);
-	virtual void definePattern( const std::string& name, bool visible);
-	virtual void attachVariable( const std::string& name, double weight);
 	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, bool visible);
 
 private:
 	QueryExpressionBuilder( const QueryExpressionBuilder&){}	//< non copyable

@@ -22,9 +22,9 @@ public:
 	enum Tag
 	{
 		Open,		///< Open a scope
-		Index,		///< Open an array element
-		Value,		///< Atomic value
-		Close		///< Closes a scope
+		Close,		///< Closes a scope
+		Name,		///< The name of the following value (Value) or structure (Open)
+		Value		///< Atomic value
 	};
 	struct Node :public ValueVariant
 	{
@@ -56,17 +56,17 @@ public:
 	{
 		m_ar.clear();
 	}
-	void pushOpen( const char* tagname)
+	void pushOpen()
 	{
-		m_ar.push_back( Node( Open, tagname));
+		m_ar.push_back( Node( Open));
 	}
 	void pushClose()
 	{
 		m_ar.push_back( Node( Close));
 	}
-	void pushIndex()
+	void pushName( const char* tagname)
 	{
-		m_ar.push_back( Node( Index));
+		m_ar.push_back( Node( Name, tagname));
 	}
 	void pushValue( const ValueVariant& val)
 	{

@@ -1,0 +1,265 @@
+/*
+ * Copyright (c) 2017 Patrick P. Frey
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+#ifndef _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
+#define _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
+#include "strus/bindings/hostObjectReference.hpp"
+#include "strus/bindings/valueVariant.hpp"
+#include "strus/bindings/callResult.hpp"
+#include "strus/numericVariant.hpp"
+#include "strus/textProcessorInterface.hpp"
+#include <vector>
+#include <string>
+
+namespace strus {
+namespace bindings {
+
+/// \class DocumentAnalyzerImpl
+/// \brief Analyzer object representing a program for segmenting, 
+///	tokenizing and normalizing a document into atomic parts, that 
+///	can be inserted into a storage and be retrieved from there.
+/// \remark The only way to construct a document analyzer instance is to call Context::createDocumentAnalyzer()
+class DocumentAnalyzerImpl
+{
+public:
+	/// \brief Copy constructor
+	DocumentAnalyzerImpl( const DocumentAnalyzerImpl& o);
+	/// \brief Destructor
+	virtual ~DocumentAnalyzerImpl(){}
+
+	/// \brief Define a feature to insert into the inverted index (search index) is selected, tokenized and normalized
+	/// \param[in] type type of the features produced
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
+	void addSearchIndexFeature(
+		const std::string& type,
+		const std::string& selectexpr,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers,
+		const ValueVariant& options);
+
+	/// \brief Define a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
+	/// \param[in] type type of the features produced
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] options a list of options (strus::analyzer::FeatureOptions), one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
+	void addForwardIndexFeature(
+		const std::string& type,
+		const std::string& selectexpr,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers,
+		const ValueVariant& options);
+
+	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
+	/// \param[in] fieldname name of the addressed meta data field.
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	void defineMetaData(
+		const std::string& fieldname,
+		const std::string& selectexpr,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers);
+
+	/// \brief Declare some aggregated value of the document to be put into the meta data table used for restrictions, weighting and summarization.
+ 	/// \param[in] fieldname name of the addressed meta data field.
+	/// \param[in] function defining how and from what the value is aggregated
+	void defineAggregatedMetaData(
+		const std::string& fieldname,
+		const ValueVariant& function);
+
+	/// \brief Define a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
+	/// \param[in] attribname name of the addressed attribute.
+	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
+	/// \param[in] tokenizer tokenizer function description to use for this feature
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	void defineAttribute(
+		const std::string& attribname,
+		const std::string& selectexpr,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers);
+
+	/// \brief Define a result of pattern matching as feature to insert into the search index, normalized
+	/// \param[in] type type name of the feature to produce.
+	/// \param[in] patternTypeName name of the pattern to select
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
+	void addSearchIndexFeatureFromPatternMatch(
+		const std::string& type,
+		const std::string& patternTypeName,
+		const ValueVariant& normalizers,
+		const ValueVariant& options);
+
+	/// \brief Define a result of pattern matching as feature to insert into the forward index, normalized
+	/// \param[in] type type name of the feature to produce.
+	/// \param[in] patternTypeName name of the pattern to select
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] options a list of options as std::string, elements one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
+	void addForwardIndexFeatureFromPatternMatch(
+		const std::string& type,
+		const std::string& patternTypeName,
+		const ValueVariant& normalizers,
+		const ValueVariant& options);
+
+	/// \brief Define a result of pattern matching to insert as metadata, normalized
+	/// \param[in] fieldname field name of the meta data element to produce.
+	/// \param[in] patternTypeName name of the pattern to select
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	void defineMetaDataFromPatternMatch(
+		const std::string& fieldname,
+		const std::string& patternTypeName,
+		const ValueVariant& normalizers);
+
+	/// \brief Define a result of pattern matching to insert as document attribute, normalized
+	/// \param[in] attribname name of the document attribute to produce.
+	/// \param[in] patternTypeName name of the pattern to select
+	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	void defineAttributeFromPatternMatch(
+		const std::string& attribname,
+		const std::string& patternTypeName,
+		const ValueVariant& normalizers);
+
+	/// \brief Declare a pattern matcher on the document features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty std::string for default)
+	/// \param[in] patterns structure with all patterns
+	void definePatternMatcherPostProc(
+			const std::string& patternTypeName,
+			const std::string& patternMatcherModule,
+			const ValueVariant& patterns);
+
+	/// \brief Declare a pattern matcher on the document features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty std::string for default)
+	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
+	void definePatternMatcherPostProcFromFile(
+			const std::string& patternTypeName,
+			const std::string& patternMatcherModule,
+			const std::string& serializedPatternFile);
+
+	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
+	/// \param[in] selectexpr an expression that defines the content of the sub document declared
+	/// \param[in] subDocumentTypeName type name assinged to this sub document
+	/// \remark Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
+	void defineDocument(
+			const std::string& subDocumentTypeName,
+			const std::string& selectexpr);
+
+	/// \brief Analye a content of a defined document class and return the set of features to insert
+	/// \param[in] content std::string (NOT a file name !) of the document to analyze
+	/// \param[in] documentClass document class of the document to analyze (see analyzer::DocumentClass)
+	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes) (See analyzer::Document)
+	CallResult analyze(
+			const std::string& content,
+			const ValueVariant& documentClass = ValueVariant());
+
+	/// \brief Analye the content and return the set of features to insert
+	/// \param[in] content std::string (NOT a file name !) of the document to analyze
+	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes) (See analyzer::Document)
+	CallResult analyze(
+			const std::string& content);
+
+private:
+	/// \brief Constructor used by Context
+	friend class Context;
+	DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_);
+
+	HostObjectReference m_errorhnd_impl;
+	HostObjectReference m_trace_impl;
+	HostObjectReference m_objbuilder_impl;
+	HostObjectReference m_analyzer_impl;
+	const TextProcessorInterface* m_textproc;
+};
+
+/// \class QueryAnalyzerImpl
+/// \brief Analyzer object representing a set of function for transforming a field,
+///	the smallest unit in any query language, to a set of terms that can be used
+///	to build a query.
+/// \remark The only way to construct a query analyzer instance is to call Context::createQueryAnalyzer()
+class QueryAnalyzerImpl
+{
+public:
+	/// \brief Copy constructor
+	QueryAnalyzerImpl( const QueryAnalyzerImpl& o);
+	/// \brief Destructor
+	virtual ~QueryAnalyzerImpl(){}
+
+	/// \brief Defines a search index element.
+	/// \param[in] featureType element feature type created from this field type
+	/// \param[in] fieldType name of the field type defined
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	void addSearchIndexElement(
+			const std::string& featureType,
+			const std::string& fieldType,
+			const ValueVariant& tokenizer,
+			const ValueVariant& normalizers);
+
+	/// \brief Defines a search index element from a pattern matching result.
+	/// \param[in] type element type created from this pattern match result type
+	/// \param[in] patternTypeName name of the pattern match result item
+	/// \param[in] normalizers list of normalizer functions
+	void addSearchIndexElementFromPatternMatch(
+			const std::string& type,
+			const std::string& patternTypeName,
+			const ValueVariant& normalizers);
+
+	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of query analysis
+	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
+	/// \param[in] fieldtype type of the field of this element in the query
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
+	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	void addPatternLexem(
+			const std::string& termtype,
+			const std::string& fieldtype,
+			const ValueVariant& tokenizer,
+			const ValueVariant& normalizers);
+
+	/// \brief Declare a pattern matcher on the query features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] patternLexems list of lexems of the patterns
+	/// \param[in] patterns structure with all patterns
+	void definePatternMatcherPostProc(
+			const std::string& patternTypeName,
+			const std::string& patternMatcherModule,
+			const ValueVariant& patternLexems,
+			const ValueVariant& patterns);
+
+	/// \brief Declare a pattern matcher on the query features after other query analysis
+	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
+	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
+	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
+	void definePatternMatcherPostProcFromFile(
+			const std::string& patternTypeName,
+			const std::string& patternMatcherModule,
+			const std::string& serializedPatternFile);
+
+	/// \brief Tokenizes and normalizes a query field and creates some typed terms out of it according the definition of the field type given.
+	/// \param[in] fieldType name of the field type to use for analysis
+	/// \param[in] fieldContent content string of the query field to analyze
+	/// \return list of terms in the query (std::vector<analyzer::Term>)
+	/// \note This is a very simplistic method to analyze a query. For multi field queries the object QueryAnalyzeContext is more appropriate
+	CallResult analyze( const ValueVariant& query);
+
+private:
+	/// \brief Constructor used by Context
+	friend class ContextImpl;
+	QueryAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
+
+	HostObjectReference m_errorhnd_impl;
+	HostObjectReference m_trace_impl;
+	HostObjectReference m_objbuilder_impl;
+	HostObjectReference m_analyzer_impl;
+};
+
+}}//namespace
+#endif
+

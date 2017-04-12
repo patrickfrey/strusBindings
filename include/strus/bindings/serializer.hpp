@@ -128,17 +128,17 @@ public:
 	static void serialize( Serialization& result, const analyzer::Document& val)
 	{
 		serializeStructMember( result, "subDocumentTypeName", val.subDocumentTypeName());
-		serializeStructMemberArray( result, "metadata", val.metadata());
-		serializeStructMemberArray( result, "attributes", val.attributes());
-		serializeStructMemberArray( result, "searchIndexTerms", val.searchIndexTerms());
-		serializeStructMemberArray( result, "forwardIndexTerms", val.forwardIndexTerms());
+		serializeStructMember( result, "metadata", val.metadata());
+		serializeStructMember( result, "attributes", val.attributes());
+		serializeStructMember( result, "searchIndexTerms", val.searchIndexTerms());
+		serializeStructMember( result, "forwardIndexTerms", val.forwardIndexTerms());
 	}
 	static void serialize( Serialization& result, const analyzer::Query& val)
 	{
-		serializeStructMemberArray( result, "metadata", val.metadata());
-		serializeStructMemberArray( result, "searchIndexTerms", val.searchIndexTerms());
-		serializeStructMemberArray( result, "elements", val.elements());
-		serializeStructMemberArray( result, "instructions", val.instructions());
+		serializeStructMember( result, "metadata", val.metadata());
+		serializeStructMember( result, "searchIndexTerms", val.searchIndexTerms());
+		serializeStructMember( result, "elements", val.elements());
+		serializeStructMember( result, "instructions", val.instructions());
 	}
 	static void serialize( Serialization& result, const bindings::DocumentFrequencyChange& val)
 	{
@@ -148,21 +148,21 @@ public:
 	}
 	static void serialize( Serialization& result, const bindings::StatisticsMessage& val)
 	{
-		serializeStructMemberArray( result, "dflist", val.dflist());
+		serializeStructMember( result, "dflist", val.dflist());
 		serializeStructMember( result, "nofdocs", (ValueVariant::IntType)val.nofdocs());
 	}
 	static void serialize( Serialization& result, const ResultDocument& val)
 	{
 		serializeStructMember( result, "docno", (ValueVariant::IntType)val.docno());
 		serializeStructMember( result, "weight", val.weight());
-		serializeStructMemberArray( result, "summaryElements", val.summaryElements());
+		serializeStructMember( result, "summaryElements", val.summaryElements());
 	}
 	static void serialize( Serialization& result, const QueryResult& val)
 	{
 		serializeStructMember( result, "evaluationPass", (ValueVariant::UIntType)val.evaluationPass());
 		serializeStructMember( result, "nofRanked", (ValueVariant::UIntType)val.nofRanked());
 		serializeStructMember( result, "nofVisited", (ValueVariant::UIntType)val.nofVisited());
-		serializeStructMemberArray( result, "ranks", val.ranks());
+		serializeStructMember( result, "ranks", val.ranks());
 	}
 	static void serialize( Serialization& result, const std::vector<VectorStorageSearchInterface::Result>& val)
 	{
@@ -184,39 +184,61 @@ public:
 	{
 		serializeArray( result, val);
 	}
+	static void serialize( Serialization& result, const std::vector<analyzer::MetaData>& val)
+	{
+		serializeArray( result, val);
+	}
+	static void serialize( Serialization& result, const std::vector<analyzer::Attribute>& val)
+	{
+		serializeArray( result, val);
+	}
+	static void serialize( Serialization& result, const std::vector<analyzer::Query::Element>& val)
+	{
+		serializeArray( result, val);
+	}
+	static void serialize( Serialization& result, const std::vector<analyzer::Query::Instruction>& val)
+	{
+		serializeArray( result, val);
+	}
+	static void serialize( Serialization& result, const std::vector<StatisticsViewerInterface::DocumentFrequencyChange>& val)
+	{
+		serializeArray( result, val);
+	}
+	static void serialize( Serialization& result, const std::vector<strus::SummaryElement>& val)
+	{
+		serializeArray( result, val);
+	}
+	static void serialize( Serialization& result, const std::vector<ResultDocument>& val)
+	{
+		serializeArray( result, val);
+	}
 
 private:
 	template <typename TYPE>
 	static void serializeStructMember( Serialization& result, const char* tagname, const TYPE& val)
 	{
-		result.pushOpen( tagname);
+		result.pushName( tagname);
 		serialize( result, val);
-		result.pushClose();
 	}
 	template <typename TYPE>
 	static void serializeArray( Serialization& result, const std::vector<TYPE>& val)
 	{
+		result.pushOpen();
 		typename std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			result.pushIndex();
 			serialize( result, *vi);
 		}
+		result.pushClose();
 	}
 	static void serializeIntArray( Serialization& result, const std::vector<int>& val)
 	{
+		result.pushOpen();
 		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			result.pushIndex();
 			serialize( result, (ValueVariant::IntType)*vi);
 		}
-	}
-	template <typename TYPE>
-	static void serializeStructMemberArray( Serialization& result, const char* tagname, const std::vector<TYPE>& val)
-	{
-		result.pushOpen( tagname);
-		serializeArray( result, val);
 		result.pushClose();
 	}
 };

@@ -115,7 +115,7 @@ static std::basic_string<uint16_t> print2uint16string( const char* fmt, TYPE val
 	return rt;
 }
 
-static bool try_map2ascii( char* destbuf, std::size_t destbufsize, const uint16_t* src, std::size_t srcsize)
+bool ValueVariantConv::try_map2ascii( char* destbuf, std::size_t destbufsize, const uint16_t* src, std::size_t srcsize)
 {
 	std::size_t ii = 0;
 	if (srcsize+1 >= destbufsize) return false;
@@ -128,7 +128,7 @@ static bool try_map2ascii( char* destbuf, std::size_t destbufsize, const uint16_
 	return ii;
 }
 
-static std::size_t map2ascii( char* destbuf, std::size_t destbufsize,const uint16_t* src, std::size_t srcsize, const char* where)
+std::size_t ValueVariantConv::map2ascii( char* destbuf, std::size_t destbufsize,const uint16_t* src, std::size_t srcsize, const char* where)
 {
 	if (!try_map2ascii( destbuf, destbufsize, src, srcsize))
 	{ 
@@ -269,7 +269,7 @@ static TYPE variant_touint( const ValueVariant& val)
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
+			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
 			NumParseError err;
 			TYPE rt = uintFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
@@ -331,7 +331,7 @@ static TYPE variant_toint( const ValueVariant& val)
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
+			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
 			NumParseError err;
 			TYPE rt = intFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");

@@ -17,7 +17,8 @@ using namespace strus::bindings;
 
 enum {MaxPatternTermNameId=(1<<24)};
 
-static strus::PatternMatcherInstanceInterface::JoinOperation patternMatcherJoinOp( const std::string& opname)
+static strus::PatternMatcherInstanceInterface::JoinOperation
+	patternMatcherJoinOp( const std::string& opname)
 {
 	if (opname == "sequence")
 	{
@@ -62,34 +63,38 @@ static std::string termSymbolKey( unsigned int termid, const std::string& name)
 	return symkey;
 }
 
-void PostProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value, int length)
+void PostProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
 	throw strus::runtime_error(_TXT("length parameter not implemented for pattern input terms"));
 }
 
 void PostProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
 {
-	uint32_t termtypeid = m_termtypetab.getOrCreate( type);
-	if (!termtypeid) throw std::bad_alloc();
-	if (m_termtypetab.isNew())
+	uint32_t termtypeid = m_termtypetab.get( type);
+	if (!termtypeid)
 	{
-		if (termtypeid >= MaxPatternTermNameId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
-		m_feeder->defineLexem( termtypeid, type);
+		throw strus::runtime_error(_TXT("lexem with type '%s' is not defined"), type.c_str());
 	}
-	if (value.empty())
+	uint32_t termsymid = m_termsymtab.getOrCreate( termSymbolKey( termtypeid, value));
+	if (!termsymid) throw std::bad_alloc();
+	termsymid += MaxPatternTermNameId;
+	if (m_termsymtab.isNew())
 	{
-		m_matcher->pushTerm( termtypeid);
+		m_feeder->defineSymbol( termsymid, termtypeid, value);
+	}
+	m_matcher->pushTerm( termsymid);
+}
+
+void PostProcPatternExpressionBuilder::pushTerm( const std::string& type)
+{
+	uint32_t termtypeid = m_termtypetab.get( type);
+	if (!termtypeid)
+	{
+		m_matcher->pushPattern( type);
 	}
 	else
 	{
-		uint32_t termsymid = m_termsymtab.getOrCreate( termSymbolKey( termtypeid, value));
-		if (!termsymid) throw std::bad_alloc();
-		termsymid += MaxPatternTermNameId;
-		if (m_termsymtab.isNew())
-		{
-			m_feeder->defineSymbol( termsymid, termtypeid, value);
-		}
-		m_matcher->pushTerm( termsymid);
+		m_matcher->pushTerm( termtypeid);
 	}
 }
 
@@ -98,25 +103,15 @@ void PostProcPatternExpressionBuilder::pushDocField( const std::string& metadata
 	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in pattern expressions"), metadataRangeStart.c_str(), metadataRangeEnd.c_str());
 }
 
-void PostProcPatternExpressionBuilder::pushReference( const std::string& name)
-{
-	m_matcher->pushPattern( name);
-}
-
 void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, int argc, int range, unsigned int cardinality)
 {
 	strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( op);
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
 }
 
-void PostProcPatternExpressionBuilder::defineItem( const std::string& name)
+void PostProcPatternExpressionBuilder::attachVariable( const std::string& name)
 {
-	m_matcher->definePattern( name, true);
-}
-
-void PostProcPatternExpressionBuilder::defineFeature( const std::string& name, double weight)
-{
-	throw strus::runtime_error(_TXT("specification of weight not possible in pattern definition"));
+	m_matcher->attachVariable( name);
 }
 
 void PostProcPatternExpressionBuilder::definePattern( const std::string& name, bool visible)
@@ -124,17 +119,22 @@ void PostProcPatternExpressionBuilder::definePattern( const std::string& name, b
 	m_matcher->definePattern( name, visible);
 }
 
-void PostProcPatternExpressionBuilder::attachVariable( const std::string& name)
+void PostProcPatternExpressionBuilder::defineLexem( const std::string& name)
 {
-	m_matcher->attachVariable( name, 1.0);
+	uint32_t termtypeid = m_termtypetab.getOrCreate( name);
+	if (!termtypeid) throw std::bad_alloc();
+	if (m_termtypetab.isNew())
+	{
+		if (termtypeid >= MaxPatternTermNameId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
+		m_feeder->defineLexem( termtypeid, name);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("duplicate definition of lexem '%s'"), name.c_str());
+	}
 }
 
-void PostProcPatternExpressionBuilder::attachVariable( const std::string& name, double weight)
-{
-	m_matcher->attachVariable( name, weight);
-}
-
-void PreProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value, int length)
+void PreProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
 	throw strus::runtime_error(_TXT("length parameter not implemented for pattern input terms"));
 }
@@ -144,29 +144,28 @@ void PreProcPatternExpressionBuilder::pushTerm( const std::string& type, const s
 	uint32_t termtypeid = m_termtypetab.get( type);
 	if (!termtypeid)
 	{
-		if (value.empty())
-		{
-			m_matcher->pushPattern( type);
-		}
-		else
-		{
-			throw strus::runtime_error(_TXT("lexem with type '%s' is not defined"), type.c_str());
-		}
+		throw strus::runtime_error(_TXT("lexem with type '%s' is not defined"), type.c_str());
 	}
-	if (value.empty())
+	uint32_t termsymid = m_termsymtab.getOrCreate( termSymbolKey( termtypeid, value));
+	if (!termsymid) throw std::bad_alloc();
+	termsymid += MaxPatternTermNameId;
+	if (m_termsymtab.isNew())
 	{
-		m_matcher->pushTerm( termtypeid);
+		m_lexer->defineSymbol( termsymid, termtypeid, value);
+	}
+	m_matcher->pushTerm( termsymid);
+}
+
+void PreProcPatternExpressionBuilder::pushTerm( const std::string& type)
+{
+	uint32_t termtypeid = m_termtypetab.get( type);
+	if (!termtypeid)
+	{
+		m_matcher->pushPattern( type);
 	}
 	else
 	{
-		uint32_t termsymid = m_termsymtab.getOrCreate( termSymbolKey( termtypeid, value));
-		if (!termsymid) throw std::bad_alloc();
-		termsymid += MaxPatternTermNameId;
-		if (m_termsymtab.isNew())
-		{
-			m_lexer->defineSymbol( termsymid, termtypeid, value);
-		}
-		m_matcher->pushTerm( termsymid);
+		m_matcher->pushTerm( termtypeid);
 	}
 }
 
@@ -175,40 +174,15 @@ void PreProcPatternExpressionBuilder::pushDocField( const std::string& metadataR
 	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in pattern expressions"), metadataRangeStart.c_str(), metadataRangeEnd.c_str());
 }
 
-void PreProcPatternExpressionBuilder::pushReference( const std::string& name)
-{
-	m_matcher->pushPattern( name);
-}
-
 void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, int argc, int range, unsigned int cardinality)
 {
 	strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( op);
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
 }
 
-void PreProcPatternExpressionBuilder::defineItem( const std::string& name)
-{
-	m_matcher->definePattern( name, true);
-}
-
-void PreProcPatternExpressionBuilder::defineFeature( const std::string& name, double weight)
-{
-	throw strus::runtime_error(_TXT("specification of weight not possible in pattern definition"));
-}
-
-void PreProcPatternExpressionBuilder::definePattern( const std::string& name, bool visible)
-{
-	m_matcher->definePattern( name, visible);
-}
-
 void PreProcPatternExpressionBuilder::attachVariable( const std::string& name)
 {
-	m_matcher->attachVariable( name, 1.0);
-}
-
-void PreProcPatternExpressionBuilder::attachVariable( const std::string& name, double weight)
-{
-	m_matcher->attachVariable( name, weight);
+	m_matcher->attachVariable( name);
 }
 
 void PreProcPatternExpressionBuilder::defineLexem(
@@ -223,6 +197,11 @@ void PreProcPatternExpressionBuilder::defineLexem(
 	m_lexer->defineLexem( termtypeid, expression, resultIndex, level, posbind);
 }
 
+void PreProcPatternExpressionBuilder::definePattern( const std::string& name, bool visible)
+{
+	m_matcher->definePattern( name, visible);
+}
+
 void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value, int length)
 {
 	m_query->pushTerm( type, value, length);
@@ -233,14 +212,14 @@ void QueryExpressionBuilder::pushTerm( const std::string& type, const std::strin
 	m_query->pushTerm( type, value, 1);
 }
 
+void QueryExpressionBuilder::pushTerm( const std::string& type)
+{
+	m_query->pushTerm( type, std::string(), 1);
+}
+
 void QueryExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
 {
 	m_query->pushDocField( metadataRangeStart, metadataRangeEnd);
-}
-
-void QueryExpressionBuilder::pushReference( const std::string& name)
-{
-	throw strus::runtime_error(_TXT("feature references not implemented in query"));
 }
 
 void QueryExpressionBuilder::pushExpression( const std::string& opname, int argc, int range, unsigned int cardinality)
@@ -251,29 +230,13 @@ void QueryExpressionBuilder::pushExpression( const std::string& opname, int argc
 	m_query->pushExpression( op, argc, range, cardinality);
 }
 
-void QueryExpressionBuilder::defineItem( const std::string& name)
-{
-	m_query->defineFeature( name, 1.0);
-}
-
-void QueryExpressionBuilder::defineFeature( const std::string& name, double weight)
-{
-	m_query->defineFeature( name, weight);
-}
-
-void QueryExpressionBuilder::definePattern( const std::string& name, bool visible)
-{
-	throw strus::runtime_error(_TXT("visibility of features cannot be specified in query expressions"));
-}
-
-void QueryExpressionBuilder::attachVariable( const std::string& name, double weight)
-{
-	throw strus::runtime_error(_TXT("weight of a variable cannot be specified in query expressions"));
-}
-
 void QueryExpressionBuilder::attachVariable( const std::string& name)
 {
 	m_query->attachVariable( name);
 }
 
+void QueryExpressionBuilder::definePattern( const std::string& name, bool visible)
+{
+	throw strus::runtime_error(_TXT("define pattern not implemented for query"));
+}
 

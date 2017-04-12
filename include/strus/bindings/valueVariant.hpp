@@ -102,15 +102,15 @@ struct ValueVariant
 	} value;
 	int length;
 
-	bool isNumericType()
+	bool isNumericType() const
 	{
 		return (type & NumericTypeMask) != 0;
 	}
-	bool isStringType()
+	bool isStringType() const
 	{
 		return (type & StringTypeMask) != 0;
 	}
-	bool isAtomicType()
+	bool isAtomicType() const
 	{
 		return (type & AtomicTypeMask) != 0;
 	}

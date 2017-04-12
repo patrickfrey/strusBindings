@@ -117,7 +117,7 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
-	out << "#include \"strus/bindings/bindingObjects.hpp\"" << std::endl;
+	out << "#include \"strus/bindingObjects.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
 	out
 		<< std::endl
@@ -195,10 +195,6 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			<< "}" << std::endl;
 		}
 	}
-	out
-		<< std::endl
-		<< "}}//namespace" << std::endl;
-	strus::printHppFrameTail( out);
 }
 
 int main( int argc, const char* argv[])

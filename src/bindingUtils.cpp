@@ -8,71 +8,58 @@
 #include "bindingUtils.hpp"
 #include "valueVariantConv.hpp"
 #include "internationalization.hpp"
+#include "structDefs.hpp"
+#include "wcharString.hpp"
 #include "strus/bindings/serialization.hpp"
 #include <string>
 
 using namespace strus;
 using namespace strus::bindings;
 
-static const ValueVariant& getValueWithOptionalName(
-		const char* ascii_name,
+static const ValueVariant& getValue(
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
-	if (si->tag == Serialization::Open && ValueVariantConv::isequal_ascii( *si, ascii_name))
-	{
-		++si;
-		if (si == se || si->tag != Serialization::Value) throw strus::runtime_error(_TXT("value expected after open (optional name)"));
-		const ValueVariant& rt = *si++;
-		if (si == se || si->tag != Serialization::Close) throw strus::runtime_error(_TXT("close expeced after name"));
-		++si;
-		return rt;
-	}
-	else if (si->tag == Serialization::Value)
+	if (si != se && si->tag == Serialization::Value)
 	{
 		return *si++;
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("expected variant value value (optionally with name)"));
+		throw strus::runtime_error(_TXT("expected value in serialization"));
 	}
 }
 
-std::string Deserializer::getStringWithOptionalName(
-		const char* name,
+unsigned int Deserializer::getUint(
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
-	std::string rt;
-	if (si->tag == Serialization::Open && ValueVariantConv::isequal_ascii( *si, name))
-	{
-		++si;
-		if (si == se || si->tag != Serialization::Value) throw strus::runtime_error(_TXT("value expected after open (optional name)"));
-		rt = ValueVariantConv::tostring( *si++);
-		if (si == se || si->tag != Serialization::Close) throw strus::runtime_error(_TXT("close expeced after name"));
-		++si;
-	}
-	else if (si->tag == Serialization::Value)
-	{
-		rt = ValueVariantConv::tostring( *si++);
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("expected variant value value (optionally with name)"));
-	}
-	return rt;
+	return ValueVariantConv::touint( getValue( si, se));
+}
+
+unsigned int Deserializer::getInt(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	return ValueVariantConv::toint( getValue( si, se));
 }
 
 std::string Deserializer::getString( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
-	if (si == se) return std::string();
-	if (si->tag == Serialization::Value)
+	return ValueVariantConv::tostring( getValue( si, se));
+}
+
+void Deserializer::consumeClose(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	if (si != se)
 	{
-		return ValueVariantConv::tostring( *si++);
-	}
-	else
-	{
-		throw strus::runtime_error( _TXT( "expected value in string serialization"));
+		if (si->tag != Serialization::Close)
+		{
+			throw strus::runtime_error("unexpected element at end of structure (close expected)");
+		}
+		++si;
 	}
 }
 
@@ -80,30 +67,110 @@ std::vector<std::string> Deserializer::getStringList( Serialization::const_itera
 {
 	std::vector<std::string> rt;
 	if (si == se) return rt;
-	if (si->tag == Serialization::Index)
+	if (si->tag == Serialization::Open)
 	{
-		do
+		++si;
+		while (si != se && si->tag != Serialization::Close)
+		{
+			rt.push_back( getString( si, se));
+		}
+		if (si != se)
 		{
 			++si;
-			rt.push_back( getString( si, se));
-		} while (si->tag == Serialization::Index);
+		}
 	}
 	else
 	{
 		rt.push_back( getString( si, se));
 	}
-	if (si != se)
+	return rt;
+}
+
+std::vector<std::string> Deserializer::getStringList(
+		const ValueVariant& val)
+{
+	std::vector<std::string> rt;
+	if (val.type != ValueVariant::StrusSerialization)
 	{
-		if (si->tag == Serialization::Close)
+		rt.push_back( ValueVariantConv::tostring( val));
+		return rt;
+	}
+	else
+	{
+		Serialization::const_iterator
+			si = val.value.serialization->begin(),  
+			se = val.value.serialization->end();
+		return getStringList( si, se);
+	}
+}
+
+std::string Deserializer::getPrefixStringValue(
+		const ValueVariant& val,
+		unsigned char prefix)
+{
+	if (val.type == ValueVariant::String)
+	{
+		if (val.length > 1 && (unsigned char)val.value.string[0] == prefix)
 		{
-			++si;
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT( "expected close or end after string list serialization"));
+			return std::string( val.value.string+1, val.length-1);
 		}
 	}
-	return rt;
+	else if (val.type == ValueVariant::WString)
+	{
+		if (val.length > 1 && val.value.wstring[0] == prefix)
+		{
+			return convert_w16string_to_uft8string( val.value.wstring+1, val.length-1);
+		}
+	}
+	throw strus::runtime_error(_TXT("expected string with '%c' prefix"), prefix);
+}
+
+bool Deserializer::isStringWithPrefix(
+		const ValueVariant& val,
+		unsigned char prefix)
+{
+	if (val.type == ValueVariant::String)
+	{
+		if (val.length > 1 && (unsigned char)val.value.string[0] == prefix)
+		{
+			return true;
+		}
+	}
+	else if (val.type == ValueVariant::WString)
+	{
+		if (val.length > 1 && val.value.wstring[0] == prefix)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+static int getStringPrefix(
+		const ValueVariant& val,
+		const char* prefixList)
+{
+	if (val.type == ValueVariant::String)
+	{
+		if (val.length > 1)
+		{
+			const char* pi = std::strchr( prefixList, (char)val.value.string[0]);
+			if (!pi) return -1;
+			return pi - prefixList;
+		}
+	}
+	else if (val.type == ValueVariant::WString)
+	{
+		if (val.length > 1)
+		{
+			if (val.value.wstring[0] >= 127) return -1;
+			char chr = (char)val.value.wstring[0];
+			const char* pi = std::strchr( prefixList, chr);
+			if (!pi) return -1;
+			return pi - prefixList;
+		}
+	}
+	return -1;
 }
 
 static bool setFeatureOption_position( analyzer::FeatureOptions& res, const ValueVariant& val)
@@ -141,41 +208,19 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	analyzer::FeatureOptions rt;
 	for (; si != se && si->tag != Serialization::Close; ++si)
 	{
-		if (si->tag == Serialization::Open)
+		if (si->tag == Serialization::Name
+		&& ValueVariantConv::isequal_ascii( *si, "position")) ++si;
+
+		if (si->tag == Serialization::Value)
 		{
-			if (ValueVariantConv::isequal_ascii( *si, "position"))
+			if (!setFeatureOption_position( rt, getValue(si,se)))
 			{
-				++si;
-				if (si != se && si->tag == Serialization::Value
-					&& setFeatureOption_position( rt, *si))
-				{
-					++si;
-				}
-				else
-				{
-					throw strus::runtime_error(_TXT("expected position bind option"));
-				}
-			}
-			if (si != se && si->tag == Serialization::Close)
-			{
-				++si;
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("expected close tag after position bind option"));
+				throw strus::runtime_error(_TXT("expected position bind option"));
 			}
 		}
 		else
 		{
-			if (si != se && si->tag == Serialization::Value
-				&& setFeatureOption_position( rt, *si))
-			{
-				++si;
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("expected feature option (position bind value)"));
-			}
+			throw strus::runtime_error(_TXT("expected feature option"));
 		}
 	}
 	if (si != se)
@@ -204,6 +249,68 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 			se = options.value.serialization->end();
 		return getFeatureOptions( si, se);
 	}
+}
+
+static analyzer::DocumentClass getDocumentClass(
+		const ValueVariant& val)
+{
+	analyzer::DocumentClass rt;
+	if (val.type != ValueVariant::StrusSerialization)
+	{
+		rt.setMimeType( ValueVariantConv::tostring( val));
+		return rt;
+	}
+	Serialization::const_iterator
+		si = val.value.serialization->begin(),  
+		se = val.value.serialization->end();
+
+	static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
+	if (si == se) return rt;
+
+	if (si->tag == Serialization::Name)
+	{
+		do
+		{
+			switch (namemap.index( *si++))
+			{
+				case -1: throw strus::runtime_error("unknown tag name in document class structure");
+				case 0: rt.setMimeType( Deserializer::getString( si, se));
+					break;
+				case 1: rt.setEncoding( Deserializer::getString( si, se));
+					break;
+				case 2: rt.setScheme( Deserializer::getString( si, se));
+					break;
+			}
+		} while (si != se && si->tag == Serialization::Name);
+		Deserializer::consumeClose( si, se);
+	}
+	else if (si->tag == Serialization::Value)
+	{
+		if (si == se) throw strus::runtime_error("unexpected end of serialization: document class definition expected");
+
+		if (si->tag == Serialization::Value)
+		{
+			rt.setMimeType( Deserializer::getString( si, se));
+			if (si != se && si->tag != Serialization::Close)
+			{
+				rt.setEncoding( Deserializer::getString( si, se));
+				if (si != se && si->tag != Serialization::Close)
+				{
+					rt.setScheme( Deserializer::getString( si, se));
+				}
+			}
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("document class definition expected"));
+		}
+		Deserializer::consumeClose( si, se);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("document class definition expected"));
+	}
+	return rt;
 }
 
 static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
@@ -267,23 +374,9 @@ static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
 		ErrorBufferInterface* errorhnd)
 {
 	if (si == se) return Reference<NormalizerFunctionInstanceInterface>();
-
-	std::string name = Deserializer::getStringWithOptionalName( "name", si, se);
-	std::vector<std::string> args;
-	if (si != se && si->tag == Serialization::Open)
-	{
-		if (si->length == 0
-		||  ValueVariantConv::isequal_ascii( *si, "arg"))
-		{
-			++si;
-			args = Deserializer::getStringList( si, se);
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT("expected list of normalizer arguments as only sub structure of a normalizer"));
-		}
-	}
-	return getNormalizer_( name, args, textproc, errorhnd);
+	AnalyzerFunctionDef def;
+	def.deserialize( si, se);
+	return getNormalizer_( def.name, def.args, textproc, errorhnd);
 }
 
 Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
@@ -294,22 +387,9 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 {
 	if (si == se) return Reference<TokenizerFunctionInstanceInterface>();
 
-	std::string name = Deserializer::getStringWithOptionalName( "name", si, se);
-	std::vector<std::string> args;
-	if (si != se && si->tag == Serialization::Open)
-	{
-		if (si->length == 0
-		||  ValueVariantConv::isequal_ascii( *si, "arg"))
-		{
-			++si;
-			args = getStringList( si, se);
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT("expected list of tokenizer arguments as only sub structure of a normalizer"));
-		}
-	}
-	return getTokenizer_( name, args, textproc, errorhnd);
+	AnalyzerFunctionDef def;
+	def.deserialize( si, se);
+	return getTokenizer_( def.name, def.args, textproc, errorhnd);
 }
 
 Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
@@ -320,22 +400,9 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 {
 	if (si == se) return Reference<AggregatorFunctionInstanceInterface>();
 
-	std::string name = Deserializer::getStringWithOptionalName( "name", si, se);
-	std::vector<std::string> args;
-	if (si != se && si->tag == Serialization::Open)
-	{
-		if (si->length == 0
-		||  ValueVariantConv::isequal_ascii( *si, "arg"))
-		{
-			++si;
-			args = getStringList( si, se);
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT("expected list of aggregator arguments as only sub structure of a normalizer"));
-		}
-	}
-	return getAggregator_( name, args, textproc, errorhnd);
+	AnalyzerFunctionDef def;
+	def.deserialize( si, se);
+	return getAggregator_( def.name, def.args, textproc, errorhnd);
 }
 
 std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNormalizers(
@@ -345,30 +412,26 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		ErrorBufferInterface* errorhnd)
 {
 	std::vector< Reference<NormalizerFunctionInstanceInterface> > rt;
-	if (si == se) return rt;
 
-	if (si->tag == Serialization::Index)
+	while (si != se && si->tag != Serialization::Close)
 	{
-		do
+		if (si->tag == Serialization::Value)
+		{
+			rt.push_back( getNormalizer_( getString( si, se), std::vector<std::string>(), textproc, errorhnd));
+		}
+		else if (si->tag == Serialization::Open)
 		{
 			++si;
 			rt.push_back( getNormalizer_( si, se, textproc, errorhnd));
-		} while (si != se && si->tag == Serialization::Index);
-		if (si != se)
+		}
+		else
 		{
-			if (si->tag == Serialization::Close)
-			{
-				++si;
-			}
-			else
-			{
-				throw strus::runtime_error( _TXT("expected close tag after normalizer structure list"));
-			}
+			throw strus::runtime_error(_TXT("unexpected element in normalizer list structure"));
 		}
 	}
-	else
+	if (si != se)
 	{
-		rt.push_back( getNormalizer_( si, se, textproc, errorhnd));
+		++si;
 	}
 	return rt;
 }
@@ -433,257 +496,269 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 	}
 }
 
-void Deserializer::buildPatternLexems(
-		PreProcPatternExpressionBuilder& builder,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
-		ErrorBufferInterface* errorhnd)
-{
-	
-}
-
-void Deserializer::buildPatternLexems(
-		PreProcPatternExpressionBuilder& builder,
-		const ValueVariant& regexdefs,
-		ErrorBufferInterface* errorhnd)
-{
-	
-}
-
-static bool isMetadataRangeValue( const ValueVariant& val)
-{
-	if (val.type == ValueVariant::String)
-	{
-		if (val.length > 0 && val.value.string[0] == '@') return true;
-	}
-	else if (val.type == ValueVariant::WString)
-	{
-		if (val.length > 0 && val.value.wstring[0] == (unsigned char)'@') return true;
-	}
-	return false;
-}
-
-static bool isTermExpression( Serialization::const_iterator si, const Serialization::const_iterator& se)
+bool Deserializer::skipStructure( Serialization::const_iterator si, const Serialization::const_iterator& se)
 {
 	if (si == se) return false;
-	if (si->tag == Serialization::Value && !isMetadataRangeValue( *si))
-	{
-		return true;
-	}
-	if (si->tag == Serialization::Open)
-	{
-		return (ValueVariantConv::isequal_ascii( *si, "type")
-			|| ValueVariantConv::isequal_ascii( *si, "value")
-			||  ValueVariantConv::isequal_ascii( *si, "len"));
-	}
-	if (si->tag != Serialization::Index) return false;
-	++si;
-	if (si == se) return false;
-	if (si->tag == Serialization::Value && !isMetadataRangeValue( *si))
-	{
-		++si;
-		if (si == se || si->tag == Serialization::Close) return true;
-		if (si->tag != Serialization::Index) return false;
-		++si;
-		if (si->tag == Serialization::Value)
-		{
-			++si;
-			if (si == se || si->tag == Serialization::Close) return true;
-			if (si->tag != Serialization::Index) return false;
-			if (si->tag == Serialization::Value)
-			{
-				++si;
-				if (si == se || si->tag == Serialization::Close) return true;
-			}
-		}
-	}
-	return false;
-}
-
-static bool isMetadataRangeExpression( Serialization::const_iterator si, const Serialization::const_iterator& se)
-{
-	if (si == se) return false;
-	if (si->tag == Serialization::Open)
-	{
-		return (ValueVariantConv::isequal_ascii( *si, "from")
-			|| ValueVariantConv::isequal_ascii( *si, "to"));
-	}
-	if (si->tag == Serialization::Index)
-	{
-		++si;
-	}
-	if (si != se && si->tag == Serialization::Value)
-	{
-		if (si->type == ValueVariant::String)
-		{
-			if (si->length > 0 && si->value.string[0] == '@') return true;
-		}
-		else if (si->type == ValueVariant::WString)
-		{
-			if (si->length > 0 && si->value.wstring[0] == (unsigned char)'@') return true;
-		}
-	}
-	return false;
-}
-
-static void fillStructure(
-		ValueVariant* star,
-		const char** ascii_names,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
-{
-}
-
-static void buildExpression_term(
-		ExpressionBuilder& builder,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
-		ErrorBufferInterface* errorhnd)
-{
-	std::size_t argc;
-	ValueVariant argv[3];
-	if (si == se) throw strus::runtime_error(_TXT("error parsing term expression"));
 	if (si->tag == Serialization::Value)
 	{
-		argc = 1;
-		argv[0] = *si;
+		++si;
+		return true;
+	}
+	else if (si->tag == Serialization::Open)
+	{
+		int brkcnt = 1;
+		++si;
+		for (;si != se && brkcnt; ++si)
+		{
+			if (si->tag == Serialization::Open)
+			{
+				++brkcnt;
+			}
+			else if (si->tag == Serialization::Close)
+			{
+				--brkcnt;
+			}
+		}
+		return brkcnt == 0;
 	}
 	else
 	{
-		for (argc=0; si != se && si->tag == Serialization::Index && argc < 3; ++argc)
+		return false;
+	}
+}
+
+enum ExpressionType {
+	ExpressionUnknown,
+	ExpressionTerm,
+	ExpressionVariableAssignment,
+	ExpressionMetaDataRange,
+	ExpressionJoin
+};
+
+static ExpressionType getExpressionType( Serialization::const_iterator si, const Serialization::const_iterator& se)
+{
+	static const StructureNameMap keywords( "type,value,len,from,to,variable,join,range,cardinality,arg", ',');
+	static const ExpressionType keywordTypeMap[10] = {
+		ExpressionTerm, ExpressionTerm, ExpressionTerm,			/*type,value,len*/
+		ExpressionMetaDataRange,ExpressionMetaDataRange,		/*from,to*/
+		ExpressionVariableAssignment,					/*variable*/
+		ExpressionJoin,ExpressionJoin,ExpressionJoin,ExpressionJoin	/*join,range,cardinality,arg*/
+	};
+	if (si == se) return ExpressionUnknown;
+	if (si->tag == Serialization::Value)
+	{
+		if (si->isStringType())
 		{
-			if (++si == se) throw strus::runtime_error("unexpected end of expression");
-			if (si->tag == Serialization::Value)
+			int pi = getStringPrefix( *si, "=@");
+			switch (pi)
 			{
-				argv[argc] = *si;
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("error parsing term expression"));
-			}
-			++si;
-		}
-		if (si == se || si->tag == Serialization::Close)
-		{
-			if (argc == 1)
-			{
-				builder.pushTerm(
-					ValueVariantConv::tostring(argv[0]),
-					std::string());
-			}
-			else if (argc == 2)
-			{
-				builder.pushTerm(
-					ValueVariantConv::tostring(argv[0]),
-					ValueVariantConv::tostring(argv[1]));
-			}
-			else if (argc == 3)
-			{
-				builder.pushTerm(
-					ValueVariantConv::tostring(argv[0]),
-					ValueVariantConv::tostring(argv[1]),
-					ValueVariantConv::touint(argv[2]));
+				case 0: return ExpressionVariableAssignment;
+				case 1: return ExpressionMetaDataRange;
+				default: return ExpressionTerm;
 			}
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("unexpected tokens at end of term expression"));
+			return ExpressionUnknown;
 		}
+	}
+	else if (si->tag == Serialization::Open)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error("unexpected end of expression");
+
+		if (si->tag == Serialization::Name)
+		{
+			do
+			{
+				int ki = keywords.index( *si);
+				if (ki<0) return ExpressionUnknown;
+				ExpressionType rt = keywordTypeMap[ ki];
+				if (rt != ExpressionVariableAssignment) return rt;
+				++si;
+				if (!Deserializer::skipStructure( si, se)) return ExpressionUnknown;
+			} while (si != se && si->tag == Serialization::Name);
+			return ExpressionUnknown;
+		}
+		else
+		{
+			for (; si != se && si->tag == Serialization::Value; ++si)
+			{
+				int pi = getStringPrefix( *si, "=@");
+				if (pi < 0) break;
+				switch (pi)
+				{
+					case 0: ++si; break;
+					case 1: return ExpressionMetaDataRange;
+					default: break;
+				}
+			}
+			int argc = 0;
+			for (; si != se && si->tag == Serialization::Value && argc < 3; ++si,++argc)
+			{}
+			if (si == se || si->tag == Serialization::Close)
+			{
+				return ExpressionTerm;
+			}
+			else
+			{
+				return ExpressionJoin;
+			}
+		}
+	}
+	else
+	{
+		return ExpressionUnknown;
+	}
+}
+
+static void buildExpressionJoin(
+		ExpressionBuilder& builder,
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	static const StructureNameMap joinop_namemap( "variable,join,range,cardinality,arg", ',');
+	enum StructureNameId {JO_UNKNOWN=-1,JO_variable=0,JO_join=1, JO_range=2, JO_cardinality=3, JO_arg=4};
+
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of sub expression"));
+
+	if (si->tag == Serialization::Open)
+	{
+		std::string variable;
+		std::string op;
+		unsigned int argc = 0;
+		int range = 0;
+		unsigned int cardinality = 0;
+
+		if (si == se) throw strus::runtime_error("unexpected end of sub expression: term expression tree expected");
+
+		if (si->tag == Serialization::Name)
+		{
+			do
+			{
+				switch ((StructureNameId)joinop_namemap.index( *si++))
+				{
+					case JO_UNKNOWN: throw strus::runtime_error("unknown tag name in sub expression");
+					case JO_variable:
+						variable = Deserializer::getString( si, se);
+						break;
+					case JO_join:
+						op = Deserializer::getString( si, se);
+						break;
+					case JO_range:
+						range = Deserializer::getInt( si, se);
+						break;
+					case JO_cardinality:
+						cardinality = Deserializer::getUint( si, se);
+						break;
+					case JO_arg:
+						Deserializer::buildExpression( builder, si, se);
+						++argc;
+						break;
+				}
+			} while (si != se && si->tag == Serialization::Name);
+			Deserializer::consumeClose( si, se);
+		}
+		else if (si->tag == Serialization::Value)
+		{
+			if (Deserializer::isStringWithPrefix( *si, '='))
+			{
+				variable = Deserializer::getPrefixStringValue( *si++, '=');
+				if (si == se || si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected variable assignment,term, metadata range or posting sub expression"));
+				}
+			}
+			op = Deserializer::getString( si, se);
+			if (si != se && si->tag == Serialization::Value)
+			{
+				ValueVariant val = *si++;
+				if (ValueVariantConv::try_convertToNumber( val))
+				{
+					range = ValueVariantConv::toint( val);
+					if (si != se && si->tag == Serialization::Value)
+					{
+						ValueVariant val = *si++;
+						cardinality = ValueVariantConv::touint( val);
+					}
+				}
+			}
+			while (si != se && si->tag != Serialization::Close)
+			{
+				Deserializer::buildExpression( builder, si, se);
+				++argc;
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("unexpected element in sub expression"));
+		}
+		builder.pushExpression( op, argc, range, cardinality);
+		if (!variable.empty())
+		{
+			builder.attachVariable( variable);
+		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("unexpected element in sub expression"));
 	}
 }
 
 void Deserializer::buildExpression(
 		ExpressionBuilder& builder,
 		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
-		ErrorBufferInterface* errorhnd)
+		const Serialization::const_iterator& se)
 {
-	if (si == se) throw strus::runtime_error("unexpected end of expression");
-	if (si->tag == Serialization::Value)
+	ExpressionType etype = getExpressionType( si, se);
+	switch (etype)
 	{
-		builder.pushTerm( ValueVariantConv::tostring(*si++),std::string());
-		return;
-	}
-	else if (si->tag == Serialization::Index)
-	{
-		if (++si == se) throw strus::runtime_error("unexpected end of expression");
-		if (si->tag == Serialization::Value)
+		case ExpressionUnknown:
 		{
-			const ValueVariant& name = *si++;
-			if (si == se)
-			{
-				builder.pushTerm(
-					ValueVariantConv::tostring(name),
-					std::string());
-				return;
-			}
-			if (si->tag == Serialization::Close)
-			{
-				builder.pushTerm(
-					ValueVariantConv::tostring(name),
-					std::string());
-				++si;
-				return;
-			}
-			if (si->tag != Serialization::Index) throw strus::runtime_error("unexpected element in expression (index expected)");
-			if (++si == se) throw strus::runtime_error("unexpected end of expression");
-			if (si->tag == Serialization::Open)
-			{
-				
-			}
-			else if (si->tag == Serialization::Value)
-			{
-				const ValueVariant& value = *si++;
-				if (si == se)
-				{
-					builder.pushTerm( 
-						ValueVariantConv::tostring(name),
-						ValueVariantConv::tostring(value));
-					return;
-				}
-				if (si->tag == Serialization::Close)
-				{
-					builder.pushTerm( 
-						ValueVariantConv::tostring(name),
-						ValueVariantConv::tostring(value));
-					++si;
-					return;
-				}
-				if (si->tag != Serialization::Index) throw strus::runtime_error("unexpected element in expression (index expected)");
-				if (++si == se) throw strus::runtime_error("unexpected end of expression");
-				if (si->tag == Serialization::Value)
-				{
-					ValueVariant length = *si;
-					if (ValueVariantConv::try_convertToNumber( length))
-					{
-						++si;
-						builder.pushTerm( 
-							ValueVariantConv::tostring(name),
-							ValueVariantConv::tostring(value),
-							ValueVariantConv::touint(value));
-					}
-					else
-					{
-						builder.pushTerm( 
-							ValueVariantConv::tostring(name),
-							ValueVariantConv::tostring(value));
-					}
-				}
-			}
-			if (si->tag != Serialization::Index) throw strus::runtime_error("unexpected element in expression (index expected)");
+			throw strus::runtime_error(_TXT("unable to interpret expression"));
 		}
-	}
-	else if (ValueVariantConv::isequal_ascii( *si, "name"))
-	{
-		
-	}
-	return;
+		case ExpressionTerm:
+		{
+			TermDef def;
+			def.deserialize( si, se);
+			if (def.value_defined)
+			{
+				builder.pushTerm( def.type);
+			}
+			else if (def.length_defined)
+			{
+				builder.pushTerm( def.type, def.value, def.length);
+			}
+			else
+			{
+				builder.pushTerm( def.type, def.value);
+			}
+			if (!def.variable.empty())
+			{
+				builder.attachVariable( def.variable);
+			}
+		}
+		case ExpressionVariableAssignment:
+		{
+			throw strus::runtime_error(_TXT("isolated variable assignment in structure, must be at the beginning of an expression"));
+		}
+		case ExpressionMetaDataRange:
+		{
+			MetaDataRangeDef def;
+			def.deserialize( si, se);
+			builder.pushDocField( def.from, def.to);
+		}
+		case ExpressionJoin:
+		{
+			buildExpressionJoin( builder, si, se);
+		}
+	};
 }
 
 void Deserializer::buildExpression(
 		ExpressionBuilder& builder,
-		const ValueVariant& expression,
-		ErrorBufferInterface* errorhnd)
+		const ValueVariant& expression)
 {
 	if (expression.type != ValueVariant::StrusSerialization)
 	{
@@ -694,23 +769,74 @@ void Deserializer::buildExpression(
 		Serialization::const_iterator
 			si = expression.value.serialization->begin(),  
 			se = expression.value.serialization->end();
-		return buildExpression( builder, si, se, errorhnd);
+		return buildExpression( builder, si, se);
 	}
 }
 
-void Deserializer::buildFeatures(
+void Deserializer::buildPatterns(
 		ExpressionBuilder& builder,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
-		ErrorBufferInterface* errorhnd)
+		const ValueVariant& patterns)
 {
-	
+	static const StructureNameMap namemap( "name,pattern,visible", ',');
+	if (patterns.type != ValueVariant::StrusSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for patterns"));
+	}
+	Serialization::const_iterator
+		si = patterns.value.serialization->begin(),  
+		se = patterns.value.serialization->end();
+
+	if (si->tag == Serialization::Open)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error("unexpected end of pattern");
+		std::string name;
+		bool visible = true;
+		if (si->tag == Serialization::Name)
+		{
+			do
+			{
+				int ki = namemap.index( *si++);
+				if (ki<0) throw strus::runtime_error(_TXT("unknown element in pattern definition"));
+				switch (ki)
+				{
+					case 0:
+						name = ValueVariantConv::tostring( getValue( si, se));
+						break;
+					case 1:
+						buildExpression( builder, si, se);
+						break;
+					case 2:
+						visible = ValueVariantConv::tobool( getValue( si, se));
+						break;
+				}
+			} while (si != se && si->tag == Serialization::Name);
+		}
+		else if (si->tag == Serialization::Value)
+		{
+			if (Deserializer::isStringWithPrefix( *si, '.'))
+			{
+				name = Deserializer::getPrefixStringValue( *si, '.');
+				visible = false;
+			}
+			else
+			{
+				name = getString( si, se);
+				visible = true;
+			}
+			buildExpression( builder, si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("error in pattern definition structure"));
+		}
+		Deserializer::consumeClose( si, se);
+		builder.definePattern( name, visible);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("pattern definition expected to be a structure"));
+	}
 }
 
-void Deserializer::buildFeatures(
-		ExpressionBuilder& builder,
-		const ValueVariant& expressions,
-		ErrorBufferInterface* errorhnd)
-{
-}
 
