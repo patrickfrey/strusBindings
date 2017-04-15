@@ -11,6 +11,7 @@
 #include "strus/storageTransactionInterface.hpp"
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageClientInterface.hpp"
+#include "internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;

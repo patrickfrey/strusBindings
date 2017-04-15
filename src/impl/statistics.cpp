@@ -11,6 +11,7 @@
 #include "strus/statisticsProcessorInterface.hpp"
 #include "strus/statisticsIteratorInterface.hpp"
 #include "strus/statisticsViewerInterface.hpp"
+#include "internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;

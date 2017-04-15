@@ -9,6 +9,7 @@
 #include "impl/statistics.hpp"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/queryInterface.hpp"
+#include "internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;

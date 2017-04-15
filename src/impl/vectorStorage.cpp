@@ -12,6 +12,7 @@
 #include "strus/vectorStorageDumpInterface.hpp"
 #include "strus/vectorStorageTransactionInterface.hpp"
 #include "strus/vectorStorageInterface.hpp"
+#include "internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;

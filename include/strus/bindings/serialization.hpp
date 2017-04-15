@@ -81,6 +81,20 @@ public:
 	std::size_t size() const			{return m_ar.size();}
 	const Node& operator[]( std::size_t i) const	{return m_ar[i];}
 
+	static bool isLabeled( const_iterator si, const const_iterator& se)
+	{
+		for (; si != se; ++si)
+		{
+			if (si->tag == Name) return true;
+			if (si->tag == Value) return false;
+		}
+		return false;
+	}
+	bool isLabeled() const
+	{
+		return isLabeled( m_ar.begin(), m_ar.end());
+	}
+
 private:
 	std::vector<Node> m_ar;
 };

@@ -42,7 +42,7 @@ PatternMatcherPostProc bindings::loadPatternMatcherPostProc(
 	return rt;
 }
 
-PatternMatcherPostProc bindings::loadPatterMatcherPostProcFromFile(
+PatternMatcherPostProc bindings::loadPatternMatcherPostProcFromFile(
 	const TextProcessorInterface* textproc,
 	const std::string& patternMatcherModule,
 	const std::string& filename,

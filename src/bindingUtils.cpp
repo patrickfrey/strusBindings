@@ -251,7 +251,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	}
 }
 
-static analyzer::DocumentClass getDocumentClass(
+analyzer::DocumentClass Deserializer::getDocumentClass(
 		const ValueVariant& val)
 {
 	analyzer::DocumentClass rt;

@@ -103,7 +103,7 @@ void PostProcPatternExpressionBuilder::pushDocField( const std::string& metadata
 	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in pattern expressions"), metadataRangeStart.c_str(), metadataRangeEnd.c_str());
 }
 
-void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, int argc, int range, unsigned int cardinality)
+void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
 	strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( op);
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
@@ -174,7 +174,7 @@ void PreProcPatternExpressionBuilder::pushDocField( const std::string& metadataR
 	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in pattern expressions"), metadataRangeStart.c_str(), metadataRangeEnd.c_str());
 }
 
-void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, int argc, int range, unsigned int cardinality)
+void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
 	strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( op);
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
@@ -222,7 +222,7 @@ void QueryExpressionBuilder::pushDocField( const std::string& metadataRangeStart
 	m_query->pushDocField( metadataRangeStart, metadataRangeEnd);
 }
 
-void QueryExpressionBuilder::pushExpression( const std::string& opname, int argc, int range, unsigned int cardinality)
+void QueryExpressionBuilder::pushExpression( const std::string& opname, unsigned int argc, int range, unsigned int cardinality)
 {
 	const PostingJoinOperatorInterface* op = m_queryproc->getPostingJoinOperator( opname);
 	if (!op) throw strus::runtime_error(_TXT("error getting posting join operator '%s': %s"), opname.c_str(), m_errorhnd->fetchError());
@@ -236,6 +236,85 @@ void QueryExpressionBuilder::attachVariable( const std::string& name)
 }
 
 void QueryExpressionBuilder::definePattern( const std::string& name, bool visible)
+{
+	throw strus::runtime_error(_TXT("define pattern not implemented for query"));
+}
+
+void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value, int length)
+{
+	throw strus::runtime_error(_TXT("length parameter not allowed for query fields passed to analyzer"));
+}
+
+void QueryAnalyzerExpressionBuilder::pushField( const std::string& fieldtype, const std::string& value)
+{
+	typedef QueryAnalyzerStruct::GroupOperatorList GroupOperatorList;
+
+	unsigned int fieldno = m_fields.size();
+	m_fields.push_back( Field());
+	m_analyzer->putField( fieldno, fieldtype, value);
+	m_fieldno_stack.push_back( fieldno);
+	std::vector<unsigned int> fieldnoList( m_fieldno_stack.end()-1, m_fieldno_stack.end());
+
+	m_last_groupid = -1;
+	const GroupOperatorList& gop = m_analyzerStruct->autoGroupOperators( fieldtype);
+	GroupOperatorList::const_iterator gi = gop.begin(), ge = gop.end();
+	for (; gi != ge; ++gi)
+	{
+		m_last_groupid = m_operators.size();
+		m_operators.push_back( gi->opr);
+		m_analyzer->groupElements( m_last_groupid, fieldnoList, gi->groupBy, gi->groupSingle);
+	}
+}
+
+void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
+{
+	pushField( type, value);
+}
+
+void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& value)
+{
+	pushField( std::string(), value);
+}
+
+void QueryAnalyzerExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
+{
+	throw strus::runtime_error(_TXT("document meta data ranges not implemented for query"));
+}
+
+void QueryAnalyzerExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
+{
+	if (m_fieldno_stack.size() < argc) throw strus::runtime_error(_TXT("push expression without all arguments defined"));
+	unsigned int* fnstart = m_fieldno_stack.data() + m_fieldno_stack.size() - argc;
+	unsigned int* fnend = fnstart + argc;
+	std::vector<unsigned int> fieldnoList( fnstart, fnend);
+	m_last_groupid = m_operators.size();
+	m_operators.push_back( QueryAnalyzerStruct::Operator( op, argc, range, cardinality, false/*variable*/));
+	QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupAll;
+	m_analyzer->groupElements( m_last_groupid, fieldnoList, groupBy, true/*groupSingle*/);
+	m_fieldno_stack.resize( m_fieldno_stack.size() - argc + 1);
+}
+
+void QueryAnalyzerExpressionBuilder::attachVariable( const std::string& name)
+{
+	if (m_last_groupid < 0)
+	{
+		if (m_fields.empty()) throw strus::runtime_error(_TXT("attach variable not allowed without query fields defined"));
+		if (!m_fields.back().variable.empty()) throw strus::runtime_error(_TXT("attach variable only allowed once per field or expression node"));
+		m_fields.back().variable = name;
+	}
+	else
+	{
+		if (m_fieldno_stack.empty()) throw strus::runtime_error(_TXT("attach variable not allowed without any expression or field on the stack"));
+		std::vector<unsigned int> fieldnoList;
+		fieldnoList.push_back( m_fieldno_stack.back());
+		m_last_groupid = m_operators.size();
+		m_operators.push_back( QueryAnalyzerStruct::Operator( name, 1, 0/*range*/, 0/*cardinality*/, true/*variable*/));
+		QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupEvery;
+		m_analyzer->groupElements( m_last_groupid, fieldnoList, groupBy, true/*groupSingle*/);
+	}
+}
+
+void QueryAnalyzerExpressionBuilder::definePattern( const std::string& name, bool visible)
 {
 	throw strus::runtime_error(_TXT("define pattern not implemented for query"));
 }

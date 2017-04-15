@@ -49,7 +49,7 @@ PatternMatcherPostProc loadPatternMatcherPostProc(
 	const ValueVariant& patterns,
 	ErrorBufferInterface* errorhnd);
 
-PatternMatcherPostProc loadPatterMatcherPostProcFromFile(
+PatternMatcherPostProc loadPatternMatcherPostProcFromFile(
 	const TextProcessorInterface* textproc,
 	const std::string& patternMatcherModule,
 	const std::string& filename,

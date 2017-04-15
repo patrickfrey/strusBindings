@@ -14,10 +14,14 @@
 #include "strus/patternTermFeederInstanceInterface.hpp"
 #include "strus/patternLexerInstanceInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
+#include "strus/queryAnalyzerInterface.hpp"
+#include "strus/queryAnalyzerContextInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/base/symbolTable.hpp"
+#include "queryAnalyzerStruct.hpp"
 #include <string>
+#include <vector>
 
 namespace strus {
 namespace bindings {
@@ -30,7 +34,7 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value)=0;
 	virtual void pushTerm( const std::string& type)=0;
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)=0;
-	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality)=0;
+	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)=0;
 	virtual void attachVariable( const std::string& name)=0;
 	virtual void definePattern( const std::string& name, bool visible)=0;
 };
@@ -47,7 +51,7 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
-	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality);
+	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, bool visible);
 
@@ -77,7 +81,7 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
-	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality);
+	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, bool visible);
 
@@ -111,7 +115,7 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
-	virtual void pushExpression( const std::string& op, int argc, int range, unsigned int cardinality);
+	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, bool visible);
 
@@ -123,6 +127,50 @@ private:
 	ErrorBufferInterface* m_errorhnd;
 	const QueryProcessorInterface* m_queryproc;
 	QueryInterface* m_query;
+};
+
+class QueryAnalyzerExpressionBuilder
+	:public ExpressionBuilder
+{
+public:
+	QueryAnalyzerExpressionBuilder( const QueryAnalyzerStruct* analyzerStruct_, QueryAnalyzerContextInterface* analyzer_, ErrorBufferInterface* errorhnd_)
+		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_),m_operators(),m_fields(),m_last_groupid(-1),m_fieldno_stack(){}
+	virtual ~QueryAnalyzerExpressionBuilder(){}
+
+	virtual void pushTerm( const std::string& fieldtype, const std::string& value, int length);
+	virtual void pushTerm( const std::string& fieldtype, const std::string& value);
+	virtual void pushTerm( const std::string& value);
+	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
+	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, bool visible);
+
+private:
+	QueryAnalyzerExpressionBuilder( const QueryAnalyzerExpressionBuilder&){}	//< non copyable
+	void operator=( const QueryAnalyzerExpressionBuilder&){}			//< non copyable
+
+private:
+	void pushField( const std::string& fieldtype, const std::string& value);
+
+	struct Field
+	{
+		std::string variable;
+
+		Field()
+			:variable(){}
+		Field( const std::string& variable_)
+			:variable(variable_){}
+		Field( const Field& o)
+			:variable(o.variable){}
+	};
+
+	ErrorBufferInterface* m_errorhnd;
+	const QueryAnalyzerStruct* m_analyzerStruct;
+	QueryAnalyzerContextInterface* m_analyzer;
+	std::vector<QueryAnalyzerStruct::Operator> m_operators;
+	std::vector<Field> m_fields;
+	int m_last_groupid;
+	std::vector<unsigned int> m_fieldno_stack;
 };
 
 }}//namespace
