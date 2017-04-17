@@ -202,7 +202,7 @@ void PreProcPatternExpressionBuilder::definePattern( const std::string& name, bo
 	m_matcher->definePattern( name, visible);
 }
 
-void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value, int length)
+void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
 	m_query->pushTerm( type, value, length);
 }
@@ -240,7 +240,7 @@ void QueryExpressionBuilder::definePattern( const std::string& name, bool visibl
 	throw strus::runtime_error(_TXT("define pattern not implemented for query"));
 }
 
-void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value, int length)
+void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
 	throw strus::runtime_error(_TXT("length parameter not allowed for query fields passed to analyzer"));
 }
@@ -249,20 +249,18 @@ void QueryAnalyzerExpressionBuilder::pushField( const std::string& fieldtype, co
 {
 	typedef QueryAnalyzerStruct::GroupOperatorList GroupOperatorList;
 
-	unsigned int fieldno = m_fields.size();
-	m_fields.push_back( Field());
-	m_analyzer->putField( fieldno, fieldtype, value);
-	m_fieldno_stack.push_back( fieldno);
+	++m_fieldno_cnt;
+	m_analyzer->putField( m_fieldno_cnt, fieldtype, value);
+	m_fieldno_stack.push_back( m_fieldno_cnt);
 	std::vector<unsigned int> fieldnoList( m_fieldno_stack.end()-1, m_fieldno_stack.end());
 
-	m_last_groupid = -1;
 	const GroupOperatorList& gop = m_analyzerStruct->autoGroupOperators( fieldtype);
 	GroupOperatorList::const_iterator gi = gop.begin(), ge = gop.end();
 	for (; gi != ge; ++gi)
 	{
-		m_last_groupid = m_operators.size();
+		unsigned int groupid = m_operators.size();
 		m_operators.push_back( gi->opr);
-		m_analyzer->groupElements( m_last_groupid, fieldnoList, gi->groupBy, gi->groupSingle);
+		m_analyzer->groupElements( groupid, fieldnoList, gi->groupBy, gi->groupSingle);
 	}
 }
 
@@ -287,31 +285,27 @@ void QueryAnalyzerExpressionBuilder::pushExpression( const std::string& op, unsi
 	unsigned int* fnstart = m_fieldno_stack.data() + m_fieldno_stack.size() - argc;
 	unsigned int* fnend = fnstart + argc;
 	std::vector<unsigned int> fieldnoList( fnstart, fnend);
-	m_last_groupid = m_operators.size();
-	m_operators.push_back( QueryAnalyzerStruct::Operator( op, argc, range, cardinality, false/*variable*/));
+
+	unsigned int groupid = m_operators.size();
+	m_operators.push_back( QueryAnalyzerStruct::Operator(
+			QueryAnalyzerStruct::Operator::Expression,
+			op, argc, range, cardinality));
 	QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupAll;
-	m_analyzer->groupElements( m_last_groupid, fieldnoList, groupBy, true/*groupSingle*/);
+	m_analyzer->groupElements( groupid, fieldnoList, groupBy, true/*groupSingle*/);
 	m_fieldno_stack.resize( m_fieldno_stack.size() - argc + 1);
 }
 
 void QueryAnalyzerExpressionBuilder::attachVariable( const std::string& name)
 {
-	if (m_last_groupid < 0)
-	{
-		if (m_fields.empty()) throw strus::runtime_error(_TXT("attach variable not allowed without query fields defined"));
-		if (!m_fields.back().variable.empty()) throw strus::runtime_error(_TXT("attach variable only allowed once per field or expression node"));
-		m_fields.back().variable = name;
-	}
-	else
-	{
-		if (m_fieldno_stack.empty()) throw strus::runtime_error(_TXT("attach variable not allowed without any expression or field on the stack"));
-		std::vector<unsigned int> fieldnoList;
-		fieldnoList.push_back( m_fieldno_stack.back());
-		m_last_groupid = m_operators.size();
-		m_operators.push_back( QueryAnalyzerStruct::Operator( name, 1, 0/*range*/, 0/*cardinality*/, true/*variable*/));
-		QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupEvery;
-		m_analyzer->groupElements( m_last_groupid, fieldnoList, groupBy, true/*groupSingle*/);
-	}
+	if (m_fieldno_stack.empty()) throw strus::runtime_error(_TXT("attach variable not allowed without query fields defined"));
+	std::vector<unsigned int> fieldnoList( m_fieldno_stack.end()-1, m_fieldno_stack.end());
+
+	unsigned int groupid = m_operators.size();
+	m_operators.push_back( QueryAnalyzerStruct::Operator( 
+			QueryAnalyzerStruct::Operator::Variable,
+			name, 1, 0/*range*/, 0/*cardinality*/));
+	QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupEvery;
+	m_analyzer->groupElements( groupid, fieldnoList, groupBy, true/*groupSingle*/);
 }
 
 void QueryAnalyzerExpressionBuilder::definePattern( const std::string& name, bool visible)

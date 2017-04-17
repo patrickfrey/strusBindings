@@ -111,7 +111,7 @@ public:
 	QueryExpressionBuilder( QueryInterface* query_, const QueryProcessorInterface* queryproc_, ErrorBufferInterface* errorhnd_)
 		:m_errorhnd(errorhnd_),m_queryproc(queryproc_),m_query(query_){}
 	virtual ~QueryExpressionBuilder(){}
-	virtual void pushTerm( const std::string& type, const std::string& value, int length);
+	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
@@ -134,16 +134,21 @@ class QueryAnalyzerExpressionBuilder
 {
 public:
 	QueryAnalyzerExpressionBuilder( const QueryAnalyzerStruct* analyzerStruct_, QueryAnalyzerContextInterface* analyzer_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_),m_operators(),m_fields(),m_last_groupid(-1),m_fieldno_stack(){}
+		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_),m_operators(),m_fieldno_stack(),m_fieldno_cnt(0){}
 	virtual ~QueryAnalyzerExpressionBuilder(){}
 
-	virtual void pushTerm( const std::string& fieldtype, const std::string& value, int length);
+	virtual void pushTerm( const std::string& fieldtype, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& fieldtype, const std::string& value);
 	virtual void pushTerm( const std::string& value);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, bool visible);
+	
+	const std::vector<QueryAnalyzerStruct::Operator>& operators() const
+	{
+		return m_operators;
+	}
 
 private:
 	QueryAnalyzerExpressionBuilder( const QueryAnalyzerExpressionBuilder&){}	//< non copyable
@@ -152,25 +157,12 @@ private:
 private:
 	void pushField( const std::string& fieldtype, const std::string& value);
 
-	struct Field
-	{
-		std::string variable;
-
-		Field()
-			:variable(){}
-		Field( const std::string& variable_)
-			:variable(variable_){}
-		Field( const Field& o)
-			:variable(o.variable){}
-	};
-
 	ErrorBufferInterface* m_errorhnd;
 	const QueryAnalyzerStruct* m_analyzerStruct;
 	QueryAnalyzerContextInterface* m_analyzer;
 	std::vector<QueryAnalyzerStruct::Operator> m_operators;
-	std::vector<Field> m_fields;
-	int m_last_groupid;
 	std::vector<unsigned int> m_fieldno_stack;
+	unsigned int m_fieldno_cnt;
 };
 
 }}//namespace

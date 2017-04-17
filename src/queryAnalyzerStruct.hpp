@@ -7,6 +7,7 @@
  */
 #ifndef _STRUS_BINDING_QUERY_ANALYZER_STRUCT_HPP_INCLUDED
 #define _STRUS_BINDING_QUERY_ANALYZER_STRUCT_HPP_INCLUDED
+#include "strus/queryAnalyzerContextInterface.hpp"
 #include <vector>
 #include <string>
 #include <map>
@@ -25,16 +26,18 @@ public:
 
 	struct Operator
 	{
-		std::string opname;
+		enum Type {Variable,Expression};
+		Type type;
+
+		std::string name;
 		unsigned int argc;
 		int range;
 		unsigned int cardinality;
-		bool variable;
 
-		Operator( const std::string& opname_, unsigned int argc_, int range_, unsigned int cardinality_, bool variable_)
-			:opname(opname_),argc(argc_),range(range_),cardinality(cardinality_),variable(variable_){}
+		Operator( Type type_, const std::string& name_, unsigned int argc_, int range_, unsigned int cardinality_)
+			:type(type_),name(name_),argc(argc_),range(range_),cardinality(cardinality_){}
 		Operator( const Operator& o)
-			:opname(o.opname),argc(o.argc),range(o.range),cardinality(o.cardinality),variable(o.variable){}
+			:type(o.type),name(o.name),argc(o.argc),range(o.range),cardinality(o.cardinality){}
 	};
 	struct GroupOperator
 	{
@@ -49,10 +52,10 @@ public:
 	};
 	typedef std::vector<GroupOperator> GroupOperatorList;
 
-	void autoGroupBy( const std::string& fieldtype_, const std::string& opname, int range, unsigned int cardinality, QueryAnalyzerContextInterface::GroupBy groupBy, bool groupSingle)
+	void autoGroupBy( const std::string& fieldtype_, const std::string& name, int range, unsigned int cardinality, QueryAnalyzerContextInterface::GroupBy groupBy, bool groupSingle)
 	{
 		std::string fieldtype = utils::tolower( fieldtype_);
-		GroupOperator gop( Operator( opname, 0, range, cardinality, false/*variable*/), groupBy, groupSingle);
+		GroupOperator gop( Operator( Operator::Variable, name, 0, range, cardinality), groupBy, groupSingle);
 		GroupMap::iterator gi = m_groupmap.find( fieldtype);
 		if (gi == m_groupmap.end())
 		{

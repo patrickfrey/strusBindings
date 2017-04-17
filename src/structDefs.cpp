@@ -9,16 +9,30 @@
 #include "wcharString.hpp"
 #include "valueVariantConv.hpp"
 #include "internationalization.hpp"
-#include "bindingUtils.hpp"
+#include "deserializer.hpp"
 #include "strus/bindings/serialization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
 
+static const ValueVariant& getValue(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	if (si != se && si->tag == Serialization::Value)
+	{
+		return *si++;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected value in serialization"));
+	}
+}
+
 void AnalyzerFunctionDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "name,arg", ',');
-	if (si == se) throw strus::runtime_error("unexpected end of serialization: analyzer function structure expected");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: analyzer function structure expected"));
 
 	bool name_defined = false;
 	if (si->tag == Serialization::Name)
@@ -32,7 +46,7 @@ void AnalyzerFunctionDef::deserialize( Serialization::const_iterator& si, const 
 					break;
 				case 1: args = Deserializer::getStringList( si, se);
 					break;
-				default: throw strus::runtime_error("unknown tag name in analyzer function structure");
+				default: throw strus::runtime_error(_TXT("unknown tag name in analyzer function structure"));
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -49,7 +63,7 @@ void AnalyzerFunctionDef::deserialize( Serialization::const_iterator& si, const 
 	}
 	else
 	{
-		throw strus::runtime_error("analyzer function definition structure expected");
+		throw strus::runtime_error(_TXT("analyzer function definition structure expected"));
 	}
 	if (!name_defined)
 	{
@@ -60,7 +74,7 @@ void AnalyzerFunctionDef::deserialize( Serialization::const_iterator& si, const 
 void TermDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "type,value,variable,len", ',');
-	if (si == se) throw strus::runtime_error("unexpected end of serialization: term structure expected");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
 
 	bool type_defined = false;
 	if (si->tag == Serialization::Name)
@@ -69,7 +83,6 @@ void TermDef::deserialize( Serialization::const_iterator& si, const Serializatio
 		{
 			switch (namemap.index( *si++))
 			{
-				case -1: throw strus::runtime_error("unknown tag name in term structure");
 				case 0: type_defined = true;
 					type = Deserializer::getString( si, se);
 					break;
@@ -81,6 +94,7 @@ void TermDef::deserialize( Serialization::const_iterator& si, const Serializatio
 				case 3: length_defined = true;
 					length = Deserializer::getUint( si, se);
 					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in term structure"));
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -91,7 +105,7 @@ void TermDef::deserialize( Serialization::const_iterator& si, const Serializatio
 		{
 			variable = Deserializer::getPrefixStringValue( *si++, '=');
 		}
-		if (si == se) throw strus::runtime_error("unexpected end of serialization: term structure expected");
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
 
 		if (si->tag == Serialization::Value)
 		{
@@ -131,7 +145,7 @@ void TermDef::deserialize( Serialization::const_iterator& si, const Serializatio
 void MetaDataRangeDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "from,to", ',');
-	if (si == se) throw strus::runtime_error("unexpected end of serialization: term structure expected");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
 
 	if (si->tag == Serialization::Name)
 	{
@@ -139,11 +153,11 @@ void MetaDataRangeDef::deserialize( Serialization::const_iterator& si, const Ser
 		{
 			switch (namemap.index( *si++))
 			{
-				case -1: throw strus::runtime_error("unknown tag name in term structure");
 				case 0: from = Deserializer::getString( si, se);
 					break;
 				case 1:	to = Deserializer::getString( si, se);
 					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in term structure"));
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -159,6 +173,130 @@ void MetaDataRangeDef::deserialize( Serialization::const_iterator& si, const Ser
 	}
 }
 
+void QueryEvalFunctionParameterDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	static const StructureNameMap namemap( "name,value,feature", ',');
+	if (si->tag == Serialization::Open)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of configuration definition"));
+		if (si->tag == Serialization::Value)
+		{
+			type = Undefined;
+			name = Deserializer::getString( si, se);
+			value = getValue( si, se);
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			unsigned char name_defined = 0;
+			while (si->tag == Serialization::Name)
+			{
+				switch (namemap.index( *si++))
+				{
+					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "name");
+						name = Deserializer::getString( si, se);
+						break;
+					case 1: if (type != Undefined) throw strus::runtime_error(_TXT("contradicting definitions in query evaluation function parameter: only one allowed of 'value', 'result', or 'feature'"));
+						type = Value; value = getValue( si, se);
+						break;
+					case 2:	if (type != Undefined) throw strus::runtime_error(_TXT("contradicting definitions in query evaluation function parameter: only one allowed of 'value', 'result', or 'feature'"));
+						type = Feature; value = getValue( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in query evaluation function config"));
+				}
+			}
+			Deserializer::consumeClose( si, se);
+			if (!name_defined || type == Undefined)
+			{
+				throw strus::runtime_error(_TXT("incomplete query evaluation function definition"));
+			}
+		}
+	}
+	else if (si->tag == Serialization::Name)
+	{
+		name = Deserializer::getString( si, se);
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of query evaluation function parameter definition"));
 
+		std::pair<ValueVariant,ValueVariant> paramdecl = Deserializer::getValueWithOptionalName( si, se);
+		if (paramdecl.first.defined())
+		{
+			if (ValueVariantConv::isequal_ascii( paramdecl.first, "feature"))
+			{
+				value = paramdecl.second;
+				type = Feature;
+			}
+			else if (ValueVariantConv::isequal_ascii( paramdecl.first, "value"))
+			{
+				value = paramdecl.second;
+				type = Value;
+			}
+			else
+			{
+				std::string typname = ValueVariantConv::tostring( paramdecl.first);
+				throw strus::runtime_error(_TXT("unexpected parameter type name '%s', expected 'feature' or 'value'"), typname.c_str());
+			}
+		}
+		else
+		{
+			type = Undefined;
+			value = paramdecl.second;
+		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("argument name expected as as start of a query evaluation function parameter"));
+	}
+}
+
+
+void ConfigDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	static const StructureNameMap namemap( "name,value", ',');
+	if (si->tag == Serialization::Open)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of configuration definition"));
+		if (si->tag == Serialization::Value)
+		{
+			name = Deserializer::getString( si, se);
+			value = getValue( si, se);
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			unsigned char defined[2] = {0,0};
+			while (si->tag == Serialization::Name)
+			{
+				switch (namemap.index( *si++))
+				{
+					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "name");
+						name = Deserializer::getString( si, se);
+						break;
+					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "value");
+						value = getValue( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in configuration, 'name' or 'value' expected"));
+				}
+			}
+			Deserializer::consumeClose( si, se);
+			if (!defined[0] || !defined[1])
+			{
+				throw strus::runtime_error(_TXT("incomplete configuration definition"));
+			}
+		}
+	}
+	else if (si->tag == Serialization::Name)
+	{
+		name = Deserializer::getString( si, se);
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of configuration definition"));
+
+		value = *si++;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("argument name expected as as start of a configuration parameter"));
+	}
+}
 
 

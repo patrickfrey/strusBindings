@@ -16,6 +16,12 @@
 #include "strus/tokenizerFunctionInstanceInterface.hpp"
 #include "strus/aggregatorFunctionInterface.hpp"
 #include "strus/aggregatorFunctionInstanceInterface.hpp"
+#include "strus/summarizerFunctionInterface.hpp"
+#include "strus/summarizerFunctionInstanceInterface.hpp"
+#include "strus/weightingFunctionInterface.hpp"
+#include "strus/weightingFunctionInstanceInterface.hpp"
+#include "strus/scalarFunctionInterface.hpp"
+#include "strus/scalarFunctionParserInterface.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/patternMatcherInstanceInterface.hpp"
@@ -23,6 +29,7 @@
 #include "strus/reference.hpp"
 #include "expressionBuilder.hpp"
 #include <string>
+#include <utility>
 
 namespace strus {
 namespace bindings {
@@ -44,6 +51,10 @@ struct Deserializer
 	static std::string getPrefixStringValue(
 			const ValueVariant& val,
 			unsigned char prefix);
+
+	static std::pair<ValueVariant,ValueVariant> getValueWithOptionalName(
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static bool skipStructure(
 			Serialization::const_iterator si,
@@ -78,6 +89,9 @@ struct Deserializer
 	static analyzer::FeatureOptions getFeatureOptions(
 			const ValueVariant& options);
 
+	static TermStatistics getTermStatistics(
+			const ValueVariant& stats);
+
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se,
@@ -109,6 +123,28 @@ struct Deserializer
 	static Reference<AggregatorFunctionInstanceInterface> getAggregator(
 			const ValueVariant& aggregator,
 			const TextProcessorInterface* textproc,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildSummarizerFunction(
+			QueryEvalInterface* queryeval,
+			const std::string& functionName,
+			const ValueVariant& parameter,
+			const ValueVariant& resultnames,
+			const QueryProcessorInterface* queryproc,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildWeightingFunction(
+			QueryEvalInterface* queryeval,
+			const std::string& functionName,
+			const ValueVariant& parameter,
+			const QueryProcessorInterface* queryproc,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildWeightingFormula(
+			QueryEvalInterface* queryeval,
+			const std::string& source,
+			const ValueVariant& parameter,
+			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildExpression(

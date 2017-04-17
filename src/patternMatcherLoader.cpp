@@ -8,7 +8,7 @@
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
 #include "expressionBuilder.hpp"
-#include "bindingUtils.hpp"
+#include "deserializer.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/lib/pattern_serialize.hpp"
 

@@ -192,6 +192,46 @@ static void checkError( NumParseError err, const char* type)
 	throw strus::runtime_error( _TXT( "failed to convert string to %s: %s"), type, "undefined error code");
 }
 
+NumericVariant ValueVariantConv::tonumeric( const ValueVariant& val)
+{
+	switch (val.type)
+	{
+		case ValueVariant::Void:
+			return NumericVariant();
+		case ValueVariant::Double:
+			return NumericVariant( val.value.Double);
+		case ValueVariant::UInt:
+			return NumericVariant( (unsigned int)val.value.UInt);
+		case ValueVariant::Int:
+			return NumericVariant( (int)val.value.Int);
+		case ValueVariant::WString:
+		case ValueVariant::String:
+		{
+			ValueVariant valcopy = val;
+			if (try_convertToNumber( valcopy))
+			{
+				return tonumeric( valcopy);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("failed to convert value to numeric type"));
+			}
+		}
+		case ValueVariant::StrusObject:
+			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "numeric");
+		case ValueVariant::StrusSerialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+			{
+				return tonumeric( (*val.value.serialization)[0]);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "serialization", "numeric");
+			}
+	}
+	throw strus::runtime_error(_TXT("cannot convert value variant to %s: %s"), "numeric", _TXT("unknown type"));
+}
+
 double ValueVariantConv::todouble( const ValueVariant& val)
 {
 	switch (val.type)
@@ -214,7 +254,7 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
+			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion to double"));
 			NumParseError err;
 			double rt = doubleFromString( buf, bufsize, err);
 			checkError( err, "double");
@@ -269,7 +309,7 @@ static TYPE variant_touint( const ValueVariant& val)
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
+			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion to uint"));
 			NumParseError err;
 			TYPE rt = uintFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
@@ -331,7 +371,7 @@ static TYPE variant_toint( const ValueVariant& val)
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion too double"));
+			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion to int"));
 			NumParseError err;
 			TYPE rt = intFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");

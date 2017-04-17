@@ -12,7 +12,8 @@ set( bindingsimpl_source_files
 	patternMatcherLoader.cpp
 	structNameMap.cpp
 	structDefs.cpp
-	bindingUtils.cpp
+	serializer.cpp
+	deserializer.cpp
 	testcheck.cpp
 	wcharString.cpp
 	utils.cpp

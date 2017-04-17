@@ -23,12 +23,12 @@ class CallResult
 {
 public:
 	CallResult()
-		:value(),object(),serialization()
+		:value(),object(),serialization(),stringbuf(),classid(-1)
 	{
 		m_errorbuf[0] = 0;
 	}
 	CallResult( const CallResult& o)
-		:value(o.value),object(o.object),serialization(o.serialization)
+		:value(o.value),object(o.object),serialization(o.serialization),stringbuf(o.stringbuf),classid(o.classid)
 	{
 		if (o.m_errorbuf[0])
 		{
@@ -40,6 +40,22 @@ public:
 			m_errorbuf[0] = 0;
 		}
 	}
+
+	CallResult( int val)
+		:value((ValueVariant::IntType)val),object(),serialization(),stringbuf(),classid(-1)
+		{m_errorbuf[0] = 0;}
+
+	CallResult( unsigned int val)
+		:value((ValueVariant::UIntType)val),object(),serialization(),stringbuf(),classid(-1)
+		{m_errorbuf[0] = 0;}
+
+	CallResult( double val)
+		:value(val),object(),serialization(),stringbuf(),classid(-1)
+		{m_errorbuf[0] = 0;}
+
+	CallResult( const std::string& val)
+		:value(),object(),serialization(),stringbuf(val),classid(-1)
+		{m_errorbuf[0] = 0; value.init( stringbuf);}
 
 	void reportError( const char* fmt, ...)
 	{
@@ -53,6 +69,8 @@ public:
 	ValueVariant value;
 	HostObjectReference object;
 	Serialization serialization;
+	std::string stringbuf;
+	int classid;
 
 public:
 	enum {MaxErrorMessageSize=1024};

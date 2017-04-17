@@ -9,12 +9,14 @@
 #include "strus/documentAnalyzerInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
-#include "strus/bindings/serializer.hpp"
+#include "strus/errorBufferInterface.hpp"
 #include "strus/bindings/serialization.hpp"
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
-#include "bindingUtils.hpp"
+#include "serializer.hpp"
+#include "deserializer.hpp"
 #include "utils.hpp"
+#include "callResultUtils.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -265,15 +267,12 @@ void DocumentAnalyzerImpl::defineDocument(
 
 static CallResult analyzeDoc( DocumentAnalyzerInterface* THIS, const std::string& content, const analyzer::DocumentClass& dclass, ErrorBufferInterface* errorhnd)
 {
-	CallResult rt;
-	analyzer::Document* doc;
-	rt.object.resetOwnership( doc = new analyzer::Document( THIS->analyze( content, dclass)));
+	Reference<analyzer::Document> doc( new analyzer::Document( THIS->analyze( content, dclass)));
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
 	}
-	Serializer::serialize( rt.serialization, *doc);
-	return rt;
+	return callResultStructureOwnership( doc.release());
 }
 
 CallResult DocumentAnalyzerImpl::analyze( const std::string& content)
@@ -405,15 +404,15 @@ void QueryAnalyzerImpl::definePatternMatcherPostProcFromFile(
 
 static QueryAnalyzerContextInterface::GroupBy getImplicitGroupBy( const std::string& name)
 {
-	if (name.empty() || strus::caseInsensitiveEquals( name, "all"))
+	if (name.empty() || utils::caseInsensitiveEquals( name, "all"))
 	{
 		return QueryAnalyzerContextInterface::GroupAll;
 	}
-	else if (strus::caseInsensitiveEquals( name, "position"))
+	else if (utils::caseInsensitiveEquals( name, "position"))
 	{
 		return QueryAnalyzerContextInterface::GroupByPosition;
 	}
-	else if (strus::caseInsensitiveEquals( name, "every"))
+	else if (utils::caseInsensitiveEquals( name, "every"))
 	{
 		throw strus::runtime_error(_TXT("'%s' does not make sense as implicit grouping operation"), name.c_str());
 	}
@@ -429,38 +428,9 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-static void serializeQueryExpression(
-		Serialization& result,
-		const analyzer::Query& query,
-		bool labeledOutput,
-		const QueryAnalyzerExpressionBuilder& expressionBuilder)
-{
-	std::vector<analyzer::Query::Instruction>::const_iterator
-		ii = query.instructions().begin(),
-		ie = query.instructions().end();
-	for (; ii != ie; ++ii)
-	{
-		switch (ii->opCode())
-		{
-			case analyzer::Query::Instruction::PushMetaData:
-				if (labeledOutput) result.pushName( "metadata");
-	
-				{
-					
-				}
-				break;
-			case analyzer::Query::Instruction::PushSearchIndexTerm:
-				break;
-			case analyzer::Query::Instruction::Operator:
-				break;
-		}
-	}
-}
-
-ValueVariant QueryAnalyzerImpl::analyzeExpression(
+CallResult QueryAnalyzerImpl::analyze(
 		const ValueVariant& expression)
 {
-	ValueVariant rt;
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	std::auto_ptr<QueryAnalyzerContextInterface> anactx( THIS->createContext());
@@ -469,32 +439,18 @@ ValueVariant QueryAnalyzerImpl::analyzeExpression(
 	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
 	Deserializer::buildExpression( exprbuilder, expression);
 
-	analyzer::Query anares = anactx->analyze();
-	if (expression.type == StrusSerialization && expression.isLabeled())
+	analyzer::Query* qry = new analyzer::Query( anactx->analyze());
+
+	// Build and return the result structure:
+	CallResult rt;
+	rt.object.createOwnership( qry);
+	if (errorhnd->hasError())
 	{
-		
+		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
 	}
-	std::vector<analyzer::Query::Element>::const_iterator
-		ei = qry.elements().begin(), ee = qry.elements().end();
-	for (; ei != ee; ++ei)
-	{
-		switch (ei->type())
-		{
-			case analyzer::Query::Element::MetaData:
-			{
-				const analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->position(), 1/*length*/));
-				break;
-			}
-			case analyzer::Query::Element::SearchIndexTerm:
-			{
-				const analyzer::Term& term = qry.searchIndexTerm( ei->idx());
-				rt.push_back( Term( term.type(), term.value(), term.pos(), term.len()));
-				break;
-			}
-		}
-	}
-	std::sort( rt.begin(), rt.end());
+	bool output_labeled = (expression.type == ValueVariant::StrusSerialization && expression.value.serialization->isLabeled());
+	Serializer::serialize( rt.serialization, *qry, exprbuilder.operators(), output_labeled);
+	rt.value.init( &rt.serialization);
 	return rt;
 }
 

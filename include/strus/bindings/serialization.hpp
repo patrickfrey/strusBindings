@@ -72,6 +72,10 @@ public:
 	{
 		m_ar.push_back( Node( Value, val));
 	}
+	void append( const Serialization& val)
+	{
+		m_ar.insert( m_ar.end(), val.m_ar.begin(), val.m_ar.end());
+	}
 
 	typedef std::vector<Node>::const_iterator const_iterator;
 

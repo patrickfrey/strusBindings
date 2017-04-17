@@ -5,8 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
-#define _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
+#ifndef _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
+#define _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
 #include "strus/bindings/hostObjectReference.hpp"
 #include "strus/bindings/valueVariant.hpp"
 #include "strus/numericVariant.hpp"

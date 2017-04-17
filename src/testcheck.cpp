@@ -1,8 +1,9 @@
 #include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/serializer.hpp"
 #include "strus/bindings/hostObjectReference.hpp"
 #include "strus/bindings/callResult.hpp"
 #include "strus/index.hpp"
+#include "serializer.hpp"
+#include "deserializer.hpp"
 #include <cstring>
 
 using namespace strus;

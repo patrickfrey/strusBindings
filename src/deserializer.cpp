@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#include "bindingUtils.hpp"
+#include "deserializer.hpp"
 #include "valueVariantConv.hpp"
 #include "internationalization.hpp"
 #include "structDefs.hpp"
@@ -23,6 +23,43 @@ static const ValueVariant& getValue(
 	if (si != se && si->tag == Serialization::Value)
 	{
 		return *si++;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected value in serialization"));
+	}
+}
+
+std::pair<ValueVariant,ValueVariant> Deserializer::getValueWithOptionalName(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of structure"));
+	if (si->tag == Serialization::Open)
+	{
+		if (++si == se) throw strus::runtime_error(_TXT("unexpected end of structure"));
+		ValueVariant name;
+		ValueVariant value;
+		if (si->tag == Serialization::Name)
+		{
+			name = *si++;
+		}
+		if (++si == se) throw strus::runtime_error(_TXT("unexpected end of structure"));
+		if (si->tag == Serialization::Value)
+		{
+			value = *si++;
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("atomic value expected as value in optional name value pair"));
+		}
+		if (si == se || si->tag != Serialization::Close) throw strus::runtime_error(_TXT("close expected after value in optional name"));
+		++si;
+		return std::pair<ValueVariant,ValueVariant>( name, value);
+	}
+	else if (si->tag == Serialization::Value)
+	{
+		return std::pair<ValueVariant,ValueVariant>( ValueVariant(), *si++);
 	}
 	else
 	{
@@ -251,9 +288,42 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	}
 }
 
+TermStatistics Deserializer::getTermStatistics(
+		const ValueVariant& val)
+{
+	static const StructureNameMap namemap( "df", ',');
+	TermStatistics rt;
+	if (val.isAtomicType())
+	{
+		rt.setDocumentFrequency( ValueVariantConv::touint64( val));
+		return rt;
+	}
+	if (val.type != ValueVariant::StrusSerialization)
+	{
+		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for term statistics"));
+	}
+	Serialization::const_iterator
+		si = val.value.serialization->begin(),  
+		se = val.value.serialization->end();
+	while (si != se)
+	{
+		if (si->tag != Serialization::Name)
+		{
+			throw strus::runtime_error(_TXT("list of named arguments expected for term statistics as structure"));
+		}
+		switch (namemap.index( *si++))
+		{
+			case 0: rt.setDocumentFrequency( ValueVariantConv::touint64( stats));
+			default: throw strus::runtime_error("unknown tag name in term statistics structure");
+				break;
+		}
+	}
+}
+
 analyzer::DocumentClass Deserializer::getDocumentClass(
 		const ValueVariant& val)
 {
+	static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
 	analyzer::DocumentClass rt;
 	if (val.type != ValueVariant::StrusSerialization)
 	{
@@ -264,7 +334,6 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 		si = val.value.serialization->begin(),  
 		se = val.value.serialization->end();
 
-	static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
 	if (si == se) return rt;
 
 	if (si->tag == Serialization::Name)
@@ -273,13 +342,13 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 		{
 			switch (namemap.index( *si++))
 			{
-				case -1: throw strus::runtime_error("unknown tag name in document class structure");
 				case 0: rt.setMimeType( Deserializer::getString( si, se));
 					break;
 				case 1: rt.setEncoding( Deserializer::getString( si, se));
 					break;
 				case 2: rt.setScheme( Deserializer::getString( si, se));
 					break;
+				default: throw strus::runtime_error("unknown tag name in document class structure");
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -495,6 +564,409 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 		return getAggregator( si, se, textproc, errorhnd);
 	}
 }
+
+struct FeatureParameterPositional
+{
+	std::string name;
+	ValueVariant value;
+	bool isFeatureSet;
+	std::string featureSet;
+
+	FeatureParameterPositional( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+		:name(),value(),isFeatureSet(false),featureSet()
+	{
+		if (si == se || si->tag != Serialization::Name) throw strus::runtime_error(_TXT("argument name expected as as start of a summarizer function parameter"));
+		std::string paramname = ValueVariantConv::tostring( *si++);
+
+		std::pair<ValueVariant,ValueVariant> paramdecl = Deserializer::getValueWithOptionalName( si, se);
+		if (paramdecl.first.defined())
+		{
+			if (ValueVariantConv::isequal_ascii( paramdecl.first, "feature"))
+			{
+				featureSet = ValueVariantConv::tostring( paramdecl.second);
+				isFeatureSet = true;
+			}
+			else if (ValueVariantConv::isequal_ascii( paramdecl.first, "value"))
+			{
+				value = paramdecl.second;
+			}
+			else
+			{
+				std::string typname = ValueVariantConv::tostring( paramdecl.first);
+				throw strus::runtime_error(_TXT("unexpected parameter type name '%s', expected 'feature' or 'value'"), typname.c_str());
+			}
+		}
+		else
+		{
+			if (paramdecl.second.isStringType() && Deserializer::isStringWithPrefix( paramdecl.second, '.'))
+			{
+				featureSet = Deserializer::getPrefixStringValue( paramdecl.second, '.');
+				isFeatureSet = true;
+			}
+			else
+			{
+				value = paramdecl.second;
+			}
+		}
+	}
+};
+
+template <class FUNCTYPE>
+static void instantiateQueryEvalFunctionParameter(
+		const char* functionclass,
+		FUNCTYPE* function,
+		const std::string& name,
+		const ValueVariant& value)
+{
+	if (value.isNumericType())
+	{
+		function->addNumericParameter( name, ValueVariantConv::tonumeric( value));
+	}
+	else if (value.isStringType())
+	{
+		function->addStringParameter( name, ValueVariantConv::tostring( value));
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("atomic value expected as %s function argument (%s)"), functionclass, name.c_str());
+	}
+}
+
+template <class FUNCTYPE>
+static void deserializeQueryEvalFunctionParameterValue(
+		const char* functionclass,
+		FUNCTYPE* function,
+		std::string& debuginfoAttribute,
+		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
+		const std::string& paramname,
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s function parameter definition"), functionclass);
+	if (si->tag == Serialization::Open)
+	{
+		++si;
+		while (si != se && si->tag != Serialization::Close)
+		{
+			ValueVariant value = getValue( si, se);
+			if (value.isStringType() && Deserializer::isStringWithPrefix( value, '.'))
+			{
+				std::string featureSet = Deserializer::getPrefixStringValue( paramdef.value, '.');
+				featureParameters.push_back( FeatureParameter( paramname, featureSet));
+			}
+			else
+			{
+				instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
+			}
+		}
+		Deserializer::consumeClose( si, se);
+	}
+	else
+	{
+		ValueVariant value = getValue( si, se);
+		if (value.isStringType() && Deserializer::isStringWithPrefix( value, '.'))
+		{
+			std::string featureSet = Deserializer::getPrefixStringValue( paramdef.value, '.');
+			featureParameters.push_back( FeatureParameter( paramname, featureSet));
+		}
+		else
+		{
+			instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
+		}
+	}
+}
+
+template <class FUNCTYPE>
+static void deserializeQueryEvalFunctionParameter(
+		const char* functionclass,
+		FUNCTYPE* function,
+		std::string& debuginfoAttribute,
+		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
+		const ValueVariant& parameters)
+{
+	static const StructureNameMap namemap( "name,value,feature", ',');
+	if (si->tag == Serialization::Open)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s function parameter definition"), functionclass);
+		if (si->tag == Serialization::Value)
+		{
+			std::string paramname = Deserializer::getString( si, se);
+			deserializeQueryEvalFunctionParameterValue(
+				functionclass, function, debuginfoAttribute, featureParameters,
+				paramname, si, se);
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			std::string name;
+			unsigned char name_defined = 0;
+			ValueVariant value;
+			while (si->tag == Serialization::Name)
+			{
+				switch (namemap.index( *si++))
+				{
+					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "name");
+						name = Deserializer::getString( si, se);
+						break;
+					case 1: if (type != Undefined) throw strus::runtime_error(_TXT("contradicting definitions in query evaluation function parameter: only one allowed of 'value', 'result', or 'feature'"));
+						type = Value; value = getValue( si, se);
+						break;
+					case 2:	if (type != Undefined) throw strus::runtime_error(_TXT("contradicting definitions in query evaluation function parameter: only one allowed of 'value', 'result', or 'feature'"));
+						type = Feature; value = getValue( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in query evaluation function config"));
+				}
+			}
+			Deserializer::consumeClose( si, se);
+			if (!name_defined || type == Undefined)
+			{
+				throw strus::runtime_error(_TXT("incomplete query evaluation function definition"));
+			}
+			instantiateQueryEvalFunctionParameter( functionclass, function, name, value);
+		}
+	}
+	else if (si->tag == Serialization::Name)
+	{
+		name = Deserializer::getString( si, se);
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of query evaluation function parameter definition"));
+
+		std::pair<ValueVariant,ValueVariant> paramdecl = Deserializer::getValueWithOptionalName( si, se);
+		if (paramdecl.first.defined())
+		{
+			if (ValueVariantConv::isequal_ascii( paramdecl.first, "feature"))
+			{
+				value = paramdecl.second;
+				type = Feature;
+			}
+			else if (ValueVariantConv::isequal_ascii( paramdecl.first, "value"))
+			{
+				value = paramdecl.second;
+				type = Value;
+			}
+			else
+			{
+				std::string typname = ValueVariantConv::tostring( paramdecl.first);
+				throw strus::runtime_error(_TXT("unexpected parameter type name '%s', expected 'feature' or 'value'"), typname.c_str());
+			}
+		}
+		else
+		{
+			type = Undefined;
+			value = paramdecl.second;
+		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("argument name expected as as start of a query evaluation function parameter"));
+	}
+}
+
+template <class FUNCTYPE>
+static void instantiateQueryEvalFunctionParameters(
+		const char* functionclass,
+		FUNCTYPE* function,
+		std::string& debuginfoAttribute,
+		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
+		const ValueVariant& parameters)
+{
+	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
+	if (parameters.type != ValueVariant::StrusSerialization)
+	{
+		throw strus::runtime_error(_TXT("list of named arguments expected as %s function parameters"), functionclass);
+	}
+	Serialization::const_iterator
+		si = parameters.value.serialization->begin(),  
+		se = parameters.value.serialization->end();
+	while (si != se && si->tag != Serialization::Close)
+	{
+		QueryEvalFunctionParameterDef paramdef;
+		paramdef.deserialize( si, se);
+		switch (paramdef.type)
+		{
+			case QueryEvalFunctionParameterDef::Undefined:
+			{
+				if (paramdef.name == "debug")
+				{
+					debuginfoAttribute = ValueVariantConv::tostring( paramdef.value);
+				}
+				else if (paramdef.value.isStringType() && Deserializer::isStringWithPrefix( paramdef.value, '.'))
+				{
+					std::string featureSet = Deserializer::getPrefixStringValue( paramdef.value, '.');
+					featureParameters.push_back( FeatureParameter( paramdef.name, featureSet));
+				}
+				else
+				{
+					instantiateQueryEvalFunctionParameter( functionclass, function, paramdef.name, paramdef.value);
+				}
+				break;
+			}
+			case QueryEvalFunctionParameterDef::Feature:
+			{
+				std::string featureSet = ValueVariantConv::tostring( paramdef.value);
+				featureParameters.push_back( FeatureParameter( paramdef.name, featureSet));
+				break;
+			}
+			case QueryEvalFunctionParameterDef::Value:
+			{
+				if (paramdef.name == "debug")
+				{
+					debuginfoAttribute = ValueVariantConv::tostring( paramdef.value);
+				}
+				else
+				{
+					instantiateQueryEvalFunctionParameter( functionclass, function, paramdef.name, paramdef.value);
+				}
+				break;
+			 }
+		}
+	}
+}
+
+template <class FUNCTYPE>
+static void instantiateQueryEvalFunctionResultNames(
+	const char* functionclass, FUNCTYPE* function, const ValueVariant& resultnames)
+{
+	if (resultnames.defined())
+	{
+		if (resultnames.type != ValueVariant::StrusSerialization)
+		{
+			throw strus::runtime_error(_TXT("list of named arguments expected as %s function result name definitions"), functionclass);
+		}
+		Serialization::const_iterator
+			si = resultnames.value.serialization->begin(),  
+			se = resultnames.value.serialization->end();
+		while (si != se)
+		{
+			ConfigDef resultdef;
+			resultdef.deserialize( si, se);
+			function->defineResultName(
+					ValueVariantConv::tostring( resultdef.value),
+					ValueVariantConv::tostring( resultdef.name));
+		}
+	}
+}
+
+void Deserializer::buildSummarizerFunction(
+		QueryEvalInterface* queryeval,
+		const std::string& functionName,
+		const ValueVariant& parameters,
+		const ValueVariant& resultnames,
+		const QueryProcessorInterface* queryproc,
+		ErrorBufferInterface* errorhnd)
+{
+	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
+	std::vector<FeatureParameter> featureParameters;
+
+	const SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( functionName);
+	if (!sf) throw strus::runtime_error( _TXT("%s function not defined: '%s'"), "summarizer", functionName.c_str());
+
+	Reference<SummarizerFunctionInstanceInterface> function( sf->createInstance( queryproc));
+	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s function '%s': %s"), "summarizer", functionName.c_str(), errorhnd->fetchError());
+
+	std::string debuginfoAttribute("debug");
+
+	instantiateQueryEvalFunctionParameters(
+		"summarizer", function.get(), debuginfoAttribute, featureParameters, parameters);
+
+	instantiateQueryEvalFunctionResultNames(
+		"summarizer", function.get(), resultnames);
+
+	queryeval->addSummarizerFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
+	function.release();
+
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to define %s function '%s': %s"), "summarizer", functionName.c_str(), errorhnd->fetchError());
+	}
+}
+
+void Deserializer::buildWeightingFunction(
+		QueryEvalInterface* queryeval,
+		const std::string& functionName,
+		const ValueVariant& parameters,
+		const QueryProcessorInterface* queryproc,
+		ErrorBufferInterface* errorhnd)
+{
+	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
+	std::vector<FeatureParameter> featureParameters;
+
+	const WeightingFunctionInterface* sf = queryproc->getWeightingFunction( functionName);
+	if (!sf) throw strus::runtime_error( _TXT("%s function not defined: '%s'"), "weighting", functionName.c_str());
+
+	Reference<WeightingFunctionInstanceInterface> function( sf->createInstance( queryproc));
+	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s function '%s': %s"), "weighting", functionName.c_str(), errorhnd->fetchError());
+
+	std::string debuginfoAttribute("debug");
+	instantiateQueryEvalFunctionParameters(
+		"weighting", function.get(), debuginfoAttribute, featureParameters, parameters);
+
+	queryeval->addWeightingFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
+	function.release();
+
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to define %s function '%s': %s"), "weighting", functionName.c_str(), errorhnd->fetchError());
+	}
+}
+
+void Deserializer::buildWeightingFormula(
+		QueryEvalInterface* queryeval,
+		const std::string& source,
+		const ValueVariant& parameter,
+		const QueryProcessorInterface* queryproc,
+		ErrorBufferInterface* errorhnd)
+{
+	std::string parsername;
+	typedef std::pair<std::string,double> ParamDef;
+	std::vector<ParamDef> paramlist;
+	if (parameter.defined())
+	{
+		if (parameter.type != ValueVariant::StrusSerialization)
+		{
+			throw strus::runtime_error(_TXT("list of named arguments expected as %s function parameters"), "scalar");
+		}
+		Serialization::const_iterator
+			si = parameter.value.serialization->begin(),
+			se = parameter.value.serialization->end();
+		while (si != se)
+		{
+			ConfigDef cdef;
+			cdef.deserialize( si, se);
+			if (ValueVariantConv::isequal_ascii( cdef.name, "parser"))
+			{
+				parsername = ValueVariantConv::tostring( cdef.value);
+			}
+			else
+			{
+				paramlist.push_back( ParamDef(
+					ValueVariantConv::tostring( cdef.name),
+					ValueVariantConv::todouble( cdef.name)));
+			}
+		}
+	}
+	const ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser( parsername);
+	std::auto_ptr<ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source, std::vector<std::string>()));
+	if (!scalarfunc.get())
+	{
+		throw strus::runtime_error(_TXT( "failed to create %s function (%s) from source: %s"), "scalar", source.c_str(), errorhnd->fetchError());
+	}
+	std::vector<ParamDef>::const_iterator
+		vi = paramlist.begin(),
+		ve = paramlist.end();
+	for (; vi != ve; ++vi)
+	{
+		scalarfunc->setDefaultVariableValue( vi->first, vi->second);
+	}
+	queryeval->defineWeightingFormula( scalarfunc.get());
+	scalarfunc.release();
+
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to define %s function (%s): %s"), "scalar", source.c_str(), errorhnd->fetchError());
+	}
+}
+
 
 bool Deserializer::skipStructure( Serialization::const_iterator si, const Serialization::const_iterator& se)
 {

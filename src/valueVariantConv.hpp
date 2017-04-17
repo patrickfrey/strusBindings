@@ -58,6 +58,7 @@ public:
 	static int64_t toint64( const ValueVariant& val);
 	static uint64_t touint64( const ValueVariant& val);
 	static bool tobool( const ValueVariant& val);
+	static NumericVariant tonumeric( const ValueVariant& val);
 
 	static bool isequal_ascii( const ValueVariant& val, const char* value);
 	static bool try_convertToNumber( ValueVariant& val);

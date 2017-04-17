@@ -54,6 +54,35 @@ struct MetaDataRangeDef
 	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 };
 
+struct QueryEvalFunctionParameterDef
+{
+	enum Type {Undefined,Value,Feature};
+
+	Type type;
+	std::string name;
+	ValueVariant value;
+
+	QueryEvalFunctionParameterDef()
+		:type(Undefined),name(),value(){}
+	QueryEvalFunctionParameterDef( const QueryEvalFunctionParameterDef& o)
+		:type(o.type),name(o.name),value(o.value){}
+
+	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
+};
+
+
+struct ConfigDef
+{
+	std::string name;
+	ValueVariant value;
+
+	ConfigDef()
+		:name(),value(){}
+	ConfigDef( const ConfigDef& o)
+		:name(o.name),value(o.value){}
+
+	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
+};
 
 }} //namespace
 #endif

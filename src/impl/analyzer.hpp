@@ -174,7 +174,7 @@ private:
 	friend class Context;
 	DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_);
 
-	HostObjectReference m_errorhnd_impl;
+	mutable HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;
 	HostObjectReference m_objbuilder_impl;
 	HostObjectReference m_analyzer_impl;
@@ -256,16 +256,15 @@ public:
 
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] expression query expression tree
-	/// \return structure of the query analyzed
-	CallResult analyzeExpression(
-			const std::string& expression);
+	/// \return structure of the query analyzed, depending on input the output structures are positional or labeled
+	CallResult analyze( const ValueVariant& expression);
 
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
 	QueryAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
 
-	HostObjectReference m_errorhnd_impl;
+	mutable HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;
 	HostObjectReference m_objbuilder_impl;
 	HostObjectReference m_analyzer_impl;
