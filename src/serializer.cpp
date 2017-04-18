@@ -56,11 +56,11 @@ void Serializer::serialize( Serialization& result, const SummaryElement& val)
 }
 void Serializer::serialize( Serialization& result, const analyzer::Document& val)
 {
-	serializeStructMember( result, "subDocumentTypeName", val.subDocumentTypeName());
+	serializeStructMember( result, "doctype", val.subDocumentTypeName());
 	serializeStructMember( result, "metadata", val.metadata());
 	serializeStructMember( result, "attributes", val.attributes());
-	serializeStructMember( result, "searchIndexTerms", val.searchIndexTerms());
-	serializeStructMember( result, "forwardIndexTerms", val.forwardIndexTerms());
+	serializeStructMember( result, "searchindex", val.searchIndexTerms());
+	serializeStructMember( result, "forwardindex", val.forwardIndexTerms());
 }
 static void serialize_labeled( Serialization& result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators)
 {
@@ -181,13 +181,13 @@ void Serializer::serialize( Serialization& result, const ResultDocument& val)
 {
 	serializeStructMember( result, "docno", (ValueVariant::IntType)val.docno());
 	serializeStructMember( result, "weight", val.weight());
-	serializeStructMember( result, "summaryElements", val.summaryElements());
+	serializeStructMember( result, "summary", val.summaryElements());
 }
 void Serializer::serialize( Serialization& result, const QueryResult& val)
 {
-	serializeStructMember( result, "evaluationPass", (ValueVariant::UIntType)val.evaluationPass());
-	serializeStructMember( result, "nofRanked", (ValueVariant::UIntType)val.nofRanked());
-	serializeStructMember( result, "nofVisited", (ValueVariant::UIntType)val.nofVisited());
+	serializeStructMember( result, "pass", (ValueVariant::UIntType)val.evaluationPass());
+	serializeStructMember( result, "nofranked", (ValueVariant::UIntType)val.nofRanked());
+	serializeStructMember( result, "nofvisited", (ValueVariant::UIntType)val.nofVisited());
 	serializeStructMember( result, "ranks", val.ranks());
 }
 void Serializer::serialize( Serialization& result, const std::vector<VectorStorageSearchInterface::Result>& val)

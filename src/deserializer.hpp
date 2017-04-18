@@ -27,6 +27,7 @@
 #include "strus/patternMatcherInstanceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
+#include "strus/index.hpp"
 #include "expressionBuilder.hpp"
 #include <string>
 #include <utility>
@@ -52,10 +53,6 @@ struct Deserializer
 			const ValueVariant& val,
 			unsigned char prefix);
 
-	static std::pair<ValueVariant,ValueVariant> getValueWithOptionalName(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
-
 	static bool skipStructure(
 			Serialization::const_iterator si,
 			const Serialization::const_iterator& se);
@@ -79,6 +76,12 @@ struct Deserializer
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
 
+	static std::vector<int> getIntList(
+			const ValueVariant& val);
+
+	static std::vector<Index> getIndexList(
+			const ValueVariant& val);
+
 	static analyzer::DocumentClass getDocumentClass(
 			const ValueVariant& val);
 
@@ -90,6 +93,9 @@ struct Deserializer
 			const ValueVariant& options);
 
 	static TermStatistics getTermStatistics(
+			const ValueVariant& stats);
+
+	static GlobalStatistics getGlobalStatistics(
 			const ValueVariant& stats);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
@@ -154,11 +160,23 @@ struct Deserializer
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
-			const ValueVariant& expression);
+			const ValueVariant& expression,
+			ErrorBufferInterface* errorhnd);
 
 	static void buildPatterns(
 			ExpressionBuilder& builder,
-			const ValueVariant& patterns);
+			const ValueVariant& patterns,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildInsertDocument(
+			StorageDocumentInterface* document,
+			const ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildUpdateDocument(
+			StorageDocumentInterface* document,
+			const ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
 };
 
 }}//namespace

@@ -29,7 +29,8 @@ static const ValueVariant& getValue(
 	}
 }
 
-void AnalyzerFunctionDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+	:name(),args()
 {
 	static const StructureNameMap namemap( "name,arg", ',');
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: analyzer function structure expected"));
@@ -71,7 +72,8 @@ void AnalyzerFunctionDef::deserialize( Serialization::const_iterator& si, const 
 	}
 }
 
-void TermDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+	:variable(),type(),value(),length(1),value_defined(false),length_defined(false)
 {
 	static const StructureNameMap namemap( "type,value,variable,len", ',');
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
@@ -142,7 +144,8 @@ void TermDef::deserialize( Serialization::const_iterator& si, const Serializatio
 	}
 }
 
-void MetaDataRangeDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+	:from(),to()
 {
 	static const StructureNameMap namemap( "from,to", ',');
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
@@ -173,84 +176,9 @@ void MetaDataRangeDef::deserialize( Serialization::const_iterator& si, const Ser
 	}
 }
 
-void QueryEvalFunctionParameterDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
-{
-	static const StructureNameMap namemap( "name,value,feature", ',');
-	if (si->tag == Serialization::Open)
-	{
-		++si;
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of configuration definition"));
-		if (si->tag == Serialization::Value)
-		{
-			type = Undefined;
-			name = Deserializer::getString( si, se);
-			value = getValue( si, se);
-			Deserializer::consumeClose( si, se);
-		}
-		else
-		{
-			unsigned char name_defined = 0;
-			while (si->tag == Serialization::Name)
-			{
-				switch (namemap.index( *si++))
-				{
-					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "name");
-						name = Deserializer::getString( si, se);
-						break;
-					case 1: if (type != Undefined) throw strus::runtime_error(_TXT("contradicting definitions in query evaluation function parameter: only one allowed of 'value', 'result', or 'feature'"));
-						type = Value; value = getValue( si, se);
-						break;
-					case 2:	if (type != Undefined) throw strus::runtime_error(_TXT("contradicting definitions in query evaluation function parameter: only one allowed of 'value', 'result', or 'feature'"));
-						type = Feature; value = getValue( si, se);
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in query evaluation function config"));
-				}
-			}
-			Deserializer::consumeClose( si, se);
-			if (!name_defined || type == Undefined)
-			{
-				throw strus::runtime_error(_TXT("incomplete query evaluation function definition"));
-			}
-		}
-	}
-	else if (si->tag == Serialization::Name)
-	{
-		name = Deserializer::getString( si, se);
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of query evaluation function parameter definition"));
 
-		std::pair<ValueVariant,ValueVariant> paramdecl = Deserializer::getValueWithOptionalName( si, se);
-		if (paramdecl.first.defined())
-		{
-			if (ValueVariantConv::isequal_ascii( paramdecl.first, "feature"))
-			{
-				value = paramdecl.second;
-				type = Feature;
-			}
-			else if (ValueVariantConv::isequal_ascii( paramdecl.first, "value"))
-			{
-				value = paramdecl.second;
-				type = Value;
-			}
-			else
-			{
-				std::string typname = ValueVariantConv::tostring( paramdecl.first);
-				throw strus::runtime_error(_TXT("unexpected parameter type name '%s', expected 'feature' or 'value'"), typname.c_str());
-			}
-		}
-		else
-		{
-			type = Undefined;
-			value = paramdecl.second;
-		}
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("argument name expected as as start of a query evaluation function parameter"));
-	}
-}
-
-
-void ConfigDef::deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+	:name(),value()
 {
 	static const StructureNameMap namemap( "name,value", ',');
 	if (si->tag == Serialization::Open)

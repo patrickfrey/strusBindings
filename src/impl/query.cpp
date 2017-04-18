@@ -12,8 +12,11 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "internationalization.hpp"
+#include "valueVariantConv.hpp"
+#include "callResultUtils.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
+#include "structDefs.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -204,26 +207,21 @@ void QueryImpl::addMetaDataRestrictionCondition(
 void QueryImpl::defineTermStatistics( const std::string& type_, const std::string& value_, const ValueVariant& stats_)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	TermStatistics stats;
-	stats.setDocumentFrequency( stats_.df());
+	TermStatistics stats = Deserializer::getTermStatistics( stats_);
 	THIS->defineTermStatistics( type_, value_, stats);
 }
 
-void QueryImpl::defineGlobalStatistics( const GlobalStatistics& stats_)
+void QueryImpl::defineGlobalStatistics( const ValueVariant& stats_)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	GlobalStatistics stats;
-	stats.setNofDocumentsInserted( stats_.nofdocs());
+	GlobalStatistics stats = Deserializer::getGlobalStatistics( stats_);
 	THIS->defineGlobalStatistics( stats);
 }
 
-void QueryImpl::addDocumentEvaluationSet(
-		const std::vector<Index>& docnolist_)
+void QueryImpl::addDocumentEvaluationSet( const ValueVariant& docnolist_)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	std::vector<Index> docnolist;
-	std::vector<Index>::const_iterator di = docnolist_.begin(), de = docnolist_.end();
-	for (; di != de; ++di) docnolist.push_back( *di);
+	std::vector<Index> docnolist = Deserializer::getIndexList( docnolist_);
 	THIS->addDocumentEvaluationSet( docnolist);
 }
 
@@ -246,15 +244,20 @@ void QueryImpl::addUserName( const std::string& username_)
 }
 
 void QueryImpl::setWeightingVariables(
-		const FunctionVariableConfig& parameter)
+		const ValueVariant& parameter)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	std::map<std::pair<std::string,double> >::const_iterator
-		vi = parameter.m_variables.begin(),
-		ve = parameter.m_variables.end();
-	for (; vi != ve; ++vi)
+	if (parameter.type != ValueVariant::StrusSerialization)
 	{
-		THIS->setWeightingVariableValue( vi->first, vi->second);
+		throw strus::runtime_error(_TXT("list of variable assignments expected as argument"));
+	}
+	Serialization::const_iterator
+		si = parameter.value.serialization->begin(),
+		se = parameter.value.serialization->end();
+	while (si != se)
+	{
+		ConfigDef assignment( si, se);
+		THIS->setWeightingVariableValue( assignment.name, ValueVariantConv::todouble( assignment.value));
 	}
 }
 
@@ -266,45 +269,14 @@ void QueryImpl::setDebugMode( bool debug)
 
 CallResult QueryImpl::evaluate() const
 {
-	std::vector<Rank> ranks;
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	QueryResult res = THIS->evaluate();
-	if (res.ranks().empty() && errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT("failed to evaluate query: %s"), errorhnd->fetchError());
-	}
-	QueryResult rt( res.evaluationPass(), res.nofDocumentsRanked(), res.nofDocumentsVisited());
-	std::vector<ResultDocument>::const_iterator
-		ri = res.ranks().begin(), re = res.ranks().end();
-	for (;ri != re; ++ri)
-	{
-		Rank reselem;
-		reselem.m_docno = (unsigned int)ri->docno();
-		reselem.m_weight = ri->weight();
-		std::vector<SummaryElement>::const_iterator
-			ai = ri->summaryElements().begin(), ae = ri->summaryElements().end();
-	
-		for (;ai != ae; ++ai)
-		{
-			SummaryElement elem( ai->name(), ai->value(), ai->weight(), ai->index());
-			reselem.m_summaryElements.push_back( elem);
-		}
-		rt.m_ranks.push_back( reselem);
-	}
-	return QueryResult( rt);
+	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
+	return callResultStructureOwnership( new QueryResult( THIS->evaluate()));
 }
 
 CallResult QueryImpl::tostring() const
 {
-	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	std::string rt( THIS->tostring());
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT("failed to map query to string: %s"), errorhnd->fetchError());
-	}
-	return rt;
+	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
+	return THIS->tostring();
 }
 
 

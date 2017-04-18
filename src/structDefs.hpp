@@ -18,11 +18,9 @@ struct AnalyzerFunctionDef
 	std::string name;
 	std::vector<std::string> args;
 
-	AnalyzerFunctionDef(){}
+	AnalyzerFunctionDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 	AnalyzerFunctionDef( const AnalyzerFunctionDef& o)
 		:name(o.name),args(o.args){}
-
-	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 };
 
 struct TermDef
@@ -34,12 +32,9 @@ struct TermDef
 	bool value_defined;
 	bool length_defined;
 
-	TermDef()
-		:variable(),type(),value(),length(1),value_defined(false),length_defined(false){}
+	TermDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 	TermDef( const TermDef& o)
 		:variable(o.variable),type(o.type),value(o.value),length(o.length),value_defined(o.value_defined),length_defined(o.length_defined){}
-
-	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 };
 
 struct MetaDataRangeDef
@@ -47,41 +42,19 @@ struct MetaDataRangeDef
 	std::string from;
 	std::string to;
 
-	MetaDataRangeDef(){}
+	MetaDataRangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 	MetaDataRangeDef( const MetaDataRangeDef& o)
 		:from(o.from),to(o.to){}
-
-	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 };
-
-struct QueryEvalFunctionParameterDef
-{
-	enum Type {Undefined,Value,Feature};
-
-	Type type;
-	std::string name;
-	ValueVariant value;
-
-	QueryEvalFunctionParameterDef()
-		:type(Undefined),name(),value(){}
-	QueryEvalFunctionParameterDef( const QueryEvalFunctionParameterDef& o)
-		:type(o.type),name(o.name),value(o.value){}
-
-	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
-};
-
 
 struct ConfigDef
 {
 	std::string name;
 	ValueVariant value;
 
-	ConfigDef()
-		:name(),value(){}
+	ConfigDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 	ConfigDef( const ConfigDef& o)
 		:name(o.name),value(o.value){}
-
-	void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se);
 };
 
 }} //namespace

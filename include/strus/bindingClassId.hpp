@@ -16,7 +16,9 @@ enum BindingsClassId
 {
 	ClassContext=0x0,
 	ClassDocumentAnalyzer=0x1,
-	ClassQueryAnalyzer=0x2
+	ClassQueryAnalyzer=0x2,
+	ClassQueryEval=0x3,
+	ClassQuery=0x3
 };
 
 }//namespace

@@ -28,6 +28,8 @@ struct ClassIdMap
 {
 	static int get( const DocumentAnalyzerImpl& )	{return ClassDocumentAnalyzer;}
 	static int get( const QueryAnalyzerImpl&)	{return ClassQueryAnalyzer;}
+	static int get( const QueryEvalImpl&)		{return ClassQueryEval;}
+	static int get( const QueryImpl&)		{return ClassQuery;}
 };
 
 template <typename STRUCTVALUE>
@@ -40,21 +42,21 @@ static CallResult callResultStructureOwnership( STRUCTVALUE* st)
 	return rt;
 }
 
-template <typename OBJECT>
-static CallResult callResultObject( OBJECT* st)
-{
-	CallResult rt;
-	rt.object.createOwnership( st);
-	rt.classid = ClassIdMap::get(*st);
-	return rt;
-}
-
 template <typename STRUCTVALUE>
 static CallResult callResultStructureConst( const STRUCTVALUE* st)
 {
 	CallResult rt;
 	Serializer::serialize( rt.serialization, *st);
 	rt.value.init( &rt.serialization);
+	return rt;
+}
+
+template <typename OBJECT>
+static CallResult callResultObject( OBJECT* st)
+{
+	CallResult rt;
+	rt.object.createOwnership( st);
+	rt.classid = ClassIdMap::get(*st);
 	return rt;
 }
 
