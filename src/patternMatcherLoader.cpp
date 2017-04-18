@@ -38,7 +38,7 @@ PatternMatcherPostProc bindings::loadPatternMatcherPostProc(
 	{
 		expressionBuilder.defineLexem( *si);
 	}
-	Deserializer::buildPatterns( expressionBuilder, patterns);
+	Deserializer::buildPatterns( expressionBuilder, patterns, errorhnd);
 	return rt;
 }
 

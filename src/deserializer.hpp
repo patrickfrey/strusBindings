@@ -25,6 +25,8 @@
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/patternMatcherInstanceInterface.hpp"
+#include "strus/storageDocumentInterface.hpp"
+#include "strus/storageDocumentUpdateInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/index.hpp"
@@ -174,7 +176,7 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 
 	static void buildUpdateDocument(
-			StorageDocumentInterface* document,
+			StorageDocumentUpdateInterface* document,
 			const ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 };
