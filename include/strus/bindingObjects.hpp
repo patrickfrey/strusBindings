@@ -1332,6 +1332,7 @@ public:
 #endif
 
 private:
+	friend class QueryAnalyzeContext;
 	Index m_field;
 };
 #ifdef STRUS_BOOST_PYTHON

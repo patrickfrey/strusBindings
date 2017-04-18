@@ -813,7 +813,7 @@ static void loadPatterMatcher(
 			case PatternMatcher::StackOp::AttachVariable:
 			{
 				const char* name_ = patternMatcher.strings().c_str() + oi->arg[ PatternMatcher::StackOp::Variable_name];
-				matcherInstance->attachVariable( name_, 1.0);
+				matcherInstance->attachVariable( name_);
 				break;
 			}
 		}
@@ -1297,27 +1297,31 @@ std::vector<Term> QueryAnalyzer::analyzeField(
 	if (!anactx.get()) throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
 	anactx->putField( 1/*field no*/, fieldType, fieldContent);
 	strus::analyzer::Query qry = anactx->analyze();
-	if (qry.empty() && errorhnd->hasError())
+	if (qry.instructions().empty() && errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error in analyze query field: %s"), errorhnd->fetchError());
 	}
-	std::vector<strus::analyzer::Query::Element>::const_iterator
-		ei = qry.elements().begin(), ee = qry.elements().end();
+	std::vector<strus::analyzer::Query::Instruction>::const_iterator
+		ei = qry.instructions().begin(), ee = qry.instructions().end();
 	for (; ei != ee; ++ei)
 	{
-		switch (ei->type())
+		switch (ei->opCode())
 		{
-			case strus::analyzer::Query::Element::MetaData:
+			case strus::analyzer::Query::Instruction::MetaData:
 			{
 				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( Term( md.name(), md.value().tostring().c_str(), ei->pos(), 1/*length*/));
+				rt.push_back( Term( md.name(), md.value().tostring().c_str(), 0, 1/*length*/));
 				break;
 			}
-			case strus::analyzer::Query::Element::SearchIndexTerm:
+			case strus::analyzer::Query::Instruction::Term:
 			{
-				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
+				const strus::analyzer::Term& term = qry.term( ei->idx());
 				rt.push_back( Term( term.type(), term.value(), term.pos(), term.len()));
 				break;
+			}
+			case strus::analyzer::Query::Instruction::Operator:
+			{
+				throw strus::runtime_error(_TXT("no operator expected in result of analysis of a query field"));
 			}
 		}
 	}
@@ -1356,6 +1360,8 @@ void QueryAnalyzeContext::putField(
 {
 	strus::QueryAnalyzerContextInterface* anactx = (strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
 	anactx->putField( fieldNo, fieldType, fieldContent);
+	std::vector<unsigned int> fieldnoList( &fieldNo, (&fieldNo)+1);
+	anactx->groupElements( fieldNo, fieldnoList, strus::QueryAnalyzerContextInterface::GroupAll, true/*groupSingle*/);
 }
 
 std::vector<QueryTerm> QueryAnalyzeContext::analyze()
@@ -1364,27 +1370,36 @@ std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryAnalyzerContextInterface* anactx = (strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
 	strus::analyzer::Query qry = anactx->analyze();
-	if (qry.empty() && errorhnd->hasError())
+	if (qry.instructions().empty() && errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error in analyze query: %s"), errorhnd->fetchError());
 	}
-	std::vector<strus::analyzer::Query::Element>::const_iterator
-		ei = qry.elements().begin(), ee = qry.elements().end();
+	std::vector<strus::analyzer::Query::Instruction>::const_iterator
+		ei = qry.instructions().begin(), ee = qry.instructions().end();
 	for (; ei != ee; ++ei)
 	{
-		switch (ei->type())
+		switch (ei->opCode())
 		{
-			case strus::analyzer::Query::Element::MetaData:
+			case strus::analyzer::Query::Instruction::MetaData:
 			{
 				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( QueryTerm( ei->field(), md.name(), md.value().tostring().c_str(), ei->pos(), ei->len()));
+				rt.push_back( QueryTerm( 0, md.name(), md.value().tostring().c_str(), 0, 1));
 				break;
 			}
-			case strus::analyzer::Query::Element::SearchIndexTerm:
+			case strus::analyzer::Query::Instruction::Term:
 			{
-				const strus::analyzer::Term& term = qry.searchIndexTerm( ei->idx());
-				rt.push_back( QueryTerm( ei->field(), term.type(), term.value(), term.pos(), ei->pos()));
+				const strus::analyzer::Term& term = qry.term( ei->idx());
+				rt.push_back( QueryTerm( 0, term.type(), term.value(), term.pos(), term.len()));
 				break;
+			}
+			case strus::analyzer::Query::Instruction::Operator:
+			{
+				if (rt.size() < ei->nofOperands()) throw strus::runtime_error(_TXT("internal: corrupt query structure"));
+				std::size_t idx = rt.size() - ei->nofOperands();
+				for (; idx < rt.size(); ++idx)
+				{
+					rt[ idx].m_field = ei->idx();
+				}
 			}
 		}
 	}
