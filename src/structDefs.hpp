@@ -57,6 +57,17 @@ struct ConfigDef
 		:name(o.name),value(o.value){}
 };
 
+struct DfChangeDef
+{
+	const char* termtype;
+	const char* termvalue;
+	int increment;
+
+	DfChangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
+	DfChangeDef( const DfChangeDef& o)
+		:termtype(o.termtype),termvalue(o.termvalue),increment(o.increment){}
+};
+		
 }} //namespace
 #endif
 

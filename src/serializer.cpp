@@ -166,7 +166,7 @@ void Serializer::serialize( Serialization& result, const analyzer::Query& val, c
 		serialize_positional( result, val, operators);
 	}
 }
-void Serializer::serialize( Serialization& result, const bindings::DocumentFrequencyChange& val)
+void Serializer::serialize( Serialization& result, const StatisticsViewerInterface::DocumentFrequencyChange& val)
 {
 	serializeStructMember( result, "type", val.type());
 	serializeStructMember( result, "value", val.value());

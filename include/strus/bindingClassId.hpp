@@ -23,7 +23,10 @@ enum BindingsClassId
 	ClassStorageTransaction=0x06,
 	ClassStatisticsProcessor=0x07,
 	ClassStatisticsIterator=0x08,
-	ClassDocumentBrowser=0x09
+	ClassDocumentBrowser=0x09,
+	ClassVectorStorageSearcher=0x10,
+	ClassVectorStorageClient=0x11,
+	ClassVectorStorageTransaction=0x12
 };
 
 }//namespace

@@ -112,16 +112,39 @@ unsigned int Deserializer::getUint(
 	return ValueVariantConv::touint( getValue( si, se));
 }
 
-unsigned int Deserializer::getInt(
+int Deserializer::getInt(
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
 	return ValueVariantConv::toint( getValue( si, se));
 }
 
+Index Deserializer::getIndex(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	return ValueVariantConv::toint( getValue( si, se));
+}
+
+double Deserializer::getDouble(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	return ValueVariantConv::todouble( getValue( si, se));
+}
+
 std::string Deserializer::getString( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	return ValueVariantConv::tostring( getValue( si, se));
+}
+
+const char* Deserializer::getCharp(
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
+{
+	ValueVariant val = getValue( si, se);
+	if (val.type != ValueVariant::String) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
+	return val.value.string;
 }
 
 void Deserializer::consumeClose(
@@ -138,23 +161,24 @@ void Deserializer::consumeClose(
 	}
 }
 
-std::vector<std::string> Deserializer::getStringList( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+template <typename ATOMICTYPE, ATOMICTYPE FUNC( Serialization::const_iterator& si, const Serialization::const_iterator& se)>
+static std::vector<ATOMICTYPE> getAtomicTypeList( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
-	std::vector<std::string> rt;
+	std::vector<ATOMICTYPE> rt;
 	while (si != se && si->tag != Serialization::Close)
 	{
-		rt.push_back( getString( si, se));
+		rt.push_back( FUNC( si, se));
 	}
 	return rt;
 }
 
-std::vector<std::string> Deserializer::getStringList(
-		const ValueVariant& val)
+template <typename ATOMICTYPE, ATOMICTYPE CONV( const ValueVariant& val), ATOMICTYPE FUNC( Serialization::const_iterator& si, const Serialization::const_iterator& se)>
+static std::vector<ATOMICTYPE> getAtomicTypeList( const ValueVariant& val)
 {
-	std::vector<std::string> rt;
+	std::vector<ATOMICTYPE> rt;
 	if (val.type != ValueVariant::StrusSerialization)
 	{
-		rt.push_back( ValueVariantConv::tostring( val));
+		rt.push_back( CONV( val));
 		return rt;
 	}
 	else
@@ -162,52 +186,38 @@ std::vector<std::string> Deserializer::getStringList(
 		Serialization::const_iterator
 			si = val.value.serialization->begin(),  
 			se = val.value.serialization->end();
-		return getStringList( si, se);
+		return getAtomicTypeList<ATOMICTYPE,FUNC>( si, se);
 	}
+	return rt;
+}
+
+std::vector<std::string> Deserializer::getStringList( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	return getAtomicTypeList<std::string,getString>( si, se);
+}
+
+std::vector<std::string> Deserializer::getStringList(
+		const ValueVariant& val)
+{
+	return getAtomicTypeList<std::string,ValueVariantConv::tostring,getString>( val);
+}
+
+std::vector<double> Deserializer::getDoubleList(
+		const ValueVariant& val)
+{
+	return getAtomicTypeList<double,ValueVariantConv::todouble,Deserializer::getDouble>( val);
 }
 
 std::vector<int> Deserializer::getIntList(
 		const ValueVariant& val)
 {
-	std::vector<int> rt;
-	if (val.type != ValueVariant::StrusSerialization)
-	{
-		rt.push_back( ValueVariantConv::toint( val));
-	}
-	else
-	{
-		Serialization::const_iterator
-			si = val.value.serialization->begin(),  
-			se = val.value.serialization->end();
-
-		while (si != se && si->tag != Serialization::Close)
-		{
-			rt.push_back( getInt( si, se));
-		}
-	}
-	return rt;
+	return getAtomicTypeList<int,ValueVariantConv::toint,Deserializer::getInt>( val);
 }
 
 std::vector<Index> Deserializer::getIndexList(
 		const ValueVariant& val)
 {
-	std::vector<Index> rt;
-	if (val.type != ValueVariant::StrusSerialization)
-	{
-		rt.push_back( ValueVariantConv::toint( val));
-	}
-	else
-	{
-		Serialization::const_iterator
-			si = val.value.serialization->begin(),  
-			se = val.value.serialization->end();
-
-		while (si != se && si->tag != Serialization::Close)
-		{
-			rt.push_back( getInt( si, se));
-		}
-	}
-	return rt;
+	return getAtomicTypeList<Index,ValueVariantConv::toint,Deserializer::getIndex>( val);
 }
 
 std::string Deserializer::getPrefixStringValue(
@@ -1404,6 +1414,7 @@ void Deserializer::buildPatterns(
 {
 	static const StructureNameMap namemap( "name,expression,visible", ',');
 	static const char* context = _TXT("pattern");
+	if (!patterns.defined()) return;
 	if (patterns.type != ValueVariant::StrusSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for list of %s"), context);
@@ -1484,8 +1495,9 @@ void Deserializer::buildPatterns(
 	}
 }
 
-static void buildInsertMetaData(
-		StorageDocumentInterface* document,
+template <class StorageDocumentAccess>
+static void buildMetaData(
+		StorageDocumentAccess* document,
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
@@ -1566,8 +1578,9 @@ static void buildInsertMetaData(
 	}
 }
 
-static void buildInsertAttributes(
-		StorageDocumentInterface* document,
+template <class StorageDocumentAccess>
+static void buildAttributes(
+		StorageDocumentAccess* document,
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
@@ -1647,8 +1660,35 @@ static void buildInsertAttributes(
 	}
 }
 
-static void buildInsertSearchIndex(
-		StorageDocumentInterface* document,
+template <class StorageDocumentAccess>
+struct StorageDocumentForwardIndexAccess
+{
+	StorageDocumentForwardIndexAccess( StorageDocumentAccess* doc_)
+		:m_doc(doc_){}
+	void addTerm( const std::string& type_, const std::string& value_, const Index& position_)
+	{
+		m_doc->addForwardIndexTerm( type_, value_, position_);
+	}
+private:
+	StorageDocumentAccess* m_doc;
+};
+
+template <class StorageDocumentAccess>
+struct StorageDocumentSearchIndexAccess
+{
+	StorageDocumentSearchIndexAccess( StorageDocumentAccess* doc_)
+		:m_doc(doc_){}
+	void addTerm( const std::string& type_, const std::string& value_, const Index& position_)
+	{
+		m_doc->addSearchIndexTerm( type_, value_, position_);
+	}
+private:
+	StorageDocumentAccess* m_doc;
+};
+
+template <class StorageDocumentIndexAccess>
+static void buildStorageIndex(
+		StorageDocumentIndexAccess* document,
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
@@ -1709,7 +1749,7 @@ static void buildInsertSearchIndex(
 				{
 					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 				}
-				document->addSearchIndexTerm( type, value, pos);
+				document->addTerm( type, value, pos);
 			}
 			else if (si->tag == Serialization::Value)
 			{
@@ -1724,7 +1764,7 @@ static void buildInsertSearchIndex(
 					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
 				}
 				unsigned int pos = Deserializer::getUint( si, se);
-				document->addSearchIndexTerm( type, value, pos);
+				document->addTerm( type, value, pos);
 			}
 			else
 			{
@@ -1739,101 +1779,9 @@ static void buildInsertSearchIndex(
 	}
 }
 
-static void buildInsertForwardIndex(
-		StorageDocumentInterface* document,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
-{
-	static const StructureNameMap namemap( "type,value,pos,len", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), _TXT("document forward index"));
-	static const char* context = _TXT("forward index");
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
-	++si;
-
-	while (si != se)
-	{
-		if (si->tag == Serialization::Name)
-		{
-			if (ValueVariantConv::isequal_ascii( *si, "term"))
-			{
-				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-				if (si->tag != Serialization::Open) --si;
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("structure with optional name 'term' expected"), context);
-			}
-		}
-		if (si->tag == Serialization::Open)
-		{
-			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-
-			if (si->tag == Serialization::Name)
-			{
-				unsigned char type_defined = 0;
-				unsigned char value_defined = 0;
-				unsigned char pos_defined = 0;
-				std::string type;
-				std::string value;
-				unsigned int pos;
-				do
-				{
-					switch (namemap.index( *si++))
-					{
-						case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
-							type = Deserializer::getString( si, se);
-							break;
-						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
-							value = Deserializer::getString( si, se);
-							break;
-						case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "pos", context);
-							pos = Deserializer::getUint( si, se);
-							break;
-						case 3: (void)Deserializer::getUint( si, se);
-							// ... len that is part of analyzer output is ignored
-							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-					}
-				}
-				while (si->tag == Serialization::Name);
-				if (!type_defined || !value_defined || !pos_defined)
-				{
-					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
-				}
-				document->addForwardIndexTerm( type, value, pos);
-			}
-			else if (si->tag == Serialization::Value)
-			{
-				std::string type = Deserializer::getString( si, se);
-				if (si->tag != Serialization::Value)
-				{
-					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
-				}
-				std::string value = Deserializer::getString( si, se);
-				if (si->tag != Serialization::Value)
-				{
-					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
-				}
-				unsigned int pos = Deserializer::getUint( si, se);
-				document->addForwardIndexTerm( type, value, pos);
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
-			}
-			Deserializer::consumeClose( si, se);
-		}
-		else
-		{
-			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
-		}
-	}
-}
-
+template <class StorageDocumentAccess>
 static void buildAccessRights(
-		StorageDocumentInterface* document,
+		StorageDocumentAccess* document,
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
@@ -1861,15 +1809,18 @@ static void buildAccessRights(
 	}
 }
 
-void Deserializer::buildInsertDocument(
-		StorageDocumentInterface* document,
+template <class StorageDocumentAccess>
+static void buildStorageDocument(
+		StorageDocumentAccess* document,
 		const ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
 	static const StructureNameMap namemap( "doctype,attributes,metadata,searchindex,forwardindex,access", ',');
+	static const char* context = _TXT("document");
+	if (!content.defined()) return;
 	if (content.type != ValueVariant::StrusSerialization)
 	{
-		throw strus::runtime_error(_TXT("serialized structure expected for %s"), _TXT("document"));
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
 	Serialization::const_iterator
 		si = content.value.serialization->begin(),
@@ -1880,24 +1831,34 @@ void Deserializer::buildInsertDocument(
 		{
 			if (si->tag != Serialization::Name)
 			{
-				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), _TXT("document"));
+				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
 			}
 			switch (namemap.index( *si++))
 			{
-				case 0: (void)getString( si, se);
+				case 0: (void)Deserializer::getString( si, se);
 					// ... ignore sub document type (output of analyzer)
 					break;
-				case 1: buildInsertAttributes( document, si, se);
+				case 1: buildAttributes( document, si, se);
 					break;
-				case 2: buildInsertMetaData( document, si, se);
+				case 2: buildMetaData( document, si, se);
 					break;
-				case 3: buildInsertSearchIndex( document, si, se);
+				case 3:
+				{
+					StorageDocumentSearchIndexAccess<StorageDocumentAccess>
+						da( document);
+					buildStorageIndex( &da, si, se);
 					break;
-				case 4: buildInsertForwardIndex( document, si, se);
+				}
+				case 4:
+				{
+					StorageDocumentForwardIndexAccess<StorageDocumentAccess>
+						da( document);
+					buildStorageIndex( &da, si, se);
 					break;
+				}
 				case 5: buildAccessRights( document, si, se);
 					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), _TXT("document"));
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
 		}
 	}
@@ -1907,12 +1868,173 @@ void Deserializer::buildInsertDocument(
 	}
 }
 
-void Deserializer::buildUpdateDocument(
+static void buildStorageDocumentDeletes(
 		StorageDocumentUpdateInterface* document,
 		const ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	
+	static const StructureNameMap namemap( "attributes,metadata,searchindex,forwardindex,access", ',');
+	static const char* context = _TXT("document update deletes");
+	if (!content.defined()) return;
+	if (content.type != ValueVariant::StrusSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
+	}
+	Serialization::const_iterator
+		si = content.value.serialization->begin(),
+		se = content.value.serialization->end();
+	try
+	{
+		while (si != se)
+		{
+			if (si->tag != Serialization::Name)
+			{
+				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
+			}
+			switch (namemap.index( *si++))
+			{
+				case 0:
+				{
+					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+					for (; di != de; ++di)
+					{
+						document->clearAttribute( *di);
+					}
+					break;
+				}
+				case 1: buildMetaData( document, si, se);
+				{
+					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+					for (; di != de; ++di)
+					{
+						document->setMetaData( *di, NumericVariant());
+					}
+					break;
+				}
+				case 2:
+				{
+					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+					for (; di != de; ++di)
+					{
+						document->clearSearchIndexTerm( *di);
+					}
+					break;
+				}
+				case 3:
+				{
+					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+					for (; di != de; ++di)
+					{
+						document->clearForwardIndexTerm( *di);
+					}
+					break;
+				}
+				case 4:
+				{
+					if (si != se && si->tag == Serialization::Value
+						&& si->isStringType() && ValueVariantConv::isequal_ascii( *si, "*"))
+					{
+						document->clearUserAccessRights();
+					}
+					else
+					{
+						std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+						std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+						for (; di != de; ++di)
+						{
+							document->clearUserAccessRight( *di);
+						}
+					}
+					break;
+				}
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+			}
+		}
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, content.value.serialization->begin());
+	}
 }
 
+void Deserializer::buildInsertDocument(
+		StorageDocumentInterface* document,
+		const ValueVariant& content,
+		ErrorBufferInterface* errorhnd)
+{
+	buildStorageDocument( document, content, errorhnd);
+}
+
+void Deserializer::buildUpdateDocument(
+		StorageDocumentUpdateInterface* document,
+		const ValueVariant& content,
+		const ValueVariant& deletes,
+		ErrorBufferInterface* errorhnd)
+{
+	buildStorageDocument( document, content, errorhnd);
+	buildStorageDocumentDeletes( document, deletes, errorhnd);
+}
+
+void Deserializer::buildStatistics(
+		StatisticsBuilderInterface* builder,
+		const ValueVariant& content,
+		ErrorBufferInterface* errorhnd)
+{
+	static const StructureNameMap namemap( "dfchange,nofdocs", ',');
+	static const char* context = _TXT("statistics");
+
+	if (!content.defined()) return;
+	if (content.type != ValueVariant::StrusSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
+	}
+	Serialization::const_iterator
+		si = content.value.serialization->begin(),
+		se = content.value.serialization->end();
+	try
+	{
+		while (si != se)
+		{
+			if (si->tag != Serialization::Name)
+			{
+				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
+			}
+			switch (namemap.index( *si++))
+			{
+				case 0:
+				{
+					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
+					if (si->tag == Serialization::Open)
+					{
+						++si;
+						while (si != se && si->tag != Serialization::Close)
+						{
+							if (si->tag == Serialization::Name && ValueVariantConv::isequal_ascii( *si, "dfchange"))
+							{
+								//... skip name of structure if defined (for example for XML)
+								++si;
+							}
+							DfChangeDef dfchg( si, se);
+							builder->addDfChange( dfchg.termtype, dfchg.termvalue, dfchg.increment);
+						}
+						Deserializer::consumeClose( si, se);
+					}
+				}
+				case 1:
+				{
+					builder->setNofDocumentsInsertedChange( Deserializer::getInt( si, se));
+				}
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+			}
+		}
+	}	
+	catch (const std::runtime_error& err)
+	{
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, content.value.serialization->begin());
+	}
+}
 

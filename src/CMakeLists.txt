@@ -24,7 +24,7 @@ set( bindingsimpl_source_files
 	impl/query.cpp
 	impl/storage.cpp
         impl/statistics.cpp
-	impl/vectorStorage.cpp
+	impl/vector.cpp
 	impl/context.cpp
 )
 

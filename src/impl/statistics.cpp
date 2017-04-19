@@ -13,7 +13,10 @@
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/reference.hpp"
 #include "internationalization.hpp"
+#include "serializer.hpp"
+#include "deserializer.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -68,25 +71,27 @@ StatisticsProcessorImpl::StatisticsProcessorImpl( const HostObjectReference& obj
 	}
 }
 
+typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
+
 CallResult StatisticsProcessorImpl::decode( const std::string& blob) const
 {
 	CallResult rt;
-	const ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* proc = m_statsproc;
 	StatisticsViewerInterface* viewer;
-	rt.object.resetWithOwnership( viewer = proc->createViewer( blob.c_str(), blob.size()));
+	rt.object.resetOwnership( viewer = proc->createViewer( blob.c_str(), blob.size()));
 	if (!viewer) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 
 	rt.serialization.pushName( "dfchange");
 	rt.serialization.pushOpen();
-	StatisticsViewerInterface::DocumentFrequencyChange rec;
+	DocumentFrequencyChange rec;
 	while (viewer->nextDfChange( rec))
 	{
 		Serializer::serialize( rt.serialization, rec);
 	}
 	rt.serialization.pushClose();
 	rt.serialization.pushName( "nofdocs");
-	rt.serialization.pushValue( viewer->nofDocumentsInsertedChange());
+	rt.serialization.pushValue( (ValueVariant::IntType) viewer->nofDocumentsInsertedChange());
 
 	if (errorhnd->hasError())
 	{
@@ -101,15 +106,10 @@ CallResult StatisticsProcessorImpl::encode( const ValueVariant& msg) const
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* proc = m_statsproc;
 	StatisticsProcessorInterface::BuilderOptions options;
-	std::auto_ptr<StatisticsBuilderInterface> builder( proc->createBuilder( options));
-	std::vector<DocumentFrequencyChange>::const_iterator
-			dfi = msg.documentFrequencyChangeList().begin(),
-			dfe = msg.documentFrequencyChangeList().end();
-	for (; dfi != dfe; ++dfi)
-	{
-		builder->addDfChange( dfi->type().c_str(), dfi->value().c_str(), dfi->increment());
-	}
-	builder->setNofDocumentsInsertedChange( msg.nofDocumentsInsertedChange());
+	Reference<StatisticsBuilderInterface> builder( proc->createBuilder( options));
+	if (!builder.get()) throw strus::runtime_error(_TXT("failed to create builder for statistics: %s"), errorhnd->fetchError());
+	Deserializer::buildStatistics( builder.get(), msg, errorhnd);
+
 	std::string rt;
 	const char* blk;
 	std::size_t blksize;

@@ -15,7 +15,7 @@
 #include "strus/bindings/serialization.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
-#include "impl/vectorStorage.hpp"
+#include "impl/vector.hpp"
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"
 #include "impl/statistics.hpp"
@@ -26,16 +26,19 @@ namespace bindings {
 
 struct ClassIdMap
 {
-	//static int get( const ContextImpl& )		{return ClassContext;}
-	static int get( const DocumentAnalyzerImpl& )	{return ClassDocumentAnalyzer;}
-	static int get( const QueryAnalyzerImpl&)	{return ClassQueryAnalyzer;}
-	static int get( const QueryEvalImpl&)		{return ClassQueryEval;}
-	static int get( const QueryImpl&)		{return ClassQuery;}
-	static int get( const StorageClientImpl&)	{return ClassStorageClient;}
-	static int get( const StorageTransactionImpl&)	{return ClassStorageTransaction;}
-	static int get( const StatisticsProcessorImpl&)	{return ClassStatisticsProcessor;}
-	static int get( const StatisticsIteratorImpl&)	{return ClassStatisticsIterator;}
-	static int get( const DocumentBrowserImpl&)	{return ClassDocumentBrowser;}
+	//static int get( const ContextImpl& )			{return ClassContext;}
+	static int get( const DocumentAnalyzerImpl& )		{return ClassDocumentAnalyzer;}
+	static int get( const QueryAnalyzerImpl&)		{return ClassQueryAnalyzer;}
+	static int get( const QueryEvalImpl&)			{return ClassQueryEval;}
+	static int get( const QueryImpl&)			{return ClassQuery;}
+	static int get( const StorageClientImpl&)		{return ClassStorageClient;}
+	static int get( const StorageTransactionImpl&)		{return ClassStorageTransaction;}
+	static int get( const StatisticsProcessorImpl&)		{return ClassStatisticsProcessor;}
+	static int get( const StatisticsIteratorImpl&)		{return ClassStatisticsIterator;}
+	static int get( const DocumentBrowserImpl&)		{return ClassDocumentBrowser;}
+	static int get( const VectorStorageSearcherImpl&)	{return ClassVectorStorageSearcher;}
+	static int get( const VectorStorageClientImpl&)		{return ClassVectorStorageClient;}
+	static int get( const VectorStorageTransactionImpl&)	{return ClassVectorStorageTransaction;}
 };
 
 
@@ -54,6 +57,15 @@ static CallResult callResultStructureConst( const STRUCTVALUE* st)
 {
 	CallResult rt;
 	Serializer::serialize( rt.serialization, *st);
+	rt.value.init( &rt.serialization);
+	return rt;
+}
+
+template <typename STRUCTVALUE>
+static CallResult callResultStructure( const STRUCTVALUE& st)
+{
+	CallResult rt;
+	Serializer::serialize( rt.serialization, st);
 	rt.value.init( &rt.serialization);
 	return rt;
 }

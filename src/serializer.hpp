@@ -20,7 +20,7 @@
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
-#include "statisticsMessage.hpp"
+#include "strus/statisticsViewerInterface.hpp"
 #include "queryAnalyzerStruct.hpp"
 #include <string>
 #include <cstring>

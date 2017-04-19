@@ -25,15 +25,16 @@ static const ValueVariant& getValue(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("expected value in serialization"));
+		throw strus::runtime_error(_TXT("unexpected token in serialization, expected value"));
 	}
 }
 
 AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:name(),args()
 {
+	static const char* context = _TXT("analyzer function");
 	static const StructureNameMap namemap( "name,arg", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: analyzer function structure expected"));
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 
 	bool name_defined = false;
 	if (si->tag == Serialization::Name)
@@ -47,7 +48,7 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, con
 					break;
 				case 1: args = Deserializer::getStringList( si, se);
 					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in analyzer function structure"));
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -64,19 +65,20 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, con
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("analyzer function definition structure expected"));
+		throw strus::runtime_error(_TXT("%s definition structure expected"), context);
 	}
 	if (!name_defined)
 	{
-		throw strus::runtime_error(_TXT("name not defined in analyzer function"));
+		throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 	}
 }
 
 TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:variable(),type(),value(),length(1),value_defined(false),length_defined(false)
 {
+	static const char* context = _TXT("term");
 	static const StructureNameMap namemap( "type,value,variable,len", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 
 	bool type_defined = false;
 	if (si->tag == Serialization::Name)
@@ -96,7 +98,7 @@ TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_
 				case 3: length_defined = true;
 					length = Deserializer::getUint( si, se);
 					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in term structure"));
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -107,7 +109,7 @@ TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_
 		{
 			variable = Deserializer::getPrefixStringValue( *si++, '=');
 		}
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
 		if (si->tag == Serialization::Value)
 		{
@@ -126,29 +128,30 @@ TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("term definition expected"));
+			throw strus::runtime_error(_TXT("%s definition expected"), context);
 		}
 		Deserializer::consumeClose( si, se);
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("term definition expected"));
+		throw strus::runtime_error(_TXT("%s definition expected"), context);
 	}
 	if (!value_defined && length_defined)
 	{
-		throw strus::runtime_error(_TXT("terms with length defined without value defined are not accepted"));
+		throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 	}
 	if (!type_defined)
 	{
-		throw strus::runtime_error(_TXT("type not defined in term expression"));
+		throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 	}
 }
 
 MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:from(),to()
 {
+	static const char* context = _TXT("metadata range");
 	static const StructureNameMap namemap( "from,to", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of serialization: term structure expected"));
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition, structure expected"), context);
 
 	if (si->tag == Serialization::Name)
 	{
@@ -160,7 +163,7 @@ MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Ser
 					break;
 				case 1:	to = Deserializer::getString( si, se);
 					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in term structure"));
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -180,11 +183,12 @@ MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Ser
 ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:name(),value()
 {
+	static const char* context = _TXT("configuration");
 	static const StructureNameMap namemap( "name,value", ',');
 	if (si->tag == Serialization::Open)
 	{
 		++si;
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of configuration definition"));
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 		if (si->tag == Serialization::Value)
 		{
 			name = Deserializer::getString( si, se);
@@ -198,72 +202,79 @@ ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::co
 			{
 				switch (namemap.index( *si++))
 				{
-					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "name");
+					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
 						name = Deserializer::getString( si, se);
 						break;
-					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s'"), "value");
+					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
 						value = getValue( si, se);
 						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in configuration, 'name' or 'value' expected"));
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'name' or 'value' expected"), context);
 				}
 			}
 			Deserializer::consumeClose( si, se);
 			if (!defined[0] || !defined[1])
 			{
-				throw strus::runtime_error(_TXT("incomplete configuration definition"));
+				throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 			}
 		}
 	}
 	else if (si->tag == Serialization::Name)
 	{
 		name = Deserializer::getString( si, se);
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of configuration definition"));
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 
 		value = *si++;
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("argument name expected as as start of a configuration parameter"));
+		throw strus::runtime_error(_TXT("argument name expected as as start of a %s parameter"), context);
 	}
 }
 
-struct Element
-{
-	enum Type {Unknown,MetaData,Attribute};
-	Type type;
-	std::string name;
 
-	Element( const std::string& name_)
-		:type(Unknown),name(name_){}
-	Element( Type type_, const std::string& name_)
-		:type(type_),name(name_){}
-	Element( const Element& o)
-		:type(o.type),name(o.name){}
-};
-std::vector<Element> ar;
-
-void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+DfChangeDef::DfChangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
-	while (si != se)
+	static const char* context = _TXT("document frequency change");
+	static const StructureNameMap namemap( "type,value,increment", ',');
+	if (si->tag == Serialization::Open)
 	{
-		
-	}
-}
-
-DocumentBrowserSelectDef::DocumentBrowserSelectDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
-{
-	deserialize( si, se);
-}
-
-DocumentBrowserSelectDef::DocumentBrowserSelectDef( const VariantValue& val)
-{
-	if (val.type != ValueVariant::StrusSerialization)
-	{
-		ar.push_back( ValueVariantConv::tostring( val));
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+		if (si->tag == Serialization::Value)
+		{
+			termtype = Deserializer::getCharp( si, se);
+			termvalue = Deserializer::getCharp( si, se);
+			increment = Deserializer::getInt( si, se);
+		}
+		else
+		{
+			unsigned char defined[3] = {0,0};
+			while (si->tag == Serialization::Name)
+			{
+				switch (namemap.index( *si++))
+				{
+					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "type", context);
+						termtype = Deserializer::getCharp( si, se);
+						break;
+					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
+						termvalue = Deserializer::getCharp( si, se);
+						break;
+					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "increment", context);
+						increment = Deserializer::getInt( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s definition, 'type', 'value' or 'increment' expected"), context);
+				}
+			}
+			if (!defined[0] || !defined[1] || !defined[2])
+			{
+				throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+			}
+		}
+		Deserializer::consumeClose( si, se);
 	}
 	else
 	{
-		deserialize( val.value.serialization->begin(), val.value.serialization->end());
+		throw strus::runtime_error(_TXT("structure expected for %s definition"), context);
 	}
 }
 

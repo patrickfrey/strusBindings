@@ -236,46 +236,74 @@ CallResult DocumentBrowserImpl::skipDoc( int docno)
 		}
 	}
 	PostingIteratorInterface* itr = m_postingitr_impl.getObject<PostingIteratorInterface>();
-	return itr->skipDoc( docno_);
+	return itr->skipDoc( docno);
 }
 
-CallResult DocumentBrowserImpl::get( unsigned int docno, const ValueVariant& elementsSelected)
+CallResult DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected)
 {
-	if (docno)
+	if (docno <= 0)
 	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		std::vector<std::string> elemlist = Deserializer::getStringList( elementsSelected);
-		bool metadatareader_skipdoc_called = false;
 		AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
 		MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
 		bool attributereader_called = false;
 		bool metadatareader_called = false;
 
+		CallResult rt;
+		rt.serialization.pushOpen();
+		std::vector<int> miar( elemlist.size(), -1);
+
 		std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
-		for (; ei != ee; ++ei)
+		for (int eidx=0; ei != ee; ++ei,++eidx)
 		{
 			Index eh = attributereader->elementHandle( ei->c_str());
-		}
-		if (!m_attributereader_impl.get())
-		{
-			const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-			m_attributereader_impl.resetOwnership( storage->createAttributeReader());
-			if (!m_attributereader_impl.get())
+			if (eh)
 			{
-				throw strus::runtime_error( _TXT("failed to create attribute reader for document browser"));
+				if (!attributereader_called)
+				{
+					attributereader->skipDoc( docno);
+					attributereader_called = true;
+				}
+				miar[ eidx] = rt.stringbuf.size();
+				rt.stringbuf.append( attributereader->getValue( eh));
+				rt.stringbuf.push_back( '\0');
 			}
 		}
-		const AttributeReaderInterface* reader = m_attributereader_impl.getObject<AttributeReaderInterface>();
-		Index elemhnd = reader->elementHandle( name.c_str());
-		if (!elemhnd)
+		ei = elemlist.begin(), ee = elemlist.end();
+		for (int eidx=0; ei != ee; ++ei,++eidx)
 		{
-			throw strus::runtime_error( _TXT("document attribute name %s is not defined"), name.c_str());
+			if (miar[ eidx] >= 0)
+			{
+				rt.serialization.pushValue( ValueVariant( rt.stringbuf.c_str() + miar[ eidx]));
+			}
+			else
+			{
+				Index eh = metadatareader->elementHandle( ei->c_str());
+				if (eh >= 0)
+				{
+					if (!metadatareader_called)
+					{
+						metadatareader->skipDoc( docno);
+						metadatareader_called = true;
+					}
+					rt.serialization.pushValue( metadatareader->getValue( eh));
+				}
+				else
+				{
+					rt.serialization.pushValue( ValueVariant());
+				}
+			}
 		}
-		return reader->getValue( elemhnd);
+		rt.serialization.pushClose();
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT("error getting document attributes and metadata with document browser: %s"), errorhnd->fetchError());
+		}
+		rt.value.init( &rt.serialization);
+		return rt;
 	}
-	else
-	{
-		return CallResult();
-	}
+	throw strus::runtime_error(_TXT("document browser get called without valid document selected"));
 }
 
 

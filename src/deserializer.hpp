@@ -27,6 +27,7 @@
 #include "strus/patternMatcherInstanceInterface.hpp"
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageDocumentUpdateInterface.hpp"
+#include "strus/statisticsBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/index.hpp"
@@ -62,7 +63,11 @@ struct Deserializer
 	static std::string getString(
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
-	
+
+	static const char* getCharp(
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
+
 	static std::vector<std::string> getStringList(
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
@@ -74,7 +79,15 @@ struct Deserializer
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
 
-	static unsigned int getInt(
+	static int getInt(
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
+
+	static Index getIndex(
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
+
+	static double getDouble(
 			Serialization::const_iterator& si,
 			const Serialization::const_iterator& se);
 
@@ -82,6 +95,9 @@ struct Deserializer
 			const ValueVariant& val);
 
 	static std::vector<Index> getIndexList(
+			const ValueVariant& val);
+
+	static std::vector<double> getDoubleList(
 			const ValueVariant& val);
 
 	static analyzer::DocumentClass getDocumentClass(
@@ -177,6 +193,12 @@ struct Deserializer
 
 	static void buildUpdateDocument(
 			StorageDocumentUpdateInterface* document,
+			const ValueVariant& content,
+			const ValueVariant& deletes,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildStatistics(
+			StatisticsBuilderInterface* builder,
 			const ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 };
