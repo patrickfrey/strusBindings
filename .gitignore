@@ -66,6 +66,7 @@ lang/java/net/strus/example/storage/
 lang/java/net/strus/example/vsm/
 lang/python/example/storage/
 lang/python/example/vsm/
+lang/python/example/storage_unicode/
 lang/php/example/storage/
 lang/php/example/vsm/
 
