@@ -227,4 +227,43 @@ ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::co
 	}
 }
 
+struct Element
+{
+	enum Type {Unknown,MetaData,Attribute};
+	Type type;
+	std::string name;
+
+	Element( const std::string& name_)
+		:type(Unknown),name(name_){}
+	Element( Type type_, const std::string& name_)
+		:type(type_),name(name_){}
+	Element( const Element& o)
+		:type(o.type),name(o.name){}
+};
+std::vector<Element> ar;
+
+void deserialize( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	while (si != se)
+	{
+		
+	}
+}
+
+DocumentBrowserSelectDef::DocumentBrowserSelectDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	deserialize( si, se);
+}
+
+DocumentBrowserSelectDef::DocumentBrowserSelectDef( const VariantValue& val)
+{
+	if (val.type != ValueVariant::StrusSerialization)
+	{
+		ar.push_back( ValueVariantConv::tostring( val));
+	}
+	else
+	{
+		deserialize( val.value.serialization->begin(), val.value.serialization->end());
+	}
+}
 

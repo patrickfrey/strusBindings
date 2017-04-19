@@ -132,21 +132,16 @@ public:
 			const char* compareOp, const std::string& name,
 			const ValueVariant& value, bool newGroup);
 
-	/// \brief Declare an attribute to be part of the result structure
-	/// \param[in] name of the attribute
-	void defineResultAttribute( const std::string& name);
-	!!!! HIE WIITER
-
-	/// \brief Declare a metadata field to be part of the result structure
-	/// \param[in] name of the meta data field
-	void defineResultMetadata( const std::string& name);
-	!!!! HIE WIITER
-
 	///\brief Get the internal document number of the next document bigger or equal the document number passed
-	///\param[in] docno_ document number to get the matching least upperbound from
+	///\param[in] docno document number to get the matching least upperbound from
 	///\return the internal document number or 0 if no more documents defined
-	CallResult evaluate( unsigned int firstDocnoCandidate, unsigned int nofResults) const;
-	!!!! HIE WIITER
+	CallResult skipDoc( int docno);
+
+	///\brief Get the elements of a document according to a selection expression
+	///\param[in] docno document number to get the selected content from
+	///\param[in] elementsSelected structure with the elements to select from the document requested
+	///\return the structure with a tuple or a map with the elements selected (depending on input)
+	CallResult get( int docno, const ValueVariant& elementsSelected);
 
 private:
 	friend class StorageClientImpl;
@@ -164,7 +159,7 @@ private:
 	HostObjectReference m_restriction_impl;
 	HostObjectReference m_postingitr_impl;
 	HostObjectReference m_attributereader_impl;
-	int m_docno;
+	HostObjectReference m_metadatareader_impl;
 };
 
 }}//namespace

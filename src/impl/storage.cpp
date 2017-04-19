@@ -17,6 +17,8 @@
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
 #include "strus/statisticsIteratorInterface.hpp"
+#include "strus/metaDataReaderInterface.hpp"
+#include "strus/metaDataRestrictionInterface.hpp"
 #include "valueVariantConv.hpp"
 #include "internationalization.hpp"
 #include "metadataop.hpp"
@@ -185,7 +187,7 @@ DocumentBrowserImpl::DocumentBrowserImpl( const DocumentBrowserImpl& o)
 	,m_restriction_impl(o.m_restriction_impl)
 	,m_postingitr_impl(o.m_postingitr_impl)
 	,m_attributereader_impl(o.m_attributereader_impl)
-	,m_docno(o.m_docno)
+	,m_metadatareader_impl(o.m_metadatareader_impl)
 {}
 
 DocumentBrowserImpl::DocumentBrowserImpl( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& storage_impl_, const HostObjectReference& errorhnd_)
@@ -196,7 +198,7 @@ DocumentBrowserImpl::DocumentBrowserImpl( const HostObjectReference& objbuilder_
 	,m_restriction_impl()
 	,m_postingitr_impl()
 	,m_attributereader_impl()
-	,m_docno(0)
+	,m_metadatareader_impl()
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	m_restriction_impl.resetOwnership( storage->createMetaDataRestriction());
@@ -204,6 +206,8 @@ DocumentBrowserImpl::DocumentBrowserImpl( const HostObjectReference& objbuilder_
 	{
 		throw strus::runtime_error( _TXT("failed to create meta data restriction interface for browsing documents"));
 	}
+	m_attributereader_impl.resetOwnership( storage->createAttributeReader());
+	m_metadatareader_impl.resetOwnership( storage->createMetaDataReader());
 }
 
 void DocumentBrowserImpl::addMetaDataRestrictionCondition(
@@ -219,7 +223,7 @@ void DocumentBrowserImpl::addMetaDataRestrictionCondition(
 	restriction->addCondition( cmpop, name, ValueVariantConv::tonumeric(value), newGroup);
 }
 
-CallResult DocumentBrowserImpl::skipDoc( int docno_)
+CallResult DocumentBrowserImpl::skipDoc( int docno)
 {
 	if (!m_postingitr_impl.get())
 	{
@@ -232,13 +236,25 @@ CallResult DocumentBrowserImpl::skipDoc( int docno_)
 		}
 	}
 	PostingIteratorInterface* itr = m_postingitr_impl.getObject<PostingIteratorInterface>();
-	return m_docno = itr->skipDoc( docno_);
+	return itr->skipDoc( docno_);
 }
 
-CallResult DocumentBrowserImpl::attribute( const std::string& name)
+CallResult DocumentBrowserImpl::get( unsigned int docno, const ValueVariant& elementsSelected)
 {
-	if (m_docno)
+	if (docno)
 	{
+		std::vector<std::string> elemlist = Deserializer::getStringList( elementsSelected);
+		bool metadatareader_skipdoc_called = false;
+		AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
+		MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
+		bool attributereader_called = false;
+		bool metadatareader_called = false;
+
+		std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
+		for (; ei != ee; ++ei)
+		{
+			Index eh = attributereader->elementHandle( ei->c_str());
+		}
 		if (!m_attributereader_impl.get())
 		{
 			const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
