@@ -5,7 +5,7 @@ import os
 from testCollection import createCollection
 
 queryphrase = "citi that, is"
-createCollection()
+createCollection( "./data", "storage")
 
 storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
 config = "path=%s" % (storagePath)

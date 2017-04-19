@@ -2,7 +2,7 @@
 
 from testCollection import createCollection
 
-createCollection()
+createCollection( "./data", "storage")
 print "done"
 
 

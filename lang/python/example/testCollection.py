@@ -10,8 +10,8 @@ def readFile( path ):
 		fileContent = file.read()
 	return fileContent
 
-def createCollection():
-	storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
+def createCollection( datadir, storagename):
+	storagePath = os.environ[ "PYTHONPATH" ] + "/example/" + storagename
 	config = "path=%s; metadata=doclen UINT16, title_start UINT8, title_end UINT8" % (storagePath)
 	ctx = strus.Context()
 	ctx.loadModule( "analyzer_pattern");
@@ -48,13 +48,12 @@ def createCollection():
 	
 	# Read input files, analyze and insert them:
 	transaction = storage.createTransaction()
-	datadir = "./data/"
 	for (dirpath, dirnames, filenames) in os.walk( datadir):
 		for idx, filename in enumerate( filenames):
 			if filename.endswith('.xml'):
 				print "%u process document %s" % (idx,filename)
 				docid = filename[0:-4]
-				doc = analyzer.analyze( readFile( datadir + filename))
+				doc = analyzer.analyze( readFile( os.path.join( datadir, filename)))
 				transaction.insertDocument( docid, doc)
 	
 	# Without this the documents wont be inserted:

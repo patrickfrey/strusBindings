@@ -2,7 +2,6 @@
 
 import strus
 import os
-from testCollection import createCollection
 
 storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
 config="path=%s;dim=7;bit=3;var=32;maxdist=5;probsim=yes;simdist=5;probdist=8;raddist=5;eqdist=1;singletons=yes" % (storagePath)

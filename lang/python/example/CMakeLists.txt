@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
 set( THISDIR "${PROJECT_SOURCE_DIR}/lang/python/example" )
-set( tests helloWorld createCollection query query_trace query_debug queryexpr status )
+set( tests helloWorld createCollection query query_trace query_debug query_unicode queryexpr status )
 IF (WITH_STRUS_PATTERN STREQUAL "YES")
 set( tests ${tests} querypattern )
 ENDIF (WITH_STRUS_PATTERN STREQUAL "YES")
