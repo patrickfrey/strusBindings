@@ -437,7 +437,7 @@ CallResult QueryAnalyzerImpl::analyze(
 	if (!anactx.get()) throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
 
 	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
-	Deserializer::buildExpression( exprbuilder, expression);
+	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
 
 	analyzer::Query* qry = new analyzer::Query( anactx->analyze());
 

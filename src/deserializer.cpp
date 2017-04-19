@@ -17,7 +17,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-static void throw_error_with_location( const char* msg, ErrorBufferInterface* errorhnd, Serialization::const_iterator si, const Serialization::const_iterator& se, const Serialization::const_iterator& start)
+static std::runtime_error runtime_error_with_location( const char* msg, ErrorBufferInterface* errorhnd, Serialization::const_iterator si, const Serialization::const_iterator& se, const Serialization::const_iterator& start)
 {
 	std::string msgbuf;
 	try
@@ -83,11 +83,11 @@ static void throw_error_with_location( const char* msg, ErrorBufferInterface* er
 		{
 			msgbuf.append( string_format( _TXT("(in expression at %s)"), location_explain.c_str()));
 		}
-		throw strus::runtime_error( msgbuf.c_str());
+		return strus::runtime_error( msgbuf.c_str());
 	}
 	catch (const std::exception&)
 	{
-		throw strus::runtime_error( msg);
+		return strus::runtime_error( msg);
 	}
 }
 
@@ -132,7 +132,7 @@ void Deserializer::consumeClose(
 	{
 		if (si->tag != Serialization::Close)
 		{
-			throw strus::runtime_error(_TXT("unexpected element at end of %s, close expected"), _TXT("structure"));
+			throw strus::runtime_error(_TXT("unexpected element at end of structure, close expected"));
 		}
 		++si;
 	}
@@ -361,6 +361,7 @@ TermStatistics Deserializer::getTermStatistics(
 		const ValueVariant& val)
 {
 	static const StructureNameMap namemap( "df", ',');
+	static const char* context = _TXT("term statistics");
 	TermStatistics rt;
 	if (val.isAtomicType())
 	{
@@ -369,7 +370,7 @@ TermStatistics Deserializer::getTermStatistics(
 	}
 	if (val.type != ValueVariant::StrusSerialization)
 	{
-		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), _TXT("term statistics"));
+		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), context);
 	}
 	Serialization::const_iterator
 		si = val.value.serialization->begin(),  
@@ -378,13 +379,13 @@ TermStatistics Deserializer::getTermStatistics(
 	{
 		if (si->tag != Serialization::Name)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), _TXT("term statistics"));
+			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
 		}
 		switch (namemap.index( *si++))
 		{
 			case 0: rt.setDocumentFrequency( ValueVariantConv::touint64( getValue(si,se)));
 				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), _TXT("term statistics"));
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				break;
 		}
 	}
@@ -395,6 +396,7 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 		const ValueVariant& val)
 {
 	static const StructureNameMap namemap( "nofdocs", ',');
+	static const char* context = _TXT("global statistics");
 	GlobalStatistics rt;
 	if (val.isAtomicType())
 	{
@@ -403,7 +405,7 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 	}
 	if (val.type != ValueVariant::StrusSerialization)
 	{
-		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), _TXT("global statistics"));
+		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), context);
 	}
 	Serialization::const_iterator
 		si = val.value.serialization->begin(),  
@@ -412,13 +414,13 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 	{
 		if (si->tag != Serialization::Name)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), _TXT("global statistics"));
+			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
 		}
 		switch (namemap.index( *si++))
 		{
 			case 0: rt.setNofDocumentsInserted( ValueVariantConv::touint64( getValue(si,se)));
 				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), _TXT("global statistics"));
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				break;
 		}
 	}
@@ -429,6 +431,7 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 		const ValueVariant& val)
 {
 	static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
+	static const char* context = _TXT("document class");
 	analyzer::DocumentClass rt;
 	if (val.type != ValueVariant::StrusSerialization)
 	{
@@ -453,7 +456,7 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 					break;
 				case 2: rt.setScheme( Deserializer::getString( si, se));
 					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), _TXT("document class"));
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
 		} while (si != se && si->tag == Serialization::Name);
 		Deserializer::consumeClose( si, se);
@@ -473,7 +476,7 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("expected %s structure"), _TXT("document class"));
+		throw strus::runtime_error(_TXT("expected %s structure"), context);
 	}
 	return rt;
 }
@@ -485,14 +488,15 @@ static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
 		ErrorBufferInterface* errorhnd)
 {
 	const NormalizerFunctionInterface* nf = textproc->getNormalizer( name);
-	if (!nf) throw strus::runtime_error( _TXT("failed to get %s function '%s': %s"), _TXT("normalizer"), name.c_str(), errorhnd->fetchError());
+	static const char* context = _TXT("normalizer function");
+	if (!nf) throw strus::runtime_error( _TXT("failed to get %s '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 
 	Reference<NormalizerFunctionInstanceInterface> function(
 			nf->createInstance( arguments, textproc));
 	if (!function.get())
 	{
-		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"),
-						_TXT("normalizer"), name.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to create %s instance '%s': %s"),
+						context, name.c_str(), errorhnd->fetchError());
 	}
 	return function;
 }
@@ -504,14 +508,15 @@ static Reference<TokenizerFunctionInstanceInterface> getTokenizer_(
 		ErrorBufferInterface* errorhnd)
 {
 	const TokenizerFunctionInterface* nf = textproc->getTokenizer( name);
-	if (!nf) throw strus::runtime_error( _TXT("failed to get %s function '%s': %s"),
-						_TXT("tokenizer"), name.c_str(), errorhnd->fetchError());
+	static const char* context = _TXT("tokenizer function");
+	if (!nf) throw strus::runtime_error( _TXT("failed to get %s '%s': %s"),
+						context, name.c_str(), errorhnd->fetchError());
 
 	Reference<TokenizerFunctionInstanceInterface> function(
 			nf->createInstance( arguments, textproc));
 	if (!function.get())
 	{
-		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"), _TXT("tokenizer"), name.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 	}
 	return function;
 }
@@ -523,13 +528,14 @@ static Reference<AggregatorFunctionInstanceInterface> getAggregator_(
 		ErrorBufferInterface* errorhnd)
 {
 	const AggregatorFunctionInterface* nf = textproc->getAggregator( name);
-	if (!nf) throw strus::runtime_error( _TXT("failed to get %s function '%s': %s"), _TXT("aggregator"), name.c_str(), errorhnd->fetchError());
+	static const char* context = _TXT("aggregator function");
+	if (!nf) throw strus::runtime_error( _TXT("failed to get %s function '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 
 	Reference<AggregatorFunctionInstanceInterface> function(
 			nf->createInstance( arguments));
 	if (!function.get())
 	{
-		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"), _TXT("aggregator"), name.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 	}
 	return function;
 }
@@ -576,6 +582,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		ErrorBufferInterface* errorhnd)
 {
 	std::vector< Reference<NormalizerFunctionInstanceInterface> > rt;
+	static const char* context = _TXT("normalizer function list");
 
 	while (si != se && si->tag != Serialization::Close)
 	{
@@ -590,7 +597,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("unexpected element in %s structure"), _TXT("normalizer list"));
+			throw strus::runtime_error(_TXT("unexpected element in %s"), context);
 		}
 	}
 	if (si != se)
@@ -623,7 +630,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw_error_with_location( err.what(), errorhnd, si, se, normalizers.value.serialization->begin());
+			throw runtime_error_with_location( err.what(), errorhnd, si, se, normalizers.value.serialization->begin());
 		}
 	}
 }
@@ -650,7 +657,7 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw_error_with_location( err.what(), errorhnd, si, se, tokenizer.value.serialization->begin());
+			throw runtime_error_with_location( err.what(), errorhnd, si, se, tokenizer.value.serialization->begin());
 		}
 	}
 }
@@ -676,7 +683,7 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw_error_with_location( err.what(), errorhnd, si, se, aggregator.value.serialization->begin());
+			throw runtime_error_with_location( err.what(), errorhnd, si, se, aggregator.value.serialization->begin());
 		}
 	}
 }
@@ -698,7 +705,7 @@ static void instantiateQueryEvalFunctionParameter(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("atomic value expected as %s function argument (%s)"), functionclass, name.c_str());
+		throw strus::runtime_error(_TXT("atomic value expected as %s argument (%s)"), functionclass, name.c_str());
 	}
 }
 
@@ -712,11 +719,11 @@ static void deserializeQueryEvalFunctionParameterValue(
 		const Serialization::const_iterator& se)
 {
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s function parameter definition"), functionclass);
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
 	if (si->tag == Serialization::Open)
 	{
 		++si;
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s function parameter definition"), functionclass);
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
 		if (si->tag == Serialization::Name)
 		{
 			if (ValueVariantConv::isequal_ascii( *si, "feature"))
@@ -738,7 +745,7 @@ static void deserializeQueryEvalFunctionParameterValue(
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("unexpected tag name in %s function parameter definition"), functionclass);
+				throw strus::runtime_error(_TXT("unexpected tag name in %s parameter definition"), functionclass);
 			}
 		}
 		else
@@ -785,10 +792,19 @@ static void deserializeQueryEvalFunctionParameter(
 {
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
 	static const StructureNameMap namemap( "name,value,feature", ',');
+	if (si->tag == Serialization::Name)
+	{
+		if (ValueVariantConv::isequal_ascii( *si++, "param"))
+		{
+			++si;
+			if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
+			if (si->tag != Serialization::Open) --si;
+		}
+	}
 	if (si->tag == Serialization::Open)
 	{
 		++si;
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s function parameter definition"), functionclass);
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
 		if (si->tag == Serialization::Value)
 		{
 			std::string paramname = Deserializer::getString( si, se);
@@ -814,22 +830,22 @@ static void deserializeQueryEvalFunctionParameter(
 			{
 				switch (namemap.index( *si++))
 				{
-					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", functionclass);
+					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", functionclass);
 						name = Deserializer::getString( si, se);
 						break;
-					case 1: if (value_defined++) throw strus::runtime_error(_TXT("contradicting definitions in %s function parameter: only one allowed of 'value' or 'feature'"), functionclass);
+					case 1: if (value_defined++) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
 						value = getValue( si, se);
 						break;
-					case 2:	if (value_defined++) throw strus::runtime_error(_TXT("contradicting definitions in %s function parameter: only one allowed of 'value' or 'feature'"), functionclass);
+					case 2:	if (value_defined++) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
 						is_feature=true; value = getValue( si, se);
 						break;
-					default: throw strus::runtime_error(_TXT("unknown name in %s function parameter list"), functionclass);
+					default: throw strus::runtime_error(_TXT("unknown name in %s parameter list"), functionclass);
 				}
 			}
 			Deserializer::consumeClose( si, se);
 			if (!name_defined || !value_defined)
 			{
-				throw strus::runtime_error(_TXT("incomplete %s function definition"), functionclass);
+				throw strus::runtime_error(_TXT("incomplete %s definition"), functionclass);
 			}
 			if (is_feature)
 			{
@@ -849,7 +865,7 @@ static void deserializeQueryEvalFunctionParameter(
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("incomplete %s function definition"), functionclass);
+			throw strus::runtime_error(_TXT("incomplete %s definition"), functionclass);
 		}
 	}
 	else if (si->tag == Serialization::Name)
@@ -867,7 +883,7 @@ static void deserializeQueryEvalFunctionParameter(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("format error in %s function parameter structure"), functionclass);
+		throw strus::runtime_error(_TXT("format error in %s parameter structure"), functionclass);
 	}
 }
 
@@ -882,7 +898,7 @@ static void deserializeQueryEvalFunctionParameters(
 {
 	if (parameters.type != ValueVariant::StrusSerialization)
 	{
-		throw strus::runtime_error(_TXT("list of named arguments expected as %s function parameters"), functionclass);
+		throw strus::runtime_error(_TXT("list of named arguments expected as %s parameters"), functionclass);
 	}
 	Serialization::const_iterator
 		si = parameters.value.serialization->begin(),
@@ -897,7 +913,7 @@ static void deserializeQueryEvalFunctionParameters(
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw_error_with_location( err.what(), errorhnd, si, se, parameters.value.serialization->begin());
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, parameters.value.serialization->begin());
 	}
 }
 
@@ -912,7 +928,7 @@ static void deserializeQueryEvalFunctionResultNames(
 	{
 		if (resultnames.type != ValueVariant::StrusSerialization)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected as %s function result name definitions"), functionclass);
+			throw strus::runtime_error(_TXT("list of named arguments expected as %s result name definitions"), functionclass);
 		}
 		Serialization::const_iterator
 			si = resultnames.value.serialization->begin(),
@@ -929,7 +945,7 @@ static void deserializeQueryEvalFunctionResultNames(
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw_error_with_location( err.what(), errorhnd, si, se, resultnames.value.serialization->begin());
+			throw runtime_error_with_location( err.what(), errorhnd, si, se, resultnames.value.serialization->begin());
 		}
 	}
 }
@@ -942,29 +958,30 @@ void Deserializer::buildSummarizerFunction(
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context = _TXT("summarizer function");
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
 	std::vector<FeatureParameter> featureParameters;
 
 	const SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( functionName);
-	if (!sf) throw strus::runtime_error( _TXT("%s function not defined: '%s'"), "summarizer", functionName.c_str());
+	if (!sf) throw strus::runtime_error( _TXT("%s not defined: '%s'"), context, functionName.c_str());
 
 	Reference<SummarizerFunctionInstanceInterface> function( sf->createInstance( queryproc));
-	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s function '%s': %s"), "summarizer", functionName.c_str(), errorhnd->fetchError());
+	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 
 	std::string debuginfoAttribute("debug");
 
 	deserializeQueryEvalFunctionParameters(
-		"summarizer", function.get(), debuginfoAttribute, featureParameters, parameters, errorhnd);
+		context, function.get(), debuginfoAttribute, featureParameters, parameters, errorhnd);
 
 	deserializeQueryEvalFunctionResultNames(
-		"summarizer", function.get(), resultnames, errorhnd);
+		context, function.get(), resultnames, errorhnd);
 
 	queryeval->addSummarizerFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
 	function.release();
 
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to define %s function '%s': %s"), "summarizer", functionName.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT("failed to define %s '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 	}
 }
 
@@ -975,25 +992,26 @@ void Deserializer::buildWeightingFunction(
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context = _TXT("weighting function");
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
 	std::vector<FeatureParameter> featureParameters;
 
 	const WeightingFunctionInterface* sf = queryproc->getWeightingFunction( functionName);
-	if (!sf) throw strus::runtime_error( _TXT("%s function not defined: '%s'"), "weighting", functionName.c_str());
+	if (!sf) throw strus::runtime_error( _TXT("%s not defined: '%s'"), context, functionName.c_str());
 
 	Reference<WeightingFunctionInstanceInterface> function( sf->createInstance( queryproc));
-	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s function '%s': %s"), "weighting", functionName.c_str(), errorhnd->fetchError());
+	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 
 	std::string debuginfoAttribute("debug");
 	deserializeQueryEvalFunctionParameters(
-		"weighting", function.get(), debuginfoAttribute, featureParameters, parameters, errorhnd);
+		context, function.get(), debuginfoAttribute, featureParameters, parameters, errorhnd);
 
 	queryeval->addWeightingFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
 	function.release();
 
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to define %s function '%s': %s"), "weighting", functionName.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT("failed to define %s function '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 	}
 }
 
@@ -1004,6 +1022,7 @@ void Deserializer::buildWeightingFormula(
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context = _TXT("scalar function");
 	std::string parsername;
 	typedef std::pair<std::string,double> ParamDef;
 	std::vector<ParamDef> paramlist;
@@ -1011,7 +1030,7 @@ void Deserializer::buildWeightingFormula(
 	{
 		if (parameter.type != ValueVariant::StrusSerialization)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected as %s function parameters"), "scalar");
+			throw strus::runtime_error(_TXT("list of named arguments expected as parameters of %s"), context);
 		}
 		Serialization::const_iterator
 			si = parameter.value.serialization->begin(),
@@ -1035,14 +1054,14 @@ void Deserializer::buildWeightingFormula(
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw_error_with_location( err.what(), errorhnd, si, se, parameter.value.serialization->begin());
+			throw runtime_error_with_location( err.what(), errorhnd, si, se, parameter.value.serialization->begin());
 		}
 	}
 	const ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser( parsername);
 	std::auto_ptr<ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source, std::vector<std::string>()));
 	if (!scalarfunc.get())
 	{
-		throw strus::runtime_error(_TXT( "failed to create %s function (%s) from source: %s"), "scalar", source.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT( "failed to create %s (%s) from source: %s"), context, source.c_str(), errorhnd->fetchError());
 	}
 	std::vector<ParamDef>::const_iterator
 		vi = paramlist.begin(),
@@ -1056,7 +1075,7 @@ void Deserializer::buildWeightingFormula(
 
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to define %s function (%s): %s"), "scalar", source.c_str(), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT("failed to define %s (%s): %s"), context, source.c_str(), errorhnd->fetchError());
 	}
 }
 
@@ -1182,10 +1201,11 @@ static void buildExpressionJoin(
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
+	static const char* context = _TXT("join expression");
 	static const StructureNameMap joinop_namemap( "variable,join,range,cardinality,arg", ',');
-	enum StructureNameId {JO_UNKNOWN=-1,JO_variable=0,JO_join=1, JO_range=2, JO_cardinality=3, JO_arg=4};
+	enum StructureNameId {JO_variable=0,JO_join=1, JO_range=2, JO_cardinality=3, JO_arg=4};
 
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), "sub expression");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
 	if (si->tag == Serialization::Open)
 	{
@@ -1195,7 +1215,7 @@ static void buildExpressionJoin(
 		int range = 0;
 		unsigned int cardinality = 0;
 
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), "sub expression");
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
 		if (si->tag == Serialization::Name)
 		{
@@ -1203,7 +1223,6 @@ static void buildExpressionJoin(
 			{
 				switch ((StructureNameId)joinop_namemap.index( *si++))
 				{
-					case JO_UNKNOWN: throw strus::runtime_error(_TXT("unknown tag name in %s"),"sub expression");
 					case JO_variable:
 						variable = Deserializer::getString( si, se);
 						break;
@@ -1220,6 +1239,7 @@ static void buildExpressionJoin(
 						Deserializer::buildExpression( builder, si, se);
 						++argc;
 						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s"), context);
 				}
 			} while (si != se && si->tag == Serialization::Name);
 			Deserializer::consumeClose( si, se);
@@ -1229,10 +1249,6 @@ static void buildExpressionJoin(
 			if (Deserializer::isStringWithPrefix( *si, '='))
 			{
 				variable = Deserializer::getPrefixStringValue( *si++, '=');
-				if (si == se || si->tag != Serialization::Value)
-				{
-					throw strus::runtime_error(_TXT("expected variable assignment,term, metadata range or posting sub expression"));
-				}
 			}
 			op = Deserializer::getString( si, se);
 			if (si != se && si->tag == Serialization::Value)
@@ -1257,7 +1273,7 @@ static void buildExpressionJoin(
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("unexpected element in %s"), _TXT("sub expression"));
+			throw strus::runtime_error(_TXT("unexpected element in %s"), context);
 		}
 		builder.pushExpression( op, argc, range, cardinality);
 		if (!variable.empty())
@@ -1267,7 +1283,29 @@ static void buildExpressionJoin(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("unexpected element in %s"), _TXT("sub expression"));
+		throw strus::runtime_error(_TXT("unexpected element in %s"), context);
+	}
+}
+
+static void builderPushTerm(
+		ExpressionBuilder& builder,
+		const TermDef& def)
+{
+	if (def.value_defined)
+	{
+		builder.pushTerm( def.type);
+	}
+	else if (def.length_defined)
+	{
+		builder.pushTerm( def.type, def.value, def.length);
+	}
+	else
+	{
+		builder.pushTerm( def.type, def.value);
+	}
+	if (!def.variable.empty())
+	{
+		builder.attachVariable( def.variable);
 	}
 }
 
@@ -1276,47 +1314,61 @@ void Deserializer::buildExpression(
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
-	ExpressionType etype = getExpressionType( si, se);
-	switch (etype)
+	const char* context = "expression";
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
+	static const StructureNameMap namemap( "term,metadata,expression", ',');
+
+	if (si->tag == Serialization::Name)
 	{
-		case ExpressionUnknown:
+		switch (namemap.index( *si++))
 		{
-			throw strus::runtime_error(_TXT("unable to interpret expression"));
-		}
-		case ExpressionTerm:
-		{
-			TermDef def( si, se);
-			if (def.value_defined)
+			case 0:
 			{
-				builder.pushTerm( def.type);
+				builderPushTerm( builder, TermDef( si, se));
+				break;
 			}
-			else if (def.length_defined)
+			case 1:
 			{
-				builder.pushTerm( def.type, def.value, def.length);
+				MetaDataRangeDef def( si, se);
+				builder.pushDocField( def.from, def.to);
+				break;
 			}
-			else
+			case 2:
 			{
-				builder.pushTerm( def.type, def.value);
+				buildExpressionJoin( builder, si, se);
+				break;
 			}
-			if (!def.variable.empty())
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+		}
+	}
+	else
+	{
+		ExpressionType etype = getExpressionType( si, se);
+		switch (etype)
+		{
+			case ExpressionUnknown:
 			{
-				builder.attachVariable( def.variable);
+				throw strus::runtime_error(_TXT("unable to interpret %s"), context);
+			}
+			case ExpressionTerm:
+			{
+				builderPushTerm( builder, TermDef( si, se));
+			}
+			case ExpressionVariableAssignment:
+			{
+				throw strus::runtime_error(_TXT("isolated variable assignment in %s"), context);
+			}
+			case ExpressionMetaDataRange:
+			{
+				MetaDataRangeDef def( si, se);
+				builder.pushDocField( def.from, def.to);
+			}
+			case ExpressionJoin:
+			{
+				buildExpressionJoin( builder, si, se);
 			}
 		}
-		case ExpressionVariableAssignment:
-		{
-			throw strus::runtime_error(_TXT("isolated variable assignment in structure, must be at the beginning of an expression"));
-		}
-		case ExpressionMetaDataRange:
-		{
-			MetaDataRangeDef def( si, se);
-			builder.pushDocField( def.from, def.to);
-		}
-		case ExpressionJoin:
-		{
-			buildExpressionJoin( builder, si, se);
-		}
-	};
+	}
 }
 
 void Deserializer::buildExpression(
@@ -1324,9 +1376,10 @@ void Deserializer::buildExpression(
 		const ValueVariant& expression,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context = _TXT("expression");
 	if (expression.type != ValueVariant::StrusSerialization)
 	{
-		throw strus::runtime_error(_TXT("serialized structure expected for %s"), _TXT("expression"));
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
 	else
 	{
@@ -1339,7 +1392,7 @@ void Deserializer::buildExpression(
 		}
 		catch (const std::runtime_error& err)
 		{
-			throw_error_with_location( err.what(), errorhnd, si, se, expression.value.serialization->begin());
+			throw runtime_error_with_location( err.what(), errorhnd, si, se, expression.value.serialization->begin());
 		}
 	}
 }
@@ -1349,10 +1402,11 @@ void Deserializer::buildPatterns(
 		const ValueVariant& patterns,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "name,pattern,visible", ',');
+	static const StructureNameMap namemap( "name,expression,visible", ',');
+	static const char* context = _TXT("pattern");
 	if (patterns.type != ValueVariant::StrusSerialization)
 	{
-		throw strus::runtime_error(_TXT("serialized structure expected for %s"), _TXT("patterns"));
+		throw strus::runtime_error(_TXT("serialized structure expected for list of %s"), context);
 	}
 	Serialization::const_iterator
 		si = patterns.value.serialization->begin(),
@@ -1361,10 +1415,23 @@ void Deserializer::buildPatterns(
 	{
 		while (si != se)
 		{
+			if (si->tag == Serialization::Name)
+			{
+				if (ValueVariantConv::isequal_ascii( *si, "pattern"))
+				{
+					++si;
+					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+					if (si->tag != Serialization::Open) --si;
+				}
+				else
+				{
+					throw strus::runtime_error(_TXT("structure with optional name 'pattern' expected"), context);
+				}
+			}
 			if (si->tag == Serialization::Open)
 			{
 				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), _TXT("pattern"));
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 				std::string name;
 				bool visible = true;
 				if (si->tag == Serialization::Name)
@@ -1372,17 +1439,14 @@ void Deserializer::buildPatterns(
 					do
 					{
 						int ki = namemap.index( *si++);
-						if (ki<0) throw strus::runtime_error(_TXT("unknown element in %s definition"), _TXT("pattern"));
+						if (ki<0) throw strus::runtime_error(_TXT("unknown element in %s definition"), context);
 						switch (ki)
 						{
-							case 0:
-								name = ValueVariantConv::tostring( getValue( si, se));
+							case 0: name = ValueVariantConv::tostring( getValue( si, se));
 								break;
-							case 1:
-								buildExpression( builder, si, se);
+							case 1: buildExpression( builder, si, se);
 								break;
-							case 2:
-								visible = ValueVariantConv::tobool( getValue( si, se));
+							case 2: visible = ValueVariantConv::tobool( getValue( si, se));
 								break;
 						}
 					} while (si != se && si->tag == Serialization::Name);
@@ -1403,20 +1467,20 @@ void Deserializer::buildPatterns(
 				}
 				else
 				{
-					throw strus::runtime_error(_TXT("error in %s definition structure"), _TXT("pattern"));
+					throw strus::runtime_error(_TXT("error in %s definition structure"), context);
 				}
 				Deserializer::consumeClose( si, se);
 				builder.definePattern( name, visible);
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("%s definition expected to be a structure"), _TXT("pattern"));
+				throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
 			}
 		}
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw_error_with_location( err.what(), errorhnd, si, se, patterns.value.serialization->begin());
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, patterns.value.serialization->begin());
 	}
 }
 
@@ -1426,8 +1490,80 @@ static void buildInsertMetaData(
 		const Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "name,value", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), _TXT("document meta data"));
-	
+	static const char* context = _TXT("document metadata");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+
+	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	++si;
+
+	while (si != se)
+	{
+		if (si->tag == Serialization::Name)
+		{
+			if (ValueVariantConv::isequal_ascii( *si, "assign"))
+			{
+				++si;
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), context);
+				if (si->tag != Serialization::Open) --si;
+			}
+		}
+		if (si->tag == Serialization::Open)
+		{
+			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+
+			if (si->tag == Serialization::Name)
+			{
+				unsigned char name_defined = 0;
+				unsigned char value_defined = 0;
+				std::string name;
+				NumericVariant value;
+				do
+				{
+					switch (namemap.index( *si++))
+					{
+						case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+							name = Deserializer::getString( si, se);
+							break;
+						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+							value = ValueVariantConv::tonumeric( getValue( si, se));
+							break;
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					}
+				}
+				while (si->tag == Serialization::Name);
+				if (!name_defined || !value_defined)
+				{
+					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+				}
+				document->setMetaData( name, value);
+			}
+			else if (si->tag == Serialization::Value)
+			{
+				std::string name = Deserializer::getString( si, se);
+				if (si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
+				}
+				NumericVariant value = ValueVariantConv::tonumeric( getValue( si, se));
+				document->setMetaData( name, value);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else if (si->tag == Serialization::Name)
+		{
+			std::string name = Deserializer::getString( si, se);
+			NumericVariant value = ValueVariantConv::tonumeric( getValue( si, se));
+			document->setMetaData( name, value);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
+		}
+	}
 }
 
 static void buildInsertAttributes(
@@ -1436,40 +1572,78 @@ static void buildInsertAttributes(
 		const Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "name,value", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), _TXT("document attributes"));
-	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), _TXT("document attributes"));
+	static const char* context = _TXT("document attributes");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
 	++si;
-	try
+
+	while (si != se)
 	{
-		while (si != se)
+		if (si->tag == Serialization::Name)
 		{
-			std::string name;
+			if (ValueVariantConv::isequal_ascii( *si, "attribute"))
+			{
+				++si;
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+				if (si->tag != Serialization::Open) --si;
+			}
+		}
+		if (si->tag == Serialization::Open)
+		{
+			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+
 			if (si->tag == Serialization::Name)
 			{
-				ValueVariant value;
-				switch (namemap.index( *si++))
+				unsigned char name_defined = 0;
+				unsigned char value_defined = 0;
+				std::string name;
+				std::string value;
+				do
 				{
-					case 0: name = Deserializer::getString( si, se);
-						break;
-					case 1: value = getValue( si, se);
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), _TXT("document attributes"));
+					switch (namemap.index( *si++))
+					{
+						case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+							name = Deserializer::getString( si, se);
+							break;
+						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+							value = Deserializer::getString( si, se);
+							break;
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					}
 				}
+				while (si->tag == Serialization::Name);
+				if (!name_defined || !value_defined)
+				{
+					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+				}
+				document->setAttribute( name, value);
 			}
 			else if (si->tag == Serialization::Value)
 			{
-				
+				std::string name = Deserializer::getString( si, se);
+				if (si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
+				}
+				std::string value = Deserializer::getString( si, se);
+				document->setAttribute( name, value);
 			}
-			else if (si->tag == Serialization::Open)
+			else
 			{
-				
+				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
 			}
+			Deserializer::consumeClose( si, se);
 		}
-		Deserializer::consumeClose( si, se);
-	}
-	catch (const std::runtime_error& err)
-	{
-		throw_error_with_location( err.what(), errorhnd, si, se, content.value.serialization->begin());
+		else if (si->tag == Serialization::Name)
+		{
+			std::string name = Deserializer::getString( si, se);
+			std::string value = Deserializer::getString( si, se);
+			document->setAttribute( name, value);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
+		}
 	}
 }
 
@@ -1479,7 +1653,90 @@ static void buildInsertSearchIndex(
 		const Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "type,value,pos,len", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), _TXT("document search index"));
+	static const char* context = _TXT("search index");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	++si;
+
+	while (si != se)
+	{
+		if (si->tag == Serialization::Name)
+		{
+			if (ValueVariantConv::isequal_ascii( *si, "term"))
+			{
+				++si;
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+				if (si->tag != Serialization::Open) --si;
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("structure with optional name 'term' expected"), context);
+			}
+		}
+		if (si->tag == Serialization::Open)
+		{
+			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+
+			if (si->tag == Serialization::Name)
+			{
+				unsigned char type_defined = 0;
+				unsigned char value_defined = 0;
+				unsigned char pos_defined = 0;
+				std::string type;
+				std::string value;
+				unsigned int pos;
+				do
+				{
+					switch (namemap.index( *si++))
+					{
+						case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+							type = Deserializer::getString( si, se);
+							break;
+						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+							value = Deserializer::getString( si, se);
+							break;
+						case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "pos", context);
+							pos = Deserializer::getUint( si, se);
+							break;
+						case 3: (void)Deserializer::getUint( si, se);
+							// ... len that is part of analyzer output is ignored
+							break;
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					}
+				}
+				while (si->tag == Serialization::Name);
+				if (!type_defined || !value_defined || !pos_defined)
+				{
+					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+				}
+				document->addSearchIndexTerm( type, value, pos);
+			}
+			else if (si->tag == Serialization::Value)
+			{
+				std::string type = Deserializer::getString( si, se);
+				if (si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+				}
+				std::string value = Deserializer::getString( si, se);
+				if (si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+				}
+				unsigned int pos = Deserializer::getUint( si, se);
+				document->addSearchIndexTerm( type, value, pos);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
+		}
+	}
 }
 
 static void buildInsertForwardIndex(
@@ -1489,16 +1746,120 @@ static void buildInsertForwardIndex(
 {
 	static const StructureNameMap namemap( "type,value,pos,len", ',');
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), _TXT("document forward index"));
+	static const char* context = _TXT("forward index");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	++si;
+
+	while (si != se)
+	{
+		if (si->tag == Serialization::Name)
+		{
+			if (ValueVariantConv::isequal_ascii( *si, "term"))
+			{
+				++si;
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+				if (si->tag != Serialization::Open) --si;
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("structure with optional name 'term' expected"), context);
+			}
+		}
+		if (si->tag == Serialization::Open)
+		{
+			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+
+			if (si->tag == Serialization::Name)
+			{
+				unsigned char type_defined = 0;
+				unsigned char value_defined = 0;
+				unsigned char pos_defined = 0;
+				std::string type;
+				std::string value;
+				unsigned int pos;
+				do
+				{
+					switch (namemap.index( *si++))
+					{
+						case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+							type = Deserializer::getString( si, se);
+							break;
+						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+							value = Deserializer::getString( si, se);
+							break;
+						case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "pos", context);
+							pos = Deserializer::getUint( si, se);
+							break;
+						case 3: (void)Deserializer::getUint( si, se);
+							// ... len that is part of analyzer output is ignored
+							break;
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					}
+				}
+				while (si->tag == Serialization::Name);
+				if (!type_defined || !value_defined || !pos_defined)
+				{
+					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+				}
+				document->addForwardIndexTerm( type, value, pos);
+			}
+			else if (si->tag == Serialization::Value)
+			{
+				std::string type = Deserializer::getString( si, se);
+				if (si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+				}
+				std::string value = Deserializer::getString( si, se);
+				if (si->tag != Serialization::Value)
+				{
+					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+				}
+				unsigned int pos = Deserializer::getUint( si, se);
+				document->addForwardIndexTerm( type, value, pos);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
+		}
+	}
 }
 
-static void buildUserAccessRights(
+static void buildAccessRights(
 		StorageDocumentInterface* document,
 		Serialization::const_iterator& si,
 		const Serialization::const_iterator& se)
 {
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), _TXT("document user access rights"));
-}
+	static const char* context = _TXT("document access rights");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
+	if (si->tag == Serialization::Open)
+	{
+		while (si != se && si->tag != Serialization::Close)
+		{
+			if (si->tag == Serialization::Name)
+			{
+				if (ValueVariantConv::isequal_ascii( *si++, "user"))
+				{
+					++si;
+				}
+			}
+			document->setUserAccessRight( Deserializer::getString( si, se));
+		}
+		Deserializer::consumeClose( si, se);
+	}
+	else
+	{
+		document->setUserAccessRight( Deserializer::getString( si, se));
+	}
+}
 
 void Deserializer::buildInsertDocument(
 		StorageDocumentInterface* document,
@@ -1523,7 +1884,8 @@ void Deserializer::buildInsertDocument(
 			}
 			switch (namemap.index( *si++))
 			{
-				case 0: // ... nothing to do for sub document type (analyzer)
+				case 0: (void)getString( si, se);
+					// ... ignore sub document type (output of analyzer)
 					break;
 				case 1: buildInsertAttributes( document, si, se);
 					break;
@@ -1533,13 +1895,15 @@ void Deserializer::buildInsertDocument(
 					break;
 				case 4: buildInsertForwardIndex( document, si, se);
 					break;
+				case 5: buildAccessRights( document, si, se);
+					break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), _TXT("document"));
 			}
 		}
 	}
 	catch (const std::runtime_error& err)
 	{
-		throw_error_with_location( err.what(), errorhnd, si, se, content.value.serialization->begin());
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, content.value.serialization->begin());
 	}
 }
 

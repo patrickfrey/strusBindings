@@ -26,11 +26,18 @@ namespace bindings {
 
 struct ClassIdMap
 {
+	//static int get( const ContextImpl& )		{return ClassContext;}
 	static int get( const DocumentAnalyzerImpl& )	{return ClassDocumentAnalyzer;}
 	static int get( const QueryAnalyzerImpl&)	{return ClassQueryAnalyzer;}
 	static int get( const QueryEvalImpl&)		{return ClassQueryEval;}
 	static int get( const QueryImpl&)		{return ClassQuery;}
+	static int get( const StorageClientImpl&)	{return ClassStorageClient;}
+	static int get( const StorageTransactionImpl&)	{return ClassStorageTransaction;}
+	static int get( const StatisticsProcessorImpl&)	{return ClassStatisticsProcessor;}
+	static int get( const StatisticsIteratorImpl&)	{return ClassStatisticsIterator;}
+	static int get( const DocumentBrowserImpl&)	{return ClassDocumentBrowser;}
 };
+
 
 template <typename STRUCTVALUE>
 static CallResult callResultStructureOwnership( STRUCTVALUE* st)

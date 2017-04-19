@@ -7,6 +7,7 @@
  */
 #include "impl/query.hpp"
 #include "impl/storage.hpp"
+#include "metadataop.hpp"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
@@ -139,60 +140,8 @@ void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryExpressionBuilder exprbuilder( THIS, m_queryproc, errorhnd);
 
-	Deserializer::buildExpression( exprbuilder, expr_);
+	Deserializer::buildExpression( exprbuilder, expr_, errorhnd);
 	THIS->defineFeature( set_, weight_);
-}
-
-static MetaDataRestrictionInterface::CompareOperator getCompareOp( const char* compareOp)
-{
-	MetaDataRestrictionInterface::CompareOperator cmpop;
-	if (compareOp[0] == '<')
-	{
-		if (compareOp[1] == '\0')
-		{
-			cmpop = MetaDataRestrictionInterface::CompareLess;
-		}
-		else if (compareOp[1] == '=' && compareOp[2] == '\0')
-		{
-			cmpop = MetaDataRestrictionInterface::CompareLessEqual;
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
-		}
-	}
-	else if (compareOp[0] == '>')
-	{
-		if (compareOp[1] == '\0')
-		{
-			cmpop = MetaDataRestrictionInterface::CompareGreater;
-		}
-		else if (compareOp[1] == '=' && compareOp[2] == '\0')
-		{
-			cmpop = MetaDataRestrictionInterface::CompareGreaterEqual;
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
-		}
-	}
-	else if (compareOp[0] == '=' && compareOp[1] == '\0')
-	{
-		cmpop = MetaDataRestrictionInterface::CompareEqual;
-	}
-	else if (compareOp[0] == '=' && compareOp[1] == '=' && compareOp[2] == '\0')
-	{
-		cmpop = MetaDataRestrictionInterface::CompareEqual;
-	}
-	else if (compareOp[0] == '!' && compareOp[1] == '=' && compareOp[2] == '\0')
-	{
-		cmpop = MetaDataRestrictionInterface::CompareNotEqual;
-	}
-	else
-	{
-		throw strus::runtime_error( _TXT("unknown compare operator '%s', expected one of '=','!=','>','<','<=','>='"), compareOp);
-	}
-	return cmpop;
 }
 
 void QueryImpl::addMetaDataRestrictionCondition(

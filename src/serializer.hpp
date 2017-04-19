@@ -75,6 +75,8 @@ public:
 	{
 		result.pushValue( ValueVariant( val));
 	}
+	typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
+	static void serialize( Serialization& result, const DocumentFrequencyChange& val);
 	static void serialize( Serialization& result, const analyzer::Term& val);
 	static void serialize( Serialization& result, const analyzer::Attribute& val);
 	static void serialize( Serialization& result, const analyzer::MetaData& val);
@@ -82,8 +84,6 @@ public:
 	static void serialize( Serialization& result, const SummaryElement& val);
 	static void serialize( Serialization& result, const analyzer::Document& val);
 	static void serialize( Serialization& result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators, bool labeled);
-	static void serialize( Serialization& result, const bindings::DocumentFrequencyChange& val);
-	static void serialize( Serialization& result, const bindings::StatisticsMessage& val);
 	static void serialize( Serialization& result, const ResultDocument& val);
 	static void serialize( Serialization& result, const QueryResult& val);
 	static void serialize( Serialization& result, const std::vector<VectorStorageSearchInterface::Result>& val);

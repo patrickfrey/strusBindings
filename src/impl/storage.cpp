@@ -7,11 +7,22 @@
  */
 #include "impl/storage.hpp"
 #include "impl/statistics.hpp"
+#include "strus/lib/storage_objbuild.hpp"
 #include "strus/storageClientInterface.hpp"
 #include "strus/storageTransactionInterface.hpp"
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageClientInterface.hpp"
+#include "strus/storageObjectBuilderInterface.hpp"
+#include "strus/errorBufferInterface.hpp"
+#include "strus/postingIteratorInterface.hpp"
+#include "strus/attributeReaderInterface.hpp"
+#include "strus/statisticsIteratorInterface.hpp"
+#include "valueVariantConv.hpp"
 #include "internationalization.hpp"
+#include "metadataop.hpp"
+#include "deserializer.hpp"
+#include "serializer.hpp"
+#include "callResultUtils.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -41,7 +52,7 @@ StorageClientImpl::StorageClientImpl( const StorageClientImpl& o)
 
 CallResult StorageClientImpl::nofDocumentsInserted() const
 {
-	StorageClientInterface* THIS = m_storage_impl.getObject<StorageClientInterface>();
+	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
 	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->nofDocumentsInserted();
 }
@@ -52,11 +63,11 @@ CallResult StorageClientImpl::createTransaction() const
 	return callResultObject( new StorageTransactionImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl));
 }
 
-CallResult StorageClientImpl::createInitStatisticsIterator( bool sign) const
+CallResult StorageClientImpl::createInitStatisticsIterator( bool sign)
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	Reference iter;
+	HostObjectReference iter;
 	iter.resetOwnership( storage->createInitStatisticsIterator( sign));
 	if (!iter.get())
 	{
@@ -66,24 +77,24 @@ CallResult StorageClientImpl::createInitStatisticsIterator( bool sign) const
 	return callResultObject( new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter));
 }
 
-CallResult StorageClientImpl::createUpdateStatisticsIterator() const
+CallResult StorageClientImpl::createUpdateStatisticsIterator()
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	Reference iter;
+	HostObjectReference iter;
 	iter.resetOwnership( storage->createUpdateStatisticsIterator());
 	if (!iter.get())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
-	callResultObject( new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter));
+	return callResultObject( new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter));
 }
 
-CallResult StorageClientImpl::createDocumentBrowser()
+CallResult StorageClientImpl::createDocumentBrowser() const
 {
 	if (!m_objbuilder_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	callResultObject( new DocumentBrowserImpl( m_objbuilder_impl, m_trace_impl, m_storage_impl, m_errorhnd_impl));
+	return callResultObject( new DocumentBrowserImpl( m_objbuilder_impl, m_trace_impl, m_storage_impl, m_errorhnd_impl));
 }
 
 void StorageClientImpl::close()
@@ -106,75 +117,43 @@ StorageTransactionImpl::StorageTransactionImpl( const HostObjectReference& objbu
 	,m_transaction_impl()
 {}
 
-void StorageTransactionImpl::insertDocument( const std::string& docid, const Document& doc)
+StorageTransactionInterface* StorageTransactionImpl::getTransaction()
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	StorageTransactionInterface* rt;
 	if (!m_transaction_impl.get())
 	{
-		m_transaction_impl.reset( (StorageTransactionInterface*)storage->createTransaction());
-		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+		m_transaction_impl.resetOwnership( rt = storage->createTransaction());
+		if (!rt) throw strus::runtime_error( _TXT("failed to create transaction: %s"), errorhnd->fetchError());
 	}
-	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	std::auto_ptr<StorageDocumentInterface> document( transaction->createDocument( docid));
+	else
+	{
+		rt = m_transaction_impl.getObject<StorageTransactionInterface>();
+	}
+	return rt;
+}
+
+void StorageTransactionImpl::insertDocument( const std::string& docid, const ValueVariant& doc)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	StorageTransactionInterface* transaction = getTransaction();
+	Reference<StorageDocumentInterface> document( transaction->createDocument( docid));
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
-	std::vector<Attribute>::const_iterator
-		ai = doc.attributes().begin(), ae = doc.attributes().end();
-	for (; ai != ae; ++ai)
-	{
-		document->setAttribute( ai->name(), ai->value());
-	}
-	std::vector<MetaData>::const_iterator
-		mi = doc.metaData().begin(), me = doc.metaData().end();
-	for (; mi != me; ++mi)
-	{
-		document->setMetaData( mi->name(), numericVariant( mi->value()));
-	}
-	std::vector<Term>::const_iterator
-		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
-	for (; ti != te; ++ti)
-	{
-		document->addSearchIndexTerm( ti->type(), ti->value(), ti->position());
-	}
-	std::vector<Term>::const_iterator
-		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
-	for (; fi != fe; ++fi)
-	{
-		document->addForwardIndexTerm( fi->type(), fi->value(), fi->position());
-	}
-	std::vector<std::string>::const_iterator
-		ui = doc.users().begin(), ue = doc.users().end();
-	for (; ui != ue; ++ui)
-	{
-		document->setUserAccessRight( *ui);
-	}
+	Deserializer::buildInsertDocument( document.get(), doc, errorhnd);
 	document->done();
 }
 
 void StorageTransactionImpl::deleteDocument( const std::string& docId)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!m_transaction_impl.get())
-	{
-		m_transaction_impl.reset( (StorageTransactionInterface*)storage->createTransaction());
-		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for deleting document: %s"), errorhnd->fetchError());
-	}
-	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	StorageTransactionInterface* transaction = getTransaction();
 	transaction->deleteDocument( docId);
 }
 
 void StorageTransactionImpl::deleteUserAccessRights( const std::string& username)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!m_transaction_impl.get())
-	{
-		m_transaction_impl.reset( (StorageTransactionInterface*)storage->createTransaction());
-		if (!m_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for deleting user access rights: %s"), errorhnd->fetchError());
-	}
-	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	StorageTransactionInterface* transaction = getTransaction();
 	transaction->deleteUserAccessRights( username);
 }
 
@@ -196,6 +175,91 @@ void StorageTransactionImpl::commit()
 void StorageTransactionImpl::rollback()
 {
 	m_transaction_impl.reset();
+}
+
+DocumentBrowserImpl::DocumentBrowserImpl( const DocumentBrowserImpl& o)
+	:m_errorhnd_impl(o.m_errorhnd_impl)
+	,m_trace_impl(o.m_trace_impl)
+	,m_objbuilder_impl(o.m_objbuilder_impl)
+	,m_storage_impl(o.m_storage_impl)
+	,m_restriction_impl(o.m_restriction_impl)
+	,m_postingitr_impl(o.m_postingitr_impl)
+	,m_attributereader_impl(o.m_attributereader_impl)
+	,m_docno(o.m_docno)
+{}
+
+DocumentBrowserImpl::DocumentBrowserImpl( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& storage_impl_, const HostObjectReference& errorhnd_)
+	:m_errorhnd_impl(errorhnd_)
+	,m_trace_impl(trace_impl_)
+	,m_objbuilder_impl(objbuilder_impl_)
+	,m_storage_impl(storage_impl_)
+	,m_restriction_impl()
+	,m_postingitr_impl()
+	,m_attributereader_impl()
+	,m_docno(0)
+{
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	m_restriction_impl.resetOwnership( storage->createMetaDataRestriction());
+	if (!m_restriction_impl.get())
+	{
+		throw strus::runtime_error( _TXT("failed to create meta data restriction interface for browsing documents"));
+	}
+}
+
+void DocumentBrowserImpl::addMetaDataRestrictionCondition(
+		const char* compareOp, const std::string& name,
+		const ValueVariant& value, bool newGroup)
+{
+	MetaDataRestrictionInterface* restriction = m_restriction_impl.getObject<MetaDataRestrictionInterface>();
+	if (!restriction)
+	{
+		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
+	}
+	MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	restriction->addCondition( cmpop, name, ValueVariantConv::tonumeric(value), newGroup);
+}
+
+CallResult DocumentBrowserImpl::skipDoc( int docno_)
+{
+	if (!m_postingitr_impl.get())
+	{
+		const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+		MetaDataRestrictionInterface* restriction = m_restriction_impl.getObject<MetaDataRestrictionInterface>();
+		m_postingitr_impl.resetOwnership( storage->createBrowsePostingIterator( restriction, 1));
+		if (!m_postingitr_impl.get())
+		{
+			throw strus::runtime_error( _TXT("failed to create posting iterator for document browser"));
+		}
+	}
+	PostingIteratorInterface* itr = m_postingitr_impl.getObject<PostingIteratorInterface>();
+	return m_docno = itr->skipDoc( docno_);
+}
+
+CallResult DocumentBrowserImpl::attribute( const std::string& name)
+{
+	if (m_docno)
+	{
+		if (!m_attributereader_impl.get())
+		{
+			const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+			m_attributereader_impl.resetOwnership( storage->createAttributeReader());
+			if (!m_attributereader_impl.get())
+			{
+				throw strus::runtime_error( _TXT("failed to create attribute reader for document browser"));
+			}
+		}
+		const AttributeReaderInterface* reader = m_attributereader_impl.getObject<AttributeReaderInterface>();
+		Index elemhnd = reader->elementHandle( name.c_str());
+		if (!elemhnd)
+		{
+			throw strus::runtime_error( _TXT("document attribute name %s is not defined"), name.c_str());
+		}
+		return reader->getValue( elemhnd);
+	}
+	else
+	{
+		return CallResult();
+	}
 }
 
 

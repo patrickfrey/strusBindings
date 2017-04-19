@@ -12,6 +12,7 @@ set( bindingsimpl_source_files
 	patternMatcherLoader.cpp
 	structNameMap.cpp
 	structDefs.cpp
+	metadataop.cpp
 	serializer.cpp
 	deserializer.cpp
 	testcheck.cpp

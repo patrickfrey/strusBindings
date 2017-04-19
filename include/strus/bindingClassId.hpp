@@ -18,7 +18,12 @@ enum BindingsClassId
 	ClassDocumentAnalyzer=0x1,
 	ClassQueryAnalyzer=0x2,
 	ClassQueryEval=0x3,
-	ClassQuery=0x3
+	ClassQuery=0x4,
+	ClassStorageClient=0x05,
+	ClassStorageTransaction=0x06,
+	ClassStatisticsProcessor=0x07,
+	ClassStatisticsIterator=0x08,
+	ClassDocumentBrowser=0x09
 };
 
 }//namespace

@@ -49,6 +49,7 @@ public:
 	/// \brief Destructor
 	~HostObjectReference(){}
 
+	/// \brief Create pointer as reference with ownership and reference counting
 	template <class OBJECTTYPE>
 	static HostObjectReference createOwnership( OBJECTTYPE* obj)
 	{
@@ -57,6 +58,7 @@ public:
 		return rt;
 	}
 
+	/// \brief Create pointer as constant reference
 	template <class OBJECTTYPE>
 	static HostObjectReference createConst( const OBJECTTYPE* obj)
 	{
@@ -65,6 +67,7 @@ public:
 		return rt;
 	}
 
+	/// \brief Define pointer as reference with ownership and reference counting
 	template <class OBJECTTYPE>
 	void resetOwnership( OBJECTTYPE* obj)
 	{
@@ -79,10 +82,17 @@ public:
 		}
 	}
 
+	/// \brief Define pointer as constant reference
 	template <class OBJECTTYPE>
 	void resetConst( const OBJECTTYPE* obj)
 	{
 		m_ptr.reset( const_cast<OBJECTTYPE*>(obj), no_deleter);
+	}
+
+	/// \brief Clear this
+	void reset()
+	{
+		m_ptr.reset();
 	}
 
 	/// \brief Assignment operator
@@ -97,6 +107,7 @@ public:
 	/// \brief Object access as function
 	void* get()					{return m_ptr.get();}
 
+	/// \brief Get const pointer to object
 	template <class OBJECTTYPE>
 	const OBJECTTYPE* getObject() const
 	{
@@ -111,6 +122,7 @@ public:
 		return obj;
 	}
 
+	/// \brief Get pointer to object
 	template <class OBJECTTYPE>
 	OBJECTTYPE* getObject()
 	{

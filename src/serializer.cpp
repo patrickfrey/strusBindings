@@ -172,11 +172,6 @@ void Serializer::serialize( Serialization& result, const bindings::DocumentFrequ
 	serializeStructMember( result, "value", val.value());
 	serializeStructMember( result, "increment", (ValueVariant::IntType)val.increment());
 }
-void Serializer::serialize( Serialization& result, const bindings::StatisticsMessage& val)
-{
-	serializeStructMember( result, "dflist", val.dflist());
-	serializeStructMember( result, "nofdocs", (ValueVariant::IntType)val.nofdocs());
-}
 void Serializer::serialize( Serialization& result, const ResultDocument& val)
 {
 	serializeStructMember( result, "docno", (ValueVariant::IntType)val.docno());

@@ -15,6 +15,10 @@
 #include <string>
 
 namespace strus {
+
+///\brief Forward declaration
+class StorageTransactionInterface;
+
 namespace bindings {
 
 /// \brief Object representing a client connection to the storage 
@@ -39,14 +43,14 @@ public:
 	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
 	/// \param[in] sign true = registration, false = deregistration
 	/// return the statistics iterator object created
-	CallResult createInitStatisticsIterator( bool sign) const;
+	CallResult createInitStatisticsIterator( bool sign);
 
 	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
 	/// return the statistics message iterator object created
-	CallResult createUpdateStatisticsIterator() const;
+	CallResult createUpdateStatisticsIterator();
 
 	/// \brief Create a document browser instance
-	CallResult createDocumentBrowser();
+	CallResult createDocumentBrowser() const;
 
 	/// \brief Close of the storage client
 	void close();
@@ -98,6 +102,8 @@ private:
 	friend class StorageClientImpl;
 	StorageTransactionImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_);
 
+	StorageTransactionInterface* getTransaction();
+
 	friend class QueryImpl;
 	friend class QueryEvalImpl;
 	mutable HostObjectReference m_errorhnd_impl;
@@ -105,6 +111,60 @@ private:
 	HostObjectReference m_objbuilder_impl;
 	HostObjectReference m_storage_impl;
 	HostObjectReference m_transaction_impl;
+};
+
+///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata
+class DocumentBrowserImpl
+{
+public:
+	/// \brief Copy constructor
+	DocumentBrowserImpl( const DocumentBrowserImpl& o);
+	/// \brief Destructor
+	~DocumentBrowserImpl(){}
+
+	/// \brief Define a meta data restriction condition on the documents visited
+	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
+	/// \param[in] name of the meta data field (left side of comparison operator)
+	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
+	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
+	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
+	void addMetaDataRestrictionCondition(
+			const char* compareOp, const std::string& name,
+			const ValueVariant& value, bool newGroup);
+
+	/// \brief Declare an attribute to be part of the result structure
+	/// \param[in] name of the attribute
+	void defineResultAttribute( const std::string& name);
+	!!!! HIE WIITER
+
+	/// \brief Declare a metadata field to be part of the result structure
+	/// \param[in] name of the meta data field
+	void defineResultMetadata( const std::string& name);
+	!!!! HIE WIITER
+
+	///\brief Get the internal document number of the next document bigger or equal the document number passed
+	///\param[in] docno_ document number to get the matching least upperbound from
+	///\return the internal document number or 0 if no more documents defined
+	CallResult evaluate( unsigned int firstDocnoCandidate, unsigned int nofResults) const;
+	!!!! HIE WIITER
+
+private:
+	friend class StorageClientImpl;
+	DocumentBrowserImpl(
+		const HostObjectReference& objbuilder_impl_,
+		const HostObjectReference& trace_impl_,
+		const HostObjectReference& storage_impl_,
+		const HostObjectReference& errorhnd_);
+
+private:
+	HostObjectReference m_errorhnd_impl;
+	HostObjectReference m_trace_impl;
+	HostObjectReference m_objbuilder_impl;
+	HostObjectReference m_storage_impl;
+	HostObjectReference m_restriction_impl;
+	HostObjectReference m_postingitr_impl;
+	HostObjectReference m_attributereader_impl;
+	int m_docno;
 };
 
 }}//namespace

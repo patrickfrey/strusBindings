@@ -31,60 +31,6 @@ class StorageTransactionImpl;
 /// \brief Forward declaration
 class DocumentBrowserImpl;
 
-/// \brief Iterator on messages with storage statistics
-class StatisticsIteratorImpl
-{
-public:
-	/// \brief Destructor
-	virtual ~StatisticsIteratorImpl(){}
-
-	/// \brief Copy constructor
-	StatisticsIteratorImpl( const StatisticsIteratorImpl& o);
-
-	/// \brief Fetches the next statistics message
-	/// \return message blob or empty string if there is no message left
-	std::string getNext();
-
-private:
-	friend class StorageClientImpl;
-	StatisticsIteratorImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_, const HostObjectReference& iter_);
-
-private:
-	HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
-	HostObjectReference m_iter_impl;
-};
-
-
-/// \brief Translation to update a storage with statistics messages
-class StatisticsProcessorImpl
-{
-public:
-	/// \brief Destructor
-	virtual ~StatisticsProcessorImpl(){}
-
-	/// \brief Decode a statistics message blob for introspection
-	/// \param[in] blob statistics message blob
-	/// \return the statistics message (bindings::StatisticsMessage)
-	ValueVariant decode( const std::string& blob) const;
-	/// \brief Create binary blob from statistics message
-	/// \param[in] msg statistics message structure (bindings::StatisticsMessage)
-	/// \return the statistics message blob
-	std::string encode( const ValueVariant& msg) const;
-
-private:
-	friend class ContextImpl;
-	StatisticsProcessorImpl( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const std::string& name_, const HostObjectReference& errorhnd_);
-
-private:
-	HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	const StatisticsProcessorInterface* m_statsproc;
-};
-
 class VectorStorageSearcherImpl
 {
 public:
@@ -242,73 +188,6 @@ private:
 	HostObjectReference m_objbuilder_impl;
 	HostObjectReference m_vector_storage_impl;	
 	HostObjectReference m_vector_transaction_impl;
-};
-
-///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata
-class DocumentBrowserImpl
-{
-public:
-	/// \brief Copy constructor
-	DocumentBrowserImpl( const DocumentBrowserImpl& o);
-	/// \brief Destructor
-	~DocumentBrowserImpl(){}
-
-	/// \brief Define a meta data restriction condition on the documents visited
-	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
-	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
-	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
-	void addMetaDataRestrictionCondition(
-			const char* compareOp, const std::string& name,
-			double value, bool newGroup);
-
-	/// \brief Define a meta data restriction condition on the documents visited
-	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
-	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
-	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
-	void addMetaDataRestrictionCondition(
-			const char* compareOp, const std::string& name,
-			unsigned int value, bool newGroup);
-
-	/// \brief Define a meta data restriction condition on the documents visited
-	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
-	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
-	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
-	void addMetaDataRestrictionCondition(
-			const char* compareOp, const std::string& name,
-			int value, bool newGroup);
-
-	///\brief Get the internal document number of the next document bigger or equal the document number passed
-	///\param[in] docno_ document number to get the matching least upperbound from
-	///\return the internal document number or 0 if no more documents defined
-	int skipDoc( int docno_);
-
-	///\brief Get an attribute of the current document visited
-	///\return the internal document number or 0, if there is no one left
-	std::string attribute( const std::string& name);
-
-private:
-	friend class StorageClientImpl;
-	DocumentBrowserImpl(
-		const HostObjectReference& objbuilder_impl_,
-		const HostObjectReference& trace_impl_,
-		const HostObjectReference& storage_impl_,
-		const HostObjectReference& errorhnd_);
-
-private:
-	HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
-	HostObjectReference m_restriction_impl;
-	HostObjectReference m_postingitr_impl;
-	HostObjectReference m_attributereader_impl;
-	int m_docno;
 };
 
 /// \brief Object holding the global context of the strus information retrieval engine
