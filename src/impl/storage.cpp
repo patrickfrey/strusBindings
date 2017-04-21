@@ -19,6 +19,7 @@
 #include "strus/statisticsIteratorInterface.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
+#include "strus/base/configParser.hpp"
 #include "valueVariantConv.hpp"
 #include "internationalization.hpp"
 #include "metadataop.hpp"
@@ -109,6 +110,21 @@ void StorageClientImpl::close()
 	{
 		throw strus::runtime_error( _TXT("error detected after calling storage client close: %s"), errorhnd->fetchError());
 	}
+}
+
+CallResult StorageClientImpl::config() const
+{
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+
+	typedef std::vector<std::pair<std::string,std::string> > Configuration;
+	CallResult rt( callResultStructureOwnership( new Configuration( getConfigStringItems( storage->config(), errorhnd))));
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
+	}
+	return rt;
 }
 
 StorageTransactionImpl::StorageTransactionImpl( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const HostObjectReference& errorhnd_, const HostObjectReference& storage_)

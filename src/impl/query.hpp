@@ -77,7 +77,7 @@ public:
 
 private:
 	/// \brief Constructor used by Context
-	friend class Context;
+	friend class ContextImpl;
 	QueryEvalImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
 
 	friend class QueryImpl;

@@ -111,8 +111,8 @@ public:
 	/// \return the number of features
 	CallResult nofFeatures() const;
 
-	/// \brief Get the configuration of this model
-	/// \return the configuration
+	/// \brief Get the configuration of this storage
+	/// \return the configuration as structure
 	CallResult config() const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)

@@ -68,6 +68,10 @@ public:
 	{
 		m_ar.push_back( Node( Name, tagname));
 	}
+	void pushName( const std::string& tagname)
+	{
+		m_ar.push_back( Node( Name, tagname));
+	}
 	void pushValue( const ValueVariant& val)
 	{
 		m_ar.push_back( Node( Value, val));

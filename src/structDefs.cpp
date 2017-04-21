@@ -278,3 +278,70 @@ DfChangeDef::DfChangeDef( Serialization::const_iterator& si, const Serialization
 	}
 }
 
+ContextDef::ContextDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	static const char* context = _TXT("context configuration");
+	static const StructureNameMap namemap( "threads,rpc,trace", ',');
+
+	if (si != se && si->tag == Serialization::Value)
+	{
+		rpc = Deserializer::getString( si, se);
+		Deserializer::consumeClose( si, se);
+	}
+	unsigned char defined[3] = {0,0,0};
+	while (si != se && si->tag == Serialization::Name)
+	{
+		switch (namemap.index( *si++))
+		{
+			case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "threads", context);
+				threads = Deserializer::getUint( si, se);
+				break;
+			case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
+				rpc = Deserializer::getString( si, se);
+				break;
+			case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
+				trace = Deserializer::getString( si, se);
+				break;
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
+		}
+	}
+	Deserializer::consumeClose( si, se);
+}
+
+SegmenterDef::SegmenterDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+{
+	static const char* context = _TXT("segmenter configuration");
+	static const StructureNameMap namemap( "segmenter,mimetype,encoding,scheme", ',');
+
+	if (si != se && si->tag == Serialization::Value)
+	{
+		segmenter = Deserializer::getString( si, se);
+		Deserializer::consumeClose( si, se);
+	}
+	unsigned char defined[4] = {0,0,0,0};
+	while (si != se && si->tag == Serialization::Name)
+	{
+		switch (namemap.index( *si++))
+		{
+			case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "segmenter", context);
+				if (0!=(defined[1]|defined[2]|defined[3])) throw strus::runtime_error(_TXT("mixed definition of '%s' and %s in %s"), "segmenter", "'scheme', 'mimetype' and 'encoding'", context);
+				segmenter = Deserializer::getString( si, se);
+				break;
+			case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "mimetype", context);
+				if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "mimetype", context);
+				mimetype = Deserializer::getString( si, se);
+				break;
+			case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "encoding", context);
+				if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "encoding", context);
+				encoding = Deserializer::getString( si, se);
+				break;
+			case 3:	if (defined[3]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "scheme", context);
+				if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "scheme", context);
+				scheme = Deserializer::getString( si, se);
+				break;
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'segmenter' or 'mimetype' or 'encoding' or 'scheme' expected"), context);
+		}
+	}
+	Deserializer::consumeClose( si, se);
+}
+

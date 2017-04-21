@@ -67,7 +67,34 @@ struct DfChangeDef
 	DfChangeDef( const DfChangeDef& o)
 		:termtype(o.termtype),termvalue(o.termvalue),increment(o.increment){}
 };
-		
+
+struct ContextDef
+{
+	unsigned int threads;
+	std::string rpc;
+	std::string trace;
+
+	ContextDef( const std::string& connstr)
+		:threads(0),rpc(connstr){}
+	ContextDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
+	ContextDef( const ContextDef& o)
+		:threads(o.threads),rpc(o.rpc),trace(o.trace){}
+};
+
+struct SegmenterDef
+{
+	std::string segmenter;
+	std::string mimetype;
+	std::string encoding;
+	std::string scheme;
+
+	SegmenterDef( const std::string& segmenter_)
+		:segmenter(segmenter_){}
+	SegmenterDef( Serialization::const_iterator& si, const Serialization::const_iterator& se);
+	SegmenterDef( const SegmenterDef& o)
+		:segmenter(o.segmenter),mimetype(o.mimetype),encoding(o.encoding),scheme(o.scheme){}
+};
+
 }} //namespace
 #endif
 

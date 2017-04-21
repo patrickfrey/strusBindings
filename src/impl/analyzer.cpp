@@ -17,29 +17,65 @@
 #include "deserializer.hpp"
 #include "utils.hpp"
 #include "callResultUtils.hpp"
+#include "structDefs.hpp"
+#include "valueVariantConv.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
 
-DocumentAnalyzerImpl::DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_)
-	:m_errorhnd_impl(errorhnd)
+static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
+{
+	if (ctx.isStringType())
+	{
+		return SegmenterDef( ValueVariantConv::tostring( ctx));
+	}
+	else if (ctx.type == ValueVariant::StrusSerialization)
+	{
+		Serialization::const_iterator si = ctx.value.serialization->begin();
+		return SegmenterDef( si, ctx.value.serialization->end());
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected string or document class structure for document segmenter definition"));
+	}
+}
+
+DocumentAnalyzerImpl::DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const ValueVariant& doctype, const TextProcessorInterface* textproc_)
+	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl()
 	,m_textproc(textproc_)
 {
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	const TextProcessorInterface* textproc = m_textproc;
-	const SegmenterInterface* segmenter = textproc->getSegmenterByName( segmentername);
+
+	SegmenterDef segdef( parseSegmenterDef( doctype));
+	const SegmenterInterface* segmenter = 0;
+	analyzer::SegmenterOptions segmenteropt;
+
+	if (!segdef.segmenter.empty())
+	{
+		segmenter = m_textproc->getSegmenterByName( segdef.segmenter);
+	}
+	else
+	{
+		if (!segdef.mimetype.empty())
+		{
+			segmenter = m_textproc->getSegmenterByMimeType( segdef.mimetype);
+		}
+		if (!segdef.scheme.empty())
+		{
+			segmenteropt = m_textproc->getSegmenterOptions( segdef.scheme);
+		}
+	}
 	if (!segmenter)
 	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("failed to get document document segmenter by name: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to get document document segmenter: %s"), errorhnd->fetchError());
 	}
-	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter));
+	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter, segmenteropt));
 	if (!m_analyzer_impl.get())
 	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create document analyzer: %s"), errorhnd->fetchError());
 	}
 }

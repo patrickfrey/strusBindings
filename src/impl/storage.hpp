@@ -52,6 +52,10 @@ public:
 	/// \brief Create a document browser instance
 	CallResult createDocumentBrowser() const;
 
+	/// \brief Get the configuration of this storage
+	/// \return the configuration as structure
+	CallResult config() const;
+
 	/// \brief Close of the storage client
 	void close();
 

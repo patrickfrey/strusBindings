@@ -201,6 +201,10 @@ struct Deserializer
 			StatisticsBuilderInterface* builder,
 			const ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
+
+	static std::string getStorageConfigString(
+			const ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
 };
 
 }}//namespace

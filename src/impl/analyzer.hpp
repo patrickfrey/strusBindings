@@ -171,8 +171,8 @@ public:
 
 private:
 	/// \brief Constructor used by Context
-	friend class Context;
-	DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const std::string& segmentername, const TextProcessorInterface* textproc_);
+	friend class ContextImpl;
+	DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const ValueVariant& doctype, const TextProcessorInterface* textproc_);
 
 	mutable HostObjectReference m_errorhnd_impl;
 	HostObjectReference m_trace_impl;

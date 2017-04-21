@@ -16,6 +16,7 @@
 #include "strus/analyzer/term.hpp"
 #include "strus/analyzer/attribute.hpp"
 #include "strus/analyzer/metaData.hpp"
+#include "strus/analyzer/documentClass.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
@@ -23,6 +24,8 @@
 #include "strus/statisticsViewerInterface.hpp"
 #include "queryAnalyzerStruct.hpp"
 #include <string>
+#include <vector>
+#include <utility>
 #include <cstring>
 
 namespace strus {
@@ -75,11 +78,15 @@ public:
 	{
 		result.pushValue( ValueVariant( val));
 	}
+	typedef std::vector<std::pair<std::string,std::string> > ConfigurationItemList;
+	static void serialize( Serialization& result, const ConfigurationItemList& val);
+
 	typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
 	static void serialize( Serialization& result, const DocumentFrequencyChange& val);
 	static void serialize( Serialization& result, const analyzer::Term& val);
 	static void serialize( Serialization& result, const analyzer::Attribute& val);
 	static void serialize( Serialization& result, const analyzer::MetaData& val);
+	static void serialize( Serialization& result, const analyzer::DocumentClass& val);
 	static void serialize( Serialization& result, const VectorStorageSearchInterface::Result& val);
 	static void serialize( Serialization& result, const SummaryElement& val);
 	static void serialize( Serialization& result, const analyzer::Document& val);

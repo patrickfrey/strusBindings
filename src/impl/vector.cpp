@@ -14,6 +14,7 @@
 #include "strus/vectorStorageInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
+#include "strus/base/configParser.hpp"
 #include "internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
@@ -233,12 +234,13 @@ CallResult VectorStorageClientImpl::config() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
-
-	std::string rt = storage->config();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+
+	typedef std::vector<std::pair<std::string,std::string> > Configuration;
+	CallResult rt( callResultStructureOwnership( new Configuration( getConfigStringItems( storage->config(), errorhnd))));
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to get the storage configuration string: %s"), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT("failed to get the vector storage configuration: %s"), errorhnd->fetchError());
 	}
 	return rt;
 }

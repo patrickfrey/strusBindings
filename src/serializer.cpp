@@ -42,6 +42,12 @@ void Serializer::serialize( Serialization& result, const analyzer::MetaData& val
 	serializeStructMember( result, "name", val.name());
 	serializeStructMember( result, "value", val.value());
 }
+void Serializer::serialize( Serialization& result, const analyzer::DocumentClass& val)
+{
+	if (!val.mimeType().empty()) serializeStructMember( result, "mimetype", val.mimeType());
+	if (!val.encoding().empty()) serializeStructMember( result, "encoding", val.encoding());
+	if (!val.scheme().empty()) serializeStructMember( result, "scheme", val.scheme());
+}
 void Serializer::serialize( Serialization& result, const VectorStorageSearchInterface::Result& val)
 {
 	serializeStructMember( result, "featidx", (ValueVariant::IntType)val.featidx());
@@ -184,6 +190,15 @@ void Serializer::serialize( Serialization& result, const QueryResult& val)
 	serializeStructMember( result, "nofranked", (ValueVariant::UIntType)val.nofRanked());
 	serializeStructMember( result, "nofvisited", (ValueVariant::UIntType)val.nofVisited());
 	serializeStructMember( result, "ranks", val.ranks());
+}
+void Serializer::serialize( Serialization& result, const ConfigurationItemList& val)
+{
+	ConfigurationItemList::const_iterator ci = val.begin(), ce = val.end();
+	for (; ci != ce; ++ci)
+	{
+		result.pushName( ci->first);
+		result.pushValue( ci->second);
+	}
 }
 void Serializer::serialize( Serialization& result, const std::vector<VectorStorageSearchInterface::Result>& val)
 {

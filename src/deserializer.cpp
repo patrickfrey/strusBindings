@@ -13,6 +13,7 @@
 #include "strus/bindings/serialization.hpp"
 #include "strus/base/string_format.hpp"
 #include <string>
+#include <cstring>
 
 using namespace strus;
 using namespace strus::bindings;
@@ -2038,3 +2039,66 @@ void Deserializer::buildStatistics(
 	}
 }
 
+std::string Deserializer::getStorageConfigString(
+		const ValueVariant& content,
+		ErrorBufferInterface* errorhnd)
+{
+	static const char* context = _TXT("storage configuration");
+	if (content.isStringType())
+	{
+		return ValueVariantConv::tostring( content);
+	}
+	if (!content.defined()) return std::string();
+	if (content.type != ValueVariant::StrusSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure or string expected for %s"), context);
+	}
+	Serialization::const_iterator
+		si = content.value.serialization->begin(),
+		se = content.value.serialization->end();
+	try
+	{
+		std::string rt;
+		while (si != se)
+		{
+			if (rt.empty()) rt.push_back(';');
+			ConfigDef item( si, se);
+			rt.append( item.name);
+			rt.push_back('=');
+			if (item.value.isStringType())
+			{
+				std::string value = ValueVariantConv::tostring( item.value);
+				if (std::strchr( value.c_str(), '\"') == 0)
+				{
+					rt.push_back('\"');
+					rt.append( value);
+					rt.push_back('\"');
+				}
+				else if (std::strchr( value.c_str(), '\'') == 0)
+				{
+					rt.push_back('\'');
+					rt.append( value);
+					rt.push_back('\'');
+				}
+				else
+				{
+					throw strus::runtime_error(_TXT("cannot build configuration string with values containing both type of quotes (\' and \")"));
+				}
+			}
+			else if (item.value.isAtomicType())
+			{
+				std::string value = ValueVariantConv::tostring( item.value);
+				rt.append( value);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("atomic values expected for %s"), context);
+			}
+		}
+		return rt;
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, content.value.serialization->begin());
+	}
+}
