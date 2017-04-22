@@ -6,6 +6,44 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # Subdirectories:
 add_subdirectory( parser )
 
+set( lua_source_files
+	${PROJECT_SOURCE_DIR}/lua/lapi.c
+	${PROJECT_SOURCE_DIR}/lua/lauxlib.c
+	${PROJECT_SOURCE_DIR}/lua/lbaselib.c
+	${PROJECT_SOURCE_DIR}/lua/lbitlib.c
+	${PROJECT_SOURCE_DIR}/lua/lcode.c
+	${PROJECT_SOURCE_DIR}/lua/lcorolib.c
+	${PROJECT_SOURCE_DIR}/lua/lctype.c
+	${PROJECT_SOURCE_DIR}/lua/ldblib.c
+	${PROJECT_SOURCE_DIR}/lua/ldebug.c
+	${PROJECT_SOURCE_DIR}/lua/ldo.c
+	${PROJECT_SOURCE_DIR}/lua/ldump.c
+	${PROJECT_SOURCE_DIR}/lua/lfunc.c
+	${PROJECT_SOURCE_DIR}/lua/lgc.c
+	${PROJECT_SOURCE_DIR}/lua/linit.c
+	${PROJECT_SOURCE_DIR}/lua/liolib.c
+	${PROJECT_SOURCE_DIR}/lua/llex.c
+	${PROJECT_SOURCE_DIR}/lua/lmathlib.c
+	${PROJECT_SOURCE_DIR}/lua/lmem.c
+	${PROJECT_SOURCE_DIR}/lua/loadlib.c
+	${PROJECT_SOURCE_DIR}/lua/lobject.c
+	${PROJECT_SOURCE_DIR}/lua/lopcodes.c
+	${PROJECT_SOURCE_DIR}/lua/loslib.c
+	${PROJECT_SOURCE_DIR}/lua/lparser.c
+	${PROJECT_SOURCE_DIR}/lua/lstate.c
+	${PROJECT_SOURCE_DIR}/lua/lstring.c
+	${PROJECT_SOURCE_DIR}/lua/lstrlib.c
+	${PROJECT_SOURCE_DIR}/lua/ltable.c
+	${PROJECT_SOURCE_DIR}/lua/ltablib.c
+	${PROJECT_SOURCE_DIR}/lua/ltests.c
+	${PROJECT_SOURCE_DIR}/lua/ltm.c
+	${PROJECT_SOURCE_DIR}/lua/lua.c
+	${PROJECT_SOURCE_DIR}/lua/lundump.c
+	${PROJECT_SOURCE_DIR}/lua/lutf8lib.c
+	${PROJECT_SOURCE_DIR}/lua/lvm.c
+	${PROJECT_SOURCE_DIR}/lua/lzio.c
+)
+
 set( bindingsimpl_source_files
         valueVariantConv.cpp
 	expressionBuilder.cpp
@@ -54,10 +92,44 @@ link_directories(
 )
 
 
+# ------------------------------
+# LIBRARIES
+# ------------------------------
+add_library( strus_bindings_lua_impl STATIC ${lua_source_files} )
+
 add_library( strus_bindingsimpl STATIC ${bindingsimpl_source_files} )
 target_link_libraries( strus_bindingsimpl strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket strus_base strus_error )
 
-add_library( strus_bindings STATIC ${bindings_source_files} )
+add_library( strus_bindings SHARED ${bindings_source_files} )
 target_link_libraries( strus_bindings strus_bindingsimpl strus_base strus_error )
 
+set_target_properties(
+    strus_bindings
+    PROPERTIES
+    DEBUG_POSTFIX "_d"
+    SOVERSION "${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}"
+    VERSION ${STRUS_VERSION}
+)
+
+# ------------------------------
+# PROGRAMS
+# ------------------------------
+add_executable( strusLua strusLua.cpp )
+target_link_libraries( strusLua  "${Boost_LIBRARIES}" ${strusrpc_LIBRARIES} ${strusmodule_LIBRARIES} strus_bindings_lua_impl strus_base strus_error strus_module strus_rpc_client strus_rpc_client_socket ${Intl_LIBRARIES})
+
+# FreeBSD needs kernel data access library for libuv (-libkvm)
+find_library( LIBKVM_LIBRARIES kvm )
+if(LIBKVM_LIBRARIES)
+        target_link_libraries( strusLua ${LIBKVM_LIBRARIES} )
+endif()
+
+# ------------------------------
+# INSTALLATION
+# ------------------------------
+install( TARGETS strus_bindings
+           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus
+           RUNTIME DESTINATION bin )
+
+install( TARGETS strusLua
+           RUNTIME DESTINATION bin )
 

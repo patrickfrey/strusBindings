@@ -57,31 +57,9 @@ lang/php/php.ini
 # Compiled programs
 src/parser/strusBindingsGen
 tests/query_cpp/src/testBindingsQuery
-lang/java/net/strus/example/*.class
-lang/java/net/strus/api/*.class
-*.pyc
+src/strusLua
 
 # Generated test data
 tests/query_cpp/storage/
-lang/java/net/strus/example/storage/
-lang/java/net/strus/example/vsm/
-lang/python/example/storage/
-lang/python/example/vsm/
-lang/php/example/storage/
-lang/php/example/vsm/
 
-# SWIG generated code
-lang/strusPYTHON_wrap.cxx
-lang/php/strus_wrap.cpp
-lang/php/php_strus.h
-lang/php/strus.php
-lang/java/strus_wrap.c
-lang/java/*.java
-lang/java/strus_wrap.cxx
-lang/java/net/strus/api/*.jar
-lang/java/net/strus/api/*.java
-lang/java/net/strus/api/*.class
-lang/python.swig/strus.pyc
-lang/python.swig/strus.py
-lang/python.swig/strus_wrap.cxx
-
+lang/

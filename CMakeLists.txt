@@ -40,7 +40,7 @@ find_strus_package( trace )
 find_strus_package( rpc )
 
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
-configure_file( "${PROJECT_SOURCE_DIR}/src/version.hpp.in"   "${PROJECT_SOURCE_DIR}/src/version.hpp"   @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp"   @ONLY )
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)
@@ -55,7 +55,6 @@ configure_file( "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec.in"  "${PR
 enable_testing()
 
 # Subdirectories:
-add_subdirectory( luabind )
 add_subdirectory( src )
 add_subdirectory( tests )
   
