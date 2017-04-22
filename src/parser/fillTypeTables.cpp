@@ -16,51 +16,49 @@ using namespace strus;
 void strus::fillTypeTables( TypeSystem& typesystem)
 {
 	typesystem.defineType( "void")
+		("retv_map", "CallResult()")
+	;
+	typesystem.defineType( "CallResult")
+		("retv_map", "CallResult( $name)")
 	;
 	typesystem.defineType( "std::size_t")
-		("param_value", "parambuf.packDouble($name);")
+		("argv_map", "VariantValueConv::touint64( argv[ $idx])")
 	;
 	typesystem.defineType( "bool")
+		("argv_map", "VariantValueConv::tobool( argv[ $idx])")
 	;
 	typesystem.defineType( "int")
-	;
-	typesystem.defineType( "int $val=0")
+		("argv_map", "VariantValueConv::toint( argv[ $idx])")
 	;
 	typesystem.defineType( "unsigned int")
+		("argv_map", "VariantValueConv::touint( argv[ $idx])")
 	;
 	typesystem.defineType( "unsigned int $val=0")
+		("argv_map", "(argc > $idx && argv[ $idx].defined()) ? VariantValueConv::touint( argv[ $idx]) : 0")
 	;
 	typesystem.defineType( "float")
+		("argv_map", "VariantValueConv::tofloat( argv[ $idx])")
 	;
 	typesystem.defineType( "double")
+		("argv_map", "VariantValueConv::todouble( argv[ $idx])")
 	;
 	typesystem.defineType( "double $val=1")
+		("argv_map", "(argc > $idx && argv[ $idx].defined()) ? VariantValueConv::todouble( argv[ $idx]) : 1.0")
 	;
 	typesystem.defineType( "const ValueVariant&")
-	;
-	typesystem.defineType( "ValueVariant")
+		("argv_map", "argv[ $idx]")
 	;
 	typesystem.defineType( "const NumericVariant&")
-	;
-	typesystem.defineType( "NumericVariant")
-	;
-	typesystem.defineType( "std::string")
+		("argv_map", "VariantValueConv::tonumeric( argv[ $idx])")
 	;
 	typesystem.defineType( "const std::string& $val=\"\"")
+		("argv_map", "(argc > $idx && argv[ $idx].defined()) ? VariantValueConv::tostring( argv[ $idx]) : std::string()")
 	;
 	typesystem.defineType( "const std::string&")
+		("argv_map", "VariantValueConv::tostring( argv[ $idx])")
 	;
 	typesystem.defineType( "const char*")
-	;
-	typesystem.defineType( "$objid~Impl")
-	;
-	typesystem.defineType( "const $objid~Impl&")
-	;
-	typesystem.defineType( "const TextProcessorInterface*")
-	;
-	typesystem.defineType( "const StatisticsProcessorInterface*")
-	;
-	typesystem.defineType( "const QueryProcessorInterface*")
+		("argv_map", "VariantValueConv::tostring( argv[ $idx])")
 	;
 }
 

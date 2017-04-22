@@ -275,6 +275,11 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 	throw strus::runtime_error(_TXT("cannot convert value variant to %s: %s"), "double", _TXT("unknown type"));
 }
 
+float ValueVariantConv::tofloat( const ValueVariant& val)
+{
+	return (float)todouble( val);
+}
+
 template <typename TYPE>
 static TYPE variant_touint( const ValueVariant& val)
 {

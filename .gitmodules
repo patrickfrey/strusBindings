@@ -1,0 +1,6 @@
+[submodule "lua"]
+	path = lua
+	url = https://github.com/lua/lua
+[submodule "3rdParty/textwolf"]
+	path = 3rdParty/textwolf
+	url = https://github.com/patrickfrey/textwolf

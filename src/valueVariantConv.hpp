@@ -53,6 +53,7 @@ public:
 	static SliceW16 towslice( std::basic_string<uint16_t>& buf, const ValueVariant& val);
 
 	static double todouble( const ValueVariant& val);
+	static float tofloat( const ValueVariant& val);
 	static int toint( const ValueVariant& val);
 	static unsigned int touint( const ValueVariant& val);
 	static int64_t toint64( const ValueVariant& val);

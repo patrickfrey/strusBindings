@@ -37,24 +37,3 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL
 	-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang .
 make
 
-Python bindings
----------------
-
-You must install 'boost-python-libs' as package or from the ports.
-
-Java bindings
--------------
-
-You must install 'openjdk' as package or from the ports.
-You'll also need the 'swig' package or port.
-
-Before calling cmake with -DWITH_JAVA="YES" make sure
-to set the environment variable:
-
-setenv JAVA_HOME /usr/local/openjdk7/
-
-Php bindings
-------------
-
-You must install a Php package, so far 'php56' has been tested.
-You'll also need the 'swig' package or port.
