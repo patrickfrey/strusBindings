@@ -27,8 +27,6 @@ namespace bindings {
 class DocumentAnalyzerImpl
 {
 public:
-	/// \brief Copy constructor
-	DocumentAnalyzerImpl( const DocumentAnalyzerImpl& o);
 	/// \brief Destructor
 	virtual ~DocumentAnalyzerImpl(){}
 
@@ -189,8 +187,6 @@ private:
 class QueryAnalyzerImpl
 {
 public:
-	/// \brief Copy constructor
-	QueryAnalyzerImpl( const QueryAnalyzerImpl& o);
 	/// \brief Destructor
 	virtual ~QueryAnalyzerImpl(){}
 

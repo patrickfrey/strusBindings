@@ -21,13 +21,6 @@
 using namespace strus;
 using namespace strus::bindings;
 
-StatisticsIteratorImpl::StatisticsIteratorImpl( const StatisticsIteratorImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_storage_impl(o.m_storage_impl)
-	,m_iter_impl(o.m_iter_impl){}
-
 StatisticsIteratorImpl::StatisticsIteratorImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_, const HostObjectReference& iter_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)

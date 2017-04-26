@@ -80,14 +80,6 @@ DocumentAnalyzerImpl::DocumentAnalyzerImpl( const HostObjectReference& objbuilde
 	}
 }
 
-DocumentAnalyzerImpl::DocumentAnalyzerImpl( const DocumentAnalyzerImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_analyzer_impl(o.m_analyzer_impl)
-	,m_textproc(o.m_textproc)
-{}
-
 struct FeatureFuncDef
 {
 	std::vector<Reference<NormalizerFunctionInstanceInterface> > normalizers_ref;
@@ -356,14 +348,6 @@ QueryAnalyzerImpl::QueryAnalyzerImpl( const HostObjectReference& objbuilder, con
 		throw strus::runtime_error( _TXT("failed to create query analyzer: %s"), errorhnd->fetchError());
 	}
 }
-
-QueryAnalyzerImpl::QueryAnalyzerImpl( const QueryAnalyzerImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_analyzer_impl(o.m_analyzer_impl)
-	,m_queryAnalyzerStruct(o.m_queryAnalyzerStruct)
-{}
 
 void QueryAnalyzerImpl::addSearchIndexElement(
 		const std::string& featureType,

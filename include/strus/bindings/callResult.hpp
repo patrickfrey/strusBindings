@@ -23,12 +23,12 @@ class CallResult
 {
 public:
 	CallResult()
-		:value(),object(),serialization(),stringbuf(),classid(-1)
+		:value(),object(),serialization(),stringbuf()
 	{
 		m_errorbuf[0] = 0;
 	}
 	CallResult( const CallResult& o)
-		:value(o.value),object(o.object),serialization(o.serialization),stringbuf(o.stringbuf),classid(o.classid)
+		:value(o.value),object(o.object),serialization(o.serialization),stringbuf(o.stringbuf)
 	{
 		if (o.m_errorbuf[0])
 		{
@@ -42,19 +42,19 @@ public:
 	}
 
 	CallResult( int val)
-		:value((ValueVariant::IntType)val),object(),serialization(),stringbuf(),classid(-1)
+		:value((ValueVariant::IntType)val),object(),serialization(),stringbuf()
 		{m_errorbuf[0] = 0;}
 
 	CallResult( unsigned int val)
-		:value((ValueVariant::UIntType)val),object(),serialization(),stringbuf(),classid(-1)
+		:value((ValueVariant::UIntType)val),object(),serialization(),stringbuf()
 		{m_errorbuf[0] = 0;}
 
 	CallResult( double val)
-		:value(val),object(),serialization(),stringbuf(),classid(-1)
+		:value(val),object(),serialization(),stringbuf()
 		{m_errorbuf[0] = 0;}
 
 	CallResult( const std::string& val)
-		:value(),object(),serialization(),stringbuf(val),classid(-1)
+		:value(),object(),serialization(),stringbuf(val)
 		{m_errorbuf[0] = 0; value.init( stringbuf);}
 
 	void reportError( const char* fmt, ...)
@@ -64,13 +64,20 @@ public:
 		strus_vsnprintf( m_errorbuf, sizeof(m_errorbuf), fmt, ap);
 		va_end(ap);
 	}
+	bool hasError() const
+	{
+		return m_errorbuf[0] != 0;
+	}
+	const char* lastError() const
+	{
+		return m_errorbuf;
+	}
 
 public:
 	ValueVariant value;
 	HostObjectReference object;
 	Serialization serialization;
 	std::string stringbuf;
-	int classid;
 
 public:
 	enum {MaxErrorMessageSize=1024};

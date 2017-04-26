@@ -39,12 +39,6 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const HostObjectReference&
 	}
 }
 
-VectorStorageSearcherImpl::VectorStorageSearcherImpl( const VectorStorageSearcherImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_searcher_impl(o.m_searcher_impl)
-	,m_trace_impl(o.m_trace_impl)
-{}
-
 CallResult VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
@@ -89,14 +83,6 @@ void VectorStorageSearcherImpl::close()
 		throw strus::runtime_error( _TXT("error detected after calling storage searcher close: %s"), errorhnd->fetchError());
 	}
 }
-
-VectorStorageClientImpl::VectorStorageClientImpl( const VectorStorageClientImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_vector_storage_impl(o.m_vector_storage_impl)
-	,m_config(o.m_config)
-{}
 
 void VectorStorageClientImpl::close()
 {
@@ -261,14 +247,6 @@ VectorStorageClientImpl::VectorStorageClientImpl( const HostObjectReference& obj
 		throw strus::runtime_error( _TXT("failed to create vector storage client: %s"), errorhnd->fetchError());
 	}
 }
-
-VectorStorageTransactionImpl::VectorStorageTransactionImpl( const VectorStorageTransactionImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_vector_storage_impl(o.m_vector_storage_impl)
-	,m_vector_transaction_impl(o.m_vector_transaction_impl)
-{}
 
 void VectorStorageTransactionImpl::addFeature( const std::string& name, const ValueVariant& vec)
 {

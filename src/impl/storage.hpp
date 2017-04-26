@@ -26,9 +26,6 @@ namespace bindings {
 class StorageClientImpl
 {
 public:
-	/// \brief Copy constructor
-	StorageClientImpl( const StorageClientImpl& o);
-
 	/// \brief Destructor
 	virtual ~StorageClientImpl(){}
 
@@ -121,8 +118,6 @@ private:
 class DocumentBrowserImpl
 {
 public:
-	/// \brief Copy constructor
-	DocumentBrowserImpl( const DocumentBrowserImpl& o);
 	/// \brief Destructor
 	~DocumentBrowserImpl(){}
 

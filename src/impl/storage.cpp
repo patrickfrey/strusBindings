@@ -46,13 +46,6 @@ StorageClientImpl::StorageClientImpl( const HostObjectReference& objbuilder, con
 	}
 }
 
-StorageClientImpl::StorageClientImpl( const StorageClientImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_storage_impl(o.m_storage_impl)
-{}
-
 CallResult StorageClientImpl::nofDocumentsInserted() const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
@@ -194,17 +187,6 @@ void StorageTransactionImpl::rollback()
 {
 	m_transaction_impl.reset();
 }
-
-DocumentBrowserImpl::DocumentBrowserImpl( const DocumentBrowserImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_storage_impl(o.m_storage_impl)
-	,m_restriction_impl(o.m_restriction_impl)
-	,m_postingitr_impl(o.m_postingitr_impl)
-	,m_attributereader_impl(o.m_attributereader_impl)
-	,m_metadatareader_impl(o.m_metadatareader_impl)
-{}
 
 DocumentBrowserImpl::DocumentBrowserImpl( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& storage_impl_, const HostObjectReference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)

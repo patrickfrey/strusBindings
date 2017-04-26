@@ -46,16 +46,16 @@ struct ValueVariant
 	typedef double FloatType;
 	typedef uint16_t WCharType;
 
-	ValueVariant()							{value.string = 0; type = Void; length = 0;}
-	ValueVariant( double Double_)					{value.Double = Double_; type = Double; length = 0;}
-	ValueVariant( uint64_t UInt_)					{value.UInt = UInt_; type = UInt; length = 0;}
-	ValueVariant( int64_t Int_)					{value.Int = Int_; type = Int; length = 0;}
-	ValueVariant( const char* string_)				{value.string = string_; type = String; length = std::strlen(string_);}
-	ValueVariant( const char* s, std::size_t l)			{value.string = s; type = String; length = l;}
-	ValueVariant( const std::string& s)				{value.string = s.c_str(); type = String; length = s.size();}
-	ValueVariant( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; length = l;}
-	ValueVariant( const StrusObjectType* s_)			{value.strusObject = s_; type = StrusObject; length = 0;}
-	ValueVariant( const Serialization* s_)				{value.serialization = s_; type = StrusSerialization; length = 0;}
+	ValueVariant()							{value.string = 0; type = Void; attribute.length = 0;}
+	ValueVariant( double Double_)					{value.Double = Double_; type = Double; attribute.length = 0;}
+	ValueVariant( uint64_t UInt_)					{value.UInt = UInt_; type = UInt; attribute.length = 0;}
+	ValueVariant( int64_t Int_)					{value.Int = Int_; type = Int; attribute.length = 0;}
+	ValueVariant( const char* string_)				{value.string = string_; type = String; attribute.length = std::strlen(string_);}
+	ValueVariant( const char* s, std::size_t l)			{value.string = s; type = String; attribute.length = l;}
+	ValueVariant( const std::string& s)				{value.string = s.c_str(); type = String; attribute.length = s.size();}
+	ValueVariant( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; attribute.length = l;}
+	ValueVariant( const StrusObjectType* s_, int classid_)		{value.strusObject = s_; type = StrusObject; attribute.classid = classid_;}
+	ValueVariant( const Serialization* s_)				{value.serialization = s_; type = StrusSerialization; attribute.length = 0;}
 	ValueVariant( const NumericVariant& num)
 	{
 		assign( num);
@@ -70,20 +70,20 @@ struct ValueVariant
 	}
 	~ValueVariant(){}
 
-	void init( double Double_)					{value.Double = Double_; type = Double; length=0;}
-	void init( uint64_t UInt_)					{value.UInt = UInt_; type = UInt; length=0;}
-	void init( int64_t Int_)					{value.Int = Int_; type = Int; length=0;}
-	void init( const char* string_)					{value.string = string_; type = String; length = std::strlen(string_);}
-	void init( const char* s, std::size_t l)			{value.string = s; type = String; length = l;}
-	void init( const std::string& s)				{value.string = s.c_str(); type = String; length = s.size();}
-	void init( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; length = l;}
-	void init( const StrusObjectType* s_)				{value.strusObject = s_; type = StrusObject; length=0;}
-	void init( const Serialization* s)				{value.serialization = s; type = StrusSerialization; length=0;} 
+	void init( double Double_)					{value.Double = Double_; type = Double; attribute.length=0;}
+	void init( uint64_t UInt_)					{value.UInt = UInt_; type = UInt; attribute.length=0;}
+	void init( int64_t Int_)					{value.Int = Int_; type = Int; attribute.length=0;}
+	void init( const char* string_)					{value.string = string_; type = String; attribute.length = std::strlen(string_);}
+	void init( const char* s, std::size_t l)			{value.string = s; type = String; attribute.length = l;}
+	void init( const std::string& s)				{value.string = s.c_str(); type = String; attribute.length = s.size();}
+	void init( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; attribute.length = l;}
+	void init( const StrusObjectType* s_, int classid_=-1)		{value.strusObject = s_; type = StrusObject; attribute.classid=classid_;}
+	void init( const Serialization* s)				{value.serialization = s; type = StrusSerialization; attribute.length=0;} 
 	void init( const NumericVariant& num)				{assign( num);}
 
 	void clear()
 	{
-		value.Int = 0; type = Void; length = 0;
+		value.Int = 0; type = Void; attribute.length = 0;
 	}
 	bool defined() const
 	{
@@ -100,7 +100,10 @@ struct ValueVariant
 		const StrusObjectType* strusObject;
 		const Serialization* serialization;
 	} value;
-	int length;
+	union {
+		int length;
+		int classid;
+	} attribute;
 
 	bool isNumericType() const
 	{
@@ -120,7 +123,7 @@ private:
 	{
 		type = o.type;
 		value = o.value;
-		length = o.length;
+		attribute = o.attribute;
 	}
 	void assign( const NumericVariant& num)
 	{
@@ -128,13 +131,13 @@ private:
 		{
 			case NumericVariant::Null: break;
 			case NumericVariant::Int:
-				value.Int = num.variant.Int; type = Int; length = 0;
+				value.Int = num.variant.Int; type = Int; attribute.length = 0;
 				return;
 			case NumericVariant::UInt:
-				value.UInt = num.variant.Int; type = UInt; length = 0;
+				value.UInt = num.variant.Int; type = UInt; attribute.length = 0;
 				return;
 			case NumericVariant::Float:
-				value.Double = num.variant.Float; type = Double; length = 0;
+				value.Double = num.variant.Float; type = Double; attribute.length = 0;
 				return;
 		}
 		clear(); 

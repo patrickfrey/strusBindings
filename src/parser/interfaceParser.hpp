@@ -28,11 +28,12 @@ public:
 
 	bool parse( std::map<std::string,std::string>& defmap, char const*& si, const char* se) const;
 
-	std::string expand( 
+	std::string expand(
 			const char* eventname,
 			const std::map<std::string,std::string>& defmap,
 			const std::string& name,
 			const std::string& value) const;
+	bool hasEvent( const char* eventname) const;
 
 	const std::string& source() const;
 	std::string tostring() const;
@@ -89,13 +90,13 @@ private:
 class MethodDef
 {
 public:
-	MethodDef( const std::string& name_, const VariableValue& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_)
+	MethodDef( const std::string& name_, const std::string& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_)
 		:m_name(name_),m_returnvalue(returnvalue_),m_param(param_),m_isconst(isconst_){}
 	MethodDef( const MethodDef& o)
 		:m_name(o.m_name),m_returnvalue(o.m_returnvalue),m_param(o.m_param),m_isconst(o.m_isconst){}
 
 	const std::string& name() const				{return m_name;}
-	const VariableValue& returnValue() const		{return m_returnvalue;}
+	const std::string& returnValue() const			{return m_returnvalue;}
 	const std::vector<VariableValue>& parameters() const	{return m_param;}
 	bool isconst() const					{return m_isconst;}
 
@@ -103,7 +104,7 @@ public:
 
 private:
 	std::string m_name;
-	VariableValue m_returnvalue;
+	std::string m_returnvalue;
 	std::vector<VariableValue> m_param;
 	bool m_isconst;
 };
@@ -156,53 +157,6 @@ private:
 	std::vector<MethodDef> m_methodar;
 };
 
-class StructDef
-{
-public:
-	StructDef( const std::string& id_, const std::string& origtype_)
-		:m_id(id_),m_origtype(origtype_),m_elements(){}
-	StructDef( const StructDef& o)
-		:m_id(o.m_id),m_origtype(o.m_origtype),m_elements(o.m_elements){}
-
-	class Element
-	{
-	public:
-		enum Type
-		{
-			Atomic,
-			Struct
-		};
-
-		Element( Type type_, const std::string& id_, const std::string& origtype_)
-			:m_type(type_),m_id(id_),m_origtype(origtype_){}
-		Element( const Element& o)
-			:m_type(o.m_type),m_id(o.m_id),m_origtype(o.m_origtype){}
-
-		Type type() const			{return m_type;}
-		const std::string& id() const		{return m_id;}
-		const std::string& origtype() const	{return m_origtype;}
-
-	private:
-		Type m_type;
-		std::string m_id;
-		std::string m_origtype;
-	};
-
-	void addElement( Element::Type type_, const std::string& id_, const std::string& origtype_)
-	{
-		m_elements.push_back( Element( type_, id_, origtype_));
-	}
-
-	const std::string& id() const			{return m_id;}
-	const std::string& origtype() const		{return m_origtype;}
-	const std::vector<Element>& elements() const	{return m_elements;}
-
-private:
-	std::string m_id;
-	std::string m_origtype;
-	std::vector<Element> m_elements;
-};
-
 
 class InterfacesDef
 {
@@ -222,11 +176,6 @@ public:
 	std::string tostring() const;
 
 private:
-	void addStructDef( const StructDef& def)
-	{
-		m_structdefar.push_back( def);
-	}
-
 	void parseClass( const std::string& className, const std::string& classScope, char const*& si, const char* se);
 	std::vector<VariableValue> parseParameters(
 			const std::string& scope_class,
@@ -236,7 +185,6 @@ private:
 private:
 	const TypeSystem* m_typeSystem;
 	std::vector<ClassDef> m_classdefar;
-	std::vector<StructDef> m_structdefar;
 	std::map<std::string,int> m_classdefmap;
 };
 } //namespace

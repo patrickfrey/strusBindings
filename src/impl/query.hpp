@@ -23,8 +23,6 @@ namespace bindings {
 class QueryEvalImpl
 {
 public:
-	/// \brief Copy constructor
-	QueryEvalImpl( const QueryEvalImpl& o);
 	/// \brief Destructor
 	virtual ~QueryEvalImpl(){}
 
@@ -93,8 +91,6 @@ private:
 class QueryImpl
 {
 public:
-	/// \brief Copy constructor
-	QueryImpl( const QueryImpl& o);
 	/// \brief Destructor
 	virtual ~QueryImpl(){}
 

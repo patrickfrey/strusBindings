@@ -35,8 +35,6 @@ public:
 	/// \brief Constructor
 	/// \param[in] config context configuration
 	explicit ContextImpl( const ValueVariant& config);
-	/// \brief Copy constructor
-	ContextImpl( const ContextImpl& o);
 	/// \brief Destructor
 	~ContextImpl(){}
 

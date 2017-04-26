@@ -20,9 +20,6 @@ namespace bindings {
 class VectorStorageSearcherImpl
 {
 public:
-	/// \brief Copy constructor
-	VectorStorageSearcherImpl( const VectorStorageSearcherImpl& o);
-
 	/// \brief Destructor
 	virtual ~VectorStorageSearcherImpl(){}
 
@@ -56,9 +53,6 @@ private:
 class VectorStorageClientImpl
 {
 public:
-	/// \brief Copy constructor
-	VectorStorageClientImpl( const VectorStorageClientImpl& o);
-
 	/// \brief Destructor
 	virtual ~VectorStorageClientImpl(){}
 
@@ -134,9 +128,6 @@ private:
 class VectorStorageTransactionImpl
 {
 public:
-	/// \brief Copy constructor
-	VectorStorageTransactionImpl( const VectorStorageTransactionImpl& o);
-
 	/// \brief Destructor
 	virtual ~VectorStorageTransactionImpl(){}
 

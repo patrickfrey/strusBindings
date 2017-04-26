@@ -25,9 +25,6 @@ public:
 	/// \brief Destructor
 	virtual ~StatisticsIteratorImpl(){}
 
-	/// \brief Copy constructor
-	StatisticsIteratorImpl( const StatisticsIteratorImpl& o);
-
 	/// \brief Fetches the next statistics message
 	/// \return message blob or empty string if there is no message left
 	CallResult getNext();

@@ -15,6 +15,8 @@
 
 using namespace strus;
 
+#define STRUS_LOWLEVEL_DEBUG
+
 static bool endsWith( const std::string& ident, const std::string& tail)
 {
 	if (tail.size() > ident.size()) return false;
@@ -498,6 +500,12 @@ public:
 		m_output[ eventname] = OutputDef( output);
 	}
 
+	bool hasEvent( const char* eventname) const
+	{
+		std::map<std::string,OutputDef>::const_iterator oi = m_output.find( eventname);
+		return (oi != m_output.end());
+	}
+
 	std::string
 		expand(
 			const char* eventname,
@@ -624,6 +632,12 @@ std::string VariableType::expand(
 	return m_impl->expand( eventname, defmap, name, value);
 }
 
+bool VariableType::hasEvent(
+		const char* eventname) const
+{
+	return m_impl->hasEvent( eventname);
+}
+
 std::string VariableType::tostring() const
 {
 	return m_impl->tostring();
@@ -646,7 +660,7 @@ std::string MethodDef::tostring() const
 {
 	std::ostringstream out;
 	out << "METHOD " << m_name << std::endl;
-	out << "\tRETURN { " << m_returnvalue.tostring() << "}" << std::endl;
+	out << "\tRETURN { " << m_returnvalue << "}" << std::endl;
 	out << "\tPARAMS ( ";
 	std::vector<VariableValue>::const_iterator pi = m_param.begin(), pe = m_param.end();
 	for (int pidx=0; pi != pe; ++pi,++pidx)
@@ -935,6 +949,9 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 		{
 			char const* start = si;
 			std::string ident = parseIdentifier( si,se);
+#ifdef STRUS_LOWLEVEL_DEBUG
+			std::cerr << "PARSE CLASS ELEMENT IDENTIFIER '" << ident << "' IN CLASS '" << className << "'" << std::endl;
+#endif
 			if (ident == className || ident == className + "Impl")
 			{
 				//... constructor
@@ -959,7 +976,12 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				{
 					skipStructure( si, se);
 				}
-				classDef.addConstructor( ConstructorDef( params));
+				ConstructorDef def( params);
+				classDef.addConstructor( def);
+
+#ifdef STRUS_LOWLEVEL_DEBUG
+				std::cerr << "ADD CONSTRUCTOR " << def.tostring() << std::endl;
+#endif
 			}
 			else if (ident == "namespace")
 			{
@@ -1064,7 +1086,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 			{
 				std::string methodName( className.empty()?std::string():guessMethodName( si, se));
 				si = start;
-				VariableValue retvaltype = m_typeSystem->parse( className, methodName, si, se);
+				std::string retvaltype = parseIdentifier( si, se);
 
 				skipSpacesAndComments( si, se);
 				if (si == se || !isAlpha( *si))

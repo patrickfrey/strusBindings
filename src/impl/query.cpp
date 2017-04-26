@@ -43,14 +43,6 @@ QueryEvalImpl::QueryEvalImpl( const HostObjectReference& objbuilder, const HostO
 	}
 }
 
-QueryEvalImpl::QueryEvalImpl( const QueryEvalImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_queryeval_impl(o.m_queryeval_impl)
-	,m_queryproc(o.m_queryproc)
-{}
-
 void QueryEvalImpl::addTerm(
 		const std::string& set_,
 		const std::string& type_,
@@ -122,17 +114,6 @@ CallResult QueryEvalImpl::createQuery( const StorageClientImpl& storage) const
 
 	return callResultObject( new QueryImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query, m_queryproc));
 }
-
-
-QueryImpl::QueryImpl( const QueryImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_trace_impl(o.m_trace_impl)
-	,m_objbuilder_impl(o.m_objbuilder_impl)
-	,m_storage_impl(o.m_storage_impl)
-	,m_queryeval_impl(o.m_queryeval_impl)
-	,m_query_impl(o.m_query_impl)
-	,m_queryproc(o.m_queryproc)
-{}
 
 void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr_, double weight_)
 {

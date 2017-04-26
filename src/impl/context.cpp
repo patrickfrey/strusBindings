@@ -126,16 +126,6 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	}
 }
 
-ContextImpl::ContextImpl( const ContextImpl& o)
-	:m_errorhnd_impl(o.m_errorhnd_impl)
-	,m_moduleloader_impl(o.m_moduleloader_impl)
-	,m_rpc_impl(o.m_rpc_impl)
-	,m_trace_impl( o.m_trace_impl)
-	,m_storage_objbuilder_impl(o.m_storage_objbuilder_impl)
-	,m_analyzer_objbuilder_impl(o.m_analyzer_objbuilder_impl)
-	,m_textproc(o.m_textproc)
-{}
-
 CallResult ContextImpl::getLastError() const
 {
 	CallResult rt;

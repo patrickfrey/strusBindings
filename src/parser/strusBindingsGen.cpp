@@ -11,6 +11,7 @@
 #include "fillTypeTables.hpp"
 #include "printFrame.hpp"
 #include "strus/base/fileio.hpp"
+#include "strus/base/string_format.hpp"
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -114,6 +115,24 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 	strus::printHppFrameTail( out);
 }
 
+static std::string expandMethodCall(
+	const std::string& methodname,
+	std::size_t nofargs,
+	const std::vector<std::string>& params_converted,
+	const std::vector<std::string>& params_default)
+{
+	std::ostringstream out;
+	out << "\tTHIS->" << methodname << "(";
+	std::size_t pi = 0, pe = params_converted.size();
+	for (; pi != pe; ++pi)
+	{
+		if (pi) out << ", "; else out << " ";
+		out << (pi >= nofargs) ? params_default[ pi] : params_converted[ pi];
+	}
+	out << ")";
+	return out.str();
+}
+
 static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
@@ -134,65 +153,58 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
-			out 
-			<< "DLL_PUBLIC bool bindings::" << ci->name() << "__" << mi->name()
-			<< "( const HostObjectReference& self, callResult& retval, "
-			<< "std::size_t argc, ValueVariant* argv)" << std::endl;
-			out
-			<< "{" << std::endl
-			<< "\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl;
+			out << "DLL_PUBLIC bool bindings::" << ci->name() << "__" << mi->name()
+				<< "( const HostObjectReference& self, callResult& retval, "
+				<< "std::size_t argc, ValueVariant* argv)" << std::endl;
+			out << "{" << std::endl;
+			out << "\ttry {" << std::endl;
+			out << "\t\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl;
+
+			std::size_t min_nofargs = 0;
 			std::vector<strus::VariableValue>::const_iterator
 				pi = mi->parameters().begin(),
 				pe = mi->parameters().end();
-			std::vector<bool> param_converted;
-			for (int pidx=0; pi != pe; ++pi,++pidx)
+			for (; pi != pe; ++pi,++min_nofargs)
 			{
-				char namebuf[ 128];
-				char valuebuf[ 128];
-				snprintf( namebuf, sizeof( namebuf), "p%d", pidx);
-				snprintf( valuebuf, sizeof( valuebuf), "argv[ %d]", pidx);
-				std::string param_decl( pi->expand( "param_decl", namebuf, valuebuf));
-				if (param_decl.empty())
-				{
-					param_converted.push_back( false);
-				}
-				else
-				{
-					param_converted.push_back( true);
-					out << expandIndent( "\t", param_decl);
-				}
+				if (pi->type().hasEvent( "argv_default")) break;
 			}
-			out
-			<< "\tTHIS->" << mi->name() << "( ";
+			out << "\t\tif (argc < " << min_nofargs << ") throw strus::runtime_error(_TXT(\"too few arguments\"));";
+
+			// Collect argument values:
+			std::vector<std::string> params_converted;
+			std::vector<std::string> params_default;
+			pi = mi->parameters().begin();
+			for (std::size_t pidx=0; pi != pe; ++pi,++pidx)
+			{
+				char namebuf[ 1] = "";
+				char valuebuf[ 64]; std::snprintf( valuebuf, sizeof(valuebuf), "argv[%u]", pidx);
+				params_converted.push_back( pi->expand( "argv_map", namebuf, valuebuf));
+				params_default.push_back( min_nofargs <= pidx ? pi->expand( "argv_default", namebuf, valuebuf) : std::string());
+			}
+			// Print redirect calls:
+			out << "\t\tswitch (argc)" << std::endl;
+			out << "\t\t{" << std::endl;
 			pi = mi->parameters().begin();
 			for (int pidx=0; pi != pe; ++pi,++pidx)
 			{
-				if (pidx)
-				{
-					out << ", ";
-				}
-				char namebuf[ 128];
-				char valuebuf[ 128];
-				snprintf( namebuf, sizeof( namebuf), "p%d", pidx);
-				snprintf( valuebuf, sizeof( valuebuf), "argv[ %d]", pidx);
-				std::string param_value( pi->expand( "param_value", namebuf, valuebuf));
-				if (param_value.empty())
-				{
-					if (!param_converted[pidx])
-					{
-						throw std::runtime_error( std::string("member 'param_value' not defined for '") + valuebuf + "' in method '" + mi->name());
-					}
-					out << namebuf;
-				}
-				else
-				{
-					out << param_value;
-				}
+				out << "\t\t\tcase " << pidx << ": retval = " << expandMethodCall( mi->name(), pidx, params_converted, params_default) << "; break;" << std::endl;
 			}
-			out
-			<< ");" << std::endl;
-			out
-			<< "}" << std::endl;
+			out << "\t\t\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
+			out << "\t\t}" << std::endl;
+			out << "\t\treturn true;" << std::endl;
+			out << "\t} catch (const std::runtime_error& err)" << std::endl;
+			out << "\t{" << std::endl;
+			out << "\t\tretval.reportError( _TXT(\"error calling method %s::%s(): %s\"), mi->name().c_str(), ci->name().c_str(), err.what());";
+			out << "\t} catch (const std::bad_alloc& err)" << std::endl;
+			out << "\t{" << std::endl;
+			out << "\t\tretval.reportError( _TXT(\"out of memory calling method %s::%s()\"), mi->name().c_str(), ci->name().c_str());";
+			out << "\t}" << std::endl;
+			out << "\t} catch (const std::exception& err)" << std::endl;
+			out << "\t{" << std::endl;
+			out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), mi->name().c_str(), ci->name().c_str(), err.what());";
+			out << "\t}" << std::endl;
+			out << "\treturn false;" << std::endl;
+			out << "}" << std::endl;
 		}
 	}
 }
