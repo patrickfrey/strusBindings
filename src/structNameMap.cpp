@@ -42,14 +42,14 @@ int StructureNameMap::index( const ValueVariant& id) const
 {
 	if (id.type == ValueVariant::String)
 	{
-		return index( id.value.string, id.length);
+		return index( id.value.string, id.length());
 	}
 	if (id.type == ValueVariant::WString)
 	{
 		enum {MaxIdSize=128};
 		char buf[ MaxIdSize];
-		if (!ValueVariantConv::try_map2ascii( buf, sizeof(buf), id.value.wstring, id.length)) return false;
-		return index( buf, id.length);
+		if (!ValueVariantConv::try_map2ascii( buf, sizeof(buf), id.value.wstring, id.length())) return false;
+		return index( buf, id.length());
 	}
 	return false;
 }

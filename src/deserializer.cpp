@@ -227,16 +227,16 @@ std::string Deserializer::getPrefixStringValue(
 {
 	if (val.type == ValueVariant::String)
 	{
-		if (val.length > 1 && (unsigned char)val.value.string[0] == prefix)
+		if (val.length() > 1 && (unsigned char)val.value.string[0] == prefix)
 		{
-			return std::string( val.value.string+1, val.length-1);
+			return std::string( val.value.string+1, val.length()-1);
 		}
 	}
 	else if (val.type == ValueVariant::WString)
 	{
-		if (val.length > 1 && val.value.wstring[0] == prefix)
+		if (val.length() > 1 && val.value.wstring[0] == prefix)
 		{
-			return convert_w16string_to_uft8string( val.value.wstring+1, val.length-1);
+			return convert_w16string_to_uft8string( val.value.wstring+1, val.length()-1);
 		}
 	}
 	throw strus::runtime_error(_TXT("expected string with '%c' prefix"), prefix);
@@ -248,14 +248,14 @@ bool Deserializer::isStringWithPrefix(
 {
 	if (val.type == ValueVariant::String)
 	{
-		if (val.length > 1 && (unsigned char)val.value.string[0] == prefix)
+		if (val.length() > 1 && (unsigned char)val.value.string[0] == prefix)
 		{
 			return true;
 		}
 	}
 	else if (val.type == ValueVariant::WString)
 	{
-		if (val.length > 1 && val.value.wstring[0] == prefix)
+		if (val.length() > 1 && val.value.wstring[0] == prefix)
 		{
 			return true;
 		}
@@ -269,7 +269,7 @@ static int getStringPrefix(
 {
 	if (val.type == ValueVariant::String)
 	{
-		if (val.length > 1)
+		if (val.length() > 1)
 		{
 			const char* pi = std::strchr( prefixList, (char)val.value.string[0]);
 			if (!pi) return -1;
@@ -278,7 +278,7 @@ static int getStringPrefix(
 	}
 	else if (val.type == ValueVariant::WString)
 	{
-		if (val.length > 1)
+		if (val.length() > 1)
 		{
 			if (val.value.wstring[0] >= 127) return -1;
 			char chr = (char)val.value.wstring[0];

@@ -442,7 +442,7 @@ static QueryAnalyzerContextInterface::GroupBy getImplicitGroupBy( const std::str
 	}
 }
 
-void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, std::string groupBy_)
+void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, const std::string& groupBy_)
 {
 	QueryAnalyzerContextInterface::GroupBy groupBy = getImplicitGroupBy( groupBy_);
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);

@@ -27,7 +27,7 @@ std::string ValueVariantConv::tostring( const ValueVariant& val)
 {
 	if (val.type == ValueVariant::String)
 	{
-		return std::string( val.value.string, val.length);
+		return std::string( val.value.string, val.length());
 	}
 	else
 	{
@@ -48,7 +48,7 @@ ValueVariantConv::Slice ValueVariantConv::toslice( std::string& buf, const Value
 {
 	if (val.type == ValueVariant::String)
 	{
-		return Slice( val.value.string, val.length);
+		return Slice( val.value.string, val.length());
 	}
 	else switch (val.type)
 	{
@@ -64,9 +64,9 @@ ValueVariantConv::Slice ValueVariantConv::toslice( std::string& buf, const Value
 			buf = string_format( FORMAT_INT, val.value.Int);
 			return Slice( buf.c_str(), buf.size());
 		case ValueVariant::String:
-			return Slice( val.value.string, val.length);
+			return Slice( val.value.string, val.length());
 		case ValueVariant::WString:
-			buf = convert_w16string_to_uft8string( val.value.wstring, val.length);
+			buf = convert_w16string_to_uft8string( val.value.wstring, val.length());
 			return Slice( buf.c_str(), buf.size());
 		case ValueVariant::StrusObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "slice");
@@ -87,7 +87,7 @@ std::basic_string<uint16_t> ValueVariantConv::towstring( const ValueVariant& val
 {
 	if (val.type == ValueVariant::WString)
 	{
-		return std::basic_string<uint16_t>( val.value.wstring, val.length);
+		return std::basic_string<uint16_t>( val.value.wstring, val.length());
 	}
 	else
 	{
@@ -141,7 +141,7 @@ ValueVariantConv::SliceW16 ValueVariantConv::towslice( std::basic_string<uint16_
 {
 	if (val.type == ValueVariant::WString)
 	{
-		return SliceW16( val.value.wstring, val.length);
+		return SliceW16( val.value.wstring, val.length());
 	}
 	else switch (val.type)
 	{
@@ -157,10 +157,10 @@ ValueVariantConv::SliceW16 ValueVariantConv::towslice( std::basic_string<uint16_
 			buf = print2uint16string( FORMAT_INT, val.value.Int);
 			return SliceW16( buf.c_str(), buf.size());
 		case ValueVariant::String:
-			buf = convert_uft8string_to_w16string( val.value.string, val.length);
+			buf = convert_uft8string_to_w16string( val.value.string, val.length());
 			return SliceW16( buf.c_str(), buf.size());
 		case ValueVariant::WString:
-			return SliceW16( val.value.wstring, val.length);
+			return SliceW16( val.value.wstring, val.length());
 		case ValueVariant::StrusObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "wslice");
 		case ValueVariant::StrusSerialization:
@@ -247,14 +247,14 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 		case ValueVariant::String:
 		{
 			NumParseError err;
-			double rt = doubleFromString( val.value.string, val.length, err);
+			double rt = doubleFromString( val.value.string, val.length(), err);
 			checkError( err, "double");
 			return rt;
 		}
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion to double"));
+			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to double"));
 			NumParseError err;
 			double rt = doubleFromString( buf, bufsize, err);
 			checkError( err, "double");
@@ -307,14 +307,14 @@ static TYPE variant_touint( const ValueVariant& val)
 		case ValueVariant::String:
 		{
 			NumParseError err;
-			TYPE rt = uintFromString( val.value.string, val.length, std::numeric_limits<TYPE>::max(), err);
+			TYPE rt = uintFromString( val.value.string, val.length(), std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
 			return rt;
 		}
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion to uint"));
+			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to uint"));
 			NumParseError err;
 			TYPE rt = uintFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
@@ -369,14 +369,14 @@ static TYPE variant_toint( const ValueVariant& val)
 		case ValueVariant::String:
 		{
 			NumParseError err;
-			TYPE rt = intFromString( val.value.string, val.length, std::numeric_limits<TYPE>::max(), err);
+			TYPE rt = intFromString( val.value.string, val.length(), std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");
 			return rt;
 		}
 		case ValueVariant::WString:
 		{
 			char buf[ 64];
-			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length, _TXT("conversion to int"));
+			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to int"));
 			NumParseError err;
 			TYPE rt = intFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");
@@ -429,12 +429,12 @@ bool ValueVariantConv::isequal_ascii( const ValueVariant& val, const char* value
 {
 	if (val.type == ValueVariant::String)
 	{
-		return (std::strlen( value) == (std::size_t)val.length
-			&& std::memcmp( val.value.string, value, val.length) == 0);
+		return (std::strlen( value) == (std::size_t)val.length()
+			&& std::memcmp( val.value.string, value, val.length()) == 0);
 	}
 	else if (val.type == ValueVariant::WString)
 	{
-		std::size_t wi = 0, we = val.length;
+		std::size_t wi = 0, we = val.length();
 		for (; wi != we; ++wi)
 		{
 			if (val.value.wstring[wi] != (ValueVariant::WCharType)(unsigned char)value[wi])
@@ -512,16 +512,16 @@ bool ValueVariantConv::try_convertToNumber( ValueVariant& val)
 {
 	if (!val.isAtomicType()) return false;
 	if (!val.isNumericType()) return true;
-	if (val.type == ValueVariant::String && val.length < 64)
+	if (val.type == ValueVariant::String && val.length() < 64)
 	{
-		return try_convertStringToNumber( val, val.value.string, val.length);
+		return try_convertStringToNumber( val, val.value.string, val.length());
 	}
-	if (val.type == ValueVariant::String && val.length < 64)
+	if (val.type == ValueVariant::String && val.length() < 64)
 	{
 		char buf[ 128];
-		if (try_map2ascii( buf, sizeof(buf), val.value.wstring, val.length))
+		if (try_map2ascii( buf, sizeof(buf), val.value.wstring, val.length()))
 		{
-			return try_convertStringToNumber( val, buf, val.length);
+			return try_convertStringToNumber( val, buf, val.length());
 		}
 	}
 	return false;

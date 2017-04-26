@@ -105,6 +105,9 @@ struct ValueVariant
 		int classid;
 	} attribute;
 
+	int length() const	{return attribute.length;}
+	int classid() const	{return attribute.classid;}
+
 	bool isNumericType() const
 	{
 		return (type & NumericTypeMask) != 0;

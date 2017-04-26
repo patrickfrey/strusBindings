@@ -71,7 +71,7 @@ public:
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
-	CallResult createQuery( const StorageClientImpl& storage) const;
+	CallResult createQuery( const ValueVariant& storage) const;
 
 private:
 	/// \brief Constructor used by Context

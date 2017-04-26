@@ -105,8 +105,8 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 		{
 			out 
 			<< "bool " << ci->name() << "__" << mi->name()
-			<< "( const HostObjectReference& self, callResult& retval, "
-			<< "std::size_t argc, ValueVariant* argv);" << std::endl;
+			<< "( const HostObjectReference& self, CallResult& retval, "
+			<< "std::size_t argc, ValueVariant const* argv);" << std::endl;
 		}
 	}
 	out
@@ -122,12 +122,12 @@ static std::string expandMethodCall(
 	const std::vector<std::string>& params_default)
 {
 	std::ostringstream out;
-	out << "\tTHIS->" << methodname << "(";
+	out << "THIS->" << methodname << "(";
 	std::size_t pi = 0, pe = params_converted.size();
 	for (; pi != pe; ++pi)
 	{
 		if (pi) out << ", "; else out << " ";
-		out << (pi >= nofargs) ? params_default[ pi] : params_converted[ pi];
+		out << ((pi >= nofargs) ? params_default[ pi] : params_converted[ pi]);
 	}
 	out << ")";
 	return out.str();
@@ -138,11 +138,26 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
 	out << "#include \"strus/bindingObjects.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out
-		<< std::endl
+	out << std::endl
 		<< "using namespace strus;" << std::endl
+		<< "using namespace strus::bindings;" << std::endl
 		<< std::endl;
 
+	out << "#define CATCH_METHOD_CALL_ERROR( retval, classname, methodname)\\" << std::endl;
+	out << "\tcatch (const std::runtime_error& err)\\" << std::endl;
+	out << "\t{\\" << std::endl;
+	out << "\t\tretval.reportError( _TXT(\"error calling method %s::%s(): %s\"), classnam.c_str(), methodnam.c_str(), err.what());\\" << std::endl;
+	out << "\t} catch (const std::bad_alloc& err)\\" << std::endl;
+	out << "\t{\\" << std::endl;
+	out << "\t\tretval.reportError( _TXT(\"out of memory calling method %s::%s()\"), classnam.c_str(), methodnam.c_str());\\" << std::endl;
+	out << "\t}\\" << std::endl;
+	out << "\t} catch (const std::exception& err)\\" << std::endl;
+	out << "\t{\\" << std::endl;
+	out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam.c_str(), methodnam.c_str(), err.what());\\" << std::endl;
+	out << "\t}\\" << std::endl;
+	out << "\treturn false;\\" << std::endl;
+	out << "}" << std::endl << std::endl;
+	
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
@@ -154,8 +169,8 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		for (; mi != me; ++mi)
 		{
 			out << "DLL_PUBLIC bool bindings::" << ci->name() << "__" << mi->name()
-				<< "( const HostObjectReference& self, callResult& retval, "
-				<< "std::size_t argc, ValueVariant* argv)" << std::endl;
+				<< "( const HostObjectReference& self, CallResult& retval, "
+				<< "std::size_t argc, ValueVariant const* argv)" << std::endl;
 			out << "{" << std::endl;
 			out << "\ttry {" << std::endl;
 			out << "\t\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl;
@@ -168,7 +183,10 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			{
 				if (pi->type().hasEvent( "argv_default")) break;
 			}
-			out << "\t\tif (argc < " << min_nofargs << ") throw strus::runtime_error(_TXT(\"too few arguments\"));";
+			if (min_nofargs)
+			{
+				out << "\t\tif (argc < " << min_nofargs << ") throw strus::runtime_error(_TXT(\"too few arguments\"));" << std::endl;
+			}
 
 			// Collect argument values:
 			std::vector<std::string> params_converted;
@@ -176,35 +194,31 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			pi = mi->parameters().begin();
 			for (std::size_t pidx=0; pi != pe; ++pi,++pidx)
 			{
-				char namebuf[ 1] = "";
-				char valuebuf[ 64]; std::snprintf( valuebuf, sizeof(valuebuf), "argv[%u]", pidx);
-				params_converted.push_back( pi->expand( "argv_map", namebuf, valuebuf));
-				params_default.push_back( min_nofargs <= pidx ? pi->expand( "argv_default", namebuf, valuebuf) : std::string());
+				std::string val = strus::string_format( "argv[%u]", (unsigned int)pidx);
+				params_converted.push_back( pi->expand( "argv_map", "", val.c_str()));
+				params_default.push_back( min_nofargs <= pidx ? pi->expand( "argv_default", "", val.c_str()) : std::string());
 			}
 			// Print redirect calls:
-			out << "\t\tswitch (argc)" << std::endl;
-			out << "\t\t{" << std::endl;
-			pi = mi->parameters().begin();
-			for (int pidx=0; pi != pe; ++pi,++pidx)
+			if (mi->parameters().empty())
 			{
-				out << "\t\t\tcase " << pidx << ": retval = " << expandMethodCall( mi->name(), pidx, params_converted, params_default) << "; break;" << std::endl;
+				out << "\t\tif (argc > " << mi->parameters().size() << ") throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
+				out << "\t\tretval = " << expandMethodCall( mi->name(), 0, params_converted, params_default) << ";" << std::endl;
 			}
-			out << "\t\t\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
-			out << "\t\t}" << std::endl;
+			else
+			{
+				out << "\t\tswitch (argc)" << std::endl;
+				out << "\t\t{" << std::endl;
+				for (std::size_t pidx=min_nofargs; pidx<=mi->parameters().size(); ++pidx)
+				{
+					out << "\t\t\tcase " << pidx << ": retval = " << expandMethodCall( mi->name(), pidx, params_converted, params_default) << "; break;" << std::endl;
+				}
+				out << "\t\t\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
+				out << "\t\t}" << std::endl;
+			}
 			out << "\t\treturn true;" << std::endl;
-			out << "\t} catch (const std::runtime_error& err)" << std::endl;
-			out << "\t{" << std::endl;
-			out << "\t\tretval.reportError( _TXT(\"error calling method %s::%s(): %s\"), mi->name().c_str(), ci->name().c_str(), err.what());";
-			out << "\t} catch (const std::bad_alloc& err)" << std::endl;
-			out << "\t{" << std::endl;
-			out << "\t\tretval.reportError( _TXT(\"out of memory calling method %s::%s()\"), mi->name().c_str(), ci->name().c_str());";
 			out << "\t}" << std::endl;
-			out << "\t} catch (const std::exception& err)" << std::endl;
-			out << "\t{" << std::endl;
-			out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), mi->name().c_str(), ci->name().c_str(), err.what());";
-			out << "\t}" << std::endl;
-			out << "\treturn false;" << std::endl;
-			out << "}" << std::endl;
+			out << "\tCATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());" << std::endl;
+			out << "}" << std::endl << std::endl;
 		}
 	}
 }

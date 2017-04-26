@@ -159,7 +159,7 @@ public:
 	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes) (See analyzer::Document)
 	CallResult analyze(
 			const std::string& content,
-			const ValueVariant& documentClass = ValueVariant());
+			const ValueVariant& documentClass);
 
 	/// \brief Analye a content (detects its document class) and return the analyzed document structure
 	/// \param[in] content std::string (NOT a file name !) of the document to analyze
@@ -248,7 +248,7 @@ public:
 	/// \param[in] range positional range attribute for the node used for grouping
 	/// \param[in] cardinality cardinality attribute for the node used for grouping
 	/// \param[in] groupBy kind of selection of the arguments grouped ("position": elements with same position get their own group, "all" (or "" default): all elements of the field get into one group
-	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, std::string groupBy);
+	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, const std::string& groupBy);
 
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] expression query expression tree

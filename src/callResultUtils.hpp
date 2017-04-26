@@ -19,28 +19,11 @@
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"
 #include "impl/statistics.hpp"
+#include "implTraits.hpp"
 #include "serializer.hpp"
 
 namespace strus {
 namespace bindings {
-
-struct ClassIdMap
-{
-	//static int get( const ContextImpl& )			{return ClassContext;}
-	static int get( const DocumentAnalyzerImpl& )		{return ClassDocumentAnalyzer;}
-	static int get( const QueryAnalyzerImpl&)		{return ClassQueryAnalyzer;}
-	static int get( const QueryEvalImpl&)			{return ClassQueryEval;}
-	static int get( const QueryImpl&)			{return ClassQuery;}
-	static int get( const StorageClientImpl&)		{return ClassStorageClient;}
-	static int get( const StorageTransactionImpl&)		{return ClassStorageTransaction;}
-	static int get( const StatisticsProcessorImpl&)		{return ClassStatisticsProcessor;}
-	static int get( const StatisticsIteratorImpl&)		{return ClassStatisticsIterator;}
-	static int get( const DocumentBrowserImpl&)		{return ClassDocumentBrowser;}
-	static int get( const VectorStorageSearcherImpl&)	{return ClassVectorStorageSearcher;}
-	static int get( const VectorStorageClientImpl&)		{return ClassVectorStorageClient;}
-	static int get( const VectorStorageTransactionImpl&)	{return ClassVectorStorageTransaction;}
-};
-
 
 template <typename STRUCTVALUE>
 static CallResult callResultStructureOwnership( STRUCTVALUE* st)
@@ -75,7 +58,7 @@ static CallResult callResultObject( OBJECT* st)
 {
 	CallResult rt;
 	rt.object.createOwnership( st);
-	rt.classid = ClassIdMap::get(*st);
+	rt.value.init( (const ValueVariant::StrusObjectType*)st, ClassIdMap::get(*st));
 	return rt;
 }
 

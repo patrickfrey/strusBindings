@@ -18,6 +18,7 @@
 #include "deserializer.hpp"
 #include "serializer.hpp"
 #include "structDefs.hpp"
+#include "implTraits.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -103,16 +104,17 @@ void QueryEvalImpl::addWeightingFormula(
 	Deserializer::buildWeightingFormula( queryeval, source, parameter, m_queryproc, errorhnd);
 }
 
-CallResult QueryEvalImpl::createQuery( const StorageClientImpl& storage) const
+CallResult QueryEvalImpl::createQuery( const ValueVariant& storage) const
 {
+	StorageClientImpl* storageclient = implObjectCast<StorageClientImpl>( storage);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryEvalInterface* qe = m_queryeval_impl.getObject<QueryEvalInterface>();
-	const StorageClientInterface* st = storage.m_storage_impl.getObject<StorageClientInterface>();
+	const StorageClientInterface* st = storageclient->m_storage_impl.getObject<StorageClientInterface>();
 	HostObjectReference query;
 	query.resetOwnership( qe->createQuery( st));
 	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
 
-	return callResultObject( new QueryImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storage.m_storage_impl, m_queryeval_impl, query, m_queryproc));
+	return callResultObject( new QueryImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storageclient->m_storage_impl, m_queryeval_impl, query, m_queryproc));
 }
 
 void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr_, double weight_)
