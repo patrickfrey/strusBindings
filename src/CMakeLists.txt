@@ -103,6 +103,9 @@ target_link_libraries( strus_bindingsimpl strus_storage_objbuild strus_analyzer_
 add_library( strus_bindings SHARED ${bindings_source_files} )
 target_link_libraries( strus_bindings strus_bindingsimpl strus_base strus_error )
 
+add_library( libstrus_bindings_description SHARED libstrus_bindings_description.cpp )
+target_link_libraries( libstrus_bindings_description )
+
 set_target_properties(
     strus_bindings
     PROPERTIES

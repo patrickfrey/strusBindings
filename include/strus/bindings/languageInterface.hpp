@@ -21,6 +21,7 @@ public:
 		struct Method
 		{
 			const char* name;		///< name of the method
+			const char* funcname;		///< name of the method
 			int argc;			///< maximum number of arguments
 		};
 		

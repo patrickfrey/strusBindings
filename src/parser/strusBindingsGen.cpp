@@ -55,6 +55,73 @@ static void printOutput( const char* filename, PrintInterface print, const strus
 	}
 }
 
+static std::string methodFunctionName( const std::string& cl, const std::string& mt)
+{
+	return cl + "__" + mt;
+}
+
+static void print_BindingInterfaceDescriptionHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
+{
+	strus::printHppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
+	out << "#include \"strus/bindings/languageInterface.hpp\"" << std::endl;
+	out << "#include <cstddef>" << std::endl;
+	out << std::endl
+		<< "namespace strus {" << std::endl
+		<< std::endl << std::endl;
+
+	out << "const bindings::LanguageInterface::InterfaceDescription* getBindingsInterfaceDescription();"
+		<< std::endl << std::endl;
+
+	out << "}//namespace" << std::endl;
+	strus::printHppFrameTail( out);
+}
+
+static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
+{
+	strus::printCppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
+	out << "#include \"strus/lib/bindings_description.hpp\"" << std::endl;
+	out << "#include \"strus/bindings/bindingClassId.hpp\"" << std::endl;
+	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
+
+	out << "#include <cstddef>" << std::endl;
+	out
+		<< std::endl
+		<< "namespace strus {" << std::endl
+		<< std::endl << std::endl;
+
+	out << "static const bindings::LanguageInterface::InterfaceDescription g_descr = " << std::endl
+		<< "{" << std::endl
+		<< "\t{" << std::endl;
+	std::vector<strus::ClassDef>::const_iterator
+		ci = interfaceDef.classDefs().begin(),
+		ce = interfaceDef.classDefs().end();
+	for (; ci != ce; ++ci)
+	{
+		std::string classid = std::string("Class") + ci->name();
+		out << "\t\t{ " << classid << ", \"" << ci->name() << "," << std::endl;
+		out << "\t\t\t{" << std::endl;
+		std::vector<strus::MethodDef>::const_iterator
+			mi = ci->methodDefs().begin(),
+			me = ci->methodDefs().end();
+		for (; mi != me; ++mi)
+		{
+			
+			out << "\t\t\t\t{\"" << mi->name() <<  "\", \"" << methodFunctionName(ci->name(),mi->name()) << "\", " << mi->parameters().size() << "}," << std::endl;
+		}
+		out << "\t\t\t\t{0,0,0}" << std::endl;
+		out << "\t\t\t}" << std::endl;
+		out << "\t\t}," << std::endl;
+	}
+	out << "\t\t{0,0}" << std::endl;
+	out << "\t}" << std::endl;
+	out << "};" << std::endl << std::endl;
+
+	out << "DLL_PUBLIC const bindings::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
+	out << "{" << std::endl;
+	out << "\treturn &g_descr;" << std::endl;
+	out << "}" << std::endl;
+}
+
 static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
@@ -79,7 +146,7 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 		for (; mi != me; ++mi)
 		{
 			out 
-			<< "bool " << ci->name() << "__" << mi->name()
+			<< "bool " << methodFunctionName( ci->name(), mi->name())
 			<< "( void* self, CallResult& retval, "
 			<< "std::size_t argc, ValueVariant const* argv);" << std::endl;
 		}
@@ -252,6 +319,9 @@ int main( int argc, const char* argv[])
 #endif
 		printOutput( "include/strus/bindingObjects.hpp", &print_BindingObjectsHpp, interfaceDef);
 		printOutput( "src/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
+
+		printOutput( "include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
+		printOutput( "src/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
 
 		std::cerr << "done." << std::endl;
 		return 0;
