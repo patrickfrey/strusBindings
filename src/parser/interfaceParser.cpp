@@ -15,7 +15,7 @@
 
 using namespace strus;
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 
 static bool endsWith( const std::string& ident, const std::string& tail)
 {
@@ -92,59 +92,6 @@ static std::string parseIdentifier( char const*& si, const char* se)
 {
 	std::string rt;
 	for (; si != se && isAlnum(*si); ++si)
-	{
-		rt.push_back( *si);
-	}
-	return rt;
-}
-static std::string parseStructureIdentifier( char const*& si, const char* se)
-{
-	std::string rt;
-	while (si < se && isAlpha(*si))
-	{
-		rt.append( parseIdentifier( si, se));
-		skipSpacesAndComments( si, se);
-		if (si+1 < se && si[0] == ':' && si[1] == ':')
-		{
-			rt.append( "::");
-			si += 2;
-			skipSpacesAndComments( si, se);
-		}
-		else if (si+1 < se && si[0] == '-' && si[1] == '>')
-		{
-			rt.append( "->");
-			si += 2;
-			skipSpacesAndComments( si, se);
-		}
-		else if (si != se && *si == '.')
-		{
-			rt.append( ".");
-			++si;
-			skipSpacesAndComments( si, se);
-		}
-		else
-		{
-			break;
-		}
-	}
-	return rt;
-}
-static std::string parseNumericValue( char const*& si, const char* se)
-{
-	std::string rt;
-	if (si != se && (*si == '-' || *si == '+'))
-	{
-		rt.push_back( *si++);
-	}
-	for (; si != se && isDigit(*si); ++si)
-	{
-		rt.push_back( *si);
-	}
-	if (si != se && *si == '.')
-	{
-		rt.push_back( *si++);
-	}
-	for (; si != se && isDigit(*si); ++si)
 	{
 		rt.push_back( *si);
 	}

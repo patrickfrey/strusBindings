@@ -21,7 +21,7 @@
 #include <sstream>
 #include <cerrno>
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 
 /// \brief List of interface files parsed without path
 std::vector<std::string> g_inputFiles;
@@ -55,30 +55,6 @@ static void printOutput( const char* filename, PrintInterface print, const strus
 	}
 }
 
-static std::string expandIndent( const std::string& indent, const std::string& source)
-{
-	std::string rt ( indent);
-	char const* si = source.c_str();
-	for (; *si; ++si)
-	{
-		char const* seol = si;
-		for (; *seol && *seol != '\n'; ++seol){}
-		if (seol != si)
-		{
-			rt.append( "\n");
-			++si;
-		}
-		else
-		{
-			rt.append( indent);
-			rt.append( si, seol-si);
-			if (!*seol) break;
-			si = seol;
-		}
-	}
-	return rt;
-}
-
 static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
@@ -90,7 +66,6 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 	out
 		<< std::endl
 		<< "namespace strus {" << std::endl
-		<< "namespace bindings {" << std::endl
 		<< std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
@@ -105,13 +80,13 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 		{
 			out 
 			<< "bool " << ci->name() << "__" << mi->name()
-			<< "( const HostObjectReference& self, CallResult& retval, "
+			<< "( void* self, CallResult& retval, "
 			<< "std::size_t argc, ValueVariant const* argv);" << std::endl;
 		}
 	}
 	out
 		<< std::endl
-		<< "}}//namespace" << std::endl;
+		<< "}//namespace" << std::endl;
 	strus::printHppFrameTail( out);
 }
 
@@ -138,6 +113,14 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
 	out << "#include \"strus/bindingObjects.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
+	out << "#include \"impl/context.hpp\"" << std::endl;
+	out << "#include \"impl/storage.hpp\"" << std::endl;
+	out << "#include \"impl/vector.hpp\"" << std::endl;
+	out << "#include \"impl/analyzer.hpp\"" << std::endl;
+	out << "#include \"impl/query.hpp\"" << std::endl;
+	out << "#include \"impl/statistics.hpp\"" << std::endl;
+	out << "#include \"internationalization.hpp\"" << std::endl;
+
 	out << std::endl
 		<< "using namespace strus;" << std::endl
 		<< "using namespace strus::bindings;" << std::endl
@@ -169,11 +152,11 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		for (; mi != me; ++mi)
 		{
 			out << "DLL_PUBLIC bool bindings::" << ci->name() << "__" << mi->name()
-				<< "( const HostObjectReference& self, CallResult& retval, "
+				<< "( void* self, CallResult& retval, "
 				<< "std::size_t argc, ValueVariant const* argv)" << std::endl;
 			out << "{" << std::endl;
 			out << "\ttry {" << std::endl;
-			out << "\t\t" << ci->name() << "Impl* THIS = self.getObject<" << ci->name() << "Impl>();" << std::endl;
+			out << "\t\t" << ci->name() << "Impl* THIS = ("<< ci->name() << "Impl*)(self);" << std::endl;
 
 			std::size_t min_nofargs = 0;
 			std::vector<strus::VariableValue>::const_iterator

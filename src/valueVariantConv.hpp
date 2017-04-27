@@ -10,7 +10,7 @@
 /// \brief Conversion methods for the variant type
 /// \file valueVariantConv.hpp
 #include "strus/bindings/valueVariant.hpp"
-#include "strus/bindingsClassId.hpp"
+#include "strus/bindingClassId.hpp"
 #include "strus/base/stdint.h"
 #include "callResultUtils.hpp"
 #include <string>

@@ -10,6 +10,13 @@
 /// \file bindingObjects.cpp
 #include "strus/bindingObjects.hpp"
 #include "strus/base/dll_tags.hpp"
+#include "impl/context.hpp"
+#include "impl/storage.hpp"
+#include "impl/vector.hpp"
+#include "impl/analyzer.hpp"
+#include "impl/query.hpp"
+#include "impl/statistics.hpp"
+#include "internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -29,10 +36,10 @@ using namespace strus::bindings;
 	return false;\
 }
 
-DLL_PUBLIC bool bindings::Context__getLastError( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__getLastError( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->getLastError();
 		return true;
@@ -40,10 +47,10 @@ DLL_PUBLIC bool bindings::Context__getLastError( const HostObjectReference& self
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__loadModule( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__loadModule( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -55,10 +62,10 @@ DLL_PUBLIC bool bindings::Context__loadModule( const HostObjectReference& self, 
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__addModulePath( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__addModulePath( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -70,10 +77,10 @@ DLL_PUBLIC bool bindings::Context__addModulePath( const HostObjectReference& sel
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__addResourcePath( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__addResourcePath( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -85,10 +92,10 @@ DLL_PUBLIC bool bindings::Context__addResourcePath( const HostObjectReference& s
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createStatisticsProcessor( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createStatisticsProcessor( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -100,10 +107,10 @@ DLL_PUBLIC bool bindings::Context__createStatisticsProcessor( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createStorageClient( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createStorageClient( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createStorageClient();
 		return true;
@@ -111,10 +118,10 @@ DLL_PUBLIC bool bindings::Context__createStorageClient( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createStorageClient( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createStorageClient( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -126,10 +133,10 @@ DLL_PUBLIC bool bindings::Context__createStorageClient( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createVectorStorageClient( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createVectorStorageClient( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createVectorStorageClient();
 		return true;
@@ -137,10 +144,10 @@ DLL_PUBLIC bool bindings::Context__createVectorStorageClient( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createVectorStorageClient( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createVectorStorageClient( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -152,10 +159,10 @@ DLL_PUBLIC bool bindings::Context__createVectorStorageClient( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createStorage( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createStorage( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -167,10 +174,10 @@ DLL_PUBLIC bool bindings::Context__createStorage( const HostObjectReference& sel
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createVectorStorage( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createVectorStorage( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -182,10 +189,10 @@ DLL_PUBLIC bool bindings::Context__createVectorStorage( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__destroyStorage( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__destroyStorage( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -197,10 +204,10 @@ DLL_PUBLIC bool bindings::Context__destroyStorage( const HostObjectReference& se
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__detectDocumentClass( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__detectDocumentClass( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -212,10 +219,10 @@ DLL_PUBLIC bool bindings::Context__detectDocumentClass( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createDocumentAnalyzer( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createDocumentAnalyzer( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -227,10 +234,10 @@ DLL_PUBLIC bool bindings::Context__createDocumentAnalyzer( const HostObjectRefer
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createQueryAnalyzer( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createQueryAnalyzer( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createQueryAnalyzer();
 		return true;
@@ -238,10 +245,10 @@ DLL_PUBLIC bool bindings::Context__createQueryAnalyzer( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__createQueryEval( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__createQueryEval( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createQueryEval();
 		return true;
@@ -249,10 +256,10 @@ DLL_PUBLIC bool bindings::Context__createQueryEval( const HostObjectReference& s
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Context__close( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Context__close( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		ContextImpl* THIS = self.getObject<ContextImpl>();
+		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->close();
 		return true;
@@ -260,10 +267,10 @@ DLL_PUBLIC bool bindings::Context__close( const HostObjectReference& self, CallR
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__nofDocumentsInserted( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__nofDocumentsInserted( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->nofDocumentsInserted();
 		return true;
@@ -271,10 +278,10 @@ DLL_PUBLIC bool bindings::StorageClient__nofDocumentsInserted( const HostObjectR
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__createTransaction( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__createTransaction( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createTransaction();
 		return true;
@@ -282,10 +289,10 @@ DLL_PUBLIC bool bindings::StorageClient__createTransaction( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__createInitStatisticsIterator( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__createInitStatisticsIterator( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -297,10 +304,10 @@ DLL_PUBLIC bool bindings::StorageClient__createInitStatisticsIterator( const Hos
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__createUpdateStatisticsIterator( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__createUpdateStatisticsIterator( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createUpdateStatisticsIterator();
 		return true;
@@ -308,10 +315,10 @@ DLL_PUBLIC bool bindings::StorageClient__createUpdateStatisticsIterator( const H
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__createDocumentBrowser( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__createDocumentBrowser( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createDocumentBrowser();
 		return true;
@@ -319,10 +326,10 @@ DLL_PUBLIC bool bindings::StorageClient__createDocumentBrowser( const HostObject
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__config( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__config( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->config();
 		return true;
@@ -330,10 +337,10 @@ DLL_PUBLIC bool bindings::StorageClient__config( const HostObjectReference& self
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageClient__close( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageClient__close( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageClientImpl* THIS = self.getObject<StorageClientImpl>();
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->close();
 		return true;
@@ -341,10 +348,10 @@ DLL_PUBLIC bool bindings::StorageClient__close( const HostObjectReference& self,
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageTransaction__insertDocument( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageTransaction__insertDocument( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageTransactionImpl* THIS = self.getObject<StorageTransactionImpl>();
+		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -356,10 +363,10 @@ DLL_PUBLIC bool bindings::StorageTransaction__insertDocument( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageTransaction__deleteDocument( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageTransaction__deleteDocument( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageTransactionImpl* THIS = self.getObject<StorageTransactionImpl>();
+		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -371,10 +378,10 @@ DLL_PUBLIC bool bindings::StorageTransaction__deleteDocument( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageTransaction__deleteUserAccessRights( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageTransaction__deleteUserAccessRights( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageTransactionImpl* THIS = self.getObject<StorageTransactionImpl>();
+		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -386,10 +393,10 @@ DLL_PUBLIC bool bindings::StorageTransaction__deleteUserAccessRights( const Host
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageTransaction__commit( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageTransaction__commit( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageTransactionImpl* THIS = self.getObject<StorageTransactionImpl>();
+		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->commit();
 		return true;
@@ -397,10 +404,10 @@ DLL_PUBLIC bool bindings::StorageTransaction__commit( const HostObjectReference&
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StorageTransaction__rollback( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StorageTransaction__rollback( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StorageTransactionImpl* THIS = self.getObject<StorageTransactionImpl>();
+		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->rollback();
 		return true;
@@ -408,10 +415,10 @@ DLL_PUBLIC bool bindings::StorageTransaction__rollback( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentBrowser__addMetaDataRestrictionCondition( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentBrowser__addMetaDataRestrictionCondition( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentBrowserImpl* THIS = self.getObject<DocumentBrowserImpl>();
+		DocumentBrowserImpl* THIS = (DocumentBrowserImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -423,10 +430,10 @@ DLL_PUBLIC bool bindings::DocumentBrowser__addMetaDataRestrictionCondition( cons
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentBrowser__skipDoc( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentBrowser__skipDoc( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentBrowserImpl* THIS = self.getObject<DocumentBrowserImpl>();
+		DocumentBrowserImpl* THIS = (DocumentBrowserImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -438,10 +445,10 @@ DLL_PUBLIC bool bindings::DocumentBrowser__skipDoc( const HostObjectReference& s
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentBrowser__get( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentBrowser__get( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentBrowserImpl* THIS = self.getObject<DocumentBrowserImpl>();
+		DocumentBrowserImpl* THIS = (DocumentBrowserImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -453,10 +460,10 @@ DLL_PUBLIC bool bindings::DocumentBrowser__get( const HostObjectReference& self,
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StatisticsIterator__getNext( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StatisticsIterator__getNext( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StatisticsIteratorImpl* THIS = self.getObject<StatisticsIteratorImpl>();
+		StatisticsIteratorImpl* THIS = (StatisticsIteratorImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->getNext();
 		return true;
@@ -464,10 +471,10 @@ DLL_PUBLIC bool bindings::StatisticsIterator__getNext( const HostObjectReference
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StatisticsProcessor__decode( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StatisticsProcessor__decode( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StatisticsProcessorImpl* THIS = self.getObject<StatisticsProcessorImpl>();
+		StatisticsProcessorImpl* THIS = (StatisticsProcessorImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -479,10 +486,10 @@ DLL_PUBLIC bool bindings::StatisticsProcessor__decode( const HostObjectReference
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::StatisticsProcessor__encode( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::StatisticsProcessor__encode( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		StatisticsProcessorImpl* THIS = self.getObject<StatisticsProcessorImpl>();
+		StatisticsProcessorImpl* THIS = (StatisticsProcessorImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -494,10 +501,10 @@ DLL_PUBLIC bool bindings::StatisticsProcessor__encode( const HostObjectReference
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageSearcher__findSimilar( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageSearcher__findSimilar( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageSearcherImpl* THIS = self.getObject<VectorStorageSearcherImpl>();
+		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -509,10 +516,10 @@ DLL_PUBLIC bool bindings::VectorStorageSearcher__findSimilar( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageSearcher__findSimilarFromSelection( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageSearcher__findSimilarFromSelection( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageSearcherImpl* THIS = self.getObject<VectorStorageSearcherImpl>();
+		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -524,10 +531,10 @@ DLL_PUBLIC bool bindings::VectorStorageSearcher__findSimilarFromSelection( const
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageSearcher__close( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageSearcher__close( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageSearcherImpl* THIS = self.getObject<VectorStorageSearcherImpl>();
+		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->close();
 		return true;
@@ -535,10 +542,10 @@ DLL_PUBLIC bool bindings::VectorStorageSearcher__close( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__createSearcher( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__createSearcher( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -550,10 +557,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__createSearcher( const HostObjectR
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__createTransaction( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__createTransaction( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->createTransaction();
 		return true;
@@ -561,10 +568,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__createTransaction( const HostObje
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__conceptClassNames( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__conceptClassNames( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->conceptClassNames();
 		return true;
@@ -572,10 +579,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__conceptClassNames( const HostObje
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__conceptFeatures( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__conceptFeatures( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -587,10 +594,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__conceptFeatures( const HostObject
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__nofConcepts( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__nofConcepts( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -602,10 +609,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__nofConcepts( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__featureConcepts( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__featureConcepts( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -617,10 +624,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__featureConcepts( const HostObject
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__featureVector( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__featureVector( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -632,10 +639,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__featureVector( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__featureName( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__featureName( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -647,10 +654,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__featureName( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__featureIndex( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__featureIndex( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -662,10 +669,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__featureIndex( const HostObjectRef
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__nofFeatures( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__nofFeatures( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->nofFeatures();
 		return true;
@@ -673,10 +680,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__nofFeatures( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__config( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__config( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->config();
 		return true;
@@ -684,10 +691,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__config( const HostObjectReference
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageClient__close( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageClient__close( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageClientImpl* THIS = self.getObject<VectorStorageClientImpl>();
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->close();
 		return true;
@@ -695,10 +702,10 @@ DLL_PUBLIC bool bindings::VectorStorageClient__close( const HostObjectReference&
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageTransaction__addFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageTransaction__addFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageTransactionImpl* THIS = self.getObject<VectorStorageTransactionImpl>();
+		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -710,10 +717,10 @@ DLL_PUBLIC bool bindings::VectorStorageTransaction__addFeature( const HostObject
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageTransaction__defineFeatureConceptRelation( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageTransaction__defineFeatureConceptRelation( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageTransactionImpl* THIS = self.getObject<VectorStorageTransactionImpl>();
+		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -725,10 +732,10 @@ DLL_PUBLIC bool bindings::VectorStorageTransaction__defineFeatureConceptRelation
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageTransaction__commit( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageTransaction__commit( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageTransactionImpl* THIS = self.getObject<VectorStorageTransactionImpl>();
+		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->commit();
 		return true;
@@ -736,10 +743,10 @@ DLL_PUBLIC bool bindings::VectorStorageTransaction__commit( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageTransaction__rollback( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageTransaction__rollback( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageTransactionImpl* THIS = self.getObject<VectorStorageTransactionImpl>();
+		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->rollback();
 		return true;
@@ -747,10 +754,10 @@ DLL_PUBLIC bool bindings::VectorStorageTransaction__rollback( const HostObjectRe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::VectorStorageTransaction__close( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::VectorStorageTransaction__close( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		VectorStorageTransactionImpl* THIS = self.getObject<VectorStorageTransactionImpl>();
+		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->close();
 		return true;
@@ -758,10 +765,10 @@ DLL_PUBLIC bool bindings::VectorStorageTransaction__close( const HostObjectRefer
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__addSearchIndexFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__addSearchIndexFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 5) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -773,10 +780,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__addSearchIndexFeature( const HostObj
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__addForwardIndexFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__addForwardIndexFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 5) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -788,10 +795,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__addForwardIndexFeature( const HostOb
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__defineMetaData( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__defineMetaData( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -803,10 +810,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__defineMetaData( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAggregatedMetaData( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAggregatedMetaData( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -818,10 +825,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAggregatedMetaData( const Host
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAttribute( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAttribute( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -833,10 +840,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAttribute( const HostObjectRef
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__addSearchIndexFeatureFromPatternMatch( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__addSearchIndexFeatureFromPatternMatch( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -848,10 +855,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__addSearchIndexFeatureFromPatternMatc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__addForwardIndexFeatureFromPatternMatch( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__addForwardIndexFeatureFromPatternMatch( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -863,10 +870,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__addForwardIndexFeatureFromPatternMat
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__defineMetaDataFromPatternMatch( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__defineMetaDataFromPatternMatch( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -878,10 +885,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__defineMetaDataFromPatternMatch( cons
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAttributeFromPatternMatch( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAttributeFromPatternMatch( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -893,10 +900,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__defineAttributeFromPatternMatch( con
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__definePatternMatcherPostProc( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__definePatternMatcherPostProc( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -908,10 +915,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__definePatternMatcherPostProc( const 
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__definePatternMatcherPostProcFromFile( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__definePatternMatcherPostProcFromFile( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -923,10 +930,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__definePatternMatcherPostProcFromFile
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__defineDocument( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__defineDocument( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -938,10 +945,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__defineDocument( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__analyze( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__analyze( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -953,10 +960,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__analyze( const HostObjectReference& 
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::DocumentAnalyzer__analyze( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::DocumentAnalyzer__analyze( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		DocumentAnalyzerImpl* THIS = self.getObject<DocumentAnalyzerImpl>();
+		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -968,10 +975,10 @@ DLL_PUBLIC bool bindings::DocumentAnalyzer__analyze( const HostObjectReference& 
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__addSearchIndexElement( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__addSearchIndexElement( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -983,10 +990,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__addSearchIndexElement( const HostObject
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__addSearchIndexElementFromPatternMatch( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__addSearchIndexElementFromPatternMatch( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -998,10 +1005,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__addSearchIndexElementFromPatternMatch( 
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__addPatternLexem( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__addPatternLexem( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1013,10 +1020,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__addPatternLexem( const HostObjectRefere
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__definePatternMatcherPostProc( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__definePatternMatcherPostProc( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1028,10 +1035,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__definePatternMatcherPostProc( const Hos
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__definePatternMatcherPostProcFromFile( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__definePatternMatcherPostProcFromFile( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1043,10 +1050,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__definePatternMatcherPostProcFromFile( c
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__defineImplicitGroupBy( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__defineImplicitGroupBy( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 5) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1058,10 +1065,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__defineImplicitGroupBy( const HostObject
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryAnalyzer__analyze( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryAnalyzer__analyze( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryAnalyzerImpl* THIS = self.getObject<QueryAnalyzerImpl>();
+		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1073,10 +1080,10 @@ DLL_PUBLIC bool bindings::QueryAnalyzer__analyze( const HostObjectReference& sel
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addTerm( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addTerm( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1088,10 +1095,10 @@ DLL_PUBLIC bool bindings::QueryEval__addTerm( const HostObjectReference& self, C
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addSelectionFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addSelectionFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1103,10 +1110,10 @@ DLL_PUBLIC bool bindings::QueryEval__addSelectionFeature( const HostObjectRefere
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addRestrictionFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addRestrictionFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1118,10 +1125,10 @@ DLL_PUBLIC bool bindings::QueryEval__addRestrictionFeature( const HostObjectRefe
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addExclusionFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addExclusionFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1133,10 +1140,10 @@ DLL_PUBLIC bool bindings::QueryEval__addExclusionFeature( const HostObjectRefere
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addSummarizer( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addSummarizer( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1148,10 +1155,10 @@ DLL_PUBLIC bool bindings::QueryEval__addSummarizer( const HostObjectReference& s
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addWeightingFunction( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addWeightingFunction( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1163,10 +1170,10 @@ DLL_PUBLIC bool bindings::QueryEval__addWeightingFunction( const HostObjectRefer
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__addWeightingFormula( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__addWeightingFormula( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1178,10 +1185,10 @@ DLL_PUBLIC bool bindings::QueryEval__addWeightingFormula( const HostObjectRefere
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::QueryEval__createQuery( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::QueryEval__createQuery( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryEvalImpl* THIS = self.getObject<QueryEvalImpl>();
+		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1193,10 +1200,10 @@ DLL_PUBLIC bool bindings::QueryEval__createQuery( const HostObjectReference& sel
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__defineFeature( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__defineFeature( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1209,10 +1216,10 @@ DLL_PUBLIC bool bindings::Query__defineFeature( const HostObjectReference& self,
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__addMetaDataRestrictionCondition( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__addMetaDataRestrictionCondition( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1224,10 +1231,10 @@ DLL_PUBLIC bool bindings::Query__addMetaDataRestrictionCondition( const HostObje
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__defineTermStatistics( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__defineTermStatistics( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1239,10 +1246,10 @@ DLL_PUBLIC bool bindings::Query__defineTermStatistics( const HostObjectReference
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__defineGlobalStatistics( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__defineGlobalStatistics( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1254,10 +1261,10 @@ DLL_PUBLIC bool bindings::Query__defineGlobalStatistics( const HostObjectReferen
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__addDocumentEvaluationSet( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__addDocumentEvaluationSet( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1269,10 +1276,10 @@ DLL_PUBLIC bool bindings::Query__addDocumentEvaluationSet( const HostObjectRefer
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__setMaxNofRanks( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__setMaxNofRanks( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1284,10 +1291,10 @@ DLL_PUBLIC bool bindings::Query__setMaxNofRanks( const HostObjectReference& self
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__setMinRank( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__setMinRank( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1299,10 +1306,10 @@ DLL_PUBLIC bool bindings::Query__setMinRank( const HostObjectReference& self, Ca
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__addUserName( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__addUserName( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1314,10 +1321,10 @@ DLL_PUBLIC bool bindings::Query__addUserName( const HostObjectReference& self, C
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__setWeightingVariables( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__setWeightingVariables( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1329,10 +1336,10 @@ DLL_PUBLIC bool bindings::Query__setWeightingVariables( const HostObjectReferenc
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__setDebugMode( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__setDebugMode( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
@@ -1344,10 +1351,10 @@ DLL_PUBLIC bool bindings::Query__setDebugMode( const HostObjectReference& self, 
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__evaluate( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__evaluate( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->evaluate();
 		return true;
@@ -1355,10 +1362,10 @@ DLL_PUBLIC bool bindings::Query__evaluate( const HostObjectReference& self, Call
 	CATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());
 }
 
-DLL_PUBLIC bool bindings::Query__tostring( const HostObjectReference& self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
+DLL_PUBLIC bool bindings::Query__tostring( void* self, CallResult& retval, std::size_t argc, ValueVariant const* argv)
 {
 	try {
-		QueryImpl* THIS = self.getObject<QueryImpl>();
+		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("too many arguments"));
 		retval = THIS->tostring();
 		return true;

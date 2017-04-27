@@ -22,7 +22,7 @@ class Serialization;
 /// \brief Representation of a typed value const reference or an owned object with reference count
 struct ValueVariant
 {
-	typedef void* StrusObjectType;
+	typedef void StrusObjectType;
 
 	/// \brief Enumeration of value type identifiers
 	enum Type {
