@@ -43,6 +43,8 @@
 using namespace strus;
 using namespace strus::bindings;
 
+typedef papuga::Serialization Serialization;
+
 static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
 {
 	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads);
@@ -69,7 +71,7 @@ static ContextDef parseContext( const ValueVariant& ctx)
 	{
 		return ContextDef( ValueVariantConv::tostring( ctx));
 	}
-	else if (ctx.type == ValueVariant::StrusSerialization)
+	else if (ctx.type == ValueVariant::Serialization)
 	{
 		Serialization::const_iterator si = ctx.value.serialization->begin();
 		return ContextDef( si, ctx.value.serialization->end());
@@ -275,23 +277,11 @@ CallResult ContextImpl::createStorageClient( const ValueVariant& config_)
 	return callResultObject( new StorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd)));
 }
 
-CallResult ContextImpl::createStorageClient()
-{
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return callResultObject( new StorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, std::string()));
-}
-
 CallResult ContextImpl::createVectorStorageClient( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return callResultObject( new VectorStorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd)));
-}
-
-CallResult ContextImpl::createVectorStorageClient()
-{
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return callResultObject( new VectorStorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, std::string()));
 }
 
 CallResult ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)

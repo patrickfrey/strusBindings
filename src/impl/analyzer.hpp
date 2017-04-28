@@ -7,9 +7,9 @@
  */
 #ifndef _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/callResult.hpp"
+#include "papuga/hostObjectReference.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include <vector>
@@ -18,6 +18,10 @@
 
 namespace strus {
 namespace bindings {
+
+typedef papuga::ValueVariant ValueVariant;
+typedef papuga::CallResult CallResult;
+typedef papuga::HostObjectReference HostObjectReference;
 
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 
@@ -153,19 +157,13 @@ public:
 			const std::string& subDocumentTypeName,
 			const std::string& selectexpr);
 
-	/// \brief Analye a content of a defined document class and return the analyzed document structure
+	/// \brief Analye a content and return the analyzed document structure
 	/// \param[in] content std::string (NOT a file name !) of the document to analyze
-	/// \param[in] documentClass document class of the document to analyze (see analyzer::DocumentClass)
+	/// \param[in] documentClass document class of the document to analyze (see analyzer::DocumentClass), if not specified the document class is guessed from the content with document class detection
 	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes) (See analyzer::Document)
 	CallResult analyze(
 			const std::string& content,
-			const ValueVariant& documentClass);
-
-	/// \brief Analye a content (detects its document class) and return the analyzed document structure
-	/// \param[in] content std::string (NOT a file name !) of the document to analyze
-	/// \param[in] documentClass document class of the document to analyze (see analyzer::DocumentClass)
-	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes) (See analyzer::Document)
-	CallResult analyze( const std::string& content);
+			const ValueVariant& documentClass=ValueVariant());
 
 private:
 	/// \brief Constructor used by Context

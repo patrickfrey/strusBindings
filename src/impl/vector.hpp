@@ -7,14 +7,18 @@
  */
 #ifndef _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/callResult.hpp"
+#include "papuga/hostObjectReference.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.hpp"
 #include <vector>
 #include <string>
 
 namespace strus {
 namespace bindings {
+
+typedef papuga::ValueVariant ValueVariant;
+typedef papuga::CallResult CallResult;
+typedef papuga::HostObjectReference HostObjectReference;
 
 /// \brief Object used to search for similar vectors in the collection
 class VectorStorageSearcherImpl

@@ -155,6 +155,8 @@ static void skipStructure( char const*& si, const char* se)
 	{
 		parseIdentifier( si, se);
 		skipSpacesAndComments( si, se);
+		while (*si == ':') ++si;
+		skipSpacesAndComments( si, se);
 	}
 	if (si == se)
 	{

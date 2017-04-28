@@ -10,7 +10,7 @@
 #include "internationalization.hpp"
 #include "structDefs.hpp"
 #include "wcharString.hpp"
-#include "strus/bindings/serialization.hpp"
+#include "papuga/serialization.hpp"
 #include "strus/base/string_format.hpp"
 #include <string>
 #include <cstring>
@@ -18,13 +18,13 @@
 using namespace strus;
 using namespace strus::bindings;
 
-static std::runtime_error runtime_error_with_location( const char* msg, ErrorBufferInterface* errorhnd, Serialization::const_iterator si, const Serialization::const_iterator& se, const Serialization::const_iterator& start)
+static std::runtime_error runtime_error_with_location( const char* msg, ErrorBufferInterface* errorhnd, papuga::Serialization::const_iterator si, const papuga::Serialization::const_iterator& se, const papuga::Serialization::const_iterator& start)
 {
 	std::string msgbuf;
 	try
 	{
 		std::string location_explain;
-		Serialization::const_iterator errorpos = si;
+		papuga::Serialization::const_iterator errorpos = si;
 		for (int cnt=0; si != start && cnt < 5; --si,++cnt){}
 		
 		for (int cnt=0; si != se && cnt < 15; ++cnt,++si)
@@ -35,17 +35,17 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 			}
 			switch (si->tag)
 			{
-				case Serialization::Open:
+				case papuga::Serialization::Open:
 					location_explain.push_back( '[');
 					break;
-				case Serialization::Close:
+				case papuga::Serialization::Close:
 					location_explain.push_back( ']');
 					break;
-				case Serialization::Name:
+				case papuga::Serialization::Name:
 					location_explain.append( ValueVariantConv::tostring( *si));
 					location_explain.push_back( ':');
 					break;
-				case Serialization::Value:
+				case papuga::Serialization::Value:
 					if (!si->defined())
 					{
 						location_explain.append( "<null>");
@@ -92,11 +92,11 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 	}
 }
 
-static const ValueVariant& getValue(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+static const papuga::ValueVariant& getValue(
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
-	if (si != se && si->tag == Serialization::Value)
+	if (si != se && si->tag == papuga::Serialization::Value)
 	{
 		return *si++;
 	}
@@ -107,54 +107,54 @@ static const ValueVariant& getValue(
 }
 
 unsigned int Deserializer::getUint(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	return ValueVariantConv::touint( getValue( si, se));
 }
 
 int Deserializer::getInt(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	return ValueVariantConv::toint( getValue( si, se));
 }
 
 Index Deserializer::getIndex(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	return ValueVariantConv::toint( getValue( si, se));
 }
 
 double Deserializer::getDouble(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	return ValueVariantConv::todouble( getValue( si, se));
 }
 
-std::string Deserializer::getString( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+std::string Deserializer::getString( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	return ValueVariantConv::tostring( getValue( si, se));
 }
 
 const char* Deserializer::getCharp(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
-	ValueVariant val = getValue( si, se);
-	if (val.type != ValueVariant::String) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
+	papuga::ValueVariant val = getValue( si, se);
+	if (val.type != papuga::ValueVariant::String) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
 	return val.value.string;
 }
 
 void Deserializer::consumeClose(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	if (si != se)
 	{
-		if (si->tag != Serialization::Close)
+		if (si->tag != papuga::Serialization::Close)
 		{
 			throw strus::runtime_error(_TXT("unexpected element at end of structure, close expected"));
 		}
@@ -162,29 +162,29 @@ void Deserializer::consumeClose(
 	}
 }
 
-template <typename ATOMICTYPE, ATOMICTYPE FUNC( Serialization::const_iterator& si, const Serialization::const_iterator& se)>
-static std::vector<ATOMICTYPE> getAtomicTypeList( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+template <typename ATOMICTYPE, ATOMICTYPE FUNC( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)>
+static std::vector<ATOMICTYPE> getAtomicTypeList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	std::vector<ATOMICTYPE> rt;
-	while (si != se && si->tag != Serialization::Close)
+	while (si != se && si->tag != papuga::Serialization::Close)
 	{
 		rt.push_back( FUNC( si, se));
 	}
 	return rt;
 }
 
-template <typename ATOMICTYPE, ATOMICTYPE CONV( const ValueVariant& val), ATOMICTYPE FUNC( Serialization::const_iterator& si, const Serialization::const_iterator& se)>
-static std::vector<ATOMICTYPE> getAtomicTypeList( const ValueVariant& val)
+template <typename ATOMICTYPE, ATOMICTYPE CONV( const papuga::ValueVariant& val), ATOMICTYPE FUNC( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)>
+static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga::ValueVariant& val)
 {
 	std::vector<ATOMICTYPE> rt;
-	if (val.type != ValueVariant::StrusSerialization)
+	if (val.type != papuga::ValueVariant::Serialization)
 	{
 		rt.push_back( CONV( val));
 		return rt;
 	}
 	else
 	{
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = val.value.serialization->begin(),  
 			se = val.value.serialization->end();
 		return getAtomicTypeList<ATOMICTYPE,FUNC>( si, se);
@@ -192,47 +192,47 @@ static std::vector<ATOMICTYPE> getAtomicTypeList( const ValueVariant& val)
 	return rt;
 }
 
-std::vector<std::string> Deserializer::getStringList( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+std::vector<std::string> Deserializer::getStringList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	return getAtomicTypeList<std::string,getString>( si, se);
 }
 
 std::vector<std::string> Deserializer::getStringList(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	return getAtomicTypeList<std::string,ValueVariantConv::tostring,getString>( val);
 }
 
 std::vector<double> Deserializer::getDoubleList(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	return getAtomicTypeList<double,ValueVariantConv::todouble,Deserializer::getDouble>( val);
 }
 
 std::vector<int> Deserializer::getIntList(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	return getAtomicTypeList<int,ValueVariantConv::toint,Deserializer::getInt>( val);
 }
 
 std::vector<Index> Deserializer::getIndexList(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	return getAtomicTypeList<Index,ValueVariantConv::toint,Deserializer::getIndex>( val);
 }
 
 std::string Deserializer::getPrefixStringValue(
-		const ValueVariant& val,
+		const papuga::ValueVariant& val,
 		unsigned char prefix)
 {
-	if (val.type == ValueVariant::String)
+	if (val.type == papuga::ValueVariant::String)
 	{
 		if (val.length() > 1 && (unsigned char)val.value.string[0] == prefix)
 		{
 			return std::string( val.value.string+1, val.length()-1);
 		}
 	}
-	else if (val.type == ValueVariant::WString)
+	else if (val.type == papuga::ValueVariant::WString)
 	{
 		if (val.length() > 1 && val.value.wstring[0] == prefix)
 		{
@@ -243,17 +243,17 @@ std::string Deserializer::getPrefixStringValue(
 }
 
 bool Deserializer::isStringWithPrefix(
-		const ValueVariant& val,
+		const papuga::ValueVariant& val,
 		unsigned char prefix)
 {
-	if (val.type == ValueVariant::String)
+	if (val.type == papuga::ValueVariant::String)
 	{
 		if (val.length() > 1 && (unsigned char)val.value.string[0] == prefix)
 		{
 			return true;
 		}
 	}
-	else if (val.type == ValueVariant::WString)
+	else if (val.type == papuga::ValueVariant::WString)
 	{
 		if (val.length() > 1 && val.value.wstring[0] == prefix)
 		{
@@ -264,10 +264,10 @@ bool Deserializer::isStringWithPrefix(
 }
 
 static int getStringPrefix(
-		const ValueVariant& val,
+		const papuga::ValueVariant& val,
 		const char* prefixList)
 {
-	if (val.type == ValueVariant::String)
+	if (val.type == papuga::ValueVariant::String)
 	{
 		if (val.length() > 1)
 		{
@@ -276,7 +276,7 @@ static int getStringPrefix(
 			return pi - prefixList;
 		}
 	}
-	else if (val.type == ValueVariant::WString)
+	else if (val.type == papuga::ValueVariant::WString)
 	{
 		if (val.length() > 1)
 		{
@@ -290,7 +290,7 @@ static int getStringPrefix(
 	return -1;
 }
 
-static bool setFeatureOption_position( analyzer::FeatureOptions& res, const ValueVariant& val)
+static bool setFeatureOption_position( analyzer::FeatureOptions& res, const papuga::ValueVariant& val)
 {
 	if (ValueVariantConv::isequal_ascii( val, "content"))
 	{
@@ -319,16 +319,16 @@ static bool setFeatureOption_position( analyzer::FeatureOptions& res, const Valu
 }
 
 analyzer::FeatureOptions Deserializer::getFeatureOptions(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	analyzer::FeatureOptions rt;
-	for (; si != se && si->tag != Serialization::Close; ++si)
+	for (; si != se && si->tag != papuga::Serialization::Close; ++si)
 	{
-		if (si->tag == Serialization::Name
+		if (si->tag == papuga::Serialization::Name
 		&& ValueVariantConv::isequal_ascii( *si, "position")) ++si;
 
-		if (si->tag == Serialization::Value)
+		if (si->tag == papuga::Serialization::Value)
 		{
 			if (!setFeatureOption_position( rt, getValue(si,se)))
 			{
@@ -348,9 +348,9 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 }
 
 analyzer::FeatureOptions Deserializer::getFeatureOptions(
-	const ValueVariant& options)
+	const papuga::ValueVariant& options)
 {
-	if (options.type != ValueVariant::StrusSerialization)
+	if (options.type != papuga::ValueVariant::Serialization)
 	{
 		analyzer::FeatureOptions rt;
 		if (!setFeatureOption_position( rt, options))
@@ -361,7 +361,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	}
 	else
 	{
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = options.value.serialization->begin(),  
 			se = options.value.serialization->end();
 		return getFeatureOptions( si, se);
@@ -369,7 +369,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 }
 
 TermStatistics Deserializer::getTermStatistics(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	static const StructureNameMap namemap( "df", ',');
 	static const char* context = _TXT("term statistics");
@@ -379,16 +379,16 @@ TermStatistics Deserializer::getTermStatistics(
 		rt.setDocumentFrequency( ValueVariantConv::touint64( val));
 		return rt;
 	}
-	if (val.type != ValueVariant::StrusSerialization)
+	if (val.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = val.value.serialization->begin(),  
 		se = val.value.serialization->end();
 	while (si != se)
 	{
-		if (si->tag != Serialization::Name)
+		if (si->tag != papuga::Serialization::Name)
 		{
 			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
 		}
@@ -404,7 +404,7 @@ TermStatistics Deserializer::getTermStatistics(
 }
 
 GlobalStatistics Deserializer::getGlobalStatistics(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	static const StructureNameMap namemap( "nofdocs", ',');
 	static const char* context = _TXT("global statistics");
@@ -414,16 +414,16 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 		rt.setNofDocumentsInserted( ValueVariantConv::touint64( val));
 		return rt;
 	}
-	if (val.type != ValueVariant::StrusSerialization)
+	if (val.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = val.value.serialization->begin(),  
 		se = val.value.serialization->end();
 	while (si != se)
 	{
-		if (si->tag != Serialization::Name)
+		if (si->tag != papuga::Serialization::Name)
 		{
 			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
 		}
@@ -439,23 +439,23 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 }
 
 analyzer::DocumentClass Deserializer::getDocumentClass(
-		const ValueVariant& val)
+		const papuga::ValueVariant& val)
 {
 	static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
 	static const char* context = _TXT("document class");
 	analyzer::DocumentClass rt;
-	if (val.type != ValueVariant::StrusSerialization)
+	if (val.type != papuga::ValueVariant::Serialization)
 	{
 		rt.setMimeType( ValueVariantConv::tostring( val));
 		return rt;
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = val.value.serialization->begin(),  
 		se = val.value.serialization->end();
 
 	if (si == se) return rt;
 
-	if (si->tag == Serialization::Name)
+	if (si->tag == papuga::Serialization::Name)
 	{
 		do
 		{
@@ -469,16 +469,16 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 					break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
-		} while (si != se && si->tag == Serialization::Name);
+		} while (si != se && si->tag == papuga::Serialization::Name);
 		Deserializer::consumeClose( si, se);
 	}
-	else if (si->tag == Serialization::Value)
+	else if (si->tag == papuga::Serialization::Value)
 	{
 		rt.setMimeType( Deserializer::getString( si, se));
-		if (si != se && si->tag != Serialization::Close)
+		if (si != se && si->tag != papuga::Serialization::Close)
 		{
 			rt.setEncoding( Deserializer::getString( si, se));
-			if (si != se && si->tag != Serialization::Close)
+			if (si != se && si->tag != papuga::Serialization::Close)
 			{
 				rt.setScheme( Deserializer::getString( si, se));
 			}
@@ -552,8 +552,8 @@ static Reference<AggregatorFunctionInstanceInterface> getAggregator_(
 }
 
 static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -563,8 +563,8 @@ static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
 }
 
 Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -575,8 +575,8 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 }
 
 Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -587,21 +587,21 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 }
 
 std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNormalizers(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
 	std::vector< Reference<NormalizerFunctionInstanceInterface> > rt;
 	static const char* context = _TXT("normalizer function list");
 
-	while (si != se && si->tag != Serialization::Close)
+	while (si != se && si->tag != papuga::Serialization::Close)
 	{
-		if (si->tag == Serialization::Value)
+		if (si->tag == papuga::Serialization::Value)
 		{
 			rt.push_back( getNormalizer_( getString( si, se), std::vector<std::string>(), textproc, errorhnd));
 		}
-		else if (si->tag == Serialization::Open)
+		else if (si->tag == papuga::Serialization::Open)
 		{
 			++si;
 			rt.push_back( getNormalizer_( si, se, textproc, errorhnd));
@@ -619,11 +619,11 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 }
 
 std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNormalizers(
-		const ValueVariant& normalizers,
+		const papuga::ValueVariant& normalizers,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
-	if (normalizers.type != ValueVariant::StrusSerialization)
+	if (normalizers.type != papuga::ValueVariant::Serialization)
 	{
 		std::vector<Reference<NormalizerFunctionInstanceInterface> > rt;
 		std::string name = ValueVariantConv::tostring( normalizers);
@@ -632,7 +632,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 	}
 	else
 	{
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = normalizers.value.serialization->begin(),  
 			se = normalizers.value.serialization->end();
 		try
@@ -648,18 +648,18 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 
 
 Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
-		const ValueVariant& tokenizer,
+		const papuga::ValueVariant& tokenizer,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
-	if (tokenizer.type != ValueVariant::StrusSerialization)
+	if (tokenizer.type != papuga::ValueVariant::Serialization)
 	{
 		std::string name = ValueVariantConv::tostring( tokenizer);
 		return getTokenizer_( name, std::vector<std::string>(), textproc, errorhnd);
 	}
 	else
 	{
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = tokenizer.value.serialization->begin(),
 			se = tokenizer.value.serialization->end();
 		try
@@ -674,18 +674,18 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 }
 
 Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
-		const ValueVariant& aggregator,
+		const papuga::ValueVariant& aggregator,
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
-	if (aggregator.type != ValueVariant::StrusSerialization)
+	if (aggregator.type != papuga::ValueVariant::Serialization)
 	{
 		std::string name = ValueVariantConv::tostring( aggregator);
 		return getAggregator_( name, std::vector<std::string>(), textproc, errorhnd);
 	}
 	else
 	{
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = aggregator.value.serialization->begin(),
 			se = aggregator.value.serialization->end();
 		try
@@ -704,7 +704,7 @@ static void instantiateQueryEvalFunctionParameter(
 		const char* functionclass,
 		FUNCTYPE* function,
 		const std::string& name,
-		const ValueVariant& value)
+		const papuga::ValueVariant& value)
 {
 	if (value.isNumericType())
 	{
@@ -726,30 +726,30 @@ static void deserializeQueryEvalFunctionParameterValue(
 		FUNCTYPE* function,
 		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
 		const std::string& paramname,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
-	if (si->tag == Serialization::Open)
+	if (si->tag == papuga::Serialization::Open)
 	{
 		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
-		if (si->tag == Serialization::Name)
+		if (si->tag == papuga::Serialization::Name)
 		{
 			if (ValueVariantConv::isequal_ascii( *si, "feature"))
 			{
 				++si;
-				if (si->tag == Serialization::Open)
+				if (si->tag == papuga::Serialization::Open)
 				{
 					++si;
-					while (si->tag == Serialization::Value)
+					while (si->tag == papuga::Serialization::Value)
 					{
 						featureParameters.push_back( FeatureParameter( paramname, Deserializer::getString( si, se)));
 					}
 					Deserializer::consumeClose( si, se);
 				}
-				else if (si->tag == Serialization::Value)
+				else if (si->tag == papuga::Serialization::Value)
 				{
 					featureParameters.push_back( FeatureParameter( paramname, Deserializer::getString( si, se)));
 				}
@@ -761,9 +761,9 @@ static void deserializeQueryEvalFunctionParameterValue(
 		}
 		else
 		{
-			while (si != se && si->tag != Serialization::Close)
+			while (si != se && si->tag != papuga::Serialization::Close)
 			{
-				ValueVariant value = getValue( si, se);
+				papuga::ValueVariant value = getValue( si, se);
 				if (value.isStringType() && Deserializer::isStringWithPrefix( value, '.'))
 				{
 					std::string featureSet = Deserializer::getPrefixStringValue( value, '.');
@@ -779,7 +779,7 @@ static void deserializeQueryEvalFunctionParameterValue(
 	}
 	else
 	{
-		ValueVariant value = getValue( si, se);
+		papuga::ValueVariant value = getValue( si, se);
 		if (value.isStringType() && Deserializer::isStringWithPrefix( value, '.'))
 		{
 			std::string featureSet = Deserializer::getPrefixStringValue( value, '.');
@@ -798,25 +798,25 @@ static void deserializeQueryEvalFunctionParameter(
 		FUNCTYPE* function,
 		std::string& debuginfoAttribute,
 		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
 	static const StructureNameMap namemap( "name,value,feature", ',');
-	if (si->tag == Serialization::Name)
+	if (si->tag == papuga::Serialization::Name)
 	{
 		if (ValueVariantConv::isequal_ascii( *si++, "param"))
 		{
 			++si;
 			if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
-			if (si->tag != Serialization::Open) --si;
+			if (si->tag != papuga::Serialization::Open) --si;
 		}
 	}
-	if (si->tag == Serialization::Open)
+	if (si->tag == papuga::Serialization::Open)
 	{
 		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
-		if (si->tag == Serialization::Value)
+		if (si->tag == papuga::Serialization::Value)
 		{
 			std::string paramname = Deserializer::getString( si, se);
 			if (paramname == "debug")
@@ -830,14 +830,14 @@ static void deserializeQueryEvalFunctionParameter(
 			}
 			Deserializer::consumeClose( si, se);
 		}
-		else if (si->tag == Serialization::Name)
+		else if (si->tag == papuga::Serialization::Name)
 		{
 			std::string name;
 			unsigned char name_defined = 0;
 			unsigned char value_defined = 0;
 			bool is_feature = false;
-			ValueVariant value;
-			while (si->tag == Serialization::Name)
+			papuga::ValueVariant value;
+			while (si->tag == papuga::Serialization::Name)
 			{
 				switch (namemap.index( *si++))
 				{
@@ -879,7 +879,7 @@ static void deserializeQueryEvalFunctionParameter(
 			throw strus::runtime_error(_TXT("incomplete %s definition"), functionclass);
 		}
 	}
-	else if (si->tag == Serialization::Name)
+	else if (si->tag == papuga::Serialization::Name)
 	{
 		std::string paramname = Deserializer::getString( si, se);
 		if (paramname == "debug")
@@ -904,14 +904,14 @@ static void deserializeQueryEvalFunctionParameters(
 		FUNCTYPE* function,
 		std::string& debuginfoAttribute,
 		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
-		const ValueVariant& parameters,
+		const papuga::ValueVariant& parameters,
 		ErrorBufferInterface* errorhnd)
 {
-	if (parameters.type != ValueVariant::StrusSerialization)
+	if (parameters.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("list of named arguments expected as %s parameters"), functionclass);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = parameters.value.serialization->begin(),
 		se = parameters.value.serialization->end();
 	try
@@ -932,16 +932,16 @@ template <class FUNCTYPE>
 static void deserializeQueryEvalFunctionResultNames(
 		const char* functionclass,
 		FUNCTYPE* function,
-		const ValueVariant& resultnames,
+		const papuga::ValueVariant& resultnames,
 		ErrorBufferInterface* errorhnd)
 {
 	if (resultnames.defined())
 	{
-		if (resultnames.type != ValueVariant::StrusSerialization)
+		if (resultnames.type != papuga::ValueVariant::Serialization)
 		{
 			throw strus::runtime_error(_TXT("list of named arguments expected as %s result name definitions"), functionclass);
 		}
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = resultnames.value.serialization->begin(),
 			se = resultnames.value.serialization->end();
 		try
@@ -964,8 +964,8 @@ static void deserializeQueryEvalFunctionResultNames(
 void Deserializer::buildSummarizerFunction(
 		QueryEvalInterface* queryeval,
 		const std::string& functionName,
-		const ValueVariant& parameters,
-		const ValueVariant& resultnames,
+		const papuga::ValueVariant& parameters,
+		const papuga::ValueVariant& resultnames,
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -999,7 +999,7 @@ void Deserializer::buildSummarizerFunction(
 void Deserializer::buildWeightingFunction(
 		QueryEvalInterface* queryeval,
 		const std::string& functionName,
-		const ValueVariant& parameters,
+		const papuga::ValueVariant& parameters,
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -1029,7 +1029,7 @@ void Deserializer::buildWeightingFunction(
 void Deserializer::buildWeightingFormula(
 		QueryEvalInterface* queryeval,
 		const std::string& source,
-		const ValueVariant& parameter,
+		const papuga::ValueVariant& parameter,
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -1039,11 +1039,11 @@ void Deserializer::buildWeightingFormula(
 	std::vector<ParamDef> paramlist;
 	if (parameter.defined())
 	{
-		if (parameter.type != ValueVariant::StrusSerialization)
+		if (parameter.type != papuga::ValueVariant::Serialization)
 		{
 			throw strus::runtime_error(_TXT("list of named arguments expected as parameters of %s"), context);
 		}
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = parameter.value.serialization->begin(),
 			se = parameter.value.serialization->end();
 		try
@@ -1091,25 +1091,25 @@ void Deserializer::buildWeightingFormula(
 }
 
 
-bool Deserializer::skipStructure( Serialization::const_iterator si, const Serialization::const_iterator& se)
+bool Deserializer::skipStructure( papuga::Serialization::const_iterator si, const papuga::Serialization::const_iterator& se)
 {
 	if (si == se) return false;
-	if (si->tag == Serialization::Value)
+	if (si->tag == papuga::Serialization::Value)
 	{
 		++si;
 		return true;
 	}
-	else if (si->tag == Serialization::Open)
+	else if (si->tag == papuga::Serialization::Open)
 	{
 		int brkcnt = 1;
 		++si;
 		for (;si != se && brkcnt; ++si)
 		{
-			if (si->tag == Serialization::Open)
+			if (si->tag == papuga::Serialization::Open)
 			{
 				++brkcnt;
 			}
-			else if (si->tag == Serialization::Close)
+			else if (si->tag == papuga::Serialization::Close)
 			{
 				--brkcnt;
 			}
@@ -1130,7 +1130,7 @@ enum ExpressionType {
 	ExpressionJoin
 };
 
-static ExpressionType getExpressionType( Serialization::const_iterator si, const Serialization::const_iterator& se)
+static ExpressionType getExpressionType( papuga::Serialization::const_iterator si, const papuga::Serialization::const_iterator& se)
 {
 	static const StructureNameMap keywords( "type,value,len,from,to,variable,join,range,cardinality,arg", ',');
 	static const ExpressionType keywordTypeMap[10] = {
@@ -1140,7 +1140,7 @@ static ExpressionType getExpressionType( Serialization::const_iterator si, const
 		ExpressionJoin,ExpressionJoin,ExpressionJoin,ExpressionJoin	/*join,range,cardinality,arg*/
 	};
 	if (si == se) return ExpressionUnknown;
-	if (si->tag == Serialization::Value)
+	if (si->tag == papuga::Serialization::Value)
 	{
 		if (si->isStringType())
 		{
@@ -1157,12 +1157,12 @@ static ExpressionType getExpressionType( Serialization::const_iterator si, const
 			return ExpressionUnknown;
 		}
 	}
-	else if (si->tag == Serialization::Open)
+	else if (si->tag == papuga::Serialization::Open)
 	{
 		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), "expression");
 
-		if (si->tag == Serialization::Name)
+		if (si->tag == papuga::Serialization::Name)
 		{
 			do
 			{
@@ -1172,12 +1172,12 @@ static ExpressionType getExpressionType( Serialization::const_iterator si, const
 				if (rt != ExpressionVariableAssignment) return rt;
 				++si;
 				if (!Deserializer::skipStructure( si, se)) return ExpressionUnknown;
-			} while (si != se && si->tag == Serialization::Name);
+			} while (si != se && si->tag == papuga::Serialization::Name);
 			return ExpressionUnknown;
 		}
 		else
 		{
-			for (; si != se && si->tag == Serialization::Value; ++si)
+			for (; si != se && si->tag == papuga::Serialization::Value; ++si)
 			{
 				int pi = getStringPrefix( *si, "=@");
 				if (pi < 0) break;
@@ -1189,9 +1189,9 @@ static ExpressionType getExpressionType( Serialization::const_iterator si, const
 				}
 			}
 			int argc = 0;
-			for (; si != se && si->tag == Serialization::Value && argc < 3; ++si,++argc)
+			for (; si != se && si->tag == papuga::Serialization::Value && argc < 3; ++si,++argc)
 			{}
-			if (si == se || si->tag == Serialization::Close)
+			if (si == se || si->tag == papuga::Serialization::Close)
 			{
 				return ExpressionTerm;
 			}
@@ -1209,8 +1209,8 @@ static ExpressionType getExpressionType( Serialization::const_iterator si, const
 
 static void buildExpressionJoin(
 		ExpressionBuilder& builder,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("join expression");
 	static const StructureNameMap joinop_namemap( "variable,join,range,cardinality,arg", ',');
@@ -1218,7 +1218,7 @@ static void buildExpressionJoin(
 
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
-	if (si->tag == Serialization::Open)
+	if (si->tag == papuga::Serialization::Open)
 	{
 		std::string variable;
 		std::string op;
@@ -1228,7 +1228,7 @@ static void buildExpressionJoin(
 
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
-		if (si->tag == Serialization::Name)
+		if (si->tag == papuga::Serialization::Name)
 		{
 			do
 			{
@@ -1252,30 +1252,30 @@ static void buildExpressionJoin(
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s"), context);
 				}
-			} while (si != se && si->tag == Serialization::Name);
+			} while (si != se && si->tag == papuga::Serialization::Name);
 			Deserializer::consumeClose( si, se);
 		}
-		else if (si->tag == Serialization::Value)
+		else if (si->tag == papuga::Serialization::Value)
 		{
 			if (Deserializer::isStringWithPrefix( *si, '='))
 			{
 				variable = Deserializer::getPrefixStringValue( *si++, '=');
 			}
 			op = Deserializer::getString( si, se);
-			if (si != se && si->tag == Serialization::Value)
+			if (si != se && si->tag == papuga::Serialization::Value)
 			{
-				ValueVariant val = *si++;
+				papuga::ValueVariant val = *si++;
 				if (ValueVariantConv::try_convertToNumber( val))
 				{
 					range = ValueVariantConv::toint( val);
-					if (si != se && si->tag == Serialization::Value)
+					if (si != se && si->tag == papuga::Serialization::Value)
 					{
-						ValueVariant val = *si++;
+						papuga::ValueVariant val = *si++;
 						cardinality = ValueVariantConv::touint( val);
 					}
 				}
 			}
-			while (si != se && si->tag != Serialization::Close)
+			while (si != se && si->tag != papuga::Serialization::Close)
 			{
 				Deserializer::buildExpression( builder, si, se);
 				++argc;
@@ -1322,14 +1322,14 @@ static void builderPushTerm(
 
 void Deserializer::buildExpression(
 		ExpressionBuilder& builder,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	const char* context = "expression";
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 	static const StructureNameMap namemap( "term,metadata,expression", ',');
 
-	if (si->tag == Serialization::Name)
+	if (si->tag == papuga::Serialization::Name)
 	{
 		switch (namemap.index( *si++))
 		{
@@ -1384,17 +1384,17 @@ void Deserializer::buildExpression(
 
 void Deserializer::buildExpression(
 		ExpressionBuilder& builder,
-		const ValueVariant& expression,
+		const papuga::ValueVariant& expression,
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("expression");
-	if (expression.type != ValueVariant::StrusSerialization)
+	if (expression.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
 	else
 	{
-		Serialization::const_iterator
+		papuga::Serialization::const_iterator
 			si = expression.value.serialization->begin(),
 			se = expression.value.serialization->end();
 		try
@@ -1410,43 +1410,43 @@ void Deserializer::buildExpression(
 
 void Deserializer::buildPatterns(
 		ExpressionBuilder& builder,
-		const ValueVariant& patterns,
+		const papuga::ValueVariant& patterns,
 		ErrorBufferInterface* errorhnd)
 {
 	static const StructureNameMap namemap( "name,expression,visible", ',');
 	static const char* context = _TXT("pattern");
 	if (!patterns.defined()) return;
-	if (patterns.type != ValueVariant::StrusSerialization)
+	if (patterns.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for list of %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = patterns.value.serialization->begin(),
 		se = patterns.value.serialization->end();
 	try
 	{
 		while (si != se)
 		{
-			if (si->tag == Serialization::Name)
+			if (si->tag == papuga::Serialization::Name)
 			{
 				if (ValueVariantConv::isequal_ascii( *si, "pattern"))
 				{
 					++si;
 					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
-					if (si->tag != Serialization::Open) --si;
+					if (si->tag != papuga::Serialization::Open) --si;
 				}
 				else
 				{
 					throw strus::runtime_error(_TXT("structure with optional name 'pattern' expected"), context);
 				}
 			}
-			if (si->tag == Serialization::Open)
+			if (si->tag == papuga::Serialization::Open)
 			{
 				++si;
 				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 				std::string name;
 				bool visible = true;
-				if (si->tag == Serialization::Name)
+				if (si->tag == papuga::Serialization::Name)
 				{
 					do
 					{
@@ -1461,9 +1461,9 @@ void Deserializer::buildPatterns(
 							case 2: visible = ValueVariantConv::tobool( getValue( si, se));
 								break;
 						}
-					} while (si != se && si->tag == Serialization::Name);
+					} while (si != se && si->tag == papuga::Serialization::Name);
 				}
-				else if (si->tag == Serialization::Value)
+				else if (si->tag == papuga::Serialization::Value)
 				{
 					if (Deserializer::isStringWithPrefix( *si, '.'))
 					{
@@ -1499,32 +1499,32 @@ void Deserializer::buildPatterns(
 template <class StorageDocumentAccess>
 static void buildMetaData(
 		StorageDocumentAccess* document,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "name,value", ',');
 	static const char* context = _TXT("document metadata");
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
-	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	if (si->tag != papuga::Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
 	++si;
 
 	while (si != se)
 	{
-		if (si->tag == Serialization::Name)
+		if (si->tag == papuga::Serialization::Name)
 		{
 			if (ValueVariantConv::isequal_ascii( *si, "assign"))
 			{
 				++si;
 				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), context);
-				if (si->tag != Serialization::Open) --si;
+				if (si->tag != papuga::Serialization::Open) --si;
 			}
 		}
-		if (si->tag == Serialization::Open)
+		if (si->tag == papuga::Serialization::Open)
 		{
 			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
-			if (si->tag == Serialization::Name)
+			if (si->tag == papuga::Serialization::Name)
 			{
 				unsigned char name_defined = 0;
 				unsigned char value_defined = 0;
@@ -1543,17 +1543,17 @@ static void buildMetaData(
 						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 					}
 				}
-				while (si->tag == Serialization::Name);
+				while (si->tag == papuga::Serialization::Name);
 				if (!name_defined || !value_defined)
 				{
 					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 				}
 				document->setMetaData( name, value);
 			}
-			else if (si->tag == Serialization::Value)
+			else if (si->tag == papuga::Serialization::Value)
 			{
 				std::string name = Deserializer::getString( si, se);
-				if (si->tag != Serialization::Value)
+				if (si->tag != papuga::Serialization::Value)
 				{
 					throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
 				}
@@ -1566,7 +1566,7 @@ static void buildMetaData(
 			}
 			Deserializer::consumeClose( si, se);
 		}
-		else if (si->tag == Serialization::Name)
+		else if (si->tag == papuga::Serialization::Name)
 		{
 			std::string name = Deserializer::getString( si, se);
 			NumericVariant value = ValueVariantConv::tonumeric( getValue( si, se));
@@ -1582,31 +1582,31 @@ static void buildMetaData(
 template <class StorageDocumentAccess>
 static void buildAttributes(
 		StorageDocumentAccess* document,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "name,value", ',');
 	static const char* context = _TXT("document attributes");
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	if (si->tag != papuga::Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
 	++si;
 
 	while (si != se)
 	{
-		if (si->tag == Serialization::Name)
+		if (si->tag == papuga::Serialization::Name)
 		{
 			if (ValueVariantConv::isequal_ascii( *si, "attribute"))
 			{
 				++si;
 				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-				if (si->tag != Serialization::Open) --si;
+				if (si->tag != papuga::Serialization::Open) --si;
 			}
 		}
-		if (si->tag == Serialization::Open)
+		if (si->tag == papuga::Serialization::Open)
 		{
 			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
-			if (si->tag == Serialization::Name)
+			if (si->tag == papuga::Serialization::Name)
 			{
 				unsigned char name_defined = 0;
 				unsigned char value_defined = 0;
@@ -1625,17 +1625,17 @@ static void buildAttributes(
 						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 					}
 				}
-				while (si->tag == Serialization::Name);
+				while (si->tag == papuga::Serialization::Name);
 				if (!name_defined || !value_defined)
 				{
 					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 				}
 				document->setAttribute( name, value);
 			}
-			else if (si->tag == Serialization::Value)
+			else if (si->tag == papuga::Serialization::Value)
 			{
 				std::string name = Deserializer::getString( si, se);
-				if (si->tag != Serialization::Value)
+				if (si->tag != papuga::Serialization::Value)
 				{
 					throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
 				}
@@ -1648,7 +1648,7 @@ static void buildAttributes(
 			}
 			Deserializer::consumeClose( si, se);
 		}
-		else if (si->tag == Serialization::Name)
+		else if (si->tag == papuga::Serialization::Name)
 		{
 			std::string name = Deserializer::getString( si, se);
 			std::string value = Deserializer::getString( si, se);
@@ -1690,35 +1690,35 @@ private:
 template <class StorageDocumentIndexAccess>
 static void buildStorageIndex(
 		StorageDocumentIndexAccess* document,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	static const StructureNameMap namemap( "type,value,pos,len", ',');
 	static const char* context = _TXT("search index");
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-	if (si->tag != Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	if (si->tag != papuga::Serialization::Open) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
 	++si;
 
 	while (si != se)
 	{
-		if (si->tag == Serialization::Name)
+		if (si->tag == papuga::Serialization::Name)
 		{
 			if (ValueVariantConv::isequal_ascii( *si, "term"))
 			{
 				++si;
 				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-				if (si->tag != Serialization::Open) --si;
+				if (si->tag != papuga::Serialization::Open) --si;
 			}
 			else
 			{
 				throw strus::runtime_error(_TXT("structure with optional name 'term' expected"), context);
 			}
 		}
-		if (si->tag == Serialization::Open)
+		if (si->tag == papuga::Serialization::Open)
 		{
 			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
-			if (si->tag == Serialization::Name)
+			if (si->tag == papuga::Serialization::Name)
 			{
 				unsigned char type_defined = 0;
 				unsigned char value_defined = 0;
@@ -1745,22 +1745,22 @@ static void buildStorageIndex(
 						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 					}
 				}
-				while (si->tag == Serialization::Name);
+				while (si->tag == papuga::Serialization::Name);
 				if (!type_defined || !value_defined || !pos_defined)
 				{
 					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 				}
 				document->addTerm( type, value, pos);
 			}
-			else if (si->tag == Serialization::Value)
+			else if (si->tag == papuga::Serialization::Value)
 			{
 				std::string type = Deserializer::getString( si, se);
-				if (si->tag != Serialization::Value)
+				if (si->tag != papuga::Serialization::Value)
 				{
 					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
 				}
 				std::string value = Deserializer::getString( si, se);
-				if (si->tag != Serialization::Value)
+				if (si->tag != papuga::Serialization::Value)
 				{
 					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
 				}
@@ -1783,17 +1783,17 @@ static void buildStorageIndex(
 template <class StorageDocumentAccess>
 static void buildAccessRights(
 		StorageDocumentAccess* document,
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("document access rights");
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
 
-	if (si->tag == Serialization::Open)
+	if (si->tag == papuga::Serialization::Open)
 	{
-		while (si != se && si->tag != Serialization::Close)
+		while (si != se && si->tag != papuga::Serialization::Close)
 		{
-			if (si->tag == Serialization::Name)
+			if (si->tag == papuga::Serialization::Name)
 			{
 				if (ValueVariantConv::isequal_ascii( *si++, "user"))
 				{
@@ -1813,24 +1813,24 @@ static void buildAccessRights(
 template <class StorageDocumentAccess>
 static void buildStorageDocument(
 		StorageDocumentAccess* document,
-		const ValueVariant& content,
+		const papuga::ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
 	static const StructureNameMap namemap( "doctype,attributes,metadata,searchindex,forwardindex,access", ',');
 	static const char* context = _TXT("document");
 	if (!content.defined()) return;
-	if (content.type != ValueVariant::StrusSerialization)
+	if (content.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = content.value.serialization->begin(),
 		se = content.value.serialization->end();
 	try
 	{
 		while (si != se)
 		{
-			if (si->tag != Serialization::Name)
+			if (si->tag != papuga::Serialization::Name)
 			{
 				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
 			}
@@ -1871,24 +1871,24 @@ static void buildStorageDocument(
 
 static void buildStorageDocumentDeletes(
 		StorageDocumentUpdateInterface* document,
-		const ValueVariant& content,
+		const papuga::ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
 	static const StructureNameMap namemap( "attributes,metadata,searchindex,forwardindex,access", ',');
 	static const char* context = _TXT("document update deletes");
 	if (!content.defined()) return;
-	if (content.type != ValueVariant::StrusSerialization)
+	if (content.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = content.value.serialization->begin(),
 		se = content.value.serialization->end();
 	try
 	{
 		while (si != se)
 		{
-			if (si->tag != Serialization::Name)
+			if (si->tag != papuga::Serialization::Name)
 			{
 				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
 			}
@@ -1936,7 +1936,7 @@ static void buildStorageDocumentDeletes(
 				}
 				case 4:
 				{
-					if (si != se && si->tag == Serialization::Value
+					if (si != se && si->tag == papuga::Serialization::Value
 						&& si->isStringType() && ValueVariantConv::isequal_ascii( *si, "*"))
 					{
 						document->clearUserAccessRights();
@@ -1964,7 +1964,7 @@ static void buildStorageDocumentDeletes(
 
 void Deserializer::buildInsertDocument(
 		StorageDocumentInterface* document,
-		const ValueVariant& content,
+		const papuga::ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
 	buildStorageDocument( document, content, errorhnd);
@@ -1972,8 +1972,8 @@ void Deserializer::buildInsertDocument(
 
 void Deserializer::buildUpdateDocument(
 		StorageDocumentUpdateInterface* document,
-		const ValueVariant& content,
-		const ValueVariant& deletes,
+		const papuga::ValueVariant& content,
+		const papuga::ValueVariant& deletes,
 		ErrorBufferInterface* errorhnd)
 {
 	buildStorageDocument( document, content, errorhnd);
@@ -1982,25 +1982,25 @@ void Deserializer::buildUpdateDocument(
 
 void Deserializer::buildStatistics(
 		StatisticsBuilderInterface* builder,
-		const ValueVariant& content,
+		const papuga::ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
 	static const StructureNameMap namemap( "dfchange,nofdocs", ',');
 	static const char* context = _TXT("statistics");
 
 	if (!content.defined()) return;
-	if (content.type != ValueVariant::StrusSerialization)
+	if (content.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = content.value.serialization->begin(),
 		se = content.value.serialization->end();
 	try
 	{
 		while (si != se)
 		{
-			if (si->tag != Serialization::Name)
+			if (si->tag != papuga::Serialization::Name)
 			{
 				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
 			}
@@ -2009,12 +2009,12 @@ void Deserializer::buildStatistics(
 				case 0:
 				{
 					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
-					if (si->tag == Serialization::Open)
+					if (si->tag == papuga::Serialization::Open)
 					{
 						++si;
-						while (si != se && si->tag != Serialization::Close)
+						while (si != se && si->tag != papuga::Serialization::Close)
 						{
-							if (si->tag == Serialization::Name && ValueVariantConv::isequal_ascii( *si, "dfchange"))
+							if (si->tag == papuga::Serialization::Name && ValueVariantConv::isequal_ascii( *si, "dfchange"))
 							{
 								//... skip name of structure if defined (for example for XML)
 								++si;
@@ -2040,7 +2040,7 @@ void Deserializer::buildStatistics(
 }
 
 std::string Deserializer::getStorageConfigString(
-		const ValueVariant& content,
+		const papuga::ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("storage configuration");
@@ -2049,11 +2049,11 @@ std::string Deserializer::getStorageConfigString(
 		return ValueVariantConv::tostring( content);
 	}
 	if (!content.defined()) return std::string();
-	if (content.type != ValueVariant::StrusSerialization)
+	if (content.type != papuga::ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure or string expected for %s"), context);
 	}
-	Serialization::const_iterator
+	papuga::Serialization::const_iterator
 		si = content.value.serialization->begin(),
 		se = content.value.serialization->end();
 	try

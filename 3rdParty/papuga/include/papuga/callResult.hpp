@@ -5,19 +5,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDINGS_CALL_RESULT_HPP_INCLUDED
-#define _STRUS_BINDINGS_CALL_RESULT_HPP_INCLUDED
-/// \brief Representation of a result of a call to language bindings
+#ifndef _PAPUGA_CALL_RESULT_HPP_INCLUDED
+#define _PAPUGA_CALL_RESULT_HPP_INCLUDED
+/// \brief Representation of a result of a call to papuga language bindings
 /// \file callResult.hpp
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/serialization.hpp"
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/base/snprintf.h"
+#include "papuga/valueVariant.hpp"
+#include "papuga/serialization.hpp"
+#include "papuga/hostObjectReference.hpp"
 #include <string>
 #include <cstring>
+#include <cstdarg>
+#include <cstdio>
 
-namespace strus {
-namespace bindings {
+namespace papuga {
 
 class CallResult
 {
@@ -61,7 +61,7 @@ public:
 	{
 		va_list ap;
 		va_start(ap, fmt);
-		strus_vsnprintf( m_errorbuf, sizeof(m_errorbuf), fmt, ap);
+		std::vsnprintf( m_errorbuf, sizeof(m_errorbuf), fmt, ap);
 		va_end(ap);
 	}
 	bool hasError() const
@@ -86,7 +86,7 @@ private:
 	char m_errorbuf[ MaxErrorMessageSize];
 };
 
-}}//namespace
+}//namespace
 #endif
 
 

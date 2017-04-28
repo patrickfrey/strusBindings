@@ -30,6 +30,8 @@
 using namespace strus;
 using namespace strus::bindings;
 
+typedef papuga::Serialization Serialization;
+
 StorageClientImpl::StorageClientImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
@@ -285,7 +287,7 @@ CallResult DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSele
 						metadatareader->skipDoc( docno);
 						metadatareader_called = true;
 					}
-					rt.serialization.pushValue( metadatareader->getValue( eh));
+					rt.serialization.pushValue( ValueVariantConv::fromnumeric( metadatareader->getValue( eh)));
 				}
 				else
 				{

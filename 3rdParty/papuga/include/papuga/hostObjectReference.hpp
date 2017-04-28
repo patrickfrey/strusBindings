@@ -5,17 +5,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDINGS_HOST_OBJECT_REFERENCE_HPP_INCLUDED
-#define _STRUS_BINDINGS_HOST_OBJECT_REFERENCE_HPP_INCLUDED
+#ifndef _PAPUGA_HOST_OBJECT_REFERENCE_HPP_INCLUDED
+#define _PAPUGA_HOST_OBJECT_REFERENCE_HPP_INCLUDED
 /// \brief Reference to host object from the scripting language
-/// \file strus/bindings/hostObjectReference.hpp
+/// \file hostObjectReference.hpp
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-#define STRUS_USE_RTTI_TYPECHECK
+#define PAPUGA_USE_RTTI_TYPECHECK
 
-namespace strus {
-namespace bindings {
+namespace papuga {
 
 class HostObjectReference
 {
@@ -113,7 +112,7 @@ public:
 	{
 		const OBJECTTYPE* obj = static_cast<const OBJECTTYPE*>( (const void*)m_ptr.get());
 		if (!obj) return 0;
-#ifdef STRUS_USE_RTTI_TYPECHECK
+#ifdef PAPUGA_USE_RTTI_TYPECHECK
 		if (dynamic_cast<const OBJECTTYPE*>( obj) == 0)
 		{
 			throw std::runtime_error( "internal: unexpected object type passed in bindings");
@@ -128,7 +127,7 @@ public:
 	{
 		OBJECTTYPE* obj = static_cast<OBJECTTYPE*>( m_ptr.get());
 		if (!obj) return 0;
-#ifdef STRUS_USE_RTTI_TYPECHECK
+#ifdef PAPUGA_USE_RTTI_TYPECHECK
 		if (dynamic_cast<OBJECTTYPE*>( obj) == 0)
 		{
 			throw std::runtime_error( "internal: unexpected object type passed in bindings");
@@ -140,6 +139,6 @@ private:
 	boost::shared_ptr<void> m_ptr;
 };
 
-}} //namespace
+} //namespace
 #endif
 

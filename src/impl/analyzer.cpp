@@ -10,7 +10,7 @@
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "strus/bindings/serialization.hpp"
+#include "papuga/serialization.hpp"
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
 #include "serializer.hpp"
@@ -23,13 +23,15 @@
 using namespace strus;
 using namespace strus::bindings;
 
+typedef papuga::Serialization Serialization;
+
 static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 {
 	if (ctx.isStringType())
 	{
 		return SegmenterDef( ValueVariantConv::tostring( ctx));
 	}
-	else if (ctx.type == ValueVariant::StrusSerialization)
+	else if (ctx.type == ValueVariant::Serialization)
 	{
 		Serialization::const_iterator si = ctx.value.serialization->begin();
 		return SegmenterDef( si, ctx.value.serialization->end());
@@ -303,34 +305,34 @@ static CallResult analyzeDoc( DocumentAnalyzerInterface* THIS, const std::string
 	return callResultStructureOwnership( doc.release());
 }
 
-CallResult DocumentAnalyzerImpl::analyze( const std::string& content)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
-	analyzer::DocumentClass dclass;
-
-	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-	if (!textproc) throw runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
-	if (!textproc->detectDocumentClass( dclass, content.c_str(), content.size()))
-	{
-		if (errorhnd->hasError())
-		{
-			throw strus::runtime_error( _TXT( "failed to detect document class of document to analyze (%s)"), errorhnd->fetchError());
-		}
-		else
-		{
-			throw strus::runtime_error( _TXT( "could not detect document class of document to analyze"));
-		}
-	}
-	return analyzeDoc( THIS, content, dclass, errorhnd);
-}
-
 CallResult DocumentAnalyzerImpl::analyze( const std::string& content, const ValueVariant& dclass)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
-	return analyzeDoc( THIS, content, Deserializer::getDocumentClass( dclass), errorhnd);
+	if (dclass.defined())
+	{
+		return analyzeDoc( THIS, content, Deserializer::getDocumentClass( dclass), errorhnd);
+	}
+	else
+	{
+		analyzer::DocumentClass detected_dclass;
+	
+		const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
+		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+		if (!textproc) throw runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+		if (!textproc->detectDocumentClass( detected_dclass, content.c_str(), content.size()))
+		{
+			if (errorhnd->hasError())
+			{
+				throw strus::runtime_error( _TXT( "failed to detect document class of document to analyze (%s)"), errorhnd->fetchError());
+			}
+			else
+			{
+				throw strus::runtime_error( _TXT( "could not detect document class of document to analyze"));
+			}
+		}
+		return analyzeDoc( THIS, content, detected_dclass, errorhnd);
+	}
 }
 
 QueryAnalyzerImpl::QueryAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd)
@@ -468,7 +470,7 @@ CallResult QueryAnalyzerImpl::analyze(
 	{
 		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
 	}
-	bool output_labeled = (expression.type == ValueVariant::StrusSerialization && expression.value.serialization->isLabeled());
+	bool output_labeled = (expression.type == ValueVariant::Serialization && expression.value.serialization->isLabeled());
 	Serializer::serialize( rt.serialization, *qry, exprbuilder.operators(), output_labeled);
 	rt.value.init( &rt.serialization);
 	return rt;

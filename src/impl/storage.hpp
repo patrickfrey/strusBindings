@@ -7,9 +7,9 @@
  */
 #ifndef _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/callResult.hpp"
+#include "papuga/hostObjectReference.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.hpp"
 #include "strus/numericVariant.hpp"
 #include <vector>
 #include <string>
@@ -20,6 +20,10 @@ namespace strus {
 class StorageTransactionInterface;
 
 namespace bindings {
+
+typedef papuga::ValueVariant ValueVariant;
+typedef papuga::CallResult CallResult;
+typedef papuga::HostObjectReference HostObjectReference;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)

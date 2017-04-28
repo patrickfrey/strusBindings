@@ -7,8 +7,8 @@
  */
 #ifndef _STRUS_BINDING_PATTERN_MATCHER_LOADER_HPP_INCLUDED
 #define _STRUS_BINDING_PATTERN_MATCHER_LOADER_HPP_INCLUDED
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/serialization.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/serialization.hpp"
 #include "strus/patternLexerInterface.hpp"
 #include "strus/patternLexerInstanceInterface.hpp"
 #include "strus/patternTermFeederInterface.hpp"
@@ -45,8 +45,8 @@ struct PatternMatcherPostProc
 PatternMatcherPostProc loadPatternMatcherPostProc(
 	const TextProcessorInterface* textproc,
 	const std::string& patternMatcherModule,
-	const ValueVariant& lexems,
-	const ValueVariant& patterns,
+	const papuga::ValueVariant& lexems,
+	const papuga::ValueVariant& patterns,
 	ErrorBufferInterface* errorhnd);
 
 PatternMatcherPostProc loadPatternMatcherPostProcFromFile(

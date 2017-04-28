@@ -7,8 +7,6 @@
  */
 #ifndef _STRUS_BINDING_EXPRESSION_BUILDER_HPP_INCLUDED
 #define _STRUS_BINDING_EXPRESSION_BUILDER_HPP_INCLUDED
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/serialization.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/patternMatcherInstanceInterface.hpp"
 #include "strus/patternTermFeederInstanceInterface.hpp"

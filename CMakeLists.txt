@@ -55,6 +55,7 @@ configure_file( "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec.in"  "${PR
 enable_testing()
 
 # Subdirectories:
+add_subdirectory( 3rdParty )
 add_subdirectory( src )
 add_subdirectory( tests )
   

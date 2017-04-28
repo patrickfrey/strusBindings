@@ -23,6 +23,8 @@
 using namespace strus;
 using namespace strus::bindings;
 
+typedef papuga::Serialization Serialization;
+
 VectorStorageSearcherImpl::VectorStorageSearcherImpl( const HostObjectReference& storageref, const HostObjectReference& trace, int range_from, int range_to, const HostObjectReference& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_searcher_impl()

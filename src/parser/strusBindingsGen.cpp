@@ -63,13 +63,13 @@ static std::string methodFunctionName( const std::string& cl, const std::string&
 static void print_BindingInterfaceDescriptionHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
-	out << "#include \"strus/bindings/languageInterface.hpp\"" << std::endl;
+	out << "#include \"papuga/languageInterface.hpp\"" << std::endl;
 	out << "#include <cstddef>" << std::endl;
 	out << std::endl
 		<< "namespace strus {" << std::endl
 		<< std::endl << std::endl;
 
-	out << "const bindings::LanguageInterface::InterfaceDescription* getBindingsInterfaceDescription();"
+	out << "const papuga::LanguageInterface::InterfaceDescription* getBindingsInterfaceDescription();"
 		<< std::endl << std::endl;
 
 	out << "}//namespace" << std::endl;
@@ -80,43 +80,50 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 {
 	strus::printCppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
 	out << "#include \"strus/lib/bindings_description.hpp\"" << std::endl;
-	out << "#include \"strus/bindings/bindingClassId.hpp\"" << std::endl;
+	out << "#include \"strus/bindingClassId.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
+	out << "#include \"internationaliation.hpp\"" << std::endl;
 
 	out << "#include <cstddef>" << std::endl;
 	out
 		<< std::endl
-		<< "namespace strus {" << std::endl
+		<< "using namespace strus;" << std::endl
 		<< std::endl << std::endl;
 
-	out << "static const bindings::LanguageInterface::InterfaceDescription g_descr = " << std::endl
-		<< "{" << std::endl
-		<< "\t{" << std::endl;
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
 	for (; ci != ce; ++ci)
 	{
-		std::string classid = std::string("Class") + ci->name();
-		out << "\t\t{ " << classid << ", \"" << ci->name() << "," << std::endl;
-		out << "\t\t\t{" << std::endl;
+		out << "static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_" << ci->name() << "[" << (ci->methodDefs().size()+1) << "] = " << std::endl
+			<< "{" << std::endl;
 		std::vector<strus::MethodDef>::const_iterator
 			mi = ci->methodDefs().begin(),
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
 			
-			out << "\t\t\t\t{\"" << mi->name() <<  "\", \"" << methodFunctionName(ci->name(),mi->name()) << "\", " << mi->parameters().size() << "}," << std::endl;
+			out << "\t{\"" << mi->name() <<  "\", \"" << methodFunctionName(ci->name(),mi->name()) << "\", " << mi->parameters().size() << "}," << std::endl;
 		}
-		out << "\t\t\t\t{0,0,0}" << std::endl;
-		out << "\t\t\t}" << std::endl;
-		out << "\t\t}," << std::endl;
+		out << "\t{0,0,0}" << std::endl;
+		out << "};" << std::endl;
 	}
-	out << "\t\t{0,0}" << std::endl;
-	out << "\t}" << std::endl;
+
+	out << "static const papuga::LanguageInterface::InterfaceDescription::Class g_classes[" << (interfaceDef.classDefs().size()+1) << "] = " << std::endl
+		<< "{" << std::endl;
+	ci = interfaceDef.classDefs().begin();
+	for (; ci != ce; ++ci)
+	{
+		std::string classid = std::string("Class") + ci->name();
+		out << "\t{ " << classid << ", \"" << ci->name() << "\", g_methods_" << ci->name() << "}," << std::endl;
+	}
+	out << "\t{0,0}" << std::endl;
 	out << "};" << std::endl << std::endl;
 
-	out << "DLL_PUBLIC const bindings::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
+	out << "static const papuga::LanguageInterface::InterfaceDescription g_descr = { \"strus\", g_classes };"
+		<< std::endl << std::endl;
+
+	out << "DLL_PUBLIC const papuga::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
 	out << "{" << std::endl;
 	out << "\treturn &g_descr;" << std::endl;
 	out << "}" << std::endl;
@@ -125,10 +132,10 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
-	out << "#include \"strus/bindings/valueVariant.hpp\"" << std::endl;
-	out << "#include \"strus/bindings/callResult.hpp\"" << std::endl;
-	out << "#include \"strus/bindings/serialization.hpp\"" << std::endl;
-	out << "#include \"strus/bindings/hostObjectReference.hpp\"" << std::endl;
+	out << "#include \"papuga/valueVariant.hpp\"" << std::endl;
+	out << "#include \"papuga/callResult.hpp\"" << std::endl;
+	out << "#include \"papuga/serialization.hpp\"" << std::endl;
+	out << "#include \"papuga/hostObjectReference.hpp\"" << std::endl;
 	out << "#include <cstddef>" << std::endl;
 	out
 		<< std::endl
@@ -147,8 +154,8 @@ static void print_BindingObjectsHpp( std::ostream& out, const strus::InterfacesD
 		{
 			out 
 			<< "bool " << methodFunctionName( ci->name(), mi->name())
-			<< "( void* self, CallResult& retval, "
-			<< "std::size_t argc, ValueVariant const* argv);" << std::endl;
+			<< "( void* self, papuga::CallResult& retval, "
+			<< "std::size_t argc, papuga::ValueVariant const* argv);" << std::endl;
 		}
 	}
 	out
@@ -187,27 +194,28 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#include \"impl/query.hpp\"" << std::endl;
 	out << "#include \"impl/statistics.hpp\"" << std::endl;
 	out << "#include \"internationalization.hpp\"" << std::endl;
+	out << "#include \"valueVariantConv.hpp\"" << std::endl;
 
 	out << std::endl
 		<< "using namespace strus;" << std::endl
 		<< "using namespace strus::bindings;" << std::endl
 		<< std::endl;
 
-	out << "#define CATCH_METHOD_CALL_ERROR( retval, classname, methodname)\\" << std::endl;
+	out << "#define CATCH_METHOD_CALL_ERROR( retval, classnam, methodnam)\\" << std::endl;
 	out << "\tcatch (const std::runtime_error& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tretval.reportError( _TXT(\"error calling method %s::%s(): %s\"), classnam.c_str(), methodnam.c_str(), err.what());\\" << std::endl;
-	out << "\t} catch (const std::bad_alloc& err)\\" << std::endl;
-	out << "\t{\\" << std::endl;
-	out << "\t\tretval.reportError( _TXT(\"out of memory calling method %s::%s()\"), classnam.c_str(), methodnam.c_str());\\" << std::endl;
+	out << "\t\tretval.reportError( _TXT(\"error calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
-	out << "\t} catch (const std::exception& err)\\" << std::endl;
+	out << "\tcatch (const std::bad_alloc& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam.c_str(), methodnam.c_str(), err.what());\\" << std::endl;
+	out << "\t\tretval.reportError( _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);\\" << std::endl;
 	out << "\t}\\" << std::endl;
-	out << "\treturn false;\\" << std::endl;
-	out << "}" << std::endl << std::endl;
-	
+	out << "\tcatch (const std::exception& err)\\" << std::endl;
+	out << "\t{\\" << std::endl;
+	out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
+	out << "\t}\\" << std::endl;
+	out << "\treturn false;" << std::endl;
+
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
@@ -218,9 +226,9 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
-			out << "DLL_PUBLIC bool bindings::" << ci->name() << "__" << mi->name()
-				<< "( void* self, CallResult& retval, "
-				<< "std::size_t argc, ValueVariant const* argv)" << std::endl;
+			out << "DLL_PUBLIC bool strus::" << ci->name() << "__" << mi->name()
+				<< "( void* self, papuga::CallResult& retval, "
+				<< "std::size_t argc, papuga::ValueVariant const* argv)" << std::endl;
 			out << "{" << std::endl;
 			out << "\ttry {" << std::endl;
 			out << "\t\t" << ci->name() << "Impl* THIS = ("<< ci->name() << "Impl*)(self);" << std::endl;
@@ -237,7 +245,17 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			{
 				out << "\t\tif (argc < " << min_nofargs << ") throw strus::runtime_error(_TXT(\"too few arguments\"));" << std::endl;
 			}
-
+			// Do some conversions, if needed:
+			pi = mi->parameters().begin();
+			for (std::size_t pidx=0; pi != pe; ++pi,++pidx)
+			{
+				if (pi->type().hasEvent( "argv_decl"))
+				{
+					std::string val = strus::string_format( "argv[%u]", (unsigned int)pidx);
+					std::string nam = strus::string_format( "conv_argv%u", (unsigned int)pidx);
+					out << "\t\t" << pi->expand( "argv_decl", nam.c_str(), val.c_str()) << std::endl;
+				}
+			}
 			// Collect argument values:
 			std::vector<std::string> params_converted;
 			std::vector<std::string> params_default;
@@ -245,14 +263,22 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			for (std::size_t pidx=0; pi != pe; ++pi,++pidx)
 			{
 				std::string val = strus::string_format( "argv[%u]", (unsigned int)pidx);
-				params_converted.push_back( pi->expand( "argv_map", "", val.c_str()));
-				params_default.push_back( min_nofargs <= pidx ? pi->expand( "argv_default", "", val.c_str()) : std::string());
+				std::string nam = strus::string_format( "conv_argv%u", (unsigned int)pidx);
+				params_converted.push_back( pi->expand( "argv_map", nam.c_str(), val.c_str()));
+				params_default.push_back( min_nofargs <= pidx ? pi->expand( "argv_default", nam.c_str(), val.c_str()) : std::string());
 			}
 			// Print redirect calls:
 			if (mi->parameters().empty())
 			{
 				out << "\t\tif (argc > " << mi->parameters().size() << ") throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
-				out << "\t\tretval = " << expandMethodCall( mi->name(), 0, params_converted, params_default) << ";" << std::endl;
+				if (mi->returnValue() == "void")
+				{
+					out << "\t\t" << expandMethodCall( mi->name(), 0, params_converted, params_default) << ";" << std::endl;
+				}
+				else
+				{
+					out << "\t\tretval = " << expandMethodCall( mi->name(), 0, params_converted, params_default) << ";" << std::endl;
+				}
 			}
 			else
 			{
@@ -260,14 +286,21 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 				out << "\t\t{" << std::endl;
 				for (std::size_t pidx=min_nofargs; pidx<=mi->parameters().size(); ++pidx)
 				{
-					out << "\t\t\tcase " << pidx << ": retval = " << expandMethodCall( mi->name(), pidx, params_converted, params_default) << "; break;" << std::endl;
+					if (mi->returnValue() == "void")
+					{
+						out << "\t\t\tcase " << pidx << ": " << expandMethodCall( mi->name(), pidx, params_converted, params_default) << "; break;" << std::endl;
+					}
+					else
+					{
+						out << "\t\t\tcase " << pidx << ": retval = " << expandMethodCall( mi->name(), pidx, params_converted, params_default) << "; break;" << std::endl;
+					}
 				}
 				out << "\t\t\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
 				out << "\t\t}" << std::endl;
 			}
 			out << "\t\treturn true;" << std::endl;
 			out << "\t}" << std::endl;
-			out << "\tCATCH_METHOD_CALL_ERROR( retval, ci->name().c_str(), mi->name().c_str());" << std::endl;
+			out << "\tCATCH_METHOD_CALL_ERROR( retval, \"" << ci->name().c_str() << "\", \"" << mi->name().c_str() << "\")" << std::endl;
 			out << "}" << std::endl << std::endl;
 		}
 	}

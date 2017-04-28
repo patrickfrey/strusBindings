@@ -8,24 +8,30 @@
 /// \brief Serializers of all data types needed for the language bindings
 /// \file serializer.hpp
 #include "serializer.hpp"
+#include "valueVariantConv.hpp"
 #include "internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
+using namespace papuga;
 
+void Serializer::serialize( papuga::Serialization& result, const NumericVariant& val)
+{
+	result.pushValue( ValueVariantConv::fromnumeric( val));
+}
 static void serialize_positional( Serialization& result, const analyzer::Term& val)
 {
 	Serializer::serialize( result, val.type());
 	Serializer::serialize( result, val.value());
-	Serializer::serialize( result, (ValueVariant::UIntType)val.pos());
-	Serializer::serialize( result, (ValueVariant::UIntType)val.len());
+	Serializer::serialize( result, (papuga::ValueVariant::UIntType)val.pos());
+	Serializer::serialize( result, (papuga::ValueVariant::UIntType)val.len());
 }
 void Serializer::serialize( Serialization& result, const analyzer::Term& val)
 {
 	serializeStructMember( result, "type", val.type());
 	serializeStructMember( result, "value", val.value());
-	serializeStructMember( result, "pos", (ValueVariant::UIntType)val.pos());
-	serializeStructMember( result, "len", (ValueVariant::UIntType)val.len());
+	serializeStructMember( result, "pos", (papuga::ValueVariant::UIntType)val.pos());
+	serializeStructMember( result, "len", (papuga::ValueVariant::UIntType)val.len());
 }
 void Serializer::serialize( Serialization& result, const analyzer::Attribute& val)
 {
@@ -50,7 +56,7 @@ void Serializer::serialize( Serialization& result, const analyzer::DocumentClass
 }
 void Serializer::serialize( Serialization& result, const VectorStorageSearchInterface::Result& val)
 {
-	serializeStructMember( result, "featidx", (ValueVariant::IntType)val.featidx());
+	serializeStructMember( result, "featidx", (papuga::ValueVariant::IntType)val.featidx());
 	serializeStructMember( result, "weight", val.weight());
 }
 void Serializer::serialize( Serialization& result, const SummaryElement& val)
@@ -58,7 +64,7 @@ void Serializer::serialize( Serialization& result, const SummaryElement& val)
 	serializeStructMember( result, "name", val.name());
 	serializeStructMember( result, "value", val.value());
 	serializeStructMember( result, "weight", val.weight());
-	serializeStructMember( result, "index", (ValueVariant::IntType)val.index());
+	serializeStructMember( result, "index", (papuga::ValueVariant::IntType)val.index());
 }
 void Serializer::serialize( Serialization& result, const analyzer::Document& val)
 {
@@ -95,8 +101,8 @@ static void serialize_labeled( Serialization& result, const analyzer::Query& val
 				opres.pushName( "op");
 				const QueryAnalyzerStruct::Operator& op = operators[ ii->idx()];
 				Serializer::serializeStructMember( opres, "name", op.name);
-				if (op.range) Serializer::serializeStructMember( opres, "range", (ValueVariant::IntType)op.range);
-				if (op.cardinality) Serializer::serializeStructMember( opres, "cardinality", (ValueVariant::UIntType)op.cardinality);
+				if (op.range) Serializer::serializeStructMember( opres, "range", (papuga::ValueVariant::IntType)op.range);
+				if (op.cardinality) Serializer::serializeStructMember( opres, "cardinality", (papuga::ValueVariant::UIntType)op.cardinality);
 				opres.pushName( "arg");
 				opres.pushOpen();
 				if (ii->nofOperands() > stk.size()) throw strus::runtime_error(_TXT("number of query analyzer expression operands out of range"));
@@ -143,8 +149,8 @@ static void serialize_positional( Serialization& result, const analyzer::Query& 
 				const QueryAnalyzerStruct::Operator& op = operators[ ii->idx()];
 
 				Serializer::serialize( opres, op.name);
-				if (op.range) Serializer::serialize( opres, (ValueVariant::IntType)op.range);
-				if (op.cardinality) Serializer::serialize( opres, (ValueVariant::UIntType)op.cardinality);
+				if (op.range) Serializer::serialize( opres, (papuga::ValueVariant::IntType)op.range);
+				if (op.cardinality) Serializer::serialize( opres, (papuga::ValueVariant::UIntType)op.cardinality);
 				
 				if (ii->nofOperands() > stk.size()) throw strus::runtime_error(_TXT("number of query analyzer expression operands out of range"));
 				std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
@@ -176,19 +182,19 @@ void Serializer::serialize( Serialization& result, const StatisticsViewerInterfa
 {
 	serializeStructMember( result, "type", val.type());
 	serializeStructMember( result, "value", val.value());
-	serializeStructMember( result, "increment", (ValueVariant::IntType)val.increment());
+	serializeStructMember( result, "increment", (papuga::ValueVariant::IntType)val.increment());
 }
 void Serializer::serialize( Serialization& result, const ResultDocument& val)
 {
-	serializeStructMember( result, "docno", (ValueVariant::IntType)val.docno());
+	serializeStructMember( result, "docno", (papuga::ValueVariant::IntType)val.docno());
 	serializeStructMember( result, "weight", val.weight());
 	serializeStructMember( result, "summary", val.summaryElements());
 }
 void Serializer::serialize( Serialization& result, const QueryResult& val)
 {
-	serializeStructMember( result, "pass", (ValueVariant::UIntType)val.evaluationPass());
-	serializeStructMember( result, "nofranked", (ValueVariant::UIntType)val.nofRanked());
-	serializeStructMember( result, "nofvisited", (ValueVariant::UIntType)val.nofVisited());
+	serializeStructMember( result, "pass", (papuga::ValueVariant::UIntType)val.evaluationPass());
+	serializeStructMember( result, "nofranked", (papuga::ValueVariant::UIntType)val.nofRanked());
+	serializeStructMember( result, "nofvisited", (papuga::ValueVariant::UIntType)val.nofVisited());
 	serializeStructMember( result, "ranks", val.ranks());
 }
 void Serializer::serialize( Serialization& result, const ConfigurationItemList& val)

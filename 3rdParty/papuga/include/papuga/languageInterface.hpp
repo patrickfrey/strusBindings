@@ -7,11 +7,11 @@
 */
 /// \brief Bindings language interface
 /// \file languageInterface.hpp
-#ifndef _STRUS_BINDINGS_LANGUAGE_INTERFACE_HPP_INCLUDED
-#define _STRUS_BINDINGS_LANGUAGE_INTERFACE_HPP_INCLUDED
+#ifndef _PAPUGA_LANGUAGE_INTERFACE_HPP_INCLUDED
+#define _PAPUGA_LANGUAGE_INTERFACE_HPP_INCLUDED
+#include <string>
 
-namespace strus {
-namespace bindings {
+namespace papuga {
 
 class LanguageInterface
 {
@@ -27,21 +27,22 @@ public:
 		
 		struct Class
 		{
-			unsigned int id;		///< id of the class (unique index counted from 0, that corresponds to the index in Interface::classes), used to double check that enum valuess used as classid in the bindings correspond to the id used by the binding language.
+			unsigned int id;		///< id of the class (unique index counted from 0)
 			const char* name;		///< name of class
 			const Method* methodtable;	///< (NULL,0) terminated list of methods
 		};
-	
-		const Class* classes;		///< (0,NULL,NULL) terminated list of classes 
+
+		const char* name;			///< name of the project wrapped by the bindings
+		const Class* classes;			///< (0,NULL,NULL) terminated list of classes 
 	};
 
-	virtual ~BindingLanguage(){}
+	virtual ~LanguageInterface(){}
 
 	virtual std::string generate(
 			const char* name,
 			const InterfaceDescription* descr)=0;
 };
 
-}}//namespace
+}//namespace
 #endif
 

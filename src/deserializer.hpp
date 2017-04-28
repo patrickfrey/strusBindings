@@ -7,8 +7,8 @@
  */
 #ifndef _STRUS_BINDING_UTILS_HPP_INCLUDED
 #define _STRUS_BINDING_UTILS_HPP_INCLUDED
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/serialization.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/serialization.hpp"
 #include "strus/analyzer/featureOptions.hpp"
 #include "strus/normalizerFunctionInterface.hpp"
 #include "strus/normalizerFunctionInstanceInterface.hpp"
@@ -41,169 +41,169 @@ namespace bindings {
 struct Deserializer
 {
 	static void consumeClose(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static bool isStringWithPrefix(
-			const ValueVariant& val,
+			const papuga::ValueVariant& val,
 			unsigned char prefix);
 
 	static int getStringPrefix(
-			const ValueVariant& val,
+			const papuga::ValueVariant& val,
 			const char* prefixList);
 
 	static std::string getPrefixStringValue(
-			const ValueVariant& val,
+			const papuga::ValueVariant& val,
 			unsigned char prefix);
 
 	static bool skipStructure(
-			Serialization::const_iterator si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator si,
+			const papuga::Serialization::const_iterator& se);
 
 	static std::string getString(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static const char* getCharp(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static std::vector<std::string> getStringList(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static std::vector<std::string> getStringList(
-			const ValueVariant& val);
+			const papuga::ValueVariant& val);
 
 	static unsigned int getUint(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static int getInt(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static Index getIndex(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static double getDouble(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static std::vector<int> getIntList(
-			const ValueVariant& val);
+			const papuga::ValueVariant& val);
 
 	static std::vector<Index> getIndexList(
-			const ValueVariant& val);
+			const papuga::ValueVariant& val);
 
 	static std::vector<double> getDoubleList(
-			const ValueVariant& val);
+			const papuga::ValueVariant& val);
 
 	static analyzer::DocumentClass getDocumentClass(
-			const ValueVariant& val);
+			const papuga::ValueVariant& val);
 
 	static analyzer::FeatureOptions getFeatureOptions(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static analyzer::FeatureOptions getFeatureOptions(
-			const ValueVariant& options);
+			const papuga::ValueVariant& options);
 
 	static TermStatistics getTermStatistics(
-			const ValueVariant& stats);
+			const papuga::ValueVariant& stats);
 
 	static GlobalStatistics getGlobalStatistics(
-			const ValueVariant& stats);
+			const papuga::ValueVariant& stats);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se,
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
-			const ValueVariant& normalizers,
+			const papuga::ValueVariant& normalizers,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 	
 	static Reference<TokenizerFunctionInstanceInterface> getTokenizer(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se,
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
 	static Reference<TokenizerFunctionInstanceInterface> getTokenizer(
-			const ValueVariant& tokenizer,
+			const papuga::ValueVariant& tokenizer,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 	
 	static Reference<AggregatorFunctionInstanceInterface> getAggregator(
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se,
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
 	static Reference<AggregatorFunctionInstanceInterface> getAggregator(
-			const ValueVariant& aggregator,
+			const papuga::ValueVariant& aggregator,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildSummarizerFunction(
 			QueryEvalInterface* queryeval,
 			const std::string& functionName,
-			const ValueVariant& parameter,
-			const ValueVariant& resultnames,
+			const papuga::ValueVariant& parameter,
+			const papuga::ValueVariant& resultnames,
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildWeightingFunction(
 			QueryEvalInterface* queryeval,
 			const std::string& functionName,
-			const ValueVariant& parameter,
+			const papuga::ValueVariant& parameter,
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildWeightingFormula(
 			QueryEvalInterface* queryeval,
 			const std::string& source,
-			const ValueVariant& parameter,
+			const papuga::ValueVariant& parameter,
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
-			Serialization::const_iterator& si,
-			const Serialization::const_iterator& se);
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
-			const ValueVariant& expression,
+			const papuga::ValueVariant& expression,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildPatterns(
 			ExpressionBuilder& builder,
-			const ValueVariant& patterns,
+			const papuga::ValueVariant& patterns,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildInsertDocument(
 			StorageDocumentInterface* document,
-			const ValueVariant& content,
+			const papuga::ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildUpdateDocument(
 			StorageDocumentUpdateInterface* document,
-			const ValueVariant& content,
-			const ValueVariant& deletes,
+			const papuga::ValueVariant& content,
+			const papuga::ValueVariant& deletes,
 			ErrorBufferInterface* errorhnd);
 
 	static void buildStatistics(
 			StatisticsBuilderInterface* builder,
-			const ValueVariant& content,
+			const papuga::ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 
 	static std::string getStorageConfigString(
-			const ValueVariant& content,
+			const papuga::ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 };
 

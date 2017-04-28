@@ -7,9 +7,9 @@
  */
 #ifndef _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/callResult.hpp"
+#include "papuga/hostObjectReference.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
@@ -18,6 +18,10 @@
 
 namespace strus {
 namespace bindings {
+
+typedef papuga::ValueVariant ValueVariant;
+typedef papuga::CallResult CallResult;
+typedef papuga::HostObjectReference HostObjectReference;
 
 /// \brief Object holding the global context of the strus information retrieval engine
 /// \note There a two modes of this context object operating on a different base.
@@ -61,19 +65,13 @@ public:
 	/// \return the processor
 	CallResult createStatisticsProcessor( const std::string& name);
 
-	/// \brief Create a storage client instance of the the default storage
-	CallResult createStorageClient();
-
 	/// \brief Create a storage client instance
-	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or empty, if the default remote storage of the RPC server is chosen,
-	CallResult createStorageClient( const ValueVariant& config_);
-
-	/// \brief Create a storage client instance of the the default remote storage of the RPC server
-	CallResult createVectorStorageClient();
+	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or undefined, if the default remote storage of the RPC server is chosen
+	CallResult createStorageClient( const ValueVariant& config_=ValueVariant());
 
 	/// \brief Create a vector storage client instance
-	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or empty for the default storage
-	CallResult createVectorStorageClient( const ValueVariant& config_);
+	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or undefined, if the default remote vector storage of the RPC server is chosen
+	CallResult createVectorStorageClient( const ValueVariant& config_=ValueVariant());
 
 	/// \brief Create a new storage (physically) described by config
 	/// \param[in] config_ storage configuration (string or structure with named elements) 

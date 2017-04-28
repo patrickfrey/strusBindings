@@ -5,24 +5,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDINGS_VALUE_VARIANT_HPP_INCLUDED
-#define _STRUS_BINDINGS_VALUE_VARIANT_HPP_INCLUDED
+#ifndef _PAPUGA_VALUE_VARIANT_HPP_INCLUDED
+#define _PAPUGA_VALUE_VARIANT_HPP_INCLUDED
 /// \brief Representation of a typed value for language bindings
 /// \file valueVariant.hpp
-#include "strus/base/stdint.h"
-#include "strus/numericVariant.hpp"
 #include <string>
 #include <cstring>
+#ifdef _MSC_VER
+#error stdint definitions missing for Windows
+#else
+#include <stdint.h>
+#endif
 
-namespace strus {
-namespace bindings {
+namespace papuga {
 
 class Serialization;
 
 /// \brief Representation of a typed value const reference or an owned object with reference count
 struct ValueVariant
 {
-	typedef void StrusObjectType;
+	typedef void HostObjectType;
 
 	/// \brief Enumeration of value type identifiers
 	enum Type {
@@ -32,8 +34,8 @@ struct ValueVariant
 		Int			= 0x03,
 		String			= 0x04,
 		WString			= 0x05,
-		StrusObject		= 0x06,
-		StrusSerialization	= 0x07
+		HostObject		= 0x06,
+		Serialization		= 0x07
 	};
 	enum {
 		NumericTypeMask = (1U<<(unsigned int)UInt)|(1U<<(unsigned int)Int)|(1U<<(unsigned int)Double),
@@ -54,12 +56,8 @@ struct ValueVariant
 	ValueVariant( const char* s, std::size_t l)			{value.string = s; type = String; attribute.length = l;}
 	ValueVariant( const std::string& s)				{value.string = s.c_str(); type = String; attribute.length = s.size();}
 	ValueVariant( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; attribute.length = l;}
-	ValueVariant( const StrusObjectType* s_, int classid_)		{value.strusObject = s_; type = StrusObject; attribute.classid = classid_;}
-	ValueVariant( const Serialization* s_)				{value.serialization = s_; type = StrusSerialization; attribute.length = 0;}
-	ValueVariant( const NumericVariant& num)
-	{
-		assign( num);
-	}
+	ValueVariant( const HostObjectType* s_, int classid_)		{value.hostObject = s_; type = HostObject; attribute.classid = classid_;}
+	ValueVariant( const papuga::Serialization* s_)			{value.serialization = s_; type = Serialization; attribute.length = 0;}
 	ValueVariant( const ValueVariant& o)
 	{
 		assign( o);
@@ -77,9 +75,8 @@ struct ValueVariant
 	void init( const char* s, std::size_t l)			{value.string = s; type = String; attribute.length = l;}
 	void init( const std::string& s)				{value.string = s.c_str(); type = String; attribute.length = s.size();}
 	void init( const uint16_t* s, std::size_t l)			{value.wstring = s; type = WString; attribute.length = l;}
-	void init( const StrusObjectType* s_, int classid_=-1)		{value.strusObject = s_; type = StrusObject; attribute.classid=classid_;}
-	void init( const Serialization* s)				{value.serialization = s; type = StrusSerialization; attribute.length=0;} 
-	void init( const NumericVariant& num)				{assign( num);}
+	void init( const HostObjectType* s_, int classid_=-1)		{value.hostObject = s_; type = HostObject; attribute.classid=classid_;}
+	void init( const papuga::Serialization* s)			{value.serialization = s; type = Serialization; attribute.length=0;} 
 
 	void clear()
 	{
@@ -97,8 +94,8 @@ struct ValueVariant
 		int64_t Int;
 		const char* string;
 		const uint16_t* wstring;
-		const StrusObjectType* strusObject;
-		const Serialization* serialization;
+		const HostObjectType* hostObject;
+		const papuga::Serialization* serialization;
 	} value;
 	union {
 		int length;
@@ -128,25 +125,8 @@ private:
 		value = o.value;
 		attribute = o.attribute;
 	}
-	void assign( const NumericVariant& num)
-	{
-		switch (num.type)
-		{
-			case NumericVariant::Null: break;
-			case NumericVariant::Int:
-				value.Int = num.variant.Int; type = Int; attribute.length = 0;
-				return;
-			case NumericVariant::UInt:
-				value.UInt = num.variant.Int; type = UInt; attribute.length = 0;
-				return;
-			case NumericVariant::Float:
-				value.Double = num.variant.Float; type = Double; attribute.length = 0;
-				return;
-		}
-		clear(); 
-	}
 };
 
-}}//namespace
+}//namespace
 #endif
 

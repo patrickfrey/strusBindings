@@ -7,7 +7,7 @@
  */
 #ifndef _STRUS_BINDINGS_STRUCTURE_NAME_MAP_HPP_INCLUDED
 #define _STRUS_BINDINGS_STRUCTURE_NAME_MAP_HPP_INCLUDED
-#include "strus/bindings/valueVariant.hpp"
+#include "papuga/valueVariant.hpp"
 #include <vector>
 
 namespace strus {
@@ -23,7 +23,7 @@ public:
 
 	int index( const char* id, std::size_t idsize) const;
 	int index( const char* id) const;
-	int index( const ValueVariant& id) const;
+	int index( const papuga::ValueVariant& id) const;
 
 private:
 	const char* m_strings;

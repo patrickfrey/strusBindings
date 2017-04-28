@@ -9,7 +9,7 @@
 #define _STRUS_BINDINGS_IMPL_TRAITS_HPP_INCLUDED
 /// \file implTraits.hpp
 #include "strus/bindingClassId.hpp"
-#include "strus/bindings/valueVariant.hpp"
+#include "papuga/valueVariant.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
 #include "impl/vector.hpp"
@@ -112,13 +112,13 @@ template <> struct ImplTraits<VectorStorageTransactionImpl>
 };
 
 template <class ClassImpl>
-static ClassImpl* implObjectCast( const ValueVariant& val)
+static ClassImpl* implObjectCast( const papuga::ValueVariant& val)
 {
-	if (val.type != ValueVariant::StrusObject || val.classid() != ImplTraits<ClassImpl>::classid())
+	if (val.type != papuga::ValueVariant::HostObject || val.classid() != ImplTraits<ClassImpl>::classid())
 	{
 		throw strus::runtime_error(_TXT("expected class '%s'"), ImplTraits<ClassImpl>::name());
 	}
-	return (ClassImpl*)const_cast<void*>( val.value.strusObject);
+	return (ClassImpl*)const_cast<void*>( val.value.hostObject);
 }
 
 }}// namespace

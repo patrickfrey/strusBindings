@@ -16,46 +16,51 @@ using namespace strus;
 void strus::fillTypeTables( TypeSystem& typesystem)
 {
 	typesystem.defineType( "std::size_t")
-		("argv_map", "VariantValueConv::touint64( $value)")
+		("argv_map", "ValueVariantConv::touint64( $value)")
 	;
 	typesystem.defineType( "bool")
-		("argv_map", "VariantValueConv::tobool( $value)")
+		("argv_map", "ValueVariantConv::tobool( $value)")
 	;
 	typesystem.defineType( "int")
-		("argv_map", "VariantValueConv::toint( $value)")
+		("argv_map", "ValueVariantConv::toint( $value)")
 	;
 	typesystem.defineType( "unsigned int")
-		("argv_map", "VariantValueConv::touint( $value)")
+		("argv_map", "ValueVariantConv::touint( $value)")
 	;
 	typesystem.defineType( "unsigned int $val=0")
 		("argv_default", "0")
-		("argv_map", "VariantValueConv::touint( $value)")
+		("argv_map", "ValueVariantConv::touint( $value)")
 	;
 	typesystem.defineType( "float")
-		("argv_map", "VariantValueConv::tofloat( $value)")
+		("argv_map", "ValueVariantConv::tofloat( $value)")
 	;
 	typesystem.defineType( "double")
-		("argv_map", "VariantValueConv::todouble( $value)")
+		("argv_map", "ValueVariantConv::todouble( $value)")
 	;
 	typesystem.defineType( "double $val=1")
 		("argv_default", "1.0")
-		("argv_map", "VariantValueConv::todouble( $value)")
+		("argv_map", "ValueVariantConv::todouble( $value)")
+	;
+	typesystem.defineType( "const ValueVariant& $val=ValueVariant()")
+		("argv_default", "ValueVariant()")
+		("argv_map", "$value")
 	;
 	typesystem.defineType( "const ValueVariant&")
 		("argv_map", "$value")
 	;
 	typesystem.defineType( "const NumericVariant&")
-		("argv_map", "VariantValueConv::tonumeric( $value)")
+		("argv_map", "ValueVariantConv::tonumeric( $value)")
 	;
 	typesystem.defineType( "const std::string& $val=\"\"")
 		("argv_default", "std::string()")
-		("argv_map", "VariantValueConv::tostring( $value)")
+		("argv_map", "ValueVariantConv::tostring( $value)")
 	;
 	typesystem.defineType( "const std::string&")
-		("argv_map", "VariantValueConv::tostring( $value)")
+		("argv_map", "ValueVariantConv::tostring( $value)")
 	;
 	typesystem.defineType( "const char*")
-		("argv_map", "VariantValueConv::tostring( $value)")
+		("argv_decl", "std::string $name;")
+		("argv_map", "ValueVariantConv::tocharp( $name, $value)")
 	;
 }
 

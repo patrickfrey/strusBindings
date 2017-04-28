@@ -5,16 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDINGS_SERIALIZATION_HPP_INCLUDED
-#define _STRUS_BINDINGS_SERIALIZATION_HPP_INCLUDED
-/// \brief Serialization of structures for the language bindings
+#ifndef _PAPUGA_SERIALIZATION_HPP_INCLUDED
+#define _PAPUGA_SERIALIZATION_HPP_INCLUDED
+/// \brief Serialization of structures for papuga language bindings
 /// \file serialization.hpp
-#include "strus/bindings/valueVariant.hpp"
+#include "papuga/valueVariant.hpp"
 #include <string>
 #include <vector>
 
-namespace strus {
-namespace bindings {
+namespace papuga {
 
 class Serialization
 {
@@ -107,7 +106,7 @@ private:
 	std::vector<Node> m_ar;
 };
 
-}}//namespace
+}//namespace
 #endif
 
 

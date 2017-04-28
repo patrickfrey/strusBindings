@@ -7,9 +7,9 @@
  */
 #ifndef _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/callResult.hpp"
+#include "papuga/hostObjectReference.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.hpp"
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/numericVariant.hpp"
 #include "impl/storage.hpp"
@@ -18,6 +18,10 @@
 
 namespace strus {
 namespace bindings {
+
+typedef papuga::ValueVariant ValueVariant;
+typedef papuga::CallResult CallResult;
+typedef papuga::HostObjectReference HostObjectReference;
 
 /// \brief Query evaluation program object representing an information retrieval scheme for documents in a storage.
 class QueryEvalImpl

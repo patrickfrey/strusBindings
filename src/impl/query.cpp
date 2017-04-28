@@ -23,6 +23,8 @@
 using namespace strus;
 using namespace strus::bindings;
 
+typedef papuga::Serialization Serialization;
+
 QueryEvalImpl::QueryEvalImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
@@ -179,7 +181,7 @@ void QueryImpl::setWeightingVariables(
 		const ValueVariant& parameter)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	if (parameter.type != ValueVariant::StrusSerialization)
+	if (parameter.type != ValueVariant::Serialization)
 	{
 		throw strus::runtime_error(_TXT("list of variable assignments expected as argument"));
 	}

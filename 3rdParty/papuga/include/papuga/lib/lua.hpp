@@ -1,0 +1,31 @@
+/*
+* Copyright (c) 2017 Patrick P. Frey
+*
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+/// \brief Library interface for libpapuga_lua for generating lua bindings
+/// \file papuga/lib/lua.hpp
+#ifndef _PAPUGA_LUA_LIB_HPP_INCLUDED
+#define _PAPUGA_LUA_LIB_HPP_INCLUDED
+#include "papuga/languageInterface.hpp"
+#include <string>
+#include <iostream>
+
+namespace papuga {
+
+/// \brief Generate a source of the lua bindings for an interface described
+/// \param[out] out where to print the generated source
+/// \param[err] err stream to report errors and warnings
+/// \param[in] what name of artefact to generate
+/// \param[in] descr interface description
+bool generateLuaSource(
+	std::ostream& out,
+	std::ostream& err,
+	const std::string& what,
+	const LanguageInterface::InterfaceDescription& descr);
+
+}//namespace
+#endif
+

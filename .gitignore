@@ -36,7 +36,7 @@ install_manifest.txt
 CTestTestfile.cmake
 CMakeLists.txt.user
 CTestTestfile.cmake.user
-cmake/uninstall.cmake
+uninstall.cmake
 DartConfiguration.tcl
 Testing/
 CPackConfig.cmake

@@ -1,6 +1,6 @@
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/hostObjectReference.hpp"
-#include "strus/bindings/callResult.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/hostObjectReference.hpp"
+#include "papuga/callResult.hpp"
 #include "strus/index.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
@@ -16,11 +16,11 @@ public:
 	~TestObject(){}
 };
 
-bool test_function( CallResult& res, std::size_t , const ValueVariant* )
+bool test_function( papuga::CallResult& res, std::size_t , const papuga::ValueVariant* )
 {
 	bindings::Serializer::serialize_int( res.serialization, 1);
 
-	res.object = HostObjectReference::createOwnership( new TestObject());
+	res.object = papuga::HostObjectReference::createOwnership( new TestObject());
 	return true;
 }
 

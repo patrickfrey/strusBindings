@@ -9,7 +9,7 @@
 #define _STRUS_BINDINGS_VALUE_VARIANT_CONVERSIONS_HPP_INCLUDED
 /// \brief Conversion methods for the variant type
 /// \file valueVariantConv.hpp
-#include "strus/bindings/valueVariant.hpp"
+#include "papuga/valueVariant.hpp"
 #include "strus/bindingClassId.hpp"
 #include "strus/base/stdint.h"
 #include "callResultUtils.hpp"
@@ -48,23 +48,42 @@ public:
 		SliceW16( const SliceW16& o) :ptr(o.ptr),size(o.size){}
 	};
 
-	static std::string tostring( const ValueVariant& val);
-	static Slice toslice( std::string& buf, const ValueVariant& val);
+	static std::string tostring( const papuga::ValueVariant& val);
+	static Slice toslice( std::string& buf, const papuga::ValueVariant& val);
+	static const char* tocharp( std::string& buf, const papuga::ValueVariant& val)
+	{
+		return toslice( buf, val).ptr;
+	}
 
-	static std::basic_string<uint16_t> towstring( const ValueVariant& val);
-	static SliceW16 towslice( std::basic_string<uint16_t>& buf, const ValueVariant& val);
+	static std::basic_string<uint16_t> towstring( const papuga::ValueVariant& val);
+	static SliceW16 towslice( std::basic_string<uint16_t>& buf, const papuga::ValueVariant& val);
 
-	static double todouble( const ValueVariant& val);
-	static float tofloat( const ValueVariant& val);
-	static int toint( const ValueVariant& val);
-	static unsigned int touint( const ValueVariant& val);
-	static int64_t toint64( const ValueVariant& val);
-	static uint64_t touint64( const ValueVariant& val);
-	static bool tobool( const ValueVariant& val);
-	static NumericVariant tonumeric( const ValueVariant& val);
+	static double todouble( const papuga::ValueVariant& val);
+	static float tofloat( const papuga::ValueVariant& val);
+	static int toint( const papuga::ValueVariant& val);
+	static unsigned int touint( const papuga::ValueVariant& val);
+	static int64_t toint64( const papuga::ValueVariant& val);
+	static uint64_t touint64( const papuga::ValueVariant& val);
+	static bool tobool( const papuga::ValueVariant& val);
+	static NumericVariant tonumeric( const papuga::ValueVariant& val);
 
-	static bool isequal_ascii( const ValueVariant& val, const char* value);
-	static bool try_convertToNumber( ValueVariant& val);
+	static ValueVariant fromnumeric( const NumericVariant& num)
+	{
+		switch (num.type)
+		{
+			case NumericVariant::Null: break;
+			case NumericVariant::Int:
+				return papuga::ValueVariant( (papuga::ValueVariant::IntType)num.variant.Int);
+			case NumericVariant::UInt:
+				return papuga::ValueVariant( (papuga::ValueVariant::UIntType)num.variant.UInt);
+			case NumericVariant::Float:
+				return papuga::ValueVariant( num.variant.Float);
+		}
+		return papuga::ValueVariant();
+	}
+
+	static bool isequal_ascii( const papuga::ValueVariant& val, const char* value);
+	static bool try_convertToNumber( papuga::ValueVariant& val);
 
 	static bool try_map2ascii( char* destbuf, std::size_t destbufsize, const uint16_t* src, std::size_t srcsize);
 	static std::size_t map2ascii( char* destbuf, std::size_t destbufsize,const uint16_t* src, std::size_t srcsize, const char* where);

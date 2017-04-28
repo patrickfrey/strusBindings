@@ -12,7 +12,7 @@
 #include "strus/base/string_format.hpp"
 #include "strus/base/numParser.hpp"
 #include "internationalization.hpp"
-#include "strus/bindings/serialization.hpp"
+#include "papuga/serialization.hpp"
 #include <string>
 #include <cstring>
 #include <inttypes.h>
@@ -23,9 +23,9 @@ using namespace bindings;
 #define FORMAT_UINT "%" PRIu64
 #define FORMAT_INT "%" PRId64
 
-std::string ValueVariantConv::tostring( const ValueVariant& val)
+std::string ValueVariantConv::tostring( const papuga::ValueVariant& val)
 {
-	if (val.type == ValueVariant::String)
+	if (val.type == papuga::ValueVariant::String)
 	{
 		return std::string( val.value.string, val.length());
 	}
@@ -44,34 +44,34 @@ std::string ValueVariantConv::tostring( const ValueVariant& val)
 	}
 }
 
-ValueVariantConv::Slice ValueVariantConv::toslice( std::string& buf, const ValueVariant& val)
+ValueVariantConv::Slice ValueVariantConv::toslice( std::string& buf, const papuga::ValueVariant& val)
 {
-	if (val.type == ValueVariant::String)
+	if (val.type == papuga::ValueVariant::String)
 	{
 		return Slice( val.value.string, val.length());
 	}
 	else switch (val.type)
 	{
-		case ValueVariant::Void:
+		case papuga::ValueVariant::Void:
 			return Slice();
-		case ValueVariant::Double:
+		case papuga::ValueVariant::Double:
 			buf = string_format( "%.12f", val.value.Double);
 			return Slice( buf.c_str(), buf.size());
-		case ValueVariant::UInt:
+		case papuga::ValueVariant::UInt:
 			buf = string_format( FORMAT_UINT, val.value.UInt);
 			return Slice( buf.c_str(), buf.size());
-		case ValueVariant::Int:
+		case papuga::ValueVariant::Int:
 			buf = string_format( FORMAT_INT, val.value.Int);
 			return Slice( buf.c_str(), buf.size());
-		case ValueVariant::String:
+		case papuga::ValueVariant::String:
 			return Slice( val.value.string, val.length());
-		case ValueVariant::WString:
+		case papuga::ValueVariant::WString:
 			buf = convert_w16string_to_uft8string( val.value.wstring, val.length());
 			return Slice( buf.c_str(), buf.size());
-		case ValueVariant::StrusObject:
+		case papuga::ValueVariant::HostObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "slice");
-		case ValueVariant::StrusSerialization:
-			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+		case papuga::ValueVariant::Serialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == papuga::Serialization::Value)
 			{
 				return toslice( buf, (*val.value.serialization)[0]);
 			}
@@ -85,7 +85,7 @@ ValueVariantConv::Slice ValueVariantConv::toslice( std::string& buf, const Value
 
 std::basic_string<uint16_t> ValueVariantConv::towstring( const ValueVariant& val)
 {
-	if (val.type == ValueVariant::WString)
+	if (val.type == papuga::ValueVariant::WString)
 	{
 		return std::basic_string<uint16_t>( val.value.wstring, val.length());
 	}
@@ -139,32 +139,32 @@ std::size_t ValueVariantConv::map2ascii( char* destbuf, std::size_t destbufsize,
 
 ValueVariantConv::SliceW16 ValueVariantConv::towslice( std::basic_string<uint16_t>& buf, const ValueVariant& val)
 {
-	if (val.type == ValueVariant::WString)
+	if (val.type == papuga::ValueVariant::WString)
 	{
 		return SliceW16( val.value.wstring, val.length());
 	}
 	else switch (val.type)
 	{
-		case ValueVariant::Void:
+		case papuga::ValueVariant::Void:
 			return SliceW16();
-		case ValueVariant::Double:
+		case papuga::ValueVariant::Double:
 			buf = print2uint16string( "%.12f", val.value.Double);
 			return SliceW16( buf.c_str(), buf.size());
-		case ValueVariant::UInt:
+		case papuga::ValueVariant::UInt:
 			buf = print2uint16string( FORMAT_UINT, val.value.UInt);
 			return SliceW16( buf.c_str(), buf.size());
-		case ValueVariant::Int:
+		case papuga::ValueVariant::Int:
 			buf = print2uint16string( FORMAT_INT, val.value.Int);
 			return SliceW16( buf.c_str(), buf.size());
-		case ValueVariant::String:
+		case papuga::ValueVariant::String:
 			buf = convert_uft8string_to_w16string( val.value.string, val.length());
 			return SliceW16( buf.c_str(), buf.size());
-		case ValueVariant::WString:
+		case papuga::ValueVariant::WString:
 			return SliceW16( val.value.wstring, val.length());
-		case ValueVariant::StrusObject:
+		case papuga::ValueVariant::HostObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "wslice");
-		case ValueVariant::StrusSerialization:
-			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+		case papuga::ValueVariant::Serialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == papuga::Serialization::Value)
 			{
 				return towslice( buf, (*val.value.serialization)[0]);
 			}
@@ -196,16 +196,16 @@ NumericVariant ValueVariantConv::tonumeric( const ValueVariant& val)
 {
 	switch (val.type)
 	{
-		case ValueVariant::Void:
+		case papuga::ValueVariant::Void:
 			return NumericVariant();
-		case ValueVariant::Double:
+		case papuga::ValueVariant::Double:
 			return NumericVariant( val.value.Double);
-		case ValueVariant::UInt:
+		case papuga::ValueVariant::UInt:
 			return NumericVariant( (unsigned int)val.value.UInt);
-		case ValueVariant::Int:
+		case papuga::ValueVariant::Int:
 			return NumericVariant( (int)val.value.Int);
-		case ValueVariant::WString:
-		case ValueVariant::String:
+		case papuga::ValueVariant::WString:
+		case papuga::ValueVariant::String:
 		{
 			ValueVariant valcopy = val;
 			if (try_convertToNumber( valcopy))
@@ -217,10 +217,10 @@ NumericVariant ValueVariantConv::tonumeric( const ValueVariant& val)
 				throw strus::runtime_error(_TXT("failed to convert value to numeric type"));
 			}
 		}
-		case ValueVariant::StrusObject:
+		case papuga::ValueVariant::HostObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "numeric");
-		case ValueVariant::StrusSerialization:
-			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+		case papuga::ValueVariant::Serialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == papuga::Serialization::Value)
 			{
 				return tonumeric( (*val.value.serialization)[0]);
 			}
@@ -236,22 +236,22 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 {
 	switch (val.type)
 	{
-		case ValueVariant::Void:
+		case papuga::ValueVariant::Void:
 			return 0.0;
-		case ValueVariant::Double:
+		case papuga::ValueVariant::Double:
 			return val.value.Double;
-		case ValueVariant::UInt:
+		case papuga::ValueVariant::UInt:
 			return val.value.UInt; 
-		case ValueVariant::Int:
+		case papuga::ValueVariant::Int:
 			return val.value.Int; 
-		case ValueVariant::String:
+		case papuga::ValueVariant::String:
 		{
 			NumParseError err;
 			double rt = doubleFromString( val.value.string, val.length(), err);
 			checkError( err, "double");
 			return rt;
 		}
-		case ValueVariant::WString:
+		case papuga::ValueVariant::WString:
 		{
 			char buf[ 64];
 			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to double"));
@@ -260,10 +260,10 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 			checkError( err, "double");
 			return rt;
 		}
-		case ValueVariant::StrusObject:
+		case papuga::ValueVariant::HostObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "double");
-		case ValueVariant::StrusSerialization:
-			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+		case papuga::ValueVariant::Serialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == papuga::Serialization::Value)
 			{
 				return todouble( (*val.value.serialization)[0]);
 			}
@@ -285,33 +285,33 @@ static TYPE variant_touint( const ValueVariant& val)
 {
 	switch (val.type)
 	{
-		case ValueVariant::Void:
+		case papuga::ValueVariant::Void:
 			return 0;
-		case ValueVariant::Double:
+		case papuga::ValueVariant::Double:
 		{
-			return (ValueVariant::UIntType)( val.value.Double + std::numeric_limits<float>::epsilon()); 
+			return (papuga::ValueVariant::UIntType)( val.value.Double + std::numeric_limits<float>::epsilon()); 
 		}
-		case ValueVariant::UInt:
-			if (val.value.UInt > (ValueVariant::UIntType)std::numeric_limits<TYPE>::max())
+		case papuga::ValueVariant::UInt:
+			if (val.value.UInt > (papuga::ValueVariant::UIntType)std::numeric_limits<TYPE>::max())
 			{
 				throw strus::runtime_error(_TXT("cannot convert value to unsigned integer (out of range)"));
 			}
 			return val.value.UInt; 
-		case ValueVariant::Int:
-			if (val.value.Int > (ValueVariant::IntType)std::numeric_limits<TYPE>::max()
+		case papuga::ValueVariant::Int:
+			if (val.value.Int > (papuga::ValueVariant::IntType)std::numeric_limits<TYPE>::max()
 			||  val.value.Int < 0)
 			{
 				throw strus::runtime_error(_TXT("cannot convert value to unsigned integer (out of range)"));
 			}
-			return (TYPE)(ValueVariant::UIntType)val.value.Int; 
-		case ValueVariant::String:
+			return (TYPE)(papuga::ValueVariant::UIntType)val.value.Int; 
+		case papuga::ValueVariant::String:
 		{
 			NumParseError err;
 			TYPE rt = uintFromString( val.value.string, val.length(), std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
 			return rt;
 		}
-		case ValueVariant::WString:
+		case papuga::ValueVariant::WString:
 		{
 			char buf[ 64];
 			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to uint"));
@@ -320,10 +320,10 @@ static TYPE variant_touint( const ValueVariant& val)
 			checkError( err, "uint");
 			return rt;
 		}
-		case ValueVariant::StrusObject:
+		case papuga::ValueVariant::HostObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "uint");
-		case ValueVariant::StrusSerialization:
-			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+		case papuga::ValueVariant::Serialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == papuga::Serialization::Value)
 			{
 				return variant_touint<TYPE>( (*val.value.serialization)[0]);
 			}
@@ -340,40 +340,40 @@ static TYPE variant_toint( const ValueVariant& val)
 {
 	switch (val.type)
 	{
-		case ValueVariant::Void:
+		case papuga::ValueVariant::Void:
 			return 0;
-		case ValueVariant::Double:
+		case papuga::ValueVariant::Double:
 			if (val.value.Double < 0.0)
 			{
 				if (val.value.Double < (double)std::numeric_limits<TYPE>::min()) throw strus::runtime_error(_TXT("cannot convert value to integer (out of range)"));
-				return (ValueVariant::IntType)(val.value.Double - std::numeric_limits<float>::epsilon()); 
+				return (papuga::ValueVariant::IntType)(val.value.Double - std::numeric_limits<float>::epsilon()); 
 			}
 			else
 			{
 				if (val.value.Double > (double)std::numeric_limits<TYPE>::max()) throw strus::runtime_error(_TXT("cannot convert value to integer (out of range)"));
-				return (ValueVariant::IntType)(val.value.Double + std::numeric_limits<float>::epsilon());
+				return (papuga::ValueVariant::IntType)(val.value.Double + std::numeric_limits<float>::epsilon());
 			}
-		case ValueVariant::UInt:
-			if (val.value.UInt > (ValueVariant::UIntType)std::numeric_limits<TYPE>::max())
+		case papuga::ValueVariant::UInt:
+			if (val.value.UInt > (papuga::ValueVariant::UIntType)std::numeric_limits<TYPE>::max())
 			{
 				throw strus::runtime_error(_TXT("cannot convert value to unsigned integer (out of range)"));
 			}
 			return val.value.UInt; 
-		case ValueVariant::Int:
-			if (val.value.Int > (ValueVariant::IntType)std::numeric_limits<int>::max()
-			||  val.value.Int < (ValueVariant::IntType)std::numeric_limits<int>::min())
+		case papuga::ValueVariant::Int:
+			if (val.value.Int > (papuga::ValueVariant::IntType)std::numeric_limits<int>::max()
+			||  val.value.Int < (papuga::ValueVariant::IntType)std::numeric_limits<int>::min())
 			{
 				throw strus::runtime_error(_TXT("cannot convert value to int (out of range)"));
 			}
 			return val.value.Int; 
-		case ValueVariant::String:
+		case papuga::ValueVariant::String:
 		{
 			NumParseError err;
 			TYPE rt = intFromString( val.value.string, val.length(), std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");
 			return rt;
 		}
-		case ValueVariant::WString:
+		case papuga::ValueVariant::WString:
 		{
 			char buf[ 64];
 			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to int"));
@@ -382,10 +382,10 @@ static TYPE variant_toint( const ValueVariant& val)
 			checkError( err, "int");
 			return rt;
 		}
-		case ValueVariant::StrusObject:
+		case papuga::ValueVariant::HostObject:
 			throw strus::runtime_error(_TXT("cannot convert value variant %s to %s"), "host object reference", "int");
-		case ValueVariant::StrusSerialization:
-			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == Serialization::Value)
+		case papuga::ValueVariant::Serialization:
+			if (val.value.serialization->size() == 1 && (*val.value.serialization)[0].tag == papuga::Serialization::Value)
 			{
 				return variant_toint<TYPE>( (*val.value.serialization)[0]);
 			}
@@ -427,17 +427,17 @@ bool ValueVariantConv::tobool( const ValueVariant& val)
 
 bool ValueVariantConv::isequal_ascii( const ValueVariant& val, const char* value)
 {
-	if (val.type == ValueVariant::String)
+	if (val.type == papuga::ValueVariant::String)
 	{
 		return (std::strlen( value) == (std::size_t)val.length()
 			&& std::memcmp( val.value.string, value, val.length()) == 0);
 	}
-	else if (val.type == ValueVariant::WString)
+	else if (val.type == papuga::ValueVariant::WString)
 	{
 		std::size_t wi = 0, we = val.length();
 		for (; wi != we; ++wi)
 		{
-			if (val.value.wstring[wi] != (ValueVariant::WCharType)(unsigned char)value[wi])
+			if (val.value.wstring[wi] != (papuga::ValueVariant::WCharType)(unsigned char)value[wi])
 			{
 				return false;
 			}
@@ -512,11 +512,11 @@ bool ValueVariantConv::try_convertToNumber( ValueVariant& val)
 {
 	if (!val.isAtomicType()) return false;
 	if (!val.isNumericType()) return true;
-	if (val.type == ValueVariant::String && val.length() < 64)
+	if (val.type == papuga::ValueVariant::String && val.length() < 64)
 	{
 		return try_convertStringToNumber( val, val.value.string, val.length());
 	}
-	if (val.type == ValueVariant::String && val.length() < 64)
+	if (val.type == papuga::ValueVariant::String && val.length() < 64)
 	{
 		char buf[ 128];
 		if (try_map2ascii( buf, sizeof(buf), val.value.wstring, val.length()))

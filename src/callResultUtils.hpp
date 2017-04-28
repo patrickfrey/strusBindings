@@ -10,9 +10,9 @@
 /// \brief Helper templates to build the CallResult structure, the uniform return value of binding methods
 /// \file callResultUtils.hpp
 #include "strus/bindingClassId.hpp"
-#include "strus/bindings/callResult.hpp"
-#include "strus/bindings/valueVariant.hpp"
-#include "strus/bindings/serialization.hpp"
+#include "papuga/callResult.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/serialization.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
 #include "impl/vector.hpp"
@@ -26,9 +26,9 @@ namespace strus {
 namespace bindings {
 
 template <typename STRUCTVALUE>
-static CallResult callResultStructureOwnership( STRUCTVALUE* st)
+static papuga::CallResult callResultStructureOwnership( STRUCTVALUE* st)
 {
-	CallResult rt;
+	papuga::CallResult rt;
 	rt.object.createOwnership( st);
 	Serializer::serialize( rt.serialization, *st);
 	rt.value.init( &rt.serialization);
@@ -36,29 +36,29 @@ static CallResult callResultStructureOwnership( STRUCTVALUE* st)
 }
 
 template <typename STRUCTVALUE>
-static CallResult callResultStructureConst( const STRUCTVALUE* st)
+static papuga::CallResult callResultStructureConst( const STRUCTVALUE* st)
 {
-	CallResult rt;
+	papuga::CallResult rt;
 	Serializer::serialize( rt.serialization, *st);
 	rt.value.init( &rt.serialization);
 	return rt;
 }
 
 template <typename STRUCTVALUE>
-static CallResult callResultStructure( const STRUCTVALUE& st)
+static papuga::CallResult callResultStructure( const STRUCTVALUE& st)
 {
-	CallResult rt;
+	papuga::CallResult rt;
 	Serializer::serialize( rt.serialization, st);
 	rt.value.init( &rt.serialization);
 	return rt;
 }
 
 template <typename OBJECT>
-static CallResult callResultObject( OBJECT* st)
+static papuga::CallResult callResultObject( OBJECT* st)
 {
-	CallResult rt;
+	papuga::CallResult rt;
 	rt.object.createOwnership( st);
-	rt.value.init( (const ValueVariant::StrusObjectType*)st, ClassIdMap::get(*st));
+	rt.value.init( (const void*)st, ClassIdMap::get(*st));
 	return rt;
 }
 
