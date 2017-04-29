@@ -18,6 +18,11 @@ namespace papuga {
 class Serialization
 {
 public:
+	Serialization()
+		:m_ar(){}
+	Serialization( const Serialization& o)
+		:m_ar(o.m_ar){}
+
 	enum Tag
 	{
 		Open,		///< Open a scope
@@ -46,14 +51,13 @@ public:
 		{}
 	};
 
-	Serialization()
-		:m_ar(){}
-	Serialization( const Serialization& o)
-		:m_ar(o.m_ar){}
-
 	void clear()
 	{
 		m_ar.clear();
+	}
+	void resize( std::size_t n)
+	{
+		m_ar.resize( n);
 	}
 	void pushOpen()
 	{

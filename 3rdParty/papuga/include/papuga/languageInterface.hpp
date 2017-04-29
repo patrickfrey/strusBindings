@@ -32,8 +32,14 @@ public:
 			const Method* methodtable;	///< (NULL,0) terminated list of methods
 		};
 
+		struct Details
+		{
+			unsigned int max_argc;
+		};
+
 		const char* name;			///< name of the project wrapped by the bindings
 		const Class* classes;			///< (0,NULL,NULL) terminated list of classes 
+		Details details;			///< some addiitional info that is useful for the interface generator
 	};
 
 	virtual ~LanguageInterface(){}

@@ -82,14 +82,14 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "#include \"strus/lib/bindings_description.hpp\"" << std::endl;
 	out << "#include \"strus/bindingClassId.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out << "#include \"internationaliation.hpp\"" << std::endl;
+	out << "#include \"internationalization.hpp\"" << std::endl;
 
 	out << "#include <cstddef>" << std::endl;
 	out
 		<< std::endl
 		<< "using namespace strus;" << std::endl
 		<< std::endl << std::endl;
-
+	int max_argc = 0;
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
@@ -102,8 +102,9 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
-			
-			out << "\t{\"" << mi->name() <<  "\", \"" << methodFunctionName(ci->name(),mi->name()) << "\", " << mi->parameters().size() << "}," << std::endl;
+			int argc = mi->parameters().size();
+			if (argc > max_argc) max_argc = argc;
+			out << "\t{\"" << mi->name() <<  "\", \"" << methodFunctionName(ci->name(),mi->name()) << "\", " << argc << "}," << std::endl;
 		}
 		out << "\t{0,0,0}" << std::endl;
 		out << "};" << std::endl;
@@ -120,7 +121,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "\t{0,0}" << std::endl;
 	out << "};" << std::endl << std::endl;
 
-	out << "static const papuga::LanguageInterface::InterfaceDescription g_descr = { \"strus\", g_classes };"
+	out << "static const papuga::LanguageInterface::InterfaceDescription g_descr = { \"strus\", g_classes, {" << max_argc << "} };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;

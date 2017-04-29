@@ -11,7 +11,7 @@
 #include "strus/lib/bindings_description.hpp"
 #include "strus/bindingClassId.hpp"
 #include "strus/base/dll_tags.hpp"
-#include "internationaliation.hpp"
+#include "internationalization.hpp"
 #include <cstddef>
 
 using namespace strus;
@@ -180,7 +180,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Class g_classes[14
 	{0,0}
 };
 
-static const papuga::LanguageInterface::InterfaceDescription g_descr = { "strus", g_classes };
+static const papuga::LanguageInterface::InterfaceDescription g_descr = { "strus", g_classes, {5} };
 
 DLL_PUBLIC const papuga::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()
 {
