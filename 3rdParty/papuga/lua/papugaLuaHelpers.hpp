@@ -1,5 +1,14 @@
 #include <lua.h>
 
+enum LuaErrorCode
+{
+	ErrLogic=1,
+	ErrNoMem=2,
+	ErrType=3,
+	ErrNofArgs=4,
+	ErrDeep=5
+};
+
 struct Arguments
 {
 	Arguments( lua_State *ls)
