@@ -61,5 +61,4 @@ src/strusLua
 
 # Generated test data
 tests/query_cpp/storage/
-
 lang/

@@ -5,7 +5,7 @@ import os
 from testCollection import createCollection
 
 queryphrase = "New York dimensions imagine"
-createCollection()
+createCollection( "./data", "storage")
 
 storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
 config = "path=%s" % (storagePath)

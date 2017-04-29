@@ -2,10 +2,10 @@
 
 import strus
 import os
-from testCollection import createCollection
+from testCollection import createCollectionSmart
 
-queryphrase = "city"
-createCollection( "./data", "storage")
+queryphrase = "brothers"
+createCollectionSmart( "./data_smart", "storage")
 
 storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
 config = "path=%s" % (storagePath)
@@ -26,12 +26,18 @@ try:
 	queryEval.addSelectionFeature( "select")
 	
 	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
-	queryEval.addWeightingFunction( "BM25", (("k1",0.75), ("b",2.1), ("avgdoclen", 1000), (".match", "seek")))
-
+	queryEval.addWeightingFunction( "smart", (("function", "df * ff * variable1 / meta1"), ("metadata","meta1"), (".match", "seek")) )
+	queryEval.addWeightingFunction( "smart", (("function", "df * ff * variable2 / meta2"), ("metadata","meta2"), (".match", "seek")) )
+	queryEval.addWeightingFunction( "smart", (("function", "df * ff * variable3 / meta3"), ("metadata","meta3"), (".match", "seek")) )
+	queryEval.addWeightingFormula( "d0 * _0 / frac0 + d1 * _1 / frac1 + d2 * _2 / frac2", (("d0",0.1),("d1",0.2),("d2",0.3)) )
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
 	# First we add a summarizer that extracts us the title of the document:
 	queryEval.addSummarizer( "attribute", [("name", "title")])
+	queryEval.addSummarizer( "smart", (("function", "df * ff"), ("$FFDF","weight"), ("metadata","meta3"), (".match", "seek")) )
+	queryEval.addSummarizer( "smart", (("function", "df * ff * variable1 / meta1"), ("$S1","weight"), ("metadata","meta1"), (".match", "seek")) )
+	queryEval.addSummarizer( "smart", (("function", "df * ff * variable2 / meta2"), ("$S2","weight"), ("metadata","meta2"), (".match", "seek")) )
+	queryEval.addSummarizer( "smart", (("function", "df * ff * variable3 / meta3"), ("$S3","weight"), ("metadata","meta3"), (".match", "seek")) )
 
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
@@ -74,7 +80,14 @@ try:
 	# Define the index of the first rank (for implementing scrolling: 0 for the first, 
 	# 20 for the 2nd, 40 for the 3rd page, etc.):
 	query.setMinRank( 0)
-	
+
+	query.setWeightingVariables(
+		(
+		("variable1",7), ("variable2",13), ("variable3",17),
+		("frac0", 3.5), ("frac1", 6.5), ("frac2", 8.5)
+		)
+	)
+
 	# Now we evaluate the query and iterate on the result to display them:
 	results = query.evaluate()
 	pos = 0

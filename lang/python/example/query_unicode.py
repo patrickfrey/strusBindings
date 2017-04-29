@@ -1,13 +1,14 @@
 #!/usr/bin/python
+# coding=UTF-8
 
 import strus
 import os
 from testCollection import createCollection
 
-queryphrase = "city"
-createCollection( "./data", "storage")
+queryphrase = unicode(u'风雷动').encode('utf-8')
+createCollection( "./data_unicode", "storage_unicode")
 
-storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage"
+storagePath = os.environ[ "PYTHONPATH" ] + "/example/storage_unicode"
 config = "path=%s" % (storagePath)
 ctx = strus.Context()
 
@@ -17,8 +18,8 @@ try:
 	
 	# Define the query analyzer to use:
 	analyzer = ctx.createQueryAnalyzer()
-	analyzer.addSearchIndexElement( "word", "word", "word", (("stem","en"),"lc",("convdia","en")))
-	
+	analyzer.addSearchIndexElement( "word", "word", "word", "orig")
+
 	# Define the query evaluation scheme:
 	queryEval = ctx.createQueryEval()
 
@@ -32,10 +33,6 @@ try:
 	# The functions that extract stuff from documents for presentation are called summarizers.
 	# First we add a summarizer that extracts us the title of the document:
 	queryEval.addSummarizer( "attribute", [("name", "title")])
-
-	# Then we add a summarizer that collects the sections that enclose the best matches 
-	# in a ranked document:
-	queryEval.addSummarizer( "matchphrase", (("type","orig"),("sentencesize",40),("windowsize",30),(".match","seek")))
 
 	# Now we build the query to issue:
 	query = queryEval.createQuery( storage)
