@@ -3,6 +3,10 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # SOURCES AND INCLUDES
 # --------------------------------------
+set( lua_source_files
+        libpapuga_lua.cpp
+)
+
 set( source_files
         libpapuga_lua.cpp
 )
