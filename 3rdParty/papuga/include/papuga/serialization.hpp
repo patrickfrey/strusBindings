@@ -33,7 +33,8 @@ public:
 	struct Node :public ValueVariant
 	{
 		Tag tag;
-
+		Node()
+			:ValueVariant(),tag(Value){}
 		Node( const Tag& tag_, const ValueVariant& value_)
 			:ValueVariant(value_),tag(tag_)
 		{}

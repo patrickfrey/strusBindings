@@ -4,6 +4,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # SOURCES AND INCLUDES
 # --------------------------------------
 set( lua_source_files
+	papugaLuaHelpers.cpp
         libpapuga_lua.cpp
 )
 
@@ -13,6 +14,7 @@ set( source_files
 
 include_directories(
 	"${Intl_INCLUDE_DIRS}"
+	"${PROJECT_SOURCE_DIR}/3rdParty/lua"
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
