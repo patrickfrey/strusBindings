@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # include(cmake/install_prefix.cmake)
 
 # Project globals:
-project( papuga )
+# project( papuga )
 
 set( PAPUGA_MAJOR_VERSION 0 )
 set( PAPUGA_MINOR_VERSION 0 )
@@ -16,7 +16,10 @@ set( PAPUGA_VERSION ${PAPUGA_MAJOR_VERSION}.${PAPUGA_MINOR_VERSION}.${PAPUGA_PAT
 # include( cmake/build_rules.cmake )
 # include( cmake/intl.cmake )
 
+configure_file( "${PROJECT_SOURCE_DIR}/include/papuga/version.h.in"   "${PROJECT_SOURCE_DIR}/include/papuga/version.h"   @ONLY )
+
 # Subdirectories:
+add_subdirectory( src )
 add_subdirectory( lua )
   
 # include( cmake/report_build_settings.cmake )

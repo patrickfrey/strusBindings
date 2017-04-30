@@ -99,12 +99,13 @@ private:
 			case LUA_TBOOLEAN:	result.pushValue( (ValueVariant::IntType)lua_toboolean( ls, ai)); break;
 			case LUA_TSTRING:	result.pushValue( lua_tostring( ls, ai)); break;
 			case LUA_TTABLE:	result.pushOpen(); serialize( result, ls, ai); result.pushClose(); break;
-			case LUA_TFUNCTION:	errcode = ErrType; goto ERROR;
-			case LUA_TUSERDATA:	errcode = ErrType; goto ERROR;
-			case LUA_TTHREAD:	errcode = ErrType; goto ERROR;
-			case LUA_TLIGHTUSERDATA:errcode = ErrType; goto ERROR;
-			default:		errcode = ErrType; goto ERROR;
+			case LUA_TFUNCTION:	errcode = ErrType; return false;
+			case LUA_TUSERDATA:	errcode = ErrType; return false;
+			case LUA_TTHREAD:	errcode = ErrType; return false;
+			case LUA_TLIGHTUSERDATA:errcode = ErrType; return false;
+			default:		errcode = ErrType; return false;
 		}
+		return true;
 	}
 	
 	static bool try_serialize_array( Serialization& result, lua_State* ls, int ai)
