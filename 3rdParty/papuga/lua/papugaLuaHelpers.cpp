@@ -1,4 +1,13 @@
 #include <lua.h>
+#include <cstddef>
+#include <list>
+#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.hpp"
+#include "papuga/serialization.hpp"
+
+#define MAX_NOF_ARGUMENTS 32
+
+using namespace papuga;
 
 enum LuaErrorCode
 {
@@ -30,14 +39,16 @@ struct Arguments
 				case LUA_TBOOLEAN:	argv[ai].init( (bool)lua_toboolean( ls, ai)); break;
 				case LUA_TSTRING:	argv[ai].init( lua_tostring( ls, ai)); break;
 				case LUA_TTABLE:	serialize( ls, ai); if (errcode) {if (errcode != ErrLogic && errcode != ErrNoMem) errcode=ErrDeep; goto ERROR;} break;
-				case LUA_TFUNCTION:	errcode = ErrType; goto ERROR;
-				case LUA_TUSERDATA:	errcode = ErrType; goto ERROR;
-				case LUA_TTHREAD:	errcode = ErrType; goto ERROR;
-				case LUA_TLIGHTUSERDATA:errcode = ErrType; goto ERROR;
-				default:		errcode = ErrType; goto ERROR;
+				case LUA_TFUNCTION:	goto ERROR;
+				case LUA_TUSERDATA:	goto ERROR;
+				case LUA_TTHREAD:	goto ERROR;
+				case LUA_TLIGHTUSERDATA:goto ERROR;
+				default:		goto ERROR;
 			}
 		}
-		return ae;
+	ERROR:
+		erridx = ai;
+		errcode = ErrType;
 	}
 
 	int erridx;
@@ -61,7 +72,7 @@ private:
 		}
 	}
 
-	static bool serialize_key( Serialization& result, lua_State* ls, int ai)
+	bool serialize_key( Serialization& result, lua_State* ls, int ai)
 	{
 		switch (lua_type (ls, ai))
 		{
@@ -79,7 +90,7 @@ private:
 		return true;
 	}
 
-	static bool serialize_value( Serialization& result, lua_State* ls, int ai)
+	bool serialize_value( Serialization& result, lua_State* ls, int ai)
 	{
 		switch (lua_type (ls, ai))
 		{

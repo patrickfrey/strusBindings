@@ -5,7 +5,6 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 set( lua_source_files
 	papugaLuaHelpers.cpp
-        libpapuga_lua.cpp
 )
 
 set( source_files
@@ -14,14 +13,14 @@ set( source_files
 
 include_directories(
 	"${Intl_INCLUDE_DIRS}"
-	"${PROJECT_SOURCE_DIR}/3rdParty/lua"
+	/home/patrick/Projects/github/strusBindings/3rdParty/lua
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
 # ------------------------------
 # LIBRARIES
 # ------------------------------
-add_library( papuga_lua SHARED ${source_files} )
+add_library( papuga_lua SHARED ${source_files} ${lua_source_files} )
 target_link_libraries( papuga_lua )
 
 set_target_properties(

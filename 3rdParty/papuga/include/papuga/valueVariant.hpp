@@ -68,6 +68,7 @@ struct ValueVariant
 	}
 	~ValueVariant(){}
 
+	void init()							{value.Int = 0; type = Void; attribute.length=0;}
 	void init( bool Boolean_)					{value.Int = Boolean_; type = Int; attribute.length=0;}
 	void init( double Double_)					{value.Double = Double_; type = Double; attribute.length=0;}
 	void init( uint64_t UInt_)					{value.UInt = UInt_; type = UInt; attribute.length=0;}

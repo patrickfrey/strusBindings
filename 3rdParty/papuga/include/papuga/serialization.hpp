@@ -76,6 +76,10 @@ public:
 	{
 		m_ar.push_back( Node( Name, tagname));
 	}
+	void pushName( const ValueVariant& name)
+	{
+		m_ar.push_back( Node( Name, name));
+	}
 	void pushValue( const ValueVariant& val)
 	{
 		m_ar.push_back( Node( Value, val));
