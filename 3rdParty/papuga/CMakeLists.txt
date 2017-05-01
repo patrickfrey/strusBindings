@@ -16,7 +16,7 @@ set( PAPUGA_VERSION ${PAPUGA_MAJOR_VERSION}.${PAPUGA_MINOR_VERSION}.${PAPUGA_PAT
 # include( cmake/build_rules.cmake )
 # include( cmake/intl.cmake )
 
-configure_file( "${PROJECT_SOURCE_DIR}/include/papuga/version.h.in"   "${PROJECT_SOURCE_DIR}/include/papuga/version.h"   @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/3rdParty/papuga/include/papuga/version.h.in"   "${PROJECT_SOURCE_DIR}/3rdParty/papuga/include/papuga/version.h"   @ONLY )
 
 # Subdirectories:
 add_subdirectory( src )

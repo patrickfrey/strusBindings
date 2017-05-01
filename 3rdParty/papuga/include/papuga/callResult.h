@@ -5,88 +5,41 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _PAPUGA_CALL_RESULT_HPP_INCLUDED
-#define _PAPUGA_CALL_RESULT_HPP_INCLUDED
+#ifndef _PAPUGA_CALL_RESULT_H_INCLUDED
+#define _PAPUGA_CALL_RESULT_H_INCLUDED
 /// \brief Representation of a result of a call to papuga language bindings
-/// \file callResult.hpp
-#include "papuga/valueVariant.hpp"
-#include "papuga/serialization.hpp"
-#include "papuga/hostObjectReference.hpp"
-#include <string>
-#include <cstring>
-#include <cstdarg>
-#include <cstdio>
+/// \file callResult.h
+#include "papuga/typedefs.h"
 
-namespace papuga {
-
-class CallResult
-{
-public:
-	CallResult()
-		:value(),object(),serialization(),stringbuf()
-	{
-		m_errorbuf[0] = 0;
-	}
-	CallResult( const CallResult& o)
-		:value(o.value),object(o.object),serialization(o.serialization),stringbuf(o.stringbuf)
-	{
-		if (o.m_errorbuf[0])
-		{
-			std::strncpy( m_errorbuf, o.m_errorbuf, sizeof(m_errorbuf));
-			m_errorbuf[ sizeof(m_errorbuf)-1] = 0;
-		}
-		else
-		{
-			m_errorbuf[0] = 0;
-		}
-	}
-
-	CallResult( int val)
-		:value((ValueVariant::IntType)val),object(),serialization(),stringbuf()
-		{m_errorbuf[0] = 0;}
-
-	CallResult( unsigned int val)
-		:value((ValueVariant::UIntType)val),object(),serialization(),stringbuf()
-		{m_errorbuf[0] = 0;}
-
-	CallResult( double val)
-		:value(val),object(),serialization(),stringbuf()
-		{m_errorbuf[0] = 0;}
-
-	CallResult( const std::string& val)
-		:value(),object(),serialization(),stringbuf(val)
-		{m_errorbuf[0] = 0; value.init( stringbuf);}
-
-	void reportError( const char* fmt, ...)
-	{
-		va_list ap;
-		va_start(ap, fmt);
-		std::vsnprintf( m_errorbuf, sizeof(m_errorbuf), fmt, ap);
-		va_end(ap);
-	}
-	bool hasError() const
-	{
-		return m_errorbuf[0] != 0;
-	}
-	const char* lastError() const
-	{
-		return m_errorbuf;
-	}
-
-public:
-	ValueVariant value;
-	HostObjectReference object;
-	Serialization serialization;
-	std::string stringbuf;
-
-public:
-	enum {MaxErrorMessageSize=1024};
-
-private:
-	char m_errorbuf[ MaxErrorMessageSize];
-};
-
-}//namespace
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+void papuga_init_CallResult( papuga_CallResult* self);
+void papuga_init_CallResult_int( papuga_CallResult* self, papuga_IntType val);
+void papuga_init_CallResult_uint( papuga_CallResult* self, papuga_UIntType val);
+void papuga_init_CallResult_double( papuga_CallResult* self, double val);
+void papuga_init_CallResult_bool( papuga_CallResult* self, bool val);
+void papuga_init_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize);
+void papuga_init_CallResult_string_const( papuga_CallResult* self, const char* val, size_t valsize);
+void papuga_init_CallResult_charp( papuga_CallResult* self, const char* val);
+void papuga_init_CallResult_charp_const( papuga_CallResult* self, const char* val);
+void papuga_init_CallResult_langstring_const( papuga_CallResult* self, papuga_StringEncoding enc, const void* val, size_t valsize);
+void papuga_init_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_HostObjectDeleter destroy);
+void papuga_init_CallResult_langobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy);
+void papuga_init_CallResult_serialization( papuga_CallResult* self);
+void papuga_init_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy);
+
+void papuga_destroy_CallResult( papuga_CallResult* self);
+
+void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ...);
+#define papuga_CallResult_hasError( self)		((self)->errorbuf[0] != 0)
+#define papuga_CallResult_lastError( self)		((self)->errorbuf)
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 
 

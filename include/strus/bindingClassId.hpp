@@ -14,19 +14,20 @@ namespace strus {
 
 enum BindingsClassId
 {
-	ClassContext=0x0,
-	ClassDocumentAnalyzer=0x1,
-	ClassQueryAnalyzer=0x2,
-	ClassQueryEval=0x3,
-	ClassQuery=0x4,
-	ClassStorageClient=0x05,
-	ClassStorageTransaction=0x06,
-	ClassStatisticsProcessor=0x07,
-	ClassStatisticsIterator=0x08,
-	ClassDocumentBrowser=0x09,
-	ClassVectorStorageSearcher=0x10,
-	ClassVectorStorageClient=0x11,
-	ClassVectorStorageTransaction=0x12
+	ClassNone=0x00,
+	ClassContext=0x01,
+	ClassDocumentAnalyzer=0x02,
+	ClassQueryAnalyzer=0x03,
+	ClassQueryEval=0x04,
+	ClassQuery=0x05,
+	ClassStorageClient=0x06,
+	ClassStorageTransaction=0x07,
+	ClassStatisticsProcessor=0x08,
+	ClassStatisticsIterator=0x09,
+	ClassDocumentBrowser=0x0a,
+	ClassVectorStorageSearcher=0x0b,
+	ClassVectorStorageClient=0x0c,
+	ClassVectorStorageTransaction=0x0d
 };
 
 }//namespace

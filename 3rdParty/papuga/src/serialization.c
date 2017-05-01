@@ -8,19 +8,26 @@
 /// \brief Serialization of structures for papuga language bindings
 /// \file serialization.c
 #include "papuga/serialization.h"
+#include "papuga/valueVariant.h"
 #include <stdlib.h>
+#include <string.h>
 
 static bool alloc_nodes( papuga_Serialization* self, size_t addsize)
 {
 	size_t newsize = self->arsize + addsize;
 	if (newsize < self->arsize) return false;
-	size_t mm = self->arsize * 2;
-	while (mm > self->arsize && mm < newsize) mm *= 2;
-	mm *= sizeof(papuga_Node);
-	if (mm < newsize) return false;
-	papuga_Node* newmem = (papuga_Node*)realloc( self->ar, mm);
-	if (newmem == NULL) return false;
-	self->ar = newmem;
+	if (newsize > self->allocsize)
+	{
+		size_t mm = self->allocsize ? (self->allocsize * 2) : 256;
+		while (mm > self->allocsize && mm < newsize) mm *= 2;
+		size_t newallocsize = mm;
+		mm *= sizeof(papuga_Node);
+		if (mm < newsize) return false;
+		papuga_Node* newmem = (papuga_Node*)realloc( self->ar, mm);
+		if (newmem == NULL) return false;
+		self->ar = newmem;
+		self->allocsize = newallocsize;
+	}
 	return true;
 }
 
@@ -43,19 +50,19 @@ static inline bool add_nodes( papuga_Serialization* self, const papuga_Node* ar,
 #define PUSH_NODE_1(self,TAG,CONV,p1)\
 	papuga_Node nd;\
 	nd.tag = TAG;\
-	CONV( &nd, p1);\
+	CONV( &nd.value, p1);\
 	return add_node( self, nd);
 
 #define PUSH_NODE_2(self,TAG,CONV,p1,p2)\
 	papuga_Node nd;\
 	nd.tag = TAG;\
-	CONV( &nd, p1, p2);\
+	CONV( &nd.value, p1, p2);\
 	return add_node( self, nd);
 
 #define PUSH_NODE_3(self,TAG,CONV,p1,p2,p3)\
 	papuga_Node nd;\
 	nd.tag = TAG;\
-	CONV( &nd, p1, p2, p3);\
+	CONV( &nd.value, p1, p2, p3);\
 	return add_node( self, nd);
 
 
@@ -63,7 +70,7 @@ bool papuga_Serialization_pushOpen( papuga_Serialization* self)
 {
 	papuga_Node nd;
 	nd.tag = papuga_TagOpen;
-	nd.value.init();
+	papuga_init_ValueVariant( &nd.value);
 	return add_node( self, nd);
 }
 
@@ -71,7 +78,7 @@ bool papuga_Serialization_pushClose( papuga_Serialization* self)
 {
 	papuga_Node nd;
 	nd.tag = papuga_TagClose;
-	nd.value.init();
+	papuga_init_ValueVariant( &nd.value);
 	return add_node( self, nd);
 }
 
@@ -122,24 +129,19 @@ bool papuga_Serialization_pushValue_double( papuga_Serialization* self, double v
 
 bool papuga_Serialization_append( papuga_Serialization* self, const papuga_Serialization* o)
 {
-	return add_nodes( self, o.ar, o.arsize);
+	return add_nodes( self, o->ar, o->arsize);
 }
 
 bool papuga_Serialization_islabeled( const papuga_Serialization* self)
 {
-	papuga_Node const* nd;
-	size_t ni = 0, ne = self.arsize;
+	size_t ni = 0, ne = self->arsize;
 	for (; ni != ne; ++ni)
 	{
-		if (ni->tag == papuga_TagName) return true;
-		if (ni->tag == papuga_TagValue) return false;
+		if (self->ar[ni].tag == papuga_TagName) return true;
+		if (self->ar[ni].tag == papuga_TagValue) return false;
 	}
 	return false;
 }
 
-#ifdef __cplusplus
-}
-#endif
-#endif
 
 

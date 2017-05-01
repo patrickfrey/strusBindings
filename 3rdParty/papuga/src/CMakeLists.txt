@@ -4,8 +4,10 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # SOURCES AND INCLUDES
 # --------------------------------------
 set( source_files
-	valueVariant.c
+	stringBuffer.c
+	valueVariant.cpp
 	serialization.c
+	callResult.c
 )
 
 include_directories(
