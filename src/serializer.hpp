@@ -9,7 +9,7 @@
 #define _STRUS_BINDINGS_SERIALIZER_HPP_INCLUDED
 /// \brief Serializers of all data types needed for the language bindings
 /// \file serializer.hpp
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "strus/numericVariant.hpp"
 #include "strus/analyzer/document.hpp"
 #include "strus/analyzer/query.hpp"
@@ -27,6 +27,7 @@
 #include <vector>
 #include <utility>
 #include <cstring>
+#include <stdexcept>
 
 namespace strus {
 namespace bindings {
@@ -34,102 +35,114 @@ namespace bindings {
 class Serializer
 {
 public:
-	static inline void serialize( papuga::Serialization& result, const double& val)
+	template<typename SERVAL>
+	static void serialize( papuga_Serialization* result, const SERVAL& param)
 	{
-		result.pushValue( papuga::ValueVariant( val));
+		if (!serialize_nothrow( result, param)) throw std::bad_alloc();
 	}
-	static inline void serialize( papuga::Serialization& result, const papuga::ValueVariant::IntType& val)
+
+	static inline bool serialize_nothrow( papuga_Serialization* result, const double& val)
 	{
-		result.pushValue( papuga::ValueVariant( val));
+		return papuga_Serialization_pushValue_double( result, val);
 	}
-	static inline void serialize_int( papuga::Serialization& result, const papuga::ValueVariant::IntType& val)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_IntType& val)
 	{
-		result.pushValue( papuga::ValueVariant( (papuga::ValueVariant::IntType)val));
+		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline void serialize( papuga::Serialization& result, const papuga::ValueVariant::UIntType& val)
+	static inline bool serialize_int( papuga_Serialization* result, const papuga_IntType& val)
 	{
-		result.pushValue( papuga::ValueVariant( val));
+		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline void serialize_uint( papuga::Serialization& result, const papuga::ValueVariant::UIntType& val)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_UIntType& val)
 	{
-		result.pushValue( papuga::ValueVariant( (papuga::ValueVariant::UIntType)val));
+		return papuga_Serialization_pushValue_uint( result, val);
 	}
-	static inline void serialize( papuga::Serialization& result, const bool& val)
+	static inline bool serialize_uint( papuga_Serialization* result, const papuga_UIntType& val)
 	{
-		result.pushValue( papuga::ValueVariant( (papuga::ValueVariant::IntType)val));
+		return papuga_Serialization_pushValue_uint( result, val);
 	}
-	static inline void serialize_bool( papuga::Serialization& result, const bool& val)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const bool& val)
 	{
-		result.pushValue( papuga::ValueVariant( (papuga::ValueVariant::IntType)val));
+		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline void serialize( papuga::Serialization& result, const std::string& val)
+	static inline bool serialize_bool( papuga_Serialization* result, const bool& val)
 	{
-		result.pushValue( papuga::ValueVariant( val));
+		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline void serialize( papuga::Serialization& result, const char* val)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const std::string& val)
 	{
-		result.pushValue( papuga::ValueVariant( val));
+		return papuga_Serialization_pushValue_string( result, val.c_str(), val.size());
 	}
-	static inline void serialize( papuga::Serialization& result, const char* val, std::size_t valsize)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const char* val)
 	{
-		result.pushValue( papuga::ValueVariant( val, valsize));
+		return papuga_Serialization_pushValue_charp( result, val);
 	}
-	static void serialize( papuga::Serialization& result, const NumericVariant& val);
+	static inline bool serialize_nothrow( papuga_Serialization* result, const char* val, std::size_t valsize)
+	{
+		return papuga_Serialization_pushValue_string( result, val, valsize);
+	}
+	static bool serialize_nothrow( papuga_Serialization* result, const NumericVariant& val);
 
 	typedef std::vector<std::pair<std::string,std::string> > ConfigurationItemList;
-	static void serialize( papuga::Serialization& result, const ConfigurationItemList& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val);
 
 	typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
-	static void serialize( papuga::Serialization& result, const DocumentFrequencyChange& val);
-	static void serialize( papuga::Serialization& result, const analyzer::Term& val);
-	static void serialize( papuga::Serialization& result, const analyzer::Attribute& val);
-	static void serialize( papuga::Serialization& result, const analyzer::MetaData& val);
-	static void serialize( papuga::Serialization& result, const analyzer::DocumentClass& val);
-	static void serialize( papuga::Serialization& result, const VectorStorageSearchInterface::Result& val);
-	static void serialize( papuga::Serialization& result, const SummaryElement& val);
-	static void serialize( papuga::Serialization& result, const analyzer::Document& val);
-	static void serialize( papuga::Serialization& result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators, bool labeled);
-	static void serialize( papuga::Serialization& result, const ResultDocument& val);
-	static void serialize( papuga::Serialization& result, const QueryResult& val);
-	static void serialize( papuga::Serialization& result, const std::vector<VectorStorageSearchInterface::Result>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<analyzer::Term>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<std::string>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<int>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<double>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<analyzer::MetaData>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<analyzer::Attribute>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<StatisticsViewerInterface::DocumentFrequencyChange>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<strus::SummaryElement>& val);
-	static void serialize( papuga::Serialization& result, const std::vector<ResultDocument>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const DocumentFrequencyChange& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Term& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Attribute& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::MetaData& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const VectorStorageSearchInterface::Result& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators, bool labeled);
+	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorStorageSearchInterface::Result>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Term>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::MetaData>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Attribute>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<StatisticsViewerInterface::DocumentFrequencyChange>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val);
 
 	template <typename TYPE>
-	static void serializeStructMember( papuga::Serialization& result, const char* tagname, const TYPE& val)
+	static bool serializeStructMember( papuga_Serialization* result, const char* tagname, const TYPE& val)
 	{
-		result.pushName( tagname);
-		serialize( result, val);
+		bool rt = true;
+		rt &= papuga_Serialization_pushName_charp( result, tagname);
+		rt &= serialize_nothrow( result, val);
+		return rt;
 	}
 
 private:
 	template <typename TYPE>
-	static void serializeArray( papuga::Serialization& result, const std::vector<TYPE>& val)
+	static bool serializeArray( papuga_Serialization* result, const std::vector<TYPE>& val)
 	{
-		result.pushOpen();
+		bool rt = true;
+		rt &= papuga_Serialization_pushOpen( result);
 		typename std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			serialize( result, *vi);
+			rt &= serialize_nothrow( result, *vi);
 		}
-		result.pushClose();
+		rt &= papuga_Serialization_pushClose( result);
+		return rt;
 	}
-	static void serializeIntArray( papuga::Serialization& result, const std::vector<int>& val)
+	static bool serializeIntArray( papuga_Serialization* result, const std::vector<int>& val)
 	{
-		result.pushOpen();
+		bool rt = true;
+		rt &= papuga_Serialization_pushOpen( result);
 		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			serialize( result, (papuga::ValueVariant::IntType)*vi);
+			rt &= serialize_nothrow( result, (papuga_IntType)*vi);
 		}
-		result.pushClose();
+		rt &= papuga_Serialization_pushClose( result);
+		return rt;
 	}
 };
 

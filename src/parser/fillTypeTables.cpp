@@ -53,10 +53,10 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "const std::string& $val=\"\"")
 		("argv_default", "std::string()")
-		("argv_map", "ValueVariantConv::tostring( $value)")
+		("argv_map", "papuga::ValueVariant_tostring( $value)")
 	;
 	typesystem.defineType( "const std::string&")
-		("argv_map", "ValueVariantConv::tostring( $value)")
+		("argv_map", "papuga::ValueVariant_tostring( $value)")
 	;
 	typesystem.defineType( "const char*")
 		("argv_decl", "std::string $name;")

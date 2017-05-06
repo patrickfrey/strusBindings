@@ -45,7 +45,6 @@ set( lua_source_files
 )
 
 set( bindingsimpl_source_files
-        valueVariantConv.cpp
 	expressionBuilder.cpp
 	patternMatcherLoader.cpp
 	structNameMap.cpp
@@ -53,8 +52,8 @@ set( bindingsimpl_source_files
 	metadataop.cpp
 	serializer.cpp
 	deserializer.cpp
-	testcheck.cpp
-	wcharString.cpp
+	papugaErrorException.cpp
+	valueVariantWrap.cpp
 	utils.cpp
 	traceUtils.cpp
 	internationalization.cpp

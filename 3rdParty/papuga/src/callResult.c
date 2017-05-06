@@ -19,74 +19,12 @@
 
 static void init_CallResult_structures( papuga_CallResult* self)
 {
+	papuga_init_ValueVariant( &self->value);
 	papuga_init_HostObjectReference( &self->object, 0, 0);
 	papuga_init_Serialization( &self->serialization);
 	papuga_init_StringBuffer( &self->valuebuf);
 	self->errorbuf[0] = 0;
 }
-
-void papuga_init_CallResult( papuga_CallResult* self)
-{
-	papuga_init_ValueVariant( &self->value);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_int( papuga_CallResult* self, papuga_IntType val)
-{
-	papuga_init_ValueVariant_int( &self->value, val);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_uint( papuga_CallResult* self, papuga_UIntType val)
-{
-	papuga_init_ValueVariant_uint( &self->value, val);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_double( papuga_CallResult* self, double val)
-{
-	papuga_init_ValueVariant_double( &self->value, val);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_bool( papuga_CallResult* self, bool val)
-{
-	papuga_init_ValueVariant_bool( &self->value, val);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize)
-{
-	char* val_copy = papuga_StringBuffer_copy_string( &self->valuebuf, val, valsize);
-	papuga_init_ValueVariant_string( &self->value, val_copy, valsize);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_string_const( papuga_CallResult* self, const char* val, size_t valsize)
-{
-	papuga_init_ValueVariant_string( &self->value, val, valsize);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_charp( papuga_CallResult* self, const char* val)
-{
-	char* val_copy = papuga_StringBuffer_copy_charp( &self->valuebuf, val);
-	papuga_init_ValueVariant_charp( &self->value, val_copy);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_charp_const( papuga_CallResult* self, const char* val)
-{
-	papuga_init_ValueVariant_charp( &self->value, val);
-	init_CallResult_structures( self);
-}
-
-void papuga_init_CallResult_langstring_const( papuga_CallResult* self, papuga_StringEncoding enc, const void* val, size_t valsize)
-{
-	papuga_init_ValueVariant_langstring( &self->value, enc, val, valsize);
-	init_CallResult_structures( self);
-}
-
 
 void papuga_destroy_CallResult( papuga_CallResult* self)
 {
@@ -95,24 +33,78 @@ void papuga_destroy_CallResult( papuga_CallResult* self)
 	papuga_destroy_StringBuffer( &self->valuebuf);
 }
 
-void papuga_init_CallResult_serialization( papuga_CallResult* self)
+void papuga_init_CallResult( papuga_CallResult* self, char* errorbuf, size_t errorbufsize)
+{
+	init_CallResult_structures( self);
+	self->errorbuf = errorbuf;
+	self->errorbufsize = errorbufsize;
+}
+
+void papuga_set_CallResult_int( papuga_CallResult* self, papuga_IntType val)
+{
+	papuga_init_ValueVariant_int( &self->value, val);
+}
+
+void papuga_set_CallResult_uint( papuga_CallResult* self, papuga_UIntType val)
+{
+	papuga_init_ValueVariant_uint( &self->value, val);
+}
+
+void papuga_set_CallResult_double( papuga_CallResult* self, double val)
+{
+	papuga_init_ValueVariant_double( &self->value, val);
+}
+
+void papuga_set_CallResult_bool( papuga_CallResult* self, bool val)
+{
+	papuga_init_ValueVariant_bool( &self->value, val);
+}
+
+void papuga_set_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize)
+{
+	char* val_copy = papuga_StringBuffer_copy_string( &self->valuebuf, val, valsize);
+	papuga_init_ValueVariant_string( &self->value, val_copy, valsize);
+}
+
+void papuga_set_CallResult_string_const( papuga_CallResult* self, const char* val, size_t valsize)
+{
+	papuga_init_ValueVariant_string( &self->value, val, valsize);
+}
+
+void papuga_set_CallResult_charp( papuga_CallResult* self, const char* val)
+{
+	char* val_copy = papuga_StringBuffer_copy_charp( &self->valuebuf, val);
+	papuga_init_ValueVariant_charp( &self->value, val_copy);
+}
+
+void papuga_set_CallResult_charp_const( papuga_CallResult* self, const char* val)
+{
+	papuga_init_ValueVariant_charp( &self->value, val);
+}
+
+void papuga_set_CallResult_langstring_const( papuga_CallResult* self, papuga_StringEncoding enc, const void* val, size_t valsize)
+{
+	papuga_init_ValueVariant_langstring( &self->value, enc, val, valsize);
+}
+
+void papuga_set_CallResult_serialization( papuga_CallResult* self)
 {
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 
-void papuga_init_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy)
+void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy)
 {
 	papuga_init_HostObjectReference( &self->object, data, destroy);
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 
-void papuga_init_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_HostObjectDeleter destroy)
+void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_HostObjectDeleter destroy)
 {
 	papuga_init_HostObjectReference( &self->object, data, destroy);
 	papuga_init_ValueVariant_hostobj( &self->value, data, classid);
 }
 
-void papuga_init_CallResult_langobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy)
+void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy)
 {
 	papuga_init_HostObjectReference( &self->object, data, destroy);
 	papuga_init_ValueVariant_hostobj( &self->value, data, 0);
@@ -122,7 +114,7 @@ void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ..
 {
 	va_list ap;
 	va_start(ap, msg);
-	vsnprintf( self->errorbuf, sizeof(self->errorbuf), msg, ap);
+	vsnprintf( self->errorbuf, self->errorbufsize, msg, ap);
 	va_end(ap);
 }
 

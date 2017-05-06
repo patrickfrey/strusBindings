@@ -50,7 +50,7 @@ struct MetaDataRangeDef
 struct ConfigDef
 {
 	std::string name;
-	papuga::ValueVariant value;
+	papuga_ValueVariant value;
 
 	ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
 	ConfigDef( const ConfigDef& o)

@@ -47,6 +47,12 @@ static inline bool add_nodes( papuga_Serialization* self, const papuga_Node* ar,
 	return true;
 }
 
+#define PUSH_NODE_0(self,TAG,CONV)\
+	papuga_Node nd;\
+	nd.tag = TAG;\
+	CONV( &nd.value);\
+	return add_node( self, nd);
+
 #define PUSH_NODE_1(self,TAG,CONV,p1)\
 	papuga_Node nd;\
 	nd.tag = TAG;\
@@ -82,8 +88,11 @@ bool papuga_Serialization_pushClose( papuga_Serialization* self)
 	return add_node( self, nd);
 }
 
+bool papuga_Serialization_pushName_void( papuga_Serialization* self)
+	{PUSH_NODE_0(self,papuga_TagName,papuga_init_ValueVariant)}
+
 bool papuga_Serialization_pushName( papuga_Serialization* self, const papuga_ValueVariant* name)
-	{PUSH_NODE_1(self,papuga_TagName,papuga_assign_ValueVariant,name)}
+	{PUSH_NODE_1(self,papuga_TagName,papuga_init_ValueVariant_copy,name)}
 
 bool papuga_Serialization_pushName_string( papuga_Serialization* self, const char* name, int namelen)
 	{PUSH_NODE_2(self,papuga_TagName,papuga_init_ValueVariant_string,name,namelen)}
@@ -103,9 +112,15 @@ bool papuga_Serialization_pushName_uint( papuga_Serialization* self, uint64_t na
 bool papuga_Serialization_pushName_double( papuga_Serialization* self, double name)
 	{PUSH_NODE_1(self,papuga_TagName,papuga_init_ValueVariant_double,name)}
 
+bool papuga_Serialization_pushName_bool( papuga_Serialization* self, bool name)
+	{PUSH_NODE_1(self,papuga_TagName,papuga_init_ValueVariant_bool,name)}
+
+
+bool papuga_Serialization_pushValue_void( papuga_Serialization* self)
+	{PUSH_NODE_0(self,papuga_TagValue,papuga_init_ValueVariant)}
 
 bool papuga_Serialization_pushValue( papuga_Serialization* self, const papuga_ValueVariant* value)
-	{PUSH_NODE_1(self,papuga_TagValue,papuga_assign_ValueVariant,value)}
+	{PUSH_NODE_1(self,papuga_TagValue,papuga_init_ValueVariant_copy,value)}
 
 bool papuga_Serialization_pushValue_string( papuga_Serialization* self, const char* value, int valuelen)
 	{PUSH_NODE_2(self,papuga_TagValue,papuga_init_ValueVariant_string,value,valuelen)}
@@ -125,6 +140,9 @@ bool papuga_Serialization_pushValue_uint( papuga_Serialization* self, uint64_t v
 bool papuga_Serialization_pushValue_double( papuga_Serialization* self, double value)
 	{PUSH_NODE_1(self,papuga_TagValue,papuga_init_ValueVariant_double,value)}
 
+bool papuga_Serialization_pushValue_bool( papuga_Serialization* self, bool value)
+	{PUSH_NODE_1(self,papuga_TagValue,papuga_init_ValueVariant_bool,value)}
+
 
 
 bool papuga_Serialization_append( papuga_Serialization* self, const papuga_Serialization* o)
@@ -143,5 +161,10 @@ bool papuga_Serialization_islabeled( const papuga_Serialization* self)
 	return false;
 }
 
+bool papuga_init_Serialization_copy( papuga_Serialization* self, const papuga_Serialization* o)
+{
+	papuga_init_Serialization( self);
+	return add_nodes( self, o->ar, o->arsize);
+}
 
 

@@ -39,7 +39,7 @@ extern "C" {
 #define papuga_init_ValueVariant_hostobj(self,objptr,clid)	{(self)->valuetype = (unsigned char)papuga_HostObject; (self)->encoding=0; (self)->classid=clid; (self)->length=0; (self)->value.hostObject=objptr;}
 #define papuga_init_ValueVariant_serialization(self,ser)	{(self)->valuetype = (unsigned char)papuga_Serialized; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.serialization=ser;}
 
-#define papuga_assign_ValueVariant(self,o)			{(self)->valuetype=o->valuetype;(self)->encoding=o->encoding;(self)->classid=o->classid;(self)->length=o->length;(self)->value.string=o->value.string;}
+#define papuga_init_ValueVariant_copy(self,o)			{(self)->valuetype=o->valuetype;(self)->encoding=o->encoding;(self)->classid=o->classid;(self)->length=o->length;(self)->value.string=o->value.string;}
 #define papuga_ValueVariant_defined(self)			((self)->valuetype!=papuga_Void)
 
 /// \brief Type check
@@ -57,6 +57,8 @@ bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, papuga_ErrorC
 papuga_ErrorCode papuga_ValueVariant_convert_tonumeric( papuga_ValueVariant* value);
 
 bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* val, const char* value);
+bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* val, const char* value);
+char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* val);
 
 #ifdef __cplusplus
 }

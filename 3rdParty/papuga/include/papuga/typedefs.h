@@ -31,7 +31,9 @@ typedef enum papuga_ErrorCode
 	papuga_TypeError=3,
 	papuga_EncodingError=4,
 	papuga_BufferOverflowError=5,
-	papuga_OutOfRangeError=6
+	papuga_OutOfRangeError=6,
+	papuga_NofArgsError=7,
+	papuga_MissingSelf=8
 } papuga_ErrorCode;
 
 /// \brief Object of the host environment
@@ -130,11 +132,12 @@ typedef struct papuga_StringBuffer
 
 typedef struct papuga_CallResult
 {
-	papuga_ValueVariant value;
-	papuga_HostObjectReference object;
-	papuga_Serialization serialization;
-	papuga_StringBuffer valuebuf;
-	char errorbuf[ 2048];
+	papuga_ValueVariant value;		///< result value
+	papuga_HostObjectReference object;	///< reference (with or without ownership) to an object that lives in the host environment
+	papuga_Serialization serialization;	///< serialization of the result in case of a structure
+	papuga_StringBuffer valuebuf;		///< buffer for values (strings) that have to be copied
+	char* errorbuf;				///< buffer for error messages
+	size_t errorbufsize;			///< sizeof errorbuf in bytes
 } papuga_CallResult;
 
 #ifdef __cplusplus

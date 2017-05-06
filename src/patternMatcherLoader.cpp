@@ -18,8 +18,8 @@ using namespace strus::bindings;
 PatternMatcherPostProc bindings::loadPatternMatcherPostProc(
 	const TextProcessorInterface* textproc,
 	const std::string& patternMatcherModule,
-	const papuga::ValueVariant& lexems,
-	const papuga::ValueVariant& patterns,
+	const papuga_ValueVariant& lexems,
+	const papuga_ValueVariant& patterns,
 	ErrorBufferInterface* errorhnd)
 {
 	PatternMatcherPostProc rt;

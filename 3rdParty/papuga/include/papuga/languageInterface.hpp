@@ -21,7 +21,8 @@ public:
 		struct Method
 		{
 			const char* name;		///< name of the method
-			const char* funcname;		///< name of the method
+			const char* funcname;		///< function name of the method
+			bool self;			///< method that requires an instance of its class (self pointer)
 			int argc;			///< maximum number of arguments
 		};
 		
@@ -29,6 +30,8 @@ public:
 		{
 			unsigned int id;		///< id of the class (unique index counted from 0)
 			const char* name;		///< name of class
+			const char* constructorname;	///< name of the constructor
+			const char* destructorname;	///< name of the destructor
 			const Method* methodtable;	///< (NULL,0) terminated list of methods
 		};
 
@@ -37,8 +40,15 @@ public:
 			unsigned int max_argc;
 		};
 
+		struct ErrorText
+		{
+			int errorcode;
+			const char* text;
+		};
+
 		const char* name;			///< name of the project wrapped by the bindings
 		const Class* classes;			///< (0,NULL,NULL) terminated list of classes 
+		const ErrorText* errors;		///< text for error codes defined in typedefs.h (papuga_ErrorCode)
 		Details details;			///< some addiitional info that is useful for the interface generator
 	};
 

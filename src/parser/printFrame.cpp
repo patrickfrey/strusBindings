@@ -36,11 +36,25 @@ void strus::printHppFrameHeader( std::ostream& out, const char* name, const char
 	printLicense( out);
 	printFrameFileDescription( out, name, "hpp", description);
 	out
-	<< "#ifndef _STRUS_BINDINGS_PARSER_" << name << "_HPP_INCLUDED" << std::endl
-	<< "#define _STRUS_BINDINGS_PARSER_" << name << "_HPP_INCLUDED" << std::endl;
+	<< "#ifndef _STRUS_BINDINGS_" << name << "_HPP_INCLUDED" << std::endl
+	<< "#define _STRUS_BINDINGS_" << name << "_HPP_INCLUDED" << std::endl;
 }
 
 void strus::printHppFrameTail( std::ostream& out)
+{
+	out << "#endif" << std::endl << std::endl;
+}
+
+void strus::printHFrameHeader( std::ostream& out, const char* name, const char* description)
+{
+	printLicense( out);
+	printFrameFileDescription( out, name, "h", description);
+	out
+	<< "#ifndef _STRUS_BINDINGS_" << name << "_H_INCLUDED" << std::endl
+	<< "#define _STRUS_BINDINGS_" << name << "_H<_INCLUDED" << std::endl;
+}
+
+void strus::printHFrameTail( std::ostream& out)
 {
 	out << "#endif" << std::endl << std::endl;
 }

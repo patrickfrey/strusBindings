@@ -18,7 +18,7 @@
 #include "utils.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
-#include "valueVariantConv.hpp"
+#include "papuga/valueVariant.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -29,7 +29,7 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 {
 	if (ctx.isStringType())
 	{
-		return SegmenterDef( ValueVariantConv::tostring( ctx));
+		return SegmenterDef( papuga::ValueVariant_tostring( ctx));
 	}
 	else if (ctx.type == ValueVariant::Serialization)
 	{

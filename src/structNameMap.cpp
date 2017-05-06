@@ -7,7 +7,7 @@
  */
 #include "structNameMap.hpp"
 #include "internationalization.hpp"
-#include "valueVariantConv.hpp"
+#include "papuga/valueVariant.h"
 #include <cstring>
 
 using namespace strus;
@@ -38,18 +38,18 @@ int StructureNameMap::index( const char* id) const
 	return index( id, std::strlen(id));
 }
 
-int StructureNameMap::index( const ValueVariant& id) const
+int StructureNameMap::index( const papuga_ValueVariant& id) const
 {
-	if (id.type == ValueVariant::String)
+	if (id.valuetype == papuga_String)
 	{
-		return index( id.value.string, id.length());
+		return index( id.value.string, id.length);
 	}
-	if (id.type == ValueVariant::WString)
+	if (id.valuetype == papuga_LangString)
 	{
 		enum {MaxIdSize=128};
 		char buf[ MaxIdSize];
-		if (!ValueVariantConv::try_map2ascii( buf, sizeof(buf), id.value.wstring, id.length())) return false;
-		return index( buf, id.length());
+		if (!papuga_ValueVariant_toascii( buf, sizeof(buf), &id)) return Undefined;
+		return index( buf, id.length);
 	}
 	return false;
 }

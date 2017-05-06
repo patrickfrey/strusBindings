@@ -34,11 +34,9 @@ typedef papuga::HostObjectReference HostObjectReference;
 class ContextImpl
 {
 public:
-	/// \brief Constructor for local mode with own module loader
-	ContextImpl();
 	/// \brief Constructor
-	/// \param[in] config context configuration
-	explicit ContextImpl( const ValueVariant& config);
+	/// \param[in] config context configuration. If not defined, create context for local mode with own module loader
+	explicit ContextImpl( const ValueVariant& config=ValueVariant());
 	/// \brief Destructor
 	~ContextImpl(){}
 

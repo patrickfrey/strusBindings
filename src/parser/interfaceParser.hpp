@@ -149,6 +149,10 @@ public:
 	{
 		return m_methodar;
 	}
+	const std::vector<ConstructorDef>& constructorDefs() const
+	{
+		return m_constructorar;
+	}
 	std::string tostring() const;
 
 private:

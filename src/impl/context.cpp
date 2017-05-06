@@ -32,7 +32,7 @@
 #include "strus/constants.hpp"
 #include "strus/base/configParser.hpp"
 #include "internationalization.hpp"
-#include "valueVariantConv.hpp"
+#include "papuga/valueVariant.hpp"
 #include "internationalization.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -69,7 +69,7 @@ static ContextDef parseContext( const ValueVariant& ctx)
 {
 	if (ctx.isStringType())
 	{
-		return ContextDef( ValueVariantConv::tostring( ctx));
+		return ContextDef( papuga::ValueVariant_tostring( ctx));
 	}
 	else if (ctx.type == ValueVariant::Serialization)
 	{

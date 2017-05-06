@@ -8,8 +8,8 @@
 /// \brief Strus interface description used for generating language bindings
 /// \note PROGRAM (strusBindingsGen) GENERATED FILE! DO NOT MODIFY!!!
 /// \file bindings_description.hpp
-#ifndef _STRUS_BINDINGS_PARSER_bindings_description_HPP_INCLUDED
-#define _STRUS_BINDINGS_PARSER_bindings_description_HPP_INCLUDED
+#ifndef _STRUS_BINDINGS_bindings_description_HPP_INCLUDED
+#define _STRUS_BINDINGS_bindings_description_HPP_INCLUDED
 #include "papuga/languageInterface.hpp"
 #include <cstddef>
 

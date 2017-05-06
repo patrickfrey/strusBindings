@@ -17,6 +17,8 @@ namespace strus
 void printLicense( std::ostream& out);
 void printHppFrameHeader( std::ostream& out, const char* name, const char* description);
 void printHppFrameTail( std::ostream& out);
+void printHFrameHeader( std::ostream& out, const char* name, const char* description);
+void printHFrameTail( std::ostream& out);
 void printCppFrameHeader( std::ostream& out, const char* name, const char* description);
 
 }//namespace

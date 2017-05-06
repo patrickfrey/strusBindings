@@ -7,8 +7,8 @@
 */
 /// \brief Library interface for libpapuga_lua for generating lua bindings
 /// \file libpapuga_lua.cpp
-#include "papuga/lib/lua.hpp"
-#include "private/dll_tags.hpp"
+#include "papuga/lib/lua_gen.hpp"
+#include "private/dll_tags.h"
 #include <string>
 #include <cstdio>
 #include <cstdarg>
@@ -30,21 +30,56 @@ static std::runtime_error exception( const char* msg, ...)
 
 #define INDENT "\t"
 
-static void define_method_call_helpers( std::ostream& out, const LanguageInterface::InterfaceDescription& descr)
+static void define_errormap(
+		std::ostream& out,
+		const LanguageInterface::InterfaceDescription::ErrorText* errors)
 {
-	out << "#define MAX_NOF_ARGUMENTS " << (((descr.details.max_argc + 31) / 32) * 32) << std::endl;
+	out << "static void error_exception( lua_State *ls, int errcode)" << std::endl;
+	out << "{" << std::endl;
+	for(int ei=0; errors[ei].text; ++ei)
+	{
+		out << INDENT << "if (errcode == " << errors[ei].errorcode << ") {" << std::endl;
+		out << INDENT << "{" << std::endl;
+		out << INDENT << INDENT << "lua_pushstring( ls, \"" << errors[ei].text << "\");" << std::endl;
+		out << INDENT << INDENT << "lua_error( ls);" << std::endl;
+		out << INDENT << "}" << std::endl;
+	}
+	out << "}" << std::endl;
 }
 
-static void define_method( std::ostream& out, const LanguageInterface::InterfaceDescription::Method& method)
+static void define_method(
+		std::ostream& out,
+		const LanguageInterface::InterfaceDescription::Class& classdef,
+		const LanguageInterface::InterfaceDescription::Method& method)
 {
-	out << "static int l_" << method.funcname << "( lua_State *L )" << std::endl;
+	out << "static int l_" << method.funcname << "( lua_State *ls )" << std::endl;
 	out << "{" << std::endl;
-	out << INDENT << "int argc = lua_gettop(L);" << std::endl;
-	out << INDENT << std::endl;
+	out << INDENT << "papuga_lua_CallArgs arg;" << std::endl;
+	out << INDENT << "papuga::CallResult retval;" << std::endl;
+	out << INDENT << "char errorbuf[ 1024];" << std::endl;
+	if (method.self)
+	{
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << method.name << "\")) error_exception( ls, arg.errcode);" << std::endl;
+	}
+	else
+	{
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) error_exception( ls, arg.errcode);" << std::endl;
+	}
+	out << INDENT << "papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));" << std::endl;
+	out << INDENT << "if (!" << method.funcname << "( self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;" << std::endl;
+	out << INDENT << "papuga_lua_destroy_CallArgs( &arg);" << std::endl;
+	out << INDENT << "return papuga_lua_move_CallResult( ls, &retval);" << std::endl;
+	out << "ERROR_CALL:" << std::endl;
+	out << INDENT << "papuga_lua_destroy_CallResult( &retval);" << std::endl;
+	out << INDENT << "papuga_lua_destroy_CallArgs( &arg);" << std::endl;
+	out << INDENT << "lua_pushstring( ls, errorbuf);" << std::endl;
+	out << INDENT << "lua_error( ls);" << std::endl;	
 	out << "}" << std::endl << std::endl;
 }
 
-static void define_methodtable( std::ostream& out, const LanguageInterface::InterfaceDescription::Class& classdef)
+static void define_methodtable(
+		std::ostream& out,
+		const LanguageInterface::InterfaceDescription::Class& classdef)
 {
 	out << "static const luaL_Reg mt_" << classdef.name << "[] = {" << std::endl;
 	std::size_t mi = 0;
@@ -78,14 +113,17 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		else if (what == "module")
 		{
 			out << "#include \"lua_" << descr.name << ".h\"" << std::endl;
-			define_method_call_helpers( out, descr);
+			out << "#include \"papuga/lib/lua_dev.h\"" << std::endl;
+
+			define_errormap( out, descr.errors);
+
 			std::size_t ci = 0;
 			for (; descr.classes[ci].name; ++ci)
 			{
 				std::size_t mi = 0;
 				for (; descr.classes[ci].methodtable[mi].name; ++mi)
 				{
-					define_method( out, descr.classes[ci].methodtable[mi]);
+					define_method( out, descr.classes[ci], descr.classes[ci].methodtable[mi]);
 				}
 				define_methodtable( out, descr.classes[ci]);
 			}
