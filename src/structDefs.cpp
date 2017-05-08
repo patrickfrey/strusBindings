@@ -8,9 +8,9 @@
 #include "structDefs.hpp"
 #include "internationalization.hpp"
 #include "deserializer.hpp"
-#include "serialization.hpp"
 #include "papuga/valueVariant.h"
 #include "valueVariantWrap.hpp"
+#include "papugaSerialization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;

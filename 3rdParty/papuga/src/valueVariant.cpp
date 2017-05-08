@@ -815,7 +815,7 @@ extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, pa
 	return 0;
 }
 
-extern "C" bool papuga_ValueVariant_convert_tonumeric( const papuga_ValueVariant* value, papuga_ValueVariant* res, papuga_ErrorCode* err)
+extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_ValueVariant* value, papuga_ValueVariant* res, papuga_ErrorCode* err)
 {
 	char destbuf[64];
 
@@ -826,22 +826,22 @@ extern "C" bool papuga_ValueVariant_convert_tonumeric( const papuga_ValueVariant
 			if (value->valuetype == papuga_UInt)
 			{
 				papuga_init_ValueVariant_uint( res, value->value.UInt);
-				return true;
+				return res;
 			}
 			else if (value->valuetype == papuga_Int)
 			{
 				papuga_init_ValueVariant_int( res, value->value.Int);
-				return true;
+				return res;
 			}
 			else if (value->valuetype == papuga_Double)
 			{
 				papuga_init_ValueVariant_double( res, value->value.Double);
-				return true;
+				return res;
 			}
 			else
 			{
 				*err = papuga_TypeError;
-				return false;
+				return NULL;
 			}
 		}
 		else if (papuga_ValueVariant_isstring( value))
@@ -859,20 +859,20 @@ extern "C" bool papuga_ValueVariant_convert_tonumeric( const papuga_ValueVariant
 			if (!numstr_to_variant( &numval, numtype, destbuf))
 			{
 				*err = papuga_TypeError;
-				return 0;
+				return NULL;
 			}
-			return papuga_ValueVariant_convert_tonumeric( &numval, res, err);
+			return papuga_ValueVariant_tonumeric( &numval, res, err);
 		}
 		else
 		{
 			*err = papuga_TypeError;
-			return false;
+			return NULL;
 		}
 	}
 	else
 	{
 		*err = papuga_TypeError;
-		return false;
+		return NULL;
 	}
 }
 

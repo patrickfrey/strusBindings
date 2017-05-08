@@ -8,7 +8,7 @@
 #include "deserializer.hpp"
 #include "internationalization.hpp"
 #include "structDefs.hpp"
-#include "serialization.hpp"
+#include "papugaSerialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
 #include "valueVariantWrap.hpp"
@@ -1222,13 +1222,13 @@ static void buildExpressionJoin(
 				if (si != se && si->tag == papuga_TagValue)
 				{
 					papuga_ValueVariant val;
-					if (papuga_ValueVariant_convert_tonumeric( &si->value, &val, &err))
+					if (papuga_ValueVariant_tonumeric( &si->value, &val, &err))
 					{
 						++si;
 						range = ValueVariantWrap::toint( val);
 						if (si != se && si->tag == papuga_TagValue)
 						{
-							if (papuga_ValueVariant_convert_tonumeric( &si->value, &val, &err))
+							if (papuga_ValueVariant_tonumeric( &si->value, &val, &err))
 							{
 								++si;
 								cardinality = ValueVariantWrap::touint( val);

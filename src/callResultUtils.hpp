@@ -12,7 +12,7 @@
 #include "strus/bindingClassId.hpp"
 #include "papuga/callResult.hpp"
 #include "papuga/valueVariant.hpp"
-#include "papuga/serialization.hpp"
+#include "papugaSerialization.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
 #include "impl/vector.hpp"

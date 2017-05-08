@@ -30,7 +30,7 @@
 #include "strus/reference.hpp"
 #include "strus/index.hpp"
 #include "expressionBuilder.hpp"
-#include "serialization.hpp"
+#include "papugaSerialization.hpp"
 #include "papuga/valueVariant.h"
 #include <string>
 #include <utility>

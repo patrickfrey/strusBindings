@@ -5,8 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _PAPUGA_SERIALIZATION_HPP_INCLUDED
-#define _PAPUGA_SERIALIZATION_HPP_INCLUDED
+#ifndef _STRUS_BINDINGS_PAPUGA_SERIALIZATION_HPP_INCLUDED
+#define _STRUS_BINDINGS_PAPUGA_SERIALIZATION_HPP_INCLUDED
 /// \brief C++ Interface to papuga serialization
 /// \file serialization.hpp
 #include "papuga/serialization.h"

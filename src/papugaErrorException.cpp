@@ -6,7 +6,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 /// \brief Map of papuga error codes to std::runtime_error exception
-/// \file valueVariant.hpp
+/// \file papugaErrorException.hpp
 #include "papugaErrorException.hpp"
 #include "internationalization.hpp"
 
