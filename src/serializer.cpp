@@ -9,7 +9,7 @@
 /// \file serializer.hpp
 #include "serializer.hpp"
 #include "papuga/valueVariant.h"
-#include "papuga/serialization.hpp"
+#include "serialization.hpp"
 #include "internationalization.hpp"
 
 using namespace strus;

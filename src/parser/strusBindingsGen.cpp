@@ -73,13 +73,13 @@ static std::string destructorFunctionName( const std::string& cl)
 static void print_BindingInterfaceDescriptionHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
-	out << "#include \"papuga/languageInterface.hpp\"" << std::endl;
+	out << "#include \"papuga/interfaceDescription.h\"" << std::endl;
 	out << "#include <cstddef>" << std::endl;
 	out << std::endl
 		<< "namespace strus {" << std::endl
 		<< std::endl << std::endl;
 
-	out << "const papuga::LanguageInterface::InterfaceDescription* getBindingsInterfaceDescription();"
+	out << "const papuga_InterfaceDescription* getBindingsInterfaceDescription();"
 		<< std::endl << std::endl;
 
 	out << "}//namespace" << std::endl;
@@ -106,7 +106,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		ce = interfaceDef.classDefs().end();
 	for (; ci != ce; ++ci)
 	{
-		out << "static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_" << ci->name() << "[" << (ci->methodDefs().size()+1) << "] = " << std::endl
+		out << "static const papuga_MethodDescription g_methods_" << ci->name() << "[" << (ci->methodDefs().size()+1) << "] = " << std::endl
 			<< "{" << std::endl;
 		std::vector<strus::MethodDef>::const_iterator
 			mi = ci->methodDefs().begin(),
@@ -121,7 +121,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		out << "};" << std::endl;
 	}
 
-	out << "static const papuga::LanguageInterface::InterfaceDescription::Class g_classes[" << (interfaceDef.classDefs().size()+1) << "] = " << std::endl
+	out << "static const papuga_ClassDescription g_classes[" << (interfaceDef.classDefs().size()+1) << "] = " << std::endl
 		<< "{" << std::endl;
 	ci = interfaceDef.classDefs().begin();
 	for (; ci != ce; ++ci)
@@ -133,7 +133,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	}
 	out << "\t{0,0}" << std::endl;
 	out << "};" << std::endl << std::endl;
-	out << "static const papuga::LanguageInterface::InterfaceDescription::ErrorText g_errors[] = {" << std::endl;
+	out << "static const papuga_ErrorDescription g_errors[] = {" << std::endl;
 	out << "\t{papuga_Ok,_TXT(\"Ok\")}," << std::endl;
 	out << "\t{papuga_LogicError,_TXT(\"logic error\")}," << std::endl;
 	out << "\t{papuga_NoMemError,_TXT(\"out of memory\")}," << std::endl;
@@ -146,10 +146,10 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "\t{0,NULL}" << std::endl;
 	out << "};" << std::endl << std::endl;
 
-	out << "static const papuga::LanguageInterface::InterfaceDescription g_descr = { \"strus\", g_classes, g_errors, {" << max_argc << "} };"
+	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", \"strus/bindingObjects.h\", g_classes, g_errors };"
 		<< std::endl << std::endl;
 
-	out << "DLL_PUBLIC const papuga::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
+	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
 	out << "{" << std::endl;
 	out << "\treturn &g_descr;" << std::endl;
 	out << "}" << std::endl;

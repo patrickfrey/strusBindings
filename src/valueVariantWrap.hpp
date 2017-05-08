@@ -10,8 +10,8 @@
 /// \brief Some local value variant wrappers for the strus bindings in C++
 /// \file valueVariantWrap.hpp
 #include "papuga/typedefs.h"
-#include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
+#include "strus/index.hpp"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
 #include "internationalization.hpp"
@@ -22,8 +22,11 @@ namespace bindings {
 
 struct ValueVariantWrap
 {
-	static int64_t toint( const papuga_ValueVariant& value);
-	static uint64_t touint( const papuga_ValueVariant& value);
+	static int64_t toint64( const papuga_ValueVariant& value);
+	static uint64_t touint64( const papuga_ValueVariant& value);
+	static int toint( const papuga_ValueVariant& value);
+	static unsigned int touint( const papuga_ValueVariant& value);
+	static Index toindex( const papuga_ValueVariant& value);
 	static double todouble( const papuga_ValueVariant& value);
 	static bool tobool( const papuga_ValueVariant& value);
 	static strus::NumericVariant tonumeric( const papuga_ValueVariant& value);

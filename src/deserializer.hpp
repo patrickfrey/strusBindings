@@ -30,8 +30,8 @@
 #include "strus/reference.hpp"
 #include "strus/index.hpp"
 #include "expressionBuilder.hpp"
+#include "serialization.hpp"
 #include "papuga/valueVariant.h"
-#include "papuga/serialization.hpp"
 #include <string>
 #include <utility>
 
@@ -43,18 +43,6 @@ struct Deserializer
 	static void consumeClose(
 			papuga::Serialization::const_iterator& si,
 			const papuga::Serialization::const_iterator& se);
-
-	static bool isStringWithPrefix(
-			const papuga_ValueVariant& val,
-			unsigned char prefix);
-
-	static int getStringPrefix(
-			const papuga_ValueVariant& val,
-			const char* prefixList);
-
-	static std::string getPrefixStringValue(
-			const papuga_ValueVariant& val,
-			unsigned char prefix);
 
 	static bool skipStructure(
 			papuga::Serialization::const_iterator si,
@@ -99,6 +87,11 @@ struct Deserializer
 
 	static std::vector<double> getDoubleList(
 			const papuga_ValueVariant& val);
+
+	static std::string getOptionalDefinition(
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se,
+			const char* name);
 
 	static analyzer::DocumentClass getDocumentClass(
 			const papuga_ValueVariant& val);

@@ -18,7 +18,7 @@
 using namespace strus;
 
 
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_Context[16] = 
+static const papuga_MethodDescription g_methods_Context[16] = 
 {
 	{"getLastError", "_strus_binding_Context__getLastError", true, 0},
 	{"loadModule", "_strus_binding_Context__loadModule", true, 1},
@@ -37,7 +37,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_C
 	{"close", "_strus_binding_Context__close", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_StorageClient[8] = 
+static const papuga_MethodDescription g_methods_StorageClient[8] = 
 {
 	{"nofDocumentsInserted", "_strus_binding_StorageClient__nofDocumentsInserted", true, 0},
 	{"createTransaction", "_strus_binding_StorageClient__createTransaction", true, 0},
@@ -48,7 +48,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_S
 	{"close", "_strus_binding_StorageClient__close", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_StorageTransaction[6] = 
+static const papuga_MethodDescription g_methods_StorageTransaction[6] = 
 {
 	{"insertDocument", "_strus_binding_StorageTransaction__insertDocument", true, 2},
 	{"deleteDocument", "_strus_binding_StorageTransaction__deleteDocument", true, 1},
@@ -57,32 +57,32 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_S
 	{"rollback", "_strus_binding_StorageTransaction__rollback", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_DocumentBrowser[4] = 
+static const papuga_MethodDescription g_methods_DocumentBrowser[4] = 
 {
 	{"addMetaDataRestrictionCondition", "_strus_binding_DocumentBrowser__addMetaDataRestrictionCondition", true, 4},
 	{"skipDoc", "_strus_binding_DocumentBrowser__skipDoc", true, 1},
 	{"get", "_strus_binding_DocumentBrowser__get", true, 2},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_StatisticsIterator[2] = 
+static const papuga_MethodDescription g_methods_StatisticsIterator[2] = 
 {
 	{"getNext", "_strus_binding_StatisticsIterator__getNext", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_StatisticsProcessor[3] = 
+static const papuga_MethodDescription g_methods_StatisticsProcessor[3] = 
 {
 	{"decode", "_strus_binding_StatisticsProcessor__decode", true, 1},
 	{"encode", "_strus_binding_StatisticsProcessor__encode", true, 1},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_VectorStorageSearcher[4] = 
+static const papuga_MethodDescription g_methods_VectorStorageSearcher[4] = 
 {
 	{"findSimilar", "_strus_binding_VectorStorageSearcher__findSimilar", true, 2},
 	{"findSimilarFromSelection", "_strus_binding_VectorStorageSearcher__findSimilarFromSelection", true, 3},
 	{"close", "_strus_binding_VectorStorageSearcher__close", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_VectorStorageClient[13] = 
+static const papuga_MethodDescription g_methods_VectorStorageClient[13] = 
 {
 	{"createSearcher", "_strus_binding_VectorStorageClient__createSearcher", true, 2},
 	{"createTransaction", "_strus_binding_VectorStorageClient__createTransaction", true, 0},
@@ -98,7 +98,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_V
 	{"close", "_strus_binding_VectorStorageClient__close", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_VectorStorageTransaction[6] = 
+static const papuga_MethodDescription g_methods_VectorStorageTransaction[6] = 
 {
 	{"addFeature", "_strus_binding_VectorStorageTransaction__addFeature", true, 2},
 	{"defineFeatureConceptRelation", "_strus_binding_VectorStorageTransaction__defineFeatureConceptRelation", true, 3},
@@ -107,7 +107,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_V
 	{"close", "_strus_binding_VectorStorageTransaction__close", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_DocumentAnalyzer[14] = 
+static const papuga_MethodDescription g_methods_DocumentAnalyzer[14] = 
 {
 	{"addSearchIndexFeature", "_strus_binding_DocumentAnalyzer__addSearchIndexFeature", true, 5},
 	{"addForwardIndexFeature", "_strus_binding_DocumentAnalyzer__addForwardIndexFeature", true, 5},
@@ -124,7 +124,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_D
 	{"analyze", "_strus_binding_DocumentAnalyzer__analyze", true, 2},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_QueryAnalyzer[8] = 
+static const papuga_MethodDescription g_methods_QueryAnalyzer[8] = 
 {
 	{"addSearchIndexElement", "_strus_binding_QueryAnalyzer__addSearchIndexElement", true, 4},
 	{"addSearchIndexElementFromPatternMatch", "_strus_binding_QueryAnalyzer__addSearchIndexElementFromPatternMatch", true, 3},
@@ -135,7 +135,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_Q
 	{"analyze", "_strus_binding_QueryAnalyzer__analyze", true, 1},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_QueryEval[9] = 
+static const papuga_MethodDescription g_methods_QueryEval[9] = 
 {
 	{"addTerm", "_strus_binding_QueryEval__addTerm", true, 3},
 	{"addSelectionFeature", "_strus_binding_QueryEval__addSelectionFeature", true, 1},
@@ -147,7 +147,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_Q
 	{"createQuery", "_strus_binding_QueryEval__createQuery", true, 1},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_Query[13] = 
+static const papuga_MethodDescription g_methods_Query[13] = 
 {
 	{"defineFeature", "_strus_binding_Query__defineFeature", true, 3},
 	{"addMetaDataRestrictionCondition", "_strus_binding_Query__addMetaDataRestrictionCondition", true, 4},
@@ -163,7 +163,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Method g_methods_Q
 	{"tostring", "_strus_binding_Query__tostring", true, 0},
 	{0,0,0}
 };
-static const papuga::LanguageInterface::InterfaceDescription::Class g_classes[14] = 
+static const papuga_ClassDescription g_classes[14] = 
 {
 	{ ClassContext, "Context", "_strus_binding_constructor__Context", "_strus_binding_destructor__Context", g_methods_Context},
 	{ ClassStorageClient, "StorageClient", NULL, "_strus_binding_destructor__StorageClient", g_methods_StorageClient},
@@ -181,7 +181,7 @@ static const papuga::LanguageInterface::InterfaceDescription::Class g_classes[14
 	{0,0}
 };
 
-static const papuga::LanguageInterface::InterfaceDescription::ErrorText g_errors[] = {
+static const papuga_ErrorDescription g_errors[] = {
 	{papuga_Ok,_TXT("Ok")},
 	{papuga_LogicError,_TXT("logic error")},
 	{papuga_NoMemError,_TXT("out of memory")},
@@ -194,9 +194,9 @@ static const papuga::LanguageInterface::InterfaceDescription::ErrorText g_errors
 	{0,NULL}
 };
 
-static const papuga::LanguageInterface::InterfaceDescription g_descr = { "strus", g_classes, g_errors, {5} };
+static const papuga_InterfaceDescription g_descr = { "strus", "strus/bindingObjects.h", g_classes, g_errors };
 
-DLL_PUBLIC const papuga::LanguageInterface::InterfaceDescription* strus::getBindingsInterfaceDescription()
+DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()
 {
 	return &g_descr;
 }

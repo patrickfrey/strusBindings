@@ -8,7 +8,7 @@
 #ifndef _STRUS_BINDINGS_STRUCTURE_DEFINITIONS_HPP_INCLUDED
 #define _STRUS_BINDINGS_STRUCTURE_DEFINITIONS_HPP_INCLUDED
 #include "structNameMap.hpp"
-#include "papuga/serialization.hpp"
+#include "serialization.hpp"
 
 namespace strus {
 namespace bindings {

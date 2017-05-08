@@ -32,7 +32,7 @@ static std::runtime_error exception( const char* msg, ...)
 
 static void define_errormap(
 		std::ostream& out,
-		const LanguageInterface::InterfaceDescription::ErrorText* errors)
+		const papuga_ErrorDescription* errors)
 {
 	out << "static void error_exception( lua_State *ls, int errcode)" << std::endl;
 	out << "{" << std::endl;
@@ -49,8 +49,8 @@ static void define_errormap(
 
 static void define_method(
 		std::ostream& out,
-		const LanguageInterface::InterfaceDescription::Class& classdef,
-		const LanguageInterface::InterfaceDescription::Method& method)
+		const papuga_ClassDescription& classdef,
+		const papuga_MethodDescription& method)
 {
 	out << "static int l_" << method.funcname << "( lua_State *ls )" << std::endl;
 	out << "{" << std::endl;
@@ -79,7 +79,7 @@ static void define_method(
 
 static void define_methodtable(
 		std::ostream& out,
-		const LanguageInterface::InterfaceDescription::Class& classdef)
+		const papuga_ClassDescription& classdef)
 {
 	out << "static const luaL_Reg mt_" << classdef.name << "[] = {" << std::endl;
 	std::size_t mi = 0;
@@ -95,7 +95,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 	std::ostream& out,
 	std::ostream& err,
 	const std::string& what,
-	const LanguageInterface::InterfaceDescription& descr)
+	const papuga_InterfaceDescription& descr)
 {
 	try
 	{

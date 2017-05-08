@@ -54,7 +54,7 @@ int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, papuga_Erro
 uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value, papuga_ErrorCode* err);
 double papuga_ValueVariant_todouble( const papuga_ValueVariant* value, papuga_ErrorCode* err);
 bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, papuga_ErrorCode* err);
-papuga_ErrorCode papuga_ValueVariant_convert_tonumeric( papuga_ValueVariant* value);
+bool papuga_ValueVariant_convert_tonumeric( const papuga_ValueVariant* value, papuga_ValueVariant* res, papuga_ErrorCode* err);
 
 bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* val, const char* value);
 bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* val, const char* value);

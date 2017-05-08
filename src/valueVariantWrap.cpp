@@ -16,22 +16,47 @@
 #include "strus/numericVariant.h"
 #include "internationalization.hpp"
 #include "papugaErrorException.hpp"
+#include <limits>
 
 namespace strus {
 namespace bindings {
 
-int64_t ValueVariantWrap::toint( const papuga_ValueVariant& value)
+int64_t ValueVariantWrap::toint64( const papuga_ValueVariant& value)
 {
 	papuga_ErrorCode err;
 	int64_t rt = papuga_ValueVariant_toint( &value, &err);
-	if (err != papuga_Ok) throw error_exception( err, _TXT("toint of variant value"));
+	if (err != papuga_Ok) throw error_exception( err, _TXT("toint64 of variant value"));
 	return rt;
 }
-uint64_t ValueVariantWrap::touint( const papuga_ValueVariant& value)
+uint64_t ValueVariantWrap::touint64( const papuga_ValueVariant& value)
 {
 	papuga_ErrorCode err;
 	uint64_t rt = papuga_ValueVariant_touint( &value, &err);
-	if (err != papuga_Ok) throw error_exception( err, _TXT("touint of variant value"));
+	if (err != papuga_Ok) throw error_exception( err, _TXT("touint64 of variant value"));
+	return rt;
+}
+int ValueVariantWrap::toint( const papuga_ValueVariant& value)
+{
+	papuga_ErrorCode err;
+	int64_t rt = papuga_ValueVariant_toint( &value, &err);
+	if (rt > std::numeric_limits<int>::max() || rt < std::numeric_limits<int>::min()) err = papuga_OutOfRangeError;
+	if (err != papuga_Ok) throw error_exception( err, _TXT("toint of variant value"));
+	return rt;
+}
+unsigned int ValueVariantWrap::touint( const papuga_ValueVariant& value)
+{
+	papuga_ErrorCode err;
+	uint64_t rt = papuga_ValueVariant_toint( &value, &err);
+	if (rt > std::numeric_limits<unsigned int>::max()) err = papuga_OutOfRangeError;
+	if (err != papuga_Ok) throw error_exception( err, _TXT("toint of variant value"));
+	return rt;
+}
+Index ValueVariantWrap::toindex( const papuga_ValueVariant& value)
+{
+	papuga_ErrorCode err;
+	int64_t rt = papuga_ValueVariant_toint( &value, &err);
+	if (rt > std::numeric_limits<Index>::max() || rt < std::numeric_limits<Index>::min()) err = papuga_OutOfRangeError;
+	if (err != papuga_Ok) throw error_exception( err, _TXT("toindex of variant value"));
 	return rt;
 }
 double ValueVariantWrap::todouble( const papuga_ValueVariant& value)

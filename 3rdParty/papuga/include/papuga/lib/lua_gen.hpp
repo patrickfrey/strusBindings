@@ -9,7 +9,7 @@
 /// \file papuga/lib/lua.hpp
 #ifndef _PAPUGA_LUA_LIB_HPP_INCLUDED
 #define _PAPUGA_LUA_LIB_HPP_INCLUDED
-#include "papuga/languageInterface.hpp"
+#include "papuga/interfaceDescription.h"
 #include <string>
 #include <iostream>
 
@@ -24,7 +24,7 @@ bool generateLuaSource(
 	std::ostream& out,
 	std::ostream& err,
 	const std::string& what,
-	const LanguageInterface::InterfaceDescription& descr);
+	const papuga_InterfaceDescription& descr);
 
 }//namespace
 #endif

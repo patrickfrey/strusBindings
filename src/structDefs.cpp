@@ -6,11 +6,11 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 #include "structDefs.hpp"
-#include "wcharString.hpp"
 #include "internationalization.hpp"
 #include "deserializer.hpp"
-#include "papuga/serialization.hpp"
+#include "serialization.hpp"
 #include "papuga/valueVariant.h"
+#include "valueVariantWrap.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -85,57 +85,74 @@ TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Seria
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 
 	bool type_defined = false;
-	if (si->tag == papuga_TagName)
+	if (si->tag == papuga_TagValue)
 	{
-		do
-		{
-			int idx = namemap.index( si->value);
-			++si;
-			switch (idx)
-			{
-				case 0: type_defined = true;
-					type = Deserializer::getString( si, se);
-					break;
-				case 1: value_defined = true;
-					value = Deserializer::getString( si, se);
-					break;
-				case 2: variable = Deserializer::getString( si, se);
-					break;
-				case 3: length_defined = true;
-					length = Deserializer::getUint( si, se);
-					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-			}
-		} while (si != se && si->tag == papuga_TagName);
-		Deserializer::consumeClose( si, se);
+		type = Deserializer::getString( si, se);
+		type_defined = true;
 	}
-	else if (si->tag == papuga_TagValue)
+	else if (si->tag == papuga_TagOpen)
 	{
-		if (Deserializer::isStringWithPrefix( si->value, '='))
+		if (si->tag == papuga_TagName)
 		{
-			variable = Deserializer::getPrefixStringValue( si->value, '=');
-			++si;
-		}
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-
-		if (si->tag == papuga_TagValue)
-		{
-			type = Deserializer::getString( si, se);
-			type_defined = true;
-			if (si != se && si->tag != papuga_TagClose)
+			do
 			{
-				value = Deserializer::getString( si, se);
-				value_defined = true;
-				if (si != se && si->tag != papuga_TagClose)
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
 				{
-					length_defined = true;
-					length = Deserializer::getUint( si, se);
+					case 0: type_defined = true;
+						type = Deserializer::getString( si, se);
+						break;
+					case 1: value_defined = true;
+						value = Deserializer::getString( si, se);
+						break;
+					case 2: variable = Deserializer::getString( si, se);
+						break;
+					case 3: length_defined = true;
+						length = Deserializer::getUint( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
-			}
+			} while (si != se && si->tag == papuga_TagName);
+			Deserializer::consumeClose( si, se);
+		}
+		else if (si->tag == papuga_TagClose)
+		{
+			throw strus::runtime_error(_TXT("%s definition expected"), context);
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("%s definition expected"), context);
+			if (si->tag == papuga_TagOpen)
+			{
+				++si;
+				variable = Deserializer::getOptionalDefinition( si, se, "variable");
+				Deserializer::consumeClose( si, se);
+			}
+			if (si->tag == papuga_TagValue)
+			{
+				type = Deserializer::getString( si, se);
+				type_defined = true;
+	
+				if (si != se && si->tag != papuga_TagClose)
+				{
+					value = Deserializer::getString( si, se);
+					value_defined = true;
+	
+					if (si != se && si->tag != papuga_TagClose)
+					{
+						length_defined = true;
+						length = Deserializer::getUint( si, se);
+					}
+				}
+				else
+				{
+					throw strus::runtime_error(_TXT("%s definition expected"), context);
+				}
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("%s definition expected"), context);
+			}
 		}
 		Deserializer::consumeClose( si, se);
 	}
@@ -177,16 +194,9 @@ MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, c
 		} while (si != se && si->tag == papuga_TagName);
 		Deserializer::consumeClose( si, se);
 	}
-	else if (si->tag == papuga_TagValue)
+	else
 	{
-		from = Deserializer::getPrefixStringValue( si->value, '@');
-		++si;
-		if (si != se && si->tag != papuga_TagClose)
-		{
-			to = Deserializer::getPrefixStringValue( si->value, '@');
-			++si;
-		}
-		Deserializer::consumeClose( si, se);
+		throw strus::runtime_error(_TXT("internal: expected %s structure"), context);
 	}
 }
 

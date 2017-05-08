@@ -17,9 +17,12 @@
 #include <limits>
 #include <inttypes.h>
 
-#define FORMAT_UINT "%" PRIu64
-#define FORMAT_INT "%" PRId64
-#define FORMAT_DOUBLE "%.15g"
+#define PRINT_FORMAT_UINT "%" PRIu64
+#define PRINT_FORMAT_INT "%" PRId64
+#define PRINT_FORMAT_DOUBLE "%.15g"
+#define SCAN_FORMAT_UINT "%" PRIu64
+#define SCAN_FORMAT_INT "%" PRId64
+#define SCAN_FORMAT_DOUBLE "%lf"
 
 #ifdef _MSC_VER
 #define IS_BIG_ENDIAN  0
@@ -38,9 +41,8 @@
 #endif
 
 template <class DESTCHARSET>
-static papuga_ErrorCode convert_uft8string_to_langstring( char* destbuf, int destbufsize, size_t* destlen, const char* str, size_t strsize)
+static void* uft8string_to_langstring( char* destbuf, int destbufsize, size_t* destlen, const char* str, size_t strsize, papuga_ErrorCode* err)
 {
-	papuga_ErrorCode err = papuga_Ok;
 	typedef textwolf::TextScanner<textwolf::CStringIterator,textwolf::charset::UTF8> ScannerUTF8;
 	ScannerUTF8 itr( textwolf::CStringIterator( str, strsize));
 
@@ -57,18 +59,56 @@ static papuga_ErrorCode convert_uft8string_to_langstring( char* destbuf, int des
 	*destlen = out.size();
 	if (out.overflow())
 	{
-		err = papuga_BufferOverflowError;
+		*err = papuga_BufferOverflowError;
+		return 0;
 	}
-	return err;
+	return destbuf;
 }
 
+static void* uft8string_to_any_langstring( papuga_StringEncoding enc, const char* str, std::size_t strsize, void* buf, size_t bufsize, size_t* len, papuga_ErrorCode* err)
+{
+	void* rt;
+	switch (enc)
+	{
+		case papuga_UTF8:
+			rt = uft8string_to_langstring<textwolf::charset::UTF8>( (char*)buf, bufsize, len, str, strsize, err);
+			break;
+		case papuga_UTF16BE:
+			rt = uft8string_to_langstring<textwolf::charset::UTF16BE>( (char*)buf, bufsize*2, len, str, strsize, err);
+			*len /= 2;
+			break;
+		case papuga_UTF16LE:
+			rt = uft8string_to_langstring<textwolf::charset::UTF16LE>( (char*)buf, bufsize*2, len, str, strsize, err);
+			*len /= 2;
+			break;
+		case papuga_UTF16:
+			rt = uft8string_to_langstring<W16CHARSET>( (char*)buf, bufsize*2, len, str, strsize, err);
+			*len /= 2;
+			break;
+		case papuga_UTF32BE:
+			rt = uft8string_to_langstring<textwolf::charset::UCS4BE>( (char*)buf, bufsize*4, len, str, strsize, err);
+			*len /= 4;
+			break;
+		case papuga_UTF32LE:
+			rt = uft8string_to_langstring<textwolf::charset::UCS4LE>( (char*)buf, bufsize*4, len, str, strsize, err);
+			*len /= 4;
+			break;
+		case papuga_UTF32:
+			rt = uft8string_to_langstring<W32CHARSET>( (char*)buf, bufsize*4, len, str, strsize, err);
+			*len /= 4;
+			break;
+		default:
+			*err = papuga_TypeError;
+			rt = 0;
+	}
+	return rt;
+}
 
 template <class LANGCHARSET>
-static papuga_ErrorCode convert_langstring_to_uft8string( papuga_StringBuffer* buf, char const* str, size_t strsize)
+static char* langstring_to_uft8string( papuga_StringBuffer* buf, const char* str, size_t strsize, papuga_ErrorCode* err)
 {
-	papuga_ErrorCode err = papuga_Ok;
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( reinterpret_cast<const char*>(str), strsize));
+	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
 
 	enum {LocalBufSize=2032};
 	char localbuf[ LocalBufSize+16];
@@ -84,20 +124,44 @@ static papuga_ErrorCode convert_langstring_to_uft8string( papuga_StringBuffer* b
 		{
 			if (!papuga_StringBuffer_append_string( buf, out.ptr(), out.size()))
 			{
-				err = papuga_NoMemError;
-				break;
+				*err = papuga_NoMemError;
+				return 0;
 			}
 			out.clear();
 		}
 	}
-	return err;
+	return buf->ar;
+}
+
+static char* any_langstring_to_uft8string( papuga_StringBuffer* buf, papuga_StringEncoding enc, const void* str, std::size_t strsize, papuga_ErrorCode* err)
+{
+	switch (enc)
+	{
+		case papuga_UTF8:
+			return langstring_to_uft8string<textwolf::charset::UTF8>( buf, (const char*)str, strsize, err);
+		case papuga_UTF16BE:
+			return langstring_to_uft8string<textwolf::charset::UTF16BE>( buf, (const char*)str, strsize * 2, err);
+		case papuga_UTF16LE:
+			return langstring_to_uft8string<textwolf::charset::UTF16LE>( buf, (const char*)str, strsize * 2, err);
+		case papuga_UTF16:
+			return langstring_to_uft8string<W16CHARSET>( buf, (const char*)str, strsize * 2, err);
+		case papuga_UTF32BE:
+			return langstring_to_uft8string<textwolf::charset::UCS4BE>( buf, (const char*)str, strsize * 4, err);
+		case papuga_UTF32LE:
+			return langstring_to_uft8string<textwolf::charset::UCS4LE>( buf, (const char*)str, strsize * 4, err);
+		case papuga_UTF32:
+			return langstring_to_uft8string<W32CHARSET>( buf, (const char*)str, strsize * 4, err);
+		default:
+			*err = papuga_TypeError;
+			return 0;
+	}
 }
 
 template <class LANGCHARSET>
-static std::string convert_langstring_to_uft8string_stl( char const* str, size_t strsize)
+static std::string langstring_to_uft8string_stl( const char* str, size_t strsize)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( reinterpret_cast<const char*>(str), strsize));
+	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
 
 	std::string rt;
 	textwolf::charset::UTF8 u8out;
@@ -110,11 +174,34 @@ static std::string convert_langstring_to_uft8string_stl( char const* str, size_t
 	return rt;
 }
 
+static std::string any_langstring_to_uft8string_stl( papuga_StringEncoding enc, const void* str, std::size_t strsize)
+{
+	switch (enc)
+	{
+		case papuga_UTF8:
+			return langstring_to_uft8string_stl<textwolf::charset::UTF8>( (const char*)str, strsize);
+		case papuga_UTF16BE:
+			return langstring_to_uft8string_stl<textwolf::charset::UTF16BE>( (const char*)str, strsize * 2);
+		case papuga_UTF16LE:
+			return langstring_to_uft8string_stl<textwolf::charset::UTF16LE>( (const char*)str, strsize * 2);
+		case papuga_UTF16:
+			return langstring_to_uft8string_stl<W16CHARSET>( (const char*)str, strsize * 2);
+		case papuga_UTF32BE:
+			return langstring_to_uft8string_stl<textwolf::charset::UCS4BE>( (const char*)str, strsize * 4);
+		case papuga_UTF32LE:
+			return langstring_to_uft8string_stl<textwolf::charset::UCS4LE>( (const char*)str, strsize * 4);
+		case papuga_UTF32:
+			return langstring_to_uft8string_stl<W32CHARSET>( (const char*)str, strsize * 4);
+	}
+	return std::string();
+	
+}
+
 template <class LANGCHARSET>
-static bool compare_langstring_ascii( char const* str, size_t strsize, char const* cmpstr)
+static bool compare_langstring_ascii( const char* str, size_t strsize, const char* cmpstr)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( reinterpret_cast<const char*>(str), strsize));
+	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
 
 	unsigned char chr;
 	for (; 0!=(chr=itr.ascii()); ++itr)
@@ -124,11 +211,36 @@ static bool compare_langstring_ascii( char const* str, size_t strsize, char cons
 	return (chr == 0 && *cmpstr == 0);
 }
 
+static bool compare_any_langstring_ascii( papuga_StringEncoding enc, const void* str, size_t strsize, const char* cmpstr)
+{
+	std::size_t cmplen;
+	switch (enc)
+	{
+		case papuga_UTF8:
+			cmplen = std::strlen( cmpstr);
+			return cmplen == strsize && 0 == strncmp( cmpstr, (const char*)str, strsize);
+		case papuga_UTF16BE:
+			return compare_langstring_ascii<textwolf::charset::UTF16BE>( (const char*)str, strsize*2, cmpstr);
+		case papuga_UTF16LE:
+			return compare_langstring_ascii<textwolf::charset::UTF16LE>( (const char*)str, strsize*2, cmpstr);
+		case papuga_UTF16:
+			return compare_langstring_ascii<W16CHARSET>( (const char*)str, strsize*2, cmpstr);
+		case papuga_UTF32BE:
+			return compare_langstring_ascii<textwolf::charset::UCS4BE>( (const char*)str, strsize*4, cmpstr);
+		case papuga_UTF32LE:
+			return compare_langstring_ascii<textwolf::charset::UCS4LE>( (const char*)str, strsize*4, cmpstr);
+		case papuga_UTF32:
+			return compare_langstring_ascii<W32CHARSET>( (const char*)str, strsize*4, cmpstr);
+		default:
+			return false;
+	}
+}
+
 template <class LANGCHARSET>
-static bool starts_langstring_ascii( char const* str, size_t strsize, char const* cmpstr)
+static bool starts_langstring_ascii( const char* str, size_t strsize, const char* cmpstr)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( reinterpret_cast<const char*>(str), strsize));
+	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
 
 	unsigned char chr;
 	for (; 0!=(chr=itr.ascii() && *cmpstr); ++itr)
@@ -138,21 +250,233 @@ static bool starts_langstring_ascii( char const* str, size_t strsize, char const
 	return (*cmpstr == 0);
 }
 
+static bool starts_any_langstring_ascii( papuga_StringEncoding enc, const void* str, size_t strsize, const char* cmpstr)
+{
+	std::size_t cmplen;
+	switch (enc)
+	{
+		case papuga_UTF8:
+			cmplen = std::strlen( cmpstr);
+			return 0 == strncmp( (const char*)str, cmpstr, cmplen);
+		case papuga_UTF16BE:
+			return starts_langstring_ascii<textwolf::charset::UTF16BE>( (const char*)str, strsize*2, cmpstr);
+		case papuga_UTF16LE:
+			return starts_langstring_ascii<textwolf::charset::UTF16LE>( (const char*)str, strsize*2, cmpstr);
+		case papuga_UTF16:
+			return starts_langstring_ascii<W16CHARSET>( (const char*)str, strsize*2, cmpstr);
+		case papuga_UTF32BE:
+			return starts_langstring_ascii<textwolf::charset::UCS4BE>( (const char*)str, strsize*4, cmpstr);
+		case papuga_UTF32LE:
+			return starts_langstring_ascii<textwolf::charset::UCS4LE>( (const char*)str, strsize*4, cmpstr);
+		case papuga_UTF32:
+			return starts_langstring_ascii<W32CHARSET>( (const char*)str, strsize*4, cmpstr);
+		default:
+			return false;
+	}
+}
+
 template <class LANGCHARSET>
-static char* langstring_toascii( char* destbuf, size_t destbufsize, char const* str, size_t strsize)
+static char* langstring_toascii( char* destbuf, size_t destbufsize, const char* str, size_t strsize)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( reinterpret_cast<const char*>(str), strsize));
+	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
 	size_t destpos = 0;
 	unsigned char chr;
 	for (; 0!=(chr=itr.ascii()) && destpos < destbufsize; ++itr)
 	{
-		destbuf[ destpos] = chr;
+		destbuf[ destpos++] = chr;
 	}
 	if (destpos >= destbufsize) return false;
 	destbuf[ destpos] = 0;
 	return (chr == 0) ? destbuf : 0;
 }
+
+static char* any_langstring_toascii( papuga_StringEncoding enc, char* destbuf, size_t destbufsize, void const* str, size_t strsize)
+{
+	switch (enc)
+	{
+		case papuga_UTF8:
+			return langstring_toascii<textwolf::charset::UTF8>( destbuf, destbufsize, (const char*)str, strsize);
+		case papuga_UTF16BE:
+			return langstring_toascii<textwolf::charset::UTF16BE>( destbuf, destbufsize, (const char*)str, strsize*2);
+		case papuga_UTF16LE:
+			return langstring_toascii<textwolf::charset::UTF16LE>( destbuf, destbufsize, (const char*)str, strsize*2);
+		case papuga_UTF16:
+			return langstring_toascii<W16CHARSET>( destbuf, destbufsize, (const char*)str, strsize*2);
+		case papuga_UTF32BE:
+			return langstring_toascii<textwolf::charset::UCS4BE>( destbuf, destbufsize, (const char*)str, strsize*4);
+		case papuga_UTF32LE:
+			return langstring_toascii<textwolf::charset::UCS4LE>( destbuf, destbufsize, (const char*)str, strsize*4);
+		case papuga_UTF32:
+			return langstring_toascii<W32CHARSET>( destbuf, destbufsize, (const char*)str, strsize*4);
+		default:
+			return 0;
+	}
+}
+
+enum NumericType {NumericDouble,NumericInt,NumericUInt,NumericNone};
+template <class LANGCHARSET>
+static NumericType langstring_tonumstr( char* destbuf, size_t destbufsize, const char* str, size_t strsize)
+{
+	NumericType rt = NumericNone;
+	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
+	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
+	size_t destpos = 0;
+	unsigned char chr = itr.ascii();
+	++itr;
+	if (!chr || destbufsize < 2) return NumericNone;
+	if (chr == '-')
+	{
+		destbuf[ destpos++] = chr;
+		chr = itr.ascii();
+		++itr;
+		if (chr < '0' || chr > '9') return NumericNone;
+
+		rt = NumericInt;
+	}
+	else if (chr >= '0' && chr <= '9')
+	{
+		rt = NumericUInt;
+	}
+	else
+	{
+		return NumericNone;
+	}
+	destbuf[ destpos++] = chr;
+
+	for (++itr; 0!=(chr=itr.ascii()) && destpos < destbufsize; ++itr)
+	{
+		if (chr == '.')
+		{
+			if (rt == NumericDouble) return NumericNone;
+			rt = NumericDouble;
+		}
+		else if (chr < '0' || chr > '9')
+		{
+			break;
+		}
+		destbuf[ destpos++] = chr;
+	}
+	if (destpos < destbufsize && (chr|32) == 'e')
+	{
+		rt = NumericDouble;
+		destbuf[ destpos++] = chr;
+		++itr;
+		chr = itr.ascii();
+		if (destpos < destbufsize && chr == '-')
+		{
+			destbuf[ destpos++] = chr;
+			++itr;
+		}
+		for (; 0!=(chr=itr.ascii()) && destpos < destbufsize; ++itr)
+		{
+			if (chr < '0' || chr > '9')
+			{
+				break;
+			}
+			destbuf[ destpos++] = chr;
+		}
+	}
+	if (chr != 0 || destpos >= destbufsize) return NumericNone;
+	destbuf[ destpos] = 0;
+	return rt;
+}
+
+static NumericType any_langstring_tonumstr( papuga_StringEncoding enc, char* destbuf, size_t destbufsize, const void* str, size_t strsize)
+{
+	switch (enc)
+	{
+		case papuga_UTF8:
+			return langstring_tonumstr<textwolf::charset::UTF8>( destbuf, destbufsize, (const char*)str, strsize);
+		case papuga_UTF16BE:
+			return langstring_tonumstr<textwolf::charset::UTF16BE>( destbuf, destbufsize, (const char*)str, strsize*2);
+		case papuga_UTF16LE:
+			return langstring_tonumstr<textwolf::charset::UTF16LE>( destbuf, destbufsize, (const char*)str, strsize*2);
+		case papuga_UTF16:
+			return langstring_tonumstr<W16CHARSET>( destbuf, destbufsize, (const char*)str, strsize*2);
+		case papuga_UTF32BE:
+			return langstring_tonumstr<textwolf::charset::UCS4BE>( destbuf, destbufsize, (const char*)str, strsize*4);
+		case papuga_UTF32LE:
+			return langstring_tonumstr<textwolf::charset::UCS4LE>( destbuf, destbufsize, (const char*)str, strsize*4);
+		case papuga_UTF32:
+			return langstring_tonumstr<W32CHARSET>( destbuf, destbufsize, (const char*)str, strsize*4);
+		default:
+			return NumericNone;
+	}
+}
+
+static NumericType string_tonumstr( char* destbuf, size_t destbufsize, const char* str, size_t strsize)
+{
+	return langstring_tonumstr<textwolf::charset::UTF8>( destbuf, destbufsize, str, strsize);
+}
+
+static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, const char* numstr)
+{
+	switch (numtype)
+	{
+		case NumericDouble:
+		{
+			papuga_FloatType val;
+			if (scanf( SCAN_FORMAT_DOUBLE, &val) < 1)
+			{
+				return false;
+			}
+			papuga_init_ValueVariant_double( value, val);
+			return true;
+		}
+		case NumericInt:
+		{
+			papuga_IntType val;
+			if (scanf( SCAN_FORMAT_INT, &val) < 1)
+			{
+				return false;
+			}
+			papuga_init_ValueVariant_int( value, val);
+			return true;
+		}
+		case NumericUInt:
+		{
+			papuga_UIntType val;
+			if (scanf( SCAN_FORMAT_UINT, &val) < 1)
+			{
+				return false;
+			}
+			papuga_init_ValueVariant_uint( value, val);
+			return true;
+		}
+		case NumericNone:
+			break;
+	}
+	return false;
+}
+
+static bool bufprint_number_variant( char* buf, std::size_t bufsize, std::size_t& len, const papuga_ValueVariant* value, papuga_ErrorCode* err)
+{
+	if (value->valuetype == papuga_Double)
+	{
+		len = snprintf( buf, bufsize, PRINT_FORMAT_DOUBLE, value->value.Double);
+	}
+	else if (value->valuetype == papuga_Int)
+	{
+		len = snprintf( buf, bufsize, PRINT_FORMAT_INT, value->value.Int);
+	}
+	else if (value->valuetype == papuga_UInt)
+	{
+		len = snprintf( buf, bufsize, PRINT_FORMAT_UINT, value->value.UInt);
+	}
+	else
+	{
+		*err = papuga_TypeError;
+		return false;
+	}
+	if (len >= bufsize)
+	{
+		*err = papuga_BufferOverflowError;
+		return false;
+	}
+	return true;
+}
+
 
 extern "C" char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* val)
 {
@@ -160,123 +484,24 @@ extern "C" char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize,
 	if (val->valuetype == papuga_String)
 	{
 		if (destbufsize <= (size_t)val->length) return 0;
-		memcpy( destbuf, val->value.string, val->length);
-		destbuf[ val->length] = 0;
+		const char* si = val->value.string;
+		char* di = destbuf;
+		while (*si && *si < 128)
+		{
+			*di++ = *si++;
+		}
+		*di = 0;
 		return destbuf;
 	}
 	else//if (val->valuetype == papuga_LangString)
 	{
-		switch ((papuga_StringEncoding)val->encoding)
-		{
-			case papuga_UTF8:
-				if (destbufsize <= (size_t)val->length) return 0;
-				memcpy( destbuf, val->value.string, val->length);
-				destbuf[ val->length] = 0;
-				return destbuf;
-			case papuga_UTF16BE:
-				return langstring_toascii<textwolf::charset::UTF16BE>( destbuf, destbufsize, val->value.string, val->length*2);
-			case papuga_UTF16LE:
-				return langstring_toascii<textwolf::charset::UTF16LE>( destbuf, destbufsize, val->value.string, val->length*2);
-			case papuga_UTF16:
-				return langstring_toascii<W16CHARSET>( destbuf, destbufsize, val->value.string, val->length*2);
-			case papuga_UTF32BE:
-				return langstring_toascii<textwolf::charset::UCS4BE>( destbuf, destbufsize, val->value.string, val->length*4);
-			case papuga_UTF32LE:
-				return langstring_toascii<textwolf::charset::UCS4LE>( destbuf, destbufsize, val->value.string, val->length*4);
-			case papuga_UTF32:
-				return langstring_toascii<W32CHARSET>( destbuf, destbufsize, val->value.string, val->length*4);
-			default:
-				return 0;
-		}
+		return any_langstring_toascii( (papuga_StringEncoding)val->encoding, destbuf, destbufsize, val->value.langstring, val->length);
 	}
 	return 0;
 }
 
-static void bufprint_number_variant( char* buf, std::size_t bufsize, std::size_t& len, const papuga_ValueVariant* value)
-{
-	if (value->valuetype == papuga_Double)
-	{
-		len = snprintf( buf, bufsize, FORMAT_DOUBLE, value->value.Double);
-	}
-	else if (value->valuetype == papuga_Int)
-	{
-		len = snprintf( buf, bufsize, FORMAT_INT, value->value.Int);
-	}
-	else if (value->valuetype == papuga_UInt)
-	{
-		len = snprintf( buf, bufsize, FORMAT_UINT, value->value.UInt);
-	}
-	else
-	{
-		buf[0] = 0;
-		len = 0;
-	}
-}
-
-static papuga_ErrorCode convert_any_langstring_to_uft8string( papuga_StringBuffer* buf, papuga_StringEncoding enc, const char* str, std::size_t strsize)
-{
-	switch (enc)
-	{
-		case papuga_UTF8:
-			return convert_langstring_to_uft8string<textwolf::charset::UTF8>( buf, str, strsize);
-		case papuga_UTF16BE:
-			return convert_langstring_to_uft8string<textwolf::charset::UTF16BE>( buf, str, strsize * 2);
-		case papuga_UTF16LE:
-			return convert_langstring_to_uft8string<textwolf::charset::UTF16LE>( buf, str, strsize * 2);
-		case papuga_UTF16:
-			return convert_langstring_to_uft8string<W16CHARSET>( buf, str, strsize * 2);
-		case papuga_UTF32BE:
-			return convert_langstring_to_uft8string<textwolf::charset::UCS4BE>( buf, str, strsize * 4);
-		case papuga_UTF32LE:
-			return convert_langstring_to_uft8string<textwolf::charset::UCS4LE>( buf, str, strsize * 4);
-		case papuga_UTF32:
-			return convert_langstring_to_uft8string<W32CHARSET>( buf, str, strsize * 4);
-		default:
-			return papuga_TypeError;
-	}
-}
-
-static papuga_ErrorCode convert_uft8string_to_any_langstring( papuga_StringEncoding enc, const char* str, std::size_t strsize, void* buf, size_t bufsize, size_t* len)
-{
-	papuga_ErrorCode rt;
-	switch (enc)
-	{
-		case papuga_UTF8:
-			rt = convert_uft8string_to_langstring<textwolf::charset::UTF8>( (char*)buf, bufsize, len, str, strsize);
-			break;
-		case papuga_UTF16BE:
-			rt = convert_uft8string_to_langstring<textwolf::charset::UTF16BE>( (char*)buf, bufsize*2, len, str, strsize);
-			*len /= 2;
-			break;
-		case papuga_UTF16LE:
-			rt = convert_uft8string_to_langstring<textwolf::charset::UTF16LE>( (char*)buf, bufsize*2, len, str, strsize);
-			*len /= 2;
-			break;
-		case papuga_UTF16:
-			rt = convert_uft8string_to_langstring<W16CHARSET>( (char*)buf, bufsize*2, len, str, strsize);
-			*len /= 2;
-			break;
-		case papuga_UTF32BE:
-			rt = convert_uft8string_to_langstring<textwolf::charset::UCS4BE>( (char*)buf, bufsize*4, len, str, strsize);
-			*len /= 4;
-			break;
-		case papuga_UTF32LE:
-			rt = convert_uft8string_to_langstring<textwolf::charset::UCS4LE>( (char*)buf, bufsize*4, len, str, strsize);
-			*len /= 4;
-			break;
-		case papuga_UTF32:
-			rt = convert_uft8string_to_langstring<W32CHARSET>( (char*)buf, bufsize*4, len, str, strsize);
-			*len /= 4;
-			break;
-		default:
-			rt = papuga_TypeError;
-	}
-	return rt;
-}
-
 extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* value, papuga_StringBuffer* buf, size_t* len, papuga_ErrorCode* err)
 {
-	papuga_ErrorCode ec = papuga_Ok;
 	if (papuga_ValueVariant_isatomic( value))
 	{
 		if (papuga_ValueVariant_isstring( value))
@@ -288,20 +513,13 @@ extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* 
 			}
 			else//if (value->valuetype == papuga_LangString)
 			{
-				ec = convert_any_langstring_to_uft8string( buf, (papuga_StringEncoding)value->encoding, value->value.string, value->length);
-				if (ec != papuga_Ok)
-				{
-					*err = ec;
-					return 0;
-				}
-				*len = buf->arsize;
-				return buf->ar;
+				return any_langstring_to_uft8string( buf, (papuga_StringEncoding)value->encoding, value->value.langstring, value->length, err);
 			}
 		}
 		else//if (papuga_ValueVariant_isnumeric( value))
 		{
 			char localbuf[256];
-			bufprint_number_variant( localbuf, sizeof(localbuf), *len, value);
+			if (!bufprint_number_variant( localbuf, sizeof(localbuf), *len, value, err)) return 0;
 			if (!papuga_StringBuffer_append_string( buf, localbuf, *len))
 			{
 				*err = papuga_NoMemError;
@@ -331,31 +549,14 @@ std::string papuga::ValueVariant_tostring( const papuga_ValueVariant* value, pap
 				}
 				else//if (value->valuetype == papuga_LangString)
 				{
-					switch ((papuga_StringEncoding)value->encoding)
-					{
-						case papuga_UTF8:
-							return convert_langstring_to_uft8string_stl<textwolf::charset::UTF8>( value->value.string, value->length);
-						case papuga_UTF16BE:
-							return convert_langstring_to_uft8string_stl<textwolf::charset::UTF16BE>( value->value.string, value->length * 2);
-						case papuga_UTF16LE:
-							return convert_langstring_to_uft8string_stl<textwolf::charset::UTF16LE>( value->value.string, value->length * 2);
-						case papuga_UTF16:
-							return convert_langstring_to_uft8string_stl<W16CHARSET>( value->value.string, value->length * 2);
-						case papuga_UTF32BE:
-							return convert_langstring_to_uft8string_stl<textwolf::charset::UCS4BE>( value->value.string, value->length * 4);
-						case papuga_UTF32LE:
-							return convert_langstring_to_uft8string_stl<textwolf::charset::UCS4LE>( value->value.string, value->length * 4);
-						case papuga_UTF32:
-							return convert_langstring_to_uft8string_stl<W32CHARSET>( value->value.string, value->length * 4);
-					}
-					return std::string();
+					return any_langstring_to_uft8string_stl( (papuga_StringEncoding)value->encoding, value->value.langstring, value->length);
 				}
 			}
 			else//if (papuga_ValueVariant_isnumeric( value))
 			{
 				char localbuf[256];
 				std::size_t numlen;
-				bufprint_number_variant( localbuf, sizeof(localbuf), numlen, value);
+				if (!bufprint_number_variant( localbuf, sizeof(localbuf), numlen, value, &errcode)) return std::string();
 				return std::string( localbuf, numlen);
 			}
 		}
@@ -373,20 +574,13 @@ std::string papuga::ValueVariant_tostring( const papuga_ValueVariant* value, pap
 
 extern "C" const void* papuga_ValueVariant_tolangstring( const papuga_ValueVariant* value, papuga_StringEncoding enc, void* buf, size_t bufsize, size_t* len, papuga_ErrorCode* err)
 {
-	papuga_ErrorCode ec = papuga_Ok;
 	if (papuga_ValueVariant_isatomic( value))
 	{
 		if (papuga_ValueVariant_isstring( value))
 		{
 			if (value->valuetype == papuga_String || (value->valuetype == papuga_LangString && (papuga_StringEncoding)value->encoding == papuga_UTF8))
 			{
-				ec = convert_uft8string_to_any_langstring( enc, value->value.string, value->length, (char*)buf, bufsize, len);
-				if (ec != papuga_Ok)
-				{
-					*err = ec;
-					return 0;
-				}
-				return buf;
+				return uft8string_to_any_langstring( enc, value->value.string, value->length, (char*)buf, bufsize, len, err);
 			}
 			else
 			{
@@ -398,14 +592,8 @@ extern "C" const void* papuga_ValueVariant_tolangstring( const papuga_ValueVaria
 		{
 			char localbuf[256];
 			std::size_t numlen;
-			bufprint_number_variant( localbuf, sizeof(localbuf), numlen, value);
-			ec = convert_uft8string_to_any_langstring( enc, localbuf, numlen, (char*)buf, bufsize, len);
-			if (ec != papuga_Ok)
-			{
-				*err = ec;
-				return 0;
-			}
-			return buf;
+			if (!bufprint_number_variant( localbuf, sizeof(localbuf), numlen, value, err)) return 0;
+			return uft8string_to_any_langstring( enc, localbuf, numlen, (char*)buf, bufsize, len, err);
 		}
 	}
 	else
@@ -417,9 +605,7 @@ extern "C" const void* papuga_ValueVariant_tolangstring( const papuga_ValueVaria
 
 extern "C" int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, papuga_ErrorCode* err)
 {
-	int64_t rt;
 	char destbuf[256];
-	char* numstr;
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
@@ -454,14 +640,22 @@ extern "C" int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, 
 		}
 		else if (papuga_ValueVariant_isstring( value))
 		{
-			numstr = papuga_ValueVariant_toascii( destbuf, sizeof(destbuf), value);
-			if (numstr == NULL) return 0;
-			if (scanf( FORMAT_INT, &rt) < 1)
+			NumericType numtype;
+			if (value->valuetype == papuga_String)
+			{
+				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
+			}
+			else
+			{
+				numtype = any_langstring_tonumstr( (papuga_StringEncoding)value->encoding, destbuf, sizeof(destbuf), value->value.langstring, value->length);
+			}
+			papuga_ValueVariant numval;
+			if (!numstr_to_variant( &numval, numtype, destbuf))
 			{
 				*err = papuga_TypeError;
 				return 0;
 			}
-			return rt;
+			return papuga_ValueVariant_toint( &numval, err);
 		}
 		else
 		{
@@ -478,9 +672,7 @@ extern "C" int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, 
 
 extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value, papuga_ErrorCode* err)
 {
-	uint64_t rt;
 	char destbuf[256];
-	char* numstr;
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
@@ -509,14 +701,22 @@ extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value
 		}
 		else if (papuga_ValueVariant_isstring( value))
 		{
-			numstr = papuga_ValueVariant_toascii( destbuf, sizeof(destbuf), value);
-			if (numstr == NULL) return 0;
-			if (scanf( FORMAT_UINT, &rt) < 1)
+			NumericType numtype;
+			if (value->valuetype == papuga_String)
+			{
+				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
+			}
+			else
+			{
+				numtype = any_langstring_tonumstr( (papuga_StringEncoding)value->encoding, destbuf, sizeof(destbuf), value->value.langstring, value->length);
+			}
+			papuga_ValueVariant numval;
+			if (!numstr_to_variant( &numval, numtype, destbuf))
 			{
 				*err = papuga_TypeError;
 				return 0;
 			}
-			return rt;
+			return papuga_ValueVariant_touint( &numval, err);
 		}
 		else
 		{
@@ -533,9 +733,7 @@ extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value
 
 extern "C" double papuga_ValueVariant_todouble( const papuga_ValueVariant* value, papuga_ErrorCode* err)
 {
-	double rt;
 	char destbuf[256];
-	char* numstr;
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
@@ -553,13 +751,22 @@ extern "C" double papuga_ValueVariant_todouble( const papuga_ValueVariant* value
 		}
 		else if (papuga_ValueVariant_isstring( value))
 		{
-			numstr = papuga_ValueVariant_toascii( destbuf, sizeof(destbuf), value);
-			if (numstr == NULL) return 0;
-			if (scanf( "%lf", &rt) < 1)
+			NumericType numtype;
+			if (value->valuetype == papuga_String)
+			{
+				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
+			}
+			else
+			{
+				numtype = any_langstring_tonumstr( (papuga_StringEncoding)value->encoding, destbuf, sizeof(destbuf), value->value.langstring, value->length);
+			}
+			papuga_ValueVariant numval;
+			if (!numstr_to_variant( &numval, numtype, destbuf))
 			{
 				*err = papuga_TypeError;
 				return 0;
 			}
+			return papuga_ValueVariant_todouble( &numval, err);
 		}
 	}
 	*err = papuga_TypeError;
@@ -608,102 +815,65 @@ extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, pa
 	return 0;
 }
 
-enum NumericType {NumericDouble,NumericInt,NumericUInt,NumericNone};
-
-static NumericType getNumericType( char const* ni)
+extern "C" bool papuga_ValueVariant_convert_tonumeric( const papuga_ValueVariant* value, papuga_ValueVariant* res, papuga_ErrorCode* err)
 {
-	bool sign = false;
-	if (*ni == '-')
-	{
-		sign = true;
-		++ni;
-	}
-	while (*ni == ' ') ++ni;
-	if (!*ni) return NumericNone;
-	while (*ni >= '0' && *ni <= '9') ++ni;
-	if (*ni == '.' || (*ni|32) == 'E') return NumericDouble;
-	if (*ni) return NumericNone;
-	return sign ? NumericInt : NumericUInt;
-}
-
-extern "C" papuga_ErrorCode papuga_ValueVariant_convert_tonumeric( papuga_ValueVariant* value)
-{
-	char destbuf[256];
-	char* numstr;
+	char destbuf[64];
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
-		if (value->valuetype == papuga_UInt)
+		if (papuga_ValueVariant_isnumeric( value))
 		{
-			papuga_init_ValueVariant_uint( value, value->value.UInt);
-			return papuga_Ok;
+			if (value->valuetype == papuga_UInt)
+			{
+				papuga_init_ValueVariant_uint( res, value->value.UInt);
+				return true;
+			}
+			else if (value->valuetype == papuga_Int)
+			{
+				papuga_init_ValueVariant_int( res, value->value.Int);
+				return true;
+			}
+			else if (value->valuetype == papuga_Double)
+			{
+				papuga_init_ValueVariant_double( res, value->value.Double);
+				return true;
+			}
+			else
+			{
+				*err = papuga_TypeError;
+				return false;
+			}
 		}
-		else if (value->valuetype == papuga_Int)
+		else if (papuga_ValueVariant_isstring( value))
 		{
-			papuga_init_ValueVariant_int( value, value->value.Int);
-			return papuga_Ok;
+			NumericType numtype;
+			if (value->valuetype == papuga_String)
+			{
+				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
+			}
+			else
+			{
+				numtype = any_langstring_tonumstr( (papuga_StringEncoding)value->encoding, destbuf, sizeof(destbuf), value->value.langstring, value->length);
+			}
+			papuga_ValueVariant numval;
+			if (!numstr_to_variant( &numval, numtype, destbuf))
+			{
+				*err = papuga_TypeError;
+				return 0;
+			}
+			return papuga_ValueVariant_convert_tonumeric( &numval, res, err);
 		}
-		else if (value->valuetype == papuga_Double)
+		else
 		{
-			papuga_init_ValueVariant_double( value, value->value.Double);
-			return papuga_Ok;
-		}
-		numstr = papuga_ValueVariant_toascii( destbuf, sizeof(destbuf), value);
-
-		if (numstr == NULL) return papuga_TypeError;
-		switch (getNumericType( numstr))
-		{
-			case NumericDouble:
-			{
-				papuga_ErrorCode rt;
-				double cv = papuga_ValueVariant_todouble( value, &rt);
-				if (rt != papuga_Ok)
-				{
-					papuga_init_ValueVariant( value);
-				}
-				else
-				{
-					papuga_init_ValueVariant_double( value, cv);
-				}
-				return rt;
-			}
-			case NumericInt:
-			{
-				papuga_ErrorCode rt;
-				int64_t cv = papuga_ValueVariant_toint( value, &rt);
-				if (rt != papuga_Ok)
-				{
-					papuga_init_ValueVariant( value);
-				}
-				else
-				{
-					papuga_init_ValueVariant_int( value, cv);
-				}
-				return rt;
-			}
-			case NumericUInt:
-			{
-				papuga_ErrorCode rt;
-				uint64_t cv = papuga_ValueVariant_touint( value, &rt);
-				if (rt != papuga_Ok)
-				{
-					papuga_init_ValueVariant( value);
-				}
-				else
-				{
-					papuga_init_ValueVariant_uint( value, cv);
-				}
-				return rt;
-			}
-			case NumericNone:
-			default:
-			{
-				break;
-			}
+			*err = papuga_TypeError;
+			return false;
 		}
 	}
-	papuga_init_ValueVariant( value);
-	return papuga_TypeError;
+	else
+	{
+		*err = papuga_TypeError;
+		return false;
+	}
 }
 
 extern "C" bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* val, const char* cmpstr)
@@ -715,25 +885,7 @@ extern "C" bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* va
 	}
 	else//if (val->valuetype == papuga_LangString)
 	{
-		switch ((papuga_StringEncoding)val->encoding)
-		{
-			case papuga_UTF8:
-				return 0 == strncmp( val->value.string, cmpstr, val->length);
-			case papuga_UTF16BE:
-				return compare_langstring_ascii<textwolf::charset::UTF16BE>( val->value.string, val->length*2, cmpstr);
-			case papuga_UTF16LE:
-				return compare_langstring_ascii<textwolf::charset::UTF16LE>( val->value.string, val->length*2, cmpstr);
-			case papuga_UTF16:
-				return compare_langstring_ascii<W16CHARSET>( val->value.string, val->length*2, cmpstr);
-			case papuga_UTF32BE:
-				return compare_langstring_ascii<textwolf::charset::UCS4BE>( val->value.string, val->length*4, cmpstr);
-			case papuga_UTF32LE:
-				return compare_langstring_ascii<textwolf::charset::UCS4LE>( val->value.string, val->length*4, cmpstr);
-			case papuga_UTF32:
-				return compare_langstring_ascii<W32CHARSET>( val->value.string, val->length*4, cmpstr);
-			default:
-				return false;
-		}
+		return compare_any_langstring_ascii( (papuga_StringEncoding)val->encoding, val->value.langstring, val->length, cmpstr);
 	}
 	return false;
 }
@@ -750,27 +902,8 @@ extern "C" bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* val
 	}
 	else//if (val->valuetype == papuga_LangString)
 	{
-		switch ((papuga_StringEncoding)val->encoding)
-		{
-			case papuga_UTF8:
-				return 0 == strncmp( val->value.string, cmpstr, cmplen);
-			case papuga_UTF16BE:
-				return starts_langstring_ascii<textwolf::charset::UTF16BE>( val->value.string, val->length*2, cmpstr);
-			case papuga_UTF16LE:
-				return starts_langstring_ascii<textwolf::charset::UTF16LE>( val->value.string, val->length*2, cmpstr);
-			case papuga_UTF16:
-				return starts_langstring_ascii<W16CHARSET>( val->value.string, val->length*2, cmpstr);
-			case papuga_UTF32BE:
-				return starts_langstring_ascii<textwolf::charset::UCS4BE>( val->value.string, val->length*4, cmpstr);
-			case papuga_UTF32LE:
-				return starts_langstring_ascii<textwolf::charset::UCS4LE>( val->value.string, val->length*4, cmpstr);
-			case papuga_UTF32:
-				return starts_langstring_ascii<W32CHARSET>( val->value.string, val->length*4, cmpstr);
-			default:
-				return false;
-		}
+		return starts_any_langstring_ascii( (papuga_StringEncoding)val->encoding, val->value.langstring, val->length, cmpstr);
 	}
-	return false;
 }
 
 
