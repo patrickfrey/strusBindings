@@ -291,19 +291,30 @@ struct ParameterSructureExpanded
 		}
 	}
 
-	void printMethodCall( std::ostream& out, const std::string& indent, const std::string& methodname, const std::string& returnvalue)
+	std::string mapInitReturnValue( const strus::VariableValue& returnvalue, const std::string& expression)
 	{
+		if (returnvalue.type().hasEvent("retv_map"))
+		{
+			return returnvalue.expand( "retv_map", "retval", expression.c_str());
+		}
+		else if (returnvalue.type().source() == "void")
+		{
+			return expression;
+		}
+		else
+		{
+			throw std::runtime_error( std::string("no return value type map declared for '") + returnvalue.type().source() + "'");
+		}
+	}
+
+	void printMethodCall( std::ostream& out, const std::string& indent, const std::string& methodname, const strus::VariableValue& returnvalue)
+	{
+		std::string expression;
 		if (param_converted.size() == 0)
 		{
 			out << indent << "if (argc > 0) throw strus::runtime_error(_TXT(\"no arguments expected\"));" << std::endl;
-			if (returnvalue == "void")
-			{
-				out << indent << "THIS->" << methodname << "();" << std::endl;
-			}
-			else
-			{
-				out << indent << "retval = THIS->" << methodname << "();" << std::endl;
-			}
+			std::string expression = "THIS->" + methodname + "()";
+			out << indent << mapInitReturnValue( returnvalue, expression) << std::endl;
 		}
 		else
 		{
@@ -311,14 +322,8 @@ struct ParameterSructureExpanded
 			out << indent << "{" << std::endl;
 			for (std::size_t pidx=min_nofargs; pidx<=param_converted.size(); ++pidx)
 			{
-				if (returnvalue == "void")
-				{
-					out << indent << "\tcase " << pidx << ": " << "THIS->" << methodname << "(" << expandCallParameter( pidx) << "); break;" << std::endl;
-				}
-				else
-				{
-					out << indent << "\tcase " << pidx << ": retval = THIS->" << methodname << "(" << expandCallParameter( pidx) << "); break;" << std::endl;
-				}
+				std::string expression = "THIS->" + methodname + "(" + expandCallParameter( pidx) + ")";
+				out << indent << "\tcase " << pidx << ": " << mapInitReturnValue( returnvalue, expression) << " break;" << std::endl;
 			}
 			out << indent << "\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
 			out << indent << "}" << std::endl;
@@ -357,7 +362,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "\t{\\" << std::endl;
 	out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
-	out << "\treturn false;" << std::endl;
+	out << "\treturn false;" << std::endl << std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),

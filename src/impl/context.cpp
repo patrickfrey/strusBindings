@@ -6,7 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/storage.hpp"
+#include "impl/vector.hpp"
 #include "impl/statistics.hpp"
+#include "impl/query.hpp"
+#include "impl/analyzer.hpp"
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"
 #include "strus/lib/module.hpp"
@@ -36,7 +39,6 @@
 #include "internationalization.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
-#include "callResultUtils.hpp"
 #include "structDefs.hpp"
 #include "traceUtils.hpp"
 
@@ -128,15 +130,10 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	}
 }
 
-CallResult ContextImpl::getLastError() const
+const char* ContextImpl::getLastError() const
 {
-	CallResult rt;
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	if (errorhnd->hasError())
-	{
-		rt.reportError( "%s", errorhnd->fetchError());
-	}
-	return rt;
+	return errorhnd->fetchError();
 }
 
 void ContextImpl::loadModule( const std::string& name_)
@@ -170,10 +167,10 @@ void ContextImpl::addResourcePath( const std::string& paths_)
 	moduleLoader->addResourcePath( paths_);
 }
 
-CallResult ContextImpl::createStatisticsProcessor( const std::string& name)
+StatisticsProcessorImpl* ContextImpl::createStatisticsProcessor( const std::string& name)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return callResultObject( new StatisticsProcessorImpl( m_storage_objbuilder_impl, m_trace_impl, name, m_errorhnd_impl));
+	return new StatisticsProcessorImpl( m_storage_objbuilder_impl, m_trace_impl, name, m_errorhnd_impl);
 }
 
 void ContextImpl::initStorageObjBuilder()
@@ -248,7 +245,7 @@ void ContextImpl::initAnalyzerObjBuilder()
 	m_analyzer_objbuilder_impl.resetOwnership( analyzerObjectBuilder);
 }
 
-CallResult ContextImpl::detectDocumentClass( const std::string& content)
+analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& content)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -261,30 +258,30 @@ CallResult ContextImpl::detectDocumentClass( const std::string& content)
 	Reference<analyzer::DocumentClass> dclass( new analyzer::DocumentClass());
 	if (m_textproc->detectDocumentClass( *dclass, content.c_str(), content.size()))
 	{
-		return callResultStructureOwnership( dclass.release());
+		return dclass.release();
 	}
 	else
 	{
 		if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to detect document class: %s"), errorhnd->fetchError());
-		return CallResult();
+		return 0;
 	}
 }
 
-CallResult ContextImpl::createStorageClient( const ValueVariant& config_)
+StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return callResultObject( new StorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd)));
+	return new StorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
 }
 
-CallResult ContextImpl::createVectorStorageClient( const ValueVariant& config_)
+VectorStorageClientImpl* ContextImpl::createVectorStorageClient( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return callResultObject( new VectorStorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd)));
+	return new VectorStorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
 }
 
-CallResult ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
+DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	if (!m_textproc)
@@ -297,19 +294,19 @@ CallResult ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
 			throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 		}
 	}
-	return callResultObject( new DocumentAnalyzerImpl( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl, doctype, m_textproc));
+	return new DocumentAnalyzerImpl( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl, doctype, m_textproc);
 }
 
-CallResult ContextImpl::createQueryAnalyzer()
+QueryAnalyzerImpl* ContextImpl::createQueryAnalyzer()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return callResultObject( new QueryAnalyzerImpl( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl));
+	return new QueryAnalyzerImpl( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl);
 }
 
-CallResult ContextImpl::createQueryEval()
+QueryEvalImpl* ContextImpl::createQueryEval()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return callResultObject( new QueryEvalImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl));
+	return new QueryEvalImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl);
 }
 
 void ContextImpl::createStorage( const ValueVariant& config_)

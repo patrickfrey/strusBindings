@@ -104,7 +104,10 @@ static bool isOperator( char ch)
 }
 static void skipBrackets( char const*& si, const char* se, char sb, char eb)
 {
-	if (si == se || *si != sb) throw std::runtime_error("internal: illegal call of skipBrackets");
+	if (si == se || *si != sb)
+	{
+		throw std::runtime_error("internal: illegal call of skipBrackets");
+	}
 	int cnt = 1;
 	++si;
 	skipSpacesAndComments( si, se);
@@ -172,9 +175,10 @@ static void skipStructure( char const*& si, const char* se)
 		skipBrackets( si, se, '{', '}');
 		skipSpacesAndComments( si, se);
 	}
-	else if (*si == ';')
+	if (*si == ';')
 	{
 		++si;
+		skipSpacesAndComments( si, se);
 	}
 }
 
@@ -609,7 +613,7 @@ std::string MethodDef::tostring() const
 {
 	std::ostringstream out;
 	out << "METHOD " << m_name << std::endl;
-	out << "\tRETURN { " << m_returnvalue << "}" << std::endl;
+	out << "\tRETURN { " << m_returnvalue.tostring() << "}" << std::endl;
 	out << "\tPARAMS ( ";
 	std::vector<VariableValue>::const_iterator pi = m_param.begin(), pe = m_param.end();
 	for (int pidx=0; pi != pe; ++pi,++pidx)
@@ -758,6 +762,7 @@ void InterfacesDef::addSource( const std::string& source)
 			if (*si == ';')
 			{
 				++si;
+				skipSpacesAndComments( si, se);
 			}
 			else if (isAlpha( *si))
 			{
@@ -888,6 +893,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 		if (*si == ';')
 		{
 			++si;
+			skipSpacesAndComments( si, se);
 		}
 		else if (*si == '~')
 		{
@@ -958,6 +964,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 			}
 			else if (ident == "class" && !privateScope)
 			{
+				skipSpacesAndComments( si, se);
 				char const* sn = si;
 				skipStructure( sn, se);
 				std::string subClassName = parseIdentifier( si, sn);
@@ -974,8 +981,8 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				if (*si == ';') continue;
 				if (*si == '{')
 				{
-					++si;
 					skipBrackets( si, sn, '{', '}');
+					if (si != se && *si == ';') ++si;
 				}
 				skipSpacesAndComments( si, sn);
 				if (si != sn)
@@ -1035,7 +1042,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 			{
 				std::string methodName( className.empty()?std::string():guessMethodName( si, se));
 				si = start;
-				std::string retvaltype = parseIdentifier( si, se);
+				VariableValue retvaltype = m_typeSystem->parse( className, methodName, si, se);
 
 				skipSpacesAndComments( si, se);
 				if (si == se || !isAlpha( *si))

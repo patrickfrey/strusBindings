@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/statistics.hpp"
+#include "impl/struct.hpp"
 #include "strus/storageClientInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
 #include "strus/statisticsProcessorInterface.hpp"
@@ -14,6 +15,9 @@
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
+#include "papugaSerialization.hpp"
+#include "serializer.hpp"
+#include "valueVariantWrap.hpp"
 #include "internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
@@ -31,7 +35,7 @@ StatisticsIteratorImpl::StatisticsIteratorImpl( const HostObjectReference& objbu
 	,m_iter_impl(iter_)
 {}
 
-CallResult StatisticsIteratorImpl::getNext()
+std::string* StatisticsIteratorImpl::getNext()
 {
 	StatisticsIteratorInterface* iter = m_iter_impl.getObject<StatisticsIteratorInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -44,7 +48,7 @@ CallResult StatisticsIteratorImpl::getNext()
 			throw strus::runtime_error( _TXT("error fetching statistics message: %s"), errorhnd->fetchError());
 		}
 	}
-	return std::string( outmsg, outmsgsize);
+	return new std::string( outmsg, outmsgsize);
 }
 
 StatisticsProcessorImpl::StatisticsProcessorImpl( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const std::string& name_, const HostObjectReference& errorhnd_)
@@ -68,35 +72,39 @@ StatisticsProcessorImpl::StatisticsProcessorImpl( const HostObjectReference& obj
 
 typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
 
-CallResult StatisticsProcessorImpl::decode( const std::string& blob) const
+Struct* StatisticsProcessorImpl::decode( const std::string& blob) const
 {
-	CallResult rt;
+	Reference<Struct> rt( new Struct());
+	papuga_Serialization* ser = &rt->serialization;
+	bool serflag = true;
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* proc = m_statsproc;
 	StatisticsViewerInterface* viewer;
 	rt.object.resetOwnership( viewer = proc->createViewer( blob.c_str(), blob.size()));
 	if (!viewer) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 
-	rt.serialization.pushName( "dfchange");
-	rt.serialization.pushOpen();
+	serflag &= papuga_Serialization_pushName_charp( ser, "dfchange");
+	serflag &= papuga_Serialization_pushOpen( ser);
+
 	DocumentFrequencyChange rec;
 	while (viewer->nextDfChange( rec))
 	{
-		Serializer::serialize( rt.serialization, rec);
+		serflag &= Serializer::serialize_nothrow( ser, rec);
 	}
 	rt.serialization.pushClose();
-	rt.serialization.pushName( "nofdocs");
-	rt.serialization.pushValue( (ValueVariant::IntType) viewer->nofDocumentsInsertedChange());
+	serflag &= papuga_Serialization_pushClose( ser);
+	serflag &= papuga_Serialization_pushName_charp( ser, "nofdocs");
+	serflag &= papuga_Serialization_pushValue_int( ser, viewer->nofDocumentsInsertedChange());
 
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "error statistics message structure from blob: %s"), errorhnd->fetchError());
 	}
-	rt.value.init( &rt.serialization);
-	return rt;
+	if (!serflag) throw std::bad_alloc();
+	return rt.release();
 }
 
-CallResult StatisticsProcessorImpl::encode( const ValueVariant& msg) const
+std::string* StatisticsProcessorImpl::encode( const ValueVariant& msg) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* proc = m_statsproc;
@@ -105,18 +113,18 @@ CallResult StatisticsProcessorImpl::encode( const ValueVariant& msg) const
 	if (!builder.get()) throw strus::runtime_error(_TXT("failed to create builder for statistics: %s"), errorhnd->fetchError());
 	Deserializer::buildStatistics( builder.get(), msg, errorhnd);
 
-	std::string rt;
+	Reference<std::string> rt( new std::string());
 	const char* blk;
 	std::size_t blksize;
 	if (builder->fetchMessage( blk, blksize))
 	{
-		rt.append( blk, blksize);
+		rt->append( blk, blksize);
 	}
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "error creating blob from statistics message structure: %s"), errorhnd->fetchError());
 	}
-	return rt;
+	return rt.release();
 }
 
 

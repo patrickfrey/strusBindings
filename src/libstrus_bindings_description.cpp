@@ -37,7 +37,7 @@ static const papuga_MethodDescription g_methods_Context[16] =
 	{"close", "_strus_binding_Context__close", true, 0},
 	{0,0,0}
 };
-static const papuga_MethodDescription g_methods_StorageClient[8] = 
+static const papuga_MethodDescription g_methods_StorageClient[9] = 
 {
 	{"nofDocumentsInserted", "_strus_binding_StorageClient__nofDocumentsInserted", true, 0},
 	{"createTransaction", "_strus_binding_StorageClient__createTransaction", true, 0},
@@ -45,6 +45,7 @@ static const papuga_MethodDescription g_methods_StorageClient[8] =
 	{"createUpdateStatisticsIterator", "_strus_binding_StorageClient__createUpdateStatisticsIterator", true, 0},
 	{"createDocumentBrowser", "_strus_binding_StorageClient__createDocumentBrowser", true, 0},
 	{"config", "_strus_binding_StorageClient__config", true, 0},
+	{"configstring", "_strus_binding_StorageClient__configstring", true, 0},
 	{"close", "_strus_binding_StorageClient__close", true, 0},
 	{0,0,0}
 };
@@ -82,7 +83,7 @@ static const papuga_MethodDescription g_methods_VectorStorageSearcher[4] =
 	{"close", "_strus_binding_VectorStorageSearcher__close", true, 0},
 	{0,0,0}
 };
-static const papuga_MethodDescription g_methods_VectorStorageClient[13] = 
+static const papuga_MethodDescription g_methods_VectorStorageClient[14] = 
 {
 	{"createSearcher", "_strus_binding_VectorStorageClient__createSearcher", true, 2},
 	{"createTransaction", "_strus_binding_VectorStorageClient__createTransaction", true, 0},
@@ -95,6 +96,7 @@ static const papuga_MethodDescription g_methods_VectorStorageClient[13] =
 	{"featureIndex", "_strus_binding_VectorStorageClient__featureIndex", true, 1},
 	{"nofFeatures", "_strus_binding_VectorStorageClient__nofFeatures", true, 0},
 	{"config", "_strus_binding_VectorStorageClient__config", true, 0},
+	{"configstring", "_strus_binding_VectorStorageClient__configstring", true, 0},
 	{"close", "_strus_binding_VectorStorageClient__close", true, 0},
 	{0,0,0}
 };

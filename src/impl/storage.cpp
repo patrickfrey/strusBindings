@@ -7,6 +7,7 @@
  */
 #include "impl/storage.hpp"
 #include "impl/statistics.hpp"
+#include "impl/struct.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/storageClientInterface.hpp"
 #include "strus/storageTransactionInterface.hpp"
@@ -20,7 +21,9 @@
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/base/configParser.hpp"
-#include "valueVariantConv.hpp"
+#include "papugaSerialization.hpp"
+#include "serializer.hpp"
+#include "valueVariantWrap.hpp"
 #include "internationalization.hpp"
 #include "metadataop.hpp"
 #include "deserializer.hpp"
@@ -48,20 +51,20 @@ StorageClientImpl::StorageClientImpl( const HostObjectReference& objbuilder, con
 	}
 }
 
-CallResult StorageClientImpl::nofDocumentsInserted() const
+unsigned int StorageClientImpl::nofDocumentsInserted() const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
 	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->nofDocumentsInserted();
 }
 
-CallResult StorageClientImpl::createTransaction() const
+StorageTransactionImpl* StorageClientImpl::createTransaction() const
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	return callResultObject( new StorageTransactionImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl));
+	return new StorageTransactionImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl);
 }
 
-CallResult StorageClientImpl::createInitStatisticsIterator( bool sign)
+StatisticsIteratorImpl* StorageClientImpl::createInitStatisticsIterator( bool sign)
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
@@ -72,10 +75,10 @@ CallResult StorageClientImpl::createInitStatisticsIterator( bool sign)
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
-	return callResultObject( new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter));
+	return new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
-CallResult StorageClientImpl::createUpdateStatisticsIterator()
+StatisticsIteratorImpl* StorageClientImpl::createUpdateStatisticsIterator()
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
@@ -86,13 +89,13 @@ CallResult StorageClientImpl::createUpdateStatisticsIterator()
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
 	}
-	return callResultObject( new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter));
+	return new StatisticsIteratorImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
-CallResult StorageClientImpl::createDocumentBrowser() const
+DocumentBrowserImpl* StorageClientImpl::createDocumentBrowser() const
 {
 	if (!m_objbuilder_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	return callResultObject( new DocumentBrowserImpl( m_objbuilder_impl, m_trace_impl, m_storage_impl, m_errorhnd_impl));
+	return new DocumentBrowserImpl( m_objbuilder_impl, m_trace_impl, m_storage_impl, m_errorhnd_impl);
 }
 
 void StorageClientImpl::close()
@@ -107,14 +110,21 @@ void StorageClientImpl::close()
 	}
 }
 
-CallResult StorageClientImpl::config() const
+std::string StorageClientImpl::configstring() const
+{
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	return storage->config();
+}
+
+std::vector<std::pair<std::string,std::string> >* StorageClientImpl::config() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	typedef std::vector<std::pair<std::string,std::string> > Configuration;
-	CallResult rt( callResultStructureOwnership( new Configuration( getConfigStringItems( storage->config(), errorhnd))));
+	Configuration* rt( new Configuration( getConfigStringItems( storage->config(), errorhnd)));
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
@@ -223,7 +233,7 @@ void DocumentBrowserImpl::addMetaDataRestrictionCondition(
 	restriction->addCondition( cmpop, name, ValueVariantConv::tonumeric(value), newGroup);
 }
 
-CallResult DocumentBrowserImpl::skipDoc( int docno)
+Index DocumentBrowserImpl::skipDoc( int docno)
 {
 	if (!m_postingitr_impl.get())
 	{
@@ -239,71 +249,71 @@ CallResult DocumentBrowserImpl::skipDoc( int docno)
 	return itr->skipDoc( docno);
 }
 
-CallResult DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected)
+Struct* DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected)
 {
-	if (docno <= 0)
+	if (docno <= 0) throw strus::runtime_error(_TXT("document browser get called without valid document selected"));
+
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	std::vector<std::string> elemlist = Deserializer::getStringList( elementsSelected);
+	AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
+	MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
+	bool attributereader_called = false;
+	bool metadatareader_called = false;
+
+	Reference<Struct> rt( new Struct());
+	papuga_Serialization* res = &rt->serialization;
+	bool serflag = true;
+	serflag &= papuga_Serialization_pushOpen( res);
+	std::vector<int> miar( elemlist.size(), -1);
+
+	std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
+	for (int eidx=0; ei != ee; ++ei,++eidx)
 	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		std::vector<std::string> elemlist = Deserializer::getStringList( elementsSelected);
-		AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
-		MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
-		bool attributereader_called = false;
-		bool metadatareader_called = false;
-
-		CallResult rt;
-		rt.serialization.pushOpen();
-		std::vector<int> miar( elemlist.size(), -1);
-
-		std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
-		for (int eidx=0; ei != ee; ++ei,++eidx)
+		Index eh = attributereader->elementHandle( ei->c_str());
+		if (eh)
 		{
-			Index eh = attributereader->elementHandle( ei->c_str());
-			if (eh)
+			if (!attributereader_called)
 			{
-				if (!attributereader_called)
-				{
-					attributereader->skipDoc( docno);
-					attributereader_called = true;
-				}
-				miar[ eidx] = rt.stringbuf.size();
-				rt.stringbuf.append( attributereader->getValue( eh));
-				rt.stringbuf.push_back( '\0');
+				attributereader->skipDoc( docno);
+				attributereader_called = true;
 			}
+			miar[ eidx] = rt.stringbuf.size();
+			rt->strings.append( attributereader->getValue( eh));
+			rt->strings.push_back( '\0');
 		}
-		ei = elemlist.begin(), ee = elemlist.end();
-		for (int eidx=0; ei != ee; ++ei,++eidx)
+	}
+	ei = elemlist.begin(), ee = elemlist.end();
+	for (int eidx=0; ei != ee; ++ei,++eidx)
+	{
+		if (miar[ eidx] >= 0)
 		{
-			if (miar[ eidx] >= 0)
+			serflag &= papuga_Serialization_pushValue_charp( res, rt->strings.c_str() + miar[ eidx]);
+		}
+		else
+		{
+			Index eh = metadatareader->elementHandle( ei->c_str());
+			if (eh >= 0)
 			{
-				rt.serialization.pushValue( ValueVariant( rt.stringbuf.c_str() + miar[ eidx]));
+				if (!metadatareader_called)
+				{
+					metadatareader->skipDoc( docno);
+					metadatareader_called = true;
+				}
+				serflag &= Serializer::serialize_nothrow( res, metadatareader->getValue( eh));
 			}
 			else
 			{
-				Index eh = metadatareader->elementHandle( ei->c_str());
-				if (eh >= 0)
-				{
-					if (!metadatareader_called)
-					{
-						metadatareader->skipDoc( docno);
-						metadatareader_called = true;
-					}
-					rt.serialization.pushValue( ValueVariantConv::fromnumeric( metadatareader->getValue( eh)));
-				}
-				else
-				{
-					rt.serialization.pushValue( ValueVariant());
-				}
+				serflag &= papuga_Serialization_pushValue_void( res);
 			}
 		}
-		rt.serialization.pushClose();
-		if (errorhnd->hasError())
-		{
-			throw strus::runtime_error(_TXT("error getting document attributes and metadata with document browser: %s"), errorhnd->fetchError());
-		}
-		rt.value.init( &rt.serialization);
-		return rt;
 	}
-	throw strus::runtime_error(_TXT("document browser get called without valid document selected"));
+	serflag &= papuga_Serialization_pushClose( res);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("error getting document attributes and metadata with document browser: %s"), errorhnd->fetchError());
+	}
+	if (!serflag) throw std::bad_alloc();
+	return rt.release();
 }
 
 

@@ -205,15 +205,15 @@ static bool serialize_positional( papuga_Serialization* result, const analyzer::
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators, bool labeled)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const QueryAnalyzerImpl::AnalyzeResult& val)
 {
-	if (labeled)
+	if (val.labeledOutput())
 	{
-		return serialize_labeled( result, val, operators);
+		return serialize_labeled( result, *val.query(), val.operators());
 	}
 	else
 	{
-		return serialize_positional( result, val, operators);
+		return serialize_positional( result, *val.query(), val.operators());
 	}
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsViewerInterface::DocumentFrequencyChange& val)
@@ -265,6 +265,10 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 	return serializeArray( result, val);
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val)
+{
+	return serializeIntArray( result, val);
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<Index>& val)
 {
 	return serializeIntArray( result, val);
 }

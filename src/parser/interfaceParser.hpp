@@ -90,13 +90,13 @@ private:
 class MethodDef
 {
 public:
-	MethodDef( const std::string& name_, const std::string& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_)
+	MethodDef( const std::string& name_, const VariableValue& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_)
 		:m_name(name_),m_returnvalue(returnvalue_),m_param(param_),m_isconst(isconst_){}
 	MethodDef( const MethodDef& o)
 		:m_name(o.m_name),m_returnvalue(o.m_returnvalue),m_param(o.m_param),m_isconst(o.m_isconst){}
 
 	const std::string& name() const				{return m_name;}
-	const std::string& returnValue() const			{return m_returnvalue;}
+	const VariableValue& returnValue() const		{return m_returnvalue;}
 	const std::vector<VariableValue>& parameters() const	{return m_param;}
 	bool isconst() const					{return m_isconst;}
 
@@ -104,7 +104,7 @@ public:
 
 private:
 	std::string m_name;
-	std::string m_returnvalue;
+	VariableValue m_returnvalue;
 	std::vector<VariableValue> m_param;
 	bool m_isconst;
 };

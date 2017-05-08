@@ -6,11 +6,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/analyzer.hpp"
+#include "impl/analyzedQuery.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "papuga/serialization.hpp"
+#include "papugaSerialization.hpp"
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
 #include "serializer.hpp"
@@ -295,17 +296,17 @@ void DocumentAnalyzerImpl::defineDocument(
 	THIS->defineSubDocument( subDocumentTypeName, selectexpr);
 }
 
-static CallResult analyzeDoc( DocumentAnalyzerInterface* THIS, const std::string& content, const analyzer::DocumentClass& dclass, ErrorBufferInterface* errorhnd)
+static analyzer::Document* analyzeDoc( DocumentAnalyzerInterface* THIS, const std::string& content, const analyzer::DocumentClass& dclass, ErrorBufferInterface* errorhnd)
 {
 	Reference<analyzer::Document> doc( new analyzer::Document( THIS->analyze( content, dclass)));
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
 	}
-	return callResultStructureOwnership( doc.release());
+	return doc.release();
 }
 
-CallResult DocumentAnalyzerImpl::analyze( const std::string& content, const ValueVariant& dclass)
+analyzer::Document* DocumentAnalyzerImpl::analyze( const std::string& content, const ValueVariant& dclass)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
@@ -450,7 +451,7 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-CallResult QueryAnalyzerImpl::analyze(
+QueryAnalyzerImpl::AnalyzeResult* QueryAnalyzerImpl::analyze(
 		const ValueVariant& expression)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -461,19 +462,9 @@ CallResult QueryAnalyzerImpl::analyze(
 	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
 
-	analyzer::Query* qry = new analyzer::Query( anactx->analyze());
-
-	// Build and return the result structure:
-	CallResult rt;
-	rt.object.createOwnership( qry);
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
-	}
 	bool output_labeled = (expression.type == ValueVariant::Serialization && expression.value.serialization->isLabeled());
-	Serializer::serialize( rt.serialization, *qry, exprbuilder.operators(), output_labeled);
-	rt.value.init( &rt.serialization);
-	return rt;
+	Reference<AnalyzeResult> res( new QueryAnalyzerImpl::AnalyzeResult( anactx->analyze(), exprbuilder.operators(), output_labeled));
+	return res.release();
 }
 
 

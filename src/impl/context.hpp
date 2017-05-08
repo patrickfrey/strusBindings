@@ -7,9 +7,8 @@
  */
 #ifndef _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
-#include "papuga/hostObjectReference.hpp"
-#include "papuga/valueVariant.hpp"
-#include "papuga/callResult.hpp"
+#include "papuga/hostObjectReference.h"
+#include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
@@ -19,9 +18,21 @@
 namespace strus {
 namespace bindings {
 
-typedef papuga::ValueVariant ValueVariant;
-typedef papuga::CallResult CallResult;
-typedef papuga::HostObjectReference HostObjectReference;
+/// \brief Forward declaration
+class StatisticsProcessorImpl;
+/// \brief Forward declaration
+class StorageClientImpl;
+/// \brief Forward declaration
+class VectorStorageClientImpl;
+/// \brief Forward declaration
+class DocumentAnalyzerImpl;
+/// \brief Forward declaration
+class QueryAnalyzerImpl;
+/// \brief Forward declaration
+class QueryEvalImpl;
+
+typedef papuga_ValueVariant ValueVariant;
+typedef papuga_HostObjectReference HostObjectReference;
 
 /// \brief Object holding the global context of the strus information retrieval engine
 /// \note There a two modes of this context object operating on a different base.
@@ -42,7 +53,7 @@ public:
 
 	/// \brief Check if there has an error occurred and return it if yes
 	/// \remark Some bindings have coroutines and with a coroutine switch an error message might get lost, because error context is per thread. So if a coroutine switch is done without the last error fetched it might happen that the second coroutine gets the error of the first one. Call this function after calling some method without return value before a state where a context switch is possible.
-	CallResult getLastError() const;
+	const char* getLastError() const;
 
 	/// \brief Load a module
 	/// \param[in] name_ name of the module to load
@@ -61,15 +72,15 @@ public:
 
 	/// \brief Create a statistics message processor instance
 	/// \return the processor
-	CallResult createStatisticsProcessor( const std::string& name);
+	StatisticsProcessorImpl* createStatisticsProcessor( const std::string& name);
 
 	/// \brief Create a storage client instance
 	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or undefined, if the default remote storage of the RPC server is chosen
-	CallResult createStorageClient( const ValueVariant& config_=ValueVariant());
+	StorageClientImpl* createStorageClient( const ValueVariant& config_=ValueVariant());
 
 	/// \brief Create a vector storage client instance
 	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or undefined, if the default remote vector storage of the RPC server is chosen
-	CallResult createVectorStorageClient( const ValueVariant& config_=ValueVariant());
+	VectorStorageClientImpl* createVectorStorageClient( const ValueVariant& config_=ValueVariant());
 
 	/// \brief Create a new storage (physically) described by config
 	/// \param[in] config_ storage configuration (string or structure with named elements) 
@@ -90,17 +101,17 @@ public:
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
 	/// \return the document class (analyzer::DocumentClass)
-	CallResult detectDocumentClass( const std::string& content);
+	analyzer::DocumentClass* detectDocumentClass( const std::string& content);
 
 	/// \brief Create a document analyzer instance
 	/// \param[in] doctype structure describing the segmenter to use (either document class description structure or segmenter name)
-	CallResult createDocumentAnalyzer( const ValueVariant& doctype);
+	DocumentAnalyzerImpl* createDocumentAnalyzer( const ValueVariant& doctype);
 
 	/// \brief Create a query analyzer instance
-	CallResult createQueryAnalyzer();
+	QueryAnalyzerImpl* createQueryAnalyzer();
 
 	/// \brief Create a query evaluation instance
-	CallResult createQueryEval();
+	QueryEvalImpl* createQueryEval();
 
 	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
 	void close();

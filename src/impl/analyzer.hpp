@@ -7,21 +7,22 @@
  */
 #ifndef _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
-#include "papuga/hostObjectReference.hpp"
-#include "papuga/valueVariant.hpp"
-#include "papuga/callResult.hpp"
+#include "papuga/hostObjectReference.h"
+#include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
+#include "strus/reference.hpp"
+#include "strus/analyzer/document.hpp"
+#include "strus/analyzer/query.hpp"
+#include "queryAnalyzerStruct.hpp"
 #include <vector>
 #include <string>
-#include "queryAnalyzerStruct.hpp"
 
 namespace strus {
 namespace bindings {
 
-typedef papuga::ValueVariant ValueVariant;
-typedef papuga::CallResult CallResult;
-typedef papuga::HostObjectReference HostObjectReference;
+typedef papuga_ValueVariant ValueVariant;
+typedef papuga_HostObjectReference HostObjectReference;
 
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 
@@ -160,8 +161,8 @@ public:
 	/// \brief Analye a content and return the analyzed document structure
 	/// \param[in] content std::string (NOT a file name !) of the document to analyze
 	/// \param[in] documentClass document class of the document to analyze (see analyzer::DocumentClass), if not specified the document class is guessed from the content with document class detection
-	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes) (See analyzer::Document)
-	CallResult analyze(
+	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes)
+	analyzer::Document* analyze(
 			const std::string& content,
 			const ValueVariant& documentClass=ValueVariant());
 
@@ -248,10 +249,34 @@ public:
 	/// \param[in] groupBy kind of selection of the arguments grouped ("position": elements with same position get their own group, "all" (or "" default): all elements of the field get into one group
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, const std::string& groupBy);
 
+	/// \brief Structure holding all parts needed for serializing an analyzed query
+	class AnalyzeResult
+	{
+	public:
+		/// \brief Constructor
+		AnalyzeResult( const Reference<analyzer::Query>& query_, const std::vector<QueryAnalyzerStruct::Operator>& operators_, bool labeledOutput_)
+			:m_query(query_),m_operators(operators_),m_labeledOutput(labeledOutput_){}
+		/// \brief Copy constructor
+		AnalyzeResult( const AnalyzeResult& o)
+			:m_query(o.m_query),m_operators(o.m_operators),m_labeledOutput(o.m_labeledOutput){}
+	
+		/// \brief Reference to query structure
+		const Reference<analyzer::Query>& query() const				{return m_query;}
+		/// \brief Operators defined
+		const std::vector<QueryAnalyzerStruct::Operator>& operators() const	{return m_operators;}
+		/// \brief Defines the serialization of output depending on input (positional
+		bool labeledOutput() const						{return m_labeledOutput;}
+	
+	private:
+		Reference<analyzer::Query> m_query;
+		std::vector<QueryAnalyzerStruct::Operator> m_operators;
+		bool m_labeledOutput;
+	};
+
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] expression query expression tree
 	/// \return structure of the query analyzed, depending on input the output structures are positional or labeled
-	CallResult analyze( const ValueVariant& expression);
+	AnalyzeResult* analyze( const ValueVariant& expression);
 
 private:
 	/// \brief Constructor used by Context

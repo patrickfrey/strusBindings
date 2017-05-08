@@ -10,8 +10,8 @@
 /// \brief Helper templates to build the CallResult structure, the uniform return value of binding methods
 /// \file callResultUtils.hpp
 #include "strus/bindingClassId.hpp"
-#include "papuga/callResult.hpp"
-#include "papuga/valueVariant.hpp"
+#include "papuga/callResult.h"
+#include "papuga/valueVariant.h"
 #include "papugaSerialization.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
@@ -19,6 +19,7 @@
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"
 #include "impl/statistics.hpp"
+#include "impl/struct.hpp"
 #include "implTraits.hpp"
 #include "serializer.hpp"
 
@@ -26,41 +27,48 @@ namespace strus {
 namespace bindings {
 
 template <typename STRUCTVALUE>
-static papuga::CallResult callResultStructureOwnership( STRUCTVALUE* st)
+static void initCallResultStructureOwnership( papuga::CallResult& retval, STRUCTVALUE* st)
 {
-	papuga::CallResult rt;
-	rt.object.createOwnership( st);
-	Serializer::serialize( rt.serialization, *st);
-	rt.value.init( &rt.serialization);
-	return rt;
+	retval.object.createOwnership( st);
+	Serializer::serialize( retval.serialization, *st);
+	retval.value.init( &retval.serialization);
+}
+
+template <>
+static void initCallResultStructureOwnership<Struct>( papuga::CallResult& retval, Struct* st)
+{
+	retval.object.createOwnership( st);
+	retval.value.init( &st->serialization);
 }
 
 template <typename STRUCTVALUE>
-static papuga::CallResult callResultStructureConst( const STRUCTVALUE* st)
+static void initCallResultStructureConst( papuga::CallResult& retval, const STRUCTVALUE* st)
 {
-	papuga::CallResult rt;
-	Serializer::serialize( rt.serialization, *st);
-	rt.value.init( &rt.serialization);
-	return rt;
+	Serializer::serialize( retval.serialization, *st);
+	retval.value.init( &retval.serialization);
 }
 
 template <typename STRUCTVALUE>
-static papuga::CallResult callResultStructure( const STRUCTVALUE& st)
+static void initCallResultNumericValues( papuga::CallResult& retval, const STRUCTVALUE& st)
 {
-	papuga::CallResult rt;
-	Serializer::serialize( rt.serialization, st);
-	rt.value.init( &rt.serialization);
-	return rt;
+	Serializer::serialize( retval.serialization, st);
+	retval.value.init( &retval.serialization);
 }
 
 template <typename OBJECT>
-static papuga::CallResult callResultObject( OBJECT* st)
+static void initCallResultObjectOwnership( papuga::CallResult& retval, OBJECT* st)
 {
-	papuga::CallResult rt;
-	rt.object.createOwnership( st);
-	rt.value.init( (const void*)st, ClassIdMap::get(*st));
-	return rt;
+	HostObjectReference::initOwnership( &retval.object, st);
+	retval.value.init( (const void*)st, ClassIdMap::get(*st));
 }
+
+template <typename OBJECT>
+static void initCallResultObjectConst( papuga::CallResult& retval, const OBJECT* st)
+{
+	HostObjectReference::initConst( &retval.object, st);
+	retval.value.init( (const void*)st, ClassIdMap::get(*st));
+}
+
 
 }}//namespace
 #endif

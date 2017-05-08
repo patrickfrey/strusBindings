@@ -7,10 +7,10 @@
  */
 #ifndef _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
-#include "papuga/hostObjectReference.hpp"
-#include "papuga/valueVariant.hpp"
-#include "papuga/callResult.hpp"
+#include "papuga/hostObjectReference.h"
+#include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
+#include "strus/index.hpp"
 #include <vector>
 #include <string>
 
@@ -21,9 +21,17 @@ class StorageTransactionInterface;
 
 namespace bindings {
 
-typedef papuga::ValueVariant ValueVariant;
-typedef papuga::CallResult CallResult;
-typedef papuga::HostObjectReference HostObjectReference;
+typedef papuga_ValueVariant ValueVariant;
+typedef papuga_HostObjectReference HostObjectReference;
+
+/// \brief Forward declaration
+class StorageTransactionImpl;
+/// \brief Forward declaration
+class StatisticsIteratorImpl;
+/// \brief Forward declaration
+class DocumentBrowserImpl;
+/// \brief Forward declaration
+class Struct;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -35,27 +43,31 @@ public:
 
 	/// \brief Get the number of documents inserted into the storage
 	/// return the total number of documents
-	CallResult nofDocumentsInserted() const;
+	unsigned int nofDocumentsInserted() const;
 
 	/// \brief Create a transaction
 	/// return the transaction object created
-	CallResult createTransaction() const;
+	StorageTransactionImpl* createTransaction() const;
 
 	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
 	/// \param[in] sign true = registration, false = deregistration
 	/// return the statistics iterator object created
-	CallResult createInitStatisticsIterator( bool sign);
+	StatisticsIteratorImpl* createInitStatisticsIterator( bool sign);
 
 	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
 	/// return the statistics message iterator object created
-	CallResult createUpdateStatisticsIterator();
+	StatisticsIteratorImpl* createUpdateStatisticsIterator();
 
 	/// \brief Create a document browser instance
-	CallResult createDocumentBrowser() const;
+	DocumentBrowserImpl* createDocumentBrowser() const;
 
 	/// \brief Get the configuration of this storage
 	/// \return the configuration as structure
-	CallResult config() const;
+	std::vector<std::pair<std::string,std::string> >* config() const;
+
+	/// \brief Get the configuration of this storage as string
+	/// \return the configuration as string
+	std::string configstring() const;
 
 	/// \brief Close of the storage client
 	void close();
@@ -138,13 +150,13 @@ public:
 	///\brief Get the internal document number of the next document bigger or equal the document number passed
 	///\param[in] docno document number to get the matching least upperbound from
 	///\return the internal document number or 0 if no more documents defined
-	CallResult skipDoc( int docno);
+	Index skipDoc( int docno);
 
 	///\brief Get the elements of a document according to a selection expression
 	///\param[in] docno document number to get the selected content from
 	///\param[in] elementsSelected structure with the elements to select from the document requested
 	///\return the structure with a tuple or a map with the elements selected (depending on input)
-	CallResult get( int docno, const ValueVariant& elementsSelected);
+	Struct* get( int docno, const ValueVariant& elementsSelected);
 
 private:
 	friend class StorageClientImpl;

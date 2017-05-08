@@ -7,18 +7,20 @@
  */
 #ifndef _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
-#include "papuga/hostObjectReference.hpp"
-#include "papuga/valueVariant.hpp"
-#include "papuga/callResult.hpp"
+#include "papuga/hostObjectReference.h"
+#include "papuga/valueVariant.h"
+#include "strus/vectorStorageSearchInterface.hpp"
 #include <vector>
 #include <string>
 
 namespace strus {
 namespace bindings {
 
-typedef papuga::ValueVariant ValueVariant;
-typedef papuga::CallResult CallResult;
-typedef papuga::HostObjectReference HostObjectReference;
+typedef papuga_ValueVariant ValueVariant;
+typedef papuga_HostObjectReference HostObjectReference;
+
+/// \brief Forward declaration
+class VectorStorageTransactionImpl;
 
 /// \brief Object used to search for similar vectors in the collection
 class VectorStorageSearcherImpl
@@ -31,14 +33,14 @@ public:
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
 	/// return the list of most similar vectors (double[])
-	CallResult findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const;
+	std::vector<VectorStorageSearchInterface::Result> findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const;
 
 	/// \brief Find the most similar vectors to vector in a selection of features addressed by index
 	/// \param[in] featidxlist list of candidate indices (int[])
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
 	/// return the list of most similar vectors (double[])
-	CallResult findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const;
+	std::vector<VectorStorageSearchInterface::Result> findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
@@ -64,54 +66,58 @@ public:
 	/// \param[in] range_from start range of the features for the searcher (possibility to split into multiple searcher instances)
 	/// \param[in] range_to end of range of the features for the searcher (possibility to split into multiple searcher instances)
 	/// \return the vector search interface (with ownership)
-	CallResult createSearcher( int range_from, int range_to) const;
+	VectorStorageSearcherImpl* createSearcher( int range_from, int range_to) const;
 
 	/// \brief Create a vector storage transaction instance
-	CallResult createTransaction();
+	VectorStorageTransactionImpl* createTransaction();
 	
 	/// \brief Get the list of concept class names defined
 	/// \return the list
-	CallResult conceptClassNames() const;
+	std::vector<std::string>* conceptClassNames() const;
 
 	/// \brief Get the list of indices of features represented by a learnt concept feature
 	/// \param[in] conceptClass name identifying a class of concepts learnt
 	/// \param[in] conceptid index (indices of learnt concepts starting from 1) 
 	/// \return the resulting vector indices (index is order of insertion starting from 0)
-	CallResult conceptFeatures( const std::string& conceptClass, int conceptid) const;
+	std::vector<Index> conceptFeatures( const std::string& conceptClass, int conceptid) const;
 
 	/// \brief Get the number of concept features learnt for a class
 	/// \param[in] conceptClass name identifying a class of concepts learnt.
 	/// \return the number of concept features and also the maximum number assigned to a feature (starting with 1)
-	CallResult nofConcepts( const std::string& conceptClass) const;
+	unsigned int nofConcepts( const std::string& conceptClass) const;
 
 	/// \brief Get the set of learnt concepts of a class for a feature defined
 	/// \param[in] conceptClass name identifying a class of concepts learnt
 	/// \param[in] index index of vector in the order of insertion starting from 0
 	/// \return the resulting concept feature indices (indices of learnt concepts starting from 1) (std::vector<int>)
-	CallResult featureConcepts( const std::string& conceptClass, int index) const;
+	std::vector<Index> featureConcepts( const std::string& conceptClass, int index) const;
 
 	/// \brief Get the vector assigned to a feature addressed by index
 	/// \param[in] index index of the feature (starting from 0)
 	/// return the vector (std::vector<double>)
-	CallResult featureVector( int index) const;
+	std::vector<double> featureVector( int index) const;
 
 	/// \brief Get the name of a feature by its index starting from 0
 	/// \param[in] index index of the feature (starting from 0)
 	/// \return the name of the feature defined 
-	CallResult featureName( int index) const;
+	std::string featureName( int index) const;
 
 	/// \brief Get the index starting from 0 of a feature by its name
 	/// \param[in] name name of the feature
 	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion starting with 0)
-	CallResult featureIndex( const std::string& name) const;
+	Index featureIndex( const std::string& name) const;
 
 	/// \brief Get the number of feature vectors defined
 	/// \return the number of features
-	CallResult nofFeatures() const;
+	unsigned int nofFeatures() const;
 
-	/// \brief Get the configuration of this storage
+	/// \brief Get the configuration of this vector storage
 	/// \return the configuration as structure
-	CallResult config() const;
+	std::vector<std::pair<std::string,std::string> >* config() const;
+
+	/// \brief Get the configuration of this vector storage as string
+	/// \return the configuration as string
+	std::string configstring() const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
@@ -152,7 +158,7 @@ public:
 			int conidx);
 
 	/// \brief Commit of the transaction
-	CallResult commit();
+	bool commit();
 
 	/// \brief Rollback of the transaction
 	void rollback();

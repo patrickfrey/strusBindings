@@ -45,6 +45,7 @@ bool _strus_binding_StorageClient__createInitStatisticsIterator( void* self, pap
 bool _strus_binding_StorageClient__createUpdateStatisticsIterator( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_StorageClient__createDocumentBrowser( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_StorageClient__config( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
+bool _strus_binding_StorageClient__configstring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_StorageClient__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_destructor__StorageTransaction( void* self);
 
@@ -83,6 +84,7 @@ bool _strus_binding_VectorStorageClient__featureName( void* self, papuga_CallRes
 bool _strus_binding_VectorStorageClient__featureIndex( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_VectorStorageClient__nofFeatures( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_VectorStorageClient__config( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
+bool _strus_binding_VectorStorageClient__configstring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_VectorStorageClient__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv);
 bool _strus_binding_destructor__VectorStorageTransaction( void* self);
 

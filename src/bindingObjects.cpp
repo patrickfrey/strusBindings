@@ -35,6 +35,7 @@ using namespace strus::bindings;
 		retval.reportError( _TXT("uncaught exception calling method %s::%s(): %s"), classnam, methodnam, err.what());\
 	}\
 	return false;
+
 void _strus_binding_destructor__Context( void* self)
 {
 	delete reinterpret_cast<ContextImpl>( self);
@@ -58,7 +59,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__getLastError( void* self, pap
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->getLastError();
+		papuga_set_CallResult_charp_const( &retval, THIS->getLastError());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "getLastError")
@@ -71,7 +72,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__loadModule( void* self, papug
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->loadModule( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->loadModule( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -86,7 +87,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__addModulePath( void* self, pa
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addModulePath( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->addModulePath( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -101,7 +102,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__addResourcePath( void* self, 
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addResourcePath( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->addResourcePath( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -116,7 +117,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createStatisticsProcessor( vo
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->createStatisticsProcessor( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: initCallResultObjectOwnership( &retval, THIS->createStatisticsProcessor( papuga::ValueVariant_tostring( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -130,8 +131,8 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createStorageClient( void* se
 		ContextImpl* THIS = (ContextImpl*)(self);
 		switch (argc)
 		{
-			case 0: retval = THIS->createStorageClient( ValueVariant()); break;
-			case 1: retval = THIS->createStorageClient( argv[0]); break;
+			case 0: initCallResultObjectOwnership( &retval, THIS->createStorageClient( ValueVariant())); break;
+			case 1: initCallResultObjectOwnership( &retval, THIS->createStorageClient( argv[0])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -145,8 +146,8 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createVectorStorageClient( vo
 		ContextImpl* THIS = (ContextImpl*)(self);
 		switch (argc)
 		{
-			case 0: retval = THIS->createVectorStorageClient( ValueVariant()); break;
-			case 1: retval = THIS->createVectorStorageClient( argv[0]); break;
+			case 0: initCallResultObjectOwnership( &retval, THIS->createVectorStorageClient( ValueVariant())); break;
+			case 1: initCallResultObjectOwnership( &retval, THIS->createVectorStorageClient( argv[0])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -161,7 +162,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createStorage( void* self, pa
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->createStorage( argv[0]); break;
+			case 1: THIS->createStorage( argv[0]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -176,7 +177,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createVectorStorage( void* se
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->createVectorStorage( argv[0]); break;
+			case 1: THIS->createVectorStorage( argv[0]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -191,7 +192,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__destroyStorage( void* self, p
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->destroyStorage( argv[0]); break;
+			case 1: THIS->destroyStorage( argv[0]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -206,7 +207,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__detectDocumentClass( void* se
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->detectDocumentClass( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: initCallResultStructureOwnership( &retval, THIS->detectDocumentClass( papuga::ValueVariant_tostring( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -221,7 +222,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createDocumentAnalyzer( void*
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->createDocumentAnalyzer( argv[0]); break;
+			case 1: initCallResultObjectOwnership( &retval, THIS->createDocumentAnalyzer( argv[0])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -234,7 +235,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createQueryAnalyzer( void* se
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->createQueryAnalyzer();
+		initCallResultObjectOwnership( &retval, THIS->createQueryAnalyzer());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createQueryAnalyzer")
@@ -245,7 +246,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__createQueryEval( void* self, 
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->createQueryEval();
+		initCallResultObjectOwnership( &retval, THIS->createQueryEval());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createQueryEval")
@@ -256,7 +257,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Context__close( void* self, papuga_Cal
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->close();
+		THIS->close()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "close")
@@ -272,7 +273,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__nofDocumentsInserted( v
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->nofDocumentsInserted();
+		papuga_set_CallResult_uint( &retval, THIS->nofDocumentsInserted());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "nofDocumentsInserted")
@@ -283,7 +284,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__createTransaction( void
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->createTransaction();
+		initCallResultObjectOwnership( &retval, THIS->createTransaction());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createTransaction")
@@ -296,7 +297,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__createInitStatisticsIte
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->createInitStatisticsIterator( ValueVariantConv::tobool( argv[0])); break;
+			case 1: initCallResultObjectOwnership( &retval, THIS->createInitStatisticsIterator( ValueVariantConv::tobool( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -309,7 +310,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__createUpdateStatisticsI
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->createUpdateStatisticsIterator();
+		initCallResultObjectOwnership( &retval, THIS->createUpdateStatisticsIterator());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createUpdateStatisticsIterator")
@@ -320,7 +321,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__createDocumentBrowser( 
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->createDocumentBrowser();
+		initCallResultObjectOwnership( &retval, THIS->createDocumentBrowser());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createDocumentBrowser")
@@ -331,10 +332,21 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__config( void* self, pap
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->config();
+		initCallResultStructureOwnership( &retval, THIS->config());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "config")
+}
+
+extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__configstring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+{
+	try {
+		StorageClientImpl* THIS = (StorageClientImpl*)(self);
+		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
+		{std::string retvalstr = THIS->configstring(); papuga_set_CallResult_string( &retval, retvalstr.c_str(), retvalstr.size());}
+		return true;
+	}
+	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "configstring")
 }
 
 extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
@@ -342,7 +354,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageClient__close( void* self, papu
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->close();
+		THIS->close()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "close")
@@ -360,7 +372,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageTransaction__insertDocument( vo
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->insertDocument( papuga::ValueVariant_tostring( argv[0]), argv[1]); break;
+			case 2: THIS->insertDocument( papuga::ValueVariant_tostring( argv[0]), argv[1]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -375,7 +387,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageTransaction__deleteDocument( vo
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->deleteDocument( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->deleteDocument( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -390,7 +402,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageTransaction__deleteUserAccessRi
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->deleteUserAccessRights( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->deleteUserAccessRights( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -403,7 +415,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageTransaction__commit( void* self
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->commit();
+		THIS->commit()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageTransaction", "commit")
@@ -414,7 +426,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StorageTransaction__rollback( void* se
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->rollback();
+		THIS->rollback()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StorageTransaction", "rollback")
@@ -433,7 +445,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentBrowser__addMetaDataRestrictio
 		std::string conv_argv0;
 		switch (argc)
 		{
-			case 4: THIS->addMetaDataRestrictionCondition( ValueVariantConv::tocharp( conv_argv0, argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], ValueVariantConv::tobool( argv[3])); break;
+			case 4: THIS->addMetaDataRestrictionCondition( ValueVariantConv::tocharp( conv_argv0, argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], ValueVariantConv::tobool( argv[3])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -448,7 +460,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentBrowser__skipDoc( void* self, 
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->skipDoc( ValueVariantConv::toint( argv[0])); break;
+			case 1: papuga_set_CallResult_int( &retval, THIS->skipDoc( ValueVariantConv::toint( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -463,7 +475,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentBrowser__get( void* self, papu
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: retval = THIS->get( ValueVariantConv::toint( argv[0]), argv[1]); break;
+			case 2: initCallResultStructureOwnership( &retval, THIS->get( ValueVariantConv::toint( argv[0]), argv[1])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -481,7 +493,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StatisticsIterator__getNext( void* sel
 	try {
 		StatisticsIteratorImpl* THIS = (StatisticsIteratorImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->getNext();
+		initCallResultStructureOwnership( &retval, THIS->getNext());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "StatisticsIterator", "getNext")
@@ -499,7 +511,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StatisticsProcessor__decode( void* sel
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->decode( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: initCallResultStructureOwnership( &retval, THIS->decode( papuga::ValueVariant_tostring( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -514,7 +526,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_StatisticsProcessor__encode( void* sel
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->encode( argv[0]); break;
+			case 1: initCallResultStructureOwnership( &retval, THIS->encode( argv[0])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -534,7 +546,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageSearcher__findSimilar( vo
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: retval = THIS->findSimilar( argv[0], ValueVariantConv::touint( argv[1])); break;
+			case 2: initCallResultNumericValues( &retval, THIS->findSimilar( argv[0], ValueVariantConv::touint( argv[1]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -549,7 +561,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageSearcher__findSimilarFrom
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: retval = THIS->findSimilarFromSelection( argv[0], argv[1], ValueVariantConv::touint( argv[2])); break;
+			case 3: initCallResultNumericValues( &retval, THIS->findSimilarFromSelection( argv[0], argv[1], ValueVariantConv::touint( argv[2]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -562,7 +574,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageSearcher__close( void* se
 	try {
 		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->close();
+		THIS->close()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageSearcher", "close")
@@ -580,7 +592,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__createSearcher( v
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: retval = THIS->createSearcher( ValueVariantConv::toint( argv[0]), ValueVariantConv::toint( argv[1])); break;
+			case 2: initCallResultObjectOwnership( &retval, THIS->createSearcher( ValueVariantConv::toint( argv[0]), ValueVariantConv::toint( argv[1]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -593,7 +605,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__createTransaction
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->createTransaction();
+		initCallResultObjectOwnership( &retval, THIS->createTransaction());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "createTransaction")
@@ -604,7 +616,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__conceptClassNames
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->conceptClassNames();
+		initCallResultStructureOwnership( &retval, THIS->conceptClassNames());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "conceptClassNames")
@@ -617,7 +629,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__conceptFeatures( 
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: retval = THIS->conceptFeatures( papuga::ValueVariant_tostring( argv[0]), ValueVariantConv::toint( argv[1])); break;
+			case 2: initCallResultNumericValues( &retval, THIS->conceptFeatures( papuga::ValueVariant_tostring( argv[0]), ValueVariantConv::toint( argv[1]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -632,7 +644,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__nofConcepts( void
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->nofConcepts( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: papuga_set_CallResult_uint( &retval, THIS->nofConcepts( papuga::ValueVariant_tostring( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -647,7 +659,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__featureConcepts( 
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: retval = THIS->featureConcepts( papuga::ValueVariant_tostring( argv[0]), ValueVariantConv::toint( argv[1])); break;
+			case 2: initCallResultNumericValues( &retval, THIS->featureConcepts( papuga::ValueVariant_tostring( argv[0]), ValueVariantConv::toint( argv[1]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -662,7 +674,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__featureVector( vo
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->featureVector( ValueVariantConv::toint( argv[0])); break;
+			case 1: initCallResultNumericValues( &retval, THIS->featureVector( ValueVariantConv::toint( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -677,7 +689,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__featureName( void
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->featureName( ValueVariantConv::toint( argv[0])); break;
+			case 1: {std::string retvalstr = THIS->featureName( ValueVariantConv::toint( argv[0])); papuga_set_CallResult_string( &retval, retvalstr.c_str(), retvalstr.size());} break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -692,7 +704,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__featureIndex( voi
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->featureIndex( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: papuga_set_CallResult_int( &retval, THIS->featureIndex( papuga::ValueVariant_tostring( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -705,7 +717,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__nofFeatures( void
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->nofFeatures();
+		papuga_set_CallResult_uint( &retval, THIS->nofFeatures());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "nofFeatures")
@@ -716,10 +728,21 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__config( void* sel
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->config();
+		initCallResultStructureOwnership( &retval, THIS->config());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "config")
+}
+
+extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__configstring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+{
+	try {
+		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
+		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
+		{std::string retvalstr = THIS->configstring(); papuga_set_CallResult_string( &retval, retvalstr.c_str(), retvalstr.size());}
+		return true;
+	}
+	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "configstring")
 }
 
 extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
@@ -727,7 +750,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageClient__close( void* self
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->close();
+		THIS->close()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "close")
@@ -745,7 +768,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageTransaction__addFeature( 
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->addFeature( papuga::ValueVariant_tostring( argv[0]), argv[1]); break;
+			case 2: THIS->addFeature( papuga::ValueVariant_tostring( argv[0]), argv[1]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -760,7 +783,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageTransaction__defineFeatur
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->defineFeatureConceptRelation( papuga::ValueVariant_tostring( argv[0]), ValueVariantConv::toint( argv[1]), ValueVariantConv::toint( argv[2])); break;
+			case 3: THIS->defineFeatureConceptRelation( papuga::ValueVariant_tostring( argv[0]), ValueVariantConv::toint( argv[1]), ValueVariantConv::toint( argv[2])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -773,7 +796,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageTransaction__commit( void
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->commit();
+		papuga_set_CallResult_bool( &retval, THIS->commit());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "commit")
@@ -784,7 +807,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageTransaction__rollback( vo
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->rollback();
+		THIS->rollback()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "rollback")
@@ -795,7 +818,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_VectorStorageTransaction__close( void*
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		THIS->close();
+		THIS->close()
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "close")
@@ -813,7 +836,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__addSearchIndexFeatur
 		if (argc < 5) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 5: THIS->addSearchIndexFeature( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3], argv[4]); break;
+			case 5: THIS->addSearchIndexFeature( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3], argv[4]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -828,7 +851,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__addForwardIndexFeatu
 		if (argc < 5) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 5: THIS->addForwardIndexFeature( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3], argv[4]); break;
+			case 5: THIS->addForwardIndexFeature( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3], argv[4]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -843,7 +866,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__defineMetaData( void
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->defineMetaData( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->defineMetaData( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -858,7 +881,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__defineAggregatedMeta
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->defineAggregatedMetaData( papuga::ValueVariant_tostring( argv[0]), argv[1]); break;
+			case 2: THIS->defineAggregatedMetaData( papuga::ValueVariant_tostring( argv[0]), argv[1]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -873,7 +896,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__defineAttribute( voi
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->defineAttribute( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->defineAttribute( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -888,7 +911,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__addSearchIndexFeatur
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->addSearchIndexFeatureFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->addSearchIndexFeatureFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -903,7 +926,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__addForwardIndexFeatu
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->addForwardIndexFeatureFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->addForwardIndexFeatureFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -918,7 +941,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__defineMetaDataFromPa
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->defineMetaDataFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]); break;
+			case 3: THIS->defineMetaDataFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -933,7 +956,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__defineAttributeFromP
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->defineAttributeFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]); break;
+			case 3: THIS->defineAttributeFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -948,7 +971,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__definePatternMatcher
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->definePatternMatcherPostProc( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->definePatternMatcherPostProc( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -963,7 +986,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__definePatternMatcher
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->definePatternMatcherPostProcFromFile( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), papuga::ValueVariant_tostring( argv[2])); break;
+			case 3: THIS->definePatternMatcherPostProcFromFile( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), papuga::ValueVariant_tostring( argv[2])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -978,7 +1001,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__defineDocument( void
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->defineDocument( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1])); break;
+			case 2: THIS->defineDocument( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -993,8 +1016,8 @@ extern "C" DLL_PUBLIC bool _strus_binding_DocumentAnalyzer__analyze( void* self,
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->analyze( papuga::ValueVariant_tostring( argv[0]), ValueVariant()); break;
-			case 2: retval = THIS->analyze( papuga::ValueVariant_tostring( argv[0]), argv[1]); break;
+			case 1: initCallResultStructureOwnership( &retval, THIS->analyze( papuga::ValueVariant_tostring( argv[0]), ValueVariant())); break;
+			case 2: initCallResultStructureOwnership( &retval, THIS->analyze( papuga::ValueVariant_tostring( argv[0]), argv[1])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1014,7 +1037,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__addSearchIndexElement( 
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->addSearchIndexElement( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->addSearchIndexElement( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1029,7 +1052,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__addSearchIndexElementFr
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->addSearchIndexElementFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]); break;
+			case 3: THIS->addSearchIndexElementFromPatternMatch( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1044,7 +1067,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__addPatternLexem( void* 
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->addPatternLexem( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->addPatternLexem( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1059,7 +1082,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__definePatternMatcherPos
 		if (argc < 4) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 4: THIS->definePatternMatcherPostProc( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]); break;
+			case 4: THIS->definePatternMatcherPostProc( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], argv[3]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1074,7 +1097,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__definePatternMatcherPos
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->definePatternMatcherPostProcFromFile( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), papuga::ValueVariant_tostring( argv[2])); break;
+			case 3: THIS->definePatternMatcherPostProcFromFile( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), papuga::ValueVariant_tostring( argv[2])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1089,7 +1112,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__defineImplicitGroupBy( 
 		if (argc < 5) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 5: THIS->defineImplicitGroupBy( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), ValueVariantConv::toint( argv[2]), ValueVariantConv::touint( argv[3]), papuga::ValueVariant_tostring( argv[4])); break;
+			case 5: THIS->defineImplicitGroupBy( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), ValueVariantConv::toint( argv[2]), ValueVariantConv::touint( argv[3]), papuga::ValueVariant_tostring( argv[4])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1104,7 +1127,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryAnalyzer__analyze( void* self, pa
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->analyze( argv[0]); break;
+			case 1: initCallResultStructureOwnership( &retval, THIS->analyze( argv[0])); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1124,7 +1147,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addTerm( void* self, papuga
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->addTerm( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), papuga::ValueVariant_tostring( argv[2])); break;
+			case 3: THIS->addTerm( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), papuga::ValueVariant_tostring( argv[2])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1139,7 +1162,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addSelectionFeature( void* 
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addSelectionFeature( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->addSelectionFeature( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1154,7 +1177,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addRestrictionFeature( void
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addRestrictionFeature( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->addRestrictionFeature( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1169,7 +1192,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addExclusionFeature( void* 
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addExclusionFeature( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->addExclusionFeature( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1184,7 +1207,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addSummarizer( void* self, 
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->addSummarizer( papuga::ValueVariant_tostring( argv[0]), argv[1], argv[2]); break;
+			case 3: THIS->addSummarizer( papuga::ValueVariant_tostring( argv[0]), argv[1], argv[2]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1199,7 +1222,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addWeightingFunction( void*
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->addWeightingFunction( papuga::ValueVariant_tostring( argv[0]), argv[1]); break;
+			case 2: THIS->addWeightingFunction( papuga::ValueVariant_tostring( argv[0]), argv[1]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1214,7 +1237,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__addWeightingFormula( void* 
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->addWeightingFormula( papuga::ValueVariant_tostring( argv[0]), argv[1]); break;
+			case 2: THIS->addWeightingFormula( papuga::ValueVariant_tostring( argv[0]), argv[1]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1229,7 +1252,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_QueryEval__createQuery( void* self, pa
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: retval = THIS->createQuery( argv[0]); break;
+			case 1: initCallResultObjectOwnership( &retval, THIS->createQuery( implObjectCast<StorageClientImpl>( argv[0]))); break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1249,8 +1272,8 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__defineFeature( void* self, papu
 		if (argc < 2) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 2: THIS->defineFeature( papuga::ValueVariant_tostring( argv[0]), argv[1], 1.0); break;
-			case 3: THIS->defineFeature( papuga::ValueVariant_tostring( argv[0]), argv[1], ValueVariantConv::todouble( argv[2])); break;
+			case 2: THIS->defineFeature( papuga::ValueVariant_tostring( argv[0]), argv[1], 1.0) break;
+			case 3: THIS->defineFeature( papuga::ValueVariant_tostring( argv[0]), argv[1], ValueVariantConv::todouble( argv[2])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1266,7 +1289,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__addMetaDataRestrictionCondition
 		std::string conv_argv0;
 		switch (argc)
 		{
-			case 4: THIS->addMetaDataRestrictionCondition( ValueVariantConv::tocharp( conv_argv0, argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], ValueVariantConv::tobool( argv[3])); break;
+			case 4: THIS->addMetaDataRestrictionCondition( ValueVariantConv::tocharp( conv_argv0, argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2], ValueVariantConv::tobool( argv[3])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1281,7 +1304,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__defineTermStatistics( void* sel
 		if (argc < 3) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 3: THIS->defineTermStatistics( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]); break;
+			case 3: THIS->defineTermStatistics( papuga::ValueVariant_tostring( argv[0]), papuga::ValueVariant_tostring( argv[1]), argv[2]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1296,7 +1319,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__defineGlobalStatistics( void* s
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->defineGlobalStatistics( argv[0]); break;
+			case 1: THIS->defineGlobalStatistics( argv[0]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1311,7 +1334,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__addDocumentEvaluationSet( void*
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addDocumentEvaluationSet( argv[0]); break;
+			case 1: THIS->addDocumentEvaluationSet( argv[0]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1326,7 +1349,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__setMaxNofRanks( void* self, pap
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->setMaxNofRanks( ValueVariantConv::touint( argv[0])); break;
+			case 1: THIS->setMaxNofRanks( ValueVariantConv::touint( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1341,7 +1364,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__setMinRank( void* self, papuga_
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->setMinRank( ValueVariantConv::touint( argv[0])); break;
+			case 1: THIS->setMinRank( ValueVariantConv::touint( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1356,7 +1379,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__addUserName( void* self, papuga
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->addUserName( papuga::ValueVariant_tostring( argv[0])); break;
+			case 1: THIS->addUserName( papuga::ValueVariant_tostring( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1371,7 +1394,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__setWeightingVariables( void* se
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->setWeightingVariables( argv[0]); break;
+			case 1: THIS->setWeightingVariables( argv[0]) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1386,7 +1409,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__setDebugMode( void* self, papug
 		if (argc < 1) throw strus::runtime_error(_TXT("too few arguments"));
 		switch (argc)
 		{
-			case 1: THIS->setDebugMode( ValueVariantConv::tobool( argv[0])); break;
+			case 1: THIS->setDebugMode( ValueVariantConv::tobool( argv[0])) break;
 			default: throw strus::runtime_error(_TXT("too many arguments"));
 		}
 		return true;
@@ -1399,7 +1422,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__evaluate( void* self, papuga_Ca
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->evaluate();
+		initCallResultStructureOwnership( &retval, THIS->evaluate());
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "evaluate")
@@ -1410,7 +1433,7 @@ extern "C" DLL_PUBLIC bool _strus_binding_Query__tostring( void* self, papuga_Ca
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
 		if (argc > 0) throw strus::runtime_error(_TXT("no arguments expected"));
-		retval = THIS->tostring();
+		{std::string retvalstr = THIS->tostring(); papuga_set_CallResult_string( &retval, retvalstr.c_str(), retvalstr.size());}
 		return true;
 	}
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "tostring")

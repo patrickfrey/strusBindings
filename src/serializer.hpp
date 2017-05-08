@@ -22,7 +22,7 @@
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
 #include "strus/statisticsViewerInterface.hpp"
-#include "queryAnalyzerStruct.hpp"
+#include "impl/analyzer.hpp"
 #include <string>
 #include <vector>
 #include <utility>
@@ -95,13 +95,14 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorStorageSearchInterface::Result& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators, bool labeled);
+	static bool serialize_nothrow( papuga_Serialization* result, const QueryAnalyzerImpl::AnalyzeResult& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorStorageSearchInterface::Result>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Term>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<Index>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::MetaData>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Attribute>& val);
@@ -132,7 +133,8 @@ private:
 		rt &= papuga_Serialization_pushClose( result);
 		return rt;
 	}
-	static bool serializeIntArray( papuga_Serialization* result, const std::vector<int>& val)
+	template <typename TYPE>
+	static bool serializeIntArray( papuga_Serialization* result, const std::vector<TYPE>& val)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushOpen( result);

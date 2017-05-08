@@ -7,21 +7,23 @@
  */
 #ifndef _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
-#include "papuga/hostObjectReference.hpp"
-#include "papuga/valueVariant.hpp"
-#include "papuga/callResult.hpp"
+#include "papuga/hostObjectReference.h"
+#include "papuga/valueVariant.h"
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/numericVariant.hpp"
-#include "impl/storage.hpp"
 #include <vector>
 #include <string>
 
 namespace strus {
 namespace bindings {
 
-typedef papuga::ValueVariant ValueVariant;
-typedef papuga::CallResult CallResult;
-typedef papuga::HostObjectReference HostObjectReference;
+typedef papuga_ValueVariant ValueVariant;
+typedef papuga_HostObjectReference HostObjectReference;
+
+///\brief Forward declaration
+class QueryImpl;
+///\brief Forward declaration
+class StorageClientImpl;
 
 /// \brief Query evaluation program object representing an information retrieval scheme for documents in a storage.
 class QueryEvalImpl
@@ -75,7 +77,7 @@ public:
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
-	CallResult createQuery( const ValueVariant& storage) const;
+	QueryImpl* createQuery( StorageClientImpl* storage) const;
 
 private:
 	/// \brief Constructor used by Context
@@ -160,11 +162,11 @@ public:
 
 	/// \brief Evaluate this query and return the result
 	/// \return the result (strus::QueryResult)
-	CallResult evaluate() const;
+	QueryResult* evaluate() const;
 
 	/// \brief Map the contents of the query to a readable string
 	/// \return the string
-	CallResult tostring() const;
+	std::string tostring() const;
 
 private:
 	friend class QueryEvalImpl;
