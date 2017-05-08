@@ -11,6 +11,7 @@
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/statisticsProcessorInterface.hpp"
+#include "impl/objectref.hpp"
 #include <vector>
 #include <string>
 
@@ -21,7 +22,6 @@ namespace bindings {
 class Struct;
 
 typedef papuga_ValueVariant ValueVariant;
-typedef papuga_HostObjectReference HostObjectReference;
 
 /// \brief Iterator on messages with storage statistics
 class StatisticsIteratorImpl

@@ -13,6 +13,7 @@
 #include "papuga/callResult.h"
 #include "papuga/valueVariant.h"
 #include "papugaSerialization.hpp"
+#include "hostObjectReference.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
 #include "impl/vector.hpp"
@@ -27,46 +28,46 @@ namespace strus {
 namespace bindings {
 
 template <typename STRUCTVALUE>
-static void initCallResultStructureOwnership( papuga::CallResult& retval, STRUCTVALUE* st)
+static void initCallResultStructureOwnership( papuga_CallResult& retval, STRUCTVALUE* st)
 {
-	retval.object.createOwnership( st);
-	Serializer::serialize( retval.serialization, *st);
-	retval.value.init( &retval.serialization);
+	HostObjectReference::initOwnership( &retval.object, st);
+	Serializer::serialize( &retval.serialization, *st);
+	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
 }
 
 template <>
-static void initCallResultStructureOwnership<Struct>( papuga::CallResult& retval, Struct* st)
-{
-	retval.object.createOwnership( st);
-	retval.value.init( &st->serialization);
-}
-
-template <typename STRUCTVALUE>
-static void initCallResultStructureConst( papuga::CallResult& retval, const STRUCTVALUE* st)
-{
-	Serializer::serialize( retval.serialization, *st);
-	retval.value.init( &retval.serialization);
-}
-
-template <typename STRUCTVALUE>
-static void initCallResultNumericValues( papuga::CallResult& retval, const STRUCTVALUE& st)
-{
-	Serializer::serialize( retval.serialization, st);
-	retval.value.init( &retval.serialization);
-}
-
-template <typename OBJECT>
-static void initCallResultObjectOwnership( papuga::CallResult& retval, OBJECT* st)
+static void initCallResultStructureOwnership<Struct>( papuga_CallResult& retval, Struct* st)
 {
 	HostObjectReference::initOwnership( &retval.object, st);
-	retval.value.init( (const void*)st, ClassIdMap::get(*st));
+	papuga_init_ValueVariant_serialization( &retval.value, &st->serialization);
+}
+
+template <typename STRUCTVALUE>
+static void initCallResultStructureConst( papuga_CallResult& retval, const STRUCTVALUE* st)
+{
+	Serializer::serialize( &retval.serialization, *st);
+	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
+}
+
+template <typename STRUCTVALUE>
+static void initCallResultNumericValues( papuga_CallResult& retval, const STRUCTVALUE& st)
+{
+	Serializer::serialize( &retval.serialization, st);
+	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
 }
 
 template <typename OBJECT>
-static void initCallResultObjectConst( papuga::CallResult& retval, const OBJECT* st)
+static void initCallResultObjectOwnership( papuga_CallResult& retval, OBJECT* st)
+{
+	HostObjectReference::initOwnership( &retval.object, st);
+	papuga_init_ValueVariant_hostobj( &retval.value, st, ClassIdMap::get(*st));
+}
+
+template <typename OBJECT>
+static void initCallResultObjectConst( papuga_CallResult& retval, const OBJECT* st)
 {
 	HostObjectReference::initConst( &retval.object, st);
-	retval.value.init( (const void*)st, ClassIdMap::get(*st));
+	papuga_init_ValueVariant_hostobj( &retval.value, st, ClassIdMap::get(*st));
 }
 
 

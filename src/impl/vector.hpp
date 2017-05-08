@@ -10,6 +10,7 @@
 #include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/vectorStorageSearchInterface.hpp"
+#include "impl/objectref.hpp"
 #include <vector>
 #include <string>
 
@@ -17,7 +18,6 @@ namespace strus {
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
-typedef papuga_HostObjectReference HostObjectReference;
 
 /// \brief Forward declaration
 class VectorStorageTransactionImpl;

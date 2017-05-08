@@ -15,6 +15,7 @@
 #include "strus/analyzer/document.hpp"
 #include "strus/analyzer/query.hpp"
 #include "queryAnalyzerStruct.hpp"
+#include "impl/objectref.hpp"
 #include <vector>
 #include <string>
 
@@ -22,7 +23,6 @@ namespace strus {
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
-typedef papuga_HostObjectReference HostObjectReference;
 
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 

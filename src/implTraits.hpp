@@ -112,9 +112,9 @@ template <> struct ImplTraits<VectorStorageTransactionImpl>
 };
 
 template <class ClassImpl>
-static ClassImpl* implObjectCast( const papuga::ValueVariant& val)
+static ClassImpl* implObjectCast( const papuga_ValueVariant& val)
 {
-	if (val.type != papuga::ValueVariant::HostObject || val.classid() != ImplTraits<ClassImpl>::classid())
+	if (val.valuetype != papuga_HostObject || val.classid != ImplTraits<ClassImpl>::classid())
 	{
 		throw strus::runtime_error(_TXT("expected class '%s'"), ImplTraits<ClassImpl>::name());
 	}

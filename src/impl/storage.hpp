@@ -11,6 +11,7 @@
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/index.hpp"
+#include "impl/objectref.hpp"
 #include <vector>
 #include <string>
 
@@ -22,7 +23,6 @@ class StorageTransactionInterface;
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
-typedef papuga_HostObjectReference HostObjectReference;
 
 /// \brief Forward declaration
 class StorageTransactionImpl;

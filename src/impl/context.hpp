@@ -12,6 +12,7 @@
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
+#include "impl/objectref.hpp"
 #include <vector>
 #include <string>
 
@@ -32,7 +33,6 @@ class QueryAnalyzerImpl;
 class QueryEvalImpl;
 
 typedef papuga_ValueVariant ValueVariant;
-typedef papuga_HostObjectReference HostObjectReference;
 
 /// \brief Object holding the global context of the strus information retrieval engine
 /// \note There a two modes of this context object operating on a different base.

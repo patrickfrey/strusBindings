@@ -102,7 +102,6 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Term>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<Index>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::MetaData>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Attribute>& val);

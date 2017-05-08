@@ -268,10 +268,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 {
 	return serializeIntArray( result, val);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<Index>& val)
-{
-	return serializeIntArray( result, val);
-}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val)
 {
 	return serializeArray( result, val);
