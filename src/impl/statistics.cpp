@@ -25,9 +25,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-typedef papuga::Serialization Serialization;
-
-StatisticsIteratorImpl::StatisticsIteratorImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_, const HostObjectReference& iter_)
+StatisticsIteratorImpl::StatisticsIteratorImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& iter_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -51,7 +49,7 @@ std::string* StatisticsIteratorImpl::getNext()
 	return new std::string( outmsg, outmsgsize);
 }
 
-StatisticsProcessorImpl::StatisticsProcessorImpl( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const std::string& name_, const HostObjectReference& errorhnd_)
+StatisticsProcessorImpl::StatisticsProcessorImpl( const ObjectRef& objbuilder_, const ObjectRef& trace_, const std::string& name_, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
@@ -72,36 +70,14 @@ StatisticsProcessorImpl::StatisticsProcessorImpl( const HostObjectReference& obj
 
 typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
 
-Struct* StatisticsProcessorImpl::decode( const std::string& blob) const
+StatisticsViewerInterface* StatisticsProcessorImpl::decode( const std::string& blob) const
 {
-	Reference<Struct> rt( new Struct());
-	papuga_Serialization* ser = &rt->serialization;
-	bool serflag = true;
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* proc = m_statsproc;
 	StatisticsViewerInterface* viewer;
-	rt.object.resetOwnership( viewer = proc->createViewer( blob.c_str(), blob.size()));
+	viewer = proc->createViewer( blob.c_str(), blob.size());
 	if (!viewer) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
-
-	serflag &= papuga_Serialization_pushName_charp( ser, "dfchange");
-	serflag &= papuga_Serialization_pushOpen( ser);
-
-	DocumentFrequencyChange rec;
-	while (viewer->nextDfChange( rec))
-	{
-		serflag &= Serializer::serialize_nothrow( ser, rec);
-	}
-	rt.serialization.pushClose();
-	serflag &= papuga_Serialization_pushClose( ser);
-	serflag &= papuga_Serialization_pushName_charp( ser, "nofdocs");
-	serflag &= papuga_Serialization_pushValue_int( ser, viewer->nofDocumentsInsertedChange());
-
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error(_TXT( "error statistics message structure from blob: %s"), errorhnd->fetchError());
-	}
-	if (!serflag) throw std::bad_alloc();
-	return rt.release();
+	return viewer;
 }
 
 std::string* StatisticsProcessorImpl::encode( const ValueVariant& msg) const

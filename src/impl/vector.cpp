@@ -23,9 +23,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-typedef papuga::Serialization Serialization;
-
-VectorStorageSearcherImpl::VectorStorageSearcherImpl( const HostObjectReference& storageref, const HostObjectReference& trace, int range_from, int range_to, const HostObjectReference& errorhnd_)
+VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& storageref, const ObjectRef& trace, int range_from, int range_to, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_searcher_impl()
 	,m_trace_impl( trace)
@@ -247,7 +245,7 @@ std::vector<std::pair<std::string,std::string> >* VectorStorageClientImpl::confi
 	return rt;
 }
 
-VectorStorageClientImpl::VectorStorageClientImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config)
+VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
@@ -334,7 +332,7 @@ void VectorStorageTransactionImpl::close()
 	}
 }
 
-VectorStorageTransactionImpl::VectorStorageTransactionImpl( const HostObjectReference& objbuilder, const HostObjectReference& storageref, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config)
+VectorStorageTransactionImpl::VectorStorageTransactionImpl( const ObjectRef& objbuilder, const ObjectRef& storageref, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)

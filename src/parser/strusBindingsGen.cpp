@@ -57,17 +57,17 @@ static void printOutput( const char* filename, PrintInterface print, const strus
 
 static std::string methodFunctionName( const std::string& cl, const std::string& mt)
 {
-	return "_strus_binding_" + cl + "__" + mt;
+	return "_strus_bindings_" + cl + "__" + mt;
 }
 
 static std::string constructorFunctionName( const std::string& cl)
 {
-	return "_strus_binding_constructor__" + cl;
+	return "_strus_bindings_constructor__" + cl;
 }
 
 static std::string destructorFunctionName( const std::string& cl)
 {
-	return "_strus_binding_destructor__" + cl;
+	return "_strus_bindings_destructor__" + cl;
 }
 
 static void print_BindingInterfaceDescriptionHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
@@ -174,7 +174,7 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 		ce = interfaceDef.classDefs().end();
 	for (; ci != ce; ++ci)
 	{
-		out << "bool " << destructorFunctionName( ci->name()) << "( void* self);" << std::endl;
+		out << "void " << destructorFunctionName( ci->name()) << "( void* self);" << std::endl;
 		out << std::endl;
 
 		if (ci->constructorDefs().size() > 1) throw std::runtime_error( std::string("only one constructor allowed for '") + ci->name() + "'");
@@ -276,7 +276,7 @@ struct ParameterSructureExpanded
 		if (param_converted.size() == 0)
 		{
 			out << indent << "if (argc > 0) throw strus::runtime_error(_TXT(\"no arguments expected\"));" << std::endl;
-			out << indent << "papuga::HostObjectReference::initOwnership( &retval, new " << classname << "Impl());" << std::endl;
+			out << indent << "initCallResultObjectOwnership( retval, new " << classname << "Impl());" << std::endl;
 		}
 		else
 		{
@@ -284,7 +284,7 @@ struct ParameterSructureExpanded
 			out << indent << "{" << std::endl;
 			for (std::size_t pidx=min_nofargs; pidx<=param_converted.size(); ++pidx)
 			{
-				out << indent << "\tcase " << pidx << ": papuga::HostObjectReference::initOwnership( &retval, new " << classname << "(" << expandCallParameter( pidx) << "); break;" << std::endl;
+				out << indent << "\tcase " << pidx << ": initCallResultObjectOwnership( retval, new " << classname << "Impl(" << expandCallParameter( pidx) << ")); break;" << std::endl;
 			}
 			out << indent << "\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
 			out << indent << "}" << std::endl;
@@ -299,7 +299,7 @@ struct ParameterSructureExpanded
 		}
 		else if (returnvalue.type().source() == "void")
 		{
-			return expression;
+			return expression + ";";
 		}
 		else
 		{
@@ -334,7 +334,7 @@ struct ParameterSructureExpanded
 static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
-	out << "#include \"strus/bindingObjects.hpp\"" << std::endl;
+	out << "#include \"strus/bindingObjects.h\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
 	out << "#include \"impl/context.hpp\"" << std::endl;
 	out << "#include \"impl/storage.hpp\"" << std::endl;
@@ -343,7 +343,8 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#include \"impl/query.hpp\"" << std::endl;
 	out << "#include \"impl/statistics.hpp\"" << std::endl;
 	out << "#include \"internationalization.hpp\"" << std::endl;
-
+	out << "#include \"callResultUtils.hpp\"" << std::endl;
+	out << "#include \"valueVariantWrap.hpp\"" << std::endl;
 	out << std::endl
 		<< "using namespace strus;" << std::endl
 		<< "using namespace strus::bindings;" << std::endl
@@ -352,15 +353,15 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#define CATCH_METHOD_CALL_ERROR( retval, classnam, methodnam)\\" << std::endl;
 	out << "\tcatch (const std::runtime_error& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tretval.reportError( _TXT(\"error calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
+	out << "\t\tpapuga_CallResult_reportError( &retval, _TXT(\"error calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
 	out << "\tcatch (const std::bad_alloc& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tretval.reportError( _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);\\" << std::endl;
+	out << "\t\tpapuga_CallResult_reportError( &retval, _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);\\" << std::endl;
 	out << "\t}\\" << std::endl;
 	out << "\tcatch (const std::exception& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tretval.reportError( _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
+	out << "\t\tpapuga_CallResult_reportError( &retval, _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
 	out << "\treturn false;" << std::endl << std::endl;
 
@@ -369,9 +370,9 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		ce = interfaceDef.classDefs().end();
 	for (; ci != ce; ++ci)
 	{
-		out << "void " << destructorFunctionName( ci->name()) << "( void* self)" << std::endl;
+		out << "extern \"C\" DLL_PUBLIC void " << destructorFunctionName( ci->name()) << "( void* self)" << std::endl;
 		out << "{" << std::endl;
-		out << "	delete reinterpret_cast<" << ci->name() << "Impl>( self);" << std::endl;
+		out << "	delete reinterpret_cast<" << ci->name() << "Impl*>( self);" << std::endl;
 		out << "}" << std::endl;
 		out << std::endl;
 
@@ -382,10 +383,11 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		for (; ki != ke; ++ki)
 		{
 			out 
-			<< "bool " << constructorFunctionName( ci->name())
+			<< "extern \"C\" DLL_PUBLIC bool " << constructorFunctionName( ci->name())
 			<< "( papuga_CallResult& retval, "
 			<< "size_t argc, const papuga_ValueVariant* argv)" << std::endl
 			<< "{" << std::endl;
+			out << "\ttry {" << std::endl;
 			ParameterSructureExpanded paramstruct( ki->parameters());
 			if (paramstruct.min_nofargs)
 			{

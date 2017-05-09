@@ -15,7 +15,8 @@
 
 #define PAPUGA_USE_RTTI_TYPECHECK
 
-namespace papuga {
+namespace strus {
+namespace bindings {
 
 struct HostObjectReference
 {
@@ -76,6 +77,6 @@ public:
 	}
 };
 
-} //namespace
+}} //namespace
 #endif
 

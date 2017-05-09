@@ -33,9 +33,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-typedef papuga::Serialization Serialization;
-
-StorageClientImpl::StorageClientImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config_)
+StorageClientImpl::StorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
@@ -68,7 +66,7 @@ StatisticsIteratorImpl* StorageClientImpl::createInitStatisticsIterator( bool si
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	HostObjectReference iter;
+	ObjectRef iter;
 	iter.resetOwnership( storage->createInitStatisticsIterator( sign));
 	if (!iter.get())
 	{
@@ -82,7 +80,7 @@ StatisticsIteratorImpl* StorageClientImpl::createUpdateStatisticsIterator()
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	HostObjectReference iter;
+	ObjectRef iter;
 	iter.resetOwnership( storage->createUpdateStatisticsIterator());
 	if (!iter.get())
 	{
@@ -132,7 +130,7 @@ std::vector<std::pair<std::string,std::string> >* StorageClientImpl::config() co
 	return rt;
 }
 
-StorageTransactionImpl::StorageTransactionImpl( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const HostObjectReference& errorhnd_, const HostObjectReference& storage_)
+StorageTransactionImpl::StorageTransactionImpl( const ObjectRef& objbuilder_, const ObjectRef& trace_, const ObjectRef& errorhnd_, const ObjectRef& storage_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
@@ -200,7 +198,7 @@ void StorageTransactionImpl::rollback()
 	m_transaction_impl.reset();
 }
 
-DocumentBrowserImpl::DocumentBrowserImpl( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& storage_impl_, const HostObjectReference& errorhnd_)
+DocumentBrowserImpl::DocumentBrowserImpl( const ObjectRef& objbuilder_impl_, const ObjectRef& trace_impl_, const ObjectRef& storage_impl_, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_impl_)
 	,m_objbuilder_impl(objbuilder_impl_)
@@ -230,7 +228,7 @@ void DocumentBrowserImpl::addMetaDataRestrictionCondition(
 		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
 	}
 	MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	restriction->addCondition( cmpop, name, ValueVariantConv::tonumeric(value), newGroup);
+	restriction->addCondition( cmpop, name, ValueVariantWrap::tonumeric(value), newGroup);
 }
 
 Index DocumentBrowserImpl::skipDoc( int docno)
@@ -277,7 +275,7 @@ Struct* DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelecte
 				attributereader->skipDoc( docno);
 				attributereader_called = true;
 			}
-			miar[ eidx] = rt.stringbuf.size();
+			miar[ eidx] = rt->strings.size();
 			rt->strings.append( attributereader->getValue( eh));
 			rt->strings.push_back( '\0');
 		}

@@ -16,9 +16,6 @@
 namespace strus {
 namespace bindings {
 
-typedef papuga_ValueVariant ValueVariant;
-typedef papuga_HostObjectReference HostObjectReference;
-
 /// \brief Object used to search for similar vectors in the collection
 struct Struct
 {

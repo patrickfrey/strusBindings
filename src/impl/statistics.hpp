@@ -7,15 +7,18 @@
  */
 #ifndef _STRUS_BINDING_IMPL_STATISTICS_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STATISTICS_HPP_INCLUDED
-#include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
-#include "strus/statisticsProcessorInterface.hpp"
 #include "impl/objectref.hpp"
 #include <vector>
 #include <string>
 
 namespace strus {
+///\brief Forward declaration
+class StatisticsViewerInterface;
+///\brief Forward declaration
+class StatisticsProcessorInterface;
+
 namespace bindings {
 
 ///\brief Forward declaration
@@ -36,14 +39,14 @@ public:
 
 private:
 	friend class StorageClientImpl;
-	StatisticsIteratorImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_, const HostObjectReference& iter_);
+	StatisticsIteratorImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& iter_);
 
 private:
-	HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
-	HostObjectReference m_iter_impl;
+	ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
+	ObjectRef m_iter_impl;
 };
 
 
@@ -57,7 +60,7 @@ public:
 	/// \brief Decode a statistics message blob for introspection
 	/// \param[in] blob statistics message blob
 	/// \return the statistics message structure
-	Struct* decode( const std::string& blob) const;
+	StatisticsViewerInterface* decode( const std::string& blob) const;
 
 	/// \brief Create binary blob from statistics message
 	/// \param[in] msg statistics message structure
@@ -66,12 +69,12 @@ public:
 
 private:
 	friend class ContextImpl;
-	StatisticsProcessorImpl( const HostObjectReference& objbuilder_, const HostObjectReference& trace_, const std::string& name_, const HostObjectReference& errorhnd_);
+	StatisticsProcessorImpl( const ObjectRef& objbuilder_, const ObjectRef& trace_, const std::string& name_, const ObjectRef& errorhnd_);
 
 private:
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
 	const StatisticsProcessorInterface* m_statsproc;
 };
 

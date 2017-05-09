@@ -31,6 +31,7 @@ struct ValueVariantWrap
 	static bool tobool( const papuga_ValueVariant& value);
 	static strus::NumericVariant tonumeric( const papuga_ValueVariant& value);
 	static std::string tostring( const papuga_ValueVariant& value);
+	static const char* tocharp( std::string& buf, const papuga_ValueVariant& value);
 };
 
 }}//namespace

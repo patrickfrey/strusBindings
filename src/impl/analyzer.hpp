@@ -7,7 +7,6 @@
  */
 #ifndef _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
-#include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
@@ -23,6 +22,9 @@ namespace strus {
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
+
+///\brief Forward declaration
+class AnalyzedQuery;
 
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 
@@ -169,12 +171,12 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd, const ValueVariant& doctype, const TextProcessorInterface* textproc_);
+	DocumentAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd, const ValueVariant& doctype, const TextProcessorInterface* textproc_);
 
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_analyzer_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_analyzer_impl;
 	const TextProcessorInterface* m_textproc;
 };
 
@@ -249,44 +251,20 @@ public:
 	/// \param[in] groupBy kind of selection of the arguments grouped ("position": elements with same position get their own group, "all" (or "" default): all elements of the field get into one group
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, const std::string& groupBy);
 
-	/// \brief Structure holding all parts needed for serializing an analyzed query
-	class AnalyzeResult
-	{
-	public:
-		/// \brief Constructor
-		AnalyzeResult( const Reference<analyzer::Query>& query_, const std::vector<QueryAnalyzerStruct::Operator>& operators_, bool labeledOutput_)
-			:m_query(query_),m_operators(operators_),m_labeledOutput(labeledOutput_){}
-		/// \brief Copy constructor
-		AnalyzeResult( const AnalyzeResult& o)
-			:m_query(o.m_query),m_operators(o.m_operators),m_labeledOutput(o.m_labeledOutput){}
-	
-		/// \brief Reference to query structure
-		const Reference<analyzer::Query>& query() const				{return m_query;}
-		/// \brief Operators defined
-		const std::vector<QueryAnalyzerStruct::Operator>& operators() const	{return m_operators;}
-		/// \brief Defines the serialization of output depending on input (positional
-		bool labeledOutput() const						{return m_labeledOutput;}
-	
-	private:
-		Reference<analyzer::Query> m_query;
-		std::vector<QueryAnalyzerStruct::Operator> m_operators;
-		bool m_labeledOutput;
-	};
-
 	/// \brief Analye the content and return the set of features to insert
 	/// \param[in] expression query expression tree
 	/// \return structure of the query analyzed, depending on input the output structures are positional or labeled
-	AnalyzeResult* analyze( const ValueVariant& expression);
+	AnalyzedQuery* analyze( const ValueVariant& expression);
 
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	QueryAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
+	QueryAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd);
 
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_analyzer_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_analyzer_impl;
 	QueryAnalyzerStruct m_queryAnalyzerStruct;
 };
 

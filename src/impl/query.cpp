@@ -24,9 +24,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-typedef papuga::Serialization Serialization;
-
-QueryEvalImpl::QueryEvalImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd)
+QueryEvalImpl::QueryEvalImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -107,16 +105,16 @@ void QueryEvalImpl::addWeightingFormula(
 	Deserializer::buildWeightingFormula( queryeval, source, parameter, m_queryproc, errorhnd);
 }
 
-CallResult QueryEvalImpl::createQuery( StorageClientImpl* storage) const
+QueryImpl* QueryEvalImpl::createQuery( StorageClientImpl* storage) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryEvalInterface* qe = m_queryeval_impl.getObject<QueryEvalInterface>();
 	const StorageClientInterface* st = storage->m_storage_impl.getObject<StorageClientInterface>();
-	HostObjectReference query;
+	ObjectRef query;
 	query.resetOwnership( qe->createQuery( st));
 	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
 
-	return callResultObject( new QueryImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc));
+	return new QueryImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
 
 void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr_, double weight_)
@@ -135,7 +133,7 @@ void QueryImpl::addMetaDataRestrictionCondition(
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
 	MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
-	THIS->addMetaDataRestrictionCondition( cmpop, name, ValueVariantConv::tonumeric(operand), newGroup);
+	THIS->addMetaDataRestrictionCondition( cmpop, name, ValueVariantWrap::tonumeric(operand), newGroup);
 }
 
 void QueryImpl::defineTermStatistics( const std::string& type_, const std::string& value_, const ValueVariant& stats_)
@@ -181,17 +179,17 @@ void QueryImpl::setWeightingVariables(
 		const ValueVariant& parameter)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	if (parameter.type != ValueVariant::Serialization)
+	if (parameter.valuetype != papuga_Serialized)
 	{
 		throw strus::runtime_error(_TXT("list of variable assignments expected as argument"));
 	}
 	Serialization::const_iterator
-		si = parameter.value.serialization->begin(),
-		se = parameter.value.serialization->end();
+		si = Serialization::begin( parameter.value.serialization),
+		se = Serialization::end( parameter.value.serialization);
 	while (si != se)
 	{
 		ConfigDef assignment( si, se);
-		THIS->setWeightingVariableValue( assignment.name, ValueVariantConv::todouble( assignment.value));
+		THIS->setWeightingVariableValue( assignment.name, ValueVariantWrap::todouble( assignment.value));
 	}
 }
 
@@ -201,7 +199,7 @@ void QueryImpl::setDebugMode( bool debug)
 	THIS->setDebugMode( debug);
 }
 
-CallResult QueryImpl::evaluate() const
+QueryResult* QueryImpl::evaluate() const
 {
 	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
 	return new QueryResult( THIS->evaluate());

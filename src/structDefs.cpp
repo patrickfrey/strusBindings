@@ -16,8 +16,8 @@ using namespace strus;
 using namespace strus::bindings;
 
 static const papuga_ValueVariant& getValue(
-		papuga::Serialization::const_iterator& si,
-		const papuga::Serialization::const_iterator& se)
+		Serialization::const_iterator& si,
+		const Serialization::const_iterator& se)
 {
 	if (si != se && si->tag == papuga_TagValue)
 	{
@@ -31,7 +31,7 @@ static const papuga_ValueVariant& getValue(
 	}
 }
 
-AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:name(),args()
 {
 	static const char* context = _TXT("analyzer function");
@@ -77,7 +77,7 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator&
 	}
 }
 
-TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:variable(),type(),value(),length(1),value_defined(false),length_defined(false)
 {
 	static const char* context = _TXT("term");
@@ -170,7 +170,7 @@ TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Seria
 	}
 }
 
-MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:from(),to()
 {
 	static const char* context = _TXT("metadata range");
@@ -201,7 +201,7 @@ MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, c
 }
 
 
-ConfigDef::ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 	:name(),value()
 {
 	static const char* context = _TXT("configuration");
@@ -256,7 +256,7 @@ ConfigDef::ConfigDef( papuga::Serialization::const_iterator& si, const papuga::S
 }
 
 
-DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+DfChangeDef::DfChangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("document frequency change");
 	static const StructureNameMap namemap( "type,value,increment", ',');
@@ -304,7 +304,7 @@ DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papug
 	}
 }
 
-ContextDef::ContextDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+ContextDef::ContextDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("context configuration");
 	static const StructureNameMap namemap( "threads,rpc,trace", ',');
@@ -336,7 +336,7 @@ ContextDef::ContextDef( papuga::Serialization::const_iterator& si, const papuga:
 	Deserializer::consumeClose( si, se);
 }
 
-SegmenterDef::SegmenterDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+SegmenterDef::SegmenterDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("segmenter configuration");
 	static const StructureNameMap namemap( "segmenter,mimetype,encoding,scheme", ',');

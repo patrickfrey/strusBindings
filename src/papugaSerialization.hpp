@@ -12,7 +12,8 @@
 #include "papuga/serialization.h"
 #include <stdexcept>
 
-namespace papuga {
+namespace strus {
+namespace bindings {
 
 class Serialization
 {
@@ -71,6 +72,6 @@ private:
 	papuga_Serialization m_st;
 };
 
-} //namespace
+}} //namespace
 #endif
 

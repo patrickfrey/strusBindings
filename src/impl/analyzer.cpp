@@ -13,28 +13,31 @@
 #include "papugaSerialization.hpp"
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
+#include "papugaErrorException.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
 #include "utils.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
 #include "papuga/valueVariant.hpp"
+#include "impl/analyzedQuery.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
 
-typedef papuga::Serialization Serialization;
-
 static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 {
-	if (ctx.isStringType())
+	if (papuga_ValueVariant_isstring( &ctx))
 	{
-		return SegmenterDef( papuga::ValueVariant_tostring( ctx));
+		papuga_ErrorCode err = papuga_Ok;
+		SegmenterDef segdef( papuga::ValueVariant_tostring( &ctx, err));
+		if (err != papuga_Ok) throw papuga_error_exception( err, "segmenter definition");
+		return segdef;
 	}
-	else if (ctx.type == ValueVariant::Serialization)
+	else if (ctx.valuetype == papuga_Serialized)
 	{
-		Serialization::const_iterator si = ctx.value.serialization->begin();
-		return SegmenterDef( si, ctx.value.serialization->end());
+		Serialization::const_iterator si = Serialization::begin( ctx.value.serialization);
+		return SegmenterDef( si, Serialization::begin( ctx.value.serialization));
 	}
 	else
 	{
@@ -42,7 +45,7 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 	}
 }
 
-DocumentAnalyzerImpl::DocumentAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const ValueVariant& doctype, const TextProcessorInterface* textproc_)
+DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ValueVariant& doctype, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -88,7 +91,7 @@ struct FeatureFuncDef
 	std::vector<NormalizerFunctionInstanceInterface*> normalizers;
 	Reference<TokenizerFunctionInstanceInterface> tokenizer;
 
-	FeatureFuncDef( const HostObjectReference& objbuilder_impl,
+	FeatureFuncDef( const ObjectRef& objbuilder_impl,
 			const ValueVariant& tokenizer_,
 			const ValueVariant& normalizers_,
 			ErrorBufferInterface* errorhnd)
@@ -97,7 +100,7 @@ struct FeatureFuncDef
 		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 		if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor object: %s"), errorhnd->fetchError());
 
-		if (tokenizer_.defined())
+		if (papuga_ValueVariant_defined( &tokenizer_))
 		{
 			tokenizer = Deserializer::getTokenizer( tokenizer_, textproc, errorhnd);
 		}
@@ -309,7 +312,7 @@ analyzer::Document* DocumentAnalyzerImpl::analyze( const std::string& content, c
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
-	if (dclass.defined())
+	if (papuga_ValueVariant_defined( &dclass))
 	{
 		return analyzeDoc( THIS, content, Deserializer::getDocumentClass( dclass), errorhnd);
 	}
@@ -335,7 +338,7 @@ analyzer::Document* DocumentAnalyzerImpl::analyze( const std::string& content, c
 	}
 }
 
-QueryAnalyzerImpl::QueryAnalyzerImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd)
+QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -450,7 +453,7 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-QueryAnalyzerImpl::AnalyzeResult* QueryAnalyzerImpl::analyze(
+AnalyzedQuery* QueryAnalyzerImpl::analyze(
 		const ValueVariant& expression)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -461,8 +464,8 @@ QueryAnalyzerImpl::AnalyzeResult* QueryAnalyzerImpl::analyze(
 	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
 
-	bool output_labeled = (expression.type == ValueVariant::Serialization && expression.value.serialization->isLabeled());
-	Reference<AnalyzeResult> res( new QueryAnalyzerImpl::AnalyzeResult( anactx->analyze(), exprbuilder.operators(), output_labeled));
+	bool output_labeled = (expression.valuetype == papuga_Serialized && papuga_Serialization_islabeled( expression.value.serialization));
+	Reference<AnalyzedQuery> res( new AnalyzedQuery( anactx->analyze(), exprbuilder.operators(), output_labeled));
 	return res.release();
 }
 

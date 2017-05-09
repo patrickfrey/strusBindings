@@ -41,43 +41,43 @@ namespace bindings {
 struct Deserializer
 {
 	static void consumeClose(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static bool skipStructure(
-			papuga::Serialization::const_iterator si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator si,
+			const Serialization::const_iterator& se);
 
 	static std::string getString(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static const char* getCharp(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static std::vector<std::string> getStringList(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static std::vector<std::string> getStringList(
 			const papuga_ValueVariant& val);
 
 	static unsigned int getUint(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static int getInt(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static Index getIndex(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static double getDouble(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static std::vector<int> getIntList(
 			const papuga_ValueVariant& val);
@@ -89,16 +89,16 @@ struct Deserializer
 			const papuga_ValueVariant& val);
 
 	static std::string getOptionalDefinition(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se,
 			const char* name);
 
 	static analyzer::DocumentClass getDocumentClass(
 			const papuga_ValueVariant& val);
 
 	static analyzer::FeatureOptions getFeatureOptions(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static analyzer::FeatureOptions getFeatureOptions(
 			const papuga_ValueVariant& options);
@@ -110,8 +110,8 @@ struct Deserializer
 			const papuga_ValueVariant& stats);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
@@ -121,8 +121,8 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 	
 	static Reference<TokenizerFunctionInstanceInterface> getTokenizer(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
@@ -132,8 +132,8 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 	
 	static Reference<AggregatorFunctionInstanceInterface> getAggregator(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
@@ -166,8 +166,8 @@ struct Deserializer
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+			Serialization::const_iterator& si,
+			const Serialization::const_iterator& se);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,

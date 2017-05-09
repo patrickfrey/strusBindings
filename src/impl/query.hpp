@@ -7,10 +7,10 @@
  */
 #ifndef _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
-#include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/numericVariant.hpp"
+#include "strus/queryResult.hpp"
 #include "impl/objectref.hpp"
 #include <vector>
 #include <string>
@@ -82,13 +82,13 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	QueryEvalImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd);
+	QueryEvalImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd);
 
 	friend class QueryImpl;
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_queryeval_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_queryeval_impl;
 	const QueryProcessorInterface* m_queryproc;
 };
 
@@ -170,16 +170,16 @@ public:
 
 private:
 	friend class QueryEvalImpl;
-	QueryImpl( const HostObjectReference& objbuilder_impl_, const HostObjectReference& trace_impl_, const HostObjectReference& errorhnd_, const HostObjectReference& storage_impl_, const HostObjectReference& queryeval_impl_, const HostObjectReference& query_impl_, const QueryProcessorInterface* queryproc_)
+	QueryImpl( const ObjectRef& objbuilder_impl_, const ObjectRef& trace_impl_, const ObjectRef& errorhnd_, const ObjectRef& storage_impl_, const ObjectRef& queryeval_impl_, const ObjectRef& query_impl_, const QueryProcessorInterface* queryproc_)
 		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
 	{}
 
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
-	HostObjectReference m_queryeval_impl;
-	HostObjectReference m_query_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
+	ObjectRef m_queryeval_impl;
+	ObjectRef m_query_impl;
 	const QueryProcessorInterface* m_queryproc;
 };
 

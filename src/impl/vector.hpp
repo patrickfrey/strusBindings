@@ -7,7 +7,6 @@
  */
 #ifndef _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
-#include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/vectorStorageSearchInterface.hpp"
 #include "impl/objectref.hpp"
@@ -47,11 +46,11 @@ public:
 
 private:
 	friend class VectorStorageClientImpl;
-	VectorStorageSearcherImpl( const HostObjectReference& storage, const HostObjectReference& trace, int range_from, int range_to, const HostObjectReference& errorhnd_);
+	VectorStorageSearcherImpl( const ObjectRef& storage, const ObjectRef& trace, int range_from, int range_to, const ObjectRef& errorhnd_);
 
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_searcher_impl;
-	HostObjectReference m_trace_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_searcher_impl;
+	ObjectRef m_trace_impl;
 };
 
 /// \brief Object representing a client connection to a vector storage 
@@ -124,12 +123,12 @@ public:
 
 private:
 	friend class ContextImpl;
-	VectorStorageClientImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config);
+	VectorStorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config);
 
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_vector_storage_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_vector_storage_impl;
 	std::string m_config;
 };
 
@@ -168,13 +167,13 @@ public:
 
 private:
 	friend class VectorStorageClientImpl;
-	VectorStorageTransactionImpl( const HostObjectReference& objbuilder, const HostObjectReference& storage, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config);
+	VectorStorageTransactionImpl( const ObjectRef& objbuilder, const ObjectRef& storage, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config);
 
-	HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_vector_storage_impl;	
-	HostObjectReference m_vector_transaction_impl;
+	ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_vector_storage_impl;	
+	ObjectRef m_vector_transaction_impl;
 };
 
 }}//namespace

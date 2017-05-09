@@ -7,7 +7,6 @@
  */
 #ifndef _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
-#include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
@@ -121,12 +120,12 @@ private:
 	void initAnalyzerObjBuilder();
 
 private:
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_moduleloader_impl;
-	HostObjectReference m_rpc_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_storage_objbuilder_impl;
-	HostObjectReference m_analyzer_objbuilder_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_moduleloader_impl;
+	ObjectRef m_rpc_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_storage_objbuilder_impl;
+	ObjectRef m_analyzer_objbuilder_impl;
 	const TextProcessorInterface* m_textproc;
 	const QueryProcessorInterface* m_queryproc;
 };

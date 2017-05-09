@@ -14,7 +14,6 @@
 
 using namespace strus;
 using namespace strus::bindings;
-using namespace papuga;
 
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericVariant& val)
 {
@@ -108,7 +107,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 static bool serialize_labeled( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators)
 {
 	bool rt = true;
-	std::vector<papuga::Serialization> stk;
+	std::vector<Serialization> stk;
 	std::vector<analyzer::Query::Instruction>::const_iterator
 		ii = val.instructions().begin(), ie = val.instructions().end();
 	for (; ii != ie && rt; ++ii)
@@ -205,15 +204,15 @@ static bool serialize_positional( papuga_Serialization* result, const analyzer::
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const QueryAnalyzerImpl::AnalyzeResult& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const AnalyzedQuery& query)
 {
-	if (val.labeledOutput())
+	if (query.labeledOutput())
 	{
-		return serialize_labeled( result, *val.query(), val.operators());
+		return serialize_labeled( result, query.query(), query.operators());
 	}
 	else
 	{
-		return serialize_positional( result, *val.query(), val.operators());
+		return serialize_positional( result, query.query(), query.operators());
 	}
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsViewerInterface::DocumentFrequencyChange& val)
@@ -222,6 +221,24 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Statisti
 	rt &= serializeStructMember( result, "type", val.type());
 	rt &= serializeStructMember( result, "value", val.value());
 	rt &= serializeStructMember( result, "increment", (papuga_IntType)val.increment());
+	return rt;
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val)
+{
+	bool rt = true;
+
+	rt &= papuga_Serialization_pushName_charp( result, "dfchange");
+	rt &= papuga_Serialization_pushOpen( result);
+
+	DocumentFrequencyChange rec;
+	while (val.nextDfChange( rec))
+	{
+		rt &= Serializer::serialize_nothrow( result, rec);
+	}
+	rt &= papuga_Serialization_pushClose( result);
+
+	rt &= papuga_Serialization_pushName_charp( result, "nofdocs");
+	rt &= papuga_Serialization_pushValue_int( result, val.nofDocumentsInsertedChange());
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const ResultDocument& val)

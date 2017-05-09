@@ -103,3 +103,11 @@ std::string ValueVariantWrap::tostring( const papuga_ValueVariant& value)
 	return rt;
 }
 
+const char* ValueVariantWrap::tocharp( std::string& buf, const papuga_ValueVariant& value)
+{
+	papuga_ErrorCode err = papuga_Ok;
+	buf = papuga::ValueVariant_tostring( &value, err);
+	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("tocharp of variant value"));
+	return buf.c_str();
+}
+

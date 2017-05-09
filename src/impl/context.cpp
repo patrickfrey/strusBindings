@@ -5,6 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#include "impl/context.hpp"
 #include "impl/storage.hpp"
 #include "impl/vector.hpp"
 #include "impl/statistics.hpp"
@@ -41,11 +42,10 @@
 #include "serializer.hpp"
 #include "structDefs.hpp"
 #include "traceUtils.hpp"
+#include "papugaErrorException.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
-
-typedef papuga::Serialization Serialization;
 
 static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
 {
@@ -69,35 +69,22 @@ static ModuleLoaderInterface* createModuleLoader_( ErrorBufferInterface* errorhn
 
 static ContextDef parseContext( const ValueVariant& ctx)
 {
-	if (ctx.isStringType())
+	if (papuga_ValueVariant_isstring( &ctx))
 	{
-		return ContextDef( papuga::ValueVariant_tostring( ctx));
+		papuga_ErrorCode err = papuga_Ok;
+		ContextDef rt( papuga::ValueVariant_tostring( &ctx, err));
+		if (err != papuga_Ok) throw papuga_error_exception( err, "context definition");
+		return rt;
 	}
-	else if (ctx.type == ValueVariant::Serialization)
+	else if (ctx.valuetype == papuga_Serialized)
 	{
-		Serialization::const_iterator si = ctx.value.serialization->begin();
-		return ContextDef( si, ctx.value.serialization->end());
+		Serialization::const_iterator si = Serialization::begin( ctx.value.serialization);
+		return ContextDef( si, Serialization::end( ctx.value.serialization));
 	}
 	else
 	{
 		throw strus::runtime_error(_TXT("expected string or structure for context configuration"));
 	}
-}
-
-ContextImpl::ContextImpl()
-	:m_errorhnd_impl()
-	,m_moduleloader_impl()
-	,m_rpc_impl()
-	,m_trace_impl()
-	,m_storage_objbuilder_impl()
-	,m_analyzer_objbuilder_impl()
-	,m_textproc(0)
-	,m_queryproc(0)
-{
-	ErrorBufferInterface* errorhnd = createErrorBuffer_( 0);
-	m_errorhnd_impl.resetOwnership( errorhnd);
-	ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-	m_moduleloader_impl.resetOwnership( moduleLoader);
 }
 
 ContextImpl::ContextImpl( const ValueVariant& descr)
@@ -110,23 +97,33 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_textproc(0)
 	,m_queryproc(0)
 {
-	ContextDef contextdef = parseContext( descr);
-	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
-	m_errorhnd_impl.resetOwnership( errorhnd);
-	ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-	m_moduleloader_impl.resetOwnership( moduleLoader);
-	if (!contextdef.rpc.empty())
+	if (papuga_ValueVariant_defined( &descr))
 	{
-		Reference<RpcClientMessagingInterface> messaging;
-		messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
-		if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
-		m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd));
-		if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
-		(void)messaging.release();
+		ContextDef contextdef = parseContext( descr);
+		ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
+		m_errorhnd_impl.resetOwnership( errorhnd);
+		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
+		m_moduleloader_impl.resetOwnership( moduleLoader);
+		if (!contextdef.rpc.empty())
+		{
+			Reference<RpcClientMessagingInterface> messaging;
+			messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
+			if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
+			m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd));
+			if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
+			(void)messaging.release();
+		}
+		if (!contextdef.trace.empty())
+		{
+			m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd));
+		}
 	}
-	if (!contextdef.trace.empty())
+	else
 	{
-		m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd));
+		ErrorBufferInterface* errorhnd = createErrorBuffer_( 0);
+		m_errorhnd_impl.resetOwnership( errorhnd);
+		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
+		m_moduleloader_impl.resetOwnership( moduleLoader);
 	}
 }
 

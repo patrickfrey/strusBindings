@@ -7,7 +7,6 @@
  */
 #ifndef _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
-#include "papuga/hostObjectReference.h"
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/index.hpp"
@@ -74,14 +73,14 @@ public:
 
 private:
 	friend class ContextImpl;
-	StorageClientImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const std::string& config);
+	StorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config);
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
 };
 
 
@@ -117,17 +116,17 @@ public:
 
 private:
 	friend class StorageClientImpl;
-	StorageTransactionImpl( const HostObjectReference& objbuilder, const HostObjectReference& trace, const HostObjectReference& errorhnd_, const HostObjectReference& storage_);
+	StorageTransactionImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ObjectRef& storage_);
 
 	StorageTransactionInterface* getTransaction();
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;
-	mutable HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
-	HostObjectReference m_transaction_impl;
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
+	ObjectRef m_transaction_impl;
 };
 
 ///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata
@@ -161,20 +160,20 @@ public:
 private:
 	friend class StorageClientImpl;
 	DocumentBrowserImpl(
-		const HostObjectReference& objbuilder_impl_,
-		const HostObjectReference& trace_impl_,
-		const HostObjectReference& storage_impl_,
-		const HostObjectReference& errorhnd_);
+		const ObjectRef& objbuilder_impl_,
+		const ObjectRef& trace_impl_,
+		const ObjectRef& storage_impl_,
+		const ObjectRef& errorhnd_);
 
 private:
-	HostObjectReference m_errorhnd_impl;
-	HostObjectReference m_trace_impl;
-	HostObjectReference m_objbuilder_impl;
-	HostObjectReference m_storage_impl;
-	HostObjectReference m_restriction_impl;
-	HostObjectReference m_postingitr_impl;
-	HostObjectReference m_attributereader_impl;
-	HostObjectReference m_metadatareader_impl;
+	ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
+	ObjectRef m_restriction_impl;
+	ObjectRef m_postingitr_impl;
+	ObjectRef m_attributereader_impl;
+	ObjectRef m_metadatareader_impl;
 };
 
 }}//namespace
