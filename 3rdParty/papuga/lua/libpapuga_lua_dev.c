@@ -1,19 +1,26 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <stddef.h>
+#include <math.h>
+#include <float.h>
 #include "papuga/lib/lua_dev.h"
 #include "papuga/valueVariant.h"
 #include "papuga/callResult.h"
+#include "papuga/errors.h"
 #include "papuga/serialization.h"
 #include "private/dll_tags.h"
+
+#define MAX_DOUBLE_INT            ((int64_t)1<<53)
+#define MIN_DOUBLE_INT           -((int64_t)1<<53)
+#define IS_CONVERTIBLE_TOINT( x)  ((x-floor(x) < 2*DBL_EPSILON) && x < MAX_DOUBLE_INT && x > -MIN_DOUBLE_INT)
+#define NUM_EPSILON               (2*DBL_EPSILON)
 
 static bool serialize_key( papuga_lua_CallArgs* as, papuga_Serialization* result, lua_State* ls, int li)
 {
 	bool rt = true;
 	const char* str;
 	size_t strsize;
-	int isnum;
-	lua_Integer intval;
+	double numval;
 
 	switch (lua_type (ls, li))
 	{
@@ -21,9 +28,17 @@ static bool serialize_key( papuga_lua_CallArgs* as, papuga_Serialization* result
 			rt &= papuga_Serialization_pushName_void( result);
 			break;
 		case LUA_TNUMBER:
-			if (0!=(intval=lua_tointegerx( ls, li, &isnum)) && isnum)
+			numval = lua_tonumber( ls, li);
+			if (IS_CONVERTIBLE_TOINT( numval))
 			{
-				rt &= papuga_Serialization_pushName_int( result, intval);
+				if (numval > 0.0)
+				{
+					rt &= papuga_Serialization_pushName_uint( result, (uint64_t)(numval + NUM_EPSILON));
+				}
+				else
+				{
+					rt &= papuga_Serialization_pushName_int( result, (int64_t)(numval - NUM_EPSILON));
+				}
 			}
 			else
 			{
@@ -174,6 +189,12 @@ static bool serialize_root( papuga_lua_CallArgs* as, lua_State *ls, int li)
 DLL_PUBLIC bool papuga_init_lua_state( lua_State* ls)
 {
 	return true;
+}
+
+DLL_PUBLIC void papuga_lua_error( lua_State* ls, papuga_ErrorCode err)
+{
+	lua_pushstring( ls, papuga_ErrorCode_tostring( err));
+	lua_error( ls);
 }
 
 DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* as, const char* classname)

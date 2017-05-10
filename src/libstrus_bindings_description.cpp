@@ -183,20 +183,7 @@ static const papuga_ClassDescription g_classes[14] =
 	{0,0}
 };
 
-static const papuga_ErrorDescription g_errors[] = {
-	{papuga_Ok,_TXT("Ok")},
-	{papuga_LogicError,_TXT("logic error")},
-	{papuga_NoMemError,_TXT("out of memory")},
-	{papuga_TypeError,_TXT("type mismatch")},
-	{papuga_EncodingError,_TXT("string character encoding error")},
-	{papuga_BufferOverflowError,_TXT("internal buffer not big enough")},
-	{papuga_OutOfRangeError,_TXT("value out of range")},
-	{papuga_NofArgsError,_TXT("number of arguments does not match")},
-	{papuga_MissingSelf,_TXT("self argument is missing")},
-	{0,NULL}
-};
-
-static const papuga_InterfaceDescription g_descr = { "strus", "strus/bindingObjects.h", g_classes, g_errors };
+static const papuga_InterfaceDescription g_descr = { "strus", "strus/bindingObjects.h", g_classes };
 
 DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()
 {

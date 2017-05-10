@@ -86,6 +86,7 @@ include_directories(
 )
 
 link_directories(
+	"${CMAKE_BINARY_DIR}/3rdParty/papuga/lua/"
 	"${Boost_LIBRARY_DIRS}"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
@@ -104,8 +105,8 @@ target_link_libraries( strus_bindingsimpl strus_storage_objbuild strus_analyzer_
 add_library( strus_bindings SHARED ${bindings_source_files} )
 target_link_libraries( strus_bindings strus_bindingsimpl strus_base strus_error )
 
-add_library( libstrus_bindings_description SHARED libstrus_bindings_description.cpp )
-target_link_libraries( libstrus_bindings_description )
+add_library( strus_bindings_description SHARED libstrus_bindings_description.cpp )
+target_link_libraries( strus_bindings_description )
 
 set_target_properties(
     strus_bindings
@@ -120,6 +121,9 @@ set_target_properties(
 # ------------------------------
 add_executable( strusLua strusLua.cpp )
 target_link_libraries( strusLua  "${Boost_LIBRARIES}" strus_bindings_lua_impl strus_base strus_error strus_module strus_rpc_client strus_rpc_client_socket ${Intl_LIBRARIES} )
+
+add_executable( strusBindingsModuleGen strusBindingsModuleGen.cpp )
+target_link_libraries( strusBindingsModuleGen  "${Boost_LIBRARIES}" strus_base papuga_lua_gen strus_bindings_description ${Intl_LIBRARIES} )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )

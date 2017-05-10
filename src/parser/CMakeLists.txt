@@ -27,13 +27,13 @@ link_directories(
 # STRUS BINDINGS CODE GENERATOR
 # Code generator that maps the strus interfaces to sources needed for bindings
 # -------------------------------------------
-add_executable( strusBindingsGen strusBindingsGen.cpp ${source_files} )
-target_link_libraries( strusBindingsGen strus_base ${CMAKE_DL_LIBS} ${Intl_LIBRARIES} )
+add_executable( strusBindingsInterfaceGen strusBindingsInterfaceGen.cpp ${source_files} )
+target_link_libraries( strusBindingsInterfaceGen strus_base ${CMAKE_DL_LIBS} ${Intl_LIBRARIES} )
 
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install( TARGETS strusBindingsGen
+install( TARGETS strusBindingsInterfaceGen
            RUNTIME DESTINATION bin )
 
 

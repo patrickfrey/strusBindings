@@ -14,6 +14,18 @@
 
 #define papuga_LUA_MAX_NOF_ARGUMENTS 64
 
+typedef struct papuga_lua_ClassDescriptor
+{
+	void (*destructor)( void* self);
+	const char* metatablename;
+} papuga_lua_ClassDescriptor;
+
+typedef struct papuga_lua_UserData
+{
+	int classid;
+	void* object;
+} papuga_lua_UserData;
+
 typedef struct papuga_lua_CallArgs
 {
 	int erridx;
@@ -27,6 +39,9 @@ typedef struct papuga_lua_CallArgs
 
 /// \brief Defines some globals needed
 bool papuga_init_lua_state( lua_State *ls);
+
+/// \brief Invokes a lua error exception on a papuga error
+void papuga_lua_error( lua_State* ls, papuga_ErrorCode err);
 
 /// \brief Function that fills a structure with the arguments passed in the lua context for papuga
 bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* arg, const char* classname);

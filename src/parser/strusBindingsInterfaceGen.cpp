@@ -5,8 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Code generator for strusBindings
-/// \file strusTraceCodeGen.cpp
+/// \brief Code generator for the papuga interface of strusBindings
+/// \file strusBindingsInterfaceGen.cpp
 #include "interfaceParser.hpp"
 #include "fillTypeTables.hpp"
 #include "printFrame.hpp"
@@ -133,20 +133,8 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	}
 	out << "\t{0,0}" << std::endl;
 	out << "};" << std::endl << std::endl;
-	out << "static const papuga_ErrorDescription g_errors[] = {" << std::endl;
-	out << "\t{papuga_Ok,_TXT(\"Ok\")}," << std::endl;
-	out << "\t{papuga_LogicError,_TXT(\"logic error\")}," << std::endl;
-	out << "\t{papuga_NoMemError,_TXT(\"out of memory\")}," << std::endl;
-	out << "\t{papuga_TypeError,_TXT(\"type mismatch\")}," << std::endl;
-	out << "\t{papuga_EncodingError,_TXT(\"string character encoding error\")}," << std::endl;
-	out << "\t{papuga_BufferOverflowError,_TXT(\"internal buffer not big enough\")}," << std::endl;
-	out << "\t{papuga_OutOfRangeError,_TXT(\"value out of range\")}," << std::endl;
-	out << "\t{papuga_NofArgsError,_TXT(\"number of arguments does not match\")}," << std::endl;
-	out << "\t{papuga_MissingSelf,_TXT(\"self argument is missing\")}," << std::endl;
-	out << "\t{0,NULL}" << std::endl;
-	out << "};" << std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", \"strus/bindingObjects.h\", g_classes, g_errors };"
+	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", \"strus/bindingObjects.h\", g_classes };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;

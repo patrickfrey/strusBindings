@@ -30,23 +30,6 @@ static std::runtime_error exception( const char* msg, ...)
 
 #define INDENT "\t"
 
-static void define_errormap(
-		std::ostream& out,
-		const papuga_ErrorDescription* errors)
-{
-	out << "static void error_exception( lua_State *ls, int errcode)" << std::endl;
-	out << "{" << std::endl;
-	for(int ei=0; errors[ei].text; ++ei)
-	{
-		out << INDENT << "if (errcode == " << errors[ei].errorcode << ") {" << std::endl;
-		out << INDENT << "{" << std::endl;
-		out << INDENT << INDENT << "lua_pushstring( ls, \"" << errors[ei].text << "\");" << std::endl;
-		out << INDENT << INDENT << "lua_error( ls);" << std::endl;
-		out << INDENT << "}" << std::endl;
-	}
-	out << "}" << std::endl;
-}
-
 static void define_method(
 		std::ostream& out,
 		const papuga_ClassDescription& classdef,
@@ -59,11 +42,11 @@ static void define_method(
 	out << INDENT << "char errorbuf[ 1024];" << std::endl;
 	if (method.self)
 	{
-		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << method.name << "\")) error_exception( ls, arg.errcode);" << std::endl;
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << method.name << "\")) papuga_lua_error( ls, arg.errcode);" << std::endl;
 	}
 	else
 	{
-		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) error_exception( ls, arg.errcode);" << std::endl;
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, arg.errcode);" << std::endl;
 	}
 	out << INDENT << "papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));" << std::endl;
 	out << INDENT << "if (!" << method.funcname << "( self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;" << std::endl;
@@ -101,9 +84,9 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 	{
 		if (what == "header")
 		{
-			out << "#ifndef _PAPUGA_VALUE_VARIANT_HPP_INCLUDED" << std::endl;
+			out << "#ifndef _PAPUGA_" << descr.name << "_LUA_INTERFACE__INCLUDED" << std::endl;
 			out << "#define _PAPUGA_" << descr.name << "_LUA_INTERFACE__INCLUDED" << std::endl;
-			out << "///\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
+			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
 			out << std::endl;
 			out << "#include <lua.h>" << std::endl;
 			out << "extern \"C\" int luaopen_" << descr.name << "( lua_State* L );" << std::endl;
@@ -114,8 +97,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		{
 			out << "#include \"lua_" << descr.name << ".h\"" << std::endl;
 			out << "#include \"papuga/lib/lua_dev.h\"" << std::endl;
-
-			define_errormap( out, descr.errors);
+			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
 
 			std::size_t ci = 0;
 			for (; descr.classes[ci].name; ++ci)

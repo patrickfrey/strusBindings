@@ -28,18 +28,11 @@ typedef struct papuga_ClassDescription
 	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods
 } papuga_ClassDescription;
 
-typedef struct papuga_ErrorDescription
-{
-	int errorcode;					///< error code
-	const char* text;				///< error message string assigned to errorcode
-} papuga_ErrorDescription;
-
 typedef struct papuga_InterfaceDescription
 {
 	const char* name;				///< name of the project wrapped by the bindings
 	const char* includefile;			///< name of the bindings interface file to include
 	const papuga_ClassDescription* classes;		///< (0,NULL,NULL) terminated list of classes 
-	const papuga_ErrorDescription* errors;		///< text for error codes defined in typedefs.h (papuga_ErrorCode)
 } papuga_InterfaceDescription;
 
 #endif

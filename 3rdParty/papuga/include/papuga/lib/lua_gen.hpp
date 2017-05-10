@@ -6,9 +6,9 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 /// \brief Library interface for libpapuga_lua for generating lua bindings
-/// \file papuga/lib/lua.hpp
-#ifndef _PAPUGA_LUA_LIB_HPP_INCLUDED
-#define _PAPUGA_LUA_LIB_HPP_INCLUDED
+/// \file papuga/lib/lua_gen.hpp
+#ifndef _PAPUGA_LUA_GEN_LIB_HPP_INCLUDED
+#define _PAPUGA_LUA_GEN_LIB_HPP_INCLUDED
 #include "papuga/interfaceDescription.h"
 #include <string>
 #include <iostream>
