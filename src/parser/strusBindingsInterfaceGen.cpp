@@ -495,10 +495,10 @@ int main( int argc, const char* argv[])
 		std::cout << interfaceDef.tostring() << std::endl;
 #endif
 		printOutput( outputdir + "/include/strus/bindingObjects.h", &print_BindingObjectsH, interfaceDef);
-		printOutput( outputdir + "/src/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
+		printOutput( outputdir + "/src/bindings/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
 
 		printOutput( outputdir + "/include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
-		printOutput( outputdir + "/src/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
+		printOutput( outputdir + "/src/bindings/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
 
 		std::cerr << "done." << std::endl;
 		return 0;

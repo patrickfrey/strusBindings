@@ -42,7 +42,7 @@ Testing/
 CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake/build_rules.cmake.user
-src/internationalization.cpp
+src/bindings/internationalization.cpp
 dist/obs/deploy_to_obs.sh
 dist/archlinux/PKGBUILD
 dist/obs/strusbindings.dsc
@@ -56,16 +56,17 @@ dist/redhat/strusbindings.spec
 lang/java
 lang/php
 lang/python
-src/lang/lua/libstrus_bindings_lua.c
 src/lang/lua/strus_lua.h
-src/bindingObjects.cpp
+src/lang/lua/libstrus_bindings_lua.c
+src/bindings/libstrus_bindings_description.cpp
+src/bindings/bindingObjects.cpp
 include/strus/bindingObjects.h
 
 # Compiled programs
 src/parser/strusBindingsInterfaceGen
-src/strusBindingsModuleGen
+src/gen/strusBindingsModuleGen
 tests/query_cpp/src/testBindingsQuery
-src/strusLua
+src/lang/lua/strusLua
 
 # Generated test data
 tests/query_cpp/storage/

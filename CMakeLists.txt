@@ -44,7 +44,7 @@ configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)
-configure_file( "${PROJECT_SOURCE_DIR}/src/internationalization.cpp.in"  "${PROJECT_SOURCE_DIR}/src/internationalization.cpp"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/src/bindings/internationalization.cpp.in"  "${PROJECT_SOURCE_DIR}/src/bindings/internationalization.cpp"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh.in"  "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD.in"  "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc"  @ONLY )

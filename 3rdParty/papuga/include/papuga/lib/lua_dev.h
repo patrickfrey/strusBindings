@@ -29,7 +29,7 @@ typedef struct papuga_lua_UserData
 typedef struct papuga_lua_CallArgs
 {
 	int erridx;
-	int errcode;
+	papuga_ErrorCode errcode;
 	size_t argc;
 	size_t serc;
 	void* self;
