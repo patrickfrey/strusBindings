@@ -16,19 +16,22 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 #undef STRUS_LOWLEVEL_DEBUG
 
 static void printUsage()
 {
-	std::cerr << "strusBindingsModuleGen <language> <what>" << std::endl;
+	std::cerr << "strusBindingsModuleGen <language> <what> [<outputfile>]" << std::endl;
 	std::cerr << "Description : Prints one specific part of the generated laguage binding to stdout" << std::endl;
-	std::cerr << "<language>  : language to generate language binding module for." << std::endl;
-	std::cerr << "<what>      : what binding part to generate." << std::endl;
+	std::cerr << "<language>  : Language to generate language binding module for." << std::endl;
+	std::cerr << "<what>      : What binding part to generate." << std::endl;
+	std::cerr << "<outputfile>: Where to print the output (stdout if not specified)" << std::endl;
 }
 
 int main( int argc, const char* argv[])
 {
+	int ec = 0;
 	try
 	{
 		const papuga_InterfaceDescription* interface_description = strus::getBindingsInterfaceDescription();
@@ -41,9 +44,24 @@ int main( int argc, const char* argv[])
 			printUsage();
 			throw std::runtime_error( "too few arguments");
 		}
+		if (argc > 4)
+		{
+			printUsage();
+			throw std::runtime_error( "too many arguments");
+		}
 		if (std::strcmp( argv[1], "lua") == 0)
 		{
-			papuga::generateLuaSource( std::cout, std::cerr, argv[2], *interface_description);
+			if (argc <= 3)
+			{
+				papuga::generateLuaSource( std::cout, std::cerr, argv[2], *interface_description);
+			}
+			else
+			{
+				std::ostringstream out;
+				papuga::generateLuaSource( out, std::cerr, argv[2], *interface_description);
+				int ec = strus::writeFile( argv[3], out.str());
+				if (ec) throw std::runtime_error( std::string("failed to write output file '") + argv[3] + "': " + std::strerror(ec));
+			}
 		}
 		else
 		{
@@ -63,7 +81,7 @@ int main( int argc, const char* argv[])
 	catch (const std::runtime_error& err)
 	{
 		std::cerr << "error in code generator: " << err.what() << std::endl;
-		return -1;
+		return ec ? ec:-1;
 	}
 	catch (...)
 	{

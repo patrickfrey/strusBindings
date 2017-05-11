@@ -131,6 +131,8 @@ if(LIBKVM_LIBRARIES)
         target_link_libraries( strusLua ${LIBKVM_LIBRARIES} )
 endif()
 
+add_subdirectory( lang )
+
 # ------------------------------
 # INSTALLATION
 # ------------------------------

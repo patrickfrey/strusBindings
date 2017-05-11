@@ -41,7 +41,9 @@ typedef struct papuga_lua_CallArgs
 bool papuga_init_lua_state( lua_State *ls);
 
 /// \brief Invokes a lua error exception on a papuga error
-void papuga_lua_error( lua_State* ls, papuga_ErrorCode err);
+void papuga_lua_error( lua_State* ls, const char* function, papuga_ErrorCode err);
+/// \brief Invokes a lua error exception on a host function execution error
+void papuga_lua_error_str( lua_State* ls, const char* function, const char* errormsg);
 
 /// \brief Function that fills a structure with the arguments passed in the lua context for papuga
 bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* arg, const char* classname);

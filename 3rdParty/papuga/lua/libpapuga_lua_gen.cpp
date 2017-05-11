@@ -42,21 +42,20 @@ static void define_method(
 	out << INDENT << "char errorbuf[ 1024];" << std::endl;
 	if (method.self)
 	{
-		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << method.name << "\")) papuga_lua_error( ls, arg.errcode);" << std::endl;
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << classdef.name << "\")) papuga_lua_error( ls, arg.errcode);" << std::endl;
 	}
 	else
 	{
-		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, arg.errcode);" << std::endl;
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, " << classdef.name << "." << method.name << ", arg.errcode);" << std::endl;
 	}
 	out << INDENT << "papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));" << std::endl;
-	out << INDENT << "if (!" << method.funcname << "( self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;" << std::endl;
+	out << INDENT << "if (!" << method.funcname << "( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;" << std::endl;
 	out << INDENT << "papuga_lua_destroy_CallArgs( &arg);" << std::endl;
 	out << INDENT << "return papuga_lua_move_CallResult( ls, &retval);" << std::endl;
 	out << "ERROR_CALL:" << std::endl;
 	out << INDENT << "papuga_lua_destroy_CallResult( &retval);" << std::endl;
 	out << INDENT << "papuga_lua_destroy_CallArgs( &arg);" << std::endl;
-	out << INDENT << "lua_pushstring( ls, errorbuf);" << std::endl;
-	out << INDENT << "lua_error( ls);" << std::endl;	
+	out << INDENT << "papuga_lua_error_str( ls, " << classdef.name << "." << method.name << ", errorbuf);" << std::endl;
 	out << "}" << std::endl << std::endl;
 }
 
@@ -89,13 +88,19 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
 			out << std::endl;
 			out << "#include <lua.h>" << std::endl;
-			out << "extern \"C\" int luaopen_" << descr.name << "( lua_State* L );" << std::endl;
+			out << "#ifdef __cplusplus" << std::endl;
+			out << "extern \"C\" {" << std::endl;
+			out << "#endif" << std::endl;
+			out << "int luaopen_" << descr.name << "( lua_State* L );" << std::endl;
 			out << std::endl;
+			out << "#ifdef __cplusplus" << std::endl;
+			out << "}" << std::endl;
+			out << "#endif" << std::endl;
 			out << "#endif" << std::endl;
 		}
 		else if (what == "module")
 		{
-			out << "#include \"lua_" << descr.name << ".h\"" << std::endl;
+			out << "#include \"" << descr.name << "_lua.h\"" << std::endl;
 			out << "#include \"papuga/lib/lua_dev.h\"" << std::endl;
 			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
 

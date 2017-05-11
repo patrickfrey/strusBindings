@@ -191,10 +191,14 @@ DLL_PUBLIC bool papuga_init_lua_state( lua_State* ls)
 	return true;
 }
 
-DLL_PUBLIC void papuga_lua_error( lua_State* ls, papuga_ErrorCode err)
+DLL_PUBLIC void papuga_lua_error( lua_State* ls, const char* function, papuga_ErrorCode err)
 {
-	lua_pushstring( ls, papuga_ErrorCode_tostring( err));
-	lua_error( ls);
+	luaL_error( ls, "%s (%s)", papuga_ErrorCode_tostring( err), function);
+}
+
+DLL_PUBLIC void papuga_lua_error_str( lua_State* ls, const char* function, const char* errormsg)
+{
+	luaL_error( ls, "%s (%s)", errormsg, function);
 }
 
 DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* as, const char* classname)
