@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
 add_custom_command(
     OUTPUT     strus_lua.h
-    DEPENDS   ${PROJECT_SOURCE_DIR}/include/strus/bindingObjects.h
+    DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h
     COMMAND  ${CMAKE_BINARY_DIR}/src/strusBindingsModuleGen lua header strus_lua.h
     COMMENT  "Generating Lua module header"
     VERBATIM
@@ -10,7 +10,7 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT     libstrus_bindings_lua.c
-    DEPENDS    ${PROJECT_SOURCE_DIR}/include/strus/bindingObjects.h
+    DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h
     COMMAND  ${CMAKE_BINARY_DIR}/src/strusBindingsModuleGen lua module libstrus_bindings_lua.c
     COMMENT  "Generating Lua module source"
     VERBATIM
@@ -18,8 +18,11 @@ add_custom_command(
  
  add_custom_target(
     lua_mod ALL
-    DEPENDS strus_lua.h libstrus_bindings_lua.c
+    DEPENDS strus_lua.h libstrus_bindings_lua.c papuga_lua_gen
 )
+
+set_source_files_properties( strus_lua.h PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( libstrus_bindings_lua.c PROPERTIES GENERATED TRUE ) 
 
 add_library( strus_bindings_lua SHARED libstrus_bindings_lua.c )
 add_dependencies( strus_bindings_lua lua_mod )

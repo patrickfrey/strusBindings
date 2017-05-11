@@ -53,7 +53,7 @@ void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg);
 
 /// \brief Function that transfers the call result of a function into the lua context, freeing the call result structure
 /// \return the number of values to return
-int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* callres, const char** classid2mtmap, papuga_ErrorCode* errcode);
+int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* callres, papuga_ErrorCode* errcode);
 
 #endif
 

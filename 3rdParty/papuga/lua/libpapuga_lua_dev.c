@@ -278,8 +278,9 @@ DLL_PUBLIC void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg)
 	}
 }
 
-DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, const char** classid2mtmap, papuga_ErrorCode* errcode)
+DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, papuga_ErrorCode* errcode)
 {
+	int rt = 0;
 	char* errorstr;
 	const char* str;
 	size_t strsize;
@@ -291,34 +292,49 @@ DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* ret
 		lua_pushstring( ls, errorstr);
 		lua_error( ls);
 	}
-	*errcode = papuga_Ok;
 	switch (retval->value.valuetype)
 	{
 		case papuga_Void:
-			return 0;
+			rt = 0;
+			break;
 		case papuga_Double:
 			lua_pushnumber( ls, retval->value.value.Double);
-			return 1;
+			rt = 1;
+			break;
 		case papuga_UInt:
 			lua_pushnumber( ls, retval->value.value.UInt);
-			return 1;
+			rt = 1;
+			break;
 		case papuga_Int:
 			lua_pushinteger( ls, retval->value.value.Int);
-			return 1;
+			rt = 1;
+			break;
 		case papuga_String:
 			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when lua_pushlstring fails because of a memory allocation error
 			lua_pushlstring( ls, retval->value.value.string, retval->value.length);
-			return 1;
+			rt = 1;
+			break;
 		case papuga_LangString:
+		{
 			str = papuga_ValueVariant_tostring( &retval->value, &retval->valuebuf, &strsize, errcode);
-			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when lua_pushlstring fails because of a memory allocation error
-			lua_pushlstring( ls, str, strsize);
-			return 1;
+			if (!str)
+			{
+				rt = -1;
+			}
+			else
+			{
+				// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when lua_pushlstring fails because of a memory allocation error
+				lua_pushlstring( ls, str, strsize);
+				rt = 1;
+			}
+			break;
+		}
 		case papuga_HostObject:
 		case papuga_Serialized:
 			break;
 	}
-	return 0;
+	papuga_destroy_CallResult( retval);
+	return rt;
 }
 
 

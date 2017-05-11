@@ -28,12 +28,12 @@ std::vector<std::string> g_inputFiles;
 
 typedef void (*PrintInterface)( std::ostream& out, const strus::InterfacesDef& interfaceDef);
 
-static void printOutput( const char* filename, PrintInterface print, const strus::InterfacesDef& interfaceDef)
+static void printOutput( const std::string& filename, PrintInterface print, const strus::InterfacesDef& interfaceDef)
 {
 	try
 	{
 		std::ofstream out;
-		out.open( filename, std::ofstream::out);
+		out.open( filename.c_str(), std::ofstream::out);
 		if (!out)
 		{
 			throw std::runtime_error( std::string("could not open file '") + filename + "' for writing: " + std::strerror( errno));
@@ -439,6 +439,19 @@ int main( int argc, const char* argv[])
 	int ec = 0;
 	try
 	{
+		std::string outputdir;
+		if (argc >= 2)
+		{
+			if (std::strcmp(argv[1],"-h") == 0 || std::strcmp(argv[1],"--help") == 0)
+			{
+				std::cerr << "Usage: strusBindingsInterfaceGen <outputroot> { <inputfile> }" << std::endl;
+				std::cerr << "<outputroot> :Root director for output" << std::endl;
+				std::cerr << "<inputfile>  :input file path" << std::endl;
+				return 0;
+			}
+			outputdir = argv[1];
+			std::cerr << "Output directory root is '" << outputdir << "'" << std::endl;
+		}
 		strus::TypeSystem typeSystem;
 		strus::fillTypeTables( typeSystem);
 
@@ -446,10 +459,13 @@ int main( int argc, const char* argv[])
 		std::cout << "TypeSystem:" << std::endl << typeSystem.tostring() << std::endl;
 #endif
 		strus::InterfacesDef interfaceDef( &typeSystem);
-		int argi=1;
+		int argi=2;
 		for (; argi < argc; ++argi)
 		{
 			std::string source;
+#ifdef STRUS_LOWLEVEL_DEBUG
+			std::cout << "read file:" << argv[ argi] << std::endl;
+#endif
 			ec = strus::readFile( argv[ argi], source);
 			if (ec)
 			{
@@ -478,11 +494,11 @@ int main( int argc, const char* argv[])
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::cout << interfaceDef.tostring() << std::endl;
 #endif
-		printOutput( "include/strus/bindingObjects.h", &print_BindingObjectsH, interfaceDef);
-		printOutput( "src/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
+		printOutput( outputdir + "/include/strus/bindingObjects.h", &print_BindingObjectsH, interfaceDef);
+		printOutput( outputdir + "/src/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
 
-		printOutput( "include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
-		printOutput( "src/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
+		printOutput( outputdir + "/include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
+		printOutput( outputdir + "/src/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
 
 		std::cerr << "done." << std::endl;
 		return 0;

@@ -58,6 +58,8 @@ lang/php
 lang/python
 src/lang/lua/libstrus_bindings_lua.c
 src/lang/lua/strus_lua.h
+src/bindingObjects.cpp
+include/strus/bindingObjects.h
 
 # Compiled programs
 src/parser/strusBindingsInterfaceGen

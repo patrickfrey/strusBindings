@@ -37,6 +37,8 @@ static void define_method(
 {
 	out << "static int l_" << method.funcname << "( lua_State *ls )" << std::endl;
 	out << "{" << std::endl;
+	out << INDENT << "int rt;" << std::endl;
+	out << INDENT << "papuga_ErrorCode errcode = papuga_Ok;" << std::endl;
 	out << INDENT << "papuga_lua_CallArgs arg;" << std::endl;
 	out << INDENT << "papuga_CallResult retval;" << std::endl;
 	out << INDENT << "char errorbuf[ 1024];" << std::endl;
@@ -51,7 +53,9 @@ static void define_method(
 	out << INDENT << "papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));" << std::endl;
 	out << INDENT << "if (!" << method.funcname << "( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;" << std::endl;
 	out << INDENT << "papuga_lua_destroy_CallArgs( &arg);" << std::endl;
-	out << INDENT << "return papuga_lua_move_CallResult( ls, &retval);" << std::endl;
+	out << INDENT << "rt = papuga_lua_move_CallResult( ls, &retval, &arg.errcode);" << std::endl;
+	out << INDENT << "if (rt < 0) papuga_lua_error( ls, \"" << classdef.name << "." << method.name << "\", arg.errcode);" << std::endl;
+	out << INDENT << "return rt;" << std::endl;
 	out << "ERROR_CALL:" << std::endl;
 	out << INDENT << "papuga_lua_destroy_CallResult( &retval);" << std::endl;
 	out << INDENT << "papuga_lua_destroy_CallArgs( &arg);" << std::endl;
@@ -105,6 +109,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 			out << "#include \"papuga/lib/lua_dev.h\"" << std::endl;
 			out << "#include \"" << descr.includefile << "\"" << std::endl;
 			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
+			out << std::endl;
 
 			std::size_t ci = 0;
 			for (; descr.classes[ci].name; ++ci)
