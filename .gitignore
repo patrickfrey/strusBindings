@@ -43,7 +43,6 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake/build_rules.cmake.user
 src/internationalization.cpp
-src/version.hpp
 dist/obs/deploy_to_obs.sh
 dist/archlinux/PKGBUILD
 dist/obs/strusbindings.dsc

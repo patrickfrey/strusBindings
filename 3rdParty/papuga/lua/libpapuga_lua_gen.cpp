@@ -38,15 +38,15 @@ static void define_method(
 	out << "static int l_" << method.funcname << "( lua_State *ls )" << std::endl;
 	out << "{" << std::endl;
 	out << INDENT << "papuga_lua_CallArgs arg;" << std::endl;
-	out << INDENT << "papuga::CallResult retval;" << std::endl;
+	out << INDENT << "papuga_CallResult retval;" << std::endl;
 	out << INDENT << "char errorbuf[ 1024];" << std::endl;
 	if (method.self)
 	{
-		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << classdef.name << "\")) papuga_lua_error( ls, arg.errcode);" << std::endl;
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << classdef.name << "\")) papuga_lua_error( ls, \"" << classdef.name << "." << method.name << "\", arg.errcode);" << std::endl;
 	}
 	else
 	{
-		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, " << classdef.name << "." << method.name << ", arg.errcode);" << std::endl;
+		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, \"" << classdef.name << "." << method.name << "\", arg.errcode);" << std::endl;
 	}
 	out << INDENT << "papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));" << std::endl;
 	out << INDENT << "if (!" << method.funcname << "( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;" << std::endl;
