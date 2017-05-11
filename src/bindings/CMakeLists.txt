@@ -33,6 +33,7 @@ set_source_files_properties( libstrus_bindings_description.cpp PROPERTIES GENERA
 include_directories(
 	"${Boost_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
+	"${CMAKE_BINARY_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/lua"
 	"${PROJECT_SOURCE_DIR}/3rdParty/textwolf/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
