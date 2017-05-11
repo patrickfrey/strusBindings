@@ -27,54 +27,54 @@
 namespace {
 
 template <typename STRUCTVALUE>
-void initCallResultStructureOwnership( papuga_CallResult& retval, STRUCTVALUE* st)
+void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* st)
 {
-	strus::bindings::HostObjectReference::initOwnership( retval.object, st);
-	strus::bindings::Serializer::serialize( &retval.serialization, *st);
-	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
+	strus::bindings::HostObjectReference::initOwnership( retval->object, st);
+	strus::bindings::Serializer::serialize( &retval->serialization, *st);
+	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);
 }
 
 template <>
-void initCallResultStructureOwnership<strus::bindings::Struct>( papuga_CallResult& retval, strus::bindings::Struct* st)
+void initCallResultStructureOwnership<strus::bindings::Struct>( papuga_CallResult* retval, strus::bindings::Struct* st)
 {
-	strus::bindings::HostObjectReference::initOwnership( retval.object, st);
-	papuga_init_ValueVariant_serialization( &retval.value, &st->serialization);
+	strus::bindings::HostObjectReference::initOwnership( retval->object, st);
+	papuga_init_ValueVariant_serialization( &retval->value, &st->serialization);
 }
 
 template <>
-void initCallResultStructureOwnership<strus::StatisticsViewerInterface>( papuga_CallResult& retval, strus::StatisticsViewerInterface* st)
+void initCallResultStructureOwnership<strus::StatisticsViewerInterface>( papuga_CallResult* retval, strus::StatisticsViewerInterface* st)
 {
-	strus::bindings::HostObjectReference::initOwnership( retval.object, st);
-	if (!strus::bindings::Serializer::serialize_nothrow( &retval.serialization, *st)) throw std::bad_alloc();
-	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
+	strus::bindings::HostObjectReference::initOwnership( retval->object, st);
+	if (!strus::bindings::Serializer::serialize_nothrow( &retval->serialization, *st)) throw std::bad_alloc();
+	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);
 }
 
 template <typename STRUCTVALUE>
-static void initCallResultStructureConst( papuga_CallResult& retval, const STRUCTVALUE* st)
+static void initCallResultStructureConst( papuga_CallResult* retval, const STRUCTVALUE* st)
 {
-	strus::bindings::Serializer::serialize( &retval.serialization, *st);
-	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
+	strus::bindings::Serializer::serialize( &retval->serialization, *st);
+	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);
 }
 
 template <typename STRUCTVALUE>
-static void initCallResultNumericValues( papuga_CallResult& retval, const STRUCTVALUE& st)
+static void initCallResultNumericValues( papuga_CallResult* retval, const STRUCTVALUE& st)
 {
-	strus::bindings::Serializer::serialize( &retval.serialization, st);
-	papuga_init_ValueVariant_serialization( &retval.value, &retval.serialization);
+	strus::bindings::Serializer::serialize( &retval->serialization, st);
+	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);
 }
 
 template <typename OBJECT>
-static void initCallResultObjectOwnership( papuga_CallResult& retval, OBJECT* st)
+static void initCallResultObjectOwnership( papuga_CallResult* retval, OBJECT* st)
 {
-	strus::bindings::HostObjectReference::initOwnership( retval.object, st);
-	papuga_init_ValueVariant_hostobj( &retval.value, st, strus::bindings::ClassIdMap::get(*st));
+	strus::bindings::HostObjectReference::initOwnership( retval->object, st);
+	papuga_init_ValueVariant_hostobj( &retval->value, st, strus::bindings::ClassIdMap::get(*st));
 }
 
 template <typename OBJECT>
-static void initCallResultObjectConst( papuga_CallResult& retval, const OBJECT* st)
+static void initCallResultObjectConst( papuga_CallResult* retval, const OBJECT* st)
 {
-	strus::bindings::HostObjectReference::initConst( &retval.object, st);
-	papuga_init_ValueVariant_hostobj( &retval.value, st, strus::bindings::ClassIdMap::get(*st));
+	strus::bindings::HostObjectReference::initConst( &retval->object, st);
+	papuga_init_ValueVariant_hostobj( &retval->value, st, strus::bindings::ClassIdMap::get(*st));
 }
 
 }//namespace

@@ -26,15 +26,15 @@ using namespace strus::bindings;
 #define CATCH_METHOD_CALL_ERROR( retval, classnam, methodnam)\
 	catch (const std::runtime_error& err)\
 	{\
-		papuga_CallResult_reportError( &retval, _TXT("error calling method %s::%s(): %s"), classnam, methodnam, err.what());\
+		papuga_CallResult_reportError( retval, _TXT("error calling method %s::%s(): %s"), classnam, methodnam, err.what());\
 	}\
 	catch (const std::bad_alloc& err)\
 	{\
-		papuga_CallResult_reportError( &retval, _TXT("out of memory calling method %s::%s()"), classnam, methodnam);\
+		papuga_CallResult_reportError( retval, _TXT("out of memory calling method %s::%s()"), classnam, methodnam);\
 	}\
 	catch (const std::exception& err)\
 	{\
-		papuga_CallResult_reportError( &retval, _TXT("uncaught exception calling method %s::%s(): %s"), classnam, methodnam, err.what());\
+		papuga_CallResult_reportError( retval, _TXT("uncaught exception calling method %s::%s(): %s"), classnam, methodnam, err.what());\
 	}\
 	return false;
 
@@ -43,7 +43,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__Context( void* self)
 	delete reinterpret_cast<ContextImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_constructor__Context( papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_constructor__Context( papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		switch (argc)
@@ -57,7 +57,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_constructor__Context( papuga_CallResu
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "constructor")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__getLastError( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__getLastError( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -68,7 +68,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__getLastError( void* self, pa
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "getLastError")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__loadModule( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__loadModule( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -83,7 +83,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__loadModule( void* self, papu
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "loadModule")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__addModulePath( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__addModulePath( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -98,7 +98,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__addModulePath( void* self, p
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "addModulePath")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__addResourcePath( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__addResourcePath( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -113,7 +113,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__addResourcePath( void* self,
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "addResourcePath")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStatisticsProcessor( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStatisticsProcessor( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -128,7 +128,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStatisticsProcessor( v
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createStatisticsProcessor")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStorageClient( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStorageClient( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -143,7 +143,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStorageClient( void* s
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createStorageClient")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createVectorStorageClient( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createVectorStorageClient( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -158,7 +158,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createVectorStorageClient( v
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createVectorStorageClient")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStorage( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStorage( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -173,7 +173,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createStorage( void* self, p
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createStorage")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createVectorStorage( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createVectorStorage( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -188,7 +188,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createVectorStorage( void* s
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createVectorStorage")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__destroyStorage( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__destroyStorage( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -203,7 +203,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__destroyStorage( void* self, 
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "destroyStorage")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__detectDocumentClass( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__detectDocumentClass( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -218,7 +218,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__detectDocumentClass( void* s
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "detectDocumentClass")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createDocumentAnalyzer( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createDocumentAnalyzer( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -233,7 +233,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createDocumentAnalyzer( void
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createDocumentAnalyzer")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createQueryAnalyzer( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createQueryAnalyzer( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -244,7 +244,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createQueryAnalyzer( void* s
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createQueryAnalyzer")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__createQueryEval( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__createQueryEval( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -255,7 +255,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Context__createQueryEval( void* self,
 	CATCH_METHOD_CALL_ERROR( retval, "Context", "createQueryEval")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Context__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Context__close( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		ContextImpl* THIS = (ContextImpl*)(self);
@@ -271,7 +271,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__StorageClient( void* self
 	delete reinterpret_cast<StorageClientImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__nofDocumentsInserted( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__nofDocumentsInserted( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -282,7 +282,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__nofDocumentsInserted( 
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "nofDocumentsInserted")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createTransaction( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createTransaction( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -293,7 +293,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createTransaction( voi
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createTransaction")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createInitStatisticsIterator( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createInitStatisticsIterator( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -308,7 +308,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createInitStatisticsIt
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createInitStatisticsIterator")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createUpdateStatisticsIterator( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createUpdateStatisticsIterator( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -319,7 +319,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createUpdateStatistics
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createUpdateStatisticsIterator")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createDocumentBrowser( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createDocumentBrowser( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -330,7 +330,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__createDocumentBrowser(
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "createDocumentBrowser")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__config( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__config( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -341,7 +341,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__config( void* self, pa
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "config")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__configstring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__configstring( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -352,7 +352,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__configstring( void* se
 	CATCH_METHOD_CALL_ERROR( retval, "StorageClient", "configstring")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageClient__close( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageClientImpl* THIS = (StorageClientImpl*)(self);
@@ -368,7 +368,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__StorageTransaction( void*
 	delete reinterpret_cast<StorageTransactionImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__insertDocument( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__insertDocument( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
@@ -383,7 +383,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__insertDocument( v
 	CATCH_METHOD_CALL_ERROR( retval, "StorageTransaction", "insertDocument")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__deleteDocument( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__deleteDocument( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
@@ -398,7 +398,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__deleteDocument( v
 	CATCH_METHOD_CALL_ERROR( retval, "StorageTransaction", "deleteDocument")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__deleteUserAccessRights( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__deleteUserAccessRights( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
@@ -413,7 +413,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__deleteUserAccessR
 	CATCH_METHOD_CALL_ERROR( retval, "StorageTransaction", "deleteUserAccessRights")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__commit( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__commit( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
@@ -424,7 +424,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__commit( void* sel
 	CATCH_METHOD_CALL_ERROR( retval, "StorageTransaction", "commit")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__rollback( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StorageTransaction__rollback( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StorageTransactionImpl* THIS = (StorageTransactionImpl*)(self);
@@ -440,7 +440,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__DocumentBrowser( void* se
 	delete reinterpret_cast<DocumentBrowserImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__addMetaDataRestrictionCondition( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__addMetaDataRestrictionCondition( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentBrowserImpl* THIS = (DocumentBrowserImpl*)(self);
@@ -456,7 +456,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__addMetaDataRestricti
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentBrowser", "addMetaDataRestrictionCondition")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__skipDoc( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__skipDoc( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentBrowserImpl* THIS = (DocumentBrowserImpl*)(self);
@@ -471,7 +471,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__skipDoc( void* self,
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentBrowser", "skipDoc")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__get( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentBrowser__get( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentBrowserImpl* THIS = (DocumentBrowserImpl*)(self);
@@ -491,7 +491,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__StatisticsIterator( void*
 	delete reinterpret_cast<StatisticsIteratorImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsIterator__getNext( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsIterator__getNext( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StatisticsIteratorImpl* THIS = (StatisticsIteratorImpl*)(self);
@@ -507,7 +507,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__StatisticsProcessor( void
 	delete reinterpret_cast<StatisticsProcessorImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsProcessor__decode( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsProcessor__decode( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StatisticsProcessorImpl* THIS = (StatisticsProcessorImpl*)(self);
@@ -522,7 +522,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsProcessor__decode( void* se
 	CATCH_METHOD_CALL_ERROR( retval, "StatisticsProcessor", "decode")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsProcessor__encode( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_StatisticsProcessor__encode( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		StatisticsProcessorImpl* THIS = (StatisticsProcessorImpl*)(self);
@@ -542,7 +542,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__VectorStorageSearcher( vo
 	delete reinterpret_cast<VectorStorageSearcherImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__findSimilar( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__findSimilar( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
@@ -557,7 +557,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__findSimilar( v
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageSearcher", "findSimilar")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__findSimilarFromSelection( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__findSimilarFromSelection( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
@@ -572,7 +572,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__findSimilarFro
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageSearcher", "findSimilarFromSelection")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageSearcher__close( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageSearcherImpl* THIS = (VectorStorageSearcherImpl*)(self);
@@ -588,7 +588,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__VectorStorageClient( void
 	delete reinterpret_cast<VectorStorageClientImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__createSearcher( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__createSearcher( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -603,7 +603,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__createSearcher( 
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "createSearcher")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__createTransaction( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__createTransaction( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -614,7 +614,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__createTransactio
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "createTransaction")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__conceptClassNames( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__conceptClassNames( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -625,7 +625,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__conceptClassName
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "conceptClassNames")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__conceptFeatures( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__conceptFeatures( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -640,7 +640,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__conceptFeatures(
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "conceptFeatures")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__nofConcepts( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__nofConcepts( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -655,7 +655,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__nofConcepts( voi
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "nofConcepts")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureConcepts( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureConcepts( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -670,7 +670,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureConcepts(
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "featureConcepts")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureVector( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureVector( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -685,7 +685,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureVector( v
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "featureVector")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureName( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureName( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -700,7 +700,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureName( voi
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "featureName")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureIndex( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureIndex( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -715,7 +715,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__featureIndex( vo
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "featureIndex")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__nofFeatures( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__nofFeatures( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -726,7 +726,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__nofFeatures( voi
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "nofFeatures")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__config( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__config( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -737,7 +737,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__config( void* se
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "config")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__configstring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__configstring( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -748,7 +748,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__configstring( vo
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageClient", "configstring")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageClient__close( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageClientImpl* THIS = (VectorStorageClientImpl*)(self);
@@ -764,7 +764,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__VectorStorageTransaction(
 	delete reinterpret_cast<VectorStorageTransactionImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__addFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__addFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
@@ -779,7 +779,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__addFeature(
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "addFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__defineFeatureConceptRelation( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__defineFeatureConceptRelation( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
@@ -794,7 +794,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__defineFeatu
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "defineFeatureConceptRelation")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__commit( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__commit( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
@@ -805,7 +805,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__commit( voi
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "commit")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__rollback( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__rollback( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
@@ -816,7 +816,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__rollback( v
 	CATCH_METHOD_CALL_ERROR( retval, "VectorStorageTransaction", "rollback")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__close( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_VectorStorageTransaction__close( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		VectorStorageTransactionImpl* THIS = (VectorStorageTransactionImpl*)(self);
@@ -832,7 +832,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__DocumentAnalyzer( void* s
 	delete reinterpret_cast<DocumentAnalyzerImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addSearchIndexFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addSearchIndexFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -847,7 +847,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addSearchIndexFeatu
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "addSearchIndexFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addForwardIndexFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addForwardIndexFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -862,7 +862,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addForwardIndexFeat
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "addForwardIndexFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineMetaData( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineMetaData( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -877,7 +877,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineMetaData( voi
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "defineMetaData")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAggregatedMetaData( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAggregatedMetaData( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -892,7 +892,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAggregatedMet
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "defineAggregatedMetaData")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAttribute( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAttribute( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -907,7 +907,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAttribute( vo
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "defineAttribute")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addSearchIndexFeatureFromPatternMatch( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addSearchIndexFeatureFromPatternMatch( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -922,7 +922,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addSearchIndexFeatu
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "addSearchIndexFeatureFromPatternMatch")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addForwardIndexFeatureFromPatternMatch( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addForwardIndexFeatureFromPatternMatch( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -937,7 +937,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__addForwardIndexFeat
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "addForwardIndexFeatureFromPatternMatch")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineMetaDataFromPatternMatch( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineMetaDataFromPatternMatch( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -952,7 +952,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineMetaDataFromP
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "defineMetaDataFromPatternMatch")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAttributeFromPatternMatch( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAttributeFromPatternMatch( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -967,7 +967,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineAttributeFrom
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "defineAttributeFromPatternMatch")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__definePatternMatcherPostProc( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__definePatternMatcherPostProc( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -982,7 +982,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__definePatternMatche
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "definePatternMatcherPostProc")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__definePatternMatcherPostProcFromFile( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__definePatternMatcherPostProcFromFile( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -997,7 +997,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__definePatternMatche
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "definePatternMatcherPostProcFromFile")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineDocument( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineDocument( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -1012,7 +1012,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__defineDocument( voi
 	CATCH_METHOD_CALL_ERROR( retval, "DocumentAnalyzer", "defineDocument")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__analyze( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_DocumentAnalyzer__analyze( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		DocumentAnalyzerImpl* THIS = (DocumentAnalyzerImpl*)(self);
@@ -1033,7 +1033,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__QueryAnalyzer( void* self
 	delete reinterpret_cast<QueryAnalyzerImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addSearchIndexElement( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addSearchIndexElement( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1048,7 +1048,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addSearchIndexElement(
 	CATCH_METHOD_CALL_ERROR( retval, "QueryAnalyzer", "addSearchIndexElement")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addSearchIndexElementFromPatternMatch( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addSearchIndexElementFromPatternMatch( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1063,7 +1063,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addSearchIndexElementF
 	CATCH_METHOD_CALL_ERROR( retval, "QueryAnalyzer", "addSearchIndexElementFromPatternMatch")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addPatternLexem( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addPatternLexem( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1078,7 +1078,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__addPatternLexem( void*
 	CATCH_METHOD_CALL_ERROR( retval, "QueryAnalyzer", "addPatternLexem")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__definePatternMatcherPostProc( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__definePatternMatcherPostProc( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1093,7 +1093,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__definePatternMatcherPo
 	CATCH_METHOD_CALL_ERROR( retval, "QueryAnalyzer", "definePatternMatcherPostProc")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__definePatternMatcherPostProcFromFile( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__definePatternMatcherPostProcFromFile( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1108,7 +1108,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__definePatternMatcherPo
 	CATCH_METHOD_CALL_ERROR( retval, "QueryAnalyzer", "definePatternMatcherPostProcFromFile")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__defineImplicitGroupBy( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__defineImplicitGroupBy( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1123,7 +1123,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__defineImplicitGroupBy(
 	CATCH_METHOD_CALL_ERROR( retval, "QueryAnalyzer", "defineImplicitGroupBy")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__analyze( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryAnalyzer__analyze( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryAnalyzerImpl* THIS = (QueryAnalyzerImpl*)(self);
@@ -1143,7 +1143,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__QueryEval( void* self)
 	delete reinterpret_cast<QueryEvalImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addTerm( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addTerm( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1158,7 +1158,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addTerm( void* self, papug
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addTerm")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addSelectionFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addSelectionFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1173,7 +1173,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addSelectionFeature( void*
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addSelectionFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addRestrictionFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addRestrictionFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1188,7 +1188,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addRestrictionFeature( voi
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addRestrictionFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addExclusionFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addExclusionFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1203,7 +1203,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addExclusionFeature( void*
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addExclusionFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addSummarizer( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addSummarizer( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1218,7 +1218,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addSummarizer( void* self,
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addSummarizer")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addWeightingFunction( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addWeightingFunction( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1233,7 +1233,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addWeightingFunction( void
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addWeightingFunction")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addWeightingFormula( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addWeightingFormula( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1248,7 +1248,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__addWeightingFormula( void*
 	CATCH_METHOD_CALL_ERROR( retval, "QueryEval", "addWeightingFormula")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__createQuery( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_QueryEval__createQuery( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryEvalImpl* THIS = (QueryEvalImpl*)(self);
@@ -1268,7 +1268,7 @@ extern "C" DLL_PUBLIC void _strus_bindings_destructor__Query( void* self)
 	delete reinterpret_cast<QueryImpl*>( self);
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineFeature( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineFeature( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1284,7 +1284,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineFeature( void* self, pap
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "defineFeature")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__addMetaDataRestrictionCondition( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__addMetaDataRestrictionCondition( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1300,7 +1300,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__addMetaDataRestrictionConditio
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "addMetaDataRestrictionCondition")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineTermStatistics( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineTermStatistics( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1315,7 +1315,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineTermStatistics( void* se
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "defineTermStatistics")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineGlobalStatistics( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineGlobalStatistics( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1330,7 +1330,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__defineGlobalStatistics( void* 
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "defineGlobalStatistics")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__addDocumentEvaluationSet( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__addDocumentEvaluationSet( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1345,7 +1345,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__addDocumentEvaluationSet( void
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "addDocumentEvaluationSet")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__setMaxNofRanks( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__setMaxNofRanks( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1360,7 +1360,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__setMaxNofRanks( void* self, pa
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "setMaxNofRanks")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__setMinRank( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__setMinRank( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1375,7 +1375,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__setMinRank( void* self, papuga
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "setMinRank")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__addUserName( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__addUserName( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1390,7 +1390,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__addUserName( void* self, papug
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "addUserName")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__setWeightingVariables( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__setWeightingVariables( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1405,7 +1405,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__setWeightingVariables( void* s
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "setWeightingVariables")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__setDebugMode( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__setDebugMode( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1420,7 +1420,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__setDebugMode( void* self, papu
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "setDebugMode")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__evaluate( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__evaluate( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);
@@ -1431,7 +1431,7 @@ extern "C" DLL_PUBLIC bool _strus_bindings_Query__evaluate( void* self, papuga_C
 	CATCH_METHOD_CALL_ERROR( retval, "Query", "evaluate")
 }
 
-extern "C" DLL_PUBLIC bool _strus_bindings_Query__tostring( void* self, papuga_CallResult& retval, size_t argc, const papuga_ValueVariant* argv)
+extern "C" DLL_PUBLIC bool _strus_bindings_Query__tostring( void* self, papuga_CallResult* retval, size_t argc, const papuga_ValueVariant* argv)
 {
 	try {
 		QueryImpl* THIS = (QueryImpl*)(self);

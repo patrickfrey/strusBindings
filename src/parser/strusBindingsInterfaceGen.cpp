@@ -173,7 +173,7 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 		{
 			out 
 			<< "bool " << constructorFunctionName( ci->name())
-			<< "( papuga_CallResult& retval, "
+			<< "( papuga_CallResult* retval, "
 			<< "size_t argc, const papuga_ValueVariant* argv);" << std::endl;
 		}
 
@@ -184,7 +184,7 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 		{
 			out 
 			<< "bool " << methodFunctionName( ci->name(), mi->name())
-			<< "( void* self, papuga_CallResult& retval, "
+			<< "( void* self, papuga_CallResult* retval, "
 			<< "size_t argc, const papuga_ValueVariant* argv);" << std::endl;
 		}
 	}
@@ -341,15 +341,15 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#define CATCH_METHOD_CALL_ERROR( retval, classnam, methodnam)\\" << std::endl;
 	out << "\tcatch (const std::runtime_error& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tpapuga_CallResult_reportError( &retval, _TXT(\"error calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
+	out << "\t\tpapuga_CallResult_reportError( retval, _TXT(\"error calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
 	out << "\tcatch (const std::bad_alloc& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tpapuga_CallResult_reportError( &retval, _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);\\" << std::endl;
+	out << "\t\tpapuga_CallResult_reportError( retval, _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);\\" << std::endl;
 	out << "\t}\\" << std::endl;
 	out << "\tcatch (const std::exception& err)\\" << std::endl;
 	out << "\t{\\" << std::endl;
-	out << "\t\tpapuga_CallResult_reportError( &retval, _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
+	out << "\t\tpapuga_CallResult_reportError( retval, _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
 	out << "\treturn false;" << std::endl << std::endl;
 
@@ -372,7 +372,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		{
 			out 
 			<< "extern \"C\" DLL_PUBLIC bool " << constructorFunctionName( ci->name())
-			<< "( papuga_CallResult& retval, "
+			<< "( papuga_CallResult* retval, "
 			<< "size_t argc, const papuga_ValueVariant* argv)" << std::endl
 			<< "{" << std::endl;
 			out << "\ttry {" << std::endl;
@@ -404,7 +404,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		for (; mi != me; ++mi)
 		{
 			out << "extern \"C\" DLL_PUBLIC bool " << methodFunctionName( ci->name(), mi->name())
-				<< "( void* self, papuga_CallResult& retval, "
+				<< "( void* self, papuga_CallResult* retval, "
 				<< "size_t argc, const papuga_ValueVariant* argv)" << std::endl;
 			out << "{" << std::endl;
 			out << "\ttry {" << std::endl;

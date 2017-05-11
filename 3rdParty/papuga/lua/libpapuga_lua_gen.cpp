@@ -101,7 +101,9 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		else if (what == "module")
 		{
 			out << "#include \"" << descr.name << "_lua.h\"" << std::endl;
+			out << "#include \"papuga.h\"" << std::endl;
 			out << "#include \"papuga/lib/lua_dev.h\"" << std::endl;
+			out << "#include \"" << descr.includefile << "\"" << std::endl;
 			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
 
 			std::size_t ci = 0;

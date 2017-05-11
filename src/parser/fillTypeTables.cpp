@@ -18,23 +18,23 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	typesystem.defineType( "void")
 	;
 	typesystem.defineType( "std::size_t")
-		("retv_map", "papuga_set_CallResult_uint( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_uint( $name, $value);")
 		("argv_map", "ValueVariantWrap::touint64( $value)")
 	;
 	typesystem.defineType( "bool")
-		("retv_map", "papuga_set_CallResult_bool( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_bool( $name, $value);")
 		("argv_map", "ValueVariantWrap::tobool( $value)")
 	;
 	typesystem.defineType( "Index")
-		("retv_map", "papuga_set_CallResult_int( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")
 	;
 	typesystem.defineType( "int")
-		("retv_map", "papuga_set_CallResult_int( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")
 	;
 	typesystem.defineType( "unsigned int")
-		("retv_map", "papuga_set_CallResult_uint( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_uint( $name, $value);")
 		("argv_map", "ValueVariantWrap::touint( $value)")
 	;
 	typesystem.defineType( "unsigned int $val=0")
@@ -42,11 +42,11 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("argv_map", "ValueVariantWrap::touint( $value)")
 	;
 	typesystem.defineType( "float")
-		("retv_map", "papuga_set_CallResult_double( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_double( $name, $value);")
 		("argv_map", "ValueVariantWrap::tofloat( $value)")
 	;
 	typesystem.defineType( "double")
-		("retv_map", "papuga_set_CallResult_double( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_double( $name, $value);")
 		("argv_map", "ValueVariantWrap::todouble( $value)")
 	;
 	typesystem.defineType( "double $val=1")
@@ -68,17 +68,17 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("argv_map", "ValueVariantWrap::tostring( $value)")
 	;
 	typesystem.defineType( "const std::string&")
-		("retv_map", "{const std::string& retvalstr = $value; papuga_set_CallResult_string_const( &$name, retvalstr.c_str(), retvalstr.size());}")
+		("retv_map", "{const std::string& retvalstr = $value; papuga_set_CallResult_string_const( $name, retvalstr.c_str(), retvalstr.size());}")
 		("argv_map", "ValueVariantWrap::tostring( $value)")
 	;
 	typesystem.defineType( "std::string")
-		("retv_map", "{std::string retvalstr = $value; papuga_set_CallResult_string( &$name, retvalstr.c_str(), retvalstr.size());}")
+		("retv_map", "{std::string retvalstr = $value; papuga_set_CallResult_string( $name, retvalstr.c_str(), retvalstr.size());}")
 	;
 	typesystem.defineType( "std::string*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "const char*")
-		("retv_map", "papuga_set_CallResult_charp_const( &$name, $value);")
+		("retv_map", "papuga_set_CallResult_charp_const( $name, $value);")
 		("argv_decl", "std::string $name;")
 		("argv_map", "ValueVariantWrap::tocharp( $name, $value)")
 	;

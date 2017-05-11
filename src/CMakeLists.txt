@@ -6,6 +6,26 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # Subdirectories:
 add_subdirectory( parser )
 
+add_custom_command(
+    OUTPUT     ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h ${CMAKE_BINARY_DIR}/src/bindingObjects.cpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/impl/context.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/impl/storage.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/impl/statistics.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/impl/vector.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/impl/analyzer.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/impl/query.hpp
+    COMMAND  ${CMAKE_BINARY_DIR}/src/parser/strusBindingsInterfaceGen ${PROJECT_SOURCE_DIR}/src/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/impl/statistics.hpp ${PROJECT_SOURCE_DIR}/src/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/impl/query.hpp
+    COMMENT  "Generating strus bindings C header and implementation"
+    VERBATIM
+ )
+ 
+ add_custom_target(
+    strus_bindings_c_interface ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/src/bindingObjects.cpp ${PROJECT_SOURCE_DIR}/include/strus/bindingObjects.h
+)
+
+add_library( strus_bindings_lua SHARED libstrus_bindings_lua.c )
+
 set( lua_source_files
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lapi.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lauxlib.c
@@ -93,7 +113,6 @@ link_directories(
 	"${strusrpc_LIBRARY_DIRS}"
 )
 
-
 # ------------------------------
 # LIBRARIES
 # ------------------------------
@@ -103,6 +122,7 @@ add_library( strus_bindingsimpl STATIC ${bindingsimpl_source_files} )
 target_link_libraries( strus_bindingsimpl strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket strus_base strus_error )
 
 add_library( strus_bindings SHARED ${bindings_source_files} )
+add_dependencies( strus_bindings  strus_bindings_c_interface )
 target_link_libraries( strus_bindings strus_bindingsimpl strus_base strus_error )
 
 add_library( strus_bindings_description SHARED libstrus_bindings_description.cpp )
