@@ -6,6 +6,7 @@ Table of Contents
 	lua
 	textwolf
 	boost
+	fmt
 
 textwolf
 ----------
@@ -19,4 +20,9 @@ boost
 lua
 ----------------
 	MIT license (https://www.lua.org/license.html)
+
+fmt
+----------------
+       BSD 2-clause "Simplified" License
+       https://github.com/fmtlib/fmt/blob/master/LICENSE.rst
 

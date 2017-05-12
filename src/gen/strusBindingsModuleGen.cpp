@@ -22,11 +22,41 @@
 
 static void printUsage()
 {
-	std::cerr << "strusBindingsModuleGen <language> <what> [<outputfile>]" << std::endl;
+	std::cerr << "strusBindingsModuleGen <language> <what> <outputfile> {<name>=<value>}" << std::endl;
 	std::cerr << "Description : Prints one specific part of the generated laguage binding to stdout" << std::endl;
 	std::cerr << "<language>  : Language to generate language binding module for." << std::endl;
 	std::cerr << "<what>      : What binding part to generate." << std::endl;
-	std::cerr << "<outputfile>: Where to print the output (stdout if not specified)" << std::endl;
+	std::cerr << "<outputfile>: Where to print the output ('-' for stdout)" << std::endl;
+	std::cerr << "<name>      : Name of an argument to pass to the generator" << std::endl;
+	std::cerr << "<value>     : Value of an argument to pass to the generator" << std::endl;
+}
+
+typedef bool (*GenerateSourceFunc)(
+		std::ostream& out,
+		std::ostream& err,
+		const std::string& what,
+		const std::multimap<std::string,std::string>& args,
+		const papuga_InterfaceDescription& descr);
+
+static void generateSource( GenerateSourceFunc printproc, const std::string& langname, const std::string& modname, std::multimap<std::string,std::string> args, const char* filename, const papuga_InterfaceDescription& descr)
+{
+	if (!filename || std::strcmp(filename,"-") == 0)
+	{
+		if (!printproc( std::cout, std::cerr, modname, args, descr))
+		{
+			throw std::runtime_error( std::string("failed to generate '") + langname + "' source");
+		}
+	}
+	else
+	{
+		std::ostringstream out;
+		if (!printproc( out, std::cerr, modname, args, descr))
+		{
+			throw std::runtime_error( std::string("failed to generate '") + langname + "' source");
+		}
+		int ec = strus::writeFile( filename, out.str());
+		if (ec) throw std::runtime_error( std::string("failed to write output file '") + filename + "': " + std::strerror(ec));
+	}
 }
 
 int main( int argc, const char* argv[])
@@ -39,37 +69,36 @@ int main( int argc, const char* argv[])
 		{
 			throw std::runtime_error( "could not get interface description");
 		}
-		if (argc <= 2)
+		if (argc < 4)
 		{
 			printUsage();
 			throw std::runtime_error( "too few arguments");
 		}
-		if (argc > 4)
+		const char* lang = argv[1];
+		const char* what = argv[2];
+		const char* filename = argv[3];
+		std::multimap<std::string,std::string> args;
+		int argi=4;
+		for (; argi < argc; ++argi)
 		{
-			printUsage();
-			throw std::runtime_error( "too many arguments");
+			const char* eq = std::strchr( argv[argi], '=');
+			if (!eq) throw std::runtime_error( std::string( "assignment (<name>=<value> expected as argument instead of '") + argv[argi] + "'");
+			std::string name( argv[argi], eq-argv[argi]);
+			std::string value( eq+1);
+			args.insert( std::pair<std::string,std::string>( name, value));
 		}
-		if (std::strcmp( argv[1], "lua") == 0)
+
+		GenerateSourceFunc printfunc;
+		if (std::strcmp( lang, "lua") == 0)
 		{
-			if (argc <= 3)
-			{
-				papuga::generateLuaSource( std::cout, std::cerr, argv[2], *interface_description);
-			}
-			else
-			{
-				std::ostringstream out;
-				papuga::generateLuaSource( out, std::cerr, argv[2], *interface_description);
-				int ec = strus::writeFile( argv[3], out.str());
-				if (ec) throw std::runtime_error( std::string("failed to write output file '") + argv[3] + "': " + std::strerror(ec));
-			}
+			printfunc = &papuga::generateLuaSource;
 		}
 		else
 		{
 			throw std::runtime_error( "unknown language");
 		}
 		//Output:
-#ifdef STRUS_LOWLEVEL_DEBUG
-#endif
+		generateSource( printfunc, lang, what, args, filename, *interface_description);
 		std::cerr << "done." << std::endl;
 		return 0;
 	}

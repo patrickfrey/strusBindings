@@ -13,16 +13,22 @@ set( gen_source_files
 
 include_directories(
 	"${Intl_INCLUDE_DIRS}"
+	"${PROJECT_SOURCE_DIR}/3rdParty/fmt"
 	"${PROJECT_SOURCE_DIR}/3rdParty/lua"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
+link_directories(
+	"${PROJECT_SOURCE_DIR}/3rdParty/fmt/fmt"
+)
+
+
 # ------------------------------
 # LIBRARIES
 # ------------------------------
 add_library( papuga_lua_gen SHARED ${gen_source_files} )
-target_link_libraries( papuga_lua_gen )
+target_link_libraries( papuga_lua_gen fmt )
 
 set_target_properties(
     papuga_lua_gen

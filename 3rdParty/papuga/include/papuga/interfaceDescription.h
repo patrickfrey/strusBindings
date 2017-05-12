@@ -31,7 +31,7 @@ typedef struct papuga_ClassDescription
 typedef struct papuga_InterfaceDescription
 {
 	const char* name;				///< name of the project wrapped by the bindings
-	const char* includefile;			///< name of the bindings interface file to include
+	const char** includefiles;			///< null terminated list of files to include
 	const papuga_ClassDescription* classes;		///< (0,NULL,NULL) terminated list of classes 
 } papuga_InterfaceDescription;
 

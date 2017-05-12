@@ -11,6 +11,7 @@
 #define _PAPUGA_LUA_GEN_LIB_HPP_INCLUDED
 #include "papuga/interfaceDescription.h"
 #include <string>
+#include <map>
 #include <iostream>
 
 namespace papuga {
@@ -19,11 +20,13 @@ namespace papuga {
 /// \param[out] out where to print the generated source
 /// \param[err] err stream to report errors and warnings
 /// \param[in] what name of artefact to generate
+/// \param[in] args arguments passed to the generator
 /// \param[in] descr interface description
 bool generateLuaSource(
 	std::ostream& out,
 	std::ostream& err,
 	const std::string& what,
+	const std::multimap<std::string,std::string>& args,
 	const papuga_InterfaceDescription& descr);
 
 }//namespace

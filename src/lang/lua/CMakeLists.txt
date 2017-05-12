@@ -12,6 +12,7 @@ link_directories(
 	"${PROJECT_SOURCE_DIR}/3rdParty/lua_cmake"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/src"
 	"${PROJECT_SOURCE_DIR}/src/bindings"
+	"${PROJECT_SOURCE_DIR}/src/lang/lua"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"

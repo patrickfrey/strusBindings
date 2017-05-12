@@ -9,6 +9,7 @@
 /// \file libpapuga_lua.cpp
 #include "papuga/lib/lua_gen.hpp"
 #include "private/dll_tags.h"
+#include "fmt/format.h"
 #include <string>
 #include <cstdio>
 #include <cstdarg>
@@ -28,6 +29,7 @@ static std::runtime_error exception( const char* msg, ...)
 	return rt;
 }
 
+
 #define INDENT "\t"
 
 static void define_method(
@@ -35,12 +37,14 @@ static void define_method(
 		const papuga_ClassDescription& classdef,
 		const papuga_MethodDescription& method)
 {
-	out << "static int l_" << method.funcname << "( lua_State *ls )" << std::endl;
-	out << "{" << std::endl;
-	out << INDENT << "int rt;" << std::endl;
-	out << INDENT << "papuga_lua_CallArgs arg;" << std::endl;
-	out << INDENT << "papuga_CallResult retval;" << std::endl;
-	out << INDENT << "char errorbuf[ 1024];" << std::endl;
+	out << fmt::format(
+		"static int l_{methodname}( lua_State *ls )\n"
+		"{{\n"
+		"\tint rt;\n"
+		"\tpapuga_lua_CallArgs arg;\n"
+		"\tpapuga_CallResult retval;\n"
+		"\tchar errorbuf[ 1024];" , fmt::arg("methodname", method.funcname)) << std::endl;
+
 	if (method.self)
 	{
 		out << INDENT << "if (!papuga_lua_init_CallArgs( ls, &arg, \"" << classdef.name << "\")) papuga_lua_error( ls, \"" << classdef.name << "." << method.name << "\", arg.errcode);" << std::endl;
@@ -76,10 +80,13 @@ static void define_methodtable(
 	out << "};" << std::endl << std::endl;
 }
 
+typedef std::multimap<std::string,std::string>::const_iterator ArgIterator;
+
 DLL_PUBLIC bool papuga::generateLuaSource(
 	std::ostream& out,
 	std::ostream& err,
 	const std::string& what,
+	const std::multimap<std::string,std::string>& args,
 	const papuga_InterfaceDescription& descr)
 {
 	try
@@ -108,7 +115,14 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 			out << "#include \"papuga.h\"" << std::endl;
 			out << "#include \"papuga/lib/lua_dev.h\"" << std::endl;
 			out << "#include \"strus/bindings/lua.h\"" << std::endl;
-			out << "#include \"" << descr.includefile << "\"" << std::endl;
+			char const** fi = descr.includefiles;
+			for (; *fi; ++fi) out << "#include \"" << *fi << "\"" << std::endl;
+			std::pair<ArgIterator,ArgIterator> inclist = args.equal_range( "include");
+			ArgIterator ai = inclist.first, ae = inclist.second;
+			for (; ai != ae; ++ai)
+			{
+				out << "#include \"" << ai->second << "\"" << std::endl;
+			}
 			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
 			out << std::endl;
 
@@ -129,9 +143,13 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		}
 		return true;
 	}
+	catch (const fmt::FormatError& ex)
+	{
+		err << "format error generating lua binding source '" << what << "': " << ex.what() << std::endl;
+	}
 	catch (const std::exception& ex)
 	{
-		err << "error generating lua binding source '" << what << "': " << ex.what();
+		err << "error generating lua binding source '" << what << "': " << ex.what() << std::endl;
 	}
 	return false;
 }

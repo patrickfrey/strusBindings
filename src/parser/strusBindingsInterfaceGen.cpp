@@ -134,7 +134,10 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "\t{0,0}" << std::endl;
 	out << "};" << std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", \"strus/bindingObjects.h\", g_classes };"
+	out << "static const char* g_includefiles[2] = {\"strus/bindingObjects.h\", 0};"
+		<< std::endl << std::endl;
+
+	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", g_includefiles, g_classes };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
