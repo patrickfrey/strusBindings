@@ -32,7 +32,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT     libstrus_bindings_lua.c
     DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen
-    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua module libstrus_bindings_lua.c
+    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua module libstrus_bindings_lua.c include=strus/bindings/lua.h
     COMMENT  "Generating Lua module source"
     VERBATIM
  )

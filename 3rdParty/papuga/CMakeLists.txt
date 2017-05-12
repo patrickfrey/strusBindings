@@ -20,6 +20,7 @@ configure_file( "${PROJECT_SOURCE_DIR}/3rdParty/papuga/include/papuga/version.h.
 
 # Subdirectories:
 add_subdirectory( src )
+add_subdirectory( gen )
 add_subdirectory( lua )
   
 # include( cmake/report_build_settings.cmake )

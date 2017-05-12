@@ -28,7 +28,7 @@ link_directories(
 # LIBRARIES
 # ------------------------------
 add_library( papuga_lua_gen SHARED ${gen_source_files} )
-target_link_libraries( papuga_lua_gen fmt )
+target_link_libraries( papuga_lua_gen fmt papuga_gen_utils )
 
 set_target_properties(
     papuga_lua_gen
