@@ -26,19 +26,25 @@ static void define_classdefmap(
 		const papuga_InterfaceDescription& descr)
 {
 	ClassDescriptionMap descrmap = papuga::getClassDescriptionMap( descr);
-	out << "static const papuga_lua_ClassDef* g_classidmap[] = { " << std::endl;
 	unsigned int cidx = 0;
 	ClassDescriptionMap::const_iterator ci = descrmap.begin(), ce = descrmap.end();
+	for (; ci != ce; ++ci,++cidx)
+	{
+		for (; cidx+1 < ci->first; ++cidx){}
+	}
+	out << "static const papuga_lua_ClassDef g_classdefar[" << (cidx+1) << "] = {" << std::endl;
+	cidx = 0;
+	ci = descrmap.begin(), ce = descrmap.end();
 	for (; ci != ce; ++ci,++cidx)
 	{
 		for (; cidx+1 < ci->first; ++cidx)
 		{
 			out << "{NULL, NULL}";
 		}
-		out << "{\"" << ci->second.name << "\", " << ci->second.funcname_destructor << "}, ";
+		out << "{\"" << ci->second->name << "\", &" << ci->second->funcname_destructor << "}, ";
 	}
-	out << "NULL };" << std::endl << std::endl;
-	out << "static const papuga_lua_ClassDefMap = { " << cidx << ", g_classidmap };";
+	out << "{ NULL, NULL }};" << std::endl << std::endl;
+	out << "static const papuga_lua_ClassDefMap g_classdefmap = { " << cidx << ", g_classdefar };";
 }
 
 static void define_method(
@@ -55,11 +61,11 @@ static void define_method(
 		"papuga_lua_CallArgs arg;",
 		"papuga_CallResult retval;",
 		"char errorbuf[ 2048];",
-		"if (!papuga_lua_init_CallArgs( ls, &arg, {selfname})) papuga_lua_error( ls, \"{classname}.{methodname}\", arg.errcode);",
+		"if (!papuga_lua_init_CallArgs( ls, &arg, {selfname}, &g_classdefmap)) papuga_lua_error( ls, \"{classname}.{methodname}\", arg.errcode);",
 		"papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));",
 		"if (!{funcname}( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;",
 		"papuga_lua_destroy_CallArgs( &arg);",
-		"rt = papuga_lua_move_CallResult( ls, &retval, &papuga_lua_ClassIdMap, &arg.errcode);",
+		"rt = papuga_lua_move_CallResult( ls, &retval, &g_classdefmap, &arg.errcode);",
 		"if (rt < 0) papuga_lua_error( ls, \"{classname}.{methodname}\", arg.errcode);",
 		"return rt;",
 		"ERROR_CALL:",
@@ -87,9 +93,9 @@ static void define_constructor(
 		"papuga_CallResult retval;",
 		"char errorbuf[ 2048];",
 		"papuga_lua_UserData* udata = papuga_lua_new_userdata( ls, \"{classname}\");",
-		"if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, \"{classname}.new\", arg.errcode);",
-		"{classname}Impl* objref = {constructor}( arg.argc, arg.argv);",
-		"if (!objref)) goto ERROR_CALL;",
+		"if (!papuga_lua_init_CallArgs( ls, &arg, NULL, &g_classdefmap)) papuga_lua_error( ls, \"{classname}.new\", arg.errcode);",
+		"void* objref = {constructor}( arg.argc, arg.argv);",
+		"if (!objref) goto ERROR_CALL;",
 		"papuga_lua_destroy_CallArgs( &arg);",
 		"papuga_lua_init_UserData( udata, {classid}, objref, {destructor});",
 		"return 1;",
@@ -187,7 +193,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 				"#include <lauxlib.h>",
 				"#include \"papuga.h\"",
 				"#include \"papuga/lib/lua_dev.h\"",
-				"#include \"strus/bindings/lua.h\"", 0) << std::endl;
+				"#include \"strus/bindings/lua.h\"", 0);
 
 			char const** fi = descr.includefiles;
 			for (; *fi; ++fi)
@@ -204,6 +210,8 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 			out << "///\\remark GENERATED FILE (libpapuga_lua_gen) - DO NOT MODIFY" << std::endl;
 			out << std::endl;
 
+			define_classdefmap( out, descr);
+
 			std::size_t ci;
 			for (ci=0; descr.classes[ci].name; ++ci)
 			{
@@ -212,11 +220,6 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 				{
 					define_constructor( out, classdef);
 				}
-			}
-			define_classdefmap( out, descr);
-
-			for (ci=0; descr.classes[ci].name; ++ci)
-			{
 				std::size_t mi = 0;
 				for (; classdef.methodtable[mi].name; ++mi)
 				{

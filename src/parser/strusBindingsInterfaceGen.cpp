@@ -175,9 +175,8 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 		for (; ki != ke; ++ki)
 		{
 			out 
-			<< "bool " << constructorFunctionName( ci->name())
-			<< "( papuga_CallResult* retval, "
-			<< "size_t argc, const papuga_ValueVariant* argv);" << std::endl;
+			<< "void* " << constructorFunctionName( ci->name())
+			<< "( size_t argc, const papuga_ValueVariant* argv);" << std::endl;
 		}
 
 		std::vector<strus::MethodDef>::const_iterator
@@ -267,7 +266,7 @@ struct ParameterSructureExpanded
 		if (param_converted.size() == 0)
 		{
 			out << indent << "if (argc > 0) throw strus::runtime_error(_TXT(\"no arguments expected\"));" << std::endl;
-			out << indent << "return (void*) new " << classname << "Impl());" << std::endl;
+			out << indent << "return (void*) new " << classname << "Impl();" << std::endl;
 		}
 		else
 		{
@@ -275,7 +274,7 @@ struct ParameterSructureExpanded
 			out << indent << "{" << std::endl;
 			for (std::size_t pidx=min_nofargs; pidx<=param_converted.size(); ++pidx)
 			{
-				out << indent << "\tcase " << pidx << ": return new " << classname << "Impl(" << expandCallParameter( pidx) << "));" << std::endl;
+				out << indent << "\tcase " << pidx << ": return new " << classname << "Impl(" << expandCallParameter( pidx) << ");" << std::endl;
 			}
 			out << indent << "\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
 			out << indent << "}" << std::endl;
@@ -394,7 +393,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			// Print call:
 			paramstruct.printConstructorCall( out, "\t\t", ci->name());
 
-			out << "\t\treturn true;" << std::endl;
+			out << "\t\treturn 0;" << std::endl;
 			out << "\t}" << std::endl;
 			out << "\tCATCH_METHOD_CALL_ERROR( retval, \"" << ci->name().c_str() << "\", \"constructor\")" << std::endl;
 			out << "}" << std::endl << std::endl;

@@ -231,7 +231,7 @@ struct papuga_lua_UserData
 	int classid;
 	int checksum;
 	void* objectref;
-	papuga_lua_ClassDestructorFunc destructor;
+	papuga_HostObjectDeleter destructor;
 };
 
 #define KNUTH_HASH 2654435761U
@@ -318,7 +318,7 @@ DLL_PUBLIC papuga_lua_UserData* papuga_lua_new_userdata( lua_State* ls, const ch
 	return rt;
 }
 
-DLL_PUBLIC void papuga_lua_init_UserData( papuga_lua_UserData* udata, int classid, void* objectref, papuga_lua_ClassDestructorFunc destructor)
+DLL_PUBLIC void papuga_lua_init_UserData( papuga_lua_UserData* udata, int classid, void* objectref, papuga_HostObjectDeleter destructor)
 {
 	udata->classid = classid;
 	udata->objectref = objectref;
