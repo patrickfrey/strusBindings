@@ -21,6 +21,26 @@ using namespace papuga;
 
 #define INDENT "\t"
 
+static void define_classdefmap(
+		std::ostream& out,
+		const papuga_InterfaceDescription& descr)
+{
+	ClassDescriptionMap descrmap = papuga::getClassDescriptionMap( descr);
+	out << "static const papuga_lua_ClassDef* g_classidmap[] = { " << std::endl;
+	unsigned int cidx = 0;
+	ClassDescriptionMap::const_iterator ci = descrmap.begin(), ce = descrmap.end();
+	for (; ci != ce; ++ci,++cidx)
+	{
+		for (; cidx+1 < ci->first; ++cidx)
+		{
+			out << "{NULL, NULL}";
+		}
+		out << "{\"" << ci->second.name << "\", " << ci->second.funcname_destructor << "}, ";
+	}
+	out << "NULL };" << std::endl << std::endl;
+	out << "static const papuga_lua_ClassDefMap = { " << cidx << ", g_classidmap };";
+}
+
 static void define_method(
 		std::ostream& out,
 		const papuga_ClassDescription& classdef,
@@ -39,7 +59,7 @@ static void define_method(
 		"papuga_init_CallResult( &retval, errorbuf, sizeof(errorbuf));",
 		"if (!{funcname}( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;",
 		"papuga_lua_destroy_CallArgs( &arg);",
-		"rt = papuga_lua_move_CallResult( ls, &retval, &arg.errcode);",
+		"rt = papuga_lua_move_CallResult( ls, &retval, &papuga_lua_ClassIdMap, &arg.errcode);",
 		"if (rt < 0) papuga_lua_error( ls, \"{classname}.{methodname}\", arg.errcode);",
 		"return rt;",
 		"ERROR_CALL:",
@@ -52,6 +72,38 @@ static void define_method(
 			fmt::arg("classname", classdef.name),
 			fmt::arg("selfname", selfname),
 			fmt::arg("funcname", method.funcname)
+		) << std::endl;
+}
+
+static void define_constructor(
+		std::ostream& out,
+		const papuga_ClassDescription& classdef)
+{
+	out << fmt::format( papuga::cppCodeSnippet( 0,
+		"static int l_new_{classname}( lua_State *ls)",
+		"{",
+		"int rt;",
+		"papuga_lua_CallArgs arg;",
+		"papuga_CallResult retval;",
+		"char errorbuf[ 2048];",
+		"papuga_lua_UserData* udata = papuga_lua_new_userdata( ls, \"{classname}\");",
+		"if (!papuga_lua_init_CallArgs( ls, &arg, NULL)) papuga_lua_error( ls, \"{classname}.new\", arg.errcode);",
+		"{classname}Impl* objref = {constructor}( arg.argc, arg.argv);",
+		"if (!objref)) goto ERROR_CALL;",
+		"papuga_lua_destroy_CallArgs( &arg);",
+		"papuga_lua_init_UserData( udata, {classid}, objref, {destructor});",
+		"return 1;",
+		"ERROR_CALL:",
+		"papuga_destroy_CallResult( &retval);",
+		"papuga_lua_destroy_CallArgs( &arg);",
+		"lua_pop(ls, 1);//... pop udata"
+		"papuga_lua_error_str( ls, \"{classname}.new\", errorbuf);",
+		"}",
+		0),
+			fmt::arg("classname", classdef.name),
+			fmt::arg("classid", classdef.id),
+			fmt::arg("constructor", classdef.funcname_constructor),
+			fmt::arg("destructor", classdef.funcname_destructor)
 		) << std::endl;
 }
 
@@ -72,7 +124,32 @@ static void define_methodtable(
 	out << "\t" << "{0,0}" << "};" << std::endl << std::endl;
 }
 
-typedef std::multimap<std::string,std::string>::const_iterator ArgIterator;
+static void define_main(
+		std::ostream& out,
+		const papuga_InterfaceDescription& descr)
+{
+	out << fmt::format( papuga::cppCodeSnippet( 0,
+		"int luaopen_{modulename}( lua_State* L );",
+		"{",
+		0),
+		fmt::arg("modulename", descr.name)
+	) << std::endl;
+	std::size_t ci = 0;
+	for (; descr.classes[ci].name; ++ci)
+	{
+		const papuga_ClassDescription& classdef = descr.classes[ci];
+		out << fmt::format( papuga::cppCodeSnippet( 1,
+			"papuga_lua_declare_class( ls, {classid}, \"{modulename}_{classname}\", mt_{classname}, {destructor});",
+			0),
+			fmt::arg("modulename", descr.name),
+			fmt::arg("classid", classdef.id),
+			fmt::arg("classname", classdef.name),
+			fmt::arg("destructor", classdef.funcname_destructor)
+		) << std::endl;
+	}
+	out << "}" << std::endl << std::endl;
+}
+
 
 DLL_PUBLIC bool papuga::generateLuaSource(
 	std::ostream& out,
@@ -88,7 +165,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 			out << fmt::format( papuga::cppCodeSnippet( 0,
 				"#ifndef _PAPUGA_{modulename}_LUA_INTERFACE__INCLUDED",
 				"#define _PAPUGA_{modulename}_LUA_INTERFACE__INCLUDED",
-				"///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY",
+				"///\\remark GENERATED FILE (libpapuga_lua_gen) - DO NOT MODIFY",
 				"",
 				"#include <lua.h>",
 				"#ifdef __cplusplus",
@@ -117,25 +194,37 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 			{
 				out << "#include \"" << *fi << "\"" << std::endl;
 			}
+			typedef std::multimap<std::string,std::string>::const_iterator ArgIterator;
 			std::pair<ArgIterator,ArgIterator> inclist = args.equal_range( "include");
 			ArgIterator ai = inclist.first, ae = inclist.second;
 			for (; ai != ae; ++ai)
 			{
 				out << "#include \"" << ai->second << "\"" << std::endl;
 			}
-			out << "///\\remark GENERATED FILE (papuga lua generator) - DO NOT MODIFY" << std::endl;
+			out << "///\\remark GENERATED FILE (libpapuga_lua_gen) - DO NOT MODIFY" << std::endl;
 			out << std::endl;
 
-			std::size_t ci = 0;
-			for (; descr.classes[ci].name; ++ci)
+			std::size_t ci;
+			for (ci=0; descr.classes[ci].name; ++ci)
+			{
+				const papuga_ClassDescription& classdef = descr.classes[ci];
+				if (classdef.funcname_constructor)
+				{
+					define_constructor( out, classdef);
+				}
+			}
+			define_classdefmap( out, descr);
+
+			for (ci=0; descr.classes[ci].name; ++ci)
 			{
 				std::size_t mi = 0;
-				for (; descr.classes[ci].methodtable[mi].name; ++mi)
+				for (; classdef.methodtable[mi].name; ++mi)
 				{
-					define_method( out, descr.classes[ci], descr.classes[ci].methodtable[mi]);
+					define_method( out, classdef, classdef.methodtable[mi]);
 				}
-				define_methodtable( out, descr.classes[ci]);
+				define_methodtable( out, classdef);
 			}
+			define_main( out, descr);
 		}
 		else
 		{

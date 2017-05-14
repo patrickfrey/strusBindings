@@ -8,6 +8,7 @@
 #include "papuga/callResult.h"
 #include "papuga/errors.h"
 #include "papuga/serialization.h"
+#include "papuga/hostObjectReference.h"
 #include "private/dll_tags.h"
 
 #define MAX_DOUBLE_INT            ((int64_t)1<<53)
@@ -15,43 +16,85 @@
 #define IS_CONVERTIBLE_TOINT( x)  ((x-floor(x) < 2*DBL_EPSILON) && x < MAX_DOUBLE_INT && x > -MIN_DOUBLE_INT)
 #define NUM_EPSILON               (2*DBL_EPSILON)
 
+static bool Serialization_pushName_number( papuga_Serialization* result, double numval)
+{
+	if (IS_CONVERTIBLE_TOINT( numval))
+	{
+		if (numval > 0.0)
+		{
+			return papuga_Serialization_pushName_uint( result, (uint64_t)(numval + NUM_EPSILON));
+		}
+		else
+		{
+			return papuga_Serialization_pushName_int( result, (int64_t)(numval - NUM_EPSILON));
+		}
+	}
+	else
+	{
+		return papuga_Serialization_pushName_double( result, numval);
+	}
+}
+
+static bool Serialization_pushValue_number( papuga_Serialization* result, double numval)
+{
+	if (IS_CONVERTIBLE_TOINT( numval))
+	{
+		if (numval > 0.0)
+		{
+			return papuga_Serialization_pushValue_uint( result, (uint64_t)(numval + NUM_EPSILON));
+		}
+		else
+		{
+			return papuga_Serialization_pushValue_int( result, (int64_t)(numval - NUM_EPSILON));
+		}
+	}
+	else
+	{
+		return papuga_Serialization_pushValue_double( result, numval);
+	}
+}
+
+static void init_ValueVariant_number( papuga_ValueVariant* result, double numval)
+{
+	if (IS_CONVERTIBLE_TOINT( numval))
+	{
+		if (numval > 0.0)
+		{
+			papuga_init_ValueVariant_uint( result, (uint64_t)(numval + NUM_EPSILON));
+		}
+		else
+		{
+			papuga_init_ValueVariant_int( result, (int64_t)(numval - NUM_EPSILON));
+		}
+	}
+	else
+	{
+		papuga_init_ValueVariant_double( result, numval);
+	}
+}
+
+
 static bool serialize_key( papuga_lua_CallArgs* as, papuga_Serialization* result, lua_State* ls, int li)
 {
 	bool rt = true;
-	const char* str;
-	size_t strsize;
-	double numval;
-
 	switch (lua_type (ls, li))
 	{
 		case LUA_TNIL:
 			rt &= papuga_Serialization_pushName_void( result);
 			break;
 		case LUA_TNUMBER:
-			numval = lua_tonumber( ls, li);
-			if (IS_CONVERTIBLE_TOINT( numval))
-			{
-				if (numval > 0.0)
-				{
-					rt &= papuga_Serialization_pushName_uint( result, (uint64_t)(numval + NUM_EPSILON));
-				}
-				else
-				{
-					rt &= papuga_Serialization_pushName_int( result, (int64_t)(numval - NUM_EPSILON));
-				}
-			}
-			else
-			{
-				rt &= papuga_Serialization_pushName_double( result, lua_tonumber( ls, li));
-			}
+			rt &= Serialization_pushName_number( result, lua_tonumber( ls, li));
 			break;
 		case LUA_TBOOLEAN:
 			rt &= papuga_Serialization_pushName_bool( result, lua_toboolean( ls, li));
 			break;
 		case LUA_TSTRING:
-			str = lua_tolstring( ls, li, &strsize);
+		{
+			size_t strsize;
+			const char* str = lua_tolstring( ls, li, &strsize);
 			rt &= papuga_Serialization_pushName_string( result, str, strsize);
 			break;
+		}
 		case LUA_TTABLE:	as->errcode = papuga_TypeError; return false;
 		case LUA_TFUNCTION:	as->errcode = papuga_TypeError; return false;
 		case LUA_TUSERDATA:	as->errcode = papuga_TypeError; return false;
@@ -74,8 +117,6 @@ static bool serialize_value( papuga_lua_CallArgs* as, papuga_Serialization* resu
 	bool rt = true;
 	const char* str;
 	size_t strsize;
-	int isnum;
-	lua_Integer intval;
 
 	switch (lua_type (ls, li))
 	{
@@ -83,14 +124,7 @@ static bool serialize_value( papuga_lua_CallArgs* as, papuga_Serialization* resu
 			rt &= papuga_Serialization_pushValue_void( result);
 			break;
 		case LUA_TNUMBER:
-			if (0!=(intval=lua_tointegerx( ls, li, &isnum)) && isnum)
-			{
-				rt &= papuga_Serialization_pushValue_int( result, intval);
-			}
-			else
-			{
-				rt &= papuga_Serialization_pushValue_double( result, lua_tonumber( ls, li));
-			}
+			rt &= Serialization_pushValue_number( result, lua_tonumber( ls, li));
 			break;
 		case LUA_TBOOLEAN:
 			rt &= papuga_Serialization_pushValue_bool( result, lua_toboolean( ls, li));
@@ -104,8 +138,8 @@ static bool serialize_value( papuga_lua_CallArgs* as, papuga_Serialization* resu
 			rt &= serialize_node( as, result, ls, li);
 			rt &= papuga_Serialization_pushClose( result);
 			break;
-		case LUA_TFUNCTION:	as->errcode = papuga_TypeError; return false;
 		case LUA_TUSERDATA:	as->errcode = papuga_TypeError; return false;
+		case LUA_TFUNCTION:	as->errcode = papuga_TypeError; return false;
 		case LUA_TTHREAD:	as->errcode = papuga_TypeError; return false;
 		case LUA_TLIGHTUSERDATA:as->errcode = papuga_TypeError; return false;
 		default:		as->errcode = papuga_TypeError; return false;
@@ -186,9 +220,110 @@ static bool serialize_root( papuga_lua_CallArgs* as, lua_State *ls, int li)
 	return serialize_node( as, result, ls, li);
 }
 
-DLL_PUBLIC bool papuga_init_lua_state( lua_State* ls)
+static bool deserialize_root( papuga_lua_CallArgs* as, lua_State *ls, int li)
 {
-	return true;
+	papuga_Serialization* result = new_Serialization( as);
+	return serialize_node( as, result, ls, li);
+}
+
+struct papuga_lua_UserData
+{
+	int classid;
+	int checksum;
+	void* objectref;
+	papuga_lua_ClassDestructorFunc destructor;
+};
+
+#define KNUTH_HASH 2654435761U
+static int calcCheckSum( papuga_lua_UserData* udata)
+{
+	return (((udata->classid ^ (uintptr_t)udata->objectref) * KNUTH_HASH) ^ (uintptr_t)udata->destructor);
+}
+
+static int papuga_lua_destroy_UserData( lua_State* ls)
+{
+	papuga_lua_UserData* udata = (papuga_lua_UserData*)lua_touserdata( ls, 1);
+	if (calcCheckSum(udata) != udata->checksum)
+	{
+		papuga_lua_error( ls, "destructor", papuga_InvalidAccess);
+	}
+	++udata->checksum;
+	if (udata->destructor) udata->destructor( udata->objectref);
+	return 0;
+}
+
+static papuga_lua_UserData* get_UserData( lua_State* ls, int idx)
+{
+	papuga_lua_UserData* udata = (papuga_lua_UserData*)lua_touserdata( ls, 1);
+	if (calcCheckSum(udata) != udata->checksum)
+	{
+		papuga_lua_error( ls, "destructor", papuga_InvalidAccess);
+	}
+	return udata;
+}
+
+static void release_UserData( papuga_lua_UserData* udata)
+{
+	udata->classid = 0;
+	udata->objectref = 0;
+	udata->destructor = 0;
+	udata->checksum = 0;
+}
+
+static const papuga_lua_ClassDef* get_classdef( const papuga_lua_ClassDefMap* classdefmap, unsigned int classid)
+{
+	return (classid >= classdefmap->size) ? NULL : &classdefmap->ar[ classid];
+}
+
+static void createMetaTable( lua_State* ls, const char* classname, unsigned int classid, const luaL_Reg* mt, papuga_HostObjectDeleter destructor)
+{
+	luaL_newmetatable( ls, classname);
+	luaL_setfuncs( ls, mt, 0);
+	lua_pushliteral( ls, "__index");
+	lua_pushvalue( ls, -2);
+	lua_rawset( ls, -3);
+
+	lua_pushliteral( ls, "__newindex");
+	lua_pushvalue( ls, -2);
+	lua_rawset( ls, -3);
+
+	lua_pushliteral( ls, "classname");
+	lua_pushstring( ls, classname);
+	lua_rawset( ls, -3);
+
+	lua_pushliteral( ls, "classid");
+	lua_pushinteger( ls, classid);
+	lua_rawset( ls, -3);
+
+	lua_pushliteral( ls, "__gc");
+	lua_pushcfunction( ls, papuga_lua_destroy_UserData);
+	lua_rawset( ls, -3);
+
+	lua_pop( ls, 1);
+}
+
+
+DLL_PUBLIC void papuga_lua_declare_class( lua_State* ls, int classid, const char* classname,
+				const luaL_Reg* mt, papuga_HostObjectDeleter destructor)
+{
+	createMetaTable( ls, classname, classid, mt, destructor);
+}
+
+DLL_PUBLIC papuga_lua_UserData* papuga_lua_new_userdata( lua_State* ls, const char* classname)
+{
+	papuga_lua_UserData* rt = (papuga_lua_UserData*)lua_newuserdata( ls, sizeof(papuga_lua_UserData));
+	release_UserData( rt);
+	luaL_getmetatable( ls, classname);
+	lua_setmetatable( ls, -2);
+	return rt;
+}
+
+DLL_PUBLIC void papuga_lua_init_UserData( papuga_lua_UserData* udata, int classid, void* objectref, papuga_lua_ClassDestructorFunc destructor)
+{
+	udata->classid = classid;
+	udata->objectref = objectref;
+	udata->destructor = destructor;
+	udata->checksum = calcCheckSum( udata);
 }
 
 DLL_PUBLIC void papuga_lua_error( lua_State* ls, const char* function, papuga_ErrorCode err)
@@ -201,12 +336,8 @@ DLL_PUBLIC void papuga_lua_error_str( lua_State* ls, const char* function, const
 	luaL_error( ls, "%s (%s)", errormsg, function);
 }
 
-DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* as, const char* classname)
+DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* as, const char* classname, const papuga_lua_ClassDefMap* classdefmap)
 {
-	const char* str;
-	size_t strsize;
-	int isnum;
-	lua_Integer intval;
 	int argi = 0;
 
 	as->erridx = -1;
@@ -236,27 +367,27 @@ DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* as
 				papuga_init_ValueVariant( &as->argv[argi]);
 				break;
 			case LUA_TNUMBER:
-				if (0!=(intval=lua_tointegerx( ls, argi, &isnum)) && isnum)
-				{
-					papuga_init_ValueVariant_int( &as->argv[argi], intval);
-				}
-				else
-				{
-					papuga_init_ValueVariant_double( &as->argv[argi], lua_tonumber( ls, argi));
-				}
+				init_ValueVariant_number( &as->argv[argi], lua_tonumber( ls, argi));
 				break;
 			case LUA_TBOOLEAN:
 				papuga_init_ValueVariant_bool( &as->argv[argi], lua_toboolean( ls, argi));
 				break;
 			case LUA_TSTRING:
-				str = lua_tolstring( ls, argi, &strsize);
+			{
+				size_t strsize;
+				const char* str = lua_tolstring( ls, argi, &strsize);
 				papuga_init_ValueVariant_string( &as->argv[argi], str, strsize);
 				break;
+			}
 			case LUA_TTABLE:
 				if (!serialize_root( as, ls, argi)) goto ERROR;
 				break;
+			case LUA_TUSERDATA:
+			{
+				papuga_lua_UserData* udata = get_UserData( ls, argi);
+				papuga_init_ValueVariant_hostobj( &as->argv[argi], udata->objectref, udata->classid);
+			}
 			case LUA_TFUNCTION:	goto ERROR;
-			case LUA_TUSERDATA:	goto ERROR;
 			case LUA_TTHREAD:	goto ERROR;
 			case LUA_TLIGHTUSERDATA:goto ERROR;
 			default:		goto ERROR;
@@ -278,7 +409,7 @@ DLL_PUBLIC void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg)
 	}
 }
 
-DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, papuga_ErrorCode* errcode)
+DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, const papuga_lua_ClassDefMap* classdefmap, papuga_ErrorCode* errcode)
 {
 	int rt = 0;
 	char* errorstr;
@@ -330,6 +461,19 @@ DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* ret
 			break;
 		}
 		case papuga_HostObject:
+		{
+			papuga_lua_UserData* udata;
+			const papuga_lua_ClassDef* classdef = get_classdef( classdefmap, retval->value.classid);
+			if (!classdef)
+			{
+				papuga_destroy_CallResult( retval);
+				papuga_lua_error( ls, "move result", papuga_LogicError);
+			}
+			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when papuga_lua_new_userdata fails because of a memory allocation error
+			udata = papuga_lua_new_userdata( ls, classdef->name);
+			papuga_lua_init_UserData( udata, retval->value.classid, retval->object.data, retval->object.destroy);
+			papuga_release_HostObjectReference( &retval->object);
+		}
 		case papuga_Serialized:
 			break;
 	}

@@ -29,13 +29,13 @@ extern "C" {
 
 /// \brief Value Variant initializer
 #define papuga_init_ValueVariant(self)				{(self)->valuetype = (unsigned char)papuga_Void; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.string=0;}
-#define papuga_init_ValueVariant_double(self,val)		{(self)->valuetype = (unsigned char)papuga_Double; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.Double=val;}
-#define papuga_init_ValueVariant_bool(self,val)			{(self)->valuetype = (unsigned char)papuga_Int; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.Int=!!val;}
-#define papuga_init_ValueVariant_uint(self,val)			{(self)->valuetype = (unsigned char)papuga_UInt; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.UInt=val;}
-#define papuga_init_ValueVariant_int(self,val)			{(self)->valuetype = (unsigned char)papuga_Int; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.Int=val;}
-#define papuga_init_ValueVariant_charp(self,val)		{(self)->valuetype = (unsigned char)papuga_String; (self)->encoding=papuga_UTF8; (self)->classid=0; (self)->length=strlen(val); (self)->value.string=val;}
-#define papuga_init_ValueVariant_string(self,val,sz)		{(self)->valuetype = (unsigned char)papuga_String; (self)->encoding=papuga_UTF8; (self)->classid=0; (self)->length=sz; (self)->value.string=val;}
-#define papuga_init_ValueVariant_langstring(self,enc,val,sz)	{(self)->valuetype = (unsigned char)papuga_LangString; (self)->encoding=enc; (self)->classid=0; (self)->length=sz; (self)->value.langstring=val;}
+#define papuga_init_ValueVariant_double(self,val)		{(self)->valuetype = (unsigned char)papuga_Double; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.Double=(val);}
+#define papuga_init_ValueVariant_bool(self,val)			{(self)->valuetype = (unsigned char)papuga_Int; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.Int=!!(val);}
+#define papuga_init_ValueVariant_uint(self,val)			{(self)->valuetype = (unsigned char)papuga_UInt; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.UInt=(val);}
+#define papuga_init_ValueVariant_int(self,val)			{(self)->valuetype = (unsigned char)papuga_Int; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.Int=(val);}
+#define papuga_init_ValueVariant_charp(self,val)		{(self)->valuetype = (unsigned char)papuga_String; (self)->encoding=papuga_UTF8; (self)->classid=0; (self)->length=strlen(val); (self)->value.string=(val);}
+#define papuga_init_ValueVariant_string(self,val,sz)		{(self)->valuetype = (unsigned char)papuga_String; (self)->encoding=papuga_UTF8; (self)->classid=0; (self)->length=sz; (self)->value.string=(val);}
+#define papuga_init_ValueVariant_langstring(self,enc,val,sz)	{(self)->valuetype = (unsigned char)papuga_LangString; (self)->encoding=enc; (self)->classid=0; (self)->length=sz; (self)->value.langstring=(val);}
 #define papuga_init_ValueVariant_hostobj(self,objptr,clid)	{(self)->valuetype = (unsigned char)papuga_HostObject; (self)->encoding=0; (self)->classid=clid; (self)->length=0; (self)->value.hostObject=objptr;}
 #define papuga_init_ValueVariant_serialization(self,ser)	{(self)->valuetype = (unsigned char)papuga_Serialized; (self)->encoding=0; (self)->classid=0; (self)->length=0; (self)->value.serialization=ser;}
 

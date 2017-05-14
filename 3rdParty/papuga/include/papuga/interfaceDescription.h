@@ -23,8 +23,8 @@ typedef struct papuga_ClassDescription
 {
 	unsigned int id;				///< id of the class (unique index counted from 0)
 	const char* name;				///< name of class
-	const char* constructorname;			///< name of the constructor
-	const char* destructorname;			///< name of the destructor
+	const char* funcname_constructor;		///< function name of the constructor
+	const char* funcname_destructor;		///< function name of the destructor
 	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods
 } papuga_ClassDescription;
 

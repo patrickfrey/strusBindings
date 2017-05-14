@@ -33,7 +33,8 @@ typedef enum papuga_ErrorCode
 	papuga_BufferOverflowError=5,
 	papuga_OutOfRangeError=6,
 	papuga_NofArgsError=7,
-	papuga_MissingSelf=8
+	papuga_MissingSelf=8,
+	papuga_InvalidAccess=9
 } papuga_ErrorCode;
 
 /// \brief Object of the host environment
@@ -77,7 +78,7 @@ typedef enum papuga_Tag
 	papuga_TagValue		///< Atomic value
 } papuga_Tag;
 
-typedef struct papuga_Serialization* papuga_SerializationPtr;
+typedef struct papuga_Serialization papuga_Serialization;
 
 /// \brief Representation of a variadic value type
 typedef struct papuga_ValueVariant
@@ -93,7 +94,7 @@ typedef struct papuga_ValueVariant
 		const char* string;				///< null terminated UTF-8 string (host string representation)
 		const void* langstring;				///< string value (not nessesarily null terminated) for other character set encodings (binding language string representation)
 		const papuga_HostObjectType* hostObject;	///< object represented in the host environment
-		papuga_SerializationPtr serialization;		///< object serialization reference
+		papuga_Serialization* serialization;		///< object serialization reference
 	} value;
 } papuga_ValueVariant;
 
@@ -105,12 +106,12 @@ typedef struct papuga_Node
 } papuga_Node;
 
 /// \brief Papuga serialization structure
-typedef struct papuga_Serialization
+struct papuga_Serialization
 {
 	unsigned int allocsize;					///< allocation size of the array
 	unsigned int arsize;					///< number of nodes
 	papuga_Node* ar;					///< array of nodes
-} papuga_Serialization;
+};
 
 /// \brief Destructor function of a host object
 typedef void (*papuga_HostObjectDeleter)( void* obj);

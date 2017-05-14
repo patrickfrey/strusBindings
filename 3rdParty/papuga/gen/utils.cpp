@@ -69,6 +69,33 @@ std::string papuga::cppCodeSnippet( unsigned int idntcnt, ...)
 	return rt.str();
 }
 
+ClassDescriptionMap papuga::getClassDescriptionMap( const papuga_InterfaceDescription& descr)
+{
+	ClassDescriptionMap rt;
+	std::size_t ci = 0;
+	for (; descr.classes[ci].name; ++ci)
+	{
+		const char* cname = descr.classes[ci].name;
+		unsigned int cid = descr.classes[ci].id;
+		if (!cid) throw std::runtime_error( "class id must be non zero");
+		ClassDescriptionMap::const_iterator mi = rt.find( cid);
+		if (mi != rt.end())
+		{
+			throw papuga::runtime_error( "duplicate definition of class id %u (%s,%s)", cid, mi->second->name, cname);
+		}
+		rt[ descr.classes[ci].id] = &descr.classes[ci];
+	}
+	unsigned int max_classid = rt.size();
+	ClassDescriptionMap::const_iterator mi = rt.begin(), me = rt.end();
+	for (; mi != me; ++mi)
+	{
+		if (mi->first > max_classid)
+		{
+			throw papuga::runtime_error( "class id map has gaps");
+		}
+	}
+	return rt;
+}
 
 
 

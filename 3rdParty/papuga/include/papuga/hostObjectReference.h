@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
 #define papuga_init_HostObjectReference( self, object_, destroy_)	{(self)->data=object_; (self)->destroy=destroy_;}
+#define papuga_release_HostObjectReference( self)			{(self)->data=0; (self)->destroy=0;}
 #define papuga_destroy_HostObjectReference( self)			{if ((self)->destroy) {(self)->destroy( (self)->data);(self)->destroy=0;}}
 
 #ifdef __cplusplus

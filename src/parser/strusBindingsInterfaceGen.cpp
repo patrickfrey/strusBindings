@@ -267,7 +267,7 @@ struct ParameterSructureExpanded
 		if (param_converted.size() == 0)
 		{
 			out << indent << "if (argc > 0) throw strus::runtime_error(_TXT(\"no arguments expected\"));" << std::endl;
-			out << indent << "initCallResultObjectOwnership( retval, new " << classname << "Impl());" << std::endl;
+			out << indent << "return (void*) new " << classname << "Impl());" << std::endl;
 		}
 		else
 		{
@@ -275,7 +275,7 @@ struct ParameterSructureExpanded
 			out << indent << "{" << std::endl;
 			for (std::size_t pidx=min_nofargs; pidx<=param_converted.size(); ++pidx)
 			{
-				out << indent << "\tcase " << pidx << ": initCallResultObjectOwnership( retval, new " << classname << "Impl(" << expandCallParameter( pidx) << ")); break;" << std::endl;
+				out << indent << "\tcase " << pidx << ": return new " << classname << "Impl(" << expandCallParameter( pidx) << "));" << std::endl;
 			}
 			out << indent << "\tdefault: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
 			out << indent << "}" << std::endl;
@@ -354,7 +354,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "\t{\\" << std::endl;
 	out << "\t\tpapuga_CallResult_reportError( retval, _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t}\\" << std::endl;
-	out << "\treturn false;" << std::endl << std::endl;
+	out << "\treturn 0;" << std::endl << std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
@@ -374,9 +374,8 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		for (; ki != ke; ++ki)
 		{
 			out 
-			<< "extern \"C\" DLL_PUBLIC bool " << constructorFunctionName( ci->name())
-			<< "( papuga_CallResult* retval, "
-			<< "size_t argc, const papuga_ValueVariant* argv)" << std::endl
+			<< "extern \"C\" DLL_PUBLIC void* " << constructorFunctionName( ci->name())
+			<< "( size_t argc, const papuga_ValueVariant* argv)" << std::endl
 			<< "{" << std::endl;
 			out << "\ttry {" << std::endl;
 			ParameterSructureExpanded paramstruct( ki->parameters());

@@ -25,7 +25,8 @@ std::runtime_error bindings::papuga_error_exception( const papuga_ErrorCode& ec,
 		case papuga_BufferOverflowError: return strus::runtime_error(_TXT("buffer owerflow error in %s"), where);
 		case papuga_OutOfRangeError: return strus::runtime_error(_TXT("argument out of range in %s"), where);
 		case papuga_NofArgsError: return strus::runtime_error(_TXT("number of arguments do not match in %s"), where);
-		case papuga_MissingSelf: return strus::runtime_error(_TXT("illegal callof method without self reference in %s"), where);
+		case papuga_MissingSelf: return strus::runtime_error(_TXT("illegal call of method without self reference in %s"), where);
+		case papuga_InvalidAccess: return strus::runtime_error(_TXT("invalid access (illegal pointer) in %s"), where);
 	}
 	throw strus::runtime_error(_TXT("internal: exception without known cause in %s"), where);
 }

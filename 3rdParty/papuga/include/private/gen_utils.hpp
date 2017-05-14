@@ -9,13 +9,18 @@
 /// \file private/gen_utils.hpp
 #ifndef _PAPUGA_GEN_UTILS_HPP_INCLUDED
 #define _PAPUGA_GEN_UTILS_HPP_INCLUDED
+#include "papuga/interfaceDescription.h"
 #include <string>
+#include <map>
 #include <stdexcept>
 
 namespace papuga {
 
 std::string cppCodeSnippet( unsigned int idntcnt, ...);
 std::runtime_error runtime_error( const char* msg, ...);
+
+typedef std::map<unsigned int,const papuga_ClassDescription*> ClassDescriptionMap;
+ClassDescriptionMap getClassDescriptionMap( const papuga_InterfaceDescription& descr);
 
 }//namespace
 #endif
