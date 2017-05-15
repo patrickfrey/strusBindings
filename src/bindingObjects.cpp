@@ -671,13 +671,13 @@ static strus::NumericVariant numericVariant( const Variant& val)
 		case Variant_UNDEFINED:
 			break;
 		case Variant_INT:
-			rt = (int)val.getInt();
+			rt = (int64_t)val.getInt();
 			break;
 		case Variant_UINT:
-			rt = (unsigned int)val.getUInt();
+			rt = (uint64_t)val.getUInt();
 			break;
 		case Variant_FLOAT:
-			rt = (float)val.getFloat();
+			rt = (double)val.getFloat();
 			break;
 		case Variant_TEXT:
 			if (!rt.initFromString( val.getText()))
