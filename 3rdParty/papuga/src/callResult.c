@@ -12,6 +12,7 @@
 #include "papuga/serialization.h"
 #include "papuga/hostObjectReference.h"
 #include "papuga/stringBuffer.h"
+#include "papuga/errors.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
