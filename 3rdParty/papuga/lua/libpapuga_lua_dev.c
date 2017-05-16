@@ -412,13 +412,10 @@ DLL_PUBLIC void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg)
 DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, const papuga_lua_ClassDefMap* classdefmap, papuga_ErrorCode* errcode)
 {
 	int rt = 0;
-	char* errorstr;
-	const char* str;
-	size_t strsize;
 
 	if (papuga_CallResult_hasError( retval))
 	{
-		errorstr = retval->errorbuf;
+		char* errorstr = retval->errorbuf.ptr;
 		papuga_destroy_CallResult( retval);
 		lua_pushstring( ls, errorstr);
 		lua_error( ls);
@@ -447,7 +444,8 @@ DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* ret
 			break;
 		case papuga_LangString:
 		{
-			str = papuga_ValueVariant_tostring( &retval->value, &retval->valuebuf, &strsize, errcode);
+			size_t strsize;
+			const char* str = papuga_ValueVariant_tostring( &retval->value, &retval->valuebuf, &strsize, errcode);
 			if (!str)
 			{
 				rt = -1;

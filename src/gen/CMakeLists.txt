@@ -30,6 +30,7 @@ add_custom_command(
 		${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp
 	        ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp
 	        ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp
+    DEPENDS   strusBindingsInterfaceGen
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/statistics.hpp

@@ -8,11 +8,13 @@
 /// \brief Representation of a result of a call to papuga language bindings
 /// \file callResult.c
 #include "papuga/typedefs.h"
+#include <stdarg.h>
+#include <stdio.h>
 
 /// \brief Hook for GETTEXT
 #define _TXT(x) x
 
-const char* papuga_ErrorCode_tostring( int errorcode)
+const char* papuga_ErrorCode_tostring( papuga_ErrorCode errorcode)
 {
 	switch (errorcode)
 	{
@@ -27,5 +29,13 @@ const char* papuga_ErrorCode_tostring( int errorcode)
 		case papuga_MissingSelf: return _TXT("self argument is missing");
 		default: return _TXT("unknown error");
 	}
+}
+
+void papuga_ErrorBuffer_reportError( papuga_ErrorBuffer* self, const char* msg, ...)
+{
+	va_list ap;
+	va_start(ap, msg);
+	vsnprintf( self->ptr, self->size, msg, ap);
+	va_end(ap);
 }
 

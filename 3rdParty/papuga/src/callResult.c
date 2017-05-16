@@ -23,7 +23,6 @@ static void init_CallResult_structures( papuga_CallResult* self)
 	papuga_init_HostObjectReference( &self->object, 0, 0);
 	papuga_init_Serialization( &self->serialization);
 	papuga_init_StringBuffer( &self->valuebuf);
-	self->errorbuf[0] = 0;
 }
 
 void papuga_destroy_CallResult( papuga_CallResult* self)
@@ -36,8 +35,7 @@ void papuga_destroy_CallResult( papuga_CallResult* self)
 void papuga_init_CallResult( papuga_CallResult* self, char* errorbuf, size_t errorbufsize)
 {
 	init_CallResult_structures( self);
-	self->errorbuf = errorbuf;
-	self->errorbufsize = errorbufsize;
+	papuga_init_ErrorBuffer( &self->errorbuf, errorbuf, errorbufsize);
 }
 
 void papuga_set_CallResult_int( papuga_CallResult* self, papuga_IntType val)
@@ -114,7 +112,11 @@ void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ..
 {
 	va_list ap;
 	va_start(ap, msg);
-	vsnprintf( self->errorbuf, self->errorbufsize, msg, ap);
+	size_t nn = vsnprintf( self->errorbuf.ptr, self->errorbuf.size, msg, ap);
+	if (nn >= self->errorbuf.size-1)
+	{
+		self->errorbuf.ptr[ self->errorbuf.size-1] = 0;
+	}
 	va_end(ap);
 }
 

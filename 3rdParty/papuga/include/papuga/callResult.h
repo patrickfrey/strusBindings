@@ -33,8 +33,8 @@ void papuga_set_CallResult_serialization( papuga_CallResult* self);
 void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy);
 
 void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ...);
-#define papuga_CallResult_hasError( self)		((self)->errorbuf[0] != 0)
-#define papuga_CallResult_lastError( self)		((self)->errorbuf)
+#define papuga_CallResult_hasError( self)		((self)->errorbuf.ptr[0] != 0)
+#define papuga_CallResult_lastError( self)		((self)->errorbuf.ptr)
 
 #ifdef __cplusplus
 }

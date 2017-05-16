@@ -37,6 +37,13 @@ typedef enum papuga_ErrorCode
 	papuga_InvalidAccess=9
 } papuga_ErrorCode;
 
+/// \brief Static buffer for error message
+typedef struct papuga_ErrorBuffer
+{
+	char* ptr;
+	size_t size;
+} papuga_ErrorBuffer;
+
 /// \brief Object of the host environment
 typedef void papuga_HostObjectType;
 
@@ -137,8 +144,7 @@ typedef struct papuga_CallResult
 	papuga_HostObjectReference object;	///< reference (with or without ownership) to an object that lives in the host environment
 	papuga_Serialization serialization;	///< serialization of the result in case of a structure
 	papuga_StringBuffer valuebuf;		///< buffer for values (strings) that have to be copied
-	char* errorbuf;				///< buffer for error messages
-	size_t errorbufsize;			///< sizeof errorbuf in bytes
+	papuga_ErrorBuffer errorbuf;		///< static buffer for error message
 } papuga_CallResult;
 
 #ifdef __cplusplus

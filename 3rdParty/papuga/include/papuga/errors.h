@@ -14,7 +14,13 @@
 extern "C" {
 #endif
 
-const char* papuga_ErrorCode_tostring( int errorcode);
+const char* papuga_ErrorCode_tostring( papuga_ErrorCode errorcode);
+
+#define papuga_init_ErrorBuffer( buf, ptr_, size_)			{(buf)->ptr = (ptr_); (buf)->size = (size_); (buf)->ptr[0]=0;}
+
+void papuga_ErrorBuffer_reportError( papuga_ErrorBuffer* self, const char* msg, ...);
+#define papuga_ErrorBuffer_hasError( self)		((self)->ptr[0] != 0)
+#define papuga_ErrorBuffer_lastError( self)		((self)->ptr)
 
 #ifdef __cplusplus
 }
