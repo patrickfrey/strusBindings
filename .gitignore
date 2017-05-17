@@ -56,7 +56,7 @@ dist/redhat/strusbindings.spec
 lang/java
 lang/php
 lang/python
-include/strus/bindings/lua.h
+include/strus/lib/lua.h
 src/lang/lua/libstrus_bindings_lua.c
 src/bindings/libstrus_bindings_description.cpp
 include/strus/lib/bindings_description.hpp

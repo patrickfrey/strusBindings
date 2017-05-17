@@ -63,6 +63,14 @@ if(NOT STRUS_ALL)
 include( cmake/report_build_settings.cmake )
 endif()
 
+# Install header files:
+install(DIRECTORY include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.h")
+
 if(NOT STRUS_ALL)
 include( cmake/standard_targets.cmake )
 endif()

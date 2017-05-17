@@ -22,28 +22,25 @@ link_directories(
 )
 
 add_custom_command(
-    OUTPUT     ${CMAKE_BINARY_DIR}/include/strus/bindings/lua.h
+    OUTPUT     ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h
     DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen
-    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua header ${CMAKE_BINARY_DIR}/include/strus/bindings/lua.h
-    COMMENT  "Generating Lua module header"
+    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua header ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h
+    COMMENT  "Generating Lua module header include/strus/lib/lua.h"
     VERBATIM
  )
 
 add_custom_command(
     OUTPUT     libstrus_bindings_lua.c
     DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen
-    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua module libstrus_bindings_lua.c include=strus/bindings/lua.h
-    COMMENT  "Generating Lua module source"
+    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua module libstrus_bindings_lua.c include=strus/lib/lua.h
+    COMMENT  "Generating Lua module source libstrus_bindings_lua.c"
     VERBATIM
  )
  
  add_custom_target(
     lua_mod ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/include/strus/bindings/lua.h libstrus_bindings_lua.c papuga_lua_gen
+    DEPENDS ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h libstrus_bindings_lua.c papuga_lua_gen
 )
-
-set_source_files_properties( strus_lua.h PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( libstrus_bindings_lua.c PROPERTIES GENERATED TRUE ) 
 
 # ------------------------------
 # LIBRARIES
