@@ -27,7 +27,7 @@ namespace bindings {
 class ExpressionBuilder
 {
 public:
-	virtual ~ExpressionBuilder();
+	virtual ~ExpressionBuilder(){}
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length)=0;
 	virtual void pushTerm( const std::string& type, const std::string& value)=0;
 	virtual void pushTerm( const std::string& type)=0;

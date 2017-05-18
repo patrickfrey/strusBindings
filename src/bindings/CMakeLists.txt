@@ -63,7 +63,7 @@ target_link_libraries( strus_bindingsimpl strus_storage_objbuild strus_analyzer_
 
 add_library( strus_bindings SHARED ${bindings_source_files} )
 add_dependencies( strus_bindings  strus_bindings_c_interface )
-target_link_libraries( strus_bindings strus_bindingsimpl strus_base strus_error )
+target_link_libraries( strus_bindings strus_bindingsimpl strus_base strus_error papuga_devel )
 
 add_library( strus_bindings_description SHARED libstrus_bindings_description.cpp )
 add_dependencies( strus_bindings_description  strus_bindings_c_interface )

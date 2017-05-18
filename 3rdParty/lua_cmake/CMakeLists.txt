@@ -1,10 +1,18 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
+if ( WIN32 )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLUA_USE_WINDOWS" )
+endif( WIN32 )
+if( APPLE )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLUA_USE_MACOSX" )
+endif( APPLE )
+if( UNIX )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLUA_USE_LINUX" )
+endif( UNIX )
+
 # --------------------------------------
 # SOURCES AND INCLUDES
 # --------------------------------------
-# Subdirectories:
-
 set( source_files
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lapi.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lauxlib.c

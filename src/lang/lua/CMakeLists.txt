@@ -48,13 +48,13 @@ add_custom_command(
 add_library( strus_bindings_lua SHARED libstrus_bindings_lua.c )
 add_dependencies( strus_bindings_lua lua_mod )
 
-target_link_libraries( strus_bindings_lua strus_bindings strus_lua )
+target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bindings strus_lua )
 
 # ------------------------------
 # PROGRAMS
 # ------------------------------
-add_executable( strusLua strusLua.cpp )
-target_link_libraries( strusLua  strus_lua ${Intl_LIBRARIES} )
+add_executable( strusLua strusLua.c )
+target_link_libraries( strusLua  strus_bindings_lua papuga_devel strus_lua m dl ${Intl_LIBRARIES} )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )
