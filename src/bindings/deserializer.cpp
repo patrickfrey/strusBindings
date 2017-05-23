@@ -286,9 +286,12 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	if (options.valuetype != papuga_Serialized)
 	{
 		analyzer::FeatureOptions rt;
-		if (!setFeatureOption_position( rt, options))
+		if (papuga_ValueVariant_defined( &options))
 		{
-			throw strus::runtime_error(_TXT("expected feature option (position bind value)"));
+			if (!setFeatureOption_position( rt, options))
+			{
+				throw strus::runtime_error(_TXT("expected feature option (position bind value)"));
+			}
 		}
 		return rt;
 	}
@@ -1165,7 +1168,7 @@ static void buildExpressionJoin(
 	static const char* context = _TXT("join expression");
 	static const StructureNameMap joinop_namemap( "variable,join,range,cardinality,arg", ',');
 	enum StructureNameId {JO_variable=0,JO_join=1, JO_range=2, JO_cardinality=3, JO_arg=4};
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
@@ -1176,7 +1179,7 @@ static void buildExpressionJoin(
 		unsigned int argc = 0;
 		int range = 0;
 		unsigned int cardinality = 0;
-
+		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
 		if (si->tag == papuga_TagName)

@@ -48,7 +48,7 @@ public:
 		const std::string& selectexpr,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers,
-		const ValueVariant& options);
+		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
 	/// \param[in] type type of the features produced
@@ -61,7 +61,7 @@ public:
 		const std::string& selectexpr,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers,
-		const ValueVariant& options);
+		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
@@ -101,7 +101,7 @@ public:
 		const std::string& type,
 		const std::string& patternTypeName,
 		const ValueVariant& normalizers,
-		const ValueVariant& options);
+		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a result of pattern matching as feature to insert into the forward index, normalized
 	/// \param[in] type type name of the feature to produce.
@@ -112,7 +112,7 @@ public:
 		const std::string& type,
 		const std::string& patternTypeName,
 		const ValueVariant& normalizers,
-		const ValueVariant& options);
+		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a result of pattern matching to insert as metadata, normalized
 	/// \param[in] fieldname field name of the meta data element to produce.

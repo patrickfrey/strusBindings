@@ -55,7 +55,7 @@ void papuga_lua_error( lua_State* ls, const char* function, papuga_ErrorCode err
 void papuga_lua_error_str( lua_State* ls, const char* function, const char* errormsg);
 
 /// \brief Function that fills a structure with the arguments passed in the lua context for papuga
-bool papuga_lua_init_CallArgs( lua_State *ls, papuga_lua_CallArgs* arg,
+bool papuga_lua_init_CallArgs( lua_State *ls, int argc, papuga_lua_CallArgs* arg,
 				const char* classname, const papuga_lua_ClassDefMap* classdefmap);
 
 /// \brief Frees the arguments of a papuga call (to call after the call)

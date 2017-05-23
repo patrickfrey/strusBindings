@@ -44,7 +44,6 @@ set( source_files
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/ltablib.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/ltests.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/ltm.c
-	${PROJECT_SOURCE_DIR}/3rdParty/lua/lua.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lundump.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lutf8lib.c
 	${PROJECT_SOURCE_DIR}/3rdParty/lua/lvm.c
@@ -63,4 +62,22 @@ link_directories(
 # LIBRARIES
 # ------------------------------
 add_library( strus_lua STATIC ${source_files} )
+
+# ------------------------------
+# PROGRAMS
+# ------------------------------
+# add_executable( lua ${PROJECT_SOURCE_DIR}/3rdParty/lua/lua.c )
+# target_link_libraries( lua strus_lua m dl ${Intl_LIBRARIES} )
+
+# FreeBSD needs kernel data access library for libuv (-libkvm)
+# find_library( LIBKVM_LIBRARIES kvm )
+# if(LIBKVM_LIBRARIES)
+#        target_link_libraries( lua ${LIBKVM_LIBRARIES} )
+# endif()
+
+# ------------------------------
+# INSTALLATION
+# ------------------------------
+# install( TARGETS lua
+#            RUNTIME DESTINATION bin )
 

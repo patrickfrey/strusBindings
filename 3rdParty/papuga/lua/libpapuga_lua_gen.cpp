@@ -21,6 +21,11 @@ using namespace papuga;
 
 #define INDENT "\t"
 
+static std::string namespace_classname( const std::string& modulename, const std::string& classname)
+{
+	return modulename + '_' + classname;
+}
+
 static void define_classdefmap(
 		std::ostream& out,
 		const papuga_InterfaceDescription& descr)
@@ -41,7 +46,7 @@ static void define_classdefmap(
 		{
 			out << "{NULL, NULL}";
 		}
-		out << "{\"" << ci->second->name << "\", &" << ci->second->funcname_destructor << "}, ";
+		out << "{\"" << namespace_classname( descr.name, ci->second->name) << "\", &" << ci->second->funcname_destructor << "}, ";
 	}
 	out << "{ NULL, NULL }};" << std::endl << std::endl;
 	out << "static const papuga_lua_ClassDefMap g_classdefmap = { " << cidx << ", g_classdefar };"
@@ -50,33 +55,35 @@ static void define_classdefmap(
 
 static void define_method(
 		std::ostream& out,
+		const papuga_InterfaceDescription& descr,
 		const papuga_ClassDescription& classdef,
 		const papuga_MethodDescription& method)
 {
-	std::string selfname = (method.self) ? (std::string("\"") + classdef.name + "\""):std::string("NULL");
+	std::string selfname = (method.self) ? (std::string("\"") + namespace_classname( descr.name, classdef.name) + "\""):std::string("NULL");
 
 	out << fmt::format( papuga::cppCodeSnippet( 0,
-		"static int l_{classname}_{methodname}( lua_State *ls)",
+		"static int l_{nsclassname}_{methodname}( lua_State *ls)",
 		"{",
 		"int rt;",
 		"papuga_lua_CallArgs arg;",
 		"papuga_CallResult retval;",
 		"char errbuf[ 2048];",
-		"if (!papuga_lua_init_CallArgs( ls, &arg, {selfname}, &g_classdefmap)) papuga_lua_error( ls, \"{classname}.{methodname}\", arg.errcode);",
+		"if (!papuga_lua_init_CallArgs( ls, lua_gettop(ls), &arg, {selfname}, &g_classdefmap)) papuga_lua_error( ls, \"{nsclassname}.{methodname}\", arg.errcode);",
 		"papuga_init_CallResult( &retval, errbuf, sizeof(errbuf));",
 		"if (!{funcname}( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;",
 		"papuga_lua_destroy_CallArgs( &arg);",
 		"rt = papuga_lua_move_CallResult( ls, &retval, &g_classdefmap, &arg.errcode);",
-		"if (rt < 0) papuga_lua_error( ls, \"{classname}.{methodname}\", arg.errcode);",
+		"if (rt < 0) papuga_lua_error( ls, \"{nsclassname}.{methodname}\", arg.errcode);",
 		"return rt;",
 		"ERROR_CALL:",
 		"papuga_destroy_CallResult( &retval);",
 		"papuga_lua_destroy_CallArgs( &arg);",
-		"papuga_lua_error_str( ls, \"{classname}.{methodname}\", errbuf);",
+		"papuga_lua_error_str( ls, \"{nsclassname}.{methodname}\", errbuf);",
 		"return 0; //... never get here (papuga_lua_error_str exits)",
 		"}",
 		0),
 			fmt::arg("methodname", method.name),
+			fmt::arg("nsclassname", namespace_classname( descr.name, classdef.name)),
 			fmt::arg("classname", classdef.name),
 			fmt::arg("selfname", selfname),
 			fmt::arg("funcname", method.funcname)
@@ -85,16 +92,17 @@ static void define_method(
 
 static void define_constructor(
 		std::ostream& out,
+		const papuga_InterfaceDescription& descr,
 		const papuga_ClassDescription& classdef)
 {
 	out << fmt::format( papuga::cppCodeSnippet( 0,
-		"static int l_new_{classname}( lua_State *ls)",
+		"static int l_new_{nsclassname}( lua_State *ls)",
 		"{",
 		"papuga_lua_CallArgs arg;",
 		"papuga_ErrorBuffer errbufstruct;",
 		"char errbuf[ 2048];",
-		"papuga_lua_UserData* udata = papuga_lua_new_userdata( ls, \"{classname}\");",
-		"if (!papuga_lua_init_CallArgs( ls, &arg, NULL, &g_classdefmap)) papuga_lua_error( ls, \"{classname}.new\", arg.errcode);",
+		"papuga_lua_UserData* udata = papuga_lua_new_userdata( ls, \"{nsclassname}\");",
+		"if (!papuga_lua_init_CallArgs( ls, lua_gettop(ls)-1, &arg, NULL, &g_classdefmap)) papuga_lua_error( ls, \"{nsclassname}.new\", arg.errcode);",
 		"papuga_init_ErrorBuffer( &errbufstruct, errbuf, sizeof(errbuf));",
 		"void* objref = {constructor}( &errbufstruct, arg.argc, arg.argv);",
 		"if (!objref) goto ERROR_CALL;",
@@ -104,11 +112,12 @@ static void define_constructor(
 		"ERROR_CALL:",
 		"papuga_lua_destroy_CallArgs( &arg);",
 		"lua_pop(ls, 1);//... pop udata"
-		"papuga_lua_error_str( ls, \"{classname}.new\", errbuf);",
+		"papuga_lua_error_str( ls, \"{nsclassname}.new\", errbuf);",
 		"return 0; //... never get here (papuga_lua_error_str exits)",
 		"}",
 		0),
 			fmt::arg("classname", classdef.name),
+			fmt::arg("nsclassname", namespace_classname( descr.name, classdef.name)),
 			fmt::arg("classid", classdef.id),
 			fmt::arg("constructor", classdef.funcname_constructor),
 			fmt::arg("destructor", classdef.funcname_destructor)
@@ -117,21 +126,25 @@ static void define_constructor(
 
 static void define_methodtable(
 		std::ostream& out,
+		const papuga_InterfaceDescription& descr,
 		const papuga_ClassDescription& classdef)
 {
 	out << fmt::format( papuga::cppCodeSnippet( 0,
-			"static const luaL_Reg mt_{classname}[] =", "{", 0),
-			fmt::arg("classname", classdef.name));
+			"static const luaL_Reg mt_{nsclassname}[] =", "{", 0),
+			fmt::arg("classname", classdef.name),
+			fmt::arg("nsclassname", namespace_classname( descr.name, classdef.name)));
 	std::size_t mi = 0;
 	if (classdef.funcname_constructor)
 	{
-		out << fmt::format( papuga::cppCodeSnippet( 1, "{{ \"new\", &l_new_{classname} }},", 0),
-				fmt::arg("classname", classdef.name));
+		out << fmt::format( papuga::cppCodeSnippet( 1, "{{ \"new\", &l_new_{nsclassname} }},", 0),
+				fmt::arg("classname", classdef.name),
+				fmt::arg("nsclassname", namespace_classname( descr.name, classdef.name)));
 	}
 	for (; classdef.methodtable[mi].name; ++mi)
 	{
-		out << fmt::format( papuga::cppCodeSnippet( 1, "{{ \"{methodname}\", &l_{classname}_{methodname} }},", 0),
+		out << fmt::format( papuga::cppCodeSnippet( 1, "{{ \"{methodname}\", &l_{nsclassname}_{methodname} }},", 0),
 				fmt::arg("classname", classdef.name),
+				fmt::arg("nsclassname", namespace_classname( descr.name, classdef.name)),
 				fmt::arg("methodname", classdef.methodtable[mi].name));
 	}
 	out << "\t" << "{0,0}" << "};" << std::endl << std::endl;
@@ -152,11 +165,12 @@ static void define_main(
 	{
 		const papuga_ClassDescription& classdef = descr.classes[ci];
 		out << fmt::format( papuga::cppCodeSnippet( 1,
-			"papuga_lua_declare_class( ls, {classid}, \"{modulename}_{classname}\", mt_{classname}, {destructor});",
+			"papuga_lua_declare_class( ls, {classid}, \"{nsclassname}\", mt_{nsclassname}, {destructor});",
 			0),
 			fmt::arg("modulename", descr.name),
 			fmt::arg("classid", classdef.id),
 			fmt::arg("classname", classdef.name),
+			fmt::arg("nsclassname", namespace_classname( descr.name, classdef.name)),
 			fmt::arg("destructor", classdef.funcname_destructor)
 		);
 	}
@@ -224,14 +238,14 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 				const papuga_ClassDescription& classdef = descr.classes[ci];
 				if (classdef.funcname_constructor)
 				{
-					define_constructor( out, classdef);
+					define_constructor( out, descr, classdef);
 				}
 				std::size_t mi = 0;
 				for (; classdef.methodtable[mi].name; ++mi)
 				{
-					define_method( out, classdef, classdef.methodtable[mi]);
+					define_method( out, descr, classdef, classdef.methodtable[mi]);
 				}
-				define_methodtable( out, classdef);
+				define_methodtable( out, descr, classdef);
 			}
 			define_main( out, descr);
 		}

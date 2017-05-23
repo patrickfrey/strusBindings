@@ -11,13 +11,6 @@
 /// \file valueVariant.h
 #include "papuga/typedefs.h"
 
-#ifdef _MSC_VER
-#error stdint definitions missing for Windows
-#else
-#include <stdint.h>
-#endif
-#include <string.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,9 +36,9 @@ extern "C" {
 #define papuga_ValueVariant_defined(self)			((self)->valuetype!=papuga_Void)
 
 /// \brief Type check
-#define papuga_ValueVariant_isnumeric(self)			(0!=((self)->valuetype & papuga_NumericTypeMask))
-#define papuga_ValueVariant_isatomic(self)			(0!=((self)->valuetype & papuga_AtomicTypeMask))
-#define papuga_ValueVariant_isstring(self)			(0!=((self)->valuetype & papuga_StringTypeMask))
+#define papuga_ValueVariant_isnumeric(self)			(0!=((1U << (self)->valuetype) & papuga_NumericTypeMask))
+#define papuga_ValueVariant_isatomic(self)			(0!=((1U << (self)->valuetype) & papuga_AtomicTypeMask))
+#define papuga_ValueVariant_isstring(self)			(0!=((1U << (self)->valuetype) & papuga_StringTypeMask))
 
 /// \brief Conversion functions
 const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* value, papuga_StringBuffer* buf, size_t* len, papuga_ErrorCode* err);

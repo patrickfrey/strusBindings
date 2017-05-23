@@ -343,7 +343,15 @@ SegmenterDef::SegmenterDef( Serialization::const_iterator& si, const Serializati
 
 	if (si != se && si->tag == papuga_TagValue)
 	{
-		segmenter = Deserializer::getString( si, se);
+		mimetype = Deserializer::getString( si, se);
+		if (si != se && si->tag == papuga_TagValue)
+		{
+			encoding = Deserializer::getString( si, se);
+		}
+		if (si != se && si->tag == papuga_TagValue)
+		{
+			scheme = Deserializer::getString( si, se);
+		}
 		Deserializer::consumeClose( si, se);
 	}
 	unsigned char defined[4] = {0,0,0,0};

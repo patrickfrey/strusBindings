@@ -37,7 +37,7 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 	else if (ctx.valuetype == papuga_Serialized)
 	{
 		Serialization::const_iterator si = Serialization::begin( ctx.value.serialization);
-		return SegmenterDef( si, Serialization::begin( ctx.value.serialization));
+		return SegmenterDef( si, Serialization::end( ctx.value.serialization));
 	}
 	else
 	{

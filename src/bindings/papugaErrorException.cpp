@@ -27,6 +27,7 @@ std::runtime_error bindings::papuga_error_exception( const papuga_ErrorCode& ec,
 		case papuga_NofArgsError: return strus::runtime_error(_TXT("number of arguments do not match in %s"), where);
 		case papuga_MissingSelf: return strus::runtime_error(_TXT("illegal call of method without self reference in %s"), where);
 		case papuga_InvalidAccess: return strus::runtime_error(_TXT("invalid access (illegal pointer) in %s"), where);
+		case papuga_UnexpectedEof: return strus::runtime_error(_TXT("unexpected end of serialization in %s"), where);
 	}
 	throw strus::runtime_error(_TXT("internal: exception without known cause in %s"), where);
 }

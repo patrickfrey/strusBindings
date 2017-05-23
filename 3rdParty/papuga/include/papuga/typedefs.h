@@ -34,7 +34,8 @@ typedef enum papuga_ErrorCode
 	papuga_OutOfRangeError=6,
 	papuga_NofArgsError=7,
 	papuga_MissingSelf=8,
-	papuga_InvalidAccess=9
+	papuga_InvalidAccess=9,
+	papuga_UnexpectedEof=10
 } papuga_ErrorCode;
 
 /// \brief Static buffer for error message

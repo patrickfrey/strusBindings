@@ -23,21 +23,21 @@ using namespace strus::bindings;
 
 int64_t ValueVariantWrap::toint64( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	int64_t rt = papuga_ValueVariant_toint( &value, &err);
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("toint64 of variant value"));
 	return rt;
 }
 uint64_t ValueVariantWrap::touint64( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	uint64_t rt = papuga_ValueVariant_touint( &value, &err);
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("touint64 of variant value"));
 	return rt;
 }
 int ValueVariantWrap::toint( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	int64_t rt = papuga_ValueVariant_toint( &value, &err);
 	if (rt > std::numeric_limits<int>::max() || rt < std::numeric_limits<int>::min()) err = papuga_OutOfRangeError;
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("toint of variant value"));
@@ -45,7 +45,7 @@ int ValueVariantWrap::toint( const papuga_ValueVariant& value)
 }
 unsigned int ValueVariantWrap::touint( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	uint64_t rt = papuga_ValueVariant_toint( &value, &err);
 	if (rt > std::numeric_limits<unsigned int>::max()) err = papuga_OutOfRangeError;
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("toint of variant value"));
@@ -53,7 +53,7 @@ unsigned int ValueVariantWrap::touint( const papuga_ValueVariant& value)
 }
 Index ValueVariantWrap::toindex( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	int64_t rt = papuga_ValueVariant_toint( &value, &err);
 	if (rt > std::numeric_limits<Index>::max() || rt < std::numeric_limits<Index>::min()) err = papuga_OutOfRangeError;
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("toindex of variant value"));
@@ -61,21 +61,21 @@ Index ValueVariantWrap::toindex( const papuga_ValueVariant& value)
 }
 double ValueVariantWrap::todouble( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	double rt = papuga_ValueVariant_todouble( &value, &err);
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("todouble of variant value"));
 	return rt;
 }
 bool ValueVariantWrap::tobool( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	double rt = papuga_ValueVariant_tobool( &value, &err);
 	if (err != papuga_Ok) throw papuga_error_exception( err, _TXT("tobool of variant value"));
 	return rt;
 }
 strus::NumericVariant ValueVariantWrap::tonumeric( const papuga_ValueVariant& value)
 {
-	papuga_ErrorCode err;
+	papuga_ErrorCode err = papuga_Ok;
 	papuga_ValueVariant numval;
 	if (!papuga_ValueVariant_tonumeric( &value, &numval, &err))
 	{

@@ -72,13 +72,27 @@ void papuga_set_CallResult_string_const( papuga_CallResult* self, const char* va
 
 void papuga_set_CallResult_charp( papuga_CallResult* self, const char* val)
 {
-	char* val_copy = papuga_StringBuffer_copy_charp( &self->valuebuf, val);
-	papuga_init_ValueVariant_charp( &self->value, val_copy);
+	if (val)
+	{
+		char* val_copy = papuga_StringBuffer_copy_charp( &self->valuebuf, val);
+		papuga_init_ValueVariant_charp( &self->value, val_copy);
+	}
+	else
+	{
+		papuga_init_ValueVariant( &self->value);
+	}
 }
 
 void papuga_set_CallResult_charp_const( papuga_CallResult* self, const char* val)
 {
-	papuga_init_ValueVariant_charp( &self->value, val);
+	if (val)
+	{
+		papuga_init_ValueVariant_charp( &self->value, val);
+	}
+	else
+	{
+		papuga_init_ValueVariant( &self->value);
+	}
 }
 
 void papuga_set_CallResult_langstring_const( papuga_CallResult* self, papuga_StringEncoding enc, const void* val, size_t valsize)
