@@ -32,6 +32,7 @@ CMakeFiles
 Makefile
 cmake_install.cmake
 cmake_install.cmake.user
+build_rules.cmake.user
 install_manifest.txt
 CTestTestfile.cmake
 CMakeLists.txt.user
