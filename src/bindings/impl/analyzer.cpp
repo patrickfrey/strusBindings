@@ -10,16 +10,16 @@
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "papugaSerialization.hpp"
+#include "papuga/serialization.hpp"
+#include "papuga/exceptions.hpp"
+#include "papuga/valueVariant.hpp"
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
-#include "papugaErrorException.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
 #include "utils.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
-#include "papuga/valueVariant.hpp"
 #include "impl/analyzedQuery.hpp"
 
 using namespace strus;
@@ -30,14 +30,14 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 	if (papuga_ValueVariant_isstring( &ctx))
 	{
 		papuga_ErrorCode err = papuga_Ok;
-		SegmenterDef segdef( papuga::ValueVariant_tostring( &ctx, err));
-		if (err != papuga_Ok) throw papuga_error_exception( err, "segmenter definition");
+		SegmenterDef segdef( papuga::ValueVariant_tostring( ctx, err));
+		if (err != papuga_Ok) throw papuga::error_exception( err, "segmenter definition");
 		return segdef;
 	}
 	else if (ctx.valuetype == papuga_Serialized)
 	{
-		Serialization::const_iterator si = Serialization::begin( ctx.value.serialization);
-		return SegmenterDef( si, Serialization::end( ctx.value.serialization));
+		papuga::Serialization::const_iterator si = papuga::Serialization::begin( ctx.value.serialization);
+		return SegmenterDef( si, papuga::Serialization::end( ctx.value.serialization));
 	}
 	else
 	{

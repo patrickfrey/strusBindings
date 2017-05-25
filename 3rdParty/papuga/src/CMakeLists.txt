@@ -5,10 +5,12 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 set( source_files
 	stringBuffer.c
-	valueVariant.cpp
 	serialization.c
 	callResult.c
 	errors.c
+	valueVariant.cpp
+	serialization.cpp
+	exceptions.cpp
 )
 
 include_directories(
@@ -25,4 +27,5 @@ link_directories(
 # LIBRARIES
 # ------------------------------
 add_library( papuga_devel STATIC ${source_files} )
+
 

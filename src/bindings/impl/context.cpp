@@ -11,6 +11,8 @@
 #include "impl/statistics.hpp"
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
+#include "papuga/valueVariant.hpp"
+#include "papuga/exceptions.hpp"
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"
 #include "strus/lib/module.hpp"
@@ -36,13 +38,10 @@
 #include "strus/constants.hpp"
 #include "strus/base/configParser.hpp"
 #include "internationalization.hpp"
-#include "papuga/valueVariant.hpp"
-#include "internationalization.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
 #include "structDefs.hpp"
 #include "traceUtils.hpp"
-#include "papugaErrorException.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -72,14 +71,14 @@ static ContextDef parseContext( const ValueVariant& ctx)
 	if (papuga_ValueVariant_isstring( &ctx))
 	{
 		papuga_ErrorCode err = papuga_Ok;
-		ContextDef rt( papuga::ValueVariant_tostring( &ctx, err));
-		if (err != papuga_Ok) throw papuga_error_exception( err, "context definition");
+		ContextDef rt( papuga::ValueVariant_tostring( ctx, err));
+		if (err != papuga_Ok) throw papuga::error_exception( err, "context definition");
 		return rt;
 	}
 	else if (ctx.valuetype == papuga_Serialized)
 	{
-		Serialization::const_iterator si = Serialization::begin( ctx.value.serialization);
-		return ContextDef( si, Serialization::end( ctx.value.serialization));
+		papuga::Serialization::const_iterator si = papuga::Serialization::begin( ctx.value.serialization);
+		return ContextDef( si, papuga::Serialization::end( ctx.value.serialization));
 	}
 	else
 	{

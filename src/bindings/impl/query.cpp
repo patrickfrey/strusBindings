@@ -7,13 +7,13 @@
  */
 #include "impl/query.hpp"
 #include "impl/storage.hpp"
+#include "papuga/serialization.hpp"
 #include "metadataop.hpp"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "internationalization.hpp"
-#include "papugaSerialization.hpp"
 #include "valueVariantWrap.hpp"
 #include "callResultUtils.hpp"
 #include "deserializer.hpp"
@@ -183,9 +183,9 @@ void QueryImpl::setWeightingVariables(
 	{
 		throw strus::runtime_error(_TXT("list of variable assignments expected as argument"));
 	}
-	Serialization::const_iterator
-		si = Serialization::begin( parameter.value.serialization),
-		se = Serialization::end( parameter.value.serialization);
+	papuga::Serialization::const_iterator
+		si = papuga::Serialization::begin( parameter.value.serialization),
+		se = papuga::Serialization::end( parameter.value.serialization);
 	while (si != se)
 	{
 		ConfigDef assignment( si, se);

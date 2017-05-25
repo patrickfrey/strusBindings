@@ -14,7 +14,7 @@
 
 namespace papuga {
 
-std::string ValueVariant_tostring( const papuga_ValueVariant* value, papuga_ErrorCode& errcode);
+std::string ValueVariant_tostring( const papuga_ValueVariant& value, papuga_ErrorCode& errcode);
 
 }//namespace
 #endif

@@ -11,7 +11,6 @@ set( bindingsimpl_source_files
 	metadataop.cpp
 	serializer.cpp
 	deserializer.cpp
-	papugaErrorException.cpp
 	valueVariantWrap.cpp
 	utils.cpp
 	traceUtils.cpp

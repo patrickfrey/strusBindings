@@ -72,5 +72,8 @@ src/lang/lua/strusLua
 
 # Generated test data
 tests/query_cpp/storage/
+tests/data/t3s/storage
+tests/data/chinese_poem/storage
+tests/data/ft_smart/storage
 
 

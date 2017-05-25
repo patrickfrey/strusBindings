@@ -21,7 +21,7 @@
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/base/configParser.hpp"
-#include "papugaSerialization.hpp"
+#include "papuga/serialization.hpp"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "internationalization.hpp"

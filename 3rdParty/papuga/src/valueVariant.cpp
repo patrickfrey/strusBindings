@@ -532,26 +532,26 @@ extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* 
 	}
 }
 
-std::string papuga::ValueVariant_tostring( const papuga_ValueVariant* value, papuga_ErrorCode& errcode)
+std::string papuga::ValueVariant_tostring( const papuga_ValueVariant& value, papuga_ErrorCode& errcode)
 {
 	try
 	{
-		if (papuga_ValueVariant_isstring( value))
+		if (papuga_ValueVariant_isstring( &value))
 		{
-			if (value->valuetype == papuga_String)
+			if (value.valuetype == papuga_String)
 			{
-				return std::string( value->value.string, value->length);
+				return std::string( value.value.string, value.length);
 			}
-			else//if (value->valuetype == papuga_LangString)
+			else//if (value.valuetype == papuga_LangString)
 			{
-				return any_langstring_to_uft8string_stl( (papuga_StringEncoding)value->encoding, value->value.langstring, value->length);
+				return any_langstring_to_uft8string_stl( (papuga_StringEncoding)value.encoding, value.value.langstring, value.length);
 			}
 		}
-		else if (papuga_ValueVariant_isnumeric( value))
+		else if (papuga_ValueVariant_isnumeric( &value))
 		{
 			char localbuf[256];
 			std::size_t numlen;
-			if (!bufprint_number_variant( localbuf, sizeof(localbuf), numlen, value, &errcode)) return std::string();
+			if (!bufprint_number_variant( localbuf, sizeof(localbuf), numlen, &value, &errcode)) return std::string();
 			return std::string( localbuf, numlen);
 		}
 		else

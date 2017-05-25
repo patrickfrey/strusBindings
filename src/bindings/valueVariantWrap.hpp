@@ -5,17 +5,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _PAPUGA_VALUE_VARIANT_WRAP_HPP_INCLUDED
-#define _PAPUGA_VALUE_VARIANT_WRAP_HPP_INCLUDED
+#ifndef _STRUS_PAPUGA_VALUE_VARIANT_WRAP_HPP_INCLUDED
+#define _STRUS_PAPUGA_VALUE_VARIANT_WRAP_HPP_INCLUDED
 /// \brief Some local value variant wrappers for the strus bindings in C++
 /// \file valueVariantWrap.hpp
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.hpp"
+#include "papuga/exceptions.hpp"
 #include "strus/index.hpp"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
 #include "internationalization.hpp"
-#include "papugaErrorException.hpp"
 
 namespace strus {
 namespace bindings {

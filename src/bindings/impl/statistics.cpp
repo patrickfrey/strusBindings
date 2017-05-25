@@ -15,7 +15,7 @@
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
-#include "papugaSerialization.hpp"
+#include "papuga/serialization.hpp"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "internationalization.hpp"

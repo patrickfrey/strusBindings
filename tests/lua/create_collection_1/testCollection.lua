@@ -2,14 +2,28 @@ require "string"
 
 local function readFile( path)
 	local file = io.open( path, "rb") -- r read mode and b binary mode
-	if not file then return nil end
+	if not file then
+		error( string.format( "could not read file '%s'", path))
+	end
 	local content = file:read "*a" -- *a or *all reads the whole file
 	file:close()
 	return content
 end
 
-function createCollection( datadir, storagename)
-	storagePath = datadir .. "/" .. storagename
+function dump(o)
+	if type(o) == 'table' then
+		local s = '{ '
+		for k,v in pairs(o) do
+			if type(k) ~= 'number' then k = '"'..k..'"' end
+			s = s .. '['..k..'] = ' .. dump(v) .. ','
+		end
+		return s .. '} '
+	else
+		return tostring(o)
+	end
+end
+
+function createCollection( storagePath, datadir, fnams)
 	config = string.format( "path=%s; metadata=doclen UINT16, title_start UINT8, title_end UINT8", storagePath)
 	ctx = strus_Context.new()
 	ctx:loadModule( "analyzer_pattern")
@@ -44,16 +58,15 @@ function createCollection( datadir, storagename)
 	transaction = storage:createTransaction()
 	files = {}
 	idx = 0
-	for fnam in lfs.dir(datadir) do
+	for _,fnam in ipairs(fnams) do
 		local filename = datadir..'/'..fnam
-		local mode = lfs.attributes( fullPath,"mode")
-		if mode=="file" and string.sub( filename,-4) == '.xml' then
+		if string.sub( filename, 1, 1) ~= '.' then
 			idx = idx + 1
 			print( string.format( "%u process document %s", idx, filename))
 			docid = string.sub( filename,-4)
 			doc = analyzer:analyze( readFile( filename))
+			print ("ANALYZED DOC: " .. dump( doc) .. "\n")
 			transaction:insertDocument( docid, doc)
-
 		end
 	end
 	-- Without this the documents wont be inserted:

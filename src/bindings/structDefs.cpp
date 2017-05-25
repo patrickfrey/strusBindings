@@ -10,14 +10,14 @@
 #include "deserializer.hpp"
 #include "papuga/valueVariant.h"
 #include "valueVariantWrap.hpp"
-#include "papugaSerialization.hpp"
+#include "papuga/serialization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
 
 static const papuga_ValueVariant& getValue(
-		Serialization::const_iterator& si,
-		const Serialization::const_iterator& se)
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
 {
 	if (si != se && si->tag == papuga_TagValue)
 	{
@@ -31,7 +31,7 @@ static const papuga_ValueVariant& getValue(
 	}
 }
 
-AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 	:name(),args()
 {
 	static const char* context = _TXT("analyzer function");
@@ -77,7 +77,7 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( Serialization::const_iterator& si, con
 	}
 }
 
-TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 	:variable(),type(),value(),length(1),value_defined(false),length_defined(false)
 {
 	static const char* context = _TXT("term");
@@ -92,6 +92,9 @@ TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_
 	}
 	else if (si->tag == papuga_TagOpen)
 	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
 		if (si->tag == papuga_TagName)
 		{
 			do
@@ -170,7 +173,7 @@ TermDef::TermDef( Serialization::const_iterator& si, const Serialization::const_
 	}
 }
 
-MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 	:from(),to()
 {
 	static const char* context = _TXT("metadata range");
@@ -201,7 +204,7 @@ MetaDataRangeDef::MetaDataRangeDef( Serialization::const_iterator& si, const Ser
 }
 
 
-ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+ConfigDef::ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 	:name(),value()
 {
 	static const char* context = _TXT("configuration");
@@ -256,7 +259,7 @@ ConfigDef::ConfigDef( Serialization::const_iterator& si, const Serialization::co
 }
 
 
-DfChangeDef::DfChangeDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("document frequency change");
 	static const StructureNameMap namemap( "type,value,increment", ',');
@@ -304,7 +307,7 @@ DfChangeDef::DfChangeDef( Serialization::const_iterator& si, const Serialization
 	}
 }
 
-ContextDef::ContextDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+ContextDef::ContextDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("context configuration");
 	static const StructureNameMap namemap( "threads,rpc,trace", ',');
@@ -336,7 +339,7 @@ ContextDef::ContextDef( Serialization::const_iterator& si, const Serialization::
 	Deserializer::consumeClose( si, se);
 }
 
-SegmenterDef::SegmenterDef( Serialization::const_iterator& si, const Serialization::const_iterator& se)
+SegmenterDef::SegmenterDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("segmenter configuration");
 	static const StructureNameMap namemap( "segmenter,mimetype,encoding,scheme", ',');
