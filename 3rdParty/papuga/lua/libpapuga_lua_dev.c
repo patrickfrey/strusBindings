@@ -18,7 +18,7 @@
 #define IS_CONVERTIBLE_TOINT( x)  ((x-floor(x) <= 2*DBL_EPSILON) && x < MAX_DOUBLE_INT && x > MIN_DOUBLE_INT)
 #define NUM_EPSILON               (2*DBL_EPSILON)
 
-#define PAPUGA_LOWLEVEL_DEBUG
+#undef PAPUGA_LOWLEVEL_DEBUG
 #ifdef PAPUGA_LOWLEVEL_DEBUG
 void STACKTRACE( lua_State* ls, const char* where)
 {

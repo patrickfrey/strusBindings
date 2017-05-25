@@ -10,7 +10,7 @@ local function readFile( path)
 	return content
 end
 
-function dump(o)
+function dumpValue(o)
 	if type(o) == 'table' then
 		local s = '{ '
 		for k,v in pairs(o) do
@@ -37,7 +37,7 @@ function createCollection( storagePath, datadir, fnams)
 
 	-- Define the document analyzer to use:
 	analyzer = ctx:createDocumentAnalyzer( {"xml"})
-	
+
 	-- Define the features and attributes to store:
 	analyzer:addSearchIndexFeature( "word", "/doc/text()", "word", {{"stem","en"},"lc",{"convdia","en"}})
 	analyzer:addSearchIndexFeature( "word", "/doc/title()", "word", {{"stem","en"},"lc",{"convdia","en"}})
@@ -63,10 +63,8 @@ function createCollection( storagePath, datadir, fnams)
 		if string.sub( filename, 1, 1) ~= '.' then
 			idx = idx + 1
 			print( string.format( "%u process document %s", idx, filename))
-			docid = string.sub( filename,-4)
 			doc = analyzer:analyze( readFile( filename))
-			print ("ANALYZED DOC: " .. dump( doc) .. "\n")
-			transaction:insertDocument( docid, doc)
+			transaction:insertDocument( fnam, doc)
 		end
 	end
 	-- Without this the documents wont be inserted:
