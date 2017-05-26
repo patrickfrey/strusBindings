@@ -69,6 +69,7 @@ function createCollection( storagePath, datadir, fnams)
 	end
 	-- Without this the documents wont be inserted:
 	transaction:commit()
+	storage:close()
 end
 
 

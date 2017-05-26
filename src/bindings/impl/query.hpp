@@ -60,7 +60,7 @@ public:
 	void addSummarizer(
 			const std::string& name,
 			const ValueVariant& parameter,
-			const ValueVariant& resultnames);
+			const ValueVariant& resultnames=ValueVariant());
 
 	/// \brief Add a weighting function to use as summand of the total document weight
 	/// \param[in] name the name of the weighting function to add

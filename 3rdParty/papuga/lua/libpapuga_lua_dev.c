@@ -630,6 +630,7 @@ DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, int argc, papuga_lua_Ca
 				papuga_lua_UserData* udata = get_UserData( ls, argi, classdefmap);
 				papuga_init_ValueVariant_hostobj( &as->argv[as->argc], udata->objectref, udata->classid);
 				as->argc += 1;
+				break;
 			}
 			case LUA_TFUNCTION:	goto ERROR;
 			case LUA_TTHREAD:	goto ERROR;

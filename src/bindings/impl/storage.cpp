@@ -101,6 +101,8 @@ void StorageClientImpl::close()
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
+	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	storage->close();
 	m_storage_impl.reset();
 	if (!preverr && errorhnd->hasError())
 	{

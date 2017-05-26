@@ -842,7 +842,8 @@ static void deserializeQueryEvalFunctionParameter(
 	}
 	else if (si->tag == papuga_TagName)
 	{
-		std::string paramname = Deserializer::getString( si, se);
+		std::string paramname = ValueVariantWrap::tostring( si->value);
+		++si;
 		if (paramname == "debug")
 		{
 			debuginfoAttribute = Deserializer::getString( si, se);
@@ -1558,7 +1559,8 @@ static void buildMetaData(
 		}
 		else if (si->tag == papuga_TagName)
 		{
-			std::string name = Deserializer::getString( si, se);
+			std::string name = ValueVariantWrap::tostring( si->value);
+			++si;
 			NumericVariant value = ValueVariantWrap::tonumeric( getValue( si, se));
 			document->setMetaData( name, value);
 		}
@@ -1643,7 +1645,8 @@ static void buildAttributes(
 		}
 		else if (si->tag == papuga_TagName)
 		{
-			std::string name = Deserializer::getString( si, se);
+			std::string name = ValueVariantWrap::tostring( si->value);
+			++si;
 			std::string value = Deserializer::getString( si, se);
 			document->setAttribute( name, value);
 		}
