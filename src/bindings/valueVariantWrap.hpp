@@ -11,7 +11,7 @@
 /// \file valueVariantWrap.hpp
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.hpp"
-#include "papuga/exceptions.hpp"
+#include "papuga/errors.hpp"
 #include "strus/index.hpp"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"

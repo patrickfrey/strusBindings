@@ -12,7 +12,7 @@
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
 #include "papuga/valueVariant.hpp"
-#include "papuga/exceptions.hpp"
+#include "papuga/errors.hpp"
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"
 #include "strus/lib/module.hpp"

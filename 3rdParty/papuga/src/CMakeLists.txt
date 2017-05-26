@@ -8,9 +8,9 @@ set( source_files
 	serialization.c
 	callResult.c
 	errors.c
+	errors.cpp
 	valueVariant.cpp
 	serialization.cpp
-	exceptions.cpp
 )
 
 include_directories(

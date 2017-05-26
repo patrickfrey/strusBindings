@@ -11,7 +11,7 @@
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.h"
 #include "papuga/valueVariant.hpp"
-#include "papuga/exceptions.hpp"
+#include "papuga/errors.hpp"
 #include "papuga/serialization.hpp"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"

@@ -11,7 +11,7 @@
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "papuga/serialization.hpp"
-#include "papuga/exceptions.hpp"
+#include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
 #include "patternMatcherLoader.hpp"
 #include "internationalization.hpp"
