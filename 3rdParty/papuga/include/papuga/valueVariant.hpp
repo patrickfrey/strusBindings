@@ -14,6 +14,11 @@
 
 namespace papuga {
 
+/// \brief Convert variant value to string, if possible
+/// \param[in] value variant value to convert
+/// \param[out] error code returned in case of error
+/// \return result string of empty string in case of error
+/// \note does not throw
 std::string ValueVariant_tostring( const papuga_ValueVariant& value, papuga_ErrorCode& errcode);
 
 }//namespace

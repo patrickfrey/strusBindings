@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void papuga_dealloc_StringBuffer( papuga_StringBuffer* self)
+void papuga_destroy_StringBuffer_( papuga_StringBuffer* self)
 {
 	if (self->ar != NULL)
 	{

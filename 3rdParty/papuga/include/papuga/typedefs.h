@@ -50,14 +50,14 @@ typedef void papuga_HostObjectType;
 
 /// \brief Enumeration of value type identifiers
 typedef enum papuga_Type {
-	papuga_Void			= 0x00,
-	papuga_Double			= 0x01,
-	papuga_UInt			= 0x02,
-	papuga_Int			= 0x03,
-	papuga_String			= 0x04,
-	papuga_LangString		= 0x05,
-	papuga_HostObject		= 0x06,
-	papuga_Serialized		= 0x07
+	papuga_Void			= 0x00,		///< NULL Value without type
+	papuga_Double			= 0x01,		///< Double precision floating point value (C double)
+	papuga_UInt			= 0x02,		///< Unsigned integer value (maximum width 64 bits)
+	papuga_Int			= 0x03,		///< Signed integer value (maximum width 64 bits)
+	papuga_String			= 0x04,		///< Host environment string (null-terminated UTF-8)
+	papuga_LangString		= 0x05,		///< Bindings language string (unicode string with a defined encoding - papuga_StringEncoding)
+	papuga_HostObject		= 0x06,		///< Class object defined in the host environment, part of the interface
+	papuga_Serialized		= 0x07		///< Serialization of an object constructed in the binding language
 } papuga_Type;
 
 /// \brief Unsigned integer type as represented by papuga
@@ -67,6 +67,7 @@ typedef int64_t papuga_IntType;
 /// \brief Floating point value type as represented by papuga
 typedef double papuga_FloatType;
 
+/// \brief Enumeration of character set encodings used for strings defined in the binding language (papuga_LangString)
 typedef enum papuga_StringEncoding {
 	papuga_UTF8,		///< Unicode UTF-8 encoding
 	papuga_UTF16BE,		///< Unicode UTF-16 big endian encoding
@@ -109,16 +110,16 @@ typedef struct papuga_ValueVariant
 /// \brief One node of a papuga serialization
 typedef struct papuga_Node
 {
-	papuga_Tag tag;
-	papuga_ValueVariant value;
+	papuga_Tag tag;				///< tag of the serialization node
+	papuga_ValueVariant value;		///< value of the serialization node
 } papuga_Node;
 
 /// \brief Papuga serialization structure
 struct papuga_Serialization
 {
-	unsigned int allocsize;					///< allocation size of the array
-	unsigned int arsize;					///< number of nodes
-	papuga_Node* ar;					///< array of nodes
+	unsigned int allocsize;			///< allocation size of the array
+	unsigned int arsize;			///< number of nodes
+	papuga_Node* ar;			///< array of nodes
 };
 
 /// \brief Destructor function of a host object
@@ -127,10 +128,11 @@ typedef void (*papuga_HostObjectDeleter)( void* obj);
 /// \brief Papuga host object reference
 typedef struct papuga_HostObjectReference
 {
-	void* data;
-	papuga_HostObjectDeleter destroy;
+	void* data;				///< pointer to the object
+	papuga_HostObjectDeleter destroy;	///< destructor of the object in case of this structure holding ownership of it
 } papuga_HostObjectReference;
 
+/// \brief Buffer for strings copied
 typedef struct papuga_StringBuffer
 {
 	unsigned int allocsize;			///< allocation size of the string
@@ -139,6 +141,7 @@ typedef struct papuga_StringBuffer
 	struct papuga_StringBuffer* next;	///< next buffer in linked list of buffers
 } papuga_StringBuffer;
 
+/// \brief Structure representing the result of an interface method call
 typedef struct papuga_CallResult
 {
 	papuga_ValueVariant value;		///< result value

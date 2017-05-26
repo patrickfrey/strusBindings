@@ -9,6 +9,7 @@
 #define _PAPUGA_ERRORS_H_INCLUDED
 /// \brief Mapping of error codes to strings
 /// \file errors.h
+#include "papuga/typedefs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,10 +19,24 @@ extern "C" {
 /// \param[in] errorcode error code
 const char* papuga_ErrorCode_tostring( papuga_ErrorCode errorcode);
 
-#define papuga_init_ErrorBuffer( buf, ptr_, size_)			{(buf)->ptr = (ptr_); (buf)->size = (size_); (buf)->ptr[0]=0;}
+/// \brief Constructor of ErrorBuffer
+/// \param[out] self pointer to structure 
+/// \param[in] ptr_ pointer to buffer
+/// \param[in] size_ allocation size of the buffer in bytes
+#define papuga_init_ErrorBuffer( self, ptr_, size_)			{(self)->ptr = (ptr_); (self)->size = (size_); (self)->ptr[0]=0;}
 
+/// \brief Storing the current error in the buffer
+/// \param[in,out] self pointer to structure
+/// \param[in] msg format string of the error message
+/// \param[in] ... arguments of the error message
 void papuga_ErrorBuffer_reportError( papuga_ErrorBuffer* self, const char* msg, ...);
+
+/// \brief Test if the error buffer has an error reported
+/// \param[in] self pointer to structure
 #define papuga_ErrorBuffer_hasError( self)		((self)->ptr[0] != 0)
+
+/// \brief Get the pointer to the error message string
+/// \param[in] self pointer to structure
 #define papuga_ErrorBuffer_lastError( self)		((self)->ptr)
 
 #ifdef __cplusplus

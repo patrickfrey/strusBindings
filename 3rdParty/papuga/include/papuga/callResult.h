@@ -100,10 +100,12 @@ void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ..
 
 /// \brief Test if the call result has an error reported
 /// \param[in,out] self pointer to structure
+/// \return true, if yes
 #define papuga_CallResult_hasError( self)		((self)->errorbuf.ptr[0] != 0)
 
 /// \brief Get the error message of the call result
 /// \param[in,out] self pointer to structure
+/// \return the pointer to the message string
 #define papuga_CallResult_lastError( self)		((self)->errorbuf.ptr)
 
 #ifdef __cplusplus

@@ -11,6 +11,7 @@
 #define _PAPUGA_INTERFACE_DESCRIPTION_H_INCLUDED
 #include <stdbool.h>
 
+/// \brief Structure describing a method of a host object class
 typedef struct papuga_MethodDescription
 {
 	const char* name;				///< name of the method
@@ -19,6 +20,7 @@ typedef struct papuga_MethodDescription
 	int argc;					///< maximum number of arguments
 } papuga_MethodDescription;
 
+/// \brief Structure describing a host object class
 typedef struct papuga_ClassDescription
 {
 	unsigned int id;				///< id of the class (unique index counted from 0)
@@ -28,6 +30,7 @@ typedef struct papuga_ClassDescription
 	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods
 } papuga_ClassDescription;
 
+/// \brief Structure describing the interface
 typedef struct papuga_InterfaceDescription
 {
 	const char* name;				///< name of the project wrapped by the bindings

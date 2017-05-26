@@ -15,8 +15,18 @@
 extern "C" {
 #endif
 
+/// \brief Constructor of a host object reference
+/// \param[out] self pointer to structure initialized by constructor
+/// \param[in] object_ pointer to host object
+/// \param[in] destroy_ destructor of host object in case of ownership
 #define papuga_init_HostObjectReference( self, object_, destroy_)	{(self)->data=object_; (self)->destroy=destroy_;}
+
+/// \brief Release of ownership of a host object reference
+/// \param[in,out] self pointer to structure
 #define papuga_release_HostObjectReference( self)			{(self)->data=0; (self)->destroy=0;}
+
+/// \brief Destructor of a host object reference
+/// \param[in,out] self pointer to structure
 #define papuga_destroy_HostObjectReference( self)			{if ((self)->destroy) {(self)->destroy( (self)->data);(self)->destroy=0;}}
 
 #ifdef __cplusplus
