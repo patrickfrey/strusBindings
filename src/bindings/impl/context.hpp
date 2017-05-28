@@ -104,16 +104,23 @@ public:
 
 	/// \brief Create a document analyzer instance
 	/// \param[in] doctype structure describing the segmenter to use (either document class description structure or segmenter name)
+	/// \return document analyzer interface
 	DocumentAnalyzerImpl* createDocumentAnalyzer( const ValueVariant& doctype);
 
 	/// \brief Create a query analyzer instance
+	/// \return query analyzer interface
 	QueryAnalyzerImpl* createQueryAnalyzer();
 
 	/// \brief Create a query evaluation instance
+	/// \return quer evaluation interface
 	QueryEvalImpl* createQueryEval();
 
 	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
 	void close();
+
+	/// \brief Debug method that returns the serialization of the arguments as string
+	/// \return the input serialization as string
+	std::string debug_serialize( const ValueVariant& arg);
 
 private:
 	void initStorageObjBuilder();

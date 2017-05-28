@@ -1,5 +1,5 @@
 require "string"
-package.path = "../create_collection_1/testCollection.lua"
+package.path = "../common/testCollection.lua"
 require "testCollection"
 
 function dumpValue(o)
@@ -72,6 +72,7 @@ query = queryEval:createQuery( storage)
 
 -- First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
 terms = analyzer:analyze( {"word",queryPhrase})
+print( ctx:debug_serialize( {"word",queryPhrase}))
 if #terms == 0 then
 	error( "query is empty")
 end

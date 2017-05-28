@@ -36,6 +36,9 @@ function createCollection( storagePath, datadir, fnams)
 	storage = ctx:createStorageClient( config)
 
 	-- Define the document analyzer to use:
+	print( "----")
+	print( ctx:debug_serialize( {"xgl"}))
+	print( "----")
 	analyzer = ctx:createDocumentAnalyzer( {"xml"})
 
 	-- Define the features and attributes to store:

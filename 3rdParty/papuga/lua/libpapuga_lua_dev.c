@@ -12,6 +12,7 @@
 #include <float.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 
 #define MAX_DOUBLE_INT            ((int64_t)1<<53)
 #define MIN_DOUBLE_INT           -((int64_t)1<<53)
@@ -186,6 +187,7 @@ static bool serialize_value( papuga_lua_CallArgs* as, papuga_Serialization* resu
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring( ls, li, &strsize);
+			/*[-]*/fprintf( stderr, "serialize_value STRING %u '%s'\n", (unsigned int)strsize, str);
 			rt &= papuga_Serialization_pushValue_string( result, str, strsize);
 			break;
 		case LUA_TTABLE:
@@ -273,7 +275,11 @@ static bool serialize_root( papuga_lua_CallArgs* as, lua_State *ls, int li)
 	papuga_Serialization* result = new_Serialization( as);
 	papuga_init_ValueVariant_serialization( &as->argv[as->argc], result);
 	as->argc += 1;
-	return serialize_node( as, result, ls, li);
+	bool rt = true;
+	rt &= papuga_Serialization_pushOpen( result);
+	rt &= serialize_node( as, result, ls, li);
+	rt &= papuga_Serialization_pushClose( result);
+	return rt;
 }
 
 static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* ser, lua_State *ls, const papuga_lua_ClassDefMap* classdefmap);

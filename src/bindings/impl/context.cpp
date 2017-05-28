@@ -42,6 +42,7 @@
 #include "serializer.hpp"
 #include "structDefs.hpp"
 #include "traceUtils.hpp"
+#include "valueVariantWrap.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -364,5 +365,23 @@ void ContextImpl::close()
 	m_moduleloader_impl.reset();
 }
 
+std::string ContextImpl::debug_serialize( const ValueVariant& arg)
+{
+	if (!papuga_ValueVariant_defined( &arg))
+	{
+		return std::string();
+	}
+	if (arg.valuetype != papuga_Serialized)
+	{
+		return ValueVariantWrap::tostring( arg);
+	}
+	papuga_ErrorCode errcode = papuga_Ok;
+	std::string rt = papuga::Serialization::tostring( *arg.value.serialization, errcode);
+	if (errcode != papuga_Ok)
+	{
+		throw papuga::error_exception( errcode, "method debug_serialize");
+	}
+	return rt;
+}
 
 

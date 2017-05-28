@@ -1272,6 +1272,7 @@ static void builderPushTerm(
 		ExpressionBuilder& builder,
 		const TermDef& def)
 {
+	/*[-]*/fprintf( stderr, "deserializer::builderPushTerm %s '%s' %u\n", def.type.c_str(), def.value.c_str(), def.length);
 	if (def.value_defined)
 	{
 		builder.pushTerm( def.type);
