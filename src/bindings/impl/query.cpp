@@ -178,6 +178,7 @@ void QueryImpl::addUserName( const std::string& username_)
 void QueryImpl::setWeightingVariables(
 		const ValueVariant& parameter)
 {
+	static char* context = _TXT("weighting variables");
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
 	if (parameter.valuetype != papuga_Serialized)
 	{
@@ -186,10 +187,13 @@ void QueryImpl::setWeightingVariables(
 	papuga::Serialization::const_iterator
 		si = papuga::Serialization::begin( parameter.value.serialization),
 		se = papuga::Serialization::end( parameter.value.serialization);
-	while (si != se)
+	KeyValueList kvlist( si, se);
+	if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
+
+	KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
+	for (; ki != ke; ++ki)
 	{
-		ConfigDef assignment( si, se);
-		THIS->setWeightingVariableValue( assignment.name, ValueVariantWrap::todouble( assignment.value));
+		THIS->setWeightingVariableValue( ki->first, ValueVariantWrap::todouble( *ki->second));
 	}
 }
 

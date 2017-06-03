@@ -336,10 +336,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 {
 	return serializeArray( result, val);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<StatisticsViewerInterface::DocumentFrequencyChange>& val)
-{
-	return serializeArray( result, val);
-}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val)
 {
 	return serializeArray( result, val);

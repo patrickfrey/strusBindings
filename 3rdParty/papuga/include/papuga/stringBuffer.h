@@ -17,7 +17,7 @@ extern "C" {
 
 /// \brief Constructor of StringBuffer
 /// \param[out] self pointer to structure 
-#define papuga_init_StringBuffer(self)		{(self)->ar=0;(self)->next=0;}
+#define papuga_init_StringBuffer(self)		{(self)->allocsize=0;(self)->arsize=0;(self)->ar=0;(self)->next=0;}
 
 /// \brief Destructor of StringBuffer
 /// \param[in] self pointer to structure 

@@ -187,7 +187,6 @@ static bool serialize_value( papuga_lua_CallArgs* as, papuga_Serialization* resu
 			break;
 		case LUA_TSTRING:
 			str = lua_tolstring( ls, li, &strsize);
-			/*[-]*/fprintf( stderr, "serialize_value STRING %u '%s'\n", (unsigned int)strsize, str);
 			rt &= papuga_Serialization_pushValue_string( result, str, strsize);
 			break;
 		case LUA_TTABLE:
@@ -459,7 +458,7 @@ static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* se
 		}
 		else if (ni->tag == papuga_TagValue)
 		{
-			deserialize_node( retval, &ni, ne, ls, classdefmap);
+			deserialize_value( retval, &ni->value, ls, classdefmap);
 		}
 		else
 		{

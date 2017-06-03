@@ -105,7 +105,6 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::MetaData>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Attribute>& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<StatisticsViewerInterface::DocumentFrequencyChange>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val);

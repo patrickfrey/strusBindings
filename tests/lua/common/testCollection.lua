@@ -1,45 +1,17 @@
 require "string"
 
-local function readFile( path)
-	local file = io.open( path, "rb") -- r read mode and b binary mode
-	if not file then
-		error( string.format( "could not read file '%s'", path))
-	end
-	local content = file:read "*a" -- *a or *all reads the whole file
-	file:close()
-	return content
-end
+function createCollection( strusctx, storagePath, datadir, fnams)
+	local config = string.format( "path=%s; metadata=doclen UINT16, title_start UINT8, title_end UINT8; cache=512M; statsproc=default", storagePath)
 
-function dumpValue(o)
-	if type(o) == 'table' then
-		local s = '{ '
-		for k,v in pairs(o) do
-			if type(k) ~= 'number' then k = '"'..k..'"' end
-			s = s .. '['..k..'] = ' .. dump(v) .. ','
-		end
-		return s .. '} '
-	else
-		return tostring(o)
-	end
-end
+	strusctx:destroyStorage( config)
+	strusctx:getLastError()
 
-function createCollection( storagePath, datadir, fnams)
-	config = string.format( "path=%s; metadata=doclen UINT16, title_start UINT8, title_end UINT8", storagePath)
-	ctx = strus_Context.new()
-	ctx:loadModule( "analyzer_pattern")
-
-	ctx:destroyStorage( config)
-	ctx:getLastError()
-
-	ctx:createStorage( config)
+	strusctx:createStorage( config)
 	-- Get a client for the new created storage:
-	storage = ctx:createStorageClient( config)
+	local storage = strusctx:createStorageClient( config)
 
 	-- Define the document analyzer to use:
-	print( "----")
-	print( ctx:debug_serialize( {"xgl"}))
-	print( "----")
-	analyzer = ctx:createDocumentAnalyzer( {"xml"})
+	local analyzer = strusctx:createDocumentAnalyzer( {"xml"})
 
 	-- Define the features and attributes to store:
 	analyzer:addSearchIndexFeature( "word", "/doc/text()", "word", {{"stem","en"},"lc",{"convdia","en"}})
@@ -49,6 +21,7 @@ function createCollection( storagePath, datadir, fnams)
 	analyzer:addForwardIndexFeature( "orig", "/doc/title()", "split", "orig")
 	analyzer:defineAttribute( "title", "/doc/title()", "content", "orig")
 	analyzer:defineAggregatedMetaData( "title_end", {"nextpos", "endtitle"})
+	analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
 
 	analyzer:definePatternMatcherPostProc( "coresult", "std", {"word"}, {
 		{"city_that_is", {"sequence", 3, {"word","citi"},{"word","that"},{"word","is"}} },
@@ -58,15 +31,16 @@ function createCollection( storagePath, datadir, fnams)
 	analyzer:addSearchIndexFeatureFromPatternMatch( "word", "coresult", {"lc"})
 	
 	-- Read input files, analyze and insert them:
-	transaction = storage:createTransaction()
-	files = {}
-	idx = 0
+	local transaction = storage:createTransaction()
+	local files = {}
+	local idx = 0
 	for _,fnam in ipairs(fnams) do
 		local filename = datadir..'/'..fnam
 		if string.sub( filename, 1, 1) ~= '.' then
 			idx = idx + 1
 			print( string.format( "%u process document %s", idx, filename))
 			doc = analyzer:analyze( readFile( filename))
+			table.insert( doc.attributes, {name="docid", value=fnam})
 			transaction:insertDocument( fnam, doc)
 		end
 	end

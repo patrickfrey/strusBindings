@@ -56,18 +56,25 @@ unsigned int StorageClientImpl::nofDocumentsInserted() const
 	return THIS->nofDocumentsInserted();
 }
 
+Index StorageClientImpl::documentNumber( const std::string& docid) const
+{
+	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	return THIS->documentNumber( docid);
+}
+
 StorageTransactionImpl* StorageClientImpl::createTransaction() const
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return new StorageTransactionImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, m_storage_impl);
 }
 
-StatisticsIteratorImpl* StorageClientImpl::createInitStatisticsIterator( bool sign)
+StatisticsIteratorImpl* StorageClientImpl::createStatisticsIterator( bool sign)
 {
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ObjectRef iter;
-	iter.resetOwnership( storage->createInitStatisticsIterator( sign));
+	iter.resetOwnership( storage->createStatisticsIterator( sign));
 	if (!iter.get())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();

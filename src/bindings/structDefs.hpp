@@ -9,6 +9,7 @@
 #define _STRUS_BINDINGS_STRUCTURE_DEFINITIONS_HPP_INCLUDED
 #include "structNameMap.hpp"
 #include "papuga/serialization.hpp"
+#include "strus/errorBufferInterface.hpp"
 
 namespace strus {
 namespace bindings {
@@ -49,12 +50,30 @@ struct MetaDataRangeDef
 
 struct ConfigDef
 {
-	std::string name;
-	papuga_ValueVariant value;
+	std::string cfgstring;
 
 	ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
 	ConfigDef( const ConfigDef& o)
-		:name(o.name),value(o.value){}
+		:cfgstring(o.cfgstring){}
+};
+
+struct KeyValueList
+{
+	typedef std::pair< std::string, const papuga_ValueVariant*> Item;
+	std::vector<Item> items;
+
+	KeyValueList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	KeyValueList( const KeyValueList& o)
+		:items(o.items){}
+
+	typedef std::vector<Item>::const_iterator const_iterator;
+	const_iterator begin() const	{return items.begin();}
+	const_iterator end() const	{return items.end();}
+
+private:
+	void parseMetaKeyValueList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	void parseDictionary( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	void parseValueTupleList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
 };
 
 struct DfChangeDef

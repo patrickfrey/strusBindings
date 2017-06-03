@@ -1,37 +1,28 @@
 require "string"
+package.path = "../common/utils.lua"
+require "utils"
 package.path = "../common/testCollection.lua"
 require "testCollection"
-
-function dumpValue(o)
-	if type(o) == 'table' then
-		local s = '{ '
-		for k,v in pairs(o) do
-			if type(k) ~= 'number' then k = '"'..k..'"' end
-			s = s .. '['..k..'] = ' .. dump(v) .. ','
-		end
-		return s .. '} '
-	else
-		return tostring(o)
-	end
-end
-
-queryPhrase = "New York dimensions imagine"
-storagePath = arg[1] .. "/storage"
-storageConfig = string.format( "path=%s", storagePath)
-createCollection( storagePath, arg[1], {"A.xml","B.xml","C.xml"})
+package.path = "../common/dumpCollection.lua"
+require "dumpCollection"
 
 ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
 
+queryPhrase = "New York dimensions imagine"
+storagePath = arg[1] .. "/storage"
+storageConfig = string.format( "path=%s", storagePath)
+createCollection( ctx, storagePath, arg[1], {"A.xml","B.xml","C.xml"})
+
 -- Get a client for the new created storage:
-storage = ctx:createStorageClient( config)
+local storage = ctx:createStorageClient( config)
 
 -- Define the query analyzer to use:
-analyzer = ctx:createQueryAnalyzer()
+local analyzer = ctx:createQueryAnalyzer()
 analyzer:addSearchIndexElement( "word", "word", "word", {{"stem","en"},"lc",{"convdia","en"}})
 
 -- Define the query evaluation scheme:
-queryEval = ctx:createQueryEval()
+local queryEval = ctx:createQueryEval()
 
 -- Here we define what query features decide, what is ranked for the result:
 queryEval:addSelectionFeature( "select")
@@ -68,10 +59,10 @@ queryEval:addSummarizer(
 		})
 
 -- Now we build the query to issue:
-query = queryEval:createQuery( storage)
+local query = queryEval:createQuery( storage)
 
 -- First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
-terms = analyzer:analyze( {"word",queryPhrase})
+local terms = analyzer:analyze( {"word",queryPhrase})
 print( ctx:debug_serialize( {"word",queryPhrase}))
 if #terms == 0 then
 	error( "query is empty")
@@ -79,7 +70,7 @@ end
 
 -- Then we iterate on the terms and create a single term feature for each term and collect
 -- all terms to create a selection expression out of them:
-selexpr = {}
+local selexpr = {}
 
 for _,term in ipairs(terms) do
 	dumpValue( term)
@@ -107,7 +98,7 @@ query:defineDocFieldFeature( "titlefield", "", "title_end" )
 query:setDebugMode( True )
 
 -- Now we evaluate the query and iterate on the result to display them:
-results = query:evaluate()
+local results = query:evaluate()
 for pos,result in ipairs(results.ranks) do
 	print( string.format( "rank %u: %u %f\n", pos, result.docno, result.weight))
 	for sidx,si in pairs(result.summary) do

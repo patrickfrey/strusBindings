@@ -45,6 +45,7 @@ std::string* StatisticsIteratorImpl::getNext()
 		{
 			throw strus::runtime_error( _TXT("error fetching statistics message: %s"), errorhnd->fetchError());
 		}
+		return 0;
 	}
 	return new std::string( outmsg, outmsgsize);
 }

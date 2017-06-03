@@ -11,7 +11,6 @@
 #include "strus/base/utf8.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
 #include <stdexcept>
-/*[-]*/#include <cstdio>
 
 using namespace strus;
 using namespace strus::bindings;
@@ -248,7 +247,6 @@ void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const st
 
 void QueryAnalyzerExpressionBuilder::pushField( const std::string& fieldtype, const std::string& value)
 {
-	/*[-]*/fprintf( stderr, "QueryAnalyzerExpressionBuilder::pushField %s '%s'\n", fieldtype.c_str(), value.c_str());
 	typedef QueryAnalyzerStruct::GroupOperatorList GroupOperatorList;
 
 	++m_fieldno_cnt;

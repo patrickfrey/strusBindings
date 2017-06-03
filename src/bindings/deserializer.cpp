@@ -90,7 +90,7 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 		}
 		if (!location_explain.empty())
 		{
-			msgbuf.append( string_format( _TXT("(in expression at %s)"), location_explain.c_str()));
+			msgbuf.append( string_format( _TXT(" (in expression at %s)"), location_explain.c_str()));
 		}
 		return strus::runtime_error( msgbuf.c_str());
 	}
@@ -100,13 +100,13 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 	}
 }
 
-static const papuga_ValueVariant& getValue(
+static const papuga_ValueVariant* getValue(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
 	if (si != se && si->tag == papuga_TagValue)
 	{
-		const papuga_ValueVariant& rt = si->value;
+		const papuga_ValueVariant* rt = &si->value;
 		++si;
 		return rt;
 	}
@@ -120,65 +120,81 @@ unsigned int Deserializer::getUint(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	return ValueVariantWrap::touint( getValue( si, se));
+	return ValueVariantWrap::touint( *getValue( si, se));
 }
 
 int Deserializer::getInt(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	return ValueVariantWrap::toint( getValue( si, se));
+	return ValueVariantWrap::toint( *getValue( si, se));
 }
 
 Index Deserializer::getIndex(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	return ValueVariantWrap::toint( getValue( si, se));
+	return ValueVariantWrap::toint( *getValue( si, se));
 }
 
 double Deserializer::getDouble(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	return ValueVariantWrap::todouble( getValue( si, se));
+	return ValueVariantWrap::todouble( *getValue( si, se));
 }
 
 std::string Deserializer::getString( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
-	return ValueVariantWrap::tostring( getValue( si, se));
+	return ValueVariantWrap::tostring( *getValue( si, se));
 }
 
 const char* Deserializer::getCharp(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	papuga_ValueVariant val = getValue( si, se);
-	if (val.valuetype != papuga_String) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
-	return val.value.string;
+	const papuga_ValueVariant* val = getValue( si, se);
+	if (val->valuetype != papuga_String) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
+	return val->value.string;
 }
 
 void Deserializer::consumeClose(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	if (si != se)
+	if (si == se)
 	{
-		if (si->tag != papuga_TagClose)
-		{
-			throw strus::runtime_error(_TXT("unexpected element at end of structure, close expected"));
-		}
-		++si;
+		throw strus::runtime_error(_TXT("close expected element at end of structure"));
 	}
+	if (si->tag != papuga_TagClose)
+	{
+		throw strus::runtime_error(_TXT("unexpected element at end of structure"));
+	}
+	++si;
 }
 
 template <typename ATOMICTYPE, ATOMICTYPE FUNC( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)>
 static std::vector<ATOMICTYPE> getAtomicTypeList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
 	std::vector<ATOMICTYPE> rt;
-	while (si != se && si->tag != papuga_TagClose)
+	static const char* context = _TXT("atomic type list");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+	if (si->tag == papuga_TagValue)
 	{
 		rt.push_back( FUNC( si, se));
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		while (si != se && si->tag != papuga_TagClose)
+		{
+			rt.push_back( FUNC( si, se));
+		}
+		Deserializer::consumeClose( si, se);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected list or single value for %s definition"), context);
 	}
 	return rt;
 }
@@ -197,7 +213,9 @@ static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga_ValueVariant& val
 		papuga::Serialization::const_iterator
 			si = papuga::Serialization::begin( val.value.serialization),
 			se = papuga::Serialization::end( val.value.serialization);
-		return getAtomicTypeList<ATOMICTYPE,FUNC>( si, se);
+		if (si == se) return rt;
+		rt = getAtomicTypeList<ATOMICTYPE,FUNC>( si, se);
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
 	}
 	return rt;
 }
@@ -231,24 +249,41 @@ std::vector<Index> Deserializer::getIndexList(
 	return getAtomicTypeList<Index,ValueVariantWrap::toint,Deserializer::getIndex>( val);
 }
 
-static bool setFeatureOption_position( analyzer::FeatureOptions& res, const papuga_ValueVariant& val)
+bool Deserializer::hasDepth(
+		papuga::Serialization::const_iterator si,
+		const papuga::Serialization::const_iterator& se,
+		int depth)
 {
-	if (papuga_ValueVariant_isequal_ascii( &val, "content"))
+	if (depth == 0) return true;
+	for (; si != se && si->tag != papuga_TagClose; ++si)
+	{
+		if (si->tag == papuga_TagOpen)
+		{
+			++si;
+			if (hasDepth( si, se, depth-1)) return true;
+		}
+	}
+	return false;
+}
+
+static bool setFeatureOption_position( analyzer::FeatureOptions& res, const papuga_ValueVariant* val)
+{
+	if (papuga_ValueVariant_isequal_ascii( val, "content"))
 	{
 		res.definePositionBind( analyzer::BindContent);
 		return true;
 	}
-	else if (papuga_ValueVariant_isequal_ascii( &val, "succ"))
+	else if (papuga_ValueVariant_isequal_ascii( val, "succ"))
 	{
 		res.definePositionBind( analyzer::BindSuccessor);
 		return true;
 	}
-	else if (papuga_ValueVariant_isequal_ascii( &val, "pred"))
+	else if (papuga_ValueVariant_isequal_ascii( val, "pred"))
 	{
 		res.definePositionBind( analyzer::BindPredecessor);
 		return true;
 	}
-	else if (papuga_ValueVariant_isequal_ascii( &val, "unique"))
+	else if (papuga_ValueVariant_isequal_ascii( val, "unique"))
 	{
 		res.definePositionBind( analyzer::BindPredecessor);
 		return true;
@@ -264,26 +299,50 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 		const papuga::Serialization::const_iterator& se)
 {
 	analyzer::FeatureOptions rt;
-	for (; si != se && si->tag != papuga_TagClose; ++si)
+	static const char* context = _TXT("feature option list");
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+	if (si->tag == papuga_TagValue)
 	{
-		if (si->tag == papuga_TagName
-		&& papuga_ValueVariant_isequal_ascii( &si->value, "position")) ++si;
-
-		if (si->tag == papuga_TagValue)
+		if (!setFeatureOption_position( rt, getValue(si,se)))
 		{
-			if (!setFeatureOption_position( rt, getValue(si,se)))
-			{
-				throw strus::runtime_error(_TXT("expected position bind option"));
-			}
-		}
-		else
-		{
-			throw strus::runtime_error(_TXT("expected feature option"));
+			throw strus::runtime_error(_TXT("expected position bind option"));
 		}
 	}
-	if (si != se)
+	else if (si->tag == papuga_TagOpen)
 	{
 		++si;
+		for (; si != se && si->tag != papuga_TagClose; ++si)
+		{
+			if (si->tag == papuga_TagName
+			&& papuga_ValueVariant_isequal_ascii( &si->value, "position"))
+			{
+				++si;
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+				if (si->tag == papuga_TagValue)
+				{
+					if (!setFeatureOption_position( rt, getValue(si,se)))
+					{
+						throw strus::runtime_error(_TXT("expected position bind option"));
+					}
+				}
+				else
+				{
+					throw strus::runtime_error(_TXT("expected feature option"));
+				}
+			}
+			else if (si->tag == papuga_TagValue)
+			{
+				if (!setFeatureOption_position( rt, getValue(si,se)))
+				{
+					throw strus::runtime_error(_TXT("expected position bind option"));
+				}
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("expected feature option"));
+			}
+		}
+		Deserializer::consumeClose(si,se);
 	}
 	return rt;
 }
@@ -291,25 +350,27 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	const papuga_ValueVariant& options)
 {
+	analyzer::FeatureOptions rt;
 	if (options.valuetype != papuga_Serialized)
 	{
-		analyzer::FeatureOptions rt;
 		if (papuga_ValueVariant_defined( &options))
 		{
-			if (!setFeatureOption_position( rt, options))
+			if (!setFeatureOption_position( rt, &options))
 			{
 				throw strus::runtime_error(_TXT("expected feature option (position bind value)"));
 			}
 		}
-		return rt;
 	}
 	else
 	{
 		papuga::Serialization::const_iterator
 			si = papuga::Serialization::begin( options.value.serialization),  
 			se = papuga::Serialization::end( options.value.serialization);
-		return getFeatureOptions( si, se);
+		if (si == se) return rt;
+		rt = getFeatureOptions( si, se);
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
 	}
+	return rt;
 }
 
 TermStatistics Deserializer::getTermStatistics(
@@ -325,26 +386,41 @@ TermStatistics Deserializer::getTermStatistics(
 	}
 	if (val.valuetype != papuga_Serialized)
 	{
-		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), context);
+		throw strus::runtime_error(_TXT("atomic value or list of named arguments expected for %s"), context);
 	}
 	papuga::Serialization::const_iterator
 		si = papuga::Serialization::begin( val.value.serialization),  
 		se = papuga::Serialization::end( val.value.serialization);
-	while (si != se)
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), context);
+	if (si->tag == papuga_TagValue)
 	{
-		if (si->tag != papuga_TagName)
+		rt.setDocumentFrequency( ValueVariantWrap::touint64( *getValue(si,se)));
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		int value_defined[1] = {0};
+		while (si != se && si->tag != papuga_TagClose)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
+			if (si->tag != papuga_TagName)
+			{
+				throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
+			}
+			int idx = namemap.index( si->value);
+			++si;
+			switch (idx)
+			{
+				case 0: if (value_defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "df", context);
+					rt.setDocumentFrequency( ValueVariantWrap::touint64( *getValue(si,se)));
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					break;
+			}
 		}
-		int idx = namemap.index( si->value);
-		++si;
-		switch (idx)
-		{
-			case 0: rt.setDocumentFrequency( ValueVariantWrap::touint64( getValue(si,se)));
-				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-				break;
-		}
+		consumeClose( si, se);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected %s structure"), context);
 	}
 	return rt;
 }
@@ -362,44 +438,59 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 	}
 	if (val.valuetype != papuga_Serialized)
 	{
-		throw strus::runtime_error(_TXT("atomic value (df) or list of named arguments expected for %s"), context);
+		throw strus::runtime_error(_TXT("atomic value or list of named arguments expected for %s"), context);
 	}
 	papuga::Serialization::const_iterator
 		si = papuga::Serialization::begin( val.value.serialization),
 		se = papuga::Serialization::end( val.value.serialization);
-	while (si != se)
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), context);
+	if (si->tag == papuga_TagValue)
 	{
-		if (si->tag != papuga_TagName)
+		rt.setNofDocumentsInserted( ValueVariantWrap::touint64( *getValue(si,se)));
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		int value_defined[1] = {0};
+		while (si != se && si->tag != papuga_TagClose)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
+			if (si->tag != papuga_TagName)
+			{
+				throw strus::runtime_error(_TXT("list of named arguments expected for %s as structure"), context);
+			}
+			int idx = namemap.index( si->value);
+			++si;
+			switch (idx)
+			{
+				case 0: if (value_defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "nofdocs", context);
+					rt.setNofDocumentsInserted( ValueVariantWrap::touint64( *getValue(si,se)));
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					break;
+			}
 		}
-		int idx = namemap.index( si->value);
-		++si;
-		switch (idx)
-		{
-			case 0: rt.setNofDocumentsInserted( ValueVariantWrap::touint64( getValue(si,se)));
-				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-				break;
-		}
+		consumeClose( si, se);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected %s structure"), context);
 	}
 	return rt;
 }
 
-std::string Deserializer::getOptionalDefinition(
+const papuga_ValueVariant* Deserializer::getOptionalDefinition(
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se,
 		const char* name)
 {
-	std::string rt;
-	if (si->tag == papuga_TagName)
+	const papuga_ValueVariant* rt = 0;
+	if (si != se && si->tag == papuga_TagName)
 	{
 		if (papuga_ValueVariant_isequal_ascii( &si->value, name))
 		{
 			++si;
 			if (si->tag == papuga_TagValue)
 			{
-				rt = ValueVariantWrap::tostring( si->value);
+				rt = &si->value;
 				++si;
 			}
 			else
@@ -431,36 +522,48 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 		se = papuga::Serialization::end( val.value.serialization);
 
 	if (si == se) return rt;
-
-	if (si->tag == papuga_TagName)
-	{
-		do
-		{
-			int idx = namemap.index( si->value);
-			++si;
-			switch (idx)
-			{
-				case 0: rt.setMimeType( Deserializer::getString( si, se));
-					break;
-				case 1: rt.setEncoding( Deserializer::getString( si, se));
-					break;
-				case 2: rt.setScheme( Deserializer::getString( si, se));
-					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-			}
-		} while (si != se && si->tag == papuga_TagName);
-		Deserializer::consumeClose( si, se);
-	}
-	else if (si->tag == papuga_TagValue)
+	if (si->tag == papuga_TagValue)
 	{
 		rt.setMimeType( Deserializer::getString( si, se));
-		if (si != se && si->tag != papuga_TagClose)
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
+
+		if (si->tag == papuga_TagName)
 		{
-			rt.setEncoding( Deserializer::getString( si, se));
+			do
+			{
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
+				{
+					case 0: rt.setMimeType( Deserializer::getString( si, se));
+						break;
+					case 1: rt.setEncoding( Deserializer::getString( si, se));
+						break;
+					case 2: rt.setScheme( Deserializer::getString( si, se));
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+				}
+			} while (si != se && si->tag == papuga_TagName);
+		}
+		else if (si->tag == papuga_TagValue)
+		{
+			rt.setMimeType( Deserializer::getString( si, se));
 			if (si != se && si->tag != papuga_TagClose)
 			{
-				rt.setScheme( Deserializer::getString( si, se));
+				rt.setEncoding( Deserializer::getString( si, se));
+				if (si != se && si->tag != papuga_TagClose)
+				{
+					rt.setScheme( Deserializer::getString( si, se));
+				}
 			}
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("expected %s structure"), context);
 		}
 		Deserializer::consumeClose( si, se);
 	}
@@ -468,6 +571,7 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 	{
 		throw strus::runtime_error(_TXT("expected %s structure"), context);
 	}
+	if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
 	return rt;
 }
 
@@ -481,8 +585,7 @@ static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
 	static const char* context = _TXT("normalizer function");
 	if (!nf) throw strus::runtime_error( _TXT("failed to get %s '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 
-	Reference<NormalizerFunctionInstanceInterface> function(
-			nf->createInstance( arguments, textproc));
+	Reference<NormalizerFunctionInstanceInterface> function( nf->createInstance( arguments, textproc));
 	if (!function.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create %s instance '%s': %s"),
@@ -502,8 +605,7 @@ static Reference<TokenizerFunctionInstanceInterface> getTokenizer_(
 	if (!nf) throw strus::runtime_error( _TXT("failed to get %s '%s': %s"),
 						context, name.c_str(), errorhnd->fetchError());
 
-	Reference<TokenizerFunctionInstanceInterface> function(
-			nf->createInstance( arguments, textproc));
+	Reference<TokenizerFunctionInstanceInterface> function( nf->createInstance( arguments, textproc));
 	if (!function.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"), context, name.c_str(), errorhnd->fetchError());
@@ -521,8 +623,7 @@ static Reference<AggregatorFunctionInstanceInterface> getAggregator_(
 	static const char* context = _TXT("aggregator function");
 	if (!nf) throw strus::runtime_error( _TXT("failed to get %s function '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 
-	Reference<AggregatorFunctionInstanceInterface> function(
-			nf->createInstance( arguments));
+	Reference<AggregatorFunctionInstanceInterface> function( nf->createInstance( arguments));
 	if (!function.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create %s function instance '%s': %s"), context, name.c_str(), errorhnd->fetchError());
@@ -572,22 +673,24 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		ErrorBufferInterface* errorhnd)
 {
 	std::vector< Reference<NormalizerFunctionInstanceInterface> > rt;
-	static const char* context = _TXT("normalizer function list");
-
-	while (si != se && si->tag != papuga_TagClose)
+	if (si == se)
 	{
-		if (si->tag == papuga_TagValue)
-		{
-			rt.push_back( getNormalizer_( getString( si, se), std::vector<std::string>(), textproc, errorhnd));
-		}
-		else if (si->tag == papuga_TagOpen)
+		return rt;
+	}
+	if (si->tag == papuga_TagOpen)
+	{
+		if (Deserializer::hasDepth( si+1, se, 1))
 		{
 			++si;
-			rt.push_back( getNormalizer_( si, se, textproc, errorhnd));
+			while (si != se && si->tag != papuga_TagClose)
+			{
+				rt.push_back( getNormalizer_( si, se, textproc, errorhnd));
+			}
+			Deserializer::consumeClose(si,se);
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("unexpected element in %s"), context);
+			rt.push_back( getNormalizer_( si, se, textproc, errorhnd));
 		}
 	}
 	return rt;
@@ -598,9 +701,9 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
+	std::vector<Reference<NormalizerFunctionInstanceInterface> > rt;
 	if (normalizers.valuetype != papuga_Serialized)
 	{
-		std::vector<Reference<NormalizerFunctionInstanceInterface> > rt;
 		std::string name = ValueVariantWrap::tostring( normalizers);
 		rt.push_back( getNormalizer_( name, std::vector<std::string>(), textproc, errorhnd));
 		return rt;
@@ -612,13 +715,15 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 			se = papuga::Serialization::end( normalizers.value.serialization);
 		try
 		{
-			return getNormalizers( si, se, textproc, errorhnd);
+			rt = getNormalizers( si, se, textproc, errorhnd);
 		}
 		catch (const std::runtime_error& err)
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( normalizers.value.serialization));
 		}
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
 	}
+	return rt;
 }
 
 
@@ -637,14 +742,17 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 		papuga::Serialization::const_iterator
 			si = papuga::Serialization::begin( tokenizer.value.serialization),
 			se = papuga::Serialization::end( tokenizer.value.serialization);
+		Reference<TokenizerFunctionInstanceInterface> rt;
 		try
 		{
-			return getTokenizer( si, se, textproc, errorhnd);
+			rt = getTokenizer( si, se, textproc, errorhnd);
 		}
 		catch (const std::runtime_error& err)
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( tokenizer.value.serialization));
 		}
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		return rt;
 	}
 }
 
@@ -660,17 +768,20 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 	}
 	else
 	{
+		Reference<AggregatorFunctionInstanceInterface> rt;
 		papuga::Serialization::const_iterator
 			si = papuga::Serialization::begin( aggregator.value.serialization),
 			se = papuga::Serialization::end( aggregator.value.serialization);
 		try
 		{
-			return getAggregator( si, se, textproc, errorhnd);
+			rt = getAggregator( si, se, textproc, errorhnd);
 		}
 		catch (const std::runtime_error& err)
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( aggregator.value.serialization));
 		}
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		return rt;
 	}
 }
 
@@ -679,15 +790,15 @@ static void instantiateQueryEvalFunctionParameter(
 		const char* functionclass,
 		FUNCTYPE* function,
 		const std::string& name,
-		const papuga_ValueVariant& value)
+		const papuga_ValueVariant* value)
 {
-	if (papuga_ValueVariant_isnumeric( &value))
+	if (papuga_ValueVariant_isnumeric( value))
 	{
-		function->addNumericParameter( name, ValueVariantWrap::tonumeric( value));
+		function->addNumericParameter( name, ValueVariantWrap::tonumeric( *value));
 	}
-	else if (papuga_ValueVariant_isstring( &value))
+	else if (papuga_ValueVariant_isstring( value))
 	{
-		function->addStringParameter( name, ValueVariantWrap::tostring( value));
+		function->addStringParameter( name, ValueVariantWrap::tostring( *value));
 	}
 	else
 	{
@@ -710,6 +821,7 @@ static void deserializeQueryEvalFunctionParameterValue(
 	{
 		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
+
 		if (si->tag == papuga_TagName)
 		{
 			if (papuga_ValueVariant_isequal_ascii( &si->value, "feature"))
@@ -738,7 +850,7 @@ static void deserializeQueryEvalFunctionParameterValue(
 		{
 			while (si != se && si->tag != papuga_TagClose)
 			{
-				papuga_ValueVariant value = getValue( si, se);
+				const papuga_ValueVariant* value = getValue( si, se);
 				instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
 			}
 		}
@@ -746,7 +858,7 @@ static void deserializeQueryEvalFunctionParameterValue(
 	}
 	else
 	{
-		papuga_ValueVariant value = getValue( si, se);
+		const papuga_ValueVariant* value = getValue( si, se);
 		instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
 	}
 }
@@ -762,19 +874,11 @@ static void deserializeQueryEvalFunctionParameter(
 {
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
 	static const StructureNameMap namemap( "name,value,feature", ',');
-	if (si->tag == papuga_TagName)
-	{
-		if (papuga_ValueVariant_isequal_ascii( &si->value, "param"))
-		{
-			++si;
-			if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
-			if (si->tag != papuga_TagOpen) --si;
-		}
-	}
 	if (si->tag == papuga_TagOpen)
 	{
 		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
+
 		if (si->tag == papuga_TagValue)
 		{
 			std::string paramname = Deserializer::getString( si, se);
@@ -793,9 +897,8 @@ static void deserializeQueryEvalFunctionParameter(
 		{
 			std::string name;
 			unsigned char name_defined = 0;
-			unsigned char value_defined = 0;
 			bool is_feature = false;
-			papuga_ValueVariant value;
+			const papuga_ValueVariant* value = 0;
 			while (si->tag == papuga_TagName)
 			{
 				int idx = namemap.index( si->value);
@@ -805,29 +908,29 @@ static void deserializeQueryEvalFunctionParameter(
 					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", functionclass);
 						name = Deserializer::getString( si, se);
 						break;
-					case 1: if (value_defined++) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
+					case 1: if (value) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
 						value = getValue( si, se);
 						break;
-					case 2:	if (value_defined++) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
+					case 2:	if (value) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
 						is_feature=true; value = getValue( si, se);
 						break;
 					default: throw strus::runtime_error(_TXT("unknown name in %s parameter list"), functionclass);
 				}
 			}
 			Deserializer::consumeClose( si, se);
-			if (!name_defined || !value_defined)
+			if (!name_defined || !value)
 			{
 				throw strus::runtime_error(_TXT("incomplete %s definition"), functionclass);
 			}
 			if (is_feature)
 			{
-				featureParameters.push_back( FeatureParameter( name, ValueVariantWrap::tostring( value)));
+				featureParameters.push_back( FeatureParameter( name, ValueVariantWrap::tostring( *value)));
 			}
 			else
 			{
 				if (name == "debug")
 				{
-					debuginfoAttribute = ValueVariantWrap::tostring(value);
+					debuginfoAttribute = ValueVariantWrap::tostring( *value);
 				}
 				else
 				{
@@ -869,6 +972,7 @@ static void deserializeQueryEvalFunctionParameters(
 		const papuga_ValueVariant& parameters,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context = _TXT("query evaluation function parameter list");
 	if (parameters.valuetype != papuga_Serialized)
 	{
 		throw strus::runtime_error(_TXT("list of named arguments expected as %s parameters"), functionclass);
@@ -878,16 +982,27 @@ static void deserializeQueryEvalFunctionParameters(
 		se = papuga::Serialization::end( parameters.value.serialization);
 	try
 	{
-		while (si != se)
+		if (si == se) return;
+		if (si->tag == papuga_TagOpen)
 		{
-			deserializeQueryEvalFunctionParameter(
-				functionclass, function, debuginfoAttribute, featureParameters, si, se);
+			++si;
+			while (si != se && si->tag != papuga_TagClose)
+			{
+				deserializeQueryEvalFunctionParameter(
+					functionclass, function, debuginfoAttribute, featureParameters, si, se);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
 		}
 	}
 	catch (const std::runtime_error& err)
 	{
 		throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( parameters.value.serialization));
 	}
+	if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
 }
 
 template <class FUNCTYPE>
@@ -908,12 +1023,13 @@ static void deserializeQueryEvalFunctionResultNames(
 			se = papuga::Serialization::end( resultnames.value.serialization);
 		try
 		{
-			while (si != se)
+			KeyValueList kvlist( si, se);
+			if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+
+			KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
+			for (; ki != ke; ++ki)
 			{
-				ConfigDef resultdef( si, se);
-				function->defineResultName(
-						ValueVariantWrap::tostring( resultdef.value),
-						resultdef.name);
+				function->defineResultName( ValueVariantWrap::tostring( *ki->second), ki->first);
 			}
 		}
 		catch (const std::runtime_error& err)
@@ -1010,18 +1126,20 @@ void Deserializer::buildWeightingFormula(
 			se = papuga::Serialization::end( parameter.value.serialization);
 		try
 		{
-			while (si != se)
+			KeyValueList kvlist( si, se);
+			if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
+
+			KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
+			for (; ki != ke; ++ki)
 			{
-				ConfigDef cdef( si, se);
-				if (cdef.name == "parser")
+				if (ki->first == "parser")
 				{
-					parsername = ValueVariantWrap::tostring( cdef.value);
+					parsername = ValueVariantWrap::tostring( *ki->second);
 				}
 				else
 				{
 					paramlist.push_back( ParamDef(
-						cdef.name,
-						ValueVariantWrap::todouble( cdef.value)));
+						ki->first, ValueVariantWrap::todouble( *ki->second)));
 				}
 			}
 		}
@@ -1036,9 +1154,7 @@ void Deserializer::buildWeightingFormula(
 	{
 		throw strus::runtime_error(_TXT( "failed to create %s (%s) from source: %s"), context, source.c_str(), errorhnd->fetchError());
 	}
-	std::vector<ParamDef>::const_iterator
-		vi = paramlist.begin(),
-		ve = paramlist.end();
+	std::vector<ParamDef>::const_iterator vi = paramlist.begin(), ve = paramlist.end();
 	for (; vi != ve; ++vi)
 	{
 		scalarfunc->setDefaultVariableValue( vi->first, vi->second);
@@ -1094,6 +1210,7 @@ enum ExpressionType {
 
 static ExpressionType getExpressionType( papuga::Serialization::const_iterator si, const papuga::Serialization::const_iterator& se)
 {
+	static const char* context = "expression";
 	static const StructureNameMap keywords( "type,value,len,from,to,variable,join,range,cardinality,arg", ',');
 	static const ExpressionType keywordTypeMap[10] = {
 		ExpressionTerm, ExpressionTerm, ExpressionTerm,			/*type,value,len*/
@@ -1116,7 +1233,7 @@ static ExpressionType getExpressionType( papuga::Serialization::const_iterator s
 	else if (si->tag == papuga_TagOpen)
 	{
 		++si;
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), "expression");
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
 		if (si->tag == papuga_TagName)
 		{
@@ -1179,13 +1296,14 @@ static void buildExpressionJoin(
 
 	if (si->tag == papuga_TagOpen)
 	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
+
 		std::string variable;
 		std::string op;
 		unsigned int argc = 0;
 		int range = 0;
 		unsigned int cardinality = 0;
-		++si;
-		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 
 		if (si->tag == papuga_TagName)
 		{
@@ -1221,7 +1339,12 @@ static void buildExpressionJoin(
 			if (si->tag == papuga_TagOpen)
 			{
 				++si;
-				variable = Deserializer::getOptionalDefinition( si, se, "variable");
+				const papuga_ValueVariant* variable_
+					= Deserializer::getOptionalDefinition( si, se, "variable");
+				if (variable_)
+				{
+					variable = ValueVariantWrap::tostring( *variable_);
+				}
 				Deserializer::consumeClose( si, se);
 			}
 			if (si->tag == papuga_TagValue)
@@ -1272,7 +1395,6 @@ static void builderPushTerm(
 		ExpressionBuilder& builder,
 		const TermDef& def)
 {
-	/*[-]*/fprintf( stderr, "deserializer::builderPushTerm %s '%s' %u\n", def.type.c_str(), def.value.c_str(), def.length);
 	if (def.value_defined)
 	{
 		builder.pushTerm( def.type);
@@ -1300,61 +1422,77 @@ void Deserializer::buildExpression(
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
 	static const StructureNameMap namemap( "term,metadata,expression", ',');
 
-	if (si->tag == papuga_TagName)
+	if (si->tag == papuga_TagValue)
 	{
-		int idx = namemap.index( si->value);
-		++si;
-		switch (idx)
+		builderPushTerm( builder, TermDef( si, se));
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		papuga::Serialization::const_iterator la_si = si;
+		++la_si;
+		if (la_si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
+
+		if (la_si->tag == papuga_TagName)
 		{
-			case 0:
+			int idx = namemap.index( la_si->value);
+			si = ++la_si;
+			switch (idx)
 			{
-				builderPushTerm( builder, TermDef( si, se));
-				break;
+				case 0:
+				{
+					builderPushTerm( builder, TermDef( si, se));
+					break;
+				}
+				case 1:
+				{
+					MetaDataRangeDef def( si, se);
+					builder.pushDocField( def.from, def.to);
+					break;
+				}
+				case 2:
+				{
+					buildExpressionJoin( builder, si, se);
+					break;
+				}
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
-			case 1:
+			consumeClose( si, se);
+		}
+		else
+		{
+			ExpressionType etype = getExpressionType( si, se);
+			switch (etype)
 			{
-				MetaDataRangeDef def( si, se);
-				builder.pushDocField( def.from, def.to);
-				break;
+				case ExpressionUnknown:
+				{
+					throw strus::runtime_error(_TXT("unable to interpret %s"), context);
+				}
+				case ExpressionTerm:
+				{
+					builderPushTerm( builder, TermDef( si, se));
+					break;
+				}
+				case ExpressionVariableAssignment:
+				{
+					throw strus::runtime_error(_TXT("isolated variable assignment in %s"), context);
+				}
+				case ExpressionMetaDataRange:
+				{
+					MetaDataRangeDef def( si, se);
+					builder.pushDocField( def.from, def.to);
+					break;
+				}
+				case ExpressionJoin:
+				{
+					buildExpressionJoin( builder, si, se);
+					break;
+				}
 			}
-			case 2:
-			{
-				buildExpressionJoin( builder, si, se);
-				break;
-			}
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 		}
 	}
 	else
 	{
-		ExpressionType etype = getExpressionType( si, se);
-		switch (etype)
-		{
-			case ExpressionUnknown:
-			{
-				throw strus::runtime_error(_TXT("unable to interpret %s"), context);
-			}
-			case ExpressionTerm:
-			{
-				builderPushTerm( builder, TermDef( si, se));
-				break;
-			}
-			case ExpressionVariableAssignment:
-			{
-				throw strus::runtime_error(_TXT("isolated variable assignment in %s"), context);
-			}
-			case ExpressionMetaDataRange:
-			{
-				MetaDataRangeDef def( si, se);
-				builder.pushDocField( def.from, def.to);
-				break;
-			}
-			case ExpressionJoin:
-			{
-				buildExpressionJoin( builder, si, se);
-				break;
-			}
-		}
+		throw strus::runtime_error(_TXT("%s definition expected"), context);
 	}
 }
 
@@ -1375,12 +1513,91 @@ void Deserializer::buildExpression(
 			se = papuga::Serialization::end( expression.value.serialization);
 		try
 		{
-			return buildExpression( builder, si, se);
+			buildExpression( builder, si, se);
 		}
 		catch (const std::runtime_error& err)
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( expression.value.serialization));
 		}
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
+	}
+}
+
+void Deserializer::buildPattern(
+		ExpressionBuilder& builder,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
+		ErrorBufferInterface* errorhnd)
+{
+	static const StructureNameMap namemap( "name,expression,visible", ',');
+	static const char* context = _TXT("pattern");
+
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+	if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
+		std::string name;
+		bool visible = true;
+		if (si->tag == papuga_TagName)
+		{
+			do
+			{
+				int ki = namemap.index( si->value);
+				++si;
+				switch (ki)
+				{
+					case 0: name = ValueVariantWrap::tostring( *getValue( si, se));
+						break;
+					case 1: buildExpression( builder, si, se);
+						break;
+					case 2: visible = ValueVariantWrap::tobool( *getValue( si, se));
+						break;
+					default:throw strus::runtime_error(_TXT("unknown element in %s definition"), context);
+				}
+			} while (si != se && si->tag == papuga_TagName);
+		}
+		else
+		{
+			if (si->tag == papuga_TagOpen)
+			{
+				++si;
+				const papuga_ValueVariant* visibility = getOptionalDefinition( si, se, "access");
+
+				if (visibility)
+				{
+					if (papuga_ValueVariant_isequal_ascii( visibility, "public"))
+					{
+						visible = true;
+					}
+					else if (papuga_ValueVariant_isequal_ascii( visibility, "private"))
+					{
+						visible = false;
+					}
+					else
+					{
+						throw strus::runtime_error(_TXT("expected 'private' or 'public' as access flag of %s"), context);
+					}
+				}
+				Deserializer::consumeClose( si, se);
+			}
+			if (si->tag == papuga_TagValue)
+			{
+				name = getString( si, se);
+				buildExpression( builder, si, se);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("error in %s definition structure"), context);
+			}
+		}
+		Deserializer::consumeClose( si, se);
+		builder.definePattern( name, visible);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
 	}
 }
 
@@ -1389,8 +1606,8 @@ void Deserializer::buildPatterns(
 		const papuga_ValueVariant& patterns,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "name,expression,visible", ',');
-	static const char* context = _TXT("pattern");
+	static const char* context = _TXT("pattern list");
+
 	if (!papuga_ValueVariant_defined( &patterns)) return;
 	if (patterns.valuetype != papuga_Serialized)
 	{
@@ -1401,83 +1618,20 @@ void Deserializer::buildPatterns(
 		se = papuga::Serialization::end( patterns.value.serialization);
 	try
 	{
-		while (si != se)
-		{
-			if (si->tag == papuga_TagName)
-			{
-				if (papuga_ValueVariant_isequal_ascii( &si->value, "pattern"))
-				{
-					++si;
-					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
-					if (si->tag != papuga_TagOpen) --si;
-				}
-				else
-				{
-					throw strus::runtime_error(_TXT("structure with optional name 'pattern' expected"), context);
-				}
-			}
-			if (si->tag == papuga_TagOpen)
-			{
-				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
-				std::string name;
-				bool visible = true;
-				if (si->tag == papuga_TagName)
-				{
-					do
-					{
-						int ki = namemap.index( si->value);
-						++si;
-						switch (ki)
-						{
-							case 0: name = ValueVariantWrap::tostring( getValue( si, se));
-								break;
-							case 1: buildExpression( builder, si, se);
-								break;
-							case 2: visible = ValueVariantWrap::tobool( getValue( si, se));
-								break;
-							default:throw strus::runtime_error(_TXT("unknown element in %s definition"), context);
-						}
-					} while (si != se && si->tag == papuga_TagName);
-				}
-				else
-				{
-					if (si->tag == papuga_TagOpen)
-					{
-						++si;
-						std::string visibility = Deserializer::getOptionalDefinition( si, se, "access");
-						Deserializer::consumeClose( si, se);
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 
-						if (visibility == "public")
-						{
-							visible = true;
-						}
-						else if (visibility == "private")
-						{
-							visible = false;
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("expected 'private' or 'public' as access flag of %s"), context);
-						}
-					}
-					if (si->tag == papuga_TagValue)
-					{
-						name = getString( si, se);
-						buildExpression( builder, si, se);
-					}
-					else
-					{
-						throw strus::runtime_error(_TXT("error in %s definition structure"), context);
-					}
-				}
-				Deserializer::consumeClose( si, se);
-				builder.definePattern( name, visible);
-			}
-			else
+		if (si->tag == papuga_TagOpen && Deserializer::hasDepth( si+1, se, 1))
+		{
+			++si;
+			while (si != se && si->tag != papuga_TagClose)
 			{
-				throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
+				buildPattern( builder, si, se, errorhnd);
 			}
+			consumeClose( si, se);
+		}
+		else
+		{
+			buildPattern( builder, si, se, errorhnd);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -1494,83 +1648,81 @@ static void buildMetaData(
 {
 	static const StructureNameMap namemap( "name,value", ',');
 	static const char* context = _TXT("document metadata");
+
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-
-	if (si->tag != papuga_TagOpen) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
-	++si;
-
-	while (si != se && si->tag != papuga_TagClose)
+	if (si->tag == papuga_TagOpen)
 	{
-		if (si->tag == papuga_TagName)
+		++si;
+	
+		while (si != se && si->tag != papuga_TagClose)
 		{
-			if (papuga_ValueVariant_isequal_ascii( &si->value, "assign"))
+			if (si->tag == papuga_TagOpen)
 			{
 				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), context);
-				if (si->tag != papuga_TagOpen) --si;
-			}
-		}
-		if (si->tag == papuga_TagOpen)
-		{
-			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-
-			if (si->tag == papuga_TagName)
-			{
-				unsigned char name_defined = 0;
-				unsigned char value_defined = 0;
-				std::string name;
-				NumericVariant value;
-				do
+				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	
+				if (si->tag == papuga_TagName)
 				{
-					int idx = namemap.index( si->value);
-					++si;
-					switch (idx)
+					unsigned char name_defined = 0;
+					unsigned char value_defined = 0;
+					std::string name;
+					NumericVariant value;
+					do
 					{
-						case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
-							name = Deserializer::getString( si, se);
-							break;
-						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
-							value = ValueVariantWrap::tonumeric( getValue( si, se));
-							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						int idx = namemap.index( si->value);
+						++si;
+						switch (idx)
+						{
+							case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+								name = Deserializer::getString( si, se);
+								break;
+							case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+								value = ValueVariantWrap::tonumeric( *getValue( si, se));
+								break;
+							default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						}
 					}
+					while (si->tag == papuga_TagName);
+					if (!name_defined || !value_defined)
+					{
+						throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					}
+					document->setMetaData( name, value);
 				}
-				while (si->tag == papuga_TagName);
-				if (!name_defined || !value_defined)
+				else if (si->tag == papuga_TagValue)
 				{
-					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					std::string name = Deserializer::getString( si, se);
+					if (si->tag != papuga_TagValue)
+					{
+						throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
+					}
+					NumericVariant value = ValueVariantWrap::tonumeric( *getValue( si, se));
+					document->setMetaData( name, value);
 				}
-				document->setMetaData( name, value);
+				else
+				{
+					throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+				}
+				Deserializer::consumeClose( si, se);
 			}
-			else if (si->tag == papuga_TagValue)
+			else if (si->tag == papuga_TagName)
 			{
-				std::string name = Deserializer::getString( si, se);
-				if (si->tag != papuga_TagValue)
-				{
-					throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
-				}
-				NumericVariant value = ValueVariantWrap::tonumeric( getValue( si, se));
+				std::string name = ValueVariantWrap::tostring( si->value);
+				++si;
+				NumericVariant value = ValueVariantWrap::tonumeric( *getValue( si, se));
 				document->setMetaData( name, value);
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+				throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
 			}
-			Deserializer::consumeClose( si, se);
 		}
-		else if (si->tag == papuga_TagName)
-		{
-			std::string name = ValueVariantWrap::tostring( si->value);
-			++si;
-			NumericVariant value = ValueVariantWrap::tonumeric( getValue( si, se));
-			document->setMetaData( name, value);
-		}
-		else
-		{
-			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
-		}
+		Deserializer::consumeClose( si, se);
 	}
-	Deserializer::consumeClose( si, se);
+	else
+	{
+		throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	}
 }
 
 template <class StorageDocumentAccess>
@@ -1581,82 +1733,79 @@ static void buildAttributes(
 {
 	static const StructureNameMap namemap( "name,value", ',');
 	static const char* context = _TXT("document attributes");
+
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-	if (si->tag != papuga_TagOpen) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
-	++si;
-
-	while (si != se && si->tag != papuga_TagClose)
+	if (si->tag == papuga_TagOpen)
 	{
-		if (si->tag == papuga_TagName)
+		++si;
+		while (si != se && si->tag != papuga_TagClose)
 		{
-			if (papuga_ValueVariant_isequal_ascii( &si->value, "attribute"))
+			if (si->tag == papuga_TagOpen)
 			{
-				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-				if (si->tag != papuga_TagOpen) --si;
-			}
-		}
-		if (si->tag == papuga_TagOpen)
-		{
-			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-
-			if (si->tag == papuga_TagName)
-			{
-				unsigned char name_defined = 0;
-				unsigned char value_defined = 0;
-				std::string name;
-				std::string value;
-				do
+				if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	
+				if (si->tag == papuga_TagName)
 				{
-					int idx = namemap.index( si->value);
-					++si;
-					switch (idx)
+					unsigned char name_defined = 0;
+					unsigned char value_defined = 0;
+					std::string name;
+					std::string value;
+					do
 					{
-						case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
-							name = Deserializer::getString( si, se);
-							break;
-						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
-							value = Deserializer::getString( si, se);
-							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						int idx = namemap.index( si->value);
+						++si;
+						switch (idx)
+						{
+							case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+								name = Deserializer::getString( si, se);
+								break;
+							case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+								value = Deserializer::getString( si, se);
+								break;
+							default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						}
 					}
+					while (si->tag == papuga_TagName);
+					if (!name_defined || !value_defined)
+					{
+						throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					}
+					document->setAttribute( name, value);
 				}
-				while (si->tag == papuga_TagName);
-				if (!name_defined || !value_defined)
+				else if (si->tag == papuga_TagValue)
 				{
-					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					std::string name = Deserializer::getString( si, se);
+					if (si->tag != papuga_TagValue)
+					{
+						throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
+					}
+					std::string value = Deserializer::getString( si, se);
+					document->setAttribute( name, value);
 				}
-				document->setAttribute( name, value);
+				else
+				{
+					throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+				}
+				Deserializer::consumeClose( si, se);
 			}
-			else if (si->tag == papuga_TagValue)
+			else if (si->tag == papuga_TagName)
 			{
-				std::string name = Deserializer::getString( si, se);
-				if (si->tag != papuga_TagValue)
-				{
-					throw strus::runtime_error(_TXT("expected 2-tuple for element in %s function"), context);
-				}
+				std::string name = ValueVariantWrap::tostring( si->value);
+				++si;
 				std::string value = Deserializer::getString( si, se);
 				document->setAttribute( name, value);
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+				throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
 			}
-			Deserializer::consumeClose( si, se);
 		}
-		else if (si->tag == papuga_TagName)
-		{
-			std::string name = ValueVariantWrap::tostring( si->value);
-			++si;
-			std::string value = Deserializer::getString( si, se);
-			document->setAttribute( name, value);
-		}
-		else
-		{
-			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
-		}
+		Deserializer::consumeClose( si, se);
 	}
-	Deserializer::consumeClose( si, se);
+	else
+	{
+		throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	}
 }
 
 template <class StorageDocumentAccess>
@@ -1693,92 +1842,85 @@ static void buildStorageIndex(
 {
 	static const StructureNameMap namemap( "type,value,pos,len", ',');
 	static const char* context = _TXT("search index");
+
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-	if (si->tag != papuga_TagOpen) throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
-	++si;
-
-	while (si != se && si->tag != papuga_TagClose)
+	if (si->tag == papuga_TagOpen)
 	{
-		if (si->tag == papuga_TagName)
+		++si;
+		while (si != se && si->tag != papuga_TagClose)
 		{
-			if (papuga_ValueVariant_isequal_ascii( &si->value, "term"))
+			if (si->tag == papuga_TagOpen)
 			{
-				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-				if (si->tag != papuga_TagOpen) --si;
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("structure with optional name 'term' expected"), context);
-			}
-		}
-		if (si->tag == papuga_TagOpen)
-		{
-			if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
-
-			if (si->tag == papuga_TagName)
-			{
-				unsigned char type_defined = 0;
-				unsigned char value_defined = 0;
-				unsigned char pos_defined = 0;
-				std::string type;
-				std::string value;
-				unsigned int pos;
-				do
+				if (++si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	
+				if (si->tag == papuga_TagName)
 				{
-					int idx = namemap.index( si->value);
-					++si;
-					switch (idx)
+					unsigned char type_defined = 0;
+					unsigned char value_defined = 0;
+					unsigned char pos_defined = 0;
+					std::string type;
+					std::string value;
+					unsigned int pos;
+					do
 					{
-						case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
-							type = Deserializer::getString( si, se);
-							break;
-						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
-							value = Deserializer::getString( si, se);
-							break;
-						case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "pos", context);
-							pos = Deserializer::getUint( si, se);
-							break;
-						case 3: (void)Deserializer::getUint( si, se);
-							// ... len that is part of analyzer output is ignored
-							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						int idx = namemap.index( si->value);
+						++si;
+						switch (idx)
+						{
+							case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+								type = Deserializer::getString( si, se);
+								break;
+							case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+								value = Deserializer::getString( si, se);
+								break;
+							case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "pos", context);
+								pos = Deserializer::getUint( si, se);
+								break;
+							case 3: (void)Deserializer::getUint( si, se);
+								// ... len that is part of analyzer output is ignored
+								break;
+							default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						}
 					}
+					while (si->tag == papuga_TagName);
+					if (!type_defined || !value_defined || !pos_defined)
+					{
+						throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					}
+					document->addTerm( type, value, pos);
 				}
-				while (si->tag == papuga_TagName);
-				if (!type_defined || !value_defined || !pos_defined)
+				else if (si->tag == papuga_TagValue)
 				{
-					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					std::string type = Deserializer::getString( si, se);
+					if (si->tag != papuga_TagValue)
+					{
+						throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+					}
+					std::string value = Deserializer::getString( si, se);
+					if (si->tag != papuga_TagValue)
+					{
+						throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+					}
+					unsigned int pos = Deserializer::getUint( si, se);
+					document->addTerm( type, value, pos);
 				}
-				document->addTerm( type, value, pos);
-			}
-			else if (si->tag == papuga_TagValue)
-			{
-				std::string type = Deserializer::getString( si, se);
-				if (si->tag != papuga_TagValue)
+				else
 				{
-					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
+					throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
 				}
-				std::string value = Deserializer::getString( si, se);
-				if (si->tag != papuga_TagValue)
-				{
-					throw strus::runtime_error(_TXT("expected 3-tuple for element in %s"), context);
-				}
-				unsigned int pos = Deserializer::getUint( si, se);
-				document->addTerm( type, value, pos);
+				Deserializer::consumeClose( si, se);
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("structure expected with named elements or tuple with positional arguments for %s"), context);
+				throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
 			}
-			Deserializer::consumeClose( si, se);
 		}
-		else
-		{
-			throw strus::runtime_error(_TXT("named elements or structures expected for %s"), context);
-		}
+		Deserializer::consumeClose( si, se);
 	}
-	Deserializer::consumeClose( si, se);
+	else
+	{
+		throw strus::runtime_error(_TXT("sub structure expected as content of %s section"), context);
+	}
 }
 
 template <class StorageDocumentAccess>
@@ -1795,13 +1937,6 @@ static void buildAccessRights(
 		++si;
 		while (si != se && si->tag != papuga_TagClose)
 		{
-			if (si->tag == papuga_TagName)
-			{
-				if (papuga_ValueVariant_isequal_ascii( &si->value, "user"))
-				{
-					++si;
-				}
-			}
 			document->setUserAccessRight( Deserializer::getString( si, se));
 		}
 		Deserializer::consumeClose( si, se);
@@ -1830,41 +1965,51 @@ static void buildStorageDocument(
 		se = papuga::Serialization::end( content.value.serialization);
 	try
 	{
-		while (si != se)
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+		if (si->tag == papuga_TagOpen)
 		{
-			if (si->tag != papuga_TagName)
-			{
-				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
-			}
-			int idx = namemap.index( si->value);
 			++si;
-			switch (idx)
+			while (si != se && si->tag != papuga_TagClose)
 			{
-				case 0: (void)Deserializer::getString( si, se);
-					// ... ignore sub document type (output of analyzer)
-					break;
-				case 1: buildAttributes( document, si, se);
-					break;
-				case 2: buildMetaData( document, si, se);
-					break;
-				case 3:
+				if (si->tag != papuga_TagName)
 				{
-					StorageDocumentSearchIndexAccess<StorageDocumentAccess>
-						da( document);
-					buildStorageIndex( &da, si, se);
-					break;
+					throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
 				}
-				case 4:
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
 				{
-					StorageDocumentForwardIndexAccess<StorageDocumentAccess>
-						da( document);
-					buildStorageIndex( &da, si, se);
-					break;
+					case 0: (void)Deserializer::getString( si, se);
+						// ... ignore sub document type (output of analyzer)
+						break;
+					case 1: buildAttributes( document, si, se);
+						break;
+					case 2: buildMetaData( document, si, se);
+						break;
+					case 3:
+					{
+						StorageDocumentSearchIndexAccess<StorageDocumentAccess>
+							da( document);
+						buildStorageIndex( &da, si, se);
+						break;
+					}
+					case 4:
+					{
+						StorageDocumentForwardIndexAccess<StorageDocumentAccess>
+							da( document);
+						buildStorageIndex( &da, si, se);
+						break;
+					}
+					case 5: buildAccessRights( document, si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
-				case 5: buildAccessRights( document, si, se);
-					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -1890,76 +2035,86 @@ static void buildStorageDocumentDeletes(
 		se = papuga::Serialization::end( content.value.serialization);
 	try
 	{
-		while (si != se)
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+		if (si->tag == papuga_TagOpen)
 		{
-			if (si->tag != papuga_TagName)
-			{
-				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
-			}
-			int idx = namemap.index( si->value);
 			++si;
-			switch (idx)
+			while (si != se && si->tag != papuga_TagClose)
 			{
-				case 0:
+				if (si->tag != papuga_TagName)
 				{
-					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
-					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
-					for (; di != de; ++di)
-					{
-						document->clearAttribute( *di);
-					}
-					break;
+					throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
 				}
-				case 1: buildMetaData( document, si, se);
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
 				{
-					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
-					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
-					for (; di != de; ++di)
-					{
-						document->setMetaData( *di, NumericVariant());
-					}
-					break;
-				}
-				case 2:
-				{
-					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
-					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
-					for (; di != de; ++di)
-					{
-						document->clearSearchIndexTerm( *di);
-					}
-					break;
-				}
-				case 3:
-				{
-					std::vector<std::string> deletes( Deserializer::getStringList( si, se));
-					std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
-					for (; di != de; ++di)
-					{
-						document->clearForwardIndexTerm( *di);
-					}
-					break;
-				}
-				case 4:
-				{
-					if (si != se && si->tag == papuga_TagValue
-						&& papuga_ValueVariant_isequal_ascii( &si->value, "*"))
-					{
-						document->clearUserAccessRights();
-					}
-					else
+					case 0:
 					{
 						std::vector<std::string> deletes( Deserializer::getStringList( si, se));
 						std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 						for (; di != de; ++di)
 						{
-							document->clearUserAccessRight( *di);
+							document->clearAttribute( *di);
 						}
+						break;
 					}
-					break;
+					case 1: buildMetaData( document, si, se);
+					{
+						std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+						std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+						for (; di != de; ++di)
+						{
+							document->setMetaData( *di, NumericVariant());
+						}
+						break;
+					}
+					case 2:
+					{
+						std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+						std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+						for (; di != de; ++di)
+						{
+							document->clearSearchIndexTerm( *di);
+						}
+						break;
+					}
+					case 3:
+					{
+						std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+						std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+						for (; di != de; ++di)
+						{
+							document->clearForwardIndexTerm( *di);
+						}
+						break;
+					}
+					case 4:
+					{
+						if (si != se && si->tag == papuga_TagValue
+							&& papuga_ValueVariant_isequal_ascii( &si->value, "*"))
+						{
+							document->clearUserAccessRights();
+						}
+						else
+						{
+							std::vector<std::string> deletes( Deserializer::getStringList( si, se));
+							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+							for (; di != de; ++di)
+							{
+								document->clearUserAccessRight( *di);
+							}
+						}
+						break;
+					}
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -1982,8 +2137,8 @@ void Deserializer::buildUpdateDocument(
 		const papuga_ValueVariant& deletes,
 		ErrorBufferInterface* errorhnd)
 {
-	buildStorageDocument( document, content, errorhnd);
 	buildStorageDocumentDeletes( document, deletes, errorhnd);
+	buildStorageDocument( document, content, errorhnd);
 }
 
 void Deserializer::buildStatistics(
@@ -2004,43 +2159,48 @@ void Deserializer::buildStatistics(
 		se = papuga::Serialization::end( content.value.serialization);
 	try
 	{
-		while (si != se)
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+		if (si->tag == papuga_TagOpen)
 		{
-			if (si->tag != papuga_TagName)
-			{
-				throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
-			}
-			int idx = namemap.index( si->value);
 			++si;
-			switch (idx)
+			while (si != se && si->tag != papuga_TagClose)
 			{
-				case 0:
+				if (si->tag != papuga_TagName)
 				{
-					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
-					if (si->tag == papuga_TagOpen)
+					throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
+				}
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
+				{
+					case 0:
 					{
-						++si;
-						while (si != se && si->tag != papuga_TagClose)
+						if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
+						if (si->tag == papuga_TagOpen)
 						{
-							if (si->tag == papuga_TagName && papuga_ValueVariant_isequal_ascii( &si->value, "dfchange"))
+							++si;
+							while (si != se && si->tag != papuga_TagClose)
 							{
-								//... skip name of structure if defined (for example for XML)
-								++si;
+								DfChangeDef dfchg( si, se);
+								builder->addDfChange( dfchg.termtype, dfchg.termvalue, dfchg.increment);
 							}
-							DfChangeDef dfchg( si, se);
-							builder->addDfChange( dfchg.termtype, dfchg.termvalue, dfchg.increment);
+							Deserializer::consumeClose( si, se);
 						}
-						Deserializer::consumeClose( si, se);
 					}
+					case 1:
+					{
+						builder->setNofDocumentsInsertedChange( Deserializer::getInt( si, se));
+					}
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
-				case 1:
-				{
-					builder->setNofDocumentsInsertedChange( Deserializer::getInt( si, se));
-				}
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
+			Deserializer::consumeClose( si, se);
 		}
-	}	
+		else
+		{
+			throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
+		}
+	}
 	catch (const std::runtime_error& err)
 	{
 		throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( content.value.serialization));
@@ -2066,44 +2226,9 @@ std::string Deserializer::getStorageConfigString(
 		se = papuga::Serialization::end( content.value.serialization);
 	try
 	{
-		std::string rt;
-		while (si != se)
-		{
-			if (rt.empty()) rt.push_back(';');
-			ConfigDef item( si, se);
-			rt.append( item.name);
-			rt.push_back('=');
-			if (papuga_ValueVariant_isstring( &item.value))
-			{
-				std::string value = ValueVariantWrap::tostring( item.value);
-				if (std::strchr( value.c_str(), '\"') == 0)
-				{
-					rt.push_back('\"');
-					rt.append( value);
-					rt.push_back('\"');
-				}
-				else if (std::strchr( value.c_str(), '\'') == 0)
-				{
-					rt.push_back('\'');
-					rt.append( value);
-					rt.push_back('\'');
-				}
-				else
-				{
-					throw strus::runtime_error(_TXT("cannot build configuration string with values containing both type of quotes (\' and \")"));
-				}
-			}
-			else if (papuga_ValueVariant_isatomic( &item.value))
-			{
-				std::string value = ValueVariantWrap::tostring( item.value);
-				rt.append( value);
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("atomic values expected for %s"), context);
-			}
-		}
-		return rt;
+		ConfigDef item( si, se);
+		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
+		return item.cfgstring;
 	}
 	catch (const std::runtime_error& err)
 	{

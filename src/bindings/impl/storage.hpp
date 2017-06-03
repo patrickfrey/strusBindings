@@ -44,6 +44,10 @@ public:
 	/// return the total number of documents
 	unsigned int nofDocumentsInserted() const;
 
+	/// \brief Get the internal document number from the document identifier
+	/// return the internal document number or 0, if not defined
+	Index documentNumber( const std::string& docid) const;
+
 	/// \brief Create a transaction
 	/// return the transaction object created
 	StorageTransactionImpl* createTransaction() const;
@@ -51,7 +55,7 @@ public:
 	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
 	/// \param[in] sign true = registration, false = deregistration
 	/// return the statistics iterator object created
-	StatisticsIteratorImpl* createInitStatisticsIterator( bool sign);
+	StatisticsIteratorImpl* createStatisticsIterator( bool sign);
 
 	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
 	/// return the statistics message iterator object created

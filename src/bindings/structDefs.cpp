@@ -8,9 +8,11 @@
 #include "structDefs.hpp"
 #include "internationalization.hpp"
 #include "deserializer.hpp"
+#include "papuga/serialization.hpp"
 #include "papuga/valueVariant.h"
 #include "valueVariantWrap.hpp"
-#include "papuga/serialization.hpp"
+#include "strus/base/localErrorBuffer.hpp"
+#include "strus/base/configParser.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -46,6 +48,9 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator&
 	}
 	else if (si->tag == papuga_TagOpen)
 	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
 		if (si->tag == papuga_TagName)
 		{
 			do
@@ -62,7 +67,6 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator&
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
 			} while (si != se && si->tag == papuga_TagName);
-			Deserializer::consumeClose( si, se);
 		}
 		else if (si->tag == papuga_TagValue)
 		{
@@ -72,12 +76,12 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator&
 			{
 				args = Deserializer::getStringList( si, se);
 			}
-			Deserializer::consumeClose( si, se);
 		}
 		else
 		{
 			throw strus::runtime_error(_TXT("%s definition structure expected"), context);
 		}
+		Deserializer::consumeClose( si, se);
 	}
 	else
 	{
@@ -140,7 +144,12 @@ TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Seria
 			if (si->tag == papuga_TagOpen)
 			{
 				++si;
-				variable = Deserializer::getOptionalDefinition( si, se, "variable");
+				const papuga_ValueVariant* variable_
+					= Deserializer::getOptionalDefinition( si, se, "variable");
+				if (variable_)
+				{
+					variable = ValueVariantWrap::tostring( *variable_);
+				}
 				Deserializer::consumeClose( si, se);
 			}
 			if (si->tag == papuga_TagValue)
@@ -190,10 +199,13 @@ MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, c
 {
 	static const char* context = _TXT("metadata range");
 	static const StructureNameMap namemap( "from,to", ',');
-	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition, structure expected"), context);
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 
 	if (si->tag == papuga_TagOpen)
 	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
 		if (si->tag == papuga_TagName)
 		{
 			do
@@ -209,12 +221,20 @@ MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, c
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
 			} while (si != se && si->tag == papuga_TagName);
-			Deserializer::consumeClose( si, se);
+		}
+		else if (si->tag == papuga_TagValue)
+		{
+			from = Deserializer::getString( si, se);
+			if (si != se && si->tag == papuga_TagValue)
+			{
+				to = Deserializer::getString( si, se);
+			}
 		}
 		else
 		{
 			throw strus::runtime_error(_TXT("expected %s structure"), context);
 		}
+		Deserializer::consumeClose( si, se);
 	}
 	else
 	{
@@ -222,72 +242,160 @@ MetaDataRangeDef::MetaDataRangeDef( papuga::Serialization::const_iterator& si, c
 	}
 }
 
-
-ConfigDef::ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
-	:name(),value()
+void KeyValueList::parseMetaKeyValueList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 {
-	static const char* context = _TXT("configuration");
+	static const char* context = _TXT("named key value pair list");
 	static const StructureNameMap namemap( "name,value", ',');
-	if (si->tag == papuga_TagOpen)
+	while (si != se && si->tag != papuga_TagClose)
 	{
-		if (si->tag == papuga_TagName)
-		{
-			if (papuga_ValueVariant_isequal_ascii( &si->value, "def"))
-			{
-				!!!!!! HIE Wiiter
-			}
-		}
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
 		if (si->tag == papuga_TagOpen)
 		{
 			++si;
 			if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
-			if (si->tag == papuga_TagValue)
+
+			std::string name;
+			const papuga_ValueVariant* value;
+			unsigned char defined[2] = {0,0};
+			while (si->tag == papuga_TagName)
 			{
-				name = Deserializer::getString( si, se);
-				value = getValue( si, se);
-				Deserializer::consumeClose( si, se);
-			}
-			else
-			{
-				unsigned char defined[2] = {0,0};
-				while (si->tag == papuga_TagName)
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
 				{
-					int idx = namemap.index( si->value);
-					++si;
-					switch (idx)
-					{
-						case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
-							name = Deserializer::getString( si, se);
-							break;
-						case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
-							value = getValue( si, se);
-							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'name' or 'value' expected"), context);
-					}
-				}
-				Deserializer::consumeClose( si, se);
-				if (!defined[0] || !defined[1])
-				{
-					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+						name = Deserializer::getString( si, se);
+						break;
+					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
+						value = &getValue( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'name' or 'value' expected"), context);
 				}
 			}
-		}
-		else if (si->tag == papuga_TagName)
-		{
-			name = Deserializer::getString( si, se);
-			if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
-	
-			value = si->value;
-			++si;
+			Deserializer::consumeClose( si, se);
+			if (!defined[0] || !defined[1])
+			{
+				throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+			}
+			items.push_back( Item( name, value));
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("argument name expected as as start of a %s parameter"), context);
+			throw strus::runtime_error(_TXT("expected %s structure"), context);
 		}
+	}
+}
+
+void KeyValueList::parseDictionary( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+{
+	static const char* context = _TXT("name value pair list");
+	while (si != se && si->tag != papuga_TagClose)
+	{
+		if (si->tag == papuga_TagName)
+		{
+			std::string name = ValueVariantWrap::tostring( getValue( si, se));
+			const papuga_ValueVariant* value = &getValue( si, se);
+			items.push_back( Item( name, value));
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("expected only name value pairs in %s structure"), context);
+		}
+	}
+}
+
+void KeyValueList::parseValueTupleList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+{
+	static const char* context = _TXT("value tuple list");
+	while (si != se && si->tag != papuga_TagClose)
+	{
+		if (si->tag == papuga_TagOpen)
+		{
+			++si;
+			if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
+			if (si->tag == papuga_TagValue)
+			{
+				std::string name = Deserializer::getString( si, se);
+				const papuga_ValueVariant* value = &getValue( si, se);
+				items.push_back( Item( name, value));
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("expected only value pairs in %s structure"), context);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("expected only value pairs in %s structure"), context);
+		}
+	}
+}
+
+KeyValueList::KeyValueList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+	:items()
+
+{
+	static const char* context = _TXT("key value pair list");
+	if (si == se) return;
+	if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
+		if (si->tag == papuga_TagOpen)
+		{
+			if ((si+1)->tag == papuga_TagName)
+			{
+				parseMetaKeyValueList( si, se);
+			}
+			else if ((si+1)->tag == papuga_TagValue)
+			{
+				parseValueTupleList( si, se);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("expected %s structure"), context);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+		else if (si->tag == papuga_TagName)
+		{
+			parseDictionary( si, se);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("expected %s structure"), context);
+		}
+		Deserializer::consumeClose( si, se);
 	}
 	else
 	{
 		throw strus::runtime_error(_TXT("expected %s structure"), context);
+	}
+}
+
+ConfigDef::ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+	:cfgstring()
+{
+	if (si == se) return;
+	if (si->tag == papuga_TagOpen)
+	{
+		LocalErrorBuffer errorhnd;
+		KeyValueList kvmap( si, se);
+		KeyValueList::const_iterator ki = kvmap.begin(), ke = kvmap.end();
+		for (; ki != ke; ++ki)
+		{
+			if (!addConfigStringItem( cfgstring, ki->first, ValueVariantWrap::tostring( *ki->second), &errorhnd))
+			{
+				throw strus::runtime_error( _TXT("error parsing configuration: %s"), errorhnd.fetchError());
+			}
+		}
+	}
+	else if (si->tag == papuga_TagValue)
+	{
+		cfgstring = Deserializer::getString( si, se);
 	}
 }
 
@@ -300,6 +408,7 @@ DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papug
 	{
 		++si;
 		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
 		if (si->tag == papuga_TagValue)
 		{
 			termtype = Deserializer::getCharp( si, se);
@@ -345,31 +454,48 @@ ContextDef::ContextDef( papuga::Serialization::const_iterator& si, const papuga:
 	static const char* context = _TXT("context configuration");
 	static const StructureNameMap namemap( "threads,rpc,trace", ',');
 
-	if (si != se && si->tag == papuga_TagValue)
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+	if (si->tag == papuga_TagValue)
 	{
 		rpc = Deserializer::getString( si, se);
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
+		if (si != se && si->tag == papuga_TagValue)
+		{
+			rpc = Deserializer::getString( si, se);
+		}
+		else
+		{
+			unsigned char defined[3] = {0,0,0};
+			while (si != se && si->tag == papuga_TagName)
+			{
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
+				{
+					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "threads", context);
+						threads = Deserializer::getUint( si, se);
+						break;
+					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
+						rpc = Deserializer::getString( si, se);
+						break;
+					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
+						trace = Deserializer::getString( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
+				}
+			}
+		}
 		Deserializer::consumeClose( si, se);
 	}
-	unsigned char defined[3] = {0,0,0};
-	while (si != se && si->tag == papuga_TagName)
+	else
 	{
-		int idx = namemap.index( si->value);
-		++si;
-		switch (idx)
-		{
-			case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "threads", context);
-				threads = Deserializer::getUint( si, se);
-				break;
-			case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
-				rpc = Deserializer::getString( si, se);
-				break;
-			case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
-				trace = Deserializer::getString( si, se);
-				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
-		}
+		throw strus::runtime_error(_TXT("structure expected for %s definition"), context);
 	}
-	Deserializer::consumeClose( si, se);
 }
 
 SegmenterDef::SegmenterDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
@@ -377,45 +503,58 @@ SegmenterDef::SegmenterDef( papuga::Serialization::const_iterator& si, const pap
 	static const char* context = _TXT("segmenter configuration");
 	static const StructureNameMap namemap( "segmenter,mimetype,encoding,scheme", ',');
 
-	if (si != se && si->tag == papuga_TagValue)
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+	if (si->tag == papuga_TagValue)
 	{
 		mimetype = Deserializer::getString( si, se);
+	}
+	else if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+
 		if (si != se && si->tag == papuga_TagValue)
 		{
-			encoding = Deserializer::getString( si, se);
+			mimetype = Deserializer::getString( si, se);
+			if (si != se && si->tag == papuga_TagValue)
+			{
+				encoding = Deserializer::getString( si, se);
+			}
+			if (si != se && si->tag == papuga_TagValue)
+			{
+				scheme = Deserializer::getString( si, se);
+			}
 		}
-		if (si != se && si->tag == papuga_TagValue)
+		else
 		{
-			scheme = Deserializer::getString( si, se);
+			unsigned char defined[4] = {0,0,0,0};
+			while (si != se && si->tag == papuga_TagName)
+			{
+				int idx = namemap.index( si->value);
+				++si;
+				switch (idx)
+				{
+					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "segmenter", context);
+						if (0!=(defined[1]|defined[2]|defined[3])) throw strus::runtime_error(_TXT("mixed definition of '%s' and %s in %s"), "segmenter", "'scheme', 'mimetype' and 'encoding'", context);
+						segmenter = Deserializer::getString( si, se);
+						break;
+					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "mimetype", context);
+						if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "mimetype", context);
+						mimetype = Deserializer::getString( si, se);
+						break;
+					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "encoding", context);
+						if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "encoding", context);
+						encoding = Deserializer::getString( si, se);
+						break;
+					case 3:	if (defined[3]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "scheme", context);
+						if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "scheme", context);
+						scheme = Deserializer::getString( si, se);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'segmenter' or 'mimetype' or 'encoding' or 'scheme' expected"), context);
+				}
+			}
 		}
 		Deserializer::consumeClose( si, se);
 	}
-	unsigned char defined[4] = {0,0,0,0};
-	while (si != se && si->tag == papuga_TagName)
-	{
-		int idx = namemap.index( si->value);
-		++si;
-		switch (idx)
-		{
-			case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "segmenter", context);
-				if (0!=(defined[1]|defined[2]|defined[3])) throw strus::runtime_error(_TXT("mixed definition of '%s' and %s in %s"), "segmenter", "'scheme', 'mimetype' and 'encoding'", context);
-				segmenter = Deserializer::getString( si, se);
-				break;
-			case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "mimetype", context);
-				if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "mimetype", context);
-				mimetype = Deserializer::getString( si, se);
-				break;
-			case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "encoding", context);
-				if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "encoding", context);
-				encoding = Deserializer::getString( si, se);
-				break;
-			case 3:	if (defined[3]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "scheme", context);
-				if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "scheme", context);
-				scheme = Deserializer::getString( si, se);
-				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'segmenter' or 'mimetype' or 'encoding' or 'scheme' expected"), context);
-		}
-	}
-	Deserializer::consumeClose( si, se);
 }
 

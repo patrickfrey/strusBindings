@@ -129,7 +129,6 @@ int main( int argc, const char* argv[])
 		return -3;
 	}
 	lua_close( ls);
-	fprintf( stderr, "done\n");
 	return 0;
 }
 
