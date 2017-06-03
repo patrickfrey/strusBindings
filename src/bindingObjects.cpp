@@ -1448,7 +1448,7 @@ StatisticsIterator StorageClient::createInitStatisticsIterator( bool sign) const
 	strus::StorageClientInterface* storage = (strus::StorageClientInterface*)m_storage_impl.get();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference iter( ReferenceDeleter<strus::StatisticsIteratorInterface>::function);
-	iter.reset( storage->createInitStatisticsIterator( sign));
+	iter.reset( storage->createStatisticsIterator( sign));
 	if (!iter.get())
 	{
 		strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
