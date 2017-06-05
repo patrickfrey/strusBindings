@@ -180,7 +180,7 @@ void QueryImpl::setWeightingVariables(
 {
 	static char* context = _TXT("weighting variables");
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	if (parameter.valuetype != papuga_Serialized)
+	if (parameter.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("list of variable assignments expected as argument"));
 	}

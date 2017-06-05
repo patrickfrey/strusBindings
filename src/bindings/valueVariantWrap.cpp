@@ -81,15 +81,15 @@ strus::NumericVariant ValueVariantWrap::tonumeric( const papuga_ValueVariant& va
 	{
 		throw papuga::error_exception( err, _TXT("tonumeric of variant value"));
 	}
-	if (numval.valuetype == papuga_Double)
+	if (numval.valuetype == papuga_TypeDouble)
 	{
 		return strus::NumericVariant( numval.value.Double);
 	}
-	if (numval.valuetype == papuga_UInt)
+	if (numval.valuetype == papuga_TypeUInt)
 	{
 		return strus::NumericVariant( numval.value.UInt);
 	}
-	if (numval.valuetype == papuga_Int)
+	if (numval.valuetype == papuga_TypeInt)
 	{
 		return strus::NumericVariant( numval.value.Int);
 	}

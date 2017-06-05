@@ -45,19 +45,19 @@ public:
 	{
 		return papuga_Serialization_pushValue_double( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_IntType& val)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_Int& val)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_int( papuga_Serialization* result, const papuga_IntType& val)
+	static inline bool serialize_int( papuga_Serialization* result, const papuga_Int& val)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_UIntType& val)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_UInt& val)
 	{
 		return papuga_Serialization_pushValue_uint( result, val);
 	}
-	static inline bool serialize_uint( papuga_Serialization* result, const papuga_UIntType& val)
+	static inline bool serialize_uint( papuga_Serialization* result, const papuga_UInt& val)
 	{
 		return papuga_Serialization_pushValue_uint( result, val);
 	}
@@ -140,7 +140,7 @@ private:
 		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			rt &= serialize_nothrow( result, (papuga_IntType)*vi);
+			rt &= serialize_nothrow( result, (papuga_Int)*vi);
 		}
 		rt &= papuga_Serialization_pushClose( result);
 		return rt;

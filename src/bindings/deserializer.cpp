@@ -154,7 +154,7 @@ const char* Deserializer::getCharp(
 		const papuga::Serialization::const_iterator& se)
 {
 	const papuga_ValueVariant* val = getValue( si, se);
-	if (val->valuetype != papuga_String) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
+	if (val->valuetype != papuga_TypeString) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
 	return val->value.string;
 }
 
@@ -203,7 +203,7 @@ template <typename ATOMICTYPE, ATOMICTYPE CONV( const papuga_ValueVariant& val),
 static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga_ValueVariant& val)
 {
 	std::vector<ATOMICTYPE> rt;
-	if (val.valuetype != papuga_Serialized)
+	if (val.valuetype != papuga_TypeSerialization)
 	{
 		rt.push_back( CONV( val));
 		return rt;
@@ -351,7 +351,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	const papuga_ValueVariant& options)
 {
 	analyzer::FeatureOptions rt;
-	if (options.valuetype != papuga_Serialized)
+	if (options.valuetype != papuga_TypeSerialization)
 	{
 		if (papuga_ValueVariant_defined( &options))
 		{
@@ -384,7 +384,7 @@ TermStatistics Deserializer::getTermStatistics(
 		rt.setDocumentFrequency( ValueVariantWrap::touint64( val));
 		return rt;
 	}
-	if (val.valuetype != papuga_Serialized)
+	if (val.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("atomic value or list of named arguments expected for %s"), context);
 	}
@@ -436,7 +436,7 @@ GlobalStatistics Deserializer::getGlobalStatistics(
 		rt.setNofDocumentsInserted( ValueVariantWrap::touint64( val));
 		return rt;
 	}
-	if (val.valuetype != papuga_Serialized)
+	if (val.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("atomic value or list of named arguments expected for %s"), context);
 	}
@@ -512,7 +512,7 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 	static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
 	static const char* context = _TXT("document class");
 	analyzer::DocumentClass rt;
-	if (val.valuetype != papuga_Serialized)
+	if (val.valuetype != papuga_TypeSerialization)
 	{
 		rt.setMimeType( ValueVariantWrap::tostring( val));
 		return rt;
@@ -702,7 +702,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		ErrorBufferInterface* errorhnd)
 {
 	std::vector<Reference<NormalizerFunctionInstanceInterface> > rt;
-	if (normalizers.valuetype != papuga_Serialized)
+	if (normalizers.valuetype != papuga_TypeSerialization)
 	{
 		std::string name = ValueVariantWrap::tostring( normalizers);
 		rt.push_back( getNormalizer_( name, std::vector<std::string>(), textproc, errorhnd));
@@ -732,7 +732,7 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
-	if (tokenizer.valuetype != papuga_Serialized)
+	if (tokenizer.valuetype != papuga_TypeSerialization)
 	{
 		std::string name = ValueVariantWrap::tostring( tokenizer);
 		return getTokenizer_( name, std::vector<std::string>(), textproc, errorhnd);
@@ -761,7 +761,7 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
-	if (aggregator.valuetype != papuga_Serialized)
+	if (aggregator.valuetype != papuga_TypeSerialization)
 	{
 		std::string name = ValueVariantWrap::tostring( aggregator);
 		return getAggregator_( name, std::vector<std::string>(), textproc, errorhnd);
@@ -973,7 +973,7 @@ static void deserializeQueryEvalFunctionParameters(
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("query evaluation function parameter list");
-	if (parameters.valuetype != papuga_Serialized)
+	if (parameters.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("list of named arguments expected as %s parameters"), functionclass);
 	}
@@ -1014,7 +1014,7 @@ static void deserializeQueryEvalFunctionResultNames(
 {
 	if (papuga_ValueVariant_defined( &resultnames))
 	{
-		if (resultnames.valuetype != papuga_Serialized)
+		if (resultnames.valuetype != papuga_TypeSerialization)
 		{
 			throw strus::runtime_error(_TXT("list of named arguments expected as %s result name definitions"), functionclass);
 		}
@@ -1117,7 +1117,7 @@ void Deserializer::buildWeightingFormula(
 	std::vector<ParamDef> paramlist;
 	if (papuga_ValueVariant_defined( &parameter))
 	{
-		if (parameter.valuetype != papuga_Serialized)
+		if (parameter.valuetype != papuga_TypeSerialization)
 		{
 			throw strus::runtime_error(_TXT("list of named arguments expected as parameters of %s"), context);
 		}
@@ -1502,7 +1502,7 @@ void Deserializer::buildExpression(
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("expression");
-	if (expression.valuetype != papuga_Serialized)
+	if (expression.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
@@ -1609,7 +1609,7 @@ void Deserializer::buildPatterns(
 	static const char* context = _TXT("pattern list");
 
 	if (!papuga_ValueVariant_defined( &patterns)) return;
-	if (patterns.valuetype != papuga_Serialized)
+	if (patterns.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for list of %s"), context);
 	}
@@ -1956,7 +1956,7 @@ static void buildStorageDocument(
 	static const StructureNameMap namemap( "doctype,attributes,metadata,searchindex,forwardindex,access", ',');
 	static const char* context = _TXT("document");
 	if (!papuga_ValueVariant_defined( &content)) return;
-	if (content.valuetype != papuga_Serialized)
+	if (content.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
@@ -2026,7 +2026,7 @@ static void buildStorageDocumentDeletes(
 	static const StructureNameMap namemap( "attributes,metadata,searchindex,forwardindex,access", ',');
 	static const char* context = _TXT("document update deletes");
 	if (!papuga_ValueVariant_defined( &content)) return;
-	if (content.valuetype != papuga_Serialized)
+	if (content.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
@@ -2150,7 +2150,7 @@ void Deserializer::buildStatistics(
 	static const char* context = _TXT("statistics");
 
 	if (!papuga_ValueVariant_defined( &content)) return;
-	if (content.valuetype != papuga_Serialized)
+	if (content.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
@@ -2217,7 +2217,7 @@ std::string Deserializer::getStorageConfigString(
 	{
 		return ValueVariantWrap::tostring( content);
 	}
-	if (content.valuetype != papuga_Serialized)
+	if (content.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error(_TXT("serialized structure or string expected for %s"), context);
 	}

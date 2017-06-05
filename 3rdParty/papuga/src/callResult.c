@@ -10,7 +10,8 @@
 #include "papuga/callResult.h"
 #include "papuga/valueVariant.h"
 #include "papuga/serialization.h"
-#include "papuga/hostObjectReference.h"
+#include "papuga/hostObject.h"
+#include "papuga/iterator.h"
 #include "papuga/stringBuffer.h"
 #include "papuga/errors.h"
 #include <stdlib.h>
@@ -21,15 +22,17 @@
 static void init_CallResult_structures( papuga_CallResult* self)
 {
 	papuga_init_ValueVariant( &self->value);
-	papuga_init_HostObjectReference( &self->object, 0, 0);
+	papuga_init_HostObject( &self->object, 0, 0);
 	papuga_init_Serialization( &self->serialization);
+	papuga_init_Iterator( &self->iterator, 0, 0, 0);
 	papuga_init_StringBuffer( &self->valuebuf);
 }
 
 void papuga_destroy_CallResult( papuga_CallResult* self)
 {
-	papuga_destroy_HostObjectReference( &self->object);
+	papuga_destroy_HostObject( &self->object);
 	papuga_destroy_Serialization( &self->serialization);
+	papuga_destroy_Iterator( &self->iterator);
 	papuga_destroy_StringBuffer( &self->valuebuf);
 }
 
@@ -39,12 +42,12 @@ void papuga_init_CallResult( papuga_CallResult* self, char* errorbuf, size_t err
 	papuga_init_ErrorBuffer( &self->errorbuf, errorbuf, errorbufsize);
 }
 
-void papuga_set_CallResult_int( papuga_CallResult* self, papuga_IntType val)
+void papuga_set_CallResult_int( papuga_CallResult* self, papuga_Int val)
 {
 	papuga_init_ValueVariant_int( &self->value, val);
 }
 
-void papuga_set_CallResult_uint( papuga_CallResult* self, papuga_UIntType val)
+void papuga_set_CallResult_uint( papuga_CallResult* self, papuga_UInt val)
 {
 	papuga_init_ValueVariant_uint( &self->value, val);
 }
@@ -105,22 +108,40 @@ void papuga_set_CallResult_serialization( papuga_CallResult* self)
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 
-void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy)
+void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_Deleter destroy)
 {
-	papuga_init_HostObjectReference( &self->object, data, destroy);
+	papuga_init_HostObject( &self->object, data, destroy);
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 
-void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_HostObjectDeleter destroy)
+void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser)
 {
-	papuga_init_HostObjectReference( &self->object, data, destroy);
+	papuga_init_Serialization_move( &self->serialization, ser);
+	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
+}
+
+void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy)
+{
+	papuga_init_HostObject( &self->object, data, destroy);
 	papuga_init_ValueVariant_hostobj( &self->value, data, classid);
 }
 
-void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy)
+void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_Deleter destroy)
 {
-	papuga_init_HostObjectReference( &self->object, data, destroy);
+	papuga_init_HostObject( &self->object, data, destroy);
 	papuga_init_ValueVariant_hostobj( &self->value, data, 0);
+}
+
+void papuga_set_CallResult_iterator( papuga_CallResult* self, void* data, papuga_Deleter destroy, papuga_GetNext getNext)
+{
+	papuga_init_Iterator( &self->iterator, data, destroy, getNext);
+	papuga_init_ValueVariant_iterator( &self->value, &self->iterator);
+}
+
+void papuga_set_CallResult_iterator_move( papuga_CallResult* self, papuga_Iterator* itr)
+{
+	papuga_init_Iterator_move( &self->iterator, itr);
+	papuga_init_ValueVariant_iterator( &self->value, &self->iterator);
 }
 
 void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ...)

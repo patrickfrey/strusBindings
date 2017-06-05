@@ -416,7 +416,7 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 	{
 		case NumericDouble:
 		{
-			papuga_FloatType val;
+			papuga_Float val;
 			if (scanf( SCAN_FORMAT_DOUBLE, &val) < 1)
 			{
 				return false;
@@ -426,7 +426,7 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 		}
 		case NumericInt:
 		{
-			papuga_IntType val;
+			papuga_Int val;
 			if (scanf( SCAN_FORMAT_INT, &val) < 1)
 			{
 				return false;
@@ -436,7 +436,7 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 		}
 		case NumericUInt:
 		{
-			papuga_UIntType val;
+			papuga_UInt val;
 			if (scanf( SCAN_FORMAT_UINT, &val) < 1)
 			{
 				return false;
@@ -452,15 +452,15 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 
 static bool bufprint_number_variant( char* buf, std::size_t bufsize, std::size_t& len, const papuga_ValueVariant* value, papuga_ErrorCode* err)
 {
-	if (value->valuetype == papuga_Double)
+	if (value->valuetype == papuga_TypeDouble)
 	{
 		len = snprintf( buf, bufsize, PRINT_FORMAT_DOUBLE, value->value.Double);
 	}
-	else if (value->valuetype == papuga_Int)
+	else if (value->valuetype == papuga_TypeInt)
 	{
 		len = snprintf( buf, bufsize, PRINT_FORMAT_INT, value->value.Int);
 	}
-	else if (value->valuetype == papuga_UInt)
+	else if (value->valuetype == papuga_TypeUInt)
 	{
 		len = snprintf( buf, bufsize, PRINT_FORMAT_UINT, value->value.UInt);
 	}
@@ -481,7 +481,7 @@ static bool bufprint_number_variant( char* buf, std::size_t bufsize, std::size_t
 extern "C" char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* val)
 {
 	if (!papuga_ValueVariant_isstring( val)) return false;
-	if (val->valuetype == papuga_String)
+	if (val->valuetype == papuga_TypeString)
 	{
 		if (destbufsize <= (size_t)val->length) return 0;
 		const char* si = val->value.string;
@@ -493,7 +493,7 @@ extern "C" char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize,
 		*di = 0;
 		return destbuf;
 	}
-	else//if (val->valuetype == papuga_LangString)
+	else//if (val->valuetype == papuga_TypeLangString)
 	{
 		return any_langstring_toascii( (papuga_StringEncoding)val->encoding, destbuf, destbufsize, val->value.langstring, val->length);
 	}
@@ -504,12 +504,12 @@ extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* 
 {
 	if (papuga_ValueVariant_isstring( value))
 	{
-		if (value->valuetype == papuga_String)
+		if (value->valuetype == papuga_TypeString)
 		{
 			*len = value->length;
 			return value->value.string;
 		}
-		else//if (value->valuetype == papuga_LangString)
+		else//if (value->valuetype == papuga_TypeLangString)
 		{
 			return any_langstring_to_uft8string( buf, (papuga_StringEncoding)value->encoding, value->value.langstring, value->length, err);
 		}
@@ -538,11 +538,11 @@ std::string papuga::ValueVariant_tostring( const papuga_ValueVariant& value, pap
 	{
 		if (papuga_ValueVariant_isstring( &value))
 		{
-			if (value.valuetype == papuga_String)
+			if (value.valuetype == papuga_TypeString)
 			{
 				return std::string( value.value.string, value.length);
 			}
-			else//if (value.valuetype == papuga_LangString)
+			else//if (value.valuetype == papuga_TypeLangString)
 			{
 				return any_langstring_to_uft8string_stl( (papuga_StringEncoding)value.encoding, value.value.langstring, value.length);
 			}
@@ -571,7 +571,7 @@ extern "C" const void* papuga_ValueVariant_tolangstring( const papuga_ValueVaria
 {
 	if (papuga_ValueVariant_isstring( value))
 	{
-		if (value->valuetype == papuga_String || (value->valuetype == papuga_LangString && (papuga_StringEncoding)value->encoding == papuga_UTF8))
+		if (value->valuetype == papuga_TypeString || (value->valuetype == papuga_TypeLangString && (papuga_StringEncoding)value->encoding == papuga_UTF8))
 		{
 			return uft8string_to_any_langstring( enc, value->value.string, value->length, (char*)buf, bufsize, len, err);
 		}
@@ -601,22 +601,22 @@ extern "C" int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, 
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
-		if (value->valuetype == papuga_Int)
+		if (value->valuetype == papuga_TypeInt)
 		{
 			return value->value.Int;
 		}
-		else if (value->valuetype == papuga_UInt)
+		else if (value->valuetype == papuga_TypeUInt)
 		{
-			if (value->value.UInt > (papuga_UIntType)std::numeric_limits<papuga_IntType>::max())
+			if (value->value.UInt > (papuga_UInt)std::numeric_limits<papuga_Int>::max())
 			{
 				*err = papuga_OutOfRangeError;
 				return 0;
 			}
 			return value->value.UInt;
 		}
-		else if (value->valuetype == papuga_Double)
+		else if (value->valuetype == papuga_TypeDouble)
 		{
-			if (value->value.Double > std::numeric_limits<papuga_IntType>::max())
+			if (value->value.Double > std::numeric_limits<papuga_Int>::max())
 			{
 				*err = papuga_OutOfRangeError;
 				return 0;
@@ -633,7 +633,7 @@ extern "C" int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, 
 		else if (papuga_ValueVariant_isstring( value))
 		{
 			NumericType numtype;
-			if (value->valuetype == papuga_String)
+			if (value->valuetype == papuga_TypeString)
 			{
 				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
 			}
@@ -668,11 +668,11 @@ extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
-		if (value->valuetype == papuga_UInt)
+		if (value->valuetype == papuga_TypeUInt)
 		{
 			return value->value.UInt;
 		}
-		else if (value->valuetype == papuga_Int)
+		else if (value->valuetype == papuga_TypeInt)
 		{
 			if (value->value.Int < 0)
 			{
@@ -681,9 +681,9 @@ extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value
 			}
 			return value->value.Int;
 		}
-		else if (value->valuetype == papuga_Double)
+		else if (value->valuetype == papuga_TypeDouble)
 		{
-			if (value->value.Double > std::numeric_limits<papuga_UIntType>::max()
+			if (value->value.Double > std::numeric_limits<papuga_UInt>::max()
 			||  value->value.Double < 0.0)
 			{
 				*err = papuga_OutOfRangeError;
@@ -694,7 +694,7 @@ extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value
 		else if (papuga_ValueVariant_isstring( value))
 		{
 			NumericType numtype;
-			if (value->valuetype == papuga_String)
+			if (value->valuetype == papuga_TypeString)
 			{
 				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
 			}
@@ -729,22 +729,22 @@ extern "C" double papuga_ValueVariant_todouble( const papuga_ValueVariant* value
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
-		if (value->valuetype == papuga_Double)
+		if (value->valuetype == papuga_TypeDouble)
 		{
 			return value->value.Double;
 		}
-		else if (value->valuetype == papuga_UInt)
+		else if (value->valuetype == papuga_TypeUInt)
 		{
 			return value->value.UInt;
 		}
-		else if (value->valuetype == papuga_Int)
+		else if (value->valuetype == papuga_TypeInt)
 		{
 			return value->value.Int;
 		}
 		else if (papuga_ValueVariant_isstring( value))
 		{
 			NumericType numtype;
-			if (value->valuetype == papuga_String)
+			if (value->valuetype == papuga_TypeString)
 			{
 				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
 			}
@@ -773,15 +773,15 @@ extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, pa
 
 	if (papuga_ValueVariant_isatomic( value))
 	{
-		if (value->valuetype == papuga_UInt)
+		if (value->valuetype == papuga_TypeUInt)
 		{
 			return !!value->value.UInt;
 		}
-		else if (value->valuetype == papuga_Int)
+		else if (value->valuetype == papuga_TypeInt)
 		{
 			return !!value->value.Int;
 		}
-		else if (value->valuetype == papuga_Double)
+		else if (value->valuetype == papuga_TypeDouble)
 		{
 			return (value->value.Double < -std::numeric_limits<float>::epsilon()
 				||  value->value.Double > +std::numeric_limits<float>::epsilon());
@@ -815,17 +815,17 @@ extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_Valu
 	{
 		if (papuga_ValueVariant_isnumeric( value))
 		{
-			if (value->valuetype == papuga_UInt)
+			if (value->valuetype == papuga_TypeUInt)
 			{
 				papuga_init_ValueVariant_uint( res, value->value.UInt);
 				return res;
 			}
-			else if (value->valuetype == papuga_Int)
+			else if (value->valuetype == papuga_TypeInt)
 			{
 				papuga_init_ValueVariant_int( res, value->value.Int);
 				return res;
 			}
-			else if (value->valuetype == papuga_Double)
+			else if (value->valuetype == papuga_TypeDouble)
 			{
 				papuga_init_ValueVariant_double( res, value->value.Double);
 				return res;
@@ -839,7 +839,7 @@ extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_Valu
 		else if (papuga_ValueVariant_isstring( value))
 		{
 			NumericType numtype;
-			if (value->valuetype == papuga_String)
+			if (value->valuetype == papuga_TypeString)
 			{
 				numtype = string_tonumstr( destbuf, sizeof(destbuf), value->value.string, value->length);
 			}
@@ -871,11 +871,11 @@ extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_Valu
 extern "C" bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* val, const char* cmpstr)
 {
 	if (!papuga_ValueVariant_isstring( val)) return false;
-	if (val->valuetype == papuga_String)
+	if (val->valuetype == papuga_TypeString)
 	{
 		return 0 == strncmp( val->value.string, cmpstr, val->length);
 	}
-	else//if (val->valuetype == papuga_LangString)
+	else//if (val->valuetype == papuga_TypeLangString)
 	{
 		return compare_any_langstring_ascii( (papuga_StringEncoding)val->encoding, val->value.langstring, val->length, cmpstr);
 	}
@@ -888,11 +888,11 @@ extern "C" bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* val
 	int cmplen = std::strlen(cmpstr);
 	if (val->length < cmplen) return false;
 
-	if (val->valuetype == papuga_String)
+	if (val->valuetype == papuga_TypeString)
 	{
 		return 0 == strncmp( val->value.string, cmpstr, cmplen);
 	}
-	else//if (val->valuetype == papuga_LangString)
+	else//if (val->valuetype == papuga_TypeLangString)
 	{
 		return starts_any_langstring_ascii( (papuga_StringEncoding)val->encoding, val->value.langstring, val->length, cmpstr);
 	}

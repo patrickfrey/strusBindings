@@ -27,12 +27,12 @@ void papuga_destroy_CallResult( papuga_CallResult* self);
 /// \brief Define value of CallResult as int
 /// \param[in,out] self pointer to structure
 /// \param[in] val value to set as return value
-void papuga_set_CallResult_int( papuga_CallResult* self, papuga_IntType val);
+void papuga_set_CallResult_int( papuga_CallResult* self, papuga_Int val);
 
 /// \brief Define value of CallResult as unsigned int
 /// \param[in,out] self pointer to structure
 /// \param[in] val value to set as return value
-void papuga_set_CallResult_uint( papuga_CallResult* self, papuga_UIntType val);
+void papuga_set_CallResult_uint( papuga_CallResult* self, papuga_UInt val);
 
 /// \brief Define value of CallResult as double precision floating point value
 /// \param[in,out] self pointer to structure
@@ -75,12 +75,12 @@ void papuga_set_CallResult_langstring_const( papuga_CallResult* self, papuga_Str
 /// \param[in] classid class identifier of the host object
 /// \param[in] data pointer to host object
 /// \param[in] destroy delete function of the host object
-void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_HostObjectDeleter destroy);
+void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy);
 
 /// \brief Define value of CallResult as object of the binding language with ownership
 /// \param[in,out] self pointer to structure
 /// \param[in] val value to set as return value
-void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy);
+void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_Deleter destroy);
 
 /// \brief Define value of CallResult as serialization defined in the call result structure
 /// \param[in,out] self pointer to structure
@@ -90,7 +90,24 @@ void papuga_set_CallResult_serialization( papuga_CallResult* self);
 /// \param[in,out] self pointer to structure
 /// \param[in] data pointer to host object
 /// \param[in] destroy delete function of the host object
-void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_HostObjectDeleter destroy);
+void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_Deleter destroy);
+
+/// \brief Define value of CallResult as serialization moved from the argument
+/// \param[in,out] self pointer to structure
+/// \param[in,out] ser pointer to serialization
+void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser);
+
+/// \brief Define value of CallResult as iterator with ownership
+/// \param[in,out] self pointer to structure
+/// \param[in] data pointer to the iterated data structure
+/// \param[in] destroy delete function of the iterated data structure
+/// \param[in] getNext method to fetch next (or first) element of iterator
+void papuga_set_CallResult_iterator( papuga_CallResult* self, void* data, papuga_Deleter destroy, papuga_GetNext getNext);
+
+/// \brief Define value of CallResult as iterator moved from the argument
+/// \param[in,out] self pointer to structure
+/// \param[in,out] itr pointer to iterator
+void papuga_set_CallResult_iterator_move( papuga_CallResult* self, papuga_Iterator* itr);
 
 /// \brief Report an error of the call
 /// \param[in,out] self pointer to structure

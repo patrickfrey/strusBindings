@@ -18,11 +18,16 @@ extern "C" {
 
 /// \brief Constructor
 /// \param[out] self pointer to structure 
-#define papuga_init_Serialization(self)		{(self)->ar=NULL;(self)->allocsize=0;(self)->arsize=0;}
+#define papuga_init_Serialization(self)			{(self)->ar=NULL;(self)->allocsize=0;(self)->arsize=0;}
 
 /// \brief Destructor
 /// \param[in] self pointer to structure 
-#define papuga_destroy_Serialization(self)	{if ((self)->ar){free( (self)->ar);(self)->ar=NULL;}}
+#define papuga_destroy_Serialization(self)		{if ((self)->ar){free( (self)->ar);(self)->ar=NULL;}}
+
+/// \brief Constructor of an iterator reference as copy of another taking ownership
+/// \param[out] self pointer to structure initialized by constructor
+/// \param[in,out] orig pointer to iterator to take data from
+#define papuga_init_Serialization_move( self, orig)	{(self)->ar=(orig)->ar; (self)->arsize=(orig)->arsize; (self)->allocsize=(orig)->allocsize; (orig)->ar=0;(orig)->arsize=0;(orig)->allocsize=0;}
 
 /// \brief Copy constructor
 /// \param[out] self pointer to structure 

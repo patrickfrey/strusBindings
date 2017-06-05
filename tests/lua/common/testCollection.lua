@@ -38,7 +38,6 @@ function createCollection( strusctx, storagePath, datadir, fnams)
 		local filename = datadir..'/'..fnam
 		if string.sub( filename, 1, 1) ~= '.' then
 			idx = idx + 1
-			print( string.format( "%u process document %s", idx, filename))
 			doc = analyzer:analyze( readFile( filename))
 			table.insert( doc.attributes, {name="docid", value=fnam})
 			transaction:insertDocument( fnam, doc)

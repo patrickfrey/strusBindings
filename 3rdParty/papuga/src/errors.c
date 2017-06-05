@@ -27,6 +27,9 @@ const char* papuga_ErrorCode_tostring( papuga_ErrorCode errorcode)
 		case papuga_OutOfRangeError: return _TXT("value out of range");
 		case papuga_NofArgsError: return _TXT("number of arguments does not match");
 		case papuga_MissingSelf: return _TXT("self argument is missing");
+		case papuga_InvalidAccess: return _TXT("invalid access");
+		case papuga_UnexpectedEof: return _TXT("unexpected EOF");
+		case papuga_NotImplemented: return _TXT("not implemented");
 		default: return _TXT("unknown error");
 	}
 }

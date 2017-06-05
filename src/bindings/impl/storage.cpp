@@ -56,6 +56,13 @@ unsigned int StorageClientImpl::nofDocumentsInserted() const
 	return THIS->nofDocumentsInserted();
 }
 
+Index StorageClientImpl::documentFrequency( const std::string& type, const std::string& term) const
+{
+	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	return THIS->documentFrequency( type, term);
+}
+
 Index StorageClientImpl::documentNumber( const std::string& docid) const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();

@@ -16,12 +16,17 @@ extern "C" {
 #endif
 
 /// \brief Constructor of StringBuffer
-/// \param[out] self pointer to structure 
-#define papuga_init_StringBuffer(self)		{(self)->allocsize=0;(self)->arsize=0;(self)->ar=0;(self)->next=0;}
+/// \param[out] self pointer to structure initialized
+#define papuga_init_StringBuffer(self)			{(self)->allocsize=0;(self)->arsize=0;(self)->ar=0;(self)->next=0;}
+
+/// \brief Moving content of StringBuffer to another with ownership
+/// \param[out] self pointer to structure initialized
+/// \param[in,out] orig pointer to structure to move from
+#define papuga_init_StringBuffer_move(self,orig)	{(self)->allocsize=(orig)->allocsize;(self)->arsize=(orig)->arsize;(self)->ar=(orig)->ar;(self)->next=(orig)->next; (orig)->allocsize=0;(orig)->arsize=0;(orig)->ar=0;(orig)->next=0;}
 
 /// \brief Destructor of StringBuffer
-/// \param[in] self pointer to structure 
-#define papuga_destroy_StringBuffer(self)	{if ((self)->ar != NULL||(self)->next != NULL) papuga_destroy_StringBuffer_( self);}
+/// \param[in] self pointer to structure destroyed
+#define papuga_destroy_StringBuffer(self)		{if ((self)->ar != NULL||(self)->next != NULL) papuga_destroy_StringBuffer_( self);}
 
 /// \brief Destructor of StringBuffer
 /// \param[in] self pointer to structure 

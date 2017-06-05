@@ -76,7 +76,7 @@ static ContextDef parseContext( const ValueVariant& ctx)
 		if (err != papuga_Ok) throw papuga::error_exception( err, "context definition");
 		return rt;
 	}
-	else if (ctx.valuetype == papuga_Serialized)
+	else if (ctx.valuetype == papuga_TypeSerialization)
 	{
 		papuga::Serialization::const_iterator si = papuga::Serialization::begin( ctx.value.serialization);
 		return ContextDef( si, papuga::Serialization::end( ctx.value.serialization));
@@ -371,7 +371,7 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg)
 	{
 		return std::string();
 	}
-	if (arg.valuetype != papuga_Serialized)
+	if (arg.valuetype != papuga_TypeSerialization)
 	{
 		return ValueVariantWrap::tostring( arg);
 	}

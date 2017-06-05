@@ -34,7 +34,7 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 		if (err != papuga_Ok) throw papuga::error_exception( err, "segmenter definition");
 		return segdef;
 	}
-	else if (ctx.valuetype == papuga_Serialized)
+	else if (ctx.valuetype == papuga_TypeSerialization)
 	{
 		papuga::Serialization::const_iterator si = papuga::Serialization::begin( ctx.value.serialization);
 		return SegmenterDef( si, papuga::Serialization::end( ctx.value.serialization));
@@ -464,7 +464,7 @@ AnalyzedQuery* QueryAnalyzerImpl::analyze(
 	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
 
-	bool output_labeled = (expression.valuetype == papuga_Serialized && papuga_Serialization_islabeled( expression.value.serialization));
+	bool output_labeled = (expression.valuetype == papuga_TypeSerialization && papuga_Serialization_islabeled( expression.value.serialization));
 	Reference<AnalyzedQuery> res( new AnalyzedQuery( anactx->analyze(), exprbuilder.operators(), output_labeled));
 	return res.release();
 }

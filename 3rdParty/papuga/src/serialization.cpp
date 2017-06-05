@@ -47,13 +47,17 @@ static bool Serialization_print( std::ostream& out, std::string indent, const pa
 				}
 				else if (!papuga_ValueVariant_isatomic( &si->value))
 				{
-					if (si->value.valuetype == papuga_Serialized)
+					if (si->value.valuetype == papuga_TypeSerialization)
 					{
 						if (!Serialization_print( out, indent, *si->value.value.serialization, errcode)) return false;
 					}
-					else if (si->value.valuetype == papuga_HostObject)
+					else if (si->value.valuetype == papuga_TypeHostObject)
 					{
 						out << indent << "value HOSTOBJ" << std::endl;
+					}
+					else if (si->value.valuetype == papuga_TypeIterator)
+					{
+						out << indent << "value ITERATOR" << std::endl;
 					}
 					else
 					{
@@ -116,7 +120,7 @@ std::string Serialization::tostring( const papuga_Serialization& serialization, 
 					}
 					else if (!papuga_ValueVariant_isatomic( &si->value))
 					{
-						if (si->value.valuetype == papuga_Serialized)
+						if (si->value.valuetype == papuga_TypeSerialization)
 						{
 							
 						}

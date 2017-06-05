@@ -11,6 +11,7 @@
 #include "strus/numericVariant.hpp"
 #include "strus/index.hpp"
 #include "impl/objectref.hpp"
+#include "impl/iterator.hpp"
 #include <vector>
 #include <string>
 
@@ -40,9 +41,15 @@ public:
 	/// \brief Destructor
 	virtual ~StorageClientImpl(){}
 
-	/// \brief Get the number of documents inserted into the storage
+	/// \brief Get the number of documents inserted into this storage
 	/// return the total number of documents
 	unsigned int nofDocumentsInserted() const;
+
+	/// \brief Get the number of documents inserted in this storage instance
+	/// \param[in] type the term type addressed
+	/// \param[in] term the term value addressed
+	/// \return the number of documents
+	Index documentFrequency( const std::string& type, const std::string& term) const;
 
 	/// \brief Get the internal document number from the document identifier
 	/// return the internal document number or 0, if not defined
@@ -155,10 +162,10 @@ public:
 	///\return the internal document number or 0 if no more documents defined
 	Index skipDoc( int docno);
 
-	///\brief Get the elements of a document according to a selection expression
-	///\param[in] docno document number to get the selected content from
-	///\param[in] elementsSelected structure with the elements to select from the document requested
-	///\return the structure with a tuple or a map with the elements selected (depending on input)
+	///\brief Get a list of attributes, resp. metadata elements addressed by name
+	///\param[in] docno document number to get the selected elements from
+	///\param[in] elementsSelected array of names of elements to select
+	///\return the array of values of the elements selected
 	Struct* get( int docno, const ValueVariant& elementsSelected);
 
 private:

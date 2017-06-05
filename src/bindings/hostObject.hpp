@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_BINDINGS_PAPUGA_HOST_OBJECT_REFERENCE_HPP_INCLUDED
-#define _STRUS_BINDINGS_PAPUGA_HOST_OBJECT_REFERENCE_HPP_INCLUDED
+#ifndef _STRUS_BINDINGS_PAPUGA_HOST_OBJECT_HPP_INCLUDED
+#define _STRUS_BINDINGS_PAPUGA_HOST_OBJECT_HPP_INCLUDED
 /// \brief Reference to host object with C++ templates for typesafety
-/// \file hostObjectReference.hpp
-#include "papuga/hostObjectReference.h"
+/// \file hostObject.hpp
+#include "papuga/hostObject.h"
 #include "internationalization.hpp"
 #include <stdexcept>
 
@@ -18,7 +18,7 @@
 namespace strus {
 namespace bindings {
 
-struct HostObjectReference
+struct HostObject
 {
 public:
 	template <class OBJECTTYPE>
@@ -30,25 +30,25 @@ public:
 	{}
 
 	/// \brief Destructor
-	~HostObjectReference(){}
+	~HostObject(){}
 
 	/// \brief Create pointer as reference with ownership and reference counting
 	template <class OBJECTTYPE>
-	static void initOwnership( papuga_HostObjectReference& ref, OBJECTTYPE* obj)
+	static void initOwnership( papuga_HostObject& ref, OBJECTTYPE* obj)
 	{
-		papuga_init_HostObjectReference( &ref, obj, deleter<OBJECTTYPE>);
+		papuga_init_HostObject( &ref, obj, deleter<OBJECTTYPE>);
 	}
 
 	/// \brief Create pointer as constant reference
 	template <class OBJECTTYPE>
-	static void initConst( papuga_HostObjectReference& ref, const OBJECTTYPE* obj)
+	static void initConst( papuga_HostObject& ref, const OBJECTTYPE* obj)
 	{
-		papuga_init_HostObjectReference( &ref, obj, 0);
+		papuga_init_HostObject( &ref, obj, 0);
 	}
 
 	/// \brief Get const pointer to object
 	template <class OBJECTTYPE>
-	static const OBJECTTYPE* getObject( const papuga_HostObjectReference& ref)
+	static const OBJECTTYPE* getObject( const papuga_HostObject& ref)
 	{
 		const OBJECTTYPE* obj = static_cast<const OBJECTTYPE*>( (const void*)ref.data);
 		if (!obj) return 0;
@@ -63,7 +63,7 @@ public:
 
 	/// \brief Get pointer to object
 	template <class OBJECTTYPE>
-	static OBJECTTYPE* getObject( const papuga_HostObjectReference& ref)
+	static OBJECTTYPE* getObject( const papuga_HostObject& ref)
 	{
 		OBJECTTYPE* obj = static_cast<OBJECTTYPE*>( (const void*)ref.data);
 		if (!obj) return 0;

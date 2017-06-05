@@ -40,11 +40,11 @@ int StructureNameMap::index( const char* id) const
 
 int StructureNameMap::index( const papuga_ValueVariant& id) const
 {
-	if (id.valuetype == papuga_String)
+	if (id.valuetype == papuga_TypeString)
 	{
 		return index( id.value.string, id.length);
 	}
-	if (id.valuetype == papuga_LangString)
+	if (id.valuetype == papuga_TypeLangString)
 	{
 		enum {MaxIdSize=128};
 		char buf[ MaxIdSize];

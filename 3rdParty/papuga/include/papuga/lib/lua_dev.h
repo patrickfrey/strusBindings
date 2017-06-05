@@ -28,7 +28,7 @@ typedef struct papuga_lua_CallArgs
 typedef struct papuga_lua_ClassDef
 {
 	const char* name;
-	papuga_HostObjectDeleter destructor;
+	papuga_Deleter destructor;
 } papuga_lua_ClassDef;
 
 typedef struct papuga_lua_ClassDefMap
@@ -41,13 +41,13 @@ typedef struct papuga_lua_UserData papuga_lua_UserData;
 
 /// \brief Declares a class with its meta data table
 void papuga_lua_declare_class( lua_State* ls, int classid, const char* classname,
-				const luaL_Reg* mt, papuga_HostObjectDeleter destructor);
+				const luaL_Reg* mt, papuga_Deleter destructor);
 
 /// \brief Allocate the userdata for a new instance of a class
 papuga_lua_UserData* papuga_lua_new_userdata( lua_State* ls, const char* classname);
 /// \brief Initialize the userdata of a new class instance created
 void papuga_lua_init_UserData( papuga_lua_UserData* udata,
-				int classid, void* objref, papuga_HostObjectDeleter destructor);
+				int classid, void* objref, papuga_Deleter destructor);
 
 /// \brief Invokes a lua error exception on a papuga error
 void papuga_lua_error( lua_State* ls, const char* function, papuga_ErrorCode err);
