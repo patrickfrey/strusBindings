@@ -16,7 +16,7 @@
 #include "papuga/hostObject.h"
 #include "papuga/iterator.h"
 #include "papuga/serialization.h"
-#include "papuga/stringBuffer.h"
+#include "papuga/allocator.h"
 #include "papuga/valueVariant.h"
 #ifdef __cplusplus
 #include "papuga/valueVariant.hpp"

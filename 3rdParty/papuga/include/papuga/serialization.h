@@ -29,6 +29,9 @@ extern "C" {
 /// \param[in,out] orig pointer to iterator to take data from
 #define papuga_init_Serialization_move( self, orig)	{(self)->ar=(orig)->ar; (self)->arsize=(orig)->arsize; (self)->allocsize=(orig)->allocsize; (orig)->ar=0;(orig)->arsize=0;(orig)->allocsize=0;}
 
+/// \brief Test if serialization is empty
+#define papuga_Serialization_empty(self)		!!(self)->ar
+
 /// \brief Copy constructor
 /// \param[out] self pointer to structure 
 bool papuga_init_Serialization_copy( papuga_Serialization* self, const papuga_Serialization* o);

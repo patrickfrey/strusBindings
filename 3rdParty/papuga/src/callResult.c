@@ -12,7 +12,7 @@
 #include "papuga/serialization.h"
 #include "papuga/hostObject.h"
 #include "papuga/iterator.h"
-#include "papuga/stringBuffer.h"
+#include "papuga/allocator.h"
 #include "papuga/errors.h"
 #include <stdlib.h>
 #include <stdarg.h>
@@ -25,7 +25,7 @@ static void init_CallResult_structures( papuga_CallResult* self)
 	papuga_init_HostObject( &self->object, 0, 0);
 	papuga_init_Serialization( &self->serialization);
 	papuga_init_Iterator( &self->iterator, 0, 0, 0);
-	papuga_init_StringBuffer( &self->valuebuf);
+	papuga_init_Allocator( &self->allocator);
 }
 
 void papuga_destroy_CallResult( papuga_CallResult* self)
@@ -33,7 +33,7 @@ void papuga_destroy_CallResult( papuga_CallResult* self)
 	papuga_destroy_HostObject( &self->object);
 	papuga_destroy_Serialization( &self->serialization);
 	papuga_destroy_Iterator( &self->iterator);
-	papuga_destroy_StringBuffer( &self->valuebuf);
+	papuga_destroy_Allocator( &self->allocator);
 }
 
 void papuga_init_CallResult( papuga_CallResult* self, char* errorbuf, size_t errorbufsize)
@@ -64,7 +64,7 @@ void papuga_set_CallResult_bool( papuga_CallResult* self, bool val)
 
 void papuga_set_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize)
 {
-	char* val_copy = papuga_StringBuffer_copy_string( &self->valuebuf, val, valsize);
+	char* val_copy = papuga_Allocator_copy_string( &self->allocator, val, valsize);
 	papuga_init_ValueVariant_string( &self->value, val_copy, valsize);
 }
 
@@ -77,7 +77,7 @@ void papuga_set_CallResult_charp( papuga_CallResult* self, const char* val)
 {
 	if (val)
 	{
-		char* val_copy = papuga_StringBuffer_copy_charp( &self->valuebuf, val);
+		char* val_copy = papuga_Allocator_copy_charp( &self->allocator, val);
 		papuga_init_ValueVariant_charp( &self->value, val_copy);
 	}
 	else
@@ -114,9 +114,10 @@ void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, vo
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 
-void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser)
+void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser, papuga_Allocator* allocator)
 {
 	papuga_init_Serialization_move( &self->serialization, ser);
+	if (allocator) papuga_init_Allocator_move( &self->allocator, allocator);
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 

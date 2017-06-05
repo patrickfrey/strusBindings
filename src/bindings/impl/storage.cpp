@@ -243,7 +243,7 @@ void DocumentBrowserImpl::addMetaDataRestrictionCondition(
 	{
 		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
 	}
-	MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	MetaDataRestrictionInterface::CompareOperator cmpop = MetaDataOp::getCompareOp( compareOp);
 	restriction->addCondition( cmpop, name, ValueVariantWrap::tonumeric(value), newGroup);
 }
 
@@ -263,7 +263,7 @@ Index DocumentBrowserImpl::skipDoc( int docno)
 	return itr->skipDoc( docno);
 }
 
-Struct* DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected)
+Struct DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected)
 {
 	if (docno <= 0) throw strus::runtime_error(_TXT("document browser get called without valid document selected"));
 
@@ -274,51 +274,40 @@ Struct* DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelecte
 	bool attributereader_called = false;
 	bool metadatareader_called = false;
 
-	Reference<Struct> rt( new Struct());
-	papuga_Serialization* res = &rt->serialization;
+	Struct rt;
+	papuga_Serialization* res = &rt.serialization;
 	bool serflag = true;
 	serflag &= papuga_Serialization_pushOpen( res);
-	std::vector<int> miar( elemlist.size(), -1);
 
 	std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
 	for (int eidx=0; ei != ee; ++ei,++eidx)
 	{
-		Index eh = attributereader->elementHandle( ei->c_str());
-		if (eh)
+		Index eh;
+		if (0 != (eh = metadatareader->elementHandle( ei->c_str())))
+		{
+			if (!metadatareader_called)
+			{
+				metadatareader->skipDoc( docno);
+				metadatareader_called = true;
+			}
+			serflag &= Serializer::serialize_nothrow( res, metadatareader->getValue( eh));
+		}
+		else if (0 != (eh = attributereader->elementHandle( ei->c_str())))
 		{
 			if (!attributereader_called)
 			{
 				attributereader->skipDoc( docno);
 				attributereader_called = true;
 			}
-			miar[ eidx] = rt->strings.size();
-			rt->strings.append( attributereader->getValue( eh));
-			rt->strings.push_back( '\0');
-		}
-	}
-	ei = elemlist.begin(), ee = elemlist.end();
-	for (int eidx=0; ei != ee; ++ei,++eidx)
-	{
-		if (miar[ eidx] >= 0)
-		{
-			serflag &= papuga_Serialization_pushValue_charp( res, rt->strings.c_str() + miar[ eidx]);
+			std::string attrvalstr = attributereader->getValue( eh);
+			const char* attrvalptr = papuga_Allocator_copy_string( &rt.allocator, attrvalstr.c_str(), attrvalstr.size());
+			if (!attrvalptr) throw std::bad_alloc();
+
+			serflag &= papuga_Serialization_pushValue_string( res, attrvalptr, attrvalstr.size());
 		}
 		else
 		{
-			Index eh = metadatareader->elementHandle( ei->c_str());
-			if (eh >= 0)
-			{
-				if (!metadatareader_called)
-				{
-					metadatareader->skipDoc( docno);
-					metadatareader_called = true;
-				}
-				serflag &= Serializer::serialize_nothrow( res, metadatareader->getValue( eh));
-			}
-			else
-			{
-				serflag &= papuga_Serialization_pushValue_void( res);
-			}
+			serflag &= papuga_Serialization_pushValue_void( res);
 		}
 	}
 	serflag &= papuga_Serialization_pushClose( res);
@@ -327,7 +316,8 @@ Struct* DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelecte
 		throw strus::runtime_error(_TXT("error getting document attributes and metadata with document browser: %s"), errorhnd->fetchError());
 	}
 	if (!serflag) throw std::bad_alloc();
-	return rt.release();
+	rt.release();
+	return rt;
 }
 
 

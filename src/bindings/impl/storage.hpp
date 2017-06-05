@@ -55,6 +55,12 @@ public:
 	/// return the internal document number or 0, if not defined
 	Index documentNumber( const std::string& docid) const;
 
+	/// \brief Get an iterator on the set of postings
+	/// \param[in] expression query term expression
+	/// \param[in] restriction meta data restrictions
+	/// return an iterator on a set of postings
+	Iterator postings( const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno);
+
 	/// \brief Create a transaction
 	/// return the transaction object created
 	StorageTransactionImpl* createTransaction() const;
@@ -166,7 +172,7 @@ public:
 	///\param[in] docno document number to get the selected elements from
 	///\param[in] elementsSelected array of names of elements to select
 	///\return the array of values of the elements selected
-	Struct* get( int docno, const ValueVariant& elementsSelected);
+	Struct get( int docno, const ValueVariant& elementsSelected);
 
 private:
 	friend class StorageClientImpl;

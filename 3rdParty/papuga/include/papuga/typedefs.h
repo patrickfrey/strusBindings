@@ -150,13 +150,13 @@ struct papuga_Iterator
 };
 
 /// \brief Buffer for strings copied
-typedef struct papuga_StringBuffer
+typedef struct papuga_Allocator
 {
-	unsigned int allocsize;			///< allocation size of the string
-	unsigned int arsize;			///< number of characters without 0-termination
-	char* ar;				///< pointer to allocated string
-	struct papuga_StringBuffer* next;	///< next buffer in linked list of buffers
-} papuga_StringBuffer;
+	unsigned int allocsize;			///< allocation size of this block
+	unsigned int arsize;			///< number of bytes allocated in this block
+	char* ar;				///< pointer to memory
+	struct papuga_Allocator* next;		///< next buffer in linked list of buffers
+} papuga_Allocator;
 
 /// \brief Structure representing the result of an interface method call
 struct papuga_CallResult
@@ -165,7 +165,7 @@ struct papuga_CallResult
 	papuga_HostObject object;		///< reference (with or without ownership) to an object that lives in the host environment
 	papuga_Serialization serialization;	///< serialization of the result in case of a structure
 	papuga_Iterator iterator;		///< iterator closure object
-	papuga_StringBuffer valuebuf;		///< buffer for values (strings) that have to be copied
+	papuga_Allocator allocator;		///< allocator for values that had to be copied
 	papuga_ErrorBuffer errorbuf;		///< static buffer for error message
 };
 

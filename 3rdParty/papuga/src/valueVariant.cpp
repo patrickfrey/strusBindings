@@ -9,7 +9,7 @@
 /// \file valueVariant.cpp
 #include "papuga/valueVariant.h"
 #include "papuga/valueVariant.hpp"
-#include "papuga/stringBuffer.h"
+#include "papuga/allocator.h"
 #include "textwolf/cstringiterator.hpp"
 #include "textwolf/charset.hpp"
 #include "textwolf/textscanner.hpp"
@@ -105,14 +105,12 @@ static void* uft8string_to_any_langstring( papuga_StringEncoding enc, const char
 }
 
 template <class LANGCHARSET>
-static char* langstring_to_uft8string( papuga_StringBuffer* buf, const char* str, size_t strsize, papuga_ErrorCode* err)
+static char* langstring_to_uft8string( papuga_Allocator* allocator, const char* str, size_t strsize, papuga_ErrorCode* err)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
 	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
 
-	enum {LocalBufSize=2032};
-	char localbuf[ LocalBufSize+16];
-	textwolf::StaticBuffer out( localbuf, sizeof(localbuf));
+	std::string out;
 
 	textwolf::charset::UTF8 u8out;
 
@@ -120,37 +118,28 @@ static char* langstring_to_uft8string( papuga_StringBuffer* buf, const char* str
 	for (; 0!=(chr=*itr); ++itr)
 	{
 		u8out.print( chr, out);
-		if (out.size() >= LocalBufSize)
-		{
-			if (!papuga_StringBuffer_append_string( buf, out.ptr(), out.size()))
-			{
-				*err = papuga_NoMemError;
-				return 0;
-			}
-			out.clear();
-		}
 	}
-	return buf->ar;
+	return papuga_Allocator_copy_string( allocator, out.c_str(), out.size());
 }
 
-static char* any_langstring_to_uft8string( papuga_StringBuffer* buf, papuga_StringEncoding enc, const void* str, std::size_t strsize, papuga_ErrorCode* err)
+static char* any_langstring_to_uft8string( papuga_Allocator* allocator, papuga_StringEncoding enc, const void* str, std::size_t strsize, papuga_ErrorCode* err)
 {
 	switch (enc)
 	{
 		case papuga_UTF8:
-			return langstring_to_uft8string<textwolf::charset::UTF8>( buf, (const char*)str, strsize, err);
+			return langstring_to_uft8string<textwolf::charset::UTF8>( allocator, (const char*)str, strsize, err);
 		case papuga_UTF16BE:
-			return langstring_to_uft8string<textwolf::charset::UTF16BE>( buf, (const char*)str, strsize * 2, err);
+			return langstring_to_uft8string<textwolf::charset::UTF16BE>( allocator, (const char*)str, strsize * 2, err);
 		case papuga_UTF16LE:
-			return langstring_to_uft8string<textwolf::charset::UTF16LE>( buf, (const char*)str, strsize * 2, err);
+			return langstring_to_uft8string<textwolf::charset::UTF16LE>( allocator, (const char*)str, strsize * 2, err);
 		case papuga_UTF16:
-			return langstring_to_uft8string<W16CHARSET>( buf, (const char*)str, strsize * 2, err);
+			return langstring_to_uft8string<W16CHARSET>( allocator, (const char*)str, strsize * 2, err);
 		case papuga_UTF32BE:
-			return langstring_to_uft8string<textwolf::charset::UCS4BE>( buf, (const char*)str, strsize * 4, err);
+			return langstring_to_uft8string<textwolf::charset::UCS4BE>( allocator, (const char*)str, strsize * 4, err);
 		case papuga_UTF32LE:
-			return langstring_to_uft8string<textwolf::charset::UCS4LE>( buf, (const char*)str, strsize * 4, err);
+			return langstring_to_uft8string<textwolf::charset::UCS4LE>( allocator, (const char*)str, strsize * 4, err);
 		case papuga_UTF32:
-			return langstring_to_uft8string<W32CHARSET>( buf, (const char*)str, strsize * 4, err);
+			return langstring_to_uft8string<W32CHARSET>( allocator, (const char*)str, strsize * 4, err);
 		default:
 			*err = papuga_TypeError;
 			return 0;
@@ -500,7 +489,7 @@ extern "C" char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize,
 	return 0;
 }
 
-extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* value, papuga_StringBuffer* buf, size_t* len, papuga_ErrorCode* err)
+extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* value, papuga_Allocator* allocator, size_t* len, papuga_ErrorCode* err)
 {
 	if (papuga_ValueVariant_isstring( value))
 	{
@@ -511,19 +500,21 @@ extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* 
 		}
 		else//if (value->valuetype == papuga_TypeLangString)
 		{
-			return any_langstring_to_uft8string( buf, (papuga_StringEncoding)value->encoding, value->value.langstring, value->length, err);
+			return any_langstring_to_uft8string( allocator, (papuga_StringEncoding)value->encoding, value->value.langstring, value->length, err);
 		}
 	}
 	else if (papuga_ValueVariant_isnumeric( value))
 	{
+		const char* rt;
 		char localbuf[256];
 		if (!bufprint_number_variant( localbuf, sizeof(localbuf), *len, value, err)) return 0;
-		if (!papuga_StringBuffer_append_string( buf, localbuf, *len))
+		rt = papuga_Allocator_copy_string( allocator, localbuf, *len);
+		if (!rt)
 		{
 			*err = papuga_NoMemError;
 			return 0;
 		}
-		return buf->ar;
+		return rt;
 	}
 	else
 	{

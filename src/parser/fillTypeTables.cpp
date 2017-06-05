@@ -29,6 +29,9 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "papuga_set_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")
 	;
+	typesystem.defineType( "const Index&")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+	;
 	typesystem.defineType( "int")
 		("retv_map", "papuga_set_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")
@@ -105,20 +108,23 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	typesystem.defineType( "std::vector<std::string>*")
 		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
 	;
-	typesystem.defineType( "Struct*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+	typesystem.defineType( "Struct")
+		("retv_map", "initCallResultStruct( $name, $value);")
+	;
+	typesystem.defineType( "Iterator")
+		("retv_map", "initCallResultIterator( $name, $value);")
 	;
 	typesystem.defineType( "QueryResult*")
 		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<VectorStorageSearchInterface::Result>")
-		("retv_map", "initCallResultNumericValues( $name, $value);")
+		("retv_map", "initCallResultAtomic( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<Index>")
-		("retv_map", "initCallResultNumericValues( $name, $value);")
+		("retv_map", "initCallResultAtomic( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<double>")
-		("retv_map", "initCallResultNumericValues( $name, $value);")
+		("retv_map", "initCallResultAtomic( $name, $value);")
 	;
 	typesystem.defineType( "$objid~Interface*")
 		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")

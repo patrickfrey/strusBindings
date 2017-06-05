@@ -95,7 +95,8 @@ void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, vo
 /// \brief Define value of CallResult as serialization moved from the argument
 /// \param[in,out] self pointer to structure
 /// \param[in,out] ser pointer to serialization
-void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser);
+/// \param[in] allocator pointer to allocator or 0 if not defined
+void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser, papuga_Allocator* allocator);
 
 /// \brief Define value of CallResult as iterator with ownership
 /// \param[in,out] self pointer to structure

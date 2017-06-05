@@ -94,11 +94,11 @@ extern "C" {
 
 /// \brief Convert a value variant to a null terminated C-string
 /// \param[in] self pointer to structure 
-/// \param[in,out] buf buffer to use for deep copies
+/// \param[in,out] allocator allocator to use for deep copy of string
 /// \param[out] len length of the string copied
 /// \param[out] err error code in case of error (untouched if call succeeds)
 /// \return the pointer to the result string
-const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* self, papuga_StringBuffer* buf, size_t* len, papuga_ErrorCode* err);
+const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* self, papuga_Allocator* allocator, size_t* len, papuga_ErrorCode* err);
 
 /// \brief Convert a value variant to a unicode string of a specific encoding
 /// \param[in] self pointer to structure 

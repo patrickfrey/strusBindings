@@ -132,7 +132,7 @@ void QueryImpl::addMetaDataRestrictionCondition(
 		const ValueVariant& operand, bool newGroup)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	MetaDataRestrictionInterface::CompareOperator cmpop = getCompareOp( compareOp);
+	MetaDataRestrictionInterface::CompareOperator cmpop = MetaDataOp::getCompareOp( compareOp);
 	THIS->addMetaDataRestrictionCondition( cmpop, name, ValueVariantWrap::tonumeric(operand), newGroup);
 }
 

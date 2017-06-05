@@ -699,7 +699,7 @@ DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* ret
 		case papuga_TypeLangString:
 		{
 			size_t strsize;
-			const char* str = papuga_ValueVariant_tostring( &retval->value, &retval->valuebuf, &strsize, errcode);
+			const char* str = papuga_ValueVariant_tostring( &retval->value, &retval->allocator, &strsize, errcode);
 			if (!str)
 			{
 				rt = -1;

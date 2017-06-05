@@ -21,31 +21,31 @@
 #include "impl/query.hpp"
 #include "impl/statistics.hpp"
 #include "impl/struct.hpp"
+#include "impl/iterator.hpp"
 #include "implTraits.hpp"
 #include "serializer.hpp"
 
 namespace {
+
+void initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Struct& st)
+{
+	papuga_set_CallResult_serialization( retval);
+	// PF:HACK: Dangerous intrusiveness (do use move semantics instead C++11)
+	std::memcpy( &retval->serialization, &st.serialization, sizeof(retval->serialization));
+	std::memcpy( &retval->allocator, &st.allocator, sizeof(retval->allocator));
+}
+
+void initCallResultIterator( papuga_CallResult* retval, const strus::bindings::Iterator& st)
+{
+	// PF:HACK: Dangerous intrusiveness (do use move semantics instead C++11)
+	std::memcpy( &retval->iterator, &st.iterator, sizeof(retval->iterator));
+}
 
 template <typename STRUCTVALUE>
 void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* st)
 {
 	strus::bindings::HostObject::initOwnership( retval->object, st);
 	strus::bindings::Serializer::serialize( &retval->serialization, *st);
-	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);
-}
-
-template <>
-void initCallResultStructureOwnership<strus::bindings::Struct>( papuga_CallResult* retval, strus::bindings::Struct* st)
-{
-	strus::bindings::HostObject::initOwnership( retval->object, st);
-	papuga_init_ValueVariant_serialization( &retval->value, &st->serialization);
-}
-
-template <>
-void initCallResultStructureOwnership<strus::StatisticsViewerInterface>( papuga_CallResult* retval, strus::StatisticsViewerInterface* st)
-{
-	strus::bindings::HostObject::initOwnership( retval->object, st);
-	if (!strus::bindings::Serializer::serialize_nothrow( &retval->serialization, *st)) throw std::bad_alloc();
 	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);
 }
 
@@ -57,7 +57,7 @@ static void initCallResultStructureConst( papuga_CallResult* retval, const STRUC
 }
 
 template <typename STRUCTVALUE>
-static void initCallResultNumericValues( papuga_CallResult* retval, const STRUCTVALUE& st)
+static void initCallResultAtomic( papuga_CallResult* retval, const STRUCTVALUE& st)
 {
 	strus::bindings::Serializer::serialize( &retval->serialization, st);
 	papuga_init_ValueVariant_serialization( &retval->value, &retval->serialization);

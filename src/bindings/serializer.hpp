@@ -40,6 +40,11 @@ public:
 	{
 		if (!serialize_nothrow( result, param)) throw std::bad_alloc();
 	}
+	template<typename SERVAL>
+	static void serialize( papuga_Serialization* result, SERVAL& param)
+	{
+		if (!serialize_nothrow( result, param)) throw std::bad_alloc();
+	}
 
 	static inline bool serialize_nothrow( papuga_Serialization* result, const double& val)
 	{
