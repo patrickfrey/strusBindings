@@ -127,13 +127,11 @@ void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr
 	THIS->defineFeature( set_, weight_);
 }
 
-void QueryImpl::addMetaDataRestrictionCondition(
-		const char* compareOp, const std::string& name,
-		const ValueVariant& operand, bool newGroup)
+void QueryImpl::addMetaDataRestriction( const ValueVariant& expression)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	MetaDataRestrictionInterface::CompareOperator cmpop = MetaDataOp::getCompareOp( compareOp);
-	THIS->addMetaDataRestrictionCondition( cmpop, name, ValueVariantWrap::tonumeric(operand), newGroup);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	Deserializer::buildMetaDataRestriction( THIS, expression, errorhnd);
 }
 
 void QueryImpl::defineTermStatistics( const std::string& type_, const std::string& value_, const ValueVariant& stats_)

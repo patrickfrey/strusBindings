@@ -14,6 +14,7 @@
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/queryAnalyzerContextInterface.hpp"
+#include "strus/postingIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/base/symbolTable.hpp"
@@ -161,6 +162,36 @@ private:
 	std::vector<QueryAnalyzerStruct::Operator> m_operators;
 	std::vector<unsigned int> m_fieldno_stack;
 	unsigned int m_fieldno_cnt;
+};
+
+class PostingsExpressionBuilder
+	:public ExpressionBuilder
+{
+public:
+	PostingsExpressionBuilder( const StorageClientInterface* storage_, const QueryProcessorInterface* queryproc_, ErrorBufferInterface* errorhnd_)
+		:m_errorhnd(errorhnd_),m_storage(storage_),m_queryproc(queryproc_){}
+
+	virtual ~PostingsExpressionBuilder(){}
+	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
+	virtual void pushTerm( const std::string& type, const std::string& value);
+	virtual void pushTerm( const std::string& type);
+	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
+	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, bool visible);
+
+public:
+	Reference<PostingIteratorInterface> pop();
+
+private:
+	PostingsExpressionBuilder( const PostingsExpressionBuilder&){}	//< non copyable
+	void operator=( const QueryExpressionBuilder&){}		//< non copyable
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_storage;
+	const QueryProcessorInterface* m_queryproc;
+	std::vector<Reference<PostingIteratorInterface> > m_stack;
 };
 
 }}//namespace

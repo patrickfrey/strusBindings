@@ -17,10 +17,15 @@ namespace bindings {
 struct Iterator
 {
 public:
-	/// \brief Constructor
+	/// \brief Default constructor
 	Iterator()
 	{
 		papuga_init_Iterator( &iterator, 0, 0, 0);
+	}
+	/// \brief Constructor
+	Iterator( void* data, papuga_Deleter deleter, papuga_GetNext getNext)
+	{
+		papuga_init_Iterator( &iterator, data, deleter, getNext);
 	}
 
 	/// \brief "Move" constructor

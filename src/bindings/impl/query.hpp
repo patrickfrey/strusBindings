@@ -111,15 +111,15 @@ public:
 			double weight_=1);
 
 	/// \brief Define a meta data restriction
-	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
-	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
-	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	void addMetaDataRestrictionCondition(
-			const char* compareOp,
-			const std::string& name,
-			const ValueVariant& value,
-			bool newGroup);
+	/// \param[in] expression meta data expression tree interpreted as CNF (conjunctive normalform "AND" of "OR"s)
+	///	leafs of the tree are 3-tuples of the form {operator,name,operand} with
+	///		operator: one of "=","!=",">=","<=","<",">"
+	///		name: name of meta data element
+	///		value: numeric value to compare with the meta data field (right side of comparison operator)
+	///	if the tree has depth 1 (single node), then it is interpreted as single condition
+	///	if the tree has depth 2 (list of nodes), then it is interpreted as intersection "AND" of its leafs
+	///	an "OR" of conditions without "AND" is therefore expressed as list of list of structures, e.g. '[[["<=","date","1.1.1970"], [">","weight",1.0]]]' <=> 'date <= "1.1.1970" OR weight > 1.0' and '[["<=","date","1.1.1970"], [">","weight",1.0]]' <=> 'date <= "1.1.1970" AND weight > 1.0'
+	void addMetaDataRestriction( const ValueVariant& expression);
 
 	/// \brief Define term statistics to use for a term for weighting it in this query
 	/// \param[in] type_ query term type name

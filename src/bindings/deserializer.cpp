@@ -8,6 +8,7 @@
 #include "deserializer.hpp"
 #include "internationalization.hpp"
 #include "structDefs.hpp"
+#include "metadataop.hpp"
 #include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
@@ -149,13 +150,15 @@ std::string Deserializer::getString( papuga::Serialization::const_iterator& si, 
 	return ValueVariantWrap::tostring( *getValue( si, se));
 }
 
-const char* Deserializer::getCharp(
+const char* Deserializer::getCharpAscii(
+		char* buf, std::size_t bufsize,
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
 {
-	const papuga_ValueVariant* val = getValue( si, se);
-	if (val->valuetype != papuga_TypeString) throw strus::runtime_error(_TXT("expected UTF-8 or ASCII string"));
-	return val->value.string;
+	const papuga_ValueVariant* vp = getValue( si, se);
+	const char* rt = papuga_ValueVariant_toascii( buf, bufsize, vp);
+	if (!rt) throw strus::runtime_error(_TXT("ascii string with maximum size %u expected"), (unsigned int)bufsize);
+	return rt;
 }
 
 void Deserializer::consumeClose(
@@ -2182,7 +2185,7 @@ void Deserializer::buildStatistics(
 							while (si != se && si->tag != papuga_TagClose)
 							{
 								DfChangeDef dfchg( si, se);
-								builder->addDfChange( dfchg.termtype, dfchg.termvalue, dfchg.increment);
+								builder->addDfChange( dfchg.termtype.c_str(), dfchg.termvalue.c_str(), dfchg.increment);
 							}
 							Deserializer::consumeClose( si, se);
 						}
@@ -2199,6 +2202,227 @@ void Deserializer::buildStatistics(
 		else
 		{
 			throw strus::runtime_error(_TXT("%s definition expected to be a structure"), context);
+		}
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( content.value.serialization));
+	}
+}
+
+template <class INTERFACE>
+struct WrapMetaDataRestriction
+{
+	static void addCondition(
+			INTERFACE* self,
+			const MetaDataRestrictionInterface::CompareOperator& opr,
+			const std::string& name,
+			const NumericVariant& operand,
+			bool newGroup)
+	{
+		self->addCondition( opr, name, operand, newGroup);
+	}
+};
+
+template <>
+struct WrapMetaDataRestriction<QueryInterface>
+{
+	static void addCondition(
+			QueryInterface* self,
+			const MetaDataRestrictionInterface::CompareOperator& opr,
+			const std::string& name,
+			const NumericVariant& operand,
+			bool newGroup)
+	{
+		self->addMetaDataRestrictionCondition( opr, name, operand, newGroup);
+	}
+};
+
+template <class RestrictionInterface>
+static void buildMetaDataRestrictionList_(
+		RestrictionInterface* builder,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
+		bool sameGroup);
+
+template <class RestrictionInterface>
+static void buildMetaDataRestriction_(
+		RestrictionInterface* builder,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
+		bool sameGroup)
+{
+	static const StructureNameMap namemap( "operator,name,value", ',');
+	static const char* context = _TXT("metadata restriction");
+
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	if (si->tag == papuga_TagOpen)
+	{
+		++si;
+		if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+
+		if (si->tag == papuga_TagOpen)
+		{
+			if (sameGroup) throw strus::runtime_error(_TXT("tree of depht smaller or equal 2 representing a conjunctive normalform expected for a %s structure"), context);
+			buildMetaDataRestrictionList_<RestrictionInterface>( builder, si, se, true);
+		}
+		else
+		{
+			MetaDataRestrictionInterface::CompareOperator opr;
+			std::string name;
+			NumericVariant value;
+
+			if (si->tag == papuga_TagName)
+			{
+				int defined[3] = {0,0,0};
+				while (si != se && si->tag != papuga_TagClose)
+				{
+					if (si->tag != papuga_TagName)
+					{
+						throw strus::runtime_error(_TXT("section name expected for top elements of %s structure"), context);
+					}
+					int idx = namemap.index( si->value);
+					++si;
+					switch (idx)
+					{
+						case 0:
+						{
+							if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "operator", context);
+							char buf[64];
+							const char* compareOpStr = Deserializer::getCharpAscii( buf, sizeof(buf), si, se);
+							opr = MetaDataOp::getCompareOp( compareOpStr);
+							break;
+						}
+						case 1:
+						{
+							if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+							name = Deserializer::getString( si, se);
+							break;
+						}
+						case 2:
+						{
+							if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
+							value = ValueVariantWrap::tonumeric( *getValue( si, se));
+							break;
+						}
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					}
+					if (!defined[0]) throw strus::runtime_error(_TXT("missing definition of %s in %s structure"), "operator", context);
+					if (!defined[1]) throw strus::runtime_error(_TXT("missing definition of %s in %s structure"), "name", context);
+					if (!defined[2]) throw strus::runtime_error(_TXT("missing definition of %s in %s structure"), "value", context);
+				}
+			}
+			else if (si->tag == papuga_TagValue)
+			{
+				char buf[64];
+				const char* compareOpStr = Deserializer::getCharpAscii( buf, sizeof(buf), si, se);
+				opr = MetaDataOp::getCompareOp( compareOpStr);
+				name = Deserializer::getString( si, se);
+				value = ValueVariantWrap::tonumeric( *getValue( si, se));
+			}
+			else
+			{
+				if (si->tag == papuga_TagClose)
+				{
+					throw strus::runtime_error(_TXT("expected non-empty %s structure"), context);
+				}
+				else
+				{
+					throw strus::runtime_error(_TXT("expected name or value opening a %s structure"), context);
+				}
+			}
+			WrapMetaDataRestriction<RestrictionInterface>::addCondition( builder, opr, name, value, !sameGroup);
+		}
+		Deserializer::consumeClose( si, se);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for %s"), context);
+	}
+}
+
+template <class RestrictionInterface>
+static void buildMetaDataRestrictionList_(
+		RestrictionInterface* builder,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
+		bool sameGroup)
+{
+	static const char* context = _TXT("metadata restriction");
+
+	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s structure"), context);
+	if (si->tag == papuga_TagOpen)
+	{
+		if (!Deserializer::hasDepth( si, se, 1))
+		{
+			buildMetaDataRestriction_<RestrictionInterface>( builder, si, se, sameGroup);
+		}
+		else
+		{
+			++si;
+			while (si != se && si->tag != papuga_TagClose)
+			{
+				buildMetaDataRestriction_<RestrictionInterface>( builder, si, se, sameGroup);
+			}
+			Deserializer::consumeClose( si, se);
+		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for %s"), context);
+	}
+}
+
+void Deserializer::buildMetaDataRestriction(
+		MetaDataRestrictionInterface* builder,
+		const papuga_ValueVariant& content,
+		ErrorBufferInterface* errorhnd)
+{
+	static const char* context = _TXT("metadata restriction");
+
+	if (!papuga_ValueVariant_defined( &content)) return;
+	if (content.valuetype != papuga_TypeSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
+	}
+	papuga::Serialization::const_iterator
+		si = papuga::Serialization::begin( content.value.serialization),
+		se = papuga::Serialization::end( content.value.serialization);
+	try
+	{
+		buildMetaDataRestrictionList_<MetaDataRestrictionInterface>( builder, si, se, false);
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT("error defining metadata restriction"));
+		}
+	}
+	catch (const std::runtime_error& err)
+	{
+		throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( content.value.serialization));
+	}
+}
+
+void Deserializer::buildMetaDataRestriction(
+		QueryInterface* builder,
+		const papuga_ValueVariant& content,
+		ErrorBufferInterface* errorhnd)
+{
+	static const char* context = _TXT("metadata restriction");
+
+	if (!papuga_ValueVariant_defined( &content)) return;
+	if (content.valuetype != papuga_TypeSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
+	}
+	papuga::Serialization::const_iterator
+		si = papuga::Serialization::begin( content.value.serialization),
+		se = papuga::Serialization::end( content.value.serialization);
+	try
+	{
+		buildMetaDataRestrictionList_<QueryInterface>( builder, si, se, false);
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT("error defining metadata restriction: %s"), errorhnd->fetchError());
 		}
 	}
 	catch (const std::runtime_error& err)

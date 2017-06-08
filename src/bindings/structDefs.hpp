@@ -78,8 +78,8 @@ private:
 
 struct DfChangeDef
 {
-	const char* termtype;
-	const char* termvalue;
+	std::string termtype;
+	std::string termvalue;
 	int increment;
 
 	DfChangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);

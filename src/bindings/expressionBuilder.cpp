@@ -65,7 +65,7 @@ static std::string termSymbolKey( unsigned int termid, const std::string& name)
 
 void PostProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
-	throw strus::runtime_error(_TXT("length parameter not implemented for pattern input terms"));
+	throw strus::runtime_error(_TXT("%s not implemented for %s %s"), "length parameter", "postproc pattern", "push term");
 }
 
 void PostProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
@@ -100,7 +100,7 @@ void PostProcPatternExpressionBuilder::pushTerm( const std::string& type)
 
 void PostProcPatternExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
 {
-	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in pattern expressions"), metadataRangeStart.c_str(), metadataRangeEnd.c_str());
+	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in %s"), metadataRangeStart.c_str(), metadataRangeEnd.c_str(), "post proc patterns");
 }
 
 void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
@@ -136,7 +136,7 @@ void PostProcPatternExpressionBuilder::defineLexem( const std::string& name)
 
 void PreProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
-	throw strus::runtime_error(_TXT("length parameter not implemented for pattern input terms"));
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "length parameter","pre proc pattern");
 }
 
 void PreProcPatternExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
@@ -171,7 +171,7 @@ void PreProcPatternExpressionBuilder::pushTerm( const std::string& type)
 
 void PreProcPatternExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
 {
-	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in pattern expressions"), metadataRangeStart.c_str(), metadataRangeEnd.c_str());
+	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented for %s"), metadataRangeStart.c_str(), metadataRangeEnd.c_str(), "pre proc pattern");
 }
 
 void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
@@ -214,7 +214,7 @@ void QueryExpressionBuilder::pushTerm( const std::string& type, const std::strin
 
 void QueryExpressionBuilder::pushTerm( const std::string& type)
 {
-	m_query->pushTerm( type, std::string(), 1);
+	throw strus::runtime_error(_TXT("push term without value not implemented for %s"), "query");
 }
 
 void QueryExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
@@ -237,7 +237,7 @@ void QueryExpressionBuilder::attachVariable( const std::string& name)
 
 void QueryExpressionBuilder::definePattern( const std::string& name, bool visible)
 {
-	throw strus::runtime_error(_TXT("define pattern not implemented for query"));
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
 }
 
 void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
@@ -276,7 +276,7 @@ void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& value)
 
 void QueryAnalyzerExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
 {
-	throw strus::runtime_error(_TXT("document meta data ranges not implemented for query"));
+	throw strus::runtime_error(_TXT("document meta data ranges not implemented for %s"), "query");
 }
 
 void QueryAnalyzerExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
@@ -310,6 +310,75 @@ void QueryAnalyzerExpressionBuilder::attachVariable( const std::string& name)
 
 void QueryAnalyzerExpressionBuilder::definePattern( const std::string& name, bool visible)
 {
-	throw strus::runtime_error(_TXT("define pattern not implemented for query"));
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
+}
+
+void PostingsExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
+{
+	Reference<PostingIteratorInterface> itr( m_storage->createTermPostingIterator( type, value, length));
+	if (!itr.get()) throw strus::runtime_error(_TXT("failed to create term posting iterator for %s '%s': %s"), type.c_str(), value.c_str(), m_errorhnd->fetchError());
+	m_stack.push_back( itr);
+}
+
+void PostingsExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
+{
+	Reference<PostingIteratorInterface> itr( m_storage->createTermPostingIterator( type, value, 1));
+	if (!itr.get()) throw strus::runtime_error(_TXT("failed to create term posting iterator for %s '%s': %s"), type.c_str(), value.c_str(), m_errorhnd->fetchError());
+	m_stack.push_back( itr);
+}
+
+void PostingsExpressionBuilder::pushTerm( const std::string& type)
+{
+	throw strus::runtime_error(_TXT("push term without value not implemented for %s"), "posting iterator");
+}
+
+void PostingsExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
+{
+	Reference<PostingIteratorInterface> itr( m_storage->createFieldPostingIterator( metadataRangeStart, metadataRangeEnd));
+	if (!itr.get()) throw strus::runtime_error(_TXT("failed to create metadata field posting iterator from '%s' to' '%s': %s"), metadataRangeStart.c_str(), metadataRangeEnd.c_str(), m_errorhnd->fetchError());
+	m_stack.push_back( itr);
+}
+
+void PostingsExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
+{
+	if (argc > m_stack.size())
+	{
+		throw strus::runtime_error(_TXT("too few arguments on stack for operation"));
+	}
+	else
+	{
+		const PostingJoinOperatorInterface* joinop = m_queryproc->getPostingJoinOperator( op);
+		if (!joinop)
+		{
+			throw strus::runtime_error(_TXT("posting join operator '%s' not defined"), op.c_str());
+		}
+		std::vector<Reference<PostingIteratorInterface> >::const_iterator
+			si = m_stack.end() - argc, se = m_stack.end();
+		std::vector<Reference<PostingIteratorInterface> > args;
+		args.insert( args.end(), si, se);
+		Reference<PostingIteratorInterface> itr( joinop->createResultIterator( args, range, cardinality));
+		if (!itr.get()) throw strus::runtime_error(_TXT("failed to create posting iterator join for '%s'"), op.c_str(), m_errorhnd->fetchError());
+		m_stack.resize( m_stack.size() - argc);
+		m_stack.push_back( itr);
+	}
+}
+
+void PostingsExpressionBuilder::attachVariable( const std::string& name)
+{
+	throw strus::runtime_error(_TXT("%s is not implemented for %s"), "attach variable", "postings iterator");
+}
+
+void PostingsExpressionBuilder::definePattern( const std::string& name, bool visible)
+{
+	throw strus::runtime_error(_TXT("%s is not implemented for %s"), "define pattern", "postings iterator");
+}
+
+Reference<PostingIteratorInterface> PostingsExpressionBuilder::pop()
+{
+	if (m_stack.empty()) throw strus::runtime_error(_TXT("no posting expression on stack as result of parsing expression"));
+	Reference<PostingIteratorInterface> rt = m_stack.back();
+	m_stack.pop_back();
+	if (!m_stack.empty()) throw strus::runtime_error(_TXT("more than one posting expression on stack as result of parsing expression"));
+	return rt;
 }
 

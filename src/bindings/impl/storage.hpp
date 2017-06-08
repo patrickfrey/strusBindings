@@ -55,12 +55,16 @@ public:
 	/// return the internal document number or 0, if not defined
 	Index documentNumber( const std::string& docid) const;
 
-	/// \brief Get an iterator on the set of postings
+	/// \brief Get an iterator on the set of postings inserted
 	/// \param[in] expression query term expression
 	/// \param[in] restriction meta data restrictions
 	/// return an iterator on a set of postings
 	Iterator postings( const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno);
 
+	/// \brief Get an iterator on the term types inserted
+	/// return an iterator on the term types
+	Iterator termTypes() const;
+	
 	/// \brief Create a transaction
 	/// return the transaction object created
 	StorageTransactionImpl* createTransaction() const;

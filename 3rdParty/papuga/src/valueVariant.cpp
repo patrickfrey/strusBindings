@@ -275,7 +275,7 @@ static char* langstring_toascii( char* destbuf, size_t destbufsize, const char* 
 	{
 		destbuf[ destpos++] = chr;
 	}
-	if (destpos >= destbufsize) return false;
+	if (destpos >= destbufsize) return 0;
 	destbuf[ destpos] = 0;
 	return (chr == 0) ? destbuf : 0;
 }
@@ -467,7 +467,7 @@ static bool bufprint_number_variant( char* buf, std::size_t bufsize, std::size_t
 }
 
 
-extern "C" char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* val)
+extern "C" const char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* val)
 {
 	if (!papuga_ValueVariant_isstring( val)) return false;
 	if (val->valuetype == papuga_TypeString)
@@ -760,7 +760,7 @@ extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, pa
 {
 	int rt;
 	char destbuf[256];
-	char* numstr;
+	const char* numstr;
 
 	if (papuga_ValueVariant_isatomic( value))
 	{

@@ -62,10 +62,12 @@ void papuga_set_CallResult_bool( papuga_CallResult* self, bool val)
 	papuga_init_ValueVariant_bool( &self->value, val);
 }
 
-void papuga_set_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize)
+bool papuga_set_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize)
 {
 	char* val_copy = papuga_Allocator_copy_string( &self->allocator, val, valsize);
+	if (!val_copy) return false;
 	papuga_init_ValueVariant_string( &self->value, val_copy, valsize);
+	return true;
 }
 
 void papuga_set_CallResult_string_const( papuga_CallResult* self, const char* val, size_t valsize)
@@ -114,13 +116,6 @@ void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, vo
 	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
 }
 
-void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser, papuga_Allocator* allocator)
-{
-	papuga_init_Serialization_move( &self->serialization, ser);
-	if (allocator) papuga_init_Allocator_move( &self->allocator, allocator);
-	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
-}
-
 void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy)
 {
 	papuga_init_HostObject( &self->object, data, destroy);
@@ -133,15 +128,8 @@ void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papu
 	papuga_init_ValueVariant_hostobj( &self->value, data, 0);
 }
 
-void papuga_set_CallResult_iterator( papuga_CallResult* self, void* data, papuga_Deleter destroy, papuga_GetNext getNext)
+void papuga_set_CallResult_iterator( papuga_CallResult* self)
 {
-	papuga_init_Iterator( &self->iterator, data, destroy, getNext);
-	papuga_init_ValueVariant_iterator( &self->value, &self->iterator);
-}
-
-void papuga_set_CallResult_iterator_move( papuga_CallResult* self, papuga_Iterator* itr)
-{
-	papuga_init_Iterator_move( &self->iterator, itr);
 	papuga_init_ValueVariant_iterator( &self->value, &self->iterator);
 }
 

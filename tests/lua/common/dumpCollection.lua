@@ -25,6 +25,15 @@ function dumpCollection( strusctx, storagePath, docidList)
 		content = statitr:getNext()
 	end
 	output[ "stat"] = output_stat
+
+	local output_types = {}
+	local typeitr = storage:termTypes()
+	print( string.format( "TYPES: %s" ,dumpValue( typeitr)))
+	for tp in typeitr do
+		table.insert( output_types, tp)
+	end
+	output[ "types"] = output_types
+
 	storage:close()
 	return output
 end

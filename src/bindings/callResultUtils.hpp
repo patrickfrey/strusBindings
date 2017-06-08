@@ -37,6 +37,7 @@ void initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Str
 
 void initCallResultIterator( papuga_CallResult* retval, const strus::bindings::Iterator& st)
 {
+	papuga_set_CallResult_iterator( retval);
 	// PF:HACK: Dangerous intrusiveness (do use move semantics instead C++11)
 	std::memcpy( &retval->iterator, &st.iterator, sizeof(retval->iterator));
 }

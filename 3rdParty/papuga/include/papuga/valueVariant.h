@@ -155,7 +155,7 @@ bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* self, const ch
 /// \param[in] destbufsize allocation size of 'destbuf' in bytes
 /// \param[in] self pointer to structure 
 /// \return the pointer to the result string if succeeded, NULL else
-char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* self);
+const char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* self);
 
 #ifdef __cplusplus
 }

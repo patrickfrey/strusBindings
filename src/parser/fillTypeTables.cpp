@@ -75,7 +75,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("argv_map", "ValueVariantWrap::tostring( $value)")
 	;
 	typesystem.defineType( "std::string")
-		("retv_map", "{std::string retvalstr = $value; papuga_set_CallResult_string( $name, retvalstr.c_str(), retvalstr.size());}")
+		("retv_map", "{std::string retvalstr = $value; if (!papuga_set_CallResult_string( $name, retvalstr.c_str(), retvalstr.size())) throw std::bad_alloc();}")
 	;
 	typesystem.defineType( "std::string*")
 		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")

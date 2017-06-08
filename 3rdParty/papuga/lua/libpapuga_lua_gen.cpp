@@ -165,7 +165,7 @@ static void define_main(
 	{
 		const papuga_ClassDescription& classdef = descr.classes[ci];
 		out << fmt::format( papuga::cppCodeSnippet( 1,
-			"papuga_lua_declare_class( ls, {classid}, \"{nsclassname}\", mt_{nsclassname}, {destructor});",
+			"papuga_lua_declare_class( ls, {classid}, \"{nsclassname}\", mt_{nsclassname});",
 			0),
 			fmt::arg("modulename", descr.name),
 			fmt::arg("classid", classdef.id),

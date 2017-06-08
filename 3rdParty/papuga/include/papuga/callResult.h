@@ -47,7 +47,8 @@ void papuga_set_CallResult_bool( papuga_CallResult* self, bool val);
 /// \brief Define value of CallResult as string (copied)
 /// \param[in,out] self pointer to structure
 /// \param[in] val value to set as return value
-void papuga_set_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize);
+/// \return true on success, false on memory allocation error
+bool papuga_set_CallResult_string( papuga_CallResult* self, const char* val, size_t valsize);
 
 /// \brief Define value of CallResult as string reference
 /// \param[in,out] self pointer to structure
@@ -92,23 +93,9 @@ void papuga_set_CallResult_serialization( papuga_CallResult* self);
 /// \param[in] destroy delete function of the host object
 void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_Deleter destroy);
 
-/// \brief Define value of CallResult as serialization moved from the argument
+/// \brief Define value of CallResult as iterator
 /// \param[in,out] self pointer to structure
-/// \param[in,out] ser pointer to serialization
-/// \param[in] allocator pointer to allocator or 0 if not defined
-void papuga_set_CallResult_serialization_move( papuga_CallResult* self, papuga_Serialization* ser, papuga_Allocator* allocator);
-
-/// \brief Define value of CallResult as iterator with ownership
-/// \param[in,out] self pointer to structure
-/// \param[in] data pointer to the iterated data structure
-/// \param[in] destroy delete function of the iterated data structure
-/// \param[in] getNext method to fetch next (or first) element of iterator
-void papuga_set_CallResult_iterator( papuga_CallResult* self, void* data, papuga_Deleter destroy, papuga_GetNext getNext);
-
-/// \brief Define value of CallResult as iterator moved from the argument
-/// \param[in,out] self pointer to structure
-/// \param[in,out] itr pointer to iterator
-void papuga_set_CallResult_iterator_move( papuga_CallResult* self, papuga_Iterator* itr);
+void papuga_set_CallResult_iterator( papuga_CallResult* self);
 
 /// \brief Report an error of the call
 /// \param[in,out] self pointer to structure

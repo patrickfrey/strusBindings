@@ -20,12 +20,15 @@
 #include "strus/statisticsIteratorInterface.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
+#include "strus/metaDataRestrictionInstanceInterface.hpp"
+#include "strus/valueIteratorInterface.hpp"
 #include "strus/base/configParser.hpp"
 #include "papuga/serialization.hpp"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "internationalization.hpp"
 #include "metadataop.hpp"
+#include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
 #include "callResultUtils.hpp"
@@ -68,6 +71,189 @@ Index StorageClientImpl::documentNumber( const std::string& docid) const
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
 	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->documentNumber( docid);
+}
+
+class PostingIterator
+{
+public:
+	PostingIterator( const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, const ValueVariant& expression, const ValueVariant& restriction, const Index& docno_)
+		:m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_errorhnd_impl(errorhnd_),m_postings(),m_restriction(),m_docno(docno_?docno_:1)
+	{
+		const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
+		const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
+		const QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+		PostingsExpressionBuilder postingsBuilder( storage, queryproc, errorhnd);
+		Deserializer::buildExpression( postingsBuilder, expression, errorhnd);
+		m_postings = postingsBuilder.pop();
+		if (papuga_ValueVariant_defined( &restriction))
+		{
+			Reference<MetaDataRestrictionInterface> builder;
+			builder.reset( storage->createMetaDataRestriction());
+			if (!builder.get()) throw strus::runtime_error(_TXT("failed to create metadata restriction for posting iterator"));
+			Deserializer::buildMetaDataRestriction( builder.get(), restriction, errorhnd);
+			m_restriction.reset( builder->createInstance());
+			if (!m_restriction.get()) throw strus::runtime_error(_TXT("failed to create metadata restriction for posting iterator instance"));
+		}
+	}
+	~PostingIterator(){}
+
+	std::pair<Index,std::vector<Index> > getNext()
+	{
+		std::pair<Index,std::vector<Index> > rt( 0, std::vector<Index>());
+		if (!m_docno) return rt;
+		for (; 0!=(m_docno = m_postings->skipDoc( m_docno)); ++m_docno)
+		{
+			if (!m_restriction.get() || m_restriction->match( m_docno)) break;
+		}
+		if (m_docno)
+		{
+			rt.first = m_docno++;
+			for (Index pos = 0; 0!=(pos=m_postings->skipPos(pos)); ++pos)
+			{
+				rt.second.push_back( pos);
+			}
+		}
+		else
+		{
+			ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+			if (errorhnd->hasError()) throw strus::runtime_error(_TXT("error in posting iterator: %s"), errorhnd->fetchError());
+		}
+		return rt;
+	}
+
+private:
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
+	ObjectRef m_errorhnd_impl;
+	Reference<PostingIteratorInterface> m_postings;
+	Reference<MetaDataRestrictionInstanceInterface> m_restriction;
+	Index m_docno;
+};
+
+static bool PostingsGetNext( void* self, papuga_CallResult* result)
+{
+	try
+	{
+		std::pair<Index,std::vector<Index> > res = ((PostingIterator*)self)->getNext();
+		if (!res.first) return false;
+
+		bool ser = true;
+		papuga_set_CallResult_serialization( result);
+		ser &= papuga_Serialization_pushOpen( &result->serialization);
+		ser &= papuga_Serialization_pushValue_int( &result->serialization, res.first);
+		ser &= Serializer::serializeIntArray( &result->serialization, res.second);
+		ser &= papuga_Serialization_pushClose( &result->serialization);
+		if (!ser)
+		{
+			papuga_CallResult_reportError( result, _TXT("memory allocation error in postings iterator get next"));
+			return false;
+		}
+		return true;
+	}
+	catch (const std::bad_alloc& err)
+	{
+		papuga_CallResult_reportError( result, _TXT("memory allocation error in postings iterator get next"));
+		return false;
+	}
+	catch (const std::runtime_error& err)
+	{
+		papuga_CallResult_reportError( result, _TXT("error in postings iterator get next: %s"), err.what());
+		return false;
+	}
+}
+
+static void PostingsDeleter( void* obj)
+{
+	delete (PostingIterator*)obj;
+}
+
+class ValueIterator
+{
+public:
+	enum {MaxNofElements=128};
+
+	ValueIterator( const Reference<ValueIteratorInterface>& values_, const ObjectRef& errorhnd_, const std::string& key=std::string())
+		:m_values(values_),m_errorhnd_impl(errorhnd_)
+	{
+		if (!key.empty())
+		{
+			m_values->skip( key.c_str(), key.size());
+		}
+		m_block = m_values->fetchValues( MaxNofElements);
+		m_blockitr = m_block.begin();
+	}
+	~ValueIterator(){}
+
+	bool getNext( papuga_CallResult* result)
+	{
+		if (m_blockitr == m_block.end())
+		{
+			if (m_block.empty()) return false;
+			m_block = m_values->fetchValues( MaxNofElements);
+			m_blockitr = m_block.begin();
+			if (m_blockitr == m_block.end())
+			{
+				ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+				if (errorhnd->hasError()) throw strus::runtime_error(_TXT("error in posting iterator: %s"), errorhnd->fetchError());
+				return false;
+			}
+		}
+		if (!papuga_set_CallResult_string( result, m_blockitr->c_str(), m_blockitr->size())) throw std::bad_alloc();
+		++m_blockitr;
+		return true;
+	}
+
+private:
+	Reference<ValueIteratorInterface> m_values;
+	ObjectRef m_errorhnd_impl;
+	std::vector<std::string> m_block;
+	std::vector<std::string>::const_iterator m_blockitr;
+};
+
+
+static bool ValueIteratorGetNext( void* self, papuga_CallResult* result)
+{
+	try
+	{
+		return (((ValueIterator*)self)->getNext( result));
+	}
+	catch (const std::bad_alloc& err)
+	{
+		papuga_CallResult_reportError( result, _TXT("memory allocation error in value iterator get next"));
+		return false;
+	}
+	catch (const std::runtime_error& err)
+	{
+		papuga_CallResult_reportError( result, _TXT("error in value iterator get next: %s"), err.what());
+		return false;
+	}
+}
+
+static void ValueIteratorDeleter( void* obj)
+{
+	delete (ValueIterator*)obj;
+}
+
+Iterator StorageClientImpl::postings( const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno)
+{
+	Reference<PostingIterator> itr( new PostingIterator( m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, expression, restriction, start_docno));
+	Iterator rt( itr.get(), &PostingsDeleter, &PostingsGetNext);
+	itr.release();
+	return rt;
+}
+
+Iterator StorageClientImpl::termTypes() const
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference<ValueIteratorInterface> itr( storage->createTermTypeIterator());
+	if (!itr.get()) throw strus::runtime_error(_TXT("error creating term type iterator: %s"), errorhnd->fetchError());
+	Iterator rt( new ValueIterator( itr, m_errorhnd_impl), &ValueIteratorDeleter, &ValueIteratorGetNext);
+	rt.release();
+	return rt;
 }
 
 StorageTransactionImpl* StorageClientImpl::createTransaction() const
@@ -283,7 +469,7 @@ Struct DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected
 	for (int eidx=0; ei != ee; ++ei,++eidx)
 	{
 		Index eh;
-		if (0 != (eh = metadatareader->elementHandle( ei->c_str())))
+		if (0 <= (eh = metadatareader->elementHandle( ei->c_str())))
 		{
 			if (!metadatareader_called)
 			{

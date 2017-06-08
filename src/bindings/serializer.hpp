@@ -123,7 +123,6 @@ public:
 		return rt;
 	}
 
-private:
 	template <typename TYPE>
 	static bool serializeArray( papuga_Serialization* result, const std::vector<TYPE>& val)
 	{

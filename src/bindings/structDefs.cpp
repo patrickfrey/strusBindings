@@ -411,8 +411,8 @@ DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papug
 
 		if (si->tag == papuga_TagValue)
 		{
-			termtype = Deserializer::getCharp( si, se);
-			termvalue = Deserializer::getCharp( si, se);
+			termtype = Deserializer::getString( si, se);
+			termvalue = Deserializer::getString( si, se);
 			increment = Deserializer::getInt( si, se);
 		}
 		else
@@ -425,10 +425,10 @@ DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papug
 				switch (idx)
 				{
 					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "type", context);
-						termtype = Deserializer::getCharp( si, se);
+						termtype = Deserializer::getString( si, se);
 						break;
 					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
-						termvalue = Deserializer::getCharp( si, se);
+						termvalue = Deserializer::getString( si, se);
 						break;
 					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "increment", context);
 						increment = Deserializer::getInt( si, se);

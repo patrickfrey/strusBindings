@@ -52,7 +52,8 @@ struct Deserializer
 			papuga::Serialization::const_iterator& si,
 			const papuga::Serialization::const_iterator& se);
 
-	static const char* getCharp(
+	static const char* getCharpAscii(
+			char* buf, std::size_t bufsize,
 			papuga::Serialization::const_iterator& si,
 			const papuga::Serialization::const_iterator& se);
 
@@ -203,6 +204,16 @@ struct Deserializer
 
 	static void buildStatistics(
 			StatisticsBuilderInterface* builder,
+			const papuga_ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildMetaDataRestriction(
+			MetaDataRestrictionInterface* builder,
+			const papuga_ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildMetaDataRestriction(
+			QueryInterface* builder,
 			const papuga_ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 

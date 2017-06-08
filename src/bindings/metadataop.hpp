@@ -19,12 +19,6 @@ public:
 	typedef MetaDataRestrictionInterface::CompareOperator CompareOperator;
 	static CompareOperator getCompareOp( const char* compareOp);
 
-	enum Join
-	{
-		JoinAnd,
-		JoinOr
-	};
-
 	MetaDataOp( const CompareOperator& opr_, const std::string& name_, const NumericVariant& operand_)
 		:m_opr(opr_),m_name(name_),m_operand(operand_){}
 	MetaDataOp( const MetaDataOp& o)
@@ -34,28 +28,13 @@ public:
 	const std::string& name() const		{return m_name;}
 	const NumericVariant& operand() const	{return m_operand;}
 
-	bool operator < (const MetaDataOp& o) const
-	{
-		if (m_name < o.m_name) return true;
-		if (m_name > o.m_name) return false;
-		if (m_opr < o.opr()) return true;
-		if (m_opr > o.opr()) return false;
-		return m_operand < o.m_operand;
-	}
+	bool operator < (const MetaDataOp& o) const;
 
 private:
 	CompareOperator m_opr;
 	std::string m_name;
 	NumericVariant m_operand;
 };
-
-#if 0/*DEPRECATED UNFINISHED*/
-typedef std::vector<MetaDataOp> MetaDataOpList;
-typedef std::vector<MetaDataOpList> MetaDataOpCNF;
-
-MetaDataOpCNF metaDataOp( const MetaDataOp::CompareOperator& opr, const std::string& name, const NumericVariant& operand);
-MetaDataOpCNF joinMetaDataOp( MetaDataOp::Join joinop, const std::vector<MetaDataOpCNF>& arglist);
-#endif
 
 }}
 #endif

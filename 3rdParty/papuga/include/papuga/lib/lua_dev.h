@@ -39,30 +39,63 @@ typedef struct papuga_lua_ClassDefMap
 
 typedef struct papuga_lua_UserData papuga_lua_UserData;
 
+/// \brief Initialize papuga globals for lua
+/// \param[in] ls lua state to initialize
+/// \remark this function has to be called when initializing the lua context
+void papuga_lua_init( lua_State* ls);
+
 /// \brief Declares a class with its meta data table
-void papuga_lua_declare_class( lua_State* ls, int classid, const char* classname,
-				const luaL_Reg* mt, papuga_Deleter destructor);
+/// \param[in] ls lua state context
+/// \param[in] classid identifier of the class
+/// \param[in] classname unique name of the class
+/// \param[in] mt method table of the class
+void papuga_lua_declare_class( lua_State* ls, int classid, const char* classname, const luaL_Reg* mt);
 
 /// \brief Allocate the userdata for a new instance of a class
+/// \param[in] ls lua state context
+/// \param[in] classname unique name of the class
+/// \return pointer to the user data allocated
 papuga_lua_UserData* papuga_lua_new_userdata( lua_State* ls, const char* classname);
+
 /// \brief Initialize the userdata of a new class instance created
+/// \param[in] ls lua state context
+/// \param[in] classid identifier of the class
+/// \param[in] objref pointer to user data object (class instance)
+/// \param[in] destructor destructor function of 'objref'
 void papuga_lua_init_UserData( papuga_lua_UserData* udata,
 				int classid, void* objref, papuga_Deleter destructor);
 
 /// \brief Invokes a lua error exception on a papuga error
+/// \param[in] ls lua state context
+/// \param[in] function the caller context of the error
+/// \param[in] err error code
 void papuga_lua_error( lua_State* ls, const char* function, papuga_ErrorCode err);
+
 /// \brief Invokes a lua error exception on a host function execution error
+/// \param[in] ls lua state context
+/// \param[in] function the caller context of the error
+/// \param[in] errormsg error message string
 void papuga_lua_error_str( lua_State* ls, const char* function, const char* errormsg);
 
 /// \brief Function that fills a structure with the arguments passed in the lua context for papuga
+/// \param[in] ls lua state context
+/// \param[in] argc number of function arguments
+/// \param[out] arg argument structure initialized
+/// \param[in] classname name of the class of the called method
+/// \param[in] classdefmap table of application class definitions
 bool papuga_lua_init_CallArgs( lua_State *ls, int argc, papuga_lua_CallArgs* arg,
 				const char* classname, const papuga_lua_ClassDefMap* classdefmap);
 
 /// \brief Frees the arguments of a papuga call (to call after the call)
+/// \param[in] arg argument structure freed
 void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg);
 
-/// \brief Function that transfers the call result of a function into the lua context, freeing the call result structure
+/// \brief Procedure that transfers the call result of a function into the lua context, freeing the call result structure
+/// \param[in] ls lua state context
+/// \param[out] callres result structure initialized
+/// \param[in] classdefmap table of application class definitions
 /// \return the number of values to return
+/// \param[out] errcode error code
 int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* callres,
 				const papuga_lua_ClassDefMap* classdefmap, papuga_ErrorCode* errcode);
 
