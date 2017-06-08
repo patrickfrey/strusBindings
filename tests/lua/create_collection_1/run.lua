@@ -17,6 +17,10 @@ createCollection( ctx, storage, datadir, docfiles)
 local result = "collection dump:" .. dumpTree( "", dumpCollection( ctx, storage, docfiles)) .. "\n"
 local expected = [[
 collection dump:
+string docids: 
+  number 1: "A.xml"
+  number 2: "B.xml"
+  number 3: "C.xml"
 string docs: 
   number 1: 
     number 1: "A.xml"
@@ -200,6 +204,10 @@ string stat:
         string type: "endtitle"
         string value: ""
     string nofdocs: 0
+string types: 
+  number 1: "endtitle"
+  number 2: "orig"
+  number 3: "word"
 ]]
 
 verifyTestOutput( outputdir, result, expected)

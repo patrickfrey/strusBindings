@@ -256,6 +256,30 @@ Iterator StorageClientImpl::termTypes() const
 	return rt;
 }
 
+Iterator StorageClientImpl::docids() const
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference<ValueIteratorInterface> itr( storage->createDocIdIterator());
+	if (!itr.get()) throw strus::runtime_error(_TXT("error creating %s iterator: %s"), "docid", errorhnd->fetchError());
+	Iterator rt( new ValueIterator( itr, m_errorhnd_impl), &ValueIteratorDeleter, &ValueIteratorGetNext);
+	rt.release();
+	return rt;
+}
+
+Iterator StorageClientImpl::usernames() const
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference<ValueIteratorInterface> itr( storage->createUserNameIterator());
+	if (!itr.get()) throw strus::runtime_error(_TXT("error creating %s iterator: %s"), "username", errorhnd->fetchError());
+	Iterator rt( new ValueIterator( itr, m_errorhnd_impl), &ValueIteratorDeleter, &ValueIteratorGetNext);
+	rt.release();
+	return rt;
+}
+
 StorageTransactionImpl* StorageClientImpl::createTransaction() const
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));

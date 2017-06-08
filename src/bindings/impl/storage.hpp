@@ -64,7 +64,15 @@ public:
 	/// \brief Get an iterator on the term types inserted
 	/// return an iterator on the term types
 	Iterator termTypes() const;
-	
+
+	/// \brief Get an iterator on the document identifiers inserted
+	/// return an iterator on the docids
+	Iterator docids() const;
+
+	/// \brief Get an iterator on the user names (roles) used in document access restrictions
+	/// \return an iterator on the user names (roles)
+	Iterator usernames() const;
+
 	/// \brief Create a transaction
 	/// return the transaction object created
 	StorageTransactionImpl* createTransaction() const;

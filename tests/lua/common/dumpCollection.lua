@@ -9,6 +9,8 @@ function dumpCollection( strusctx, storagePath, docidList)
 	local statproc = strusctx:createStatisticsProcessor( "default")
 
 	local browser = storage:createDocumentBrowser()
+
+	-- Document metadata and attributes:
 	local output_docs = {}
 	for _,docid in ipairs(docidList) do
 		dump = browser:get( storage:documentNumber( docid), {"docid","title","doclen","title_start","title_end"})
@@ -16,6 +18,7 @@ function dumpCollection( strusctx, storagePath, docidList)
 	end
 	output[ "docs"] = output_docs
 
+	-- Term statistics:
 	local output_stat = {}
 	local statitr = storage:createStatisticsIterator( true)
 	local content = statitr:getNext()
@@ -26,13 +29,21 @@ function dumpCollection( strusctx, storagePath, docidList)
 	end
 	output[ "stat"] = output_stat
 
+	-- Term types:
 	local output_types = {}
 	local typeitr = storage:termTypes()
-	print( string.format( "TYPES: %s" ,dumpValue( typeitr)))
 	for tp in typeitr do
 		table.insert( output_types, tp)
 	end
 	output[ "types"] = output_types
+
+	-- Document identifiers:
+	local output_docids = {}
+	local dociditr = storage:docids()
+	for tp in dociditr do
+		table.insert( output_docids, tp)
+	end
+	output[ "docids"] = output_docids
 
 	storage:close()
 	return output
