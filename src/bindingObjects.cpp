@@ -2016,8 +2016,7 @@ std::string StatisticsProcessor::encode( const StatisticsMessage& msg) const
 {
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	const strus::StatisticsProcessorInterface* proc = (const strus::StatisticsProcessorInterface*)m_statsproc;
-	strus::StatisticsProcessorInterface::BuilderOptions options;
-	std::auto_ptr<strus::StatisticsBuilderInterface> builder( proc->createBuilder( options));
+	std::auto_ptr<strus::StatisticsBuilderInterface> builder( proc->createBuilder());
 	std::vector<DocumentFrequencyChange>::const_iterator
 			dfi = msg.documentFrequencyChangeList().begin(),
 			dfe = msg.documentFrequencyChangeList().end();
