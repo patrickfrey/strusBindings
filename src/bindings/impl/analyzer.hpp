@@ -171,7 +171,7 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	DocumentAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd, const ValueVariant& doctype, const TextProcessorInterface* textproc_);
+	DocumentAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const ValueVariant& doctype, const TextProcessorInterface* textproc_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
@@ -259,7 +259,7 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	QueryAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd);
+	QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;

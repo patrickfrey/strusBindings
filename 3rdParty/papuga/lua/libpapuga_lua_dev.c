@@ -1,5 +1,5 @@
-#include <lua.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
 #include "papuga/lib/lua_dev.h"
 #include "papuga/valueVariant.h"
 #include "papuga/callResult.h"
@@ -19,6 +19,8 @@
 #define MIN_DOUBLE_INT           -((int64_t)1<<53)
 #define IS_CONVERTIBLE_TOINT( x)  ((x-floor(x) <= 2*DBL_EPSILON) && x < MAX_DOUBLE_INT && x > MIN_DOUBLE_INT)
 #define NUM_EPSILON               (2*DBL_EPSILON)
+
+#define PAPUGA_DEEP_TYPE_CHECKING
 
 #undef PAPUGA_LOWLEVEL_DEBUG
 #ifdef PAPUGA_LOWLEVEL_DEBUG
@@ -94,6 +96,16 @@ static int papuga_lua_destroy_UserData( lua_State* ls)
 	{
 		papuga_lua_error( ls, "destructor", papuga_InvalidAccess);
 	}
+#ifdef PAPUGA_DEEP_TYPE_CHECKING
+	if (udata->classid)
+	{
+		const papuga_lua_ClassDef* cdef = get_classdef( udata->classdefmap, udata->classid);
+		if (cdef->destructor != udata->destructor)
+		{
+			papuga_lua_error( ls, "destructor", papuga_InvalidAccess);
+		}
+	}
+#endif
 	++udata->checksum;
 	if (udata->destructor) udata->destructor( udata->objectref);
 	return 0;
@@ -102,9 +114,8 @@ static int papuga_lua_destroy_UserData( lua_State* ls)
 static const papuga_lua_UserData* get_UserData( lua_State* ls, int idx)
 {
 	const papuga_lua_UserData* udata = (const papuga_lua_UserData*)lua_touserdata( ls, idx);
-	const papuga_lua_ClassDef* cdef;
+	const papuga_lua_ClassDef* cdef = get_classdef( udata->classdefmap, udata->classid);
 	if (calcCheckSum(udata) != udata->checksum) return 0;
-	cdef = get_classdef( udata->classdefmap, udata->classid);
 	if (!cdef) return 0;
 	if (!luaL_testudata( ls, idx, cdef->name)) return 0;
 	return udata;

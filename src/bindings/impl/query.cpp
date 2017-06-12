@@ -24,7 +24,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-QueryEvalImpl::QueryEvalImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd)
+QueryEvalImpl::QueryEvalImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -37,7 +37,7 @@ QueryEvalImpl::QueryEvalImpl( const ObjectRef& objbuilder, const ObjectRef& trac
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
 	}
-	m_queryeval_impl.resetOwnership( objBuilder->createQueryEval());
+	m_queryeval_impl.resetOwnership( objBuilder->createQueryEval(), "QueryEval");
 	if (!m_queryeval_impl.get())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -111,10 +111,10 @@ QueryImpl* QueryEvalImpl::createQuery( StorageClientImpl* storage) const
 	const QueryEvalInterface* qe = m_queryeval_impl.getObject<QueryEvalInterface>();
 	const StorageClientInterface* st = storage->m_storage_impl.getObject<StorageClientInterface>();
 	ObjectRef query;
-	query.resetOwnership( qe->createQuery( st));
+	query.resetOwnership( qe->createQuery( st), "Query");
 	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
 
-	return new QueryImpl( m_objbuilder_impl, m_trace_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc);
+	return new QueryImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
 
 void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr_, double weight_)

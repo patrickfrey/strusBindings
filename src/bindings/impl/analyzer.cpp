@@ -45,7 +45,7 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 	}
 }
 
-DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ValueVariant& doctype, const TextProcessorInterface* textproc_)
+DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const ValueVariant& doctype, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -78,7 +78,7 @@ DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& objbuilder, const O
 	{
 		throw strus::runtime_error( _TXT("failed to get document document segmenter: %s"), errorhnd->fetchError());
 	}
-	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter, segmenteropt));
+	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter, segmenteropt), "DocumentAnalyzer");
 	if (!m_analyzer_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create document analyzer: %s"), errorhnd->fetchError());
@@ -338,7 +338,7 @@ analyzer::Document* DocumentAnalyzerImpl::analyze( const std::string& content, c
 	}
 }
 
-QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd)
+QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -346,7 +346,7 @@ QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& objbuilder, const ObjectR
 	,m_queryAnalyzerStruct()
 {
 	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	m_analyzer_impl.resetOwnership( objBuilder->createQueryAnalyzer());
+	m_analyzer_impl.resetOwnership( objBuilder->createQueryAnalyzer(), "QueryAnalyzer");
 	if (!m_analyzer_impl.get())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();

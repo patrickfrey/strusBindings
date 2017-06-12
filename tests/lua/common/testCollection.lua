@@ -36,12 +36,10 @@ function createCollection( strusctx, storagePath, datadir, fnams)
 	local idx = 0
 	for _,fnam in ipairs(fnams) do
 		local filename = datadir..'/'..fnam
-		if string.sub( filename, 1, 1) ~= '.' then
-			idx = idx + 1
-			doc = analyzer:analyze( readFile( filename))
-			table.insert( doc.attributes, {name="docid", value=fnam})
-			transaction:insertDocument( fnam, doc)
-		end
+		idx = idx + 1
+		doc = analyzer:analyze( readFile( filename))
+		table.insert( doc.attributes, {name="docid", value=fnam})
+		transaction:insertDocument( fnam, doc)
 	end
 	-- Without this the documents wont be inserted:
 	transaction:commit()

@@ -78,10 +78,10 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "{std::string retvalstr = $value; if (!papuga_set_CallResult_string( $name, retvalstr.c_str(), retvalstr.size())) throw std::bad_alloc();}")
 	;
 	typesystem.defineType( "std::string*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "{std::string* ptr_$name = $value; if (ptr_$name) initCallResultStructureOwnership( $name, ptr_$name);}")
 	;
 	typesystem.defineType( "const char*")
-		("retv_map", "if ($value) papuga_set_CallResult_charp_const( $name, $value);")
+		("retv_map", "{const char* ptr_$name = $value; if (ptr_$name) papuga_set_CallResult_charp_const( $name, ptr_$name);}")
 		("argv_decl", "std::string $name;")
 		("argv_map", "ValueVariantWrap::tocharp( $name, $value)")
 	;
@@ -90,23 +90,23 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("argv_map", "implObjectCast<const $objid~Impl>( $value)")
 	;
 	typesystem.defineType( "$objid~Impl*")
-		("retv_map", "if ($value) initCallResultObjectOwnership( $name, $value);")
+		("retv_map", "initCallResultObjectOwnership( $name, $value);")
 		("argv_map", "implObjectCast<$objid~Impl>( $value)")
 	;
 	typesystem.defineType( "analyzer::DocumentClass*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "analyzer::Document*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "AnalyzedQuery*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<std::pair<std::string,std::string> >*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<std::string>*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "Struct")
 		("retv_map", "initCallResultStruct( $name, $value);")
@@ -115,7 +115,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "initCallResultIterator( $name, $value);")
 	;
 	typesystem.defineType( "QueryResult*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<VectorStorageSearchInterface::Result>")
 		("retv_map", "initCallResultAtomic( $name, $value);")
@@ -127,7 +127,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "initCallResultAtomic( $name, $value);")
 	;
 	typesystem.defineType( "$objid~Interface*")
-		("retv_map", "if ($value) initCallResultStructureOwnership( $name, $value);")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 }
 

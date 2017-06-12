@@ -82,7 +82,7 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	QueryEvalImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd);
+	QueryEvalImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd);
 
 	friend class QueryImpl;
 	mutable ObjectRef m_errorhnd_impl;
@@ -170,7 +170,7 @@ public:
 
 private:
 	friend class QueryEvalImpl;
-	QueryImpl( const ObjectRef& objbuilder_impl_, const ObjectRef& trace_impl_, const ObjectRef& errorhnd_, const ObjectRef& storage_impl_, const ObjectRef& queryeval_impl_, const ObjectRef& query_impl_, const QueryProcessorInterface* queryproc_)
+	QueryImpl( const ObjectRef& trace_impl_, const ObjectRef& objbuilder_impl_, const ObjectRef& errorhnd_, const ObjectRef& storage_impl_, const ObjectRef& queryeval_impl_, const ObjectRef& query_impl_, const QueryProcessorInterface* queryproc_)
 		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
 	{}
 

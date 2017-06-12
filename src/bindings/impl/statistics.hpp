@@ -39,7 +39,7 @@ public:
 
 private:
 	friend class StorageClientImpl;
-	StatisticsIteratorImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& iter_);
+	StatisticsIteratorImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& iter_);
 
 private:
 	ObjectRef m_errorhnd_impl;
@@ -69,7 +69,7 @@ public:
 
 private:
 	friend class ContextImpl;
-	StatisticsProcessorImpl( const ObjectRef& objbuilder_, const ObjectRef& trace_, const std::string& name_, const ObjectRef& errorhnd_);
+	StatisticsProcessorImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const std::string& name_, const ObjectRef& errorhnd_);
 
 private:
 	mutable ObjectRef m_errorhnd_impl;

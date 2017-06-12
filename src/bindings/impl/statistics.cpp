@@ -25,7 +25,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-StatisticsIteratorImpl::StatisticsIteratorImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& iter_)
+StatisticsIteratorImpl::StatisticsIteratorImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& iter_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -50,7 +50,7 @@ std::string* StatisticsIteratorImpl::getNext()
 	return new std::string( outmsg, outmsgsize);
 }
 
-StatisticsProcessorImpl::StatisticsProcessorImpl( const ObjectRef& objbuilder_, const ObjectRef& trace_, const std::string& name_, const ObjectRef& errorhnd_)
+StatisticsProcessorImpl::StatisticsProcessorImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const std::string& name_, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace_)
 	,m_objbuilder_impl(objbuilder_)
@@ -85,8 +85,7 @@ std::string* StatisticsProcessorImpl::encode( const ValueVariant& msg) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* proc = m_statsproc;
-	StatisticsProcessorInterface::BuilderOptions options;
-	Reference<StatisticsBuilderInterface> builder( proc->createBuilder( options));
+	Reference<StatisticsBuilderInterface> builder( proc->createBuilder());
 	if (!builder.get()) throw strus::runtime_error(_TXT("failed to create builder for statistics: %s"), errorhnd->fetchError());
 	Deserializer::buildStatistics( builder.get(), msg, errorhnd);
 

@@ -101,29 +101,29 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	{
 		ContextDef contextdef = parseContext( descr);
 		ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
-		m_errorhnd_impl.resetOwnership( errorhnd);
+		m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
 		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-		m_moduleloader_impl.resetOwnership( moduleLoader);
+		m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
 		if (!contextdef.rpc.empty())
 		{
 			Reference<RpcClientMessagingInterface> messaging;
 			messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
 			if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
-			m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd));
+			m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd), "RpcClient");
 			if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
 			(void)messaging.release();
 		}
 		if (!contextdef.trace.empty())
 		{
-			m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd));
+			m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd), "TraceProxy");
 		}
 	}
 	else
 	{
 		ErrorBufferInterface* errorhnd = createErrorBuffer_( 0);
-		m_errorhnd_impl.resetOwnership( errorhnd);
+		m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
 		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-		m_moduleloader_impl.resetOwnership( moduleLoader);
+		m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
 	}
 }
 
@@ -167,7 +167,7 @@ void ContextImpl::addResourcePath( const std::string& paths_)
 StatisticsProcessorImpl* ContextImpl::createStatisticsProcessor( const std::string& name)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StatisticsProcessorImpl( m_storage_objbuilder_impl, m_trace_impl, name, m_errorhnd_impl);
+	return new StatisticsProcessorImpl( m_trace_impl, m_storage_objbuilder_impl, name, m_errorhnd_impl);
 }
 
 void ContextImpl::initStorageObjBuilder()
@@ -203,7 +203,7 @@ void ContextImpl::initStorageObjBuilder()
 		}
 		storageObjectBuilder = storageObjectBuilder_proxy;
 	}
-	m_storage_objbuilder_impl.resetOwnership( storageObjectBuilder);
+	m_storage_objbuilder_impl.resetOwnership( storageObjectBuilder, "StorageObjectBuilder");
 }
 
 void ContextImpl::initAnalyzerObjBuilder()
@@ -239,7 +239,7 @@ void ContextImpl::initAnalyzerObjBuilder()
 		}
 		analyzerObjectBuilder = analyzerObjectBuilder_proxy;
 	}
-	m_analyzer_objbuilder_impl.resetOwnership( analyzerObjectBuilder);
+	m_analyzer_objbuilder_impl.resetOwnership( analyzerObjectBuilder, "AnalyzerObjectBuilder");
 }
 
 analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& content)
@@ -268,14 +268,14 @@ StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
+	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
 }
 
 VectorStorageClientImpl* ContextImpl::createVectorStorageClient( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new VectorStorageClientImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
+	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
 }
 
 DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
@@ -291,19 +291,19 @@ DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& d
 			throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 		}
 	}
-	return new DocumentAnalyzerImpl( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl, doctype, m_textproc);
+	return new DocumentAnalyzerImpl( m_trace_impl, m_analyzer_objbuilder_impl, m_errorhnd_impl, doctype, m_textproc);
 }
 
 QueryAnalyzerImpl* ContextImpl::createQueryAnalyzer()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return new QueryAnalyzerImpl( m_analyzer_objbuilder_impl, m_trace_impl, m_errorhnd_impl);
+	return new QueryAnalyzerImpl( m_trace_impl, m_analyzer_objbuilder_impl, m_errorhnd_impl);
 }
 
 QueryEvalImpl* ContextImpl::createQueryEval()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new QueryEvalImpl( m_storage_objbuilder_impl, m_trace_impl, m_errorhnd_impl);
+	return new QueryEvalImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl);
 }
 
 void ContextImpl::createStorage( const ValueVariant& config_)

@@ -12,7 +12,11 @@
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-#define PAPUGA_USE_RTTI_TYPECHECK
+#define STRUS_USE_RTTI_TYPECHECK
+#undef STRUS_LOWLEVEL_DEBUG
+#ifdef STRUS_LOWLEVEL_DEBUG
+#include <iostream>
+#endif
 
 namespace strus {
 namespace bindings {
@@ -32,48 +36,84 @@ public:
 
 	/// \brief Default constructor
 	ObjectRef()
+#ifdef STRUS_LOWLEVEL_DEBUG
+		:m_ptr(),m_name("null")
+#else
 		:m_ptr()
+#endif
 	{}
 
 	/// \brief Constructor
-	ObjectRef( void* obj, Deleter deleter_)
+#ifdef STRUS_LOWLEVEL_DEBUG
+	ObjectRef( void* obj, Deleter deleter_, const char* name_)
+		:m_ptr(),m_name(name_)
+#else
+	ObjectRef( void* obj, Deleter deleter_, const char*)
 		:m_ptr()
+#endif
 	{
 		m_ptr.reset( obj, deleter_);
 	}
 
 	/// \brief Copy constructor
+#ifdef STRUS_LOWLEVEL_DEBUG
+	ObjectRef( const ObjectRef& o)
+		:m_ptr(o.m_ptr),m_name(o.m_name)
+	{
+		std::cerr << "COPY ObjRef " << m_name << " (" << m_ptr.use_count() << ")" << std::endl;
+	}
+#else
 	ObjectRef( const ObjectRef& o)
 		:m_ptr(o.m_ptr){}
+#endif
 
 	/// \brief Destructor
-	~ObjectRef(){}
+	~ObjectRef()
+	{
+#ifdef STRUS_LOWLEVEL_DEBUG
+		std::cerr << "DELETE ObjRef " << m_name << " (" << m_ptr.use_count() << ")" << std::endl;
+#endif
+	}
 
 	/// \brief Create pointer as reference with ownership and reference counting
 	template <class OBJECTTYPE>
-	static ObjectRef createOwnership( OBJECTTYPE* obj)
+	static ObjectRef createOwnership( OBJECTTYPE* obj, const char* name_)
 	{
 		ObjectRef rt;
-		rt.resetOwnership( obj);
+		rt.resetOwnership( obj, name_);
 		return rt;
 	}
 
 	/// \brief Create pointer as constant reference
 	template <class OBJECTTYPE>
-	static ObjectRef createConst( const OBJECTTYPE* obj)
+	static ObjectRef createConst( const OBJECTTYPE* obj, const char* name_)
 	{
 		ObjectRef rt;
-		rt.resetConst( const_cast<OBJECTTYPE*>(obj));
+		rt.resetConst( const_cast<OBJECTTYPE*>(obj), name_);
 		return rt;
 	}
 
 	/// \brief Define pointer as reference with ownership and reference counting
 	template <class OBJECTTYPE>
-	void resetOwnership( OBJECTTYPE* obj)
+#ifdef STRUS_LOWLEVEL_DEBUG
+	void resetOwnership( OBJECTTYPE* obj, const char* name_)
+#else
+	void resetOwnership( OBJECTTYPE* obj, const char*)
+#endif
 	{
 		try
 		{
-			m_ptr.reset( obj, deleter<OBJECTTYPE>);
+			if (obj)
+			{
+				m_ptr.reset( obj, deleter<OBJECTTYPE>);
+			}
+			else
+			{
+				m_ptr.reset();
+			}
+#ifdef STRUS_LOWLEVEL_DEBUG
+			m_name = name_;
+#endif
 		}
 		catch (const std::bad_alloc& err)
 		{
@@ -84,21 +124,37 @@ public:
 
 	/// \brief Define pointer as constant reference
 	template <class OBJECTTYPE>
-	void resetConst( const OBJECTTYPE* obj)
+#ifdef STRUS_LOWLEVEL_DEBUG
+	void resetConst( const OBJECTTYPE* obj, const char* name_)
+#else
+	void resetConst( const OBJECTTYPE* obj, const char*)
+#endif
 	{
 		m_ptr.reset( const_cast<OBJECTTYPE*>(obj), no_deleter);
+#ifdef STRUS_LOWLEVEL_DEBUG
+		m_name = name_;
+#endif
 	}
 
 	/// \brief Clear this
 	void reset()
 	{
+#ifdef STRUS_LOWLEVEL_DEBUG
+		std::cerr << "DELETE ObjRef " << m_name << " (" << m_ptr.use_count() << ")" << std::endl;
+#endif
 		m_ptr.reset();
+#ifdef STRUS_LOWLEVEL_DEBUG
+		m_name = "null";
+#endif
 	}
 
 	/// \brief Assignment operator
 	ObjectRef& operator = (const ObjectRef& o)
 	{
 		m_ptr = o.m_ptr;
+#ifdef STRUS_LOWLEVEL_DEBUG
+		m_name = o.m_name;
+#endif
 		return *this;
 	}
 
@@ -113,7 +169,7 @@ public:
 	{
 		const OBJECTTYPE* obj = static_cast<const OBJECTTYPE*>( (const void*)m_ptr.get());
 		if (!obj) return 0;
-#ifdef PAPUGA_USE_RTTI_TYPECHECK
+#ifdef STRUS_USE_RTTI_TYPECHECK
 		if (dynamic_cast<const OBJECTTYPE*>( obj) == 0)
 		{
 			throw std::runtime_error( "internal: unexpected object type passed in bindings");
@@ -128,7 +184,7 @@ public:
 	{
 		OBJECTTYPE* obj = static_cast<OBJECTTYPE*>( m_ptr.get());
 		if (!obj) return 0;
-#ifdef PAPUGA_USE_RTTI_TYPECHECK
+#ifdef STRUS_USE_RTTI_TYPECHECK
 		if (dynamic_cast<OBJECTTYPE*>( obj) == 0)
 		{
 			throw std::runtime_error( "internal: unexpected object type passed in bindings");
@@ -138,6 +194,9 @@ public:
 	}
 private:
 	boost::shared_ptr<void> m_ptr;
+#ifdef STRUS_LOWLEVEL_DEBUG
+	const char* m_name;
+#endif
 };
 
 }} //namespace

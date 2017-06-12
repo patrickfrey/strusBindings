@@ -195,7 +195,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 				"#define _PAPUGA_{modulename}_LUA_INTERFACE__INCLUDED",
 				"///\\remark GENERATED FILE (libpapuga_lua_gen) - DO NOT MODIFY",
 				"",
-				"#include <lua.h>",
+				"#include \"lua.h\"",
 				"#ifdef __cplusplus",
 				"extern \"C\" {",
 				"#endif",
@@ -212,7 +212,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		else if (what == "module")
 		{
 			out << papuga::cppCodeSnippet( 0,
-				"#include <lauxlib.h>",
+				"#include \"lauxlib.h\"",
 				"#include \"papuga.h\"",
 				"#include \"papuga/lib/lua_dev.h\"", 0);
 

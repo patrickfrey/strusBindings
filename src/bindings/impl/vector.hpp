@@ -46,7 +46,7 @@ public:
 
 private:
 	friend class VectorStorageClientImpl;
-	VectorStorageSearcherImpl( const ObjectRef& storage, const ObjectRef& trace, int range_from, int range_to, const ObjectRef& errorhnd_);
+	VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storage, int range_from, int range_to, const ObjectRef& errorhnd_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_searcher_impl;
@@ -123,7 +123,7 @@ public:
 
 private:
 	friend class ContextImpl;
-	VectorStorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config);
+	VectorStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
@@ -167,7 +167,7 @@ public:
 
 private:
 	friend class VectorStorageClientImpl;
-	VectorStorageTransactionImpl( const ObjectRef& objbuilder, const ObjectRef& storage, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config);
+	VectorStorageTransactionImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& storage, const ObjectRef& errorhnd_, const std::string& config);
 
 	ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;

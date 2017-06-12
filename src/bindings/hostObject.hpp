@@ -10,6 +10,7 @@
 /// \brief Reference to host object with C++ templates for typesafety
 /// \file hostObject.hpp
 #include "papuga/hostObject.h"
+#include "bindingClassTemplate.hpp"
 #include "internationalization.hpp"
 #include <stdexcept>
 
@@ -21,14 +22,6 @@ namespace bindings {
 struct HostObject
 {
 public:
-	template <class OBJECTTYPE>
-	static void deleter( void* obj)
-	{
-		delete static_cast<OBJECTTYPE*>( obj);
-	}
-	static void no_deleter( void* obj)
-	{}
-
 	/// \brief Destructor
 	~HostObject(){}
 
@@ -36,7 +29,7 @@ public:
 	template <class OBJECTTYPE>
 	static void initOwnership( papuga_HostObject& ref, OBJECTTYPE* obj)
 	{
-		papuga_init_HostObject( &ref, obj, deleter<OBJECTTYPE>);
+		papuga_init_HostObject( &ref, obj, BindingClassTemplate<OBJECTTYPE>::getDestructor());
 	}
 
 	/// \brief Create pointer as constant reference

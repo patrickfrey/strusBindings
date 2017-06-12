@@ -58,8 +58,17 @@ public:
 	/// \brief Get an iterator on the set of postings inserted
 	/// \param[in] expression query term expression
 	/// \param[in] restriction meta data restrictions
+	/// \param[in] start_docno starting document number
 	/// return an iterator on a set of postings
 	Iterator postings( const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno);
+
+	/// \brief Get an iterator on records of selected elements for matching documents starting from a specified document number
+	/// \param[in] what list of items to select: names of document attributes or meta data or "position" for matching positions or "docno" for the document number
+	/// \param[in] expression query term expression
+	/// \param[in] restriction meta data restrictions
+	/// \param[in] start_docno starting document number
+	/// return an iterator on a set of postings
+	Iterator select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno);
 
 	/// \brief Get an iterator on the term types inserted
 	/// return an iterator on the term types
@@ -102,7 +111,7 @@ public:
 
 private:
 	friend class ContextImpl;
-	StorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config);
+	StorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config);
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;
@@ -145,9 +154,7 @@ public:
 
 private:
 	friend class StorageClientImpl;
-	StorageTransactionImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const ObjectRef& storage_);
-
-	StorageTransactionInterface* getTransaction();
+	StorageTransactionImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const ObjectRef& storage_);
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;
@@ -189,8 +196,8 @@ public:
 private:
 	friend class StorageClientImpl;
 	DocumentBrowserImpl(
-		const ObjectRef& objbuilder_impl_,
 		const ObjectRef& trace_impl_,
+		const ObjectRef& objbuilder_impl_,
 		const ObjectRef& storage_impl_,
 		const ObjectRef& errorhnd_);
 

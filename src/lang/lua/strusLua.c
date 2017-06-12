@@ -112,11 +112,17 @@ int main( int argc, const char* argv[])
 	{
 		switch (errcode)
 		{
+			case LUA_OK:
+				lua_close( ls);
+				return 0;
 			case LUA_ERRRUN:
 				fprintf( stderr, "error in script '%s': '%s'\n", inputfile, lua_tostring( ls, -1));
 				break;
 			case LUA_ERRMEM:
 				fprintf( stderr, "out of memory in script '%s'\n", inputfile);
+				break;
+			case LUA_ERRGCMM:
+				fprintf( stderr, "internal error in destructor call (call of __gc metamethod) in script '%s'\n", inputfile);
 				break;
 			case LUA_ERRERR:
 				fprintf( stderr, "error in lua error handler executing script '%s'\n", inputfile);

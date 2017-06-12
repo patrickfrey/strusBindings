@@ -23,7 +23,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& storageref, const ObjectRef& trace, int range_from, int range_to, const ObjectRef& errorhnd_)
+VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storageref, int range_from, int range_to, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_searcher_impl()
 	,m_trace_impl( trace)
@@ -32,7 +32,7 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& storagere
 	const VectorStorageClientInterface* storage = storageref.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
-	m_searcher_impl.resetOwnership( storage->createSearcher( range_from, range_to));
+	m_searcher_impl.resetOwnership( storage->createSearcher( range_from, range_to), "VectorStorageSearcher");
 	if (!m_searcher_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create vector storage searcher: %s"), errorhnd->fetchError());
@@ -98,12 +98,12 @@ void VectorStorageClientImpl::close()
 
 VectorStorageSearcherImpl* VectorStorageClientImpl::createSearcher( int range_from, int range_to) const
 {
-	return new VectorStorageSearcherImpl( m_vector_storage_impl, m_trace_impl, range_from, range_to, m_errorhnd_impl);
+	return new VectorStorageSearcherImpl( m_trace_impl, m_vector_storage_impl, range_from, range_to, m_errorhnd_impl);
 }
 
 VectorStorageTransactionImpl* VectorStorageClientImpl::createTransaction()
 {
-	return new VectorStorageTransactionImpl( m_objbuilder_impl, m_vector_storage_impl, m_trace_impl, m_errorhnd_impl, m_config);
+	return new VectorStorageTransactionImpl( m_trace_impl, m_objbuilder_impl, m_vector_storage_impl, m_errorhnd_impl, m_config);
 }
 
 std::vector<std::string>* VectorStorageClientImpl::conceptClassNames() const
@@ -245,7 +245,7 @@ std::vector<std::pair<std::string,std::string> >* VectorStorageClientImpl::confi
 	return rt;
 }
 
-VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& objbuilder, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config)
+VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
@@ -255,7 +255,7 @@ VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& objbuilder, c
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
 
-	m_vector_storage_impl.resetOwnership( createVectorStorageClient( objBuilder, errorhnd, config));
+	m_vector_storage_impl.resetOwnership( createVectorStorageClient( objBuilder, errorhnd, config), "VectorStorageClient");
 	if (!m_vector_storage_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create vector storage client: %s"), errorhnd->fetchError());
@@ -269,7 +269,7 @@ void VectorStorageTransactionImpl::addFeature( const std::string& name, const Va
 	if (!transaction)
 	{
 		VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-		m_vector_transaction_impl.resetOwnership( transaction = storage->createTransaction());
+		m_vector_transaction_impl.resetOwnership( transaction = storage->createTransaction(), "VectorStorageTransaction");
 		if (!transaction) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
 	}
 	transaction->addFeature( name, Deserializer::getDoubleList( vec));
@@ -286,7 +286,7 @@ void VectorStorageTransactionImpl::defineFeatureConceptRelation( const std::stri
 	if (!transaction)
 	{
 		VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-		m_vector_transaction_impl.resetOwnership( transaction = storage->createTransaction());
+		m_vector_transaction_impl.resetOwnership( transaction = storage->createTransaction(), "VectorStorageTransaction");
 		if (!m_vector_transaction_impl.get()) throw strus::runtime_error( _TXT("failed to create transaction for insert document: %s"), errorhnd->fetchError());
 	}
 	transaction->defineFeatureConceptRelation( relationTypeName, featidx, conidx);
@@ -332,7 +332,7 @@ void VectorStorageTransactionImpl::close()
 	}
 }
 
-VectorStorageTransactionImpl::VectorStorageTransactionImpl( const ObjectRef& objbuilder, const ObjectRef& storageref, const ObjectRef& trace, const ObjectRef& errorhnd_, const std::string& config)
+VectorStorageTransactionImpl::VectorStorageTransactionImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& storageref, const ObjectRef& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
@@ -342,7 +342,7 @@ VectorStorageTransactionImpl::VectorStorageTransactionImpl( const ObjectRef& obj
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 
-	m_vector_transaction_impl.resetOwnership( storage->createTransaction());
+	m_vector_transaction_impl.resetOwnership( storage->createTransaction(), "VectorStorageTransaction");
 	if (!m_vector_transaction_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create vector storage transaction: %s"), errorhnd->fetchError());

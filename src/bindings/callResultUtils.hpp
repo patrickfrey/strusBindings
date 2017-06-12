@@ -9,7 +9,6 @@
 #define _STRUS_BINDINGS_CALL_RESULT_UTILS_HPP_INCLUDED
 /// \brief Helper templates to build the CallResult structure, the uniform return value of binding methods
 /// \file callResultUtils.hpp
-#include "strus/bindingClassId.hpp"
 #include "papuga/callResult.h"
 #include "papuga/valueVariant.h"
 #include "papuga/serialization.hpp"

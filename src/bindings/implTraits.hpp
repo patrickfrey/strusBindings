@@ -8,7 +8,6 @@
 #ifndef _STRUS_BINDINGS_IMPL_TRAITS_HPP_INCLUDED
 #define _STRUS_BINDINGS_IMPL_TRAITS_HPP_INCLUDED
 /// \file implTraits.hpp
-#include "strus/bindingClassId.hpp"
 #include "papuga/valueVariant.hpp"
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
@@ -16,6 +15,7 @@
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"
 #include "impl/statistics.hpp"
+#include "bindingClassIds.hpp"
 #include "serializer.hpp"
 #include "internationalization.hpp"
 
