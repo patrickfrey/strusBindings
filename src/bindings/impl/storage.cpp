@@ -181,9 +181,9 @@ public:
 		if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 
 		m_attributereader_impl.resetOwnership( storage->createAttributeReader(), "AttributeReader");
-		if (m_attributereader_impl.get()) throw strus::runtime_error( _TXT("failed to create attribute reader"));
+		if (!m_attributereader_impl.get()) throw strus::runtime_error( _TXT("failed to create attribute reader"));
 		m_metadatareader_impl.resetOwnership( storage->createMetaDataReader(), "MetaDataReader");
-		if (m_metadatareader_impl.get()) throw strus::runtime_error( _TXT("failed to create metadata reader"));
+		if (!m_metadatareader_impl.get()) throw strus::runtime_error( _TXT("failed to create metadata reader"));
 
 		AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
 		MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
@@ -327,9 +327,9 @@ public:
 	{
 		try
 		{
-			if (!m_docno) return false;
 			if (m_postings.get())
 			{
+				if (!m_docno) return false;
 				for (; 0!=(m_docno = m_postings->skipDoc( m_docno)); ++m_docno)
 				{
 					if (!m_restriction.get() || m_restriction->match( m_docno)) break;
@@ -337,7 +337,8 @@ public:
 			}
 			else
 			{
-				for (; 0 != m_docno; ++m_docno)
+				if (!m_docno || m_docno > m_maxdocno) return false;
+				for (; m_docno <= m_maxdocno; ++m_docno)
 				{
 					if (!m_restriction.get() || m_restriction->match( m_docno)) break;
 				}
@@ -497,6 +498,7 @@ Iterator StorageClientImpl::postings( const ValueVariant& expression, const Valu
 	Reference<PostingIterator> itr( new PostingIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, expression, restriction, start_docno));
 	Iterator rt( itr.get(), &PostingsDeleter, &PostingsGetNext);
 	itr.release();
+	rt.release();
 	return rt;
 }
 
@@ -505,6 +507,7 @@ Iterator StorageClientImpl::select( const ValueVariant& what, const ValueVariant
 	Reference<SelectIterator> itr( new SelectIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, what, expression, restriction, start_docno));
 	Iterator rt( itr.get(), &SelectDeleter, &SelectGetNext);
 	itr.release();
+	rt.release();
 	return rt;
 }
 

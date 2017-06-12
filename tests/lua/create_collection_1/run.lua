@@ -22,24 +22,27 @@ string docids:
   number 2: "B.xml"
   number 3: "C.xml"
 string docs: 
-  number 1: 
-    number 1: "A.xml"
-    number 2: "One day in Tokyo"
-    number 3: 20
-    number 4: 0
-    number 5: 6
-  number 2: 
-    number 1: "B.xml"
-    number 2: "A visit in New York"
-    number 3: 16
-    number 4: 0
-    number 5: 7
-  number 3: 
-    number 1: "C.xml"
-    number 2: "A journey through Germany"
-    number 3: 16
-    number 4: 0
-    number 5: 6
+  string A.xml: 
+    string docid: "A.xml"
+    string doclen: 20
+    string docno: 3
+    string title: "One day in Tokyo"
+    string title_end: 6
+    string title_start: 0
+  string B.xml: 
+    string docid: "B.xml"
+    string doclen: 16
+    string docno: 2
+    string title: "A visit in New York"
+    string title_end: 7
+    string title_start: 0
+  string C.xml: 
+    string docid: "C.xml"
+    string doclen: 16
+    string docno: 1
+    string title: "A journey through Germany"
+    string title_end: 6
+    string title_start: 0
 string stat: 
   number 1: 
     string dfchange: 
@@ -203,7 +206,7 @@ string stat:
         string increment: 3
         string type: "endtitle"
         string value: ""
-    string nofdocs: 0
+    string nofdocs: 3
 string types: 
   number 1: "endtitle"
   number 2: "orig"

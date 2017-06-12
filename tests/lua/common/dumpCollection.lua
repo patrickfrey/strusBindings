@@ -8,13 +8,12 @@ function dumpCollection( strusctx, storagePath, docidList)
 	local storage = strusctx:createStorageClient( config)
 	local statproc = strusctx:createStatisticsProcessor( "default")
 
-	local browser = storage:createDocumentBrowser()
+	local browse = storage:select( {"docno","docid","title","doclen","title_start","title_end"}, nil, nil, 0)
 
 	-- Document metadata and attributes:
 	local output_docs = {}
-	for _,docid in ipairs(docidList) do
-		dump = browser:get( storage:documentNumber( docid), {"docid","title","doclen","title_start","title_end"})
-		table.insert( output_docs, dump)
+	for docrow in browse do
+		output_docs[ docrow.docid] = docrow
 	end
 	output[ "docs"] = output_docs
 
