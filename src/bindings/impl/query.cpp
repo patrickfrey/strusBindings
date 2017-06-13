@@ -19,7 +19,6 @@
 #include "deserializer.hpp"
 #include "serializer.hpp"
 #include "structDefs.hpp"
-#include "implTraits.hpp"
 
 using namespace strus;
 using namespace strus::bindings;

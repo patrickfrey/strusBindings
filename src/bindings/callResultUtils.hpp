@@ -21,7 +21,7 @@
 #include "impl/statistics.hpp"
 #include "impl/struct.hpp"
 #include "impl/iterator.hpp"
-#include "implTraits.hpp"
+#include "bindingClassTemplate.hpp"
 #include "serializer.hpp"
 
 namespace {
@@ -67,14 +67,14 @@ template <typename OBJECT>
 static void initCallResultObjectOwnership( papuga_CallResult* retval, OBJECT* st)
 {
 	strus::bindings::HostObject::initOwnership( retval->object, st);
-	papuga_init_ValueVariant_hostobj( &retval->value, st, strus::bindings::ClassIdMap::get(*st));
+	papuga_init_ValueVariant_hostobj( &retval->value, st, strus::bindings::BindingClassTemplate<OBJECT>::classid());
 }
 
 template <typename OBJECT>
 static void initCallResultObjectConst( papuga_CallResult* retval, const OBJECT* st)
 {
 	strus::bindings::HostObject::initConst( &retval->object, st);
-	papuga_init_ValueVariant_hostobj( &retval->value, st, strus::bindings::ClassIdMap::get(*st));
+	papuga_init_ValueVariant_hostobj( &retval->value, st, strus::bindings::BindingClassTemplate<OBJECT>::classid());
 }
 
 }//namespace

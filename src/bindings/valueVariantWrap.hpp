@@ -16,6 +16,7 @@
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
 #include "internationalization.hpp"
+#include "bindingClassTemplate.hpp"
 
 namespace strus {
 namespace bindings {
@@ -32,6 +33,16 @@ struct ValueVariantWrap
 	static strus::NumericVariant tonumeric( const papuga_ValueVariant& value);
 	static std::string tostring( const papuga_ValueVariant& value);
 	static const char* tocharp( std::string& buf, const papuga_ValueVariant& value);
+
+	template <class ClassImpl>
+	static ClassImpl* toclass( const papuga_ValueVariant& val)
+	{
+		if (val.valuetype != papuga_TypeHostObject || val.classid != BindingClassTemplate<ClassImpl>::classid())
+		{
+			throw strus::runtime_error(_TXT("expected class '%s'"), BindingClassTemplate<ClassImpl>::name());
+		}
+		return (ClassImpl*)const_cast<void*>( val.value.hostObjectData);
+	}
 };
 
 }}//namespace

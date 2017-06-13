@@ -29,8 +29,6 @@ class StorageTransactionImpl;
 /// \brief Forward declaration
 class StatisticsIteratorImpl;
 /// \brief Forward declaration
-class DocumentBrowserImpl;
-/// \brief Forward declaration
 class Struct;
 
 /// \brief Object representing a client connection to the storage 
@@ -94,9 +92,6 @@ public:
 	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
 	/// return the statistics message iterator object created
 	StatisticsIteratorImpl* createUpdateStatisticsIterator();
-
-	/// \brief Create a document browser instance
-	DocumentBrowserImpl* createDocumentBrowser() const;
 
 	/// \brief Get the configuration of this storage
 	/// \return the configuration as structure
@@ -163,53 +158,6 @@ private:
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_storage_impl;
 	ObjectRef m_transaction_impl;
-};
-
-///\brief Implements browsing the documents of a storage without weighting query, just with a restriction on metadata
-class DocumentBrowserImpl
-{
-public:
-	/// \brief Destructor
-	~DocumentBrowserImpl(){}
-
-	/// \brief Define a meta data restriction condition on the documents visited
-	/// \param[in] compareOp compare operator, one of "=","!=",">=","<=","<",">"
-	/// \param[in] name of the meta data field (left side of comparison operator)
-	/// \param[in] value numeric value to compare with the meta data field (right side of comparison operator)
-	/// \param[in] newGroup true, if the restriction is not an alternative condition to the previous one defined (alternative conditions are evaluated as logical OR)
-	/// \remark Metadata restrictions can only be defined before the first call of this DocumentBrowser::next()
-	void addMetaDataRestrictionCondition(
-			const char* compareOp, const std::string& name,
-			const ValueVariant& value, bool newGroup);
-
-	///\brief Get the internal document number of the next document bigger or equal the document number passed
-	///\param[in] docno document number to get the matching least upperbound from
-	///\return the internal document number or 0 if no more documents defined
-	Index skipDoc( int docno);
-
-	///\brief Get a list of attributes, resp. metadata elements addressed by name
-	///\param[in] docno document number to get the selected elements from
-	///\param[in] elementsSelected array of names of elements to select
-	///\return the array of values of the elements selected
-	Struct get( int docno, const ValueVariant& elementsSelected);
-
-private:
-	friend class StorageClientImpl;
-	DocumentBrowserImpl(
-		const ObjectRef& trace_impl_,
-		const ObjectRef& objbuilder_impl_,
-		const ObjectRef& storage_impl_,
-		const ObjectRef& errorhnd_);
-
-private:
-	ObjectRef m_errorhnd_impl;
-	ObjectRef m_trace_impl;
-	ObjectRef m_objbuilder_impl;
-	ObjectRef m_storage_impl;
-	ObjectRef m_restriction_impl;
-	ObjectRef m_postingitr_impl;
-	ObjectRef m_attributereader_impl;
-	ObjectRef m_metadatareader_impl;
 };
 
 }}//namespace

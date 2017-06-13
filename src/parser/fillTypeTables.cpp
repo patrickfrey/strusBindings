@@ -87,11 +87,11 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "const $objid~Impl*")
 		("retv_map", "initCallResultObjectConst( $name, $value);")
-		("argv_map", "implObjectCast<const $objid~Impl>( $value)")
+		("argv_map", "ValueVariantWrap::toclass<const $objid~Impl>( $value)")
 	;
 	typesystem.defineType( "$objid~Impl*")
 		("retv_map", "initCallResultObjectOwnership( $name, $value);")
-		("argv_map", "implObjectCast<$objid~Impl>( $value)")
+		("argv_map", "ValueVariantWrap::toclass<$objid~Impl>( $value)")
 	;
 	typesystem.defineType( "analyzer::DocumentClass*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")

@@ -29,6 +29,8 @@ add_custom_command(
                 ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h
 		${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp
 	        ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp
+		${CMAKE_BINARY_DIR}/src/bindings/bindingClassIds.hpp
+		${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp
 	        ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp
     DEPENDS   strusBindingsInterfaceGen
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp
@@ -47,7 +49,7 @@ add_custom_command(
  
  add_custom_target(
     strus_bindings_c_interface ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h
+    DEPENDS ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h ${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp ${CMAKE_BINARY_DIR}/src/bindings/bindingClassIds.hpp ${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp
 )
 
 # ------------------------------

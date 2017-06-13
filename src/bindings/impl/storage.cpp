@@ -201,8 +201,15 @@ public:
 			builder.reset( storage->createMetaDataRestriction());
 			if (!builder.get()) throw strus::runtime_error(_TXT("failed to create metadata restriction for posting iterator"));
 			Deserializer::buildMetaDataRestriction( builder.get(), restriction, errorhnd);
-			m_restriction.reset( builder->createInstance());
-			if (!m_restriction.get()) throw strus::runtime_error(_TXT("failed to create metadata restriction for posting iterator instance"));
+			if (!m_postings.get())
+			{
+				m_postings.reset( storage->createBrowsePostingIterator( builder.get(), 1));
+			}
+			else
+			{
+				m_restriction.reset( builder->createInstance());
+				if (!m_restriction.get()) throw strus::runtime_error(_TXT("failed to create metadata restriction for posting iterator instance"));
+			}
 		}
 		std::vector<std::string> elemlist = Deserializer::getStringList( what);
 		std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
@@ -338,10 +345,6 @@ public:
 			else
 			{
 				if (!m_docno || m_docno > m_maxdocno) return false;
-				for (; m_docno <= m_maxdocno; ++m_docno)
-				{
-					if (!m_restriction.get() || m_restriction->match( m_docno)) break;
-				}
 			}
 			bool rt = false;
 			if (m_docno)
@@ -581,12 +584,6 @@ StatisticsIteratorImpl* StorageClientImpl::createUpdateStatisticsIterator()
 	return new StatisticsIteratorImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
 }
 
-DocumentBrowserImpl* StorageClientImpl::createDocumentBrowser() const
-{
-	if (!m_objbuilder_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	return new DocumentBrowserImpl( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl);
-}
-
 void StorageClientImpl::close()
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
@@ -683,110 +680,5 @@ void StorageTransactionImpl::rollback()
 	m_transaction_impl.reset();
 }
 
-DocumentBrowserImpl::DocumentBrowserImpl( const ObjectRef& trace_impl_, const ObjectRef& objbuilder_impl_, const ObjectRef& storage_impl_, const ObjectRef& errorhnd_)
-	:m_errorhnd_impl(errorhnd_)
-	,m_trace_impl(trace_impl_)
-	,m_objbuilder_impl(objbuilder_impl_)
-	,m_storage_impl(storage_impl_)
-	,m_restriction_impl()
-	,m_postingitr_impl()
-	,m_attributereader_impl()
-	,m_metadatareader_impl()
-{
-	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	m_restriction_impl.resetOwnership( storage->createMetaDataRestriction(), "MetaDataRestriction");
-	if (!m_restriction_impl.get())
-	{
-		throw strus::runtime_error( _TXT("failed to create meta data restriction interface for browsing documents"));
-	}
-	m_attributereader_impl.resetOwnership( storage->createAttributeReader(), "AttributeReader");
-	m_metadatareader_impl.resetOwnership( storage->createMetaDataReader(), "MetaDataReader");
-}
-
-void DocumentBrowserImpl::addMetaDataRestrictionCondition(
-		const char* compareOp, const std::string& name,
-		const ValueVariant& value, bool newGroup)
-{
-	MetaDataRestrictionInterface* restriction = m_restriction_impl.getObject<MetaDataRestrictionInterface>();
-	if (!restriction)
-	{
-		throw strus::runtime_error( _TXT("it is not allowed to add more restrictions to a document browser after the first call of next()"));
-	}
-	MetaDataRestrictionInterface::CompareOperator cmpop = MetaDataOp::getCompareOp( compareOp);
-	restriction->addCondition( cmpop, name, ValueVariantWrap::tonumeric(value), newGroup);
-}
-
-Index DocumentBrowserImpl::skipDoc( int docno)
-{
-	if (!m_postingitr_impl.get())
-	{
-		const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-		MetaDataRestrictionInterface* restriction = m_restriction_impl.getObject<MetaDataRestrictionInterface>();
-		m_postingitr_impl.resetOwnership( storage->createBrowsePostingIterator( restriction, 1), "BrowsePostingIterator");
-		if (!m_postingitr_impl.get())
-		{
-			throw strus::runtime_error( _TXT("failed to create posting iterator for document browser"));
-		}
-	}
-	PostingIteratorInterface* itr = m_postingitr_impl.getObject<PostingIteratorInterface>();
-	return itr->skipDoc( docno);
-}
-
-Struct DocumentBrowserImpl::get( int docno, const ValueVariant& elementsSelected)
-{
-	if (docno <= 0) throw strus::runtime_error(_TXT("document browser get called without valid document selected"));
-
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	std::vector<std::string> elemlist = Deserializer::getStringList( elementsSelected);
-	AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
-	MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
-	bool attributereader_called = false;
-	bool metadatareader_called = false;
-
-	Struct rt;
-	papuga_Serialization* res = &rt.serialization;
-	bool serflag = true;
-	serflag &= papuga_Serialization_pushOpen( res);
-
-	std::vector<std::string>::const_iterator ei = elemlist.begin(), ee = elemlist.end();
-	for (int eidx=0; ei != ee; ++ei,++eidx)
-	{
-		Index eh;
-		if (0 <= (eh = metadatareader->elementHandle( ei->c_str())))
-		{
-			if (!metadatareader_called)
-			{
-				metadatareader->skipDoc( docno);
-				metadatareader_called = true;
-			}
-			serflag &= Serializer::serialize_nothrow( res, metadatareader->getValue( eh));
-		}
-		else if (0 != (eh = attributereader->elementHandle( ei->c_str())))
-		{
-			if (!attributereader_called)
-			{
-				attributereader->skipDoc( docno);
-				attributereader_called = true;
-			}
-			std::string attrvalstr = attributereader->getValue( eh);
-			const char* attrvalptr = papuga_Allocator_copy_string( &rt.allocator, attrvalstr.c_str(), attrvalstr.size());
-			if (!attrvalptr) throw std::bad_alloc();
-
-			serflag &= papuga_Serialization_pushValue_string( res, attrvalptr, attrvalstr.size());
-		}
-		else
-		{
-			serflag &= papuga_Serialization_pushValue_void( res);
-		}
-	}
-	serflag &= papuga_Serialization_pushClose( res);
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error(_TXT("error getting document attributes and metadata with document browser: %s"), errorhnd->fetchError());
-	}
-	if (!serflag) throw std::bad_alloc();
-	rt.release();
-	return rt;
-}
 
 
