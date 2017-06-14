@@ -11,7 +11,6 @@
 
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
-#include "impl/statistics.hpp"
 #include "impl/vector.hpp"
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"

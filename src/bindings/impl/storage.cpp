@@ -6,7 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/storage.hpp"
-#include "impl/statistics.hpp"
 #include "impl/struct.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/storageClientInterface.hpp"
@@ -643,34 +642,6 @@ StorageTransactionImpl* StorageClientImpl::createTransaction() const
 	return new StorageTransactionImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
-StatisticsIteratorImpl* StorageClientImpl::createStatisticsIterator( bool sign)
-{
-	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	ObjectRef iter;
-	iter.resetOwnership( storage->createAllStatisticsIterator( sign), "StatisticsIterator");
-	if (!iter.get())
-	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
-	}
-	return new StatisticsIteratorImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
-}
-
-StatisticsIteratorImpl* StorageClientImpl::createUpdateStatisticsIterator()
-{
-	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
-	ObjectRef iter;
-	iter.resetOwnership( storage->createChangeStatisticsIterator(), "ChangeStatisticsIterator");
-	if (!iter.get())
-	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
-	}
-	return new StatisticsIteratorImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, m_storage_impl, iter);
-}
-
 void StorageClientImpl::close()
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
@@ -692,14 +663,23 @@ std::string StorageClientImpl::configstring() const
 	return storage->config();
 }
 
-std::vector<std::pair<std::string,std::string> >* StorageClientImpl::config() const
+Struct StorageClientImpl::config() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	typedef std::vector<std::pair<std::string,std::string> > Configuration;
-	Configuration* rt( new Configuration( getConfigStringItems( storage->config(), errorhnd)));
+	Reference<Configuration> cfg( new Configuration( getConfigStringItems( storage->config(), errorhnd)));
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
+	}
+	Struct rt;
+	strus::bindings::Serializer::serialize( &rt.serialization, *cfg);
+	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
+	cfg.release();
+	rt.release();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());

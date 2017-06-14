@@ -293,7 +293,8 @@ void KeyValueList::parseDictionary( papuga::Serialization::const_iterator& si, c
 	{
 		if (si->tag == papuga_TagName)
 		{
-			std::string name = ValueVariantWrap::tostring( getValue( si, se));
+			std::string name = ValueVariantWrap::tostring( si->value);
+			++si;
 			const papuga_ValueVariant* value = &getValue( si, se);
 			items.push_back( Item( name, value));
 		}

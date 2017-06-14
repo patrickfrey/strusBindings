@@ -12,6 +12,7 @@
 #include "strus/index.hpp"
 #include "impl/objectref.hpp"
 #include "impl/iterator.hpp"
+#include "impl/struct.hpp"
 #include <vector>
 #include <string>
 
@@ -26,8 +27,6 @@ typedef papuga_ValueVariant ValueVariant;
 
 /// \brief Forward declaration
 class StorageTransactionImpl;
-/// \brief Forward declaration
-class StatisticsIteratorImpl;
 
 /// \brief Object representing a client connection to the storage 
 /// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
@@ -93,18 +92,9 @@ public:
 	/// return the transaction object created
 	StorageTransactionImpl* createTransaction() const;
 
-	/// \brief Create an iterator on the storage statistics (total value) to distribute for initialization/deinitialization
-	/// \param[in] sign true = registration, false = deregistration
-	/// return the statistics iterator object created
-	StatisticsIteratorImpl* createStatisticsIterator( bool sign);
-
-	/// \brief Create an iterator on the storage statistics (relative value) to distribute after storage updates
-	/// return the statistics message iterator object created
-	StatisticsIteratorImpl* createUpdateStatisticsIterator();
-
 	/// \brief Get the configuration of this storage
 	/// \return the configuration as structure
-	std::vector<std::pair<std::string,std::string> >* config() const;
+	Struct config() const;
 
 	/// \brief Get the configuration of this storage as string
 	/// \return the configuration as string

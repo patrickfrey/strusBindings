@@ -106,17 +106,22 @@ VectorStorageTransactionImpl* VectorStorageClientImpl::createTransaction()
 	return new VectorStorageTransactionImpl( m_trace_impl, m_objbuilder_impl, m_vector_storage_impl, m_errorhnd_impl, m_config);
 }
 
-std::vector<std::string>* VectorStorageClientImpl::conceptClassNames() const
+Struct VectorStorageClientImpl::conceptClassNames() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
-	Reference<std::vector<std::string> > rt( new std::vector<std::string>( storage->conceptClassNames()));
+	Reference<std::vector<std::string> > cfg( new std::vector<std::string>( storage->conceptClassNames()));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get concept class names: %s"), errorhnd->fetchError());
 	}
-	return rt.release();
+	Struct rt;
+	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
+	cfg.release();
+	strus::bindings::Serializer::serialize( &rt.serialization, cfg.get());
+	rt.release();
+	return rt;
 }
 
 std::vector<Index> VectorStorageClientImpl::conceptFeatures( const std::string& conceptClass, int conceptid) const
@@ -230,14 +235,23 @@ std::string VectorStorageClientImpl::configstring() const
 	return rt;
 }
 
-std::vector<std::pair<std::string,std::string> >* VectorStorageClientImpl::config() const
+Struct VectorStorageClientImpl::config() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	typedef std::vector<std::pair<std::string,std::string> > Configuration;
-	Configuration* rt( new Configuration( getConfigStringItems( storage->config(), errorhnd)));
+	Reference<Configuration> cfg( new Configuration( getConfigStringItems( storage->config(), errorhnd)));
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
+	}
+	Struct rt;
+	strus::bindings::Serializer::serialize( &rt.serialization, *cfg);
+	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
+	cfg.release();
+	rt.release();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get the vector storage configuration: %s"), errorhnd->fetchError());
@@ -245,17 +259,17 @@ std::vector<std::pair<std::string,std::string> >* VectorStorageClientImpl::confi
 	return rt;
 }
 
-VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config)
+VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
 	,m_objbuilder_impl( objbuilder)
 	,m_vector_storage_impl()
-	,m_config(config)
+	,m_config( config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
 
-	m_vector_storage_impl.resetOwnership( createVectorStorageClient( objBuilder, errorhnd, config), "VectorStorageClient");
+	m_vector_storage_impl.resetOwnership( createVectorStorageClient( objBuilder, errorhnd, m_config), "VectorStorageClient");
 	if (!m_vector_storage_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create vector storage client: %s"), errorhnd->fetchError());

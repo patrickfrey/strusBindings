@@ -30,6 +30,7 @@ const char* papuga_ErrorCode_tostring( papuga_ErrorCode errorcode)
 		case papuga_InvalidAccess: return _TXT("invalid access");
 		case papuga_UnexpectedEof: return _TXT("unexpected EOF");
 		case papuga_NotImplemented: return _TXT("not implemented");
+		case papuga_ValueUndefined: return _TXT("value is undefined (null)");
 		default: return _TXT("unknown error");
 	}
 }

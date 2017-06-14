@@ -621,7 +621,12 @@ static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* se
 	int rt = 0;
 	papuga_Node* ni = ser->ar;
 	papuga_Node* ne = ni + ser->arsize;
-	for (; ni != ne; ++ni,++rt)
+	if (ni == ne)
+	{
+		lua_pushnil( ls);
+		++rt;
+	}
+	else for (; ni != ne; ++ni,++rt)
 	{
 		if (ni->tag == papuga_TagOpen)
 		{

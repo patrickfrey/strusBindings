@@ -1,8 +1,12 @@
 require "string"
 
 function createCollection( strusctx, storagePath, datadir, fnams)
-	local config = string.format( "path=%s; metadata=doclen UINT16, title_start UINT8, title_end UINT8; cache=512M; statsproc=default", storagePath)
-
+	local config = {
+		path = storagePath,
+		metadata = 'doclen UINT16, title_start UINT8, title_end UINT8',
+		cache = '512M',
+		statsproc = 'default'
+	}
 	strusctx:destroyStorage( config)
 	strusctx:getLastError()
 

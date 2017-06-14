@@ -323,12 +323,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	strus::printCppFrameHeader( out, "bindingObjects", "Identifiers for objects and methods for serialization");
 	out << "#include \"strus/bindingObjects.h\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out << "#include \"impl/context.hpp\"" << std::endl;
-	out << "#include \"impl/storage.hpp\"" << std::endl;
-	out << "#include \"impl/vector.hpp\"" << std::endl;
-	out << "#include \"impl/analyzer.hpp\"" << std::endl;
-	out << "#include \"impl/query.hpp\"" << std::endl;
-	out << "#include \"impl/statistics.hpp\"" << std::endl;
+	out << "#include \"impl/strus.hpp\"" << std::endl;
 	out << "#include \"papuga/valueVariant.h\"" << std::endl;
 	out << "#include \"papuga/callResult.h\"" << std::endl;
 	out << "#include \"papuga/serialization.h\"" << std::endl;

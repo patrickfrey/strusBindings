@@ -6,7 +6,9 @@ function dumpCollection( strusctx, storagePath, docidList)
 
 	-- Get a client for the storage:
 	local storage = strusctx:createStorageClient( config)
-	local statproc = strusctx:createStatisticsProcessor( "default")
+
+	-- Configuration of the storage:
+	output[ "config"] = storage:config()
 
 	-- Document metadata and attributes:
 	local output_docs = {}
@@ -17,12 +19,14 @@ function dumpCollection( strusctx, storagePath, docidList)
 
 	-- Term statistics:
 	local output_stat = {}
-	local statitr = storage:createStatisticsIterator( true)
-	local content = statitr:getNext()
-	while (content) do
-		local statview = statproc:decode( content)
-		table.insert( output_stat, statview)
-		content = statitr:getNext()
+	for blob in storage:getAllStatistics( true) do
+		local statview = strusctx:unpackStatisticBlob( blob, "default")
+		local dfchangelist = {}
+		for _,dfchange in ipairs(statview[ "dfchange"]) do
+			table.insert( dfchangelist, dfchange)
+		end
+		output_stat[ "dfchange"] = dfchangelist
+		output_stat[ "nofdocs"] = (output_stat[ "nofdocs"] or 0) + statview[ "nofdocs"]
 	end
 	output[ "stat"] = output_stat
 

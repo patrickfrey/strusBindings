@@ -18,7 +18,6 @@ set( bindingsimpl_source_files
 	impl/analyzer.cpp
 	impl/query.cpp
 	impl/storage.cpp
-        impl/statistics.cpp
 	impl/vector.cpp
 	impl/context.cpp
 )

@@ -11,6 +11,7 @@
 #include "papuga/serialization.h"
 #include "papuga/allocator.h"
 #include <string>
+#include <cstring>
 #include <stdexcept>
 
 namespace strus {
@@ -36,8 +37,8 @@ public:
 		// but move semantics are not available in C++98, we should switch to C++11
 		if (released)
 		{
-			memcpy( &serialization, &o.serialization, sizeof(serialization));
-			memcpy( &allocator, &o.allocator, sizeof(allocator));
+			std::memcpy( &serialization, &o.serialization, sizeof(serialization));
+			std::memcpy( &allocator, &o.allocator, sizeof(allocator));
 		}
 		else
 		{

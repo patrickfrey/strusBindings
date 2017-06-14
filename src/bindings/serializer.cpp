@@ -303,7 +303,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 	for (; ci != ce; ++ci)
 	{
 		rt &= papuga_Serialization_pushName_string( result, ci->first.c_str(), ci->first.size());
-		rt &= papuga_Serialization_pushValue_string( result, ci->first.c_str(), ci->first.size());
+		rt &= papuga_Serialization_pushValue_string( result, ci->second.c_str(), ci->second.size());
 	}
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;

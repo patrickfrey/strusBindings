@@ -516,9 +516,14 @@ extern "C" const char* papuga_ValueVariant_tostring( const papuga_ValueVariant* 
 		}
 		return rt;
 	}
-	else
+	else if (papuga_ValueVariant_defined( value))
 	{
 		*err = papuga_TypeError;
+		return 0;
+	}
+	else
+	{
+		*err = papuga_ValueUndefined;
 		return 0;
 	}
 }
@@ -545,9 +550,14 @@ std::string papuga::ValueVariant_tostring( const papuga_ValueVariant& value, pap
 			if (!bufprint_number_variant( localbuf, sizeof(localbuf), numlen, &value, &errcode)) return std::string();
 			return std::string( localbuf, numlen);
 		}
-		else
+		else if (papuga_ValueVariant_defined( &value))
 		{
 			errcode = papuga_TypeError;
+			return std::string();
+		}
+		else
+		{
+			errcode = papuga_ValueUndefined;
 			return std::string();
 		}
 	}
@@ -579,9 +589,14 @@ extern "C" const void* papuga_ValueVariant_tolangstring( const papuga_ValueVaria
 		if (!bufprint_number_variant( localbuf, sizeof(localbuf), numlen, value, err)) return 0;
 		return uft8string_to_any_langstring( enc, localbuf, numlen, (char*)buf, bufsize, len, err);
 	}
-	else
+	else if (papuga_ValueVariant_defined( value))
 	{
 		*err = papuga_TypeError;
+		return 0;
+	}
+	else
+	{
+		*err = papuga_ValueUndefined;
 		return 0;
 	}
 }
@@ -646,9 +661,14 @@ extern "C" int64_t papuga_ValueVariant_toint( const papuga_ValueVariant* value, 
 			return 0;
 		}
 	}
-	else
+	else if (papuga_ValueVariant_defined( value))
 	{
 		*err = papuga_TypeError;
+		return 0;
+	}
+	else
+	{
+		*err = papuga_ValueUndefined;
 		return 0;
 	}
 }
@@ -707,9 +727,14 @@ extern "C" uint64_t papuga_ValueVariant_touint( const papuga_ValueVariant* value
 			return 0;
 		}
 	}
-	else
+	else if (papuga_ValueVariant_defined( value))
 	{
 		*err = papuga_TypeError;
+		return 0;
+	}
+	else
+	{
+		*err = papuga_ValueUndefined;
 		return 0;
 	}
 }
@@ -751,9 +776,22 @@ extern "C" double papuga_ValueVariant_todouble( const papuga_ValueVariant* value
 			}
 			return papuga_ValueVariant_todouble( &numval, err);
 		}
+		else
+		{
+			*err = papuga_TypeError;
+			return 0;
+		}
 	}
-	*err = papuga_TypeError;
-	return 0;
+	else if (papuga_ValueVariant_defined( value))
+	{
+		*err = papuga_TypeError;
+		return 0;
+	}
+	else
+	{
+		*err = papuga_ValueUndefined;
+		return 0;
+	}
 }
 
 extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, papuga_ErrorCode* err)
@@ -793,9 +831,22 @@ extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, pa
 			}
 			return !!rt;
 		}
+		else
+		{
+			*err = papuga_TypeError;
+			return 0;
+		}
 	}
-	*err = papuga_TypeError;
-	return 0;
+	else if (papuga_ValueVariant_defined( value))
+	{
+		*err = papuga_TypeError;
+		return 0;
+	}
+	else
+	{
+		*err = papuga_ValueUndefined;
+		return 0;
+	}
 }
 
 extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_ValueVariant* value, papuga_ValueVariant* res, papuga_ErrorCode* err)
@@ -824,7 +875,7 @@ extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_Valu
 			else
 			{
 				*err = papuga_TypeError;
-				return NULL;
+				return 0;
 			}
 		}
 		else if (papuga_ValueVariant_isstring( value))
@@ -842,20 +893,25 @@ extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_Valu
 			if (!numstr_to_variant( &numval, numtype, destbuf))
 			{
 				*err = papuga_TypeError;
-				return NULL;
+				return 0;
 			}
 			return papuga_ValueVariant_tonumeric( &numval, res, err);
 		}
 		else
 		{
 			*err = papuga_TypeError;
-			return NULL;
+			return 0;
 		}
+	}
+	else if (papuga_ValueVariant_defined( value))
+	{
+		*err = papuga_TypeError;
+		return 0;
 	}
 	else
 	{
-		*err = papuga_TypeError;
-		return NULL;
+		*err = papuga_ValueUndefined;
+		return 0;
 	}
 }
 

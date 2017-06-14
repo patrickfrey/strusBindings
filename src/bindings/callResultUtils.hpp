@@ -14,14 +14,6 @@
 #include "papuga/serialization.hpp"
 #include "bindingClassTemplate.hpp"
 #include "hostObject.hpp"
-#include "impl/context.hpp"
-#include "impl/storage.hpp"
-#include "impl/vector.hpp"
-#include "impl/analyzer.hpp"
-#include "impl/query.hpp"
-#include "impl/statistics.hpp"
-#include "impl/struct.hpp"
-#include "impl/iterator.hpp"
 #include "bindingClassTemplate.hpp"
 #include "serializer.hpp"
 
@@ -32,7 +24,6 @@ void initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Str
 	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
 	// PF:HACK: Dangerous intrusiveness (do use move semantics instead C++11)
 	std::memcpy( retval->value.value.serialization, &st.serialization, sizeof(papuga_Serialization));
-	papuga_destroy_Allocator( &retval->allocator);
 	std::memcpy( &retval->allocator, &st.allocator, sizeof(st.allocator));
 }
 

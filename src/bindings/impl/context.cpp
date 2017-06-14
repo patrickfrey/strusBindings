@@ -8,7 +8,6 @@
 #include "impl/context.hpp"
 #include "impl/storage.hpp"
 #include "impl/vector.hpp"
-#include "impl/statistics.hpp"
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
 #include "papuga/valueVariant.hpp"
@@ -163,12 +162,6 @@ void ContextImpl::addResourcePath( const std::string& paths_)
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	moduleLoader->addResourcePath( paths_);
-}
-
-StatisticsProcessorImpl* ContextImpl::createStatisticsProcessor( const std::string& name)
-{
-	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StatisticsProcessorImpl( m_trace_impl, m_storage_objbuilder_impl, name, m_errorhnd_impl);
 }
 
 void ContextImpl::initStorageObjBuilder()
@@ -358,7 +351,7 @@ void ContextImpl::destroyStorage( const ValueVariant& config_)
 	if (!dbi->destroyDatabase( storagecfg)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
 }
 
-Struct ContextImpl::unpackStatisticBlob( const std::string& procname, const std::string& blob) const
+Struct ContextImpl::unpackStatisticBlob( const std::string& blob, const std::string& procname) const
 {
 	const StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -374,7 +367,7 @@ Struct ContextImpl::unpackStatisticBlob( const std::string& procname, const std:
 	StatisticsViewerInterface* viewer = statsproc->createViewer( blob.c_str(), blob.size());
 	if (!viewer) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 	Struct rt;
-	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, viewer)) throw std::bad_alloc();
+	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, *viewer)) throw std::bad_alloc();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());

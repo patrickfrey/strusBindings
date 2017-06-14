@@ -10,6 +10,7 @@
 #include "papuga/valueVariant.h"
 #include "strus/vectorStorageSearchInterface.hpp"
 #include "impl/objectref.hpp"
+#include "impl/struct.hpp"
 #include <vector>
 #include <string>
 
@@ -72,7 +73,7 @@ public:
 	
 	/// \brief Get the list of concept class names defined
 	/// \return the list
-	std::vector<std::string>* conceptClassNames() const;
+	Struct conceptClassNames() const;
 
 	/// \brief Get the list of indices of features represented by a learnt concept feature
 	/// \param[in] conceptClass name identifying a class of concepts learnt
@@ -112,7 +113,7 @@ public:
 
 	/// \brief Get the configuration of this vector storage
 	/// \return the configuration as structure
-	std::vector<std::pair<std::string,std::string> >* config() const;
+	Struct config() const;
 
 	/// \brief Get the configuration of this vector storage as string
 	/// \return the configuration as string

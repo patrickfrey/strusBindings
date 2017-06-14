@@ -36,7 +36,8 @@ typedef enum papuga_ErrorCode
 	papuga_MissingSelf=8,
 	papuga_InvalidAccess=9,
 	papuga_UnexpectedEof=10,
-	papuga_NotImplemented=11
+	papuga_NotImplemented=11,
+	papuga_ValueUndefined=12
 } papuga_ErrorCode;
 
 /// \brief Static buffer for error message
@@ -160,7 +161,7 @@ struct papuga_Iterator
 	papuga_GetNext getNext;			///< method to fetch the next iteration element
 };
 
-/// \brief Enumeration of value type identifiers with destructor to call
+/// \brief Enumeration of value type identifiers with destructor to call by allocator on disposal of the object
 typedef enum papuga_RefType {
 	papuga_RefTypeHostObject,			///< object of type papuga_TypeHostObject
 	papuga_RefTypeSerialization,			///< object of type papuga_TypeSerialization

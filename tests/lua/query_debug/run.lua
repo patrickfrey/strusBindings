@@ -1,8 +1,8 @@
 require "string"
 package.path = "../common/utils.lua"
 require "utils"
-package.path = "../common/testCollection.lua"
-require "testCollection"
+package.path = "../common/createCollection.lua"
+require "createCollection"
 package.path = "../common/dumpCollection.lua"
 require "dumpCollection"
 
