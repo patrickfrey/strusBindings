@@ -25,7 +25,7 @@ public:
 		:released(false)
 	{
 		papuga_init_Serialization( &serialization);
-		papuga_init_Allocator( &allocator);
+		papuga_init_Allocator( &allocator, 0, 0);
 	}
 
 	/// \brief "Move" constructor

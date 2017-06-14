@@ -22,17 +22,11 @@
 static void init_CallResult_structures( papuga_CallResult* self)
 {
 	papuga_init_ValueVariant( &self->value);
-	papuga_init_HostObject( &self->object, 0, 0);
-	papuga_init_Serialization( &self->serialization);
-	papuga_init_Iterator( &self->iterator, 0, 0, 0);
-	papuga_init_Allocator( &self->allocator);
+	papuga_init_Allocator( &self->allocator, self->allocbuf, sizeof(self->allocbuf));
 }
 
 void papuga_destroy_CallResult( papuga_CallResult* self)
 {
-	papuga_destroy_HostObject( &self->object);
-	papuga_destroy_Serialization( &self->serialization);
-	papuga_destroy_Iterator( &self->iterator);
 	papuga_destroy_Allocator( &self->allocator);
 }
 
@@ -105,32 +99,28 @@ void papuga_set_CallResult_langstring_const( papuga_CallResult* self, papuga_Str
 	papuga_init_ValueVariant_langstring( &self->value, enc, val, valsize);
 }
 
-void papuga_set_CallResult_serialization( papuga_CallResult* self)
+bool papuga_set_CallResult_serialization( papuga_CallResult* self)
 {
-	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
+	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &self->allocator);
+	if (!ser) return false;
+	papuga_init_ValueVariant_serialization( &self->value, ser);
+	return true;
 }
 
-void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_Deleter destroy)
+bool papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy)
 {
-	papuga_init_HostObject( &self->object, data, destroy);
-	papuga_init_ValueVariant_serialization( &self->value, &self->serialization);
+	papuga_HostObject* obj = papuga_Allocator_alloc_HostObject( &self->allocator, classid, data, destroy);
+	if (!obj) return false;
+	papuga_init_ValueVariant_hostobj( &self->value, obj);
+	return true;
 }
 
-void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy)
+bool papuga_set_CallResult_iterator( papuga_CallResult* self, void* data, papuga_Deleter destroy, papuga_GetNext getNext)
 {
-	papuga_init_HostObject( &self->object, data, destroy);
-	papuga_init_ValueVariant_hostobj( &self->value, data, classid);
-}
-
-void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_Deleter destroy)
-{
-	papuga_init_HostObject( &self->object, data, destroy);
-	papuga_init_ValueVariant_hostobj( &self->value, data, 0);
-}
-
-void papuga_set_CallResult_iterator( papuga_CallResult* self)
-{
-	papuga_init_ValueVariant_iterator( &self->value, &self->iterator);
+	papuga_Iterator* itr = papuga_Allocator_alloc_Iterator( &self->allocator, data, destroy, getNext);
+	if (!itr) return false;
+	papuga_init_ValueVariant_iterator( &self->value, itr);
+	return true;
 }
 
 void papuga_CallResult_reportError( papuga_CallResult* self, const char* msg, ...)

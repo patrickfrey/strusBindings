@@ -25,20 +25,6 @@ public:
 	/// \brief Destructor
 	~HostObject(){}
 
-	/// \brief Create pointer as reference with ownership and reference counting
-	template <class OBJECTTYPE>
-	static void initOwnership( papuga_HostObject& ref, OBJECTTYPE* obj)
-	{
-		papuga_init_HostObject( &ref, obj, BindingClassTemplate<OBJECTTYPE>::getDestructor());
-	}
-
-	/// \brief Create pointer as constant reference
-	template <class OBJECTTYPE>
-	static void initConst( papuga_HostObject& ref, const OBJECTTYPE* obj)
-	{
-		papuga_init_HostObject( &ref, obj, 0);
-	}
-
 	/// \brief Get const pointer to object
 	template <class OBJECTTYPE>
 	static const OBJECTTYPE* getObject( const papuga_HostObject& ref)

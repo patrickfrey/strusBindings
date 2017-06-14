@@ -37,11 +37,11 @@ struct ValueVariantWrap
 	template <class ClassImpl>
 	static ClassImpl* toclass( const papuga_ValueVariant& val)
 	{
-		if (val.valuetype != papuga_TypeHostObject || val.classid != BindingClassTemplate<ClassImpl>::classid())
+		if (val.valuetype != papuga_TypeHostObject || val.value.hostObject->classid != BindingClassTemplate<ClassImpl>::classid())
 		{
 			throw strus::runtime_error(_TXT("expected class '%s'"), BindingClassTemplate<ClassImpl>::name());
 		}
-		return (ClassImpl*)const_cast<void*>( val.value.hostObjectData);
+		return (ClassImpl*)const_cast<void*>( val.value.hostObject->data);
 	}
 };
 

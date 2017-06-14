@@ -29,7 +29,7 @@ extern "C" {
 
 /// \brief Release of ownership of an iterated object reference
 /// \param[in,out] self pointer to structure
-#define papuga_release_Iterator( self)					{(self)->data=0; (self)->destroy=0; (self)->getNext=0;}
+#define papuga_release_Iterator( self)					{(self)->destroy=0;}
 
 /// \brief Destructor of an iterated object reference
 /// \param[in,out] self pointer to structure

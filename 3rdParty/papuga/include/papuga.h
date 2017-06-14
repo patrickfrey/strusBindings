@@ -18,8 +18,5 @@
 #include "papuga/serialization.h"
 #include "papuga/allocator.h"
 #include "papuga/valueVariant.h"
-#ifdef __cplusplus
-#include "papuga/valueVariant.hpp"
-#endif
 #endif
 

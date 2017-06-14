@@ -15,27 +15,30 @@
 extern "C" {
 #endif
 
+/// \brief Constructor of AllocatorNode
+/// \param[out] self pointer to structure initialized
+#define papuga_init_AllocatorNode(self,buf,bufsize)	{(self)->allocsize=bufsize;(self)->arsize=0;(self)->allocated=!bufsize;(self)->ar=(char*)buf;(self)->next=0;}
+
 /// \brief Constructor of Allocator
 /// \param[out] self pointer to structure initialized
-#define papuga_init_Allocator(self)			{(self)->allocsize=0;(self)->arsize=0;(self)->ar=0;(self)->next=0;}
-
-/// \brief Moving content of Allocator to another with ownership
-/// \param[out] self pointer to structure initialized
-/// \param[in,out] orig pointer to structure to move from
-#define papuga_init_Allocator_move(self,orig)		{(self)->allocsize=(orig)->allocsize;(self)->arsize=(orig)->arsize;(self)->ar=(orig)->ar;(self)->next=(orig)->next; (orig)->allocsize=0;(orig)->arsize=0;(orig)->ar=0;(orig)->next=0;}
+#define papuga_init_Allocator(self,buf,bufsize)		{(self)->root.allocsize=bufsize;(self)->root.arsize=0;(self)->root.allocated=!buf;(self)->root.ar=(char*)buf;(self)->root.next=0;(self)->reflist=0;}
 
 /// \brief Destructor of Allocator
 /// \param[in] self pointer to structure destroyed
-#define papuga_destroy_Allocator(self)			{if ((self)->ar != NULL||(self)->next != NULL) papuga_destroy_Allocator_( self);}
+#define papuga_destroy_Allocator(self)			{if ((self)->reflist != NULL) papuga_destroy_ReferenceHeader( (self)->reflist); if (((self)->root.ar != NULL && (self)->root.allocated) || (self)->root.next != NULL) papuga_destroy_AllocatorNode( &(self)->root);}
 
-/// \brief Destructor of Allocator
-/// \param[in] self pointer to structure 
-void papuga_destroy_Allocator_( papuga_Allocator* self);
+/// \brief Destructor of linked list of AllocatorNode
+/// \param[in] nd pointer to node
+void papuga_destroy_AllocatorNode( papuga_AllocatorNode* nd);
+
+/// \brief Destructor of linked list of AllocatorNode
+/// \param[in] nd pointer to node
+void papuga_destroy_ReferenceHeader( papuga_ReferenceHeader* ref);
 
 /// \brief Allocate a block of memory
 /// \param[in,out] self pointer to structure 
 /// \param[in] blocksize size of block to allocate
-/// \param[in] alignment allocated block alingment in bytes
+/// \param[in] alignment allocated block alingment in bytes or 0, if the default alignment (sizeof non empty struct) should be used
 /// \remark currently no allignment bigger than the standard malloc alignment (sizeof non empty struct) is accepted
 /// \return the pointer to the allocated block or NULL if alignment is invalid or malloc failed
 void* papuga_Allocator_alloc( papuga_Allocator* self, size_t blocksize, unsigned int alignment);
@@ -52,6 +55,26 @@ char* papuga_Allocator_copy_string( papuga_Allocator* self, const char* str, siz
 /// \param[in] str pointer to 0-terminated string to copy
 /// \return the pointer to the C-string to copy
 char* papuga_Allocator_copy_charp( papuga_Allocator* self, const char* str);
+
+/// \brief Allocate a host object reference
+/// \param[out] self pointer to structure initialized by constructor
+/// \param[in] object_ pointer to host object
+/// \param[in] destroy_ destructor of the host object in case of ownership
+/// \return the pointer to the allocated host object reference
+papuga_HostObject* papuga_Allocator_alloc_HostObject( papuga_Allocator* self, int classid_, void* object_, papuga_Deleter destroy_);
+
+/// \brief Allocate a serialization object
+/// \param[out] self pointer to structure initialized by constructor
+/// \return the pointer to the allocated serialization object
+papuga_Serialization* papuga_Allocator_alloc_Serialization( papuga_Allocator* self);
+
+/// \brief Allocate an iterator
+/// \param[out] self pointer to structure initialized by constructor
+/// \param[in] object_ pointer to iterator context object
+/// \param[in] destroy_ destructor of the iterated object in case of ownership
+/// \param[in] getNext_ method of the iterated object to fetch the next element
+/// \return the pointer to the allocated iterator object
+papuga_Iterator* papuga_Allocator_alloc_Iterator( papuga_Allocator* self, void* object_, papuga_Deleter destroy_, papuga_GetNext getNext_);
 
 #ifdef __cplusplus
 }

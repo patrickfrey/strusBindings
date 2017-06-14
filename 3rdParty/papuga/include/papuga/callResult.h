@@ -76,26 +76,21 @@ void papuga_set_CallResult_langstring_const( papuga_CallResult* self, papuga_Str
 /// \param[in] classid class identifier of the host object
 /// \param[in] data pointer to host object
 /// \param[in] destroy delete function of the host object
-void papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy);
-
-/// \brief Define value of CallResult as object of the binding language with ownership
-/// \param[in,out] self pointer to structure
-/// \param[in] val value to set as return value
-void papuga_set_CallResult_langobject( papuga_CallResult* self, void* data, papuga_Deleter destroy);
+/// \return true on success, false on memory allocation error
+bool papuga_set_CallResult_hostobject( papuga_CallResult* self, int classid, void* data, papuga_Deleter destroy);
 
 /// \brief Define value of CallResult as serialization defined in the call result structure
 /// \param[in,out] self pointer to structure
-void papuga_set_CallResult_serialization( papuga_CallResult* self);
-
-/// \brief Define value of CallResult as serialization defined in the call result structure with a host object reference with ownership
-/// \param[in,out] self pointer to structure
-/// \param[in] data pointer to host object
-/// \param[in] destroy delete function of the host object
-void papuga_set_CallResult_serialization_hostobject( papuga_CallResult* self, void* data, papuga_Deleter destroy);
+/// \return true on success, false on memory allocation error
+bool papuga_set_CallResult_serialization( papuga_CallResult* self);
 
 /// \brief Define value of CallResult as iterator
 /// \param[in,out] self pointer to structure
-void papuga_set_CallResult_iterator( papuga_CallResult* self);
+/// \param[in] data pointer to host object
+/// \param[in] destroy delete function of the host object
+/// \param[in] getNext function to fetch next element of iterator
+/// \return true on success, false on memory allocation error
+bool papuga_set_CallResult_iterator( papuga_CallResult* self, void* data, papuga_Deleter destroy, papuga_GetNext getNext);
 
 /// \brief Report an error of the call
 /// \param[in,out] self pointer to structure

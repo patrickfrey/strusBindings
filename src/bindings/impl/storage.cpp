@@ -111,17 +111,18 @@ public:
 			if (m_docno)
 			{
 				bool ser = true;
-				papuga_set_CallResult_serialization( result);
-				ser &= papuga_Serialization_pushOpen( &result->serialization);
-				ser &= papuga_Serialization_pushValue_int( &result->serialization, m_docno++);
-				ser &= papuga_Serialization_pushClose( &result->serialization);
-				ser &= papuga_Serialization_pushOpen( &result->serialization);
+				if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
+				papuga_Serialization* serialization = result->value.value.serialization;
+				ser &= papuga_Serialization_pushOpen( serialization);
+				ser &= papuga_Serialization_pushValue_int( serialization, m_docno++);
+				ser &= papuga_Serialization_pushClose( serialization);
+				ser &= papuga_Serialization_pushOpen( serialization);
 				for (Index pos = 0; 0!=(pos=m_postings->skipPos(pos)); ++pos)
 				{
-					ser &= papuga_Serialization_pushValue_int( &result->serialization, pos);
+					ser &= papuga_Serialization_pushValue_int( serialization, pos);
 				}
-				ser &= papuga_Serialization_pushClose( &result->serialization);
-				ser &= papuga_Serialization_pushClose( &result->serialization);
+				ser &= papuga_Serialization_pushClose( serialization);
+				ser &= papuga_Serialization_pushClose( serialization);
 				if (!ser)
 				{
 					papuga_CallResult_reportError( result, _TXT("memory allocation error in postings iterator get next"));
@@ -247,22 +248,23 @@ public:
 		MetaDataReaderInterface* metadatareader = 0;
 
 		bool ser = true;
-		papuga_set_CallResult_serialization( result);
+		if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
+		papuga_Serialization* serialization = result->value.value.serialization;
 		if (m_items.empty())
 		{
-			ser &= papuga_Serialization_pushValue_int( &result->serialization, m_docno);
+			ser &= papuga_Serialization_pushValue_int( serialization, m_docno);
 		}
 		else
 		{
-			ser &= papuga_Serialization_pushOpen( &result->serialization);
+			ser &= papuga_Serialization_pushOpen( serialization);
 			std::vector<ItemDef>::const_iterator ei = m_items.begin(), ee = m_items.end();
 			for (; ei != ee; ++ei)
 			{
-				ser &= papuga_Serialization_pushName_string( &result->serialization, ei->name().c_str(), ei->name().size());
+				ser &= papuga_Serialization_pushName_string( serialization, ei->name().c_str(), ei->name().size());
 				switch (ei->type())
 				{
 					case ItemDef::None:
-						ser &= papuga_Serialization_pushValue_void( &result->serialization);
+						ser &= papuga_Serialization_pushValue_void( serialization);
 						break;
 
 					case ItemDef::MetaData:
@@ -273,12 +275,12 @@ public:
 						}
 						if (ei->handle() >= 0)
 						{
-							ser &= Serializer::serialize_nothrow( &result->serialization, metadatareader->getValue( ei->handle()));
+							ser &= Serializer::serialize_nothrow( serialization, metadatareader->getValue( ei->handle()));
 							attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
 						}
 						else
 						{
-							ser &= papuga_Serialization_pushValue_void( &result->serialization);
+							ser &= papuga_Serialization_pushValue_void( serialization);
 						}
 						break;
 					case ItemDef::Attribute:
@@ -293,34 +295,34 @@ public:
 							const char* attrvalptr = papuga_Allocator_copy_string( &result->allocator, attrvalstr.c_str(), attrvalstr.size());
 							if (!attrvalptr) throw std::bad_alloc();
 
-							ser &= papuga_Serialization_pushValue_string( &result->serialization, attrvalptr, attrvalstr.size());
+							ser &= papuga_Serialization_pushValue_string( serialization, attrvalptr, attrvalstr.size());
 						}
 						else
 						{
-							ser &= papuga_Serialization_pushValue_void( &result->serialization);
+							ser &= papuga_Serialization_pushValue_void( serialization);
 						}
 						break;
 					case ItemDef::Position:
 						if (m_postings.get())
 						{
-							ser &= papuga_Serialization_pushOpen( &result->serialization);
+							ser &= papuga_Serialization_pushOpen( serialization);
 							for (Index pos = 0; 0!=(pos=m_postings->skipPos(pos)); ++pos)
 							{
-								ser &= papuga_Serialization_pushValue_int( &result->serialization, pos);
+								ser &= papuga_Serialization_pushValue_int( serialization, pos);
 							}
-							ser &= papuga_Serialization_pushClose( &result->serialization);
+							ser &= papuga_Serialization_pushClose( serialization);
 						}
 						else
 						{
-							ser &= papuga_Serialization_pushValue_void( &result->serialization);
+							ser &= papuga_Serialization_pushValue_void( serialization);
 						}
 						break;
 					case ItemDef::Docno:
-						ser &= papuga_Serialization_pushValue_int( &result->serialization, m_docno);
+						ser &= papuga_Serialization_pushValue_int( serialization, m_docno);
 						break;
 				}
 			}
-			ser &= papuga_Serialization_pushClose( &result->serialization);
+			ser &= papuga_Serialization_pushClose( serialization);
 		}
 		if (!ser)
 		{

@@ -10,6 +10,7 @@
 #ifndef _PAPUGA_LUA_DEV_LIB_H_INCLUDED
 #define _PAPUGA_LUA_DEV_LIB_H_INCLUDED
 #include "papuga/typedefs.h"
+#include "papuga/allocator.h"
 #include <setjmp.h>
 
 #define papuga_LUA_MAX_NOF_ARGUMENTS 64
@@ -21,8 +22,10 @@ typedef struct papuga_lua_CallArgs
 	size_t argc;
 	size_t serc;
 	void* self;
+	papuga_Allocator allocator;
 	papuga_ValueVariant argv[ papuga_LUA_MAX_NOF_ARGUMENTS];
 	papuga_Serialization serializations[ papuga_LUA_MAX_NOF_ARGUMENTS];
+	int allocbuf[ 1024];
 } papuga_lua_CallArgs;
 
 typedef struct papuga_lua_ClassDef

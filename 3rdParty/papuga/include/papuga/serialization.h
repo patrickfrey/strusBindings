@@ -152,6 +152,12 @@ bool papuga_Serialization_pushValue_uint( papuga_Serialization* self, uint64_t v
 /// \return true on success, false on memory allocation error
 bool papuga_Serialization_pushValue_double( papuga_Serialization* self, double value);
 
+/// \brief Add a 'value' element as a host object reference to the serialization
+/// \param[in,out] self pointer to structure 
+/// \param[in] value numeric value value of the added node
+/// \return true on success, false on memory allocation error
+bool papuga_Serialization_pushValue_hostobject( papuga_Serialization* self, papuga_HostObject* value);
+
 /// \brief Add a 'value' element as a boolean value to the serialization
 /// \param[in,out] self pointer to structure 
 /// \param[in] value boolean value value of the added node

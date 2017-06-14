@@ -142,7 +142,8 @@ bool papuga_Serialization_pushValue_double( papuga_Serialization* self, double v
 
 bool papuga_Serialization_pushValue_bool( papuga_Serialization* self, bool value)
 	{PUSH_NODE_1(self,papuga_TagValue,papuga_init_ValueVariant_bool,value)}
-
+bool papuga_Serialization_pushValue_hostobject( papuga_Serialization* self, papuga_HostObject* value)
+	{PUSH_NODE_1(self,papuga_TagValue,papuga_init_ValueVariant_hostobj,value)}
 
 
 bool papuga_Serialization_append( papuga_Serialization* self, const papuga_Serialization* o)

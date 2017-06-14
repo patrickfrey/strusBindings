@@ -46,22 +46,28 @@ typedef struct papuga_ErrorBuffer
 	size_t size;
 } papuga_ErrorBuffer;
 
-/// \brief Object of the host environment
+/// \brief Forward declaration
+typedef struct papuga_LangString papuga_LangString;
+/// \brief Forward declaration
 typedef struct papuga_HostObject papuga_HostObject;
-/// \brief Call result structure
+/// \brief Forward declaration
+typedef struct papuga_Serialization papuga_Serialization;
+/// \brief Forward declaration
+typedef struct papuga_Iterator papuga_Iterator;
+/// \brief Forward declaration
 typedef struct papuga_CallResult papuga_CallResult;
 
 /// \brief Enumeration of value type identifiers
 typedef enum papuga_Type {
 	papuga_TypeVoid			= 0x00,		///< NULL Value without type
-	papuga_TypeDouble		= 0x01,		///< Double precision floating point value (C double)
-	papuga_TypeUInt			= 0x02,		///< Unsigned integer value (maximum width 64 bits)
-	papuga_TypeInt			= 0x03,		///< Signed integer value (maximum width 64 bits)
-	papuga_TypeString		= 0x04,		///< Host environment string (null-terminated UTF-8)
-	papuga_TypeLangString		= 0x05,		///< Bindings language string (unicode string with a defined encoding - papuga_StringEncoding)
-	papuga_TypeHostObject		= 0x06,		///< Class object defined in the host environment, part of the interface
-	papuga_TypeSerialization	= 0x07,		///< Serialization of an object constructed in the binding language
-	papuga_TypeIterator		= 0x08		///< Iterator closure
+	papuga_TypeDouble		= 0x01,		///< double precision floating point value (C double)
+	papuga_TypeUInt			= 0x02,		///< unsigned integer value (maximum width 64 bits)
+	papuga_TypeInt			= 0x03,		///< signed integer value (maximum width 64 bits)
+	papuga_TypeString		= 0x04,		///< host environment string (null-terminated UTF-8)
+	papuga_TypeLangString		= 0x05,		///< bindings language string (unicode string with a defined encoding - papuga_StringEncoding)
+	papuga_TypeHostObject		= 0x06,		///< class object defined in the host environment, part of the interface
+	papuga_TypeSerialization	= 0x07,		///< serialization of an object constructed in the binding language
+	papuga_TypeIterator		= 0x08		///< iterator closure
 } papuga_Type;
 
 /// \brief Unsigned integer type as represented by papuga
@@ -91,27 +97,31 @@ typedef enum papuga_Tag
 	papuga_TagValue		///< Atomic value
 } papuga_Tag;
 
-typedef struct papuga_Serialization papuga_Serialization;
-typedef struct papuga_Iterator papuga_Iterator;
-
 /// \brief Representation of a variadic value type
 typedef struct papuga_ValueVariant
 {
 	int valuetype:8;					///< casts to a papuga_Type
 	int encoding:8;						///< casts to a papuga_StringEncoding
-	int classid:16;						///< casts to a class index (starting from 1) pointing to the class method table in the scripting language as defined in the language description
-	int32_t length;						///< length of the string or serialization in items (UTF-8 item length = 1, UTF-16 item length = 2, etc.)
+	int32_t length;						///< length of a string in bytes
 	union {
 		double Double;					///< double precision floating point value
 		uint64_t UInt;					///< unsigned integer value
 		int64_t Int;					///< signed integer value
 		const char* string;				///< null terminated UTF-8 string (host string representation)
 		const void* langstring;				///< string value (not nessesarily null terminated) for other character set encodings (binding language string representation)
-		const void* hostObjectData;			///< reference to the data of an object represented in the host environment
+		papuga_HostObject* hostObject;			///< reference of an object represented in the host environment
 		papuga_Serialization* serialization;		///< reference of an object serialization 
 		papuga_Iterator* iterator;			///< reference of an iterator closure
 	} value;
 } papuga_ValueVariant;
+
+/// \brief String defined in the binding language
+struct papuga_LangString
+{
+	papuga_StringEncoding encoding;		///< specifies the encoding of this langstring type
+	int length;				///< length of the langstring in items (UTF-8 item length = 1, UTF-16 item length = 2, etc.)
+	void* ptr;				///< pointer to array of characters of the string
+};
 
 /// \brief One node of a papuga serialization
 typedef struct papuga_Node
@@ -134,6 +144,7 @@ typedef void (*papuga_Deleter)( void* obj);
 /// \brief Papuga host object 
 struct papuga_HostObject
 {
+	int classid;				///< class identifier the object
 	void* data;				///< pointer to the object
 	papuga_Deleter destroy;			///< destructor of the host object in case of this structure holding ownership of it
 };
@@ -149,24 +160,43 @@ struct papuga_Iterator
 	papuga_GetNext getNext;			///< method to fetch the next iteration element
 };
 
-/// \brief Buffer for strings copied
-typedef struct papuga_Allocator
+/// \brief Enumeration of value type identifiers with destructor to call
+typedef enum papuga_RefType {
+	papuga_RefTypeHostObject	= 0x1111,	///< object of type papuga_TypeHostObject
+	papuga_RefTypeSerialization	= 0x2222,	///< object of type papuga_TypeSerialization
+	papuga_RefTypeIterator		= 0x3333	///< object of type papuga_TypeIterator
+} papuga_RefType;
+
+/// \brief Header for an object that needs a call of a destructor when freed
+typedef struct papuga_ReferenceHeader
+{
+	papuga_RefType type;			///< type of allocator object with a destructor
+	struct papuga_ReferenceHeader* next;	///< next of single linked list
+} papuga_ReferenceHeader;
+
+/// \brief Buffer for objects needing memory allocation
+typedef struct papuga_AllocatorNode
 {
 	unsigned int allocsize;			///< allocation size of this block
 	unsigned int arsize;			///< number of bytes allocated in this block
 	char* ar;				///< pointer to memory
-	struct papuga_Allocator* next;		///< next buffer in linked list of buffers
+	bool allocated;				///< true if this block has to be freed
+	struct papuga_AllocatorNode* next;	///< next buffer in linked list of buffers
+} papuga_AllocatorNode;
+
+typedef struct papuga_Allocator
+{
+	papuga_AllocatorNode root;		///< root node
+	papuga_ReferenceHeader* reflist;	///< list of objects object that need a call of a destructor when freed
 } papuga_Allocator;
 
 /// \brief Structure representing the result of an interface method call
 struct papuga_CallResult
 {
 	papuga_ValueVariant value;		///< result value
-	papuga_HostObject object;		///< reference (with or without ownership) to an object that lives in the host environment
-	papuga_Serialization serialization;	///< serialization of the result in case of a structure
-	papuga_Iterator iterator;		///< iterator closure object
 	papuga_Allocator allocator;		///< allocator for values that had to be copied
 	papuga_ErrorBuffer errorbuf;		///< static buffer for error message
+	int allocbuf[ 1024];			///< static buffer for allocator
 };
 
 #ifdef __cplusplus
