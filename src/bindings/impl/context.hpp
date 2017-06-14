@@ -11,7 +11,9 @@
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
+#include "strus/statisticsViewerInterface.hpp"
 #include "impl/objectref.hpp"
+#include "impl/struct.hpp"
 #include <vector>
 #include <string>
 
@@ -114,6 +116,12 @@ public:
 	/// \brief Create a query evaluation instance
 	/// \return quer evaluation interface
 	QueryEvalImpl* createQueryEval();
+
+	/// \brief Unpack a statistics blob retrieved from a storage
+	/// \param[in] procname name of statistics processor to use for decoding the message
+	/// \param[in] blob blob with statistics to decode
+	/// \return the statistics structure encoded in the blob passed as argument
+	Struct unpackStatisticBlob( const std::string& procname, const std::string& blob) const;
 
 	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
 	void close();

@@ -78,6 +78,17 @@ public:
 	/// \return an iterator on the user names (roles)
 	Iterator usernames() const;
 
+	/// \brief Get an iterator on message blobs that all statistics of the storage (e.g. feature occurrencies and number of documents inserted)
+	/// \note The blobs an be decoded with Context::unpackStatisticBlob
+	/// \param[in] sign true = registration, false = deregistration, if false the sign of all statistics is inverted
+	/// \return an iterator on the encoded blobs of the complete statistics of the storage
+	Iterator getAllStatistics( bool sign=true);
+
+	/// \brief Get an iterator on message blobs that encode changes in statistics of the storage (e.g. feature occurrencies and number of documents inserted)
+	/// \note The blobs an be decoded with Context::unpackStatisticBlob
+	/// \return an iterator on the encoded blobs of the statistic changes of the storage
+	Iterator getChangeStatistics();
+
 	/// \brief Create a transaction
 	/// return the transaction object created
 	StorageTransactionImpl* createTransaction() const;

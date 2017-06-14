@@ -83,7 +83,6 @@ public:
 		const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 		const QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 		PostingsExpressionBuilder postingsBuilder( storage, queryproc, errorhnd);
 		Deserializer::buildExpression( postingsBuilder, expression, errorhnd);
 		m_postings = postingsBuilder.pop();
@@ -179,7 +178,6 @@ public:
 		const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 		const QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 
 		m_attributereader_impl.resetOwnership( storage->createAttributeReader(), "AttributeReader");
 		if (!m_attributereader_impl.get()) throw strus::runtime_error( _TXT("failed to create attribute reader"));
@@ -498,6 +496,79 @@ static void ValueIteratorDeleter( void* obj)
 	delete (ValueIterator*)obj;
 }
 
+class StatisticsIterator
+{
+public:
+	StatisticsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, bool differential, bool sign)
+		:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_errorhnd_impl(errorhnd_)
+	{
+		StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		if (differential)
+		{
+			if (!sign) throw strus::runtime_error(_TXT("internal: illegal definition of statistics iterator"));
+			m_iter.reset( storage->createChangeStatisticsIterator());
+		}
+		else
+		{
+			m_iter.reset( storage->createAllStatisticsIterator( sign));
+		}
+		if (!m_iter.get())
+		{
+			throw strus::runtime_error(_TXT("failed to create statistics iterator: %s"), errorhnd->fetchError());
+		}
+	}
+	virtual ~StatisticsIterator(){}
+
+	bool getNext( papuga_CallResult* result)
+	{
+		try
+		{
+			StatisticsIteratorInterface* iter = m_iter.get();
+			ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+			const char* outmsg;
+			std::size_t outmsgsize;
+			if (!iter->getNext( outmsg, outmsgsize))
+			{
+				if (errorhnd->hasError())
+				{
+					throw strus::runtime_error( _TXT("error fetching statistics message: %s"), errorhnd->fetchError());
+				}
+				return false;
+			}
+			if (!papuga_set_CallResult_string( result, outmsg, outmsgsize)) throw std::bad_alloc();
+			return true;
+		}
+		catch (const std::bad_alloc& err)
+		{
+			papuga_CallResult_reportError( result, _TXT("memory allocation error in postings iterator get next"));
+			return false;
+		}
+		catch (const std::runtime_error& err)
+		{
+			papuga_CallResult_reportError( result, _TXT("error in postings iterator get next: %s"), err.what());
+			return false;
+		}
+	}
+
+private:
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_storage_impl;
+	ObjectRef m_errorhnd_impl;
+	Reference<StatisticsIteratorInterface> m_iter;
+};
+
+static bool StatisticsGetNext( void* self, papuga_CallResult* result)
+{
+	return ((StatisticsIterator*)self)->getNext( result);
+}
+
+static void StatisticsDeleter( void* obj)
+{
+	delete (StatisticsIterator*)obj;
+}
+
 Iterator StorageClientImpl::postings( const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno)
 {
 	Reference<PostingIterator> itr( new PostingIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, expression, restriction, start_docno));
@@ -552,6 +623,20 @@ Iterator StorageClientImpl::usernames() const
 	return rt;
 }
 
+Iterator StorageClientImpl::getAllStatistics( bool sign)
+{
+	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, false, sign), &StatisticsDeleter, &StatisticsGetNext);
+	rt.release();
+	return rt;
+}
+
+Iterator StorageClientImpl::getChangeStatistics()
+{
+	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, true, true), &StatisticsDeleter, &StatisticsGetNext);
+	rt.release();
+	return rt;
+}
+
 StorageTransactionImpl* StorageClientImpl::createTransaction() const
 {
 	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
@@ -563,7 +648,7 @@ StatisticsIteratorImpl* StorageClientImpl::createStatisticsIterator( bool sign)
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ObjectRef iter;
-	iter.resetOwnership( storage->createStatisticsIterator( sign), "StatisticsIterator");
+	iter.resetOwnership( storage->createAllStatisticsIterator( sign), "StatisticsIterator");
 	if (!iter.get())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -577,7 +662,7 @@ StatisticsIteratorImpl* StorageClientImpl::createUpdateStatisticsIterator()
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ObjectRef iter;
-	iter.resetOwnership( storage->createUpdateStatisticsIterator(), "UpdateStatisticsIterator");
+	iter.resetOwnership( storage->createChangeStatisticsIterator(), "ChangeStatisticsIterator");
 	if (!iter.get())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();

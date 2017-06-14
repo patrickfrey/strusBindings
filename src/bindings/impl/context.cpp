@@ -27,6 +27,7 @@
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageTransactionInterface.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
+#include "strus/statisticsProcessorInterface.hpp"
 #include "strus/rpcClientInterface.hpp"
 #include "strus/rpcClientMessagingInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
@@ -355,6 +356,31 @@ void ContextImpl::destroyStorage( const ValueVariant& config_)
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
 	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
 	if (!dbi->destroyDatabase( storagecfg)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
+}
+
+Struct ContextImpl::unpackStatisticBlob( const std::string& procname, const std::string& blob) const
+{
+	const StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const StatisticsProcessorInterface* statsproc = objBuilder->getStatisticsProcessor( procname);
+	if (!statsproc)
+	{
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT( "error getting statistics message processor: %s"), errorhnd->fetchError());
+		}
+		throw strus::runtime_error(_TXT( "error statistics message processor '%s' not defined"), procname.c_str());
+	}
+	StatisticsViewerInterface* viewer = statsproc->createViewer( blob.c_str(), blob.size());
+	if (!viewer) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
+	Struct rt;
+	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, viewer)) throw std::bad_alloc();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
 }
 
 void ContextImpl::close()
