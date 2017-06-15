@@ -1,8 +1,16 @@
-package.path = "../common/utils.lua"
+require "string"
+local programpathar = {}
+for pp in string.gmatch( arg[0], "[^/]+") do
+	table.insert( programpathar, pp)
+end
+table.remove( programpathar, #programpathar)
+local programpath = "/" .. table.concat( programpathar, "/")
+
+package.path = (programpath .. "/../common/utils.lua")
 require "utils"
-package.path = "../common/createCollection.lua"
+package.path = (programpath .. "/../common/createCollection.lua")
 require "createCollection"
-package.path = "../common/dumpCollection.lua"
+package.path = (programpath .. "/../common/dumpCollection.lua")
 require "dumpCollection"
 
 local datadir = arg[1]
