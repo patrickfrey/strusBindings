@@ -1,21 +1,23 @@
 require "string"
-package.path = "../common/utils.lua"
 require "utils"
-package.path = "../common/createCollection.lua"
 require "createCollection"
-package.path = "../common/dumpCollection.lua"
 require "dumpCollection"
+
+local datadir = arg[1]
+local outputdir = arg[2] or '.'
+local storage = outputdir .. "/storage"
+local docfiles = {"A.xml","B.xml","C.xml"}
 
 ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
 
+createCollection( ctx, storage, datadir, docfiles)
+
 queryPhrase = "New York dimensions imagine"
-storagePath = arg[1] .. "/storage"
-storageConfig = string.format( "path=%s", storagePath)
-createCollection( ctx, storagePath, arg[1], {"A.xml","B.xml","C.xml"})
+storageConfig = string.format( "path='%s';metadata='doclen UINT16,title_start UINT8,title_end UINT8';cache=512M", storage)
 
 -- Get a client for the new created storage:
-local storage = ctx:createStorageClient( config)
+local storage = ctx:createStorageClient( storageConfig)
 
 -- Define the query analyzer to use:
 local analyzer = ctx:createQueryAnalyzer()
@@ -62,7 +64,9 @@ queryEval:addSummarizer(
 local query = queryEval:createQuery( storage)
 
 -- First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
-local terms = analyzer:analyze( {"word",queryPhrase})
+local terms = analyzer:analyze( {type="word",value=queryPhrase})
+print (string.format( "QUERY '%s' %s", queryPhrase, dumpValue( terms)))
+
 print( ctx:debug_serialize( {"word",queryPhrase}))
 if #terms == 0 then
 	error( "query is empty")
@@ -73,17 +77,17 @@ end
 local selexpr = {}
 
 for _,term in ipairs(terms) do
-	dumpValue( term)
+	print (string.format( "TERM %s", dumpValue( term)))
 	-- Each query term is also part of the selection expressions
-	table.insert( selexpr, {term.type, term.value, term.length})
-	print( string.format( "term %s '%s' (%u)\n", term.type, term.value, #selexpr))
+	table.insert( selexpr, {term[1], term[2]})
+	print( string.format( "term %s '%s' (%u)\n", term[1], term[2], #selexpr))
 	-- Create a document feature 'seek'.
-	query.defineFeature( "seek", {term.type, term.value, term.length}, 1.0)
+	query:defineFeature( "seek", {term[1], term[2]}, 1.0)
 end
 -- We assign the feature created to the set named 'select' because this is the
 -- name of the set defined as selection feature in the query evaluation configuration
 -- (QueryEval.addSelectionFeature):
-query:defineFeature( "select", {"contains"}, #selexpr, unpack(selexpr))
+query:defineFeature( "select", {"contains", #selexpr, table.unpack(selexpr)})
 
 -- Define the maximum number of best result (ranks) to return:
 query:setMaxNofRanks( 20)
@@ -92,10 +96,10 @@ query:setMaxNofRanks( 20)
 query:setMinRank( 0)
 
 -- Define the title field:
-query:defineDocFieldFeature( "titlefield", "", "title_end" )
+query:defineFeature( "titlefield", {from="title_start", to="title_end"} )
 
 -- Enable debugging
-query:setDebugMode( True )
+query:setDebugMode( true )
 
 -- Now we evaluate the query and iterate on the result to display them:
 local results = query:evaluate()

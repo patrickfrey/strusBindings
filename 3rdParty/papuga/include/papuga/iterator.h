@@ -22,11 +22,6 @@ extern "C" {
 /// \param[in] getNext_ method of the iterated object to fetch the next element
 #define papuga_init_Iterator( self, object_, destroy_, getNext_)	{(self)->data=object_; (self)->destroy=destroy_; (self)->getNext=getNext_;}
 
-/// \brief Constructor of an iterator reference as copy of another taking ownership
-/// \param[out] self pointer to structure initialized by constructor
-/// \param[in,out] orig pointer to iterator to take data from
-#define papuga_init_Iterator_move( self, orig)				{(self)->data=(orig)->data; (self)->destroy=(orig)->destroy; (self)->getNext=(orig)->getNext; (orig)->destroy=0;}
-
 /// \brief Release of ownership of an iterated object reference
 /// \param[in,out] self pointer to structure
 #define papuga_release_Iterator( self)					{(self)->destroy=0;}

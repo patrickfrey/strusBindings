@@ -1285,6 +1285,28 @@ static ExpressionType getExpressionType( papuga::Serialization::const_iterator s
 	}
 }
 
+static void builderPushTerm(
+		ExpressionBuilder& builder,
+		const TermDef& def)
+{
+	if (def.length_defined)
+	{
+		builder.pushTerm( def.type, def.value, def.length);
+	}
+	else if (def.value_defined)
+	{
+		builder.pushTerm( def.type, def.value);
+	}
+	else
+	{
+		builder.pushTerm( def.type);
+	}
+	if (!def.variable.empty())
+	{
+		builder.attachVariable( def.variable);
+	}
+}
+
 static void buildExpressionJoin(
 		ExpressionBuilder& builder,
 		papuga::Serialization::const_iterator& si,
@@ -1310,6 +1332,7 @@ static void buildExpressionJoin(
 
 		if (si->tag == papuga_TagName)
 		{
+			int defined[ 5] = {0,0,0,0,0};
 			do
 			{
 				StructureNameId idx = (StructureNameId)joinop_namemap.index( si->value);
@@ -1317,20 +1340,50 @@ static void buildExpressionJoin(
 				switch (idx)
 				{
 					case JO_variable:
+						if (defined[JO_variable]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "variable", context);
 						variable = Deserializer::getString( si, se);
 						break;
 					case JO_join:
+						if (defined[JO_join]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "join", context);
 						op = Deserializer::getString( si, se);
 						break;
 					case JO_range:
+						if (defined[JO_range]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "range", context);
 						range = Deserializer::getInt( si, se);
 						break;
 					case JO_cardinality:
+						if (defined[JO_cardinality]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "cardinality", context);
 						cardinality = Deserializer::getUint( si, se);
 						break;
 					case JO_arg:
-						Deserializer::buildExpression( builder, si, se);
-						++argc;
+						if (defined[JO_arg]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "arg", context);
+						if (si->tag == papuga_TagValue)
+						{
+							builderPushTerm( builder, TermDef( si, se));
+							++argc;
+						}
+						else if (si->tag == papuga_TagOpen)
+						{
+							if (si != se && Deserializer::hasDepth( si+1, se, 1))
+							{
+								++si;
+								while (si != se && si->tag != papuga_TagClose)
+								{
+									Deserializer::buildExpression( builder, si, se);
+									++argc;
+								}
+								Deserializer::consumeClose( si, se);
+							}
+							else
+							{
+								Deserializer::buildExpression( builder, si, se);
+								++argc;
+							}
+						}
+						else
+						{
+							throw strus::runtime_error(_TXT("expected term or expression as argument in %s"), context);
+						}
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s"), context);
 				}
@@ -1394,28 +1447,6 @@ static void buildExpressionJoin(
 	}
 }
 
-static void builderPushTerm(
-		ExpressionBuilder& builder,
-		const TermDef& def)
-{
-	if (def.value_defined)
-	{
-		builder.pushTerm( def.type);
-	}
-	else if (def.length_defined)
-	{
-		builder.pushTerm( def.type, def.value, def.length);
-	}
-	else
-	{
-		builder.pushTerm( def.type, def.value);
-	}
-	if (!def.variable.empty())
-	{
-		builder.attachVariable( def.variable);
-	}
-}
-
 void Deserializer::buildExpression(
 		ExpressionBuilder& builder,
 		papuga::Serialization::const_iterator& si,
@@ -1423,79 +1454,34 @@ void Deserializer::buildExpression(
 {
 	const char* context = "expression";
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
-	static const StructureNameMap namemap( "term,metadata,expression", ',');
 
-	if (si->tag == papuga_TagValue)
+	ExpressionType etype = getExpressionType( si, se);
+	switch (etype)
 	{
-		builderPushTerm( builder, TermDef( si, se));
-	}
-	else if (si->tag == papuga_TagOpen)
-	{
-		papuga::Serialization::const_iterator la_si = si;
-		++la_si;
-		if (la_si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
-
-		if (la_si->tag == papuga_TagName)
+		case ExpressionUnknown:
 		{
-			int idx = namemap.index( la_si->value);
-			si = ++la_si;
-			switch (idx)
-			{
-				case 0:
-				{
-					builderPushTerm( builder, TermDef( si, se));
-					break;
-				}
-				case 1:
-				{
-					MetaDataRangeDef def( si, se);
-					builder.pushDocField( def.from, def.to);
-					break;
-				}
-				case 2:
-				{
-					buildExpressionJoin( builder, si, se);
-					break;
-				}
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-			}
-			consumeClose( si, se);
+			throw strus::runtime_error(_TXT("unable to interpret %s"), context);
 		}
-		else
+		case ExpressionTerm:
 		{
-			ExpressionType etype = getExpressionType( si, se);
-			switch (etype)
-			{
-				case ExpressionUnknown:
-				{
-					throw strus::runtime_error(_TXT("unable to interpret %s"), context);
-				}
-				case ExpressionTerm:
-				{
-					builderPushTerm( builder, TermDef( si, se));
-					break;
-				}
-				case ExpressionVariableAssignment:
-				{
-					throw strus::runtime_error(_TXT("isolated variable assignment in %s"), context);
-				}
-				case ExpressionMetaDataRange:
-				{
-					MetaDataRangeDef def( si, se);
-					builder.pushDocField( def.from, def.to);
-					break;
-				}
-				case ExpressionJoin:
-				{
-					buildExpressionJoin( builder, si, se);
-					break;
-				}
-			}
+			builderPushTerm( builder, TermDef( si, se));
+			break;
 		}
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("%s definition expected"), context);
+		case ExpressionVariableAssignment:
+		{
+			throw strus::runtime_error(_TXT("isolated variable assignment in %s"), context);
+		}
+		case ExpressionMetaDataRange:
+		{
+			MetaDataRangeDef def( si, se);
+			builder.pushDocField( def.from, def.to);
+			break;
+		}
+		case ExpressionJoin:
+		{
+			buildExpressionJoin( builder, si, se);
+			break;
+		}
 	}
 }
 

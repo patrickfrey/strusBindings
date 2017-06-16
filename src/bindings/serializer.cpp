@@ -48,8 +48,8 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= papuga_Serialization_pushOpen( result);
 	rt &= serializeStructMember( result, "type", val.type());
 	rt &= serializeStructMember( result, "value", val.value());
-	rt &= serializeStructMember( result, "pos", (papuga_UInt)val.pos());
-	rt &= serializeStructMember( result, "len", (papuga_UInt)val.len());
+	if ((papuga_UInt)val.pos()) rt &= serializeStructMember( result, "pos", (papuga_UInt)val.pos());
+	if ((papuga_UInt)val.len()) rt &= serializeStructMember( result, "len", (papuga_UInt)val.len());
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
 }
@@ -129,6 +129,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
 }
+
 static bool serialize_labeled( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators)
 {
 	bool rt = true;
@@ -143,23 +144,22 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 			case analyzer::Query::Instruction::MetaData:
 			{
 				stk.push_back( papuga::Serialization());
-				rt &= Serializer::serializeStructMember( stk.back().cstruct(), "metadata", val.metadata( ii->idx()));
+				rt &= Serializer::serialize_nothrow( stk.back().cstruct(), val.metadata( ii->idx()));
 				break;
 			}
 			case analyzer::Query::Instruction::Term:
 			{
 				stk.push_back( papuga::Serialization());
-				rt &= Serializer::serializeStructMember( stk.back().cstruct(), "term", val.term( ii->idx()));
+				rt &= Serializer::serialize_nothrow( stk.back().cstruct(), val.term( ii->idx()));
 				break;
 			}
 			case analyzer::Query::Instruction::Operator:
 			{
 				papuga::Serialization opres;
-				rt &= papuga_Serialization_pushName_charp( opres.cstruct(), "op");
 				rt &= papuga_Serialization_pushOpen( opres.cstruct());
 
 				const QueryAnalyzerStruct::Operator& op = operators[ ii->idx()];
-				rt &= Serializer::serializeStructMember( opres.cstruct(), "name", op.name);
+				rt &= Serializer::serializeStructMember( opres.cstruct(), "join", op.name);
 				if (op.range) rt &= Serializer::serializeStructMember( opres.cstruct(), "range", (papuga_Int)op.range);
 				if (op.cardinality) rt &= Serializer::serializeStructMember( opres.cstruct(), "cardinality", (papuga_UInt)op.cardinality);
 
@@ -169,11 +169,8 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 				std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
 				for (; si != se; ++si)
 				{
-					rt &= papuga_Serialization_pushOpen( opres.cstruct());
 					papuga_Serialization_append( opres.cstruct(), stk[si].cstruct());
-					rt &= papuga_Serialization_pushClose( opres.cstruct());
 				}
-				rt &= papuga_Serialization_pushClose( opres.cstruct());
 				rt &= papuga_Serialization_pushClose( opres.cstruct());
 				stk.resize( stk.size() - ii->nofOperands());
 				stk.push_back( opres);
@@ -181,9 +178,16 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 			}
 		}
 	}
+	// Collect list of results from the stack:
+	std::vector<papuga::Serialization>::const_iterator si = stk.begin(), se = stk.end();
+	for (; si != se; ++si)
+	{
+		papuga_Serialization_append( result, si->cstruct());
+	}
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
 }
+
 static bool serialize_positional( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators)
 {
 	bool rt = true;
@@ -229,6 +233,12 @@ static bool serialize_positional( papuga_Serialization* result, const analyzer::
 				break;
 			}
 		}
+	}
+	// Collect list of results from the stack:
+	std::vector<papuga::Serialization>::const_iterator si = stk.begin(), se = stk.end();
+	for (; si != se; ++si)
+	{
+		papuga_Serialization_append( result, si->cstruct());
 	}
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;

@@ -67,11 +67,9 @@ include/strus/bindingObjects.h
 # Compiled programs
 src/parser/strusBindingsInterfaceGen
 src/gen/strusBindingsModuleGen
-tests/query_cpp/src/testBindingsQuery
 src/lang/lua/strusLua
 
 # Generated test data
-tests/query_cpp/storage/
-tests/lua/*/storage/
+tests/lua/exec
 
 

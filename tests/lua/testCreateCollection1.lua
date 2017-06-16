@@ -1,16 +1,6 @@
 require "string"
-local programpathar = {}
-for pp in string.gmatch( arg[0], "[^/]+") do
-	table.insert( programpathar, pp)
-end
-table.remove( programpathar, #programpathar)
-local programpath = "/" .. table.concat( programpathar, "/")
-
-package.path = (programpath .. "/../common/utils.lua")
 require "utils"
-package.path = (programpath .. "/../common/createCollection.lua")
 require "createCollection"
-package.path = (programpath .. "/../common/dumpCollection.lua")
 require "dumpCollection"
 
 local datadir = arg[1]
@@ -28,7 +18,7 @@ collection dump:
 string config: 
   string cache: "524288K"
   string metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
-  string path: "./storage"
+  string path: "storage"
 string docids: 
   number 1: "A.xml"
   number 2: "B.xml"

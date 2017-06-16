@@ -114,6 +114,7 @@ static int papuga_lua_destroy_UserData( lua_State* ls)
 static const papuga_lua_UserData* get_UserData( lua_State* ls, int idx)
 {
 	const papuga_lua_UserData* udata = (const papuga_lua_UserData*)lua_touserdata( ls, idx);
+	if (!udata) return 0;
 	const papuga_lua_ClassDef* cdef = get_classdef( udata->classdefmap, udata->classid);
 	if (calcCheckSum(udata) != udata->checksum) return 0;
 	if (!cdef) return 0;

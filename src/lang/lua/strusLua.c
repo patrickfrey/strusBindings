@@ -20,30 +20,97 @@ static void printUsage()
 	fprintf( stderr, "%s",
 		 "strusLua [<options>] <luascript>\n"
 		"<options>:\n" 
-		"   -h,--help   :Print this usage\n"
-		"<luascript>    :Lua script to execute\n");
+		 "   -h,--help          :Print this usage\n"
+		 "   -m,--mod <PATH>    :Set <PATH> as addidional module path\n"
+		"<luascript>            :Lua script to execute\n");
 }
 
+static void setLuaPath( lua_State* ls, const char* path)
+{
+#ifdef STRUS_LOWLEVEL_DEBUG
+	fprintf( stderr, "set lua module path to: '%s'\n", path);
+#endif
+	char pathbuf[ 2048];
+	lua_getglobal( ls, "package");
+	lua_getfield( ls, -1, "path");
+	const char* cur_path = lua_tostring( ls, -1); 
+	if (cur_path[0])
+	{
+		if (sizeof(pathbuf) <= snprintf( pathbuf, sizeof(pathbuf), "%s;%s/?.lua", cur_path, path))
+		{
+			luaL_error( ls, "internal buffer is too small for path");
+		}
+	}
+	else
+	{
+		if (sizeof(pathbuf) <= snprintf( pathbuf, sizeof(pathbuf), "%s/?.lua", path))
+		{
+			luaL_error( ls, "internal buffer is too small for path");
+		}
+	}
+#ifdef STRUS_LOWLEVEL_DEBUG
+	fprintf( stderr, "set lua module pattern to: '%s'\n", pathbuf);
+#endif
+	lua_pop( ls, 1); 
+	lua_pushstring( ls, pathbuf);
+	lua_setfield( ls, -2, "path");
+	lua_pop( ls, 1);
+}
+
+static void setLuaPathParentDir( lua_State* ls, const char* path)
+{
+	char const* pp = strchr( path, '\0')-1;
+	for (; pp>=path && (*pp == '/' || *pp == '\\'); --pp){}
+	for (; pp>=path && *pp != '/' && *pp != '\\'; --pp){}
+	for (; pp>=path && (*pp == '/' || *pp == '\\'); --pp){}
+	++pp;
+	char pathbuf[ 2048];
+	if (pp - path >= sizeof(pathbuf))
+	{
+		luaL_error( ls, "internal buffer is too small for path");
+	}
+	memcpy( pathbuf, path, pp-path);
+	pathbuf[ pp-path] = '\0';
+	setLuaPath( ls, pathbuf);
+}
+
+#define MaxModPaths 64
 int main( int argc, const char* argv[])
 {
 	const char* inputfile = 0;
 	lua_State* ls = 0;
 	int argi = 1;
 	int errcode = 0;
+	int modi = 0;
+	const char* modpath[ MaxModPaths];
 
 	// Parse command line arguments:
 	for (; argi < argc; ++argi)
 	{
-		if (argv[0][0] != '-')
+		if (argv[argi][0] != '-')
 		{
 			break;
 		}
-		if (0==strcmp( argv[argi], "--help") || 0==strcmp( argv[argi], "-h"))
+		else if (0==strcmp( argv[argi], "--help") || 0==strcmp( argv[argi], "-h"))
 		{
 			printUsage();
 			return 0;
 		}
-		if (0==strcmp( argv[argi], "--"))
+		else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))
+		{
+			++argi;
+			if (argi == argc || argv[argi][0] == '-')
+			{
+				fprintf( stderr, "option -m (--mod) needs argument\n");
+				return 1;
+			}
+			if (modi >= MaxModPaths)
+			{
+				fprintf( stderr, "too many options -m (--mod) specified in argument list\n");
+			}
+			modpath[ modi++] = argv[argi];
+		}
+		else if (0==strcmp( argv[argi], "--"))
 		{
 			++argi;
 			break;
@@ -55,13 +122,24 @@ int main( int argc, const char* argv[])
 		return -1;
 	}
 	inputfile = argv[ argi];
+	
 #ifdef STRUS_LOWLEVEL_DEBUG
 	fprintf( stderr, "create lua state\n");
 #endif
-	// Define program arguments for lua script:
+	// Define the lua state:
 	ls = luaL_newstate();
 	luaL_openlibs( ls);
 	luaopen_strus( ls);
+
+	// Set module directories
+	setLuaPathParentDir( ls, inputfile);
+	int mi = 0, me = modi;
+	for (; mi != me; ++mi)
+	{
+		setLuaPath( ls, modpath[ mi]);
+	}
+
+	// Define program arguments for lua script:
 	int ai = 0, ae = argc-argi;
 	lua_newtable( ls);
 	for (; ai != ae; ++ai)

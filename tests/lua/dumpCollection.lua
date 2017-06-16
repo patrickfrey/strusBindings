@@ -8,7 +8,15 @@ function dumpCollection( strusctx, storagePath, docidList)
 	local storage = strusctx:createStorageClient( config)
 
 	-- Configuration of the storage:
-	output[ "config"] = storage:config()
+	local output_config = {}
+	for key,value in pairs(storage:config()) do
+		if key == 'path' then
+			output_config[ key] = getFileName( value)
+		else
+			output_config[ key] = value
+		end
+	end
+	output[ "config"] = output_config
 
 	-- Document metadata and attributes:
 	local output_docs = {}

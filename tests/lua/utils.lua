@@ -71,3 +71,21 @@ function verifyTestOutput( outputdir, result, expected)
 	end
 end
 
+function getPathArray( filepath)
+	local pathar = {}
+	for pp in string.gmatch( filepath, "[^/\\]+") do
+		table.insert( pathar, pp)
+	end
+	return pathar
+end
+
+function getFileParentDirectory( filepath)
+	local pathar = getPathArray( filepath)
+	return "/" .. table.concat( pathar, "/")
+end
+
+function getFileName( filepath)
+	local pathar = getPathArray( filepath)
+	return pathar[ #pathar]
+end
+

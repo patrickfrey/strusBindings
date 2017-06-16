@@ -133,7 +133,6 @@ TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Seria
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
 			} while (si != se && si->tag == papuga_TagName);
-			Deserializer::consumeClose( si, se);
 		}
 		else if (si->tag == papuga_TagClose)
 		{
