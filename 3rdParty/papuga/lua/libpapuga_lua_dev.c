@@ -620,6 +620,13 @@ static void deserialize_node( papuga_CallResult* retval, papuga_Node** ni, papug
 static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* ser, lua_State *ls, const papuga_lua_ClassDefMap* classdefmap)
 {
 	int rt = 0;
+#if PAPUGA_LOWLEVEL_DEBUG || 1
+	char* str = papuga_Serialization_tostring( ser);
+	if (ser)
+	{
+		fprintf( stderr, "DESERIALIZE STRUCT:\n%s\n", str);
+	}
+#endif
 	papuga_Node* ni = ser->ar;
 	papuga_Node* ne = ni + ser->arsize;
 	if (ni == ne)

@@ -464,8 +464,11 @@ AnalyzedQuery* QueryAnalyzerImpl::analyze(
 	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
 
-	bool output_labeled = (expression.valuetype == papuga_TypeSerialization && papuga_Serialization_islabeled( expression.value.serialization));
-	Reference<AnalyzedQuery> res( new AnalyzedQuery( anactx->analyze(), exprbuilder.operators(), output_labeled));
+	Reference<AnalyzedQuery> res( new AnalyzedQuery( anactx->analyze(), exprbuilder.operators()));
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
+	}
 	return res.release();
 }
 

@@ -157,6 +157,11 @@ bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* self, const ch
 /// \return the pointer to the result string if succeeded, NULL else
 const char* papuga_ValueVariant_toascii( char* destbuf, size_t destbufsize, const papuga_ValueVariant* self);
 
+/// \brief Get the value of a type enum as string
+/// \param[in] type the type enum value
+/// \return the corresponding string
+const char* papuga_Type_name( papuga_Type type);
+
 #ifdef __cplusplus
 }
 #endif

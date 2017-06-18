@@ -30,6 +30,10 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 		
 		for (int cnt=0; si != se && cnt < 20; ++cnt,++si)
 		{
+			if (!location_explain.empty())
+			{
+				location_explain.push_back( ' ');
+			}
 			if (si == errorpos)
 			{
 				location_explain.append( " <!> ");
@@ -43,18 +47,10 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 					location_explain.push_back( ']');
 					break;
 				case papuga_TagName:
-					if (!location_explain.empty())
-					{
-						location_explain.push_back( ' ');
-					}
 					location_explain.append( ValueVariantWrap::tostring( si->value));
 					location_explain.push_back( ':');
 					break;
 				case papuga_TagValue:
-					if (!location_explain.empty())
-					{
-						location_explain.push_back( ' ');
-					}
 					if (!papuga_ValueVariant_defined( &si->value))
 					{
 						location_explain.append( "<null>");
@@ -1214,12 +1210,12 @@ enum ExpressionType {
 static ExpressionType getExpressionType( papuga::Serialization::const_iterator si, const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = "expression";
-	static const StructureNameMap keywords( "type,value,len,from,to,variable,join,range,cardinality,arg", ',');
+	static const StructureNameMap keywords( "type,value,len,from,to,variable,op,range,cardinality,arg", ',');
 	static const ExpressionType keywordTypeMap[10] = {
 		ExpressionTerm, ExpressionTerm, ExpressionTerm,			/*type,value,len*/
 		ExpressionMetaDataRange,ExpressionMetaDataRange,		/*from,to*/
 		ExpressionVariableAssignment,					/*variable*/
-		ExpressionJoin,ExpressionJoin,ExpressionJoin,ExpressionJoin	/*join,range,cardinality,arg*/
+		ExpressionJoin,ExpressionJoin,ExpressionJoin,ExpressionJoin	/*op,range,cardinality,arg*/
 	};
 	if (si == se) return ExpressionUnknown;
 	if (si->tag == papuga_TagValue)
@@ -1261,8 +1257,12 @@ static ExpressionType getExpressionType( papuga::Serialization::const_iterator s
 				{
 					++si;
 					if (!Deserializer::skipStructure( si, se)) return ExpressionUnknown;
+					Deserializer::consumeClose( si, se);
 				}
-				Deserializer::consumeClose( si, se);
+				else
+				{
+					--si;
+				}
 			}
 			int argc = 0;
 			for (; si != se && argc < 3; ++si,++argc)
@@ -1313,8 +1313,8 @@ static void buildExpressionJoin(
 		const papuga::Serialization::const_iterator& se)
 {
 	static const char* context = _TXT("join expression");
-	static const StructureNameMap joinop_namemap( "variable,join,range,cardinality,arg", ',');
-	enum StructureNameId {JO_variable=0,JO_join=1, JO_range=2, JO_cardinality=3, JO_arg=4};
+	static const StructureNameMap joinop_namemap( "variable,op,range,cardinality,arg", ',');
+	enum StructureNameId {JO_variable=0,JO_op=1, JO_range=2, JO_cardinality=3, JO_arg=4};
 	papuga_ErrorCode err = papuga_Ok;
 
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
@@ -1343,8 +1343,8 @@ static void buildExpressionJoin(
 						if (defined[JO_variable]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "variable", context);
 						variable = Deserializer::getString( si, se);
 						break;
-					case JO_join:
-						if (defined[JO_join]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "join", context);
+					case JO_op:
+						if (defined[JO_op]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "op", context);
 						op = Deserializer::getString( si, se);
 						break;
 					case JO_range:
@@ -1400,8 +1400,12 @@ static void buildExpressionJoin(
 				if (variable_)
 				{
 					variable = ValueVariantWrap::tostring( *variable_);
+					Deserializer::consumeClose( si, se);
 				}
-				Deserializer::consumeClose( si, se);
+				else
+				{
+					--si;
+				}
 			}
 			if (si->tag == papuga_TagValue)
 			{
@@ -1552,8 +1556,7 @@ void Deserializer::buildPattern(
 			if (si->tag == papuga_TagOpen)
 			{
 				++si;
-				const papuga_ValueVariant* visibility = getOptionalDefinition( si, se, "access");
-
+				const papuga_ValueVariant* visibility = getOptionalDefinition( si, se, "visibility");
 				if (visibility)
 				{
 					if (papuga_ValueVariant_isequal_ascii( visibility, "public"))
@@ -1568,8 +1571,12 @@ void Deserializer::buildPattern(
 					{
 						throw strus::runtime_error(_TXT("expected 'private' or 'public' as access flag of %s"), context);
 					}
+					Deserializer::consumeClose( si, se);
 				}
-				Deserializer::consumeClose( si, se);
+				else
+				{
+					--si;
+				}
 			}
 			if (si->tag == papuga_TagValue)
 			{
@@ -2083,6 +2090,7 @@ static void buildStorageDocumentDeletes(
 						if (si != se && si->tag == papuga_TagValue
 							&& papuga_ValueVariant_isequal_ascii( &si->value, "*"))
 						{
+							++si;
 							document->clearUserAccessRights();
 						}
 						else

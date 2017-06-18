@@ -945,4 +945,20 @@ extern "C" bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* val
 	}
 }
 
+extern "C" const char* papuga_Type_name( papuga_Type type)
+{
+	switch (type)
+	{
+		case papuga_TypeVoid: return "Void";
+		case papuga_TypeDouble: return "Double";
+		case papuga_TypeUInt: return "UInt";
+		case papuga_TypeInt: return "Int";
+		case papuga_TypeString: return "String";
+		case papuga_TypeLangString: return "LangString";
+		case papuga_TypeHostObject: return "HostObject";
+		case papuga_TypeSerialization: return "Serialization";
+		case papuga_TypeIterator: return "Iterator";
+		default: return "unknown";
+	}
+}
 

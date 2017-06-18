@@ -31,17 +31,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericV
 	throw strus::runtime_error(_TXT("unknown numeric type passed to serialization"));
 }
 
-static bool serialize_positional( papuga_Serialization* result, const analyzer::Term& val)
-{
-	bool rt = true;
-	rt &= papuga_Serialization_pushOpen( result);
-	rt &= Serializer::serialize_nothrow( result, val.type());
-	rt &= Serializer::serialize_nothrow( result, val.value());
-	rt &= Serializer::serialize_nothrow( result, (papuga_UInt)val.pos());
-	rt &= Serializer::serialize_nothrow( result, (papuga_UInt)val.len());
-	rt &= papuga_Serialization_pushClose( result);
-	return rt;
-}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::Term& val)
 {
 	bool rt = true;
@@ -59,15 +48,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= papuga_Serialization_pushOpen( result);
 	rt &= serializeStructMember( result, "name", val.name());
 	rt &= serializeStructMember( result, "value", val.value());
-	rt &= papuga_Serialization_pushClose( result);
-	return rt;
-}
-static bool serialize_positional( papuga_Serialization* result, const analyzer::MetaData& val)
-{
-	bool rt = true;
-	rt &= papuga_Serialization_pushOpen( result);
-	rt &= Serializer::serialize_nothrow( result, val.name());
-	rt &= Serializer::serialize_nothrow( result, val.value());
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
 }
@@ -129,14 +109,16 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
 }
-
-static bool serialize_labeled( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const AnalyzedQuery& query)
 {
 	bool rt = true;
+	const analyzer::Query& qry = query.query();
+	const std::vector<QueryAnalyzerStruct::Operator>& operators = query.operators();
+
 	rt &= papuga_Serialization_pushOpen( result);
 	std::vector<papuga::Serialization> stk;
 	std::vector<analyzer::Query::Instruction>::const_iterator
-		ii = val.instructions().begin(), ie = val.instructions().end();
+		ii = qry.instructions().begin(), ie = qry.instructions().end();
 	for (; ii != ie && rt; ++ii)
 	{
 		switch (ii->opCode())
@@ -144,13 +126,13 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 			case analyzer::Query::Instruction::MetaData:
 			{
 				stk.push_back( papuga::Serialization());
-				rt &= Serializer::serialize_nothrow( stk.back().cstruct(), val.metadata( ii->idx()));
+				rt &= Serializer::serialize_nothrow( stk.back().cstruct(), qry.metadata( ii->idx()));
 				break;
 			}
 			case analyzer::Query::Instruction::Term:
 			{
 				stk.push_back( papuga::Serialization());
-				rt &= Serializer::serialize_nothrow( stk.back().cstruct(), val.term( ii->idx()));
+				rt &= Serializer::serialize_nothrow( stk.back().cstruct(), qry.term( ii->idx()));
 				break;
 			}
 			case analyzer::Query::Instruction::Operator:
@@ -159,7 +141,7 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 				rt &= papuga_Serialization_pushOpen( opres.cstruct());
 
 				const QueryAnalyzerStruct::Operator& op = operators[ ii->idx()];
-				rt &= Serializer::serializeStructMember( opres.cstruct(), "join", op.name);
+				rt &= Serializer::serializeStructMember( opres.cstruct(), "op", op.name);
 				if (op.range) rt &= Serializer::serializeStructMember( opres.cstruct(), "range", (papuga_Int)op.range);
 				if (op.cardinality) rt &= Serializer::serializeStructMember( opres.cstruct(), "cardinality", (papuga_UInt)op.cardinality);
 
@@ -171,7 +153,8 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 				{
 					papuga_Serialization_append( opres.cstruct(), stk[si].cstruct());
 				}
-				rt &= papuga_Serialization_pushClose( opres.cstruct());
+				rt &= papuga_Serialization_pushClose( opres.cstruct());//... end arg
+				rt &= papuga_Serialization_pushClose( opres.cstruct());//... end operator
 				stk.resize( stk.size() - ii->nofOperands());
 				stk.push_back( opres);
 				break;
@@ -186,73 +169,6 @@ static bool serialize_labeled( papuga_Serialization* result, const analyzer::Que
 	}
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
-}
-
-static bool serialize_positional( papuga_Serialization* result, const analyzer::Query& val, const std::vector<QueryAnalyzerStruct::Operator>& operators)
-{
-	bool rt = true;
-	rt &= papuga_Serialization_pushOpen( result);
-	std::vector<papuga::Serialization> stk;
-	std::vector<analyzer::Query::Instruction>::const_iterator
-		ii = val.instructions().begin(), ie = val.instructions().end();
-	for (; ii != ie && rt; ++ii)
-	{
-		switch (ii->opCode())
-		{
-			case analyzer::Query::Instruction::MetaData:
-			{
-				stk.push_back( papuga::Serialization());
-				rt &= serialize_positional( stk.back().cstruct(), val.metadata( ii->idx()));
-				break;
-			}
-			case analyzer::Query::Instruction::Term:
-			{
-				stk.push_back( papuga::Serialization());
-				rt &= serialize_positional( stk.back().cstruct(), val.term( ii->idx()));
-				break;
-			}
-			case analyzer::Query::Instruction::Operator:
-			{
-				papuga::Serialization opres;
-				const QueryAnalyzerStruct::Operator& op = operators[ ii->idx()];
-
-				rt &= Serializer::serialize_nothrow( opres.cstruct(), op.name);
-				if (op.range) rt &= Serializer::serialize_nothrow( opres.cstruct(), (papuga_Int)op.range);
-				if (op.cardinality) rt &= Serializer::serialize_nothrow( opres.cstruct(), (papuga_UInt)op.cardinality);
-				
-				if (ii->nofOperands() > stk.size()) throw strus::runtime_error(_TXT("number of query analyzer expression operands out of range"));
-				std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
-				for (; si != se; ++si)
-				{
-					rt &= papuga_Serialization_pushOpen( opres.cstruct());
-					papuga_Serialization_append( opres.cstruct(), stk[si].cstruct());
-					rt &= papuga_Serialization_pushClose( opres.cstruct());
-				}
-				stk.resize( stk.size() - ii->nofOperands());
-				stk.push_back( opres);
-				break;
-			}
-		}
-	}
-	// Collect list of results from the stack:
-	std::vector<papuga::Serialization>::const_iterator si = stk.begin(), se = stk.end();
-	for (; si != se; ++si)
-	{
-		papuga_Serialization_append( result, si->cstruct());
-	}
-	rt &= papuga_Serialization_pushClose( result);
-	return rt;
-}
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const AnalyzedQuery& query)
-{
-	if (query.labeledOutput())
-	{
-		return serialize_labeled( result, query.query(), query.operators());
-	}
-	else
-	{
-		return serialize_positional( result, query.query(), query.operators());
-	}
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsViewerInterface::DocumentFrequencyChange& val)
 {

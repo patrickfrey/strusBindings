@@ -165,11 +165,19 @@ bool papuga_Serialization_pushValue_bool( papuga_Serialization* self, bool value
 /// \return true on success, false on memory allocation error
 bool papuga_Serialization_append( papuga_Serialization* self, const papuga_Serialization* o);
 
-/// \brief Test of the serialization is a labeled structure or a positional one
+/// \brief Print serialization as null terminated string, 
 /// \param[in] self pointer to structure
-/// \return true, if the serialization starts as labeled structure, false if it starts as positional structure
-/// \remark This method does not check if the serialization is consistently labeled or positional, if just looks for the first evidence for the one or the other, assuming that the rest of the serialization follows the pattern too.
-bool papuga_Serialization_islabeled( const papuga_Serialization* self);
+/// \return NULL on memory allocation error, null terminated string with serialization printed, allocated with malloc, to free by the caller, on success
+char* papuga_Serialization_tostring( const papuga_Serialization* self);
+
+/// \brief Print a node of a serialization as null terminated string in readable form
+/// \param[in] nd node to print in readable form
+/// \param[in,out] buffer to use for printing
+/// \param[in] bufsize allocation size in bytes of the buffer to use for printing
+/// \note this function is intended for debugging purposes
+/// \remark prints only untill the end of buffer is reached
+/// \return pointer to string with node printed (without exceeding the buffer used)
+const char* papuga_Serialization_print_node( const papuga_Node* nd, char* buf, size_t bufsize);
 
 #ifdef __cplusplus
 }

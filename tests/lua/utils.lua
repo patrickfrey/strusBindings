@@ -1,3 +1,7 @@
+function round( num, numDecimalPlaces)
+	local mult = 10^(numDecimalPlaces or 0)
+	return math.floor(num * mult + 0.5) / mult
+end
 
 function dumpValue(o)
 	if type(o) == 'table' then
@@ -12,6 +16,13 @@ function dumpValue(o)
 			s = s .. '['..k..'] = ' .. dumpValue(v)
 		end
 		return s .. '} '
+	elseif type(o) == 'number' then
+		num = tonumber( string.format("%.6f", o))
+		if (num == math.floor(num)) then
+			return string.format("%d", o)
+		else
+			return string.format("%.6f", o)
+		end
 	elseif type(o) == 'string' then
 		return '"' .. tostring(o) .. '"'
 	else
@@ -36,6 +47,13 @@ function dumpTree( indent, o)
 			s = s .. "\n" .. indent .. type(k) .. " " .. k .. ": " .. dumpTree( indent .. '  ', v)
 		end
 		return s
+	elseif type(o) == 'number' then
+		num = tonumber( string.format("%.6f", o))
+		if (num == math.floor(num)) then
+			return string.format("%d", o)
+		else
+			return string.format("%.6f", o)
+		end
 	elseif type(o) == 'string' then
 		return '"' .. tostring(o) .. '"'
 	else
@@ -61,6 +79,7 @@ end
 
 function verifyTestOutput( outputdir, result, expected)
 	if (result ~= expected) then
+		print( "++++ Write file [" .. outputdir .. "/RES" .. "]")
 		writeFile( outputdir .. "/RES", result)
 		writeFile( outputdir .. "/EXP", expected)
 

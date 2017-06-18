@@ -151,17 +151,6 @@ bool papuga_Serialization_append( papuga_Serialization* self, const papuga_Seria
 	return add_nodes( self, o->ar, o->arsize);
 }
 
-bool papuga_Serialization_islabeled( const papuga_Serialization* self)
-{
-	size_t ni = 0, ne = self->arsize;
-	for (; ni != ne; ++ni)
-	{
-		if (self->ar[ni].tag == papuga_TagName) return true;
-		if (self->ar[ni].tag == papuga_TagValue) return false;
-	}
-	return false;
-}
-
 bool papuga_init_Serialization_copy( papuga_Serialization* self, const papuga_Serialization* o)
 {
 	papuga_init_Serialization( self);

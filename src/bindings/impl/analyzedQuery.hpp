@@ -20,23 +20,20 @@ class AnalyzedQuery
 {
 public:
 	/// \brief Constructor
-	AnalyzedQuery( const analyzer::Query& query_, const std::vector<QueryAnalyzerStruct::Operator>& operators_, bool labeledOutput_)
-		:m_query(query_),m_operators(operators_),m_labeledOutput(labeledOutput_){}
+	AnalyzedQuery( const analyzer::Query& query_, const std::vector<QueryAnalyzerStruct::Operator>& operators_)
+		:m_query(query_),m_operators(operators_){}
 	/// \brief Copy constructor
 	AnalyzedQuery( const AnalyzedQuery& o)
-		:m_query(o.m_query),m_operators(o.m_operators),m_labeledOutput(o.m_labeledOutput){}
+		:m_query(o.m_query),m_operators(o.m_operators){}
 
 	/// \brief Reference to query structure
 	const analyzer::Query& query() const					{return m_query;}
 	/// \brief Operators defined
 	const std::vector<QueryAnalyzerStruct::Operator>& operators() const	{return m_operators;}
-	/// \brief Defines the serialization of output depending on input (positional
-	bool labeledOutput() const						{return m_labeledOutput;}
 
 private:
 	analyzer::Query m_query;
 	std::vector<QueryAnalyzerStruct::Operator> m_operators;
-	bool m_labeledOutput;
 };
 
 }}//namespace
