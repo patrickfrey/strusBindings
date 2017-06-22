@@ -906,7 +906,7 @@ void DocumentAnalyzer::defineDocument(
 static Document mapDocument( const strus::analyzer::Document& doc)
 {
 	Document rt;
-	std::vector<strus::analyzer::Attribute>::const_iterator
+	std::vector<strus::analyzer::DocumentAttribute>::const_iterator
 		ai = doc.attributes().begin(), ae = doc.attributes().end();
 	for (; ai != ae; ++ai)
 	{
@@ -919,20 +919,20 @@ static Document mapDocument( const strus::analyzer::Document& doc)
 			rt.setAttribute( ai->name(), ai->value());
 		}
 	}
-	std::vector<strus::analyzer::MetaData>::const_iterator
+	std::vector<strus::analyzer::DocumentMetaData>::const_iterator
 		mi = doc.metadata().begin(), me = doc.metadata().end();
 	for (; mi != me; ++mi)
 	{
 		Variant val = getNumericVariantFromDouble( mi->value());
 		rt.setMetaData( mi->name(), val);
 	}
-	std::vector<strus::analyzer::Term>::const_iterator
+	std::vector<strus::analyzer::DocumentTerm>::const_iterator
 		ti = doc.searchIndexTerms().begin(), te = doc.searchIndexTerms().end();
 	for (; ti != te; ++ti)
 	{
 		rt.addSearchIndexTerm( ti->type(), ti->value(), ti->pos());
 	}
-	std::vector<strus::analyzer::Term>::const_iterator
+	std::vector<strus::analyzer::DocumentTerm>::const_iterator
 		fi = doc.forwardIndexTerms().begin(), fe = doc.forwardIndexTerms().end();
 	for (; fi != fe; ++fi)
 	{
@@ -1218,7 +1218,7 @@ void QueryAnalyzer::addSearchIndexElement(
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
-	THIS->addSearchIndexElement(
+	THIS->addElement(
 		featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
 }
@@ -1232,7 +1232,7 @@ void QueryAnalyzer::addSearchIndexElementFromPatternMatch(
 	strus::QueryAnalyzerInterface* THIS = (strus::QueryAnalyzerInterface*)m_analyzer_impl.get();
 	FeatureFuncDef funcdef( m_objbuilder_impl, normalizers, errorhnd);
 
-	THIS->addSearchIndexElementFromPatternMatch( type, patternTypeName, funcdef.normalizers);
+	THIS->addElementFromPatternMatch( type, patternTypeName, funcdef.normalizers);
 	funcdef.release();
 }
 
@@ -1296,30 +1296,24 @@ std::vector<Term> QueryAnalyzer::analyzeField(
 	std::auto_ptr<strus::QueryAnalyzerContextInterface> anactx( THIS->createContext());
 	if (!anactx.get()) throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
 	anactx->putField( 1/*field no*/, fieldType, fieldContent);
-	strus::analyzer::Query qry = anactx->analyze();
+	strus::analyzer::QueryTermExpression qry = anactx->analyze();
 	if (qry.instructions().empty() && errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error in analyze query field: %s"), errorhnd->fetchError());
 	}
-	std::vector<strus::analyzer::Query::Instruction>::const_iterator
+	std::vector<strus::analyzer::QueryTermExpression::Instruction>::const_iterator
 		ei = qry.instructions().begin(), ee = qry.instructions().end();
 	for (; ei != ee; ++ei)
 	{
 		switch (ei->opCode())
 		{
-			case strus::analyzer::Query::Instruction::MetaData:
+			case strus::analyzer::QueryTermExpression::Instruction::Term:
 			{
-				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( Term( md.name(), md.value().tostring().c_str(), 0, 1/*length*/));
+				const strus::analyzer::QueryTerm& term = qry.term( ei->idx());
+				rt.push_back( Term( term.type(), term.value(), 0, term.len()));
 				break;
 			}
-			case strus::analyzer::Query::Instruction::Term:
-			{
-				const strus::analyzer::Term& term = qry.term( ei->idx());
-				rt.push_back( Term( term.type(), term.value(), term.pos(), term.len()));
-				break;
-			}
-			case strus::analyzer::Query::Instruction::Operator:
+			case strus::analyzer::QueryTermExpression::Instruction::Operator:
 			{
 				throw strus::runtime_error(_TXT("no operator expected in result of analysis of a query field"));
 			}
@@ -1369,30 +1363,24 @@ std::vector<QueryTerm> QueryAnalyzeContext::analyze()
 	std::vector<QueryTerm> rt;
 	strus::ErrorBufferInterface* errorhnd = (strus::ErrorBufferInterface*)m_errorhnd_impl.get();
 	strus::QueryAnalyzerContextInterface* anactx = (strus::QueryAnalyzerContextInterface*)m_analyzer_ctx_impl.get();
-	strus::analyzer::Query qry = anactx->analyze();
+	strus::analyzer::QueryTermExpression qry = anactx->analyze();
 	if (qry.instructions().empty() && errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("error in analyze query: %s"), errorhnd->fetchError());
 	}
-	std::vector<strus::analyzer::Query::Instruction>::const_iterator
+	std::vector<strus::analyzer::QueryTermExpression::Instruction>::const_iterator
 		ei = qry.instructions().begin(), ee = qry.instructions().end();
 	for (; ei != ee; ++ei)
 	{
 		switch (ei->opCode())
 		{
-			case strus::analyzer::Query::Instruction::MetaData:
+			case strus::analyzer::QueryTermExpression::Instruction::Term:
 			{
-				const strus::analyzer::MetaData& md = qry.metadata( ei->idx());
-				rt.push_back( QueryTerm( 0, md.name(), md.value().tostring().c_str(), 0, 1));
+				const strus::analyzer::QueryTerm& term = qry.term( ei->idx());
+				rt.push_back( QueryTerm( 0, term.type(), term.value(), 0, term.len()));
 				break;
 			}
-			case strus::analyzer::Query::Instruction::Term:
-			{
-				const strus::analyzer::Term& term = qry.term( ei->idx());
-				rt.push_back( QueryTerm( 0, term.type(), term.value(), term.pos(), term.len()));
-				break;
-			}
-			case strus::analyzer::Query::Instruction::Operator:
+			case strus::analyzer::QueryTermExpression::Instruction::Operator:
 			{
 				if (rt.size() < ei->nofOperands()) throw strus::runtime_error(_TXT("internal: corrupt query structure"));
 				std::size_t idx = rt.size() - ei->nofOperands();
