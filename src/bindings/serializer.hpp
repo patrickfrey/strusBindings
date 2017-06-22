@@ -12,17 +12,15 @@
 #include "papuga/serialization.h"
 #include "strus/numericVariant.hpp"
 #include "strus/analyzer/document.hpp"
-#include "strus/analyzer/query.hpp"
-#include "strus/analyzer/term.hpp"
-#include "strus/analyzer/attribute.hpp"
-#include "strus/analyzer/metaData.hpp"
+#include "strus/analyzer/queryTermExpression.hpp"
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
 #include "strus/statisticsViewerInterface.hpp"
-#include "impl/analyzedQuery.hpp"
+#include "impl/termExpression.hpp"
+#include "impl/metadataExpression.hpp"
 #include <string>
 #include <vector>
 #include <utility>
@@ -86,6 +84,10 @@ public:
 	{
 		return papuga_Serialization_pushValue_string( result, val, valsize);
 	}
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_ValueVariant& val)
+	{
+		return papuga_Serialization_pushValue( result, &val);
+	}
 	static bool serialize_nothrow( papuga_Serialization* result, const NumericVariant& val);
 
 	typedef std::vector<std::pair<std::string,std::string> > ConfigurationItemList;
@@ -93,23 +95,25 @@ public:
 
 	typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
 	static bool serialize_nothrow( papuga_Serialization* result, const DocumentFrequencyChange& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Term& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Attribute& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::MetaData& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename=0);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorStorageSearchInterface::Result& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const AnalyzedQuery& query);
+	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorStorageSearchInterface::Result>& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Term>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::MetaData>& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::Attribute>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentMetaData>& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentAttribute>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val);

@@ -43,8 +43,13 @@ function dumpTree( indent, o)
 		table.sort( keyset, compare)
 		local s = ''
 		for i,k in ipairs(keyset) do
-			local v = o[ k]
-			s = s .. "\n" .. indent .. type(k) .. " " .. k .. ": " .. dumpTree( indent .. '  ', v)
+			local ke = "\n" .. indent .. type(k) .. " " .. k
+			local ve = dumpTree( indent .. '  ', o[ k])
+			if string.sub( ve,1,1) == "\n" then
+				s = s .. ke .. ":" .. ve
+			else
+				s = s .. ke .. ": " .. ve
+			end
 		end
 		return s
 	elseif type(o) == 'number' then
@@ -79,7 +84,6 @@ end
 
 function verifyTestOutput( outputdir, result, expected)
 	if (result ~= expected) then
-		print( "++++ Write file [" .. outputdir .. "/RES" .. "]")
 		writeFile( outputdir .. "/RES", result)
 		writeFile( outputdir .. "/EXP", expected)
 

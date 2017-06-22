@@ -82,6 +82,10 @@ public:
 		const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 		const QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		if (!papuga_ValueVariant_defined( &expression))
+		{
+			throw strus::runtime_error(_TXT("null passed as expression to posting iterator"));
+		}
 		PostingsExpressionBuilder postingsBuilder( storage, queryproc, errorhnd);
 		Deserializer::buildExpression( postingsBuilder, expression, errorhnd);
 		m_postings = postingsBuilder.pop();

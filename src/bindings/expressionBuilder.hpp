@@ -19,6 +19,7 @@
 #include "strus/reference.hpp"
 #include "strus/base/symbolTable.hpp"
 #include "queryAnalyzerStruct.hpp"
+#include "impl/termExpression.hpp"
 #include <string>
 #include <vector>
 
@@ -128,13 +129,13 @@ private:
 	QueryInterface* m_query;
 };
 
-class QueryAnalyzerExpressionBuilder
+class QueryAnalyzerTermExpressionBuilder
 	:public ExpressionBuilder
 {
 public:
-	QueryAnalyzerExpressionBuilder( const QueryAnalyzerStruct* analyzerStruct_, QueryAnalyzerContextInterface* analyzer_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_),m_operators(),m_fieldno_stack(),m_fieldno_cnt(0){}
-	virtual ~QueryAnalyzerExpressionBuilder(){}
+	explicit QueryAnalyzerTermExpressionBuilder( TermExpression* expression_)
+		:m_expression(expression_){}
+	virtual ~QueryAnalyzerTermExpressionBuilder(){}
 
 	virtual void pushTerm( const std::string& fieldtype, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& fieldtype, const std::string& value);
@@ -143,25 +144,15 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, bool visible);
-	
-	const std::vector<QueryAnalyzerStruct::Operator>& operators() const
-	{
-		return m_operators;
-	}
 
 private:
-	QueryAnalyzerExpressionBuilder( const QueryAnalyzerExpressionBuilder&){}	//< non copyable
-	void operator=( const QueryAnalyzerExpressionBuilder&){}			//< non copyable
+	QueryAnalyzerTermExpressionBuilder( const QueryAnalyzerTermExpressionBuilder&){}	//< non copyable
+	void operator=( const QueryAnalyzerTermExpressionBuilder&){}				//< non copyable
 
 private:
 	void pushField( const std::string& fieldtype, const std::string& value);
 
-	ErrorBufferInterface* m_errorhnd;
-	const QueryAnalyzerStruct* m_analyzerStruct;
-	QueryAnalyzerContextInterface* m_analyzer;
-	std::vector<QueryAnalyzerStruct::Operator> m_operators;
-	std::vector<unsigned int> m_fieldno_stack;
-	unsigned int m_fieldno_cnt;
+	TermExpression* m_expression;
 };
 
 class PostingsExpressionBuilder

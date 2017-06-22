@@ -24,6 +24,8 @@ extern "C" {
 /// \param[in] self pointer to structure 
 #define papuga_destroy_Serialization(self)		{if ((self)->ar){free( (self)->ar);(self)->ar=NULL;}}
 
+#define papuga_Serialization_clear(self)		{(self)->arsize=0;}
+
 /// \brief Test if serialization is empty
 #define papuga_Serialization_empty(self)		!!(self)->ar
 

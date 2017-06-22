@@ -15,6 +15,8 @@ set( bindingsimpl_source_files
 	utils.cpp
 	traceUtils.cpp
 	internationalization.cpp
+	impl/termExpression.cpp
+	impl/metadataExpression.cpp
 	impl/analyzer.cpp
 	impl/query.cpp
 	impl/storage.cpp

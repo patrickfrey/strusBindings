@@ -240,75 +240,42 @@ void QueryExpressionBuilder::definePattern( const std::string& name, bool visibl
 	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
 }
 
-void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
+void QueryAnalyzerTermExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
 	throw strus::runtime_error(_TXT("length parameter not allowed for query fields passed to analyzer"));
 }
 
-void QueryAnalyzerExpressionBuilder::pushField( const std::string& fieldtype, const std::string& value)
+void QueryAnalyzerTermExpressionBuilder::pushField( const std::string& fieldtype, const std::string& value)
 {
-	typedef QueryAnalyzerStruct::GroupOperatorList GroupOperatorList;
-
-	++m_fieldno_cnt;
-	m_analyzer->putField( m_fieldno_cnt, fieldtype, value);
-	m_fieldno_stack.push_back( m_fieldno_cnt);
-	std::vector<unsigned int> fieldnoList( m_fieldno_stack.end()-1, m_fieldno_stack.end());
-
-	const GroupOperatorList& gop = m_analyzerStruct->autoGroupOperators( fieldtype);
-	GroupOperatorList::const_iterator gi = gop.begin(), ge = gop.end();
-	for (; gi != ge; ++gi)
-	{
-		unsigned int groupid = m_operators.size();
-		m_operators.push_back( gi->opr);
-		m_analyzer->groupElements( groupid, fieldnoList, gi->groupBy, gi->groupSingle);
-	}
+	m_expression->pushField( fieldtype, value);
 }
 
-void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
+void QueryAnalyzerTermExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
 {
 	pushField( type, value);
 }
 
-void QueryAnalyzerExpressionBuilder::pushTerm( const std::string& value)
+void QueryAnalyzerTermExpressionBuilder::pushTerm( const std::string& value)
 {
 	pushField( std::string(), value);
 }
 
-void QueryAnalyzerExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
+void QueryAnalyzerTermExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
 {
 	throw strus::runtime_error(_TXT("document meta data ranges not implemented for %s"), "query");
 }
 
-void QueryAnalyzerExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
+void QueryAnalyzerTermExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
-	if (m_fieldno_stack.size() < argc) throw strus::runtime_error(_TXT("push expression without all arguments defined"));
-	unsigned int* fnstart = m_fieldno_stack.data() + m_fieldno_stack.size() - argc;
-	unsigned int* fnend = fnstart + argc;
-	std::vector<unsigned int> fieldnoList( fnstart, fnend);
-
-	unsigned int groupid = m_operators.size();
-	m_operators.push_back( QueryAnalyzerStruct::Operator(
-			QueryAnalyzerStruct::Operator::Expression,
-			op, argc, range, cardinality));
-	QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupAll;
-	m_analyzer->groupElements( groupid, fieldnoList, groupBy, true/*groupSingle*/);
-	m_fieldno_stack.resize( m_fieldno_stack.size() - argc + 1);
+	m_expression->pushExpression( op, argc, range, cardinality);
 }
 
-void QueryAnalyzerExpressionBuilder::attachVariable( const std::string& name)
+void QueryAnalyzerTermExpressionBuilder::attachVariable( const std::string& name)
 {
-	if (m_fieldno_stack.empty()) throw strus::runtime_error(_TXT("attach variable not allowed without query fields defined"));
-	std::vector<unsigned int> fieldnoList( m_fieldno_stack.end()-1, m_fieldno_stack.end());
-
-	unsigned int groupid = m_operators.size();
-	m_operators.push_back( QueryAnalyzerStruct::Operator( 
-			QueryAnalyzerStruct::Operator::Variable,
-			name, 1, 0/*range*/, 0/*cardinality*/));
-	QueryAnalyzerContextInterface::GroupBy groupBy = QueryAnalyzerContextInterface::GroupEvery;
-	m_analyzer->groupElements( groupid, fieldnoList, groupBy, true/*groupSingle*/);
+	m_expression->attachVariable( name);
 }
 
-void QueryAnalyzerExpressionBuilder::definePattern( const std::string& name, bool visible)
+void QueryAnalyzerTermExpressionBuilder::definePattern( const std::string& name, bool visible)
 {
 	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
 }

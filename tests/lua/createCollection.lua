@@ -27,12 +27,12 @@ function createCollection( strusctx, storagePath, datadir, fnams)
 	analyzer:defineAggregatedMetaData( "title_end", {"nextpos", "endtitle"})
 	analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
 
-	analyzer:definePatternMatcherPostProc( "coresult", "std", {"word"}, {
-		{"city_that_is", {"sequence", 3, {"word","citi"},{"word","that"},{"word","is"}} },
-		{"city_that", {"sequence", 2, {"word","citi"},{"word","that"}}},
-		{"city_with", {"sequence", 2, {"word","citi"},{"word","with"}}}
-	})
-	analyzer:addSearchIndexFeatureFromPatternMatch( "word", "coresult", {"lc"})
+	-- analyzer:definePatternMatcherPostProc( "coresult", "std", {"word"}, {
+	-- 	{"city_that_is", {"sequence", 3, {"word","citi"},{"word","that"},{"word","is"}} },
+	-- 	{"city_that", {"sequence", 2, {"word","citi"},{"word","that"}}},
+	-- 	{"city_with", {"sequence", 2, {"word","citi"},{"word","with"}}}
+	-- })
+	-- analyzer:addSearchIndexFeatureFromPatternMatch( "word", "coresult", {"lc"})
 	
 	-- Read input files, analyze and insert them:
 	local transaction = storage:createTransaction()

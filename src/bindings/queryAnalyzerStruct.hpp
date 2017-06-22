@@ -26,18 +26,15 @@ public:
 
 	struct Operator
 	{
-		enum Type {Variable,Expression};
-		Type type;
-
 		std::string name;
 		unsigned int argc;
 		int range;
 		unsigned int cardinality;
 
-		Operator( Type type_, const std::string& name_, unsigned int argc_, int range_, unsigned int cardinality_)
-			:type(type_),name(name_),argc(argc_),range(range_),cardinality(cardinality_){}
+		Operator( const std::string& name_, unsigned int argc_, int range_, unsigned int cardinality_)
+			:name(name_),argc(argc_),range(range_),cardinality(cardinality_){}
 		Operator( const Operator& o)
-			:type(o.type),name(o.name),argc(o.argc),range(o.range),cardinality(o.cardinality){}
+			:name(o.name),argc(o.argc),range(o.range),cardinality(o.cardinality){}
 	};
 	struct GroupOperator
 	{
@@ -55,7 +52,7 @@ public:
 	void autoGroupBy( const std::string& fieldtype_, const std::string& name, int range, unsigned int cardinality, QueryAnalyzerContextInterface::GroupBy groupBy, bool groupSingle)
 	{
 		std::string fieldtype = utils::tolower( fieldtype_);
-		GroupOperator gop( Operator( Operator::Variable, name, 0, range, cardinality), groupBy, groupSingle);
+		GroupOperator gop( Operator( name, 0, range, cardinality), groupBy, groupSingle);
 		GroupMap::iterator gi = m_groupmap.find( fieldtype);
 		if (gi == m_groupmap.end())
 		{

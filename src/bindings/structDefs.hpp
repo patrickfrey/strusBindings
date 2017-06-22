@@ -9,7 +9,10 @@
 #define _STRUS_BINDINGS_STRUCTURE_DEFINITIONS_HPP_INCLUDED
 #include "structNameMap.hpp"
 #include "papuga/serialization.hpp"
+#include "papuga/typedefs.h"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/numericVariant.hpp"
+#include "strus/metaDataRestrictionInterface.hpp"
 
 namespace strus {
 namespace bindings {
@@ -112,6 +115,17 @@ struct SegmenterDef
 	SegmenterDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
 	SegmenterDef( const SegmenterDef& o)
 		:segmenter(o.segmenter),mimetype(o.mimetype),encoding(o.encoding),scheme(o.scheme){}
+};
+
+struct MetaDataCompareDef
+{
+	MetaDataRestrictionInterface::CompareOperator cmpop;
+	std::string name;
+	papuga_ValueVariant value;
+
+	MetaDataCompareDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	MetaDataCompareDef( const MetaDataCompareDef& o)
+		:cmpop(o.cmpop),name(o.name),value(o.value){}
 };
 
 }} //namespace

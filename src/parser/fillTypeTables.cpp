@@ -103,7 +103,10 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	typesystem.defineType( "analyzer::Document*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
-	typesystem.defineType( "AnalyzedQuery*")
+	typesystem.defineType( "TermExpression*")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
+	;
+	typesystem.defineType( "MetaDataExpression*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 	;
 	typesystem.defineType( "std::vector<std::pair<std::string,std::string> >*")

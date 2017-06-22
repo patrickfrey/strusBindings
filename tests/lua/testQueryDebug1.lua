@@ -55,13 +55,6 @@ local query = queryEval:createQuery( storage)
 
 -- First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
 local terms = analyzer:analyze( {"word",queryPhrase})
-print( string.format( "query expression [%s]", dumpValue(
-		ctx:debug_serialize( {
-					"sequence", 10,
-						{"sequence", 2, {"word","completely"}, {"word","different"}},
-						{"sequence", 3, {"word","you"}, {"word","expect"}}
-					})
-)))
 local qexpr = analyzer:analyze( {
 					"sequence", 10,
 						{"sequence", 2, {"word","completely"}, {"word","different"}},
@@ -75,6 +68,15 @@ output[ "QueryExpression"] = qexpr
 if #terms == 0 then
 	error( "query is empty")
 end
+
+postings = {}
+for _,qe in ipairs(qexpr) do
+	for occurrence in storage:postings( qe, nil, 0) do
+		exprpostings[ occurrence[1]] = occurrence[2]
+	end
+	table.insert( postings, exprpostings)
+end
+output[ "postings"] = postings;
 
 -- Then we iterate on the terms and create a single term feature for each term and collect
 -- all terms to create a selection expression out of them:
@@ -143,15 +145,48 @@ feature 'titlefield' 1.00000:
 maxNofRanks = 20
 minRank = 0
 "
-string QueryResult: 
+string QueryExpression:
+  number 1:
+    string arg:
+      number 1:
+        string arg:
+          number 1:
+            string len: 1
+            string pos: 1
+            string type: "word"
+            string value: "complet"
+          number 2:
+            string len: 1
+            string pos: 2
+            string type: "word"
+            string value: "differ"
+        string op: "sequence"
+        string range: 2
+      number 2:
+        string arg:
+          number 1:
+            string len: 1
+            string pos: 3
+            string type: "word"
+            string value: "you"
+          number 2: 
+            string len: 1
+            string pos: 4
+            string type: "word"
+            string value: "expect"
+        string op: "sequence"
+        string range: 3
+    string op: "sequence"
+    string range: 10
+string QueryResult:
   string nofranked: 3
   string nofvisited: 3
   string pass: 0
-  string ranks: 
-    number 1: 
+  string ranks:
+    number 1:
       string docno: 2
-      string summary: 
-        number 1: 
+      string summary:
+        number 1:
           string index: -1
           string name: "title"
           string value: "A visit in New York"
@@ -162,47 +197,47 @@ string QueryResult:
           string value: "A visit in New York New York is a city ..."
           string weight: 1
       string weight: 0.000172
-    number 2: 
+    number 2:
       string docno: 1
-      string summary: 
-        number 1: 
+      string summary:
+        number 1:
           string index: -1
           string name: "title"
           string value: "A journey through Germany"
           string weight: 1
-        number 2: 
+        number 2:
           string index: -1
           string name: "docstart"
           string value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
           string weight: 1
       string weight: 0.000087
-    number 3: 
+    number 3:
       string docno: 3
-      string summary: 
-        number 1: 
+      string summary:
+        number 1:
           string index: -1
           string name: "title"
           string value: "One day in Tokyo"
           string weight: 1
-        number 2: 
+        number 2:
           string index: -1
           string name: "docstart"
           string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
           string weight: 1
       string weight: 0.000083
 string QueryString: "City visit"
-string QueryTerms: 
-  number 1: 
+string QueryTerms:
+  number 1:
     string len: 1
     string pos: 1
     string type: "word"
     string value: "citi"
-  number 2: 
+  number 2:
     string len: 1
     string pos: 2
     string type: "word"
     string value: "visit"
-string ResultList: 
+string ResultList:
   number 1: "rank 1: 2 0.000172"
   number 2: "    title: 'A visit in New York'"
   number 3: "    phrase: 'A visit in New York New York is a city ...'"

@@ -12,9 +12,10 @@
 #include "strus/textProcessorInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/analyzer/document.hpp"
-#include "strus/analyzer/query.hpp"
-#include "queryAnalyzerStruct.hpp"
+#include "impl/termExpression.hpp"
+#include "impl/metadataExpression.hpp"
 #include "impl/objectref.hpp"
+#include "queryAnalyzerStruct.hpp"
 #include <vector>
 #include <string>
 
@@ -191,22 +192,22 @@ public:
 	/// \brief Destructor
 	virtual ~QueryAnalyzerImpl(){}
 
-	/// \brief Defines a search index element.
+	/// \brief Defines an element (term, metadata) of query analysis.
 	/// \param[in] featureType element feature type created from this field type
 	/// \param[in] fieldType name of the field type defined
 	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
 	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
-	void addSearchIndexElement(
+	void addElement(
 			const std::string& featureType,
 			const std::string& fieldType,
 			const ValueVariant& tokenizer,
 			const ValueVariant& normalizers);
 
-	/// \brief Defines a search index element from a pattern matching result.
+	/// \brief Defines an element from a pattern matching result.
 	/// \param[in] type element type created from this pattern match result type
 	/// \param[in] patternTypeName name of the pattern match result item
 	/// \param[in] normalizers list of normalizer functions
-	void addSearchIndexElementFromPatternMatch(
+	void addElementFromPatternMatch(
 			const std::string& type,
 			const std::string& patternTypeName,
 			const ValueVariant& normalizers);
@@ -251,10 +252,15 @@ public:
 	/// \param[in] groupBy kind of selection of the arguments grouped ("position": elements with same position get their own group, "all" (or "" default): all elements of the field get into one group
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, const std::string& groupBy);
 
-	/// \brief Analye the content and return the set of features to insert
-	/// \param[in] expression query expression tree
-	/// \return structure of the query analyzed, depending on input the output structures are positional or labeled
-	AnalyzedQuery* analyze( const ValueVariant& expression);
+	/// \brief Analye the term expression and return the result structure
+	/// \param[in] expression query term expression tree
+	/// \return structure analyzed
+	TermExpression* analyzeTermExpression( const ValueVariant& expression);
+
+	/// \brief Analye the metadata expression and return the result structure
+	/// \param[in] expression query metadata expression tree
+	/// \return structure analyzed
+	MetaDataExpression* analyzeMetaData( const ValueVariant& expression);
 
 private:
 	/// \brief Constructor used by Context

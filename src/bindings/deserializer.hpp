@@ -28,7 +28,10 @@
 #include "strus/statisticsBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
+#include "strus/metaDataRestrictionInterface.hpp"
+#include "strus/numericVariant.hpp"
 #include "strus/index.hpp"
+#include "impl/metadataExpression.hpp"
 #include "expressionBuilder.hpp"
 #include "papuga/serialization.hpp"
 #include "papuga/valueVariant.h"
@@ -77,6 +80,14 @@ struct Deserializer
 			const papuga::Serialization::const_iterator& se);
 
 	static double getDouble(
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
+
+	static MetaDataRestrictionInterface::CompareOperator getMetaDataCmpOp(
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
+
+	static NumericVariant getNumeric(
 			papuga::Serialization::const_iterator& si,
 			const papuga::Serialization::const_iterator& se);
 
@@ -214,6 +225,11 @@ struct Deserializer
 
 	static void buildMetaDataRestriction(
 			QueryInterface* builder,
+			const papuga_ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildMetaDataRestriction(
+			MetaDataExpression* termexpr,
 			const papuga_ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 

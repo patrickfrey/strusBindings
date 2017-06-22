@@ -20,7 +20,8 @@
 #include "utils.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
-#include "impl/analyzedQuery.hpp"
+#include "impl/termExpression.hpp"
+#include "impl/metadataExpression.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -354,7 +355,7 @@ QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& o
 	}
 }
 
-void QueryAnalyzerImpl::addSearchIndexElement(
+void QueryAnalyzerImpl::addElement(
 		const std::string& featureType,
 		const std::string& fieldType,
 		const ValueVariant& tokenizer,
@@ -364,12 +365,12 @@ void QueryAnalyzerImpl::addSearchIndexElement(
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
-	THIS->addSearchIndexElement(
+	THIS->addElement(
 		featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
 }
 
-void QueryAnalyzerImpl::addSearchIndexElementFromPatternMatch(
+void QueryAnalyzerImpl::addElementFromPatternMatch(
 		const std::string& type,
 		const std::string& patternTypeName,
 		const ValueVariant& normalizers)
@@ -378,7 +379,7 @@ void QueryAnalyzerImpl::addSearchIndexElementFromPatternMatch(
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, ValueVariant(), normalizers, errorhnd);
 
-	THIS->addSearchIndexElementFromPatternMatch( type, patternTypeName, funcdef.normalizers);
+	THIS->addElementFromPatternMatch( type, patternTypeName, funcdef.normalizers);
 	funcdef.release();
 }
 
@@ -453,23 +454,36 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-AnalyzedQuery* QueryAnalyzerImpl::analyze(
-		const ValueVariant& expression)
+TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& expression)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
-	std::auto_ptr<QueryAnalyzerContextInterface> anactx( THIS->createContext());
-	if (!anactx.get()) throw strus::runtime_error( _TXT("failed to create query analyzer context: %s"), errorhnd->fetchError());
+	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
+	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, errorhnd));
+	if (!termexpr.get()) throw strus::runtime_error( _TXT("failed to create term expression: %s"), errorhnd->fetchError());
 
-	QueryAnalyzerExpressionBuilder exprbuilder( &m_queryAnalyzerStruct, anactx.get(), errorhnd);
+	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
 
-	Reference<AnalyzedQuery> res( new AnalyzedQuery( anactx->analyze(), exprbuilder.operators()));
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
 	}
-	return res.release();
+	return termexpr.release();
 }
 
+MetaDataExpression* QueryAnalyzerImpl::analyzeMetaData( const ValueVariant& expression)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
+	Reference<MetaDataExpression> metaexpr( new MetaDataExpression( analyzer, errorhnd));
+	if (!metaexpr.get()) throw strus::runtime_error( _TXT("failed to create metadata expression: %s"), errorhnd->fetchError());
+
+	Deserializer::buildMetaDataRestriction( metaexpr.get(), expression, errorhnd);
+
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
+	}
+	return metaexpr.release();
+}
 
