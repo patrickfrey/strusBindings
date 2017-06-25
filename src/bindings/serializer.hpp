@@ -99,10 +99,10 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorStorageSearchInterface::Result& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val);

@@ -52,7 +52,7 @@ static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
 	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads);
 	if (!errorhnd)
 	{
-		throw strus::runtime_error( _TXT("failed to create error buffer object: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to create error buffer object"));
 	}
 	return errorhnd;
 }
@@ -69,7 +69,11 @@ static ModuleLoaderInterface* createModuleLoader_( ErrorBufferInterface* errorhn
 
 static ContextDef parseContext( const ValueVariant& ctx)
 {
-	if (papuga_ValueVariant_isstring( &ctx))
+	if (!papuga_ValueVariant_defined( &ctx))
+	{
+		return ContextDef();
+	}
+	else if (papuga_ValueVariant_isstring( &ctx))
 	{
 		papuga_ErrorCode err = papuga_Ok;
 		ContextDef rt( papuga::ValueVariant_tostring( ctx, err));
@@ -97,33 +101,24 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_textproc(0)
 	,m_queryproc(0)
 {
-	if (papuga_ValueVariant_defined( &descr))
+	ContextDef contextdef( parseContext( descr));
+	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads);
+	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
+	ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
+	m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
+
+	if (!contextdef.rpc.empty())
 	{
-		ContextDef contextdef = parseContext( descr);
-		ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
-		m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
-		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-		m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
-		if (!contextdef.rpc.empty())
-		{
-			Reference<RpcClientMessagingInterface> messaging;
-			messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
-			if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
-			m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd), "RpcClient");
-			if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
-			(void)messaging.release();
-		}
-		if (!contextdef.trace.empty())
-		{
-			m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd), "TraceProxy");
-		}
+		Reference<RpcClientMessagingInterface> messaging;
+		messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
+		if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
+		m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd), "RpcClient");
+		if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
+		(void)messaging.release();
 	}
-	else
+	if (!contextdef.trace.empty())
 	{
-		ErrorBufferInterface* errorhnd = createErrorBuffer_( 0);
-		m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
-		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-		m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
+		m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd), "TraceProxy");
 	}
 }
 
@@ -262,14 +257,14 @@ StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
+	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_, errorhnd));
 }
 
 VectorStorageClientImpl* ContextImpl::createVectorStorageClient( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getStorageConfigString( config_, errorhnd));
+	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_, errorhnd));
 }
 
 DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
@@ -304,7 +299,7 @@ void ContextImpl::createStorage( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	std::string dbname;
-	std::string storagecfg( Deserializer::getStorageConfigString( config_, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config_, errorhnd));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
@@ -321,7 +316,7 @@ void ContextImpl::createVectorStorage( const ValueVariant& config_)
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	std::string dbname;
 	std::string storagename;
-	std::string storagecfg( Deserializer::getStorageConfigString( config_, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config_, errorhnd));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 	if (!extractStringFromConfigString( dbname, storagename, "storage", errorhnd))
 	{
@@ -340,7 +335,7 @@ void ContextImpl::destroyStorage( const ValueVariant& config_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	std::string dbname;
-	std::string storagecfg( Deserializer::getStorageConfigString( config_, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config_, errorhnd));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();

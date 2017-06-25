@@ -17,11 +17,11 @@ function dumpValue(o)
 		end
 		return s .. '} '
 	elseif type(o) == 'number' then
-		num = tonumber( string.format("%.6f", o))
+		num = tonumber( string.format("%.5f", o))
 		if (num == math.floor(num)) then
 			return string.format("%d", o)
 		else
-			return string.format("%.6f", o)
+			return string.format("%.5f", o + 0.)
 		end
 	elseif type(o) == 'string' then
 		return '"' .. tostring(o) .. '"'
@@ -53,11 +53,11 @@ function dumpTree( indent, o)
 		end
 		return s
 	elseif type(o) == 'number' then
-		num = tonumber( string.format("%.6f", o))
+		num = tonumber( string.format("%.5f", o))
 		if (num == math.floor(num)) then
 			return string.format("%d", o)
 		else
-			return string.format("%.6f", o)
+			return string.format("%.5f", o)
 		end
 	elseif type(o) == 'string' then
 		return '"' .. tostring(o) .. '"'

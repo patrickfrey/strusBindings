@@ -93,7 +93,7 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga::Serialization::const_iterator&
 	}
 }
 
-TermDef::TermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+QueryTermDef::QueryTermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
 	:variable(),type(),value(),length(1),value_defined(false),length_defined(false)
 {
 	static const char* context = _TXT("term");
@@ -450,6 +450,7 @@ DfChangeDef::DfChangeDef( papuga::Serialization::const_iterator& si, const papug
 }
 
 ContextDef::ContextDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se)
+	:threads(0),rpc(),trace()
 {
 	static const char* context = _TXT("context configuration");
 	static const StructureNameMap namemap( "threads,rpc,trace", ',');
@@ -481,10 +482,10 @@ ContextDef::ContextDef( papuga::Serialization::const_iterator& si, const papuga:
 						threads = Deserializer::getUint( si, se);
 						break;
 					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
-						rpc = Deserializer::getString( si, se);
+						rpc = Deserializer::getConfigString( si, se);
 						break;
 					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
-						trace = Deserializer::getString( si, se);
+						trace = Deserializer::getConfigString( si, se);
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
 				}

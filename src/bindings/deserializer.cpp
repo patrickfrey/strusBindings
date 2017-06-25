@@ -8,7 +8,6 @@
 #include "deserializer.hpp"
 #include "internationalization.hpp"
 #include "structDefs.hpp"
-#include "metadataop.hpp"
 #include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
@@ -1355,7 +1354,7 @@ static ExpressionType getExpressionType( papuga::Serialization::const_iterator s
 
 static void builderPushTerm(
 		ExpressionBuilder& builder,
-		const TermDef& def)
+		const QueryTermDef& def)
 {
 	if (def.length_defined)
 	{
@@ -1427,7 +1426,7 @@ static void buildExpressionJoin(
 						if (defined[JO_arg]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "arg", context);
 						if (si->tag == papuga_TagValue)
 						{
-							builderPushTerm( builder, TermDef( si, se));
+							builderPushTerm( builder, QueryTermDef( si, se));
 							++argc;
 						}
 						else if (si->tag == papuga_TagOpen)
@@ -1540,7 +1539,7 @@ void Deserializer::buildExpression(
 		}
 		case ExpressionTerm:
 		{
-			builderPushTerm( builder, TermDef( si, se));
+			builderPushTerm( builder, QueryTermDef( si, se));
 			break;
 		}
 		case ExpressionVariableAssignment:
@@ -2021,7 +2020,7 @@ static void buildStorageDocument(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "doctype,attributes,metadata,searchindex,forwardindex,access", ',');
+	static const StructureNameMap namemap( "doctype,attribute,metadata,searchindex,forwardindex,access", ',');
 	static const char* context = _TXT("document");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -2091,7 +2090,7 @@ static void buildStorageDocumentDeletes(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "attributes,metadata,searchindex,forwardindex,access", ',');
+	static const StructureNameMap namemap( "attribute,metadata,searchindex,forwardindex,access", ',');
 	static const char* context = _TXT("document update deletes");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -2496,7 +2495,15 @@ void Deserializer::buildMetaDataRestriction(
 	}
 }
 
-std::string Deserializer::getStorageConfigString(
+std::string Deserializer::getConfigString(
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se)
+{
+	ConfigDef item( si, se);
+	return item.cfgstring;
+}
+
+std::string Deserializer::getConfigString(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {

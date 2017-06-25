@@ -233,7 +233,11 @@ struct Deserializer
 			const papuga_ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 
-	static std::string getStorageConfigString(
+	static std::string getConfigString(
+			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se);
+
+	static std::string getConfigString(
 			const papuga_ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 };

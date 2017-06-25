@@ -1,5 +1,6 @@
 require "string"
 require "utils"
+require "config_t3s"
 require "createCollection"
 require "dumpCollection"
 
@@ -11,8 +12,8 @@ local docfiles = {"A.xml","B.xml","C.xml"}
 ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
 
-createCollection( ctx, storage, datadir, docfiles)
-local result = "collection dump:" .. dumpTree( "", dumpCollection( ctx, storage, docfiles)) .. "\n"
+createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles)
+local result = "collection dump:" .. dumpTree( "", dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
 string config:

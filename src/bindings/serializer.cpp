@@ -55,19 +55,13 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val)
 {
 	bool rt = true;
-	rt &= papuga_Serialization_pushOpen( result);
-	rt &= serializeStructMember( result, "name", val.name());
-	rt &= serializeStructMember( result, "value", val.value());
-	rt &= papuga_Serialization_pushClose( result);
+	rt &= serializeStructMember( result, val.name().c_str(), val.value());
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val)
 {
 	bool rt = true;
-	rt &= papuga_Serialization_pushOpen( result);
-	rt &= serializeStructMember( result, "name", val.name());
-	rt &= serializeStructMember( result, "value", val.value());
-	rt &= papuga_Serialization_pushClose( result);
+	rt &= serializeStructMember( result, val.name().c_str(), val.value());
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val)
@@ -113,7 +107,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= papuga_Serialization_pushOpen( result);
 	rt &= serializeStructMember( result, "doctype", val.subDocumentTypeName());
 	rt &= serializeStructMember( result, "metadata", val.metadata());
-	rt &= serializeStructMember( result, "attributes", val.attributes());
+	rt &= serializeStructMember( result, "attribute", val.attributes());
 	rt &= serializeStructMember( result, "searchindex", val.searchIndexTerms());
 	rt &= serializeStructMember( result, "forwardindex", val.forwardIndexTerms());
 	rt &= papuga_Serialization_pushClose( result);

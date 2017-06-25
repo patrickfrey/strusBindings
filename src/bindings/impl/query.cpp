@@ -8,7 +8,6 @@
 #include "impl/query.hpp"
 #include "impl/storage.hpp"
 #include "papuga/serialization.hpp"
-#include "metadataop.hpp"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/errorBufferInterface.hpp"

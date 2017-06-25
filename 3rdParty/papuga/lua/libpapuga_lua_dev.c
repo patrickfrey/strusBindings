@@ -187,7 +187,7 @@ static int iteratorGetNext( lua_State* ls)
 	int rt = 0;
 	papuga_GetNext getNext;
 	papuga_CallResult retval;
-	papuga_ErrorCode errcode;
+	papuga_ErrorCode errcode = papuga_Ok;
 	char errbuf[ 2048];
 
 	void* objref = lua_touserdata( ls, lua_upvalueindex( 1));

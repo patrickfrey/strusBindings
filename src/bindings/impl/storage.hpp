@@ -9,6 +9,7 @@
 #define _STRUS_BINDING_IMPL_STORAGE_HPP_INCLUDED
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
+#include "strus/constants.hpp"
 #include "strus/index.hpp"
 #include "impl/objectref.hpp"
 #include "impl/iterator.hpp"
@@ -55,7 +56,7 @@ public:
 	/// \param[in] restriction meta data restrictions
 	/// \param[in] start_docno starting document number
 	/// return an iterator on a set of postings
-	Iterator postings( const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno);
+	Iterator postings( const ValueVariant& expression, const ValueVariant& restriction=ValueVariant(), const Index& start_docno=0);
 
 	/// \brief Get an iterator on records of selected elements for matching documents starting from a specified document number
 	/// \param[in] what list of items to select: names of document attributes or meta data or "position" for matching positions or "docno" for the document number
@@ -63,7 +64,7 @@ public:
 	/// \param[in] restriction meta data restrictions
 	/// \param[in] start_docno starting document number
 	/// return an iterator on a set of postings
-	Iterator select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno);
+	Iterator select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction=ValueVariant(), const Index& start_docno=0);
 
 	/// \brief Get an iterator on the term types inserted
 	/// return an iterator on the term types
@@ -73,9 +74,21 @@ public:
 	/// return an iterator on the docids
 	Iterator docids() const;
 
+	/// \brief Get the document identifier associated with a local document number
+	/// return document identifier
+	std::string docid( const Index& docno) const;
+
 	/// \brief Get an iterator on the user names (roles) used in document access restrictions
 	/// \return an iterator on the user names (roles)
 	Iterator usernames() const;
+
+	/// \brief Get the list of inserted document attribute names
+	/// return list of names
+	std::vector<std::string>* attributeNames() const;
+
+	/// \brief Get the list of inserted document metadata names
+	/// return list of names
+	std::vector<std::string>* metadataNames() const;
 
 	/// \brief Get an iterator on message blobs that all statistics of the storage (e.g. feature occurrencies and number of documents inserted)
 	/// \note The blobs an be decoded with Context::unpackStatisticBlob

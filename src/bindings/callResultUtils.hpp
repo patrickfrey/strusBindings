@@ -36,7 +36,11 @@ template <typename STRUCTVALUE>
 void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* st)
 {
 	papuga_HostObject* obj = papuga_Allocator_alloc_HostObject( &retval->allocator, strus::bindings::BindingClassTemplate<STRUCTVALUE>::classid(), st, strus::bindings::BindingClassTemplate<STRUCTVALUE>::getDestructor());
-	if (!obj) throw std::bad_alloc();
+	if (!obj)
+	{
+		strus::bindings::BindingClassTemplate<STRUCTVALUE>::getDestructor()( st);
+		throw std::bad_alloc();
+	}
 	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
 	strus::bindings::Serializer::serialize( retval->value.value.serialization, *st);
 }
@@ -58,7 +62,11 @@ static void initCallResultAtomic( papuga_CallResult* retval, const STRUCTVALUE& 
 template <typename OBJECT>
 static void initCallResultObjectOwnership( papuga_CallResult* retval, OBJECT* st)
 {
-	if (!papuga_set_CallResult_hostobject( retval, strus::bindings::BindingClassTemplate<OBJECT>::classid(), st, strus::bindings::BindingClassTemplate<OBJECT>::getDestructor())) throw std::bad_alloc();
+	if (!papuga_set_CallResult_hostobject( retval, strus::bindings::BindingClassTemplate<OBJECT>::classid(), st, strus::bindings::BindingClassTemplate<OBJECT>::getDestructor()))
+	{
+		strus::bindings::BindingClassTemplate<OBJECT>::getDestructor()( st);
+		throw std::bad_alloc();
+	}
 }
 
 template <typename OBJECT>

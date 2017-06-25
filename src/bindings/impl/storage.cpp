@@ -26,7 +26,6 @@
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "internationalization.hpp"
-#include "metadataop.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -115,15 +114,12 @@ public:
 				bool ser = true;
 				if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
 				papuga_Serialization* serialization = result->value.value.serialization;
-				ser &= papuga_Serialization_pushOpen( serialization);
 				ser &= papuga_Serialization_pushValue_int( serialization, m_docno++);
-				ser &= papuga_Serialization_pushClose( serialization);
 				ser &= papuga_Serialization_pushOpen( serialization);
 				for (Index pos = 0; 0!=(pos=m_postings->skipPos(pos)); ++pos)
 				{
 					ser &= papuga_Serialization_pushValue_int( serialization, pos);
 				}
-				ser &= papuga_Serialization_pushClose( serialization);
 				ser &= papuga_Serialization_pushClose( serialization);
 				if (!ser)
 				{
@@ -614,6 +610,18 @@ Iterator StorageClientImpl::docids() const
 	return rt;
 }
 
+std::string StorageClientImpl::docid( const Index& docno) const
+{
+	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	Reference<AttributeReaderInterface> areader( THIS->createAttributeReader());
+	if (!areader.get()) throw strus::runtime_error( _TXT("failed to create attribute reader"));
+	Index eh = areader->elementHandle( Constants::attribute_docid());
+	if (!eh) throw strus::runtime_error( _TXT("attribute '%s' not defined"), Constants::attribute_docid());
+	areader->skipDoc( docno);
+	return areader->getValue( eh);
+}
+
 Iterator StorageClientImpl::usernames() const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -624,6 +632,22 @@ Iterator StorageClientImpl::usernames() const
 	Iterator rt( new ValueIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, itr, m_errorhnd_impl), &ValueIteratorDeleter, &ValueIteratorGetNext);
 	rt.release();
 	return rt;
+}
+
+std::vector<std::string>* StorageClientImpl::attributeNames() const
+{
+	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
+	Reference<AttributeReaderInterface> reader( storage->createAttributeReader());
+	if (!reader.get()) throw strus::runtime_error( _TXT("failed to create attribute reader"));
+	return new std::vector<std::string>( reader->getNames());
+}
+
+std::vector<std::string>* StorageClientImpl::metadataNames() const
+{
+	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
+	Reference<MetaDataReaderInterface> reader( storage->createMetaDataReader());
+	if (!reader.get()) throw strus::runtime_error( _TXT("failed to create metadata reader"));
+	return new std::vector<std::string>( reader->getNames());
 }
 
 Iterator StorageClientImpl::getAllStatistics( bool sign)

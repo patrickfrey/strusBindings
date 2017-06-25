@@ -7,6 +7,7 @@
  */
 #include "impl/analyzer.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
+#include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
@@ -299,7 +300,7 @@ void DocumentAnalyzerImpl::defineDocument(
 	THIS->defineSubDocument( subDocumentTypeName, selectexpr);
 }
 
-static analyzer::Document* analyzeDoc( DocumentAnalyzerInterface* THIS, const std::string& content, const analyzer::DocumentClass& dclass, ErrorBufferInterface* errorhnd)
+static analyzer::Document* analyzeDoc( const DocumentAnalyzerInterface* THIS, const std::string& content, const analyzer::DocumentClass& dclass, ErrorBufferInterface* errorhnd)
 {
 	Reference<analyzer::Document> doc( new analyzer::Document( THIS->analyze( content, dclass)));
 	if (errorhnd->hasError())
@@ -309,20 +310,19 @@ static analyzer::Document* analyzeDoc( DocumentAnalyzerInterface* THIS, const st
 	return doc.release();
 }
 
-analyzer::Document* DocumentAnalyzerImpl::analyze( const std::string& content, const ValueVariant& dclass)
+analyzer::DocumentClass DocumentAnalyzerImpl::getDocumentClass( const std::string& content, const ValueVariant& dclass) const
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 	if (papuga_ValueVariant_defined( &dclass))
 	{
-		return analyzeDoc( THIS, content, Deserializer::getDocumentClass( dclass), errorhnd);
+		return Deserializer::getDocumentClass( dclass);
 	}
 	else
 	{
 		analyzer::DocumentClass detected_dclass;
-	
+
 		const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		if (!textproc) throw runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 		if (!textproc->detectDocumentClass( detected_dclass, content.c_str(), content.size()))
 		{
@@ -335,8 +335,89 @@ analyzer::Document* DocumentAnalyzerImpl::analyze( const std::string& content, c
 				throw strus::runtime_error( _TXT( "could not detect document class of document to analyze"));
 			}
 		}
-		return analyzeDoc( THIS, content, detected_dclass, errorhnd);
+		return detected_dclass;
 	}
+}
+
+analyzer::Document* DocumentAnalyzerImpl::analyzeSingle( const std::string& content, const ValueVariant& dclass) const
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<const DocumentAnalyzerInterface>();
+	analyzer::DocumentClass documentClass = getDocumentClass( content, dclass);
+	return analyzeDoc( THIS, content, documentClass, errorhnd);
+}
+
+class DocumentAnalyzeIterator
+{
+public:
+	DocumentAnalyzeIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& analyzer_, const ObjectRef& errorhnd_, const std::string& content, const analyzer::DocumentClass& dclass)
+		:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_analyzer_impl(analyzer_),m_errorhnd_impl(errorhnd_),m_analyzercontext_impl()
+	{
+		const DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<const DocumentAnalyzerInterface>();
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		DocumentAnalyzerContextInterface* analyzerContext;
+		m_analyzercontext_impl.resetOwnership( analyzerContext = analyzer->createContext( dclass), "DocumentAnalyzerContext");
+		if (!analyzerContext) throw strus::runtime_error(_TXT("failed to create analyzer context: %s"), errorhnd->fetchError());
+		analyzerContext->putInput( content.c_str(), content.size(), true);
+	}
+	virtual ~DocumentAnalyzeIterator(){}
+
+	bool getNext( papuga_CallResult* result)
+	{
+		try
+		{
+			DocumentAnalyzerContextInterface* analyzerContext = m_analyzercontext_impl.getObject<DocumentAnalyzerContextInterface>();
+			Reference<analyzer::Document> doc( new analyzer::Document());
+			if (!analyzerContext->analyzeNext( *doc))
+			{
+				ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+				if (errorhnd->hasError())
+				{
+					throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
+				}
+				return false;
+			}
+			initCallResultStructureOwnership( result, doc.release());
+			return true;
+		}
+		catch (const std::bad_alloc& err)
+		{
+			papuga_CallResult_reportError( result, _TXT("memory allocation error in document analyze multipart iterator get next"));
+			return false;
+		}
+		catch (const std::runtime_error& err)
+		{
+			papuga_CallResult_reportError( result, _TXT("error in document analyze multipart iterator get next: %s"), err.what());
+			return false;
+		}
+	}
+
+private:
+	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
+	ObjectRef m_analyzer_impl;
+	ObjectRef m_errorhnd_impl;
+	ObjectRef m_analyzercontext_impl;
+};
+
+static bool DocumentAnalyzeGetNext( void* self, papuga_CallResult* result)
+{
+	return ((DocumentAnalyzeIterator*)self)->getNext( result);
+}
+
+static void DocumentAnalyzeDeleter( void* obj)
+{
+	delete (DocumentAnalyzeIterator*)obj;
+}
+
+Iterator DocumentAnalyzerImpl::analyzeMultiPart(
+		const std::string& content,
+		const ValueVariant& dclass) const
+{
+	analyzer::DocumentClass documentClass = getDocumentClass( content, dclass);
+	Iterator rt( new DocumentAnalyzeIterator( m_trace_impl, m_objbuilder_impl, m_analyzer_impl, m_errorhnd_impl, content, documentClass), &DocumentAnalyzeDeleter, &DocumentAnalyzeGetNext);
+	rt.release();
+	return rt;
 }
 
 QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd)
@@ -463,6 +544,7 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& ex
 
 	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
+	termexpr->analyze();
 
 	if (errorhnd->hasError())
 	{
@@ -479,6 +561,7 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeMetaData( const ValueVariant& expr
 	if (!metaexpr.get()) throw strus::runtime_error( _TXT("failed to create metadata expression: %s"), errorhnd->fetchError());
 
 	Deserializer::buildMetaDataRestriction( metaexpr.get(), expression, errorhnd);
+	metaexpr->analyze();
 
 	if (errorhnd->hasError())
 	{

@@ -11,10 +11,12 @@
 #include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/reference.hpp"
+#include "strus/analyzer/documentClass.hpp"
 #include "strus/analyzer/document.hpp"
 #include "impl/termExpression.hpp"
 #include "impl/metadataExpression.hpp"
 #include "impl/objectref.hpp"
+#include "impl/iterator.hpp"
 #include "queryAnalyzerStruct.hpp"
 #include <vector>
 #include <string>
@@ -23,9 +25,6 @@ namespace strus {
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
-
-///\brief Forward declaration
-class AnalyzedQuery;
 
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 
@@ -153,7 +152,7 @@ public:
 			const std::string& patternMatcherModule,
 			const std::string& serializedPatternFile);
 
-	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content
+	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content or documents of different types with one configuration
 	/// \param[in] selectexpr an expression that defines the content of the sub document declared
 	/// \param[in] subDocumentTypeName type name assinged to this sub document
 	/// \remark Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
@@ -161,13 +160,25 @@ public:
 			const std::string& subDocumentTypeName,
 			const std::string& selectexpr);
 
-	/// \brief Analye a content and return the analyzed document structure
+	/// \brief Analye a content and return the analyzed document structure (analyzing single document)
 	/// \param[in] content std::string (NOT a file name !) of the document to analyze
 	/// \param[in] documentClass document class of the document to analyze (see analyzer::DocumentClass), if not specified the document class is guessed from the content with document class detection
 	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes)
-	analyzer::Document* analyze(
+	analyzer::Document* analyzeSingle(
 			const std::string& content,
-			const ValueVariant& documentClass=ValueVariant());
+			const ValueVariant& documentClass=ValueVariant()) const;
+
+	/// \brief Analye a content and return the analyzed document structures as iterator (analyzing multipart document)
+	/// \param[in] content std::string (NOT a file name !) with the documents to analyze
+	/// \param[in] documentClass document class of the document set to analyze (see analyzer::DocumentClass), if not specified the document class is guessed from the content with document class detection
+	/// \return iterator on structures of the documents analyzed (sub document type names, search index terms, forward index terms, metadata, attributes)
+	/// \note if you are not sure if to use analyzeSingle or analyzeMultiPart, then take analyzeMultiPart, because it covers analyzeSingle, returning an iterator on a set containing the single document only
+	Iterator analyzeMultiPart(
+			const std::string& content,
+			const ValueVariant& documentClass=ValueVariant()) const;
+
+private:
+	analyzer::DocumentClass getDocumentClass( const std::string& content, const ValueVariant& dclass) const;
 
 private:
 	/// \brief Constructor used by Context

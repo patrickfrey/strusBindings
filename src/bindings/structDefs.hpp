@@ -27,7 +27,7 @@ struct AnalyzerFunctionDef
 		:name(o.name),args(o.args){}
 };
 
-struct TermDef
+struct QueryTermDef
 {
 	std::string variable;
 	std::string type;
@@ -36,8 +36,8 @@ struct TermDef
 	bool value_defined;
 	bool length_defined;
 
-	TermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
-	TermDef( const TermDef& o)
+	QueryTermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	QueryTermDef( const QueryTermDef& o)
 		:variable(o.variable),type(o.type),value(o.value),length(o.length),value_defined(o.value_defined),length_defined(o.length_defined){}
 };
 
@@ -96,8 +96,10 @@ struct ContextDef
 	std::string rpc;
 	std::string trace;
 
-	ContextDef( const std::string& connstr)
-		:threads(0),rpc(connstr){}
+	ContextDef()
+		:threads(0),rpc(),trace(){}
+	explicit ContextDef( const std::string& connstr)
+		:threads(0),rpc(connstr),trace(){}
 	ContextDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
 	ContextDef( const ContextDef& o)
 		:threads(o.threads),rpc(o.rpc),trace(o.trace){}
@@ -110,7 +112,7 @@ struct SegmenterDef
 	std::string encoding;
 	std::string scheme;
 
-	SegmenterDef( const std::string& segmenter_)
+	explicit SegmenterDef( const std::string& segmenter_)
 		:segmenter(segmenter_){}
 	SegmenterDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
 	SegmenterDef( const SegmenterDef& o)

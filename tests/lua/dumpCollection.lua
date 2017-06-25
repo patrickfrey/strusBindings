@@ -1,6 +1,6 @@
 require "string"
 
-function dumpCollection( strusctx, storagePath, docidList)
+function dumpCollection( strusctx, storagePath)
 	local config = string.format( "path=%s; cache=512M; statsproc=default", storagePath)
 	local output = {}
 
