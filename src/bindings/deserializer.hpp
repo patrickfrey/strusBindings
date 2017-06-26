@@ -31,7 +31,7 @@
 #include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/index.hpp"
-#include "impl/metadataExpression.hpp"
+#include "impl/value/metadataExpression.hpp"
 #include "expressionBuilder.hpp"
 #include "papuga/serialization.hpp"
 #include "papuga/valueVariant.h"

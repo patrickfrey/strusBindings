@@ -13,10 +13,10 @@
 #include "strus/reference.hpp"
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/analyzer/document.hpp"
-#include "impl/termExpression.hpp"
-#include "impl/metadataExpression.hpp"
-#include "impl/objectref.hpp"
-#include "impl/iterator.hpp"
+#include "impl/value/termExpression.hpp"
+#include "impl/value/metadataExpression.hpp"
+#include "impl/value/objectref.hpp"
+#include "impl/value/iterator.hpp"
 #include "queryAnalyzerStruct.hpp"
 #include <vector>
 #include <string>
@@ -63,6 +63,17 @@ public:
 		const ValueVariant& normalizers,
 		const ValueVariant& options=ValueVariant());
 
+	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of document analysis
+	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
+	/// \param[in] selectexpr an expression that decribes what elements are taken from a document for this feature (tag selection in abbreviated syntax of XPath)
+	/// \param[in] tokenizer tokenizer (ownership passed to this) to use for this feature
+	/// \param[in] normalizers list of normalizers (element ownership passed to this) to use for this feature
+	void addPatternLexem(
+			const std::string& type,
+			const std::string& selectexpr,
+			const ValueVariant& tokenizer,
+			const ValueVariant& normalizers);
+	
 	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature

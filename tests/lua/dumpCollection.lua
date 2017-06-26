@@ -18,9 +18,38 @@ function dumpCollection( strusctx, storagePath)
 	end
 	output[ "config"] = output_config
 
-	-- Document metadata and attributes:
+	-- Document identifiers:
+	local output_docids = {}
+	local dociditr = storage:docids()
+	for tp in dociditr do
+		table.insert( output_docids, {id=tp,docno=storage:documentNumber(tp)})
+	end
+	output[ "docids"] = output_docids
+
+	-- Term types:
+	local termtypes = {}
+	local typeitr = storage:termTypes()
+	for tp in typeitr do
+		table.insert( termtypes, tp)
+	end
+	output[ "types"] = termtypes
+
+	-- Document data (metadata,attributes,content):
+	local selectids = {"docno"}
+	local attrids = {}
+	for _,name in ipairs( storage:attributeNames()) do
+		table.insert( attrids, name)
+		table.insert( selectids, name)
+	end
+	for _,name in ipairs( storage:metadataNames()) do
+		table.insert( attrids, name)
+		table.insert( selectids, name)
+	end
+	for _,name in ipairs( termtypes) do
+		table.insert( selectids, name)
+	end
 	local output_docs = {}
-	for docrow in storage:select( {"docno","docid","title","doclen","title_start","title_end"}, nil, nil, 0) do
+	for docrow in storage:select( selectids, nil, nil, 0) do
 		output_docs[ docrow.docid] = docrow
 	end
 	output[ "docs"] = output_docs
@@ -37,22 +66,6 @@ function dumpCollection( strusctx, storagePath)
 		output_stat[ "nofdocs"] = (output_stat[ "nofdocs"] or 0) + statview[ "nofdocs"]
 	end
 	output[ "stat"] = output_stat
-
-	-- Term types:
-	local output_types = {}
-	local typeitr = storage:termTypes()
-	for tp in typeitr do
-		table.insert( output_types, tp)
-	end
-	output[ "types"] = output_types
-
-	-- Document identifiers:
-	local output_docids = {}
-	local dociditr = storage:docids()
-	for tp in dociditr do
-		table.insert( output_docids, tp)
-	end
-	output[ "docids"] = output_docids
 
 	storage:close()
 	return output

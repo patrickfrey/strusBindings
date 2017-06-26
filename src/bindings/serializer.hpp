@@ -19,8 +19,8 @@
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
 #include "strus/statisticsViewerInterface.hpp"
-#include "impl/termExpression.hpp"
-#include "impl/metadataExpression.hpp"
+#include "impl/value/termExpression.hpp"
+#include "impl/value/metadataExpression.hpp"
 #include <string>
 #include <vector>
 #include <utility>

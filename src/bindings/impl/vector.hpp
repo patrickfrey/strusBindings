@@ -9,8 +9,8 @@
 #define _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
 #include "papuga/valueVariant.h"
 #include "strus/vectorStorageSearchInterface.hpp"
-#include "impl/objectref.hpp"
-#include "impl/struct.hpp"
+#include "impl/value/objectref.hpp"
+#include "impl/value/struct.hpp"
 #include <vector>
 #include <string>
 

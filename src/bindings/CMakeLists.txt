@@ -14,8 +14,14 @@ set( bindingsimpl_source_files
 	utils.cpp
 	traceUtils.cpp
 	internationalization.cpp
-	impl/termExpression.cpp
-	impl/metadataExpression.cpp
+	impl/value/termExpression.cpp
+	impl/value/metadataExpression.cpp
+	impl/value/postingIterator.cpp
+	impl/value/valueIterator.cpp
+	impl/value/selectIterator.cpp
+	impl/value/statisticsIterator.cpp
+	impl/value/forwardTermsIterator.cpp
+	impl/value/searchTermsIterator.cpp
 	impl/analyzer.cpp
 	impl/query.cpp
 	impl/storage.cpp

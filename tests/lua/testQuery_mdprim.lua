@@ -7,7 +7,7 @@ require "dumpCollection"
 local datadir = arg[1]
 local outputdir = arg[2] or '.'
 local storagedir = outputdir .. "/storage"
-local docfiles = {"docsmall.xml"}
+local docfiles = {"doc1000.xml"}
 local output = {}
 
 local ctx = strus_Context.new()

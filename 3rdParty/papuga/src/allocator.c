@@ -108,7 +108,7 @@ void* papuga_Allocator_alloc( papuga_Allocator* self, size_t blocksize, unsigned
 	if (self->root.ar != NULL)
 	{
 		unsigned int alignmentofs = (alignment - (self->root.arsize & (alignment-1))) & (MAXALIGN-1);
-		if (self->root.allocsize - self->root.arsize < blocksize + alignmentofs)
+		if (self->root.allocsize - self->root.arsize >= blocksize + alignmentofs)
 		{
 			self->root.arsize += alignmentofs;
 			rt = self->root.ar + self->root.arsize;

@@ -7,9 +7,10 @@ require "dumpCollection"
 local datadir = arg[1]
 local outputdir = arg[2] or '.'
 local storage = outputdir .. "/storage"
-local docfiles = {"doc.xml"}
+local docfiles = {"doc10.xml"}
 
-ctx = strus_Context.new( {trace={log="dump",file="stdout"}})
+-- ctx = strus_Context.new( {trace={log="dump",file="stdout"}})
+ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
 
 createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles)

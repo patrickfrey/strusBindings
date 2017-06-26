@@ -21,8 +21,6 @@
 #include "utils.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
-#include "impl/termExpression.hpp"
-#include "impl/metadataExpression.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -153,6 +151,21 @@ void DocumentAnalyzerImpl::addForwardIndexFeature(
 	analyzer->addForwardIndexFeature(
 		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers,
 		Deserializer::getFeatureOptions( options));
+	funcdef.release();
+}
+
+void DocumentAnalyzerImpl::addPatternLexem(
+		const std::string& type,
+		const std::string& selectexpr,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
+
+	analyzer->addPatternLexem(
+		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
 }
 

@@ -37,10 +37,10 @@ add_custom_command(
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp
-    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/iterator.hpp
-    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/objectref.hpp
-    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/struct.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/iterator.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/struct.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/objectref.hpp
     COMMAND  ${CMAKE_BINARY_DIR}/src/parser/strusBindingsInterfaceGen ${CMAKE_BINARY_DIR}  ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
     COMMENT  "Generating strus bindings C header and implementation (output root dir: ${CMAKE_BINARY_DIR})"
     VERBATIM

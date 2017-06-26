@@ -19,7 +19,7 @@
 #include "strus/reference.hpp"
 #include "strus/base/symbolTable.hpp"
 #include "queryAnalyzerStruct.hpp"
-#include "impl/termExpression.hpp"
+#include "impl/value/termExpression.hpp"
 #include <string>
 #include <vector>
 

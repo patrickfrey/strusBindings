@@ -21,31 +21,46 @@ string config:
   string metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
   string path: "storage"
 string docids:
-  number 1: "A.xml"
-  number 2: "B.xml"
-  number 3: "C.xml"
+  number 1:
+    string docno: 3
+    string id: "A.xml"
+  number 2:
+    string docno: 2
+    string id: "B.xml"
+  number 3:
+    string docno: 1
+    string id: "C.xml"
 string docs:
   string A.xml:
     string docid: "A.xml"
     string doclen: 20
     string docno: 3
+    string endtitle: ""
+    string orig: "One	day	in	Tokyo	Tokyo	is	a	city	that	is	completely	different	than	what	you	would	expect	as	European	citizen."
     string title: "One day in Tokyo"
     string title_end: 6
     string title_start: 0
+    string word: "one	day	in	tokyo	is	a	citi	that	complet	differ	than	what	you	would	expect	as	european	citizen"
   string B.xml:
     string docid: "B.xml"
     string doclen: 16
     string docno: 2
+    string endtitle: ""
+    string orig: "A	visit	in	New	York	New	York	is	a	city	with	dimensions	you	can't	imagine."
     string title: "A visit in New York"
     string title_end: 7
     string title_start: 0
+    string word: "in	is	a	citi	you	visit	new	york	with	dimens	can	t	imagin"
   string C.xml:
     string docid: "C.xml"
     string doclen: 16
     string docno: 1
+    string endtitle: ""
+    string orig: "A	journey	through	Germany	When	I	first	visited	germany	it	was	still	splitted	into	two	parts."
     string title: "A journey through Germany"
     string title_end: 6
     string title_start: 0
+    string word: "a	visit	journey	through	germani	when	i	first	it	was	still	split	into	two	part"
 string stat:
   string dfchange:
     number 1:

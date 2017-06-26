@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<list>
+<doc id='1'><cross>1</cross><content></content></doc>
+<doc id='2'><cross>2</cross><factors>0</factors><lo>2</lo><hi>2</hi><content>2</content></doc>
+<doc id='3'><cross>3</cross><factors>0</factors><lo>3</lo><hi>3</hi><content>3</content></doc>
+<doc id='4'><cross>4</cross><factors>1</factors><lo>2</lo><hi>2</hi><content>2 2</content></doc>
+<doc id='5'><cross>5</cross><factors>0</factors><lo>5</lo><hi>5</hi><content>5</content></doc>
+<doc id='6'><cross>6</cross><factors>1</factors><lo>2</lo><hi>3</hi><content>2 3</content></doc>
+<doc id='7'><cross>7</cross><factors>0</factors><lo>7</lo><hi>7</hi><content>7</content></doc>
+<doc id='8'><cross>8</cross><factors>2</factors><lo>2</lo><hi>2</hi><content>2 2 2</content></doc>
+<doc id='9'><cross>9</cross><factors>1</factors><lo>3</lo><hi>3</hi><content>3 3</content></doc>
+<doc id='10'><cross>1</cross><factors>1</factors><lo>2</lo><hi>5</hi><content>2 5</content></doc>
+</list>
+<!-- This document was generated with ./createMetadataTestDocuments.pl 10 -->

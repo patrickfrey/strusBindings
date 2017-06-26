@@ -11,9 +11,9 @@
 #include "strus/numericVariant.hpp"
 #include "strus/constants.hpp"
 #include "strus/index.hpp"
-#include "impl/objectref.hpp"
-#include "impl/iterator.hpp"
-#include "impl/struct.hpp"
+#include "impl/value/objectref.hpp"
+#include "impl/value/iterator.hpp"
+#include "impl/value/struct.hpp"
 #include <vector>
 #include <string>
 
@@ -48,8 +48,21 @@ public:
 	Index documentFrequency( const std::string& type, const std::string& term) const;
 
 	/// \brief Get the internal document number from the document identifier
+	/// \param[in] docid document identifier
 	/// return the internal document number or 0, if not defined
 	Index documentNumber( const std::string& docid) const;
+
+	/// \brief Get an interator on the tuples (value,pos) of the forward index of a given type for a document
+	/// \param[in] docno internal local document number
+	/// \param[in] termtype term type string
+	/// return an iterator on tuples (value,pos)
+	Iterator documentForwardTerms( const Index& docno, const std::string& termtype) const;
+
+	/// \brief Get an interator on the tuples (value,tf,firstpos) of the search index of a given type for a document
+	/// \param[in] docno internal local document number
+	/// \param[in] termtype term type string
+	/// return an iterator on tuples (value,pos)
+	Iterator documentSearchTerms( const Index& docno, const std::string& termtype) const;
 
 	/// \brief Get an iterator on the set of postings inserted
 	/// \param[in] expression query term expression

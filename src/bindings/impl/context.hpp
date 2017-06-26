@@ -12,8 +12,8 @@
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/statisticsViewerInterface.hpp"
-#include "impl/objectref.hpp"
-#include "impl/struct.hpp"
+#include "impl/value/objectref.hpp"
+#include "impl/value/struct.hpp"
 #include <vector>
 #include <string>
 
