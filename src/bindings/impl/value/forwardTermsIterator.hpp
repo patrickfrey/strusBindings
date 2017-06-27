@@ -27,7 +27,8 @@ public:
 		const ObjectRef& storage_,
 		const ObjectRef& errorhnd_,
 		const std::string& termtype,
-		const Index& docno);
+		const Index& docno,
+		const Index& pos_);
 	virtual ~ForwardTermsIterator(){}
 
 	bool getNext( papuga_CallResult* result);
@@ -41,6 +42,7 @@ private:
 	ObjectRef m_storage_impl;
 	ObjectRef m_errorhnd_impl;
 	Reference<ForwardIteratorInterface> m_iter;
+	Index m_pos;
 };
 
 }}//namespace

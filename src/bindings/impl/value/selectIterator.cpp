@@ -14,7 +14,6 @@
 #include "strus/storageClientInterface.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
-#include "internationalization.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -24,7 +23,16 @@
 using namespace strus;
 using namespace strus::bindings;
 
-SelectIterator::SelectIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, const papuga_ValueVariant& what, const papuga_ValueVariant& expression, const papuga_ValueVariant& restriction, const Index& start_docno_)
+SelectIterator::SelectIterator(
+		const ObjectRef& trace_,
+		const ObjectRef& objbuilder_,
+		const ObjectRef& storage_,
+		const ObjectRef& errorhnd_,
+		const papuga_ValueVariant& what,
+		const papuga_ValueVariant& expression,
+		const papuga_ValueVariant& restriction,
+		const Index& start_docno_,
+		const papuga_ValueVariant& accesslist)
 	:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_attributereader_impl(),m_metadatareader_impl(),m_errorhnd_impl(errorhnd_),m_postings(),m_restriction(),m_forwarditer(),m_docno(start_docno_?start_docno_:1),m_maxdocno(0),m_items()
 {
 	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
@@ -41,6 +49,15 @@ SelectIterator::SelectIterator( const ObjectRef& trace_, const ObjectRef& objbui
 	MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
 	m_maxdocno = storage->maxDocumentNumber();
 
+	if (papuga_ValueVariant_defined( &accesslist))
+	{
+		std::vector<std::string> namelist = Deserializer::getStringList( accesslist);
+		std::vector<std::string>::const_iterator ni = namelist.begin(), ne = namelist.end();
+		for (; ni != ne; ++ni)
+		{
+			m_accessiter.push_back( AccessRestriction( storage, *ni));
+		}
+	}
 	if (papuga_ValueVariant_defined( &expression))
 	{
 		PostingsExpressionBuilder postingsBuilder( storage, queryproc, errorhnd);
@@ -112,6 +129,24 @@ SelectIterator::SelectIterator( const ObjectRef& trace_, const ObjectRef& objbui
 	}
 }
 
+bool SelectIterator::checkAccess( const Index& docno)
+{
+	// [NOTE] This function assumes to be called with document numbers (docno) in ascending order !!!
+	if (m_accessiter.empty()) return docno;
+	std::vector<AccessRestriction>::iterator
+		ai = m_accessiter.begin(), ae = m_accessiter.end();
+	for (; ai != ae; ++ai)
+	{
+		if (ai->docno == 0) continue;
+		if (ai->docno < docno)
+		{
+			ai->docno = ai->acciter->skipDoc( docno);
+		}
+		if (ai->docno == docno) return true;
+	}
+	return false;
+}
+
 bool SelectIterator::buildRow( papuga_CallResult* result)
 {
 	AttributeReaderInterface* attributereader = 0;
@@ -180,7 +215,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 					std::string value;
 					while (0!=(pos=fitr->skipPos( pos+1)))
 					{
-						if (!value.empty()) value.push_back('\t');
+						if (!value.empty()) value.push_back(' ');
 						value.append( fitr->fetch());
 					}
 					const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
@@ -196,7 +231,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 						std::string value;
 						while (titr->nextTerm( term))
 						{
-							if (!value.empty()) value.push_back('\t');
+							if (!value.empty()) value.push_back(' ');
 							value.append( titr->termValue( term.termno));
 						}
 						const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
@@ -247,12 +282,17 @@ bool SelectIterator::getNext( papuga_CallResult* result)
 			if (!m_docno) return false;
 			for (; 0!=(m_docno = m_postings->skipDoc( m_docno)); ++m_docno)
 			{
-				if (!m_restriction.get() || m_restriction->match( m_docno)) break;
+				if (checkAccess( m_docno) && (!m_restriction.get() || m_restriction->match( m_docno))) break;
 			}
 		}
 		else
 		{
-			if (!m_docno || m_docno > m_maxdocno) return false;
+			if (!m_docno) return false;
+			for (;m_docno <= m_maxdocno; ++m_docno)
+			{
+				if (checkAccess( m_docno)) break;
+			}
+			if (m_docno > m_maxdocno) return false;
 		}
 		bool rt = false;
 		if (m_docno)

@@ -42,7 +42,7 @@ bool SearchTermsIterator::getNext( papuga_CallResult* result)
 		if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
 		papuga_Serialization* serialization = result->value.value.serialization;
 		DocumentTermIteratorInterface::Term term;
-		while (m_iter->nextTerm( term))
+		if (m_iter->nextTerm( term))
 		{
 			std::string value = m_iter->termValue( term.termno);
 			const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
@@ -50,18 +50,18 @@ bool SearchTermsIterator::getNext( papuga_CallResult* result)
 			ser &= papuga_Serialization_pushValue_string( serialization, valueptr, value.size());
 			ser &= papuga_Serialization_pushValue_int( serialization, term.tf);
 			ser &= papuga_Serialization_pushValue_int( serialization, term.firstpos);
+			if (!ser) throw std::bad_alloc();
+			return true;
 		}
-		if (!ser)
+		else
 		{
-			papuga_CallResult_reportError( result, _TXT("memory allocation error in %s get next"), ITERATOR_NAME);
+			ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+			if (errorhnd->hasError())
+			{
+				papuga_CallResult_reportError( result, _TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
+			}
 			return false;
 		}
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		if (errorhnd->hasError())
-		{
-			papuga_CallResult_reportError( result, _TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
-		}
-		return true;
 	}
 	catch (const std::bad_alloc& err)
 	{

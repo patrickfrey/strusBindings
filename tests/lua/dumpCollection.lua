@@ -49,10 +49,27 @@ function dumpCollection( strusctx, storagePath)
 		table.insert( selectids, name)
 	end
 	local output_docs = {}
+	local output_terms = {}
 	for docrow in storage:select( selectids, nil, nil, 0) do
 		output_docs[ docrow.docid] = docrow
+		for _,termtype in ipairs( termtypes) do
+			local fterms = storage:documentForwardIndexTerms( docrow.docno, termtype)
+			local ftermlist = {}
+			for fterm,pos in fterms do
+				table.insert( ftermlist, {value=fterm,pos=pos})
+			end
+			output_terms[ string.format("%s:%s (f)", docrow.docid, termtype)] = ftermlist
+
+			local sterms = storage:documentSearchIndexTerms( docrow.docno, termtype)
+			local stermlist = {}
+			for sterm,tf,firstpos in sterms do
+				table.insert( stermlist, {value=sterm,tf=tf,firstpos=firstpos})
+			end
+			output_terms[ string.format("%s:%s (s)", docrow.docid, termtype)] = stermlist
+		end
 	end
 	output[ "docs"] = output_docs
+	output[ "terms"] = output_terms
 
 	-- Term statistics:
 	local output_stat = {}

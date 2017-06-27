@@ -165,10 +165,10 @@ void QueryImpl::setMinRank( unsigned int minRank_)
 	THIS->setMinRank( minRank_);
 }
 
-void QueryImpl::addUserName( const std::string& username_)
+void QueryImpl::addAccessRestriction( const std::string& username_)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	THIS->addUserName( username_);
+	THIS->addAccessRestriction( username_);
 }
 
 void QueryImpl::setWeightingVariables(

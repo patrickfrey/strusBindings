@@ -146,10 +146,10 @@ public:
 	/// \param[in] minRank_ index of the first rank to be returned by this query
 	void setMinRank( unsigned int minRank_);
 
-	/// \brief Add a user for this query (as alternative role)
+	/// \brief Add an access restriction for the user of this query (as alternative role)
 	/// \param[in] username_ an alternative name of a user for the evaluation of this query
 	/// \note the user restriction applies if no user role specified in the query is allowed to see the document.
-	void addUserName( const std::string& username_);
+	void addAccessRestriction( const std::string& username_);
 
 	/// \brief Assign values to variables of the weighting formula
 	/// \param[in] parameter parameter values (std::map<std::string,double>)

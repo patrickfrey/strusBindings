@@ -56,13 +56,13 @@ public:
 	/// \param[in] docno internal local document number
 	/// \param[in] termtype term type string
 	/// return an iterator on tuples (value,pos)
-	Iterator documentForwardTerms( const Index& docno, const std::string& termtype) const;
+	Iterator documentForwardIndexTerms( const Index& docno, const std::string& termtype, const Index& pos=0) const;
 
 	/// \brief Get an interator on the tuples (value,tf,firstpos) of the search index of a given type for a document
 	/// \param[in] docno internal local document number
 	/// \param[in] termtype term type string
 	/// return an iterator on tuples (value,pos)
-	Iterator documentSearchTerms( const Index& docno, const std::string& termtype) const;
+	Iterator documentSearchIndexTerms( const Index& docno, const std::string& termtype) const;
 
 	/// \brief Get an iterator on the set of postings inserted
 	/// \param[in] expression query term expression
@@ -76,8 +76,9 @@ public:
 	/// \param[in] expression query term expression
 	/// \param[in] restriction meta data restrictions
 	/// \param[in] start_docno starting document number
+	/// \param[in] accesslist list of access restrictions (one of them must match)
 	/// return an iterator on a set of postings
-	Iterator select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction=ValueVariant(), const Index& start_docno=0);
+	Iterator select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction=ValueVariant(), const Index& start_docno=0, const ValueVariant& accesslist=ValueVariant());
 
 	/// \brief Get an iterator on the term types inserted
 	/// return an iterator on the term types

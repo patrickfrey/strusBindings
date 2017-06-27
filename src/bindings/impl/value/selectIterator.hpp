@@ -10,11 +10,14 @@
 #include "papuga/valueVariant.h"
 #include "strus/index.hpp"
 #include "strus/reference.hpp"
+#include "strus/storageClientInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/metaDataRestrictionInstanceInterface.hpp"
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/documentTermIteratorInterface.hpp"
+#include "strus/invAclIteratorInterface.hpp"
 #include "impl/value/objectref.hpp"
+#include "internationalization.hpp"
 #include <vector>
 #include <string>
 
@@ -32,7 +35,8 @@ public:
 		const papuga_ValueVariant& what,
 		const papuga_ValueVariant& expression,
 		const papuga_ValueVariant& restriction,
-		const Index& start_docno_);
+		const Index& start_docno_,
+		const papuga_ValueVariant& accesslist);
 	virtual ~SelectIterator(){}
 
 	bool getNext( papuga_CallResult* result);
@@ -72,6 +76,23 @@ private:
 		Index m_handle;
 	};
 
+	struct AccessRestriction
+	{
+		Index docno;
+		Reference<InvAclIteratorInterface> acciter;
+
+		AccessRestriction( const StorageClientInterface* storage, const std::string& ac)
+			:docno(0),acciter( storage->createInvAclIterator( ac))
+		{
+			if (!acciter.get()) throw strus::runtime_error(_TXT("failed to create access restriction for '%s'"), ac.c_str());
+			docno = acciter->skipDoc( 0);
+		}
+		AccessRestriction( const AccessRestriction& o)
+			:docno(o.docno),acciter(o.acciter){}
+	};
+private:
+	bool checkAccess( const Index& docno);
+
 private:
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
@@ -83,6 +104,7 @@ private:
 	Reference<MetaDataRestrictionInstanceInterface> m_restriction;
 	std::vector<Reference<ForwardIteratorInterface> > m_forwarditer;
 	std::vector<Reference<DocumentTermIteratorInterface> > m_searchiter;
+	std::vector<AccessRestriction> m_accessiter;
 	Index m_docno;
 	Index m_maxdocno;
 	std::vector<ItemDef> m_items;

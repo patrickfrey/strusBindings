@@ -76,16 +76,16 @@ Index StorageClientImpl::documentNumber( const std::string& docid) const
 	return THIS->documentNumber( docid);
 }
 
-Iterator StorageClientImpl::documentForwardTerms( const Index& docno, const std::string& termtype) const
+Iterator StorageClientImpl::documentForwardIndexTerms( const Index& docno, const std::string& termtype, const Index& pos) const
 {
-	Reference<ForwardTermsIterator> itr( new ForwardTermsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, termtype, docno));
+	Reference<ForwardTermsIterator> itr( new ForwardTermsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, termtype, docno, pos));
 	Iterator rt( itr.get(), &ForwardTermsIterator::Deleter, &ForwardTermsIterator::GetNext);
 	itr.release();
 	rt.release();
 	return rt;
 }
 
-Iterator StorageClientImpl::documentSearchTerms( const Index& docno, const std::string& termtype) const
+Iterator StorageClientImpl::documentSearchIndexTerms( const Index& docno, const std::string& termtype) const
 {
 	Reference<SearchTermsIterator> itr( new SearchTermsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, termtype, docno));
 	Iterator rt( itr.get(), &SearchTermsIterator::Deleter, &SearchTermsIterator::GetNext);
@@ -103,9 +103,9 @@ Iterator StorageClientImpl::postings( const ValueVariant& expression, const Valu
 	return rt;
 }
 
-Iterator StorageClientImpl::select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno)
+Iterator StorageClientImpl::select( const ValueVariant& what, const ValueVariant& expression, const ValueVariant& restriction, const Index& start_docno, const ValueVariant& accesslist)
 {
-	Reference<SelectIterator> itr( new SelectIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, what, expression, restriction, start_docno));
+	Reference<SelectIterator> itr( new SelectIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, what, expression, restriction, start_docno, accesslist));
 	Iterator rt( itr.get(), &SelectIterator::Deleter, &SelectIterator::GetNext);
 	itr.release();
 	rt.release();

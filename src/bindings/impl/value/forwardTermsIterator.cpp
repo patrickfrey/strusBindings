@@ -22,8 +22,12 @@
 using namespace strus;
 using namespace strus::bindings;
 
-ForwardTermsIterator::ForwardTermsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, const std::string& termtype, const Index& docno)
-	:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_errorhnd_impl(errorhnd_),m_iter()
+ForwardTermsIterator::ForwardTermsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, const std::string& termtype, const Index& docno, const Index& pos_)
+	:m_trace_impl(trace_)
+	,m_objbuilder_impl(objbuilder_)
+	,m_storage_impl(storage_)
+	,m_errorhnd_impl(errorhnd_)
+	,m_iter(),m_pos(pos_)
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -38,29 +42,34 @@ bool ForwardTermsIterator::getNext( papuga_CallResult* result)
 {
 	try
 	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		bool ser = true;
 		if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
 		papuga_Serialization* serialization = result->value.value.serialization;
-		Index pos = m_iter->skipPos(0);
-		for (;pos; pos=m_iter->skipPos(pos+1))
+		m_pos = m_iter->skipPos( m_pos+1);
+		if (!m_pos)
+		{
+			if (errorhnd->hasError())
+			{
+				papuga_CallResult_reportError( result, _TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
+			}
+			return false;
+		}
+		else
 		{
 			std::string value = m_iter->fetch();
+			if (errorhnd->hasError())
+			{
+				papuga_CallResult_reportError( result, _TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
+				return false;
+			}
 			const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
 			if (!valueptr) throw std::bad_alloc();
 			ser &= papuga_Serialization_pushValue_string( serialization, valueptr, value.size());
-			ser &= papuga_Serialization_pushValue_int( serialization, pos);
+			ser &= papuga_Serialization_pushValue_int( serialization, m_pos);
+			if (!ser) throw std::bad_alloc();
+			return true;
 		}
-		if (!ser)
-		{
-			papuga_CallResult_reportError( result, _TXT("memory allocation error in %s get next"), ITERATOR_NAME);
-			return false;
-		}
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		if (errorhnd->hasError())
-		{
-			papuga_CallResult_reportError( result, _TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
-		}
-		return true;
 	}
 	catch (const std::bad_alloc& err)
 	{
