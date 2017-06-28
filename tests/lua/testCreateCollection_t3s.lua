@@ -11,8 +11,9 @@ local docfiles = {"A.xml","B.xml","C.xml"}
 
 ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
+local aclmap = {["A.xml"]="a",["B.xml"]="b",["C.xml"]="c"}
 
-createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles)
+createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, aclmap)
 local result = "collection dump:" .. dumpTree( "", dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
@@ -32,6 +33,7 @@ string docids:
     string id: "C.xml"
 string docs:
   string A.xml:
+    string ACL: "a"
     string docid: "A.xml"
     string doclen: 20
     string docno: 3
@@ -42,6 +44,7 @@ string docs:
     string title_start: 0
     string word: "one day in tokyo is a citi that complet differ than what you would expect as european citizen"
   string B.xml:
+    string ACL: "b"
     string docid: "B.xml"
     string doclen: 16
     string docno: 2
@@ -52,6 +55,7 @@ string docs:
     string title_start: 0
     string word: "in is a citi you visit new york with dimens can t imagin"
   string C.xml:
+    string ACL: "c"
     string docid: "C.xml"
     string doclen: 16
     string docno: 1
@@ -61,6 +65,7 @@ string docs:
     string title_end: 6
     string title_start: 0
     string word: "a visit journey through germani when i first it was still split into two part"
+string nofdocs: 3
 string stat:
   string dfchange:
     number 1:

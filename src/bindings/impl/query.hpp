@@ -146,10 +146,10 @@ public:
 	/// \param[in] minRank_ index of the first rank to be returned by this query
 	void setMinRank( unsigned int minRank_);
 
-	/// \brief Add an access restriction for the user of this query (as alternative role)
-	/// \param[in] username_ an alternative name of a user for the evaluation of this query
-	/// \note the user restriction applies if no user role specified in the query is allowed to see the document.
-	void addAccessRestriction( const std::string& username_);
+	/// \brief Allow read access to documents having a specific ACL tag
+	/// \param[in] username_ ACL tag that must be attached to a document shown in the result ('access' tag in the document)
+	/// \note if no access restriction is specified, then all documents are shown in the result
+	void addAccess( const ValueVariant& userlist_);
 
 	/// \brief Assign values to variables of the weighting formula
 	/// \param[in] parameter parameter values (std::map<std::string,double>)

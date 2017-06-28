@@ -12,8 +12,23 @@ local output = {}
 
 local ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
-
-createCollection( ctx, storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles)
+local aclmap = {}
+for i=1,1000 do
+	local usr = {}
+	if i > 500 then
+		table.insert( usr, 'large')
+	else
+		table.insert( usr, 'small')
+	end
+	if i < 50 then
+		table.insert( usr, 'tiny')
+	end
+	if i > 950 then
+		table.insert( usr, 'huge')
+	end
+	aclmap[ tostring(i)] = usr
+end
+createCollection( ctx, storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap)
 
 local queryPhrase = "13"
 local storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_mdprim())
@@ -25,7 +40,7 @@ local storage = ctx:createStorageClient( storageConfig)
 local analyzer = createQueryAnalyzer_mdprim( ctx)
 
 -- Define the query evaluation scheme:
-local queryEval = createQueryEval_t3s( ctx)
+local queryEval = createQueryEval_mdprim( ctx)
 
 -- Now we build the query to issue:
 local query = queryEval:createQuery( storage)
@@ -67,6 +82,8 @@ query:defineFeature( "titlefield", {from="title_start", to="title_end"} )
 
 -- Enable debugging
 query:setDebugMode( false )
+
+-- query:addAccess( "small")
 
 -- Dump query to output
 output[ "QueryDump"] = query:tostring()

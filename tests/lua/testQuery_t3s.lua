@@ -13,7 +13,7 @@ local output = {}
 local ctx = strus_Context.new()
 ctx:loadModule( "analyzer_pattern")
 
-createCollection( ctx, storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles)
+createCollection( ctx, storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, nil)
 
 local queryPhrase = "City visit tokyo"
 local storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_t3s())

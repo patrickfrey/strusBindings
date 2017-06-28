@@ -16,6 +16,9 @@
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/documentTermIteratorInterface.hpp"
 #include "strus/invAclIteratorInterface.hpp"
+#include "strus/metaDataReaderInterface.hpp"
+#include "strus/attributeReaderInterface.hpp"
+#include "strus/aclReaderInterface.hpp"
 #include "impl/value/objectref.hpp"
 #include "internationalization.hpp"
 #include <vector>
@@ -55,6 +58,7 @@ private:
 			None,
 			MetaData,
 			Attribute,
+			ACL,
 			ForwardIndex,
 			SearchIndex,
 			Position,
@@ -97,9 +101,10 @@ private:
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_storage_impl;
-	ObjectRef m_attributereader_impl;
-	ObjectRef m_metadatareader_impl;
 	ObjectRef m_errorhnd_impl;
+	Reference<AttributeReaderInterface> m_attributes;
+	Reference<MetaDataReaderInterface> m_metadata;
+	Reference<AclReaderInterface> m_acls;
 	Reference<PostingIteratorInterface> m_postings;
 	Reference<MetaDataRestrictionInstanceInterface> m_restriction;
 	std::vector<Reference<ForwardIteratorInterface> > m_forwarditer;

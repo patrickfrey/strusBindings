@@ -17,6 +17,7 @@ function dumpCollection( strusctx, storagePath)
 		end
 	end
 	output[ "config"] = output_config
+	output[ "nofdocs"] = storage:nofDocumentsInserted()
 
 	-- Document identifiers:
 	local output_docids = {}
@@ -27,31 +28,20 @@ function dumpCollection( strusctx, storagePath)
 	output[ "docids"] = output_docids
 
 	-- Term types:
-	local termtypes = {}
-	local typeitr = storage:termTypes()
-	for tp in typeitr do
-		table.insert( termtypes, tp)
-	end
+	local termtypes = joinLists( storage:termTypes())
 	output[ "types"] = termtypes
 
 	-- Document data (metadata,attributes,content):
-	local selectids = {"docno"}
-	local attrids = {}
-	for _,name in ipairs( storage:attributeNames()) do
-		table.insert( attrids, name)
-		table.insert( selectids, name)
-	end
-	for _,name in ipairs( storage:metadataNames()) do
-		table.insert( attrids, name)
-		table.insert( selectids, name)
-	end
-	for _,name in ipairs( termtypes) do
-		table.insert( selectids, name)
-	end
+	local selectids = joinLists( "docno", "ACL", storage:attributeNames(), storage:metadataNames(), termtypes)
 	local output_docs = {}
 	local output_terms = {}
 	for docrow in storage:select( selectids, nil, nil, 0) do
-		output_docs[ docrow.docid] = docrow
+		flatdocrow = {}
+		for colkey,colval in pairs(docrow) do
+			flatdocrow[ colkey] = concatValue( colval)
+		end
+		output_docs[ docrow.docid] = flatdocrow
+
 		for _,termtype in ipairs( termtypes) do
 			local fterms = storage:documentForwardIndexTerms( docrow.docno, termtype)
 			local ftermlist = {}

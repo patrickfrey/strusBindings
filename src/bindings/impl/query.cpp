@@ -165,10 +165,15 @@ void QueryImpl::setMinRank( unsigned int minRank_)
 	THIS->setMinRank( minRank_);
 }
 
-void QueryImpl::addAccessRestriction( const std::string& username_)
+void QueryImpl::addAccess( const ValueVariant& userlist_)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	THIS->addAccessRestriction( username_);
+	std::vector<std::string> userlist = Deserializer::getStringList( userlist_);
+	std::vector<std::string>::const_iterator ui = userlist.begin(), ue = userlist.end();
+	for (; ui != ue; ++ui)
+	{
+		THIS->addAccess( *ui);
+	}
 }
 
 void QueryImpl::setWeightingVariables(
@@ -202,7 +207,13 @@ void QueryImpl::setDebugMode( bool debug)
 QueryResult* QueryImpl::evaluate() const
 {
 	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
-	return new QueryResult( THIS->evaluate());
+	Reference<QueryResult> result( new QueryResult( THIS->evaluate()));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("error in evaluate query: %s"), errorhnd->fetchError());
+	}
+	return result.release();
 }
 
 std::string QueryImpl::tostring() const

@@ -3,6 +3,22 @@ function round( num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
+function concatValue(o)
+	if type(o) == 'table' then
+		rt = nil
+		for _,value in ipairs(o) do
+			if (rt) then
+				rt = rt .. " " .. tostring(value)
+			else
+				rt = tostring(value)
+			end
+		end
+		return rt
+	else
+		return o
+	end
+end
+
 function dumpValue(o)
 	if type(o) == 'table' then
 		local s = '{ '
@@ -112,3 +128,20 @@ function getFileName( filepath)
 	return pathar[ #pathar]
 end
 
+function joinLists(...)
+	rt = {}
+	for _,v in ipairs({...}) do
+		if (type(v) == "function") then
+			for elem in v do
+				table.insert( rt, elem)
+			end
+		elseif (type(v) == "table") then
+			for _,elem in ipairs(v) do
+				table.insert( rt, elem)
+			end
+		else
+			table.insert( rt, v)
+		end
+	end
+	return rt
+end

@@ -264,6 +264,10 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
 	Deserializer::buildInsertDocument( document.get(), doc, errorhnd);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("failed to insert document: %s"), errorhnd->fetchError());
+	}
 	document->done();
 }
 
@@ -272,6 +276,11 @@ void StorageTransactionImpl::deleteDocument( const std::string& docId)
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
 	if (!transaction) throw strus::runtime_error( _TXT("try to delete document in a closed transaction"));
 	transaction->deleteDocument( docId);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("failed to insert document: %s"), errorhnd->fetchError());
+	}
 }
 
 void StorageTransactionImpl::deleteUserAccessRights( const std::string& username)
@@ -279,6 +288,11 @@ void StorageTransactionImpl::deleteUserAccessRights( const std::string& username
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
 	if (!transaction) throw strus::runtime_error( _TXT("try to delete user access rights in a closed transaction"));
 	transaction->deleteUserAccessRights( username);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("failed to insert document: %s"), errorhnd->fetchError());
+	}
 }
 
 void StorageTransactionImpl::commit()

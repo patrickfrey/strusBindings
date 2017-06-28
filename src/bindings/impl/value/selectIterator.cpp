@@ -14,6 +14,8 @@
 #include "strus/storageClientInterface.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
+#include "strus/aclReaderInterface.hpp"
+#include "strus/constants.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -33,20 +35,22 @@ SelectIterator::SelectIterator(
 		const papuga_ValueVariant& restriction,
 		const Index& start_docno_,
 		const papuga_ValueVariant& accesslist)
-	:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_attributereader_impl(),m_metadatareader_impl(),m_errorhnd_impl(errorhnd_),m_postings(),m_restriction(),m_forwarditer(),m_docno(start_docno_?start_docno_:1),m_maxdocno(0),m_items()
+	:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_errorhnd_impl(errorhnd_),m_attributes(),m_metadata(),m_acls(),m_postings(),m_restriction(),m_forwarditer(),m_docno(start_docno_?start_docno_:1),m_maxdocno(0),m_items()
 {
 	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
 	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 	const QueryProcessorInterface* queryproc = objBuilder->getQueryProcessor();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
-	m_attributereader_impl.resetOwnership( storage->createAttributeReader(), "AttributeReader");
-	if (!m_attributereader_impl.get()) throw strus::runtime_error( _TXT("failed to create attribute reader for %s"), ITERATOR_NAME);
-	m_metadatareader_impl.resetOwnership( storage->createMetaDataReader(), "MetaDataReader");
-	if (!m_metadatareader_impl.get()) throw strus::runtime_error( _TXT("failed to create metadata reader for %s"), ITERATOR_NAME);
+	AttributeReaderInterface* attributereader = 0;
+	MetaDataReaderInterface* metadatareader = 0;
+	AclReaderInterface* aclreader = 0;
 
-	AttributeReaderInterface* attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
-	MetaDataReaderInterface* metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
+	m_attributes.reset( attributereader = storage->createAttributeReader());
+	if (!attributereader) throw strus::runtime_error( _TXT("failed to create attribute reader for %s"), ITERATOR_NAME);
+	m_metadata.reset( metadatareader = storage->createMetaDataReader());
+	if (!metadatareader) throw strus::runtime_error( _TXT("failed to create metadata reader for %s"), ITERATOR_NAME);
+
 	m_maxdocno = storage->maxDocumentNumber();
 
 	if (papuga_ValueVariant_defined( &accesslist))
@@ -85,13 +89,22 @@ SelectIterator::SelectIterator(
 	for (; ei != ee; ++ei)
 	{
 		Index eh;
-		if (utils::caseInsensitiveEquals( *ei, "position"))
+		if (utils::caseInsensitiveEquals( *ei, strus::Constants::identifier_position()))
 		{
 			m_items.push_back( ItemDef( *ei, ItemDef::Position));
 		}
-		else if (utils::caseInsensitiveEquals( *ei, "docno"))
+		else if (utils::caseInsensitiveEquals( *ei, strus::Constants::identifier_docno()))
 		{
 			m_items.push_back( ItemDef( *ei, ItemDef::Docno));
+		}
+		else if (utils::caseInsensitiveEquals( *ei, strus::Constants::identifier_acl()))
+		{
+			if (!aclreader)
+			{
+				m_acls.reset( aclreader = storage->createAclReader());
+				if (!aclreader) throw strus::runtime_error( _TXT("failed to create metadata reader for %s"), ITERATOR_NAME);
+			}
+			m_items.push_back( ItemDef( *ei, ItemDef::ACL));
 		}
 		else if (0 <= (eh = metadatareader->elementHandle( ei->c_str())))
 		{
@@ -175,25 +188,26 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 				case ItemDef::MetaData:
 					if (!metadatareader)
 					{
-						metadatareader = m_metadatareader_impl.getObject<MetaDataReaderInterface>();
+						metadatareader = (MetaDataReaderInterface*)m_metadata.get();
 						metadatareader->skipDoc( m_docno);
 					}
 					if (ei->handle() >= 0)
 					{
 						ser &= Serializer::serialize_nothrow( serialization, metadatareader->getValue( ei->handle()));
-						attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
+						attributereader = (AttributeReaderInterface*)m_attributes.get();
 					}
 					else
 					{
 						ser &= papuga_Serialization_pushValue_void( serialization);
 					}
 					break;
+
 				case ItemDef::Attribute:
 					if (ei->handle() > 0)
 					{
 						if (!attributereader)
 						{
-							attributereader = m_attributereader_impl.getObject<AttributeReaderInterface>();
+							attributereader = (AttributeReaderInterface*)m_attributes.get();
 							attributereader->skipDoc( m_docno);
 						}
 						std::string attrvalstr = attributereader->getValue( ei->handle());
@@ -207,35 +221,55 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 						ser &= papuga_Serialization_pushValue_void( serialization);
 					}
 					break;
+
+				case ItemDef::ACL:
+				{
+					AclReaderInterface* aclreader = (AclReaderInterface*)m_acls.get();
+					aclreader->skipDoc( m_docno);
+					std::vector<std::string> usernames = aclreader->getReadAccessList();
+					ser &= papuga_Serialization_pushOpen( serialization);
+					std::vector<std::string>::const_iterator ui = usernames.begin(), ue = usernames.end();
+					for (; ui != ue; ++ui)
+					{
+						const char* usernamestr = papuga_Allocator_copy_string( &result->allocator, ui->c_str(), ui->size());
+						if (!usernamestr) throw std::bad_alloc();
+						ser &= papuga_Serialization_pushValue_string( serialization, usernamestr, ui->size());
+					}
+					ser &= papuga_Serialization_pushClose( serialization);
+					break;
+				}
+
 				case ItemDef::ForwardIndex:
 				{
 					ForwardIteratorInterface* fitr = m_forwarditer[ ei->handle()].get();
 					fitr->skipDoc( m_docno);
 					Index pos = 0;
-					std::string value;
+					ser &= papuga_Serialization_pushOpen( serialization);
 					while (0!=(pos=fitr->skipPos( pos+1)))
 					{
-						if (!value.empty()) value.push_back(' ');
-						value.append( fitr->fetch());
+						std::string value = fitr->fetch();
+						const char* valuestr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
+						if (!valuestr) throw std::bad_alloc();
+						ser &= papuga_Serialization_pushValue_string( serialization, valuestr, value.size());
 					}
-					const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
-					ser &= papuga_Serialization_pushValue_string( serialization, valueptr, value.size());
+					ser &= papuga_Serialization_pushClose( serialization);
 					break;
 				}
+
 				case ItemDef::SearchIndex:
 				{
 					DocumentTermIteratorInterface* titr = m_searchiter[ ei->handle()].get();
 					if (titr->skipDoc( m_docno) == m_docno)
 					{
+						ser &= papuga_Serialization_pushOpen( serialization);
 						DocumentTermIteratorInterface::Term term;
-						std::string value;
 						while (titr->nextTerm( term))
 						{
-							if (!value.empty()) value.push_back(' ');
-							value.append( titr->termValue( term.termno));
+							std::string value = titr->termValue( term.termno);
+							const char* valuestr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
+							ser &= papuga_Serialization_pushValue_string( serialization, valuestr, value.size());
 						}
-						const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
-						ser &= papuga_Serialization_pushValue_string( serialization, valueptr, value.size());
+						ser &= papuga_Serialization_pushClose( serialization);
 					}
 					else
 					{
@@ -243,6 +277,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 					}
 					break;
 				}
+
 				case ItemDef::Position:
 					if (m_postings.get())
 					{
@@ -258,6 +293,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 						ser &= papuga_Serialization_pushValue_void( serialization);
 					}
 					break;
+
 				case ItemDef::Docno:
 					ser &= papuga_Serialization_pushValue_int( serialization, m_docno);
 					break;
