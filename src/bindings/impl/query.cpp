@@ -115,14 +115,20 @@ QueryImpl* QueryEvalImpl::createQuery( StorageClientImpl* storage) const
 	return new QueryImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
 
-void QueryImpl::defineFeature( const std::string& set_, const ValueVariant& expr_, double weight_)
+void QueryImpl::addFeature( const std::string& set_, const ValueVariant& expr_, double weight_)
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryExpressionBuilder exprbuilder( THIS, m_queryproc, errorhnd);
 
-	Deserializer::buildExpression( exprbuilder, expr_, errorhnd);
-	THIS->defineFeature( set_, weight_);
+	Deserializer::buildExpression( exprbuilder, expr_, errorhnd, true);
+	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to create feature from expression: %s"), errorhnd->fetchError());
+	unsigned int ii=0, nn = exprbuilder.stackSize();
+	if (nn == 0) throw strus::runtime_error( _TXT("feature defined without expression"));
+	for (; ii<nn; ++ii)
+	{
+		THIS->defineFeature( set_, weight_);
+	}
 }
 
 void QueryImpl::addMetaDataRestriction( const ValueVariant& expression)

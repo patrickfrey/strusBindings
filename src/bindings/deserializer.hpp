@@ -184,12 +184,19 @@ struct Deserializer
 	static void buildExpression(
 			ExpressionBuilder& builder,
 			papuga::Serialization::const_iterator& si,
+			const papuga::Serialization::const_iterator& se,
+			bool allowList);
+
+	static void buildExpressionList(
+			ExpressionBuilder& builder,
+			papuga::Serialization::const_iterator& si,
 			const papuga::Serialization::const_iterator& se);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
 			const papuga_ValueVariant& expression,
-			ErrorBufferInterface* errorhnd);
+			ErrorBufferInterface* errorhnd,
+			bool allowLists);
 
 	static void buildPattern(
 			ExpressionBuilder& builder,

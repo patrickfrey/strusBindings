@@ -204,21 +204,25 @@ void PreProcPatternExpressionBuilder::definePattern( const std::string& name, bo
 
 void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
+	++m_stackSize;
 	m_query->pushTerm( type, value, length);
 }
 
 void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
 {
+	++m_stackSize;
 	m_query->pushTerm( type, value, 1);
 }
 
 void QueryExpressionBuilder::pushTerm( const std::string& type)
 {
+	++m_stackSize;
 	throw strus::runtime_error(_TXT("push term without value not implemented for %s"), "query");
 }
 
 void QueryExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
 {
+	++m_stackSize;
 	m_query->pushDocField( metadataRangeStart, metadataRangeEnd);
 }
 
@@ -227,6 +231,7 @@ void QueryExpressionBuilder::pushExpression( const std::string& opname, unsigned
 	const PostingJoinOperatorInterface* op = m_queryproc->getPostingJoinOperator( opname);
 	if (!op) throw strus::runtime_error(_TXT("error getting posting join operator '%s': %s"), opname.c_str(), m_errorhnd->fetchError());
 
+	m_stackSize = m_stackSize - argc + 1;
 	m_query->pushExpression( op, argc, range, cardinality);
 }
 

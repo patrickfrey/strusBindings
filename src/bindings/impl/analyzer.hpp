@@ -282,7 +282,7 @@ public:
 	/// \brief Analye the metadata expression and return the result structure
 	/// \param[in] expression query metadata expression tree
 	/// \return structure analyzed
-	MetaDataExpression* analyzeMetaData( const ValueVariant& expression);
+	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression);
 
 private:
 	/// \brief Constructor used by Context

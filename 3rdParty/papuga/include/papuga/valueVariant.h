@@ -26,51 +26,51 @@ extern "C" {
 
 /// \brief Variant value initializer as a NULL value
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant(self)				{(self)->valuetype = (unsigned char)papuga_TypeVoid; (self)->encoding=0; (self)->length=0; (self)->value.string=0;}
+#define papuga_init_ValueVariant(self)				{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeVoid; s->encoding=0; s->length=0; s->value.string=0;}
 
 /// \brief Variant value initializer as a double precision floating point value
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_double(self,val)		{(self)->valuetype = (unsigned char)papuga_TypeDouble; (self)->encoding=0; (self)->length=0; (self)->value.Double=(val);}
+#define papuga_init_ValueVariant_double(self,val)		{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeDouble; s->encoding=0; s->length=0; s->value.Double=(val);}
 
 /// \brief Variant value initializer as a boolean value
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_bool(self,val)			{(self)->valuetype = (unsigned char)papuga_TypeInt; (self)->encoding=0; (self)->length=0; (self)->value.Int=!!(val);}
+#define papuga_init_ValueVariant_bool(self,val)			{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeInt; s->encoding=0; s->length=0; s->value.Int=!!(val);}
 
 /// \brief Variant value initializer as an unsigned integer value
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_uint(self,val)			{(self)->valuetype = (unsigned char)papuga_TypeUInt; (self)->encoding=0; (self)->length=0; (self)->value.UInt=(val);}
+#define papuga_init_ValueVariant_uint(self,val)			{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeUInt; s->encoding=0; s->length=0; s->value.UInt=(val);}
 
 /// \brief Variant value initializer as a signed integer value
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_int(self,val)			{(self)->valuetype = (unsigned char)papuga_TypeInt; (self)->encoding=0; (self)->length=0; (self)->value.Int=(val);}
+#define papuga_init_ValueVariant_int(self,val)			{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeInt; s->encoding=0; s->length=0; s->value.Int=(val);}
 
 /// \brief Variant value initializer as c string (UTF-8) reference
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_charp(self,val)		{(self)->valuetype = (unsigned char)papuga_TypeString; (self)->encoding=papuga_UTF8; (self)->length=strlen(val); (self)->value.string=(val);}
+#define papuga_init_ValueVariant_charp(self,val)		{papuga_ValueVariant* s = self; const char* o = val; s->valuetype = (unsigned char)papuga_TypeString; s->encoding=papuga_UTF8; s->length=strlen(o); s->value.string=o;}
 
 /// \brief Variant value initializer as c string (UTF-8) reference with size
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_string(self,val,sz)		{(self)->valuetype = (unsigned char)papuga_TypeString; (self)->encoding=papuga_UTF8; (self)->length=sz; (self)->value.string=(val);}
+#define papuga_init_ValueVariant_string(self,val,sz)		{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeString; s->encoding=papuga_UTF8; s->length=(sz); s->value.string=(val);}
 
 /// \brief Variant value initializer as unicode string reference with size and encoding
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_langstring(self,enc,val,sz)	{(self)->valuetype = (unsigned char)papuga_TypeLangString; (self)->encoding=enc; (self)->length=sz; (self)->value.langstring=(val);}
+#define papuga_init_ValueVariant_langstring(self,enc,val,sz)	{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeLangString; s->encoding=(enc); s->length=(sz); s->value.langstring=(val);}
 
 /// \brief Variant value initializer as a reference to a host object
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_hostobj(self,hostobj)		{(self)->valuetype = (unsigned char)papuga_TypeHostObject; (self)->encoding=0; (self)->length=0; (self)->value.hostObject=hostobj;}
+#define papuga_init_ValueVariant_hostobj(self,hostobj)		{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeHostObject; s->encoding=0; s->length=0; s->value.hostObject=(hostobj);}
 
 /// \brief Variant value initializer as a serialization of an object defined in the language binding
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_serialization(self,ser)	{(self)->valuetype = (unsigned char)papuga_TypeSerialization; (self)->encoding=0; (self)->length=0; (self)->value.serialization=ser;}
+#define papuga_init_ValueVariant_serialization(self,ser)	{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeSerialization; s->encoding=0; s->length=0; s->value.serialization=(ser);}
 
 /// \brief Variant value initializer as a serialization of an object defined in the language binding
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_iterator(self,itr)		{(self)->valuetype = (unsigned char)papuga_TypeIterator; (self)->encoding=0; (self)->length=0; (self)->value.iterator=itr;}
+#define papuga_init_ValueVariant_iterator(self,itr)		{papuga_ValueVariant* s = self; s->valuetype = (unsigned char)papuga_TypeIterator; s->encoding=0; s->length=0; s->value.iterator=(itr);}
 
 /// \brief Variant value initializer as a shallow copy of another variant value
 /// \param[out] self pointer to structure 
-#define papuga_init_ValueVariant_copy(self,o)			{(self)->valuetype=(o)->valuetype;(self)->encoding=(o)->encoding;(self)->length=(o)->length;(self)->value.string=(o)->value.string;}
+#define papuga_init_ValueVariant_copy(self,o)			{papuga_ValueVariant* s = self; const papuga_ValueVariant* v = o; s->valuetype=v->valuetype;s->encoding=v->encoding;s->length=v->length;s->value.string=v->value.string;}
 
 /// \brief Test if the variant value is not NULL
 /// \param[in] self pointer to structure 

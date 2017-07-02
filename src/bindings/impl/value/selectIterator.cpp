@@ -65,7 +65,7 @@ SelectIterator::SelectIterator(
 	if (papuga_ValueVariant_defined( &expression))
 	{
 		PostingsExpressionBuilder postingsBuilder( storage, queryproc, errorhnd);
-		Deserializer::buildExpression( postingsBuilder, expression, errorhnd);
+		Deserializer::buildExpression( postingsBuilder, expression, errorhnd, false);
 		m_postings = postingsBuilder.pop();
 	}
 	if (papuga_ValueVariant_defined( &restriction))

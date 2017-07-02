@@ -18,11 +18,11 @@ extern "C" {
 
 /// \brief Constructor
 /// \param[out] self pointer to structure 
-#define papuga_init_Serialization(self)			{(self)->ar=NULL;(self)->allocsize=0;(self)->arsize=0;}
+#define papuga_init_Serialization(self)			{papuga_Serialization* s = self; s->ar=NULL;s->allocsize=0;s->arsize=0;}
 
 /// \brief Destructor
 /// \param[in] self pointer to structure 
-#define papuga_destroy_Serialization(self)		{if ((self)->ar){free( (self)->ar);(self)->ar=NULL;}}
+#define papuga_destroy_Serialization(self)		{papuga_Serialization* s = self; if (s->ar){free( s->ar);s->ar=NULL;}}
 
 #define papuga_Serialization_clear(self)		{(self)->arsize=0;}
 

@@ -67,12 +67,12 @@ for _,term in ipairs(terms) do
 	-- Each query term is also part of the selection expressions
 	table.insert( selexpr, term)
 	-- Create a document feature 'seek'.
-	query:defineFeature( "seek", term, 1.0)
+	query:addFeature( "seek", term, 1.0)
 end
 -- We assign the feature created to the set named 'select' because this is the
 -- name of the set defined as selection feature in the query evaluation configuration
 -- (QueryEval.addSelectionFeature):
-query:defineFeature( "select", {"contains", 0, 1, table.unpack(selexpr)})
+query:addFeature( "select", {"contains", 0, 1, table.unpack(selexpr)})
 
 -- Define the maximum number of best result (ranks) to return:
 query:setMaxNofRanks( 20)
@@ -81,7 +81,7 @@ query:setMaxNofRanks( 20)
 query:setMinRank( 0)
 
 -- Define the title field:
-query:defineFeature( "titlefield", {from="title_start", to="title_end"} )
+query:addFeature( "titlefield", {from="title_start", to="title_end"} )
 
 -- Enable debugging
 query:setDebugMode( false )

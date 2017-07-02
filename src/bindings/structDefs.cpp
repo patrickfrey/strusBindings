@@ -579,7 +579,8 @@ MetaDataCompareDef::MetaDataCompareDef( papuga::Serialization::const_iterator& s
 		{
 			cmpop = Deserializer::getMetaDataCmpOp( si, se);
 			name = Deserializer::getString( si, se);
-			papuga_init_ValueVariant_copy( &value, getValue( si, se));
+			const papuga_ValueVariant* valueref = getValue( si, se);
+			papuga_init_ValueVariant_copy( &value, valueref);
 		}
 		else
 		{

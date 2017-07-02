@@ -23,7 +23,7 @@ const char* papuga_ErrorCode_tostring( papuga_ErrorCode errorcode);
 /// \param[out] self pointer to structure 
 /// \param[in] ptr_ pointer to buffer
 /// \param[in] size_ allocation size of the buffer in bytes
-#define papuga_init_ErrorBuffer( self, ptr_, size_)			{(self)->ptr = (ptr_); (self)->size = (size_); (self)->ptr[0]=0;}
+#define papuga_init_ErrorBuffer( self, ptr_, size_)			{papuga_ErrorBuffer* s = self; s->ptr = (ptr_); s->size = (size_); if (s->size) s->ptr[0]=0;}
 
 /// \brief Storing the current error in the buffer
 /// \param[in,out] self pointer to structure

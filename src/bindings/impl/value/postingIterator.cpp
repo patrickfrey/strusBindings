@@ -33,7 +33,7 @@ PostingIterator::PostingIterator( const ObjectRef& trace_, const ObjectRef& objb
 		throw strus::runtime_error(_TXT("null passed as expression to %s"), ITERATOR_NAME);
 	}
 	PostingsExpressionBuilder postingsBuilder( storage, queryproc, errorhnd);
-	Deserializer::buildExpression( postingsBuilder, expression, errorhnd);
+	Deserializer::buildExpression( postingsBuilder, expression, errorhnd, false);
 	m_postings = postingsBuilder.pop();
 	if (papuga_ValueVariant_defined( &restriction))
 	{

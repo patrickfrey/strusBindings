@@ -105,7 +105,7 @@ public:
 	/// \param[in] expr_ query expression that defines the postings of the feature and the variables attached
 	/// \param[in] weight_ individual weight of the feature in the query
 	/// \remark the query expression passed as parameter is refused if it does not contain exactly one element
-	void defineFeature( 
+	void addFeature( 
 			const std::string& set_,
 			const ValueVariant& expr_,
 			double weight_=1);

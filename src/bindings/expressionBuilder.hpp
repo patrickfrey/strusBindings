@@ -109,7 +109,7 @@ class QueryExpressionBuilder
 {
 public:
 	QueryExpressionBuilder( QueryInterface* query_, const QueryProcessorInterface* queryproc_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_queryproc(queryproc_),m_query(query_){}
+		:m_errorhnd(errorhnd_),m_queryproc(queryproc_),m_query(query_),m_stackSize(0){}
 	virtual ~QueryExpressionBuilder(){}
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
@@ -119,6 +119,8 @@ public:
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, bool visible);
 
+	unsigned int stackSize() const					{return m_stackSize > 0 ? m_stackSize:0;}
+
 private:
 	QueryExpressionBuilder( const QueryExpressionBuilder&){}	//< non copyable
 	void operator=( const QueryExpressionBuilder&){}		//< non copyable
@@ -127,6 +129,7 @@ private:
 	ErrorBufferInterface* m_errorhnd;
 	const QueryProcessorInterface* m_queryproc;
 	QueryInterface* m_query;
+	int m_stackSize;
 };
 
 class QueryAnalyzerTermExpressionBuilder

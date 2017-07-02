@@ -17,15 +17,15 @@ extern "C" {
 
 /// \brief Constructor of AllocatorNode
 /// \param[out] self pointer to structure initialized
-#define papuga_init_AllocatorNode(self,buf,bufsize)	{(self)->allocsize=bufsize;(self)->arsize=0;(self)->allocated=!bufsize;(self)->ar=(char*)buf;(self)->next=0;}
+#define papuga_init_AllocatorNode(self,buf,bufsize)	{papuga_Allocator* s = self; s->allocsize=bufsize;s->arsize=0;s->allocated=!bufsize;s->ar=(char*)buf;s->next=0;}
 
 /// \brief Constructor of Allocator
 /// \param[out] self pointer to structure initialized
-#define papuga_init_Allocator(self,buf,bufsize)		{(self)->root.allocsize=bufsize;(self)->root.arsize=0;(self)->root.allocated=!buf;(self)->root.ar=(char*)buf;(self)->root.next=0;(self)->reflist=0;}
+#define papuga_init_Allocator(self,buf,bufsize)		{papuga_Allocator* s = self; s->root.allocsize=bufsize;s->root.arsize=0;s->root.allocated=!buf;s->root.ar=(char*)buf;s->root.next=0;s->reflist=0;}
 
 /// \brief Destructor of Allocator
 /// \param[in] self pointer to structure destroyed
-#define papuga_destroy_Allocator(self)			{if ((self)->reflist != NULL) papuga_destroy_ReferenceHeader( (self)->reflist); if (((self)->root.ar != NULL && (self)->root.allocated) || (self)->root.next != NULL) papuga_destroy_AllocatorNode( &(self)->root);}
+#define papuga_destroy_Allocator(self)			{papuga_Allocator* s = self; if (s->reflist != NULL) papuga_destroy_ReferenceHeader( s->reflist); if ((s->root.ar != NULL && s->root.allocated) || s->root.next != NULL) papuga_destroy_AllocatorNode( &s->root);}
 
 /// \brief Destructor of linked list of AllocatorNode
 /// \param[in] nd pointer to node

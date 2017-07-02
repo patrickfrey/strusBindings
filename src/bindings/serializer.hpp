@@ -10,6 +10,7 @@
 /// \brief Serializers of all data types needed for the language bindings
 /// \file serializer.hpp
 #include "papuga/serialization.h"
+#include "papuga/errors.h"
 #include "strus/numericVariant.hpp"
 #include "strus/analyzer/document.hpp"
 #include "strus/analyzer/queryTermExpression.hpp"
@@ -33,6 +34,16 @@ namespace bindings {
 class Serializer
 {
 public:
+	static void serialize( papuga_Serialization* result, const MetaDataExpression& param)
+	{
+		papuga_ErrorCode err;
+		if (!serialize_nothrow( result, param, err)) throw std::runtime_error(papuga_ErrorCode_tostring(err));
+	}
+	static void serialize( papuga_Serialization* result, MetaDataExpression& param)
+	{
+		papuga_ErrorCode err;
+		if (!serialize_nothrow( result, param, err)) throw std::runtime_error(papuga_ErrorCode_tostring(err));
+	}
 	template<typename SERVAL>
 	static void serialize( papuga_Serialization* result, const SERVAL& param)
 	{
@@ -43,7 +54,6 @@ public:
 	{
 		if (!serialize_nothrow( result, param)) throw std::bad_alloc();
 	}
-
 	static inline bool serialize_nothrow( papuga_Serialization* result, const double& val)
 	{
 		return papuga_Serialization_pushValue_double( result, val);
@@ -104,7 +114,7 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorStorageSearchInterface::Result& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val);
-	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& err);
 	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorStorageSearchInterface::Result>& val);

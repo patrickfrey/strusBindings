@@ -1271,7 +1271,8 @@ enum ExpressionType {
 	ExpressionTerm,
 	ExpressionVariableAssignment,
 	ExpressionMetaDataRange,
-	ExpressionJoin
+	ExpressionJoin,
+	ExpressionList
 };
 
 static ExpressionType getExpressionType( papuga::Serialization::const_iterator si, const papuga::Serialization::const_iterator& se)
@@ -1328,7 +1329,7 @@ static ExpressionType getExpressionType( papuga::Serialization::const_iterator s
 				}
 				else
 				{
-					--si;
+					return ExpressionList;
 				}
 			}
 			int argc = 0;
@@ -1436,14 +1437,14 @@ static void buildExpressionJoin(
 								++si;
 								while (si != se && si->tag != papuga_TagClose)
 								{
-									Deserializer::buildExpression( builder, si, se);
+									Deserializer::buildExpression( builder, si, se, false);
 									++argc;
 								}
 								Deserializer::consumeClose( si, se);
 							}
 							else
 							{
-								Deserializer::buildExpression( builder, si, se);
+								Deserializer::buildExpression( builder, si, se, false);
 								++argc;
 							}
 						}
@@ -1496,7 +1497,7 @@ static void buildExpressionJoin(
 				}
 				while (si != se && si->tag != papuga_TagClose)
 				{
-					Deserializer::buildExpression( builder, si, se);
+					Deserializer::buildExpression( builder, si, se, false);
 					++argc;
 				}
 				Deserializer::consumeClose( si, se);
@@ -1522,10 +1523,22 @@ static void buildExpressionJoin(
 	}
 }
 
-void Deserializer::buildExpression(
+void Deserializer::buildExpressionList(
 		ExpressionBuilder& builder,
 		papuga::Serialization::const_iterator& si,
 		const papuga::Serialization::const_iterator& se)
+{
+	while (si != se && si->tag != papuga_TagClose)
+	{
+		buildExpression( builder, si, se, false);
+	}
+}
+
+void Deserializer::buildExpression(
+		ExpressionBuilder& builder,
+		papuga::Serialization::const_iterator& si,
+		const papuga::Serialization::const_iterator& se,
+		bool allowLists)
 {
 	const char* context = "expression";
 	if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s"), context);
@@ -1557,13 +1570,24 @@ void Deserializer::buildExpression(
 			buildExpressionJoin( builder, si, se);
 			break;
 		}
+		case ExpressionList:
+		{
+			if (!allowLists) throw strus::runtime_error(_TXT("single expression expected in %s"), context);
+			if (si->tag == papuga_TagOpen)
+			{
+				++si;
+				buildExpressionList( builder, si, se);
+				Deserializer::consumeClose( si, se);
+			}
+		}
 	}
 }
 
 void Deserializer::buildExpression(
 		ExpressionBuilder& builder,
 		const papuga_ValueVariant& expression,
-		ErrorBufferInterface* errorhnd)
+		ErrorBufferInterface* errorhnd,
+		bool allowLists)
 {
 	static const char* context = _TXT("expression");
 	if (expression.valuetype != papuga_TypeSerialization)
@@ -1577,7 +1601,7 @@ void Deserializer::buildExpression(
 			se = papuga::Serialization::end( expression.value.serialization);
 		try
 		{
-			buildExpression( builder, si, se);
+			buildExpression( builder, si, se, allowLists);
 		}
 		catch (const std::runtime_error& err)
 		{
@@ -1614,7 +1638,7 @@ void Deserializer::buildPattern(
 				{
 					case 0: name = ValueVariantWrap::tostring( *getValue( si, se));
 						break;
-					case 1: buildExpression( builder, si, se);
+					case 1: buildExpression( builder, si, se, false);
 						break;
 					case 2: visible = ValueVariantWrap::tobool( *getValue( si, se));
 						break;
@@ -1652,7 +1676,7 @@ void Deserializer::buildPattern(
 			if (si->tag == papuga_TagValue)
 			{
 				name = getString( si, se);
-				buildExpression( builder, si, se);
+				buildExpression( builder, si, se, false);
 			}
 			else
 			{
@@ -2395,8 +2419,8 @@ static void buildMetaDataRestriction_(
 						builder.addCondition( def.cmpop, def.name, def.value, newGroup);
 						newGroup = false;
 					}
+					Deserializer::consumeClose( si, se);
 				}
-				Deserializer::consumeClose( si, se);
 			}
 			Deserializer::consumeClose( si, se);
 		}

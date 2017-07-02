@@ -556,7 +556,7 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& ex
 	if (!termexpr.get()) throw strus::runtime_error( _TXT("failed to create term expression: %s"), errorhnd->fetchError());
 
 	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
-	Deserializer::buildExpression( exprbuilder, expression, errorhnd);
+	Deserializer::buildExpression( exprbuilder, expression, errorhnd, true);
 	termexpr->analyze();
 
 	if (errorhnd->hasError())
@@ -566,7 +566,7 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& ex
 	return termexpr.release();
 }
 
-MetaDataExpression* QueryAnalyzerImpl::analyzeMetaData( const ValueVariant& expression)
+MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVariant& expression)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();

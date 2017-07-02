@@ -229,7 +229,7 @@ struct MetaDataComparison
 		return rt;
 	}
 };
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& err)
 {
 	try
 	{
@@ -259,8 +259,10 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 					}
 					else
 					{
+						err = papuga_TypeError;
 						return false;
 					}
+					break;
 				}
 				case analyzer::QueryTermExpression::Instruction::Operator:
 				{
@@ -271,8 +273,11 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 						{
 							if (termc > 1)
 							{
-								if (termc > ii->nofOperands()) return false;
-
+								if (termc > ii->nofOperands())
+								{
+									err = papuga_NofArgsError;
+									return false;
+								}
 								// We check that all operands of an OR are atomic terms (CNF):
 								std::vector<MetaDataComparison>::iterator
 									ci = cmplist.end() - termc + 1, ce = cmplist.end();
@@ -286,8 +291,10 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 					}
 					else
 					{
+						err = papuga_TypeError;
 						return false;
 					}
+					break;
 				}
 			}
 		}
@@ -298,7 +305,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 		{
 			std::vector<MetaDataComparison>::const_iterator cn = ci;
 			unsigned int argcnt = 1;
-			for (++cn; cn != ce && !cn->newGroup; ++cn){}
+			for (++cn; cn != ce && !cn->newGroup; ++cn,++argcnt){}
 			if (argcnt > 1)
 			{
 				rt &= papuga_Serialization_pushOpen( result);
@@ -315,10 +322,16 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 			}
 			
 		}
+		rt &= papuga_Serialization_pushClose( result);
+		if (!rt)
+		{
+			err = papuga_NoMemError;
+		}
 		return rt;
 	}
 	catch (const std::bad_alloc&)
 	{
+		err = papuga_NoMemError;
 		return false;
 	}
 }

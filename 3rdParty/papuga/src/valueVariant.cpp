@@ -333,7 +333,7 @@ static NumericType langstring_tonumstr( char* destbuf, size_t destbufsize, const
 	}
 	destbuf[ destpos++] = chr;
 
-	for (++itr; 0!=(chr=itr.ascii()) && destpos < destbufsize; ++itr)
+	for (; 0!=(chr=itr.ascii()) && destpos < destbufsize; ++itr)
 	{
 		if (chr == '.')
 		{
@@ -406,7 +406,7 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 		case NumericDouble:
 		{
 			papuga_Float val;
-			if (scanf( SCAN_FORMAT_DOUBLE, &val) < 1)
+			if (std::sscanf( numstr, SCAN_FORMAT_DOUBLE, &val) < 1)
 			{
 				return false;
 			}
@@ -416,7 +416,7 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 		case NumericInt:
 		{
 			papuga_Int val;
-			if (scanf( SCAN_FORMAT_INT, &val) < 1)
+			if (std::sscanf( numstr, SCAN_FORMAT_INT, &val) < 1)
 			{
 				return false;
 			}
@@ -426,7 +426,7 @@ static bool numstr_to_variant( papuga_ValueVariant* value, NumericType numtype, 
 		case NumericUInt:
 		{
 			papuga_UInt val;
-			if (scanf( SCAN_FORMAT_UINT, &val) < 1)
+			if (std::sscanf( numstr, SCAN_FORMAT_UINT, &val) < 1)
 			{
 				return false;
 			}
@@ -824,7 +824,7 @@ extern "C" bool papuga_ValueVariant_tobool( const papuga_ValueVariant* value, pa
 				if (numstr[0] == '1' || (numstr[0]|32) == 'y' || (numstr[0]|32) == 't') return true;
 				if (numstr[0] == '0' || (numstr[0]|32) == 'n' || (numstr[0]|32) == 'f') return false;
 			}
-			if (scanf( "%d", &rt) < 1)
+			if (std::sscanf( numstr, "%d", &rt) < 1)
 			{
 				*err = papuga_TypeError;
 				return 0;

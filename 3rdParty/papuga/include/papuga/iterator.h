@@ -20,7 +20,7 @@ extern "C" {
 /// \param[in] object_ pointer to iterator context object
 /// \param[in] destroy_ destructor of the iterated object in case of ownership
 /// \param[in] getNext_ method of the iterated object to fetch the next element
-#define papuga_init_Iterator( self, object_, destroy_, getNext_)	{(self)->data=object_; (self)->destroy=destroy_; (self)->getNext=getNext_;}
+#define papuga_init_Iterator( self, object_, destroy_, getNext_)	{papuga_Iterator* s = self; s->data=object_; s->destroy=destroy_; s->getNext=getNext_;}
 
 /// \brief Release of ownership of an iterated object reference
 /// \param[in,out] self pointer to structure
@@ -28,7 +28,7 @@ extern "C" {
 
 /// \brief Destructor of an iterated object reference
 /// \param[in,out] self pointer to structure
-#define papuga_destroy_Iterator( self)					{if ((self)->destroy) {(self)->destroy( (self)->data);(self)->destroy=0;}}
+#define papuga_destroy_Iterator( self)					{papuga_Iterator* s = self; if (s->destroy) {s->destroy( s->data);s->destroy=0;}}
 
 #ifdef __cplusplus
 }

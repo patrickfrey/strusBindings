@@ -56,9 +56,13 @@ function createQueryEval_mdprim( strusctx)
 				match={feature="seek"}, debug="debug_weighting"
 			})
 	
-	-- Now we define what attributes of the documents are returned and how they are build.
+	-- Now we define what attributes of the documents are returned and how they are build:
 	queryEval:addSummarizer( "attribute", {{"name", "docid"},{"debug","debug_attribute"}})
-	
+	queryEval:addSummarizer( "metadata", {{"name", "cross"},{"debug","debug_metadata"}})
+	queryEval:addSummarizer( "metadata", {{"name", "factors"},{"debug","debug_metadata"}})
+	queryEval:addSummarizer( "metadata", {{"name", "lo"},{"debug","debug_metadata"}})
+	queryEval:addSummarizer( "metadata", {{"name", "hi"},{"debug","debug_metadata"}})
+
 	-- Then we add a summarizer that collects the sections that enclose the best matches 
 	-- in a ranked document:
 	queryEval:addSummarizer( "forwardindex", { {"type","word"}, {"debug","debug_forwardindex"} })
