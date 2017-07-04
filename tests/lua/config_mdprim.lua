@@ -25,6 +25,7 @@ function createDocumentAnalyzer_mdprim( strusctx)
 	analyzer:addSearchIndexFeature( "word", "/list/doc/content()", "word", "orig")
 	analyzer:addForwardIndexFeature( "word", "/list/doc/content()", "word", "orig")
 	analyzer:defineAttribute( "docid", "/list/doc@id", "content", "orig")
+	analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
 
 	return analyzer
 end
@@ -40,7 +41,7 @@ function createQueryAnalyzer_mdprim( strusctx)
 end
 
 function metadata_mdprim()
-	return 'cross UINT8, factors UINT8, lo UINT16, hi UINT16'
+	return 'cross UINT8, factors UINT8, lo UINT16, hi UINT16, doclen UINT16'
 end
 
 function createQueryEval_mdprim( strusctx)
@@ -55,7 +56,12 @@ function createQueryEval_mdprim( strusctx)
 		"tf", {
 				match={feature="seek"}, debug="debug_weighting"
 			})
-	
+	queryEval:addWeightingFunction(
+		"metadata", {
+				name="doclen"
+			})
+	queryEval:defineWeightingFormula( "_0 / _1" )
+
 	-- Now we define what attributes of the documents are returned and how they are build:
 	queryEval:addSummarizer( "attribute", {{"name", "docid"},{"debug","debug_attribute"}})
 	queryEval:addSummarizer( "metadata", {{"name", "cross"},{"debug","debug_metadata"}})

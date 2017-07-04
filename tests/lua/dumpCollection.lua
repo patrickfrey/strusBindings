@@ -1,4 +1,5 @@
 require "string"
+require "utils"
 
 function dumpCollection( strusctx, storagePath)
 	local config = string.format( "path=%s; cache=512M; statsproc=default", storagePath)
@@ -9,7 +10,7 @@ function dumpCollection( strusctx, storagePath)
 
 	-- Configuration of the storage:
 	local output_config = {}
-	for key,value in pairs(storage:config()) do
+	for key,value in pairs( storage:config()) do
 		if key == 'path' then
 			output_config[ key] = getFileName( value)
 		else

@@ -14,7 +14,7 @@ ctx:loadModule( "analyzer_pattern")
 local aclmap = {["A.xml"]="a",["B.xml"]="b",["C.xml"]="c"}
 
 createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, aclmap)
-local result = "collection dump:" .. dumpTree( "", dumpCollection( ctx, storage)) .. "\n"
+local result = "collection dump:" .. dumpTree( dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
 string config:
@@ -34,6 +34,7 @@ string docids:
 string docs:
   string A.xml:
     string ACL: "a"
+    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme=nil"
     string docid: "A.xml"
     string doclen: 20
     string docno: 3
@@ -45,6 +46,7 @@ string docs:
     string word: "one day in tokyo is a citi that complet differ than what you would expect as european citizen"
   string B.xml:
     string ACL: "b"
+    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme=nil"
     string docid: "B.xml"
     string doclen: 16
     string docno: 2
@@ -56,6 +58,7 @@ string docs:
     string word: "in is a citi you visit new york with dimens can t imagin"
   string C.xml:
     string ACL: "c"
+    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme=nil"
     string docid: "C.xml"
     string doclen: 16
     string docno: 1

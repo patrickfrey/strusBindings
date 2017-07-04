@@ -15,12 +15,12 @@ ctx:loadModule( "analyzer_pattern")
 local aclmap = {["1"]='A',["2"]='A',["3"]='A',["4"]='A',["5"]='A',["6"]='B',["7"]='B',["8"]='B',["9"]='B',["10"]='B'}
 
 createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap)
-local result = "collection dump:" .. dumpTree( "", dumpCollection( ctx, storage)) .. "\n"
+local result = "collection dump:" .. dumpTree( dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
 string config:
   string cache: "524288K"
-  string metadata: "lo UInt16,hi UInt16,cross UInt8,factors UInt8"
+  string metadata: "lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
   string path: "storage"
 string docids:
   number 1:
@@ -58,6 +58,7 @@ string docs:
     string ACL: "A"
     string cross: 1
     string docid: "1"
+    string doclen: 0
     string docno: 10
     string factors: 0
     string hi: 0
@@ -66,6 +67,7 @@ string docs:
     string ACL: "B"
     string cross: 1
     string docid: "10"
+    string doclen: 2
     string docno: 1
     string factors: 1
     string hi: 5
@@ -75,6 +77,7 @@ string docs:
     string ACL: "A"
     string cross: 2
     string docid: "2"
+    string doclen: 1
     string docno: 9
     string factors: 0
     string hi: 2
@@ -84,6 +87,7 @@ string docs:
     string ACL: "A"
     string cross: 3
     string docid: "3"
+    string doclen: 1
     string docno: 6
     string factors: 0
     string hi: 3
@@ -93,6 +97,7 @@ string docs:
     string ACL: "A"
     string cross: 4
     string docid: "4"
+    string doclen: 2
     string docno: 5
     string factors: 1
     string hi: 2
@@ -102,6 +107,7 @@ string docs:
     string ACL: "A"
     string cross: 5
     string docid: "5"
+    string doclen: 1
     string docno: 4
     string factors: 0
     string hi: 5
@@ -111,6 +117,7 @@ string docs:
     string ACL: "B"
     string cross: 6
     string docid: "6"
+    string doclen: 2
     string docno: 8
     string factors: 1
     string hi: 3
@@ -120,6 +127,7 @@ string docs:
     string ACL: "B"
     string cross: 7
     string docid: "7"
+    string doclen: 1
     string docno: 7
     string factors: 0
     string hi: 7
@@ -129,6 +137,7 @@ string docs:
     string ACL: "B"
     string cross: 8
     string docid: "8"
+    string doclen: 3
     string docno: 2
     string factors: 2
     string hi: 2
@@ -138,6 +147,7 @@ string docs:
     string ACL: "B"
     string cross: 9
     string docid: "9"
+    string doclen: 2
     string docno: 3
     string factors: 1
     string hi: 3

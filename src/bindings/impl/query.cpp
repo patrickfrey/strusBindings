@@ -93,7 +93,7 @@ void QueryEvalImpl::addWeightingFunction(
 		queryeval, name, parameter, m_queryproc, errorhnd);
 }
 
-void QueryEvalImpl::addWeightingFormula(
+void QueryEvalImpl::defineWeightingFormula(
 		const std::string& source,
 		const ValueVariant& parameter)
 {

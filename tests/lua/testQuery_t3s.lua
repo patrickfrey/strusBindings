@@ -101,7 +101,7 @@ for pos,result in ipairs(results.ranks) do
 end
 output[ "ResultList"] = output_list
 
-local result = "query evaluation:" .. dumpTree( "", output) .. "\n"
+local result = "query evaluation:" .. dumpTree( output) .. "\n"
 local expected = [[
 query evaluation:
 string QueryDump: "query evaluation program:

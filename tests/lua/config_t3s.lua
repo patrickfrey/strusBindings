@@ -13,7 +13,7 @@ function createDocumentAnalyzer_t3s( strusctx)
 	analyzer:defineAttribute( "title", "/doc/title()", "content", "orig")
 	analyzer:defineAggregatedMetaData( "title_end", {"nextpos", "endtitle"})
 	analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
-	
+
 	-- analyzer:definePatternMatcherPostProc( "coresult", "std", {"word"}, {
 	-- 	{"city_that_is", {"sequence", 3, {"word","citi"},{"word","that"},{"word","is"}} },
 	-- 	{"city_that", {"sequence", 2, {"word","citi"},{"word","that"}}},

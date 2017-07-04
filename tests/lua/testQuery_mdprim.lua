@@ -48,10 +48,10 @@ local query = queryEval:createQuery( storage)
 -- First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
 local terms = analyzer:analyzeTermExpression( {"word",queryPhrase})
 -- local texpr = analyzer:analyzeTermExpression( {"union", {"sequence", 10, {"sequence", 10, {"word","2"}, {"word","3"}}, {"word","5"}}, {"sequence", 10, {"sequence", 10, {"word","2"}, {"word","5"}}, {"word","7"}} } )
-local mexpr = analyzer:analyzeMetaDataExpression( { {{"<","cross","012 "},{">","cross"," 24"}}, {">","factors"," 0 "} } )
+local mexpr = analyzer:analyzeMetaDataExpression( { {{"<","cross","010 "},{">","cross"," 14"}}, {">","factors"," 0 "} } )
 local texpr_plain = {
-			{"sequence_imm", {"word","2"}, {"word","3"}},
-			{"sequence_imm", {"sequence_imm", {"word","2"}, {"word","3"}}, {"word","5"}}
+			{"sequence_imm", {"word","2"}, {"word","2"}, {"word","2"}, {"word","2"}},
+			{"sequence_imm", {"sequence_imm", {"word","2"}, {"word","3"}}, {"union", {"sequence_imm", {"word","3"}, {"word","5"}}, {"word","5"}, {"word","7"}, {"word","11"}}}
 		}
 local texpr = analyzer:analyzeTermExpression( texpr_plain)
 
@@ -71,18 +71,13 @@ local selexpr = {}
 for _,term in ipairs(terms) do
 	-- Each query term is also part of the selection expressions
 	table.insert( selexpr, term)
-	-- Create a document feature 'seek'.
---	query:addFeature( "seek", term, 1.0)
 end
-for _,texprelem in ipairs(texpr) do
---	query:addFeature( "seek", texprelem)
-end
-query:addFeature( "seek", texpr_plain)
+query:addFeature( "seek", texpr)
 
 -- We assign the feature created to the set named 'select' because this is the
 -- name of the set defined as selection feature in the query evaluation configuration
 -- (QueryEval.addSelectionFeature):
-query:addFeature( "select", {"contains", 0, 1, table.unpack(selexpr)})
+query:addFeature( "select", {"contains", 0, 2, table.unpack(selexpr)})
 
 -- Define the maximum number of best result (ranks) to return:
 query:setMaxNofRanks( 20)
@@ -91,7 +86,7 @@ query:setMaxNofRanks( 20)
 query:setMinRank( 0)
 
 -- Query restriction
-query:addMetaDataRestriction( { {{"<","cross",12},{">","cross",24}}, {">","factors",0} } )
+query:addMetaDataRestriction( { {{"<","cross",10},{">","cross",14}}, {">","factors",0} } )
 query:addMetaDataRestriction( mexpr )
 
 -- Enable debugging
@@ -115,12 +110,13 @@ for pos,result in ipairs(results.ranks) do
 end
 output[ "ResultList"] = output_list
 
-local result = "query evaluation:" .. dumpTree( "", output) .. "\n"
+local result = "query evaluation:" .. dumpTree( output) .. "\n"
 local expected = [[
 query evaluation:
 string QueryDump: "query evaluation program:
 SELECT select;
 EVAL  tf( match= %seek);
+EVAL  metadata( name=doclen, weight=1);
 SUMMARIZE attribute( metaname='docid', resultname='docid');
 SUMMARIZE metadata( metaname='cross', resultname='cross');
 SUMMARIZE metadata( metaname='factors', resultname='factors');
@@ -128,12 +124,27 @@ SUMMARIZE metadata( metaname='lo', resultname='lo');
 SUMMARIZE metadata( metaname='hi', resultname='hi');
 SUMMARIZE forwardindex( type='word' resultname='word' N=100);
 feature 'seek' 1.00000: 
-  sequence range=1 cardinality=0:
+  sequence_imm range=0 cardinality=0:
+    sequence_imm range=0 cardinality=0:
+      term word '2'
+      term word '3'
+    union range=0 cardinality=0:
+      sequence_imm range=0 cardinality=0:
+        term word '3'
+        term word '5'
+      term word '5'
+      term word '7'
+      term word '11'
+
+feature 'seek' 1.00000: 
+  sequence_imm range=0 cardinality=0:
     term word '2'
-    term word '3'
+    term word '2'
+    term word '2'
+    term word '2'
 
 feature 'select' 1.00000: 
-  contains range=0 cardinality=1:
+  contains range=0 cardinality=2:
     term word '2'
     term word '3'
 
@@ -149,45 +160,83 @@ string QueryExpr:
         string value: "2"
       number 2:
         string type: "word"
-        string value: "3"
-    string op: "sequence"
-    string range: 1
+        string value: "2"
+      number 3:
+        string type: "word"
+        string value: "2"
+      number 4:
+        string type: "word"
+        string value: "2"
+    string op: "sequence_imm"
+  number 2:
+    string arg:
+      number 1:
+        string arg:
+          number 1:
+            string type: "word"
+            string value: "2"
+          number 2:
+            string type: "word"
+            string value: "3"
+        string op: "sequence_imm"
+      number 2:
+        string arg:
+          number 1:
+            string arg:
+              number 1:
+                string type: "word"
+                string value: "3"
+              number 2:
+                string type: "word"
+                string value: "5"
+            string op: "sequence_imm"
+          number 2:
+            string type: "word"
+            string value: "5"
+          number 3:
+            string type: "word"
+            string value: "7"
+          number 4:
+            string type: "word"
+            string value: "11"
+        string op: "union"
+    string op: "sequence_imm"
 string QueryRestr:
   number 1:
     number 1:
       string name: "cross"
       string op: "<"
-      string value: 12
+      string value: 10
     number 2:
       string name: "cross"
       string op: ">"
-      string value: 24
+      string value: 14
   number 2:
     string name: "factors"
     string op: ">"
     string value: 0
 string QueryResult:
-  string nofranked: 183
-  string nofvisited: 367
+  string nofranked: 70
+  string nofvisited: 91
   string pass: 0
   string ranks:
     number 1:
-      string docno: 996
+      string docno: 377
       string summary:
         number 1:
           string index: -1
           string name: "docid"
-          string value: "210"
+          string value: "384"
           string weight: 1
         number 2:
           string index: -1
           string name: "cross"
-          string value: "3"
+          string value: "15"
           string weight: 1
         number 3:
           string index: -1
           string name: "factors"
-          string value: "3"
+          string value: "7"
           string weight: 1
         number 4:
           string index: -1
@@ -197,7 +246,7 @@ string QueryResult:
         number 5:
           string index: -1
           string name: "hi"
-          string value: "7"
+          string value: "3"
           string weight: 1
         number 6:
           string index: 1
@@ -207,36 +256,56 @@ string QueryResult:
         number 7:
           string index: 2
           string name: "word"
-          string value: "3"
+          string value: "2"
           string weight: 1
         number 8:
           string index: 3
           string name: "word"
-          string value: "5"
+          string value: "2"
           string weight: 1
         number 9:
           string index: 4
           string name: "word"
-          string value: "7"
+          string value: "2"
           string weight: 1
-      string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 11:
+          string index: 6
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 12:
+          string index: 7
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 13:
+          string index: 8
+          string name: "word"
+          string value: "3"
+          string weight: 1
+      string weight: 0.50000
     number 2:
-      string docno: 990
+      string docno: 376
       string summary:
         number 1:
           string index: -1
           string name: "docid"
-          string value: "6"
+          string value: "960"
           string weight: 1
         number 2:
           string index: -1
           string name: "cross"
-          string value: "6"
+          string value: "15"
           string weight: 1
         number 3:
           string index: -1
           string name: "factors"
-          string value: "1"
+          string value: "7"
           string weight: 1
         number 4:
           string index: -1
@@ -246,7 +315,7 @@ string QueryResult:
         number 5:
           string index: -1
           string name: "hi"
-          string value: "3"
+          string value: "5"
           string weight: 1
         number 6:
           string index: 1
@@ -256,9 +325,39 @@ string QueryResult:
         number 7:
           string index: 2
           string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 11:
+          string index: 6
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 12:
+          string index: 7
+          string name: "word"
           string value: "3"
           string weight: 1
-      string weight: 1
+        number 13:
+          string index: 8
+          string name: "word"
+          string value: "5"
+          string weight: 1
+      string weight: 0.50000
     number 3:
       string docno: 983
       string summary:
@@ -302,454 +401,8 @@ string QueryResult:
           string name: "word"
           string value: "5"
           string weight: 1
-      string weight: 1
+      string weight: 0.33333
     number 4:
-      string docno: 968
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "12"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "3"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "2"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 5:
-      string docno: 928
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "24"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "6"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "3"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 6:
-      string docno: 920
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "252"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "4"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "7"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 10:
-          string index: 5
-          string name: "word"
-          string value: "7"
-          string weight: 1
-      string weight: 1
-    number 7:
-      string docno: 904
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "18"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "2"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 8:
-      string docno: 891
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "324"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "5"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 10:
-          string index: 5
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 11:
-          string index: 6
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 9:
-      string docno: 890
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "54"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "3"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 10:
-      string docno: 879
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "36"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "3"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 11:
-      string docno: 875
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "300"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "3"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "4"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "5"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "5"
-          string weight: 1
-        number 10:
-          string index: 5
-          string name: "word"
-          string value: "5"
-          string weight: 1
-      string weight: 1
-    number 12:
-      string docno: 839
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "102"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "3"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "2"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "17"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "17"
-          string weight: 1
-      string weight: 1
-    number 13:
       string docno: 828
       string summary:
         number 1:
@@ -807,62 +460,8 @@ string QueryResult:
           string name: "word"
           string value: "5"
           string weight: 1
-      string weight: 1
-    number 14:
-      string docno: 818
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "108"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "4"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "3"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 10:
-          string index: 5
-          string name: "word"
-          string value: "3"
-          string weight: 1
-      string weight: 1
-    number 15:
+      string weight: 0.33333
+    number 5:
       string docno: 809
       string summary:
         number 1:
@@ -905,8 +504,180 @@ string QueryResult:
           string name: "word"
           string value: "7"
           string weight: 1
-      string weight: 1
-    number 16:
+      string weight: 0.33333
+    number 6:
+      string docno: 716
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "96"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "15"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "5"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "3"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 11:
+          string index: 6
+          string name: "word"
+          string value: "3"
+          string weight: 1
+      string weight: 0.33333
+    number 7:
+      string docno: 599
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "288"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "18"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "6"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "3"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 11:
+          string index: 6
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 12:
+          string index: 7
+          string name: "word"
+          string value: "3"
+          string weight: 1
+      string weight: 0.28571
+    number 8:
+      string docno: 996
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "210"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "3"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "3"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "7"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "5"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "7"
+          string weight: 1
+      string weight: 0.25000
+    number 9:
       string docno: 789
       string summary:
         number 1:
@@ -954,165 +725,8 @@ string QueryResult:
           string name: "word"
           string value: "5"
           string weight: 1
-      string weight: 1
-    number 17:
-      string docno: 784
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "312"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "6"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "4"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "13"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 10:
-          string index: 5
-          string name: "word"
-          string value: "13"
-          string weight: 1
-      string weight: 1
-    number 18:
-      string docno: 782
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "126"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "3"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "7"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "7"
-          string weight: 1
-      string weight: 1
-    number 19:
-      string docno: 776
-      string summary:
-        number 1:
-          string index: -1
-          string name: "docid"
-          string value: "270"
-          string weight: 1
-        number 2:
-          string index: -1
-          string name: "cross"
-          string value: "9"
-          string weight: 1
-        number 3:
-          string index: -1
-          string name: "factors"
-          string value: "4"
-          string weight: 1
-        number 4:
-          string index: -1
-          string name: "lo"
-          string value: "2"
-          string weight: 1
-        number 5:
-          string index: -1
-          string name: "hi"
-          string value: "5"
-          string weight: 1
-        number 6:
-          string index: 1
-          string name: "word"
-          string value: "2"
-          string weight: 1
-        number 7:
-          string index: 2
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 8:
-          string index: 3
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 9:
-          string index: 4
-          string name: "word"
-          string value: "3"
-          string weight: 1
-        number 10:
-          string index: 5
-          string name: "word"
-          string value: "5"
-          string weight: 1
-      string weight: 1
-    number 20:
+      string weight: 0.25000
+    number 10:
       string docno: 774
       string summary:
         number 1:
@@ -1160,7 +774,522 @@ string QueryResult:
           string name: "word"
           string value: "5"
           string weight: 1
-      string weight: 1
+      string weight: 0.25000
+    number 11:
+      string docno: 640
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "132"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "6"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "3"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "11"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "11"
+          string weight: 1
+      string weight: 0.25000
+    number 12:
+      string docno: 627
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "150"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "6"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "3"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "5"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "5"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "5"
+          string weight: 1
+      string weight: 0.25000
+    number 13:
+      string docno: 559
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "330"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "6"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "3"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "11"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "5"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "11"
+          string weight: 1
+      string weight: 0.25000
+    number 14:
+      string docno: 454
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "294"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "15"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "3"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "7"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "7"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "7"
+          string weight: 1
+      string weight: 0.25000
+    number 15:
+      string docno: 7
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "966"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "21"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "3"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "23"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "7"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "23"
+          string weight: 1
+      string weight: 0.25000
+    number 16:
+      string docno: 875
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "300"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "3"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "4"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "5"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "5"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "5"
+          string weight: 1
+      string weight: 0.20000
+    number 17:
+      string docno: 770
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "180"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "9"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "4"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "5"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "5"
+          string weight: 1
+      string weight: 0.20000
+    number 18:
+      string docno: 677
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "120"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "3"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "4"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "5"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "5"
+          string weight: 1
+      string weight: 0.20000
+    number 19:
+      string docno: 598
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "168"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "15"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "4"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "7"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "7"
+          string weight: 1
+      string weight: 0.20000
+    number 20:
+      string docno: 342
+      string summary:
+        number 1:
+          string index: -1
+          string name: "docid"
+          string value: "420"
+          string weight: 1
+        number 2:
+          string index: -1
+          string name: "cross"
+          string value: "6"
+          string weight: 1
+        number 3:
+          string index: -1
+          string name: "factors"
+          string value: "4"
+          string weight: 1
+        number 4:
+          string index: -1
+          string name: "lo"
+          string value: "2"
+          string weight: 1
+        number 5:
+          string index: -1
+          string name: "hi"
+          string value: "7"
+          string weight: 1
+        number 6:
+          string index: 1
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 7:
+          string index: 2
+          string name: "word"
+          string value: "2"
+          string weight: 1
+        number 8:
+          string index: 3
+          string name: "word"
+          string value: "3"
+          string weight: 1
+        number 9:
+          string index: 4
+          string name: "word"
+          string value: "5"
+          string weight: 1
+        number 10:
+          string index: 5
+          string name: "word"
+          string value: "7"
+          string weight: 1
+      string weight: 0.20000
 string QueryString: "2 3"
 string QueryTerms:
   number 1:
@@ -1170,208 +1299,224 @@ string QueryTerms:
     string type: "word"
     string value: "3"
 string ResultList:
-  number 1: "rank 1: 996 1.00000"
-  number 2: "    docid: '210'"
-  number 3: "    cross: '3'"
-  number 4: "    factors: '3'"
+  number 1: "rank 1: 377 0.50000"
+  number 2: "    docid: '384'"
+  number 3: "    cross: '15'"
+  number 4: "    factors: '7'"
   number 5: "    lo: '2'"
-  number 6: "    hi: '7'"
+  number 6: "    hi: '3'"
   number 7: "    word: '2'"
-  number 8: "    word: '3'"
-  number 9: "    word: '5'"
-  number 10: "    word: '7'"
-  number 11: "rank 2: 990 1.00000"
-  number 12: "    docid: '6'"
-  number 13: "    cross: '6'"
-  number 14: "    factors: '1'"
-  number 15: "    lo: '2'"
-  number 16: "    hi: '3'"
-  number 17: "    word: '2'"
-  number 18: "    word: '3'"
-  number 19: "rank 3: 983 1.00000"
-  number 20: "    docid: '30'"
-  number 21: "    cross: '3'"
-  number 22: "    factors: '2'"
-  number 23: "    lo: '2'"
-  number 24: "    hi: '5'"
+  number 8: "    word: '2'"
+  number 9: "    word: '2'"
+  number 10: "    word: '2'"
+  number 11: "    word: '2'"
+  number 12: "    word: '2'"
+  number 13: "    word: '2'"
+  number 14: "    word: '3'"
+  number 15: "rank 2: 376 0.50000"
+  number 16: "    docid: '960'"
+  number 17: "    cross: '15'"
+  number 18: "    factors: '7'"
+  number 19: "    lo: '2'"
+  number 20: "    hi: '5'"
+  number 21: "    word: '2'"
+  number 22: "    word: '2'"
+  number 23: "    word: '2'"
+  number 24: "    word: '2'"
   number 25: "    word: '2'"
-  number 26: "    word: '3'"
-  number 27: "    word: '5'"
-  number 28: "rank 4: 968 1.00000"
-  number 29: "    docid: '12'"
-  number 30: "    cross: '3'"
-  number 31: "    factors: '2'"
-  number 32: "    lo: '2'"
-  number 33: "    hi: '3'"
-  number 34: "    word: '2'"
+  number 26: "    word: '2'"
+  number 27: "    word: '3'"
+  number 28: "    word: '5'"
+  number 29: "rank 3: 983 0.33333"
+  number 30: "    docid: '30'"
+  number 31: "    cross: '3'"
+  number 32: "    factors: '2'"
+  number 33: "    lo: '2'"
+  number 34: "    hi: '5'"
   number 35: "    word: '2'"
   number 36: "    word: '3'"
-  number 37: "rank 5: 928 1.00000"
-  number 38: "    docid: '24'"
-  number 39: "    cross: '6'"
-  number 40: "    factors: '3'"
-  number 41: "    lo: '2'"
-  number 42: "    hi: '3'"
-  number 43: "    word: '2'"
+  number 37: "    word: '5'"
+  number 38: "rank 4: 828 0.33333"
+  number 39: "    docid: '240'"
+  number 40: "    cross: '6'"
+  number 41: "    factors: '5'"
+  number 42: "    lo: '2'"
+  number 43: "    hi: '5'"
   number 44: "    word: '2'"
   number 45: "    word: '2'"
-  number 46: "    word: '3'"
-  number 47: "rank 6: 920 1.00000"
-  number 48: "    docid: '252'"
-  number 49: "    cross: '9'"
-  number 50: "    factors: '4'"
-  number 51: "    lo: '2'"
-  number 52: "    hi: '7'"
-  number 53: "    word: '2'"
-  number 54: "    word: '2'"
-  number 55: "    word: '3'"
-  number 56: "    word: '3'"
-  number 57: "    word: '7'"
-  number 58: "rank 7: 904 1.00000"
-  number 59: "    docid: '18'"
-  number 60: "    cross: '9'"
-  number 61: "    factors: '2'"
-  number 62: "    lo: '2'"
-  number 63: "    hi: '3'"
-  number 64: "    word: '2'"
-  number 65: "    word: '3'"
-  number 66: "    word: '3'"
-  number 67: "rank 8: 891 1.00000"
-  number 68: "    docid: '324'"
-  number 69: "    cross: '9'"
-  number 70: "    factors: '5'"
-  number 71: "    lo: '2'"
-  number 72: "    hi: '3'"
-  number 73: "    word: '2'"
-  number 74: "    word: '2'"
-  number 75: "    word: '3'"
-  number 76: "    word: '3'"
-  number 77: "    word: '3'"
-  number 78: "    word: '3'"
-  number 79: "rank 9: 890 1.00000"
-  number 80: "    docid: '54'"
-  number 81: "    cross: '9'"
-  number 82: "    factors: '3'"
-  number 83: "    lo: '2'"
-  number 84: "    hi: '3'"
-  number 85: "    word: '2'"
-  number 86: "    word: '3'"
-  number 87: "    word: '3'"
-  number 88: "    word: '3'"
-  number 89: "rank 10: 879 1.00000"
-  number 90: "    docid: '36'"
-  number 91: "    cross: '9'"
-  number 92: "    factors: '3'"
-  number 93: "    lo: '2'"
-  number 94: "    hi: '3'"
-  number 95: "    word: '2'"
-  number 96: "    word: '2'"
-  number 97: "    word: '3'"
-  number 98: "    word: '3'"
-  number 99: "rank 11: 875 1.00000"
-  number 100: "    docid: '300'"
-  number 101: "    cross: '3'"
-  number 102: "    factors: '4'"
-  number 103: "    lo: '2'"
-  number 104: "    hi: '5'"
-  number 105: "    word: '2'"
-  number 106: "    word: '2'"
-  number 107: "    word: '3'"
-  number 108: "    word: '5'"
-  number 109: "    word: '5'"
-  number 110: "rank 12: 839 1.00000"
-  number 111: "    docid: '102'"
-  number 112: "    cross: '3'"
-  number 113: "    factors: '2'"
-  number 114: "    lo: '2'"
-  number 115: "    hi: '17'"
-  number 116: "    word: '2'"
-  number 117: "    word: '3'"
-  number 118: "    word: '17'"
-  number 119: "rank 13: 828 1.00000"
-  number 120: "    docid: '240'"
-  number 121: "    cross: '6'"
-  number 122: "    factors: '5'"
-  number 123: "    lo: '2'"
-  number 124: "    hi: '5'"
-  number 125: "    word: '2'"
-  number 126: "    word: '2'"
-  number 127: "    word: '2'"
-  number 128: "    word: '2'"
-  number 129: "    word: '3'"
-  number 130: "    word: '5'"
-  number 131: "rank 14: 818 1.00000"
-  number 132: "    docid: '108'"
-  number 133: "    cross: '9'"
-  number 134: "    factors: '4'"
-  number 135: "    lo: '2'"
-  number 136: "    hi: '3'"
-  number 137: "    word: '2'"
-  number 138: "    word: '2'"
-  number 139: "    word: '3'"
-  number 140: "    word: '3'"
+  number 46: "    word: '2'"
+  number 47: "    word: '2'"
+  number 48: "    word: '3'"
+  number 49: "    word: '5'"
+  number 50: "rank 5: 809 0.33333"
+  number 51: "    docid: '42'"
+  number 52: "    cross: '6'"
+  number 53: "    factors: '2'"
+  number 54: "    lo: '2'"
+  number 55: "    hi: '7'"
+  number 56: "    word: '2'"
+  number 57: "    word: '3'"
+  number 58: "    word: '7'"
+  number 59: "rank 6: 716 0.33333"
+  number 60: "    docid: '96'"
+  number 61: "    cross: '15'"
+  number 62: "    factors: '5'"
+  number 63: "    lo: '2'"
+  number 64: "    hi: '3'"
+  number 65: "    word: '2'"
+  number 66: "    word: '2'"
+  number 67: "    word: '2'"
+  number 68: "    word: '2'"
+  number 69: "    word: '2'"
+  number 70: "    word: '3'"
+  number 71: "rank 7: 599 0.28571"
+  number 72: "    docid: '288'"
+  number 73: "    cross: '18'"
+  number 74: "    factors: '6'"
+  number 75: "    lo: '2'"
+  number 76: "    hi: '3'"
+  number 77: "    word: '2'"
+  number 78: "    word: '2'"
+  number 79: "    word: '2'"
+  number 80: "    word: '2'"
+  number 81: "    word: '2'"
+  number 82: "    word: '3'"
+  number 83: "    word: '3'"
+  number 84: "rank 8: 996 0.25000"
+  number 85: "    docid: '210'"
+  number 86: "    cross: '3'"
+  number 87: "    factors: '3'"
+  number 88: "    lo: '2'"
+  number 89: "    hi: '7'"
+  number 90: "    word: '2'"
+  number 91: "    word: '3'"
+  number 92: "    word: '5'"
+  number 93: "    word: '7'"
+  number 94: "rank 9: 789 0.25000"
+  number 95: "    docid: '60'"
+  number 96: "    cross: '6'"
+  number 97: "    factors: '3'"
+  number 98: "    lo: '2'"
+  number 99: "    hi: '5'"
+  number 100: "    word: '2'"
+  number 101: "    word: '2'"
+  number 102: "    word: '3'"
+  number 103: "    word: '5'"
+  number 104: "rank 10: 774 0.25000"
+  number 105: "    docid: '90'"
+  number 106: "    cross: '9'"
+  number 107: "    factors: '3'"
+  number 108: "    lo: '2'"
+  number 109: "    hi: '5'"
+  number 110: "    word: '2'"
+  number 111: "    word: '3'"
+  number 112: "    word: '3'"
+  number 113: "    word: '5'"
+  number 114: "rank 11: 640 0.25000"
+  number 115: "    docid: '132'"
+  number 116: "    cross: '6'"
+  number 117: "    factors: '3'"
+  number 118: "    lo: '2'"
+  number 119: "    hi: '11'"
+  number 120: "    word: '2'"
+  number 121: "    word: '2'"
+  number 122: "    word: '3'"
+  number 123: "    word: '11'"
+  number 124: "rank 12: 627 0.25000"
+  number 125: "    docid: '150'"
+  number 126: "    cross: '6'"
+  number 127: "    factors: '3'"
+  number 128: "    lo: '2'"
+  number 129: "    hi: '5'"
+  number 130: "    word: '2'"
+  number 131: "    word: '3'"
+  number 132: "    word: '5'"
+  number 133: "    word: '5'"
+  number 134: "rank 13: 559 0.25000"
+  number 135: "    docid: '330'"
+  number 136: "    cross: '6'"
+  number 137: "    factors: '3'"
+  number 138: "    lo: '2'"
+  number 139: "    hi: '11'"
+  number 140: "    word: '2'"
   number 141: "    word: '3'"
-  number 142: "rank 15: 809 1.00000"
-  number 143: "    docid: '42'"
-  number 144: "    cross: '6'"
-  number 145: "    factors: '2'"
-  number 146: "    lo: '2'"
-  number 147: "    hi: '7'"
-  number 148: "    word: '2'"
-  number 149: "    word: '3'"
-  number 150: "    word: '7'"
-  number 151: "rank 16: 789 1.00000"
-  number 152: "    docid: '60'"
-  number 153: "    cross: '6'"
-  number 154: "    factors: '3'"
-  number 155: "    lo: '2'"
-  number 156: "    hi: '5'"
-  number 157: "    word: '2'"
-  number 158: "    word: '2'"
-  number 159: "    word: '3'"
-  number 160: "    word: '5'"
-  number 161: "rank 17: 784 1.00000"
-  number 162: "    docid: '312'"
-  number 163: "    cross: '6'"
-  number 164: "    factors: '4'"
-  number 165: "    lo: '2'"
-  number 166: "    hi: '13'"
-  number 167: "    word: '2'"
-  number 168: "    word: '2'"
-  number 169: "    word: '2'"
-  number 170: "    word: '3'"
-  number 171: "    word: '13'"
-  number 172: "rank 18: 782 1.00000"
-  number 173: "    docid: '126'"
-  number 174: "    cross: '9'"
-  number 175: "    factors: '3'"
-  number 176: "    lo: '2'"
-  number 177: "    hi: '7'"
-  number 178: "    word: '2'"
-  number 179: "    word: '3'"
-  number 180: "    word: '3'"
-  number 181: "    word: '7'"
-  number 182: "rank 19: 776 1.00000"
-  number 183: "    docid: '270'"
-  number 184: "    cross: '9'"
-  number 185: "    factors: '4'"
-  number 186: "    lo: '2'"
-  number 187: "    hi: '5'"
-  number 188: "    word: '2'"
-  number 189: "    word: '3'"
-  number 190: "    word: '3'"
-  number 191: "    word: '3'"
-  number 192: "    word: '5'"
-  number 193: "rank 20: 774 1.00000"
-  number 194: "    docid: '90'"
-  number 195: "    cross: '9'"
-  number 196: "    factors: '3'"
-  number 197: "    lo: '2'"
-  number 198: "    hi: '5'"
-  number 199: "    word: '2'"
-  number 200: "    word: '3'"
-  number 201: "    word: '3'"
-  number 202: "    word: '5'"
+  number 142: "    word: '5'"
+  number 143: "    word: '11'"
+  number 144: "rank 14: 454 0.25000"
+  number 145: "    docid: '294'"
+  number 146: "    cross: '15'"
+  number 147: "    factors: '3'"
+  number 148: "    lo: '2'"
+  number 149: "    hi: '7'"
+  number 150: "    word: '2'"
+  number 151: "    word: '3'"
+  number 152: "    word: '7'"
+  number 153: "    word: '7'"
+  number 154: "rank 15: 7 0.25000"
+  number 155: "    docid: '966'"
+  number 156: "    cross: '21'"
+  number 157: "    factors: '3'"
+  number 158: "    lo: '2'"
+  number 159: "    hi: '23'"
+  number 160: "    word: '2'"
+  number 161: "    word: '3'"
+  number 162: "    word: '7'"
+  number 163: "    word: '23'"
+  number 164: "rank 16: 875 0.20000"
+  number 165: "    docid: '300'"
+  number 166: "    cross: '3'"
+  number 167: "    factors: '4'"
+  number 168: "    lo: '2'"
+  number 169: "    hi: '5'"
+  number 170: "    word: '2'"
+  number 171: "    word: '2'"
+  number 172: "    word: '3'"
+  number 173: "    word: '5'"
+  number 174: "    word: '5'"
+  number 175: "rank 17: 770 0.20000"
+  number 176: "    docid: '180'"
+  number 177: "    cross: '9'"
+  number 178: "    factors: '4'"
+  number 179: "    lo: '2'"
+  number 180: "    hi: '5'"
+  number 181: "    word: '2'"
+  number 182: "    word: '2'"
+  number 183: "    word: '3'"
+  number 184: "    word: '3'"
+  number 185: "    word: '5'"
+  number 186: "rank 18: 677 0.20000"
+  number 187: "    docid: '120'"
+  number 188: "    cross: '3'"
+  number 189: "    factors: '4'"
+  number 190: "    lo: '2'"
+  number 191: "    hi: '5'"
+  number 192: "    word: '2'"
+  number 193: "    word: '2'"
+  number 194: "    word: '2'"
+  number 195: "    word: '3'"
+  number 196: "    word: '5'"
+  number 197: "rank 19: 598 0.20000"
+  number 198: "    docid: '168'"
+  number 199: "    cross: '15'"
+  number 200: "    factors: '4'"
+  number 201: "    lo: '2'"
+  number 202: "    hi: '7'"
+  number 203: "    word: '2'"
+  number 204: "    word: '2'"
+  number 205: "    word: '2'"
+  number 206: "    word: '3'"
+  number 207: "    word: '7'"
+  number 208: "rank 20: 342 0.20000"
+  number 209: "    docid: '420'"
+  number 210: "    cross: '6'"
+  number 211: "    factors: '4'"
+  number 212: "    lo: '2'"
+  number 213: "    hi: '7'"
+  number 214: "    word: '2'"
+  number 215: "    word: '2'"
+  number 216: "    word: '3'"
+  number 217: "    word: '5'"
+  number 218: "    word: '7'"
 ]]
 
 verifyTestOutput( outputdir, result, expected)

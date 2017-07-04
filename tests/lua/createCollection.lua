@@ -33,8 +33,11 @@ function createCollection( strusctx, storagePath, metadata, analyzer, multipart,
 				transaction:insertDocument( doc.attribute.docid, doc)
 			end
 		else
-			doc = analyzer:analyzeSingle( readFile( filename))
+			local content = readFile( filename)
+			local docclass = strusctx:detectDocumentClass( content)
+			local doc = analyzer:analyzeSingle( content)
 			doc.attribute.docid = fnam
+			doc.attribute.docclass = string.format( "mimetype=%s, encoding=%s, scheme=%s", docclass.mimetype, docclass.encoding, docclass.scheme)
 			if aclmap then
 				doc.access = aclmap[ doc.attribute.docid]
 			end

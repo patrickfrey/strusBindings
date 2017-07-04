@@ -19,8 +19,11 @@ function concatValue(o)
 	end
 end
 
-function dumpValue(o)
+function dumpValue_( o, depth)
 	if type(o) == 'table' then
+		if (depth == 0) then
+			return "{...}"
+		end
 		local s = '{ '
 		local i = 0
 		for k,v in pairs(o) do
@@ -29,7 +32,7 @@ function dumpValue(o)
 			end
 			i = i + 1
 			if type(k) == 'string' then k = '"'..k..'"' end
-			s = s .. '['..k..'] = ' .. dumpValue(v)
+			s = s .. '['..k..'] = ' .. dumpValue_( v, depth-1)
 		end
 		return s .. '} '
 	elseif type(o) == 'number' then
@@ -45,9 +48,15 @@ function dumpValue(o)
 		return tostring(o)
 	end
 end
+function dumpValue( o)
+	return dumpValue_( o, 10)
+end
 
-function dumpTree( indent, o)
+function dumpTree_( indent, o, depth)
 	if type(o) == 'table' then
+		if (depth == 0) then
+			return "{...}"
+		end
 		local keyset = {}
 		
 		for k,v in pairs(o) do
@@ -60,7 +69,7 @@ function dumpTree( indent, o)
 		local s = ''
 		for i,k in ipairs(keyset) do
 			local ke = "\n" .. indent .. type(k) .. " " .. k
-			local ve = dumpTree( indent .. '  ', o[ k])
+			local ve = dumpTree_( indent .. '  ', o[ k], depth-1)
 			if string.sub( ve,1,1) == "\n" then
 				s = s .. ke .. ":" .. ve
 			else
@@ -80,6 +89,9 @@ function dumpTree( indent, o)
 	else
 		return tostring(o)
 	end
+end
+function dumpTree( o)
+	return dumpTree_( "", o, 10)
 end
 
 function readFile( path)

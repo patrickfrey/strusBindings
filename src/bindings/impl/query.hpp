@@ -69,11 +69,11 @@ public:
 			const std::string& name,
 			const ValueVariant& parameter);
 
-	/// \brief Add a weighting formula to use for calculating the total weight from the weighting function results
+	/// \brief Define the weighting formula to use for calculating the total weight from the weighting function results (sum of the weighting function results is the default)
 	/// \param[in] defaultParameter default parameter values
-	void addWeightingFormula(
+	void defineWeightingFormula(
 			const std::string& source,
-			const ValueVariant& defaultParameter);
+			const ValueVariant& defaultParameter=ValueVariant());
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on

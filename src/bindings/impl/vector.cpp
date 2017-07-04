@@ -118,8 +118,8 @@ Struct VectorStorageClientImpl::conceptClassNames() const
 	}
 	Struct rt;
 	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
+	strus::bindings::Serializer::serialize( &rt.serialization, *cfg);
 	cfg.release();
-	strus::bindings::Serializer::serialize( &rt.serialization, cfg.get());
 	rt.release();
 	return rt;
 }
