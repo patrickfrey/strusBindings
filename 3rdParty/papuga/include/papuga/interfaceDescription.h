@@ -11,13 +11,41 @@
 #define _PAPUGA_INTERFACE_DESCRIPTION_H_INCLUDED
 #include <stdbool.h>
 
+/// \brief Structure describing a parameter of a method/constructor call
+typedef struct papuga_ParameterDescription
+{
+	const char* name;				///< name of the parameter
+	const char* description;			///< description of the parameter value
+	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	bool mandatory;					///< true, if the parameter is mandatory, false if it is optional (optional parameters must only appear as last arguments, a function parameter list is always a list of mandatory arguments followed by optional arguments)
+} papuga_ParameterDescription;
+
+/// \brief Structure describing the return values of a method call
+typedef struct papuga_CallResultDescription
+{
+	const char* description;			///< description of the return values of a method
+	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+} papuga_CallResultDescription;
+
+/// \brief Structure describing the constructor of a host object class
+typedef struct papuga_ConstructorDescription
+{
+	const char* funcname;				///< function name of the method
+	const char* description;			///< description of the constructor
+	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
+} papuga_ConstructorDescription;
+
 /// \brief Structure describing a method of a host object class
 typedef struct papuga_MethodDescription
 {
 	const char* name;				///< name of the method
 	const char* funcname;				///< function name of the method
+	const char* description;			///< description of the method
+	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	const papuga_CallResultDescription* result;	///< return value descriptions or 0, if no return value defined
 	bool self;					///< method that requires an instance of its class (self pointer)
-	int argc;					///< maximum number of arguments
+	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
 } papuga_MethodDescription;
 
 /// \brief Structure describing a host object class
@@ -25,17 +53,27 @@ typedef struct papuga_ClassDescription
 {
 	unsigned int id;				///< id of the class (unique index counted from 0)
 	const char* name;				///< name of class
-	const char* funcname_constructor;		///< function name of the constructor
+	const char* description;			///< description of the class
+	const papuga_ConstructorDescription* constructor;///< function description of the constructor
 	const char* funcname_destructor;		///< function name of the destructor
 	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods
 } papuga_ClassDescription;
+
+typedef struct papuga_AboutDescription
+{
+	const char* authors;
+	const char* copyright;
+	const char* license;
+	const char* version;
+} papuga_AboutDescription;
 
 /// \brief Structure describing the interface
 typedef struct papuga_InterfaceDescription
 {
 	const char* name;				///< name of the project wrapped by the bindings
 	const char** includefiles;			///< null terminated list of files to include
-	const papuga_ClassDescription* classes;		///< (0,NULL,NULL) terminated list of classes 
+	const papuga_ClassDescription* classes;		///< (0,NULL,NULL) terminated list of classes
+	const papuga_AboutDescription* about;		///< reference to authors,copyright,license,etc...
 } papuga_InterfaceDescription;
 
 #endif

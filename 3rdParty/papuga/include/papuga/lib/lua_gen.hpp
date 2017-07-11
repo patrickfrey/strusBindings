@@ -16,10 +16,10 @@
 
 namespace papuga {
 
-/// \brief Generate a source of the lua bindings for an interface described
-/// \param[out] out where to print the generated source
+/// \brief Generate the source and documentation of the lua bindings for an interface described
+/// \param[out] out where to print the generated item
 /// \param[err] err stream to report errors and warnings
-/// \param[in] what name of artefact to generate
+/// \param[in] what name of item to generate
 /// \param[in] args arguments passed to the generator
 /// \param[in] descr interface description
 bool generateLuaSource(

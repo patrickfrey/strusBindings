@@ -45,57 +45,62 @@ class ContextImpl
 {
 public:
 	/// \brief Constructor
-	/// \param[in] config context configuration. If not defined, create context for local mode with own module loader
+	/// \param[in] config (optional) context configuration. If not defined, create context for local mode with own module loader
 	explicit ContextImpl( const ValueVariant& config=ValueVariant());
 	/// \brief Destructor
 	~ContextImpl(){}
 
 	/// \brief Check if there has an error occurred and return it if yes
+	/// \return the last error as string
 	/// \remark Some bindings have coroutines and with a coroutine switch an error message might get lost, because error context is per thread. So if a coroutine switch is done without the last error fetched it might happen that the second coroutine gets the error of the first one. Call this function after calling some method without return value before a state where a context switch is possible.
 	const char* getLastError() const;
 
 	/// \brief Load a module
-	/// \param[in] name_ name of the module to load
+	/// \param[in] name name of the module to load
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void loadModule( const std::string& name_);
+	void loadModule( const std::string& name);
 
 	/// \brief Add a path from where to try to load modules from
-	/// \param[in] paths_ semicolon separated list of module search paths
+	/// \param[in] paths semicolon separated list of module search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void addModulePath( const std::string& paths_);
+	void addModulePath( const std::string& paths);
 
 	/// \brief Define where to load analyzer resource files from
-	/// \param[in] paths_ semicolon separated list of resource search paths
+	/// \param[in] paths semicolon separated list of resource search paths
 	/// \remark Only implemented in local mode with own module loader (see constructors)
-	void addResourcePath( const std::string& paths_);
+	void addResourcePath( const std::string& paths);
 
 	/// \brief Create a storage client instance
-	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or undefined, if the default remote storage of the RPC server is chosen
-	StorageClientImpl* createStorageClient( const ValueVariant& config_=ValueVariant());
+	/// \param[in] config configuration (string or structure with named elements) of the storage client or undefined, if the default remote storage of the RPC server is chosen
+	/// \return storage client interface for accessing the storage
+	StorageClientImpl* createStorageClient( const ValueVariant& config=ValueVariant());
 
 	/// \brief Create a vector storage client instance
-	/// \param[in] config_ configuration (string or structure with named elements) of the storage client or undefined, if the default remote vector storage of the RPC server is chosen
-	VectorStorageClientImpl* createVectorStorageClient( const ValueVariant& config_=ValueVariant());
+	/// \param[in] config configuration (string or structure with named elements) of the storage client or undefined, if the default remote vector storage of the RPC server is chosen
+	/// \return vector storage client interface for accessing the vector storage
+	VectorStorageClientImpl* createVectorStorageClient( const ValueVariant& config=ValueVariant());
 
 	/// \brief Create a new storage (physically) described by config
-	/// \param[in] config_ storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements) 
  	/// \remark Fails if the storage already exists
-	void createStorage( const ValueVariant& config_);
+	void createStorage( const ValueVariant& config);
 
 	/// \brief Create a new storage (physically) described by config
-	/// \param[in] config_ storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements) 
  	/// \remark Fails if the storage already exists
-	void createVectorStorage( const ValueVariant& config_);
+	void createVectorStorage( const ValueVariant& config);
 
 	/// \brief Delete the storage (physically) described by config
 	/// \note works also on vector storages
-	/// \param[in] config_ storage configuration (string or structure with named elements) 
+	/// \param[in] config storage configuration (string or structure with named elements) 
 	/// \note Handle this function carefully
-	void destroyStorage( const ValueVariant& config_);
+	void destroyStorage( const ValueVariant& config);
 
 	/// \brief Detect the type of document from its content
 	/// \param[in] content the document content to classify
-	/// \return the document class (analyzer::DocumentClass)
+	/// \return the document class
+	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
+	/// \example [ mimetype="application/json" encoding="UTF-8" ]
 	analyzer::DocumentClass* detectDocumentClass( const std::string& content);
 
 	/// \brief Create a document analyzer instance
@@ -121,6 +126,7 @@ public:
 	void close();
 
 	/// \brief Debug method that returns the serialization of the arguments as string
+	/// \param[in] arg structure to serialize as string for visualization (debuging)
 	/// \return the input serialization as string
 	std::string debug_serialize( const ValueVariant& arg);
 

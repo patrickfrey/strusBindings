@@ -8,6 +8,8 @@ set( dev_source_files
 )
 
 set( gen_source_files
+	printLuaDoc.cpp
+	printLuaMod.cpp
         libpapuga_lua_gen.cpp
 )
 

@@ -32,14 +32,14 @@ public:
 	/// \brief Find the most similar vectors to vector
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
-	/// return the list of most similar vectors (double[])
+	/// \return the list of most similar vectors (double[])
 	std::vector<VectorStorageSearchInterface::Result> findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const;
 
 	/// \brief Find the most similar vectors to vector in a selection of features addressed by index
 	/// \param[in] featidxlist list of candidate indices (int[])
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
-	/// return the list of most similar vectors (double[])
+	/// \return the list of most similar vectors (double[])
 	std::vector<VectorStorageSearchInterface::Result> findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
@@ -69,6 +69,7 @@ public:
 	VectorStorageSearcherImpl* createSearcher( int range_from, int range_to) const;
 
 	/// \brief Create a vector storage transaction instance
+	/// \return the transaction instance
 	VectorStorageTransactionImpl* createTransaction();
 	
 	/// \brief Get the list of concept class names defined
@@ -94,7 +95,7 @@ public:
 
 	/// \brief Get the vector assigned to a feature addressed by index
 	/// \param[in] index index of the feature (starting from 0)
-	/// return the vector (std::vector<double>)
+	/// \return the vector (std::vector<double>)
 	std::vector<double> featureVector( int index) const;
 
 	/// \brief Get the name of a feature by its index starting from 0
@@ -158,6 +159,7 @@ public:
 			int conidx);
 
 	/// \brief Commit of the transaction
+	/// \return true on success, false on failure
 	bool commit();
 
 	/// \brief Rollback of the transaction

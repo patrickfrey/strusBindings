@@ -33,25 +33,25 @@ public:
 	virtual ~QueryEvalImpl(){}
 
 	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match fields summarization)
-	/// \param[in] set_ identifier of the term set that is used to address the terms
-	/// \param[in] type_ feature type of the of the term
-	/// \param[in] value_ feature value of the of the term
+	/// \param[in] set identifier of the term set that is used to address the terms
+	/// \param[in] type feature type of the of the term
+	/// \param[in] value feature value of the of the term
 	void addTerm(
-			const std::string& set_,
-			const std::string& type_,
-			const std::string& value_);
+			const std::string& set,
+			const std::string& type,
+			const std::string& value);
 
 	/// \brief Declare a feature set to be used as selecting feature
-	/// \param[in] set_ identifier of the term set addressing the terms to use for selection
-	void addSelectionFeature( const std::string& set_);
+	/// \param[in] set identifier of the term set addressing the terms to use for selection
+	void addSelectionFeature( const std::string& set);
 
 	/// \brief Declare a feature set to be used as restriction
-	/// \param[in] set_ identifier of the term set addressing the terms to use as restriction
-	void addRestrictionFeature( const std::string& set_);
+	/// \param[in] set identifier of the term set addressing the terms to use as restriction
+	void addRestrictionFeature( const std::string& set);
 
 	/// \brief Declare a feature set to be used as exclusion
-	/// \param[in] set_ identifier of the term set addressing the terms to use as exclusion
-	void addExclusionFeature( const std::string& set_);
+	/// \param[in] set identifier of the term set addressing the terms to use as exclusion
+	void addExclusionFeature( const std::string& set);
 
 	/// \brief Declare a summarizer
 	/// \param[in] name the name of the summarizer to add
@@ -70,6 +70,7 @@ public:
 			const ValueVariant& parameter);
 
 	/// \brief Define the weighting formula to use for calculating the total weight from the weighting function results (sum of the weighting function results is the default)
+	/// \param[in] source of the weighting formula
 	/// \param[in] defaultParameter default parameter values
 	void defineWeightingFormula(
 			const std::string& source,
@@ -77,6 +78,7 @@ public:
 
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
+	/// \return the query instance
 	QueryImpl* createQuery( StorageClientImpl* storage) const;
 
 private:
@@ -101,14 +103,14 @@ public:
 	virtual ~QueryImpl(){}
 
 	/// \brief Create a feature from the query expression passed
-	/// \param[in] set_ name of the feature set, this feature is addressed with
-	/// \param[in] expr_ query expression that defines the postings of the feature and the variables attached
-	/// \param[in] weight_ individual weight of the feature in the query
+	/// \param[in] set name of the feature set, this feature is addressed with
+	/// \param[in] expr query expression that defines the postings of the feature and the variables attached
+	/// \param[in] weight individual weight of the feature in the query
 	/// \remark the query expression passed as parameter is refused if it does not contain exactly one element
 	void addFeature( 
-			const std::string& set_,
-			const ValueVariant& expr_,
-			double weight_=1);
+			const std::string& set,
+			const ValueVariant& expr,
+			double weight=1);
 
 	/// \brief Define a meta data restriction
 	/// \param[in] expression meta data expression tree interpreted as CNF (conjunctive normalform "AND" of "OR"s)
@@ -122,34 +124,34 @@ public:
 	void addMetaDataRestriction( const ValueVariant& expression);
 
 	/// \brief Define term statistics to use for a term for weighting it in this query
-	/// \param[in] type_ query term type name
-	/// \param[in] value_ query term value
-	/// \param[in] stats_ the structure with the statistics to set (strus::TermStatistics)
+	/// \param[in] type query term type name
+	/// \param[in] value query term value
+	/// \param[in] stats the structure with the statistics to set (strus::TermStatistics)
 	void defineTermStatistics(
-			const std::string& type_,
-			const std::string& value_,
-			const ValueVariant& stats_);
+			const std::string& type,
+			const std::string& value,
+			const ValueVariant& stats);
 
 	/// \brief Define the global statistics to use for weighting in this query
-	/// \param[in] stats_ the structure with the statistics to set (strus::GlobalStatistics)
-	void defineGlobalStatistics( const ValueVariant& stats_);
+	/// \param[in] stats the structure with the statistics to set (strus::GlobalStatistics)
+	void defineGlobalStatistics( const ValueVariant& stats);
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
-	/// \param[in] docnolist_ list of documents to evaluate the query on (std::vector<int>)
-	void addDocumentEvaluationSet( const ValueVariant& docnolist_);
+	/// \param[in] docnolist list of documents to evaluate the query on (std::vector<int>)
+	void addDocumentEvaluationSet( const ValueVariant& docnolist);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
-	/// \param[in] maxNofRanks_ maximum number of results to return by this query
-	void setMaxNofRanks( unsigned int maxNofRanks_);
+	/// \param[in] maxNofRanks maximum number of results to return by this query
+	void setMaxNofRanks( unsigned int maxNofRanks);
 
 	/// \brief Set the index of the first rank to be returned
-	/// \param[in] minRank_ index of the first rank to be returned by this query
-	void setMinRank( unsigned int minRank_);
+	/// \param[in] minRank index of the first rank to be returned by this query
+	void setMinRank( unsigned int minRank);
 
 	/// \brief Allow read access to documents having a specific ACL tag
-	/// \param[in] username_ ACL tag that must be attached to a document shown in the result ('access' tag in the document)
-	/// \note if no access restriction is specified, then all documents are shown in the result
-	void addAccess( const ValueVariant& userlist_);
+	/// \param[in] userlist Add ACL tag or list of ACL tags that selects documents to be candidates of the result
+	/// \note if no ACL tags are specified, then all documents are potential candidates for the result
+	void addAccess( const ValueVariant& userlist);
 
 	/// \brief Assign values to variables of the weighting formula
 	/// \param[in] parameter parameter values (std::map<std::string,double>)

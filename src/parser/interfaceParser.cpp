@@ -12,6 +12,7 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <cstdio>
 
 using namespace strus;
 
@@ -26,6 +27,29 @@ static bool endsWith( const std::string& ident, const std::string& tail)
 static bool isSpace( char ch)
 {
 	return ((unsigned char)ch <= 32);
+}
+static bool isAlpha( char ch)
+{
+	if (ch == '_') return true;
+	if ((ch|32) >= 'a' && (ch|32) <= 'z') return true;
+	return false;
+}
+static bool isDigit( char ch)
+{
+	return (ch >= '0' && ch <= '9');
+}
+static bool isAlnum( char ch)
+{
+	return isAlpha(ch) || isDigit(ch);
+}
+static std::string parseIdentifier( char const*& si, const char* se)
+{
+	std::string rt;
+	for (; si != se && isAlnum(*si); ++si)
+	{
+		rt.push_back( *si);
+	}
+	return rt;
 }
 static void skipSpaces( char const*& si, const char* se)
 {
@@ -54,6 +78,217 @@ static void skipToStr( char const*& si, const char* se, const char* str)
 		++si;
 	}
 }
+
+static std::string g_current_annotation_key;
+static char g_current_annotation_sep = ' ';
+static AnnotationMap g_annotations;
+
+static void resetAnnotations()
+{
+	g_annotations.clear();
+	g_current_annotation_key.clear();
+}
+static void addAnnotation( const std::string& value, bool allowConcat)
+{
+	if (g_current_annotation_key.empty())
+	{
+		throw std::runtime_error("unknown annotation key");
+	}
+	else if (value.empty())
+	{
+		throw std::runtime_error("annotation is empty");
+	}
+	else
+	{
+		if (g_annotations.find( g_current_annotation_key) == g_annotations.end())
+		{
+			g_annotations[ g_current_annotation_key] = value;
+		}
+		else if (allowConcat)
+		{
+			g_annotations[ g_current_annotation_key] += std::string( "\n") + value;
+		}
+		else if (!g_current_annotation_sep)
+		{
+			char buf[ 1024];
+			std::snprintf( buf, sizeof(buf), "only single '%s' annotation allowed", g_current_annotation_key.c_str());
+			throw std::runtime_error( buf);
+		}
+		else
+		{
+			g_annotations[ g_current_annotation_key] += std::string( &g_current_annotation_sep, 1) + value;
+		}
+	}
+}
+static std::string getAnnotation( const AnnotationMap& amap, const std::string& key, bool mandatory)
+{
+	AnnotationMap::const_iterator ai = amap.find( key);
+	if (ai == amap.end())
+	{
+		if (mandatory) throw std::runtime_error( std::string("annotation of '") + key + "' is mandatory");
+		return std::string();
+	}
+	else
+	{
+		char const* si = ai->second.c_str();
+		const char* se = si + ai->second.size();
+		skipSpaces( si, se);
+		if (si == se)
+		{
+			throw std::runtime_error( std::string("annotation of '") + key + "' is empty");
+		}
+		return std::string( si, se-si);
+	}
+}
+
+static bool has_annotation( char const* si, const char* se)
+{
+	for (; si != se && *si == ' ' ; ++si){}
+	return (si != se && *si == '\\');
+}
+
+static void extract_annotation( char const* si, const char* se)
+{
+	for (; si != se && *si == ' ' ; ++si){}
+	if (si != se)
+	{
+		if (*si == '\t')
+		{
+			const char* start = si+1;
+			skipToEoln( si, se);
+			addAnnotation( std::string( start, si), true);
+		}
+		else if (*si == '\\')
+		{
+			std::string key;
+			for (++si; si != se && isAlpha(*si); ++si)
+			{
+				key.push_back( *si);
+			}
+			if (key == "brief")
+			{
+				g_current_annotation_key = "@brief";
+				g_current_annotation_sep = '\n';
+			}
+			else if (key == "class")
+			{
+				g_current_annotation_key = "@class";
+				g_current_annotation_sep = '\0';
+			}
+			else if (key == "example")
+			{
+				if (g_current_annotation_key.empty())
+				{
+					throw std::runtime_error("unrelated example (@example tag)");
+				}
+				if (g_current_annotation_key[0] == '@')
+				{
+					g_current_annotation_key = "@example";
+				}
+				else if (std::strstr( g_current_annotation_key.c_str(), "@example") != 0)
+				{
+				}
+				else if (std::strchr( g_current_annotation_key.c_str(), '@') != 0)
+				{
+					throw std::runtime_error("illegal annotation tag");
+				}
+				else
+				{
+					g_current_annotation_key += "@example";
+				}
+				g_current_annotation_sep = '\n';
+			}
+			else if (key == "return")
+			{
+				g_current_annotation_key = "return";
+				g_current_annotation_sep = '\0';
+			}
+			else if (key == "remark")
+			{
+				g_current_annotation_key = "@remark";
+				g_current_annotation_sep = '\n';
+			}
+			else if (key == "note")
+			{
+				g_current_annotation_key = "@note";
+				g_current_annotation_sep = '\n';
+			}
+			else if (key == "return")
+			{
+				g_current_annotation_key = "@return";
+				g_current_annotation_sep = '\0';
+			}
+			else if (key == "param")
+			{
+				skipSpaces( si, se);
+				if (si != se && *si == '[')
+				{
+					for (++si; si != se && *si != ']' && (unsigned char)*si >= 32; ++si){}
+					if (si == se || *si != ']') throw std::runtime_error("missing close bracket ']' after 'param['");
+					++si;
+					skipSpaces( si, se);
+				}
+				g_current_annotation_key = parseIdentifier( si, se);
+				g_current_annotation_sep = '\0';
+			}
+			else
+			{
+				char buf[ 1024];
+				std::snprintf( buf, sizeof(buf), "unknown annotation tag '%s'", key.c_str());
+				throw std::runtime_error(buf);
+			}
+			skipSpaces( si, se);
+			const char* start = si;
+			skipToEoln( si, se);
+			addAnnotation( std::string( start, si), false);
+		}
+		else
+		{
+			g_current_annotation_key.clear();
+			g_current_annotation_sep = '\0';
+		}
+	}
+}
+
+static void parseAnnotations( char const*& si, const char* se)
+{
+	skipSpaces( si, se);
+	if (si + 1 < se && si[0] == '/' && si[1] == '/')
+	{
+		resetAnnotations();
+		while (si + 1 < se && si[0] == '/' && si[1] == '/')
+		{
+			si += 2;
+			while (si != se && *si == '/') ++si;
+			extract_annotation( si, se);
+			skipToEoln( si, se);
+			skipSpaces( si, se);
+		}
+	}
+	else if (si + 1 < se && si[0] == '/' && si[1] == '*')
+	{
+		resetAnnotations();
+		si += 2;
+		while (si != se && *si == '*') ++si;
+		while (si != se)
+		{
+			skipSpaces( si, se);
+			if (si + 1 < se && si[0] == '*' && si[1] == '/')
+			{
+				si += 2;
+				break;
+			}
+			extract_annotation( si, se);
+			skipToEoln( si, se);
+		}
+		if (si == se)
+		{
+			throw std::runtime_error("comment not closed /*...*/");
+		}
+	}
+	skipSpaces( si, se);
+}
+
 static void skipSpacesAndComments( char const*& si, const char* se)
 {
 	while (si != se)
@@ -61,41 +296,30 @@ static void skipSpacesAndComments( char const*& si, const char* se)
 		skipSpaces( si, se);
 		if (si + 1 < se && si[0] == '/' && si[1] == '/')
 		{
+			si += 2;
+			while (si != se && *si == '/') ++si;
+			if (has_annotation( si, se))
+			{
+				throw std::runtime_error("unexpected annotation found");
+			}
 			skipToEoln( si, se);
 		}
 		else if (si + 1 < se && si[0] == '/' && si[1] == '*')
 		{
+			si += 2;
+			const char* start = si;
 			skipToStr( si, se, "*/");
-			if (si != se) si += 2;
+			if (std::memchr( start, '\\', si-start) != 0)
+			{
+				throw std::runtime_error("unexpected annotation found");
+			}
+			si += 2;
 		}
 		else
 		{
 			break;
 		}
 	}
-}
-static bool isAlpha( char ch)
-{
-	if (ch == '_') return true;
-	if ((ch|32) >= 'a' && (ch|32) <= 'z') return true;
-	return false;
-}
-static bool isDigit( char ch)
-{
-	return (ch >= '0' && ch <= '9');
-}
-static bool isAlnum( char ch)
-{
-	return isAlpha(ch) || isDigit(ch);
-}
-static std::string parseIdentifier( char const*& si, const char* se)
-{
-	std::string rt;
-	for (; si != se && isAlnum(*si); ++si)
-	{
-		rt.push_back( *si);
-	}
-	return rt;
 }
 static bool isOperator( char ch)
 {
@@ -168,17 +392,14 @@ static void skipStructure( char const*& si, const char* se)
 	if (*si == '(')
 	{
 		skipBrackets( si, se, '(', ')');
-		skipSpacesAndComments( si, se);
 	}
 	if (*si == '{')
 	{
 		skipBrackets( si, se, '{', '}');
-		skipSpacesAndComments( si, se);
 	}
 	if (*si == ';')
 	{
 		++si;
-		skipSpacesAndComments( si, se);
 	}
 }
 
@@ -663,7 +884,10 @@ VariableType& TypeSystem::defineType( const char* pattern, const char* scope_cla
 	return m_variableTypes.back();
 }
 
-VariableValue TypeSystem::parse( const std::string& scope_class, const std::string& scope_method, char const*& si, const char* se) const
+VariableValue TypeSystem::parse(
+		const std::string& scope_class,
+		const std::string& scope_method,
+		char const*& si, const char* se) const
 {
 	char const* maxend = 0;		//< maximum length (end pos) of types parsed == winning type
 	int maxpkt = 0;			//< maximum points in scope match of == winning type in case of equal length
@@ -695,7 +919,7 @@ VariableValue TypeSystem::parse( const std::string& scope_class, const std::stri
 			{
 				if (maxend < enddef || maxpkt < pkt)
 				{
-					rt = VariableValue( &*vi, defmap);
+					rt = VariableValue( ""/*name*/, &*vi, defmap, ""/*description*/, ""/*examples*/);
 					maxend = enddef;
 					maxpkt = pkt;
 				}
@@ -756,13 +980,12 @@ void InterfacesDef::addSource( const std::string& source)
 	const char* se = si + source.size();
 	try
 	{
-		skipSpacesAndComments( si, se);
 		while (si != se)
 		{
+			parseAnnotations( si, se);
 			if (*si == ';')
 			{
 				++si;
-				skipSpacesAndComments( si, se);
 			}
 			else if (isAlpha( *si))
 			{
@@ -774,20 +997,14 @@ void InterfacesDef::addSource( const std::string& source)
 					++si;
 					++brkcnt;
 				}
-				else if (ident == "typedef" || ident == "using")
-				{
-					skipStructure( si, se);
-				}
-				else if (ident == "enum")
-				{
-					skipStructure( si, se);
-				}
-				else if (ident == "struct")
+				else if (ident == "typedef" || ident == "using" || ident == "enum"
+					 || ident == "struct")
 				{
 					skipStructure( si, se);
 				}
 				else if (ident == "class")
 				{
+					AnnotationMap annotationMap = g_annotations;
 					skipSpacesAndComments( si, se);
 					if (si == se || !isAlpha(*si))
 					{
@@ -827,7 +1044,8 @@ void InterfacesDef::addSource( const std::string& source)
 
 						if (!interfacename.empty())
 						{
-							parseClass( interfacename, "", si, endClass-1);
+							std::string classDescription( getAnnotation( annotationMap, "@brief", true));
+							parseClass( interfacename, classDescription, "", si, endClass-1);
 						}
 						si = endClass;
 					}
@@ -846,7 +1064,7 @@ void InterfacesDef::addSource( const std::string& source)
 			{
 				throw std::runtime_error( std::string("unexpected character at '") + *si + "'");
 			}
-			skipSpacesAndComments( si, se);
+			skipSpaces( si, se);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -878,22 +1096,21 @@ static std::string guessMethodName( const char* si, const char* se)
 	return parseIdentifier( xi, se);
 }
 
-void InterfacesDef::parseClass( const std::string& className, const std::string& classScope, char const*& si, const char* se)
+void InterfacesDef::parseClass( const std::string& className, const std::string& classDescription, const std::string& classScope, char const*& si, const char* se)
 {
 	bool privateScope = false;
-	ClassDef classDef( className);
+	ClassDef classDef( className, classDescription);
 	std::map<std::string,int>::const_iterator ci = m_classdefmap.find( className);
 	if (ci != m_classdefmap.end() && ci->second >= 0) throw std::runtime_error( std::string("duplicate definition of class '") + className + "'");
 
 	m_classdefmap[ className] = -1;
 	while (si != se)
 	{
-		skipSpacesAndComments( si, se);
+		parseAnnotations( si, se);
 		if (si == se) break;
 		if (*si == ';')
 		{
 			++si;
-			skipSpacesAndComments( si, se);
 		}
 		else if (*si == '~')
 		{
@@ -902,6 +1119,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 		}
 		else if (isAlpha( *si))
 		{
+			AnnotationMap annotationMap = g_annotations;
 			char const* start = si;
 			std::string ident = parseIdentifier( si,se);
 #ifdef STRUS_LOWLEVEL_DEBUG
@@ -919,7 +1137,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				skipBrackets( endParams, se, '(', ')');
 				++si;
 				std::vector<VariableValue>
-					params = parseParameters( className, "constructor", si, endParams-1);
+					params = parseParameters( className, "constructor", annotationMap, si, endParams-1);
 				si = endParams;
 				skipSpacesAndComments( si, se);
 
@@ -931,34 +1149,21 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				{
 					skipStructure( si, se);
 				}
-				ConstructorDef def( params);
+				std::string description = getAnnotation( annotationMap, "@brief", false);
+				std::string examples = getAnnotation( annotationMap, "@example", false);
+				ConstructorDef def( params, description, examples);
 				classDef.addConstructor( def);
 
 #ifdef STRUS_LOWLEVEL_DEBUG
 				std::cerr << "ADD CONSTRUCTOR " << def.tostring() << std::endl;
 #endif
 			}
-			else if (ident == "namespace")
-			{
-				skipStructure( si, se);
-			}
-			else if (ident == "friend")
+			else if (ident == "explicit" || ident == "virtual" || ident == "friend")
 			{
 				continue;
 			}
-			else if (ident == "explicit")
-			{
-				continue;
-			}
-			else if (ident == "enum")
-			{
-				skipStructure( si, se);
-			}
-			else if (ident == "typedef" || ident == "using")
-			{
-				skipStructure( si, se);
-			}
-			else if (ident == "struct")
+			else if (ident == "namespace" || ident == "enum" || ident == "typedef"
+				 || ident == "using" || ident == "struct")
 			{
 				skipStructure( si, se);
 			}
@@ -984,19 +1189,16 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 					skipBrackets( si, sn, '{', '}');
 					if (si != se && *si == ';') ++si;
 				}
-				skipSpacesAndComments( si, sn);
+				skipSpaces( si, sn);
 				if (si != sn)
 				{
 					throw std::runtime_error("unexpected token after subclass definition");
 				}
 			}
-			else if (ident == "virtual")
-			{
-			}
 			else if (ident == "private" || ident == "public" || ident == "protected")
 			{
 				privateScope = ident != "public";
-				skipSpacesAndComments( si, se);
+				skipSpaces( si, se);
 				if (si == se)
 				{
 					throw std::runtime_error("unexpected end of source after class name definition");
@@ -1034,7 +1236,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 					else
 					{
 						++si;
-						skipSpacesAndComments( si, se);
+						skipSpaces( si, se);
 					}
 				}
 			}
@@ -1043,6 +1245,9 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				std::string methodName( className.empty()?std::string():guessMethodName( si, se));
 				si = start;
 				VariableValue retvaltype = m_typeSystem->parse( className, methodName, si, se);
+				bool hasReturn = retvaltype.type().hasEvent( "retv_map");
+				retvaltype.setDescription( getAnnotation( annotationMap, "return", hasReturn));
+				retvaltype.setExamples( getAnnotation( annotationMap, "return@example", false));
 
 				skipSpacesAndComments( si, se);
 				if (si == se || !isAlpha( *si))
@@ -1063,7 +1268,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				skipBrackets( endParams, se, '(', ')');
 				++si;
 				std::vector<VariableValue>
-					params = parseParameters( className, methodName, si, endParams-1);
+					params = parseParameters( className, methodName, annotationMap, si, endParams-1);
 				si = endParams;
 				skipSpacesAndComments( si, se);
 				bool isconst = false;
@@ -1086,7 +1291,9 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 						++si;
 					}
 				}
-				classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst));
+				std::string methodDescription = getAnnotation( annotationMap, "@brief", true);
+				std::string methodExamples = getAnnotation( annotationMap, "@example", false);
+				classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst, methodDescription, methodExamples));
 				if (*si == '{')
 				{
 					skipStructure( si, se);
@@ -1097,7 +1304,6 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 		{
 			throw std::runtime_error( std::string("unexpected character '") + *si + "' in structure definition");
 		}
-		skipSpacesAndComments( si, se);
 	}
 	m_classdefmap[ className] = m_classdefar.size();
 	m_classdefar.push_back( classDef);
@@ -1106,20 +1312,29 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 std::vector<VariableValue> InterfacesDef::parseParameters(
 		const std::string& scope_class,
 		const std::string& scope_method,
+		const AnnotationMap& annotationMap,
 		char const*& si, const char* se)
 {
 	std::vector<VariableValue> rt;
 	while (si != se)
 	{
+		std::string paramName;
 		const char* paramstart = si;
 		rt.push_back( m_typeSystem->parse( scope_class, scope_method, si, se));
 
 		skipSpacesAndComments( si, se);
 		if (si != se && isAlpha( *si))
 		{
-			(void)parseIdentifier(si,se);	//... name of parameter is not interesting
-			skipSpacesAndComments( si, se);
+			paramName = parseIdentifier(si,se);
 		}
+		else
+		{
+			paramName = rt.back().expand( "varname");
+		}
+		if (paramName.empty()) throw std::runtime_error( "no name of parameter defined");
+		rt.back().setName( paramName);
+		rt.back().setDescription( getAnnotation( annotationMap, paramName, true));
+		rt.back().setExamples( getAnnotation( annotationMap, paramName + "@example", false));
 		skipSpacesAndComments( si, se);
 		if (si != se)
 		{

@@ -28,4 +28,15 @@ link_directories(
 # ------------------------------
 add_library( papuga_devel STATIC ${source_files} )
 
+# -------------------------------------------
+# DOC GENERATOR
+# -------------------------------------------
+add_executable( papugaDoc papugaDoc.cpp )
+target_link_libraries( papugaDoc ${CMAKE_DL_LIBS} ${Intl_LIBRARIES} )
+
+# ------------------------------
+# INSTALLATION
+# ------------------------------
+install( TARGETS papugaDoc
+           RUNTIME DESTINATION bin )
 

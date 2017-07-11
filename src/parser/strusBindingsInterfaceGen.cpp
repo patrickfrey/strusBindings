@@ -10,6 +10,7 @@
 #include "interfaceParser.hpp"
 #include "fillTypeTables.hpp"
 #include "printFrame.hpp"
+#include "strus/versionBindings.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/base/string_format.hpp"
 #include <stdexcept>
@@ -21,6 +22,7 @@
 #include <sstream>
 #include <cerrno>
 
+#define STRUS_BINDINGS_AUTHOR "Patrick P. Frey"
 #undef STRUS_LOWLEVEL_DEBUG
 
 /// \brief List of interface files parsed without path
@@ -55,6 +57,34 @@ static void printOutput( const std::string& filename, PrintInterface print, cons
 	}
 }
 
+static std::string printString( const std::string& content)
+{
+	std::string rt;
+	std::string::const_iterator si = content.begin(), se = content.end();
+	for (; si != se; ++si)
+	{
+		if (*si == '\n')
+		{
+			rt.push_back( '\\');
+			rt.push_back( 'n');
+		}
+		else if ((unsigned char)*si <= 32)
+		{
+			rt.push_back( ' ');
+		}
+		else if (*si == '\"')
+		{
+			rt.push_back( '\\');
+			rt.push_back( '"');
+		}
+		else
+		{
+			rt.push_back( *si);
+		}
+	}
+	return rt;
+}
+
 static std::string methodFunctionName( const std::string& cl, const std::string& mt)
 {
 	return "_strus_bindings_" + cl + "__" + mt;
@@ -68,6 +98,23 @@ static std::string constructorFunctionName( const std::string& cl)
 static std::string destructorFunctionName( const std::string& cl)
 {
 	return "_strus_bindings_destructor__" + cl;
+}
+
+static std::string parameterDeclaration( const std::string& indent, const strus::VariableValue& var)
+{
+	std::ostringstream out;
+	if (var.name().empty())
+	{
+		throw std::runtime_error("empty parameter declaration");
+	}
+	bool optional = var.type().hasEvent( "argv_default");
+	out << indent << "{" << std::endl;
+	out << indent << "\t\"" << var.name() << "\"," << std::endl;
+	out << indent << "\t\"" << printString( var.description()) << "\"," << std::endl;
+	out << indent << "\t\"" << printString( var.examples()) << "\"," << std::endl;
+	out << indent << "\t" << (optional ? "true":"false") << std::endl;
+	out << indent << "}";
+	return out.str();
 }
 
 static void print_BindingInterfaceDescriptionHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
@@ -100,10 +147,41 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		<< std::endl
 		<< "using namespace strus;" << std::endl
 		<< std::endl << std::endl;
-	int max_argc = 0;
+
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
+	for (; ci != ce; ++ci)
+	{
+		std::vector<strus::MethodDef>::const_iterator
+			mi = ci->methodDefs().begin(),
+			me = ci->methodDefs().end();
+		for (; mi != me; ++mi)
+		{
+			out << "static const papuga_ParameterDescription g_parameter_method_" << ci->name() << "_" << mi->name() << "[] = " << std::endl
+				<< "{" << std::endl;
+			std::vector<strus::VariableValue>::const_iterator
+				pi = mi->parameters().begin(),
+				pe = mi->parameters().end();
+			for (; pi != pe; ++pi)
+			{
+				out << parameterDeclaration( "\t", *pi) << "," << std::endl;
+			}
+			out << "\t{NULL,NULL,NULL,false}" << std::endl;
+			out << "};" << std::endl;
+
+			if (!mi->returnValue().expand( "typename").empty())
+			{
+				out << "static const papuga_CallResultDescription g_result_method_" << ci->name() << "_" << mi->name() << " = " << std::endl
+					<< "{"
+					<< "\"" << printString( mi->returnValue().description()) << "\", "
+					<< "\"" << printString( mi->returnValue().examples()) << "\""
+				<< "};" << std::endl;
+			}
+		}
+	}
+
+	ci = interfaceDef.classDefs().begin();
 	for (; ci != ce; ++ci)
 	{
 		out << "static const papuga_MethodDescription g_methods_" << ci->name() << "[" << (ci->methodDefs().size()+1) << "] = " << std::endl
@@ -113,12 +191,51 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
-			int argc = mi->parameters().size();
-			if (argc > max_argc) max_argc = argc;
-			out << "\t" << "{\"" << mi->name() <<  "\", \"" << methodFunctionName(ci->name(),mi->name()) << "\", true, " << argc << "}," << std::endl;
+			out << "\t" << "{\""
+				<< mi->name() <<  "\", "
+				<< "\"" << methodFunctionName(ci->name(),mi->name()) << "\", "
+				<< "\"" << printString( mi->description()) << "\", "
+				<< "\"" << printString( mi->examples()) << "\", ";
+			if (!mi->returnValue().expand( "typename").empty())
+			{
+				out << "&g_result_method_" << ci->name() << "_" << mi->name() << ", ";
+			}
+			else
+			{
+				out << "NULL, ";
+			}
+			out << "true, "
+				<< "g_parameter_method_" << ci->name() << "_" << mi->name()
+				<< "}," << std::endl;
 		}
-		out << "\t" << "{0,0,0}" << std::endl;
+		out << "\t" << "{NULL,NULL,NULL,NULL,NULL,false,NULL}" << std::endl;
 		out << "};" << std::endl;
+	}
+	ci = interfaceDef.classDefs().begin();
+	for (; ci != ce; ++ci)
+	{
+		if (!ci->constructorDefs().empty())
+		{
+			const strus::ConstructorDef& cdef = ci->constructorDefs()[ 0];
+			out << "static const papuga_ParameterDescription g_parameter_constructor_" << ci->name() << "[] = " << std::endl
+				<< "{" << std::endl;
+			std::vector<strus::VariableValue>::const_iterator
+				pi = cdef.parameters().begin(),
+				pe = cdef.parameters().end();
+			for (; pi != pe; ++pi)
+			{
+				out << parameterDeclaration( "\t", *pi) << "," << std::endl;
+			}
+			out << "\t{NULL,NULL,NULL,false}" << std::endl;
+			out << "};" << std::endl;
+			out << "static const papuga_ConstructorDescription g_constructor_" << ci->name() << " = " << std::endl
+				<< "{" << std::endl
+				<< "\t\"" << constructorFunctionName(ci->name()) << "\"," << std::endl
+				<< "\t\"" << printString( cdef.description()) << "\"," << std::endl
+				<< "\t\"" << printString( cdef.examples()) << "\"," << std::endl
+				<< "\tg_parameter_constructor_" << ci->name() << std::endl
+				<< "};" << std::endl << std::endl;
+		}
 	}
 
 	out << "static const papuga_ClassDescription g_classes[" << (interfaceDef.classDefs().size()+1) << "] = " << std::endl
@@ -127,17 +244,29 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	for (; ci != ce; ++ci)
 	{
 		std::string classid = std::string("Class") + ci->name();
-		std::string constructorid = ci->constructorDefs().empty()?std::string("NULL"):(std::string("\"")+constructorFunctionName(ci->name())+std::string("\""));
+		std::string constructordescr = ci->constructorDefs().empty()?std::string("NULL"):(std::string("&g_constructor_") + ci->name());
 
-		out << "\t" << "{ " << classid << ", \"" << ci->name() << "\", " << constructorid << ", \"" << destructorFunctionName(ci->name()) << "\", g_methods_" << ci->name() << "}," << std::endl;
+		out << "\t" << "{ " << classid
+			<< ", \"" << ci->name()
+			<< "\", \"" << printString( ci->description())
+			<< "\", " << constructordescr
+			<< ", \"" << destructorFunctionName(ci->name())
+			<< "\", g_methods_" << ci->name() << "}," << std::endl;
 	}
-	out << "\t" << "{0,0}" << std::endl;
+	out << "\t" << "{0,NULL}" << std::endl;
 	out << "};" << std::endl << std::endl;
 
 	out << "static const char* g_includefiles[2] = {\"strus/bindingObjects.h\", 0};"
 		<< std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", g_includefiles, g_classes };"
+	out << "static const papuga_AboutDescription g_about = {"
+		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
+		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
+		<< "\"Mozilla Public License v. 2.0 (MPLv2)\","
+		<< "\"" << STRUS_BINDINGS_VERSION_STRING << "\""
+		<< "};" << std::endl << std::endl;
+
+	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", g_includefiles, g_classes, &g_about };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
@@ -479,7 +608,7 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 			<< "{" << std::endl
 			<< "\t" << "static papuga_Deleter getDestructor()	{return &" << destructorFunctionName( ci->name()) << ";}" << std::endl
 			<< "\t" << "static int classid()			{return Class" << ci->name() << ";}" << std::endl
-			<< "\t" << "static const char* name()		{return \"" << ci->name() << "\";}" << std::endl
+			<< "\t" << "static const char* name()			{return \"" << ci->name() << "\";}" << std::endl
 			<< "};" << std::endl << std::endl;
 	}
 	out << "}}//namespace" << std::endl;
