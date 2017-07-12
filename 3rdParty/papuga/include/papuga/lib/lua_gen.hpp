@@ -22,6 +22,7 @@ namespace papuga {
 /// \param[in] what name of item to generate
 /// \param[in] args arguments passed to the generator
 /// \param[in] descr interface description
+/// \return true on success, false else
 bool generateLuaSource(
 	std::ostream& out,
 	std::ostream& err,

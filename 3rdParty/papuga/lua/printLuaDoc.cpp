@@ -79,7 +79,7 @@ static const char* skipSpaces( char const* ei)
 static void printCodeSnippetSeparator( std::ostream& out, char const* ei)
 {
 	ei = skipSpaces( ei);
-	if (*ei && *ei != '(' && *ei != ')' && *ei != ']')
+	if (*ei && *ei != '(' && *ei != ')' && *ei != ']' && *ei != ',' && *ei != '\n')
 	{
 		out << ", ";
 	}
@@ -98,6 +98,7 @@ static void printCodeSnippet( std::ostream& out, const char* tag, const char* ex
 		if (!*ei) break;
 		if (*ei == '\n')
 		{
+			++ei;
 			out << std::endl;
 			if (tag) { out << "-- @" << tag << " "; } else {out << "--- ";}
 		}
@@ -132,11 +133,13 @@ static void printCodeSnippet( std::ostream& out, const char* tag, const char* ex
 			const char* start = ei;
 			char eb = *ei;
 			++ei;
-			for (; *ei && *ei != eb; ++ei)
+			for (; *ei && *ei != eb && *ei != '\n'; ++ei)
 			{
 				if (*ei == '\\' && *(ei+1)) ++ei;
 			}
 			out << std::string( start, ei-start) << (char)eb;
+			if (*ei != eb) throw std::runtime_error("string not correctly terminated");
+			++ei;
 			printCodeSnippetSeparator( out, ei);
 		}
 		else if (*ei == '-' || (*ei >= '0' && *ei <= '9'))
@@ -165,9 +168,16 @@ static void printCodeSnippet( std::ostream& out, const char* tag, const char* ex
 				printCodeSnippetSeparator( out, ei);
 			}
 		}
+		else if (*ei == ',')
+		{
+			out << ", ";
+			ei = skipSpaces( ei+1);
+		}
 		else
 		{
-			throw std::runtime_error("syntax error in example");
+			char buf[ 1024];
+			std::snprintf( buf, sizeof(buf), "syntax error in example, unexpected token '%c'", *ei);
+			throw std::runtime_error( buf);
 		}
 	}
 	out << std::endl;
