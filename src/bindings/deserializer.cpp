@@ -338,22 +338,25 @@ bool Deserializer::hasDepth(
 
 static bool setFeatureOption_position( analyzer::FeatureOptions& res, const papuga_ValueVariant* val)
 {
-	if (papuga_ValueVariant_isequal_ascii( val, "content"))
+	char buf[ 128];
+	const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), val);
+
+	if (0==std::strcmp( id, "content"))
 	{
 		res.definePositionBind( analyzer::BindContent);
 		return true;
 	}
-	else if (papuga_ValueVariant_isequal_ascii( val, "succ"))
+	else if (0==std::strcmp( id, "succ"))
 	{
 		res.definePositionBind( analyzer::BindSuccessor);
 		return true;
 	}
-	else if (papuga_ValueVariant_isequal_ascii( val, "pred"))
+	else if (0==std::strcmp( id, "pred"))
 	{
 		res.definePositionBind( analyzer::BindPredecessor);
 		return true;
 	}
-	else if (papuga_ValueVariant_isequal_ascii( val, "unique"))
+	else if (0==std::strcmp( id, "unique"))
 	{
 		res.definePositionBind( analyzer::BindPredecessor);
 		return true;
@@ -383,16 +386,25 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 		++si;
 		for (; si != se && si->tag != papuga_TagClose; ++si)
 		{
-			if (si->tag == papuga_TagName
-			&& papuga_ValueVariant_isequal_ascii( &si->value, "position"))
+			if (si->tag == papuga_TagName)
 			{
-				++si;
-				if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
-				if (si->tag == papuga_TagValue)
+				char buf[ 128];
+				const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), &si->value);
+
+				if (0==std::strcmp( id, "position"))
 				{
-					if (!setFeatureOption_position( rt, getValue(si,se)))
+					++si;
+					if (si == se) throw strus::runtime_error(_TXT("unexpected end of %s definition"), context);
+					if (si->tag == papuga_TagValue)
 					{
-						throw strus::runtime_error(_TXT("expected position bind option"));
+						if (!setFeatureOption_position( rt, getValue(si,se)))
+						{
+							throw strus::runtime_error(_TXT("expected position bind option"));
+						}
+					}
+					else
+					{
+						throw strus::runtime_error(_TXT("expected feature option"));
 					}
 				}
 				else
@@ -555,7 +567,10 @@ const papuga_ValueVariant* Deserializer::getOptionalDefinition(
 	const papuga_ValueVariant* rt = 0;
 	if (si != se && si->tag == papuga_TagName)
 	{
-		if (papuga_ValueVariant_isequal_ascii( &si->value, name))
+		char buf[ 128];
+		const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), &si->value);
+
+		if (0==std::strcmp( id, name))
 		{
 			++si;
 			if (si->tag == papuga_TagValue)
@@ -890,7 +905,10 @@ static void deserializeQueryEvalFunctionParameterValue(
 
 		if (si->tag == papuga_TagName)
 		{
-			if (papuga_ValueVariant_isequal_ascii( &si->value, "feature"))
+			char buf[ 128];
+			const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), &si->value);
+
+			if (0==std::strcmp( id, "feature"))
 			{
 				++si;
 				if (si->tag == papuga_TagOpen)
@@ -1320,12 +1338,21 @@ static ExpressionType getExpressionType( papuga::Serialization::const_iterator s
 			if (si->tag == papuga_TagOpen)
 			{
 				++si;
-				if (si != se && si->tag == papuga_TagName
-				&& papuga_ValueVariant_isequal_ascii( &si->value, "variable"))
+				if (si != se && si->tag == papuga_TagName)
 				{
-					++si;
-					if (!Deserializer::skipStructure( si, se)) return ExpressionUnknown;
-					Deserializer::consumeClose( si, se);
+					char buf[ 128];
+					const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), &si->value);
+
+					if (0==std::strcmp( id, "variable"))
+					{
+						++si;
+						if (!Deserializer::skipStructure( si, se)) return ExpressionUnknown;
+						Deserializer::consumeClose( si, se);
+					}
+					else
+					{
+						return ExpressionList;
+					}
 				}
 				else
 				{
@@ -1654,11 +1681,14 @@ void Deserializer::buildPattern(
 				const papuga_ValueVariant* visibility = getOptionalDefinition( si, se, "visibility");
 				if (visibility)
 				{
-					if (papuga_ValueVariant_isequal_ascii( visibility, "public"))
+					char buf[ 128];
+					const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), visibility);
+
+					if (0==std::strcmp( id, "public"))
 					{
 						visible = true;
 					}
-					else if (papuga_ValueVariant_isequal_ascii( visibility, "private"))
+					else if (0==std::strcmp( id, "private"))
 					{
 						visible = false;
 					}
@@ -2182,13 +2212,20 @@ static void buildStorageDocumentDeletes(
 					}
 					case 4:
 					{
-						if (si != se && si->tag == papuga_TagValue
-							&& papuga_ValueVariant_isequal_ascii( &si->value, "*"))
+						bool clearAll = false;
+						if (si != se && si->tag == papuga_TagValue)
 						{
-							++si;
-							document->clearUserAccessRights();
+							char buf[ 128];
+							const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), &si->value);
+
+							if (0==std::strcmp( id, "*"))
+							{
+								++si;
+								document->clearUserAccessRights();
+								clearAll = true;
+							}
 						}
-						else
+						if (!clearAll)
 						{
 							std::vector<std::string> deletes( Deserializer::getStringList( si, se));
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();

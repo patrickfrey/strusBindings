@@ -187,84 +187,6 @@ static std::string any_langstring_to_uft8string_stl( papuga_StringEncoding enc, 
 }
 
 template <class LANGCHARSET>
-static bool compare_langstring_ascii( const char* str, size_t strsize, const char* cmpstr)
-{
-	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
-
-	unsigned char chr;
-	for (; 0!=(chr=itr.ascii()); ++itr)
-	{
-		if (chr != (unsigned char)*cmpstr++) break;
-	}
-	return (chr == 0 && *cmpstr == 0);
-}
-
-static bool compare_any_langstring_ascii( papuga_StringEncoding enc, const void* str, size_t strsize, const char* cmpstr)
-{
-	std::size_t cmplen;
-	switch (enc)
-	{
-		case papuga_UTF8:
-			cmplen = std::strlen( cmpstr);
-			return cmplen == strsize && 0 == strncmp( cmpstr, (const char*)str, strsize);
-		case papuga_UTF16BE:
-			return compare_langstring_ascii<textwolf::charset::UTF16BE>( (const char*)str, strsize*2, cmpstr);
-		case papuga_UTF16LE:
-			return compare_langstring_ascii<textwolf::charset::UTF16LE>( (const char*)str, strsize*2, cmpstr);
-		case papuga_UTF16:
-			return compare_langstring_ascii<W16CHARSET>( (const char*)str, strsize*2, cmpstr);
-		case papuga_UTF32BE:
-			return compare_langstring_ascii<textwolf::charset::UCS4BE>( (const char*)str, strsize*4, cmpstr);
-		case papuga_UTF32LE:
-			return compare_langstring_ascii<textwolf::charset::UCS4LE>( (const char*)str, strsize*4, cmpstr);
-		case papuga_UTF32:
-			return compare_langstring_ascii<W32CHARSET>( (const char*)str, strsize*4, cmpstr);
-		default:
-			return false;
-	}
-}
-
-template <class LANGCHARSET>
-static bool starts_langstring_ascii( const char* str, size_t strsize, const char* cmpstr)
-{
-	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
-	ScannerLangString itr( textwolf::CStringIterator( str, strsize));
-
-	unsigned char chr;
-	for (; 0!=(chr=itr.ascii() && *cmpstr); ++itr)
-	{
-		if (chr != (unsigned char)*cmpstr++) break;
-	}
-	return (*cmpstr == 0);
-}
-
-static bool starts_any_langstring_ascii( papuga_StringEncoding enc, const void* str, size_t strsize, const char* cmpstr)
-{
-	std::size_t cmplen;
-	switch (enc)
-	{
-		case papuga_UTF8:
-			cmplen = std::strlen( cmpstr);
-			return 0 == strncmp( (const char*)str, cmpstr, cmplen);
-		case papuga_UTF16BE:
-			return starts_langstring_ascii<textwolf::charset::UTF16BE>( (const char*)str, strsize*2, cmpstr);
-		case papuga_UTF16LE:
-			return starts_langstring_ascii<textwolf::charset::UTF16LE>( (const char*)str, strsize*2, cmpstr);
-		case papuga_UTF16:
-			return starts_langstring_ascii<W16CHARSET>( (const char*)str, strsize*2, cmpstr);
-		case papuga_UTF32BE:
-			return starts_langstring_ascii<textwolf::charset::UCS4BE>( (const char*)str, strsize*4, cmpstr);
-		case papuga_UTF32LE:
-			return starts_langstring_ascii<textwolf::charset::UCS4LE>( (const char*)str, strsize*4, cmpstr);
-		case papuga_UTF32:
-			return starts_langstring_ascii<W32CHARSET>( (const char*)str, strsize*4, cmpstr);
-		default:
-			return false;
-	}
-}
-
-template <class LANGCHARSET>
 static char* langstring_toascii( char* destbuf, size_t destbufsize, const char* str, size_t strsize)
 {
 	typedef textwolf::TextScanner<textwolf::CStringIterator,LANGCHARSET> ScannerLangString;
@@ -912,36 +834,6 @@ extern "C" papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_Valu
 	{
 		*err = papuga_ValueUndefined;
 		return 0;
-	}
-}
-
-extern "C" bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* val, const char* cmpstr)
-{
-	if (!papuga_ValueVariant_isstring( val)) return false;
-	if (val->valuetype == papuga_TypeString)
-	{
-		return 0 == strncmp( val->value.string, cmpstr, val->length);
-	}
-	else//if (val->valuetype == papuga_TypeLangString)
-	{
-		return compare_any_langstring_ascii( (papuga_StringEncoding)val->encoding, val->value.langstring, val->length, cmpstr);
-	}
-	return false;
-}
-
-extern "C" bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* val, const char* cmpstr)
-{
-	if (!papuga_ValueVariant_isstring( val)) return false;
-	int cmplen = std::strlen(cmpstr);
-	if (val->length < cmplen) return false;
-
-	if (val->valuetype == papuga_TypeString)
-	{
-		return 0 == strncmp( val->value.string, cmpstr, cmplen);
-	}
-	else//if (val->valuetype == papuga_TypeLangString)
-	{
-		return starts_any_langstring_ascii( (papuga_StringEncoding)val->encoding, val->value.langstring, val->length, cmpstr);
 	}
 }
 

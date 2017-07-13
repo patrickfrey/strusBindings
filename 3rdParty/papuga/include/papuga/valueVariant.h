@@ -140,16 +140,6 @@ bool papuga_ValueVariant_tobool( const papuga_ValueVariant* self, papuga_ErrorCo
 /// \return pointer to the result value in case the conversion succeeded
 papuga_ValueVariant* papuga_ValueVariant_tonumeric( const papuga_ValueVariant* self, papuga_ValueVariant* res, papuga_ErrorCode* err);
 
-/// \brief Test if the variant value is comparable with an ASCII string and equal to it
-/// \param[in] self pointer to structure 
-/// \return true if yes, false else
-bool papuga_ValueVariant_isequal_ascii( const papuga_ValueVariant* self, const char* value);
-
-/// \brief Test if the variant value is comparable with an ASCII string and starts with a specific value
-/// \param[in] self pointer to structure 
-/// \return true if yes, false else
-bool papuga_ValueVariant_starts_ascii( const papuga_ValueVariant* self, const char* value);
-
 /// \brief Try to convert a variant value to an ASCII string in a buffer of restricted size
 /// \param[out] destbuf buffer to use if a copy of the result string is needed to be made
 /// \param[in] destbufsize allocation size of 'destbuf' in bytes

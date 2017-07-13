@@ -11,8 +11,12 @@ template main ENDHTML {{ }}
 <body>
 <div id="container">
 <div id="product">
+	<div id="product_name">{{project}}</div>
+	<div id="product_author">{{author}}</div>
+	<div id="product_copyright">{{copyright}}</div>
+	<div id="product_license">{{license}}</div>
+	<div id="product_release">{{release}}</div>
 	<div id="product_logo">images/logotype.jpg</div>
-	<div id="product_name">Strus</div>
 	<div id="product_description">Lua interface for strus, a set of libraries and programs to build a text search engine</div>
 </div>
 <div id="main">
@@ -47,6 +51,12 @@ template main ENDHTML {{ }}
 </html>
 ENDHTML
 
+variable project
+variable author
+variable copyright
+variable license
+variable release
+
 template classnav=class END {{ }}
 <li><div id="navclass">{{classname}}</div></li>
 END
@@ -68,6 +78,7 @@ template constructortable=class END {{ }}
 <th>name</th>
 <th>arguments</th>
 <th>description</th>
+<th>examples</th>
 </tr>
 {{constructorlist}}
 </table>
@@ -80,6 +91,7 @@ template methodtable=class END {{ }}
 <th>name</th>
 <th>arguments</th>
 <th>description</th>
+<th>examples</th>
 </tr>
 {{methodlist}}
 </table>
@@ -90,16 +102,30 @@ template constructorlist=constructor END {{ }}
 <tr><td>{{constructorname}}</td></tr>
 <tr><td>{{description}}</td></tr>
 <tr><td><ul>{{parameterlist}}</ul></td></tr>
+<tr><td>{{call_examples}}</td></tr>
 END
 
 template methodlist=method END {{ }}
 <tr><td>{{methodname}}</td></tr>
 <tr><td>{{description}}</td></tr>
 <tr><td><ul>{{parameterlist}}</ul></td></tr>
+<tr><td>{{call_examples}}</td></tr>
 END
 
 template parameterlist=param END {{ }}
-<li><div id="paramname">{{paramname}}</div><div id="paramdescr">{{paramdescr}}</div></li>
+<li>
+	<div id="paramname">{{paramname}}</div>
+	<div id="paramdescr">{{paramdescr}}</div>
+	<div id="examples">{{value_examples}}</div>
+</li>
+END
+
+template call_examples=usage END {{ }}
+<div id="example">{{example}}</div>
+END
+
+template value_examples=usage END {{ }}
+<div id="example">{{example}}</div>
 END
 
 variable constructorname=constructor
@@ -108,3 +134,4 @@ variable classname=class
 variable description=brief
 variable paramname=param[0]
 variable paramdescr=param[1:]
+variable example=usage

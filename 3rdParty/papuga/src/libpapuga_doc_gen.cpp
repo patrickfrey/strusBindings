@@ -262,11 +262,7 @@ static void parseTagDeclaration( std::string& variable, std::string& tag, char c
 	}
 	tag = parseIdentifier( si, se);
 	variable = tag;
-	if (!skipLineSpaces( si, se))
-	{
-		throw std::runtime_error("missing variable/template arguments");
-	}
-	if (*si == '=')
+	if (skipLineSpaces( si, se) && *si == '=')
 	{
 		++si;
 		if (!skipLineSpaces( si, se))
@@ -478,9 +474,11 @@ struct VariableDeclaration
 class DocGenerator
 {
 public:
-	DocGenerator( const std::string& src)
+	DocGenerator( std::ostream& errchn, const std::string& src)
 		:m_eolncomment(),m_templates(),m_variables(),m_groupmap(),m_groupcnt(0)
 	{
+		std::set<std::string> referencedVariables;
+		std::set<std::string> definedVariables;
 		const char* start = src.c_str();
 		char const* si = src.c_str();
 		const char* se = si + src.size();
@@ -513,10 +511,17 @@ public:
 						else if (id == "template")
 						{
 							m_templates.push_back( TemplateDeclaration( si, se));
+							if (m_templates.size() > 1)
+							{
+								definedVariables.insert( m_templates.back().variable);
+							}
+							std::vector<std::string> usedvars = m_templates.back().content.variables();
+							referencedVariables.insert( usedvars.begin(), usedvars.end());
 						}
 						else if (id == "variable")
 						{
 							m_variables.push_back( VariableDeclaration( si, se));
+							definedVariables.insert( m_variables.back().variable);
 						}
 						else if (id == "group")
 						{
@@ -572,10 +577,29 @@ public:
 					ti->groupid = gi->second;
 				}
 			}
-			// Check if at least one template defined:
+			// Check if at least one template (main template) defined:
 			if (m_templates.empty())
 			{
 				throw EXCEPTION("at least one template (toplevel template) must be defined");
+			}
+			// Check variable references:
+			std::set<std::string>::const_iterator
+				ri = referencedVariables.begin(), re = referencedVariables.end();
+			for (; ri != re; ++ri)
+			{
+				if (definedVariables.find( *ri) == definedVariables.end())
+				{
+					errchn << "undefined item '" << *ri << "' referenced in template" << std::endl;
+				}
+			}
+			std::set<std::string>::const_iterator
+				di = definedVariables.begin(), de = definedVariables.end();
+			for (; di != de; ++di)
+			{
+				if (referencedVariables.find( *di) == referencedVariables.end())
+				{
+					errchn << "unused item '" << *di << "' defined" << std::endl;
+				}
 			}
 		}
 		catch (const std::bad_alloc&)
@@ -804,7 +828,6 @@ private:
 		std::list<TemplateInstance>::iterator ti = tplist.begin(), te = tplist.end();
 		for (;ti != te; ++ti)
 		{
-			/*[-]*/std::cerr << "+++" << std::endl << m_templates[ ti->idx].tostring() << std::endl;
 			std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
 			if (mi != ti->map.end())
 			{
@@ -967,7 +990,7 @@ DLL_PUBLIC bool papuga::generateDoc(
 {
 	try
 	{
-		DocGenerator docgen( templatesrc);
+		DocGenerator docgen( err, templatesrc);
 #ifdef PAPUGA_LOWLEVEL_DEBUG
 		std::cerr << docgen.tostring() << std::endl;
 #endif
