@@ -337,16 +337,45 @@ struct TemplateDeclaration
 	}
 };
 
+typedef std::string (*EncoderFunction)( const std::string& content);
+
+static std::string escapeXmlControls( const std::string& content)
+{
+	std::string rt;
+	std::string::const_iterator ci = content.begin(), ce = content.end();
+	for (; ci != ce; ++ci)
+	{
+		if (*ci == '<')
+		{
+			rt.append( "&lt;");
+		}
+		else if (*ci == '>')
+		{
+			rt.append( "&gt;");
+		}
+		else if (*ci == '&')
+		{
+			rt.append( "&amp;");
+		}
+		else
+		{
+			rt.push_back( *ci);
+		}
+	}
+	return rt;
+}
+
 struct VariableDeclaration
 {
 	std::string variable;
 	std::string tag;
 	std::pair<int,int> index;
+	EncoderFunction encoder;
 
 	VariableDeclaration( const VariableDeclaration& o)
-		:variable(o.variable),tag(o.tag),index(o.index){}
+		:variable(o.variable),tag(o.tag),index(o.index),encoder(o.encoder){}
 	VariableDeclaration( char const*& si, const char* se)
-		:index( std::pair<int,int>(0,std::numeric_limits<int>::max()))
+		:index( std::pair<int,int>(0,std::numeric_limits<int>::max())),encoder(0)
 	{
 		parseTagDeclaration( variable, tag, si, se);
 		if (skipLineSpaces( si, se))
@@ -395,9 +424,24 @@ struct VariableDeclaration
 					throw EXCEPTION("unexpected token in array range");
 				}
 			}
+		}
+		if (skipLineSpaces( si, se))
+		{
+			if (isAlpha(*si))
+			{
+				std::string funcname = parseIdentifier( si, se);
+				if (funcname == "xmlencode")
+				{
+					encoder = &escapeXmlControls;
+				}
+				else
+				{
+					throw EXCEPTION("unknown encoder name '%s'", funcname.c_str());
+				}
+			}
 			else
 			{
-				throw EXCEPTION("unexpected token, expected array range or nothing");
+				throw EXCEPTION("unexpected token, expected array range and/or encoder name");
 			}
 		}
 	}
@@ -415,6 +459,10 @@ struct VariableDeclaration
 			}
 			idxstr << "]";
 		}
+		if (encoder == &escapeXmlControls)
+		{
+			idxstr << " " << "xmlencode";
+		}
 		std::ostringstream out;
 		if (tag == variable)
 		{
@@ -431,7 +479,14 @@ struct VariableDeclaration
 	{
 		if (index.first == 0 && index.second >= (int)annvalue.size())
 		{
-			return annvalue;
+			if (encoder)
+			{
+				return encoder( annvalue);
+			}
+			else
+			{
+				return annvalue;
+			}
 		}
 		std::string rt;
 		std::vector<std::string> valuear = splitBySpaces( annvalue);
@@ -467,7 +522,14 @@ struct VariableDeclaration
 			}
 			rt.append( valuear[ vidx]);
 		}
-		return rt;
+		if (encoder)
+		{
+			return encoder( rt);
+		}
+		else
+		{
+			return rt;
+		}
 	}
 };
 
@@ -475,7 +537,7 @@ class DocGenerator
 {
 public:
 	DocGenerator( std::ostream& errchn, const std::string& src)
-		:m_eolncomment(),m_templates(),m_variables(),m_groupmap(),m_groupcnt(0)
+		:m_eolncomment(),m_templates(),m_variables(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
 	{
 		std::set<std::string> referencedVariables;
 		std::set<std::string> definedVariables;
@@ -538,10 +600,29 @@ public:
 								}
 								else
 								{
-									throw EXCEPTION("list of identifiers expected in group declaration");
+									throw EXCEPTION("list of identifiers expected in group declaration", "group");
 								}
 							}
 							++m_groupcnt;
+						}
+						else if (id == "ignore")
+						{
+							while (skipLineSpaces( si, se))
+							{
+								if (isAlpha(*si))
+								{
+									std::string id = parseIdentifier( si, se);
+									m_ignoreset.insert( id);
+								}
+								else
+								{
+									throw EXCEPTION("list of identifiers expected in %s declaration", "ignore");
+								}
+							}
+						}
+						else
+						{
+							throw EXCEPTION("unknown template command '%s'", id.c_str());
 						}
 					}
 					else
@@ -575,6 +656,23 @@ public:
 				if (gi != m_groupmap.end())
 				{
 					ti->groupid = gi->second;
+				}
+			}
+			// Check elements to ignore (issue warning if they are referenced):
+			for (ti = m_templates.begin(); ti != te; ++ti)
+			{
+				if (m_ignoreset.find( ti->tag) != m_ignoreset.end())
+				{
+					errchn << "referencing tag '" << ti->tag << "' declared as to ignore" << std::endl;
+				}
+			}
+			std::vector<VariableDeclaration>::const_iterator
+				vi = m_variables.begin(), ve = m_variables.end();
+			for (; vi != ve; ++vi)
+			{
+				if (m_ignoreset.find( vi->tag) != m_ignoreset.end())
+				{
+					errchn << "referencing tag '" << vi->tag << "' declared as to ignore" << std::endl;
 				}
 			}
 			// Check if at least one template (main template) defined:
@@ -613,7 +711,7 @@ public:
 	}
 
 	DocGenerator( const DocGenerator& o)
-		:m_eolncomment(o.m_eolncomment),m_templates(o.m_templates),m_variables(o.m_variables),m_groupmap(o.m_groupmap),m_groupcnt(o.m_groupcnt){}
+		:m_eolncomment(o.m_eolncomment),m_templates(o.m_templates),m_variables(o.m_variables),m_ignoreset(o.m_ignoreset),m_groupmap(o.m_groupmap),m_groupcnt(o.m_groupcnt){}
 
 	std::string tostring() const
 	{
@@ -647,12 +745,6 @@ public:
 		return out.str();
 	}
 
-	const std::string& comment() const				{return m_eolncomment;}
-	const std::vector<TemplateDeclaration> templates() const	{return m_templates;}
-	const std::vector<VariableDeclaration> variables() const	{return m_variables;}
-	const std::map<std::string, unsigned int> groupmap() const	{return m_groupmap;}
-	unsigned int groupcnt() const					{return m_groupcnt;}
-
 	std::string generate( std::ostream& warnings, const std::string& content, const std::map<std::string,std::string>& varmap)
 	{
 		char const* si = content.c_str();
@@ -678,6 +770,10 @@ public:
 #ifdef PAPUGA_LOWLEVEL_DEBUG
 						std::cerr << "parse @" << ann.tag << " [" << ann.value << "]" << std::endl;
 #endif
+						if (m_ignoreset.find( ann.tag) != m_ignoreset.end())
+						{
+							continue;
+						}
 						bool action = false;
 						//[1] First close all templates reaching end of scope
 						closeEndOfScopeTemplates( tplist, ann.tag);
@@ -975,6 +1071,7 @@ private:
 	std::string m_eolncomment;
 	std::vector<TemplateDeclaration> m_templates;
 	std::vector<VariableDeclaration> m_variables;
+	std::set<std::string> m_ignoreset;
 	typedef std::map<std::string, unsigned int> GroupMap;
 	GroupMap m_groupmap;
 	unsigned int m_groupcnt;

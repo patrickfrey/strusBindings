@@ -7,7 +7,7 @@
  */
 #ifndef _PAPUGA_PRINT_LUA_DOCUMENTATION_INCLUDED
 #define _PAPUGA_PRINT_LUA_DOCUMENTATION_INCLUDED
-/// \brief Module for printing the lua documentation (LDoc - ex. LuaDoc)
+/// \brief Module for printing the lua documentation
 /// \file printLuaDoc.hpp
 #include "papuga/interfaceDescription.h"
 #include <iostream>

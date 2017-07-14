@@ -52,7 +52,7 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
-	/// \param[in] options (optional) a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
+	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
 	/// \example "content"
 	/// \example "unique"
 	/// \example "succ"

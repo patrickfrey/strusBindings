@@ -24,9 +24,38 @@ static void printUsage()
 	std::cerr << "Description : Program for generating documentation, mapping a doxygen like" << std::endl;
 	std::cerr << "              documented source file with a template" << std::endl;
 	std::cerr << "<template>  : File with the template." << std::endl;
-	std::cerr << "<inputfile> : input file to map" << std::endl;
+	std::cerr << "              Template language:" << std::endl;
+	std::cerr << "                  comment <eolncomment>" << std::endl;
+	std::cerr << "                  : specifies the end of line comment in the source to parse" << std::endl;
+	std::cerr << "                    for interface documentation. Tags start with '@'" << std::endl;
+	std::cerr << "                  variable [<name> '=']<tagname> ['[' <rangedef> ']'] [<encoder>]" << std::endl;
+	std::cerr << "                  : Declares a documentation tag to be interpreted as variable" << std::endl;
+	std::cerr << "                  template [<name> '=']<tagname> <em> <ob> <eb>" << std::endl;
+	std::cerr << "                  : Declares a documentation tag to be interpreted as template." << std::endl;
+	std::cerr << "                    The content of the template follows on the next line." << std::endl;
+	std::cerr << "                    It ends with the character sequence specified with <em>." << std::endl;
+	std::cerr << "                  group <tagname> { <tagname> }" << std::endl;
+	std::cerr << "                  : Declares templates triggered by these input tags to be of" << std::endl;
+	std::cerr << "                    the same group. Groups influence the end of scope." << std::endl;
+	std::cerr << "                  ignore <tagname> { <tagname> }" << std::endl;
+	std::cerr << "                  : Declares one or more input tags to be ignored." << std::endl;
+	std::cerr << "              Meaning of elements in the grammar of the template language:" << std::endl;
+	std::cerr << "              <eolncomment> sequence of characters starting an eoln comment" << std::endl;
+	std::cerr << "              <name> replacement identifier of the variable template" << std::endl;
+	std::cerr << "              <tagname> name of source documentation tag" << std::endl;
+	std::cerr << "              <rangedef> specifies a substring (python syntax) of the content" << std::endl;
+	std::cerr << "                 splitted by spaces to access. " << std::endl;
+	std::cerr << "              <em> end marker of the content of a template" << std::endl;
+	std::cerr << "              <ob> open bracket to mark variable references in a template" << std::endl;
+	std::cerr << "              <eb> close bracket for variable references in a template" << std::endl;
+	std::cerr << "<inputfile> : source file to map" << std::endl;
+	std::cerr << "              Source contains program source with end of line comments" << std::endl;
+	std::cerr << "              End of line comments starting with a '@' followed by" << std::endl;
+	std::cerr << "              an identifier are mapped according the templates specified." << std::endl;
 	std::cerr << "<variable>  : (optional) name of variable to define" << std::endl;
 	std::cerr << "<filepath>  : (optional) content of file to assign to variable" << std::endl;
+	std::cerr << "              Variable declarations passed with the command line are" << std::endl;
+	std::cerr << "              mapped as variables into the main (first) template specified." << std::endl;
 }
 
 static std::string readFile( const std::string& filename)

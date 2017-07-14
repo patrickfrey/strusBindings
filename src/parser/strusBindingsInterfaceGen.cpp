@@ -22,7 +22,10 @@
 #include <sstream>
 #include <cerrno>
 
-#define STRUS_BINDINGS_AUTHOR "Patrick P. Frey"
+#define STRUS_BINDINGS_PRODUCTNAME  "Strus"
+#define STRUS_BINDINGS_AUTHOR       "Patrick P. Frey"
+#define STRUS_BINDINGS_LICENSE      "Mozilla Public License v. 2.0 (MPLv2)"
+
 #undef STRUS_LOWLEVEL_DEBUG
 
 /// \brief List of interface files parsed without path
@@ -112,7 +115,7 @@ static std::string parameterDeclaration( const std::string& indent, const strus:
 	out << indent << "\t\"" << var.name() << "\"," << std::endl;
 	out << indent << "\t\"" << printString( var.description()) << "\"," << std::endl;
 	out << indent << "\t\"" << printString( var.examples()) << "\"," << std::endl;
-	out << indent << "\t" << (optional ? "true":"false") << std::endl;
+	out << indent << "\t" << (optional ? "false":"true") << std::endl;
 	out << indent << "}";
 	return out.str();
 }
@@ -262,11 +265,11 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "static const papuga_AboutDescription g_about = {"
 		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
 		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
-		<< "\"Mozilla Public License v. 2.0 (MPLv2)\","
+		<< "\"" << STRUS_BINDINGS_LICENSE << "\","
 		<< "\"" << STRUS_BINDINGS_VERSION_STRING << "\""
 		<< "};" << std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"strus\", g_includefiles, g_classes, &g_about };"
+	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCTNAME << "\", g_includefiles, g_classes, &g_about };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;

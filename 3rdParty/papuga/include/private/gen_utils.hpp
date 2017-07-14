@@ -17,7 +17,6 @@
 namespace papuga {
 
 std::string cppCodeSnippet( unsigned int idntcnt, ...);
-std::runtime_error runtime_error( const char* msg, ...);
 
 typedef std::map<unsigned int,const papuga_ClassDescription*> ClassDescriptionMap;
 ClassDescriptionMap getClassDescriptionMap( const papuga_InterfaceDescription& descr);

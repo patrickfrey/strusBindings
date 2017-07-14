@@ -51,3 +51,7 @@ target_link_libraries( papugaDoc papuga_doc_gen ${CMAKE_DL_LIBS} ${Intl_LIBRARIE
 install( TARGETS papugaDoc
            RUNTIME DESTINATION bin )
 
+install( TARGETS papuga_doc_gen
+           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/papuga )
+
+

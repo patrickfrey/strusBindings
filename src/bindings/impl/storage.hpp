@@ -55,7 +55,7 @@ public:
 	/// \brief Get an interator on the tuples (value,pos) of the forward index of a given type for a document
 	/// \param[in] docno internal local document number
 	/// \param[in] termtype term type string
-	/// \param[in] pos (optional) ordinal start position in forward index (where to start iterating)
+	/// \param[in] pos ordinal start position in forward index (where to start iterating)
 	/// \return iterator on tuples (value,pos)
 	Iterator documentForwardIndexTerms( const Index& docno, const std::string& termtype, const Index& pos=0) const;
 

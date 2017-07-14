@@ -45,7 +45,7 @@ class ContextImpl
 {
 public:
 	/// \brief Constructor
-	/// \param[in] config (optional) context configuration. If not defined, create context for local mode with own module loader
+	/// \param[in] config context configuration. If not defined, create context for local mode with own module loader
 	explicit ContextImpl( const ValueVariant& config=ValueVariant());
 	/// \brief Destructor
 	~ContextImpl(){}
