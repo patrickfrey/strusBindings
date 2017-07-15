@@ -104,10 +104,17 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	ContextDef contextdef( parseContext( descr));
 	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads);
 	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
-	ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
-	m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
 
-	if (!contextdef.rpc.empty())
+	if (contextdef.rpc.empty())
+	{
+		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);
+		m_moduleloader_impl.resetOwnership( moduleLoader, "ModuleLoader");
+		if (!contextdef.trace.empty())
+		{
+			m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd), "TraceProxy");
+		}
+	}
+	else
 	{
 		Reference<RpcClientMessagingInterface> messaging;
 		messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
@@ -115,10 +122,6 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 		m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd), "RpcClient");
 		if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
 		(void)messaging.release();
-	}
-	if (!contextdef.trace.empty())
-	{
-		m_trace_impl.resetOwnership( new TraceProxy( moduleLoader, contextdef.trace, errorhnd), "TraceProxy");
 	}
 }
 
@@ -359,10 +362,10 @@ Struct ContextImpl::unpackStatisticBlob( const std::string& blob, const std::str
 		}
 		throw strus::runtime_error(_TXT( "error statistics message processor '%s' not defined"), procname.c_str());
 	}
-	StatisticsViewerInterface* viewer = statsproc->createViewer( blob.c_str(), blob.size());
-	if (!viewer) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
+	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( blob.c_str(), blob.size()));
+	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 	Struct rt;
-	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, *viewer)) throw std::bad_alloc();
+	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, *viewer, &rt.allocator)) throw std::bad_alloc();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());

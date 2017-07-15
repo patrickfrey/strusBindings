@@ -4,19 +4,25 @@ require "config_t3s"
 require "createCollection"
 require "dumpCollection"
 
-local datadir = arg[1]
+local datadir = arg[1] or "../data/t3s/"
 local outputdir = arg[2] or '.'
+local ctxconfig = getContextConfig( arg[3])
 local storagedir = outputdir .. "/storage"
 local docfiles = {"A.xml","B.xml","C.xml"}
 local output = {}
+local withrpc = ctxconfig.rpc and true or false
 
-local ctx = strus_Context.new()
-ctx:loadModule( "analyzer_pattern")
+local ctx = strus_Context.new( ctxconfig)
+local storageConfig = nil
 
-createCollection( ctx, storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, nil)
+if not withrpc then
+	ctx:loadModule( "analyzer_pattern")
+	storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_t3s())
+end
+
+createCollection( ctx, storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, nil, withrpc)
 
 local queryPhrase = "City visit tokyo"
-local storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_t3s())
 
 -- Get a client for the new created storage:
 local storage = ctx:createStorageClient( storageConfig)
@@ -46,18 +52,21 @@ if #terms == 0 then
 	error( "query is empty")
 end
 
-local postings = {}
-for _,qe in ipairs( terms ) do
-	for docno,pos in storage:postings( qe) do
-		postings[ string.format( "term %u doc %s", _, storage:docid(docno))] = pos
+if not withrpc then
+	-- ... For RPC there are no posting iterators implemented
+	local postings = {}
+	for _,qe in ipairs( terms ) do
+		for docno,pos in storage:postings( qe) do
+			postings[ string.format( "term %u doc %s", _, storage:docid(docno))] = pos
+		end
 	end
-end
-for _,qe in ipairs( qexpr ) do
-	for docno,pos in storage:postings( qe) do
-		postings[ string.format( "expr %u doc %s", _, storage:docid(docno))] = pos
+	for _,qe in ipairs( qexpr ) do
+		for docno,pos in storage:postings( qe) do
+			postings[ string.format( "expr %u doc %s", _, storage:docid(docno))] = pos
+		end
 	end
+	output[ "postings"] = postings;
 end
-output[ "postings"] = postings;
 
 -- Then we iterate on the terms and create a single term feature for each term and collect
 -- all terms to create a selection expression out of them:

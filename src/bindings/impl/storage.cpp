@@ -264,11 +264,11 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
 	Deserializer::buildInsertDocument( document.get(), doc, errorhnd);
+	document->done();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( _TXT("failed to insert document: %s"), errorhnd->fetchError());
 	}
-	document->done();
 }
 
 void StorageTransactionImpl::deleteDocument( const std::string& docId)

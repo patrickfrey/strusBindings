@@ -329,7 +329,7 @@ void PostingsExpressionBuilder::pushExpression( const std::string& op, unsigned 
 		std::vector<Reference<PostingIteratorInterface> > args;
 		args.insert( args.end(), si, se);
 		Reference<PostingIteratorInterface> itr( joinop->createResultIterator( args, range, cardinality));
-		if (!itr.get()) throw strus::runtime_error(_TXT("failed to create posting iterator join for '%s'"), op.c_str(), m_errorhnd->fetchError());
+		if (!itr.get()) throw strus::runtime_error(_TXT("failed to create posting iterator join for '%s': %s"), op.c_str(), m_errorhnd->fetchError());
 		m_stack.resize( m_stack.size() - argc);
 		m_stack.push_back( itr);
 	}

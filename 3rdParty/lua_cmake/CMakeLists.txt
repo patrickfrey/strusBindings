@@ -66,8 +66,8 @@ add_library( strus_lua STATIC ${source_files} )
 # ------------------------------
 # PROGRAMS
 # ------------------------------
-# add_executable( lua ${PROJECT_SOURCE_DIR}/3rdParty/lua/lua.c )
-# target_link_libraries( lua strus_lua m dl ${Intl_LIBRARIES} )
+add_executable( lua ${PROJECT_SOURCE_DIR}/3rdParty/lua/lua.c )
+target_link_libraries( lua strus_lua m dl readline ${Intl_LIBRARIES} )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 # find_library( LIBKVM_LIBRARIES kvm )

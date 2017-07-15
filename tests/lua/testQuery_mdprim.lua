@@ -4,14 +4,22 @@ require "config_mdprim"
 require "createCollection"
 require "dumpCollection"
 
-local datadir = arg[1]
+local datadir = arg[1] or "../data/t3s/"
 local outputdir = arg[2] or '.'
+local ctxconfig = getContextConfig( arg[3])
 local storagedir = outputdir .. "/storage"
 local docfiles = {"doc1000.xml"}
 local output = {}
+local withrpc = ctxconfig.rpc and true or false
 
-local ctx = strus_Context.new()
-ctx:loadModule( "analyzer_pattern")
+local ctx = strus_Context.new( ctxconfig)
+local storageConfig = nil
+
+if not withrpc then
+	ctx:loadModule( "analyzer_pattern")
+	storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_mdprim())
+end
+
 local aclmap = {}
 for i=1,1000 do
 	local usr = {}
@@ -28,10 +36,9 @@ for i=1,1000 do
 	end
 	aclmap[ tostring(i)] = usr
 end
-createCollection( ctx, storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap)
+createCollection( ctx, storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap, withrpc)
 
 local queryPhrase = "2 3"
-local storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_mdprim())
 
 -- Get a client for the new created storage:
 local storage = ctx:createStorageClient( storageConfig)

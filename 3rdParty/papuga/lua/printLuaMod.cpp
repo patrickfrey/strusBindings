@@ -120,7 +120,7 @@ static void define_constructor(
 		"return 1;",
 		"ERROR_CALL:",
 		"papuga_lua_destroy_CallArgs( &arg);",
-		"lua_pop(ls, 1);//... pop udata"
+		"lua_pop(ls, 1);//... pop udata",
 		"papuga_lua_error_str( ls, \"{nsclassname}.new\", errbuf);",
 		"return 0; //... never get here (papuga_lua_error_str exits)",
 		"}",

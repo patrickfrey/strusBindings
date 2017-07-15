@@ -11,6 +11,7 @@
 #include "papuga/valueVariant.h"
 #include "papuga/serialization.hpp"
 #include "internationalization.hpp"
+#include "papuga/allocator.h"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -335,17 +336,19 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 		return false;
 	}
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsViewerInterface::DocumentFrequencyChange& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsViewerInterface::DocumentFrequencyChange& val, papuga_Allocator* allocator)
 {
 	bool rt = true;
 	rt &= papuga_Serialization_pushOpen( result);
-	rt &= serializeStructMember( result, "type", val.type());
-	rt &= serializeStructMember( result, "value", val.value());
+	const char* type = papuga_Allocator_copy_charp( allocator, val.type());
+	rt &= serializeStructMember( result, "type", type);
+	const char* value = papuga_Allocator_copy_charp( allocator, val.value());
+	rt &= serializeStructMember( result, "value", value);
 	rt &= serializeStructMember( result, "increment", (papuga_Int)val.increment());
 	rt &= papuga_Serialization_pushClose( result);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_Allocator* allocator)
 {
 	bool rt = true;
 
@@ -356,7 +359,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsView
 	DocumentFrequencyChange rec;
 	while (val.nextDfChange( rec))
 	{
-		rt &= Serializer::serialize_nothrow( result, rec);
+		rt &= Serializer::serialize_nothrow( result, rec, allocator);
 	}
 	rt &= papuga_Serialization_pushClose( result);
 

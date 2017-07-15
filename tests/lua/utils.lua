@@ -157,3 +157,14 @@ function joinLists(...)
 	end
 	return rt
 end
+
+function getContextConfig( argval)
+	if argval == 'trace' then
+		return {trace={log="dump",file="stdout"}}
+	elseif arg[3] then
+		return {rpc=arg[3]}
+	else
+		return nil
+	end
+end
+

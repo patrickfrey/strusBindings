@@ -4,21 +4,26 @@ require "config_mdprim"
 require "createCollection"
 require "dumpCollection"
 
-local datadir = arg[1]
+local datadir = arg[1] or "../data/t3s/"
 local outputdir = arg[2] or '.'
+local ctxconfig = getContextConfig( arg[3])
 local storage = outputdir .. "/storage"
 local docfiles = {"doc10.xml"}
+local withrpc = ctxconfig.rpc and true or false
 
--- ctx = strus_Context.new( {trace={log="dump",file="stdout"}})
-ctx = strus_Context.new()
-ctx:loadModule( "analyzer_pattern")
+-- ctx = strus_Context.new( )
+ctx = strus_Context.new( ctxconfig)
+if not ctxconfig.rpc then
+	ctx:loadModule( "analyzer_pattern")
+end
 local aclmap = {["1"]='A',["2"]='A',["3"]='A',["4"]='A',["5"]='A',["6"]='B',["7"]='B',["8"]='B',["9"]='B',["10"]='B'}
 
-createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap)
+createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap, withrpc)
 local result = "collection dump:" .. dumpTree( dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
 string config:
+  string acl: "true"
   string cache: "524288K"
   string metadata: "lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
   string path: "storage"

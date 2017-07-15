@@ -1,20 +1,23 @@
 require "string"
 require "utils"
 
-function createCollection( strusctx, storagePath, metadata, analyzer, multipart, datadir, fnams, aclmap)
-	local config = {
-		path = storagePath,
-		metadata = metadata,
-		cache = '512M',
-		statsproc = 'default'
-	}
-	if aclmap then
-		config.acl = true
-	end
-	strusctx:destroyStorage( config)
-	strusctx:getLastError()
+function createCollection( strusctx, storagePath, metadata, analyzer, multipart, datadir, fnams, aclmap, withrpc)
+	local config = nil
+	if not withrpc then
+		config = {
+			path = storagePath,
+			metadata = metadata,
+			cache = '512M',
+			statsproc = 'default'
+		}
+		if aclmap then
+			config.acl = true
+		end
+		strusctx:destroyStorage( config)
+		strusctx:getLastError()
 
-	strusctx:createStorage( config)
+		strusctx:createStorage( config)
+	end
 	-- Get a client for the new created storage:
 	local storage = strusctx:createStorageClient( config)
 

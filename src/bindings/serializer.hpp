@@ -104,7 +104,7 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val);
 
 	typedef StatisticsViewerInterface::DocumentFrequencyChange DocumentFrequencyChange;
-	static bool serialize_nothrow( papuga_Serialization* result, const DocumentFrequencyChange& val);
+	static bool serialize_nothrow( papuga_Serialization* result, const DocumentFrequencyChange& val, papuga_Allocator* allocator);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename=0);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val);
@@ -124,7 +124,7 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentMetaData>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentAttribute>& val);
-	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val);
+	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_Allocator* allocator);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val);
 

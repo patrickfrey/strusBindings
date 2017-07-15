@@ -4,20 +4,25 @@ require "config_t3s"
 require "createCollection"
 require "dumpCollection"
 
-local datadir = arg[1]
+local datadir = arg[1] or "../data/t3s/"
 local outputdir = arg[2] or '.'
+local ctxconfig = getContextConfig( arg[3])
 local storage = outputdir .. "/storage"
 local docfiles = {"A.xml","B.xml","C.xml"}
+local withrpc = ctxconfig.rpc and true or false
 
-ctx = strus_Context.new()
-ctx:loadModule( "analyzer_pattern")
+ctx = strus_Context.new( ctxconfig)
+if not ctxconfig.rpc then
+	ctx:loadModule( "analyzer_pattern")
+end
 local aclmap = {["A.xml"]="a",["B.xml"]="b",["C.xml"]="c"}
 
-createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, aclmap)
+createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, aclmap, withrpc)
 local result = "collection dump:" .. dumpTree( dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
 string config:
+  string acl: "true"
   string cache: "524288K"
   string metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
   string path: "storage"
