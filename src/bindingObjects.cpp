@@ -2471,7 +2471,7 @@ void Query::setMinRank( unsigned int minRank_)
 void Query::addUserName( const std::string& username_)
 {
 	strus::QueryInterface* THIS = (strus::QueryInterface*)m_query_impl.get();
-	THIS->addUserName( username_);
+	THIS->addAccess( username_);
 }
 
 void Query::setWeightingVariables(
