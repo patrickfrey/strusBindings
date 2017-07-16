@@ -537,7 +537,7 @@ class DocGenerator
 {
 public:
 	DocGenerator( std::ostream& errchn, const std::string& src)
-		:m_eolncomment(),m_templates(),m_variables(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
+		:m_eolncomment(),m_templates(),m_variables(),m_namespaces(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
 	{
 		std::set<std::string> referencedVariables;
 		std::set<std::string> definedVariables;
@@ -584,6 +584,11 @@ public:
 						{
 							m_variables.push_back( VariableDeclaration( si, se));
 							definedVariables.insert( m_variables.back().variable);
+						}
+						else if (id == "namespace")
+						{
+							m_namespaces.push_back( VariableDeclaration( si, se));
+							definedVariables.insert( m_namespaces.back().variable);
 						}
 						else if (id == "group")
 						{
@@ -675,6 +680,15 @@ public:
 					errchn << "referencing tag '" << vi->tag << "' declared as to ignore" << std::endl;
 				}
 			}
+			std::vector<VariableDeclaration>::const_iterator
+				ni = m_namespaces.begin(), ne = m_namespaces.end();
+			for (; ni != ne; ++ni)
+			{
+				if (m_ignoreset.find( ni->tag) != m_ignoreset.end())
+				{
+					errchn << "referencing tag '" << vi->tag << "' declared as to ignore" << std::endl;
+				}
+			}
 			// Check if at least one template (main template) defined:
 			if (m_templates.empty())
 			{
@@ -752,6 +766,7 @@ public:
 		const char* se = si + content.size();
 		try
 		{
+			std::list<NamespaceInstance> nslist;
 			std::list<TemplateInstance> tplist;
 			tplist.push_back( TemplateInstance( 0, m_templates[0]));
 			tplist.back().assignMap( varmap);
@@ -775,18 +790,23 @@ public:
 							continue;
 						}
 						bool action = false;
-						//[1] First close all templates reaching end of scope
+						//[1] Close all namespaces reaching end of scope
+						closeEndOfScopeNamespaces( nslist, ann.tag);
+						//[2] Close all templates reaching end of scope
 						closeEndOfScopeTemplates( tplist, ann.tag);
 						if (tplist.empty() || m_templates[ tplist.front().idx].tag != mainTemplateTagName)
 						{
 							throw EXCEPTION( "main template reached end of scope before termination");
 						}
-						//[2] Open templates triggered by the current tag
-						action |= openTriggeredTemplates( tplist, ann.tag);
-						//[3] Assign variables to top level templates triggered by the annoration found:
+
+						//[3] Open namespaces triggered by the current tag
+						action |= openTriggeredNamespaces( nslist, ann);
+						//[4] Open templates triggered by the current tag
+						action |= openTriggeredTemplates( tplist, nslist, ann.tag);
+						//[5] Assign variables to top level templates triggered by the annoration found:
 						action |= assignAnnotationVariables( tplist, ann);
 
-						//[4] Check if the annotation had meaning (effect) in the current scope:
+						//[6] Check if the annotation had meaning (effect) in the current scope:
 						if (!action)
 						{
 							warnings << "unresolved annotation found: '" << ann.tag << "'" << std::endl;
@@ -870,6 +890,17 @@ private:
 		}
 		return Annotation( tag, content);
 	}
+
+	struct NamespaceInstance
+	{
+		std::size_t idx;
+		std::string value;
+
+		NamespaceInstance( std::size_t idx_, const std::string& value_)
+			:idx(idx_),value(value_) {}
+		NamespaceInstance( const NamespaceInstance& o)
+			:idx(o.idx),value(o.value){}
+	};
 
 	struct TemplateInstance
 	{
@@ -1007,8 +1038,49 @@ private:
 			}
 		}
 	}
+	void closeEndOfScopeNamespaces( std::list<NamespaceInstance>& nslist, const std::string& tagname) const
+	{
+		unsigned int taggroupid = 0;
+		GroupMap::const_iterator gi = m_groupmap.find( tagname);
+		if (gi != m_groupmap.end())
+		{
+			taggroupid = gi->second;
+		}
+		std::list<NamespaceInstance>::iterator ni = nslist.end();
+		while (ni != nslist.begin())
+		{
+			--ni;
+			unsigned int nsgroupid = 0;
+			gi = m_groupmap.find( m_namespaces[ ni->idx].tag);
+			if (gi != m_groupmap.end())
+			{
+				nsgroupid = gi->second;
+			}
+			if (m_namespaces[ ni->idx].tag == tagname || (taggroupid && nsgroupid == taggroupid))
+			{
+				ni = nslist.erase( ni);
+			}
+		}
+	}
 
-	bool openTriggeredTemplates( std::list<TemplateInstance>& tplist, const std::string& tagname) const
+	bool openTriggeredNamespaces( std::list<NamespaceInstance>& nslist, const Annotation& ann) const
+	{
+		bool rt = false;
+		std::vector<VariableDeclaration>::const_iterator
+			ni = m_namespaces.begin(), ne = m_namespaces.end();
+		for (std::size_t nidx=0; ni != ne; ++ni,++nidx)
+		{
+			if (ann.tag == ni->tag)
+			{
+				std::string value = ni->getValue( ann.value);
+				nslist.push_back( NamespaceInstance( nidx, value));
+				rt = true;
+			}
+		}
+		return rt;
+	}
+
+	bool openTriggeredTemplates( std::list<TemplateInstance>& tplist, std::list<NamespaceInstance> nslist, const std::string& tagname) const
 	{
 		bool rt = false;
 		std::vector<TemplateDeclaration>::const_iterator
@@ -1018,6 +1090,16 @@ private:
 			if (tagname == ti->tag)
 			{
 				tplist.push_back( TemplateInstance( tidx, *ti));
+				std::list<NamespaceInstance>::const_iterator
+					ni = nslist.begin(), ne = nslist.end();
+				for (; ni != ne; ++ni)
+				{
+					const VariableDeclaration& var = m_namespaces[ ni->idx];
+					if (tplist.back().hasVariable( var.variable))
+					{
+						tplist.back().assignVariable( var.variable, ni->value);
+					}
+				}
 				rt = true;
 			}
 		}
@@ -1071,6 +1153,7 @@ private:
 	std::string m_eolncomment;
 	std::vector<TemplateDeclaration> m_templates;
 	std::vector<VariableDeclaration> m_variables;
+	std::vector<VariableDeclaration> m_namespaces;
 	std::set<std::string> m_ignoreset;
 	typedef std::map<std::string, unsigned int> GroupMap;
 	GroupMap m_groupmap;

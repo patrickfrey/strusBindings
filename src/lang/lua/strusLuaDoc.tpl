@@ -9,6 +9,74 @@ template main ENDHTML {{ }}
 	<link rel="stylesheet" href="ldoc.css" type="text/css" />
 </head>
 <body>
+<script type="text/javascript">
+function showClassNav( name) {
+	var navclassid = 'navclass_' + name;
+	var navmemberlistid = 'navmemberlist_' + name;
+	var allElements = document.getElementsByTagName("*");
+	for(var i=0; i < allElements.length; i++)
+	{
+		if (allElements[i].className === "navclass")
+		{
+			if (allElements[i].id === navclassid) {
+				allElements[i].style.background = "#66ff33";
+				allElements[i].style.display = 'block';
+			}
+			else
+			{
+				allElements[i].style.background = "#ecffe6";
+			}
+		}
+		else if (allElements[i].className === "navmemberlist")
+		{
+			if (allElements[i].id === navmemberlistid) {
+				allElements[i].style.background = "#66ff33";
+				allElements[i].style.display = 'block';
+			} else {
+				allElements[i].style.background = "#ecffe6";
+				allElements[i].style.display = 'none';
+			}
+		}
+	}
+	var title = document.getElementById( "nav_title_methods");
+	title.style.display = 'block';
+}
+
+function showMethod( name) {
+	var navmemberid = 'navmember_' + name;
+	var memberid = 'member_' + name;
+	var allElements = document.getElementsByTagName("*");
+	for(var i=0; i < allElements.length; i++)
+	{
+		if (allElements[i].className === "navmethod"
+		||  allElements[i].className === "navconstructor")
+		{
+			if (allElements[i].id === navmemberid) {
+				allElements[i].style.background = "#66ff33";
+				allElements[i].style.display = 'block';
+			}
+			else
+			{
+				allElements[i].style.background = "#ecffe6";
+			}
+		}
+		else if (allElements[i].className === "method"
+		|| allElements[i].className === "constructor")
+		{
+			if (allElements[i].id === memberid) {
+				allElements[i].style.background = "#66ff33";
+				allElements[i].style.display = 'block';
+			} else {
+				allElements[i].style.background = "#ecffe6";
+				allElements[i].style.display = 'none';
+			}
+		}
+	}
+	var title = document.getElementById( "nav_title_methods");
+	title.style.display = 'block';
+}
+</script>
+
 <div class="container">
 <div class="product">
 	<div class="product_logo"> <img class="product_logo_img" src="images/logotype.jpg" alt="Strus"/></div>
@@ -23,10 +91,12 @@ template main ENDHTML {{ }}
 <div class="navigation">
 <h1>strus</h1>
 
-<h2>Classes</h2>
-<div class="navclass">
-	{{classnav}}
+<h2 id="nav_title_classes">Classes</h2>
+<div class="navclasslist">
+	{{navclasslist}}
 </div>
+<h2 id="nav_title_methods">Classes</h2>
+{{navmemberlist}}
 </div> <!-- navigation -->
 
 <div class="content">
@@ -36,7 +106,7 @@ template main ENDHTML {{ }}
 </div>
 </div> <!-- content -->
 
-<h2>Interface description</h2>
+<h2 id="title_method">Method interface description</h2>
 <div class="classinterface">
 	{{classinterface}}
 </div>
@@ -56,13 +126,27 @@ variable copyright
 variable license
 variable release
 
-template classnav=class END {{ }}
-<div class="classname">{{classname}}</div>
+namespace classname=class
+template navclasslist=class END {{ }}
+<div class="navclass" id="navclass_{{classname}}" onclick="showClassNav('{{classname}}');">{{classname}}</div>
 END
 
 template classlist=class END {{ }}
 <div class="class"><div class="classname">{{classname}}</div>
 <div class="classdescr">{{description}}</div></div>
+END
+
+template navmemberlist=class END {{ }}
+<div class="navmemberlist" id="navmemberlist_{{classname}}">
+	{{navmember}}
+</div>
+END
+
+template navmember=method END {{ }}
+<div class="navmethod" id="navmember_{{classname}}_{{methodname}}" onclick="showMethod('{{classname}}_{{methodname}}')">{{methodname}}</div>
+END
+template navmember=constructor END {{ }}
+<div class="navconstructor"id="navmember_{{classname}}_{{methodname}}" onclick="showMethod('navmember_{{classname}}_{{methodname}}')>{{constructorname}}</div>
 END
 
 template classinterface=class END {{ }}
@@ -83,7 +167,7 @@ END
 
 group method constructor
 template constructorlist=constructor END {{ }}
-<div class="constructor">
+<div class="constructor" id='member_{{classname}}_{{constructorname}}'>
 <div class="name">{{constructorname}}</div>
 <div class="description">{{description}}</div>
 <div class="parameterlist">{{parameterlist}}</div>
@@ -92,7 +176,7 @@ template constructorlist=constructor END {{ }}
 END
 
 template methodlist=method END {{ }}
-<div class="method">
+<div class="method" id='member_{{classname}}_{{constructorname}}'>
 <div class="name">{{methodname}}</div>
 <div class="description">{{description}}</div>
 <div class="parameterlist">{{parameterlist}}</div>
@@ -118,7 +202,6 @@ END
 
 variable constructorname=constructor
 variable methodname=method
-variable classname=class
 variable description=brief
 variable paramname=param[0]
 variable paramdescr=param[1:] xmlencode

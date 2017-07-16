@@ -29,7 +29,9 @@ static void printUsage()
 	std::cerr << "                  : specifies the end of line comment in the source to parse" << std::endl;
 	std::cerr << "                    for interface documentation. Tags start with '@'" << std::endl;
 	std::cerr << "                  variable [<name> '=']<tagname> ['[' <rangedef> ']'] [<encoder>]" << std::endl;
-	std::cerr << "                  : Declares a documentation tag to be interpreted as variable" << std::endl;
+	std::cerr << "                  : Declares a documentation tag as variable" << std::endl;
+	std::cerr << "                  namespace [<name> '=']<tagname> ['[' <rangedef> ']'] [<encoder>]" << std::endl;
+	std::cerr << "                  : Declares a documentation tag as variable in the following scope" << std::endl;
 	std::cerr << "                  template [<name> '=']<tagname> <em> <ob> <eb>" << std::endl;
 	std::cerr << "                  : Declares a documentation tag to be interpreted as template." << std::endl;
 	std::cerr << "                    The content of the template follows on the next line." << std::endl;
