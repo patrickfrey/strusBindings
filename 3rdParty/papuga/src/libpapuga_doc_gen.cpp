@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
+#include <algorithm>
 
 using namespace papuga;
 
@@ -175,18 +176,24 @@ public:
 		return std::vector<std::string>( rt.begin(), rt.end());
 	}
 
-	std::string tostring( const std::string& indent) const
+	std::string tostring( const std::string& indent, int maxvaluelen) const
 	{
 		std::ostringstream out;
 		std::vector<Chunk>::const_iterator ci = m_chunks.begin(), ce = m_chunks.end();
 		for (; ci != ce; ++ci)
 		{
-			out << indent << ci->typenam() << " [" << ci->content << "]" << std::endl;
+			std::string content( ci->content);
+			if (maxvaluelen > 0 && (int)content.size() > maxvaluelen)
+			{
+				content.resize( maxvaluelen);
+				content.append( "...");
+			}
+			out << indent << ci->typenam() << " [" << content << "]" << std::endl;
 		}
 		return out.str();
 	}
 
-	std::string expand( const std::map<std::string,std::string>& map) const
+	std::string expand( const std::map<std::string,std::string>& map, const std::map<std::string,std::string>& emptymap) const
 	{
 		std::string rt;
 		std::vector<Chunk>::const_iterator ci = m_chunks.begin(), ce = m_chunks.end();
@@ -201,7 +208,18 @@ public:
 					{
 						throw EXCEPTION("internal: variable '%s' not defined", ci->content.c_str());
 					}
-					rt.append( mi->second);
+					if (mi->second.empty())
+					{
+						mi = emptymap.find( ci->content);
+						if (mi != emptymap.end())
+						{
+							rt.append( mi->second);
+						}
+					}
+					else
+					{
+						rt.append( mi->second);
+					}
 					break;
 				}
 				case Chunk::Content:
@@ -318,7 +336,7 @@ struct TemplateDeclaration
 		si = endtemplate + arg[0].size();
 	}
 
-	std::string tostring() const
+	std::string tostring( int maxvaluelen) const
 	{
 		std::ostringstream out;
 		if (groupid)
@@ -327,11 +345,12 @@ struct TemplateDeclaration
 		}
 		if (tag == variable)
 		{
-			out << variable << std::endl << content.tostring(". ") << std::endl;
+			out << variable << std::endl << content.tostring(". ", maxvaluelen) << std::endl;
 		}
 		else
 		{
-			out << variable << "=" << tag << std::endl << content.tostring(". ") << std::endl;
+			out << variable << "=" << tag;
+			out << std::endl << content.tostring(". ", maxvaluelen) << std::endl;
 		}
 		return out.str();
 	}
@@ -339,7 +358,7 @@ struct TemplateDeclaration
 
 typedef std::string (*EncoderFunction)( const std::string& content);
 
-static std::string escapeXmlControls( const std::string& content)
+static std::string xmlencode( const std::string& content)
 {
 	std::string rt;
 	std::string::const_iterator ci = content.begin(), ce = content.end();
@@ -365,6 +384,107 @@ static std::string escapeXmlControls( const std::string& content)
 	return rt;
 }
 
+static std::string tolowercase( const std::string& content)
+{
+	std::string rt( content);
+	std::transform( content.begin(), content.end(), rt.begin(), ::tolower);
+	return rt;
+}
+
+static std::string touppercase( const std::string& content)
+{
+	std::string rt( content);
+	std::transform( content.begin(), content.end(), rt.begin(), ::tolower);
+	return rt;
+}
+
+static EncoderFunction getEncoder( const std::string& funcname)
+{
+	if (funcname == "xmlencode")
+	{
+		return &xmlencode;
+	}
+	else if (funcname == "upcase")
+	{
+		return &touppercase;
+	}
+	else if (funcname == "locase")
+	{
+		return &tolowercase;
+	}
+	else
+	{
+		throw EXCEPTION("unknown encoder name '%s'", funcname.c_str());
+	}
+}
+
+static const char* getEncoderName( const EncoderFunction func)
+{
+	if (func == &xmlencode)
+	{
+		return "xmlencode";
+	}
+	else if (func == &touppercase)
+	{
+		return "upcase";
+	}
+	else if (func == &tolowercase)
+	{
+		return "locase";
+	}
+	return 0;
+}
+
+static std::pair<int,int> parseIndexRange( char const*& si, const char* se)
+{
+	std::pair<int,int> rt( 0, std::numeric_limits<int>::max());
+	if (*si == '[')
+	{
+		++si;
+		if (!skipLineSpaces( si, se))
+		{
+			throw EXCEPTION("unterminated array range");
+		}
+		if (isDigit(*si) || *si == '-')
+		{
+			rt.first = parseInteger( si, se);
+			if (!skipLineSpaces( si, se))
+			{
+				throw EXCEPTION("unterminated array range");
+			}
+			if (*si == ']')
+			{
+				rt.second = rt.first;
+			}
+		}
+		if (*si == ':')
+		{
+			++si;
+			if (!skipLineSpaces( si, se))
+			{
+				throw EXCEPTION("unterminated array range");
+			}
+			if (isDigit(*si) || *si == '-')
+			{
+				rt.second = parseInteger( si, se);
+				if (!skipLineSpaces( si, se))
+				{
+					throw EXCEPTION("unterminated array range");
+				}
+			}
+		}
+		if (*si == ']')
+		{
+			++si;
+		}
+		else
+		{
+			throw EXCEPTION("unexpected token in array range");
+		}
+	}
+	return rt;
+}
+
 struct VariableDeclaration
 {
 	std::string variable;
@@ -382,67 +502,23 @@ struct VariableDeclaration
 		{
 			if (*si == '[')
 			{
-				++si;
-				if (!skipLineSpaces( si, se))
-				{
-					throw EXCEPTION("unterminated array range");
-				}
-				if (isDigit(*si) || *si == '-')
-				{
-					index.first = parseInteger( si, se);
-					if (!skipLineSpaces( si, se))
-					{
-						throw EXCEPTION("unterminated array range");
-					}
-					if (*si == ']')
-					{
-						index.second = index.first;
-					}
-				}
-				if (*si == ':')
-				{
-					++si;
-					if (!skipLineSpaces( si, se))
-					{
-						throw EXCEPTION("unterminated array range");
-					}
-					if (isDigit(*si) || *si == '-')
-					{
-						index.second = parseInteger( si, se);
-						if (!skipLineSpaces( si, se))
-						{
-							throw EXCEPTION("unterminated array range");
-						}
-					}
-				}
-				if (*si == ']')
-				{
-					++si;
-				}
-				else
-				{
-					throw EXCEPTION("unexpected token in array range");
-				}
+				index = parseIndexRange( si, se);
 			}
 		}
 		if (skipLineSpaces( si, se))
 		{
 			if (isAlpha(*si))
 			{
-				std::string funcname = parseIdentifier( si, se);
-				if (funcname == "xmlencode")
-				{
-					encoder = &escapeXmlControls;
-				}
-				else
-				{
-					throw EXCEPTION("unknown encoder name '%s'", funcname.c_str());
-				}
+				encoder = getEncoder( parseIdentifier( si, se));
 			}
 			else
 			{
 				throw EXCEPTION("unexpected token, expected array range and/or encoder name");
 			}
+		}
+		if (skipLineSpaces( si, se))
+		{
+			throw EXCEPTION("extra tokens at end of variable declaration");
 		}
 	}
 	std::string tostring() const
@@ -459,9 +535,9 @@ struct VariableDeclaration
 			}
 			idxstr << "]";
 		}
-		if (encoder == &escapeXmlControls)
+		if (encoder)
 		{
-			idxstr << " " << "xmlencode";
+			idxstr << " " << getEncoderName( encoder);
 		}
 		std::ostringstream out;
 		if (tag == variable)
@@ -533,11 +609,92 @@ struct VariableDeclaration
 	}
 };
 
+struct IndexDeclaration
+{
+	typedef std::vector<std::string> TagVariantList;
+	typedef std::vector<TagVariantList> TagHierarchy;
+
+	std::string variable;
+	std::string tag;
+	TagHierarchy taghierarchy;
+	EncoderFunction encoder;
+
+	IndexDeclaration( const IndexDeclaration& o)
+		:variable(o.variable),tag(o.tag),taghierarchy(o.taghierarchy),encoder(o.encoder){}
+	IndexDeclaration( char const*& si, const char* se)
+		:variable(),tag(),taghierarchy(),encoder(0)
+	{
+		parseTagDeclaration( variable, tag, si, se);
+		while (skipLineSpaces( si, se) && *si == '{')
+		{
+			TagVariantList node;
+			++si;
+			while (skipLineSpaces( si, se))
+			{
+				if (!isAlpha(*si)) throw EXCEPTION( "list of identifiers expected in tag group of index");
+				node.push_back( parseIdentifier( si, se));
+				if (!skipLineSpaces( si, se)) throw EXCEPTION( "unterminated tag group of index");
+				if (*si == '}') break;
+				if (*si == ',')
+				{
+					++si;
+				}
+				else
+				{
+					throw EXCEPTION( "unexpected token in tag group of index");
+				}
+			}
+			if (*si != '}') throw EXCEPTION( "unterminated tag group of index");
+			++si;
+			taghierarchy.push_back( node);
+		}
+		if (skipLineSpaces( si, se))
+		{
+			encoder = getEncoder( parseIdentifier( si, se));
+		}
+		if (skipLineSpaces( si, se))
+		{
+			throw EXCEPTION("extra tokens at end of index declaration");
+		}
+	}
+
+	std::string tostring() const
+	{
+		std::ostringstream idxstr;
+		TagHierarchy::const_iterator hi = taghierarchy.begin(), he = taghierarchy.end();
+		for (; hi != he; ++hi)
+		{
+			idxstr << " (";
+			TagVariantList::const_iterator vi = hi->begin(), ve = he->end();
+			for (int vidx=0; vi != ve; ++vi,++vidx)
+			{
+				if (vidx) idxstr << ",";
+				idxstr << *vi;
+			}
+			idxstr << ")";
+		}
+		if (encoder)
+		{
+			idxstr << " " << getEncoderName( encoder);
+		}
+		std::ostringstream out;
+		if (tag == variable)
+		{
+			out << variable << idxstr.str() << std::endl;
+		}
+		else
+		{
+			out << variable << "=" << tag << idxstr.str() << std::endl;
+		}
+		return out.str();
+	}
+};
+
 class DocGenerator
 {
 public:
 	DocGenerator( std::ostream& errchn, const std::string& src)
-		:m_eolncomment(),m_templates(),m_variables(),m_namespaces(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
+		:m_eolncomment(),m_templates(),m_variables(),m_namespaces(),m_emptydeclmap(),m_indices(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
 	{
 		std::set<std::string> referencedVariables;
 		std::set<std::string> definedVariables;
@@ -547,6 +704,7 @@ public:
 		bool have_comment = false;
 		try
 		{
+			//[0] Parse template source and declare objects:
 			while (si != se)
 			{
 				if (skipSpaces( si, se))
@@ -580,6 +738,22 @@ public:
 							std::vector<std::string> usedvars = m_templates.back().content.variables();
 							referencedVariables.insert( usedvars.begin(), usedvars.end());
 						}
+						else if (id == "empty")
+						{
+							if (!skipLineSpaces( si, se))
+							{
+								throw EXCEPTION("expected identifier after '%s'", "empty");
+							}
+							std::string name = parseIdentifier( si, se);
+							if (skipLineSpaces( si, se))
+							{
+								if (m_emptydeclmap.find( name) != m_emptydeclmap.end())
+								{
+									throw EXCEPTION("duplicate definition of 'empty %s'", name.c_str());
+								}
+								m_emptydeclmap[ name] = parseToEoln( si, se);
+							}
+						}
 						else if (id == "variable")
 						{
 							m_variables.push_back( VariableDeclaration( si, se));
@@ -589,6 +763,11 @@ public:
 						{
 							m_namespaces.push_back( VariableDeclaration( si, se));
 							definedVariables.insert( m_namespaces.back().variable);
+						}
+						else if (id == "index")
+						{
+							m_indices.push_back( IndexDeclaration( si, se));
+							definedVariables.insert( m_indices.back().variable);
 						}
 						else if (id == "group")
 						{
@@ -635,82 +814,99 @@ public:
 						throw EXCEPTION("identifier expected at start of line");
 					}
 				}
-			}
-			// Check group references:
-			std::map<std::string,unsigned int>::const_iterator
-				gi = m_groupmap.begin(), ge = m_groupmap.end();
-			for (; gi != ge; ++gi)
-			{
-				std::vector<TemplateDeclaration>::const_iterator
+			}{
+				//[1] Check group references:
+				std::map<std::string,unsigned int>::const_iterator
+					gi = m_groupmap.begin(), ge = m_groupmap.end();
+				for (; gi != ge; ++gi)
+				{
+					std::vector<TemplateDeclaration>::const_iterator
+						ti = m_templates.begin(), te = m_templates.end();
+					for (; ti != te; ++ti)
+					{
+						if (ti->tag == gi->first) break;
+					}
+					if (ti == te)
+					{
+						throw EXCEPTION( "undefined template '%s' referenced in group", gi->first.c_str());
+					}
+				}
+			}{
+				//[2] Assign group identifiers:
+				std::vector<TemplateDeclaration>::iterator
 					ti = m_templates.begin(), te = m_templates.end();
 				for (; ti != te; ++ti)
 				{
-					if (ti->tag == gi->first) break;
+					std::map<std::string,unsigned int>::const_iterator
+						gi = m_groupmap.find( ti->tag);
+					if (gi != m_groupmap.end())
+					{
+						ti->groupid = gi->second;
+					}
 				}
-				if (ti == te)
+			}{
+				//[3] Check elements to ignore (issue warning if they are referenced):
+				std::vector<TemplateDeclaration>::iterator
+					ti = m_templates.begin(), te = m_templates.end();
+				for (; ti != te; ++ti)
 				{
-					throw EXCEPTION( "undefined template '%s' referenced in group", gi->first.c_str());
+					if (m_ignoreset.find( ti->tag) != m_ignoreset.end())
+					{
+						errchn << "referencing tag '" << ti->tag << "' declared as to ignore" << std::endl;
+					}
 				}
-			}
-			// Assign group identifiers:
-			std::vector<TemplateDeclaration>::iterator
-				ti = m_templates.begin(), te = m_templates.end();
-			for (; ti != te; ++ti)
-			{
-				gi = m_groupmap.find( ti->tag);
-				if (gi != m_groupmap.end())
+				std::vector<VariableDeclaration>::const_iterator
+					vi = m_variables.begin(), ve = m_variables.end();
+				for (; vi != ve; ++vi)
 				{
-					ti->groupid = gi->second;
+					if (m_ignoreset.find( vi->tag) != m_ignoreset.end())
+					{
+						errchn << "referencing tag '" << vi->tag << "' declared as to ignore" << std::endl;
+					}
 				}
-			}
-			// Check elements to ignore (issue warning if they are referenced):
-			for (ti = m_templates.begin(); ti != te; ++ti)
-			{
-				if (m_ignoreset.find( ti->tag) != m_ignoreset.end())
+				std::vector<VariableDeclaration>::const_iterator
+					ni = m_namespaces.begin(), ne = m_namespaces.end();
+				for (; ni != ne; ++ni)
 				{
-					errchn << "referencing tag '" << ti->tag << "' declared as to ignore" << std::endl;
+					if (m_ignoreset.find( ni->tag) != m_ignoreset.end())
+					{
+						errchn << "referencing tag '" << ni->tag << "' declared as to ignore" << std::endl;
+					}
 				}
-			}
-			std::vector<VariableDeclaration>::const_iterator
-				vi = m_variables.begin(), ve = m_variables.end();
-			for (; vi != ve; ++vi)
-			{
-				if (m_ignoreset.find( vi->tag) != m_ignoreset.end())
+				std::map<std::string,std::string>::const_iterator
+					ei = m_emptydeclmap.begin(), ee = m_emptydeclmap.end();
+				for (; ei != ee; ++ei)
 				{
-					errchn << "referencing tag '" << vi->tag << "' declared as to ignore" << std::endl;
+					if (m_ignoreset.find( ei->first) != m_ignoreset.end())
+					{
+						errchn << "referencing tag '" << ei->first << "' declared as to ignore" << std::endl;
+					}
 				}
-			}
-			std::vector<VariableDeclaration>::const_iterator
-				ni = m_namespaces.begin(), ne = m_namespaces.end();
-			for (; ni != ne; ++ni)
-			{
-				if (m_ignoreset.find( ni->tag) != m_ignoreset.end())
+			}{
+				//[4] Check if at least one template (main template) defined:
+				if (m_templates.empty())
 				{
-					errchn << "referencing tag '" << vi->tag << "' declared as to ignore" << std::endl;
+					throw EXCEPTION("at least one template (toplevel template) must be defined");
 				}
-			}
-			// Check if at least one template (main template) defined:
-			if (m_templates.empty())
-			{
-				throw EXCEPTION("at least one template (toplevel template) must be defined");
-			}
-			// Check variable references:
-			std::set<std::string>::const_iterator
-				ri = referencedVariables.begin(), re = referencedVariables.end();
-			for (; ri != re; ++ri)
-			{
-				if (definedVariables.find( *ri) == definedVariables.end())
+			}{
+				//[5] Check variable references:
+				std::set<std::string>::const_iterator
+					ri = referencedVariables.begin(), re = referencedVariables.end();
+				for (; ri != re; ++ri)
 				{
-					errchn << "undefined item '" << *ri << "' referenced in template" << std::endl;
+					if (definedVariables.find( *ri) == definedVariables.end())
+					{
+						errchn << "undefined item '" << *ri << "' referenced in template" << std::endl;
+					}
 				}
-			}
-			std::set<std::string>::const_iterator
-				di = definedVariables.begin(), de = definedVariables.end();
-			for (; di != de; ++di)
-			{
-				if (referencedVariables.find( *di) == referencedVariables.end())
+				std::set<std::string>::const_iterator
+					di = definedVariables.begin(), de = definedVariables.end();
+				for (; di != de; ++di)
 				{
-					errchn << "unused item '" << *di << "' defined" << std::endl;
+					if (referencedVariables.find( *di) == referencedVariables.end())
+					{
+						errchn << "unused item '" << *di << "' defined" << std::endl;
+					}
 				}
 			}
 		}
@@ -725,24 +921,52 @@ public:
 	}
 
 	DocGenerator( const DocGenerator& o)
-		:m_eolncomment(o.m_eolncomment),m_templates(o.m_templates),m_variables(o.m_variables),m_ignoreset(o.m_ignoreset),m_groupmap(o.m_groupmap),m_groupcnt(o.m_groupcnt){}
+		:m_eolncomment(o.m_eolncomment)
+		,m_templates(o.m_templates)
+		,m_variables(o.m_variables)
+		,m_namespaces(o.m_namespaces)
+		,m_emptydeclmap(o.m_emptydeclmap)
+		,m_indices(o.m_indices)
+		,m_ignoreset(o.m_ignoreset)
+		,m_groupmap(o.m_groupmap)
+		,m_groupcnt(o.m_groupcnt){}
 
-	std::string tostring() const
+	std::string tostring( int maxvaluelen=0) const
 	{
 		std::ostringstream out;
 		if (!m_eolncomment.empty())
 		{
 			out << "comment " << m_eolncomment << std::endl;
 		}
-		std::vector<TemplateDeclaration>::const_iterator ti = m_templates.begin(), te = m_templates.end();
+		std::vector<TemplateDeclaration>::const_iterator
+			ti = m_templates.begin(), te = m_templates.end();
 		for (; ti != te; ++ti)
 		{
-			out << "template " << ti->tostring() << std::endl;
+			out << "template " << ti->tostring( maxvaluelen) << std::endl;
 		}
-		std::vector<VariableDeclaration>::const_iterator vi = m_variables.begin(), ve = m_variables.end();
+		std::vector<VariableDeclaration>::const_iterator
+			vi = m_variables.begin(), ve = m_variables.end();
 		for (; vi != ve; ++vi)
 		{
 			out << "variable " << vi->tostring() << std::endl;
+		}
+		std::map<std::string,std::string>::const_iterator
+			ei = m_emptydeclmap.begin(), ee = m_emptydeclmap.end();
+		for (; ei != ee; ++ei)
+		{
+			out << "empty " << ei->first << " " << ei->second << std::endl;
+		}
+		std::vector<VariableDeclaration>::const_iterator
+			ni = m_namespaces.begin(), ne = m_namespaces.end();
+		for (; ni != ne; ++ni)
+		{
+			out << "namespace " << ni->tostring() << std::endl;
+		}
+		std::set<std::string>::const_iterator
+			xi = m_ignoreset.begin(), xe = m_ignoreset.end();
+		for (; xi != xe; ++xi)
+		{
+			out << "ignore " << *xi << std::endl;
 		}
 		unsigned int gi=1, ge=m_groupcnt+1;
 		for (; gi != ge; ++gi)
@@ -766,24 +990,29 @@ public:
 		const char* se = si + content.size();
 		try
 		{
+			int timestmp = 0;
 			std::list<NamespaceInstance> nslist;
 			std::list<TemplateInstance> tplist;
-			tplist.push_back( TemplateInstance( 0, m_templates[0]));
+			tplist.push_back( TemplateInstance( 0, m_templates[0], ++timestmp));
 			tplist.back().assignMap( varmap);
 			std::string mainTemplateTagName = m_templates[0].tag;
 
+			std::vector<std::vector<int> > idxar( m_indices.size(), std::vector<int>());
 			while (si != se)
 			{
 				if (!skipSpaces( si, se)) break;
+				const char* linestart = si;
+
 				if (startsWith( m_eolncomment, si, se))
 				{
 					si += m_eolncomment.size();
 					if (skipLineSpaces( si, se) && *si == '@' && isAlpha( *(si+1)))
 					{
 						++si;
-						Annotation ann = parseAnnotation( si, se);
+						Annotation ann = parseAnnotation( si, se, ++timestmp);
 #ifdef PAPUGA_LOWLEVEL_DEBUG
 						std::cerr << "parse @" << ann.tag << " [" << ann.value << "]" << std::endl;
+						printState( std::cerr, tplist);
 #endif
 						if (m_ignoreset.find( ann.tag) != m_ignoreset.end())
 						{
@@ -798,18 +1027,18 @@ public:
 						{
 							throw EXCEPTION( "main template reached end of scope before termination");
 						}
-
 						//[3] Open namespaces triggered by the current tag
 						action |= openTriggeredNamespaces( nslist, ann);
 						//[4] Open templates triggered by the current tag
-						action |= openTriggeredTemplates( tplist, nslist, ann.tag);
+						action |= openTriggeredTemplates( tplist, nslist, ann);
 						//[5] Assign variables to top level templates triggered by the annoration found:
 						action |= assignAnnotationVariables( tplist, ann);
-
-						//[6] Check if the annotation had meaning (effect) in the current scope:
+						//[6] Update indices and assign requested index variable values 
+						action |= assignIndexVariables( idxar, tplist, ann);
+						//[7] Check if the annotation had meaning (effect) in the current scope:
 						if (!action)
 						{
-							warnings << "unresolved annotation found: '" << ann.tag << "'" << std::endl;
+							warnings << "unresolved annotation found at line " << getLineNo( content.c_str(), linestart) << ": '" << ann.tag << "'" << std::endl;
 						}
 					}
 					else
@@ -849,14 +1078,15 @@ private:
 	{
 		std::string tag;
 		std::string value;
+		int timestmp;
 
-		Annotation( const std::string& tag_, const std::string& value_)
-			:tag(tag_),value(value_){}
+		Annotation( const std::string& tag_, const std::string& value_, int timestmp_)
+			:tag(tag_),value(value_),timestmp(timestmp_){}
 		Annotation( const Annotation& o)
-			:tag(o.tag),value(o.value){}
+			:tag(o.tag),value(o.value),timestmp(o.timestmp){}
 	};
 
-	Annotation parseAnnotation( char const*& si, const char* se)
+	Annotation parseAnnotation( char const*& si, const char* se, int timestmp)
 	{
 		std::string tag = parseIdentifier( si, se);
 		std::string content;
@@ -888,7 +1118,7 @@ private:
 				}
 			}
 		}
-		return Annotation( tag, content);
+		return Annotation( tag, content, timestmp);
 	}
 
 	struct NamespaceInstance
@@ -906,9 +1136,10 @@ private:
 	{
 		std::size_t idx;
 		std::map<std::string,std::string> map;
+		int timestmp;
 
-		TemplateInstance( std::size_t idx_, const TemplateDeclaration& decl)
-			:idx(idx_),map()
+		TemplateInstance( std::size_t idx_, const TemplateDeclaration& decl, int timestmp_)
+			:idx(idx_),map(),timestmp(timestmp_)
 		{
 			std::vector<std::string> vars = decl.content.variables();
 			std::vector<std::string>::const_iterator vi = vars.begin(), ve = vars.end();
@@ -918,7 +1149,7 @@ private:
 			}
 		}
 		TemplateInstance( const TemplateInstance& o)
-			:idx(o.idx),map(o.map){}
+			:idx(o.idx),map(o.map),timestmp(o.timestmp){}
 
 		bool hasVariable( const std::string& name) const
 		{
@@ -947,35 +1178,83 @@ private:
 				map[ mi->first] = mi->second;
 			}
 		}
+		static std::string mapToString( const std::map<std::string,std::string>& strmap)
+		{
+			std::ostringstream out;
+			std::map<std::string,std::string>::const_iterator
+				mi = strmap.begin(), me=strmap.end();
+			for (int midx=0; mi != me; ++mi,++midx)
+			{
+				if (midx) out << ", ";
+				std::string value = mi->second;
+				if (value.size() > 10)
+				{
+					value.resize( 10);
+					value.append( "...");
+				}
+				out << mi->first << " -> '" << value << "'";
+			}
+			return out.str();
+		}
+		std::string tostring() const
+		{
+			std::ostringstream out;
+			out << "[" << idx << "] " << mapToString( map) << std::endl;
+			return out.str();
+		}
 	};
 
-	void appendTemplateVariable( std::list<TemplateInstance>& tplist, const std::string& variable, const std::string& value) const
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+	void printState( std::ostream& out, const std::list<TemplateInstance>& tplist) const
 	{
-		unsigned int count = 0;
+		std::list<TemplateInstance>::const_iterator ti = tplist.begin(), te = tplist.end();
+		int maxtimestmp = 0;
+		for (; ti != te; ++ti) if (ti->timestmp > maxtimestmp) maxtimestmp = ti->timestmp;
+		for (ti = tplist.begin(); ti != te; ++ti)
+		{
+			out << "    " << ((ti->timestmp == maxtimestmp)?"*":">")
+				<< m_templates[ ti->idx].variable << " "
+				<< TemplateInstance::mapToString( ti->map) << std::endl;
+		}
+	}
+#endif
+
+	void appendTemplateVariable( std::list<TemplateInstance>& tplist, const std::string& variable, const std::string& value, int evtimestmp) const
+	{
+		int timestmp = 0;
 		std::list<TemplateInstance>::iterator ti = tplist.begin(), te = tplist.end();
 		for (;ti != te; ++ti)
 		{
-			std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
-			if (mi != ti->map.end())
+			if (evtimestmp > ti->timestmp)
 			{
-				++count;
-				mi->second += value;
+				std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
+				if (mi != ti->map.end())
+				{
+					if (timestmp < ti->timestmp)
+					{
+						timestmp = ti->timestmp;
+					}
+				}
 			}
 		}
-		if (count == 0)
+		ti = tplist.begin();
+		for (;ti != te; ++ti)
 		{
-			throw EXCEPTION( "variable cannot be assigned '%s'", variable.c_str());
-		}
-		if (count > 1)
-		{
-			throw EXCEPTION( "multiple assignments of variable '%s'", variable.c_str());
+			if (timestmp == ti->timestmp)
+			{
+				std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
+				if (mi != ti->map.end())
+				{
+					mi->second += value;
+				}
+			}
 		}
 	}
 
 	std::string getDocGenResult( std::list<TemplateInstance>& tplist) const
 	{
 		if (tplist.size() != 1) throw EXCEPTION( "internal: call getDocGenResult without templates at end of scope closed");
-		return m_templates[ tplist.front().idx].content.expand( tplist.front().map);
+		return m_templates[ tplist.front().idx].content.expand( tplist.front().map, m_emptydeclmap);
 	}
 	bool closeEndOfScopeVariable( std::list<TemplateInstance>& tplist, const std::string& variable, unsigned int depth) const
 	{
@@ -993,9 +1272,10 @@ private:
 					rt = true;
 					continue;
 				}
-				std::string content = m_templates[ ti->idx].content.expand( ti->map);
+				std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
+				int evtimestmp = ti->timestmp;
 				ti = tplist.erase( ti);
-				appendTemplateVariable( tplist, variable, content);
+				appendTemplateVariable( tplist, variable, content, evtimestmp);
 			}
 		}
 		return rt;
@@ -1032,9 +1312,10 @@ private:
 					continue;
 				}
 				std::string var = m_templates[ ti->idx].variable;
-				std::string content = m_templates[ ti->idx].content.expand( ti->map);
+				std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
+				int evtimestmp = ti->timestmp;
 				ti = tplist.erase( ti);
-				appendTemplateVariable( tplist, var, content);
+				appendTemplateVariable( tplist, var, content, evtimestmp);
 			}
 		}
 	}
@@ -1062,7 +1343,6 @@ private:
 			}
 		}
 	}
-
 	bool openTriggeredNamespaces( std::list<NamespaceInstance>& nslist, const Annotation& ann) const
 	{
 		bool rt = false;
@@ -1079,25 +1359,39 @@ private:
 		}
 		return rt;
 	}
-
-	bool openTriggeredTemplates( std::list<TemplateInstance>& tplist, std::list<NamespaceInstance> nslist, const std::string& tagname) const
+	int isRequestedVariable( const std::list<TemplateInstance>& tplist, const std::string& variable) const
+	{
+		if (tplist.empty()) return false;
+		std::list<TemplateInstance>::const_iterator
+			ti = tplist.begin(), te = tplist.end();
+		for (; ti != te; ++ti)
+		{
+			if (ti->idx == 0 || ti->hasVariable( variable))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	bool openTriggeredTemplates( std::list<TemplateInstance>& tplist, const std::list<NamespaceInstance>& nslist, const Annotation& ann) const
 	{
 		bool rt = false;
 		std::vector<TemplateDeclaration>::const_iterator
 			ti = m_templates.begin(), te = m_templates.end();
 		for (std::size_t tidx=0; ti != te; ++ti,++tidx)
 		{
-			if (tagname == ti->tag)
+			if (ann.tag == ti->tag && isRequestedVariable( tplist, ti->variable))
 			{
-				tplist.push_back( TemplateInstance( tidx, *ti));
+				tplist.push_back( TemplateInstance( tidx, m_templates[ tidx], ann.timestmp));
+				TemplateInstance& ctp = tplist.back();
 				std::list<NamespaceInstance>::const_iterator
 					ni = nslist.begin(), ne = nslist.end();
 				for (; ni != ne; ++ni)
 				{
 					const VariableDeclaration& var = m_namespaces[ ni->idx];
-					if (tplist.back().hasVariable( var.variable))
+					if (ctp.hasVariable( var.variable))
 					{
-						tplist.back().assignVariable( var.variable, ni->value);
+						ctp.assignVariable( var.variable, ni->value);
 					}
 				}
 				rt = true;
@@ -1105,11 +1399,10 @@ private:
 		}
 		return rt;
 	}
-
-	bool assignAnnotationVariables( std::list<TemplateInstance>& tplist, const Annotation& ann) const
+	bool assignVariableValuesToTemplates( std::list<TemplateInstance>& tplist, const std::string& variable, const std::string& value) const
 	{
+		if (tplist.empty()) return false;
 		bool rt = false;
-		if (tplist.empty()) throw EXCEPTION("unresolved annotation '%s' in source", ann.tag.c_str());
 		// Evaluate the top level scope where the variable can be assigned:
 		std::list<TemplateInstance>::iterator te = tplist.end(), ti = tplist.end();
 		--ti;
@@ -1117,7 +1410,7 @@ private:
 		while (ti != tplist.begin())
 		{
 			const TemplateDeclaration& tdecl = m_templates[ ti->idx];
-			if (tdecl.tag != backtdecl.tag)
+			if (tdecl.tag != backtdecl.tag || tplist.back().timestmp != ti->timestmp)
 			{
 				++ti;
 				break;
@@ -1127,6 +1420,21 @@ private:
 				--ti;
 			}
 		}
+		for (; ti != te; ++ti)
+		{
+			if (ti->hasVariable( variable))
+			{
+				ti->assignVariable( variable, value);
+				rt = true;
+			}
+		}
+		return rt;
+	}
+
+	bool assignAnnotationVariables( std::list<TemplateInstance>& tplist, const Annotation& ann) const
+	{
+		bool rt = false;
+
 		// Find all candidate declarations and assign the annotation value to them:
 		std::vector<VariableDeclaration>::const_iterator
 			vi = m_variables.begin(), ve = m_variables.end();
@@ -1134,16 +1442,78 @@ private:
 		{
 			if (vi->tag == ann.tag)
 			{
-				std::list<TemplateInstance>::iterator ai = ti, ae = te;
-				for (; ai != ae; ++ai)
+				std::string value = vi->getValue( ann.value);
+				rt |= assignVariableValuesToTemplates( tplist, vi->variable, value);
+			}
+		}
+		return rt;
+	}
+
+	static std::string tagHierarchyVariantToString( const IndexDeclaration::TagVariantList& vlist)
+	{
+		std::string rt;
+		IndexDeclaration::TagVariantList::const_iterator
+			vi = vlist.begin(), ve = vlist.end();
+		for (int vidx=0; vi != ve; ++vi,++vidx)
+		{
+			if (vidx) rt.push_back(',');
+			rt.append( *vi);
+		}
+		return rt;
+	}
+
+	bool assignIndexVariables( std::vector<std::vector<int> >& idxar, std::list<TemplateInstance>& tplist, const Annotation& ann) const
+	{
+		bool rt = false;
+		std::vector<IndexDeclaration>::const_iterator di = m_indices.begin(), de = m_indices.end();
+		std::size_t didx = 0;
+		for (; di != de; ++di,++didx)
+		{
+			std::size_t tidx = 0;
+			IndexDeclaration::TagHierarchy::const_iterator
+				ti = di->taghierarchy.begin(), te = di->taghierarchy.end();
+			for (; ti != te; ++ti,++tidx)
+			{
+				IndexDeclaration::TagVariantList::const_iterator
+					vi = ti->begin(), ve = ti->end();
+				for (; vi != ve && ann.tag != *vi; ++vi){}
+				if (vi != ve) break;
+			}
+			if (ti != te)
+			{
+				if (idxar[ didx].size() == tidx)
 				{
-					if (ai->hasVariable( vi->variable))
-					{
-						std::string value = vi->getValue( ann.value);
-						ai->assignVariable( vi->variable, value);
-						rt = true;
-					}
+					idxar[ didx].push_back( 1);
 				}
+				else if (idxar[ didx].size() < tidx)
+				{
+					std::string thstr = tagHierarchyVariantToString( di->taghierarchy[ tidx-1]);
+					throw EXCEPTION( "gap in index hierarchy, missing link {%s}", thstr.c_str());
+				}
+				else
+				{
+					while (idxar[ didx].size() > tidx+1)
+					{
+						idxar[ didx].pop_back();
+					}
+					++idxar[ didx][ tidx];
+				}
+			}
+		}
+		di = m_indices.begin(), de = m_indices.end();
+		for (int didx=0; di != de; ++di,++didx)
+		{
+			if (ann.tag == di->tag)
+			{
+				std::ostringstream idxval;
+				std::vector<int>::const_iterator
+					xi = idxar[ didx].begin(), xe = idxar[ didx].end();
+				for (int xidx=0; xi != xe; ++xi,++xidx)
+				{
+					if (xidx) idxval << "_";
+					idxval << *xi;
+				}
+				rt |= assignVariableValuesToTemplates( tplist, di->variable, idxval.str());
 			}
 		}
 		return rt;
@@ -1154,6 +1524,8 @@ private:
 	std::vector<TemplateDeclaration> m_templates;
 	std::vector<VariableDeclaration> m_variables;
 	std::vector<VariableDeclaration> m_namespaces;
+	std::map<std::string,std::string> m_emptydeclmap;
+	std::vector<IndexDeclaration> m_indices;
 	std::set<std::string> m_ignoreset;
 	typedef std::map<std::string, unsigned int> GroupMap;
 	GroupMap m_groupmap;
@@ -1172,7 +1544,7 @@ DLL_PUBLIC bool papuga::generateDoc(
 	{
 		DocGenerator docgen( err, templatesrc);
 #ifdef PAPUGA_LOWLEVEL_DEBUG
-		std::cerr << docgen.tostring() << std::endl;
+		std::cerr << docgen.tostring( 20) << std::endl;
 #endif
 		out << docgen.generate( err, docsrc, varmap) << std::endl;
 		return true;

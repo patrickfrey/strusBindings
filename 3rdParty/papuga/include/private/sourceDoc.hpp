@@ -20,8 +20,7 @@ class SourceDocLanguageDescription
 {
 public:
 	virtual const char* eolncomment() const=0;
-	virtual std::string fullclassname( const char* classname) const=0;
-	virtual std::string mapCodeExample( const char* example) const=0;
+	virtual std::string mapCodeExample( const std::string& example) const=0;
 	virtual std::string constructorDeclaration( const std::string& classname, const papuga_ConstructorDescription* cdef) const=0;
 	virtual std::string methodDeclaration( const std::string& classname, const papuga_MethodDescription* mdef) const=0;
 private:

@@ -80,7 +80,7 @@ static void skipToStr( char const*& si, const char* se, const char* str)
 }
 
 static std::string g_current_annotation_key;
-static char g_current_annotation_sep = ' ';
+static bool g_current_allow_multiple = false;
 static AnnotationMap g_annotations;
 
 static void resetAnnotations()
@@ -88,7 +88,7 @@ static void resetAnnotations()
 	g_annotations.clear();
 	g_current_annotation_key.clear();
 }
-static void addAnnotation( const std::string& value, bool allowConcat)
+static void addAnnotation( const std::string& value, bool concat)
 {
 	if (g_current_annotation_key.empty())
 	{
@@ -100,45 +100,66 @@ static void addAnnotation( const std::string& value, bool allowConcat)
 	}
 	else
 	{
-		if (g_annotations.find( g_current_annotation_key) == g_annotations.end())
+		std::pair<AnnotationMap::iterator,AnnotationMap::iterator> range
+			= g_annotations.equal_range( g_current_annotation_key);
+
+		if (range.first != range.second)
 		{
-			g_annotations[ g_current_annotation_key] = value;
-		}
-		else if (allowConcat)
-		{
-			g_annotations[ g_current_annotation_key] += std::string( "\n") + value;
-		}
-		else if (!g_current_annotation_sep)
-		{
-			char buf[ 1024];
-			std::snprintf( buf, sizeof(buf), "only single '%s' annotation allowed", g_current_annotation_key.c_str());
-			throw std::runtime_error( buf);
+			if (concat)
+			{
+				AnnotationMap::iterator ains = range.second;
+				--ains;
+				ains->second += std::string( "\n") + value;
+			}
+			else if (g_current_allow_multiple)
+			{
+				g_annotations.insert( AnnotationMapElem( g_current_annotation_key, value));
+			}
+			else
+			{
+				char buf[ 1024];
+				std::snprintf( buf, sizeof(buf), "only single '%s' annotation allowed", g_current_annotation_key.c_str());
+				throw std::runtime_error( buf);
+			}
 		}
 		else
 		{
-			g_annotations[ g_current_annotation_key] += std::string( &g_current_annotation_sep, 1) + value;
+			g_annotations.insert( AnnotationMapElem( g_current_annotation_key, value));
 		}
 	}
 }
-static std::string getAnnotation( const AnnotationMap& amap, const std::string& key, bool mandatory)
+static std::vector<std::string> getAnnotations( const AnnotationMap& amap, const std::string& key, bool mandatory)
 {
-	AnnotationMap::const_iterator ai = amap.find( key);
-	if (ai == amap.end())
+	std::vector<std::string> rt;
+	std::pair<AnnotationMap::const_iterator,AnnotationMap::const_iterator> range
+		= amap.equal_range( key);
+	if (range.first == range.second)
 	{
 		if (mandatory) throw std::runtime_error( std::string("annotation of '") + key + "' is mandatory");
-		return std::string();
+		return rt;
 	}
 	else
 	{
-		char const* si = ai->second.c_str();
-		const char* se = si + ai->second.size();
-		skipSpaces( si, se);
-		if (si == se)
+		AnnotationMap::const_iterator ai = range.first, ae = range.second;
+		for (; ai != ae; ++ai)
 		{
-			throw std::runtime_error( std::string("annotation of '") + key + "' is empty");
+			char const* si = ai->second.c_str();
+			const char* se = si + ai->second.size();
+			skipSpaces( si, se);
+			if (si == se)
+			{
+				throw std::runtime_error( std::string("annotation of '") + key + "' is empty");
+			}
+			rt.push_back( std::string( si, se-si));
 		}
-		return std::string( si, se-si);
 	}
+	return rt;
+}
+static std::string getAnnotation( const AnnotationMap& amap, const std::string& key, bool mandatory)
+{
+	std::vector<std::string> rt = getAnnotations( amap, key, mandatory);
+	if (rt.size() > 1) throw std::runtime_error( std::string("more than one annotations of '") + key + "'");
+	return rt.empty()?std::string():rt[0];
 }
 
 static bool has_annotation( char const* si, const char* se)
@@ -168,12 +189,12 @@ static void extract_annotation( char const* si, const char* se)
 			if (key == "brief")
 			{
 				g_current_annotation_key = "@brief";
-				g_current_annotation_sep = '\n';
+				g_current_allow_multiple = false;
 			}
 			else if (key == "class")
 			{
 				g_current_annotation_key = "@class";
-				g_current_annotation_sep = '\0';
+				g_current_allow_multiple = false;
 			}
 			else if (key == "example")
 			{
@@ -196,27 +217,27 @@ static void extract_annotation( char const* si, const char* se)
 				{
 					g_current_annotation_key += "@example";
 				}
-				g_current_annotation_sep = '\n';
+				g_current_allow_multiple = true;
 			}
 			else if (key == "return")
 			{
 				g_current_annotation_key = "return";
-				g_current_annotation_sep = '\0';
+				g_current_allow_multiple = false;
 			}
 			else if (key == "remark")
 			{
 				g_current_annotation_key = "@remark";
-				g_current_annotation_sep = '\n';
+				g_current_allow_multiple = true;
 			}
 			else if (key == "note")
 			{
 				g_current_annotation_key = "@note";
-				g_current_annotation_sep = '\n';
+				g_current_allow_multiple = true;
 			}
 			else if (key == "return")
 			{
 				g_current_annotation_key = "@return";
-				g_current_annotation_sep = '\0';
+				g_current_allow_multiple = false;
 			}
 			else if (key == "param")
 			{
@@ -229,7 +250,7 @@ static void extract_annotation( char const* si, const char* se)
 					skipSpaces( si, se);
 				}
 				g_current_annotation_key = parseIdentifier( si, se);
-				g_current_annotation_sep = '\0';
+				g_current_allow_multiple = false;
 			}
 			else
 			{
@@ -245,7 +266,7 @@ static void extract_annotation( char const* si, const char* se)
 		else
 		{
 			g_current_annotation_key.clear();
-			g_current_annotation_sep = '\0';
+			g_current_allow_multiple = false;
 		}
 	}
 }
@@ -919,7 +940,7 @@ VariableValue TypeSystem::parse(
 			{
 				if (maxend < enddef || maxpkt < pkt)
 				{
-					rt = VariableValue( ""/*name*/, &*vi, defmap, ""/*description*/, ""/*examples*/);
+					rt = VariableValue( ""/*name*/, &*vi, defmap, ""/*description*/, std::vector<std::string>()/*examples*/);
 					maxend = enddef;
 					maxpkt = pkt;
 				}
@@ -1150,7 +1171,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 					skipStructure( si, se);
 				}
 				std::string description = getAnnotation( annotationMap, "@brief", false);
-				std::string examples = getAnnotation( annotationMap, "@example", false);
+				std::vector<std::string> examples = getAnnotations( annotationMap, "@example", false);
 				ConstructorDef def( params, description, examples);
 				classDef.addConstructor( def);
 
@@ -1247,7 +1268,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 				VariableValue retvaltype = m_typeSystem->parse( className, methodName, si, se);
 				bool hasReturn = retvaltype.type().hasEvent( "retv_map");
 				retvaltype.setDescription( getAnnotation( annotationMap, "return", hasReturn));
-				retvaltype.setExamples( getAnnotation( annotationMap, "return@example", false));
+				retvaltype.setExamples( getAnnotations( annotationMap, "return@example", false));
 
 				skipSpacesAndComments( si, se);
 				if (si == se || !isAlpha( *si))
@@ -1292,7 +1313,7 @@ void InterfacesDef::parseClass( const std::string& className, const std::string&
 					}
 				}
 				std::string methodDescription = getAnnotation( annotationMap, "@brief", true);
-				std::string methodExamples = getAnnotation( annotationMap, "@example", false);
+				std::vector<std::string> methodExamples = getAnnotations( annotationMap, "@example", false);
 				classDef.addMethod( MethodDef( methodName, retvaltype, params, isconst, methodDescription, methodExamples));
 				if (*si == '{')
 				{
@@ -1334,7 +1355,7 @@ std::vector<VariableValue> InterfacesDef::parseParameters(
 		if (paramName.empty()) throw std::runtime_error( "no name of parameter defined");
 		rt.back().setName( paramName);
 		rt.back().setDescription( getAnnotation( annotationMap, paramName, true));
-		rt.back().setExamples( getAnnotation( annotationMap, paramName + "@example", false));
+		rt.back().setExamples( getAnnotations( annotationMap, paramName + "@example", false));
 		skipSpacesAndComments( si, se);
 		if (si != se)
 		{

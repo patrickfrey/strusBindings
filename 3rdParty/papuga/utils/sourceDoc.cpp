@@ -78,6 +78,25 @@ static void printDocumentationTag(
 	}
 }
 
+static void mapCodeExamples(
+		std::ostream& out,
+		const SourceDocLanguageDescription* lang,
+		const char* tag,
+		const char* examples)
+{
+	if (!examples) return;
+	char const* si = examples;
+	char const* sn;
+	while (0!=(sn = std::strchr( si,'\3')))
+	{
+		std::string examplecode = lang->mapCodeExample( std::string( si, sn-si));
+		printDocumentationTag( out, lang, tag, examplecode.c_str());
+		si = sn+1;
+	}
+	std::string examplecode = lang->mapCodeExample( std::string( si));
+	printDocumentationTag( out, lang, tag, examplecode.c_str());
+}
+
 static void printParameterDescription(
 		std::ostream& out,
 		const SourceDocLanguageDescription* lang,
@@ -93,11 +112,7 @@ static void printParameterDescription(
 				pi->mandatory?"":"(optional) ",
 				pi->description);
 		printDocumentationTag( out, lang, "param", buf);
-		if (pi->examples)
-		{
-			std::string examplecode = lang->mapCodeExample( pi->examples);
-			printDocumentationTag( out, lang, "usage", examplecode.c_str());
-		}
+		mapCodeExamples( out, lang, "usage", pi->examples);
 	}
 }
 
@@ -110,12 +125,8 @@ static void printConstructor(
 	if (!cdef) return;
 	printDocumentationTag( out, lang, "constructor", "new");
 	printDocumentationTag( out, lang, "brief", cdef->description);
+	mapCodeExamples( out, lang, "usage", cdef->examples);
 	printParameterDescription( out, lang, cdef->parameter);
-	if (cdef->examples)
-	{
-		std::string examplecode = lang->mapCodeExample( cdef->examples);
-		printDocumentationTag( out, lang, "usage", examplecode.c_str());
-	}
 	out << lang->constructorDeclaration( classname, cdef) << std::endl;
 }
 
@@ -128,12 +139,8 @@ static void printMethod(
 	if (!mdef) return;
 	printDocumentationTag( out, lang, "method", mdef->name);
 	printDocumentationTag( out, lang, "brief", mdef->description);
+	mapCodeExamples( out, lang, "usage", mdef->examples);
 	printParameterDescription( out, lang, mdef->parameter);
-	if (mdef->examples)
-	{
-		std::string examplecode = lang->mapCodeExample( mdef->examples);
-		printDocumentationTag( out, lang, "usage", examplecode.c_str());
-	}
 	out << lang->methodDeclaration( classname, mdef) << std::endl;
 }
 
@@ -153,17 +160,15 @@ void papuga::printSourceDoc(
 	std::size_t ci;
 	for (ci=0; descr.classes[ci].name; ++ci)
 	{
-		const papuga_ClassDescription& classdef = descr.classes[ci];
-		std::string classname = lang->fullclassname( classdef.name);
+		const papuga_ClassDescription& cdef = descr.classes[ci];
+		printDocumentationTag( out, lang, "class", cdef.name);
+		printDocumentationTag( out, lang, "brief", cdef.description);
 
-		printDocumentationTag( out, lang, "class", classname.c_str());
-		printDocumentationTag( out, lang, "brief", classdef.description);
-
-		printConstructor( out, lang, classname, classdef.constructor);
+		printConstructor( out, lang, cdef.name, cdef.constructor);
 		std::size_t mi = 0;
-		for (; classdef.methodtable[mi].name; ++mi)
+		for (; cdef.methodtable[mi].name; ++mi)
 		{
-			printMethod( out, lang, classname, &classdef.methodtable[mi]);
+			printMethod( out, lang, cdef.name, &cdef.methodtable[mi]);
 		}
 	}
 }

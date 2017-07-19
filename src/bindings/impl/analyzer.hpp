@@ -48,7 +48,7 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \example "split"
 	/// \example ["regex", "[0-9]+"]
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -74,7 +74,7 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \example "split"
 	/// \example ["regex", "[0-9]+"]
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -120,7 +120,7 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \example "split"
 	/// \example ["regex", "[0-9]+"]
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -149,7 +149,7 @@ public:
 	/// \param[in] tokenizer tokenizer function description to use for this feature
 	/// \example "split"
 	/// \example ["regex", "[0-9]+"]
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -164,7 +164,7 @@ public:
 	/// \example "concept"
 	/// \param[in] patternTypeName name of the pattern to select
 	/// \example "word"
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -184,7 +184,7 @@ public:
 	/// \example "concept"
 	/// \param[in] patternTypeName name of the pattern to select
 	/// \example "word"
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -204,7 +204,7 @@ public:
 	/// \example "location"
 	/// \param[in] patternTypeName name of the pattern to select
 	/// \example "word"
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -218,7 +218,7 @@ public:
 	/// \example "annotation"
 	/// \param[in] patternTypeName name of the pattern to select
 	/// \example "word"
-	/// \param[in] normalizers list of normalizer function description to use for this feature in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
@@ -317,7 +317,7 @@ public:
 	/// \param[in] featureType element feature type created from this field type
 	/// \param[in] fieldType name of the field type defined
 	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
-	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type in the ascending order of appearance
 	void addElement(
 			const std::string& featureType,
 			const std::string& fieldType,
@@ -337,7 +337,7 @@ public:
 	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
 	/// \param[in] fieldtype type of the field of this element in the query
 	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
-	/// \param[in] normalizers list of normalizer function description to use for the features of this field type in the ascending order of appearance
+	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type in the ascending order of appearance
 	void addPatternLexem(
 			const std::string& termtype,
 			const std::string& fieldtype,

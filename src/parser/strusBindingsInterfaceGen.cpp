@@ -88,6 +88,18 @@ static std::string printString( const std::string& content)
 	return rt;
 }
 
+static std::string printString( const std::vector<std::string>& content)
+{
+	std::string rt;
+	std::vector<std::string>::const_iterator si = content.begin(), se = content.end();
+	for (int sidx=0; si != se; ++si,++sidx)
+	{
+		if (sidx) rt.append( "\3");
+		rt.append( printString( *si));
+	}
+	return rt;
+}
+
 static std::string methodFunctionName( const std::string& cl, const std::string& mt)
 {
 	return "_strus_bindings_" + cl + "__" + mt;

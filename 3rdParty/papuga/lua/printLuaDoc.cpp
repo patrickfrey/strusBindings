@@ -30,16 +30,7 @@ public:
 		return "--";
 	}
 
-	virtual std::string fullclassname( const char* classname) const
-	{
-		std::string rt = m_descr->name;
-		std::transform( rt.begin(), rt.end(), rt.begin(), ::tolower);
-		rt.append( "_");
-		rt.append( classname);
-		return rt;
-	}
-
-	virtual std::string mapCodeExample( const char* example) const
+	virtual std::string mapCodeExample( const std::string& example) const
 	{
 		std::ostringstream out;
 		printCodeSnippet( out, example);
@@ -49,7 +40,7 @@ public:
 	virtual std::string constructorDeclaration( const std::string& classname, const papuga_ConstructorDescription* cdef) const
 	{
 		std::ostringstream out;
-		out << "function " << classname << ".new" << "(";
+		out << "function " << fullclassname(classname) << ".new" << "(";
 		printParameterList( out, cdef->parameter);
 		out << ")" << std::endl << "end" << std::endl;
 		return out.str();
@@ -58,13 +49,22 @@ public:
 	virtual std::string methodDeclaration( const std::string& classname, const papuga_MethodDescription* mdef) const
 	{
 		std::ostringstream out;
-		out << "function " << classname << ":" << mdef->name << "(";
+		out << "function " << fullclassname(classname) << ":" << mdef->name << "(";
 		printParameterList( out, mdef->parameter);
 		out << ")" << std::endl << "end" << std::endl;
 		return out.str();
 	}
 
 private:
+	std::string fullclassname( const std::string& classname) const
+	{
+		std::string rt = m_descr->name;
+		std::transform( rt.begin(), rt.end(), rt.begin(), ::tolower);
+		rt.append( "_");
+		rt.append( classname);
+		return rt;
+	}
+
 	static void printParameterList(
 			std::ostream& out,
 			const papuga_ParameterDescription* parameter)
@@ -93,12 +93,12 @@ private:
 		}
 	}
 
-	static void printCodeSnippet( std::ostream& out, const char* examples)
+	static void printCodeSnippet( std::ostream& out, const std::string& examples)
 	{
-		if (!examples || !examples[0]) return;
+		if (!examples[0]) return;
 		unsigned int bcnt = 0;
 		unsigned int ocnt = 0;
-		char const* ei = examples;
+		char const* ei = examples.c_str();
 		while (*ei)
 		{
 			ei = skipSpaces( ei);

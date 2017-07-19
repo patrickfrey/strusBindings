@@ -16,7 +16,8 @@
 
 namespace strus
 {
-typedef std::map<std::string,std::string> AnnotationMap;
+typedef std::multimap<std::string,std::string> AnnotationMap;
+typedef std::pair<std::string,std::string> AnnotationMapElem;
 
 class VariableType
 {
@@ -51,7 +52,7 @@ class VariableValue
 public:
 	VariableValue()
 		:m_type(0),m_defmap(),m_name(),m_description(),m_examples(){}
-	VariableValue( const std::string& name_, const VariableType* type_, const std::map<std::string,std::string>& defmap_, const std::string& description_, const std::string& examples_)
+	VariableValue( const std::string& name_, const VariableType* type_, const std::map<std::string,std::string>& defmap_, const std::string& description_, const std::vector<std::string>& examples_)
 		:m_type(type_),m_defmap(defmap_),m_name(name_),m_description(description_),m_examples(examples_){}
 	VariableValue( const VariableValue& o)
 		:m_type(o.m_type),m_defmap(o.m_defmap),m_name(o.m_name),m_description(o.m_description),m_examples(o.m_examples){}
@@ -59,14 +60,14 @@ public:
 
 	const std::string& name() const				{return m_name;}
 	const std::string& description() const			{return m_description;}
-	const std::string& examples() const			{return m_examples;}
+	const std::vector<std::string>& examples() const	{return m_examples;}
 	const VariableType& type() const			{return *m_type;}
 	const std::map<std::string,std::string>& defmap()	{return m_defmap;}
 	std::string tostring() const;
 
 	void setName( const std::string& name_)			{m_name = name_;}
 	void setDescription( const std::string& description_)	{m_description = description_;}
-	void setExamples( const std::string& examples_)		{m_examples = examples_;}
+	void setExamples( const std::vector<std::string>& examples_) {m_examples = examples_;}
 
 	std::string expand( 
 			const char* eventname,
@@ -80,7 +81,7 @@ private:
 	std::map<std::string,std::string> m_defmap;
 	std::string m_name;
 	std::string m_description;
-	std::string m_examples;
+	std::vector<std::string> m_examples;
 };
 
 class TypeSystem
@@ -101,14 +102,14 @@ private:
 class MethodDef
 {
 public:
-	MethodDef( const std::string& name_, const VariableValue& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_, const std::string& description_, const std::string& examples_)
+	MethodDef( const std::string& name_, const VariableValue& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_, const std::string& description_, const std::vector<std::string>& examples_)
 		:m_name(name_),m_description(description_),m_examples(examples_),m_returnvalue(returnvalue_),m_param(param_),m_isconst(isconst_){}
 	MethodDef( const MethodDef& o)
 		:m_name(o.m_name),m_description(o.m_description),m_examples(o.m_examples),m_returnvalue(o.m_returnvalue),m_param(o.m_param),m_isconst(o.m_isconst){}
 
 	const std::string& name() const				{return m_name;}
 	const std::string& description() const			{return m_description;}
-	const std::string& examples() const			{return m_examples;}
+	const std::vector<std::string>& examples() const	{return m_examples;}
 	const VariableValue& returnValue() const		{return m_returnvalue;}
 	const std::vector<VariableValue>& parameters() const	{return m_param;}
 	bool isconst() const					{return m_isconst;}
@@ -118,7 +119,7 @@ public:
 private:
 	std::string m_name;
 	std::string m_description;
-	std::string m_examples;
+	std::vector<std::string> m_examples;
 	VariableValue m_returnvalue;
 	std::vector<VariableValue> m_param;
 	bool m_isconst;
@@ -127,20 +128,20 @@ private:
 class ConstructorDef
 {
 public:
-	ConstructorDef( const std::vector<VariableValue>& param_, const std::string& description_, const std::string& examples_)
+	ConstructorDef( const std::vector<VariableValue>& param_, const std::string& description_, const std::vector<std::string>& examples_)
 		:m_description(description_),m_examples(examples_),m_param(param_){}
 	ConstructorDef( const ConstructorDef& o)
 		:m_description(o.m_description),m_examples(o.m_examples),m_param(o.m_param){}
 
 	const std::vector<VariableValue>& parameters() const	{return m_param;}
 	const std::string& description() const			{return m_description;}
-	const std::string& examples() const			{return m_examples;}
+	const std::vector<std::string>& examples() const	{return m_examples;}
 
 	std::string tostring() const;
 
 private:
 	std::string m_description;
-	std::string m_examples;
+	std::vector<std::string> m_examples;
 	std::vector<VariableValue> m_param;
 };
 

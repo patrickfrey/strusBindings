@@ -23,7 +23,7 @@ link_directories(
 
 add_custom_command(
     OUTPUT     ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h
-    DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen
+    DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description
     COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua header ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h
     COMMENT  "Generating Lua module header include/strus/lib/lua.h"
     VERBATIM
@@ -31,7 +31,7 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT     libstrus_bindings_lua.c
-    DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen
+    DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description
     COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua module libstrus_bindings_lua.c include=strus/lib/lua.h
     COMMENT  "Generating Lua module source libstrus_bindings_lua.c"
     VERBATIM
@@ -39,7 +39,7 @@ add_custom_command(
  
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua
-    DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen
+    DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
     COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua doc ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua
     COMMENT  "Generating LDoc description file ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua"
     VERBATIM
