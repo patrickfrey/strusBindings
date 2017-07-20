@@ -124,16 +124,19 @@ public:
 	void addMetaDataRestriction( const ValueVariant& expression);
 
 	/// \brief Define term statistics to use for a term for weighting it in this query
+	/// \example  defineTermStatistics( "word" "game" [ df: 74653 ] )
 	/// \param[in] type query term type name
 	/// \param[in] value query term value
-	/// \param[in] stats the structure with the statistics to set (strus::TermStatistics)
+	/// \param[in] stats the structure with the statistics to set
+	/// \example [ df: 74653 ]
 	void defineTermStatistics(
 			const std::string& type,
 			const std::string& value,
 			const ValueVariant& stats);
 
 	/// \brief Define the global statistics to use for weighting in this query
-	/// \param[in] stats the structure with the statistics to set (strus::GlobalStatistics)
+	/// \param[in] stats the structure with the statistics to set
+	/// \example [ nofdocs: 1234331 ]
 	void defineGlobalStatistics( const ValueVariant& stats);
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage

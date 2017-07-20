@@ -46,6 +46,9 @@ class ContextImpl
 public:
 	/// \brief Constructor
 	/// \param[in] config context configuration. If not defined, create context for local mode with own module loader
+	/// \example [ rpc: "localhost:7181" ]
+	/// \example [ trace: "log=dump;file=stdout" ]
+	/// \example [ threads: 12 ]
 	explicit ContextImpl( const ValueVariant& config=ValueVariant());
 	/// \brief Destructor
 	~ContextImpl(){}

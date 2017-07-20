@@ -6,7 +6,7 @@ template main ENDHTML {{ }}
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<title>Strus Lua interface documentation</title>
-	<link rel="stylesheet" href="ldoc.css" type="text/css" />
+	<link rel="stylesheet" href="bindingsDocNav.css" type="text/css" />
 </head>
 <body onload="initLoad()">
 <script type="text/javascript">

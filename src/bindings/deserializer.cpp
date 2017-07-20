@@ -480,6 +480,7 @@ TermStatistics Deserializer::getTermStatistics(
 	}
 	else if (si->tag == papuga_TagOpen)
 	{
+		++si;
 		int value_defined[1] = {0};
 		while (si != se && si->tag != papuga_TagClose)
 		{

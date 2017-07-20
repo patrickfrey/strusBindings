@@ -809,6 +809,11 @@ public:
 							throw EXCEPTION("unknown template command '%s'", id.c_str());
 						}
 					}
+					else if (*si == '#')
+					{
+						//... comment (until end of line)
+						if (skipToEoln( si, se)) ++si;
+					}
 					else
 					{
 						throw EXCEPTION("identifier expected at start of line");
@@ -1225,7 +1230,7 @@ private:
 		std::list<TemplateInstance>::iterator ti = tplist.begin(), te = tplist.end();
 		for (;ti != te; ++ti)
 		{
-			if (evtimestmp > ti->timestmp)
+			if (evtimestmp >= ti->timestmp)
 			{
 				std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
 				if (mi != ti->map.end())
@@ -1245,6 +1250,9 @@ private:
 				std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
 				if (mi != ti->map.end())
 				{
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+					std::cerr << "append var " << variable << "='" << std::string( value.c_str(), std::min( value.size(), (std::size_t)30)) << "' to template " << m_templates[ ti->idx].variable << std::endl;
+#endif
 					mi->second += value;
 				}
 			}
@@ -1315,6 +1323,9 @@ private:
 				std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
 				int evtimestmp = ti->timestmp;
 				ti = tplist.erase( ti);
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				std::cerr << "close template " << var << " = '" << std::string( content.c_str(), std::min( content.size(), (std::size_t)30)) << "'" << std::endl;
+#endif
 				appendTemplateVariable( tplist, var, content, evtimestmp);
 			}
 		}
@@ -1394,6 +1405,9 @@ private:
 						ctp.assignVariable( var.variable, ni->value);
 					}
 				}
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				std::cerr << "open template " << m_templates[ tidx].variable << std::endl;
+#endif
 				rt = true;
 			}
 		}
