@@ -255,11 +255,11 @@ public:
 			const std::string& serializedPatternFile);
 
 	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content or documents of different types with one configuration
+	/// \note Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
 	/// \param[in] selectexpr an expression that defines the content of the sub document declared
 	/// \example "/doc/employee"
 	/// \param[in] subDocumentTypeName type name assinged to this sub document
 	/// \example "employee"
-	/// \remark Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
 	void defineDocument(
 			const std::string& subDocumentTypeName,
 			const std::string& selectexpr);
@@ -276,13 +276,13 @@ public:
 			const ValueVariant& documentClass=ValueVariant()) const;
 
 	/// \brief Analye a content and return the analyzed document structures as iterator (analyzing multipart document)
+	/// \note If you are not sure if to use analyzeSingle or analyzeMultiPart, then take analyzeMultiPart, because it covers analyzeSingle, returning an iterator on a set containing the single document only
 	/// \param[in] content content string (NOT a file name !) with the documents to analyze
 	/// \example "<?xml version='1.0' encoding='UTF-8' standalone=yes?><doc>...</doc>"
 	/// \param[in] documentClass document class of the document set to analyze, if not specified the document class is guessed from the content with document class detection
 	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
 	/// \example [ mimetype="application/json" encoding="UTF-8" ]
 	/// \return iterator on structures of the documents analyzed (sub document type names, search index terms, forward index terms, metadata, attributes)
-	/// \note if you are not sure if to use analyzeSingle or analyzeMultiPart, then take analyzeMultiPart, because it covers analyzeSingle, returning an iterator on a set containing the single document only
 	Iterator analyzeMultiPart(
 			const std::string& content,
 			const ValueVariant& documentClass=ValueVariant()) const;

@@ -10,8 +10,9 @@
 #include "papuga/lib/doc_gen.hpp"
 #include <string>
 #include <vector>
-#include <iostream>
+#include <fstream>
 #include <sstream>
+#include <iostream>
 #include <map>
 #include <stdexcept>
 #include <cerrno>
@@ -20,9 +21,10 @@
 
 static void printUsage()
 {
-	std::cerr << "papugaDoc <template> <inputfile> {<variable>=<filepath>}" << std::endl;
+	std::cerr << "papugaDoc [-o <outputfile> ] <template> <inputfile> {<variable>=<filepath>}" << std::endl;
 	std::cerr << "Description : Program for generating documentation, mapping a doxygen like" << std::endl;
 	std::cerr << "              documented source file with a template" << std::endl;
+	std::cerr << "<outputfile>: File where to print output (default stdout)" << std::endl;
 	std::cerr << "<template>  : File with the template." << std::endl;
 	std::cerr << "              Template language:" << std::endl;
 	std::cerr << "                  comment <eolncomment>" << std::endl;
@@ -97,15 +99,67 @@ int main( int argc, const char** argv)
 	int ec = 0;
 	try
 	{
-		if (argc < 3)
+		const char* outputfile = 0;
+		bool verbose = false;
+		int argi = 1;
+		while (argc > argi && argv[argi][0] == '-')
+		{
+			char opt = argv[argi][1];
+			const char* optarg = 0;
+			if (opt == 'o')
+			{
+				if (argv[argi][2])
+				{
+					optarg = argv[argi]+2;
+					argi += 1;
+				}
+				else if (argi+1 < argc)
+				{
+					optarg = argv[argi+1];
+					argi += 2;
+				}
+				else
+				{
+					throw std::runtime_error( "missing argument of option");
+				}
+				if (opt == 'o')
+				{
+					outputfile = optarg;
+				}
+			}
+			else
+			{
+				if (argv[argi][2])
+				{
+					printUsage();
+					throw std::runtime_error( "no cascading of option characters allowed and not argument expected for this option");
+				}
+				if (opt == 'h')
+				{
+					printUsage();
+					return 0;
+				}
+				else if (opt == 'v')
+				{
+					verbose = true;
+					++argi;
+				}
+				else
+				{
+					printUsage();
+					throw std::runtime_error( "unknown option option");
+				}
+			}
+		}
+		if (argc < argi+2)
 		{
 			printUsage();
 			throw std::runtime_error( "too few arguments");
 		}
-		std::string source = readFile( argv[1]);
+		std::string source = readFile( argv[argi+0]);
 		std::map<std::string,std::string> varmap;
-		std::string docsrc = readFile( argv[2]);
-		int argi = 3;
+		std::string docsrc = readFile( argv[argi+1]);
+		argi += 2;
 		for (; argi != argc; ++argi)
 		{
 			char const* si = argv[argi];
@@ -130,9 +184,32 @@ int main( int argc, const char** argv)
 			}
 			varmap[ name] = value;
 		}
-		if (!papuga::generateDoc( std::cout, std::cerr, source, docsrc, varmap))
+		if (outputfile)
 		{
-			throw std::runtime_error( "generate documentation failed");
+			try
+			{
+				std::ofstream outs( outputfile);
+				outs.exceptions( std::ios::badbit);
+	
+				if (!papuga::generateDoc( outs, std::cerr, source, docsrc, varmap, verbose))
+				{
+					throw std::runtime_error( "generate documentation failed");
+				}
+				outs.close();
+			}
+			catch (std::ofstream::failure e)
+			{
+				char buf[ 2048];
+				std::snprintf( buf, sizeof(buf), "error in output to file: %s", e.what());
+				throw std::runtime_error( buf);
+			}
+		}
+		else
+		{
+			if (!papuga::generateDoc( std::cout, std::cerr, source, docsrc, varmap, verbose))
+			{
+				throw std::runtime_error( "generate documentation failed");
+			}
 		}
 		return 0;
 	}

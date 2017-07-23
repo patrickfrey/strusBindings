@@ -11,28 +11,37 @@
 #define _PAPUGA_INTERFACE_DESCRIPTION_H_INCLUDED
 #include <stdbool.h>
 
+#define papuga_AnnotationTag_brief	"brief"		///< documentation tag telling the 'what'
+#define papuga_AnnotationTag_example	"example"	///< documentation tag illustrating the 'how'
+#define papuga_AnnotationTag_note	"note"		///< documentation tag explaining the 'why's
+#define papuga_AnnotationTag_remark	"remark"	///< documentation tag explaining the 'dont's
+
+/// \brief Descriptive annotation (list of items as {NULL,NULL} terminated list)
+typedef struct papuga_Annotation
+{
+	const char* tag;				///< documentation tag, one of {"brief","example","remark","note"}
+	const char* text;				///< documentation text, content attached with the tag
+} papuga_Annotation;
+
 /// \brief Structure describing a parameter of a method/constructor call
 typedef struct papuga_ParameterDescription
 {
 	const char* name;				///< name of the parameter
-	const char* description;			///< description of the parameter value
-	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	const papuga_Annotation* doc;			///< description and examples of the parameter value
 	bool mandatory;					///< true, if the parameter is mandatory, false if it is optional (optional parameters must only appear as last arguments, a function parameter list is always a list of mandatory arguments followed by optional arguments)
 } papuga_ParameterDescription;
 
 /// \brief Structure describing the return values of a method call
 typedef struct papuga_CallResultDescription
 {
-	const char* description;			///< description of the return values of a method
-	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	const papuga_Annotation* doc;			///< description and examples of the return values of a method
 } papuga_CallResultDescription;
 
 /// \brief Structure describing the constructor of a host object class
 typedef struct papuga_ConstructorDescription
 {
 	const char* funcname;				///< function name of the method
-	const char* description;			///< description of the constructor
-	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	const papuga_Annotation* doc;			///< description and examples of the constructor
 	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
 } papuga_ConstructorDescription;
 
@@ -41,8 +50,7 @@ typedef struct papuga_MethodDescription
 {
 	const char* name;				///< name of the method
 	const char* funcname;				///< function name of the method
-	const char* description;			///< description of the method
-	const char* examples;				///< list of examples separated by ',' as serialization '[' = Open, ']' = Close, Identifier followed by ':' = Name, other tokens = Value
+	const papuga_Annotation* doc;			///< description and examples of the method
 	const papuga_CallResultDescription* result;	///< return value descriptions or 0, if no return value defined
 	bool self;					///< method that requires an instance of its class (self pointer)
 	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
@@ -53,7 +61,7 @@ typedef struct papuga_ClassDescription
 {
 	unsigned int id;				///< id of the class (unique index counted from 0)
 	const char* name;				///< name of class
-	const char* description;			///< description of the class
+	const papuga_Annotation* doc;			///< description of the class
 	const papuga_ConstructorDescription* constructor;///< function description of the constructor
 	const char* funcname_destructor;		///< function name of the destructor
 	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods
@@ -61,10 +69,10 @@ typedef struct papuga_ClassDescription
 
 typedef struct papuga_AboutDescription
 {
-	const char* authors;
-	const char* copyright;
-	const char* license;
-	const char* version;
+	const char* authors;				///< authors of the project
+	const char* copyright;				///< main author of the project
+	const char* license;				///< license name of the project
+	const char* version;				///< version (MAJOR.MINOR.PATCH) of the project
 } papuga_AboutDescription;
 
 /// \brief Structure describing the interface

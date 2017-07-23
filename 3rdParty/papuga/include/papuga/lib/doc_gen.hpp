@@ -21,12 +21,14 @@ namespace papuga {
 /// \param[in] templatesrc source of the templates
 /// \param[in] docsrc source to map
 /// \param[in] varmap variables initialized by the caller
+/// \param[in] verbose true, if a log of actions should be printed to err
 bool generateDoc(
 	std::ostream& out,
 	std::ostream& err,
 	const std::string& templatesrc,
 	const std::string& docsrc,
-	const std::map<std::string,std::string>& varmap);
+	const std::map<std::string,std::string>& varmap,
+	bool verbose);
 
 }//namespace
 #endif

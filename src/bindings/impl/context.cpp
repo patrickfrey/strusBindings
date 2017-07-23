@@ -125,12 +125,6 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	}
 }
 
-const char* ContextImpl::getLastError() const
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	return errorhnd->fetchError();
-}
-
 void ContextImpl::loadModule( const std::string& name_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot load modules in RPC client mode"));
@@ -144,22 +138,42 @@ void ContextImpl::loadModule( const std::string& name_)
 	}
 }
 
-void ContextImpl::addModulePath( const std::string& paths_)
+void ContextImpl::addModulePath( const ValueVariant& paths_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a module path in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
-	moduleLoader->addModulePath( paths_);
+	std::vector<std::string> pathlist = Deserializer::getStringList( paths_);
+	std::vector<std::string>::const_iterator pi = pathlist.begin(), pe = pathlist.end();
+	for (; pi != pe; ++pi)
+	{
+		moduleLoader->addModulePath( *pi);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to add module path: %s"), errorhnd->fetchError());
+	}
 }
 
-void ContextImpl::addResourcePath( const std::string& paths_)
+void ContextImpl::addResourcePath( const ValueVariant& paths_)
 {
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
-	moduleLoader->addResourcePath( paths_);
+	std::vector<std::string> pathlist = Deserializer::getStringList( paths_);
+	std::vector<std::string>::const_iterator pi = pathlist.begin(), pe = pathlist.end();
+	for (; pi != pe; ++pi)
+	{
+		moduleLoader->addResourcePath( *pi);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to add module path: %s"), errorhnd->fetchError());
+	}
 }
 
 void ContextImpl::initStorageObjBuilder()

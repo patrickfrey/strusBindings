@@ -9,191 +9,7 @@ template main ENDHTML {{ }}
 	<link rel="stylesheet" href="bindingsDocNav.css" type="text/css" />
 </head>
 <body onload="initLoad()">
-<script type="text/javascript">
-var classSelection = "1";
-var memberSelection = "1_1";
-var lastNavTable = {};
-
-function showClassNav( id) {
-	var navid = 'nav_' + id;
-	var navlistid = 'list_' + id;
-	var titleid = 'title_' + id;
-	var descriptionid = 'description_' + id;
-	var allElements = document.getElementsByTagName("*");
-	for(var i=0; i < allElements.length; i++)
-	{
-		if (allElements[i].className === "navclass")
-		{
-			if (allElements[i].id === navid) {
-				allElements[i].style.background = "#e8f8e8";
-				allElements[i].style.fontWeight = 'bold';
-				allElements[i].style.display = 'block';
-			}
-			else
-			{
-				allElements[i].style.fontWeight = 'normal';
-				allElements[i].style.background = "#ecffe6";
-			}
-		}
-		else if (allElements[i].className === "navmemberlist")
-		{
-			if (allElements[i].id === navlistid) {
-				allElements[i].style.background = "#e8f8e8";
-				allElements[i].style.display = 'block';
-			} else {
-				allElements[i].style.background = "#ecffe6";
-				allElements[i].style.display = 'none';
-			}
-		}
-		else if (allElements[i].className === "nav_title_memberlist")
-		{
-			if (allElements[i].id === titleid) {
-				allElements[i].style.display = 'block';
-			} else {
-				allElements[i].style.display = 'none';
-			}
-		}
-		else if (allElements[i].className === "classdescription")
-		{
-			if (allElements[i].id === descriptionid) {
-				allElements[i].style.display = 'block';
-			} else {
-				allElements[i].style.display = 'none';
-			}
-		}
-		else if (allElements[i].className === "memberdescription")
-		{
-			allElements[i].style.display = 'none';
-		}
-		else if (allElements[i].className === "navconstructor")
-		{
-			allElements[i].style.background = "#ecffe6";
-		}
-		else if (allElements[i].className === "navmethod")
-		{
-			allElements[i].style.background = "#ecffe6";
-		}
-	}
-	classSelection = id;
-}
-
-function showMethod( id) {
-	var navid = 'nav_' + id;
-	var descriptionid = 'description_' + id;
-
-	var allElements = document.getElementsByTagName("*");
-	for(var i=0; i < allElements.length; i++)
-	{
-		if (allElements[i].className === "navmethod"
-		||  allElements[i].className === "navconstructor")
-		{
-			if (allElements[i].id === navid) {
-				allElements[i].style.background = "#e8f8e8";
-				allElements[i].style.fontWeight = 'bold';
-				allElements[i].style.display = 'block';
-			}
-			else
-			{
-				allElements[i].style.fontWeight = 'normal';
-				allElements[i].style.background = "#ecffe6";
-			}
-		}
-		else if (allElements[i].className === "memberdescription")
-		{
-			if (allElements[i].id === descriptionid) {
-				allElements[i].style.display = 'block';
-			} else {
-				allElements[i].style.display = 'none';
-			}
-		}
-	}
-	memberSelection = id;
-}
-
-function activateClassNav( id) {
-	showClassNav( id);
-	showMethod( id + "_1");
-}
-
-function fillLastNavTable() {
-	var allElements = document.getElementsByTagName("*");
-	for(var i=0; i < allElements.length; i++)
-	{
-		if (allElements[i].className === "navmethod" || allElements[i].className === "navclass")
-		{
-			var idparts = allElements[i].id.split("_");
-			if (idparts.length > 2)
-			{
-				var nav = lastNavTable[ idparts[1]];
-				var candidate = parseInt(idparts[2]);
-				if (nav == null || nav < candidate) {
-					lastNavTable[ idparts[1]] = candidate;
-				}
-			}
-		}
-	}
-}
-function initLoad() {
-	activateClassNav( "1");
-	fillLastNavTable();
-}
-
-function navigateId( id, ofs) {
-    if (ofs == 0) return id;
-    var idparts = id.split("_");
-    var res;
-    if (idparts.length == 1) {
-        res = (parseInt(idparts[0]) + ofs).toString();
-        if (document.getElementById( "nav_" + res) == null) {
-            return id;
-        } else {
-            return res;
-        }
-    } else {
-        var prefix = idparts.slice( 0, idparts.length-1).join("_");
-        var newidx = parseInt(idparts[ idparts.length-1]) + ofs;
-        res = prefix + "_" + newidx.toString();
-        if (document.getElementById( "nav_" + res) != null) {
-            return res;
-        } else {
-            if (ofs > 0) {
-                var newprefix = navigateId( prefix, +1);
-                if (newprefix == prefix) {
-                    return id;
-                } else {
-                    return newprefix + "_1";
-                }
-            } else {
-                var newprefix = navigateId( prefix, -1);
-                var lastnav = lastNavTable[ newprefix];
-                if (newprefix == prefix || lastnav == null) {
-                    return id;
-                } else {
-                    return newprefix + "_" + lastnav.toString();
-                }
-            }
-        }
-    }
-}
-
-document.onkeydown = function(evt) {
-    evt = evt || window.event;
-    switch (evt.keyCode) {
-        case 33://PageUp
-            var nav = navigateId( memberSelection, -1);
-            var cl = nav.split("_")[0];
-            showClassNav( cl);
-            showMethod( nav);
-            break;
-        case 34://PageDown
-            var nav = navigateId( memberSelection, +1);
-            var cl = nav.split("_")[0];
-            showClassNav( cl);
-            showMethod( nav);
-            break;
-    }
-}
-</script>
+<script type="text/javascript" src="bindingsDocNav.js"></script>
 
 <div class="container">
 <div class="product">
@@ -212,7 +28,7 @@ document.onkeydown = function(evt) {
 <h2 id="nav_title_classes">Classes</h2>
 <div class="navclasslist">
 	{{navclasslist}}
-</div>
+</div>  <!-- navclasslist -->
 {{navmemberlist}}
 </div> <!-- navigation -->
 
@@ -248,7 +64,7 @@ template navmemberlist=class END {{ }}
 <h3 class="nav_title_memberlist" id="title_{{classidx}}">{{classname}}</h3>
 <div class="navmemberlist" id="list_{{classidx}}">
 	{{navmember}}
-</div>
+</div> <!-- navmemberlist -->
 END
 
 index methodidx=method      {class} {constructor,method}
@@ -267,6 +83,8 @@ template classdescription=class END {{ }}
 <p class="leadtext">
 {{description}}
 </p>
+<div class="callremarks">{{remarks}}</div> <!-- callremarks -->
+<div class="callnotes">{{notes}}</div> <!-- callnotes -->
 </div> <!-- classdescription -->
 END
 
@@ -278,6 +96,8 @@ template memberdescription=method END {{ }}
 </p>
 <h4 class="content_subtitle">Parameter</h4>
 <div class="parameterlist">{{parameterlist}}</div>
+{{callremarks}}
+{{callnotes}}
 {{callexamples}}
 </div> <!-- memberdescription -->
 END
@@ -290,18 +110,40 @@ template memberdescription=constructor END {{ }}
 </p>
 <h4 class="content_subtitle">Parameter</h4>
 <div class="parameterlist">{{parameterlist}}</div>
+{{callremarks}}
+{{callnotes}}
 {{callexamples}}
 </div> <!-- memberdescription -->
 END
 
 template callexamples=constructor END {{ }}
 <h4 class="content_subtitle">Examples</h4>
-<div class="callexamples">{{examples}}</div>
+<div class="callexamples">{{examples}}</div> <!-- callexamples -->
 END
 
 template callexamples=method END {{ }}
 <h4 class="content_subtitle">Examples</h4>
-<div class="callexamples">{{examples}}</div>
+<div class="callexamples">{{examples}}</div> <!-- callexamples -->
+END
+
+template callnotes=method END {{ }}
+<h4 class="content_subtitle">Notes</h4>
+<div class="callnotes">{{notes}}</div> <!-- callnotes -->
+END
+
+template callnotes=constructor END {{ }}
+<h4 class="content_subtitle">Notes</h4>
+<div class="callnotes">{{notes}}</div> <!-- callnotes -->
+END
+
+template callremarks=method END {{ }}
+<h4 class="content_subtitle">Remarks</h4>
+<div class="callremarks">{{remarks}}</div> <!-- callremarks -->
+END
+
+template callremarks=constructor END {{ }}
+<h4 class="content_subtitle">Remarks</h4>
+<div class="callremarks">{{remarks}}</div> <!-- callremarks -->
 END
 
 template parameterlist=param END {{ }}
@@ -315,16 +157,57 @@ END
 empty parameterlist <div class="note">no parameters defined</div>
 
 template paramexamples=param END {{ }}
-<div class="paramexamples">{{examples}}</div>
+<div class="paramexamples">{{examples}}</div> <!-- paramexamples -->
+END
+
+template notes=class END {{ }}
+{{notelist}}
+END
+template remarks=class END {{ }}
+{{remarklist}}
+END
+
+template notes=method END {{ }}
+{{notelist}}
+END
+template remarks=method END {{ }}
+{{remarklist}}
+END
+
+template notes=constructor END {{ }}
+{{notelist}}
+END
+template remarks=constructor END {{ }}
+{{remarklist}}
+END
+
+template notes=param ?notelist END {{ }}
+<div class="annotation_subtitle">{{paramname}}</div>
+<div class="annotation">{{notelist}}</div> <!-- annotation -->
+END
+
+template remarks=param ?remarklist END {{ }}
+<div class="annotation_subtitle">{{paramname}}</div>
+<div class="annotation">{{remarklist}}</div> <!-- annotation -->
 END
 
 template examples=usage END {{ }}
 <div class="example">{{example}}</div>
 END
 
+template notelist=note END {{ }}
+<div class="note">{{note}}</div>
+END
+
+template remarklist=remark END {{ }}
+<div class="remark">{{remark}}</div>
+END
+
 variable constructorname=constructor
 variable methodname=method
-variable description=brief
+variable description=brief xmlencode
+variable note=note xmlencode
+variable remark=remark xmlencode
 variable paramname=param[0]
 variable paramdescr=param[1:] xmlencode
 variable example=usage xmlencode

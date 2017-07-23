@@ -186,8 +186,18 @@ private:
 				throw std::runtime_error( buf);
 			}
 		}
+		if (ocnt || bcnt)
+		{
+			std::string expr(
+				examples.c_str(), 
+				std::min( examples.size(), (std::size_t)60));
+			char buf[ 1024];
+			if (ocnt) std::snprintf( buf, sizeof(buf), "oval brackets ( ) are not balanced in expression at '%s...'", expr.c_str());
+			if (bcnt) std::snprintf( buf, sizeof(buf), "square brackets [ ] are not balanced in expression at '%s...'", expr.c_str());
+			throw std::runtime_error( buf);
+		}
 	}
-
+private:
 	const papuga_InterfaceDescription* m_descr;
 };
 

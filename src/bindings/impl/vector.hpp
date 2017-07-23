@@ -22,6 +22,7 @@ typedef papuga_ValueVariant ValueVariant;
 /// \brief Forward declaration
 class VectorStorageTransactionImpl;
 
+/// \class VectorStorageSearcherImpl
 /// \brief Object used to search for similar vectors in the collection
 class VectorStorageSearcherImpl
 {
@@ -54,8 +55,9 @@ private:
 	ObjectRef m_trace_impl;
 };
 
+/// \class VectorStorageClientImpl
 /// \brief Object representing a client connection to a vector storage 
-/// \remark The only way to construct a vector storage client instance is to call Context::createVectorStorageClient(const std::string&)
+/// \note The only way to construct a vector storage client instance is to call Context::createVectorStorageClient(const std::string&)
 class VectorStorageClientImpl
 {
 public:
@@ -135,6 +137,7 @@ private:
 };
 
 
+/// \class VectorStorageTransactionImpl
 /// \brief Object representing a vector storage transaction
 class VectorStorageTransactionImpl
 {

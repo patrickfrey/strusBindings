@@ -47,27 +47,27 @@ private:
 	Impl* m_impl;
 };
 
+typedef std::multimap<std::string,std::string> DocTagMap;
+
 class VariableValue
 {
 public:
 	VariableValue()
-		:m_type(0),m_defmap(),m_name(),m_description(),m_examples(){}
-	VariableValue( const std::string& name_, const VariableType* type_, const std::map<std::string,std::string>& defmap_, const std::string& description_, const std::vector<std::string>& examples_)
-		:m_type(type_),m_defmap(defmap_),m_name(name_),m_description(description_),m_examples(examples_){}
+		:m_type(0),m_defmap(),m_name(),m_doc(){}
+	VariableValue( const std::string& name_, const VariableType* type_, const std::map<std::string,std::string>& defmap_, const DocTagMap& doc_)
+		:m_type(type_),m_defmap(defmap_),m_name(name_),m_doc(doc_){}
 	VariableValue( const VariableValue& o)
-		:m_type(o.m_type),m_defmap(o.m_defmap),m_name(o.m_name),m_description(o.m_description),m_examples(o.m_examples){}
+		:m_type(o.m_type),m_defmap(o.m_defmap),m_name(o.m_name),m_doc(o.m_doc){}
 	~VariableValue(){}
 
 	const std::string& name() const				{return m_name;}
-	const std::string& description() const			{return m_description;}
-	const std::vector<std::string>& examples() const	{return m_examples;}
+	const DocTagMap& doc() const				{return m_doc;}
 	const VariableType& type() const			{return *m_type;}
 	const std::map<std::string,std::string>& defmap()	{return m_defmap;}
 	std::string tostring() const;
 
 	void setName( const std::string& name_)			{m_name = name_;}
-	void setDescription( const std::string& description_)	{m_description = description_;}
-	void setExamples( const std::vector<std::string>& examples_) {m_examples = examples_;}
+	void setDoc( const DocTagMap& doc_)			{m_doc = doc_;}
 
 	std::string expand( 
 			const char* eventname,
@@ -80,8 +80,7 @@ private:
 	const VariableType* m_type;
 	std::map<std::string,std::string> m_defmap;
 	std::string m_name;
-	std::string m_description;
-	std::vector<std::string> m_examples;
+	DocTagMap m_doc;
 };
 
 class TypeSystem
@@ -102,14 +101,13 @@ private:
 class MethodDef
 {
 public:
-	MethodDef( const std::string& name_, const VariableValue& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_, const std::string& description_, const std::vector<std::string>& examples_)
-		:m_name(name_),m_description(description_),m_examples(examples_),m_returnvalue(returnvalue_),m_param(param_),m_isconst(isconst_){}
+	MethodDef( const std::string& name_, const VariableValue& returnvalue_, const std::vector<VariableValue>& param_, bool isconst_, const DocTagMap& doc_)
+		:m_name(name_),m_doc(doc_),m_returnvalue(returnvalue_),m_param(param_),m_isconst(isconst_){}
 	MethodDef( const MethodDef& o)
-		:m_name(o.m_name),m_description(o.m_description),m_examples(o.m_examples),m_returnvalue(o.m_returnvalue),m_param(o.m_param),m_isconst(o.m_isconst){}
+		:m_name(o.m_name),m_doc(o.m_doc),m_returnvalue(o.m_returnvalue),m_param(o.m_param),m_isconst(o.m_isconst){}
 
 	const std::string& name() const				{return m_name;}
-	const std::string& description() const			{return m_description;}
-	const std::vector<std::string>& examples() const	{return m_examples;}
+	const DocTagMap& doc() const				{return m_doc;}
 	const VariableValue& returnValue() const		{return m_returnvalue;}
 	const std::vector<VariableValue>& parameters() const	{return m_param;}
 	bool isconst() const					{return m_isconst;}
@@ -118,8 +116,7 @@ public:
 
 private:
 	std::string m_name;
-	std::string m_description;
-	std::vector<std::string> m_examples;
+	DocTagMap m_doc;
 	VariableValue m_returnvalue;
 	std::vector<VariableValue> m_param;
 	bool m_isconst;
@@ -128,20 +125,18 @@ private:
 class ConstructorDef
 {
 public:
-	ConstructorDef( const std::vector<VariableValue>& param_, const std::string& description_, const std::vector<std::string>& examples_)
-		:m_description(description_),m_examples(examples_),m_param(param_){}
+	ConstructorDef( const std::vector<VariableValue>& param_, const DocTagMap& doc_)
+		:m_doc(doc_),m_param(param_){}
 	ConstructorDef( const ConstructorDef& o)
-		:m_description(o.m_description),m_examples(o.m_examples),m_param(o.m_param){}
+		:m_doc(o.m_doc),m_param(o.m_param){}
 
 	const std::vector<VariableValue>& parameters() const	{return m_param;}
-	const std::string& description() const			{return m_description;}
-	const std::vector<std::string>& examples() const	{return m_examples;}
+	const DocTagMap& doc() const				{return m_doc;}
 
 	std::string tostring() const;
 
 private:
-	std::string m_description;
-	std::vector<std::string> m_examples;
+	DocTagMap m_doc;
 	std::vector<VariableValue> m_param;
 };
 
@@ -149,9 +144,9 @@ class ClassDef
 {
 public:
 	ClassDef( const ClassDef& o)
-		:m_name(o.m_name),m_description(o.m_description),m_constructorar(o.m_constructorar),m_methodar(o.m_methodar){}
-	ClassDef( const std::string& name_, const std::string& description_)
-		:m_name(name_),m_description(description_),m_constructorar(),m_methodar(){}
+		:m_name(o.m_name),m_doc(o.m_doc),m_constructorar(o.m_constructorar),m_methodar(o.m_methodar){}
+	ClassDef( const std::string& name_, const DocTagMap& doc_)
+		:m_name(name_),m_doc(doc_),m_constructorar(),m_methodar(){}
 
 	void addMethod( const MethodDef& method)
 	{
@@ -165,9 +160,9 @@ public:
 	{
 		return m_name;
 	}
-	const std::string& description() const
+	const DocTagMap& doc() const
 	{
-		return m_description;
+		return m_doc;
 	}
 	const std::vector<MethodDef>& methodDefs() const
 	{
@@ -181,7 +176,7 @@ public:
 
 private:
 	std::string m_name;
-	std::string m_description;
+	DocTagMap m_doc;
 	std::vector<ConstructorDef> m_constructorar;
 	std::vector<MethodDef> m_methodar;
 };
@@ -207,7 +202,7 @@ public:
 private:
 	void parseClass(
 			const std::string& className,
-			const std::string& classDescription, 
+			const DocTagMap& classDoc,
 			const std::string& classScope,
 			char const*& si, const char* se);
 

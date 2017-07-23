@@ -21,23 +21,6 @@
 
 using namespace papuga;
 
-static void printDocumentationTagList(
-		std::ostream& out,
-		const SourceDocLanguageDescription* lang,
-		const char* tag,
-		const char* value)
-{
-	if (!value || !value[0]) return;
-	char const* si = value;
-	char const* sn;
-	while (0!=(sn = std::strchr( si,'\n')))
-	{
-		out << lang->eolncomment() << " @" << tag << std::string( si, sn-si) << std::endl;
-		si = sn+1;
-	}
-	out << lang->eolncomment() << " @" << tag << std::string( si) << std::endl;
-}
-
 static void printDocumentationHdr(
 		std::ostream& out,
 		const SourceDocLanguageDescription* lang,
@@ -78,23 +61,42 @@ static void printDocumentationTag(
 	}
 }
 
-static void mapCodeExamples(
+static void printAnnotationTags(
 		std::ostream& out,
 		const SourceDocLanguageDescription* lang,
-		const char* tag,
-		const char* examples)
+		const papuga_Annotation* ann)
 {
-	if (!examples) return;
-	char const* si = examples;
-	char const* sn;
-	while (0!=(sn = std::strchr( si,'\3')))
+	papuga_Annotation const* di = ann;
+	for (; di->tag; ++di)
 	{
-		std::string examplecode = lang->mapCodeExample( std::string( si, sn-si));
-		printDocumentationTag( out, lang, tag, examplecode.c_str());
-		si = sn+1;
+		if (0==std::strcmp( papuga_AnnotationTag_example, di->tag))
+		{
+			if (di->text)
+			{
+				std::string examplecode = lang->mapCodeExample( di->text);
+				printDocumentationTag( out, lang, "usage", examplecode.c_str());
+			}
+		}
+		else if (0!=std::strcmp( papuga_AnnotationTag_brief, di->tag))
+		{
+			printDocumentationTag( out, lang, di->tag, di->text);
+		}
 	}
-	std::string examplecode = lang->mapCodeExample( std::string( si));
-	printDocumentationTag( out, lang, tag, examplecode.c_str());
+}
+
+static const char* getAnnotationText(
+		const papuga_Annotation* ann,
+		const char* tag)
+{
+	papuga_Annotation const* di = ann;
+	for (; di->tag; ++di)
+	{
+		if (0==std::strcmp( tag, di->tag))
+		{
+			return di->text;
+		}
+	}
+	return 0;
 }
 
 static void printParameterDescription(
@@ -106,13 +108,15 @@ static void printParameterDescription(
 	papuga_ParameterDescription const* pi = parameter;
 	for (; pi->name; ++pi)
 	{
+		const char* description = getAnnotationText( pi->doc, papuga_AnnotationTag_brief);
 		char buf[ 4096];
 		std::snprintf( buf, sizeof(buf), "%s %s%s",
 				pi->name,
 				pi->mandatory?"":"(optional) ",
-				pi->description);
+				description?description:"");
+		buf[ sizeof(buf)-1] = '\0';
 		printDocumentationTag( out, lang, "param", buf);
-		mapCodeExamples( out, lang, "usage", pi->examples);
+		printAnnotationTags( out, lang, pi->doc);
 	}
 }
 
@@ -124,8 +128,12 @@ static void printConstructor(
 {
 	if (!cdef) return;
 	printDocumentationTag( out, lang, "constructor", "new");
-	printDocumentationTag( out, lang, "brief", cdef->description);
-	mapCodeExamples( out, lang, "usage", cdef->examples);
+
+	const char* description = getAnnotationText( cdef->doc, papuga_AnnotationTag_brief);
+	printDocumentationTag( out, lang, "brief", description);
+
+	printAnnotationTags( out, lang, cdef->doc);
+
 	printParameterDescription( out, lang, cdef->parameter);
 	out << lang->constructorDeclaration( classname, cdef) << std::endl;
 }
@@ -138,8 +146,12 @@ static void printMethod(
 {
 	if (!mdef) return;
 	printDocumentationTag( out, lang, "method", mdef->name);
-	printDocumentationTag( out, lang, "brief", mdef->description);
-	mapCodeExamples( out, lang, "usage", mdef->examples);
+
+	const char* description = getAnnotationText( mdef->doc, papuga_AnnotationTag_brief);
+	printDocumentationTag( out, lang, "brief", description);
+
+	printAnnotationTags( out, lang, mdef->doc);
+
 	printParameterDescription( out, lang, mdef->parameter);
 	out << lang->methodDeclaration( classname, mdef) << std::endl;
 }
@@ -152,7 +164,7 @@ void papuga::printSourceDoc(
 	printDocumentationTag( out, lang, "project", descr.name);
 	if (descr.about)
 	{
-		printDocumentationTagList( out, lang, "author ", descr.about->authors);
+		printDocumentationTag( out, lang, "author ", descr.about->authors);
 		printDocumentationTag( out, lang, "copyright", descr.about->copyright);
 		printDocumentationTag( out, lang, "license", descr.about->license);
 		printDocumentationTag( out, lang, "release", descr.about->version);
@@ -162,7 +174,10 @@ void papuga::printSourceDoc(
 	{
 		const papuga_ClassDescription& cdef = descr.classes[ci];
 		printDocumentationTag( out, lang, "class", cdef.name);
-		printDocumentationTag( out, lang, "brief", cdef.description);
+
+		const char* description = getAnnotationText( cdef.doc, papuga_AnnotationTag_brief);
+		printDocumentationTag( out, lang, "brief", description);
+		printAnnotationTags( out, lang, cdef.doc);
 
 		printConstructor( out, lang, cdef.name, cdef.constructor);
 		std::size_t mi = 0;

@@ -29,8 +29,9 @@ typedef papuga_ValueVariant ValueVariant;
 /// \brief Forward declaration
 class StorageTransactionImpl;
 
+/// \class StorageClientImpl
 /// \brief Object representing a client connection to the storage 
-/// \remark The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
+/// \note The only way to construct a storage client instance is to call Context::createStorageClient(const std::string&)
 class StorageClientImpl
 {
 public:
@@ -145,8 +146,9 @@ private:
 };
 
 
+/// \class StorageTransactionImpl
 /// \brief Object representing a transaction of the storage 
-/// \remark The only way to construct a storage transaction instance is to call StorageClient::createTransaction()
+/// \note The only way to construct a storage transaction instance is to call StorageClient::createTransaction()
 class StorageTransactionImpl
 {
 public:
@@ -154,19 +156,19 @@ public:
 	virtual ~StorageTransactionImpl(){}
 
 	/// \brief Prepare the inserting a document into the storage
+	/// \note The document is physically inserted with the call of 'commit()'
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert (analyzer::Document)
-	/// \remark The document is physically inserted with the call of 'commit()'
 	void insertDocument( const std::string& docid, const ValueVariant& doc);
 
 	/// \brief Prepare the deletion of a document from the storage
+	/// \note The document is physically deleted with the call of 'commit()'
 	/// \param[in] docid the identifier of the document to delete
-	/// \remark The document is physically deleted with the call of 'commit()'
 	void deleteDocument( const std::string& docid);
 
 	/// \brief Prepare the deletion of all document access rights of a user
+	/// \note The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	/// \param[in] username the name of the user to delete all access rights (in the local collection)
-	/// \remark The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	void deleteUserAccessRights( const std::string& username);
 
 	/// \brief Commit all insert or delete or user access right change statements of this transaction.

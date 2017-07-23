@@ -25,6 +25,7 @@ class QueryImpl;
 ///\brief Forward declaration
 class StorageClientImpl;
 
+/// \class QueryEvalImpl
 /// \brief Query evaluation program object representing an information retrieval scheme for documents in a storage.
 class QueryEvalImpl
 {
@@ -95,6 +96,7 @@ private:
 };
 
 
+/// \class QueryImpl
 /// \brief Query program object representing a retrieval method for documents in a storage.
 class QueryImpl
 {
@@ -105,8 +107,8 @@ public:
 	/// \brief Create a feature from the query expression passed
 	/// \param[in] set name of the feature set, this feature is addressed with
 	/// \param[in] expr query expression that defines the postings of the feature and the variables attached
+	/// \remark The query expression passed as parameter is refused if it does not contain exactly one element
 	/// \param[in] weight individual weight of the feature in the query
-	/// \remark the query expression passed as parameter is refused if it does not contain exactly one element
 	void addFeature( 
 			const std::string& set,
 			const ValueVariant& expr,
@@ -114,7 +116,7 @@ public:
 
 	/// \brief Define a meta data restriction
 	/// \param[in] expression meta data expression tree interpreted as CNF (conjunctive normalform "AND" of "OR"s)
-	///	leafs of the tree are 3-tuples of the form {operator,name,operand} with
+	/// \note leafs of the expression tree are 3-tuples of the form {operator,name,operand} with
 	///		operator: one of "=","!=",">=","<=","<",">"
 	///		name: name of meta data element
 	///		value: numeric value to compare with the meta data field (right side of comparison operator)
@@ -124,7 +126,7 @@ public:
 	void addMetaDataRestriction( const ValueVariant& expression);
 
 	/// \brief Define term statistics to use for a term for weighting it in this query
-	/// \example  defineTermStatistics( "word" "game" [ df: 74653 ] )
+	/// \example defineTermStatistics( "word" "game" [ df: 74653 ] )
 	/// \param[in] type query term type name
 	/// \param[in] value query term value
 	/// \param[in] stats the structure with the statistics to set
@@ -152,8 +154,8 @@ public:
 	void setMinRank( unsigned int minRank);
 
 	/// \brief Allow read access to documents having a specific ACL tag
+	/// \note If no ACL tags are specified, then all documents are potential candidates for the result
 	/// \param[in] userlist Add ACL tag or list of ACL tags that selects documents to be candidates of the result
-	/// \note if no ACL tags are specified, then all documents are potential candidates for the result
 	void addAccess( const ValueVariant& userlist);
 
 	/// \brief Assign values to variables of the weighting formula
@@ -161,8 +163,8 @@ public:
 	void setWeightingVariables( const ValueVariant& parameter);
 
 	/// \brief Switch on debug mode that creates debug info of query evaluation methods and summarization as attributes of the query result
-	/// \param[in] debug true if switched on, false if switched off (default off)
 	/// \note Debug attributes are specified in the declaration of summarizers and weighting functions (3rd parameter of QueryEval::addSummarizer and QueryEval::addWeightingFunction)
+	/// \param[in] debug true if switched on, false if switched off (default off)
 	void setDebugMode( bool debug);
 
 	/// \brief Evaluate this query and return the result

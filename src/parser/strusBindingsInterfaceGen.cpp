@@ -88,18 +88,6 @@ static std::string printString( const std::string& content)
 	return rt;
 }
 
-static std::string printString( const std::vector<std::string>& content)
-{
-	std::string rt;
-	std::vector<std::string>::const_iterator si = content.begin(), se = content.end();
-	for (int sidx=0; si != se; ++si,++sidx)
-	{
-		if (sidx) rt.append( "\3");
-		rt.append( printString( *si));
-	}
-	return rt;
-}
-
 static std::string methodFunctionName( const std::string& cl, const std::string& mt)
 {
 	return "_strus_bindings_" + cl + "__" + mt;
@@ -115,7 +103,78 @@ static std::string destructorFunctionName( const std::string& cl)
 	return "_strus_bindings_destructor__" + cl;
 }
 
-static std::string parameterDeclaration( const std::string& indent, const strus::VariableValue& var)
+static std::string docDeclaration( const std::string& globalname, const strus::DocTagMap& doc)
+{
+	std::ostringstream out;
+	out << "static const papuga_Annotation " << globalname << "[] = " << std::endl
+		<< "{" << std::endl;
+	strus::DocTagMap::const_iterator di = doc.begin(), de = doc.end();
+	for (; di != de; ++di)
+	{
+		out << "\t{\"" << di->first << "\",\"" << printString(di->second) << "\"}," << std::endl;
+	}
+	out << "\t{NULL,NULL}" << std::endl;
+	out << "};" << std::endl;
+	return out.str();
+}
+
+static std::string docDeclarationNameMethodReturnDoc( const std::string& clname, const std::string& mtname)
+{
+	std::ostringstream out;
+	out << "g_doc_return_method_" << "_" << clname << "_" << mtname;
+	return out.str();
+}
+
+static std::string docDeclarationNameMethodParamDoc( const std::string& clname, const std::string& mtname, unsigned int idx)
+{
+	std::ostringstream out;
+	out << "g_doc_parameter_method_" << idx << "_" << clname << "_" << mtname;
+	return out.str();
+}
+
+static std::string docDeclarationNameMethodParam( const std::string& clname, const std::string& mtname)
+{
+	std::ostringstream out;
+	out << "g_parameter_method_" << clname << "_" << mtname;
+	return out.str();
+}
+
+static std::string docDeclarationNameConstructorParamDoc( const std::string& clname, unsigned int idx)
+{
+	std::ostringstream out;
+	out << "g_doc_parameter_constructor_" << idx << "_" << clname;
+	return out.str();
+}
+
+static std::string docDeclarationNameConstructorParam( const std::string& clname)
+{
+	std::ostringstream out;
+	out << "g_parameter_constructor_" << clname;
+	return out.str();
+}
+
+static std::string docDeclarationNameMethodDoc( const std::string& clname, const std::string& mtname)
+{
+	std::ostringstream out;
+	out << "g_doc_method_" << clname << "_" << mtname;
+	return out.str();
+}
+
+static std::string docDeclarationNameConstructorDoc( const std::string& clname)
+{
+	std::ostringstream out;
+	out << "g_doc_constructor_" << clname;
+	return out.str();
+}
+
+static std::string docDeclarationNameClassDoc( const std::string& clname)
+{
+	std::ostringstream out;
+	out << "g_doc_class_" << clname;
+	return out.str();
+}
+
+static std::string variableValueDeclaration( const std::string& indent, const std::string& docname, const strus::VariableValue& var)
 {
 	std::ostringstream out;
 	if (var.name().empty())
@@ -125,10 +184,57 @@ static std::string parameterDeclaration( const std::string& indent, const strus:
 	bool optional = var.type().hasEvent( "argv_default");
 	out << indent << "{" << std::endl;
 	out << indent << "\t\"" << var.name() << "\"," << std::endl;
-	out << indent << "\t\"" << printString( var.description()) << "\"," << std::endl;
-	out << indent << "\t\"" << printString( var.examples()) << "\"," << std::endl;
+	out << indent << "\t" << docname << "," << std::endl;
 	out << indent << "\t" << (optional ? "false":"true") << std::endl;
 	out << indent << "}";
+	return out.str();
+}
+
+static std::string methodParameterDeclaration( const std::string& clname, const std::string& mtname, const std::vector<strus::VariableValue>& parameters)
+{
+	std::ostringstream out;
+	
+	std::vector<strus::VariableValue>::const_iterator
+		pi = parameters.begin(), pe = parameters.end();
+	for (unsigned int pidx=0; pi != pe; ++pi,++pidx)
+	{
+		std::string docglobalname = docDeclarationNameMethodParamDoc( clname, mtname, pidx);
+		out << docDeclaration( docglobalname, pi->doc());
+	}
+	out << "static const papuga_ParameterDescription " << docDeclarationNameMethodParam( clname, mtname) << "[] = " << std::endl
+		<< "{" << std::endl;
+	pi = parameters.begin();
+	for (unsigned int pidx=0; pi != pe; ++pi,++pidx)
+	{
+		std::string docglobalname = docDeclarationNameMethodParamDoc( clname, mtname, pidx);
+		out << variableValueDeclaration( "\t", docglobalname, *pi) << "," << std::endl;
+	}
+	out << "\t{NULL,NULL,false}" << std::endl;
+	out << "};" << std::endl;
+	return out.str();
+}
+
+static std::string constructorParameterDeclaration( const std::string& clname, const std::vector<strus::VariableValue>& parameters)
+{
+	std::ostringstream out;
+	
+	std::vector<strus::VariableValue>::const_iterator
+		pi = parameters.begin(), pe = parameters.end();
+	for (unsigned int pidx=0; pi != pe; ++pi,++pidx)
+	{
+		std::string docglobalname = docDeclarationNameConstructorParamDoc( clname, pidx);
+		out << docDeclaration( docglobalname, pi->doc());
+	}
+	out << "static const papuga_ParameterDescription " << docDeclarationNameConstructorParam( clname) << "[] = " << std::endl
+		<< "{" << std::endl;
+	pi = parameters.begin();
+	for (unsigned int pidx=0; pi != pe; ++pi,++pidx)
+	{
+		std::string docglobalname = docDeclarationNameConstructorParamDoc( clname, pidx);
+		out << variableValueDeclaration( "\t", docglobalname, *pi) << "," << std::endl;
+	}
+	out << "\t{NULL,NULL,false}" << std::endl;
+	out << "};" << std::endl;
 	return out.str();
 }
 
@@ -173,26 +279,18 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
-			out << "static const papuga_ParameterDescription g_parameter_method_" << ci->name() << "_" << mi->name() << "[] = " << std::endl
-				<< "{" << std::endl;
-			std::vector<strus::VariableValue>::const_iterator
-				pi = mi->parameters().begin(),
-				pe = mi->parameters().end();
-			for (; pi != pe; ++pi)
-			{
-				out << parameterDeclaration( "\t", *pi) << "," << std::endl;
-			}
-			out << "\t{NULL,NULL,NULL,false}" << std::endl;
-			out << "};" << std::endl;
+			out << methodParameterDeclaration( ci->name(), mi->name(), mi->parameters());
 
 			if (!mi->returnValue().expand( "typename").empty())
 			{
+				std::string docreturn = docDeclarationNameMethodReturnDoc( ci->name(), mi->name());
+				out << docDeclaration( docreturn, mi->returnValue().doc());
+
 				out << "static const papuga_CallResultDescription g_result_method_" << ci->name() << "_" << mi->name() << " = " << std::endl
-					<< "{"
-					<< "\"" << printString( mi->returnValue().description()) << "\", "
-					<< "\"" << printString( mi->returnValue().examples()) << "\""
-				<< "};" << std::endl;
+					<< "{" << docreturn << "};" << std::endl;
 			}
+			std::string docmethod = docDeclarationNameMethodDoc( ci->name(), mi->name());
+			out << docDeclaration( docmethod, mi->doc());
 		}
 	}
 
@@ -206,11 +304,12 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
+			std::string docmethod = docDeclarationNameMethodDoc( ci->name(), mi->name());
+			std::string docparam = docDeclarationNameMethodParam( ci->name(), mi->name());
 			out << "\t" << "{\""
 				<< mi->name() <<  "\", "
 				<< "\"" << methodFunctionName(ci->name(),mi->name()) << "\", "
-				<< "\"" << printString( mi->description()) << "\", "
-				<< "\"" << printString( mi->examples()) << "\", ";
+				<< docmethod << ", ";
 			if (!mi->returnValue().expand( "typename").empty())
 			{
 				out << "&g_result_method_" << ci->name() << "_" << mi->name() << ", ";
@@ -219,11 +318,9 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 			{
 				out << "NULL, ";
 			}
-			out << "true, "
-				<< "g_parameter_method_" << ci->name() << "_" << mi->name()
-				<< "}," << std::endl;
+			out << "true, " << docparam << "}," << std::endl;
 		}
-		out << "\t" << "{NULL,NULL,NULL,NULL,NULL,false,NULL}" << std::endl;
+		out << "\t" << "{NULL,NULL,NULL,NULL,false,NULL}" << std::endl;
 		out << "};" << std::endl;
 	}
 	ci = interfaceDef.classDefs().begin();
@@ -232,27 +329,26 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		if (!ci->constructorDefs().empty())
 		{
 			const strus::ConstructorDef& cdef = ci->constructorDefs()[ 0];
-			out << "static const papuga_ParameterDescription g_parameter_constructor_" << ci->name() << "[] = " << std::endl
-				<< "{" << std::endl;
-			std::vector<strus::VariableValue>::const_iterator
-				pi = cdef.parameters().begin(),
-				pe = cdef.parameters().end();
-			for (; pi != pe; ++pi)
-			{
-				out << parameterDeclaration( "\t", *pi) << "," << std::endl;
-			}
-			out << "\t{NULL,NULL,NULL,false}" << std::endl;
-			out << "};" << std::endl;
+			out << constructorParameterDeclaration( ci->name(), cdef.parameters());
+
+			std::string docmethod = docDeclarationNameConstructorDoc( ci->name());
+			std::string docparam = docDeclarationNameConstructorParam( ci->name());
+
+			out << docDeclaration( docmethod, cdef.doc());
+
 			out << "static const papuga_ConstructorDescription g_constructor_" << ci->name() << " = " << std::endl
 				<< "{" << std::endl
 				<< "\t\"" << constructorFunctionName(ci->name()) << "\"," << std::endl
-				<< "\t\"" << printString( cdef.description()) << "\"," << std::endl
-				<< "\t\"" << printString( cdef.examples()) << "\"," << std::endl
-				<< "\tg_parameter_constructor_" << ci->name() << std::endl
+				<< "\t" << docmethod << "," << std::endl
+				<< "\t" << docparam << std::endl
 				<< "};" << std::endl << std::endl;
 		}
 	}
-
+	ci = interfaceDef.classDefs().begin();
+	for (; ci != ce; ++ci)
+	{
+		out << docDeclaration( docDeclarationNameClassDoc( ci->name()), ci->doc());
+	}
 	out << "static const papuga_ClassDescription g_classes[" << (interfaceDef.classDefs().size()+1) << "] = " << std::endl
 		<< "{" << std::endl;
 	ci = interfaceDef.classDefs().begin();
@@ -263,8 +359,8 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 
 		out << "\t" << "{ " << classid
 			<< ", \"" << ci->name()
-			<< "\", \"" << printString( ci->description())
-			<< "\", " << constructordescr
+			<< "\", " << docDeclarationNameClassDoc( ci->name())
+			<< ", " << constructordescr
 			<< ", \"" << destructorFunctionName(ci->name())
 			<< "\", g_methods_" << ci->name() << "}," << std::endl;
 	}

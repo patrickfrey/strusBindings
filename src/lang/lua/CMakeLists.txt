@@ -41,14 +41,21 @@ add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua
     DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
     COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen lua doc ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua
-    COMMENT  "Generating LDoc description file ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua"
+    COMMENT  "Generating bindings interface doc description file ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua"
     VERBATIM
  )
 
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/doc/luaBindingsDoc.htm
+    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/lua/strusLuaDoc.tpl"  ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua
+    COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/luaBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/lua/strusLuaDoc.tpl" ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua
+    COMMENT  "Generating bindings interface doc html file ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua"
+    VERBATIM
+ )
 
  add_custom_target(
     lua_mod ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h libstrus_bindings_lua.c ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua papuga_lua_gen
+    DEPENDS ${CMAKE_BINARY_DIR}/include/strus/lib/lua.h libstrus_bindings_lua.c ${CMAKE_BINARY_DIR}/src/lang/lua/strus.lua papuga_lua_gen ${CMAKE_BINARY_DIR}/doc/luaBindingsDoc.htm
 )
 
 # ------------------------------

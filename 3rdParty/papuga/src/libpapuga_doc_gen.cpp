@@ -293,20 +293,30 @@ static void parseTagDeclaration( std::string& variable, std::string& tag, char c
 
 struct TemplateDeclaration
 {
-	std::string variable;
-	std::string tag;
-	unsigned int groupid;
-	TemplateContent content;
+	std::string variable;		//< destination variable name
+	std::string tag;		//< name of triggering event tag
+	std::string depvar;		//< variable this template depends on (is mapped only if this variable exists)
+	unsigned int groupid;		//< id of the group of this template or 0
+	TemplateContent content;	//< content of this template
 
 	TemplateDeclaration( const TemplateDeclaration& o)
-		:variable(o.variable),tag(o.tag),groupid(o.groupid),content(o.content){}
+		:variable(o.variable),tag(o.tag),depvar(o.depvar),groupid(o.groupid),content(o.content){}
 	TemplateDeclaration( char const*& si, const char* se)
-		:groupid(0)
+		:variable(),tag(),depvar(),groupid(0),content()
 	{
 		parseTagDeclaration( variable, tag, si, se);
 		if (!skipLineSpaces( si, se))
 		{
 			throw EXCEPTION("missing template arguments");
+		}
+		if (*si == '?' and isAlpha(si[1]))
+		{
+			++si;
+			depvar = parseIdentifier( si, se);
+			if (!skipLineSpaces( si, se))
+			{
+				throw EXCEPTION("missing template arguments");
+			}
 		}
 		std::vector<std::string> arg;
 		while (skipLineSpaces( si, se))
@@ -345,13 +355,17 @@ struct TemplateDeclaration
 		}
 		if (tag == variable)
 		{
-			out << variable << std::endl << content.tostring(". ", maxvaluelen) << std::endl;
+			out << variable;
 		}
 		else
 		{
 			out << variable << "=" << tag;
-			out << std::endl << content.tostring(". ", maxvaluelen) << std::endl;
 		}
+		if (!depvar.empty())
+		{
+			out << " ?" << depvar;
+		}
+		out << std::endl << content.tostring(". ", maxvaluelen) << std::endl;
 		return out.str();
 	}
 };
@@ -731,11 +745,22 @@ public:
 						else if (id == "template")
 						{
 							m_templates.push_back( TemplateDeclaration( si, se));
+							const TemplateDeclaration& tdecl = m_templates.back();
 							if (m_templates.size() > 1)
 							{
-								definedVariables.insert( m_templates.back().variable);
+								definedVariables.insert( tdecl.variable);
 							}
-							std::vector<std::string> usedvars = m_templates.back().content.variables();
+							std::vector<std::string> usedvars = tdecl.content.variables();
+							if (!tdecl.depvar.empty())
+							{
+								std::vector<std::string>::const_iterator
+									ui = usedvars.begin(), ue = usedvars.end();
+								for (; ui != ue; ++ui)
+								{
+									if (tdecl.depvar == *ui) break;
+								}
+								if (ui == ue) throw EXCEPTION("expected dependent variable to be referenced in content of template");
+							}
 							referencedVariables.insert( usedvars.begin(), usedvars.end());
 						}
 						else if (id == "empty")
@@ -988,7 +1013,7 @@ public:
 		return out.str();
 	}
 
-	std::string generate( std::ostream& warnings, const std::string& content, const std::map<std::string,std::string>& varmap)
+	std::string generate( std::ostream& warnings, const std::string& content, const std::map<std::string,std::string>& varmap, bool verbose)
 	{
 		char const* si = content.c_str();
 		const char* start = si;
@@ -1015,8 +1040,11 @@ public:
 					{
 						++si;
 						Annotation ann = parseAnnotation( si, se, ++timestmp);
+						if (verbose)
+						{
+							warnings << "parse @" << ann.tag << " [" << ann.value << "]" << std::endl;
+						}
 #ifdef PAPUGA_LOWLEVEL_DEBUG
-						std::cerr << "parse @" << ann.tag << " [" << ann.value << "]" << std::endl;
 						printState( std::cerr, tplist);
 #endif
 						if (m_ignoreset.find( ann.tag) != m_ignoreset.end())
@@ -1027,7 +1055,7 @@ public:
 						//[1] Close all namespaces reaching end of scope
 						closeEndOfScopeNamespaces( nslist, ann.tag);
 						//[2] Close all templates reaching end of scope
-						closeEndOfScopeTemplates( tplist, ann.tag);
+						closeEndOfScopeTemplates( warnings, tplist, ann.tag, verbose);
 						if (tplist.empty() || m_templates[ tplist.front().idx].tag != mainTemplateTagName)
 						{
 							throw EXCEPTION( "main template reached end of scope before termination");
@@ -1035,7 +1063,7 @@ public:
 						//[3] Open namespaces triggered by the current tag
 						action |= openTriggeredNamespaces( nslist, ann);
 						//[4] Open templates triggered by the current tag
-						action |= openTriggeredTemplates( tplist, nslist, ann);
+						action |= openTriggeredTemplates( warnings, tplist, nslist, ann, verbose);
 						//[5] Assign variables to top level templates triggered by the annoration found:
 						action |= assignAnnotationVariables( tplist, ann);
 						//[6] Update indices and assign requested index variable values 
@@ -1058,7 +1086,7 @@ public:
 			}
 			while (tplist.size() > 1)
 			{
-				closeEndOfScopeTemplates( tplist, m_templates[ tplist.back().idx].tag);
+				closeEndOfScopeTemplates( warnings, tplist, m_templates[ tplist.back().idx].tag, verbose);
 			}
 			if (tplist.empty())
 			{
@@ -1224,7 +1252,7 @@ private:
 	}
 #endif
 
-	void appendTemplateVariable( std::list<TemplateInstance>& tplist, const std::string& variable, const std::string& value, int evtimestmp) const
+	void appendTemplateVariable( std::ostream& warnings, std::list<TemplateInstance>& tplist, const std::string& variable, const std::string& value, int evtimestmp, bool verbose) const
 	{
 		int timestmp = 0;
 		std::list<TemplateInstance>::iterator ti = tplist.begin(), te = tplist.end();
@@ -1250,9 +1278,10 @@ private:
 				std::map<std::string,std::string>::iterator mi = ti->map.find( variable);
 				if (mi != ti->map.end())
 				{
-#ifdef PAPUGA_LOWLEVEL_DEBUG
-					std::cerr << "append var " << variable << "='" << std::string( value.c_str(), std::min( value.size(), (std::size_t)30)) << "' to template " << m_templates[ ti->idx].variable << std::endl;
-#endif
+					if (verbose)
+					{
+						warnings << "append var " << variable << "='" << std::string( value.c_str(), std::min( value.size(), (std::size_t)30)) << "' to template " << m_templates[ ti->idx].variable << std::endl;
+					}
 					mi->second += value;
 				}
 			}
@@ -1264,7 +1293,7 @@ private:
 		if (tplist.size() != 1) throw EXCEPTION( "internal: call getDocGenResult without templates at end of scope closed");
 		return m_templates[ tplist.front().idx].content.expand( tplist.front().map, m_emptydeclmap);
 	}
-	bool closeEndOfScopeVariable( std::list<TemplateInstance>& tplist, const std::string& variable, unsigned int depth) const
+	bool closeEndOfScopeVariable( std::ostream& warnings, std::list<TemplateInstance>& tplist, const std::string& variable, unsigned int depth, bool verbose) const
 	{
 		bool rt = false;
 		if (!depth) throw EXCEPTION( "circular variable reference");
@@ -1274,31 +1303,71 @@ private:
 			--ti;
 			if (m_templates[ ti->idx].variable == variable)
 			{
-				if (closeEndOfScopeVariables( tplist, m_templates[ ti->idx].content.variables(), depth-1))
+				if (closeEndOfScopeVariables( warnings, tplist, m_templates[ ti->idx].content.variables(), depth-1, verbose))
 				{
 					ti = tplist.end();
 					rt = true;
 					continue;
 				}
-				std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
-				int evtimestmp = ti->timestmp;
-				ti = tplist.erase( ti);
-				appendTemplateVariable( tplist, variable, content, evtimestmp);
+				if (isCompleteTemplateInstance( *ti))
+				{
+					std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
+					int evtimestmp = ti->timestmp;
+					ti = tplist.erase( ti);
+					appendTemplateVariable( warnings, tplist, variable, content, evtimestmp, verbose);
+					if (verbose)
+					{
+						warnings << "close sub template " << variable << " = '" << std::string( content.c_str(), std::min( content.size(), (std::size_t)30)) << "'" << std::endl;
+					}
+				}
+				else
+				{
+					ti = tplist.erase( ti);
+					//.... do not assign template content if no event received*/
+					if (verbose)
+					{
+						warnings << "incomplete sub template '" << variable << "' discarded" << std::endl;
+					}
+				}
+
 			}
 		}
 		return rt;
 	}
-	bool closeEndOfScopeVariables( std::list<TemplateInstance>& tplist, const std::vector<std::string>& variables, unsigned int depth) const
+	bool closeEndOfScopeVariables( std::ostream& warnings, std::list<TemplateInstance>& tplist, const std::vector<std::string>& variables, unsigned int depth, bool verbose) const
 	{
 		bool rt = false;
 		std::vector<std::string>::const_iterator vi = variables.begin(), ve = variables.end();
 		for (; vi != ve; ++vi)
 		{
-			rt |= closeEndOfScopeVariable( tplist, *vi, depth-1);
+			rt |= closeEndOfScopeVariable( warnings, tplist, *vi, depth-1, verbose);
 		}
 		return rt;
 	}
-	void closeEndOfScopeTemplates( std::list<TemplateInstance>& tplist, const std::string& tagname) const
+	bool isCompleteTemplateInstance( const TemplateInstance& ti) const
+	{
+		const TemplateDeclaration& tdecl = m_templates[ ti.idx];
+		std::map<std::string,std::string>::const_iterator mi,me;
+		if (!tdecl.depvar.empty())
+		{
+			mi = ti.map.find( tdecl.depvar);
+			if (mi == ti.map.end()) throw EXCEPTION( "internal: bad dependent variable reference");
+
+			if (!mi->second.empty()) return true;
+			if (m_emptydeclmap.find( tdecl.depvar) != m_emptydeclmap.end()) return true;
+		}
+		else
+		{
+			mi = ti.map.begin(), me = ti.map.end();
+			for (; mi != me; ++mi)
+			{
+				if (!mi->second.empty()) return true;
+				if (m_emptydeclmap.find( mi->first) != m_emptydeclmap.end()) return true;
+			}
+		}
+		return false;
+	}
+	void closeEndOfScopeTemplates( std::ostream& warnings, std::list<TemplateInstance>& tplist, const std::string& tagname, bool verbose) const
 	{
 		unsigned int taggroupid = 0;
 		GroupMap::const_iterator gi = m_groupmap.find( tagname);
@@ -1314,19 +1383,33 @@ private:
 			if (m_templates[ ti->idx].tag == tagname
 			||	(taggroupid && m_templates[ ti->idx].groupid == taggroupid))
 			{
-				if (closeEndOfScopeVariables( tplist, m_templates[ ti->idx].content.variables(), m_templates.size()))
+				if (closeEndOfScopeVariables( warnings, tplist, m_templates[ ti->idx].content.variables(), m_templates.size(), verbose))
 				{
 					ti = tplist.end();
 					continue;
 				}
-				std::string var = m_templates[ ti->idx].variable;
-				std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
-				int evtimestmp = ti->timestmp;
-				ti = tplist.erase( ti);
-#ifdef PAPUGA_LOWLEVEL_DEBUG
-				std::cerr << "close template " << var << " = '" << std::string( content.c_str(), std::min( content.size(), (std::size_t)30)) << "'" << std::endl;
-#endif
-				appendTemplateVariable( tplist, var, content, evtimestmp);
+				if (isCompleteTemplateInstance( *ti))
+				{
+					std::string var = m_templates[ ti->idx].variable;
+					std::string content = m_templates[ ti->idx].content.expand( ti->map, m_emptydeclmap);
+					int evtimestmp = ti->timestmp;
+					ti = tplist.erase( ti);
+					appendTemplateVariable( warnings, tplist, var, content, evtimestmp, verbose);
+					if (verbose)
+					{
+						warnings << "close template " << var << " = '" << std::string( content.c_str(), std::min( content.size(), (std::size_t)30)) << "'" << std::endl;
+					}
+				}
+				else
+				{
+					std::string var = m_templates[ ti->idx].variable;
+					ti = tplist.erase( ti);
+					//.... do not assign template content if no event received*/
+					if (verbose)
+					{
+						warnings << "incomplete template '" << var << "' discarded" << std::endl;
+					}
+				}
 			}
 		}
 	}
@@ -1384,7 +1467,7 @@ private:
 		}
 		return false;
 	}
-	bool openTriggeredTemplates( std::list<TemplateInstance>& tplist, const std::list<NamespaceInstance>& nslist, const Annotation& ann) const
+	bool openTriggeredTemplates( std::ostream& warnings, std::list<TemplateInstance>& tplist, const std::list<NamespaceInstance>& nslist, const Annotation& ann, bool verbose) const
 	{
 		bool rt = false;
 		std::vector<TemplateDeclaration>::const_iterator
@@ -1405,9 +1488,10 @@ private:
 						ctp.assignVariable( var.variable, ni->value);
 					}
 				}
-#ifdef PAPUGA_LOWLEVEL_DEBUG
-				std::cerr << "open template " << m_templates[ tidx].variable << std::endl;
-#endif
+				if (verbose)
+				{
+					warnings << "open template " << m_templates[ tidx].variable << std::endl;
+				}
 				rt = true;
 			}
 		}
@@ -1552,7 +1636,8 @@ DLL_PUBLIC bool papuga::generateDoc(
 	std::ostream& err,
 	const std::string& templatesrc,
 	const std::string& docsrc,
-	const std::map<std::string,std::string>& varmap)
+	const std::map<std::string,std::string>& varmap,
+	bool verbose)
 {
 	try
 	{
@@ -1560,7 +1645,7 @@ DLL_PUBLIC bool papuga::generateDoc(
 #ifdef PAPUGA_LOWLEVEL_DEBUG
 		std::cerr << docgen.tostring( 20) << std::endl;
 #endif
-		out << docgen.generate( err, docsrc, varmap) << std::endl;
+		out << docgen.generate( err, docsrc, varmap, verbose) << std::endl;
 		return true;
 	}
 	catch (const std::bad_alloc&)
