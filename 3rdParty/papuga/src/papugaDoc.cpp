@@ -21,10 +21,11 @@
 
 static void printUsage()
 {
-	std::cerr << "papugaDoc [-o <outputfile> ] <template> <inputfile> {<variable>=<filepath>}" << std::endl;
+	std::cerr << "papugaDoc [-v][-o <outputfile> ] <template> <inputfile> {<variable>=<filepath>}" << std::endl;
 	std::cerr << "Description : Program for generating documentation, mapping a doxygen like" << std::endl;
 	std::cerr << "              documented source file with a template" << std::endl;
 	std::cerr << "<outputfile>: File where to print output (default stdout)" << std::endl;
+	std::cerr << "Option -v   : Verbose output" << std::endl;
 	std::cerr << "<template>  : File with the template." << std::endl;
 	std::cerr << "              Template language:" << std::endl;
 	std::cerr << "                  comment <eolncomment>" << std::endl;
@@ -183,6 +184,10 @@ int main( int argc, const char** argv)
 				throw std::runtime_error( buf);
 			}
 			varmap[ name] = value;
+		}
+		if (verbose)
+		{
+			std::cerr << "verbose output enabled" << std::endl;
 		}
 		if (outputfile)
 		{

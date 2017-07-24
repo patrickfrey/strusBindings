@@ -408,7 +408,7 @@ static std::string tolowercase( const std::string& content)
 static std::string touppercase( const std::string& content)
 {
 	std::string rt( content);
-	std::transform( content.begin(), content.end(), rt.begin(), ::tolower);
+	std::transform( content.begin(), content.end(), rt.begin(), ::toupper);
 	return rt;
 }
 
@@ -1134,8 +1134,7 @@ private:
 					if (startsWith( m_eolncomment, lookahead, se))
 					{
 						lookahead += m_eolncomment.size();
-						if (!isSpace(*lookahead)) break;
-						const char* followstart = lookahead+1;
+						const char* followstart = lookahead;
 						if (skipLineSpaces( lookahead, se) && *lookahead != '@')
 						{
 							si = followstart;
