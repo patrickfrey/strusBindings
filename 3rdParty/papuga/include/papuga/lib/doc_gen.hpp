@@ -17,7 +17,8 @@ namespace papuga {
 
 /// \brief Generate a documentation out of a doxygen like syntax with help of some templates
 /// \param[out] out where to print the generated item
-/// \param[err] err stream to report errors and warnings
+/// \param[out] err stream to report errors and warnings
+/// \param[out] outputfiles map filename -> content of output files to write
 /// \param[in] templatesrc source of the templates
 /// \param[in] docsrc source to map
 /// \param[in] varmap variables initialized by the caller
@@ -25,6 +26,7 @@ namespace papuga {
 bool generateDoc(
 	std::ostream& out,
 	std::ostream& err,
+	std::map<std::string,std::string>& outputfiles,
 	const std::string& templatesrc,
 	const std::string& docsrc,
 	const std::map<std::string,std::string>& varmap,

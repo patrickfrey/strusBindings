@@ -1,6 +1,6 @@
 comment --
-# file php_h { } phpenv/{project}.h
-# file php_c { } phpenv/{project}.c
+file php_h { } phpenv/{project}.h
+file php_c { } phpenv/{project}.c
 
 template main END {{ }}
 END

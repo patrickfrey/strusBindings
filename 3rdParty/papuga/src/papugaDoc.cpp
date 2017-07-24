@@ -94,6 +94,30 @@ ERROR:
 	throw std::runtime_error( buf);
 }
 
+static void writeFile( const std::string& filename, const std::string& content)
+{
+	unsigned char ch;
+	FILE* fh = ::fopen( filename.c_str(), "wb");
+	if (!fh)
+	{
+		throw std::runtime_error( std::strerror( errno));
+	}
+	std::string::const_iterator fi = content.begin(), fe = content.end();
+	for (; fi != fe; ++fi)
+	{
+		ch = *fi;
+		if (1 > ::fwrite( &ch, 1, 1, fh))
+		{
+			int ec = ::ferror( fh);
+			if (ec)
+			{
+				::fclose( fh);
+				throw std::runtime_error( std::strerror(ec));
+			}
+		}
+	}
+	::fclose( fh);
+}
 
 int main( int argc, const char** argv)
 {
@@ -189,6 +213,7 @@ int main( int argc, const char** argv)
 		{
 			std::cerr << "verbose output enabled" << std::endl;
 		}
+		std::map<std::string,std::string> outputfiles;
 		if (outputfile)
 		{
 			try
@@ -196,7 +221,7 @@ int main( int argc, const char** argv)
 				std::ofstream outs( outputfile);
 				outs.exceptions( std::ios::badbit);
 	
-				if (!papuga::generateDoc( outs, std::cerr, source, docsrc, varmap, verbose))
+				if (!papuga::generateDoc( outs, std::cerr, outputfiles, source, docsrc, varmap, verbose))
 				{
 					throw std::runtime_error( "generate documentation failed");
 				}
@@ -211,11 +236,19 @@ int main( int argc, const char** argv)
 		}
 		else
 		{
-			if (!papuga::generateDoc( std::cout, std::cerr, source, docsrc, varmap, verbose))
+			if (!papuga::generateDoc( std::cout, std::cerr, outputfiles, source, docsrc, varmap, verbose))
 			{
 				throw std::runtime_error( "generate documentation failed");
 			}
 		}
+		std::map<std::string,std::string>::const_iterator
+			oi = outputfiles.begin(), oe = outputfiles.end();
+		for (; oi != oe; ++oi)
+		{
+			std::cerr << "writing output file '" << oi->first << "'" << std::endl;
+			writeFile( oi->first, oi->second);
+		}
+		std::cerr << "done" << std::endl;
 		return 0;
 	}
 	catch (const std::bad_alloc&)
