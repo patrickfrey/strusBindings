@@ -22,6 +22,7 @@ configure_file( "${PROJECT_SOURCE_DIR}/3rdParty/papuga/include/papuga/version.h.
 add_subdirectory( src )
 add_subdirectory( utils )
 add_subdirectory( lua )
+add_subdirectory( php )
   
 # include( cmake/report_build_settings.cmake )
 # include( cmake/standard_targets.cmake )

@@ -348,11 +348,11 @@ void ContextImpl::createVectorStorage( const ValueVariant& config_)
 	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( _TXT("failed to create vector storage: %s"), errorhnd->fetchError());
 }
 
-void ContextImpl::destroyStorage( const ValueVariant& config_)
+void ContextImpl::destroyStorage( const ValueVariant& config)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	std::string dbname;
-	std::string storagecfg( Deserializer::getConfigString( config_, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config, errorhnd));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
@@ -361,6 +361,24 @@ void ContextImpl::destroyStorage( const ValueVariant& config_)
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
 	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
 	if (!dbi->destroyDatabase( storagecfg)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
+}
+
+bool ContextImpl::storageExists( const ValueVariant& config)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("called storageExists with an unhandled error: %s"), errorhnd->fetchError());
+	std::string dbname;
+	std::string storagecfg( Deserializer::getConfigString( config, errorhnd));
+	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
+
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
+	if (!objBuilder) throw strus::runtime_error( _TXT("failed to get object builder: %s"), errorhnd->fetchError());
+	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
+	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
+	bool rt = dbi->exists( storagecfg);
+	if (!rt && errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to test if database exists: %s"), errorhnd->fetchError());
+	return rt;
 }
 
 Struct ContextImpl::unpackStatisticBlob( const std::string& blob, const std::string& procname) const

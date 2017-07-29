@@ -10,7 +10,7 @@ local ctxconfig = getContextConfig( arg[3])
 local storagedir = outputdir .. "/storage"
 local docfiles = {"A.xml","B.xml","C.xml"}
 local output = {}
-local withrpc = ctxconfig.rpc and true or false
+local withrpc = (ctxconfig and ctxconfig.rpc) and true or false
 
 local ctx = strus_Context.new( ctxconfig)
 local storageConfig = nil

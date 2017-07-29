@@ -17,6 +17,7 @@ extern "C" {
 
 /// \brief Constructor of a host object reference
 /// \param[out] self pointer to structure initialized by constructor
+/// \param[in] classid_ class identifier of the host object
 /// \param[in] object_ pointer to host object
 /// \param[in] destroy_ destructor of the host object in case of ownership
 #define papuga_init_HostObject( self, classid_, object_, destroy_)	{papuga_HostObject* s = self; s->classid=classid_; s->data=object_; s->destroy=destroy_;}

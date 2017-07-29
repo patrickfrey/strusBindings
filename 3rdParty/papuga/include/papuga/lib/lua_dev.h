@@ -12,6 +12,8 @@
 #include "papuga/typedefs.h"
 #include "papuga/allocator.h"
 #include <setjmp.h>
+#include "lua.h"
+#include "lauxlib.h"
 
 #define papuga_LUA_MAX_NOF_ARGUMENTS 64
 
@@ -28,17 +30,12 @@ typedef struct papuga_lua_CallArgs
 	int allocbuf[ 1024];
 } papuga_lua_CallArgs;
 
-typedef struct papuga_lua_ClassDef
+/// \brief Map of class identifiers to class names (for accessing lua metatable by name)
+typedef struct papuga_lua_ClassNameMap
 {
-	const char* name;
-	papuga_Deleter destructor;
-} papuga_lua_ClassDef;
-
-typedef struct papuga_lua_ClassDefMap
-{
-	size_t size;
-	const papuga_lua_ClassDef* ar;
-} papuga_lua_ClassDefMap;
+	size_t size;			///< size of map in elements
+	const char** ar;		///< pointer to names
+} papuga_lua_ClassNameMap;
 
 typedef struct papuga_lua_UserData papuga_lua_UserData;
 
@@ -65,10 +62,10 @@ papuga_lua_UserData* papuga_lua_new_userdata( lua_State* ls, const char* classna
 /// \param[in] classid identifier of the class
 /// \param[in] objref pointer to user data object (class instance)
 /// \param[in] destructor destructor of 'objref'
-/// \param[in] classdefmap array (map classid) of classes in the application
+/// \param[in] classnamemap map class identifiers to class names
 void papuga_lua_init_UserData( papuga_lua_UserData* udata,
 				int classid, void* objref, papuga_Deleter destructor,
-				const papuga_lua_ClassDefMap* classdefmap);
+				const papuga_lua_ClassNameMap* classnamemap);
 
 /// \brief Invokes a lua error exception on a papuga error
 /// \param[in] ls lua state context
@@ -96,11 +93,11 @@ void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg);
 /// \brief Procedure that transfers the call result of a function into the lua context, freeing the call result structure
 /// \param[in] ls lua state context
 /// \param[out] callres result structure initialized
-/// \param[in] classdefmap table of application class definitions
-/// \return the number of values to return
+/// \param[in] classnamemap table of application class names
 /// \param[out] errcode error code
+/// \return the number of values returned
 int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* callres,
-				const papuga_lua_ClassDefMap* classdefmap, papuga_ErrorCode* errcode);
+				const papuga_lua_ClassNameMap* classnamemap, papuga_ErrorCode* errcode);
 
 #endif
 

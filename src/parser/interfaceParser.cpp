@@ -272,13 +272,6 @@ static void extract_annotation( AnnotationMapBuilder& builder, char const*& si, 
 			skipSpaces( si, se);
 			const char* start = si;
 			skipToEoln( si, se);
-			/*[-]*/if (builder.current_annotation_key == "@example")
-			{
-			/*[-]*/if (std::strstr( start, "createStorageClient") != 0)
-			/*[-]*/{
-			/*[-]*/	std::cerr << "HALLY GALLY" << std::endl;
-			/*[-]*/}
-			}
 			addAnnotation( builder, std::string( start, si), false);
 		}
 		else

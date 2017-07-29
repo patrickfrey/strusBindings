@@ -1,5 +1,13 @@
-#include "lua.h"
-#include "lauxlib.h"
+/*
+* Copyright (c) 2017 Patrick P. Frey
+*
+* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+/// \brief Library implementation for lua bindings built by papuga
+/// \file papuga/lib/lua_dev.h
+
 #include "papuga/lib/lua_dev.h"
 #include "papuga/valueVariant.h"
 #include "papuga/callResult.h"
@@ -68,10 +76,10 @@ void STACKTRACE( lua_State* ls, const char* where)
 #define STACKTRACE( ls, where)
 #endif
 
-static const papuga_lua_ClassDef* get_classdef( const papuga_lua_ClassDefMap* classdefmap, unsigned int classid)
+static const char* get_classname( const papuga_lua_ClassNameMap* classnamemap, unsigned int classid)
 {
 	--classid;
-	return (classid > classdefmap->size) ? NULL : &classdefmap->ar[ classid];
+	return (classid > classnamemap->size) ? NULL : classnamemap->ar[ classid];
 }
 
 struct papuga_lua_UserData
@@ -80,13 +88,13 @@ struct papuga_lua_UserData
 	int checksum;
 	void* objectref;
 	papuga_Deleter destructor;
-	const papuga_lua_ClassDefMap* classdefmap;
+	const papuga_lua_ClassNameMap* classnamemap;
 };
 
 #define KNUTH_HASH 2654435761U
 static int calcCheckSum( const papuga_lua_UserData* udata)
 {
-	return (((udata->classid ^ (uintptr_t)udata->objectref) * KNUTH_HASH) ^ (uintptr_t)udata->destructor ^ ((uintptr_t)udata->classdefmap << 7));
+	return (((udata->classid ^ (uintptr_t)udata->objectref) * KNUTH_HASH) ^ (uintptr_t)udata->destructor ^ ((uintptr_t)udata->classnamemap << 7));
 }
 
 static int papuga_lua_destroy_UserData( lua_State* ls)
@@ -96,16 +104,6 @@ static int papuga_lua_destroy_UserData( lua_State* ls)
 	{
 		papuga_lua_error( ls, "destructor", papuga_InvalidAccess);
 	}
-#ifdef PAPUGA_DEEP_TYPE_CHECKING
-	if (udata->classid)
-	{
-		const papuga_lua_ClassDef* cdef = get_classdef( udata->classdefmap, udata->classid);
-		if (cdef->destructor != udata->destructor)
-		{
-			papuga_lua_error( ls, "destructor", papuga_InvalidAccess);
-		}
-	}
-#endif
 	++udata->checksum;
 	if (udata->destructor) udata->destructor( udata->objectref);
 	return 0;
@@ -115,10 +113,10 @@ static const papuga_lua_UserData* get_UserData( lua_State* ls, int idx)
 {
 	const papuga_lua_UserData* udata = (const papuga_lua_UserData*)lua_touserdata( ls, idx);
 	if (!udata) return 0;
-	const papuga_lua_ClassDef* cdef = get_classdef( udata->classdefmap, udata->classid);
+	const char* cname = get_classname( udata->classnamemap, udata->classid);
 	if (calcCheckSum(udata) != udata->checksum) return 0;
-	if (!cdef) return 0;
-	if (!luaL_testudata( ls, idx, cdef->name)) return 0;
+	if (!cname) return 0;
+	if (!luaL_testudata( ls, idx, cname)) return 0;
 	return udata;
 }
 
@@ -128,7 +126,7 @@ static void release_UserData( papuga_lua_UserData* udata)
 	udata->objectref = 0;
 	udata->destructor = 0;
 	udata->checksum = 0;
-	udata->classdefmap = 0;
+	udata->classnamemap = 0;
 }
 
 static void createClassMetaTable( lua_State* ls, const char* classname, unsigned int classid, const luaL_Reg* mt)
@@ -200,24 +198,25 @@ static int iteratorGetNext( lua_State* ls)
 	papuga_init_CallResult( &retval, errbuf, sizeof(errbuf));
 	if (!(*getNext)( objref, &retval))
 	{
-		if (papuga_CallResult_hasError( &retval))
+		bool haserr = papuga_CallResult_hasError( &retval);
+		papuga_destroy_CallResult( &retval);
+		if (haserr)
 		{
-			papuga_destroy_CallResult( &retval);
 			papuga_lua_error_str( ls, "iterator get next", errbuf);
 		}
 		return 0;
 	}
-	rt = papuga_lua_move_CallResult( ls, &retval, udata->classdefmap, &errcode);
+	rt = papuga_lua_move_CallResult( ls, &retval, udata->classnamemap, &errcode);
 	if (rt < 0) papuga_lua_error( ls, "iterator get next", errcode);
 	return rt;
 }
 
-static void pushIterator( lua_State* ls, void* objectref, papuga_Deleter destructor, papuga_GetNext getNext, const papuga_lua_ClassDefMap* classdefmap)
+static void pushIterator( lua_State* ls, void* objectref, papuga_Deleter destructor, papuga_GetNext getNext, const papuga_lua_ClassNameMap* classnamemap)
 {
 	lua_pushlightuserdata( ls, objectref);
 	lua_pushlightuserdata( ls, *(void**)&getNext);
 	papuga_lua_UserData* udata = papuga_lua_new_userdata( ls, ITERATOR_METATABLE_NAME);
-	papuga_lua_init_UserData( udata, 0, objectref, destructor, classdefmap);
+	papuga_lua_init_UserData( udata, 0, objectref, destructor, classnamemap);
 	lua_pushcclosure( ls, iteratorGetNext, 3);
 }
 
@@ -448,7 +447,7 @@ static bool serialize_root( papuga_lua_CallArgs* as, lua_State *ls, int li)
 	return rt;
 }
 
-static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* ser, lua_State *ls, const papuga_lua_ClassDefMap* classdefmap);
+static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* ser, lua_State *ls, const papuga_lua_ClassNameMap* classnamemap);
 
 static void deserialize_key( papuga_ValueVariant* item, lua_State *ls)
 {
@@ -488,7 +487,7 @@ static void deserialize_key( papuga_ValueVariant* item, lua_State *ls)
 	}
 }
 
-static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* item, lua_State *ls, const papuga_lua_ClassDefMap* classdefmap)
+static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* item, lua_State *ls, const papuga_lua_ClassNameMap* classnamemap)
 {
 	switch (item->valuetype)
 	{
@@ -521,20 +520,20 @@ static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* i
 		{
 			papuga_HostObject* obj = item->value.hostObject;
 			papuga_lua_UserData* udata;
-			const papuga_lua_ClassDef* classdef = get_classdef( classdefmap, obj->classid);
-			if (!classdef)
+			const char* cname = get_classname( classnamemap, obj->classid);
+			if (!cname)
 			{
 				papuga_lua_error( ls, "deserialize result", papuga_LogicError);
 			}
 			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when papuga_lua_new_userdata fails because of a memory allocation error
-			udata = papuga_lua_new_userdata( ls, classdef->name);
-			papuga_lua_init_UserData( udata, obj->classid, obj->data, obj->destroy, classdefmap);
+			udata = papuga_lua_new_userdata( ls, cname);
+			papuga_lua_init_UserData( udata, obj->classid, obj->data, obj->destroy, classnamemap);
 			papuga_release_HostObject( obj);
 			break;
 		}
 		case papuga_TypeSerialization:
 		{
-			int nofitems = deserialize_root( retval, item->value.serialization, ls, classdefmap);
+			int nofitems = deserialize_root( retval, item->value.serialization, ls, classnamemap);
 			if (nofitems == 0)
 			{
 				lua_pushnil( ls);
@@ -548,7 +547,7 @@ static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* i
 		case papuga_TypeIterator:
 		{
 			papuga_Iterator* itr = item->value.iterator;
-			pushIterator( ls, itr->data, itr->destroy, itr->getNext, classdefmap);
+			pushIterator( ls, itr->data, itr->destroy, itr->getNext, classnamemap);
 			papuga_release_Iterator( itr);
 		}
 		default:
@@ -556,7 +555,7 @@ static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* i
 	}
 }
 
-static void deserialize_node( papuga_CallResult* retval, papuga_Node** ni, papuga_Node* ne, lua_State *ls, const papuga_lua_ClassDefMap* classdefmap)
+static void deserialize_node( papuga_CallResult* retval, papuga_Node** ni, papuga_Node* ne, lua_State *ls, const papuga_lua_ClassNameMap* classnamemap)
 {
 	unsigned int keyindex = 0;
 	papuga_ValueVariant name;
@@ -571,7 +570,7 @@ static void deserialize_node( papuga_CallResult* retval, papuga_Node** ni, papug
 				STACKTRACE( ls, "deserialize node open");
 				lua_newtable( ls);
 				++(*ni);
-				deserialize_node( retval, ni, ne, ls, classdefmap);
+				deserialize_node( retval, ni, ne, ls, classnamemap);
 				if (papuga_ValueVariant_defined( &name))
 				{
 					deserialize_key( &name, ls);
@@ -610,14 +609,14 @@ static void deserialize_node( papuga_CallResult* retval, papuga_Node** ni, papug
 				{
 					lua_pushinteger( ls, ++keyindex);
 				}
-				deserialize_value( retval, &(*ni)->value, ls, classdefmap);
+				deserialize_value( retval, &(*ni)->value, ls, classnamemap);
 				lua_rawset( ls, -3);
 				break;
 		}
 	}
 }
 
-static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* ser, lua_State *ls, const papuga_lua_ClassDefMap* classdefmap)
+static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* ser, lua_State *ls, const papuga_lua_ClassNameMap* classnamemap)
 {
 	int rt = 0;
 #ifdef PAPUGA_LOWLEVEL_DEBUG
@@ -640,13 +639,13 @@ static int deserialize_root( papuga_CallResult* retval, papuga_Serialization* se
 		{
 			++ni;
 			lua_newtable( ls);
-			deserialize_node( retval, &ni, ne, ls, classdefmap);
+			deserialize_node( retval, &ni, ne, ls, classnamemap);
 			if (ni == ne) papuga_lua_error( ls, "deserialize result", papuga_UnexpectedEof);
 			if (ni->tag != papuga_TagClose) papuga_lua_error( ls, "deserialize result", papuga_TypeError);
 		}
 		else if (ni->tag == papuga_TagValue)
 		{
-			deserialize_value( retval, &ni->value, ls, classdefmap);
+			deserialize_value( retval, &ni->value, ls, classnamemap);
 		}
 		else
 		{
@@ -675,12 +674,12 @@ DLL_PUBLIC papuga_lua_UserData* papuga_lua_new_userdata( lua_State* ls, const ch
 	return rt;
 }
 
-DLL_PUBLIC void papuga_lua_init_UserData( papuga_lua_UserData* udata, int classid, void* objectref, papuga_Deleter destructor, const papuga_lua_ClassDefMap* classdefmap)
+DLL_PUBLIC void papuga_lua_init_UserData( papuga_lua_UserData* udata, int classid, void* objectref, papuga_Deleter destructor, const papuga_lua_ClassNameMap* classnamemap)
 {
 	udata->classid = classid;
 	udata->objectref = objectref;
 	udata->destructor = destructor;
-	udata->classdefmap = classdefmap;
+	udata->classnamemap = classnamemap;
 	udata->checksum = calcCheckSum( udata);
 }
 
@@ -782,15 +781,14 @@ DLL_PUBLIC void papuga_lua_destroy_CallArgs( papuga_lua_CallArgs* arg)
 	papuga_destroy_Allocator( &arg->allocator);
 }
 
-DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, const papuga_lua_ClassDefMap* classdefmap, papuga_ErrorCode* errcode)
+DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* retval, const papuga_lua_ClassNameMap* classnamemap, papuga_ErrorCode* errcode)
 {
 	int rt = 0;
 
 	if (papuga_CallResult_hasError( retval))
 	{
-		char* errorstr = retval->errorbuf.ptr;
+		lua_pushlstring( ls, retval->errorbuf.ptr, retval->errorbuf.size);
 		papuga_destroy_CallResult( retval);
-		lua_pushstring( ls, errorstr);
 		lua_error( ls);
 	}
 	switch (retval->value.valuetype)
@@ -835,28 +833,28 @@ DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* ret
 		{
 			papuga_HostObject* obj = retval->value.value.hostObject;
 			papuga_lua_UserData* udata;
-			const papuga_lua_ClassDef* classdef = get_classdef( classdefmap, obj->classid);
-			if (!classdef)
+			const char* cname = get_classname( classnamemap, obj->classid);
+			if (!cname)
 			{
 				papuga_destroy_CallResult( retval);
 				papuga_lua_error( ls, "move result", papuga_LogicError);
 			}
 			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when papuga_lua_new_userdata fails because of a memory allocation error
-			udata = papuga_lua_new_userdata( ls, classdef->name);
-			papuga_lua_init_UserData( udata, obj->classid, obj->data, obj->destroy, classdefmap);
+			udata = papuga_lua_new_userdata( ls, cname);
+			papuga_lua_init_UserData( udata, obj->classid, obj->data, obj->destroy, classnamemap);
 			papuga_release_HostObject( obj);
 			rt = 1;
 			break;
 		}
 		case papuga_TypeSerialization:
 			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when papuga_lua_new_userdata fails because of a memory allocation error
-			rt = deserialize_root( retval, retval->value.value.serialization, ls, classdefmap);
+			rt = deserialize_root( retval, retval->value.value.serialization, ls, classnamemap);
 			break;
 		case papuga_TypeIterator:
 		{
 			papuga_Iterator* itr = retval->value.value.iterator;
 			// MEMORY LEAK ON ERROR: papuga_destroy_CallResult( retval) not called when papuga_lua_new_userdata fails because of a memory allocation error
-			pushIterator( ls, itr->data, itr->destroy, itr->getNext, classdefmap);
+			pushIterator( ls, itr->data, itr->destroy, itr->getNext, classnamemap);
 			papuga_release_Iterator( itr);
 			rt = 1;
 			break;

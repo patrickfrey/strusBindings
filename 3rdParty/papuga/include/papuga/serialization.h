@@ -33,6 +33,12 @@ extern "C" {
 /// \param[out] self pointer to structure 
 bool papuga_init_Serialization_copy( papuga_Serialization* self, const papuga_Serialization* o);
 
+/// \brief Add a node to the serialization
+/// \param[in,out] self pointer to structure 
+/// \param[in] node pointer to the added node
+/// \return true on success, false on memory allocation error
+bool papuga_Serialization_push( papuga_Serialization* self, papuga_Node* node);
+
 /// \brief Add an 'open' element to the serialization
 /// \param[in,out] self pointer to structure 
 /// \return true on success, false on memory allocation error
@@ -166,6 +172,13 @@ bool papuga_Serialization_pushValue_bool( papuga_Serialization* self, bool value
 /// \param[in] o serialization to append
 /// \return true on success, false on memory allocation error
 bool papuga_Serialization_append( papuga_Serialization* self, const papuga_Serialization* o);
+
+/// \brief Conversing a tail sequence from an array to an associative array
+/// \param[in,out] self pointer to structure
+/// \param[in] arraystart start of the serialization of the array to convert
+/// \param[in] countfrom start counting of the inserted indices
+/// \return true on success, false on error
+bool papuga_Serialization_convert_array_assoc( papuga_Serialization* self, size_t arraystart, unsigned int countfrom, papuga_ErrorCode* errcode);
 
 /// \brief Print serialization as null terminated string, 
 /// \param[in] self pointer to structure

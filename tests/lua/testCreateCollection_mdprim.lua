@@ -9,11 +9,11 @@ local outputdir = arg[2] or '.'
 local ctxconfig = getContextConfig( arg[3])
 local storage = outputdir .. "/storage"
 local docfiles = {"doc10.xml"}
-local withrpc = ctxconfig.rpc and true or false
+local withrpc = (ctxconfig and ctxconfig.rpc) and true or false
 
 -- ctx = strus_Context.new( )
 ctx = strus_Context.new( ctxconfig)
-if not ctxconfig.rpc then
+if not withrpc then
 	ctx:loadModule( "analyzer_pattern")
 end
 local aclmap = {["1"]='A',["2"]='A',["3"]='A',["4"]='A',["5"]='A',["6"]='B',["7"]='B',["8"]='B',["9"]='B',["10"]='B'}

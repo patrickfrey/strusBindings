@@ -746,11 +746,15 @@ struct IndexDeclaration
 class DocGenerator
 {
 public:
-	DocGenerator( std::ostream& errchn, const std::string& src)
-		:m_eolncomment(),m_templates(),m_files(),m_variables(),m_namespaces(),m_emptydeclmap(),m_indices(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
+	DocGenerator( std::ostream& errchn, const std::string& src, const std::map<std::string,std::string>& varmap_)
+		:m_eolncomment(),m_templates(),m_files(),m_variables(),m_namespaces(),m_emptydeclmap(),m_varmap(varmap_),m_indices(),m_ignoreset(),m_groupmap(),m_groupcnt(0)
 	{
 		std::set<std::string> referencedVariables;
 		std::set<std::string> definedVariables;
+		std::map<std::string,std::string>::const_iterator
+			vi = m_varmap.begin(), ve = m_varmap.end();
+		for (; vi != ve; ++vi) definedVariables.insert( vi->first);
+
 		const char* start = src.c_str();
 		char const* si = src.c_str();
 		const char* se = si + src.size();
@@ -1087,7 +1091,6 @@ public:
 		std::ostream& warnings,
 		std::map<std::string,std::string>& outputfiles,
 		const std::string& content,
-		const std::map<std::string,std::string>& varmap,
 		bool verbose)
 	{
 		char const* si = content.c_str();
@@ -1106,7 +1109,7 @@ public:
 			}
 			tplist.push_back( TemplateInstance( 0, variables, ++timestmp));
 
-			tplist.back().assignMap( varmap);
+			tplist.back().assignMap( m_varmap);
 			std::string mainTemplateTagName = m_templates[0].tag;
 
 			std::vector<std::vector<int> > idxar( m_indices.size(), std::vector<int>());
@@ -1224,6 +1227,10 @@ private:
 							if (si == se) break;
 							lookahead = si+1;
 						}
+						else
+						{
+							break;
+						}
 					}
 					else
 					{
@@ -1285,11 +1292,12 @@ private:
 				mi = map_.begin(), me =map_.end();
 			for (; mi != me; ++mi)
 			{
-				if (map.find( mi->first) != map.end())
+				std::map<std::string,std::string>::iterator
+					ai = map.find( mi->first);
+				if (ai != map.end())
 				{
-					throw EXCEPTION( "unknown variable '%s' assigned", mi->first.c_str());
+					ai->second = mi->second;
 				}
-				map[ mi->first] = mi->second;
 			}
 		}
 		static std::string mapToString( const std::map<std::string,std::string>& strmap)
@@ -1453,6 +1461,7 @@ private:
 		else
 		{
 			mi = ti.map.begin(), me = ti.map.end();
+			if (mi == me) return true;
 			for (; mi != me; ++mi)
 			{
 				if (!mi->second.empty()) return true;
@@ -1568,7 +1577,12 @@ private:
 		}
 		return false;
 	}
-	bool openTriggeredTemplates( std::ostream& warnings, std::list<TemplateInstance>& tplist, const std::list<NamespaceInstance>& nslist, const Annotation& ann, bool verbose) const
+	bool openTriggeredTemplates(
+		std::ostream& warnings,
+		std::list<TemplateInstance>& tplist,
+		const std::list<NamespaceInstance>& nslist,
+		const Annotation& ann,
+		bool verbose) const
 	{
 		bool rt = false;
 		std::vector<TemplateDeclaration>::const_iterator
@@ -1585,6 +1599,8 @@ private:
 				}
 				tplist.push_back( TemplateInstance( tidx, variables, ann.timestmp));
 				TemplateInstance& ctp = tplist.back();
+				ctp.assignMap( m_varmap);
+
 				std::list<NamespaceInstance>::const_iterator
 					ni = nslist.begin(), ne = nslist.end();
 				for (; ni != ne; ++ni)
@@ -1731,6 +1747,7 @@ private:
 	std::vector<VariableDeclaration> m_variables;
 	std::vector<VariableDeclaration> m_namespaces;
 	std::map<std::string,std::string> m_emptydeclmap;
+	std::map<std::string,std::string> m_varmap;
 	std::vector<IndexDeclaration> m_indices;
 	std::set<std::string> m_ignoreset;
 	typedef std::map<std::string, unsigned int> GroupMap;
@@ -1750,11 +1767,11 @@ DLL_PUBLIC bool papuga::generateDoc(
 {
 	try
 	{
-		DocGenerator docgen( err, templatesrc);
+		DocGenerator docgen( err, templatesrc, varmap);
 #ifdef PAPUGA_LOWLEVEL_DEBUG
 		std::cerr << docgen.tostring( 20) << std::endl;
 #endif
-		out << docgen.generate( err, outputfiles, docsrc, varmap, verbose) << std::endl;
+		out << docgen.generate( err, outputfiles, docsrc, verbose) << std::endl;
 		return true;
 	}
 	catch (const std::bad_alloc&)

@@ -123,6 +123,13 @@ public:
 	/// \param[in] config storage configuration (string or structure with named elements) 
 	void destroyStorage( const ValueVariant& config);
 
+	/// \brief Tests if the storage described by config exists
+	/// \example storageExists( "path=/srv/searchengine/storage" )
+	/// \note Works also on vector storages, it does not distinguish between those
+	/// \param[in] config storage configuration (string or structure with named elements) 
+	/// \return true, if the storage with this configuration exists
+	bool storageExists( const ValueVariant& config);
+
 	/// \brief Detect the type of document from its content
 	/// \example detectDocumentClass( "<?xml version='1.0' encoding='UTF-8'?><doc>...</doc>")
 	/// \param[in] content the document content to classify

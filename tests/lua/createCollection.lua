@@ -13,9 +13,9 @@ function createCollection( strusctx, storagePath, metadata, analyzer, multipart,
 		if aclmap then
 			config.acl = true
 		end
-		strusctx:destroyStorage( config)
-		strusctx:getLastError()
-
+		if strusctx:storageExists( config) then
+			strusctx:destroyStorage( config)
+		end
 		strusctx:createStorage( config)
 	end
 	-- Get a client for the new created storage:

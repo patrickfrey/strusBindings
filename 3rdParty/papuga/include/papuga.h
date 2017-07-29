@@ -7,8 +7,9 @@
  */
 #ifndef _PAPUGA_H_INCLUDED
 #define _PAPUGA_H_INCLUDED
-/// \brief Main include file of the papuga library
+/// \brief Main C include file of the papuga library
 /// \file papuga.h
+/// 
 #include "papuga/typedefs.h"
 #include "papuga/version.h"
 #include "papuga/errors.h"
@@ -18,5 +19,7 @@
 #include "papuga/serialization.h"
 #include "papuga/allocator.h"
 #include "papuga/valueVariant.h"
+#include "papuga/interfaceDescription.h"
+
 #endif
 

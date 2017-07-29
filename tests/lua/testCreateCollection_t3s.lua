@@ -9,10 +9,10 @@ local outputdir = arg[2] or '.'
 local ctxconfig = getContextConfig( arg[3])
 local storage = outputdir .. "/storage"
 local docfiles = {"A.xml","B.xml","C.xml"}
-local withrpc = ctxconfig.rpc and true or false
+local withrpc = (ctxconfig and ctxconfig.rpc) and true or false
 
 ctx = strus_Context.new( ctxconfig)
-if not ctxconfig.rpc then
+if not withrpc then
 	ctx:loadModule( "analyzer_pattern")
 end
 local aclmap = {["A.xml"]="a",["B.xml"]="b",["C.xml"]="c"}

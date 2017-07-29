@@ -40,19 +40,15 @@ static void define_classdefmap(
 	{
 		for (; cidx+1 < ci->first; ++cidx){}
 	}
-	out << "static const papuga_lua_ClassDef g_classdefar[" << (cidx+1) << "] = {" << std::endl;
+	out << "static const char* g_classnamear[" << (cidx+1) << "] = {" << std::endl;
 	cidx = 0;
 	ci = descrmap.begin(), ce = descrmap.end();
 	for (; ci != ce; ++ci,++cidx)
 	{
-		for (; cidx+1 < ci->first; ++cidx)
-		{
-			out << "{NULL, NULL}";
-		}
-		out << "{\"" << namespace_classname( modulename, ci->second->name) << "\", &" << ci->second->funcname_destructor << "}, ";
+		out << "\"" << namespace_classname( modulename, ci->second->name) << "\", ";
 	}
-	out << "{ NULL, NULL }};" << std::endl << std::endl;
-	out << "static const papuga_lua_ClassDefMap g_classdefmap = { " << cidx << ", g_classdefar };"
+	out << "NULL };" << std::endl << std::endl;
+	out << "static const papuga_lua_ClassNameMap g_classnamemap = { " << cidx << ", g_classnamear };"
 		<< std::endl << std::endl;
 }
 
@@ -78,7 +74,7 @@ static void define_method(
 		"papuga_init_CallResult( &retval, errbuf, sizeof(errbuf));",
 		"if (!{funcname}( arg.self, &retval, arg.argc, arg.argv)) goto ERROR_CALL;",
 		"papuga_lua_destroy_CallArgs( &arg);",
-		"rt = papuga_lua_move_CallResult( ls, &retval, &g_classdefmap, &arg.errcode);",
+		"rt = papuga_lua_move_CallResult( ls, &retval, &g_classnamemap, &arg.errcode);",
 		"if (rt < 0) papuga_lua_error( ls, \"{nsclassname}.{methodname}\", arg.errcode);",
 		"return rt;",
 		"ERROR_CALL:",
@@ -116,7 +112,7 @@ static void define_constructor(
 		"void* objref = {constructor}( &errbufstruct, arg.argc, arg.argv);",
 		"if (!objref) goto ERROR_CALL;",
 		"papuga_lua_destroy_CallArgs( &arg);",
-		"papuga_lua_init_UserData( udata, {classid}, objref, {destructor}, &g_classdefmap);",
+		"papuga_lua_init_UserData( udata, {classid}, objref, {destructor}, &g_classnamemap);",
 		"return 1;",
 		"ERROR_CALL:",
 		"papuga_lua_destroy_CallArgs( &arg);",

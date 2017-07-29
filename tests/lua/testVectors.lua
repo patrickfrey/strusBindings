@@ -28,8 +28,9 @@ end
 local ctx = strus_Context.new()
 ctx:loadModule( "storage_vector_std")
 
-ctx:destroyStorage( config)
-ctx:getLastError()
+if ctx:storageExists( config) then
+	ctx:destroyStorage( config)
+end
 
 ctx:createVectorStorage( config);
 local storage = ctx:createVectorStorageClient( config)
