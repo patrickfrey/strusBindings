@@ -7,6 +7,7 @@ Table of Contents
 	textwolf
 	boost
 	fmt
+	Zend framework (PHP)
 
 textwolf
 ----------
@@ -26,3 +27,6 @@ fmt
        BSD 2-clause "Simplified" License
        https://github.com/fmtlib/fmt/blob/master/LICENSE.rst
 
+Zend framework (PHP)
+----------------
+       New BSD License

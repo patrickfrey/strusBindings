@@ -30,7 +30,7 @@ link_directories(
 # ------------------------------
 # LIBRARIES
 # ------------------------------
-add_library( strus_bindings_php7 MODULE phpenv/strus.c )
+add_library( strus_bindings_php7 MODULE strus.c )
 target_link_libraries( strus_bindings_php7 papuga_devel papuga_php7_dev strus_bindings )
 
 set_target_properties( strus_bindings_php7 PROPERTIES OUTPUT_NAME strus PREFIX "" )
