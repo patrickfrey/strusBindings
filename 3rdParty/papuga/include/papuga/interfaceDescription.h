@@ -27,21 +27,21 @@ typedef struct papuga_Annotation
 typedef struct papuga_ParameterDescription
 {
 	const char* name;				///< name of the parameter
-	const papuga_Annotation* doc;			///< description and examples of the parameter value
+	const papuga_Annotation* doc;			///< description and examples of the parameter value; {NULL,NULL} terminated list
 	bool mandatory;					///< true, if the parameter is mandatory, false if it is optional (optional parameters must only appear as last arguments, a function parameter list is always a list of mandatory arguments followed by optional arguments)
 } papuga_ParameterDescription;
 
 /// \brief Structure describing the return values of a method call
 typedef struct papuga_CallResultDescription
 {
-	const papuga_Annotation* doc;			///< description and examples of the return values of a method
+	const papuga_Annotation* doc;			///< description and examples of the return values of a method; {NULL,NULL} terminated list
 } papuga_CallResultDescription;
 
 /// \brief Structure describing the constructor of a host object class
 typedef struct papuga_ConstructorDescription
 {
 	const char* funcname;				///< function name of the method
-	const papuga_Annotation* doc;			///< description and examples of the constructor
+	const papuga_Annotation* doc;			///< description and examples of the constructor as {NULL,NULL} terminated list
 	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
 } papuga_ConstructorDescription;
 
@@ -50,7 +50,7 @@ typedef struct papuga_MethodDescription
 {
 	const char* name;				///< name of the method
 	const char* funcname;				///< function name of the method
-	const papuga_Annotation* doc;			///< description and examples of the method
+	const papuga_Annotation* doc;			///< description and examples of the method; {NULL,NULL} terminated list
 	const papuga_CallResultDescription* result;	///< return value descriptions or 0, if no return value defined
 	bool self;					///< method that requires an instance of its class (self pointer)
 	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
@@ -59,9 +59,9 @@ typedef struct papuga_MethodDescription
 /// \brief Structure describing a host object class
 typedef struct papuga_ClassDescription
 {
-	unsigned int id;				///< id of the class (unique index counted from 0)
+	unsigned int id;				///< id of the class (unique index counted from 1 without gaps, but not necessarily ordered, e.g. {1,2,3,4,5} or {4,1,2,5,3})
 	const char* name;				///< name of class
-	const papuga_Annotation* doc;			///< description of the class
+	const papuga_Annotation* doc;			///< description of the class as {NULL,NULL} terminated list
 	const papuga_ConstructorDescription* constructor;///< function description of the constructor
 	const char* funcname_destructor;		///< function name of the destructor
 	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods

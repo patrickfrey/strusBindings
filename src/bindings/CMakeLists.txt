@@ -32,8 +32,12 @@ set( bindingsimpl_source_files
 set( bindings_source_files
 	bindingObjects.cpp
 )
-set_source_files_properties( bindingObjects.cpp PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( libstrus_bindings_description.cpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_BINARY_DIR}/include/strus/lib/bindingObjects.h PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/bindingClassIds.hpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp PROPERTIES GENERATED TRUE ) 
 
 include_directories(
 	"${Boost_INCLUDE_DIRS}"
@@ -65,6 +69,7 @@ link_directories(
 # LIBRARIES
 # ------------------------------
 add_library( strus_bindingsimpl STATIC ${bindingsimpl_source_files} )
+add_dependencies( strus_bindingsimpl  strus_bindings_c_interface )
 target_link_libraries( strus_bindingsimpl strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket strus_base strus_error )
 
 add_library( strus_bindings SHARED ${bindings_source_files} )

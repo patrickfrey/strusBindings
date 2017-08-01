@@ -70,6 +70,18 @@ install(DIRECTORY include/strus
 install(DIRECTORY include/strus
           DESTINATION include
           FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY  3rdParty/papuga/include/papuga
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.h")
+install(FILES  3rdParty/papuga/include/papuga.h
+          DESTINATION include )
+# Install generated header files:
+install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.h")
 
 if(NOT STRUS_ALL)
 include( cmake/standard_targets.cmake )

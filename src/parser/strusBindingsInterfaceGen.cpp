@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <fstream>
@@ -395,15 +396,23 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 
 	out << "#ifdef __cplusplus" << std::endl;
 	out << "extern \"C\" {" << std::endl;
-	out << "#endif" << std::endl;
+	out << "#endif" << std::endl << std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
+	int cidx = 0;
+	for (; ci != ce; ++ci,++cidx)
+	{
+		out << "#define STRUS_BINDINGS_CLASSID_" << ci->name() << " " << (cidx+1) << std::endl;
+	}
+	out << "#define STRUS_BINDINGS_NOF_CLASSES " << cidx << std::endl;
+	out << std::endl;
+
+	ci = interfaceDef.classDefs().begin();
 	for (; ci != ce; ++ci)
 	{
 		out << "void " << destructorFunctionName( ci->name()) << "( void* self);" << std::endl;
-		out << std::endl;
 
 		if (ci->constructorDefs().size() > 1) throw std::runtime_error( std::string("only one constructor allowed for '") + ci->name() + "'");
 		std::vector<strus::ConstructorDef>::const_iterator
@@ -426,6 +435,7 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 			<< "( void* self, papuga_CallResult* retval, "
 			<< "size_t argc, const papuga_ValueVariant* argv);" << std::endl;
 		}
+		out << std::endl;
 	}
 	out << "#ifdef __cplusplus" << std::endl;
 	out << "}" << std::endl;

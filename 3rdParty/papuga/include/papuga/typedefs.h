@@ -64,11 +64,12 @@ typedef enum papuga_Type {
 	papuga_TypeDouble		= 0x01,		///< double precision floating point value (C double)
 	papuga_TypeUInt			= 0x02,		///< unsigned integer value (maximum width 64 bits)
 	papuga_TypeInt			= 0x03,		///< signed integer value (maximum width 64 bits)
-	papuga_TypeString		= 0x04,		///< host environment string (null-terminated UTF-8)
-	papuga_TypeLangString		= 0x05,		///< bindings language string (unicode string with a defined encoding - papuga_StringEncoding)
-	papuga_TypeHostObject		= 0x06,		///< class object defined in the host environment, part of the interface
-	papuga_TypeSerialization	= 0x07,		///< serialization of an object constructed in the binding language
-	papuga_TypeIterator		= 0x08		///< iterator closure
+	papuga_TypeBool			= 0x04,		///< boolean value
+	papuga_TypeString		= 0x05,		///< host environment string (null-terminated UTF-8)
+	papuga_TypeLangString		= 0x06,		///< bindings language string (unicode string with a defined encoding - papuga_StringEncoding)
+	papuga_TypeHostObject		= 0x07,		///< class object defined in the host environment, part of the interface
+	papuga_TypeSerialization	= 0x08,		///< serialization of an object constructed in the binding language
+	papuga_TypeIterator		= 0x09		///< iterator closure
 } papuga_Type;
 
 /// \brief Unsigned integer type as represented by papuga
@@ -108,6 +109,7 @@ typedef struct papuga_ValueVariant
 		double Double;					///< double precision floating point value
 		uint64_t UInt;					///< unsigned integer value
 		int64_t Int;					///< signed integer value
+		bool Bool;					///< boolean value
 		const char* string;				///< null terminated UTF-8 string (host string representation)
 		const void* langstring;				///< string value (not nessesarily null terminated) for other character set encodings (binding language string representation)
 		papuga_HostObject* hostObject;			///< reference of an object represented in the host environment

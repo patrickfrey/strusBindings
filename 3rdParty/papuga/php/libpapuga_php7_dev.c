@@ -23,14 +23,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdio.h>
+#include <signal.h>
+#include <inttypes.h>
 
 // PHP7 stuff:
-typedef struct sigaction sigaction;
-typedef struct siginfo_t siginfo_t;
 typedef unsigned int uint;
-#include <php.h>
-#include <zend.h>
+typedef unsigned long ulong;
+typedef void siginfo_t;
 #include <zend_API.h>
+#include <zend_objects_API.h>
+#include <zend_types.h>
+#include <zend.h>
+#include <zend_ini.h>
+
+static zend_class_entry* get_class_entry( const papuga_php_ClassEntryMap* cemap, unsigned int classid)
+{
+	--classid;
+	return (classid > cemap->size) ? NULL : (zend_class_entry*)cemap->ar[ classid];
+}
 
 typedef struct ClassObject {
 	papuga_HostObject hobj;
@@ -41,7 +51,7 @@ typedef struct ClassObject {
 #define KNUTH_HASH 2654435761U
 static int calcCheckSum( const ClassObject* cobj)
 {
-	return (((cobj->hobj.classid ^ (uintptr_t)cobj->hobj.data) * KNUTH_HASH) ^ (uintptr_t)cobj->hobj.destroy);
+	return ((((cobj->hobj.classid+107) * KNUTH_HASH) ^ (uintptr_t)cobj->hobj.data) ^ (uintptr_t)cobj->hobj.destroy);
 }
 
 static ClassObject* getClassObject( zend_object* object)
@@ -51,19 +61,43 @@ static ClassObject* getClassObject( zend_object* object)
 
 static zend_object_handlers g_papuga_ce_handlers;
 
-static zend_object* createZendClassObject( zend_class_entry *ce, const papuga_HostObject* hostobj)
+papuga_zend_object* papuga_php_create_object(
+	papuga_zend_class_entry* ce)
 {
 	ClassObject *cobj;
 
 	cobj = (ClassObject*)ecalloc(1, sizeof(ClassObject) + zend_object_properties_size(ce));
-	papuga_init_HostObject( &cobj->hobj, hostobj->classid, hostobj->data, hostobj->destroy);
+	if (!cobj) return NULL;
+	papuga_init_HostObject( &cobj->hobj, 0, NULL/*data*/, NULL/*destroy*/);
 	cobj->checksum = calcCheckSum( cobj);
 	zend_object_std_init( &cobj->zobj, ce);
 	object_properties_init( &cobj->zobj, ce);
 
 	cobj->zobj.handlers = &g_papuga_ce_handlers;
-
 	return &cobj->zobj;
+}
+
+bool papuga_php_init_object( void* selfzval, papuga_HostObject* hobj)
+{
+	zval* sptr = (zval*)selfzval;
+	if (Z_TYPE_P(sptr) == IS_OBJECT)
+	{
+		zend_object* zobj = Z_OBJ_P( sptr);
+		ClassObject *cobj = getClassObject( zobj);
+		if (cobj->checksum != calcCheckSum( cobj))
+		{
+			papuga_destroy_HostObject( hobj);
+			return false;
+		}
+		papuga_init_HostObject( &cobj->hobj, hobj->classid, hobj->data, hobj->destroy);
+		cobj->checksum = calcCheckSum( cobj);
+		return true;
+	}
+	else
+	{
+		papuga_destroy_HostObject( hobj);
+		return false;
+	}
 }
 
 static void destroy_papuga_zend_object( zend_object *object)
@@ -89,13 +123,6 @@ void papuga_php_init()
 	g_papuga_ce_handlers.free_obj = &free_papuga_zend_object;
 	g_papuga_ce_handlers.dtor_obj = destroy_papuga_zend_object;
 	g_papuga_ce_handlers.offset = XtOffsetOf( ClassObject, zobj);
-}
-
-papuga_zend_object* papuga_php_create_object(
-	papuga_zend_class_entry* ce,
-	const papuga_HostObject* hostobj)
-{
-	return (zend_object*)createZendClassObject( (zend_class_entry*)ce, hostobj);
 }
 
 static bool serializeValue( papuga_Serialization* ser, zval* langval, papuga_ErrorCode* errcode);
@@ -247,7 +274,7 @@ static bool initObject( papuga_ValueVariant* hostval, zval* langval, papuga_Erro
 		*errcode = papuga_InvalidAccess;
 		return false;
 	}
-	papuga_init_ValueVariant_hostobject( hostval, &cobj->hobj);
+	papuga_init_ValueVariant_hostobj( hostval, &cobj->hobj);
 	return true;
 }
 
@@ -270,7 +297,7 @@ static bool initValue( papuga_ValueVariant* hostval, papuga_Allocator* allocator
 	}
 }
 
-DLL_PUBLIC bool papuga_php7_init_CallArgs( void* selfzval, int argc, papuga_php_CallArgs* as)
+DLL_PUBLIC bool papuga_php_init_CallArgs( void* selfzval, int argc, papuga_php_CallArgs* as)
 {
 	zval args[ papuga_PHP_MAX_NOF_ARGUMENTS];
 	int argi = -1;
@@ -286,6 +313,7 @@ DLL_PUBLIC bool papuga_php7_init_CallArgs( void* selfzval, int argc, papuga_php_
 		{
 			zend_object* zobj = Z_OBJ_P( sptr);
 			ClassObject *cobj = getClassObject( zobj);
+
 			if (cobj->checksum != calcCheckSum( cobj))
 			{
 				as->errcode = papuga_InvalidAccess;
@@ -307,7 +335,7 @@ DLL_PUBLIC bool papuga_php7_init_CallArgs( void* selfzval, int argc, papuga_php_
 	papuga_init_Allocator( &as->allocator, as->allocbuf, sizeof( as->allocbuf));
 	if (zend_get_parameters_array_ex( argc, args) == FAILURE) goto ERROR;
 
-	for (argi=0; argi <= argc; ++argi)
+	for (argi=0; argi < argc; ++argi)
 	{
 		if (!initValue( &as->argv[ as->argc], &as->allocator, &args[argi], &as->errcode))
 		{
@@ -328,8 +356,107 @@ DLL_PUBLIC void papuga_php_destroy_CallArgs( papuga_php_CallArgs* arg)
 	papuga_destroy_Allocator( &arg->allocator);
 }
 
-DLL_PUBLIC void papuga_php_move_CallResult( papuga_CallResult* retval)
+DLL_PUBLIC void papuga_php_move_CallResult( void* zval_return_value, papuga_CallResult* retval, const papuga_php_ClassEntryMap* cemap)
 {
+	zval* return_value = (zval*)zval_return_value;
+	if (papuga_CallResult_hasError( retval))
+	{
+		zend_error( E_ERROR, retval->errorbuf.ptr);
+	}
+	else switch (retval->value.valuetype)
+	{
+		case papuga_TypeVoid:
+			RETVAL_NULL();
+			break;
+		case papuga_TypeDouble:
+			RETVAL_DOUBLE( retval->value.value.Double);
+			break;
+		case papuga_TypeUInt:
+			RETVAL_LONG( retval->value.value.UInt);
+			break;
+		case papuga_TypeInt:
+			RETVAL_LONG( retval->value.value.UInt);
+			break;
+		case papuga_TypeBool:
+			if (retval->value.value.Bool)
+			{
+				RETVAL_TRUE;
+			}
+			else
+			{
+				RETVAL_FALSE;
+			}
+			break;
+		case papuga_TypeString:
+			if (retval->value.length)
+			{
+				RETVAL_STRINGL( retval->value.value.string, retval->value.length);
+			}
+			else
+			{
+				RETVAL_EMPTY_STRING();
+			}
+			break;
+		case papuga_TypeLangString:
+		{
+			if (retval->value.length)
+			{
+				papuga_ErrorCode errcode = papuga_Ok;
+				size_t strsize;
+				const char* str = papuga_ValueVariant_tostring( &retval->value, &retval->allocator, &strsize, &errcode);
+				if (!str)
+				{
+					papuga_php_error( "failed to convert unicode string: %s", papuga_ErrorCode_tostring( errcode));
+				}
+				else
+				{
+					RETVAL_STRINGL( str, strsize);
+				}
+			}
+			else
+			{
+				RETVAL_EMPTY_STRING();
+			}
+			break;
+		}
+		case papuga_TypeHostObject:
+		{
+			papuga_HostObject* hobj = retval->value.value.hostObject;
+			zend_class_entry* ce = get_class_entry( cemap, hobj->classid);
+			if (!ce)
+			{
+				zend_error( E_ERROR, "undefined class id of object returned");
+				break;
+			}
+			papuga_zend_object* zobj = papuga_php_create_object( ce);
+			if (!zobj)
+			{
+				zend_error( E_ERROR, "failed to create zend object from host object");
+				break;
+			}
+			object_init(return_value);
+			Z_OBJ_P(return_value) = zobj;
+			papuga_php_init_object(return_value, hobj);
+			papuga_release_HostObject(hobj);
+			break;
+		}
+		case papuga_TypeSerialization:
+			object_init(return_value);
+			//deserialize( return_value, retval->value.value.serialization, resultobj, cemap);
+			break;
+		case papuga_TypeIterator:
+		{
+			papuga_Iterator* itr = retval->value.value.iterator;
+			//pushIterator( return_value, itr->data, itr->destroy, itr->getNext, classnamemap);
+			papuga_release_Iterator( itr);
+			break;
+		}
+		default:
+			papuga_destroy_CallResult( retval);
+			zend_error( E_ERROR, "unknown return value type");
+			return;
+	}
+	papuga_destroy_CallResult( retval);
 }
 
 DLL_PUBLIC void papuga_php_error( const char* fmt, ...)

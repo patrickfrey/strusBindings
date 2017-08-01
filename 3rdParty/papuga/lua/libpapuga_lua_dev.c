@@ -465,6 +465,9 @@ static void deserialize_key( papuga_ValueVariant* item, lua_State *ls)
 		case papuga_TypeInt:
 			lua_pushinteger( ls, item->value.Int);
 			break;
+		case papuga_TypeBool:
+			lua_pushboolean( ls, item->value.Bool);
+			break;
 		case papuga_TypeString:
 			lua_pushlstring( ls, item->value.string, item->length);
 			break;
@@ -502,6 +505,9 @@ static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* i
 			break;
 		case papuga_TypeInt:
 			lua_pushinteger( ls, item->value.Int);
+			break;
+		case papuga_TypeBool:
+			lua_pushboolean( ls, item->value.Bool);
 			break;
 		case papuga_TypeString:
 			lua_pushlstring( ls, item->value.string, item->length);
@@ -724,30 +730,48 @@ DLL_PUBLIC bool papuga_lua_init_CallArgs( lua_State *ls, int argc, papuga_lua_Ca
 		switch (lua_type (ls, argi))
 		{
 			case LUA_TNIL:
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				fprintf( stderr, "PARAM %u %s\n", argi, "NIL");
+#endif
 				papuga_init_ValueVariant( &as->argv[as->argc]);
 				as->argc += 1;
 				break;
 			case LUA_TNUMBER:
 				init_ValueVariant_number( &as->argv[as->argc], lua_tonumber( ls, argi));
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				fprintf( stderr, "PARAM %u NUMBER %f\n", argi, lua_tonumber( ls, argi));
+#endif
 				as->argc += 1;
 				break;
 			case LUA_TBOOLEAN:
 				papuga_init_ValueVariant_bool( &as->argv[as->argc], lua_toboolean( ls, argi));
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				fprintf( stderr, "PARAM %u BOOL %d\n", argi, (int)lua_toboolean( ls, argi));
+#endif
 				as->argc += 1;
 				break;
 			case LUA_TSTRING:
 			{
 				size_t strsize;
 				const char* str = lua_tolstring( ls, argi, &strsize);
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				fprintf( stderr, "PARAM %u STRING %s\n", argi, str);
+#endif
 				papuga_init_ValueVariant_string( &as->argv[as->argc], str, strsize);
 				as->argc += 1;
 				break;
 			}
 			case LUA_TTABLE:
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				fprintf( stderr, "PARAM %u TABLE\n", argi);
+#endif
 				if (!serialize_root( as, ls, argi)) goto ERROR;
 				break;
 			case LUA_TUSERDATA:
 			{
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+				fprintf( stderr, "PARAM %u USERDATA\n", argi);
+#endif
 				papuga_HostObject* hostobj;
 				const papuga_lua_UserData* udata = get_UserData( ls, argi);
 				if (!udata) goto ERROR;
@@ -806,6 +830,10 @@ DLL_PUBLIC int papuga_lua_move_CallResult( lua_State *ls, papuga_CallResult* ret
 			break;
 		case papuga_TypeInt:
 			lua_pushinteger( ls, retval->value.value.Int);
+			rt = 1;
+			break;
+		case papuga_TypeBool:
+			lua_pushboolean( ls, retval->value.value.Bool);
 			rt = 1;
 			break;
 		case papuga_TypeString:

@@ -28,7 +28,7 @@ extern "C" {
 
 /// \brief Destructor of a host object reference
 /// \param[in,out] self pointer to structure
-#define papuga_destroy_HostObject( self)				{papuga_HostObject* s = self; if (s->destroy) {s->destroy( s->data);s->destroy=0;}}
+#define papuga_destroy_HostObject( self)				{papuga_HostObject* s = self; if (s->destroy && s->data) {s->destroy( s->data);s->destroy=0;}}
 
 #ifdef __cplusplus
 }

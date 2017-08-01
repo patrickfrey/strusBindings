@@ -93,6 +93,10 @@ strus::NumericVariant ValueVariantWrap::tonumeric( const papuga_ValueVariant& va
 	{
 		return strus::NumericVariant( numval.value.Int);
 	}
+	if (numval.valuetype == papuga_TypeBool)
+	{
+		return strus::NumericVariant( (strus::NumericVariant::IntType)(numval.value.Bool?1:0));
+	}
 	throw papuga::error_exception( papuga_TypeError, _TXT("tonumeric of variant value"));
 }
 std::string ValueVariantWrap::tostring( const papuga_ValueVariant& value)

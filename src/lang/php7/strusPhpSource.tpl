@@ -24,7 +24,7 @@ $END$
 
 template build_sh=project $END$ {{ }}
 phpize
-./configure
+./configure CFLAGS="-I../../../bindings -I../../../../3rdParty/papuga/include -I../../../../Release/include" CPPFLAGS="-I../../../bindings" LIBS="-lstrus_bindings" LDFLAGS="-L/usr/local/lib/strus"
 make
 sudo make install
 php -f test.php -c ./php.ini
@@ -36,70 +36,156 @@ dnl Tell PHP about the argument to enable the {{Project}} extension
 PHP_ARG_ENABLE({{project}}, Whether to enable the {{Project}} extension, [ --enable-{{project}}   Enable {{project}}])
 
 if test "$PHP_{{PROJECT}}" != "no"; then
-    PHP_NEW_EXTENSION({{project}}, {{project}}.c, $ext_shared)
+    PHP_NEW_EXTENSION({{project}},{{project}}.c,$ext_shared)
+    PHP_ADD_MAKEFILE_FRAGMENT
+    PHP_ADD_INCLUDE(/usr/local/include)
+    PHP_ADD_LIBPATH(/usr/local/lib/{{project}},{{PROJECT}}_SHARED_LIBADD)
+    PHP_ADD_LIBRARY_DEFER(php{{project}},1,{{PROJECT}}_SHARED_LIBADD)
+    PHP_ADD_LIBRARY({{project}}_bindings,1,{{PROJECT}}_SHARED_LIBADD)
+    PHP_SUBST({{PROJECT}}_SHARED_LIBADD)
+    AC_MSG_NOTICE([got PHP extension for '{{project}}' => '/usr/local/include','/usr/local/lib/{{project}}'])
 fi
+dnl PHP_ADD_LIBRARY_WITH_PATH({{project}}_bindings,/usr/local/lib/{{project}},{{PROJECT}}_SHARED_LIBADD)
 $END$
 
 template php_h=project $END$ {{ }}
 #define PHP_{{PROJECT}}_EXTNAME "{{project}}"
 #define PHP_{{PROJECT}}_VERSION "{{release}}"
-
-PHP_FUNCTION({{project}}_create);
 $END$
 
 
 template php_c=project $END$ {{ }}
 #include "{{project}}.h"
+#include "papuga/lib/php7_dev.h"
+#include "strus/bindingObjects.h"
+#include "papuga.h"
 
 // PHP7 stuff:
-typedef struct sigaction sigaction;
-typedef struct siginfo_t siginfo_t;
 typedef unsigned int uint;
+#include <zend_signal.h>
 #include <php.h>
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>
+#include <ext/standard/info.h>
 
-{{zend_php_class_decl_c}}
 {{zend_class_entry_decl_c}}
+static papuga_zend_class_entry* g_class_entry_list[ STRUS_BINDINGS_NOF_CLASSES];
+static const papuga_php_ClassEntryMap g_class_entry_map = {
+	STRUS_BINDINGS_NOF_CLASSES,
+	g_class_entry_list
+};
+static zend_object* create_zend_object_wrapper( zend_class_entry* ce TSRMLS_DC)
+{
+	return papuga_php_create_object( ce);
+}
+{{zend_method_impl_c}}
+{{zend_php_class_decl_c}}
 
 PHP_MINIT_FUNCTION({{project}})
 {
     zend_class_entry tmp_ce;
-    {{zend_class_entry_init_c}}
-
+    papuga_php_init();
+{{zend_class_entry_init_c}}
     return SUCCESS;
 }
+PHP_MSHUTDOWN_FUNCTION({{project}})
+{
+    return SUCCESS;
+}
+PHP_MINFO_FUNCTION({{project}})
+{
+    php_info_print_table_start();
+    php_info_print_table_row(2, "strus library support", "enabled");
+    php_info_print_table_end();
+}
+const zend_function_entry {{project}}_functions[] = {
+    PHP_FE_END
+};
+zend_module_entry {{project}}_module_entry = {
+    STANDARD_MODULE_HEADER,
+    "{{project}}",
+    {{project}}_functions,
+    PHP_MINIT({{project}}),
+    PHP_MSHUTDOWN({{project}}),
+    NULL/*PHP_RINIT({{project}})*/,
+    NULL/*PHP_RSHUTDOWN({{project}})*/,
+    PHP_MINFO({{project}}),
+    "{{release}}", /* Replace with version number for your extension */
+    STANDARD_MODULE_PROPERTIES
+};
+/* }}} */
+ZEND_GET_MODULE({{project}})
 $END$
 
-template php_method_impl_c=method $END$ {{ }}
-PHP_METHOD({{classname}}, {{methodname}})
+template zend_method_impl_c=constructor $END$ {{ }}
+PHP_METHOD({{classname}}, __construct)
 {
+    papuga_HostObject thisHostObject;
     papuga_php_CallArgs argstruct;
-    papuga_CallResult retstruct;
-    char errbuf[ 2048];
+    papuga_ErrorBuffer errbuf;
+    void* self;
+    char errstr[ 2048];
     const char* msg;
-
     int argc = ZEND_NUM_ARGS();
-    zval *obj = getThis();
-    if (!papuga_php_init_CallArgs( (void*)obj, argc, &argcstruct))
+
+    if (!papuga_php_init_CallArgs( NULL/*self*/, argc, &argstruct))
     {
-        papuga_php_throw_exception(
+        papuga_php_error(
                 "failed to initialize argument (%d): %s",
                 argstruct.erridx, papuga_ErrorCode_tostring( argstruct.errcode));
         return;
     }
-    papuga_init_CallResult( &retstruct, errbuf, sizeof(errbuf));
+    papuga_init_ErrorBuffer( &errbuf, errstr, sizeof(errstr));
+    self = _{{project}}_bindings_constructor__{{classname}}( &errbuf, argstruct.argc, argstruct.argv);
+    if (!self)
+    {
+        msg = papuga_ErrorBuffer_lastError( &errbuf);
+        papuga_php_destroy_CallArgs( &argstruct);
+        papuga_php_error( "error calling constructor of %s: %s", "{{classname}}", msg?msg:"unknown error");
+        return;
+    }
+    papuga_php_destroy_CallArgs( &argstruct);
+    zval *thiszval = getThis();
+    papuga_init_HostObject( &thisHostObject, STRUS_BINDINGS_CLASSID_{{classname}}, self, &_{{project}}_bindings_destructor__{{classname}});
+    if (!papuga_php_init_object( thiszval, &thisHostObject))
+    {
+        papuga_php_error( "error calling constructor of %s: %s", "{{classname}}", "object initialization failed");
+        return;
+    }
+    /*[-]*/printf("THIS TYPE %u\n", (unsigned int)Z_TYPE_P(thiszval));
+}
+$END$
+
+template zend_method_impl_c=method $END$ {{ }}
+PHP_METHOD({{classname}}, {{methodname}})
+{
+    papuga_php_CallArgs argstruct;
+    papuga_CallResult retstruct;
+    char errstr[ 2048];
+    const char* msg;
+    int argc = ZEND_NUM_ARGS();
+
+    /*[-]*/printf("CALL METHOD {{classname}}::{{methodname}}\n");
+    zval *obj = getThis();
+    if (!papuga_php_init_CallArgs( (void*)obj, argc, &argstruct))
+    {
+        papuga_php_error(
+                "failed to initialize argument (%d): %s",
+                argstruct.erridx, papuga_ErrorCode_tostring( argstruct.errcode));
+        return;
+    }
+    papuga_init_CallResult( &retstruct, errstr, sizeof(errstr));
     if (!_{{project}}_bindings_{{classname}}__{{methodname}}( argstruct.self, &retstruct, argstruct.argc, argstruct.argv))
     {
         msg = papuga_CallResult_lastError( &retstruct);
         papuga_php_destroy_CallArgs( &argstruct);
         papuga_destroy_CallResult( &retstruct);
-        papuga_php_throw_exception( "error calling method %s::%s: %s", "{{classname}}", "{{methodname}}", msg?msg:"unknown error");
+        papuga_php_error( "error calling method %s::%s: %s", "{{classname}}", "{{methodname}}", msg?msg:"unknown error");
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
-    papuga_php_move_CallResult( &retstruct);
+    papuga_php_move_CallResult( return_value, &retstruct, &g_class_entry_map);
 }
 $END$
 
@@ -110,13 +196,20 @@ $END$
 template zend_class_entry_init_c=class $END$ {{ }}
     INIT_CLASS_ENTRY(tmp_ce, "{{classname}}", {{classname}}_methods);
     g_{{classname}}_ce = zend_register_internal_class( &tmp_ce TSRMLS_CC);
+    g_{{classname}}_ce->create_object = &create_zend_object_wrapper;
+    g_class_entry_list[ STRUS_BINDINGS_CLASSID_{{classname}}-1] = g_{{classname}}_ce;
 $END$
 
 template zend_php_class_decl_c=class $END$ {{ }}
 const zend_function_entry {{classname}}_methods[] = {
-    {{zend_php_method_decl_c}}
+{{zend_php_constructor_decl_c}}
+{{zend_php_method_decl_c}}
     PHP_FE_END
 };
+$END$
+
+template zend_php_constructor_decl_c=constructor $END$ {{ }}
+    PHP_ME({{classname}},  __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
 $END$
 
 template zend_php_method_decl_c=method $END$ {{ }}
@@ -126,11 +219,11 @@ $END$
 namespace classname=class
 variable methodname=method
 variable Project=project
-variable project=project    locase
+namespace project=project   locase
 variable PROJECT=project    upcase
 variable release
 # variable classname=class
 # variable param[0]
-ignore usage param constructor remark note brief author copyright license
+ignore usage param remark note brief author copyright license
 
 
