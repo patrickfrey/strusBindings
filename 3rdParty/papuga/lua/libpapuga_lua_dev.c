@@ -555,6 +555,7 @@ static void deserialize_value( papuga_CallResult* retval, papuga_ValueVariant* i
 			papuga_Iterator* itr = item->value.iterator;
 			pushIterator( ls, itr->data, itr->destroy, itr->getNext, classnamemap);
 			papuga_release_Iterator( itr);
+			break;
 		}
 		default:
 			papuga_lua_error( ls, "deserialize result", papuga_NotImplemented);

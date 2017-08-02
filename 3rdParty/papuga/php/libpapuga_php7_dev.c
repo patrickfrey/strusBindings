@@ -26,15 +26,16 @@
 #include <signal.h>
 #include <inttypes.h>
 
-// PHP7 stuff:
-typedef unsigned int uint;
-typedef unsigned long ulong;
+// PHP & Zend includes:
 typedef void siginfo_t;
-#include <zend_API.h>
-#include <zend_objects_API.h>
-#include <zend_types.h>
+#ifdef _MSC_VER
+#include <zend_config.w32.h>
+#else
+#include <zend_config.nw.h>
+#endif
+#include <php.h>
 #include <zend.h>
-#include <zend_ini.h>
+#include <zend_API.h>
 
 static zend_class_entry* get_class_entry( const papuga_php_ClassEntryMap* cemap, unsigned int classid)
 {
@@ -231,6 +232,7 @@ static bool serializeValue( papuga_Serialization* ser, zval* langval, papuga_Err
 		case IS_FALSE: if (!papuga_Serialization_pushValue_bool( ser, false)) goto ERRNOMEM; return true;
 		case IS_TRUE: if (!papuga_Serialization_pushValue_bool( ser, true)) goto ERRNOMEM; return true;
 		case IS_LONG: if (!papuga_Serialization_pushValue_int( ser, Z_LVAL_P( langval))) goto ERRNOMEM; return true;
+		case IS_CONSTANT:
 		case IS_STRING: if (!papuga_Serialization_pushValue_string( ser, Z_STRVAL_P( langval), Z_STRLEN_P( langval))) goto ERRNOMEM; return true;
 		case IS_DOUBLE: if (!papuga_Serialization_pushValue_double( ser, Z_DVAL_P( langval))) goto ERRNOMEM; return true;
 		case IS_NULL: if (!papuga_Serialization_pushValue_void( ser)) goto ERRNOMEM; return true;
@@ -286,6 +288,7 @@ static bool initValue( papuga_ValueVariant* hostval, papuga_Allocator* allocator
 		case IS_FALSE: papuga_init_ValueVariant_bool( hostval, false); return true;
 		case IS_TRUE: papuga_init_ValueVariant_bool( hostval, true); return true;
 		case IS_LONG: papuga_init_ValueVariant_int( hostval, Z_LVAL_P( langval)); return true;
+		case IS_CONSTANT:
 		case IS_STRING: papuga_init_ValueVariant_string( hostval, Z_STRVAL_P( langval), Z_STRLEN_P( langval)); return true;
 		case IS_DOUBLE: papuga_init_ValueVariant_double( hostval, Z_DVAL_P( langval)); return true;
 		case IS_NULL: papuga_init_ValueVariant( hostval); return true;
@@ -295,6 +298,234 @@ static bool initValue( papuga_ValueVariant* hostval, papuga_Allocator* allocator
 		case IS_REFERENCE:
 		default: *errcode = papuga_TypeError; return false;
 	}
+}
+
+static bool deserialize( zval* return_value, papuga_Allocator* allocator, const papuga_Serialization* serialization, const papuga_php_ClassEntryMap* cemap, papuga_ErrorCode* errcode);
+
+static bool valueVariantToZval( zval* return_value, papuga_Allocator* allocator, papuga_ValueVariant* value, const papuga_php_ClassEntryMap* cemap, const char* context)
+{
+	switch (value->valuetype)
+	{
+		case papuga_TypeVoid:
+			RETVAL_NULL();
+			break;
+		case papuga_TypeDouble:
+			RETVAL_DOUBLE( value->value.Double);
+			break;
+		case papuga_TypeUInt:
+			RETVAL_LONG( value->value.UInt);
+			break;
+		case papuga_TypeInt:
+			RETVAL_LONG( value->value.UInt);
+			break;
+		case papuga_TypeBool:
+			if (value->value.Bool)
+			{
+				RETVAL_TRUE;
+			}
+			else
+			{
+				RETVAL_FALSE;
+			}
+			break;
+		case papuga_TypeString:
+			if (value->length)
+			{
+				RETVAL_STRINGL( value->value.string, value->length);
+			}
+			else
+			{
+				RETVAL_EMPTY_STRING();
+			}
+			break;
+		case papuga_TypeLangString:
+		{
+			if (value->length)
+			{
+				papuga_ErrorCode errcode = papuga_Ok;
+				size_t strsize;
+				const char* str = papuga_ValueVariant_tostring( value, allocator, &strsize, &errcode);
+				if (!str)
+				{
+					papuga_php_error( "failed to convert unicode string in %s: %s", context, papuga_ErrorCode_tostring( errcode));
+					return false;
+				}
+				else
+				{
+					RETVAL_STRINGL( str, strsize);
+				}
+			}
+			else
+			{
+				RETVAL_EMPTY_STRING();
+			}
+			break;
+		}
+		case papuga_TypeHostObject:
+		{
+			papuga_HostObject* hobj = value->value.hostObject;
+			zend_class_entry* ce = get_class_entry( cemap, hobj->classid);
+			if (!ce)
+			{
+				papuga_php_error( "error in %s: %s", context, "undefined class id of object");
+				return false;
+			}
+			papuga_zend_object* zobj = papuga_php_create_object( ce);
+			if (!zobj)
+			{
+				papuga_php_error( "error in %s: %s", context, "failed to create zend object from host object");
+				return false;
+			}
+			object_init(return_value);
+			Z_OBJ_P(return_value) = zobj;
+			if (papuga_php_init_object( return_value, hobj))
+			{
+				papuga_release_HostObject(hobj);
+			}
+			else
+			{
+				papuga_php_error( "error in %s: %s", context, "failed to initialize zend object with host object");
+				return false;
+			}
+			break;
+		}
+		case papuga_TypeSerialization:
+		{
+			papuga_ErrorCode errcode = papuga_Ok;
+			object_init(return_value);
+			if (!deserialize( return_value, allocator, value->value.serialization, cemap, &errcode))
+			{
+				papuga_php_error( "error in %s: %s", context, papuga_ErrorCode_tostring( errcode));
+				return false;
+			}
+			break;
+		}
+		case papuga_TypeIterator:
+		{
+			papuga_Iterator* itr = value->value.iterator;
+			//pushIterator( return_value, itr->data, itr->destroy, itr->getNext, classnamemap);
+			papuga_release_Iterator( itr);
+			break;
+		}
+		default:
+			papuga_php_error( "unknown value type in %s", context);
+	}
+	return true;
+}
+
+static bool deserialize_value( zval* return_value, papuga_Allocator* allocator, papuga_ValueVariant* value, const papuga_php_ClassEntryMap* cemap)
+{
+	return valueVariantToZval( return_value, allocator, value, cemap, "deserialization of structure");
+}
+
+static bool zval_structure_addnode( zval* structure, papuga_Allocator* allocator, const papuga_ValueVariant* name, zval* value)
+{
+	if (name)
+	{
+		if (papuga_ValueVariant_isnumeric( name))
+		{
+			papuga_ErrorCode errcode = papuga_Ok;
+			uint64_t index = papuga_ValueVariant_touint( name, &errcode);
+			if (!index && errcode != papuga_Ok)
+			{
+				papuga_php_error( "cannot build uint index for key in serialization: %s", papuga_ErrorCode_tostring( errcode));
+				return false;
+			}
+			add_index_zval( structure, index, value);
+		}
+		else if (papuga_ValueVariant_isstring( name))
+		{
+			papuga_ErrorCode errcode = papuga_Ok;
+			size_t propkeylen;
+			const char* propkey = papuga_ValueVariant_tostring( name, allocator, &propkeylen, &errcode);
+			if (!propkey)
+			{
+				papuga_php_error( "cannot build string key in serialization: %s", papuga_ErrorCode_tostring( errcode));
+				return false;
+			}
+			add_assoc_zval_ex( structure, propkey, propkeylen, value);
+		}
+	}
+	else
+	{
+		add_next_index_zval( structure, value);
+	}
+	return true;
+}
+
+static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, papuga_Node* ni, const papuga_Node* ne, const papuga_php_ClassEntryMap* cemap)
+{
+	const papuga_ValueVariant* name = 0;
+	for (; ni != ne && ni->tag != papuga_TagClose; ++ni)
+	{
+		if (ni->tag == papuga_TagName)
+		{
+			if (name)
+			{
+				zend_error( E_ERROR, "duplicate name tag in serialization");
+				return false;
+			}
+			name = &ni->value;
+			if (!papuga_ValueVariant_isatomic( name))
+			{
+				zend_error( E_ERROR, "atomic value expected for key element in serialization");
+				return false;
+			}
+		}
+		else if (ni->tag == papuga_TagOpen)
+		{
+			zval substructure;
+			array_init( &substructure);
+			if (!deserialize_nodes( &substructure, allocator, ++ni, ne, cemap))
+			{
+				zval_dtor( &substructure);
+				return false;
+			}
+			if (!zval_structure_addnode( return_value, allocator, name, &substructure))
+			{
+				zval_dtor( &substructure);
+				return false;
+			}
+			name = NULL;
+			if (ni == ne) papuga_php_error( "structure deserialization failed: %s", papuga_ErrorCode_tostring( papuga_UnexpectedEof));
+			if (ni->tag != papuga_TagClose) zend_error( E_ERROR, "close expected after structure in serialization");
+			++ni;
+		}
+		else if (ni->tag == papuga_TagValue)
+		{
+			zval item;
+			if (!deserialize_value( &item, allocator, &ni->value, cemap))
+			{
+				zval_dtor( &item);
+				return false;
+			}
+			if (!zval_structure_addnode( return_value, allocator, name, &item))
+			{
+				zval_dtor( &item);
+				return false;
+			}
+			name = NULL;
+		}
+		else
+		{
+			zend_error( E_ERROR, "unknown tag in structure deserialization");
+		}
+	}
+	return true;
+}
+
+static bool deserialize( zval* return_value, papuga_Allocator* allocator, const papuga_Serialization* serialization, const papuga_php_ClassEntryMap* cemap, papuga_ErrorCode* errcode)
+{
+#ifdef PAPUGA_LOWLEVEL_DEBUG
+	char* str = papuga_Serialization_tostring( ser);
+	if (ser)
+	{
+		fprintf( stderr, "DESERIALIZE STRUCT:\n%s\n", str);
+	}
+#endif
+	papuga_Node* ni = serialization->ar;
+	papuga_Node* ne = ni + serialization->arsize;
+	return deserialize_nodes( return_value, allocator, ni, ne, cemap);
 }
 
 DLL_PUBLIC bool papuga_php_init_CallArgs( void* selfzval, int argc, papuga_php_CallArgs* as)
@@ -363,99 +594,7 @@ DLL_PUBLIC void papuga_php_move_CallResult( void* zval_return_value, papuga_Call
 	{
 		zend_error( E_ERROR, retval->errorbuf.ptr);
 	}
-	else switch (retval->value.valuetype)
-	{
-		case papuga_TypeVoid:
-			RETVAL_NULL();
-			break;
-		case papuga_TypeDouble:
-			RETVAL_DOUBLE( retval->value.value.Double);
-			break;
-		case papuga_TypeUInt:
-			RETVAL_LONG( retval->value.value.UInt);
-			break;
-		case papuga_TypeInt:
-			RETVAL_LONG( retval->value.value.UInt);
-			break;
-		case papuga_TypeBool:
-			if (retval->value.value.Bool)
-			{
-				RETVAL_TRUE;
-			}
-			else
-			{
-				RETVAL_FALSE;
-			}
-			break;
-		case papuga_TypeString:
-			if (retval->value.length)
-			{
-				RETVAL_STRINGL( retval->value.value.string, retval->value.length);
-			}
-			else
-			{
-				RETVAL_EMPTY_STRING();
-			}
-			break;
-		case papuga_TypeLangString:
-		{
-			if (retval->value.length)
-			{
-				papuga_ErrorCode errcode = papuga_Ok;
-				size_t strsize;
-				const char* str = papuga_ValueVariant_tostring( &retval->value, &retval->allocator, &strsize, &errcode);
-				if (!str)
-				{
-					papuga_php_error( "failed to convert unicode string: %s", papuga_ErrorCode_tostring( errcode));
-				}
-				else
-				{
-					RETVAL_STRINGL( str, strsize);
-				}
-			}
-			else
-			{
-				RETVAL_EMPTY_STRING();
-			}
-			break;
-		}
-		case papuga_TypeHostObject:
-		{
-			papuga_HostObject* hobj = retval->value.value.hostObject;
-			zend_class_entry* ce = get_class_entry( cemap, hobj->classid);
-			if (!ce)
-			{
-				zend_error( E_ERROR, "undefined class id of object returned");
-				break;
-			}
-			papuga_zend_object* zobj = papuga_php_create_object( ce);
-			if (!zobj)
-			{
-				zend_error( E_ERROR, "failed to create zend object from host object");
-				break;
-			}
-			object_init(return_value);
-			Z_OBJ_P(return_value) = zobj;
-			papuga_php_init_object(return_value, hobj);
-			papuga_release_HostObject(hobj);
-			break;
-		}
-		case papuga_TypeSerialization:
-			object_init(return_value);
-			//deserialize( return_value, retval->value.value.serialization, resultobj, cemap);
-			break;
-		case papuga_TypeIterator:
-		{
-			papuga_Iterator* itr = retval->value.value.iterator;
-			//pushIterator( return_value, itr->data, itr->destroy, itr->getNext, classnamemap);
-			papuga_release_Iterator( itr);
-			break;
-		}
-		default:
-			papuga_destroy_CallResult( retval);
-			zend_error( E_ERROR, "unknown return value type");
-			return;
-	}
+	(void)valueVariantToZval( return_value, &retval->allocator, &retval->value, cemap, "assign return value");
 	papuga_destroy_CallResult( retval);
 }
 
