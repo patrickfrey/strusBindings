@@ -80,7 +80,7 @@ ZEND_GET_MODULE({{project}})
 $END$
 
 template zend_method_impl_c=constructor $END$ {{ }}
-PHP_METHOD({{classname}}, __construct)
+PHP_METHOD({{Project}}{{classname}}, __construct)
 {
     papuga_HostObject thisHostObject;
     papuga_php_CallArgs argstruct;
@@ -103,7 +103,7 @@ PHP_METHOD({{classname}}, __construct)
     {
         msg = papuga_ErrorBuffer_lastError( &errbuf);
         papuga_php_destroy_CallArgs( &argstruct);
-        papuga_php_error( "error calling constructor of %s: %s", "{{classname}}", msg?msg:"unknown error");
+        papuga_php_error( "error calling constructor of %s: %s", "{{Project}}{{classname}}", msg?msg:"unknown error");
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
@@ -111,14 +111,14 @@ PHP_METHOD({{classname}}, __construct)
     papuga_init_HostObject( &thisHostObject, STRUS_BINDINGS_CLASSID_{{classname}}, self, &_{{project}}_bindings_destructor__{{classname}});
     if (!papuga_php_init_object( thiszval, &thisHostObject))
     {
-        papuga_php_error( "error calling constructor of %s: %s", "{{classname}}", "object initialization failed");
+        papuga_php_error( "error calling constructor of %s: %s", "{{Project}}{{classname}}", "object initialization failed");
         return;
     }
 }
 $END$
 
 template zend_method_impl_c=method $END$ {{ }}
-PHP_METHOD({{classname}}, {{methodname}})
+PHP_METHOD({{Project}}{{classname}}, {{methodname}})
 {
     papuga_php_CallArgs argstruct;
     papuga_CallResult retstruct;
@@ -126,7 +126,7 @@ PHP_METHOD({{classname}}, {{methodname}})
     const char* msg;
     int argc = ZEND_NUM_ARGS();
 
-    /*[-]*/fprintf( stderr, "CALL METHOD {{classname}}::{{methodname}}\n");
+    /*[-]*/fprintf( stderr, "CALL METHOD {{Project}}{{classname}}::{{methodname}}\n");
     zval *obj = getThis();
     if (!papuga_php_init_CallArgs( (void*)obj, argc, &argstruct))
     {
@@ -141,7 +141,7 @@ PHP_METHOD({{classname}}, {{methodname}})
         msg = papuga_CallResult_lastError( &retstruct);
         papuga_php_destroy_CallArgs( &argstruct);
         papuga_destroy_CallResult( &retstruct);
-        papuga_php_error( "error calling method %s::%s: %s", "{{classname}}", "{{methodname}}", msg?msg:"unknown error");
+        papuga_php_error( "error calling method %s::%s: %s", "{{Project}}{{classname}}", "{{methodname}}", msg?msg:"unknown error");
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
@@ -154,7 +154,7 @@ zend_class_entry* g_{{classname}}_ce = 0;
 $END$
 
 template zend_class_entry_init_c=class $END$ {{ }}
-    INIT_CLASS_ENTRY(tmp_ce, "{{classname}}", {{classname}}_methods);
+    INIT_CLASS_ENTRY(tmp_ce, "{{Project}}{{classname}}", {{classname}}_methods);
     g_{{classname}}_ce = zend_register_internal_class( &tmp_ce TSRMLS_CC);
     g_{{classname}}_ce->create_object = &create_zend_object_wrapper;
     g_class_entry_list[ STRUS_BINDINGS_CLASSID_{{classname}}-1] = g_{{classname}}_ce;
@@ -169,18 +169,18 @@ const zend_function_entry {{classname}}_methods[] = {
 $END$
 
 template zend_php_constructor_decl_c=constructor $END$ {{ }}
-    PHP_ME({{classname}},  __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    PHP_ME({{Project}}{{classname}},  __construct, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
 $END$
 
 template zend_php_method_decl_c=method $END$ {{ }}
-    PHP_ME( {{classname}}, {{methodname}}, NULL, ZEND_ACC_PUBLIC)
+    PHP_ME({{Project}}{{classname}}, {{methodname}}, NULL, ZEND_ACC_PUBLIC)
 $END$
 
 namespace classname=class
 variable methodname=method
-variable Project=project
+namespace Project=project
 namespace project=project   locase
-variable PROJECT=project    upcase
+namespace PROJECT=project    upcase
 variable release
 # variable classname=class
 # variable param[0]

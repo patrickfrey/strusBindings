@@ -251,7 +251,7 @@ ERRNOMEM:
 
 static bool initArray( papuga_ValueVariant* hostval, papuga_Allocator* allocator, zval* langval, papuga_ErrorCode* errcode)
 {
-	papuga_Serialization* ser = (papuga_Serialization*)papuga_Allocator_alloc( allocator, sizeof(papuga_Serialization), 0);
+	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( allocator);
 	if (!ser)
 	{
 		*errcode = papuga_NoMemError;
@@ -392,7 +392,7 @@ static bool valueVariantToZval( zval* return_value, papuga_Allocator* allocator,
 		case papuga_TypeSerialization:
 		{
 			papuga_ErrorCode errcode = papuga_Ok;
-			object_init(return_value);
+			array_init(return_value);
 			if (!deserialize( return_value, allocator, value->value.serialization, cemap, &errcode))
 			{
 				papuga_php_error( "error in %s: %s", context, papuga_ErrorCode_tostring( errcode));
@@ -402,9 +402,8 @@ static bool valueVariantToZval( zval* return_value, papuga_Allocator* allocator,
 		}
 		case papuga_TypeIterator:
 		{
-			papuga_Iterator* itr = value->value.iterator;
-			//pushIterator( return_value, itr->data, itr->destroy, itr->getNext, classnamemap);
-			papuga_release_Iterator( itr);
+			//papuga_Iterator* itr = value->value.iterator;
+			papuga_php_error( "iterator not implemented for PHP");
 			break;
 		}
 		default:
@@ -453,8 +452,9 @@ static bool zval_structure_addnode( zval* structure, papuga_Allocator* allocator
 	return true;
 }
 
-static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, papuga_Node* ni, const papuga_Node* ne, const papuga_php_ClassEntryMap* cemap)
+static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, papuga_Node** ni_p, const papuga_Node* ne, const papuga_php_ClassEntryMap* cemap)
 {
+	papuga_Node* ni = *ni_p;
 	const papuga_ValueVariant* name = 0;
 	for (; ni != ne && ni->tag != papuga_TagClose; ++ni)
 	{
@@ -463,12 +463,14 @@ static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, 
 			if (name)
 			{
 				zend_error( E_ERROR, "duplicate name tag in serialization");
+				*ni_p = ni;
 				return false;
 			}
 			name = &ni->value;
 			if (!papuga_ValueVariant_isatomic( name))
 			{
 				zend_error( E_ERROR, "atomic value expected for key element in serialization");
+				*ni_p = ni;
 				return false;
 			}
 		}
@@ -476,14 +478,17 @@ static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, 
 		{
 			zval substructure;
 			array_init( &substructure);
-			if (!deserialize_nodes( &substructure, allocator, ++ni, ne, cemap))
+			++ni;
+			if (!deserialize_nodes( &substructure, allocator, &ni, ne, cemap))
 			{
 				zval_dtor( &substructure);
+				*ni_p = ni;
 				return false;
 			}
 			if (!zval_structure_addnode( return_value, allocator, name, &substructure))
 			{
 				zval_dtor( &substructure);
+				*ni_p = ni;
 				return false;
 			}
 			name = NULL;
@@ -497,11 +502,13 @@ static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, 
 			if (!deserialize_value( &item, allocator, &ni->value, cemap))
 			{
 				zval_dtor( &item);
+				*ni_p = ni;
 				return false;
 			}
 			if (!zval_structure_addnode( return_value, allocator, name, &item))
 			{
 				zval_dtor( &item);
+				*ni_p = ni;
 				return false;
 			}
 			name = NULL;
@@ -511,6 +518,7 @@ static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, 
 			zend_error( E_ERROR, "unknown tag in structure deserialization");
 		}
 	}
+	*ni_p = ni;
 	return true;
 }
 
@@ -525,7 +533,12 @@ static bool deserialize( zval* return_value, papuga_Allocator* allocator, const 
 #endif
 	papuga_Node* ni = serialization->ar;
 	papuga_Node* ne = ni + serialization->arsize;
-	return deserialize_nodes( return_value, allocator, ni, ne, cemap);
+	bool rt = deserialize_nodes( return_value, allocator, &ni, ne, cemap);
+	if (rt && ni != ne)
+	{
+		zend_error( E_ERROR, "unexpected tokens at end of serialization");
+	}
+	return rt;
 }
 
 DLL_PUBLIC bool papuga_php_init_CallArgs( void* selfzval, int argc, papuga_php_CallArgs* as)

@@ -132,6 +132,7 @@ end
 
 function getFileParentDirectory( filepath)
 	local pathar = getPathArray( filepath)
+	table.remove( pathar)
 	return "/" .. table.concat( pathar, "/")
 end
 
@@ -161,8 +162,8 @@ end
 function getContextConfig( argval)
 	if argval == 'trace' then
 		return {trace={log="dump",file="stdout"}}
-	elseif arg[3] then
-		return {rpc=arg[3]}
+	elseif argval then
+		return {rpc=argval}
 	else
 		return nil
 	end

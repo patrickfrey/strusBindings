@@ -13,7 +13,7 @@ set( bindingsimpl_source_files
 	valueVariantWrap.cpp
 	utils.cpp
 	traceUtils.cpp
-	internationalization.cpp
+	${CMAKE_BINARY_DIR}/src/bindings/internationalization.cpp
 	impl/value/termExpression.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp
