@@ -494,7 +494,6 @@ static bool deserialize_nodes( zval* return_value, papuga_Allocator* allocator, 
 			name = NULL;
 			if (ni == ne) papuga_php_error( "structure deserialization failed: %s", papuga_ErrorCode_tostring( papuga_UnexpectedEof));
 			if (ni->tag != papuga_TagClose) zend_error( E_ERROR, "close expected after structure in serialization");
-			++ni;
 		}
 		else if (ni->tag == papuga_TagValue)
 		{
@@ -607,7 +606,73 @@ DLL_PUBLIC void papuga_php_move_CallResult( void* zval_return_value, papuga_Call
 	{
 		zend_error( E_ERROR, retval->errorbuf.ptr);
 	}
-	(void)valueVariantToZval( return_value, &retval->allocator, &retval->value, cemap, "assign return value");
+	if (retval->value.valuetype == papuga_TypeSerialization)
+	{
+		papuga_Node* ni = retval->value.value.serialization->ar;
+		papuga_Node* ne = ni + retval->value.value.serialization->arsize;
+	
+		if (ni == ne)
+		{
+			RETVAL_FALSE;
+		}
+		// Complicated decision making because PHP does not support multiple return values:
+		else if (ni->tag == papuga_TagValue)
+		{
+			if (ni + 1 == ne)
+			{
+				//... one value in serialization => one return value
+				(void)deserialize_value( return_value, &retval->allocator, &ni->value, cemap);
+			}
+			else
+			{
+				//... more than one value in serialization => array with values as return value
+				(void)valueVariantToZval( return_value, &retval->allocator, &retval->value, cemap, "assign return values");
+			}
+		}
+		else if (ni->tag == papuga_TagOpen)
+		{
+			zval substructure;
+			array_init( &substructure);
+			++ni;
+			if (!deserialize_nodes( &substructure, &retval->allocator, &ni, ne, cemap))
+			{
+				zval_dtor( &substructure);
+				goto EXITFUNC;
+			}
+			if (ni == ne) papuga_php_error( "structure deserialization failed: %s", papuga_ErrorCode_tostring( papuga_UnexpectedEof));
+			if (ni->tag != papuga_TagClose) zend_error( E_ERROR, "close expected after structure in serialization");
+			++ni;
+			if (ni == ne)
+			{
+				//... one structure in serialization => one return structure
+				RETVAL_ZVAL( &substructure, 0, 1);
+			}
+			else
+			{
+				//... more than one structure in serialization => array with values as return value
+				array_init(return_value);
+				if (!zval_structure_addnode( return_value, &retval->allocator, 0, &substructure))
+				{
+					zval_dtor( &substructure);
+					goto EXITFUNC;
+				}
+				if (!deserialize_nodes( return_value, &retval->allocator, &ni, ne, cemap))
+				{
+					goto EXITFUNC;
+				}
+			}
+			goto EXITFUNC;
+		}
+		else
+		{
+			(void)valueVariantToZval( return_value, &retval->allocator, &retval->value, cemap, "assign return value");
+		}
+	}
+	else
+	{
+		(void)valueVariantToZval( return_value, &retval->allocator, &retval->value, cemap, "assign return value");
+	}
+EXITFUNC:
 	papuga_destroy_CallResult( retval);
 }
 

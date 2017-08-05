@@ -40,13 +40,13 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 			$content = readFileContent( $filename);
 			$docclass = $strusctx->detectDocumentClass( $content);
 			$doc = $analyzer->analyzeSingle( $content);
-			$doc->attribute->docid = $fnam;
-			$doc->attribute->docclass =
+			$doc['attribute']['docid'] = $fnam;
+			$doc['attribute']['docclass'] =
 				"mimetype='" . $docclass->mimetype . "'"
 				. ", encoding='" . $docclass->encoding . "'"
 				. ", scheme='" . $docclass->scheme . "'";
-			if ($aclmap) {
-				$doc->access = $aclmap[ $doc->attribute.docid];
+			if ($aclmap && isset($aclmap[ $doc->attribute.docid])) {
+				$doc['access'] = $aclmap[ $doc->attribute.docid];
 			}
 			$transaction->insertDocument( $fnam, $doc);
 		}

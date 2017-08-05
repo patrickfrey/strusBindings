@@ -39,6 +39,14 @@ static inline bool add_node( papuga_Serialization* self, const papuga_Node* nd)
 	return true;
 }
 
+static inline bool add_node_copy( papuga_Serialization* self, size_t nodei)
+{
+	if (!alloc_nodes( self, 1)) return false;
+	memcpy( self->ar + self->arsize, self->ar + nodei, sizeof(papuga_Node));
+	self->arsize += 1;
+	return true;
+}
+
 static inline bool add_nodes( papuga_Serialization* self, const papuga_Node* ar, size_t arsize)
 {
 	if (!alloc_nodes( self, arsize)) return false;
@@ -171,7 +179,11 @@ bool papuga_Serialization_convert_array_assoc( papuga_Serialization* self, size_
 				rt &= papuga_Serialization_pushOpen( self);
 				for (bcnt=1,++ai; ai != ae && bcnt; ++ai)
 				{
-					add_node( self, &self->ar[ ai]);
+					if (!add_node_copy( self, ai))
+					{
+						self->arsize = ae;
+						return false;
+					}
 					if (self->ar[ ai].tag == papuga_TagClose)
 					{
 						--bcnt;
@@ -188,7 +200,11 @@ bool papuga_Serialization_convert_array_assoc( papuga_Serialization* self, size_
 				goto CONVERR;
 			case papuga_TagValue:
 				rt &= papuga_Serialization_pushName_uint( self, countfrom++);
-				rt &= papuga_Serialization_pushValue( self, &self->ar[ ai].value);
+				if (!add_node_copy( self, ai))
+				{
+					self->arsize = ae;
+					return false;
+				}
 				break;
 		}
 	}
@@ -199,7 +215,7 @@ bool papuga_Serialization_convert_array_assoc( papuga_Serialization* self, size_
 	}
 	size_t nn = self->arsize - ae; /*... number of new elements added */
 	memmove( self->ar + arraystart, self->ar + ae, nn);
-	self->arsize -= (ae - arraystart);
+	self->arsize = arraystart + nn;
 	return true;
 CONVERR:
 	self->arsize = ae;

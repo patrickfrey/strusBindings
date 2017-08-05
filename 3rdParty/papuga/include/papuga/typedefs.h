@@ -90,7 +90,7 @@ typedef enum papuga_StringEncoding {
 	papuga_UTF32		///< Unicode chars in machine endianess encoding
 } papuga_StringEncoding;
 
-/// \brief Node type tag of a papuga serialization node
+/// \brief Tag identifier of a papuga serialization node
 typedef enum papuga_Tag
 {
 	papuga_TagOpen,		///< Open a scope

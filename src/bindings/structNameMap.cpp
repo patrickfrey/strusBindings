@@ -51,6 +51,6 @@ int StructureNameMap::index( const papuga_ValueVariant& id) const
 		if (!papuga_ValueVariant_toascii( buf, sizeof(buf), &id)) return Undefined;
 		return index( buf, id.length);
 	}
-	return false;
+	return Undefined;
 }
 
