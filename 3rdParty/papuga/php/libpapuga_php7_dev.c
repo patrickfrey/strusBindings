@@ -50,7 +50,7 @@ typedef struct ClassObject {
 } ClassObject;
 
 #define KNUTH_HASH 2654435761U
-static int calcCheckSum( const ClassObject* cobj)
+static int calcObjectCheckSum( const ClassObject* cobj)
 {
 	return ((((cobj->hobj.classid+107) * KNUTH_HASH) ^ (uintptr_t)cobj->hobj.data) ^ (uintptr_t)cobj->hobj.destroy);
 }
@@ -60,9 +60,29 @@ static ClassObject* getClassObject( zend_object* object)
 	return (ClassObject*)((char *)object - XtOffsetOf( ClassObject, zobj));
 }
 
-static zend_object_handlers g_papuga_ce_handlers;
+typedef struct IteratorObject {
+	papuga_Iterator iterator;
+	zval resultval;
+	int checksum;
+	zend_object zobj;
+	bool eof;
+} IteratorObject;
 
-papuga_zend_object* papuga_php_create_object(
+static int calcIteratorCheckSum( const IteratorObject* iobj)
+{
+	return (((uintptr_t)iobj->iterator.data+107) * KNUTH_HASH) ^ (uintptr_t)iobj->iterator.destroy ^ ((uintptr_t)iobj->iterator.getNext << 6);
+}
+
+static IteratorObject* getIteratorObject( zend_object* object)
+{
+	return (IteratorObject*)((char *)object - XtOffsetOf( IteratorObject, zobj));
+}
+
+static zend_object_handlers g_papuga_object_ce_handlers;
+static zend_object_handlers g_papuga_iterator_ce_handlers;
+static zend_class_entry* g_zend_class_entry_iterator = 0;
+
+DLL_PUBLIC papuga_zend_object* papuga_php_create_object(
 	papuga_zend_class_entry* ce)
 {
 	ClassObject *cobj;
@@ -70,28 +90,28 @@ papuga_zend_object* papuga_php_create_object(
 	cobj = (ClassObject*)ecalloc(1, sizeof(ClassObject) + zend_object_properties_size(ce));
 	if (!cobj) return NULL;
 	papuga_init_HostObject( &cobj->hobj, 0, NULL/*data*/, NULL/*destroy*/);
-	cobj->checksum = calcCheckSum( cobj);
+	cobj->checksum = calcObjectCheckSum( cobj);
 	zend_object_std_init( &cobj->zobj, ce);
 	object_properties_init( &cobj->zobj, ce);
 
-	cobj->zobj.handlers = &g_papuga_ce_handlers;
+	cobj->zobj.handlers = &g_papuga_object_ce_handlers;
 	return &cobj->zobj;
 }
 
-bool papuga_php_init_object( void* selfzval, papuga_HostObject* hobj)
+DLL_PUBLIC bool papuga_php_init_object( void* selfzval, papuga_HostObject* hobj)
 {
 	zval* sptr = (zval*)selfzval;
 	if (Z_TYPE_P(sptr) == IS_OBJECT)
 	{
 		zend_object* zobj = Z_OBJ_P( sptr);
 		ClassObject *cobj = getClassObject( zobj);
-		if (cobj->checksum != calcCheckSum( cobj))
+		if (cobj->checksum != calcObjectCheckSum( cobj))
 		{
 			papuga_destroy_HostObject( hobj);
 			return false;
 		}
 		papuga_init_HostObject( &cobj->hobj, hobj->classid, hobj->data, hobj->destroy);
-		cobj->checksum = calcCheckSum( cobj);
+		cobj->checksum = calcObjectCheckSum( cobj);
 		return true;
 	}
 	else
@@ -101,15 +121,19 @@ bool papuga_php_init_object( void* selfzval, papuga_HostObject* hobj)
 	}
 }
 
-static void destroy_papuga_zend_object( zend_object *object)
+static void destroy_papuga_object_zend_object( zend_object *object)
 {
+	/*[-]*/fprintf( stderr, "CALL destroy_papuga_object_zend_object\n");
+	/*[-]*/fflush(stderr);
 	zend_objects_destroy_object( object);
 }
 
-static void free_papuga_zend_object( zend_object *object)
+static void free_papuga_object_zend_object( zend_object *object)
 {
+	/*[-]*/fprintf(stderr,"CALL free_papuga_object_zend_object\n");
+	/*[-]*/fflush(stderr);
 	ClassObject *cobj = getClassObject( object);
-	if (cobj->checksum != calcCheckSum( cobj))
+	if (cobj->checksum != calcObjectCheckSum( cobj))
 	{
 		fprintf( stderr, "bad free of papuga object in zend engine\n");
 	}
@@ -117,13 +141,41 @@ static void free_papuga_zend_object( zend_object *object)
 	zend_object_std_dtor(object);
 }
 
-void papuga_php_init()
+static void destroy_papuga_iterator_zend_object( zend_object *object)
 {
-	memcpy( &g_papuga_ce_handlers, zend_get_std_object_handlers(), sizeof(g_papuga_ce_handlers));
+	/*[-]*/fprintf(stderr,"CALL destroy_papuga_iterator_zend_object\n");
+	/*[-]*/fflush(stderr);
+	zend_objects_destroy_object( object);
+}
 
-	g_papuga_ce_handlers.free_obj = &free_papuga_zend_object;
-	g_papuga_ce_handlers.dtor_obj = destroy_papuga_zend_object;
-	g_papuga_ce_handlers.offset = XtOffsetOf( ClassObject, zobj);
+static void free_papuga_iterator_zend_object( zend_object *object)
+{
+	/*[-]*/fprintf(stderr,"CALL free_papuga_iterator_zend_object\n");
+	/*[-]*/fflush(stderr);
+	IteratorObject *iobj = getIteratorObject( object);
+	if (iobj->checksum != calcIteratorCheckSum( iobj))
+	{
+		fprintf( stderr, "bad free of papuga iterator in zend engine\n");
+	}
+	papuga_destroy_Iterator( &iobj->iterator);
+	zend_object_std_dtor(object);
+}
+
+static void initIteratorZendClassEntry();
+
+DLL_PUBLIC void papuga_php_init()
+{
+	memcpy( &g_papuga_object_ce_handlers, zend_get_std_object_handlers(), sizeof(g_papuga_object_ce_handlers));
+	g_papuga_object_ce_handlers.free_obj = &free_papuga_object_zend_object;
+	g_papuga_object_ce_handlers.dtor_obj = &destroy_papuga_object_zend_object;
+	g_papuga_object_ce_handlers.offset = XtOffsetOf( ClassObject, zobj);
+
+	memcpy( &g_papuga_iterator_ce_handlers, zend_get_std_object_handlers(), sizeof(g_papuga_iterator_ce_handlers));
+	g_papuga_iterator_ce_handlers.free_obj = &free_papuga_iterator_zend_object;
+	g_papuga_iterator_ce_handlers.dtor_obj = &destroy_papuga_iterator_zend_object;
+	g_papuga_iterator_ce_handlers.offset = XtOffsetOf( IteratorObject, zobj);
+
+	initIteratorZendClassEntry();
 }
 
 static bool serializeValue( papuga_Serialization* ser, zval* langval, papuga_ErrorCode* errcode);
@@ -211,7 +263,7 @@ static bool serializeObject( papuga_Serialization* ser, zval* langval, papuga_Er
 {
 	zend_object* zobj = Z_OBJ_P( langval);
 	ClassObject *cobj = getClassObject( zobj);
-	if (cobj->checksum != calcCheckSum( cobj))
+	if (cobj->checksum != calcObjectCheckSum( cobj))
 	{
 		*errcode = papuga_InvalidAccess;
 		return false;
@@ -271,7 +323,7 @@ static bool initObject( papuga_ValueVariant* hostval, zval* langval, papuga_Erro
 {
 	zend_object* zobj = Z_OBJ_P( langval);
 	ClassObject *cobj = getClassObject( zobj);
-	if (cobj->checksum != calcCheckSum( cobj))
+	if (cobj->checksum != calcObjectCheckSum( cobj))
 	{
 		*errcode = papuga_InvalidAccess;
 		return false;
@@ -301,6 +353,8 @@ static bool initValue( papuga_ValueVariant* hostval, papuga_Allocator* allocator
 }
 
 static bool deserialize( zval* return_value, papuga_Allocator* allocator, const papuga_Serialization* serialization, const papuga_php_ClassEntryMap* cemap, papuga_ErrorCode* errcode);
+
+static bool iteratorToZval( zval* return_value, papuga_Iterator* iterator);
 
 static bool valueVariantToZval( zval* return_value, papuga_Allocator* allocator, papuga_ValueVariant* value, const papuga_php_ClassEntryMap* cemap, const char* context)
 {
@@ -364,6 +418,11 @@ static bool valueVariantToZval( zval* return_value, papuga_Allocator* allocator,
 		case papuga_TypeHostObject:
 		{
 			papuga_HostObject* hobj = value->value.hostObject;
+			if (!cemap)
+			{
+				papuga_php_error( "cannot create host object in this context");
+				return false;
+			}
 			zend_class_entry* ce = get_class_entry( cemap, hobj->classid);
 			if (!ce)
 			{
@@ -402,8 +461,16 @@ static bool valueVariantToZval( zval* return_value, papuga_Allocator* allocator,
 		}
 		case papuga_TypeIterator:
 		{
-			//papuga_Iterator* itr = value->value.iterator;
-			papuga_php_error( "iterator not implemented for PHP");
+			papuga_Iterator* itr = value->value.iterator;
+			if (iteratorToZval( return_value, itr))
+			{
+				papuga_release_Iterator( itr);
+			}
+			else
+			{
+				papuga_php_error( "failed to create iterator in %s", context);
+				return false;
+			}
 			break;
 		}
 		default:
@@ -557,7 +624,7 @@ DLL_PUBLIC bool papuga_php_init_CallArgs( void* selfzval, int argc, papuga_php_C
 			zend_object* zobj = Z_OBJ_P( sptr);
 			ClassObject *cobj = getClassObject( zobj);
 
-			if (cobj->checksum != calcCheckSum( cobj))
+			if (cobj->checksum != calcObjectCheckSum( cobj))
 			{
 				as->errcode = papuga_InvalidAccess;
 				return false;
@@ -596,11 +663,17 @@ ERROR:
 
 DLL_PUBLIC void papuga_php_destroy_CallArgs( papuga_php_CallArgs* arg)
 {
+	/*[-]*/fprintf(stderr,"CALL papuga_php_destroy_CallArgs\n");
+	/*[-]*/fflush(stderr);
 	papuga_destroy_Allocator( &arg->allocator);
+	/*[-]*/fprintf(stderr,"DONE papuga_php_destroy_CallArgs\n");
+	/*[-]*/fflush(stderr);
 }
 
 DLL_PUBLIC void papuga_php_move_CallResult( void* zval_return_value, papuga_CallResult* retval, const papuga_php_ClassEntryMap* cemap)
 {
+	/*[-]*/fprintf(stderr,"CALL papuga_php_move_CallResult\n");
+	/*[-]*/fflush(stderr);
 	zval* return_value = (zval*)zval_return_value;
 	if (papuga_CallResult_hasError( retval))
 	{
@@ -673,11 +746,15 @@ DLL_PUBLIC void papuga_php_move_CallResult( void* zval_return_value, papuga_Call
 		(void)valueVariantToZval( return_value, &retval->allocator, &retval->value, cemap, "assign return value");
 	}
 EXITFUNC:
+	/*[-]*/fprintf(stderr,"CALL papuga_destroy_CallResult\n");
+	/*[-]*/fflush(stderr);
 	papuga_destroy_CallResult( retval);
 }
 
 DLL_PUBLIC void papuga_php_error( const char* fmt, ...)
 {
+	/*[-]*/fprintf(stderr,"CALL papuga_php_error\n");
+	/*[-]*/fflush(stderr);
 	va_list al;
 	va_start( al, fmt);
 	char buf[ 2048];
@@ -685,9 +762,150 @@ DLL_PUBLIC void papuga_php_error( const char* fmt, ...)
 	{
 		buf[ sizeof(buf)-1] = 0;
 	}
-	zend_error( E_ERROR, buf);
 	va_end( al);
+	zend_error( E_ERROR, buf);
+	/*[-]*/fprintf(stderr,"DONE papuga_php_error\n");
+	/*[-]*/fflush(stderr);
 }
 
+static void iteratorFetchNext( IteratorObject* iobj)
+{
+	/*[-]*/fprintf(stderr, "CALL iteratorFetchNext\n");
+	/*[-]*/fflush(stderr);
+	papuga_CallResult retstruct;
+	char errstr[ 2048];
+	const char* msg;
 
+	papuga_init_CallResult( &retstruct, errstr, sizeof(errstr));
+	if (iobj->iterator.getNext( iobj->iterator.data, &retstruct))
+	{
+		//zval_dtor( &iobj->resultval);
+		papuga_php_move_CallResult( &iobj->resultval, &retstruct, 0/*classentry map*/);
+		iobj->eof = false;
+	}
+	else
+	{
+		if (papuga_CallResult_hasError( &retstruct))
+		{
+			msg = papuga_CallResult_lastError( &retstruct);
+			papuga_destroy_CallResult( &retstruct);
+			papuga_php_error( "error calling method %s: %s", "PapugaIterator::next", msg?msg:"unknown error");
+		}
+	}
+}
+
+static bool iteratorToZval( zval* return_value, papuga_Iterator* iterator)
+{
+	/*[-]*/fprintf(stderr, "CALL iteratorToZval\n");
+	/*[-]*/fflush(stderr);
+	IteratorObject *iobj = (IteratorObject*)ecalloc(1, sizeof(IteratorObject) + zend_object_properties_size(g_zend_class_entry_iterator));
+	if (!iobj)
+	{
+		papuga_destroy_Iterator( iterator);
+		return false;
+	}
+	papuga_init_Iterator( &iobj->iterator, iterator->data, iterator->destroy, iterator->getNext);
+	iobj->checksum = calcIteratorCheckSum( iobj);
+	zend_object_std_init( &iobj->zobj, g_zend_class_entry_iterator);
+	object_properties_init( &iobj->zobj, g_zend_class_entry_iterator);
+	iobj->zobj.handlers = &g_papuga_iterator_ce_handlers;
+	ZVAL_FALSE(&iobj->resultval);
+	iobj->eof = true;
+	iteratorFetchNext( iobj);
+
+	object_init(return_value);
+	Z_OBJ_P(return_value) = &iobj->zobj;
+	return true;
+}
+
+PHP_METHOD( PapugaIterator, current)
+{
+	/*[-]*/fprintf(stderr, "CALL METHOD PapugaIterator::current\n");
+	/*[-]*/fflush(stderr);
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+	zend_object* zobj = Z_OBJ_P( getThis());
+	IteratorObject *iobj = getIteratorObject( zobj);
+	if (iobj->checksum != calcIteratorCheckSum( iobj))
+	{
+		papuga_php_error( "error in %s: %s", "method PapugaIterator::current", "internal: checksum mismatch in iterator");
+	}
+	RETVAL_ZVAL( &iobj->resultval, 1, 0);
+}
+
+PHP_METHOD( PapugaIterator, key)
+{
+	/*[-]*/fprintf(stderr, "CALL METHOD PapugaIterator::key\n");
+	/*[-]*/fflush(stderr);
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+	RETVAL_NULL();
+}
+
+PHP_METHOD( PapugaIterator, next)
+{
+	/*[-]*/fprintf(stderr,"CALL PapugaIterator::next\n");
+	/*[-]*/fflush(stderr);
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+	zend_object* zobj = Z_OBJ_P( getThis());
+	IteratorObject *iobj = getIteratorObject( zobj);
+	if (iobj->checksum != calcIteratorCheckSum( iobj))
+	{
+		papuga_php_error( "error in %s: %s", "method PapugaIterator::next", "internal: checksum mismatch in iterator");
+	}
+	iteratorFetchNext( iobj);
+	RETVAL_NULL();
+}
+
+PHP_METHOD( PapugaIterator, rewind)
+{
+	/*[-]*/fprintf(stderr,"CALL PapugaIterator::rewind\n");
+	/*[-]*/fflush(stderr);
+	papuga_php_error( "calling non implemented method %s", "PapugaIterator::rewind");
+}
+
+PHP_METHOD( PapugaIterator, valid)
+{
+	/*[-]*/fprintf(stderr,"CALL PapugaIterator::valid\n");
+	/*[-]*/fflush(stderr);
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+	zend_object* zobj = Z_OBJ_P( getThis());
+	IteratorObject *iobj = getIteratorObject( zobj);
+	if (iobj->checksum != calcIteratorCheckSum( iobj))
+	{
+		papuga_php_error( "error in %s: %s", "method PapugaIterator::next", "internal: checksum mismatch in iterator");
+	}
+	if (iobj->eof)
+	{
+		RETVAL_FALSE;
+	}
+	else
+	{
+		RETVAL_TRUE;
+	}
+}
+
+static const zend_function_entry g_iterator_methods[] = {
+	PHP_ME( PapugaIterator, current, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME( PapugaIterator, key, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME( PapugaIterator, next, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME( PapugaIterator, rewind, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME( PapugaIterator, valid, NULL, ZEND_ACC_PUBLIC)
+	PHP_FE_END
+};
+
+static void initIteratorZendClassEntry()
+{
+	/*[-]*/fprintf(stderr,"CALL initIteratorZendClassEntry\n");
+	/*[-]*/fflush(stderr);
+	zend_class_entry tmp_ce;
+	INIT_CLASS_ENTRY(tmp_ce, "PapugaIterator", g_iterator_methods);
+	g_zend_class_entry_iterator = zend_register_internal_class( &tmp_ce TSRMLS_CC);
+}
 

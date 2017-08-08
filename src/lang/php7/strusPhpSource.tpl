@@ -52,6 +52,8 @@ PHP_MINIT_FUNCTION({{project}})
 }
 PHP_MSHUTDOWN_FUNCTION({{project}})
 {
+    /*[-]*/fprintf( stderr, "CALL PHP_MSHUTDOWN_FUNCTION({{project}})\n");
+    /*[-]*/fflush(stderr);
     return SUCCESS;
 }
 PHP_MINFO_FUNCTION({{project}})

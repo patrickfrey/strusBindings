@@ -95,7 +95,7 @@ function verifyTestOutput( $outputdir, $result, $expected) {
 }
 
 function getPathArray( $filepath) {
-	return preg_split( "[^/\\]+", $filepath);
+	return array_filter( explode('/', $filepath), 'strlen');
 }
 
 function getFileName( $filepath) {

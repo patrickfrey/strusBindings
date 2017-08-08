@@ -37,6 +37,11 @@ typedef struct papuga_php_ClassEntryMap
 	papuga_zend_class_entry** ar;		///< pointer to PHP Zend class entry structures
 } papuga_php_ClassEntryMap;
 
+typedef struct papuga_php_Context
+{
+	char errorbuf[ 2048];
+} papuga_php_Context;
+
 /// \brief Initialize papuga globals for PHP
 /// \remark this function has to be called before using any of the functions of this module
 void papuga_php_init();

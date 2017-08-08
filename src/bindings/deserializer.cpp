@@ -1733,7 +1733,7 @@ void Deserializer::buildPatterns(
 	if (!papuga_ValueVariant_defined( &patterns)) return;
 	if (patterns.valuetype != papuga_TypeSerialization)
 	{
-		throw strus::runtime_error(_TXT("serialized structure expected for list of %s"), context);
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
 	papuga::Serialization::const_iterator
 		si = papuga::Serialization::begin( patterns.value.serialization),
