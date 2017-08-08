@@ -37,11 +37,6 @@ typedef struct papuga_php_ClassEntryMap
 	papuga_zend_class_entry** ar;		///< pointer to PHP Zend class entry structures
 } papuga_php_ClassEntryMap;
 
-typedef struct papuga_php_Context
-{
-	char errorbuf[ 2048];
-} papuga_php_Context;
-
 /// \brief Initialize papuga globals for PHP
 /// \remark this function has to be called before using any of the functions of this module
 void papuga_php_init();
@@ -69,13 +64,10 @@ void papuga_php_destroy_CallArgs( papuga_php_CallArgs* arg);
 /// \brief Transfers the call result of a binding function into the PHP context, freeing the call result structure
 /// \param[out] zval_return_value zend variable (zval*) where to write the call result to
 /// \param[in,out] retval return values to move to PHP context
-/// \param[in] map of class ids to zend class descriptions
-void papuga_php_move_CallResult( void* zval_return_value, papuga_CallResult* retval, const papuga_php_ClassEntryMap* cemap);
-
-/// \brief Raise a PHP error
-/// \param[in] fmt format string of the error message
-/// \param[in] ... format arguments of the error message
-void papuga_php_error( const char* fmt, ...);
+/// \param[in] cemap map of class ids to zend class descriptions
+/// \param[in,out] errbuf buffer for error messages
+/// \return true on success, false on failure
+bool papuga_php_move_CallResult( void* zval_return_value, papuga_CallResult* retval, const papuga_php_ClassEntryMap* cemap, papuga_ErrorBuffer* errbuf);
 
 #endif
 

@@ -94,9 +94,7 @@ PHP_METHOD({{Project}}{{classname}}, __construct)
 
     if (!papuga_php_init_CallArgs( NULL/*self*/, argc, &argstruct))
     {
-        papuga_php_error(
-                "failed to initialize argument (%d): %s",
-                argstruct.erridx, papuga_ErrorCode_tostring( argstruct.errcode));
+        zend_error( E_ERROR, papuga_ErrorCode_tostring( argstruct.errcode));
         return;
     }
     papuga_init_ErrorBuffer( &errbuf, errstr, sizeof(errstr));
@@ -105,7 +103,7 @@ PHP_METHOD({{Project}}{{classname}}, __construct)
     {
         msg = papuga_ErrorBuffer_lastError( &errbuf);
         papuga_php_destroy_CallArgs( &argstruct);
-        papuga_php_error( "error calling constructor of %s: %s", "{{Project}}{{classname}}", msg?msg:"unknown error");
+        zend_error( E_ERROR, msg);
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
@@ -113,7 +111,7 @@ PHP_METHOD({{Project}}{{classname}}, __construct)
     papuga_init_HostObject( &thisHostObject, STRUS_BINDINGS_CLASSID_{{classname}}, self, &_{{project}}_bindings_destructor__{{classname}});
     if (!papuga_php_init_object( thiszval, &thisHostObject))
     {
-        papuga_php_error( "error calling constructor of %s: %s", "{{Project}}{{classname}}", "object initialization failed");
+        zend_error( E_ERROR, "object initialization failed");
         return;
     }
 }
@@ -124,6 +122,7 @@ PHP_METHOD({{Project}}{{classname}}, {{methodname}})
 {
     papuga_php_CallArgs argstruct;
     papuga_CallResult retstruct;
+    papuga_ErrorBuffer errbuf;
     char errstr[ 2048];
     const char* msg;
     int argc = ZEND_NUM_ARGS();
@@ -132,9 +131,7 @@ PHP_METHOD({{Project}}{{classname}}, {{methodname}})
     zval *obj = getThis();
     if (!papuga_php_init_CallArgs( (void*)obj, argc, &argstruct))
     {
-        papuga_php_error(
-                "failed to initialize argument (%d): %s",
-                argstruct.erridx, papuga_ErrorCode_tostring( argstruct.errcode));
+        zend_error( E_ERROR, papuga_ErrorCode_tostring( argstruct.errcode));
         return;
     }
     papuga_init_CallResult( &retstruct, errstr, sizeof(errstr));
@@ -143,11 +140,16 @@ PHP_METHOD({{Project}}{{classname}}, {{methodname}})
         msg = papuga_CallResult_lastError( &retstruct);
         papuga_php_destroy_CallArgs( &argstruct);
         papuga_destroy_CallResult( &retstruct);
-        papuga_php_error( "error calling method %s::%s: %s", "{{Project}}{{classname}}", "{{methodname}}", msg?msg:"unknown error");
+        zend_error( E_ERROR, msg);
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
-    papuga_php_move_CallResult( return_value, &retstruct, &g_class_entry_map);
+    papuga_init_ErrorBuffer( &errbuf, errstr, sizeof(errstr));
+    papuga_php_move_CallResult( return_value, &retstruct, &g_class_entry_map, &errbuf);
+    if (papuga_ErrorBuffer_hasError( &errbuf))
+    {
+        zend_error( E_ERROR, errbuf.ptr);
+    }
 }
 $END$
 
