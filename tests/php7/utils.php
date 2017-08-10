@@ -2,7 +2,7 @@
 function concatValues($o) {
 	if (is_array($o)) {
 		$rt = NULL;
-		foreach($array as $item) {
+		foreach($o as $item) {
 			if ($rt) {
 				$rt = $rt . " " . "$item";
 			} else {
@@ -55,14 +55,18 @@ function dumpTree_( $indent, $o, $depth) {
 		foreach($keyset as $k) {
 			$ke = "\n" . $indent . gettype($k) . " " . $k;
 			$ve = dumpTree_( $indent . '  ', $o[ $k], $depth-1);
-			$s = $s . $ke . ":" . $ve;
+			$s = $s . $ke . ": " . $ve;
 		}
 		return $s;
 	} elseif (is_numeric($o)) {
 		$num = round( floatval( $o), 5);
 		return "$num";
+	} elseif (is_string($o)) {
+		return "\"$o\"";
+	} elseif (is_null($o)) {
+		return NULL;
 	} else {
-		return tostring( $o);
+		return "$o";
 	}
 }
 function dumpTree( $o) {
@@ -87,10 +91,10 @@ function verifyTestOutput( $outputdir, $result, $expected) {
 		writeFileContent( $outputdir . "/RES", $result);
 		writeFileContent( $outputdir . "/EXP", $expected);
 
-		echo "Failed";
+		echo "Failed\n";
 		exit( 1);
 	} else {
-		echo "OK";
+		echo "OK\n";
 	}
 }
 

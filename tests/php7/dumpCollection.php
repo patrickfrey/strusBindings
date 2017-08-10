@@ -30,33 +30,32 @@ function dumpCollection( $strusctx, $storagePath) {
 
 	# Term types:
 	$termtypes = joinLists( $storage->termTypes());
-	$output[ "types"] = termtypes;
+	$output[ "types"] = $termtypes;
 
 	# Document data (metadata,attributes,content):
 	$selectids = joinLists( "docno", "ACL", $storage->attributeNames(), $storage->metadataNames(), $termtypes);
 	$output_docs = [];
 	$output_terms = [];
-	foreach ($storage->select( selectids, nil, nil, 0) as $docrow) {
+	foreach ($storage->select( $selectids, NULL, NULL, 0) as $docrow) {
 		$flatdocrow = [];
 		foreach ($docrow as $colkey => $colval) {
-			$flatdocrow[ $colkey] = concatValue( $colval);
+			$flatdocrow[ $colkey] = concatValues( $colval);
 		}
-		$output_docs[ $docrow->docid] = $flatdocrow;
+		$output_docs[ $docrow['docid']] = $flatdocrow;
 
 		foreach ($termtypes as $termtype) {
-			$fterms = $storage->documentForwardIndexTerms( $docrow->docno, $termtype);
 			$ftermlist = [];
-			foreach ($fterms as [$fterm,$pos]) {
-				array_push( $ftermlist, ['value' => $fterm, 'pos' => $pos]);
+			foreach ($storage->documentForwardIndexTerms( $docrow['docno'], $termtype) as $fterm) {
+				array_push( $ftermlist, ['value' => $fterm[0], 'pos' => $fterm[1]]);
 			}
-			$output_terms[ $docrow->docid . ":" . $termtype . '(f)'] = $ftermlist;
+			$output_terms[ $docrow['docid'] . ":" . $termtype . ' (f)'] = $ftermlist;
 
-			$sterms = $storage->documentSearchIndexTerms( $docrow->docno, $termtype);
+			$stermiter = $storage->documentSearchIndexTerms( $docrow['docno'], $termtype);
 			$stermlist = [];
-			foreach ($sterms as [$sterm,$tf,$firstpos]) {
-				array_push( $stermlist, ["value" => $sterm, "tf" => $tf, "firstpos" => $firstpos ]);
+			foreach ($stermiter as $sterm) {
+				array_push( $stermlist, ["value" => $sterm[0], "tf" => $sterm[1], "firstpos" => $sterm[2]]);
 			}
-			$output_terms[ $docrow->docid . ":" . $termtype . '(s)'] = $stermlist;
+			$output_terms[ $docrow['docid'] . ":" . $termtype . ' (s)'] = $stermlist;
 		}
 	}
 	$output[ "docs"] = $output_docs;

@@ -30,6 +30,8 @@ typedef void siginfo_t;
 #include <zend_exceptions.h>
 #include <ext/standard/info.h>
 
+#define PHP_FAIL(msg) {TSRMLS_FETCH();zend_error( E_ERROR, "%s", msg);RETVAL_FALSE;return;}
+
 {{zend_class_entry_decl_c}}
 static papuga_zend_class_entry* g_class_entry_list[ STRUS_BINDINGS_NOF_CLASSES];
 static const papuga_php_ClassEntryMap g_class_entry_map = {
@@ -52,8 +54,6 @@ PHP_MINIT_FUNCTION({{project}})
 }
 PHP_MSHUTDOWN_FUNCTION({{project}})
 {
-    /*[-]*/fprintf( stderr, "CALL PHP_MSHUTDOWN_FUNCTION({{project}})\n");
-    /*[-]*/fflush(stderr);
     return SUCCESS;
 }
 PHP_MINFO_FUNCTION({{project}})
@@ -94,7 +94,7 @@ PHP_METHOD({{Project}}{{classname}}, __construct)
 
     if (!papuga_php_init_CallArgs( NULL/*self*/, argc, &argstruct))
     {
-        zend_error( E_ERROR, papuga_ErrorCode_tostring( argstruct.errcode));
+        PHP_FAIL( papuga_ErrorCode_tostring( argstruct.errcode));
         return;
     }
     papuga_init_ErrorBuffer( &errbuf, errstr, sizeof(errstr));
@@ -103,7 +103,7 @@ PHP_METHOD({{Project}}{{classname}}, __construct)
     {
         msg = papuga_ErrorBuffer_lastError( &errbuf);
         papuga_php_destroy_CallArgs( &argstruct);
-        zend_error( E_ERROR, msg);
+        PHP_FAIL( msg);
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
@@ -111,7 +111,7 @@ PHP_METHOD({{Project}}{{classname}}, __construct)
     papuga_init_HostObject( &thisHostObject, STRUS_BINDINGS_CLASSID_{{classname}}, self, &_{{project}}_bindings_destructor__{{classname}});
     if (!papuga_php_init_object( thiszval, &thisHostObject))
     {
-        zend_error( E_ERROR, "object initialization failed");
+        PHP_FAIL( "object initialization failed");
         return;
     }
 }
@@ -127,11 +127,10 @@ PHP_METHOD({{Project}}{{classname}}, {{methodname}})
     const char* msg;
     int argc = ZEND_NUM_ARGS();
 
-    /*[-]*/fprintf( stderr, "CALL METHOD {{Project}}{{classname}}::{{methodname}}\n");
     zval *obj = getThis();
     if (!papuga_php_init_CallArgs( (void*)obj, argc, &argstruct))
     {
-        zend_error( E_ERROR, papuga_ErrorCode_tostring( argstruct.errcode));
+        PHP_FAIL( papuga_ErrorCode_tostring( argstruct.errcode));
         return;
     }
     papuga_init_CallResult( &retstruct, errstr, sizeof(errstr));
@@ -140,7 +139,7 @@ PHP_METHOD({{Project}}{{classname}}, {{methodname}})
         msg = papuga_CallResult_lastError( &retstruct);
         papuga_php_destroy_CallArgs( &argstruct);
         papuga_destroy_CallResult( &retstruct);
-        zend_error( E_ERROR, msg);
+        PHP_FAIL( msg);
         return;
     }
     papuga_php_destroy_CallArgs( &argstruct);
@@ -148,7 +147,8 @@ PHP_METHOD({{Project}}{{classname}}, {{methodname}})
     papuga_php_move_CallResult( return_value, &retstruct, &g_class_entry_map, &errbuf);
     if (papuga_ErrorBuffer_hasError( &errbuf))
     {
-        zend_error( E_ERROR, errbuf.ptr);
+        PHP_FAIL( errbuf.ptr);
+	return;
     }
 }
 $END$
