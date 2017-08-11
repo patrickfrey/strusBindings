@@ -45,7 +45,8 @@ function dumpCollection( $strusctx, $storagePath) {
 
 		foreach ($termtypes as $termtype) {
 			$ftermlist = [];
-			foreach ($storage->documentForwardIndexTerms( $docrow['docno'], $termtype) as $fterm) {
+			$ftermiter = $storage->documentForwardIndexTerms( $docrow['docno'], $termtype);
+			foreach ($ftermiter as $fterm) {
 				array_push( $ftermlist, ['value' => $fterm[0], 'pos' => $fterm[1]]);
 			}
 			$output_terms[ $docrow['docid'] . ":" . $termtype . ' (f)'] = $ftermlist;

@@ -32,6 +32,12 @@ typedef struct papuga_ReferenceIterator
 	papuga_Iterator iterator;
 } papuga_ReferenceIterator;
 
+typedef struct papuga_ReferenceAllocator
+{
+	papuga_ReferenceHeader header;
+	papuga_Allocator allocator;
+} papuga_ReferenceAllocator;
+
 void papuga_destroy_ReferenceHeader( papuga_ReferenceHeader* hdritr)
 {
 	while (hdritr != NULL)
@@ -54,6 +60,12 @@ void papuga_destroy_ReferenceHeader( papuga_ReferenceHeader* hdritr)
 			{
 				papuga_ReferenceIterator* obj = (papuga_ReferenceIterator*)hdritr;
 				papuga_destroy_Iterator( &obj->iterator);
+				break;
+			}
+			case papuga_RefTypeAllocator:
+			{
+				papuga_ReferenceAllocator* obj = (papuga_ReferenceAllocator*)hdritr;
+				papuga_destroy_Allocator( &obj->allocator);
 				break;
 			}
 			default:
@@ -181,5 +193,16 @@ papuga_Iterator* papuga_Allocator_alloc_Iterator( papuga_Allocator* self, void* 
 	self->reflist = &rt->header;
 	papuga_init_Iterator( &rt->iterator, object_, destroy_, getNext_);
 	return &rt->iterator;
+}
+
+papuga_Allocator* papuga_Allocator_alloc_Allocator( papuga_Allocator* self)
+{
+	papuga_ReferenceAllocator* rt = (papuga_ReferenceAllocator*)papuga_Allocator_alloc( self, sizeof( papuga_ReferenceAllocator), 0);
+	if (!rt) return 0;
+	rt->header.type = papuga_RefTypeAllocator;
+	rt->header.next = self->reflist;
+	self->reflist = &rt->header;
+	papuga_init_Allocator( &rt->allocator, 0, 0);
+	return &rt->allocator;
 }
 

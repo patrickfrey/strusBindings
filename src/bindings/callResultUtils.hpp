@@ -21,10 +21,11 @@ namespace {
 
 void initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Struct& st)
 {
+	papuga_Allocator* allocator = papuga_Allocator_alloc_Allocator( &retval->allocator);
+	if (!allocator) std::bad_alloc();
+	std::memcpy( allocator, &st.allocator, sizeof(st.allocator));
 	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
-	// PF:HACK: Dangerous intrusiveness (do use move semantics instead C++11)
 	std::memcpy( retval->value.value.serialization, &st.serialization, sizeof(papuga_Serialization));
-	std::memcpy( &retval->allocator, &st.allocator, sizeof(st.allocator));
 }
 
 void initCallResultIterator( papuga_CallResult* retval, const strus::bindings::Iterator& st)

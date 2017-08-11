@@ -165,9 +165,10 @@ struct papuga_Iterator
 
 /// \brief Enumeration of value type identifiers with destructor to call by allocator on disposal of the object
 typedef enum papuga_RefType {
-	papuga_RefTypeHostObject,			///< object of type papuga_TypeHostObject
-	papuga_RefTypeSerialization,			///< object of type papuga_TypeSerialization
-	papuga_RefTypeIterator				///< object of type papuga_TypeIterator
+	papuga_RefTypeHostObject,			///< object of type papuga_HostObject
+	papuga_RefTypeSerialization,			///< object of type papuga_Serialization
+	papuga_RefTypeIterator,				///< object of type papuga_Iterator
+	papuga_RefTypeAllocator				///< object of type papuga_Allocator
 } papuga_RefType;
 
 /// \brief Header for an object that needs a call of a destructor when freed

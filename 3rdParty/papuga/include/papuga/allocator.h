@@ -17,10 +17,14 @@ extern "C" {
 
 /// \brief Constructor of AllocatorNode
 /// \param[out] self pointer to structure initialized
+/// \param[in] buf pointer to preallocated (local) buffer
+/// \param[in] bufsize allocation size of buf in bytes
 #define papuga_init_AllocatorNode(self,buf,bufsize)	{papuga_Allocator* s = self; s->allocsize=bufsize;s->arsize=0;s->allocated=!bufsize;s->ar=(char*)buf;s->next=0;}
 
 /// \brief Constructor of Allocator
 /// \param[out] self pointer to structure initialized
+/// \param[in] buf pointer to preallocated (local) buffer
+/// \param[in] bufsize allocation size of buf in bytes
 #define papuga_init_Allocator(self,buf,bufsize)		{papuga_Allocator* s = self; s->root.allocsize=bufsize;s->root.arsize=0;s->root.allocated=!buf;s->root.ar=(char*)buf;s->root.next=0;s->reflist=0;}
 
 /// \brief Destructor of Allocator
@@ -51,13 +55,13 @@ void* papuga_Allocator_alloc( papuga_Allocator* self, size_t blocksize, unsigned
 char* papuga_Allocator_copy_string( papuga_Allocator* self, const char* str, size_t len);
 
 /// \brief Allocate a string copy
-/// \param[in,out] self pointer to structure 
+/// \param[in,out] self pointer to allocator structure 
 /// \param[in] str pointer to 0-terminated string to copy
 /// \return the pointer to the C-string to copy
 char* papuga_Allocator_copy_charp( papuga_Allocator* self, const char* str);
 
 /// \brief Allocate a host object reference
-/// \param[out] self pointer to structure initialized by constructor
+/// \param[out] self pointer to allocator structure
 /// \param[in] object_ pointer to host object
 /// \param[in] destroy_ destructor of the host object in case of ownership
 /// \return the pointer to the allocated host object reference
@@ -69,12 +73,17 @@ papuga_HostObject* papuga_Allocator_alloc_HostObject( papuga_Allocator* self, in
 papuga_Serialization* papuga_Allocator_alloc_Serialization( papuga_Allocator* self);
 
 /// \brief Allocate an iterator
-/// \param[out] self pointer to structure initialized by constructor
+/// \param[out] self pointer to allocator structure
 /// \param[in] object_ pointer to iterator context object
 /// \param[in] destroy_ destructor of the iterated object in case of ownership
 /// \param[in] getNext_ method of the iterated object to fetch the next element
 /// \return the pointer to the allocated iterator object
 papuga_Iterator* papuga_Allocator_alloc_Iterator( papuga_Allocator* self, void* object_, papuga_Deleter destroy_, papuga_GetNext getNext_);
+
+/// \brief Allocate an iterator
+/// \param[out] self pointer to allocator structure
+/// \return the pointer to the allocated allocator object
+papuga_Allocator* papuga_Allocator_alloc_Allocator( papuga_Allocator* self);
 
 #ifdef __cplusplus
 }
