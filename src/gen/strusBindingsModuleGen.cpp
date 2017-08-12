@@ -70,14 +70,14 @@ int main( int argc, const char* argv[])
 		{
 			throw std::runtime_error( "could not get interface description");
 		}
-		if (argc < 4)
+		if (argc < 3)
 		{
 			printUsage();
 			throw std::runtime_error( "too few arguments");
 		}
 		const char* lang = argv[1];
 		const char* what = argv[2];
-		const char* filename = argv[3];
+		const char* filename = argc==3?"-":argv[3];
 		std::multimap<std::string,std::string> args;
 		int argi=4;
 		for (; argi < argc; ++argi)

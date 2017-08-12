@@ -19,9 +19,15 @@ namespace papuga {
 
 std::string cppCodeSnippet( unsigned int idntcnt, ...);
 
-const std::vector<std::string> getGeneratorArguments(
+std::vector<std::string> getGeneratorArguments(
 	const std::multimap<std::string,std::string>& args,
 	const char* name);
+std::string getGeneratorArgument(
+	const std::multimap<std::string,std::string>& args,
+	const char* name,
+	const char* defaultval);
+
+std::string readFile( const std::string& path);
 
 }//namespace
 #endif

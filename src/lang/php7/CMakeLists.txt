@@ -43,6 +43,14 @@ add_custom_command(
  )
 
 add_custom_command(
+    OUTPUT      php.ini
+    DEPENDS    strusBindingsModuleGen strus_bindings_description
+    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen php7 ini php.ini "phpini=${PHP_INI_FILE}"
+    COMMENT  "Generating PHP 7 .ini file with strus extension loaded"
+    VERBATIM
+ )
+ 
+add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm
     DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl"  ${CMAKE_BINARY_DIR}/src/lang/php7/strus.php
     COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl" ${CMAKE_BINARY_DIR}/src/lang/php7/strus.php
@@ -52,7 +60,7 @@ add_custom_command(
 
  add_custom_target(
     php7_mod ALL
-    DEPENDS strus.c ${CMAKE_BINARY_DIR}/src/lang/php7/strus.php papuga_php7_gen ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm
+    DEPENDS strus.c php.ini ${CMAKE_BINARY_DIR}/src/lang/php7/strus.php papuga_php7_gen ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm
 )
 
 # ------------------------------

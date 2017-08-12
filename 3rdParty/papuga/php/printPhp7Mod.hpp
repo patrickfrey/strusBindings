@@ -21,6 +21,12 @@ void printPhp7ModSource(
 		const papuga_InterfaceDescription& descr,
 		const std::vector<std::string>& includes);
 
+void printPhp7ModIni(
+		std::ostream& out,
+		const papuga_InterfaceDescription& descr,
+		const std::string& php_ini,
+		const std::string& dll_ext);
+
 }//namespace
 #endif
 

@@ -21,6 +21,12 @@
 
 using namespace papuga;
 
+#if defined _WIN32
+#define DEFAULT_MODULE_EXT ".dll"
+#else
+#define DEFAULT_MODULE_EXT ".so"
+#endif
+
 DLL_PUBLIC bool papuga::generatePhp7Source(
 	std::ostream& out,
 	std::ostream& err,
@@ -33,6 +39,12 @@ DLL_PUBLIC bool papuga::generatePhp7Source(
 		if (what == "module")
 		{
 			printPhp7ModSource( out, descr, getGeneratorArguments( args, "include"));
+		}
+		else if (what == "ini")
+		{
+			std::string iniarg( getGeneratorArgument( args, "phpini", 0));
+			std::string dllext( getGeneratorArgument( args, "dllext", DEFAULT_MODULE_EXT));
+			printPhp7ModIni( out, descr, readFile( iniarg), dllext);
 		}
 		else if (what == "doc")
 		{

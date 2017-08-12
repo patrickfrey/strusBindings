@@ -30,3 +30,7 @@ execute_process( COMMAND  ${PHP_CONFIG_EXECUTABLE} --extension-dir  OUTPUT_VARIA
 string( STRIP  "${PHP_EXTENSION_DIR}"  PHP_EXTENSION_DIR )
 MESSAGE( "PHP extension dir: ${PHP_EXTENSION_DIR}" )
 
+execute_process( COMMAND  ${PHP_EXECUTABLE}  ${PROJECT_SOURCE_DIR}/src/lang/php7/getPhpIniFile.php  OUTPUT_VARIABLE  PHP_INI_FILE )
+string( STRIP  "${PHP_INI_FILE}"  PHP_INI_FILE )
+MESSAGE( "PHP .ini file: ${PHP_INI_FILE}" )
+

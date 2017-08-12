@@ -13,6 +13,7 @@
 #include <sstream>
 #include <cstdio>
 #include <cstring>
+#include <cerrno>
 #include <stdint.h>
 
 using namespace papuga;
@@ -57,7 +58,7 @@ std::string papuga::cppCodeSnippet( unsigned int idntcnt, ...)
 	return rt.str();
 }
 
-const std::vector<std::string> papuga::getGeneratorArguments(
+std::vector<std::string> papuga::getGeneratorArguments(
 	const std::multimap<std::string,std::string>& args,
 	const char* name)
 {
@@ -71,4 +72,71 @@ const std::vector<std::string> papuga::getGeneratorArguments(
 	}
 	return rt;
 }
+
+std::string papuga::getGeneratorArgument(
+	const std::multimap<std::string,std::string>& args,
+	const char* name,
+	const char* defaultval)
+{
+	typedef std::multimap<std::string,std::string>::const_iterator ArgIterator;
+	std::pair<ArgIterator,ArgIterator> argrange = args.equal_range( name);
+	ArgIterator ai = argrange.first, ae = argrange.second;
+	std::string rt;
+	if (ai == ae)
+	{
+		if (defaultval)
+		{
+			rt = defaultval;
+		}
+		else
+		{
+			char buf[ 256];
+			std::snprintf( buf, sizeof(buf), "missing definition of argument '%s'", name);
+			throw std::runtime_error( buf);
+		}
+	}
+	for (int aidx=0; ai != ae; ++ai,++aidx)
+	{
+		if (aidx)
+		{
+			char buf[ 256];
+			std::snprintf( buf, sizeof(buf), "too many arguments with name '%s' defined", name);
+			throw std::runtime_error( buf);
+		}
+		rt = ai->second;
+	}
+	return rt;
+}
+
+std::string papuga::readFile( const std::string& filename)
+{
+	int err = 0;
+	std::string rt;
+	FILE* fh = ::fopen( filename.c_str(), "rb");
+	if (!fh)
+	{
+		err = errno;
+		goto ERROR;
+	}
+	unsigned int nn;
+	enum {bufsize=(1<<12)};
+	char buf[ bufsize];
+
+	while (!!(nn=::fread( buf, 1/*nmemb*/, bufsize, fh)))
+	{
+		rt.append( buf, nn);
+	}
+	if (!feof( fh))
+	{
+		err = ::ferror( fh);
+		::fclose( fh);
+		goto ERROR;
+	}
+	::fclose( fh);
+	return rt;
+ERROR:
+	std::snprintf( buf, sizeof(buf), "error reading file '%s': %s", filename.c_str(), std::strerror(err));
+	throw std::runtime_error( buf);
+}
+
 

@@ -310,3 +310,17 @@ void papuga::printPhp7ModSource(
 	define_main( out, descr);
 }
 
+
+void papuga::printPhp7ModIni(
+		std::ostream& out,
+		const papuga_InterfaceDescription& descr,
+		const std::string& php_ini,
+		const std::string& dll_ext)
+{
+	std::string modulename = descr.name;
+	std::transform( modulename.begin(), modulename.end(), modulename.begin(), ::tolower);
+
+	out << php_ini << std::endl;
+	out << "extension=" << modulename << dll_ext << std::endl << std::endl;
+}
+

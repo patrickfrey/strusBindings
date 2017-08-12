@@ -29,7 +29,6 @@ add_custom_command(
                 ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h
 		${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp
 	        ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp
-		${CMAKE_BINARY_DIR}/src/bindings/bindingClassIds.hpp
 		${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp
 	        ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp
     DEPENDS   strusBindingsInterfaceGen
@@ -38,9 +37,17 @@ add_custom_command(
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/forwardTermsIterator.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/selectIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/iterator.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/statisticsIterator.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/metadataExpression.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/struct.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/objectref.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/termExpression.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/postingIterator.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/valueIterator.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/searchTermsIterator.hpp
     COMMAND  ${CMAKE_BINARY_DIR}/src/parser/strusBindingsInterfaceGen ${CMAKE_BINARY_DIR}  ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
     COMMENT  "Generating strus bindings C header and implementation (output root dir: ${CMAKE_BINARY_DIR})"
     VERBATIM
@@ -48,7 +55,7 @@ add_custom_command(
  
  add_custom_target(
     strus_bindings_c_interface ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h ${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp ${CMAKE_BINARY_DIR}/src/bindings/bindingClassIds.hpp ${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp
+    DEPENDS ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h ${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp ${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp
 )
 
 # ------------------------------
