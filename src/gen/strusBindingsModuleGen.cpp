@@ -8,6 +8,7 @@
 /// \brief Code generator for the papuga language modules of strusBindings
 /// \file strusBindingsModuleGen.cpp
 #include "papuga/lib/lua_gen.hpp"
+#include "papuga/lib/php7_gen.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/base/string_format.hpp"
@@ -92,6 +93,10 @@ int main( int argc, const char* argv[])
 		if (std::strcmp( lang, "lua") == 0)
 		{
 			printfunc = &papuga::generateLuaSource;
+		}
+		else if (std::strcmp( lang, "php7") == 0)
+		{
+			printfunc = &papuga::generatePhp7Source;
 		}
 		else
 		{

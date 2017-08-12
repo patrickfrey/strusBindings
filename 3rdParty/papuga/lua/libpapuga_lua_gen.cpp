@@ -5,10 +5,11 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-/// \brief Library interface for libpapuga_lua for generating lua bindings
-/// \file libpapuga_lua.cpp
+/// \brief Library interface for libpapuga_lua_gen for generating lua bindings
+/// \file libpapuga_lua_gen.cpp
 #include "papuga/lib/lua_gen.hpp"
 #include "private/dll_tags.h"
+#include "private/gen_utils.hpp"
 #include "printLuaDoc.hpp"
 #include "printLuaMod.hpp"
 #include "fmt/format.h"
@@ -19,21 +20,6 @@
 #include <sstream>
 
 using namespace papuga;
-
-static const std::vector<std::string> getArguments(
-	const std::multimap<std::string,std::string>& args,
-	const char* name)
-{
-	typedef std::multimap<std::string,std::string>::const_iterator ArgIterator;
-	std::pair<ArgIterator,ArgIterator> argrange = args.equal_range( name);
-	ArgIterator ai = argrange.first, ae = argrange.second;
-	std::vector<std::string> rt;
-	for (; ai != ae; ++ai)
-	{
-		rt.push_back( ai->second);
-	}
-	return rt;
-}
 
 DLL_PUBLIC bool papuga::generateLuaSource(
 	std::ostream& out,
@@ -50,7 +36,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		}
 		else if (what == "module")
 		{
-			printLuaModSource( out, descr, getArguments( args, "include"));
+			printLuaModSource( out, descr, getGeneratorArguments( args, "include"));
 		}
 		else if (what == "doc")
 		{
@@ -58,7 +44,7 @@ DLL_PUBLIC bool papuga::generateLuaSource(
 		}
 		else
 		{
-			char buf[ 1024];
+			char buf[ 256];
 			std::snprintf( buf, sizeof(buf), "unknown item '%s'", what.c_str());
 			throw std::runtime_error( buf);
 		}

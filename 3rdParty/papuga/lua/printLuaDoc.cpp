@@ -37,6 +37,16 @@ public:
 		return out.str();
 	}
 
+	virtual std::string classStartDeclaration( const papuga_ClassDescription* classdef) const
+	{
+		return std::string();
+	}
+
+	virtual std::string classEndDeclaration( const papuga_ClassDescription* classdef) const
+	{
+		return std::string();
+	}
+
 	virtual std::string constructorDeclaration( const std::string& classname, const papuga_ConstructorDescription* cdef) const
 	{
 		std::ostringstream out;

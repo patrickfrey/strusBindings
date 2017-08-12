@@ -3,7 +3,7 @@ function round( num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
-function concatValue(o)
+function concatValues(o)
 	if type(o) == 'table' then
 		rt = nil
 		for _,value in ipairs(o) do

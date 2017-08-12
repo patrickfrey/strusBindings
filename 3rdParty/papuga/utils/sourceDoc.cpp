@@ -178,6 +178,7 @@ void papuga::printSourceDoc(
 		const char* description = getAnnotationText( cdef.doc, papuga_AnnotationTag_brief);
 		printDocumentationTag( out, lang, "brief", description);
 		printAnnotationTags( out, lang, cdef.doc);
+		out << lang->classStartDeclaration( &cdef);
 
 		printConstructor( out, lang, cdef.name, cdef.constructor);
 		std::size_t mi = 0;
@@ -185,6 +186,8 @@ void papuga::printSourceDoc(
 		{
 			printMethod( out, lang, cdef.name, &cdef.methodtable[mi]);
 		}
+		out << lang->classEndDeclaration( &cdef);
+		out << std::endl;
 	}
 }
 

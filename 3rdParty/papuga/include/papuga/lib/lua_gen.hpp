@@ -5,7 +5,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
-/// \brief Library interface for libpapuga_lua for generating lua bindings
+/// \brief Library interface for libpapuga_lua_gen for generating lua bindings
 /// \file papuga/lib/lua_gen.hpp
 #ifndef _PAPUGA_LUA_GEN_LIB_HPP_INCLUDED
 #define _PAPUGA_LUA_GEN_LIB_HPP_INCLUDED

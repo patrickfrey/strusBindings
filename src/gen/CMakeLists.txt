@@ -55,5 +55,5 @@ add_custom_command(
 # PROGRAMS
 # ------------------------------
 add_executable( strusBindingsModuleGen strusBindingsModuleGen.cpp )
-target_link_libraries( strusBindingsModuleGen  "${Boost_LIBRARIES}" strus_base papuga_lua_gen strus_bindings_description ${Intl_LIBRARIES} )
+target_link_libraries( strusBindingsModuleGen  "${Boost_LIBRARIES}" strus_base papuga_lua_gen papuga_php7_gen strus_bindings_description ${Intl_LIBRARIES} )
 

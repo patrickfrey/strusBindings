@@ -57,34 +57,18 @@ std::string papuga::cppCodeSnippet( unsigned int idntcnt, ...)
 	return rt.str();
 }
 
-ClassDescriptionMap papuga::getClassDescriptionMap( const papuga_InterfaceDescription& descr)
+const std::vector<std::string> papuga::getGeneratorArguments(
+	const std::multimap<std::string,std::string>& args,
+	const char* name)
 {
-	ClassDescriptionMap rt;
-	std::size_t ci = 0;
-	for (; descr.classes[ci].name; ++ci)
+	typedef std::multimap<std::string,std::string>::const_iterator ArgIterator;
+	std::pair<ArgIterator,ArgIterator> argrange = args.equal_range( name);
+	ArgIterator ai = argrange.first, ae = argrange.second;
+	std::vector<std::string> rt;
+	for (; ai != ae; ++ai)
 	{
-		const char* cname = descr.classes[ci].name;
-		unsigned int cid = descr.classes[ci].id;
-		if (!cid) throw std::runtime_error( "class id must be non zero");
-		ClassDescriptionMap::const_iterator mi = rt.find( cid);
-		if (mi != rt.end())
-		{
-			char buf[ 1024];
-			std::snprintf( buf, sizeof(buf), "duplicate definition of class id %u (%s,%s)", cid, mi->second->name, cname);
-			throw std::runtime_error( buf);
-		}
-		rt[ descr.classes[ci].id] = &descr.classes[ci];
-	}
-	unsigned int max_classid = rt.size();
-	ClassDescriptionMap::const_iterator mi = rt.begin(), me = rt.end();
-	for (; mi != me; ++mi)
-	{
-		if (mi->first > max_classid)
-		{
-			throw std::runtime_error( "class id map has gaps");
-		}
+		rt.push_back( ai->second);
 	}
 	return rt;
 }
-
 

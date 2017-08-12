@@ -260,7 +260,6 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	strus::printCppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
 	out << "#include \"strus/lib/bindings_description.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out << "#include \"bindingClassIds.hpp\"" << std::endl;
 	out << "#include \"internationalization.hpp\"" << std::endl;
 	out << "#include \"papuga/typedefs.h\"" << std::endl;
 
@@ -355,11 +354,10 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	ci = interfaceDef.classDefs().begin();
 	for (; ci != ce; ++ci)
 	{
-		std::string classid = std::string("Class") + ci->name();
 		std::string constructordescr = ci->constructorDefs().empty()?std::string("NULL"):(std::string("&g_constructor_") + ci->name());
 
-		out << "\t" << "{ " << classid
-			<< ", \"" << ci->name()
+		out << "\t" << "{ "
+			<< "\"" << ci->name()
 			<< "\", " << docDeclarationNameClassDoc( ci->name())
 			<< ", " << constructordescr
 			<< ", \"" << destructorFunctionName(ci->name())
@@ -700,7 +698,6 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 {
 	strus::printHppFrameHeader( out, "bindingClassTemplate", "Template to map interface to some properties");
 	out << "#include \"strus/bindingObjects.h\"" << std::endl;
-	out << "#include \"bindingClassIds.hpp\"" << std::endl;
 	out << "#include \"papuga/typedefs.h\"" << std::endl;
 	out << "#include \"impl/strus.hpp\"" << std::endl;
 	out << std::endl
@@ -716,47 +713,23 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 		<< "\t\t" << "delete reinterpret_cast<ClassName*>( objref);" << std::endl
 		<< "\t" << "}" << std::endl
 		<< "\t" << "static papuga_Deleter getDestructor()	{return &deleter;}" << std::endl
-		<< "\t" << "static int classid()			{return ClassNone;}" << std::endl
+		<< "\t" << "static int classid()			{return 0;}" << std::endl
 		<< "};" << std::endl << std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
-	for (; ci != ce; ++ci)
+	for (int classid=1; ci != ce; ++ci,++classid)
 	{
 		out << "template<>" << std::endl
 			<< "struct BindingClassTemplate<" << ci->name() << "Impl>" << std::endl
 			<< "{" << std::endl
 			<< "\t" << "static papuga_Deleter getDestructor()	{return &" << destructorFunctionName( ci->name()) << ";}" << std::endl
-			<< "\t" << "static int classid()			{return Class" << ci->name() << ";}" << std::endl
+			<< "\t" << "static int classid()			{return " << classid << ";}" << std::endl
 			<< "\t" << "static const char* name()			{return \"" << ci->name() << "\";}" << std::endl
 			<< "};" << std::endl << std::endl;
 	}
 	out << "}}//namespace" << std::endl;
-	strus::printHppFrameTail( out);
-}
-
-static void print_BindingClassIdsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
-{
-	strus::printHppFrameHeader( out, "bindingClassIds", "strus binding class identifiers");
-	out << std::endl
-		<< "namespace strus {" << std::endl
-		<< std::endl << std::endl;
-
-	out << "enum BindingsClassId" << std::endl
-		<< "{" << std::endl
-		<< "\t" << "ClassNone";
-
-	std::vector<strus::ClassDef>::const_iterator
-		ci = interfaceDef.classDefs().begin(),
-		ce = interfaceDef.classDefs().end();
-	for (; ci != ce; ++ci)
-	{
-		out << "," << std::endl << "\t" << "Class" << ci->name();
-	}
-	out << std::endl << "};" << std::endl << std::endl;
-	
-	out << "}//namespace" << std::endl;
 	strus::printHppFrameTail( out);
 }
 
@@ -823,7 +796,6 @@ int main( int argc, const char* argv[])
 		printOutput( outputdir + "/include/strus/bindingObjects.h", &print_BindingObjectsH, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingClassTemplate.hpp", &print_BindingClassTemplatesHpp, interfaceDef);
-		printOutput( outputdir + "/src/bindings/bindingClassIds.hpp", &print_BindingClassIdsHpp, interfaceDef);
 		printOutput( outputdir + "/include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
 

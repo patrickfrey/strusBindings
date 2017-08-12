@@ -52,19 +52,18 @@ typedef struct papuga_MethodDescription
 	const char* funcname;				///< function name of the method
 	const papuga_Annotation* doc;			///< description and examples of the method; {NULL,NULL} terminated list
 	const papuga_CallResultDescription* result;	///< return value descriptions or 0, if no return value defined
-	bool self;					///< method that requires an instance of its class (self pointer)
+	bool nonstatic;					///< method that requires an instance of its class (self pointer)
 	const papuga_ParameterDescription* parameter;	///< {NULL,..} terminated list of arguments
 } papuga_MethodDescription;
 
 /// \brief Structure describing a host object class
 typedef struct papuga_ClassDescription
 {
-	unsigned int id;				///< id of the class (unique index counted from 1 without gaps, but not necessarily ordered, e.g. {1,2,3,4,5} or {4,1,2,5,3})
 	const char* name;				///< name of class
 	const papuga_Annotation* doc;			///< description of the class as {NULL,NULL} terminated list
 	const papuga_ConstructorDescription* constructor;///< function description of the constructor
 	const char* funcname_destructor;		///< function name of the destructor
-	const papuga_MethodDescription* methodtable;	///< (NULL,0) terminated list of methods
+	const papuga_MethodDescription* methodtable;	///< {NULL,..} terminated list of methods
 } papuga_ClassDescription;
 
 typedef struct papuga_AboutDescription
@@ -80,7 +79,7 @@ typedef struct papuga_InterfaceDescription
 {
 	const char* name;				///< name of the project wrapped by the bindings
 	const char** includefiles;			///< null terminated list of files to include
-	const papuga_ClassDescription* classes;		///< (0,NULL,NULL) terminated list of classes
+	const papuga_ClassDescription* classes;		///< {NULL,..} terminated list of classes
 	const papuga_AboutDescription* about;		///< reference to authors,copyright,license,etc...
 } papuga_InterfaceDescription;
 

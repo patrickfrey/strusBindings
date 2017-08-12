@@ -11,6 +11,7 @@
 #define _PAPUGA_GEN_UTILS_HPP_INCLUDED
 #include "papuga/interfaceDescription.h"
 #include <string>
+#include <vector>
 #include <map>
 #include <stdexcept>
 
@@ -18,8 +19,9 @@ namespace papuga {
 
 std::string cppCodeSnippet( unsigned int idntcnt, ...);
 
-typedef std::map<unsigned int,const papuga_ClassDescription*> ClassDescriptionMap;
-ClassDescriptionMap getClassDescriptionMap( const papuga_InterfaceDescription& descr);
+const std::vector<std::string> getGeneratorArguments(
+	const std::multimap<std::string,std::string>& args,
+	const char* name);
 
 }//namespace
 #endif
