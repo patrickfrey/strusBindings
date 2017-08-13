@@ -16,7 +16,6 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 		if ($strusctx->storageExists( $config)) {
 			$strusctx->destroyStorage( $config);
 		}
-		var_dump( $config);
 		$strusctx->createStorage( $config);
 	}
 	# Get a client for the new created storage:
@@ -31,7 +30,7 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 		$idx = $idx + 1;
 		if ($multipart) {
 			foreach ($analyzer->analyzeMultiPart( readFileContent( $filename)) as $doc) {
-				if ($aclmap) {
+				if ($aclmap && isset($aclmap[ $doc['attribute']['docid']])) {
 					$doc['access'] = $aclmap[ $doc['attribute']['docid']];
 				}
 				$transaction->insertDocument( $doc['attribute']['docid'], $doc);

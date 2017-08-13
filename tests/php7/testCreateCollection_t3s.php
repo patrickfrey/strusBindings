@@ -6,11 +6,11 @@ include_once "dumpCollection.php";
 
 $datadir = "../data/t3s/";
 if (isset($argv[1])) {
-	$datadir = argv[1];
+	$datadir = $argv[1];
 }
 $outputdir = '.';
 if (isset($argv[2])) {
-	$outputdir = argv[2];
+	$outputdir = $argv[2];
 }
 $ctxconfig = getContextConfig( $argv[3]);
 $storage = $outputdir . "/storage";
