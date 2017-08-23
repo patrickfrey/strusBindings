@@ -23,9 +23,13 @@
 #include <sstream>
 #include <cerrno>
 
-#define STRUS_BINDINGS_PRODUCTNAME  "Strus"
-#define STRUS_BINDINGS_AUTHOR       "Patrick P. Frey"
-#define STRUS_BINDINGS_LICENSE      "Mozilla Public License v. 2.0 (MPLv2)"
+#define STRUS_BINDINGS_PRODUCT_NAME		"Strus"
+#define STRUS_BINDINGS_PRODUCT_DESCRIPTION	"A set of libraries and tools to implement a text search engine"
+#define STRUS_BINDINGS_AUTHOR			"Patrick P. Frey"
+#define STRUS_BINDINGS_CONTRIBUTORS		""
+#define STRUS_BINDINGS_COPYRIGHT		"Patrick P. Frey"
+#define STRUS_BINDINGS_LICENSE			"Mozilla Public License v. 2.0 (MPLv2)"
+#define STRUS_BINDINGS_URL			"project-strus.net"
 
 #undef STRUS_LOWLEVEL_DEBUG
 
@@ -112,9 +116,30 @@ static std::string docDeclaration( const std::string& globalname, const strus::D
 	strus::DocTagMap::const_iterator di = doc.begin(), de = doc.end();
 	for (; di != de; ++di)
 	{
-		out << "\t{\"" << di->first << "\",\"" << printString(di->second) << "\"}," << std::endl;
+		std::string anntag;
+		if (di->first == "brief")
+		{
+			anntag = "papuga_AnnotationType_Description";
+		}
+		else if (di->first == "example")
+		{
+			anntag = "papuga_AnnotationType_Example";
+		}
+		else if (di->first == "note")
+		{
+			anntag = "papuga_AnnotationType_Note";
+		}
+		else if (di->first == "remark")
+		{
+			anntag = "papuga_AnnotationType_Remark";
+		}
+		else
+		{
+			throw std::runtime_error( std::string("unknown annotation tag '") + di->first + "'");
+		}
+		out << "\t{" << anntag << ", \"" << printString(di->second) << "\"}," << std::endl;
 	}
-	out << "\t{NULL,NULL}" << std::endl;
+	out << "\t{(papuga_AnnotationType)0,NULL}" << std::endl;
 	out << "};" << std::endl;
 	return out.str();
 }
@@ -371,12 +396,14 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 
 	out << "static const papuga_AboutDescription g_about = {"
 		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
-		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
+		<< "\"" << STRUS_BINDINGS_CONTRIBUTORS << "\","
+		<< "\"" << STRUS_BINDINGS_COPYRIGHT << "\","
 		<< "\"" << STRUS_BINDINGS_LICENSE << "\","
 		<< "\"" << STRUS_BINDINGS_VERSION_STRING << "\""
+		<< "\"" << STRUS_BINDINGS_URL << "\","
 		<< "};" << std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCTNAME << "\", g_includefiles, g_classes, &g_about };"
+	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCT_NAME << "\",\"" << STRUS_BINDINGS_PRODUCT_DESCRIPTION << "\", g_includefiles, g_classes, &g_about };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;

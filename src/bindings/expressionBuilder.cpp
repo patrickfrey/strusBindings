@@ -152,6 +152,7 @@ void PreProcPatternExpressionBuilder::pushTerm( const std::string& type, const s
 	if (m_termsymtab.isNew())
 	{
 		m_lexer->defineSymbol( termsymid, termtypeid, value);
+		m_lexer->defineLexemName( termsymid, value);
 	}
 	m_matcher->pushTerm( termsymid);
 }
@@ -194,6 +195,10 @@ void PreProcPatternExpressionBuilder::defineLexem(
 {
 	uint32_t termtypeid = m_termtypetab.getOrCreate( name);
 	if (!termtypeid) throw std::bad_alloc();
+	if (m_termtypetab.isNew())
+	{
+		m_lexer->defineLexemName( termtypeid, name);
+	}
 	m_lexer->defineLexem( termtypeid, expression, resultIndex, level, posbind);
 }
 

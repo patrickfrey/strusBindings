@@ -3,16 +3,16 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 include_directories(
 	"${Intl_INCLUDE_DIRS}"
 	"${CMAKE_BINARY_DIR}/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/lua"
+	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/3rdParty/lua"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
 link_directories(
-	"${PROJECT_SOURCE_DIR}/3rdParty/lua_cmake"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/src"
-	"${PROJECT_SOURCE_DIR}/src/bindings"
-	"${PROJECT_SOURCE_DIR}/src/lang/lua"
+	"${CMAKE_BINARY_DIR}/3rdParty/papuga/3rdParty/lua_cmake"
+	"${CMAKE_BINARY_DIR}/3rdParty/papuga/src"
+	"${CMAKE_BINARY_DIR}/src/bindings"
+	"${CMAKE_BINARY_DIR}/src/lang/lua"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"

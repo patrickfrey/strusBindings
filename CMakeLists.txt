@@ -12,13 +12,19 @@ set( STRUS_VERSION ${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}.${STRUS_PATCH_V
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
+
+IF (NOT WITH_PHP STREQUAL "YES")
+MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=\"YES\" to enable it." )
+ENDIF (NOT WITH_PHP STREQUAL "YES")
     
+set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
 if(NOT STRUS_ALL)
 include( cmake/dist.cmake )
 include( cmake/LinuxDistribution.cmake )
 include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
 include( cmake/intl.cmake )
+include( cmake/standard_targets.cmake )
 endif()
 
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
@@ -39,7 +45,6 @@ find_strus_package( module )
 find_strus_package( trace )
 find_strus_package( rpc )
 
-set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
 configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_BINARY_DIR}/include/strus/versionBindings.hpp"   @ONLY )
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
@@ -84,7 +89,4 @@ install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
           DESTINATION include
           FILES_MATCHING PATTERN "*.h")
 
-if(NOT STRUS_ALL)
-include( cmake/standard_targets.cmake )
-endif()
 

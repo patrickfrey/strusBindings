@@ -1,6 +1,6 @@
 [submodule "3rdParty/textwolf"]
 	path = 3rdParty/textwolf
 	url = https://github.com/patrickfrey/textwolf
-[submodule "3rdParty/lua"]
-	path = 3rdParty/lua
-	url = https://github.com/lua/lua
+[submodule "3rdParty/papuga"]
+	path = 3rdParty/papuga
+	url = git@github.com:patrickfrey/papuga.git

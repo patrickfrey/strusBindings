@@ -4,4 +4,6 @@ file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/strus/bindings )
 
 # Subdirectories:
 add_subdirectory( lua )
+IF (WITH_PHP STREQUAL "YES")
 add_subdirectory( php7 )
+ENDIF (WITH_PHP STREQUAL "YES")

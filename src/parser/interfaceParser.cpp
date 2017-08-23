@@ -179,10 +179,10 @@ static DocTagMap getAnnotationDoc( const AnnotationMap& amap, const std::string&
 {
 	DocTagMap rt;
 	std::string brief = getAnnotation( amap, context.empty()?std::string("@brief"):context, true);
-	rt.insert( std::pair<std::string,std::string>( papuga_AnnotationTag_brief, brief));
-	insertDocTagMap( rt, papuga_AnnotationTag_example, getAnnotations( amap, context + "@example", false));
-	insertDocTagMap( rt, papuga_AnnotationTag_note, getAnnotations( amap, context + "@note", false));
-	insertDocTagMap( rt, papuga_AnnotationTag_remark, getAnnotations( amap, context + "@remark", false));
+	rt.insert( std::pair<std::string,std::string>( "brief", brief));
+	insertDocTagMap( rt, "example", getAnnotations( amap, context + "@example", false));
+	insertDocTagMap( rt, "note", getAnnotations( amap, context + "@note", false));
+	insertDocTagMap( rt, "remark", getAnnotations( amap, context + "@remark", false));
 	return rt;
 }
 static bool has_annotation( char const* si, const char* se)

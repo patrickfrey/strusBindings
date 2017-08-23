@@ -3,10 +3,10 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # PHP
 # --------------------------------------
-include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/php7/php.cmake )
+include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/python3/python.cmake )
 
 include_directories(
-        "${PHP_INCLUDE_DIRS}"
+        "${PYTHON_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
 	"${CMAKE_BINARY_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
@@ -14,10 +14,10 @@ include_directories(
 )
 
 link_directories(
-        "${PHP_LIBRARY_DIRS}"
+        "${PYTHON_LIBRARY_DIRS}"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/src"
 	"${PROJECT_SOURCE_DIR}/src/bindings"
-	"${PROJECT_SOURCE_DIR}/src/lang/php7"
+	"${PROJECT_SOURCE_DIR}/src/lang/python3"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"
@@ -26,6 +26,7 @@ link_directories(
 	"${strustrace_LIBRARY_DIRS}"
 )
 
+!!!!! ---- 
 add_custom_command(
     OUTPUT      strus.c
     DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description

@@ -7,8 +7,13 @@
  */
 /// \brief Code generator for the papuga language modules of strusBindings
 /// \file strusBindingsModuleGen.cpp
+#include "papuga/languages.h"
+#if PAPUGA_LANGUAGE_SUPPORT_LUA
 #include "papuga/lib/lua_gen.hpp"
+#endif
+#if PAPUGA_LANGUAGE_SUPPORT_PHP7
 #include "papuga/lib/php7_gen.hpp"
+#endif
 #include "strus/lib/bindings_description.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/base/string_format.hpp"
@@ -92,11 +97,19 @@ int main( int argc, const char* argv[])
 		GenerateSourceFunc printfunc;
 		if (std::strcmp( lang, "lua") == 0)
 		{
+#if PAPUGA_LANGUAGE_SUPPORT_LUA
 			printfunc = &papuga::generateLuaSource;
+#else
+			throw std::runtime_error("Lua support not enabled");
+#endif
 		}
 		else if (std::strcmp( lang, "php7") == 0)
 		{
+#if PAPUGA_LANGUAGE_SUPPORT_PHP7
 			printfunc = &papuga::generatePhp7Source;
+#else
+			throw std::runtime_error("PHP (v7) support not enabled");
+#endif
 		}
 		else
 		{
