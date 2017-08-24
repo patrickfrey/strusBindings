@@ -26,9 +26,11 @@ void strus::printLicense( std::ostream& out)
 static void printFrameFileDescription( std::ostream& out, const char* name, const char* ext, const char* description)
 {
 	out
-	<< "/// \\brief " << description << std::endl
-	<< "/// \\note PROGRAM (strusBindingsGen) GENERATED FILE! DO NOT MODIFY!!!" << std::endl
-	<< "/// \\file " << name << "." << ext << std::endl;
+	<< "/*" << std::endl
+	<< "* @brief " << description << std::endl
+	<< "* @note PROGRAM (strusBindingsGen) GENERATED FILE! DO NOT MODIFY!!!" << std::endl
+	<< "* @file " << name << "." << ext << std::endl
+	<< "*/" << std::endl;
 }
 
 void strus::printHppFrameHeader( std::ostream& out, const char* name, const char* description)
