@@ -14,8 +14,12 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
 
 IF (NOT WITH_PHP STREQUAL "YES")
-MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=\"YES\" to enable it." )
+MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=YES to enable it." )
 ENDIF (NOT WITH_PHP STREQUAL "YES")
+    
+IF (NOT WITH_PYTHON STREQUAL "YES")
+MESSAGE( STATUS  "Python bindings generation is not enabled. Start cmake with -DWITH_PYTHON=YES to enable it." )
+ENDIF (NOT WITH_PYTHON STREQUAL "YES")
     
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
 if(NOT STRUS_ALL)

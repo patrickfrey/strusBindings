@@ -14,6 +14,9 @@
 #if PAPUGA_LANGUAGE_SUPPORT_PHP7
 #include "papuga/lib/php7_gen.hpp"
 #endif
+#if PAPUGA_LANGUAGE_SUPPORT_PYTHON3
+#include "papuga/lib/python3_gen.hpp"
+#endif
 #include "strus/lib/bindings_description.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/base/string_format.hpp"
@@ -109,6 +112,14 @@ int main( int argc, const char* argv[])
 			printfunc = &papuga::generatePhp7Source;
 #else
 			throw std::runtime_error("PHP (v7) support not enabled");
+#endif
+		}
+		else if (std::strcmp( lang, "python3") == 0)
+		{
+#if PAPUGA_LANGUAGE_SUPPORT_PYTHON3
+			printfunc = &papuga::generatePython3Source;
+#else
+			throw std::runtime_error("Python (v3) support not enabled");
 #endif
 		}
 		else

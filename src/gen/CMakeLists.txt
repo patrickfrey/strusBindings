@@ -61,6 +61,12 @@ add_custom_command(
 # ------------------------------
 # PROGRAMS
 # ------------------------------
+IF (WITH_PHP STREQUAL "YES")
+set( PHP7_GEN_LIBS  papuga_php7_gen )
+ENDIF (WITH_PHP STREQUAL "YES")
+IF (WITH_PYTHON STREQUAL "YES")
+set( PYTHON3_GEN_LIBS  papuga_python3_gen )
+ENDIF (WITH_PYTHON STREQUAL "YES")
 add_executable( strusBindingsModuleGen strusBindingsModuleGen.cpp )
-target_link_libraries( strusBindingsModuleGen  "${Boost_LIBRARIES}" strus_base papuga_lua_gen papuga_php7_gen strus_bindings_description ${Intl_LIBRARIES} )
+target_link_libraries( strusBindingsModuleGen  "${Boost_LIBRARIES}" strus_base papuga_lua_gen ${PHP7_GEN_LIBS} ${PYTHON3_GEN_LIBS} strus_bindings_description ${Intl_LIBRARIES} )
 

@@ -27,13 +27,14 @@ static void printUsage()
 
 static void setLuaPath( lua_State* ls, const char* path)
 {
+	const char* cur_path;
 #ifdef STRUS_LOWLEVEL_DEBUG
 	fprintf( stderr, "set lua module path to: '%s'\n", path);
 #endif
 	char pathbuf[ 2048];
 	lua_getglobal( ls, "package");
 	lua_getfield( ls, -1, "path");
-	const char* cur_path = lua_tostring( ls, -1); 
+	cur_path = lua_tostring( ls, -1); 
 	if (cur_path[0])
 	{
 		if (sizeof(pathbuf) <= snprintf( pathbuf, sizeof(pathbuf), "%s;%s/?.lua", cur_path, path))
@@ -59,12 +60,12 @@ static void setLuaPath( lua_State* ls, const char* path)
 
 static void setLuaPathParentDir( lua_State* ls, const char* path)
 {
+	char pathbuf[ 2048];
 	char const* pp = strchr( path, '\0')-1;
 	for (; pp>=path && (*pp == '/' || *pp == '\\'); --pp){}
 	for (; pp>=path && *pp != '/' && *pp != '\\'; --pp){}
 	for (; pp>=path && (*pp == '/' || *pp == '\\'); --pp){}
 	++pp;
-	char pathbuf[ 2048];
 	if (pp - path >= sizeof(pathbuf))
 	{
 		luaL_error( ls, "internal buffer is too small for path");
@@ -82,9 +83,11 @@ int main( int argc, const char* argv[])
 	int argi = 1;
 	int errcode = 0;
 	int modi = 0;
+	int mi,me;
+	int ai,ae;
 	const char* modpath[ MaxModPaths];
 
-	// Parse command line arguments:
+	/* Parse command line arguments: */
 	for (; argi < argc; ++argi)
 	{
 		if (argv[argi][0] != '-')
@@ -126,23 +129,21 @@ int main( int argc, const char* argv[])
 #ifdef STRUS_LOWLEVEL_DEBUG
 	fprintf( stderr, "create lua state\n");
 #endif
-	// Define the lua state:
+	/* Define the lua state: */
 	ls = luaL_newstate();
 	luaL_openlibs( ls);
 	luaopen_strus( ls);
 
-	// Set module directories
+	/* Set module directories: */
 	setLuaPathParentDir( ls, inputfile);
-	int mi = 0, me = modi;
-	for (; mi != me; ++mi)
+	for (mi=0,me=modi; mi != me; ++mi)
 	{
 		setLuaPath( ls, modpath[ mi]);
 	}
 
-	// Define program arguments for lua script:
-	int ai = 0, ae = argc-argi;
+	/* Define program arguments for lua script: */
 	lua_newtable( ls);
-	for (; ai != ae; ++ai)
+	for (ai=0,ae=argc-argi; ai != ae; ++ai)
 	{
 		lua_pushinteger( ls, ai);
 		lua_pushstring( ls, argv[argi+ai]);
@@ -150,7 +151,7 @@ int main( int argc, const char* argv[])
 	}
 	lua_setglobal( ls, "arg");
 
-	// Load the script:
+	/* Load the script: */
 #ifdef STRUS_LOWLEVEL_DEBUG
 	fprintf( stderr, "load script file: '%s'\n", inputfile);
 #endif
@@ -184,7 +185,7 @@ int main( int argc, const char* argv[])
 #ifdef STRUS_LOWLEVEL_DEBUG
 	fprintf( stderr, "starting ...\n");
 #endif
-	// Run the script:
+	/* Run the script: */
 	errcode = lua_pcall( ls, 0, LUA_MULTRET, 0);
 	if (errcode)
 	{
