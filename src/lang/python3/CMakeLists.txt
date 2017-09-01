@@ -52,7 +52,7 @@ add_custom_command(
     COMMENT  "Building the Python (v3) module"
     VERBATIM
 )
-
+    
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm
     DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl"  ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
@@ -69,6 +69,6 @@ add_custom_target(
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install( CODE "execute_process( COMMAND ${PYTHON3_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/setup.py install)" )
+install( CODE "execute_process( COMMAND ${PYTHON3_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/setup.py install )" )
 
 
