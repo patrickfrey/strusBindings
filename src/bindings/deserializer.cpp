@@ -88,11 +88,11 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 		{
 			msgbuf.append( string_format( _TXT(" (in expression at %s)"), location_explain.c_str()));
 		}
-		return strus::runtime_error( msgbuf.c_str());
+		return strus::runtime_error( "%s", msgbuf.c_str());
 	}
 	catch (const std::exception&)
 	{
-		return strus::runtime_error( msg);
+		return strus::runtime_error( "%s", msg);
 	}
 }
 

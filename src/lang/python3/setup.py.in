@@ -1,0 +1,13 @@
+from distutils.core import setup, Extension
+setup(
+	name = "Strus",
+	url = "http://project-strus.net",
+	version = "@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@.@STRUS_PATCH_VERSION@",
+	license = "MPLv2",
+	description = "A set of libraries and tools to implement a text search engine",
+	author = "Patrick P. Frey",
+	include_dirs = ["@CMAKE_CURRENT_BINARY_DIR@","@CMAKE_CURRENT_SOURCE_DIR@"],
+	ext_modules = [Extension("strus", ["@CMAKE_CURRENT_BINARY_DIR@/strus.c"])],
+	package_dir = {"": "@CMAKE_CURRENT_SOURCE_DIR@"}
+)
+

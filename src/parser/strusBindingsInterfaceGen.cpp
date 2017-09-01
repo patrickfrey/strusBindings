@@ -399,7 +399,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		<< "\"" << STRUS_BINDINGS_CONTRIBUTORS << "\","
 		<< "\"" << STRUS_BINDINGS_COPYRIGHT << "\","
 		<< "\"" << STRUS_BINDINGS_LICENSE << "\","
-		<< "\"" << STRUS_BINDINGS_VERSION_STRING << "\""
+		<< "\"" << STRUS_BINDINGS_VERSION_STRING << "\","
 		<< "\"" << STRUS_BINDINGS_URL << "\","
 		<< "};" << std::endl << std::endl;
 

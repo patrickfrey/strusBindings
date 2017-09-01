@@ -6,7 +6,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/php7/php.cmake )
 
 include_directories(
-        "${PHP_INCLUDE_DIRS}"
+        "${PHP7_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
 	"${CMAKE_BINARY_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
@@ -14,7 +14,7 @@ include_directories(
 )
 
 link_directories(
-        "${PHP_LIBRARY_DIRS}"
+        "${PHP7_LIBRARY_DIRS}"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/src"
 	"${PROJECT_SOURCE_DIR}/src/bindings"
 	"${PROJECT_SOURCE_DIR}/src/lang/php7"
@@ -45,7 +45,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT      php.ini
     DEPENDS    strusBindingsModuleGen strus_bindings_description
-    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen php7 ini php.ini "phpini=${PHP_INI_FILE}"
+    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen php7 ini php.ini "phpini=${PHP7_INI_FILE}"
     COMMENT  "Generating PHP 7 .ini file with strus extension loaded"
     VERBATIM
  )
@@ -76,7 +76,7 @@ set_target_properties( strus_bindings_php7 PROPERTIES OUTPUT_NAME strus PREFIX "
 # INSTALLATION
 # ------------------------------
 install( TARGETS strus_bindings_php7
-           LIBRARY DESTINATION "${PHP_EXTENSION_DIR}" )
+           LIBRARY DESTINATION "${PHP7_EXTENSION_DIR}" )
 
 
 
