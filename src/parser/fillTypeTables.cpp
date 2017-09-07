@@ -102,7 +102,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("varname", "$val")
 	;
 	typesystem.defineType( "const std::string&")
-		("retv_map", "{const std::string& retvalstr = $value; papuga_set_CallResult_string_const( $name, retvalstr.c_str(), retvalstr.size());}")
+		("retv_map", "{const std::string& retvalstr = $value; papuga_set_CallResult_string( $name, retvalstr.c_str(), retvalstr.size());}")
 		("argv_map", "ValueVariantWrap::tostring( $value)")
 		("typename", "string")
 	;
@@ -115,7 +115,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "string")
 	;
 	typesystem.defineType( "const char*")
-		("retv_map", "{const char* ptr_$name = $value; if (ptr_$name) papuga_set_CallResult_charp_const( $name, ptr_$name);}")
+		("retv_map", "{const char* ptr_$name = $value; if (ptr_$name) papuga_set_CallResult_charp( $name, ptr_$name);}")
 		("argv_decl", "std::string $name;")
 		("argv_map", "ValueVariantWrap::tocharp( $name, $value)")
 		("typename", "string")

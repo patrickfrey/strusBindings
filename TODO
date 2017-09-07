@@ -1,0 +1,2 @@
+Return values as array, serialization without required OPEN CLOSE to mark one value
+papguga_SerializationIterator data structure and macros for iterating through a serialization, for keeping a door open for optimizations behind the scenes

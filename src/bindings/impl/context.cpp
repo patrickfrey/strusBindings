@@ -381,7 +381,7 @@ bool ContextImpl::storageExists( const ValueVariant& config)
 	return rt;
 }
 
-Struct ContextImpl::unpackStatisticBlob( const std::string& blob, const std::string& procname) const
+Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::string& procname) const
 {
 	const StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -394,9 +394,16 @@ Struct ContextImpl::unpackStatisticBlob( const std::string& blob, const std::str
 		}
 		throw strus::runtime_error(_TXT( "error statistics message processor '%s' not defined"), procname.c_str());
 	}
-	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( blob.c_str(), blob.size()));
-	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 	Struct rt;
+	papuga_ErrorCode errcode = papuga_Ok;
+	std::size_t bloblen;
+	const void* blob = papuga_ValueVariant_toblob( &blob_, &rt.allocator, &bloblen, &errcode);
+	if (errcode != papuga_Ok)
+	{
+		throw strus::runtime_error(_TXT( "cannot convert 1st argument to binary blob: %s"), papuga_ErrorCode_tostring( errcode));
+	}
+	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( blob, bloblen));
+	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, *viewer, &rt.allocator)) throw std::bad_alloc();
 	if (errorhnd->hasError())
 	{

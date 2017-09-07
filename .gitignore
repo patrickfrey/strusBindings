@@ -69,4 +69,8 @@ src/lang/lua/strusLua
 # Generated test data
 tests/lua/exec
 
+# Language interpreter data:
+__pycache__
+
+
 

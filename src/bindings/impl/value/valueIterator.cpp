@@ -48,7 +48,7 @@ bool ValueIterator::getNext( papuga_CallResult* result)
 			return false;
 		}
 	}
-	if (!papuga_set_CallResult_string( result, m_blockitr->c_str(), m_blockitr->size())) throw std::bad_alloc();
+	papuga_set_CallResult_string( result, m_blockitr->c_str(), m_blockitr->size());
 	++m_blockitr;
 	return true;
 }

@@ -44,7 +44,7 @@ bool StatisticsIterator::getNext( papuga_CallResult* result)
 	{
 		StatisticsIteratorInterface* iter = m_iter.get();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		const char* outmsg;
+		const void* outmsg;
 		std::size_t outmsgsize;
 		if (!iter->getNext( outmsg, outmsgsize))
 		{
@@ -54,7 +54,7 @@ bool StatisticsIterator::getNext( papuga_CallResult* result)
 			}
 			return false;
 		}
-		if (!papuga_set_CallResult_string( result, outmsg, outmsgsize)) throw std::bad_alloc();
+		papuga_set_CallResult_blob( result, outmsg, outmsgsize);
 		return true;
 	}
 	catch (const std::bad_alloc& err)
