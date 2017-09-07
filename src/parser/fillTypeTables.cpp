@@ -107,7 +107,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "string")
 	;
 	typesystem.defineType( "std::string")
-		("retv_map", "{std::string retvalstr = $value; if (!papuga_set_CallResult_string( $name, retvalstr.c_str(), retvalstr.size())) throw std::bad_alloc();}")
+		("retv_map", "{std::string retvalstr = $value; if (!papuga_set_CallResult_string_copy( $name, retvalstr.c_str(), retvalstr.size())) throw std::bad_alloc();}")
 		("typename", "string")
 	;
 	typesystem.defineType( "std::string*")
