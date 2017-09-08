@@ -1,6 +1,6 @@
 import strus
 import os
-from utils import concatValues,dumpValue,dumpTree,readFile,writeFile,verifyTestOutput,getPathArray,getFileParentDirectory,getFileName,joinLists,getContextConfig
+from utils import *
 
 def createCollection( strusctx, storagePath, metadata, analyzer, multipart, datadir, fnams, aclmap, withrpc):
 	config = None
@@ -38,7 +38,7 @@ def createCollection( strusctx, storagePath, metadata, analyzer, multipart, data
 			docclass = strusctx.detectDocumentClass( content)
 			doc = analyzer.analyzeSingle( content, docclass)
 			doc['attribute']['docid'] = fnam
-			doc['attribute']['docclass'] = "mimetype=%s, encoding=%s, scheme=%s" % (docclass.get('mimetype',''), docclass.get('encoding',''), docclass.get('scheme',''))
+			doc['attribute']['docclass'] = "mimetype='%s', encoding='%s', scheme='%s'" % (docclass.get('mimetype',''), docclass.get('encoding',''), docclass.get('scheme',''))
 			if aclmap:
 				doc['access'] = aclmap[ fnam]
 			transaction.insertDocument( fnam, doc)

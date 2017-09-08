@@ -4,7 +4,7 @@ require "config_mdprim"
 require "createCollection"
 require "dumpCollection"
 
-local datadir = arg[1] or "../data/t3s/"
+local datadir = arg[1] or "../data/mdprim/"
 local outputdir = arg[2] or '.'
 local ctxconfig = getContextConfig( arg[3])
 local storagedir = outputdir .. "/storage"

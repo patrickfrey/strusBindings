@@ -43,6 +43,7 @@
 #include "structDefs.hpp"
 #include "traceUtils.hpp"
 #include "valueVariantWrap.hpp"
+#include <iostream>
 
 using namespace strus;
 using namespace strus::bindings;
@@ -89,6 +90,11 @@ static ContextDef parseContext( const ValueVariant& ctx)
 	{
 		throw strus::runtime_error(_TXT("expected string or structure for context configuration"));
 	}
+}
+
+ContextImpl::~ContextImpl()
+{
+	/*[-]*/std::cerr << "+++++ DESTRUCTOR OF CONTEXT CALLED" << std::endl;
 }
 
 ContextImpl::ContextImpl( const ValueVariant& descr)

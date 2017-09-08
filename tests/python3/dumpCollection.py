@@ -1,5 +1,5 @@
 import strus
-from utils import concatValues,dumpValue,dumpTree,readFile,writeFile,verifyTestOutput,getPathArray,getFileParentDirectory,getFileName,joinLists,getContextConfig
+from utils import *
 
 def dumpCollection( strusctx, storagePath):
 	config = "path=%s; cache=512M; statsproc=default" % storagePath

@@ -4,19 +4,20 @@ import sys
 import os
 
 def concatValues(obj):
-	if not obj:
-		return "None"
+	if obj is None:
+		return ""
 	elif isinstance(obj, (str,bytes)):
 		return obj
 	elif isinstance(obj, collections.Sequence):
-		rt = None
+		rt = ''
 		for v in obj:
 			if (rt):
 				rt = rt + " " + str(v)
 			else:
 				rt = str(v)
+		return rt
 	elif isinstance(obj, dict):
-		rt = None
+		rt = ''
 		for k,v in obj.items():
 			if (rt):
 				rt = rt + " " + str(v)
@@ -26,12 +27,14 @@ def concatValues(obj):
 	else:
 		return obj
 
-def dumpValue_( obj, depth):
-	if not obj:
+def _dumpValue( obj, depth):
+	if obj is None:
 		return "None"
 	elif isinstance(obj, numbers.Number):
-		if obj.is_integer():
-			return "%d" % obj
+		if isinstance(obj, numbers.Integral):
+			return "%d" % int(obj)
+		elif isinstance(obj, numbers.Real) and obj.is_integer():
+			return "%d" % int(obj)
 		else:
 			return "%.5f" % obj
 	elif isinstance(obj, (str,bytes)):
@@ -44,7 +47,7 @@ def dumpValue_( obj, depth):
 		for v in obj:
 			if i > 0:
 				s = s + ', '
-			s = s + '[' + str(i) + '] = ' + dumpValue_( v, depth-1)
+			s = s + '[' + str(i) + '] = ' + _dumpValue( v, depth-1)
 			i = i + 1
 		return s + '} '
 	elif isinstance(obj, dict):
@@ -58,20 +61,22 @@ def dumpValue_( obj, depth):
 			i = i + 1
 			if isinstance(obj, (str,bytes)):
 				k = '"' + k + '"'
-			s = s + '[' + str(k) + '] = ' + dumpValue_( v, depth-1)
+			s = s + '[' + str(k) + '] = ' + _dumpValue( v, depth-1)
 		return s + '} '
 	else:
-		return str(obj)
+		return "'" + str(obj) + "'"
 
 def dumpValue( o):
-	return dumpValue_( o, 10)
+	return _dumpValue( o, 10)
 
-def dumpTree_( indent, obj, depth):
-	if not obj:
+def _dumpTree( indent, obj, depth):
+	if obj is None:
 		return "None"
 	elif isinstance(obj, numbers.Number):
-		if obj.is_integer():
-			return "%d" % obj
+		if isinstance(obj, numbers.Integral):
+			return "%d" % int(obj)
+		elif isinstance(obj, numbers.Real) and obj.is_integer():
+			return "%d" % int(obj)
 		else:
 			return "%.5f" % obj
 	elif isinstance(obj, (str,bytes)):
@@ -79,11 +84,15 @@ def dumpTree_( indent, obj, depth):
 	elif isinstance(obj, collections.Sequence):
 		if (depth == 0):
 			return "{...}"
-		s = None
+		s = ''
+		i = 0
 		for v in obj:
-			if s:
-				s = s + ', '
-			s = s + '[' + str(i) + '] = ' + dumpValue_( v, depth-1)
+			ke = "\n" + indent + "number " + str(i+1)
+			ve = _dumpTree( indent + '  ', v, depth-1)
+			if ve and ve[0] == "\n":
+				s = s + ke + ":" + ve
+			else:
+				s = s + ke + ": " + ve
 			i = i + 1
 		return s
 	elif isinstance(obj, dict):
@@ -91,18 +100,18 @@ def dumpTree_( indent, obj, depth):
 			return "{...}"
 		s = ''
 		for k in sorted( obj.keys()):
-			ke = "\n" + indent + " " + str(k)
-			ve = dumpTree_( indent + '  ', obj[ k], depth-1)
-			if ve[0] == "\n":
+			ke = "\n" + indent + type(k).__name__ + " " + str(k)
+			ve = _dumpTree( indent + '  ', obj[ k], depth-1)
+			if ve and ve[0] == "\n":
 				s = s + ke + ":" + ve
 			else:
 				s = s + ke + ": " + ve
 		return s
 	else:
-		return str(obj)
+		return "'" + str(obj) + "'"
 
 def dumpTree( obj):
-	return dumpTree_( "", obj, 10)
+	return _dumpTree( "", obj, 10)
 
 def readFile( path):
 	with open( path) as f:
@@ -159,3 +168,5 @@ def getContextConfig( argval):
 		return {'rpc':argval}
 	else:
 		return None
+
+

@@ -11,7 +11,6 @@ local storage = outputdir .. "/storage"
 local docfiles = {"doc10.xml"}
 local withrpc = (ctxconfig and ctxconfig.rpc) and true or false
 
--- ctx = strus_Context.new( )
 ctx = strus_Context.new( ctxconfig)
 if not withrpc then
 	ctx:loadModule( "analyzer_pattern")

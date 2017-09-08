@@ -1,7 +1,7 @@
 import sys
 import strus
-from utils import concatValues,dumpValue,dumpTree,readFile,writeFile,verifyTestOutput,getPathArray,getFileParentDirectory,getFileName,joinLists,getContextConfig
-from config_t3s import createDocumentAnalyzer_t3s,createQueryAnalyzer_t3s,metadata_t3s,createQueryEval_t3s
+from utils import *
+from config_t3s import *
 from createCollection import createCollection
 from dumpCollection import dumpCollection
 
@@ -31,593 +31,592 @@ aclmap = {"A.xml":"a", "B.xml":"b", "C.xml":"c"}
 
 createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), False, datadir, docfiles, aclmap, withrpc)
 result = "collection dump:" + dumpTree( dumpCollection( ctx, storage)) + "\n"
-expected = """
-collection dump:
-string config:
-  string acl: "True"
-  string cache: "524288K"
-  string metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
-  string path: "storage"
-string docids:
+expected = """collection dump:
+str config:
+  str acl: "true"
+  str cache: "524288K"
+  str metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
+  str path: "storage"
+str docids:
   number 1:
-    string docno: 3
-    string id: "A.xml"
+    str docno: 3
+    str id: "A.xml"
   number 2:
-    string docno: 2
-    string id: "B.xml"
+    str docno: 2
+    str id: "B.xml"
   number 3:
-    string docno: 1
-    string id: "C.xml"
-string docs:
-  string A.xml:
-    string ACL: "a"
-    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme=None"
-    string docid: "A.xml"
-    string doclen: 20
-    string docno: 3
-    string endtitle: ""
-    string orig: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen."
-    string title: "One day in Tokyo"
-    string title_end: 6
-    string title_start: 0
-    string word: "one day in tokyo is a citi that complet differ than what you would expect as european citizen"
-  string B.xml:
-    string ACL: "b"
-    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme=None"
-    string docid: "B.xml"
-    string doclen: 16
-    string docno: 2
-    string endtitle: ""
-    string orig: "A visit in New York New York is a city with dimensions you can't imagine."
-    string title: "A visit in New York"
-    string title_end: 7
-    string title_start: 0
-    string word: "in is a citi you visit new york with dimens can t imagin"
-  string C.xml:
-    string ACL: "c"
-    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme=None"
-    string docid: "C.xml"
-    string doclen: 16
-    string docno: 1
-    string endtitle: ""
-    string orig: "A journey through Germany When I first visited germany it was still splitted into two parts."
-    string title: "A journey through Germany"
-    string title_end: 6
-    string title_start: 0
-    string word: "a visit journey through germani when i first it was still split into two part"
-string nofdocs: 3
-string stat:
-  string dfchange:
+    str docno: 1
+    str id: "C.xml"
+str docs:
+  str A.xml:
+    str ACL: "a"
+    str docclass: "mimetype='application/xml', encoding='UTF-8', scheme=''"
+    str docid: "A.xml"
+    str doclen: 20
+    str docno: 3
+    str endtitle: ""
+    str orig: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen."
+    str title: "One day in Tokyo"
+    str title_end: 6
+    str title_start: 0
+    str word: "one day in tokyo is a citi that complet differ than what you would expect as european citizen"
+  str B.xml:
+    str ACL: "b"
+    str docclass: "mimetype='application/xml', encoding='UTF-8', scheme=''"
+    str docid: "B.xml"
+    str doclen: 16
+    str docno: 2
+    str endtitle: ""
+    str orig: "A visit in New York New York is a city with dimensions you can't imagine."
+    str title: "A visit in New York"
+    str title_end: 7
+    str title_start: 0
+    str word: "in is a citi you visit new york with dimens can t imagin"
+  str C.xml:
+    str ACL: "c"
+    str docclass: "mimetype='application/xml', encoding='UTF-8', scheme=''"
+    str docid: "C.xml"
+    str doclen: 16
+    str docno: 1
+    str endtitle: ""
+    str orig: "A journey through Germany When I first visited germany it was still splitted into two parts."
+    str title: "A journey through Germany"
+    str title_end: 6
+    str title_start: 0
+    str word: "a visit journey through germani when i first it was still split into two part"
+str nofdocs: 3
+str stat:
+  str dfchange:
     number 1:
-      string increment: 1
-      string type: "word"
-      string value: "part"
+      str increment: 1
+      str type: "word"
+      str value: "part"
     number 2:
-      string increment: 1
-      string type: "word"
-      string value: "two"
+      str increment: 1
+      str type: "word"
+      str value: "two"
     number 3:
-      string increment: 1
-      string type: "word"
-      string value: "split"
+      str increment: 1
+      str type: "word"
+      str value: "split"
     number 4:
-      string increment: 1
-      string type: "word"
-      string value: "still"
+      str increment: 1
+      str type: "word"
+      str value: "still"
     number 5:
-      string increment: 1
-      string type: "word"
-      string value: "was"
+      str increment: 1
+      str type: "word"
+      str value: "was"
     number 6:
-      string increment: 1
-      string type: "word"
-      string value: "first"
+      str increment: 1
+      str type: "word"
+      str value: "first"
     number 7:
-      string increment: 1
-      string type: "word"
-      string value: "i"
+      str increment: 1
+      str type: "word"
+      str value: "i"
     number 8:
-      string increment: 1
-      string type: "word"
-      string value: "when"
+      str increment: 1
+      str type: "word"
+      str value: "when"
     number 9:
-      string increment: 1
-      string type: "word"
-      string value: "germani"
+      str increment: 1
+      str type: "word"
+      str value: "germani"
     number 10:
-      string increment: 1
-      string type: "word"
-      string value: "journey"
+      str increment: 1
+      str type: "word"
+      str value: "journey"
     number 11:
-      string increment: 1
-      string type: "word"
-      string value: "can"
+      str increment: 1
+      str type: "word"
+      str value: "can"
     number 12:
-      string increment: 1
-      string type: "word"
-      string value: "dimens"
+      str increment: 1
+      str type: "word"
+      str value: "dimens"
     number 13:
-      string increment: 1
-      string type: "word"
-      string value: "through"
+      str increment: 1
+      str type: "word"
+      str value: "through"
     number 14:
-      string increment: 1
-      string type: "word"
-      string value: "with"
+      str increment: 1
+      str type: "word"
+      str value: "with"
     number 15:
-      string increment: 1
-      string type: "word"
-      string value: "t"
+      str increment: 1
+      str type: "word"
+      str value: "t"
     number 16:
-      string increment: 1
-      string type: "word"
-      string value: "imagin"
+      str increment: 1
+      str type: "word"
+      str value: "imagin"
     number 17:
-      string increment: 1
-      string type: "word"
-      string value: "new"
+      str increment: 1
+      str type: "word"
+      str value: "new"
     number 18:
-      string increment: 2
-      string type: "word"
-      string value: "visit"
+      str increment: 2
+      str type: "word"
+      str value: "visit"
     number 19:
-      string increment: 1
-      string type: "word"
-      string value: "expect"
+      str increment: 1
+      str type: "word"
+      str value: "expect"
     number 20:
-      string increment: 1
-      string type: "word"
-      string value: "citizen"
+      str increment: 1
+      str type: "word"
+      str value: "citizen"
     number 21:
-      string increment: 1
-      string type: "word"
-      string value: "into"
+      str increment: 1
+      str type: "word"
+      str value: "into"
     number 22:
-      string increment: 1
-      string type: "word"
-      string value: "what"
+      str increment: 1
+      str type: "word"
+      str value: "what"
     number 23:
-      string increment: 1
-      string type: "word"
-      string value: "it"
+      str increment: 1
+      str type: "word"
+      str value: "it"
     number 24:
-      string increment: 1
-      string type: "word"
-      string value: "would"
+      str increment: 1
+      str type: "word"
+      str value: "would"
     number 25:
-      string increment: 1
-      string type: "word"
-      string value: "than"
+      str increment: 1
+      str type: "word"
+      str value: "than"
     number 26:
-      string increment: 1
-      string type: "word"
-      string value: "european"
+      str increment: 1
+      str type: "word"
+      str value: "european"
     number 27:
-      string increment: 1
-      string type: "word"
-      string value: "differ"
+      str increment: 1
+      str type: "word"
+      str value: "differ"
     number 28:
-      string increment: 1
-      string type: "word"
-      string value: "complet"
+      str increment: 1
+      str type: "word"
+      str value: "complet"
     number 29:
-      string increment: 1
-      string type: "word"
-      string value: "that"
+      str increment: 1
+      str type: "word"
+      str value: "that"
     number 30:
-      string increment: 2
-      string type: "word"
-      string value: "citi"
+      str increment: 2
+      str type: "word"
+      str value: "citi"
     number 31:
-      string increment: 3
-      string type: "word"
-      string value: "a"
+      str increment: 3
+      str type: "word"
+      str value: "a"
     number 32:
-      string increment: 2
-      string type: "word"
-      string value: "is"
+      str increment: 2
+      str type: "word"
+      str value: "is"
     number 33:
-      string increment: 2
-      string type: "word"
-      string value: "in"
+      str increment: 2
+      str type: "word"
+      str value: "in"
     number 34:
-      string increment: 1
-      string type: "word"
-      string value: "york"
+      str increment: 1
+      str type: "word"
+      str value: "york"
     number 35:
-      string increment: 2
-      string type: "word"
-      string value: "you"
+      str increment: 2
+      str type: "word"
+      str value: "you"
     number 36:
-      string increment: 1
-      string type: "word"
-      string value: "tokyo"
+      str increment: 1
+      str type: "word"
+      str value: "tokyo"
     number 37:
-      string increment: 1
-      string type: "word"
-      string value: "day"
+      str increment: 1
+      str type: "word"
+      str value: "day"
     number 38:
-      string increment: 1
-      string type: "word"
-      string value: "as"
+      str increment: 1
+      str type: "word"
+      str value: "as"
     number 39:
-      string increment: 1
-      string type: "word"
-      string value: "one"
+      str increment: 1
+      str type: "word"
+      str value: "one"
     number 40:
-      string increment: 3
-      string type: "endtitle"
-      string value: ""
-  string nofdocs: 3
-string terms:
-  string A.xml:endtitle (f): 
-  string A.xml:endtitle (s):
+      str increment: 3
+      str type: "endtitle"
+      str value: ""
+  str nofdocs: 3
+str terms:
+  str A.xml:endtitle (f): 
+  str A.xml:endtitle (s):
     number 1:
-      string firstpos: 5
-      string tf: 1
-      string value: ""
-  string A.xml:orig (f):
+      str firstpos: 5
+      str tf: 1
+      str value: ""
+  str A.xml:orig (f):
     number 1:
-      string pos: 1
-      string value: "One"
+      str pos: 1
+      str value: "One"
     number 2:
-      string pos: 2
-      string value: "day"
+      str pos: 2
+      str value: "day"
     number 3:
-      string pos: 3
-      string value: "in"
+      str pos: 3
+      str value: "in"
     number 4:
-      string pos: 4
-      string value: "Tokyo"
+      str pos: 4
+      str value: "Tokyo"
     number 5:
-      string pos: 6
-      string value: "Tokyo"
+      str pos: 6
+      str value: "Tokyo"
     number 6:
-      string pos: 7
-      string value: "is"
+      str pos: 7
+      str value: "is"
     number 7:
-      string pos: 8
-      string value: "a"
+      str pos: 8
+      str value: "a"
     number 8:
-      string pos: 9
-      string value: "city"
+      str pos: 9
+      str value: "city"
     number 9:
-      string pos: 10
-      string value: "that"
+      str pos: 10
+      str value: "that"
     number 10:
-      string pos: 11
-      string value: "is"
+      str pos: 11
+      str value: "is"
     number 11:
-      string pos: 12
-      string value: "completely"
+      str pos: 12
+      str value: "completely"
     number 12:
-      string pos: 13
-      string value: "different"
+      str pos: 13
+      str value: "different"
     number 13:
-      string pos: 14
-      string value: "than"
+      str pos: 14
+      str value: "than"
     number 14:
-      string pos: 15
-      string value: "what"
+      str pos: 15
+      str value: "what"
     number 15:
-      string pos: 16
-      string value: "you"
+      str pos: 16
+      str value: "you"
     number 16:
-      string pos: 17
-      string value: "would"
+      str pos: 17
+      str value: "would"
     number 17:
-      string pos: 18
-      string value: "expect"
+      str pos: 18
+      str value: "expect"
     number 18:
-      string pos: 19
-      string value: "as"
+      str pos: 19
+      str value: "as"
     number 19:
-      string pos: 20
-      string value: "European"
+      str pos: 20
+      str value: "European"
     number 20:
-      string pos: 21
-      string value: "citizen."
-  string A.xml:orig (s): 
-  string A.xml:word (f): 
-  string A.xml:word (s):
+      str pos: 21
+      str value: "citizen."
+  str A.xml:orig (s): 
+  str A.xml:word (f): 
+  str A.xml:word (s):
     number 1:
-      string firstpos: 1
-      string tf: 1
-      string value: "one"
+      str firstpos: 1
+      str tf: 1
+      str value: "one"
     number 2:
-      string firstpos: 2
-      string tf: 1
-      string value: "day"
+      str firstpos: 2
+      str tf: 1
+      str value: "day"
     number 3:
-      string firstpos: 3
-      string tf: 1
-      string value: "in"
+      str firstpos: 3
+      str tf: 1
+      str value: "in"
     number 4:
-      string firstpos: 4
-      string tf: 2
-      string value: "tokyo"
+      str firstpos: 4
+      str tf: 2
+      str value: "tokyo"
     number 5:
-      string firstpos: 7
-      string tf: 2
-      string value: "is"
+      str firstpos: 7
+      str tf: 2
+      str value: "is"
     number 6:
-      string firstpos: 8
-      string tf: 1
-      string value: "a"
+      str firstpos: 8
+      str tf: 1
+      str value: "a"
     number 7:
-      string firstpos: 9
-      string tf: 1
-      string value: "citi"
+      str firstpos: 9
+      str tf: 1
+      str value: "citi"
     number 8:
-      string firstpos: 10
-      string tf: 1
-      string value: "that"
+      str firstpos: 10
+      str tf: 1
+      str value: "that"
     number 9:
-      string firstpos: 12
-      string tf: 1
-      string value: "complet"
+      str firstpos: 12
+      str tf: 1
+      str value: "complet"
     number 10:
-      string firstpos: 13
-      string tf: 1
-      string value: "differ"
+      str firstpos: 13
+      str tf: 1
+      str value: "differ"
     number 11:
-      string firstpos: 14
-      string tf: 1
-      string value: "than"
+      str firstpos: 14
+      str tf: 1
+      str value: "than"
     number 12:
-      string firstpos: 15
-      string tf: 1
-      string value: "what"
+      str firstpos: 15
+      str tf: 1
+      str value: "what"
     number 13:
-      string firstpos: 16
-      string tf: 1
-      string value: "you"
+      str firstpos: 16
+      str tf: 1
+      str value: "you"
     number 14:
-      string firstpos: 17
-      string tf: 1
-      string value: "would"
+      str firstpos: 17
+      str tf: 1
+      str value: "would"
     number 15:
-      string firstpos: 18
-      string tf: 1
-      string value: "expect"
+      str firstpos: 18
+      str tf: 1
+      str value: "expect"
     number 16:
-      string firstpos: 19
-      string tf: 1
-      string value: "as"
+      str firstpos: 19
+      str tf: 1
+      str value: "as"
     number 17:
-      string firstpos: 20
-      string tf: 1
-      string value: "european"
+      str firstpos: 20
+      str tf: 1
+      str value: "european"
     number 18:
-      string firstpos: 21
-      string tf: 1
-      string value: "citizen"
-  string B.xml:endtitle (f): 
-  string B.xml:endtitle (s):
+      str firstpos: 21
+      str tf: 1
+      str value: "citizen"
+  str B.xml:endtitle (f): 
+  str B.xml:endtitle (s):
     number 1:
-      string firstpos: 6
-      string tf: 1
-      string value: ""
-  string B.xml:orig (f):
+      str firstpos: 6
+      str tf: 1
+      str value: ""
+  str B.xml:orig (f):
     number 1:
-      string pos: 1
-      string value: "A"
+      str pos: 1
+      str value: "A"
     number 2:
-      string pos: 2
-      string value: "visit"
+      str pos: 2
+      str value: "visit"
     number 3:
-      string pos: 3
-      string value: "in"
+      str pos: 3
+      str value: "in"
     number 4:
-      string pos: 4
-      string value: "New"
+      str pos: 4
+      str value: "New"
     number 5:
-      string pos: 5
-      string value: "York"
+      str pos: 5
+      str value: "York"
     number 6:
-      string pos: 7
-      string value: "New"
+      str pos: 7
+      str value: "New"
     number 7:
-      string pos: 8
-      string value: "York"
+      str pos: 8
+      str value: "York"
     number 8:
-      string pos: 9
-      string value: "is"
+      str pos: 9
+      str value: "is"
     number 9:
-      string pos: 10
-      string value: "a"
+      str pos: 10
+      str value: "a"
     number 10:
-      string pos: 11
-      string value: "city"
+      str pos: 11
+      str value: "city"
     number 11:
-      string pos: 12
-      string value: "with"
+      str pos: 12
+      str value: "with"
     number 12:
-      string pos: 13
-      string value: "dimensions"
+      str pos: 13
+      str value: "dimensions"
     number 13:
-      string pos: 14
-      string value: "you"
+      str pos: 14
+      str value: "you"
     number 14:
-      string pos: 15
-      string value: "can't"
+      str pos: 15
+      str value: "can't"
     number 15:
-      string pos: 17
-      string value: "imagine."
-  string B.xml:orig (s): 
-  string B.xml:word (f): 
-  string B.xml:word (s):
+      str pos: 17
+      str value: "imagine."
+  str B.xml:orig (s): 
+  str B.xml:word (f): 
+  str B.xml:word (s):
     number 1:
-      string firstpos: 3
-      string tf: 1
-      string value: "in"
+      str firstpos: 3
+      str tf: 1
+      str value: "in"
     number 2:
-      string firstpos: 9
-      string tf: 1
-      string value: "is"
+      str firstpos: 9
+      str tf: 1
+      str value: "is"
     number 3:
-      string firstpos: 1
-      string tf: 2
-      string value: "a"
+      str firstpos: 1
+      str tf: 2
+      str value: "a"
     number 4:
-      string firstpos: 11
-      string tf: 1
-      string value: "citi"
+      str firstpos: 11
+      str tf: 1
+      str value: "citi"
     number 5:
-      string firstpos: 14
-      string tf: 1
-      string value: "you"
+      str firstpos: 14
+      str tf: 1
+      str value: "you"
     number 6:
-      string firstpos: 2
-      string tf: 1
-      string value: "visit"
+      str firstpos: 2
+      str tf: 1
+      str value: "visit"
     number 7:
-      string firstpos: 4
-      string tf: 2
-      string value: "new"
+      str firstpos: 4
+      str tf: 2
+      str value: "new"
     number 8:
-      string firstpos: 5
-      string tf: 2
-      string value: "york"
+      str firstpos: 5
+      str tf: 2
+      str value: "york"
     number 9:
-      string firstpos: 12
-      string tf: 1
-      string value: "with"
+      str firstpos: 12
+      str tf: 1
+      str value: "with"
     number 10:
-      string firstpos: 13
-      string tf: 1
-      string value: "dimens"
+      str firstpos: 13
+      str tf: 1
+      str value: "dimens"
     number 11:
-      string firstpos: 15
-      string tf: 1
-      string value: "can"
+      str firstpos: 15
+      str tf: 1
+      str value: "can"
     number 12:
-      string firstpos: 16
-      string tf: 1
-      string value: "t"
+      str firstpos: 16
+      str tf: 1
+      str value: "t"
     number 13:
-      string firstpos: 17
-      string tf: 1
-      string value: "imagin"
-  string C.xml:endtitle (f): 
-  string C.xml:endtitle (s):
+      str firstpos: 17
+      str tf: 1
+      str value: "imagin"
+  str C.xml:endtitle (f): 
+  str C.xml:endtitle (s):
     number 1:
-      string firstpos: 5
-      string tf: 1
-      string value: ""
-  string C.xml:orig (f):
+      str firstpos: 5
+      str tf: 1
+      str value: ""
+  str C.xml:orig (f):
     number 1:
-      string pos: 1
-      string value: "A"
+      str pos: 1
+      str value: "A"
     number 2:
-      string pos: 2
-      string value: "journey"
+      str pos: 2
+      str value: "journey"
     number 3:
-      string pos: 3
-      string value: "through"
+      str pos: 3
+      str value: "through"
     number 4:
-      string pos: 4
-      string value: "Germany"
+      str pos: 4
+      str value: "Germany"
     number 5:
-      string pos: 6
-      string value: "When"
+      str pos: 6
+      str value: "When"
     number 6:
-      string pos: 7
-      string value: "I"
+      str pos: 7
+      str value: "I"
     number 7:
-      string pos: 8
-      string value: "first"
+      str pos: 8
+      str value: "first"
     number 8:
-      string pos: 9
-      string value: "visited"
+      str pos: 9
+      str value: "visited"
     number 9:
-      string pos: 10
-      string value: "germany"
+      str pos: 10
+      str value: "germany"
     number 10:
-      string pos: 11
-      string value: "it"
+      str pos: 11
+      str value: "it"
     number 11:
-      string pos: 12
-      string value: "was"
+      str pos: 12
+      str value: "was"
     number 12:
-      string pos: 13
-      string value: "still"
+      str pos: 13
+      str value: "still"
     number 13:
-      string pos: 14
-      string value: "splitted"
+      str pos: 14
+      str value: "splitted"
     number 14:
-      string pos: 15
-      string value: "into"
+      str pos: 15
+      str value: "into"
     number 15:
-      string pos: 16
-      string value: "two"
+      str pos: 16
+      str value: "two"
     number 16:
-      string pos: 17
-      string value: "parts."
-  string C.xml:orig (s): 
-  string C.xml:word (f): 
-  string C.xml:word (s):
+      str pos: 17
+      str value: "parts."
+  str C.xml:orig (s): 
+  str C.xml:word (f): 
+  str C.xml:word (s):
     number 1:
-      string firstpos: 1
-      string tf: 1
-      string value: "a"
+      str firstpos: 1
+      str tf: 1
+      str value: "a"
     number 2:
-      string firstpos: 9
-      string tf: 1
-      string value: "visit"
+      str firstpos: 9
+      str tf: 1
+      str value: "visit"
     number 3:
-      string firstpos: 2
-      string tf: 1
-      string value: "journey"
+      str firstpos: 2
+      str tf: 1
+      str value: "journey"
     number 4:
-      string firstpos: 3
-      string tf: 1
-      string value: "through"
+      str firstpos: 3
+      str tf: 1
+      str value: "through"
     number 5:
-      string firstpos: 4
-      string tf: 2
-      string value: "germani"
+      str firstpos: 4
+      str tf: 2
+      str value: "germani"
     number 6:
-      string firstpos: 6
-      string tf: 1
-      string value: "when"
+      str firstpos: 6
+      str tf: 1
+      str value: "when"
     number 7:
-      string firstpos: 7
-      string tf: 1
-      string value: "i"
+      str firstpos: 7
+      str tf: 1
+      str value: "i"
     number 8:
-      string firstpos: 8
-      string tf: 1
-      string value: "first"
+      str firstpos: 8
+      str tf: 1
+      str value: "first"
     number 9:
-      string firstpos: 11
-      string tf: 1
-      string value: "it"
+      str firstpos: 11
+      str tf: 1
+      str value: "it"
     number 10:
-      string firstpos: 12
-      string tf: 1
-      string value: "was"
+      str firstpos: 12
+      str tf: 1
+      str value: "was"
     number 11:
-      string firstpos: 13
-      string tf: 1
-      string value: "still"
+      str firstpos: 13
+      str tf: 1
+      str value: "still"
     number 12:
-      string firstpos: 14
-      string tf: 1
-      string value: "split"
+      str firstpos: 14
+      str tf: 1
+      str value: "split"
     number 13:
-      string firstpos: 15
-      string tf: 1
-      string value: "into"
+      str firstpos: 15
+      str tf: 1
+      str value: "into"
     number 14:
-      string firstpos: 16
-      string tf: 1
-      string value: "two"
+      str firstpos: 16
+      str tf: 1
+      str value: "two"
     number 15:
-      string firstpos: 17
-      string tf: 1
-      string value: "part"
-string types:
+      str firstpos: 17
+      str tf: 1
+      str value: "part"
+str types:
   number 1: "endtitle"
   number 2: "orig"
   number 3: "word"
