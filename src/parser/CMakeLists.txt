@@ -16,7 +16,7 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
 	"${strusbase_INCLUDE_DIRS}"
 	"${strus_INCLUDE_DIRS}"
-	"${strusanalyzer_INCLUDE_DIRS}" )
+	"${strusanalyzer_INCLUDE_DIRS}"
 	"${Boost_LIBRARY_DIRS}"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strus_LIBRARY_DIRS}"
