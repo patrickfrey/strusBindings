@@ -92,11 +92,6 @@ static ContextDef parseContext( const ValueVariant& ctx)
 	}
 }
 
-ContextImpl::~ContextImpl()
-{
-	/*[-]*/std::cerr << "+++++ DESTRUCTOR OF CONTEXT CALLED" << std::endl;
-}
-
 ContextImpl::ContextImpl( const ValueVariant& descr)
 	:m_errorhnd_impl()
 	,m_moduleloader_impl()
