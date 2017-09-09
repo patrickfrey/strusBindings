@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "objInitializers.hpp"
-#include "private/internationalization.hpp"
+#include "internationalization.hpp"
 #include <zend.h>
 #include <zend_API.h>
 #include <zend_exceptions.h>

@@ -9,8 +9,8 @@
 #include <boost/python.hpp>
 #include "strus/bindingObjects.hpp"
 #include "objInitializers.hpp"
-#include "private/internationalization.hpp"
-#include "private/wcharString.hpp"
+#include "internationalization.hpp"
+#include "wcharString.hpp"
 
 WString Term::ucvalue() const
 {

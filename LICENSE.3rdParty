@@ -3,33 +3,30 @@
 
 Table of Contents
 ----------------------
-    SWIG 3.0 library
-    textwolf
-    boost
+	lua
+	textwolf
+	boost
+	fmt
+	Zend framework (PHP)
 
 textwolf
 ----------
-   LGPL
-   Copyright (c) 2010 Patrick P. Frey
+	MPL v2.0
+	Copyright (c) 2010 Patrick P. Frey
 
 boost
 -------
-    http://www.boost.org/LICENSE_1_0.txt
+	http://www.boost.org/LICENSE_1_0.txt
 
-SWIG 3.0 library
+lua
 ----------------
-Free to use under own license terms. See section SWIG libraries and examples in http://www.swig.org/Release/LICENSE:
+	MIT license (https://www.lua.org/license.html)
 
-The SWIG library and examples, under the Lib and Examples top level 
-directories, are distributed under the following terms:
+fmt
+----------------
+       BSD 2-clause "Simplified" License
+       https://github.com/fmtlib/fmt/blob/master/LICENSE.rst
 
-  You may copy, modify, distribute, and make derivative works based on
-  this software, in source code or object code form, without
-  restriction. If you distribute the software to others, you may do
-  so according to the terms of your choice. This software is offered as
-  is, without warranty of any kind.
-
-See the COPYRIGHT file for a list of contributors to SWIG and their
-copyright notices.
-
-
+Zend framework (PHP)
+----------------
+       New BSD License

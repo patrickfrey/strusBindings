@@ -6,117 +6,34 @@ include(cmake/install_prefix.cmake)
 # Project globals:
 project( StrusBindings )
 set( STRUS_MAJOR_VERSION 0 )
-set( STRUS_MINOR_VERSION 14 )
+set( STRUS_MINOR_VERSION 15 )
 set( STRUS_PATCH_VERSION 0 )
 set( STRUS_VERSION ${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}.${STRUS_PATCH_VERSION} )
 
-IF (NOT WITH_JAVA STREQUAL "YES")
-MESSAGE( STATUS  "Java bindings generation is not enabled. Start cmake with -DWITH_JAVA=\"YES\" to enable it." )
-ENDIF (NOT WITH_JAVA STREQUAL "YES")
-IF (NOT WITH_PYTHON STREQUAL "YES")
-MESSAGE( STATUS  "Python bindings generation is not enabled. Start cmake with -DWITH_PYTHON=\"YES\" to enable it." )
-ENDIF (NOT WITH_PYTHON STREQUAL "YES")
-IF (NOT WITH_PHP STREQUAL "YES")
-MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=\"YES\" to enable it." )
-ENDIF (NOT WITH_PHP STREQUAL "YES")
-
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 find_package(Threads REQUIRED)
+
+IF (WITH_PHP STREQUAL "YES")
+MESSAGE( STATUS  "PHP (v7)  bindings generation is enabled." )
+ELSE (WITH_PHP STREQUAL "YES")
+MESSAGE( STATUS  "PHP bindings generation is not enabled. Start cmake with -DWITH_PHP=YES to enable it." )
+ENDIF (WITH_PHP STREQUAL "YES")
     
+IF (WITH_PYTHON STREQUAL "YES")
+MESSAGE( STATUS  "Python (v3) bindings generation is enabled." )
+ELSE (WITH_PYTHON STREQUAL "YES")
+MESSAGE( STATUS  "Python bindings generation is not enabled. Start cmake with -DWITH_PYTHON=YES to enable it." )
+ENDIF (WITH_PYTHON STREQUAL "YES")
+    
+set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
 if(NOT STRUS_ALL)
 include( cmake/dist.cmake )
 include( cmake/LinuxDistribution.cmake )
 include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
 include( cmake/intl.cmake )
+include( cmake/standard_targets.cmake )
 endif()
-
-IF( WITH_PHP STREQUAL "YES" )
-	if( APPLE OR WIN32 )
-		set( PHP_EXTENSION_DIR "${PROJECT_BINARY_DIR}/lang/php/${CMAKE_BUILD_TYPE}" )
-	else( APPLE OR WIN32 )
-		set( PHP_EXTENSION_DIR "${PROJECT_BINARY_DIR}/lang/php" )
-	endif( APPLE OR WIN32 )
-ENDIF( WITH_PHP STREQUAL "YES" )
-
-IF (WITH_JAVA STREQUAL "YES" OR WITH_PHP STREQUAL "YES")
-   # findSWIG is a little bit broken
-   # findSWIG()
-   find_package(SWIG REQUIRED)
-   if(NOT SWIG_FOUND)
-      MESSAGE( STATUS  "SWIG is required")
-   else()
-      MESSAGE( STATUS  "SWIG binary is: ${SWIG_EXECUTABLE}")
-   endif()
-ENDIF()
-
-IF (WITH_JAVA STREQUAL "YES")
-find_package( Java REQUIRED )
-find_package( Java COMPONENTS Development )
-include( UseJava )
-IF (DEFINED Java_VERSION)
-   MESSAGE( STATUS  "Found Java package ${Java_VERSION}" )
-ELSE (DEFINED Java_VERSION)
-   MESSAGE( STATUS  "Could not locate Java package" )
-ENDIF (DEFINED Java_VERSION)
-
-find_package( JNI REQUIRED )
-IF (${JNI_FOUND} STREQUAL "TRUE")
-   MESSAGE( STATUS  "Found JNI package")
-ELSE (${JNI_FOUND} STREQUAL "TRUE")
-   MESSAGE( STATUS  "Could not locate JNI package: ${JNI_FOUND} ")
-ENDIF (${JNI_FOUND} STREQUAL "TRUE")
-
-if(UNIX AND NOT APPLE)
-  MESSAGE( STATUS "Is UNIX" )
-  # make sure we always have a JAVA_HOME variable set
-  IF ("$ENV{JAVA_HOME}" STREQUAL "")
-    EXECUTE_PROCESS(
-      COMMAND readlink "-f" "/usr/bin/javac"
-      COMMAND sed "s:/bin/javac::"
-      OUTPUT_VARIABLE JAVA_HOME OUTPUT_STRIP_TRAILING_WHITESPACE
-      ERROR_VARIABLE JAVA_HOME_ERROR_OUTPUT
-      ERROR_VARIABLE JAVA_HOME_RETURN_VALUE)
-    SET( ENV{JAVA_HOME} "${JAVA_HOME}" )
-  ENDIF ("$ENV{JAVA_HOME}" STREQUAL "")  
-  IF ("$ENV{JAVA_HOME}" STREQUAL "" )
-    MESSAGE(STATUS "JAVA_HOME_RETURN_VALUE")
-    MESSAGE(FATAL_ERROR "JAVA_HOME is not set!")
-  ELSE ("$ENV{JAVA_HOME}" STREQUAL "")
-    SET( JAVA_HOME "$ENV{JAVA_HOME}" )
-  ENDIF ("$ENV{JAVA_HOME}" STREQUAL "" )
-  MESSAGE( STATUS "JAVA_HOME: ${JAVA_HOME}" )
-
-  # avoid errors like 'libmawt.so: cannot open shared object file' (for
-  # instance on Debian), do not use the one in 'headless', it seems not
-  # to work properly
-  find_library(JAVA_MAWT_LIBRARY NAMES mawt
-      PATHS "${JAVA_HOME}/jre/lib/amd64/xawt"
-            "${JAVA_HOME}/jre/lib/i386/xawt"
-  )
-  if(JAVA_MAWT_LIBRARY)
-    MESSAGE( STATUS "JAVA_MAWT_LIBRARY: ${JAVA_MAWT_LIBRARY}")
-  else()
-    set(JAVA_MAWT_LIBRARY "")
-    MESSAGE( STATUS "No mawt library found, hope we can do without" )
-  endif()
-endif()
-
-ENDIF (WITH_JAVA STREQUAL "YES")
-
-IF (WITH_PYTHON STREQUAL "YES")
-	find_package( PythonLibs 2.7 REQUIRED )
-	find_program( PYTHON_EXECUTABLE NAMES python2.7 python2 )
-	execute_process ( COMMAND /usr/bin/env ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)" OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
-IF (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
-   MESSAGE( STATUS  "Found PythonLibs package" )
-   MESSAGE( STATUS  "Using python binary: ${PYTHON_EXECUTABLE}" )
-   MESSAGE( STATUS  "Python include dirs: ${PYTHON_INCLUDE_DIRS}" )
-   MESSAGE( STATUS  "Python libraries: ${PYTHON_LIBRARIES}" )
-ELSE (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
-   MESSAGE( STATUS  "Could not locate PythonLibs package: ${PYTHONLIBS_FOUND} ")
-ENDIF (${PYTHONLIBS_FOUND} STREQUAL "TRUE")
-ENDIF (WITH_PYTHON STREQUAL "YES")
 
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 MESSAGE( STATUS  "Tests for strusVector enabled." )
@@ -136,13 +53,14 @@ find_strus_package( module )
 find_strus_package( trace )
 find_strus_package( rpc )
 
-set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
-configure_file( "${PROJECT_SOURCE_DIR}/src/version.hpp.in"   "${PROJECT_SOURCE_DIR}/src/version.hpp"   @ONLY )
-configure_file( "${PROJECT_SOURCE_DIR}/lang/php/php.ini.in"  "${PROJECT_BINARY_DIR}/lang/php/php.ini"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_BINARY_DIR}/include/strus/versionBindings.hpp"   @ONLY )
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)
-configure_file( "${PROJECT_SOURCE_DIR}/src/internationalization.cpp.in"  "${PROJECT_SOURCE_DIR}/src/internationalization.cpp"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/src/bindings/internationalization.cpp.in"  "${CMAKE_BINARY_DIR}/src/bindings/internationalization.cpp"  @ONLY )
+IF (WITH_PHP STREQUAL "YES")
+configure_file( "${PROJECT_SOURCE_DIR}/tests/php7/php.ini.in"  "${CMAKE_BINARY_DIR}/tests/php7/php.ini"  @ONLY )
+ENDIF (WITH_PHP STREQUAL "YES")
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh.in"  "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD.in"  "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc"  @ONLY )
@@ -153,15 +71,32 @@ configure_file( "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec.in"  "${PR
 enable_testing()
 
 # Subdirectories:
+add_subdirectory( 3rdParty )
 add_subdirectory( src )
-add_subdirectory( lang )
 add_subdirectory( tests )
   
 if(NOT STRUS_ALL)
 include( cmake/report_build_settings.cmake )
 endif()
 
-if(NOT STRUS_ALL)
-include( cmake/standard_targets.cmake )
-endif()
+# Install header files:
+install(DIRECTORY include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY  3rdParty/papuga/include/papuga
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.h")
+install(FILES  3rdParty/papuga/include/papuga.h
+          DESTINATION include )
+# Install generated header files:
+install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
+          DESTINATION include
+          FILES_MATCHING PATTERN "*.h")
+
 

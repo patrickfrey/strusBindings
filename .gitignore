@@ -31,19 +31,16 @@ CMakeCache.txt
 CMakeFiles
 Makefile
 cmake_install.cmake
-cmake_install.cmake.user
 install_manifest.txt
 CTestTestfile.cmake
 CMakeLists.txt.user
-CTestTestfile.cmake.user
-cmake/uninstall.cmake
+uninstall.cmake
 DartConfiguration.tcl
 Testing/
 CPackConfig.cmake
 CPackSourceConfig.cmake
-cmake/build_rules.cmake.user
-src/internationalization.cpp
-src/version.hpp
+*.cmake.user
+src/bindings/internationalization.cpp
 dist/obs/deploy_to_obs.sh
 dist/archlinux/PKGBUILD
 dist/obs/strusbindings.dsc
@@ -52,36 +49,28 @@ dist/obs/strusbindings-xUbuntu_12.04.dsc
 dist/obs/strusbindings-Debian_8.0.dsc
 dist/obs/strusbindings-xUbuntu_14.04.dsc
 dist/redhat/strusbindings.spec
-lang/php/php.ini
+
+# Generated files
+lang/java
+lang/php
+lang/python
+include/strus/lib/lua.h
+src/lang/lua/libstrus_bindings_lua.c
+src/bindings/libstrus_bindings_description.cpp
+include/strus/lib/bindings_description.hpp
+src/bindings/bindingObjects.cpp
+include/strus/bindingObjects.h
 
 # Compiled programs
-tests/query_cpp/src/testBindingsQuery
-lang/java/net/strus/example/*.class
-lang/java/net/strus/api/*.class
-*.pyc
+src/parser/strusBindingsInterfaceGen
+src/gen/strusBindingsModuleGen
+src/lang/lua/strusLua
 
 # Generated test data
-tests/query_cpp/storage/
-lang/java/net/strus/example/storage/
-lang/java/net/strus/example/vsm/
-lang/python/example/storage/
-lang/python/example/vsm/
-lang/python/example/storage_unicode/
-lang/php/example/storage/
-lang/php/example/vsm/
+tests/lua/exec
 
-# SWIG generated code
-lang/strusPYTHON_wrap.cxx
-lang/php/strus_wrap.cpp
-lang/php/php_strus.h
-lang/php/strus.php
-lang/java/strus_wrap.c
-lang/java/*.java
-lang/java/strus_wrap.cxx
-lang/java/net/strus/api/*.jar
-lang/java/net/strus/api/*.java
-lang/java/net/strus/api/*.class
-lang/python.swig/strus.pyc
-lang/python.swig/strus.py
-lang/python.swig/strus_wrap.cxx
+# Language interpreter data:
+__pycache__
+
+
 

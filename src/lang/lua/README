@@ -1,0 +1,2 @@
+# For using strus in a script with the standard Lua interpreter you have to copy the
+# built shared object libstrus_bindings_lua.so to strus.so in your Lua environment.
