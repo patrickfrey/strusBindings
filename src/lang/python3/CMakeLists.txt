@@ -46,20 +46,11 @@ add_custom_command(
     VERBATIM
  )
  
-# add_custom_command(
-#     OUTPUT setup.stamp
-#     COMMAND  ${PYTHON3_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/setup.py build
-#     COMMAND  ${CMAKE_COMMAND} -E  touch setup.stamp
-#     DEPENDS   ${CMAKE_CURRENT_BINARY_DIR}/setup.py
-#     COMMENT  "Building the Python (v3) module"
-#     VERBATIM
-# )
-  
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm
     DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl"  ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
     COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl" ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
-    COMMENT  "Generating bindings interface doc html file ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py"
+    COMMENT  "Generating bindings interface doc html file ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm"
     VERBATIM
 )
 
@@ -68,26 +59,26 @@ add_custom_target(
     DEPENDS strus.c ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py papuga_python3_gen ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm
 )
 
-add_library( strus_python MODULE strus.c )
-add_dependencies( strus_python python3_mod )
-set_target_properties( strus_python PROPERTIES 
+add_library( strus_bindings_python3 MODULE strus.c )
+add_dependencies( strus_bindings_python3 python3_mod )
+set_target_properties( strus_bindings_python3 PROPERTIES 
 				PREFIX "" 
 				OUTPUT_NAME strus 
 				LINK_FLAGS ${PYTHON3_MODULE_LINK_FLAGS} 
 				COMPILE_FLAGS ${PYTHON3_MODULE_CXX_FLAGS} )
-target_link_libraries( strus_python ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
+target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
 				debug strus_bindings_d optimized strus_bindings
 				debug papuga_python3_dev_d optimized papuga_python3_dev )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )
 if(LIBKVM_LIBRARIES)
-	target_link_libraries( strus_python ${LIBKVM_LIBRARIES} )
+	target_link_libraries( strus_bindings_python3 ${LIBKVM_LIBRARIES} )
 endif()
 
 # ------------------------------
 # INSTALLATION
 # ------------------------------
-install( TARGETS strus_python
+install( TARGETS strus_bindings_python3
            LIBRARY DESTINATION ${PYTHON3_SITE_PACKAGES} )
 
