@@ -7,7 +7,7 @@ add_custom_target( Php7TestExecDir ALL COMMAND ${CMAKE_COMMAND} -E make_director
 
 macro(add_php7_test name args )
     add_test( Php7${name} ${PHP7_EXECUTABLE} -c ${CMAKE_BINARY_DIR}/tests/php7/php.ini -f "${PHP7_TESTDIR}/test${name}.php" ${args} )
-    set_property( TEST Php7${name} PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/3rdParty/papuga/php7:${CMAKE_BINARY_DIR}/src/bindings:${Boost_LIBRARY_DIRS}")
+    set_property( TEST Php7${name} PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/3rdParty/papuga/php7:${CMAKE_BINARY_DIR}/src/bindings:${LD_LIBRARY_PATH}")
 endmacro(add_php7_test)
 
 add_php7_test( LoadStrusExtension "" )
