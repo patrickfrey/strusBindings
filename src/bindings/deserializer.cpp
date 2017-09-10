@@ -11,6 +11,7 @@
 #include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "valueVariantWrap.hpp"
 #include <string>
 #include <cstring>
@@ -1234,7 +1235,7 @@ void Deserializer::buildWeightingFormula(
 		}
 	}
 	const ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser( parsername);
-	std::auto_ptr<ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source, std::vector<std::string>()));
+	strus::local_ptr<ScalarFunctionInterface> scalarfunc( scalarfuncparser->createFunction( source, std::vector<std::string>()));
 	if (!scalarfunc.get())
 	{
 		throw strus::runtime_error(_TXT( "failed to create %s (%s) from source: %s"), context, source.c_str(), errorhnd->fetchError());
@@ -1982,7 +1983,7 @@ static void buildStorageIndex(
 					unsigned char pos_defined = 0;
 					std::string type;
 					std::string value;
-					unsigned int pos;
+					unsigned int pos = 0;
 					do
 					{
 						int idx = namemap.index( si->value);
