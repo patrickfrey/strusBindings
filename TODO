@@ -1,2 +1,3 @@
-Return values as array, serialization without required OPEN CLOSE to mark one value
+Return values as array, serialization without required OPEN CLOSE to mark one value (NO Serialization is better)
 papguga_SerializationIterator data structure and macros for iterating through a serialization, for keeping a door open for optimizations behind the scenes
+Check multiple propagation of flags like -O0 -O2 -O3 for the same target (remove silly STRUS_OPTIMIZATION_LEVEL)

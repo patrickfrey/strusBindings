@@ -6,9 +6,11 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 include_directories(
 	"${Boost_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_BINARY_DIR}/include"
+	"${CMAKE_BINARY_DIR}/3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
+	"${CMAKE_BINARY_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/include"
+	"${CMAKE_BINARY_DIR}/src/gen"
 	"${PROJECT_SOURCE_DIR}/src/gen"
 	"${strusbase_INCLUDE_DIRS}"
 )

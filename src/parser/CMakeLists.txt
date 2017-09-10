@@ -12,7 +12,9 @@ set( source_files
 include_directories(
 	"${Boost_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
+	"${CMAKE_BINARY_DIR}/include"
 	"${PROJECT_SOURCE_DIR}/include"
+	"${CMAKE_BINARY_DIR}/3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
 	"${strusbase_INCLUDE_DIRS}"
 	"${strus_INCLUDE_DIRS}"
