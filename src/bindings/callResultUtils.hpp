@@ -17,21 +17,11 @@
 #include "bindingClassTemplate.hpp"
 #include "serializer.hpp"
 
-namespace {
+namespace strus {
 
-void initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Struct& st)
-{
-	papuga_Allocator* allocator = papuga_Allocator_alloc_Allocator( &retval->allocator);
-	if (!allocator) std::bad_alloc();
-	std::memcpy( allocator, &st.allocator, sizeof(st.allocator));
-	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
-	std::memcpy( retval->value.value.serialization, &st.serialization, sizeof(papuga_Serialization));
-}
+void initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Struct& st);
 
-void initCallResultIterator( papuga_CallResult* retval, const strus::bindings::Iterator& st)
-{
-	if (!papuga_set_CallResult_iterator( retval, st.iterator.data, st.iterator.destroy, st.iterator.getNext)) throw std::bad_alloc();
-}
+void initCallResultIterator( papuga_CallResult* retval, const strus::bindings::Iterator& st);
 
 template <typename STRUCTVALUE>
 void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* st)

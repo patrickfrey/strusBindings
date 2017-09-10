@@ -11,6 +11,7 @@ set( bindings_source_files
 	serializer.cpp
 	deserializer.cpp
 	valueVariantWrap.cpp
+	callResultUtils.cpp
 	utils.cpp
 	traceUtils.cpp
 	${CMAKE_BINARY_DIR}/src/bindings/internationalization.cpp
