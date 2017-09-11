@@ -28,8 +28,8 @@ file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/strus/lib )
 
 add_custom_command(
     OUTPUT   
-                ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h
-		${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp
+                ${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/bindingObjects.h
+		${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/lib/bindings_description.hpp
 	        ${CMAKE_CURRENT_BINARY_DIR}/../bindings/bindingObjects.cpp
 		${CMAKE_CURRENT_BINARY_DIR}/../bindings/bindingClassTemplate.hpp
 	        ${CMAKE_CURRENT_BINARY_DIR}/../bindings/libstrus_bindings_description.cpp
@@ -50,14 +50,14 @@ add_custom_command(
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/postingIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/valueIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/searchTermsIterator.hpp
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../parser/strusBindingsInterfaceGen ${CMAKE_BINARY_DIR}  ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
+    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../parser/strusBindingsInterfaceGen ${CMAKE_CURRENT_BINARY_DIR}  ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
     COMMENT  "Generating strus bindings C header and implementation (output root dir: ${CMAKE_BINARY_DIR})"
     VERBATIM
  )
  
  add_custom_target(
     strus_bindings_c_interface ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/../bindings/bindingObjects.cpp ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h ${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp ${CMAKE_CURRENT_BINARY_DIR}/../bindings/bindingClassTemplate.hpp ${CMAKE_CURRENT_BINARY_DIR}/../bindings/libstrus_bindings_description.cpp
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/../bindings/bindingObjects.cpp ${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/bindingObjects.h ${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/lib/bindings_description.hpp ${CMAKE_CURRENT_BINARY_DIR}/../bindings/bindingClassTemplate.hpp ${CMAKE_CURRENT_BINARY_DIR}/../bindings/libstrus_bindings_description.cpp
 )
 
 # ------------------------------
