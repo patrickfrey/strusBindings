@@ -30,12 +30,12 @@ set( bindings_source_files
 	impl/context.cpp
 	bindingObjects.cpp
 )
-set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/bindingObjects.cpp PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/libstrus_bindings_description.cpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( bindingObjects.cpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( libstrus_bindings_description.cpp PROPERTIES GENERATED TRUE ) 
 set_source_files_properties( ${CMAKE_BINARY_DIR}/include/strus/lib/bindingObjects.h PROPERTIES GENERATED TRUE ) 
 set_source_files_properties( ${CMAKE_BINARY_DIR}/include/strus/lib/bindings_description.hpp PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/bindingClassIds.hpp PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( ${CMAKE_BINARY_DIR}/src/bindings/bindingClassTemplate.hpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( bindingClassIds.hpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( bindingClassTemplate.hpp PROPERTIES GENERATED TRUE ) 
 
 include_directories(
 	"${Boost_INCLUDE_DIRS}"
