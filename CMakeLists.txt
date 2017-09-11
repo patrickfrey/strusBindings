@@ -53,13 +53,13 @@ find_strus_package( module )
 find_strus_package( trace )
 find_strus_package( rpc )
 
-configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_BINARY_DIR}/include/strus/versionBindings.hpp"   @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_CURRENT_BINARY_DIR}/include/strus/versionBindings.hpp"   @ONLY )
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)
-configure_file( "${PROJECT_SOURCE_DIR}/src/bindings/internationalization.cpp.in"  "${CMAKE_BINARY_DIR}/src/bindings/internationalization.cpp"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/src/bindings/internationalization.cpp.in"  "${CMAKE_CURRENT_BINARY_DIR}/src/bindings/internationalization.cpp"  @ONLY )
 IF (WITH_PHP STREQUAL "YES")
-configure_file( "${PROJECT_SOURCE_DIR}/tests/php7/php.ini.in"  "${CMAKE_BINARY_DIR}/tests/php7/php.ini"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/tests/php7/php.ini.in"  "${CMAKE_CURRENT_BINARY_DIR}/tests/php7/php.ini"  @ONLY )
 ENDIF (WITH_PHP STREQUAL "YES")
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh.in"  "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD.in"  "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD"  @ONLY )
@@ -92,10 +92,10 @@ install(DIRECTORY  3rdParty/papuga/include/papuga
 install(FILES  3rdParty/papuga/include/papuga.h
           DESTINATION include )
 # Install generated header files:
-install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
+install(DIRECTORY  ${CMAKE_CURRENT_BINARY_DIR}/include/strus
           DESTINATION include
           FILES_MATCHING PATTERN "*.hpp")
-install(DIRECTORY  ${CMAKE_BINARY_DIR}/include/strus
+install(DIRECTORY  ${CMAKE_CURRENT_BINARY_DIR}/include/strus
           DESTINATION include
           FILES_MATCHING PATTERN "*.h")
 
