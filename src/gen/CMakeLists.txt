@@ -19,7 +19,6 @@ link_directories(
 	"${Boost_LIBRARY_DIRS}"
 	"${strusbase_LIBRARY_DIRS}"
 	"${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/src"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/3rdParty/fmt/fmt"
 )
 
 # --------------------------------------
