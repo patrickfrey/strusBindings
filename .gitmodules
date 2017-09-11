@@ -4,3 +4,6 @@
 [submodule "3rdParty/papuga"]
 	path = 3rdParty/papuga
 	url = git@github.com:patrickfrey/papuga.git
+[submodule "papuga"]
+	path = papuga
+	url = https://github.com/patrickfrey/papuga
