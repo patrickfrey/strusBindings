@@ -24,7 +24,7 @@ link_directories(
 # --------------------------------------
 # C INTERFACE CODE GEN
 # --------------------------------------
-file( MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/include/strus/lib )
+file( MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/lib )
 
 add_custom_command(
     OUTPUT   
