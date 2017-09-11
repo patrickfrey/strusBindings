@@ -58,7 +58,7 @@ include_directories(
 )
 
 link_directories(
-	"${PROJECT_SOURCE_DIR}/3rdParty/lua_cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/lua_cmake"
 	"${Boost_LIBRARY_DIRS}"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"

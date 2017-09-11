@@ -18,10 +18,9 @@ include_directories(
 
 link_directories(
         "${PYTHON3_LIBRARY_DIRS}"
-	"${CMAKE_BINARY_DIR}/3rdParty/papuga/src"
-	"${CMAKE_BINARY_DIR}/3rdParty/papuga/python3"
-	"${CMAKE_BINARY_DIR}/src/bindings"
-	"${CMAKE_BINARY_DIR}/src/lang/python3"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/python3"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"

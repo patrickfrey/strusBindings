@@ -18,7 +18,7 @@ include_directories(
 link_directories(
 	"${Boost_LIBRARY_DIRS}"
 	"${strusbase_LIBRARY_DIRS}"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/src"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/src"
 )
 
 # --------------------------------------

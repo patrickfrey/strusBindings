@@ -15,9 +15,8 @@ include_directories(
 
 link_directories(
         "${PHP7_LIBRARY_DIRS}"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/src"
-	"${PROJECT_SOURCE_DIR}/src/bindings"
-	"${PROJECT_SOURCE_DIR}/src/lang/php7"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
 	"${strusbase_LIBRARY_DIRS}"
 	"${strusmodule_LIBRARY_DIRS}"
 	"${strusrpc_LIBRARY_DIRS}"
