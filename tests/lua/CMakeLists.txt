@@ -6,8 +6,8 @@ set( LUA_EXECDIR "${CMAKE_CURRENT_BINARY_DIR}/exec" )
 add_custom_target( LuaTestExecDir ALL COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/exec" )
 
 macro(add_lua_test name args )
-    add_test( Lua${name} ${CMAKE_BINARY_DIR}/src/lang/lua/strusLua  "${PROJECT_SOURCE_DIR}/tests/lua/test${name}.lua" ${args} )
-    set_property( TEST Lua${name} PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/3rdParty/papuga/lua:${CMAKE_BINARY_DIR}/src/bindings:$ENV{LD_LIBRARY_PATH}")
+    add_test( Lua${name} ${CMAKE_CURRENT_BINARY_DIR}/../../src/lang/lua/strusLua  "${PROJECT_SOURCE_DIR}/tests/lua/test${name}.lua" ${args} )
+    set_property( TEST Lua${name} PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/lua:${CMAKE_CURRENT_BINARY_DIR}/../../src/bindings:$ENV{LD_LIBRARY_PATH}")
 endmacro(add_lua_test)
 
 add_lua_test( HelloWorld "" )

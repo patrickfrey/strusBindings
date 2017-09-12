@@ -4,4 +4,5 @@ Check multiple propagation of flags like -O0 -O2 -O3 for the same target (remove
 Serialization node allocation chunkwise as in allocator without realloc (possible if papguga_SerializationIterator is available)
 Serialization node allocation aligned
 Save tag as private element in ValueVariant and used macros for access
+Check if all submodules are consistent (e.g. latest nfixes of textwolf)
 

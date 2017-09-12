@@ -11,7 +11,7 @@ set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-
 include_directories(
         "${PYTHON3_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_BINARY_DIR}/include"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/include"
 )
@@ -31,31 +31,31 @@ link_directories(
 
 add_custom_command(
     OUTPUT      strus.c
-    DEPENDS    ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description
-    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen python3 module strus.c 
+    DEPENDS    ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description
+    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen python3 module strus.c 
     COMMENT  "Generating Python3 module source strus.c"
     VERBATIM
  )
  
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
-    DEPENDS   ${CMAKE_BINARY_DIR}/include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
-    COMMAND  ${CMAKE_BINARY_DIR}/src/gen/strusBindingsModuleGen python3 doc ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
-    COMMENT  "Generating bindings interface doc description file ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py"
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/strus.py
+    DEPENDS   ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
+    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen python3 doc ${CMAKE_CURRENT_BINARY_DIR}/strus.py
+    COMMENT  "Generating bindings interface doc description file ${CMAKE_CURRENT_BINARY_DIR}/strus.py"
     VERBATIM
  )
  
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm
-    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl"  ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
-    COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl" ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py
+    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl"  ${CMAKE_CURRENT_BINARY_DIR}/strus.py
+    COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/python3/strusPythonDoc.tpl" ${CMAKE_CURRENT_BINARY_DIR}/strus.py
     COMMENT  "Generating bindings interface doc html file ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm"
     VERBATIM
 )
 
 add_custom_target(
     python3_mod ALL
-    DEPENDS strus.c ${CMAKE_BINARY_DIR}/src/lang/python3/strus.py papuga_python3_gen ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm
+    DEPENDS strus.c ${CMAKE_CURRENT_BINARY_DIR}/strus.py papuga_python3_gen ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm
 )
 
 add_library( strus_bindings_python3 MODULE strus.c )
