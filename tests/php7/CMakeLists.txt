@@ -15,7 +15,9 @@ add_php7_test( CreateCollection_t3s  "${PHP7_DATADIR}/t3s"  "${PHP7_EXECDIR}" )
 add_php7_test( Query_t3s "${PHP7_DATADIR}/t3s"  "${PHP7_EXECDIR}" )
 add_php7_test( CreateCollection_mdprim "${PHP7_DATADIR}/mdprim" "${PHP7_EXECDIR}" )
 add_php7_test( Query_mdprim "${PHP7_DATADIR}/mdprim"  "${PHP7_EXECDIR}" )
+IF (WITH_STRUS_VECTOR STREQUAL "YES")
 add_php7_test( Vectors "${PHP7_EXECDIR}" )
+ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
 
 

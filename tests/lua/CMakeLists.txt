@@ -15,5 +15,7 @@ add_lua_test( CreateCollection_t3s  "${LUA_DATADIR}/t3s"  "${LUA_EXECDIR}" )
 add_lua_test( Query_t3s "${LUA_DATADIR}/t3s"  "${LUA_EXECDIR}" )
 add_lua_test( CreateCollection_mdprim "${LUA_DATADIR}/mdprim" "${LUA_EXECDIR}" )
 add_lua_test( Query_mdprim "${LUA_DATADIR}/mdprim"  "${LUA_EXECDIR}" )
+IF (WITH_STRUS_VECTOR STREQUAL "YES")
 add_lua_test( Vectors "${LUA_EXECDIR}" )
+ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
