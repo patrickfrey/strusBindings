@@ -4,7 +4,7 @@ git submodule foreach git pull
 
 mkdir build
 cd build
-cmake -DWITH_STRUS_VECTOR="YES" -DWITH_STRUS_PATTERN="YES" ..	
+cmake -DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=YES -DWITH_PHP=YES  -DWITH_PYTHON=YES  ..	
 make -j<N>
 make test ARGS=-j<N>
 
