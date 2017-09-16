@@ -7,7 +7,7 @@ add_custom_target( Python3TestExecDir ALL COMMAND ${CMAKE_COMMAND} -E make_direc
 
 macro(add_python3_test name args )
     add_test( Python3${name} ${PYTHON3_EXECUTABLE}  "${PY3_TESTDIR}/test${name}.py" ${args} )
-    SET_TESTS_PROPERTIES( Python3${name}  PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/strusBindings/3rdParty/papuga/python3:${CMAKE_BINARY_DIR}/3rdParty/papuga/python3:${CMAKE_BINARY_DIR}/src/bindings:${CMAKE_BINARY_DIR}/strusBindings/src/bindings:${BOOST_LIBRARYDIR}:$ENV{LD_LIBRARY_PATH}" )
+    SET_TESTS_PROPERTIES( Python3${name}  PROPERTIES ENVIRONMENT LD_LIBRARY_PATH="${CMAKE_BINARY_DIR}/strusBindings/3rdParty/papuga/python3:${CMAKE_BINARY_DIR}/3rdParty/papuga/python3:${CMAKE_BINARY_DIR}/src/bindings:${CMAKE_BINARY_DIR}/strusBindings/src/bindings:${BOOST_LIBRARYDIR}:$ENV{LD_LIBRARY_PATH}" )
     SET_TESTS_PROPERTIES( Python3${name}  PROPERTIES ENVIRONMENT STRUS_MODULE_PATH="${STRUS_MODULE_PATH}" )
 endmacro(add_python3_test)
 
