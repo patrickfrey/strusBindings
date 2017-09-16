@@ -18,9 +18,6 @@ $docfiles = ["doc10.xml"];
 $withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
 
 $ctx = new StrusContext( $ctxconfig);
-if (!$withrpc) {
-	$ctx->loadModule( "analyzer_pattern");
-}
 $aclmap = ["1"=>'A',"2"=>'A',"3"=>'A',"4"=>'A',"5"=>'A',"6"=>'B',"7"=>'B',"8"=>'B',"9"=>'B',"10"=>'B'];
 
 createCollection( $ctx, $storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( $ctx), True, $datadir, $docfiles, $aclmap, $withrpc);

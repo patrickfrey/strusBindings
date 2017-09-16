@@ -18,9 +18,6 @@ $docfiles = ["A.xml","B.xml","C.xml"];
 $withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
 
 $ctx = new StrusContext( $ctxconfig);
-if (!$withrpc) {
-	$ctx->loadModule( "analyzer_pattern");
-}
 $aclmap = ["A.xml" => "a", "B.xml" => "b", "C.xml" => "c"];
 
 createCollection( $ctx, $storage, metadata_t3s(), createDocumentAnalyzer_t3s( $ctx), False, $datadir, $docfiles, $aclmap, $withrpc);

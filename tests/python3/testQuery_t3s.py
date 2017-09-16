@@ -27,7 +27,6 @@ if ctxconfig and ctxconfig['rpc']:
 ctx = strus.Context( ctxconfig)
 storageConfig = None
 if not withrpc:
-	ctx.loadModule( "analyzer_pattern")
 	storageConfig = "path='%s';metadata='%s';cache=512M" % (storagedir, metadata_t3s())
 output = {}
 

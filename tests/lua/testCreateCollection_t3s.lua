@@ -12,9 +12,6 @@ local docfiles = {"A.xml","B.xml","C.xml"}
 local withrpc = (ctxconfig and ctxconfig.rpc) and true or false
 
 ctx = strus_Context.new( ctxconfig)
-if not withrpc then
-	ctx:loadModule( "analyzer_pattern")
-end
 local aclmap = {["A.xml"]="a",["B.xml"]="b",["C.xml"]="c"}
 
 createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, aclmap, withrpc)

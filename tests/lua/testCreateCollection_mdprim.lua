@@ -12,9 +12,6 @@ local docfiles = {"doc10.xml"}
 local withrpc = (ctxconfig and ctxconfig.rpc) and true or false
 
 ctx = strus_Context.new( ctxconfig)
-if not withrpc then
-	ctx:loadModule( "analyzer_pattern")
-end
 local aclmap = {["1"]='A',["2"]='A',["3"]='A',["4"]='A',["5"]='A',["6"]='B',["7"]='B',["8"]='B',["9"]='B',["10"]='B'}
 
 createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), true, datadir, docfiles, aclmap, withrpc)

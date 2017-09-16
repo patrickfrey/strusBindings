@@ -16,7 +16,6 @@ local ctx = strus_Context.new( ctxconfig)
 local storageConfig = nil
 
 if not withrpc then
-	ctx:loadModule( "analyzer_pattern")
 	storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_t3s())
 end
 

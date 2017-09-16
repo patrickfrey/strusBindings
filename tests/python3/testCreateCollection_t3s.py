@@ -25,8 +25,6 @@ if ctxconfig and ctxconfig['rpc']:
 	withrpc = True
 
 ctx = strus.Context( ctxconfig)
-if not withrpc:
-	ctx.loadModule( "analyzer_pattern")
 aclmap = {"A.xml":"a", "B.xml":"b", "C.xml":"c"}
 
 createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), False, datadir, docfiles, aclmap, withrpc)

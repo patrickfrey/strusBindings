@@ -20,7 +20,6 @@ $withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
 $storageConfig = NULL;
 $ctx = new StrusContext( $ctxconfig);
 if (!$withrpc) {
-	$ctx->loadModule( "analyzer_pattern");
 	$storageConfig = "path='" . $storagedir . "';metadata='" . metadata_t3s() . "';cache=512M";
 }
 
