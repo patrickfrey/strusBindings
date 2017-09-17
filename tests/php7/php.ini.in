@@ -1,5 +1,5 @@
 [PHP]
-open_basedir=@CMAKE_CURRENT_BINARY_DIR@/../../../tests/php7/:@CMAKE_CURRENT_BINARY_DIR@:@CMAKE_CURRENT_BINARY_DIR@/../data
+open_basedir=@PROJECT_SOURCE_DIR@/strusBindings/tests/php7:@PROJECT_SOURCE_DIR@/tests/php7:@CMAKE_CURRENT_BINARY_DIR@:@CMAKE_CURRENT_BINARY_DIR@/../data
 extension_dir=@CMAKE_CURRENT_BINARY_DIR@/../../src/lang/php7
 include_path=@CMAKE_CURRENT_BINARY_DIR@/../../../tests/php7
 extension=strus.so
