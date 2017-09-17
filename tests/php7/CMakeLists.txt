@@ -1,5 +1,7 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
+configure_file( "php.ini.in"  "${CMAKE_CURRENT_BINARY_DIR}/php.ini"  @ONLY )
+
 set( PHP7_TESTDIR "${PROJECT_SOURCE_DIR}/tests/php7" )
 set( PHP7_DATADIR "${PROJECT_SOURCE_DIR}/tests/data" )
 set( PHP7_EXECDIR "${CMAKE_CURRENT_BINARY_DIR}/exec" )
