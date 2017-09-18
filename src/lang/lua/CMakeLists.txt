@@ -10,6 +10,7 @@ include_directories(
 
 link_directories(
 	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/3rdParty/lua_cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
 	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
 	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
 	"${strusbase_LIBRARY_DIRS}"

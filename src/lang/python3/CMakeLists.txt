@@ -11,8 +11,9 @@ set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-
 include_directories(
         "${PYTHON3_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
