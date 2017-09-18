@@ -13,6 +13,7 @@ macro(add_python3_test name args )
     add_test( Python3${name} ${PYTHON3_EXECUTABLE}  "${PY3_TESTDIR}/test${name}.py" ${args} )
     set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT LD_LIBRARY_PATH=${TEST_LD_LIBRARY_PATH} )  
     set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT STRUS_MODULE_PATH=${STRUS_MODULE_PATH} )
+    set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../../src/lang/python3 )
 endmacro(add_python3_test)
 
 add_python3_test( PrintEnv "" )
