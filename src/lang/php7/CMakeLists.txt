@@ -8,14 +8,14 @@ include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/php7/php.cmake )
 include_directories(
         "${PHP7_INCLUDE_DIRS}"
 	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
 	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
+	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
 	"${PROJECT_SOURCE_DIR}/include"
 )
 
 link_directories(
         "${PHP7_LIBRARY_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
 	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
 	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
 	"${strusbase_LIBRARY_DIRS}"
