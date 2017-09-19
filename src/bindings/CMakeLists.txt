@@ -38,31 +38,30 @@ set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingClassIds.hpp PRO
 set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingClassTemplate.hpp PROPERTIES GENERATED TRUE ) 
 
 include_directories(
-	"${Boost_INCLUDE_DIRS}"
-	"${Intl_INCLUDE_DIRS}"
-	"${PROJECT_SOURCE_DIR}/3rdParty/lua"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/textwolf/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/textwolf/include"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../include"
-	"${PROJECT_SOURCE_DIR}/include"
-	"${CMAKE_CURRENT_BINARY_DIR}"
-	"${PROJECT_SOURCE_DIR}/src/bindings"
-	"${strusbase_INCLUDE_DIRS}"
-	"${strus_INCLUDE_DIRS}"
-	"${strusanalyzer_INCLUDE_DIRS}"
-	"${strusmodule_INCLUDE_DIRS}"
-	"${strustrace_INCLUDE_DIRS}"
-	"${strusrpc_INCLUDE_DIRS}"
+	${Boost_INCLUDE_DIRS}
+	${Intl_INCLUDE_DIRS}
+	${LUA_INCLUDE_DIRS}
+	${TEXTWOLF_INCLUDE_DIRS}
+	${PAPUGA_INCLUDE_DIRS}
+	${BINDINGS_INCLUDE_DIRS}
+	${BINDINGS_SOURCE_DIRS}
+	${CMAKE_CURRENT_BINARY_DIR}
+	${strusbase_INCLUDE_DIRS}
+	${strus_INCLUDE_DIRS}
+	${strusanalyzer_INCLUDE_DIRS}
+	${strusmodule_INCLUDE_DIRS}
+	${strustrace_INCLUDE_DIRS}
+	${strusrpc_INCLUDE_DIRS}
 )
 
 link_directories(
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/lua_cmake"
-	"${Boost_LIBRARY_DIRS}"
-	"${strusbase_LIBRARY_DIRS}"
-	"${strusmodule_LIBRARY_DIRS}"
-	"${strusrpc_LIBRARY_DIRS}"
+	${LUA_LIBRARY_DIRS}
+	${PAPUGA_LIBRARY_DIRS}
+	${BINDINGS_LIBRARY_DIRS}
+	${Boost_LIBRARY_DIRS}
+	${strusbase_LIBRARY_DIRS}
+	${strusmodule_LIBRARY_DIRS}
+	${strusrpc_LIBRARY_DIRS}
 )
 
 # ------------------------------

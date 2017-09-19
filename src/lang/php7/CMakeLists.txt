@@ -6,24 +6,23 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/php7/php.cmake )
 
 include_directories(
-        "${PHP7_INCLUDE_DIRS}"
-	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
-	"${PROJECT_SOURCE_DIR}/include"
+        ${PHP7_INCLUDE_DIRS}
+	${Intl_INCLUDE_DIRS}
+	${PAPUGA_INCLUDE_DIRS}
+	${BINDINGS_INCLUDE_DIRS}
 )
 
 link_directories(
-        "${PHP7_LIBRARY_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
-	"${strusbase_LIBRARY_DIRS}"
-	"${strusmodule_LIBRARY_DIRS}"
-	"${strusrpc_LIBRARY_DIRS}"
-	"${strus_LIBRARY_DIRS}"
-	"${strusanalyzer_LIBRARY_DIRS}"
-	"${strustrace_LIBRARY_DIRS}"
+        ${PHP7_LIBRARY_DIRS}
+        ${PAPUGA_PHP7_LIBRARY_DIRS}
+	${PAPUGA_LIBRARY_DIRS}
+	${BINDINGS_LIBRARY_DIRS}
+	${strusbase_LIBRARY_DIRS}
+	${strusmodule_LIBRARY_DIRS}
+	${strusrpc_LIBRARY_DIRS}
+	${strus_LIBRARY_DIRS}
+	${strusanalyzer_LIBRARY_DIRS}
+	${strustrace_LIBRARY_DIRS}
 )
 
 add_custom_command(

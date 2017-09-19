@@ -67,6 +67,19 @@ configure_file( "${PROJECT_SOURCE_DIR}/dist/redhat/strusbindings.spec.in"  "${PR
 
 enable_testing()
 
+# Path declarations:
+set( LUA_INCLUDE_DIRS                   "${PROJECT_SOURCE_DIR}/3rdParty/papuga/3rdParty/lua" )
+set( LUA_LIBRARY_DIRS                   "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/3rdParty/lua_cmake" )
+set( TEXTWOLF_INCLUDE_DIRS       "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/textwolf/include"  "${PROJECT_SOURCE_DIR}/3rdParty/textwolf/include" )
+set( PAPUGA_INCLUDE_DIRS           "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/include" "${PROJECT_SOURCE_DIR}/3rdParty/papuga/include" )
+set( PAPUGA_LIBRARY_DIRS            "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/src" )
+set( PAPUGA_PHP7_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/php7" )
+set( PAPUGA_PYTHON3_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/python3" )
+set( PAPUGA_LUA_LIBRARY_DIRS   "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/lua" )
+set( BINDINGS_INCLUDE_DIRS        "${CMAKE_CURRENT_BINARY_DIR}/include"  "${PROJECT_SOURCE_DIR}/include" )
+set( BINDINGS_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/bindings" )
+set( BINDINGS_LIBRARY_DIRS         "${CMAKE_CURRENT_BINARY_DIR}/src/bindings" )
+
 # Subdirectories:
 add_subdirectory( 3rdParty )
 add_subdirectory( src )

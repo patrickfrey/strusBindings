@@ -1,24 +1,23 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
 include_directories(
-	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
-	"${PROJECT_SOURCE_DIR}/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/3rdParty/lua"
+        ${LUA_INCLUDE_DIRS}
+	${Intl_INCLUDE_DIRS}
+	${PAPUGA_INCLUDE_DIRS}
+	${BINDINGS_INCLUDE_DIRS}
 )
 
 link_directories(
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/3rdParty/lua_cmake"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
-	"${strusbase_LIBRARY_DIRS}"
-	"${strusmodule_LIBRARY_DIRS}"
-	"${strusrpc_LIBRARY_DIRS}"
-	"${strus_LIBRARY_DIRS}"
-	"${strusanalyzer_LIBRARY_DIRS}"
-	"${strustrace_LIBRARY_DIRS}"
+        ${LUA_LIBRARY_DIRS}
+        ${PAPUGA_LUA_LIBRARY_DIRS}
+	${PAPUGA_LIBRARY_DIRS}
+	${BINDINGS_LIBRARY_DIRS}
+	${strusbase_LIBRARY_DIRS}
+	${strusmodule_LIBRARY_DIRS}
+	${strusrpc_LIBRARY_DIRS}
+	${strus_LIBRARY_DIRS}
+	${strusanalyzer_LIBRARY_DIRS}
+	${strustrace_LIBRARY_DIRS}
 )
 
 add_custom_command(

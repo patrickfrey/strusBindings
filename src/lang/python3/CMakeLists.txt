@@ -9,25 +9,23 @@ set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-
 set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
 
 include_directories(
-        "${PYTHON3_INCLUDE_DIRS}"
-	"${Intl_INCLUDE_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/include"
-	"${PROJECT_SOURCE_DIR}/3rdParty/papuga/include"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../include"
-	"${PROJECT_SOURCE_DIR}/include"
+        ${PYTHON3_INCLUDE_DIRS}
+	${Intl_INCLUDE_DIRS}
+	${PAPUGA_INCLUDE_DIRS}
+	${BINDINGS_INCLUDE_DIRS}
 )
 
 link_directories(
-        "${PYTHON3_LIBRARY_DIRS}"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/src"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../../3rdParty/papuga/python3"
-	"${CMAKE_CURRENT_BINARY_DIR}/../../bindings"
-	"${strusbase_LIBRARY_DIRS}"
-	"${strusmodule_LIBRARY_DIRS}"
-	"${strusrpc_LIBRARY_DIRS}"
-	"${strus_LIBRARY_DIRS}"
-	"${strusanalyzer_LIBRARY_DIRS}"
-	"${strustrace_LIBRARY_DIRS}"
+        ${PYTHON3_LIBRARY_DIRS}
+        ${PAPUGA_PYTHON3_LIBRARY_DIRS}
+	${PAPUGA_LIBRARY_DIRS}
+	${BINDINGS_LIBRARY_DIRS}
+	${strusbase_LIBRARY_DIRS}
+	${strusmodule_LIBRARY_DIRS}
+	${strusrpc_LIBRARY_DIRS}
+	${strus_LIBRARY_DIRS}
+	${strusanalyzer_LIBRARY_DIRS}
+	${strustrace_LIBRARY_DIRS}
 )
 
 add_custom_command(
