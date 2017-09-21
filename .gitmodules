@@ -6,4 +6,4 @@
 	url = https://github.com/patrickfrey/textwolf
 [submodule "3rdParty/papuga"]
 	path = 3rdParty/papuga
-	url = https://github.com:patrickfrey/papuga.git
+	url = https://github.com:patrickfrey/papuga
