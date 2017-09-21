@@ -11,10 +11,8 @@ case $OS in
 			cmake \
 			libboost-all-dev \
 			libleveldb-dev \
-			swig \
-			php5-dev php5-cli \
-			openjdk-7-jdk \
-			libboost-python-dev python-dev
+			php7-dev php7-cli \
+			python3-dev
 		;;
 		
 	Darwin)
@@ -29,9 +27,8 @@ case $OS in
 			gettext \
 			snappy \
 			leveldb \
-			homebrew/php/php56 \
-			swig \
-			python boost-python \
+			homebrew/php/php7 \
+			python3
 			|| true
 		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
