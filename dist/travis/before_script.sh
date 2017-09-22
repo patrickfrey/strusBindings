@@ -12,7 +12,8 @@ case $OS in
 			libboost-all-dev \
 			libleveldb-dev \
 			python3-dev
-		sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+		sudo locale-gen en_US.UTF-8
+		sudo LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
 		sudo apt-get install -y language-pack-en-base
 		sudo apt-get update
 		sudo apt-get install php7.1 php7.1-dev
