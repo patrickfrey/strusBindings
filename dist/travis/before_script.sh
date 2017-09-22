@@ -11,7 +11,6 @@ case $OS in
 			cmake \
 			libboost-all-dev \
 			libleveldb-dev \
-			php7-dev php7-cli \
 			python3-dev
 		;;
 		
@@ -27,7 +26,6 @@ case $OS in
 			gettext \
 			snappy \
 			leveldb \
-			homebrew/php/php7 \
 			python3 \
 			|| true
 		# make sure cmake finds the brew version of gettext
