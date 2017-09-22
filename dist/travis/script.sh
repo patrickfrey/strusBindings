@@ -40,7 +40,6 @@ for i in $DEPS; do
 	git submodule foreach --recursive git checkout master
 	git submodule foreach --recursive git pull
 
-	git checkout travis
 	case $OS in
 		Linux)
 			mkdir build
