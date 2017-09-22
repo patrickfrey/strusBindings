@@ -13,7 +13,12 @@ case $OS in
 			libleveldb-dev \
 			python3-dev
 		;;
-		
+		sudo add-apt-repository ppa:ondrej/php
+		sudo apt-get install -y language-pack-en-base
+		sudo LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
+		sudo apt-get update
+		sudo apt-get install php7.1 php7.1-dev
+
 	Darwin)
 		brew update
 		if test "X$CC" = "Xgcc"; then
