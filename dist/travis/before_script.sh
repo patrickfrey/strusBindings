@@ -28,7 +28,7 @@ case $OS in
 			snappy \
 			leveldb \
 			homebrew/php/php7 \
-			python3
+			python3 \
 			|| true
 		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
