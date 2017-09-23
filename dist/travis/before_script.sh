@@ -12,11 +12,6 @@ case $OS in
 			libboost-all-dev \
 			libleveldb-dev \
 			python3-dev
-		sudo apt-get install -y language-pack-en-base
-		sudo locale-gen en_US.UTF-8
-		sudo LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php
-		sudo LC_ALL=en_US.UTF-8 apt-get update
-		sudo LC_ALL=en_US.UTF-8 apt-get install -y php7.1 php7.1-dev
 		;;
 
 	Darwin)
