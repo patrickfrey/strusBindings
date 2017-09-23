@@ -14,15 +14,6 @@ sudo: required
 branches:
   only:
     - master
-addons:
-  apt:
-    sources:
-      - sourceline: 'ppa:ondrej/php'
-      - sourceline: 'ppa:ubuntu-toolchain-r/test'
-    packages:
-      - php7.1-dev
-php:
-  - '7.1'
 before_install:
 - chmod +x dist/travis/*.sh
 - dist/travis/before_script.sh
