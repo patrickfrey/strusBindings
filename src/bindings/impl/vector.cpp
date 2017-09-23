@@ -30,7 +30,7 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, co
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const VectorStorageClientInterface* storage = storageref.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	m_searcher_impl.resetOwnership( storage->createSearcher( range_from, range_to), "VectorStorageSearcher");
 	if (!m_searcher_impl.get())
@@ -42,7 +42,7 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, co
 std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
-	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
+	if (!searcher) throw strus::runtime_error( "%s",  _TXT("calling vector storage searcher method after close"));
 
 	std::vector<VectorStorageSearchInterface::Result>
 		res = searcher->findSimilar( Deserializer::getDoubleList( vec), maxNofResults);
@@ -57,7 +57,7 @@ std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::fin
 std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
-	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
+	if (!searcher) throw strus::runtime_error( "%s",  _TXT("calling vector storage searcher method after close"));
 
 	std::vector<VectorStorageSearchInterface::Result>
 		res = searcher->findSimilarFromSelection(
@@ -74,7 +74,7 @@ std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::fin
 
 void VectorStorageSearcherImpl::close()
 {
-	if (!m_searcher_impl.get()) throw strus::runtime_error( _TXT("calling storage searcher method after close"));
+	if (!m_searcher_impl.get()) throw strus::runtime_error( "%s",  _TXT("calling storage searcher method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_searcher_impl.reset();
@@ -86,7 +86,7 @@ void VectorStorageSearcherImpl::close()
 
 void VectorStorageClientImpl::close()
 {
-	if (!m_vector_storage_impl.get()) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!m_vector_storage_impl.get()) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_vector_storage_impl.reset();
@@ -109,7 +109,7 @@ VectorStorageTransactionImpl* VectorStorageClientImpl::createTransaction()
 Struct VectorStorageClientImpl::conceptClassNames() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 	Reference<std::vector<std::string> > cfg( new std::vector<std::string>( storage->conceptClassNames()));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -127,7 +127,7 @@ Struct VectorStorageClientImpl::conceptClassNames() const
 std::vector<Index> VectorStorageClientImpl::conceptFeatures( const std::string& conceptClass, int conceptid) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 	std::vector<Index> rt( storage->conceptFeatures( conceptClass, conceptid));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -140,7 +140,7 @@ std::vector<Index> VectorStorageClientImpl::conceptFeatures( const std::string& 
 unsigned int VectorStorageClientImpl::nofConcepts( const std::string& conceptClass) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	unsigned int rt = storage->nofConcepts( conceptClass);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -154,7 +154,7 @@ unsigned int VectorStorageClientImpl::nofConcepts( const std::string& conceptCla
 std::vector<Index> VectorStorageClientImpl::featureConcepts( const std::string& conceptClass, int index) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	std::vector<Index> rt( storage->featureConcepts( conceptClass, index));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -168,7 +168,7 @@ std::vector<Index> VectorStorageClientImpl::featureConcepts( const std::string& 
 std::vector<double> VectorStorageClientImpl::featureVector( int index) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	std::vector<double> rt( storage->featureVector( index));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -182,7 +182,7 @@ std::vector<double> VectorStorageClientImpl::featureVector( int index) const
 std::string VectorStorageClientImpl::featureName( int index) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	std::string rt( storage->featureName( index));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -196,7 +196,7 @@ std::string VectorStorageClientImpl::featureName( int index) const
 Index VectorStorageClientImpl::featureIndex( const std::string& name) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	Index rt = storage->featureIndex( name);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -210,7 +210,7 @@ Index VectorStorageClientImpl::featureIndex( const std::string& name) const
 unsigned int VectorStorageClientImpl::nofFeatures() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 
 	unsigned int rt = storage->nofFeatures();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -224,7 +224,7 @@ unsigned int VectorStorageClientImpl::nofFeatures() const
 std::string VectorStorageClientImpl::configstring() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	std::string rt( storage->config());
@@ -238,7 +238,7 @@ std::string VectorStorageClientImpl::configstring() const
 Struct VectorStorageClientImpl::config() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling vector storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	typedef std::vector<std::pair<std::string,std::string> > Configuration;
@@ -313,7 +313,7 @@ void VectorStorageTransactionImpl::defineFeatureConceptRelation( const std::stri
 bool VectorStorageTransactionImpl::commit()
 {
 	VectorStorageTransactionInterface* transaction = m_vector_transaction_impl.getObject<VectorStorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	if (!transaction) throw strus::runtime_error( "%s",  _TXT("calling vector storage builder method after close"));
 
 	bool rt = transaction->commit();
 	if (!rt)
@@ -330,13 +330,13 @@ bool VectorStorageTransactionImpl::commit()
 void VectorStorageTransactionImpl::rollback()
 {
 	VectorStorageTransactionInterface* transaction = m_vector_transaction_impl.getObject<VectorStorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	if (!transaction) throw strus::runtime_error( "%s",  _TXT("calling vector storage builder method after close"));
 	transaction->rollback();
 }
 
 void VectorStorageTransactionImpl::close()
 {
-	if (!m_vector_transaction_impl.get()) throw strus::runtime_error( _TXT("calling vector storage builder method after close"));
+	if (!m_vector_transaction_impl.get()) throw strus::runtime_error( "%s",  _TXT("calling vector storage builder method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	m_vector_transaction_impl.reset();

@@ -109,7 +109,7 @@ static const papuga_ValueVariant* getValue(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("expected value in structure"));
+		throw strus::runtime_error( "%s", _TXT("expected value in structure"));
 	}
 }
 
@@ -235,11 +235,11 @@ void Deserializer::consumeClose(
 {
 	if (si == se)
 	{
-		throw strus::runtime_error(_TXT("close expected element at end of structure"));
+		throw strus::runtime_error( "%s", _TXT("close expected element at end of structure"));
 	}
 	if (si->tag != papuga_TagClose)
 	{
-		throw strus::runtime_error(_TXT("unexpected element at end of structure"));
+		throw strus::runtime_error( "%s", _TXT("unexpected element at end of structure"));
 	}
 	++si;
 }
@@ -286,7 +286,7 @@ static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga_ValueVariant& val
 			se = papuga::Serialization::end( val.value.serialization);
 		if (si == se) return rt;
 		rt = getAtomicTypeList<ATOMICTYPE,FUNC>( si, se);
-		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 	}
 	return rt;
 }
@@ -379,7 +379,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 	{
 		if (!setFeatureOption_position( rt, getValue(si,se)))
 		{
-			throw strus::runtime_error(_TXT("expected position bind option"));
+			throw strus::runtime_error( "%s", _TXT("expected position bind option"));
 		}
 	}
 	else if (si->tag == papuga_TagOpen)
@@ -400,29 +400,29 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 					{
 						if (!setFeatureOption_position( rt, getValue(si,se)))
 						{
-							throw strus::runtime_error(_TXT("expected position bind option"));
+							throw strus::runtime_error( "%s", _TXT("expected position bind option"));
 						}
 					}
 					else
 					{
-						throw strus::runtime_error(_TXT("expected feature option"));
+						throw strus::runtime_error( "%s", _TXT("expected feature option"));
 					}
 				}
 				else
 				{
-					throw strus::runtime_error(_TXT("expected feature option"));
+					throw strus::runtime_error( "%s", _TXT("expected feature option"));
 				}
 			}
 			else if (si->tag == papuga_TagValue)
 			{
 				if (!setFeatureOption_position( rt, getValue(si,se)))
 				{
-					throw strus::runtime_error(_TXT("expected position bind option"));
+					throw strus::runtime_error( "%s", _TXT("expected position bind option"));
 				}
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("expected feature option"));
+				throw strus::runtime_error( "%s", _TXT("expected feature option"));
 			}
 		}
 		Deserializer::consumeClose(si,se);
@@ -440,7 +440,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 		{
 			if (!setFeatureOption_position( rt, &options))
 			{
-				throw strus::runtime_error(_TXT("expected feature option (position bind value)"));
+				throw strus::runtime_error( "%s", _TXT("expected feature option (position bind value)"));
 			}
 		}
 	}
@@ -451,7 +451,7 @@ analyzer::FeatureOptions Deserializer::getFeatureOptions(
 			se = papuga::Serialization::end( options.value.serialization);
 		if (si == se) return rt;
 		rt = getFeatureOptions( si, se);
-		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 	}
 	return rt;
 }
@@ -654,7 +654,7 @@ analyzer::DocumentClass Deserializer::getDocumentClass(
 	{
 		throw strus::runtime_error(_TXT("expected %s structure"), context);
 	}
-	if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+	if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 	return rt;
 }
 
@@ -804,7 +804,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( normalizers.value.serialization));
 		}
-		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 	}
 	return rt;
 }
@@ -834,7 +834,7 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( tokenizer.value.serialization));
 		}
-		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 		return rt;
 	}
 }
@@ -863,7 +863,7 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 		{
 			throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( aggregator.value.serialization));
 		}
-		if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+		if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 		return rt;
 	}
 }
@@ -1088,7 +1088,7 @@ static void deserializeQueryEvalFunctionParameters(
 	{
 		throw runtime_error_with_location( err.what(), errorhnd, si, se, papuga::Serialization::begin( parameters.value.serialization));
 	}
-	if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+	if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 }
 
 template <class FUNCTYPE>
@@ -1110,7 +1110,7 @@ static void deserializeQueryEvalFunctionResultNames(
 		try
 		{
 			KeyValueList kvlist( si, se);
-			if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization"));
+			if (si != se) throw strus::runtime_error( "%s", _TXT("unexpected tokens at end of serialization"));
 
 			KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
 			for (; ki != ke; ++ki)
@@ -1533,7 +1533,7 @@ static void buildExpressionJoin(
 			}
 			else if (si->tag == papuga_TagOpen)
 			{
-				throw strus::runtime_error(_TXT("list instead of single structure passed to build expression"));
+				throw strus::runtime_error( "%s", _TXT("list instead of single structure passed to build expression"));
 			}
 			else
 			{
@@ -2491,7 +2491,7 @@ void Deserializer::buildMetaDataRestriction(
 		buildMetaDataRestriction_<MetaDataRestrictionInterface>( builder, si, se);
 		if (errorhnd->hasError())
 		{
-			throw strus::runtime_error(_TXT("error defining metadata restriction"));
+			throw strus::runtime_error( _TXT("error defining metadata restriction: %s"), errorhnd->fetchError());
 		}
 	}
 	catch (const std::runtime_error& err)

@@ -537,7 +537,7 @@ struct ParameterSructureExpanded
 	{
 		if (param_converted.size() == 0)
 		{
-			out << indent << "if (argc > 0) throw strus::runtime_error(_TXT(\"no arguments expected\"));" << std::endl;
+			out << indent << "if (argc > 0) throw strus::runtime_error( \"%s\", _TXT(\"no arguments expected\"));" << std::endl;
 			out << indent << "return (void*) new " << classname << "Impl();" << std::endl;
 		}
 		else
@@ -548,7 +548,7 @@ struct ParameterSructureExpanded
 			{
 				out << indent << "\t" << "case " << pidx << ": return new " << classname << "Impl(" << expandCallParameter( pidx) << ");" << std::endl;
 			}
-			out << indent << "\t" << "default: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
+			out << indent << "\t" << "default: throw strus::runtime_error( \"%s\", _TXT(\"too many arguments\"));" << std::endl;
 			out << indent << "}" << std::endl;
 		}
 	}
@@ -574,7 +574,7 @@ struct ParameterSructureExpanded
 		std::string expression;
 		if (param_converted.size() == 0)
 		{
-			out << indent << "if (argc > 0) throw strus::runtime_error(_TXT(\"no arguments expected\"));" << std::endl;
+			out << indent << "if (argc > 0) throw strus::runtime_error( \"%s\", _TXT(\"no arguments expected\"));" << std::endl;
 			std::string expression = "THIS->" + methodname + "()";
 			out << indent << mapInitReturnValue( returnvalue, expression) << std::endl;
 		}
@@ -587,7 +587,7 @@ struct ParameterSructureExpanded
 				std::string expression = "THIS->" + methodname + "(" + expandCallParameter( pidx) + ")";
 				out << indent << "\t" << "case " << pidx << ": " << mapInitReturnValue( returnvalue, expression) << " break;" << std::endl;
 			}
-			out << indent << "\t" << "default: throw strus::runtime_error(_TXT(\"too many arguments\"));" << std::endl;
+			out << indent << "\t" << "default: throw strus::runtime_error( \"%s\", _TXT(\"too many arguments\"));" << std::endl;
 			out << indent << "}" << std::endl;
 		}
 	}
@@ -666,7 +666,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			ParameterSructureExpanded paramstruct( ki->parameters());
 			if (paramstruct.min_nofargs)
 			{
-				out << "\t\t" << "if (argc < " << paramstruct.min_nofargs << ") throw strus::runtime_error(_TXT(\"too few arguments\"));" << std::endl;
+				out << "\t\t" << "if (argc < " << paramstruct.min_nofargs << ") throw strus::runtime_error( \"%s\", _TXT(\"too few arguments\"));" << std::endl;
 			}
 			// Do some declarations and conversions, if needed:
 			for (std::size_t pidx=0; pidx < paramstruct.size(); ++pidx)
@@ -700,7 +700,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			ParameterSructureExpanded paramstruct( mi->parameters());
 			if (paramstruct.min_nofargs)
 			{
-				out << "\t\t" << "if (argc < " << paramstruct.min_nofargs << ") throw strus::runtime_error(_TXT(\"too few arguments\"));" << std::endl;
+				out << "\t\t" << "if (argc < " << paramstruct.min_nofargs << ") throw strus::runtime_error( \"%s\", _TXT(\"too few arguments\"));" << std::endl;
 			}
 			// Do some declarations and conversions, if needed:
 			for (std::size_t pidx=0; pidx < paramstruct.size(); ++pidx)

@@ -41,7 +41,7 @@ static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("expected string or document class structure for document segmenter definition"));
+		throw strus::runtime_error( "%s", _TXT("expected string or document class structure for document segmenter definition"));
 	}
 }
 
@@ -345,7 +345,7 @@ analyzer::DocumentClass DocumentAnalyzerImpl::getDocumentClass( const std::strin
 			}
 			else
 			{
-				throw strus::runtime_error( _TXT( "could not detect document class of document to analyze"));
+				throw strus::runtime_error( "%s", _TXT( "could not detect document class of document to analyze"));
 			}
 		}
 		return detected_dclass;

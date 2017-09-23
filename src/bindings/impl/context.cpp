@@ -53,7 +53,7 @@ static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
 	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads);
 	if (!errorhnd)
 	{
-		throw strus::runtime_error( _TXT("failed to create error buffer object"));
+		throw strus::runtime_error( "%s", _TXT("failed to create error buffer object"));
 	}
 	return errorhnd;
 }
@@ -88,7 +88,7 @@ static ContextDef parseContext( const ValueVariant& ctx)
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("expected string or structure for context configuration"));
+		throw strus::runtime_error( "%s", _TXT("expected string or structure for context configuration"));
 	}
 }
 
@@ -128,9 +128,9 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 
 void ContextImpl::loadModule( const std::string& name_)
 {
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot load modules in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot load modules in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to load modules after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to load modules after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	if (!moduleLoader->loadModule( name_))
 	{
@@ -141,9 +141,9 @@ void ContextImpl::loadModule( const std::string& name_)
 
 void ContextImpl::addModulePath( const ValueVariant& paths_)
 {
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a module path in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot add a module path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to set the module search path after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to set the module search path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	std::vector<std::string> pathlist = Deserializer::getStringList( paths_);
 	std::vector<std::string>::const_iterator pi = pathlist.begin(), pe = pathlist.end();
@@ -160,9 +160,9 @@ void ContextImpl::addModulePath( const ValueVariant& paths_)
 
 void ContextImpl::addResourcePath( const ValueVariant& paths_)
 {
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot add a resource path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to add a resource path after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to add a resource path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	std::vector<std::string> pathlist = Deserializer::getStringList( paths_);
 	std::vector<std::string>::const_iterator pi = pathlist.begin(), pe = pathlist.end();
@@ -193,7 +193,7 @@ void ContextImpl::initStorageObjBuilder()
 	}
 	else
 	{
-		throw strus::runtime_error( _TXT("bad state, no context initialized"));
+		throw strus::runtime_error( "%s", _TXT("bad state, no context initialized"));
 	}
 	if (!storageObjectBuilder)
 	{
@@ -229,7 +229,7 @@ void ContextImpl::initAnalyzerObjBuilder()
 	}
 	else
 	{
-		throw strus::runtime_error( _TXT("bad state, no context initialized"));
+		throw strus::runtime_error( "%s", _TXT("bad state, no context initialized"));
 	}
 	if (!analyzerObjectBuilder)
 	{

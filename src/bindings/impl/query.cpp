@@ -124,7 +124,7 @@ void QueryImpl::addFeature( const std::string& set_, const ValueVariant& expr_, 
 	Deserializer::buildExpression( exprbuilder, expr_, errorhnd, true);
 	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to create feature from expression: %s"), errorhnd->fetchError());
 	unsigned int ii=0, nn = exprbuilder.stackSize();
-	if (nn == 0) throw strus::runtime_error( _TXT("feature defined without expression"));
+	if (nn == 0) throw strus::runtime_error( "%s",  _TXT("feature defined without expression"));
 	for (; ii<nn; ++ii)
 	{
 		THIS->defineFeature( set_, weight_);
@@ -189,7 +189,7 @@ void QueryImpl::setWeightingVariables(
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
 	if (parameter.valuetype != papuga_TypeSerialization)
 	{
-		throw strus::runtime_error(_TXT("list of variable assignments expected as argument"));
+		throw strus::runtime_error( "%s", _TXT("list of variable assignments expected as argument"));
 	}
 	papuga::Serialization::const_iterator
 		si = papuga::Serialization::begin( parameter.value.serialization),

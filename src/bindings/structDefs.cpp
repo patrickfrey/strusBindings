@@ -29,7 +29,7 @@ static const papuga_ValueVariant* getValue(
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("unexpected token in serialization, expected value"));
+		throw strus::runtime_error( "%s", _TXT("unexpected token in serialization, expected value"));
 	}
 }
 

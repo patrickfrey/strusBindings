@@ -217,7 +217,7 @@ NumericVariant ValueVariantConv::tonumeric( const ValueVariant& val)
 			}
 			else
 			{
-				throw strus::runtime_error(_TXT("failed to convert value to numeric type"));
+				throw strus::runtime_error( "%s", _TXT("failed to convert value to numeric type"));
 			}
 		}
 		case papuga::ValueVariant::HostObject:
@@ -297,14 +297,14 @@ static TYPE variant_touint( const ValueVariant& val)
 		case papuga::ValueVariant::UInt:
 			if (val.value.UInt > (papuga::ValueVariant::UIntType)std::numeric_limits<TYPE>::max())
 			{
-				throw strus::runtime_error(_TXT("cannot convert value to unsigned integer (out of range)"));
+				throw strus::runtime_error( "%s", _TXT("cannot convert value to unsigned integer (out of range)"));
 			}
 			return val.value.UInt; 
 		case papuga::ValueVariant::Int:
 			if (val.value.Int > (papuga::ValueVariant::IntType)std::numeric_limits<TYPE>::max()
 			||  val.value.Int < 0)
 			{
-				throw strus::runtime_error(_TXT("cannot convert value to unsigned integer (out of range)"));
+				throw strus::runtime_error( "%s", _TXT("cannot convert value to unsigned integer (out of range)"));
 			}
 			return (TYPE)(papuga::ValueVariant::UIntType)val.value.Int; 
 		case papuga::ValueVariant::String:
@@ -348,25 +348,25 @@ static TYPE variant_toint( const ValueVariant& val)
 		case papuga::ValueVariant::Double:
 			if (val.value.Double < 0.0)
 			{
-				if (val.value.Double < (double)std::numeric_limits<TYPE>::min()) throw strus::runtime_error(_TXT("cannot convert value to integer (out of range)"));
+				if (val.value.Double < (double)std::numeric_limits<TYPE>::min()) throw strus::runtime_error( "%s", _TXT("cannot convert value to integer (out of range)"));
 				return (papuga::ValueVariant::IntType)(val.value.Double - std::numeric_limits<float>::epsilon()); 
 			}
 			else
 			{
-				if (val.value.Double > (double)std::numeric_limits<TYPE>::max()) throw strus::runtime_error(_TXT("cannot convert value to integer (out of range)"));
+				if (val.value.Double > (double)std::numeric_limits<TYPE>::max()) throw strus::runtime_error( "%s", _TXT("cannot convert value to integer (out of range)"));
 				return (papuga::ValueVariant::IntType)(val.value.Double + std::numeric_limits<float>::epsilon());
 			}
 		case papuga::ValueVariant::UInt:
 			if (val.value.UInt > (papuga::ValueVariant::UIntType)std::numeric_limits<TYPE>::max())
 			{
-				throw strus::runtime_error(_TXT("cannot convert value to unsigned integer (out of range)"));
+				throw strus::runtime_error( "%s", _TXT("cannot convert value to unsigned integer (out of range)"));
 			}
 			return val.value.UInt; 
 		case papuga::ValueVariant::Int:
 			if (val.value.Int > (papuga::ValueVariant::IntType)std::numeric_limits<int>::max()
 			||  val.value.Int < (papuga::ValueVariant::IntType)std::numeric_limits<int>::min())
 			{
-				throw strus::runtime_error(_TXT("cannot convert value to int (out of range)"));
+				throw strus::runtime_error( "%s", _TXT("cannot convert value to int (out of range)"));
 			}
 			return val.value.Int; 
 		case papuga::ValueVariant::String:
@@ -424,7 +424,7 @@ uint64_t ValueVariantConv::touint64( const ValueVariant& val)
 bool ValueVariantConv::tobool( const ValueVariant& val)
 {
 	unsigned int rt = variant_touint<unsigned int>( val);
-	if (rt > 1) throw strus::runtime_error(_TXT("cannot convert value to bool: must be 0 or 1"));
+	if (rt > 1) throw strus::runtime_error( "%s", _TXT("cannot convert value to bool: must be 0 or 1"));
 	return !!rt;
 }
 

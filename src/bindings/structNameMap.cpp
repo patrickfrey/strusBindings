@@ -22,7 +22,7 @@ StructureNameMap::StructureNameMap( const char* strings_, char delim)
 	for (; sn; si=sn+1,sn=std::strchr( si, delim))
 	{
 		m_ar[ sn-m_strings] = idx++;
-		if (idx >= 127) throw strus::runtime_error(_TXT("too many structure elements defined"));
+		if (idx >= 127) throw strus::runtime_error( "%s", _TXT("too many structure elements defined"));
 	}
 	m_ar[ m_ar.size()-1] = idx;
 }

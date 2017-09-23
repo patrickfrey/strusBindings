@@ -29,7 +29,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericV
 		case NumericVariant::Float:
 			return papuga_Serialization_pushValue_double( result, val.variant.Float);
 	}
-	throw strus::runtime_error(_TXT("unknown numeric type passed to serialization"));
+	throw strus::runtime_error( "%s", _TXT("unknown numeric type passed to serialization"));
 }
 
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename)
@@ -164,7 +164,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 	
 					rt &= papuga_Serialization_pushName_charp( opres.cstruct(), "arg");
 					rt &= papuga_Serialization_pushOpen( opres.cstruct());
-					if (ii->nofOperands() > stk.size()) throw strus::runtime_error(_TXT("number of query analyzer expression operands out of range"));
+					if (ii->nofOperands() > stk.size()) throw strus::runtime_error( "%s", _TXT("number of query analyzer expression operands out of range"));
 					std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
 					for (; si != se; ++si)
 					{

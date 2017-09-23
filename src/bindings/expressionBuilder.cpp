@@ -125,7 +125,7 @@ void PostProcPatternExpressionBuilder::defineLexem( const std::string& name)
 	if (!termtypeid) throw std::bad_alloc();
 	if (m_termtypetab.isNew())
 	{
-		if (termtypeid >= MaxPatternTermNameId) throw strus::runtime_error(_TXT("too many lexems defined in pattern match program"));
+		if (termtypeid >= MaxPatternTermNameId) throw strus::runtime_error( "%s", _TXT("too many lexems defined in pattern match program"));
 		m_feeder->defineLexem( termtypeid, name);
 	}
 	else
@@ -252,7 +252,7 @@ void QueryExpressionBuilder::definePattern( const std::string& name, bool visibl
 
 void QueryAnalyzerTermExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
-	throw strus::runtime_error(_TXT("length parameter not allowed for query fields passed to analyzer"));
+	throw strus::runtime_error( "%s", _TXT("length parameter not allowed for query fields passed to analyzer"));
 }
 
 void QueryAnalyzerTermExpressionBuilder::pushField( const std::string& fieldtype, const std::string& value)
@@ -320,7 +320,7 @@ void PostingsExpressionBuilder::pushExpression( const std::string& op, unsigned 
 {
 	if (argc > m_stack.size())
 	{
-		throw strus::runtime_error(_TXT("too few arguments on stack for operation"));
+		throw strus::runtime_error( "%s", _TXT("too few arguments on stack for operation"));
 	}
 	else
 	{
@@ -352,10 +352,10 @@ void PostingsExpressionBuilder::definePattern( const std::string& name, bool vis
 
 Reference<PostingIteratorInterface> PostingsExpressionBuilder::pop()
 {
-	if (m_stack.empty()) throw strus::runtime_error(_TXT("no posting expression on stack as result of parsing expression"));
+	if (m_stack.empty()) throw strus::runtime_error( "%s", _TXT("no posting expression on stack as result of parsing expression"));
 	Reference<PostingIteratorInterface> rt = m_stack.back();
 	m_stack.pop_back();
-	if (!m_stack.empty()) throw strus::runtime_error(_TXT("more than one posting expression on stack as result of parsing expression"));
+	if (!m_stack.empty()) throw strus::runtime_error( "%s", _TXT("more than one posting expression on stack as result of parsing expression"));
 	return rt;
 }
 
