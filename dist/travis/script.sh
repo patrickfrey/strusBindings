@@ -29,7 +29,7 @@ case $OS in
 esac
 
 # build pre-requisites
-DEPS="strusBase strus strusAnalyzer strusTrace strusModule strusRpc"
+DEPS="strusBase strus strusAnalyzer strusTrace strusModule strusRpc strusVector"
 
 GITURL=`git config remote.origin.url`
 cd ..
