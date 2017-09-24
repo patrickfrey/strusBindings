@@ -2,8 +2,6 @@ language: cpp
 php:
   - '7.0'
   - '7.1'
-python:
-  - '3.4'
 os:
 - linux
 - osx
