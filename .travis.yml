@@ -1,6 +1,4 @@
 language: cpp
-language: php
-language: python
 php:
   - '7.0'
   - '7.1'
