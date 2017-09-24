@@ -11,6 +11,9 @@ case $OS in
 			cmake \
 			libboost-all-dev \
 			libleveldb-dev \
+			libatlas-dev \
+			liblapack-dev \
+			libblas-dev \
 			python3-dev
 		sudo apt-get install -y language-pack-en-base
 		sudo locale-gen en_US.UTF-8
@@ -32,8 +35,10 @@ case $OS in
 			cmake \
 			boost \
 			gettext \
-			snappy \
+			snappy 
 			leveldb \
+			lapack \
+			blas \
 			python3 \
 			php71 \
 			|| true
