@@ -49,7 +49,7 @@ build_strus_project() {
 				cd build
 				cmake \
 					-DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
-					-DCMAKE_CXX_FLAGS=-g -G Xcode $prj_cmakeflags \
+					-DCMAKE_CXX_FLAGS='-g -Wno-error=format-nonliteral -Wno-error=format-security' -G Xcode $prj_cmakeflags \
 					..
 				xcodebuild -configuration Release -target ALL_BUILD
 				xcodebuild -configuration Release -target RUN_TESTS
