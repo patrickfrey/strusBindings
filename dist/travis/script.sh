@@ -105,7 +105,6 @@ for i in $DEPS; do
 	build_strus_project ""
 	cd ..
 done
-cd $PROJECT
 
 # build the package itself
 cd $PROJECT
