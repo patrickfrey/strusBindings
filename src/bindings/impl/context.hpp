@@ -90,7 +90,7 @@ public:
 	///	cache:"1G"
 	///	] )
 	/// \param[in] config configuration (string or structure with named elements) of the storage client or undefined, if the default remote storage of the RPC server is chosen
-	/// \return storage client interface for accessing the storage
+	/// \return storage client interface (class StorageClient) for accessing the storage
 	StorageClientImpl* createStorageClient( const ValueVariant& config=ValueVariant());
 
 	/// \brief Create a vector storage client instance
@@ -98,7 +98,7 @@ public:
 	/// \example createVectorStorageClient( "path=/srv/searchengine/vecstorage" )
 	/// \example createVectorStorageClient( [ path: "/srv/searchengine/vecstorage" ] )
 	/// \param[in] config configuration (string or structure with named elements) of the storage client or undefined, if the default remote vector storage of the RPC server is chosen
-	/// \return vector storage client interface for accessing the vector storage
+	/// \return vector storage client interface (class VectorStorageClient) for accessing the vector storage
 	VectorStorageClientImpl* createVectorStorageClient( const ValueVariant& config=ValueVariant());
 
 	/// \brief Create a new storage (physically) described by config
@@ -125,6 +125,7 @@ public:
 
 	/// \brief Tests if the storage described by config exists
 	/// \example storageExists( "path=/srv/searchengine/storage" )
+	/// \example storageExists( [ path: "/srv/searchengine/storage" ] )
 	/// \note Works also on vector storages, it does not distinguish between those
 	/// \param[in] config storage configuration (string or structure with named elements) 
 	/// \return true, if the storage with this configuration exists
@@ -139,25 +140,28 @@ public:
 	analyzer::DocumentClass* detectDocumentClass( const std::string& content);
 
 	/// \brief Create a document analyzer instance
+	/// \example createDocumentAnalyzer( [ mimetype="application/xml" encoding="UTF-8" ] )
 	/// \param[in] doctype structure describing the segmenter to use (either document class description structure or segmenter name)
 	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
 	/// \example [ mimetype="application/json" encoding="UTF-8" ]
 	/// \example [ segmenter="textwolf" ]
 	/// \example "application/json"
 	/// \example "json"
-	/// \return document analyzer interface
+	/// \return document analyzer interface (class DocumentAnalyzer)
 	DocumentAnalyzerImpl* createDocumentAnalyzer( const ValueVariant& doctype);
 
 	/// \brief Create a query analyzer instance
-	/// \return query analyzer interface
+	/// \example createQueryAnalyzer()
+	/// \return query analyzer interface (class QueryAnalyzer)
 	QueryAnalyzerImpl* createQueryAnalyzer();
 
 	/// \brief Create a query evaluation instance
-	/// \return quer evaluation interface
+	/// \example createQueryEval()
+	/// \return quer evaluation interface (class QueryEval)
 	QueryEvalImpl* createQueryEval();
 
 	/// \brief Unpack a statistics blob retrieved from a storage
-	/// \param[in] blob binary blob with statistics to decode
+	/// \param[in] blob binary blob with statistics to decode (created by StorageClient:getAllStatistics or StorageClient:getChangeStatistics)
 	/// \param[in] procname name of statistics processor to use for decoding the message (use default processor, if not defined)
 	/// \example "default"
 	/// \example ""
@@ -168,9 +172,11 @@ public:
 	void close();
 
 	/// \brief Debug method that returns the serialization of the arguments as string
+	/// \example debug_serialize( [ surname:"John" lastname:"Doe" company:[ name="ACME" url="acme.com" ]] )
 	/// \note this function is used for verifying if the deserialization of binding language data structures work as expected
 	/// \param[in] arg structure to serialize as string for visualization (debuging)
 	/// \return the input serialization as string
+	/// \example "open name 'surname' value 'John' name 'lastname' value 'Doe' name 'company' open name 'name' value 'ACME' name 'url' value 'acme.com' close close"
 	std::string debug_serialize( const ValueVariant& arg);
 
 private:

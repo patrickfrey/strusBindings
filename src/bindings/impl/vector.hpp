@@ -24,6 +24,7 @@ class VectorStorageTransactionImpl;
 
 /// \class VectorStorageSearcherImpl
 /// \brief Object used to search for similar vectors in the collection
+/// \note The only way to construct a vector storage searcher instance is to call VectorStorageClient::createSearcher( from, to)
 class VectorStorageSearcherImpl
 {
 public:
@@ -57,7 +58,7 @@ private:
 
 /// \class VectorStorageClientImpl
 /// \brief Object representing a client connection to a vector storage 
-/// \note The only way to construct a vector storage client instance is to call Context::createVectorStorageClient(const std::string&)
+/// \note The only way to construct a vector storage client instance is to call Context::createVectorStorageClient( config) or Context::createVectorStorageClient()
 class VectorStorageClientImpl
 {
 public:
@@ -66,7 +67,11 @@ public:
 
 	/// \brief Create a searcher object for scanning the vectors for similarity
 	/// \param[in] range_from start range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \example 0
+	/// \example 1000000
 	/// \param[in] range_to end of range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \example 1000000
+	/// \example 2000000
 	/// \return the vector search interface (with ownership)
 	VectorStorageSearcherImpl* createSearcher( int range_from, int range_to) const;
 
@@ -76,50 +81,84 @@ public:
 	
 	/// \brief Get the list of concept class names defined
 	/// \return the list
+	/// \example ["flections" "entityrel"]
 	Struct conceptClassNames() const;
 
 	/// \brief Get the list of indices of features represented by a learnt concept feature
 	/// \param[in] conceptClass name identifying a class of concepts learnt
+	/// \example "flections"
+	/// \example "entityrel"
+	/// \example ""
 	/// \param[in] conceptid index (indices of learnt concepts starting from 1) 
+	/// \example 1
+	/// \example 121
+	/// \example 3249432
 	/// \return the resulting vector indices (index is order of insertion starting from 0)
+	/// \example [ 2121 5355 35356 214242 8309732 32432424 ]
 	std::vector<Index> conceptFeatures( const std::string& conceptClass, int conceptid) const;
 
 	/// \brief Get the number of concept features learnt for a class
 	/// \param[in] conceptClass name identifying a class of concepts learnt.
+	/// \example "entityrel"
+	/// \example ""
 	/// \return the number of concept features and also the maximum number assigned to a feature (starting with 1)
+	/// \example 0
+	/// \example 3535
+	/// \example 324325
+	/// \example 2343246
 	unsigned int nofConcepts( const std::string& conceptClass) const;
 
 	/// \brief Get the set of learnt concepts of a class for a feature defined
 	/// \param[in] conceptClass name identifying a class of concepts learnt
+	/// \example "flections"
+	/// \example ""
 	/// \param[in] index index of vector in the order of insertion starting from 0
-	/// \return the resulting concept feature indices (indices of learnt concepts starting from 1) (std::vector<int>)
+	/// \example 0
+	/// \example 3785
+	/// \example 123325
+	/// \example 8793246
+	/// \return the resulting concept feature indices (indices of learnt concepts starting from 1)
+	/// \example [ 2121 5355 35356 214242 8309732 32432424 ]
 	std::vector<Index> featureConcepts( const std::string& conceptClass, int index) const;
 
 	/// \brief Get the vector assigned to a feature addressed by index
 	/// \param[in] index index of the feature (starting from 0)
-	/// \return the vector (std::vector<double>)
+	/// \example 0
+	/// \example 3785
+	/// \return the vector
+	/// \example [ 0.08721391 0.01232134 0.02342453 0.0011312 0.0012314 0.087232243 ]
 	std::vector<double> featureVector( int index) const;
 
 	/// \brief Get the name of a feature by its index starting from 0
 	/// \param[in] index index of the feature (starting from 0)
-	/// \return the name of the feature defined 
+	/// \example 0
+	/// \example 71243
+	/// \return the name of the feature defined
+	/// \example "castle"
 	std::string featureName( int index) const;
 
 	/// \brief Get the index starting from 0 of a feature by its name
 	/// \param[in] name name of the feature
+	/// \example "castle"
 	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion starting with 0)
+	/// \example -1
+	/// \example 52636
 	Index featureIndex( const std::string& name) const;
 
 	/// \brief Get the number of feature vectors defined
 	/// \return the number of features
+	/// \example 0
+	/// \example 15612336
 	unsigned int nofFeatures() const;
 
 	/// \brief Get the configuration of this vector storage
 	/// \return the configuration as structure
+	/// \example [ path:'storage' commit:10 dim:300 bit:64 var:32 simdist:340 maxdist:640 realvecweights:1 ]
 	Struct config() const;
 
 	/// \brief Get the configuration of this vector storage as string
 	/// \return the configuration as string
+	/// \example "path=storage;commit=10;dim=300;bit=64;var=32;simdist=340;maxdist=640;realvecweights=1"
 	std::string configstring() const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
@@ -139,6 +178,7 @@ private:
 
 /// \class VectorStorageTransactionImpl
 /// \brief Object representing a vector storage transaction
+/// \note The only way to construct a vector storage transaction instance is to call VectorStorageClient::createTransaction()
 class VectorStorageTransactionImpl
 {
 public:
@@ -147,23 +187,29 @@ public:
 
 	/// \brief Add named feature to vector storage
 	/// \param[in] name unique name of the feature added
+	/// \example "castle"
+	/// \example "conquest"
 	/// \param[in] vec vector assigned to the feature
+	/// \example [ 0.08721391 0.01232134 0.02342453 0.0011312 0.0012314 0.087232243 ]
 	void addFeature( 
 			const std::string& name,
 			const ValueVariant& vec);
 
 	/// \brief Assign a concept (index) to a feature referenced by index
 	/// \param[in] conceptClass name of the relation
+	/// \example "entityrel"
 	/// \param[in] featidx index of the feature
+	/// \example 1242321
 	/// \param[in] conidx index of the concept
+	/// \example 32874
 	void defineFeatureConceptRelation(
 			const std::string& conceptClass,
 			int featidx,
 			int conidx);
 
 	/// \brief Commit of the transaction
-	/// \return true on success, false on failure
-	bool commit();
+	/// \remark throws an error on failure
+	void commit();
 
 	/// \brief Rollback of the transaction
 	void rollback();

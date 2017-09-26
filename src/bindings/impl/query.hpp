@@ -27,6 +27,7 @@ class StorageClientImpl;
 
 /// \class QueryEvalImpl
 /// \brief Query evaluation program object representing an information retrieval scheme for documents in a storage.
+/// \note The only way to construct a query eval instance is to call Context::createQueryEval()
 class QueryEvalImpl
 {
 public:
@@ -35,8 +36,11 @@ public:
 
 	/// \brief Declare a term that is used in the query evaluation as structural element without beeing part of the query (for example punctuation used for match fields summarization)
 	/// \param[in] set identifier of the term set that is used to address the terms
+	/// \example "eos"
 	/// \param[in] type feature type of the of the term
+	/// \example "punct"
 	/// \param[in] value feature value of the of the term
+	/// \example "."
 	void addTerm(
 			const std::string& set,
 			const std::string& type,
@@ -44,19 +48,28 @@ public:
 
 	/// \brief Declare a feature set to be used as selecting feature
 	/// \param[in] set identifier of the term set addressing the terms to use for selection
+	/// \example "select"
 	void addSelectionFeature( const std::string& set);
 
 	/// \brief Declare a feature set to be used as restriction
 	/// \param[in] set identifier of the term set addressing the terms to use as restriction
+	/// \example "restrict"
 	void addRestrictionFeature( const std::string& set);
 
 	/// \brief Declare a feature set to be used as exclusion
 	/// \param[in] set identifier of the term set addressing the terms to use as exclusion
+	/// \example "exclusion"
 	void addExclusionFeature( const std::string& set);
 
 	/// \brief Declare a summarizer
+	/// \example addSummarizer( "attribute" [["name" "docid"] ["debug" "debug_attribute"]] )
+	/// \example addSummarizer( "metadata"  [["name" "cross"] ["debug" "debug_metadata" ]] )
 	/// \param[in] name the name of the summarizer to add
+	/// \example "matchphrase"
+	/// \example "matchpos"
+	/// \example "attribute"
 	/// \param[in] parameter the parameters of the summarizer to add (parameter name 'debug' reserved for declaring the debug info attribute)
+	/// \example [ sentencesize: 40 windowsize: 100 cardinality: 5 ]
 	/// \param[in] resultnames the mapping of result names
 	void addSummarizer(
 			const std::string& name,
@@ -64,14 +77,19 @@ public:
 			const ValueVariant& resultnames=ValueVariant());
 
 	/// \brief Add a weighting function to use as summand of the total document weight
+	/// \example addWeightingFunction( "tf", [match:[feature:"seek"] debug:"debug_weighting"] )
 	/// \param[in] name the name of the weighting function to add
+	/// \example "BM25"
 	/// \param[in] parameter the parameters of the weighting function to add
+	/// \example [ b:0.75 k:1.2 avgdoclen:1000 match:[feature:"seek"] debug:"debug_weighting" ]
 	void addWeightingFunction(
 			const std::string& name,
 			const ValueVariant& parameter);
 
 	/// \brief Define the weighting formula to use for calculating the total weight from the weighting function results (sum of the weighting function results is the default)
-	/// \param[in] source of the weighting formula
+	/// \example defineWeightingFormula( "_0 / _1" )
+ 	/// \param[in] source of the weighting formula
+	/// \example "_0 / ln( _1 + 1)"
 	/// \param[in] defaultParameter default parameter values
 	void defineWeightingFormula(
 			const std::string& source,
@@ -98,6 +116,7 @@ private:
 
 /// \class QueryImpl
 /// \brief Query program object representing a retrieval method for documents in a storage.
+/// \note The only way to construct a query instance is to call QueryEval::createQuery( storage)
 class QueryImpl
 {
 public:
@@ -105,10 +124,19 @@ public:
 	virtual ~QueryImpl(){}
 
 	/// \brief Create a feature from the query expression passed
+	/// \example addFeature( "select" [ "contains" 0 1 ["word" "hello"] ["word" "world"] ] )
+	/// \example addFeature( "titlefield" [ from:"title_start" to:"title_end"] )
 	/// \param[in] set name of the feature set, this feature is addressed with
+	/// \example "select"
+	/// \example "seek"
 	/// \param[in] expr query expression that defines the postings of the feature and the variables attached
+	/// \example [ "contains" 0 1 ["word" "hello"] ["word" "world"] ]
+	/// \example [ from:"title_start" to:"title_end"]
 	/// \remark The query expression passed as parameter is refused if it does not contain exactly one element
 	/// \param[in] weight individual weight of the feature in the query
+	/// \example 0.75
+	/// \example 1.0
+	/// \example 2.5
 	void addFeature( 
 			const std::string& set,
 			const ValueVariant& expr,
@@ -123,12 +151,16 @@ public:
 	///	if the tree has depth 1 (single node), then it is interpreted as single condition
 	///	if the tree has depth 2 (list of nodes), then it is interpreted as intersection "AND" of its leafs
 	///	an "OR" of conditions without "AND" is therefore expressed as list of list of structures, e.g. '[[["<=","date","1.1.1970"], [">","weight",1.0]]]' <=> 'date <= "1.1.1970" OR weight > 1.0' and '[["<=","date","1.1.1970"], [">","weight",1.0]]' <=> 'date <= "1.1.1970" AND weight > 1.0'
+	/// \example  [ [["=" "country" 12] ["=" "country" 17]]  ["<" "year" "2007"] ]
+	/// \example  ["<" "year" "2002"]
 	void addMetaDataRestriction( const ValueVariant& expression);
 
 	/// \brief Define term statistics to use for a term for weighting it in this query
 	/// \example defineTermStatistics( "word" "game" [ df: 74653 ] )
 	/// \param[in] type query term type name
+	/// \example "word"
 	/// \param[in] value query term value
+	/// \example "game"
 	/// \param[in] stats the structure with the statistics to set
 	/// \example [ df: 74653 ]
 	void defineTermStatistics(
@@ -142,24 +174,31 @@ public:
 	void defineGlobalStatistics( const ValueVariant& stats);
 
 	/// \brief Define a set of documents the query is evaluated on. By default the query is evaluated on all documents in the storage
-	/// \param[in] docnolist list of documents to evaluate the query on (std::vector<int>)
+	/// \param[in] docnolist list of documents to evaluate the query on (array of positive integers)
+	/// \example [1,23,2345,3565,4676,6456,8855,12203]
 	void addDocumentEvaluationSet( const ValueVariant& docnolist);
 
 	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
 	/// \param[in] maxNofRanks maximum number of results to return by this query
+	/// \example 20
+	/// \example 50
+	/// \example 5
 	void setMaxNofRanks( unsigned int maxNofRanks);
 
 	/// \brief Set the index of the first rank to be returned
 	/// \param[in] minRank index of the first rank to be returned by this query
+	/// \example 10
+	/// \example 20
 	void setMinRank( unsigned int minRank);
 
 	/// \brief Allow read access to documents having a specific ACL tag
 	/// \note If no ACL tags are specified, then all documents are potential candidates for the result
-	/// \param[in] userlist Add ACL tag or list of ACL tags that selects documents to be candidates of the result
-	void addAccess( const ValueVariant& userlist);
+	/// \param[in] rolelist Add ACL tag or list of ACL tags that selects documents to be candidates of the result
+	/// \example ["public" "devel" "sys"]
+	void addAccess( const ValueVariant& rolelist);
 
 	/// \brief Assign values to variables of the weighting formula
-	/// \param[in] parameter parameter values (std::map<std::string,double>)
+	/// \param[in] parameter parameter values (map of variable names to floats)
 	void setWeightingVariables( const ValueVariant& parameter);
 
 	/// \brief Switch on debug mode that creates debug info of query evaluation methods and summarization as attributes of the query result

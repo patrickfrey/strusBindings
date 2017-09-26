@@ -310,7 +310,7 @@ void VectorStorageTransactionImpl::defineFeatureConceptRelation( const std::stri
 	}
 }
 
-bool VectorStorageTransactionImpl::commit()
+void VectorStorageTransactionImpl::commit()
 {
 	VectorStorageTransactionInterface* transaction = m_vector_transaction_impl.getObject<VectorStorageTransactionInterface>();
 	if (!transaction) throw strus::runtime_error( "%s",  _TXT("calling vector storage builder method after close"));
@@ -324,7 +324,6 @@ bool VectorStorageTransactionImpl::commit()
 			throw strus::runtime_error(_TXT("failed to complete vector storage building (done): %s"), errorhnd->fetchError());
 		}
 	}
-	return rt;
 }
 
 void VectorStorageTransactionImpl::rollback()

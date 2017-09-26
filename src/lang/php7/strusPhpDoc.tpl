@@ -6,10 +6,10 @@ template main ENDHTML {{ }}
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<title>Strus PHP interface documentation</title>
-	<link rel="stylesheet" href="bindingsDocNav.css" type="text/css" />
+	<link rel="stylesheet" href="phpBindingsDoc.css" type="text/css" />
 </head>
 <body onload="initLoad()">
-<script type="text/javascript" src="bindingsDocNav.js"></script>
+<script type="text/javascript" src="phpBindingsDoc.js"></script>
 
 <div class="container">
 <div class="product">
@@ -47,7 +47,7 @@ template main ENDHTML {{ }}
 ENDHTML
 
 group constructor method
-namespace projectnamespace=project locase
+namespace projectnamespace=project
 variable project
 variable author
 variable copyright
@@ -74,12 +74,12 @@ template navmember=method END {{ }}
 <div class="navmethod" id="nav_{{methodidx}}" onclick="showMethod('{{methodidx}}')">{{methodname}}</div>
 END
 template navmember=constructor END {{ }}
-<div class="navconstructor" id="nav_{{methodidx}}" onclick="showMethod('{{methodidx}}')">{{constructorname}}</div>
+<div class="navconstructor" id="nav_{{methodidx}}" onclick="showMethod('{{methodidx}}')">new</div>
 END
 
 template classdescription=class END {{ }}
 <div class="classdescription" id="description_{{classidx}}">
-<h2 class="content_title">{{projectnamespace}}_{{classname}}</h2>
+<h2 class="content_title">{{projectnamespace}}{{classname}}</h2>
 <p class="leadtext">
 {{description}}
 </p>
@@ -90,7 +90,7 @@ END
 
 template memberdescription=method END {{ }}
 <div class="memberdescription" id="description_{{methodidx}}">
-<h2 class="content_title">:{{methodname}}</h2>
+<h2 class="content_title">{{methodname}}</h2>
 <p class="text">
 {{description}}
 </p>
@@ -99,12 +99,14 @@ template memberdescription=method END {{ }}
 {{callremarks}}
 {{callnotes}}
 {{callexamples}}
+<h4 class="content_subtitle">Result</h4>
+<div class="callresult">{{callresult}}</div>
 </div> <!-- memberdescription -->
 END
 
 template memberdescription=constructor END {{ }}
 <div class="memberdescription" id="description_{{methodidx}}">
-<h2 class="content_title">.{{constructorname}}</h2>
+<h2 class="content_title">new {{projectnamespace}}{{classname}}</h2>
 <p class="text">
 {{description}}
 </p>
@@ -154,11 +156,24 @@ template parameterlist=param END {{ }}
 </div> <!-- param -->
 END
 
-empty parameterlist <div class="note">no parameters defined</div>
-
 template paramexamples=param END {{ }}
 <div class="paramexamples">{{examples}}</div> <!-- paramexamples -->
 END
+
+empty parameterlist <div class="note">no parameters defined</div>
+
+template callresult=return END {{ }}
+<div class="result">
+<div class="resultdescr">{{resultdescr}}</div>
+{{resultexamples}}
+</div> <!-- result -->
+END
+
+template resultexamples=return END {{ }}
+<div class="resultexamples">{{examples}}</div> <!-- resultexamples -->
+END
+
+empty callresult <div class="note">no value returned</div>
 
 template notes=class END {{ }}
 {{notelist}}
@@ -191,6 +206,16 @@ template remarks=param ?remarklist END {{ }}
 <div class="annotation">{{remarklist}}</div> <!-- annotation -->
 END
 
+template notes=return ?notelist END {{ }}
+<div class="annotation_subtitle">return</div>
+<div class="annotation">{{notelist}}</div> <!-- annotation -->
+END
+
+template remarks=return ?remarklist END {{ }}
+<div class="annotation_subtitle">return</div>
+<div class="annotation">{{remarklist}}</div> <!-- annotation -->
+END
+
 template examples=usage END {{ }}
 <div class="example">{{example}}</div>
 END
@@ -210,5 +235,6 @@ variable note=note xmlencode
 variable remark=remark xmlencode
 variable paramname=param[0]
 variable paramdescr=param[1:] xmlencode
+variable resultdescr=return xmlencode
 variable example=usage xmlencode
 ignore url

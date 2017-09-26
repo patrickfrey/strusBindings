@@ -145,14 +145,14 @@ hr { width:100%; height:2px; background: #fff }
     margin-top: 50px;
     display: none;
 }
-.parameterlist {
+.parameterlist,.callresult {
     display:table;
     border:1px solid  #0;
     border-collapse: collapse;
     background-color: #f3f7c3;
     width: 100%;
 }
-.param {
+.param,.result {
     display: table-row;
     font-size:1.0em;
     font:Verdana,Arial;
@@ -169,7 +169,7 @@ hr { width:100%; height:2px; background: #fff }
     font:Verdana,Arial;
     font-weight: bold;
 }
-.paramdescr {
+.paramdescr,.resultdescr {
     display:table-cell;
     border-left: 1px solid #152515;
     border-right: 1px solid #152515;
@@ -180,7 +180,8 @@ hr { width:100%; height:2px; background: #fff }
     vertical-align:middle;
     font:Verdana,Arial;
 }
-.paramexamples {
+
+.paramexamples,.resultexamples {
     display:table-cell;
     border-left: 1px solid #152515;
     border-right: 1px solid #152515;

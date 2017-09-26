@@ -48,19 +48,21 @@ add_custom_command(
     COMMENT  "Generating PHP 7 .ini file with strus extension loaded"
     VERBATIM
  )
- 
+
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm
-    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl"  ${CMAKE_CURRENT_BINARY_DIR}/../../../src/lang/php7/strus.php
+    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl"  ${CMAKE_CURRENT_BINARY_DIR}/strus.php
     COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl" ${CMAKE_CURRENT_BINARY_DIR}/strus.php
-    COMMENT  "Generating bindings interface doc html file ${CMAKE_CURRENT_BINARY_DIR}/strus.php"
+    COMMENT  "Generating bindings interface doc html file ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm"
     VERBATIM
  )
 
+configure_file( ${PROJECT_SOURCE_DIR}/src/lang/php7/phpBindingsDoc.css  ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.css  COPYONLY )
+configure_file( ${PROJECT_SOURCE_DIR}/src/lang/php7/phpBindingsDoc.js  ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.js  COPYONLY )
+
  add_custom_target(
     php7_mod ALL
-    DEPENDS strus.c php.ini ${CMAKE_CURRENT_BINARY_DIR}/strus.php papuga_php7_gen ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm
-)
+    DEPENDS strus.c php.ini ${CMAKE_CURRENT_BINARY_DIR}/strus.php papuga_php7_gen ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.css ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.js )
 
 # ------------------------------
 # LIBRARIES

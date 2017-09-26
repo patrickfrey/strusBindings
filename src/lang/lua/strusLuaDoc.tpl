@@ -6,10 +6,10 @@ template main ENDHTML {{ }}
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<title>Strus Lua interface documentation</title>
-	<link rel="stylesheet" href="bindingsDocNav.css" type="text/css" />
+	<link rel="stylesheet" href="luaBindingsDoc.css" type="text/css" />
 </head>
 <body onload="initLoad()">
-<script type="text/javascript" src="bindingsDocNav.js"></script>
+<script type="text/javascript" src="luaBindingsDoc.js"></script>
 
 <div class="container">
 <div class="product">
@@ -99,6 +99,8 @@ template memberdescription=method END {{ }}
 {{callremarks}}
 {{callnotes}}
 {{callexamples}}
+<h4 class="content_subtitle">Result</h4>
+<div class="callresult">{{callresult}}</div>
 </div> <!-- memberdescription -->
 END
 
@@ -154,11 +156,24 @@ template parameterlist=param END {{ }}
 </div> <!-- param -->
 END
 
-empty parameterlist <div class="note">no parameters defined</div>
-
 template paramexamples=param END {{ }}
 <div class="paramexamples">{{examples}}</div> <!-- paramexamples -->
 END
+
+empty parameterlist <div class="note">no parameters defined</div>
+
+template callresult=return END {{ }}
+<div class="result">
+<div class="resultdescr">{{resultdescr}}</div>
+{{resultexamples}}
+</div> <!-- result -->
+END
+
+template resultexamples=return END {{ }}
+<div class="resultexamples">{{examples}}</div> <!-- resultexamples -->
+END
+
+empty callresult <div class="note">no value returned</div>
 
 template notes=class END {{ }}
 {{notelist}}
@@ -191,6 +206,16 @@ template remarks=param ?remarklist END {{ }}
 <div class="annotation">{{remarklist}}</div> <!-- annotation -->
 END
 
+template notes=return ?notelist END {{ }}
+<div class="annotation_subtitle">return</div>
+<div class="annotation">{{notelist}}</div> <!-- annotation -->
+END
+
+template remarks=return ?remarklist END {{ }}
+<div class="annotation_subtitle">return</div>
+<div class="annotation">{{remarklist}}</div> <!-- annotation -->
+END
+
 template examples=usage END {{ }}
 <div class="example">{{example}}</div>
 END
@@ -210,6 +235,7 @@ variable note=note xmlencode
 variable remark=remark xmlencode
 variable paramname=param[0]
 variable paramdescr=param[1:] xmlencode
+variable resultdescr=return xmlencode
 variable example=usage xmlencode
 ignore url
 
