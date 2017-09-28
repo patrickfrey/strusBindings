@@ -68,8 +68,8 @@ set_target_properties( strus_bindings_python3 PROPERTIES
 				LINK_FLAGS ${PYTHON3_MODULE_LINK_FLAGS} 
 				COMPILE_FLAGS ${PYTHON3_MODULE_CXX_FLAGS} )
 target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
-				debug strus_bindings_d optimized strus_bindings
-				debug papuga_python3_dev_d optimized papuga_python3_dev )
+				strus_bindings
+				papuga_python3_dev )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )
