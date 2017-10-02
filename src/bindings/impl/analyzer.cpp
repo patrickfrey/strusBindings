@@ -11,7 +11,7 @@
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
 #include "patternMatcherLoader.hpp"
@@ -25,26 +25,6 @@
 using namespace strus;
 using namespace strus::bindings;
 
-static SegmenterDef parseSegmenterDef( const ValueVariant& ctx)
-{
-	if (papuga_ValueVariant_isstring( &ctx))
-	{
-		papuga_ErrorCode err = papuga_Ok;
-		SegmenterDef segdef( papuga::ValueVariant_tostring( ctx, err));
-		if (err != papuga_Ok) throw papuga::error_exception( err, "segmenter definition");
-		return segdef;
-	}
-	else if (ctx.valuetype == papuga_TypeSerialization)
-	{
-		papuga::Serialization::const_iterator si = papuga::Serialization::begin( ctx.value.serialization);
-		return SegmenterDef( si, papuga::Serialization::end( ctx.value.serialization));
-	}
-	else
-	{
-		throw strus::runtime_error( "%s", _TXT("expected string or document class structure for document segmenter definition"));
-	}
-}
-
 DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const ValueVariant& doctype, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
@@ -55,7 +35,7 @@ DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& trace, const Object
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 
-	SegmenterDef segdef( parseSegmenterDef( doctype));
+	SegmenterDef segdef( doctype);
 	const SegmenterInterface* segmenter = 0;
 	analyzer::SegmenterOptions segmenteropt;
 

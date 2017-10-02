@@ -33,7 +33,7 @@
 #include "strus/index.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "expressionBuilder.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "papuga/valueVariant.h"
 #include <string>
 #include <utility>
@@ -43,53 +43,29 @@ namespace bindings {
 
 struct Deserializer
 {
-	static void consumeClose(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static void consumeClose( papuga_SerializationIter& seriter);
 
-	static bool skipStructure(
-			papuga::Serialization::const_iterator si,
-			const papuga::Serialization::const_iterator& se);
+	static bool skipStructure( papuga_SerializationIter& seriter);
 
-	static std::string getString(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static std::string getString( papuga_SerializationIter& seriter);
 
-	static const char* getCharpAscii(
-			char* buf, std::size_t bufsize,
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static const char* getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter);
 
-	static std::vector<std::string> getStringList(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static std::vector<std::string> getStringList( papuga_SerializationIter& seriter);
 
-	static std::vector<std::string> getStringList(
-			const papuga_ValueVariant& val);
+	static std::vector<std::string> getStringList( const papuga_ValueVariant& val);
 
-	static unsigned int getUint(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static unsigned int getUint( papuga_SerializationIter& seriter);
 
-	static int getInt(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static int getInt( papuga_SerializationIter& seriter);
 
-	static Index getIndex(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static Index getIndex( papuga_SerializationIter& seriter);
 
-	static double getDouble(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static double getDouble( papuga_SerializationIter& seriter);
 
-	static MetaDataRestrictionInterface::CompareOperator getMetaDataCmpOp(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static MetaDataRestrictionInterface::CompareOperator getMetaDataCmpOp( papuga_SerializationIter& seriter);
 
-	static NumericVariant getNumeric(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static NumericVariant getNumeric( papuga_SerializationIter& seriter);
 
 	static std::vector<int> getIntList(
 			const papuga_ValueVariant& val);
@@ -100,22 +76,14 @@ struct Deserializer
 	static std::vector<double> getDoubleList(
 			const papuga_ValueVariant& val);
 
-	static bool hasDepth(
-			papuga::Serialization::const_iterator si,
-			const papuga::Serialization::const_iterator& se,
-			int depth);
+	static bool hasDepth( const papuga_SerializationIter& seriter, int depth);
 
-	static const papuga_ValueVariant* getOptionalDefinition(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
-			const char* name);
+	static const papuga_ValueVariant* getOptionalDefinition( papuga_SerializationIter& seriter, const char* name);
 
 	static analyzer::DocumentClass getDocumentClass(
 			const papuga_ValueVariant& val);
 
-	static analyzer::FeatureOptions getFeatureOptions(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static analyzer::FeatureOptions getFeatureOptions( papuga_SerializationIter& seriter);
 
 	static analyzer::FeatureOptions getFeatureOptions(
 			const papuga_ValueVariant& options);
@@ -127,8 +95,7 @@ struct Deserializer
 			const papuga_ValueVariant& stats);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			papuga_SerializationIter& seriter,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
@@ -138,8 +105,7 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 	
 	static Reference<TokenizerFunctionInstanceInterface> getTokenizer(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			papuga_SerializationIter& seriter,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
@@ -149,8 +115,7 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 	
 	static Reference<AggregatorFunctionInstanceInterface> getAggregator(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
+			papuga_SerializationIter& seriter,
 			const TextProcessorInterface* textproc,
 			ErrorBufferInterface* errorhnd);
 
@@ -181,16 +146,9 @@ struct Deserializer
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
-	static void buildExpression(
-			ExpressionBuilder& builder,
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
-			bool allowList);
+	static void buildExpression( ExpressionBuilder& builder, papuga_SerializationIter& seriter, bool allowList);
 
-	static void buildExpressionList(
-			ExpressionBuilder& builder,
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static void buildExpressionList( ExpressionBuilder& builder, papuga_SerializationIter& seriter);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
@@ -198,11 +156,7 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd,
 			bool allowLists);
 
-	static void buildPattern(
-			ExpressionBuilder& builder,
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se,
-			ErrorBufferInterface* errorhnd);
+	static void buildPattern( ExpressionBuilder& builder, papuga_SerializationIter& seriter, ErrorBufferInterface* errorhnd);
 
 	static void buildPatterns(
 			ExpressionBuilder& builder,
@@ -240,9 +194,7 @@ struct Deserializer
 			const papuga_ValueVariant& content,
 			ErrorBufferInterface* errorhnd);
 
-	static std::string getConfigString(
-			papuga::Serialization::const_iterator& si,
-			const papuga::Serialization::const_iterator& se);
+	static std::string getConfigString( papuga_SerializationIter& seriter);
 
 	static std::string getConfigString(
 			const papuga_ValueVariant& content,

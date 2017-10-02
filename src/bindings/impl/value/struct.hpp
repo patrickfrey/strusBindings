@@ -25,8 +25,8 @@ public:
 	Struct()
 		:released(false)
 	{
-		papuga_init_Serialization( &serialization);
 		papuga_init_Allocator( &allocator, 0, 0);
+		papuga_init_Serialization( &serialization, &allocator);
 	}
 
 	/// \brief "Move" constructor
@@ -51,7 +51,6 @@ public:
 	{
 		if (!released)
 		{
-			papuga_destroy_Serialization( &serialization);
 			papuga_destroy_Allocator( &allocator);
 		}
 	}

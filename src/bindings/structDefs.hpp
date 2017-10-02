@@ -8,7 +8,7 @@
 #ifndef _STRUS_BINDINGS_STRUCTURE_DEFINITIONS_HPP_INCLUDED
 #define _STRUS_BINDINGS_STRUCTURE_DEFINITIONS_HPP_INCLUDED
 #include "structNameMap.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "papuga/typedefs.h"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/numericVariant.hpp"
@@ -22,7 +22,7 @@ struct AnalyzerFunctionDef
 	std::string name;
 	std::vector<std::string> args;
 
-	AnalyzerFunctionDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	AnalyzerFunctionDef( papuga_SerializationIter& seriter);
 	AnalyzerFunctionDef( const AnalyzerFunctionDef& o)
 		:name(o.name),args(o.args){}
 };
@@ -36,7 +36,7 @@ struct QueryTermDef
 	bool value_defined;
 	bool length_defined;
 
-	QueryTermDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	QueryTermDef( papuga_SerializationIter& seriter);
 	QueryTermDef( const QueryTermDef& o)
 		:variable(o.variable),type(o.type),value(o.value),length(o.length),value_defined(o.value_defined),length_defined(o.length_defined){}
 };
@@ -46,7 +46,7 @@ struct MetaDataRangeDef
 	std::string from;
 	std::string to;
 
-	MetaDataRangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	MetaDataRangeDef( papuga_SerializationIter& seriter);
 	MetaDataRangeDef( const MetaDataRangeDef& o)
 		:from(o.from),to(o.to){}
 };
@@ -55,7 +55,7 @@ struct ConfigDef
 {
 	std::string cfgstring;
 
-	ConfigDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	ConfigDef( papuga_SerializationIter& seriter);
 	ConfigDef( const ConfigDef& o)
 		:cfgstring(o.cfgstring){}
 };
@@ -65,7 +65,8 @@ struct KeyValueList
 	typedef std::pair< std::string, const papuga_ValueVariant*> Item;
 	std::vector<Item> items;
 
-	KeyValueList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	KeyValueList( const papuga_ValueVariant& def);
+	KeyValueList( papuga_SerializationIter& seriter);
 	KeyValueList( const KeyValueList& o)
 		:items(o.items){}
 
@@ -74,9 +75,10 @@ struct KeyValueList
 	const_iterator end() const	{return items.end();}
 
 private:
-	void parseMetaKeyValueList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
-	void parseDictionary( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
-	void parseValueTupleList( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	void init( papuga_SerializationIter& seriter);
+	void parseMetaKeyValueList( papuga_SerializationIter& seriter);
+	void parseDictionary( papuga_SerializationIter& seriter);
+	void parseValueTupleList( papuga_SerializationIter& seriter);
 };
 
 struct DfChangeDef
@@ -85,7 +87,7 @@ struct DfChangeDef
 	std::string termvalue;
 	int increment;
 
-	DfChangeDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	DfChangeDef( papuga_SerializationIter& seriter);
 	DfChangeDef( const DfChangeDef& o)
 		:termtype(o.termtype),termvalue(o.termvalue),increment(o.increment){}
 };
@@ -100,9 +102,13 @@ struct ContextDef
 		:threads(0),rpc(),trace(){}
 	explicit ContextDef( const std::string& connstr)
 		:threads(0),rpc(connstr),trace(){}
-	ContextDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	ContextDef( papuga_SerializationIter& seriter);
+	ContextDef( const papuga_ValueVariant& def);
 	ContextDef( const ContextDef& o)
 		:threads(o.threads),rpc(o.rpc),trace(o.trace){}
+
+private:
+	void init( papuga_SerializationIter& seriter);
 };
 
 struct SegmenterDef
@@ -114,9 +120,12 @@ struct SegmenterDef
 
 	explicit SegmenterDef( const std::string& segmenter_)
 		:segmenter(segmenter_){}
-	SegmenterDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	SegmenterDef( const papuga_ValueVariant& def);
+	SegmenterDef( papuga_SerializationIter& seriter);
 	SegmenterDef( const SegmenterDef& o)
 		:segmenter(o.segmenter),mimetype(o.mimetype),encoding(o.encoding),scheme(o.scheme){}
+private:
+	void init( papuga_SerializationIter& seriter);
 };
 
 struct MetaDataCompareDef
@@ -125,7 +134,7 @@ struct MetaDataCompareDef
 	std::string name;
 	papuga_ValueVariant value;
 
-	MetaDataCompareDef( papuga::Serialization::const_iterator& si, const papuga::Serialization::const_iterator& se);
+	MetaDataCompareDef( papuga_SerializationIter& seriter);
 	MetaDataCompareDef( const MetaDataCompareDef& o)
 		:cmpop(o.cmpop),name(o.name),value(o.value){}
 };

@@ -12,7 +12,7 @@
 #include "papuga/valueVariant.h"
 #include "papuga/valueVariant.hpp"
 #include "papuga/errors.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
 #include "internationalization.hpp"

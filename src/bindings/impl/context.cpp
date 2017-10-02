@@ -11,6 +11,7 @@
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
 #include "papuga/valueVariant.hpp"
+#include "papuga/serialization.hpp"
 #include "papuga/errors.hpp"
 #include "strus/lib/rpc_client.hpp"
 #include "strus/lib/rpc_client_socket.hpp"
@@ -68,30 +69,6 @@ static ModuleLoaderInterface* createModuleLoader_( ErrorBufferInterface* errorhn
 	return rt;
 }
 
-static ContextDef parseContext( const ValueVariant& ctx)
-{
-	if (!papuga_ValueVariant_defined( &ctx))
-	{
-		return ContextDef();
-	}
-	else if (papuga_ValueVariant_isstring( &ctx))
-	{
-		papuga_ErrorCode err = papuga_Ok;
-		ContextDef rt( papuga::ValueVariant_tostring( ctx, err));
-		if (err != papuga_Ok) throw papuga::error_exception( err, "context definition");
-		return rt;
-	}
-	else if (ctx.valuetype == papuga_TypeSerialization)
-	{
-		papuga::Serialization::const_iterator si = papuga::Serialization::begin( ctx.value.serialization);
-		return ContextDef( si, papuga::Serialization::end( ctx.value.serialization));
-	}
-	else
-	{
-		throw strus::runtime_error( "%s", _TXT("expected string or structure for context configuration"));
-	}
-}
-
 ContextImpl::ContextImpl( const ValueVariant& descr)
 	:m_errorhnd_impl()
 	,m_moduleloader_impl()
@@ -102,7 +79,7 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_textproc(0)
 	,m_queryproc(0)
 {
-	ContextDef contextdef( parseContext( descr));
+	ContextDef contextdef( descr);
 	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads);
 	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
 
@@ -433,7 +410,7 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg)
 		return ValueVariantWrap::tostring( arg);
 	}
 	papuga_ErrorCode errcode = papuga_Ok;
-	std::string rt = papuga::Serialization::tostring( *arg.value.serialization, errcode);
+	std::string rt = papuga::Serialization_tostring( *arg.value.serialization, errcode);
 	if (errcode != papuga_Ok)
 	{
 		throw papuga::error_exception( errcode, "method debug_serialize");
