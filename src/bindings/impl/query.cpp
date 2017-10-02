@@ -7,7 +7,7 @@
  */
 #include "impl/query.hpp"
 #include "impl/storage.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
@@ -185,18 +185,9 @@ void QueryImpl::addAccess( const ValueVariant& userlist_)
 void QueryImpl::setWeightingVariables(
 		const ValueVariant& parameter)
 {
-	static char* context = _TXT("weighting variables");
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	if (parameter.valuetype != papuga_TypeSerialization)
-	{
-		throw strus::runtime_error( "%s", _TXT("list of variable assignments expected as argument"));
-	}
-	papuga::Serialization::const_iterator
-		si = papuga::Serialization::begin( parameter.value.serialization),
-		se = papuga::Serialization::end( parameter.value.serialization);
-	KeyValueList kvlist( si, se);
-	if (si != se) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
 
+	KeyValueList kvlist( parameter);
 	KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
 	for (; ki != ke; ++ki)
 	{

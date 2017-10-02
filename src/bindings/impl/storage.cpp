@@ -27,7 +27,7 @@
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/base/configParser.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "internationalization.hpp"

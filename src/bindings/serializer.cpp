@@ -9,7 +9,7 @@
 /// \file serializer.hpp
 #include "serializer.hpp"
 #include "papuga/valueVariant.h"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "internationalization.hpp"
 #include "papuga/allocator.h"
 
@@ -133,9 +133,9 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 	{
 		bool rt = true;
 		const analyzer::QueryTermExpression& expr = val.expression();
-	
+		std::vector<papuga_Serialization*> stk;
+
 		rt &= papuga_Serialization_pushOpen( result);
-		std::vector<papuga::Serialization> stk;
 		std::vector<analyzer::QueryTermExpression::Instruction>::const_iterator
 			ii = expr.instructions().begin(), ie = expr.instructions().end();
 		for (; ii != ie && rt; ++ii)
@@ -144,49 +144,53 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 			{
 				case analyzer::QueryTermExpression::Instruction::Term:
 				{
-					stk.push_back( papuga::Serialization());
+					papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( result->allocator);
+					if (!ser) return false;
+					stk.push_back( ser);
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
-					rt &= Serializer::serialize_nothrow( stk.back().cstruct(), expr.term( ii->idx()), variablename);
+					rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename);
 					break;
 				}
 				case analyzer::QueryTermExpression::Instruction::Operator:
 				{
 					if (!val.isOperator( ii->idx())) return false;
 
-					papuga::Serialization opres;
-					rt &= papuga_Serialization_pushOpen( opres.cstruct());
+					papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( result->allocator);
+					if (!ser) return false;
+
+					rt &= papuga_Serialization_pushOpen( ser);
 					const TermExpression::Operator& op = val.operatorStruct( ii->idx());
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
 	
-					rt &= Serializer::serializeStructMember( opres.cstruct(), "op", op.name);
-					if (op.range) rt &= Serializer::serializeStructMember( opres.cstruct(), "range", (papuga_Int)op.range);
-					if (op.cardinality) rt &= Serializer::serializeStructMember( opres.cstruct(), "cardinality", (papuga_UInt)op.cardinality);
+					rt &= Serializer::serializeStructMember( ser, "op", op.name);
+					if (op.range) rt &= Serializer::serializeStructMember( ser, "range", (papuga_Int)op.range);
+					if (op.cardinality) rt &= Serializer::serializeStructMember( ser, "cardinality", (papuga_UInt)op.cardinality);
 	
-					rt &= papuga_Serialization_pushName_charp( opres.cstruct(), "arg");
-					rt &= papuga_Serialization_pushOpen( opres.cstruct());
+					rt &= papuga_Serialization_pushName_charp( ser, "arg");
+					rt &= papuga_Serialization_pushOpen( ser);
 					if (ii->nofOperands() > stk.size()) throw strus::runtime_error( "%s", _TXT("number of query analyzer expression operands out of range"));
 					std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
 					for (; si != se; ++si)
 					{
-						papuga_Serialization_append( opres.cstruct(), stk[si].cstruct());
+						papuga_Serialization_pushValue_serialization( ser, stk[si]);
 					}
-					rt &= papuga_Serialization_pushClose( opres.cstruct());//... end arg
+					rt &= papuga_Serialization_pushClose( ser);//... end arg
 					if (variablename)
 					{
-						rt &= Serializer::serializeStructMember( opres.cstruct(), "variable", variablename);
+						rt &= Serializer::serializeStructMember( ser, "variable", variablename);
 					}
-					rt &= papuga_Serialization_pushClose( opres.cstruct());//... end operator
+					rt &= papuga_Serialization_pushClose( ser);//... end operator
 					stk.resize( stk.size() - ii->nofOperands());
-					stk.push_back( opres);
+					stk.push_back( ser);
 					break;
 				}
 			}
 		}
 		// Collect list of results from the stack:
-		std::vector<papuga::Serialization>::const_iterator si = stk.begin(), se = stk.end();
+		std::vector<papuga_Serialization*>::const_iterator si = stk.begin(), se = stk.end();
 		for (; si != se; ++si)
 		{
-			rt &= papuga_Serialization_append( result, si->cstruct());
+			rt &= papuga_Serialization_pushValue_serialization( result, *si);
 		}
 		rt &= papuga_Serialization_pushClose( result);
 		return rt;

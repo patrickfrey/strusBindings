@@ -12,7 +12,7 @@
 #include "strus/base/string_format.hpp"
 #include "strus/base/numParser.hpp"
 #include "internationalization.hpp"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include <string>
 #include <cstring>
 #ifndef __STDC_FORMAT_MACROS

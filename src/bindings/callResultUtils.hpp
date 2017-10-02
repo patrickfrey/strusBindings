@@ -11,7 +11,7 @@
 /// \file callResultUtils.hpp
 #include "papuga/callResult.h"
 #include "papuga/valueVariant.h"
-#include "papuga/serialization.hpp"
+#include "papuga/serialization.h"
 #include "bindingClassTemplate.hpp"
 #include "hostObject.hpp"
 #include "bindingClassTemplate.hpp"
