@@ -1,10 +1,13 @@
 Fix CodeProject Articles
 Delete unused Docker images
 Publish Docker images on webpage and refurbish installation page
-Return values as array, serialization without required OPEN CLOSE to mark one value (NO Serialization is better)
 
 Check multiple propagation of flags like -O0 -O2 -O3 for the same target (remove silly STRUS_OPTIMIZATION_LEVEL)
 
 In XML/JSON call interface call papuga in steps, returning a breakpoint id each step
+No UInt in papuga, only Boolean,Float and Int (UInt is not really needed and mostly not available in scripting languages)
+NodeJS Bindings
+
+
 
 
