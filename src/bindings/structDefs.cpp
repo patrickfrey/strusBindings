@@ -66,9 +66,9 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga_SerializationIter& seriter)
 		{
 			name = Deserializer::getString( seriter);
 			name_defined = true;
-			if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
+			while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 			{
-				args = Deserializer::getStringList( seriter);
+				args.push_back( Deserializer::getString( seriter));
 			}
 		}
 		else
