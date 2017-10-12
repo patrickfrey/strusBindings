@@ -34,6 +34,7 @@ include( cmake/boost.cmake)
 include( cmake/intl.cmake )
 include( cmake/standard_targets.cmake )
 endif()
+include( cmake/find_leveldb.cmake )
 
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 MESSAGE( STATUS  "Tests for strusVector enabled." )
