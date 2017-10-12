@@ -30,10 +30,11 @@ case $OS in
 		fi
 		brew tap homebrew/dupes
 		brew tap homebrew/versions
+		brew install cmake boost
+		brew upgrade cmake
+		brew upgrade boost
 		brew tap homebrew/homebrew-php
 		brew install \
-			cmake \
-			boost \
 			gettext \
 			snappy 
 			leveldb \
