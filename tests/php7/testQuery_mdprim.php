@@ -4,129 +4,143 @@ include_once "config_mdprim.php";
 include_once "createCollection.php";
 include_once "dumpCollection.php";
 
-$datadir = "../data/mdprim/";
-if (isset($argv[1])) {
-	$datadir = $argv[1];
-}
-$outputdir = '.';
-if (isset($argv[2])) {
-	$outputdir = $argv[2];
-}
-$ctxconfig = getContextConfig( $argv[3]);
-$storagedir = $outputdir . "/storage";
-$docfiles = ["doc1000.xml"];
-$output = [];
-$withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
-
-$storageConfig = NULL;
-$ctx = new StrusContext( $ctxconfig);
-if (!$withrpc) {
-	$storageConfig = "path='" . $storagedir . "';metadata='" . metadata_mdprim() . "';cache=512M";
-}
-
-$aclmap = [];
-for ($i = 1; $i < 1000; $i++) {
-	$usr = [];
-	if ($i > 500) {
-		array_push( $usr, 'large');
-	} else {
-		array_push( $usr, 'small');
+try
+{
+	$datadir = "../data/mdprim/";
+	if (isset($argv[1])) {
+		$datadir = $argv[1];
 	}
-	if ($i < 50) {
-		array_push( $usr, 'tiny');
+	$outputdir = '.';
+	if (isset($argv[2])) {
+		$outputdir = $argv[2];
 	}
-	if ($i > 950) {
-		array_push( $usr, 'huge');
+	$ctxconfig = getContextConfig( $argv[3]);
+	$storagedir = $outputdir . "/storage";
+	$docfiles = ["doc1000.xml"];
+	$output = [];
+	$withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
+	
+	$storageConfig = NULL;
+	$ctx = new StrusContext( $ctxconfig);
+	if (!$withrpc) {
+		$storageConfig = "path='" . $storagedir . "';metadata='" . metadata_mdprim() . "';cache=512M";
 	}
-	$aclmap[ "$i"] = $usr;
-}
-
-createCollection( $ctx, $storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( $ctx), True, $datadir, $docfiles, $aclmap, $withrpc);
-
-$queryPhrase = "2 3";
-
-// Get a client for the new created storage:
-$storage = $ctx->createStorageClient( $storageConfig);
-
-// Define the query analyzer to use:
-$analyzer = createQueryAnalyzer_mdprim( $ctx);
-
-// Define the query evaluation scheme:
-$queryEval = createQueryEval_mdprim( $ctx);
-
-// Now we build the query to issue:
-$query = $queryEval->createQuery( $storage);
-
-// First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
-$terms = $analyzer->analyzeTermExpression( ["word",$queryPhrase]);
-// $texpr = $analyzer->analyzeTermExpression( ["union", ["sequence", 10, ["sequence", 10, ["word","2"], ["word","3"]], ["word","5"]], ["sequence", 10, ["sequence", 10, ["word","2"], ["word","5"]], ["word","7"]] ] );
-$mexpr = $analyzer->analyzeMetaDataExpression( [ [["<","cross","010 "],[">","cross"," 14"]], [">","factors"," 0 "] ] );
-$texpr_plain = [
-			["sequence_imm", ["word","2"], ["word","2"], ["word","2"], ["word","2"]],
-			["sequence_imm", ["sequence_imm", ["word","2"], ["word","3"]], ["union", ["sequence_imm", ["word","3"], ["word","5"]], ["word","5"], ["word","7"], ["word","11"]]]
-		];
-$texpr = $analyzer->analyzeTermExpression( $texpr_plain);
-
-$output[ "QueryString"] = $queryPhrase;
-$output[ "QueryTerms"] = $terms;
-$output[ "QueryExpr"] = $texpr;
-$output[ "QueryRestr"] = $mexpr;
-
-if (empty( $terms)) {
-	fwrite(STDERR, "query is empty");
-	exit(1);
-}
-
-// Then we iterate on the terms and create a single term feature for each term and collect
-// all terms to create a selection expression out of them:
-$selexpr = ["contains", 0, 2];
-
-foreach ($terms as $term) {
-	// Each query term is also part of the selection expressions
-	array_push( $selexpr, $term);
-}
-$query->addFeature( "seek", $texpr);
-
-// We assign the feature created to the set named 'select' because this is the
-// name of the set defined as selection feature in the query evaluation configuration
-// (QueryEval.addSelectionFeature):
-$query->addFeature( "select", $selexpr);
-
-// Define the maximum number of best result (ranks) to return:
-$query->setMaxNofRanks( 20);
-// Define the index of the first rank (for implementing scrolling: 0 for the first, 
-// 20 for the 2nd, 40 for the 3rd page, etc.):
-$query->setMinRank( 0);
-
-// Query restriction
-$query->addMetaDataRestriction( [ [["<","cross",10],[">","cross",14]], [">","factors",0] ] );
-$query->addMetaDataRestriction( $mexpr );
-
-// Enable debugging
-$query->setDebugMode( False );
-
-// Restrict document access
-$query->addAccess( ["tiny","huge","small"] );
-
-// Dump query to output
-$output[ "QueryDump"] = $query->tostring();
-
-// Now we evaluate the query and iterate on the result to display them:
-$results = $query->evaluate();
-$output[ "QueryResult"] = $results;
-$output_list = [];
-foreach ($results['ranks'] as $pos => $result) {
-	$weightstr = number_format((float)$result['weight'], 5, '.', '');
-	$docno = $result['docno'];
-	array_push( $output_list, "rank $pos: $docno $weightstr");
-	foreach ($result['summary'] as $sidx => $si) {
-		array_push( $output_list, "    " . $si['name'] . ": '" . $si['value'] . "'");
+	
+	$aclmap = [];
+	for ($i = 1; $i < 1000; $i++) {
+		$usr = [];
+		if ($i > 500) {
+			array_push( $usr, 'large');
+		} else {
+			array_push( $usr, 'small');
+		}
+		if ($i < 50) {
+			array_push( $usr, 'tiny');
+		}
+		if ($i > 950) {
+			array_push( $usr, 'huge');
+		}
+		$aclmap[ "$i"] = $usr;
 	}
+	
+	createCollection( $ctx, $storagedir, metadata_mdprim(), createDocumentAnalyzer_mdprim( $ctx), True, $datadir, $docfiles, $aclmap, $withrpc);
+	
+	$queryPhrase = "2 3";
+	
+	// Get a client for the new created storage:
+	$storage = $ctx->createStorageClient( $storageConfig);
+	
+	// Define the query analyzer to use:
+	$analyzer = createQueryAnalyzer_mdprim( $ctx);
+	
+	// Define the query evaluation scheme:
+	$queryEval = createQueryEval_mdprim( $ctx);
+	
+	// Now we build the query to issue:
+	$query = $queryEval->createQuery( $storage);
+	
+	// First we analyze the query phrase to get the terms to find in the form as they are stored in the storage
+	$terms = $analyzer->analyzeTermExpression( ["word",$queryPhrase]);
+	
+	// $texpr = $analyzer->analyzeTermExpression( ["union", ["sequence", 10, ["sequence", 10, ["word","2"], ["word","3"]], ["word","5"]], ["sequence", 10, ["sequence", 10, ["word","2"], ["word","5"]], ["word","7"]] ] );
+	$mexpr = $analyzer->analyzeMetaDataExpression( [ [["<","cross","010 "],[">","cross"," 14"]], [">","factors"," 0 "] ] );
+	$texpr_plain = [
+				["sequence_imm", ["word","2"], ["word","2"], ["word","2"], ["word","2"]],
+				["sequence_imm", ["sequence_imm", ["word","2"], ["word","3"]], ["union", ["sequence_imm", ["word","3"], ["word","5"]], ["word","5"], ["word","7"], ["word","11"]]]
+			];
+	$texpr = $analyzer->analyzeTermExpression( $texpr_plain);
+	
+	$output[ "QueryString"] = $queryPhrase;
+	$output[ "QueryTerms"] = $terms;
+	$output[ "QueryExpr"] = $texpr;
+	$output[ "QueryRestr"] = $mexpr;
+	
+	if (empty( $terms)) {
+		fwrite(STDERR, "query is empty");
+		exit(1);
+	}
+	
+	// Then we iterate on the terms and create a single term feature for each term and collect
+	// all terms to create a selection expression out of them:
+	$selexpr = ["contains", 0, 2];
+	
+	foreach ($terms as $term) {
+		// Each query term is also part of the selection expressions
+		array_push( $selexpr, $term);
+	}
+	$query->addFeature( "seek", $texpr);
+	
+	// We assign the feature created to the set named 'select' because this is the
+	// name of the set defined as selection feature in the query evaluation configuration
+	// (QueryEval.addSelectionFeature):
+	$query->addFeature( "select", $selexpr);
+	
+	// Define the maximum number of best result (ranks) to return:
+	$query->setMaxNofRanks( 20);
+	// Define the index of the first rank (for implementing scrolling: 0 for the first, 
+	// 20 for the 2nd, 40 for the 3rd page, etc.):
+	$query->setMinRank( 0);
+	
+	// Query restriction
+	$query->addMetaDataRestriction( [ [["<","cross",10],[">","cross",14]], [">","factors",0] ] );
+	$query->addMetaDataRestriction( $mexpr );
+	
+	// Enable debugging
+	$query->setDebugMode( False );
+	
+	// Restrict document access
+	$query->addAccess( ["tiny","huge","small"] );
+	
+	// Dump query to output
+	$output[ "QueryDump"] = $query->tostring();
+	
+	// Now we evaluate the query and iterate on the result to display them:
+	$results = $query->evaluate();
+	$output[ "QueryResult"] = $results;
+	$output_list = [];
+	foreach ($results['ranks'] as $pos => $result) {
+		$weightstr = number_format((float)$result['weight'], 5, '.', '');
+		$docno = $result['docno'];
+		array_push( $output_list, "rank $pos: $docno $weightstr");
+		foreach ($result['summary'] as $sidx => $si) {
+			array_push( $output_list, "    " . $si['name'] . ": '" . $si['value'] . "'");
+		}
+	}
+	
+	$output[ "ResultList"] = $output_list;
+	
+	$result = "query evaluation:" . dumpTree( $output);
 }
-
-$output[ "ResultList"] = $output_list;
-
-$result = "query evaluation:" . dumpTree( $output);
+catch (Error $e)
+{
+	echo "ERROR in script: $e\n";
+	exit( -1);
+}
+catch (Exception $e)
+{
+	echo "ERROR in script: $e\n";
+	exit( -1);
+}
 $expected = <<<END_expected
 query evaluation:
 string QueryDump: "query evaluation program:

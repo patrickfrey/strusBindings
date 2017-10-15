@@ -1,5 +1,5 @@
 [PHP]
-open_basedir=@PROJECT_SOURCE_DIR@/tests/php7:@CMAKE_CURRENT_BINARY_DIR@:@PHP7_LOCAL_DATA_DIR@
+open_basedir=@PROJECT_SOURCE_DIR@/tests/php7:@CMAKE_CURRENT_BINARY_DIR@:@PHP7_LOCAL_DATA_DIR@/chinese_poem:@PHP7_LOCAL_DATA_DIR@/ft_smart:@PHP7_LOCAL_DATA_DIR@/mdprim:@PHP7_LOCAL_DATA_DIR@/t3s
 extension_dir=@PHP7_LOCAL_EXTENSION_DIR@
 include_path=@PHP7_LOCAL_INCLUDE_DIR@
 extension=strus.so

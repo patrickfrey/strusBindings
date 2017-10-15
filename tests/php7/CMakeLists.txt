@@ -1,8 +1,8 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
 get_filename_component( PHP7_LOCAL_EXTENSION_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../src/lang/php7" ABSOLUTE )
-get_filename_component( PHP7_LOCAL_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../../tests/php7" ABSOLUTE )
-get_filename_component( PHP7_LOCAL_DATA_DIR "${CMAKE_CURRENT_BINARY_DIR}/../data" ABSOLUTE )
+get_filename_component( PHP7_LOCAL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/tests/php7" ABSOLUTE )
+get_filename_component( PHP7_LOCAL_DATA_DIR "${PROJECT_SOURCE_DIR}/tests/data" ABSOLUTE )
 
 configure_file( "php.ini.in"  "${CMAKE_CURRENT_BINARY_DIR}/php.ini"  @ONLY )
 
