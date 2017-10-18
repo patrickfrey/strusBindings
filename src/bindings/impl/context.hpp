@@ -135,16 +135,16 @@ public:
 	/// \example detectDocumentClass( "<?xml version='1.0' encoding='UTF-8'?><doc>...</doc>")
 	/// \param[in] content the document content to classify
 	/// \return the document class
-	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
-	/// \example [ mimetype="application/json" encoding="UTF-8" ]
+	/// \example [ mimetype:"application/xml" encoding:"UTF-8" scheme:"customer" ]
+	/// \example [ mimetype:"application/json" encoding:"UTF-8" ]
 	analyzer::DocumentClass* detectDocumentClass( const std::string& content);
 
 	/// \brief Create a document analyzer instance
-	/// \example createDocumentAnalyzer( [ mimetype="application/xml" encoding="UTF-8" ] )
+	/// \example createDocumentAnalyzer( [ mimetype:"application/xml" encoding:"UTF-8" ] )
 	/// \param[in] doctype structure describing the segmenter to use (either document class description structure or segmenter name)
-	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
-	/// \example [ mimetype="application/json" encoding="UTF-8" ]
-	/// \example [ segmenter="textwolf" ]
+	/// \example [ mimetype:"application/xml" encoding:"UTF-8" scheme:"customer" ]
+	/// \example [ mimetype:"application/json" encoding:"UTF-8" ]
+	/// \example [ segmenter:"textwolf" ]
 	/// \example "application/json"
 	/// \example "json"
 	/// \return document analyzer interface (class DocumentAnalyzer)
@@ -166,13 +166,13 @@ public:
 	/// \example "default"
 	/// \example ""
 	/// \return the statistics structure encoded in the blob passed as argument
-	Struct unpackStatisticBlob( const ValueVariant& blob, const std::string& procname="") const;
+	Struct unpackStatisticBlob( const ValueVariant& blob, const std::string& procname="");
 
 	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
 	void close();
 
 	/// \brief Debug method that returns the serialization of the arguments as string
-	/// \example debug_serialize( [ surname:"John" lastname:"Doe" company:[ name="ACME" url="acme.com" ]] )
+	/// \example debug_serialize( [ surname:"John" lastname:"Doe" company:[ name:"ACME" url:"acme.com" ]] )
 	/// \note this function is used for verifying if the deserialization of binding language data structures work as expected
 	/// \param[in] arg structure to serialize as string for visualization (debuging)
 	/// \return the input serialization as string

@@ -359,8 +359,9 @@ bool ContextImpl::storageExists( const ValueVariant& config)
 	return rt;
 }
 
-Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::string& procname) const
+Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::string& procname)
 {
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	const StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StatisticsProcessorInterface* statsproc = objBuilder->getStatisticsProcessor( procname);

@@ -269,8 +269,8 @@ public:
 	/// \param[in] content content string (NOT a file name !) of the document to analyze
 	/// \example "<?xml version='1.0' encoding='UTF-8' standalone=yes?><doc>...</doc>"
 	/// \param[in] documentClass document class of the document to analyze, if not specified the document class is guessed from the content with document class detection
-	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
-	/// \example [ mimetype="application/json" encoding="UTF-8" ]
+	/// \example [ mimetype:"application/xml" encoding:"UTF-8" scheme:"customer" ]
+	/// \example [ mimetype:"application/json" encoding:"UTF-8" ]
 	/// \return structure of the document analyzed (sub document type names, search index terms, forward index terms, metadata, attributes)
 	analyzer::Document* analyzeSingle(
 			const std::string& content,
@@ -281,8 +281,8 @@ public:
 	/// \param[in] content content string (NOT a file name !) with the documents to analyze
 	/// \example "<?xml version='1.0' encoding='UTF-8' standalone=yes?><doc>...</doc>"
 	/// \param[in] documentClass document class of the document set to analyze, if not specified the document class is guessed from the content with document class detection
-	/// \example [ mimetype="application/xml" encoding="UTF-8" scheme="customer" ]
-	/// \example [ mimetype="application/json" encoding="UTF-8" ]
+	/// \example [ mimetype:"application/xml" encoding:"UTF-8" scheme:"customer" ]
+	/// \example [ mimetype:"application/json" encoding:"UTF-8" ]
 	/// \return iterator on structures of the documents analyzed (sub document type names, search index terms, forward index terms, metadata, attributes)
 	Iterator analyzeMultiPart(
 			const std::string& content,
