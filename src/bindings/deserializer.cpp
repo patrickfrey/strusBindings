@@ -9,7 +9,6 @@
 #include "internationalization.hpp"
 #include "structDefs.hpp"
 #include "papuga/serialization.h"
-#include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"

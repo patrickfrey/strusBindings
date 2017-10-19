@@ -10,7 +10,6 @@
 #include "serializer.hpp"
 #include "papuga/valueVariant.h"
 #include "papuga/serialization.h"
-#include "papuga/serialization.hpp"
 #include "internationalization.hpp"
 #include "papuga/allocator.h"
 
