@@ -13,7 +13,6 @@
 #include "papuga/serialization.hpp"
 #include "internationalization.hpp"
 #include "papuga/allocator.h"
-/*[-]*/#include <iostream>
 
 using namespace strus;
 using namespace strus::bindings;
@@ -114,10 +113,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= serializeStructMember( result, "searchindex", val.searchIndexTerms());
 	rt &= serializeStructMember( result, "forwardindex", val.forwardIndexTerms());
 	rt &= papuga_Serialization_pushClose( result);
-
-	/*[-]*/papuga_ErrorCode errcode = papuga_Ok;
-	/*[-]*/std::cerr << "ANALYZED DOCUMENT:" << std::endl << papuga::Serialization_tostring( *result, errcode) << std::endl;
-
 	return rt;
 }
 static const char* getTermExpressionVariableName( const TermExpression& expr,
