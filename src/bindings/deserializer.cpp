@@ -9,12 +9,14 @@
 #include "internationalization.hpp"
 #include "structDefs.hpp"
 #include "papuga/serialization.h"
+#include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "valueVariantWrap.hpp"
 #include <string>
 #include <cstring>
+/*[-]*/#include <iostream>
 
 using namespace strus;
 using namespace strus::bindings;
@@ -2014,6 +2016,9 @@ static void buildStorageDocument(
 	{
 		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
 	}
+	/*[-]*/papuga_ErrorCode errcode = papuga_Ok;
+	/*[-]*/std::cerr << "STORAGE DOCUMENT:" << std::endl << papuga::Serialization_tostring( *content.value.serialization, errcode) << std::endl;
+
 	papuga_SerializationIter seriter, serstart;
 	papuga_init_SerializationIter( &serstart, content.value.serialization);
 	papuga_init_SerializationIter( &seriter, content.value.serialization);
