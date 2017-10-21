@@ -4,6 +4,7 @@ Publish Docker images on webpage and refurbish installation page
 
 Example Mapping Does not work, Use Grammar instead  and pass Parse Tree to Example Printers !
 Serialization == Structure always !!!
+If binding language data structure has members serialize them too and define interfaces with members instead of dictionary for return values (interface addressed by argument of OPEN)
 
 Check multiple propagation of flags like -O0 -O2 -O3 for the same target (remove silly STRUS_OPTIMIZATION_LEVEL)
 

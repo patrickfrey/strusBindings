@@ -2,6 +2,7 @@ import collections
 import numbers
 import sys
 import os
+from inspect import currentframe, getframeinfo   #... [-]
 
 def concatValues(obj):
 	if obj is None:
@@ -79,8 +80,10 @@ def _dumpTree( indent, obj, depth):
 			return "%d" % int(obj)
 		else:
 			return "%.5f" % obj
-	elif isinstance(obj, (str,bytes)):
+	elif isinstance(obj, str):
 		return '"' + obj + '"'
+	elif isinstance(obj, bytes):
+		return '"' + obj.decode('utf-8') + '"'
 	elif isinstance(obj, collections.Sequence):
 		if (depth == 0):
 			return "{...}"
