@@ -58,15 +58,13 @@ bool PostingIterator::getNext( papuga_CallResult* result)
 		if (m_docno)
 		{
 			bool ser = true;
-			if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
-			papuga_Serialization* serialization = result->value.value.serialization;
-			ser &= papuga_Serialization_pushValue_int( serialization, m_docno++);
-			ser &= papuga_Serialization_pushOpen( serialization);
+			if (!papuga_add_CallResult_int( result, m_docno++)) throw std::bad_alloc();
+			if (!papuga_add_CallResult_serialization( result)) throw std::bad_alloc();
+			papuga_Serialization* serialization = result->valuear[ result->nofvalues-1].value.serialization;
 			for (Index pos = 0; 0!=(pos=m_postings->skipPos(pos)); ++pos)
 			{
 				ser &= papuga_Serialization_pushValue_int( serialization, pos);
 			}
-			ser &= papuga_Serialization_pushClose( serialization);
 			if (!ser)
 			{
 				papuga_CallResult_reportError( result, _TXT("memory allocation error in %s get next"), ITERATOR_NAME);

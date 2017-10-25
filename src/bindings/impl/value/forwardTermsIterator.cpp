@@ -44,8 +44,6 @@ bool ForwardTermsIterator::getNext( papuga_CallResult* result)
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		bool ser = true;
-		if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
-		papuga_Serialization* serialization = result->value.value.serialization;
 		m_pos = m_iter->skipPos( m_pos+1);
 		if (!m_pos)
 		{
@@ -63,10 +61,8 @@ bool ForwardTermsIterator::getNext( papuga_CallResult* result)
 				papuga_CallResult_reportError( result, _TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
 				return false;
 			}
-			const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
-			if (!valueptr) throw std::bad_alloc();
-			ser &= papuga_Serialization_pushValue_string( serialization, valueptr, value.size());
-			ser &= papuga_Serialization_pushValue_int( serialization, m_pos);
+			ser &= papuga_add_CallResult_string_copy( result, value.c_str(), value.size());
+			ser &= papuga_add_CallResult_int( result, m_pos);
 			if (!ser) throw std::bad_alloc();
 			return true;
 		}

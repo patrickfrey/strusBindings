@@ -76,8 +76,6 @@ struct Deserializer
 	static std::vector<double> getDoubleList(
 			const papuga_ValueVariant& val);
 
-	static bool hasDepth( const papuga_SerializationIter& seriter, int depth);
-
 	static const papuga_ValueVariant* getOptionalDefinition( papuga_SerializationIter& seriter, const char* name);
 
 	static analyzer::DocumentClass getDocumentClass(
@@ -147,8 +145,6 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 
 	static void buildExpression( ExpressionBuilder& builder, papuga_SerializationIter& seriter, bool allowList);
-
-	static void buildExpressionList( ExpressionBuilder& builder, papuga_SerializationIter& seriter);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,

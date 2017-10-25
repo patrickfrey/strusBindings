@@ -39,17 +39,13 @@ bool SearchTermsIterator::getNext( papuga_CallResult* result)
 	try
 	{
 		bool ser = true;
-		if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
-		papuga_Serialization* serialization = result->value.value.serialization;
 		DocumentTermIteratorInterface::Term term;
 		if (m_iter->nextTerm( term))
 		{
 			std::string value = m_iter->termValue( term.termno);
-			const char* valueptr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
-			if (!valueptr) throw std::bad_alloc();
-			ser &= papuga_Serialization_pushValue_string( serialization, valueptr, value.size());
-			ser &= papuga_Serialization_pushValue_int( serialization, term.tf);
-			ser &= papuga_Serialization_pushValue_int( serialization, term.firstpos);
+			ser &= papuga_add_CallResult_string_copy( result, value.c_str(), value.size());
+			ser &= papuga_add_CallResult_int( result, term.tf);
+			ser &= papuga_add_CallResult_int( result, term.firstpos);
 			if (!ser) throw std::bad_alloc();
 			return true;
 		}

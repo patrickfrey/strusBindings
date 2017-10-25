@@ -14,13 +14,13 @@ void strus::initCallResultStruct( papuga_CallResult* retval, const strus::bindin
 	papuga_Allocator* allocator = papuga_Allocator_alloc_Allocator( &retval->allocator);
 	if (!allocator) std::bad_alloc();
 	std::memcpy( allocator, &st.allocator, sizeof(st.allocator));
-	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
-	std::memcpy( retval->value.value.serialization, &st.serialization, sizeof(papuga_Serialization));
+	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
+	std::memcpy( retval->valuear[0].value.serialization, &st.serialization, sizeof(papuga_Serialization));
 }
 
 void strus::initCallResultIterator( papuga_CallResult* retval, const strus::bindings::Iterator& st)
 {
-	if (!papuga_set_CallResult_iterator( retval, st.iterator.data, st.iterator.destroy, st.iterator.getNext)) throw std::bad_alloc();
+	if (!papuga_add_CallResult_iterator( retval, st.iterator.data, st.iterator.destroy, st.iterator.getNext)) throw std::bad_alloc();
 }
 
 

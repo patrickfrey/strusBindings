@@ -39,43 +39,28 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga_SerializationIter& seriter)
 	static const StructureNameMap namemap( "name,arg", ',');
 
 	bool name_defined = false;
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
-		name_defined = true;
-		name = Deserializer::getString( seriter);
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		do
 		{
-			do
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
 			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: name_defined = true; name = Deserializer::getString( seriter); break;
-					case 1: args = Deserializer::getStringList( seriter); break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-				}
-			} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			name = Deserializer::getString( seriter);
-			name_defined = true;
-			while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
-			{
-				args.push_back( Deserializer::getString( seriter));
+				case 0: name_defined = true; name = Deserializer::getString( seriter); break;
+				case 1: args = Deserializer::getStringList( seriter); break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
-		}
-		else
+		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		name = Deserializer::getString( seriter);
+		name_defined = true;
+		while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 		{
-			throw strus::runtime_error(_TXT("%s definition structure expected"), context);
+			args.push_back( Deserializer::getString( seriter));
 		}
-		Deserializer::consumeClose( seriter);
 	}
 	else
 	{
@@ -94,69 +79,51 @@ QueryTermDef::QueryTermDef( papuga_SerializationIter& seriter)
 	static const StructureNameMap namemap( "type,value,variable,len", ',');
 
 	bool type_defined = false;
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
-		type = Deserializer::getString( seriter);
-		type_defined = true;
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		do
 		{
-			do
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
 			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: type_defined = true; type = Deserializer::getString( seriter); break;
-					case 1: value_defined = true; value = Deserializer::getString( seriter); break;
-					case 2: variable = Deserializer::getString( seriter); break;
-					case 3: length_defined = true; length = Deserializer::getUint( seriter); break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-				}
-			} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagClose)
-		{
-			throw strus::runtime_error(_TXT("%s definition expected"), context);
-		}
-		else
-		{
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-			{
-				papuga_SerializationIter sernext;
-				papuga_init_SerializationIter_copy( &sernext, &seriter);
-				papuga_SerializationIter_skip( &sernext);
-				const papuga_ValueVariant* variable_ = Deserializer::getOptionalDefinition( sernext, "variable");
-				if (variable_)
-				{
-					variable = ValueVariantWrap::tostring( *variable_);
-					Deserializer::consumeClose( sernext);
-					papuga_init_SerializationIter_copy( &seriter, &sernext);
-				}
+				case 0: type_defined = true; type = Deserializer::getString( seriter); break;
+				case 1: value_defined = true; value = Deserializer::getString( seriter); break;
+				case 2: variable = Deserializer::getString( seriter); break;
+				case 3: length_defined = true; length = Deserializer::getUint( seriter); break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+	}
+	else
+	{
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter sernext;
+			papuga_init_SerializationIter_copy( &sernext, &seriter);
+			papuga_SerializationIter_skip( &sernext);
+			const papuga_ValueVariant* variable_ = Deserializer::getOptionalDefinition( sernext, "variable");
+			if (variable_)
 			{
-				type = Deserializer::getString( seriter);
-				type_defined = true;
-	
+				variable = ValueVariantWrap::tostring( *variable_);
+				Deserializer::consumeClose( sernext);
+				papuga_init_SerializationIter_copy( &seriter, &sernext);
+			}
+		}
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			type = Deserializer::getString( seriter);
+			type_defined = true;
+
+			if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
+			{
+				value = Deserializer::getString( seriter);
+				value_defined = true;
+
 				if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 				{
-					value = Deserializer::getString( seriter);
-					value_defined = true;
-	
-					if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
-					{
-						length_defined = true;
-						length = Deserializer::getUint( seriter);
-					}
-				}
-				else
-				{
-					throw strus::runtime_error(_TXT("%s definition expected"), context);
+					length_defined = true;
+					length = Deserializer::getUint( seriter);
 				}
 			}
 			else
@@ -164,11 +131,10 @@ QueryTermDef::QueryTermDef( papuga_SerializationIter& seriter)
 				throw strus::runtime_error(_TXT("%s definition expected"), context);
 			}
 		}
-		Deserializer::consumeClose( seriter);
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("%s definition expected"), context);
+		else
+		{
+			throw strus::runtime_error(_TXT("%s definition expected"), context);
+		}
 	}
 	if (!value_defined && length_defined)
 	{
@@ -186,37 +152,27 @@ MetaDataRangeDef::MetaDataRangeDef( papuga_SerializationIter& seriter)
 	static const char* context = _TXT("metadata range");
 	static const StructureNameMap namemap( "from,to", ',');
 
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
-		papuga_SerializationIter_skip( &seriter);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		do
 		{
-			do
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
 			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: from = Deserializer::getString( seriter); break;
-					case 1:	to = Deserializer::getString( seriter); break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-				}
-			} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			from = Deserializer::getString( seriter);
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-			{
-				to = Deserializer::getString( seriter);
+				case 0: from = Deserializer::getString( seriter); break;
+				case 1:	to = Deserializer::getString( seriter); break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
-		}
-		else
+		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		from = Deserializer::getString( seriter);
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
-			throw strus::runtime_error(_TXT("expected %s structure"), context);
+			to = Deserializer::getString( seriter);
 		}
-		Deserializer::consumeClose( seriter);
 	}
 	else
 	{
@@ -338,37 +294,27 @@ void KeyValueList::init( papuga_SerializationIter& seriter)
 	static const char* context = _TXT("key value pair list");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
-		papuga_SerializationIter_skip( &seriter);
+		papuga_SerializationIter sernext;
+		papuga_init_SerializationIter_copy( &sernext, &seriter);
+		papuga_SerializationIter_skip( &sernext);
 
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		if (papuga_SerializationIter_tag( &sernext) == papuga_TagName)
 		{
-			papuga_SerializationIter sernext;
-			papuga_init_SerializationIter_copy( &sernext, &seriter);
-			papuga_SerializationIter_skip( &sernext);
-
-			if (papuga_SerializationIter_tag( &sernext) == papuga_TagName)
-			{
-				parseMetaKeyValueList( seriter);
-			}
-			else if (papuga_SerializationIter_tag( &sernext) == papuga_TagValue)
-			{
-				parseValueTupleList( seriter);
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("expected %s structure"), context);
-			}
-			Deserializer::consumeClose( seriter);
+			parseMetaKeyValueList( seriter);
 		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		else if (papuga_SerializationIter_tag( &sernext) == papuga_TagValue)
 		{
-			parseDictionary( seriter);
+			parseValueTupleList( seriter);
 		}
 		else
 		{
 			throw strus::runtime_error(_TXT("expected %s structure"), context);
 		}
 		Deserializer::consumeClose( seriter);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		parseDictionary( seriter);
 	}
 	else
 	{
@@ -380,7 +326,11 @@ ConfigDef::ConfigDef( papuga_SerializationIter& seriter)
 	:cfgstring()
 {
 	static const char* context = _TXT("configuration");
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		cfgstring = Deserializer::getString( seriter);
+	}
+	else
 	{
 		LocalErrorBuffer errorhnd;
 		KeyValueList kvmap( seriter);
@@ -393,14 +343,6 @@ ConfigDef::ConfigDef( papuga_SerializationIter& seriter)
 			}
 		}
 	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-	{
-		cfgstring = Deserializer::getString( seriter);
-	}
-	else
-	{
-		throw strus::runtime_error( _TXT("structure or value expected for %s"), context);
-	}
 }
 
 
@@ -408,47 +350,37 @@ DfChangeDef::DfChangeDef( papuga_SerializationIter& seriter)
 {
 	static const char* context = _TXT("document frequency change");
 	static const StructureNameMap namemap( "type,value,increment", ',');
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
-		papuga_SerializationIter_skip( &seriter);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			termtype = Deserializer::getString( seriter);
-			termvalue = Deserializer::getString( seriter);
-			increment = Deserializer::getInt( seriter);
-		}
-		else
-		{
-			unsigned char defined[3] = {0,0};
-			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "type", context);
-						termtype = Deserializer::getString( seriter);
-						break;
-					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
-						termvalue = Deserializer::getString( seriter);
-						break;
-					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "increment", context);
-						increment = Deserializer::getInt( seriter);
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s definition, 'type', 'value' or 'increment' expected"), context);
-				}
-			}
-			if (!defined[0] || !defined[1] || !defined[2])
-			{
-				throw strus::runtime_error(_TXT("incomplete %s definition"), context);
-			}
-		}
-		Deserializer::consumeClose( seriter);
+		termtype = Deserializer::getString( seriter);
+		termvalue = Deserializer::getString( seriter);
+		increment = Deserializer::getInt( seriter);
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("structure expected for %s definition"), context);
+		unsigned char defined[3] = {0,0};
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "type", context);
+					termtype = Deserializer::getString( seriter);
+					break;
+				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
+					termvalue = Deserializer::getString( seriter);
+					break;
+				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "increment", context);
+					increment = Deserializer::getInt( seriter);
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s definition, 'type', 'value' or 'increment' expected"), context);
+			}
+		}
+		if (!defined[0] || !defined[1] || !defined[2])
+		{
+			throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+		}
 	}
 }
 
@@ -493,41 +425,27 @@ void ContextDef::init( papuga_SerializationIter& seriter)
 	{
 		rpc = Deserializer::getString( seriter);
 	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			rpc = Deserializer::getString( seriter);
-		}
-		else
-		{
-			unsigned char defined[3] = {0,0,0};
-			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "threads", context);
-						threads = Deserializer::getUint( seriter);
-						break;
-					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
-						rpc = Deserializer::getConfigString( seriter);
-						break;
-					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
-						trace = Deserializer::getConfigString( seriter);
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
-				}
-			}
-		}
-		Deserializer::consumeClose( seriter);
-	}
 	else
 	{
-		throw strus::runtime_error(_TXT("structure expected for %s definition"), context);
+		unsigned char defined[3] = {0,0,0};
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "threads", context);
+					threads = Deserializer::getUint( seriter);
+					break;
+				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
+					rpc = Deserializer::getConfigString( seriter);
+					break;
+				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
+					trace = Deserializer::getConfigString( seriter);
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
+			}
+		}
 	}
 }
 
@@ -568,57 +486,43 @@ void SegmenterDef::init( papuga_SerializationIter& seriter)
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
 		mimetype = Deserializer::getString( seriter);
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
-			mimetype = Deserializer::getString( seriter);
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-			{
-				encoding = Deserializer::getString( seriter);
-			}
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-			{
-				scheme = Deserializer::getString( seriter);
-			}
+			encoding = Deserializer::getString( seriter);
 		}
-		else
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
-			unsigned char defined[4] = {0,0,0,0};
-			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "segmenter", context);
-						if (0!=(defined[1]|defined[2]|defined[3])) throw strus::runtime_error(_TXT("mixed definition of '%s' and %s in %s"), "segmenter", "'scheme', 'mimetype' and 'encoding'", context);
-						segmenter = Deserializer::getString( seriter);
-						break;
-					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "mimetype", context);
-						if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "mimetype", context);
-						mimetype = Deserializer::getString( seriter);
-						break;
-					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "encoding", context);
-						if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "encoding", context);
-						encoding = Deserializer::getString( seriter);
-						break;
-					case 3:	if (defined[3]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "scheme", context);
-						if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "scheme", context);
-						scheme = Deserializer::getString( seriter);
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'segmenter' or 'mimetype' or 'encoding' or 'scheme' expected"), context);
-				}
-			}
+			scheme = Deserializer::getString( seriter);
 		}
-		Deserializer::consumeClose( seriter);
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("structure or single value expected for %s definition"), context);
+		unsigned char defined[4] = {0,0,0,0};
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "segmenter", context);
+					if (0!=(defined[1]|defined[2]|defined[3])) throw strus::runtime_error(_TXT("mixed definition of '%s' and %s in %s"), "segmenter", "'scheme', 'mimetype' and 'encoding'", context);
+					segmenter = Deserializer::getString( seriter);
+					break;
+				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "mimetype", context);
+					if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "mimetype", context);
+					mimetype = Deserializer::getString( seriter);
+					break;
+				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "encoding", context);
+					if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "encoding", context);
+					encoding = Deserializer::getString( seriter);
+					break;
+				case 3:	if (defined[3]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "scheme", context);
+					if (defined[0]) throw strus::runtime_error(_TXT("mixed definition of '%s' and '%s' in %s"), "segmenter", "scheme", context);
+					scheme = Deserializer::getString( seriter);
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'segmenter' or 'mimetype' or 'encoding' or 'scheme' expected"), context);
+			}
+		}
 	}
 }
 
@@ -627,46 +531,37 @@ MetaDataCompareDef::MetaDataCompareDef( papuga_SerializationIter& seriter)
 	static const char* context = _TXT("meta data compare");
 	static const StructureNameMap namemap( "op,name,value", ',');
 
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
-		papuga_SerializationIter_skip( &seriter);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			cmpop = Deserializer::getMetaDataCmpOp( seriter);
-			name = Deserializer::getString( seriter);
-			const papuga_ValueVariant* valueref = getValue( seriter);
-			papuga_init_ValueVariant_copy( &value, valueref);
-		}
-		else
-		{
-			unsigned char defined[3] = {0,0,0};
-			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "op", context);
-						cmpop = Deserializer::getMetaDataCmpOp( seriter);
-						break;
-					case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
-						name = Deserializer::getString( seriter);
-						break;
-					case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
-						papuga_init_ValueVariant_copy( &value, getValue( seriter));
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'op' or 'name' or 'value' expected"), context);
-				}
-			}
-			if (!defined[0]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "op", context);
-			if (!defined[1]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "name", context);
-			if (!defined[2]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "value", context);
-		}
-		Deserializer::consumeClose( seriter);
+		cmpop = Deserializer::getMetaDataCmpOp( seriter);
+		name = Deserializer::getString( seriter);
+		const papuga_ValueVariant* valueref = getValue( seriter);
+		papuga_init_ValueVariant_copy( &value, valueref);
 	}
 	else
 	{
-		throw strus::runtime_error(_TXT("structure expected for %s definition"), context);
+		unsigned char defined[3] = {0,0,0};
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "op", context);
+					cmpop = Deserializer::getMetaDataCmpOp( seriter);
+					break;
+				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+					name = Deserializer::getString( seriter);
+					break;
+				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
+					papuga_init_ValueVariant_copy( &value, getValue( seriter));
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'op' or 'name' or 'value' expected"), context);
+			}
+		}
+		if (!defined[0]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "op", context);
+		if (!defined[1]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "name", context);
+		if (!defined[2]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "value", context);
 	}
 }
+

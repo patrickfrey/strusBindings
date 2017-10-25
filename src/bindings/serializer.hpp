@@ -27,6 +27,8 @@
 #include <utility>
 #include <cstring>
 #include <stdexcept>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits.hpp>
 
 namespace strus {
 namespace bindings {
@@ -128,12 +130,50 @@ public:
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val);
 
+	struct atomictype_ {};
+	struct structtype_ {};
+
+	template <typename T>
+	static typename boost::enable_if_c<
+		boost::is_arithmetic<T>::value 
+		|| boost::is_same<std::string,T>::value
+		|| boost::is_same<char*,T>::value
+		|| boost::is_same<const char*,T>::value
+		|| boost::is_same<NumericVariant,T>::value
+		|| boost::is_same<papuga_ValueVariant,T>::value
+		,const atomictype_&>::type getCategory( const T&) { static atomictype_ rt; return rt;}
+
+	template <typename T>
+	static typename boost::enable_if_c<
+		!(boost::is_arithmetic<T>::value 
+		|| boost::is_same<std::string,T>::value
+		|| boost::is_same<char*,T>::value
+		|| boost::is_same<const char*,T>::value
+		|| boost::is_same<NumericVariant,T>::value
+		|| boost::is_same<papuga_ValueVariant,T>::value)
+		,const structtype_&>::type getCategory( const T&) { static structtype_ rt; return rt;}
+
+	template<typename SERVAL>
+	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const atomictype_& category)
+	{
+		return serialize_nothrow( result, val);
+	}
+	template<typename SERVAL>
+	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const structtype_& category)
+	{
+		bool rt = true;
+		rt &= papuga_Serialization_pushOpen( result);
+		rt &= serialize_nothrow( result, val);
+		rt &= papuga_Serialization_pushClose( result);
+		return rt;
+	}
+
 	template <typename TYPE>
 	static bool serializeStructMember( papuga_Serialization* result, const char* tagname, const TYPE& val)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushName_charp( result, tagname);
-		rt &= serialize_nothrow( result, val);
+		rt &= serializeStructMemberValue( result, val, getCategory( val));
 		return rt;
 	}
 
@@ -141,26 +181,22 @@ public:
 	static bool serializeArray( papuga_Serialization* result, const std::vector<TYPE>& val)
 	{
 		bool rt = true;
-		rt &= papuga_Serialization_pushOpen( result);
 		typename std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			rt &= serialize_nothrow( result, *vi);
+			rt &= serializeStructMemberValue( result, *vi, getCategory( *vi));
 		}
-		rt &= papuga_Serialization_pushClose( result);
 		return rt;
 	}
 	template <typename TYPE>
 	static bool serializeIntArray( papuga_Serialization* result, const std::vector<TYPE>& val)
 	{
 		bool rt = true;
-		rt &= papuga_Serialization_pushOpen( result);
 		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
 			rt &= serialize_nothrow( result, (papuga_Int)*vi);
 		}
-		rt &= papuga_Serialization_pushClose( result);
 		return rt;
 	}
 };

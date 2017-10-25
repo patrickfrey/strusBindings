@@ -32,28 +32,28 @@ void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* s
 		strus::bindings::BindingClassTemplate<STRUCTVALUE>::getDestructor()( st);
 		throw std::bad_alloc();
 	}
-	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( retval->value.value.serialization, *st);
+	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
+	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, *st);
 }
 
 template <typename STRUCTVALUE>
 static void initCallResultStructureConst( papuga_CallResult* retval, const STRUCTVALUE* st)
 {
-	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( retval->value.value.serialization, *st);
+	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
+	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, *st);
 }
 
 template <typename STRUCTVALUE>
 static void initCallResultAtomic( papuga_CallResult* retval, const STRUCTVALUE& st)
 {
-	if (!papuga_set_CallResult_serialization( retval)) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( retval->value.value.serialization, st);
+	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
+	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, st);
 }
 
 template <typename OBJECT>
 static void initCallResultObjectOwnership( papuga_CallResult* retval, OBJECT* st)
 {
-	if (!papuga_set_CallResult_hostobject( retval, strus::bindings::BindingClassTemplate<OBJECT>::classid(), st, strus::bindings::BindingClassTemplate<OBJECT>::getDestructor()))
+	if (!papuga_add_CallResult_hostobject( retval, strus::bindings::BindingClassTemplate<OBJECT>::classid(), st, strus::bindings::BindingClassTemplate<OBJECT>::getDestructor()))
 	{
 		strus::bindings::BindingClassTemplate<OBJECT>::getDestructor()( st);
 		throw std::bad_alloc();
@@ -63,7 +63,7 @@ static void initCallResultObjectOwnership( papuga_CallResult* retval, OBJECT* st
 template <typename OBJECT>
 static void initCallResultObjectConst( papuga_CallResult* retval, const OBJECT* st)
 {
-	if (!papuga_set_CallResult_hostobject( retval, strus::bindings::BindingClassTemplate<OBJECT>::classid(), st, 0)) throw std::bad_alloc();
+	if (!papuga_add_CallResult_hostobject( retval, strus::bindings::BindingClassTemplate<OBJECT>::classid(), st, 0)) throw std::bad_alloc();
 }
 
 }//namespace

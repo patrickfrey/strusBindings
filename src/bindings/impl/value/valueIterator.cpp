@@ -48,7 +48,7 @@ bool ValueIterator::getNext( papuga_CallResult* result)
 			return false;
 		}
 	}
-	papuga_set_CallResult_string( result, m_blockitr->c_str(), m_blockitr->size());
+	(void)papuga_add_CallResult_string( result, m_blockitr->c_str(), m_blockitr->size());
 	++m_blockitr;
 	return true;
 }

@@ -166,15 +166,14 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 	MetaDataReaderInterface* metadatareader = 0;
 
 	bool ser = true;
-	if (!papuga_set_CallResult_serialization( result)) throw std::bad_alloc();
-	papuga_Serialization* serialization = result->value.value.serialization;
+	if (!papuga_add_CallResult_serialization( result)) throw std::bad_alloc();
+	papuga_Serialization* serialization = result->valuear[0].value.serialization;
 	if (m_items.empty())
 	{
 		ser &= papuga_Serialization_pushValue_int( serialization, m_docno);
 	}
 	else
 	{
-		ser &= papuga_Serialization_pushOpen( serialization);
 		std::vector<ItemDef>::const_iterator ei = m_items.begin(), ee = m_items.end();
 		for (; ei != ee; ++ei)
 		{
@@ -299,7 +298,6 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 					break;
 			}
 		}
-		ser &= papuga_Serialization_pushClose( serialization);
 	}
 	if (!ser)
 	{

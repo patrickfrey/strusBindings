@@ -54,7 +54,7 @@ bool StatisticsIterator::getNext( papuga_CallResult* result)
 			}
 			return false;
 		}
-		papuga_set_CallResult_blob( result, outmsg, outmsgsize);
+		(void)papuga_add_CallResult_blob( result, outmsg, outmsgsize);
 		return true;
 	}
 	catch (const std::bad_alloc& err)
