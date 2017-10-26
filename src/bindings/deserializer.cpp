@@ -9,6 +9,7 @@
 #include "internationalization.hpp"
 #include "structDefs.hpp"
 #include "papuga/serialization.h"
+/*[-]*/#include "papuga/serialization.hpp"
 #include "papuga/valueVariant.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"
@@ -1892,6 +1893,8 @@ static void buildStorageDocument(
 	papuga_SerializationIter seriter, serstart;
 	papuga_init_SerializationIter( &serstart, content.value.serialization);
 	papuga_init_SerializationIter( &seriter, content.value.serialization);
+	/*[-]*/papuga_ErrorCode errcode = papuga_Ok;
+	/*[-]*/std::cout << "SERIALIZATION DOC:" << std::endl << papuga::Serialization_tostring( *content.value.serialization, errcode) << std::endl << std::endl;
 	try
 	{
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)

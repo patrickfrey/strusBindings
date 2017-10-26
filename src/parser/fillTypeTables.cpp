@@ -19,7 +19,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "")
 	;
 	typesystem.defineType( "std::size_t")
-		("retv_map", "(void)papuga_add_CallResult_uint( $name, $value);")
+		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::touint64( $value)")
 		("typename", "integer")
 	;
@@ -55,7 +55,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "integer")
 	;
 	typesystem.defineType( "unsigned int")
-		("retv_map", "(void)papuga_add_CallResult_uint( $name, $value);")
+		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::touint( $value)")
 		("typename", "integer")
 	;

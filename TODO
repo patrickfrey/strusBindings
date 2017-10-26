@@ -2,13 +2,10 @@ Fix CodeProject Articles
 Delete unused Docker images
 Publish Docker images on webpage and refurbish installation page
 
-Example Mapping Does not work, Use Grammar instead  and pass Parse Tree to Example Printers !
-Serialization == Structure always !!!
 If binding language data structure has members serialize them too and define interfaces with members instead of dictionary for return values (interface addressed by argument of OPEN)
 
 Check multiple propagation of flags like -O0 -O2 -O3 for the same target (remove silly STRUS_OPTIMIZATION_LEVEL)
 
 In XML/JSON call interface call papuga in steps, returning a breakpoint id each step
-No UInt in papuga, only Boolean,Float and Int (UInt is not really needed and mostly not available in scripting languages)
 NodeJS Bindings
 

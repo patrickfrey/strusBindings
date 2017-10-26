@@ -85,10 +85,6 @@ strus::NumericVariant ValueVariantWrap::tonumeric( const papuga_ValueVariant& va
 	{
 		return strus::NumericVariant( numval.value.Double);
 	}
-	if (numval.valuetype == papuga_TypeUInt)
-	{
-		return strus::NumericVariant( numval.value.UInt);
-	}
 	if (numval.valuetype == papuga_TypeInt)
 	{
 		return strus::NumericVariant( numval.value.Int);

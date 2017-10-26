@@ -25,7 +25,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericV
 		case NumericVariant::Int:
 			return papuga_Serialization_pushValue_int( result, val.variant.Int);
 		case NumericVariant::UInt:
-			return papuga_Serialization_pushValue_uint( result, val.variant.UInt);
+			return papuga_Serialization_pushValue_int( result, val.variant.UInt);
 		case NumericVariant::Float:
 			return papuga_Serialization_pushValue_double( result, val.variant.Float);
 	}
@@ -37,7 +37,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	bool rt = true;
 	rt &= serializeStructMember( result, "type", val.type());
 	rt &= serializeStructMember( result, "value", val.value());
-	if ((papuga_UInt)val.len() > 1) rt &= serializeStructMember( result, "len", (papuga_UInt)val.len());
+	if ((papuga_Int)val.len() > 1) rt &= serializeStructMember( result, "len", (papuga_Int)val.len());
 	if (variablename) rt &= serializeStructMember( result, "variable", variablename);
 	return rt;
 }
@@ -46,7 +46,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	bool rt = true;
 	rt &= serializeStructMember( result, "type", val.type());
 	rt &= serializeStructMember( result, "value", val.value());
-	if ((papuga_UInt)val.pos()) rt &= serializeStructMember( result, "pos", (papuga_UInt)val.pos());
+	if ((papuga_Int)val.pos()) rt &= serializeStructMember( result, "pos", (papuga_Int)val.pos());
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val)
@@ -150,7 +150,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 	
 					rt &= Serializer::serializeStructMember( ser, "op", op.name);
 					if (op.range) rt &= Serializer::serializeStructMember( ser, "range", (papuga_Int)op.range);
-					if (op.cardinality) rt &= Serializer::serializeStructMember( ser, "cardinality", (papuga_UInt)op.cardinality);
+					if (op.cardinality) rt &= Serializer::serializeStructMember( ser, "cardinality", (papuga_Int)op.cardinality);
 	
 					rt &= papuga_Serialization_pushName_charp( ser, "arg");
 					rt &= papuga_Serialization_pushOpen( ser);
@@ -363,9 +363,9 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const ResultDo
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const QueryResult& val)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "pass", (papuga_UInt)val.evaluationPass());
-	rt &= serializeStructMember( result, "nofranked", (papuga_UInt)val.nofRanked());
-	rt &= serializeStructMember( result, "nofvisited", (papuga_UInt)val.nofVisited());
+	rt &= serializeStructMember( result, "pass", (papuga_Int)val.evaluationPass());
+	rt &= serializeStructMember( result, "nofranked", (papuga_Int)val.nofRanked());
+	rt &= serializeStructMember( result, "nofvisited", (papuga_Int)val.nofVisited());
 	rt &= serializeStructMember( result, "ranks", val.ranks());
 	return rt;
 }

@@ -68,14 +68,6 @@ public:
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_UInt& val)
-	{
-		return papuga_Serialization_pushValue_uint( result, val);
-	}
-	static inline bool serialize_uint( papuga_Serialization* result, const papuga_UInt& val)
-	{
-		return papuga_Serialization_pushValue_uint( result, val);
-	}
 	static inline bool serialize_nothrow( papuga_Serialization* result, const bool& val)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
