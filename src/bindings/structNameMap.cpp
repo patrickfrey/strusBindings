@@ -42,14 +42,17 @@ int StructureNameMap::index( const papuga_ValueVariant& id) const
 {
 	if (id.valuetype == papuga_TypeString)
 	{
-		return index( id.value.string, id.length);
-	}
-	if (id.valuetype == papuga_TypeLangString)
-	{
-		enum {MaxIdSize=128};
-		char buf[ MaxIdSize];
-		if (!papuga_ValueVariant_toascii( buf, sizeof(buf), &id)) return Undefined;
-		return index( buf, id.length);
+		if (id.encoding == papuga_UTF8)
+		{
+			return index( id.value.string, id.length);
+		}
+		else
+		{
+			enum {MaxIdSize=128};
+			char buf[ MaxIdSize];
+			if (!papuga_ValueVariant_toascii( buf, sizeof(buf), &id)) return Undefined;
+			return index( buf, id.length);
+		}
 	}
 	return Undefined;
 }
