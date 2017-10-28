@@ -14,6 +14,7 @@ macro(add_python3_test name args )
     set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT LD_LIBRARY_PATH=${TEST_LD_LIBRARY_PATH} )  
     set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT STRUS_MODULE_PATH=${STRUS_MODULE_PATH} )
     set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../../src/lang/python3 )
+    set_property( TEST Python3${name}  APPEND PROPERTY ENVIRONMENT PYTHONHASHSEED=1 )
 endmacro(add_python3_test)
 
 add_python3_test( PrintEnv "" )
@@ -24,6 +25,7 @@ add_python3_test( CreateCollection_mdprim "${PY3_DATADIR}/mdprim" "${PY3_EXECDIR
 add_python3_test( Query_mdprim "${PY3_DATADIR}/mdprim"  "${PY3_EXECDIR}" )
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 add_python3_test( Vectors "${PY3_EXECDIR}" )
+add_python3_test( Serialization "${PY3_EXECDIR}" )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
 

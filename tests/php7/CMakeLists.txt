@@ -30,6 +30,7 @@ add_php7_test( Query_mdprim "${PHP7_DATADIR}/mdprim"  "${PHP7_EXECDIR}" )
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 add_php7_test( Vectors "${PHP7_EXECDIR}" )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
+add_php7_test( Serialization "${PHP7_EXECDIR}" )
 
 
 
