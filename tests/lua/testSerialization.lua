@@ -4,13 +4,10 @@
 require "string"
 require "math"
 require "utils"
+require "math"
 
-if len(sys.argv) > 1:
-    outputdir = sys.argv[1]
-else:
-    outputdir = "."
-
-ctx = strus.Context()
+local outputdir = arg[1] or '.'
+local ctx = strus_Context.new( ctxconfig)
 
 Example = {}
 function Example.new( a, b, xyz )
@@ -29,11 +26,12 @@ estruct1 = ExampleStruct.new( e1, e2)
 estruct2 = ExampleStruct.new( example, estruct1)
 
 result = "result:\n" ..
-	string.format( "(%u)\n%s\n", 1, ctx.debug_serialize( example)) ..
-	string.format( "(%u)\n%s\n", 2, ctx.debug_serialize( estruct1)) ..
-	string.format( "(%u)\n%s\n", 3, ctx.debug_serialize( estruct2))
+	string.format( "(%u)\n%s\n", 1, ctx:debug_serialize( example)) ..
+	string.format( "(%u)\n%s\n", 2, ctx:debug_serialize( estruct1)) ..
+	string.format( "(%u)\n%s\n", 3, ctx:debug_serialize( estruct2))
 
-expected = """result:
+local expected = [[
+result:
 (1)
 name b
 value 'goloman'
@@ -93,21 +91,7 @@ open
   name xyz
   value 12.45
 close
+]]
 
-(4)
-name foo
-value 'bar'
-name ham
-value NULL
-name spamm
-value 'eggs'
-
-(5)
-value 99
-value 1.23
-value 'blabla'
-
-"""
-
-utils.verifyTestOutput( outputdir, result, expected)
+verifyTestOutput( outputdir, result, expected)
 
