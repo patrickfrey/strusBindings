@@ -3,7 +3,7 @@ require "string"
 -- Create the document analyzer for the documents in data/t3s:
 function createDocumentAnalyzer_t3s( strusctx)
 	local analyzer = strusctx:createDocumentAnalyzer( {"xml"})
-	
+
 	-- Define the features and attributes to store:
 	analyzer:addSearchIndexFeature( "word", "/doc/text()", "word", {{"stem","en"},"lc",{"convdia","en"}})
 	analyzer:addSearchIndexFeature( "word", "/doc/title()", "word", {{"stem","en"},"lc",{"convdia","en"}})

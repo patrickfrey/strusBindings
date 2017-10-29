@@ -1,6 +1,3 @@
-#
-# This test is not part of the automated tests, because it does not run with a deterministic result and has to be verified manually
-#
 import strus
 import os
 import sys

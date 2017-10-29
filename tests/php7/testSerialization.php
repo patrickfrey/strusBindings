@@ -4,9 +4,6 @@ include_once "utils.php";
 try
 {
 
-#
-# This test is not part of the automated tests, because it does not run with a deterministic result and has to be verified manually
-#
 $outputdir = '.';
 if (isset($argv[1])) {
 	$outputdir = $argv[1];
