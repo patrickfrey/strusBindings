@@ -34,10 +34,10 @@ add_custom_command(
  )
  
 add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/strus.php
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
     DEPENDS   ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen php7 doc ${CMAKE_CURRENT_BINARY_DIR}/strus.php
-    COMMENT  "Generating bindings interface doc description file ${CMAKE_CURRENT_BINARY_DIR}/strus.php"
+    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen php7 doc ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
+    COMMENT  "Generating bindings interface doc description file ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php"
     VERBATIM
  )
 
@@ -51,8 +51,8 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm
-    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl"  ${CMAKE_CURRENT_BINARY_DIR}/strus.php
-    COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl" ${CMAKE_CURRENT_BINARY_DIR}/strus.php
+    DEPENDS   papugaDoc  "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl"  ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
+    COMMAND  papugaDoc -o ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm "${PROJECT_SOURCE_DIR}/src/lang/php7/strusPhpDoc.tpl" ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
     COMMENT  "Generating bindings interface doc html file ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm"
     VERBATIM
  )
@@ -62,7 +62,7 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/lang/php7/phpBindingsDoc.js  ${CMAKE_B
 
  add_custom_target(
     php7_mod ALL
-    DEPENDS strus.c php.ini ${CMAKE_CURRENT_BINARY_DIR}/strus.php papuga_php7_gen ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.css ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.js )
+    DEPENDS strus.c php.ini ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php papuga_php7_gen ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.htm ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.css ${CMAKE_BINARY_DIR}/doc/phpBindingsDoc.js )
 
 # ------------------------------
 # LIBRARIES
