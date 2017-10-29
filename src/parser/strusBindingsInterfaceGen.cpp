@@ -394,6 +394,9 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "static const char* g_includefiles[2] = {\"strus/bindingObjects.h\", 0};"
 		<< std::endl << std::endl;
 
+	out << "static const papuga_StructInterfaceDescription g_structs = {0};" 
+		<< std::endl << std::endl;
+
 	out << "static const papuga_AboutDescription g_about = {"
 		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
 		<< "\"" << STRUS_BINDINGS_CONTRIBUTORS << "\","
@@ -403,7 +406,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		<< "\"" << STRUS_BINDINGS_URL << "\","
 		<< "};" << std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCT_NAME << "\",\"" << STRUS_BINDINGS_PRODUCT_DESCRIPTION << "\", g_includefiles, g_classes, &g_about };"
+	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCT_NAME << "\",\"" << STRUS_BINDINGS_PRODUCT_DESCRIPTION << "\", g_includefiles, g_classes, &g_structs, &g_about };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
