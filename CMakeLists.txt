@@ -53,7 +53,7 @@ find_strus_package( module )
 find_strus_package( trace )
 find_strus_package( rpc )
 
-configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_CURRENT_BINARY_DIR}/include/strus/versionBindings.hpp"   @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_CURRENT_SOURCE_DIR}/include/strus/versionBindings.hpp"   @ONLY )
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)

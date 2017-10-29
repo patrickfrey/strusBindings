@@ -1,5 +1,8 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
+configure_file( "${PROJECT_SOURCE_DIR}/src/lang/lua/dist.info.in"   "${CMAKE_CURRENT_BINARY_DIR}/dist.info"   @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/src/lang/lua/strus.lua.in"   "${CMAKE_CURRENT_BINARY_DIR}/strus.lua"   @ONLY )
+
 include_directories(
         ${LUA_INCLUDE_DIRS}
 	${Intl_INCLUDE_DIRS}
@@ -87,5 +90,6 @@ install( TARGETS strus_bindings_lua
 
 install( TARGETS strusLua
            RUNTIME DESTINATION bin )
+
 
 

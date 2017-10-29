@@ -1,0 +1,7 @@
+name="strus"
+version="@STRUS_VERSION@"
+license="MPLv2"
+author="Patrick P. Frey"
+maintainer="Patrick P. Frey"
+url="project-strus.net"
+desc="Lua bingings for strus, a library to build text search engines"
