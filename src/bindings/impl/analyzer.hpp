@@ -26,6 +26,13 @@ namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
 
+/// \struct DocumentClass
+/// \brief Document class structure
+/// \member mimetype MIME type
+/// \member encoding Character set encoding (default UTF-8)
+/// \member scheme Document type id
+enum _DocumentClass {mimetype,encoding,scheme};
+
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 
 ///	tokenizing and normalizing a document into atomic parts, that 

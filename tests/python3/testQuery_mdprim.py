@@ -1,5 +1,7 @@
 import sys
+import gc
 import strus
+import pprint
 from utils import *
 from config_mdprim import *
 from createCollection import createCollection
@@ -1530,4 +1532,9 @@ str ResultList:
 """
 
 verifyTestOutput( outputdir, result, expected)
+
+n = gc.collect( 0)
+print('Remaining Garbage:', end=' ')
+pprint.pprint(gc.garbage)
+print('Unreachable objects:', n)
 

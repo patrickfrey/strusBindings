@@ -191,6 +191,7 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd);
 
 	static std::string getConfigString( papuga_SerializationIter& seriter);
+	static std::string getSubConfigString( papuga_SerializationIter& seriter);
 
 	static std::string getConfigString(
 			const papuga_ValueVariant& content,

@@ -214,6 +214,11 @@ static void extract_annotation( AnnotationMapBuilder& builder, char const*& si, 
 				builder.current_annotation_key = "@brief";
 				builder.current_allow_multiple = false;
 			}
+			else if (key == "struct")
+			{
+				builder.current_annotation_key = "@struct";
+				builder.current_allow_multiple = false;
+			}
 			else if (key == "class")
 			{
 				builder.current_annotation_key = "@class";
@@ -260,6 +265,12 @@ static void extract_annotation( AnnotationMapBuilder& builder, char const*& si, 
 					++si;
 					skipSpaces( si, se);
 				}
+				builder.current_annotation_key = parseIdentifier( si, se);
+				builder.current_allow_multiple = false;
+			}
+			else if (key == "member")
+			{
+				skipSpaces( si, se);
 				builder.current_annotation_key = parseIdentifier( si, se);
 				builder.current_allow_multiple = false;
 			}
@@ -902,6 +913,11 @@ std::string MethodDef::tostring() const
 {
 	std::ostringstream out;
 	out << "METHOD " << m_name << std::endl;
+	DocTagMap::const_iterator di = m_doc.begin(), de = m_doc.end();
+	for (; di != de; ++di)
+	{
+		out << "\tDOC " << di->first << " " << di->second << std::endl;
+	}
 	out << "\tRETURN { " << m_returnvalue.tostring() << "}" << std::endl;
 	out << "\tPARAMS ( ";
 	std::vector<VariableValue>::const_iterator pi = m_param.begin(), pe = m_param.end();
@@ -924,7 +940,12 @@ std::string ConstructorDef::tostring() const
 	{
 		out << "{ " << pi->tostring() << " }";
 	}
-	out << " )";
+	out << " )" << std::endl;
+	DocTagMap::const_iterator di = m_doc.begin(), de = m_doc.end();
+	for (; di != de; ++di)
+	{
+		out << "\tDOC " << di->first << " " << di->second << std::endl;
+	}
 	return out.str();
 }
 
@@ -932,6 +953,11 @@ std::string ClassDef::tostring() const
 {
 	std::ostringstream out;
 	out << "CLASS " << m_name << std::endl;
+	DocTagMap::const_iterator di = m_doc.begin(), de = m_doc.end();
+	for (; di != de; ++di)
+	{
+		out << "\tDOC " << di->first << " " << di->second << std::endl;
+	}
 	std::vector<ConstructorDef>::const_iterator ci = m_constructorar.begin(), ce = m_constructorar.end();
 	for (; ci != ce; ++ci)
 	{
@@ -943,6 +969,35 @@ std::string ClassDef::tostring() const
 		out << mi->tostring();
 	}
 	out << std::endl;
+	return out.str();
+}
+
+std::string MemberDef::tostring() const
+{
+	std::ostringstream out;
+	out << "MEMBER " << m_name << std::endl;
+	DocTagMap::const_iterator di = m_doc.begin(), de = m_doc.end();
+	for (; di != de; ++di)
+	{
+		out << "\tDOC " << di->first << " " << di->second << std::endl;
+	}
+	return out.str();
+}
+
+std::string StructDef::tostring() const
+{
+	std::ostringstream out;
+	out << "STRUCT " << m_name << std::endl;
+	DocTagMap::const_iterator di = m_doc.begin(), de = m_doc.end();
+	for (; di != de; ++di)
+	{
+		out << "\tDOC " << di->first << " " << di->second << std::endl;
+	}
+	std::vector<MemberDef>::const_iterator mi = m_memberar.begin(), me = m_memberar.end();
+	for (; mi != me; ++mi)
+	{
+		out << mi->tostring();
+	}
 	return out.str();
 }
 
@@ -1072,10 +1127,40 @@ void InterfacesDef::addSource( const std::string& source)
 					++si;
 					++brkcnt;
 				}
-				else if (ident == "typedef" || ident == "using" || ident == "enum"
-					 || ident == "struct")
+				else if (ident == "typedef" || ident == "using" || ident == "struct")
 				{
 					skipStructure( si, se);
+				}
+				else if (ident == "enum")
+				{
+					AnnotationMap annotationMap;
+					if (commentStart)
+					{
+						annotationMap = parseAnnotations( commentStart, se);
+					}
+					skipSpacesAndComments( si, se);
+					if (si == se || !isAlpha(*si))
+					{
+						throw std::runtime_error("enum name expected after 'enum'");
+					}
+					std::string name = parseIdentifier( si, se);
+					const char* structName = 0;
+					if (name[0] == '_')
+					{
+						structName = name.c_str()+1;
+					}
+					skipToStr( si, se, "{");
+					if (si == se) throw std::runtime_error("unexpected end of source ('{' expected after enum identifier)");
+					
+					char const* endClass = si++;
+					skipBrackets( endClass, se, '{', '}');
+
+					if (structName)
+					{
+						parseStructEnum( structName, annotationMap, si, endClass-1);
+					}
+					si = endClass;
+					++si;
 				}
 				else if (ident == "class")
 				{
@@ -1173,6 +1258,29 @@ static std::string guessMethodName( const char* si, const char* se)
 	for (;xi > si && isAlnum(*xi); --xi){}
 	++xi;
 	return parseIdentifier( xi, se);
+}
+
+void InterfacesDef::parseStructEnum( const std::string& structName, const AnnotationMap& annotationMap, char const*& si, const char* se)
+{
+	StructDef structDef( structName, getAnnotationDoc( annotationMap, ""));
+	skipSpaces( si, se);
+	while (si != se)
+	{
+		skipSpaces( si, se);
+		if (isAlpha( *si))
+		{
+			std::string memberName = parseIdentifier( si, se);
+			DocTagMap memberDoc = getAnnotationDoc( annotationMap, memberName);
+			structDef.addMember( MemberDef( memberName, memberDoc));
+		}
+		else
+		{
+			throw std::runtime_error( "unexpected token in enum");
+		}
+		skipSpaces( si, se);
+		if (*si == ',') ++si;
+	}
+	m_structdefar.push_back( structDef);
 }
 
 void InterfacesDef::parseClass( const std::string& className, const DocTagMap& classDoc, const std::string& classScope, char const*& si, const char* se)
@@ -1461,6 +1569,11 @@ std::vector<VariableValue> InterfacesDef::parseParameters(
 std::string InterfacesDef::tostring() const
 {
 	std::ostringstream out;
+	std::vector<StructDef>::const_iterator si = m_structdefar.begin(), se = m_structdefar.end();
+	for (; si != se; ++si)
+	{
+		out << si->tostring();
+	}
 	std::vector<ClassDef>::const_iterator ci = m_classdefar.begin(), ce = m_classdefar.end();
 	for (; ci != ce; ++ci)
 	{

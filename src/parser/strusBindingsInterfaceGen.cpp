@@ -31,8 +31,6 @@
 #define STRUS_BINDINGS_LICENSE			"Mozilla Public License v. 2.0 (MPLv2)"
 #define STRUS_BINDINGS_URL			"project-strus.net"
 
-#undef STRUS_LOWLEVEL_DEBUG
-
 /// \brief List of interface files parsed without path
 std::vector<std::string> g_inputFiles;
 
@@ -93,19 +91,24 @@ static std::string printString( const std::string& content)
 	return rt;
 }
 
+static std::string structMembersFunctionName( const std::string& st)
+{
+	return "strus_bindings_struct_" + st;
+}
+
 static std::string methodFunctionName( const std::string& cl, const std::string& mt)
 {
-	return "_strus_bindings_" + cl + "__" + mt;
+	return "strus_bindings_method_" + cl + "__" + mt;
 }
 
 static std::string constructorFunctionName( const std::string& cl)
 {
-	return "_strus_bindings_constructor__" + cl;
+	return "strus_bindings_constructor_" + cl;
 }
 
 static std::string destructorFunctionName( const std::string& cl)
 {
-	return "_strus_bindings_destructor__" + cl;
+	return "strus_bindings_destructor_" + cl;
 }
 
 static std::string docDeclaration( const std::string& globalname, const strus::DocTagMap& doc)
@@ -147,14 +150,14 @@ static std::string docDeclaration( const std::string& globalname, const strus::D
 static std::string docDeclarationNameMethodReturnDoc( const std::string& clname, const std::string& mtname)
 {
 	std::ostringstream out;
-	out << "g_doc_return_method_" << "_" << clname << "_" << mtname;
+	out << "g_doc_return_method_" << "_" << clname << "__" << mtname;
 	return out.str();
 }
 
 static std::string docDeclarationNameMethodParamDoc( const std::string& clname, const std::string& mtname, unsigned int idx)
 {
 	std::ostringstream out;
-	out << "g_doc_parameter_method_" << idx << "_" << clname << "_" << mtname;
+	out << "g_doc_parameter_method_" << idx << "_" << clname << "__" << mtname;
 	return out.str();
 }
 
@@ -168,7 +171,7 @@ static std::string docDeclarationNameMethodParam( const std::string& clname, con
 static std::string docDeclarationNameConstructorParamDoc( const std::string& clname, unsigned int idx)
 {
 	std::ostringstream out;
-	out << "g_doc_parameter_constructor_" << idx << "_" << clname;
+	out << "g_doc_parameter_constructor_" << idx << "__" << clname;
 	return out.str();
 }
 
@@ -182,7 +185,7 @@ static std::string docDeclarationNameConstructorParam( const std::string& clname
 static std::string docDeclarationNameMethodDoc( const std::string& clname, const std::string& mtname)
 {
 	std::ostringstream out;
-	out << "g_doc_method_" << clname << "_" << mtname;
+	out << "g_doc_method_" << clname << "__" << mtname;
 	return out.str();
 }
 
@@ -197,6 +200,20 @@ static std::string docDeclarationNameClassDoc( const std::string& clname)
 {
 	std::ostringstream out;
 	out << "g_doc_class_" << clname;
+	return out.str();
+}
+
+static std::string docDeclarationNameStructDoc( const std::string& stname)
+{
+	std::ostringstream out;
+	out << "g_doc_struct_" << stname;
+	return out.str();
+}
+
+static std::string docDeclarationNameStructMemberDoc( const std::string& stname, const std::string& mbname)
+{
+	std::ostringstream out;
+	out << "g_doc_struct_member_" << stname << "__" << mbname;
 	return out.str();
 }
 
@@ -394,8 +411,51 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	out << "static const char* g_includefiles[2] = {\"strus/bindingObjects.h\", 0};"
 		<< std::endl << std::endl;
 
-	out << "static const papuga_StructInterfaceDescription g_structs = {0};" 
-		<< std::endl << std::endl;
+	std::vector<strus::StructDef>::const_iterator
+		si = interfaceDef.structDefs().begin(),
+		se = interfaceDef.structDefs().end();
+	for (; si != se; ++si)
+	{
+		std::vector<strus::MemberDef>::const_iterator
+			mi = si->memberDefs().begin(),
+			me = si->memberDefs().end();
+		for (; mi != me; ++mi)
+		{
+			out << docDeclaration( docDeclarationNameStructMemberDoc( si->name(), mi->name()), mi->doc());
+		}
+	}
+	si = interfaceDef.structDefs().begin();
+	for (; si != se; ++si)
+	{
+		out << "static const papuga_StructMemberDescription g_struct_members_" << si->name() << "[" << (si->memberDefs().size()+1) << "] = " << std::endl
+			<< "{" << std::endl;
+		std::vector<strus::MemberDef>::const_iterator
+			mi = si->memberDefs().begin(),
+			me = si->memberDefs().end();
+		for (; mi != me; ++mi)
+		{
+			std::string docmember = docDeclarationNameStructMemberDoc( si->name(), mi->name());
+			out << "\t" << "{\"" << mi->name() << "\", " << docmember << "}," << std::endl;
+		}
+		out << "\t" << "{NULL,NULL}" << std::endl;
+		out << "};" << std::endl;
+	}
+	out << std::endl;
+	si = interfaceDef.structDefs().begin();
+	for (; si != se; ++si)
+	{
+		out << docDeclaration( docDeclarationNameStructDoc( si->name()), si->doc());
+	}
+	out << std::endl;
+	out << "static const papuga_StructInterfaceDescription g_structs[" << (interfaceDef.structDefs().size()+1) << "] = " << std::endl
+		<< "{" << std::endl;
+	si = interfaceDef.structDefs().begin();
+	for (; si != se; ++si)
+	{
+		out << "\t" << "{\"" << si->name() << "\", " << docDeclarationNameStructDoc( si->name()) << ", g_struct_members_" << si->name() << "}," << std::endl;
+	}
+	out << "\t" << "{NULL,NULL,NULL}" << std::endl;
+	out << "};" << std::endl << std::endl;
 
 	out << "static const papuga_AboutDescription g_about = {"
 		<< "\"" << STRUS_BINDINGS_AUTHOR << "\","
@@ -406,7 +466,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 		<< "\"" << STRUS_BINDINGS_URL << "\","
 		<< "};" << std::endl << std::endl;
 
-	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCT_NAME << "\",\"" << STRUS_BINDINGS_PRODUCT_DESCRIPTION << "\", g_includefiles, g_classes, &g_structs, &g_about };"
+	out << "static const papuga_InterfaceDescription g_descr = { \"" << STRUS_BINDINGS_PRODUCT_NAME << "\",\"" << STRUS_BINDINGS_PRODUCT_DESCRIPTION << "\", g_includefiles, g_classes, g_structs, &g_about };"
 		<< std::endl << std::endl;
 
 	out << "DLL_PUBLIC const papuga_InterfaceDescription* strus::getBindingsInterfaceDescription()" << std::endl;
@@ -435,6 +495,24 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 		out << "#define STRUS_BINDINGS_CLASSID_" << ci->name() << " " << (cidx+1) << std::endl;
 	}
 	out << "#define STRUS_BINDINGS_NOF_CLASSES " << cidx << std::endl;
+	out << std::endl;
+
+	std::vector<strus::StructDef>::const_iterator
+		si = interfaceDef.structDefs().begin(),
+		se = interfaceDef.structDefs().end();
+	int sidx = 0;
+	for (; si != se; ++si,++sidx)
+	{
+		out << "#define STRUS_BINDINGS_STRUCTID_" << si->name() << " " << (sidx+1) << std::endl;
+	}
+	out << "#define STRUS_BINDINGS_NOF_STRUCTS " << sidx << std::endl;
+	out << std::endl;
+
+	si = interfaceDef.structDefs().begin();
+	for (; si != se; ++si)
+	{
+		out << "const char** " << structMembersFunctionName( si->name()) << "();" << std::endl;
+	}
 	out << std::endl;
 
 	ci = interfaceDef.classDefs().begin();
@@ -644,6 +722,24 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "\t" << "}\\" << std::endl;
 	out << "\t" << "return 0;" << std::endl << std::endl;
 
+	std::vector<strus::StructDef>::const_iterator
+		si = interfaceDef.structDefs().begin(),
+		se = interfaceDef.structDefs().end();
+	int sidx = 0;
+	for (; si != se; ++si,++sidx)
+	{
+		out << "extern \"C\" DLL_PUBLIC const char** " << structMembersFunctionName( si->name()) << "()" << std::endl << "{" << std::endl;
+		out << "\t" << "static const char* ar[] = {";
+		std::vector<strus::MemberDef>::const_iterator mi = si->memberDefs().begin(), me = si->memberDefs().end();
+		for (; mi != me; ++mi)
+		{
+			out << "\"" << mi->name() << "\", ";
+		}
+		out << "NULL};" << std::endl;
+		out << "\t" << "return ar;" << std::endl << "}" << std::endl;
+	}
+	out << std::endl;
+
 	std::vector<strus::ClassDef>::const_iterator
 		ci = interfaceDef.classDefs().begin(),
 		ce = interfaceDef.classDefs().end();
@@ -768,33 +864,59 @@ int main( int argc, const char* argv[])
 	int ec = 0;
 	try
 	{
-		std::string outputdir;
-		if (argc >= 2)
+		std::string outputdir = ".";
+		bool verbose = false;
+		int argi = 1;
+		for (; argi < argc; ++argi)
 		{
-			if (std::strcmp(argv[1],"-h") == 0 || std::strcmp(argv[1],"--help") == 0)
+			if (argv[argi][0] == '-')
 			{
-				std::cerr << "Usage: strusBindingsInterfaceGen <outputroot> { <inputfile> }" << std::endl;
-				std::cerr << "<outputroot> :Root director for output" << std::endl;
-				std::cerr << "<inputfile>  :input file path" << std::endl;
-				return 0;
+				if (std::strcmp(argv[argi],"-h") == 0 || std::strcmp(argv[argi],"--help") == 0)
+				{
+					std::cerr << "Usage: strusBindingsInterfaceGen <outputroot> { <inputfile> }" << std::endl;
+					std::cerr << "<outputroot> :Root director for output" << std::endl;
+					std::cerr << "<inputfile>  :input file path" << std::endl;
+					return 0;
+				}
+				else if (std::strcmp(argv[argi],"-v") == 0 || std::strcmp(argv[argi],"--verbose") == 0)
+				{
+					verbose = true;
+				}
+				else if (std::strcmp(argv[argi],"--") == 0)
+				{
+					++argi;
+					break;
+				}
+				else
+				{
+					throw std::runtime_error( std::string("unknown option ") + argv[argi]);
+				}
 			}
-			outputdir = argv[1];
-			std::cerr << "Output directory root is '" << outputdir << "'" << std::endl;
+			else
+			{
+				break;
+			}
 		}
+		if (argi < argc)
+		{
+			outputdir = argv[ argi++];
+		}
+		std::cerr << "Output directory root is '" << outputdir << "'" << std::endl;
 		strus::TypeSystem typeSystem;
 		strus::fillTypeTables( typeSystem);
 
-#ifdef STRUS_LOWLEVEL_DEBUG
-		std::cout << "TypeSystem:" << std::endl << typeSystem.tostring() << std::endl;
-#endif
+		if (verbose)
+		{
+			std::cout << "TypeSystem:" << std::endl << typeSystem.tostring() << std::endl;
+		}
 		strus::InterfacesDef interfaceDef( &typeSystem);
-		int argi=2;
 		for (; argi < argc; ++argi)
 		{
 			std::string source;
-#ifdef STRUS_LOWLEVEL_DEBUG
-			std::cout << "read file:" << argv[ argi] << std::endl;
-#endif
+			if (verbose)
+			{
+				std::cout << "read file:" << argv[ argi] << std::endl;
+			}
 			ec = strus::readFile( argv[ argi], source);
 			if (ec)
 			{
@@ -820,9 +942,10 @@ int main( int argc, const char* argv[])
 		interfaceDef.checkUnresolved();
 
 		//Output:
-#ifdef STRUS_LOWLEVEL_DEBUG
-		std::cout << interfaceDef.tostring() << std::endl;
-#endif
+		if (verbose)
+		{
+			std::cout << interfaceDef.tostring() << std::endl;
+		}
 		printOutput( outputdir + "/include/strus/bindingObjects.h", &print_BindingObjectsH, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingClassTemplate.hpp", &print_BindingClassTemplatesHpp, interfaceDef);

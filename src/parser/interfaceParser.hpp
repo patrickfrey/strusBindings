@@ -181,18 +181,71 @@ private:
 	std::vector<MethodDef> m_methodar;
 };
 
+class MemberDef
+{
+public:
+	MemberDef( const std::string& name_, const DocTagMap& doc_)
+		:m_name(name_),m_doc(doc_){}
+	MemberDef( const MemberDef& o)
+		:m_name(o.m_name),m_doc(o.m_doc){}
+
+	const std::string& name() const				{return m_name;}
+	const DocTagMap& doc() const				{return m_doc;}
+
+	std::string tostring() const;
+
+private:
+	std::string m_name;
+	DocTagMap m_doc;
+};
+
+class StructDef
+{
+public:
+	StructDef( const StructDef& o)
+		:m_name(o.m_name),m_doc(o.m_doc),m_memberar(o.m_memberar){}
+	StructDef( const std::string& name_, const DocTagMap& doc_)
+		:m_name(name_),m_doc(doc_),m_memberar(){}
+
+	void addMember( const MemberDef& member)
+	{
+		m_memberar.push_back( member);
+	}
+	const std::string& name() const
+	{
+		return m_name;
+	}
+	const DocTagMap& doc() const
+	{
+		return m_doc;
+	}
+	const std::vector<MemberDef>& memberDefs() const
+	{
+		return m_memberar;
+	}
+	std::string tostring() const;
+
+private:
+	std::string m_name;
+	DocTagMap m_doc;
+	std::vector<MemberDef> m_memberar;
+};
 
 class InterfacesDef
 {
 public:
 	InterfacesDef( const InterfacesDef& o)
-		:m_typeSystem(o.m_typeSystem),m_classdefar(o.m_classdefar),m_classdefmap(o.m_classdefmap){}
+		:m_typeSystem(o.m_typeSystem),m_structdefar(o.m_structdefar),m_classdefar(o.m_classdefar),m_classdefmap(o.m_classdefmap){}
 	explicit InterfacesDef( const TypeSystem* typeSystem_)
-		:m_typeSystem(typeSystem_),m_classdefar(),m_classdefmap(){}
+		:m_typeSystem(typeSystem_),m_structdefar(),m_classdefar(),m_classdefmap(){}
 
 	void addSource( const std::string& source);
 	void checkUnresolved() const;
 
+	const std::vector<StructDef>& structDefs() const
+	{
+		return m_structdefar;
+	}
 	const std::vector<ClassDef>& classDefs() const
 	{
 		return m_classdefar;
@@ -200,6 +253,11 @@ public:
 	std::string tostring() const;
 
 private:
+	void parseStructEnum(
+			const std::string& structName,
+			const DocTagMap& classDoc,
+			char const*& si, const char* se);
+
 	void parseClass(
 			const std::string& className,
 			const DocTagMap& classDoc,
@@ -214,6 +272,7 @@ private:
 
 private:
 	const TypeSystem* m_typeSystem;
+	std::vector<StructDef> m_structdefar;
 	std::vector<ClassDef> m_classdefar;
 	std::map<std::string,int> m_classdefmap;
 };

@@ -345,7 +345,6 @@ ConfigDef::ConfigDef( papuga_SerializationIter& seriter)
 	}
 }
 
-
 DfChangeDef::DfChangeDef( papuga_SerializationIter& seriter)
 {
 	static const char* context = _TXT("document frequency change");
@@ -438,10 +437,10 @@ void ContextDef::init( papuga_SerializationIter& seriter)
 					threads = Deserializer::getUint( seriter);
 					break;
 				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "rpc", context);
-					rpc = Deserializer::getConfigString( seriter);
+					rpc = Deserializer::getSubConfigString( seriter);
 					break;
 				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "trace", context);
-					trace = Deserializer::getConfigString( seriter);
+					trace = Deserializer::getSubConfigString( seriter);
 					break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'threads' or 'rpc' or 'trace' expected"), context);
 			}

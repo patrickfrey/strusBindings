@@ -2411,8 +2411,27 @@ void Deserializer::buildMetaDataRestriction(
 
 std::string Deserializer::getConfigString( papuga_SerializationIter& seriter)
 {
-	ConfigDef item( seriter);
-	return item.cfgstring;
+	ConfigDef cfg( seriter);
+	return cfg.cfgstring;
+}
+
+std::string Deserializer::getSubConfigString( papuga_SerializationIter& seriter)
+{
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		return Deserializer::getString( seriter);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		ConfigDef item( seriter);
+		Deserializer::consumeClose( seriter);
+		return item.cfgstring;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected sub structure or string for config"));
+	}
 }
 
 std::string Deserializer::getConfigString(
@@ -2434,9 +2453,9 @@ std::string Deserializer::getConfigString(
 	papuga_init_SerializationIter( &seriter, content.value.serialization);
 	try
 	{
-		ConfigDef item( seriter);
+		ConfigDef cfg( seriter);
 		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
-		return item.cfgstring;
+		return cfg.cfgstring;
 	}
 	catch (const std::runtime_error& err)
 	{

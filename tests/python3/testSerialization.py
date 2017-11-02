@@ -49,72 +49,72 @@ result += "(%u)\n%s\n" % (5,ctx.debug_serialize( estruct4))
 
 expected = """result:
 (1)
-name b
-value 'goloman'
 name a
 value 1
+name b
+value 'goloman'
 name xyz
 value 12.45
 
 (2)
-name e2
-open
-  name b
-  value 'huhu'
-  name a
-  value 789
-  name xyz
-  value 456.789
-close
 name e1
 open
-  name b
-  value 'hoho'
   name a
   value 567
+  name b
+  value 'hoho'
   name xyz
   value 123.456
 close
-
-(3)
 name e2
 open
-  name e2
-  open
-    name b
-    value 'huhu'
-    name a
-    value 789
-    name xyz
-    value 456.789
-  close
+  name a
+  value 789
+  name b
+  value 'huhu'
+  name xyz
+  value 456.789
+close
+
+(3)
+name e1
+open
+  name a
+  value 1
+  name b
+  value 'goloman'
+  name xyz
+  value 12.45
+close
+name e2
+open
   name e1
   open
-    name b
-    value 'hoho'
     name a
     value 567
+    name b
+    value 'hoho'
     name xyz
     value 123.456
   close
-close
-name e1
-open
-  name b
-  value 'goloman'
-  name a
-  value 1
-  name xyz
-  value 12.45
+  name e2
+  open
+    name a
+    value 789
+    name b
+    value 'huhu'
+    name xyz
+    value 456.789
+  close
 close
 
 (4)
 name foo
 value 'bar'
-name ham
-value NULL
 name spamm
 value 'eggs'
+name ham
+value NULL
 
 (5)
 value 99
