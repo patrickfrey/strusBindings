@@ -15,8 +15,8 @@ set( TEST_LD_LIBRARY_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/php
 set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${CMAKE_CURRENT_BINARY_DIR}/../../src/bindings" )
 set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${Boost_LIBRARY_DIRS}" )
 
-macro(add_php7_test name args )
-    add_test( Php7${name} ${PHP7_EXECUTABLE} -c ${CMAKE_CURRENT_BINARY_DIR}/php.ini -f "${PHP7_TESTDIR}/test${name}.php" ${args} )
+macro(add_php7_test name )
+    add_test( Php7${name} ${PHP7_EXECUTABLE} -c ${CMAKE_CURRENT_BINARY_DIR}/php.ini -f "${PHP7_TESTDIR}/test${name}.php"  ${ARGN} )
     set_property( TEST Php7${name}  APPEND PROPERTY ENVIRONMENT LD_LIBRARY_PATH=${TEST_LD_LIBRARY_PATH} )  
     set_property( TEST Php7${name}  APPEND PROPERTY ENVIRONMENT STRUS_MODULE_PATH=${STRUS_MODULE_PATH} )
 endmacro(add_php7_test)
