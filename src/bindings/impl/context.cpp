@@ -329,6 +329,7 @@ void ContextImpl::createVectorStorage( const ValueVariant& config_)
 void ContextImpl::destroyStorage( const ValueVariant& config)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (!papuga_ValueVariant_defined( &config)) throw strus::runtime_error( _TXT("called context method destroyStorage with undefined config"));
 	std::string dbname;
 	std::string storagecfg( Deserializer::getConfigString( config, errorhnd));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
@@ -344,7 +345,8 @@ void ContextImpl::destroyStorage( const ValueVariant& config)
 bool ContextImpl::storageExists( const ValueVariant& config)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("called storageExists with an unhandled error: %s"), errorhnd->fetchError());
+	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("called context method storageExists with an unhandled error: %s"), errorhnd->fetchError());
+	if (!papuga_ValueVariant_defined( &config)) throw strus::runtime_error( _TXT("called storageExists with undefined config"));
 	std::string dbname;
 	std::string storagecfg( Deserializer::getConfigString( config, errorhnd));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);

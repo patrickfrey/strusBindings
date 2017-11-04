@@ -5,6 +5,7 @@ from config_mdprim import *
 from createCollection import createCollection
 from dumpCollection import dumpCollection
 
+testname = "CreateCollection_mdprim"
 if len(sys.argv) > 1:
 	datadir = sys.argv[1]
 else:
@@ -14,14 +15,14 @@ if len(sys.argv) > 2:
 else:
 	outputdir = "."
 if len(sys.argv) > 3:
-	ctxconfig = getContextConfig( sys.argv[3])
+	ctxconfig = getContextConfig( sys.argv[3], testname)
 else:
 	ctxconfig = None
 
 storage = outputdir + "/storage"
 docfiles = ["doc10.xml"]
 withrpc = False
-if ctxconfig and ctxconfig['rpc']:
+if ctxconfig and 'rpc' in ctxconfig:
 	withrpc = True
 
 ctx = strus.Context( ctxconfig)

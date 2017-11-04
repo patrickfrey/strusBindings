@@ -164,9 +164,10 @@ def joinLists(*args):
 				rt.append( elem)
 	return rt
 
-def getContextConfig( argval):
+def getContextConfig( argval, testname):
 	if argval == 'trace':
-		return {'trace':{'log':"dump",'file':"stdout"}}
+		tracefile = "trace.%s.txt" % testname
+		return {'trace':{'log':"dump", 'file':tracefile}}
 	elif argval:
 		return {'rpc':argval}
 	else:

@@ -17,6 +17,7 @@ endmacro(add_lua_test)
 
 add_lua_test( HelloWorld "" )
 add_lua_test( PrintEnv "" )
+add_lua_test( LoadStrusExtension "" )
 add_lua_test( CreateCollection_t3s  "${LUA_DATADIR}/t3s"  "${LUA_EXECDIR}" )
 add_lua_test( Query_t3s "${LUA_DATADIR}/t3s"  "${LUA_EXECDIR}" )
 add_lua_test( CreateCollection_mdprim "${LUA_DATADIR}/mdprim" "${LUA_EXECDIR}" )

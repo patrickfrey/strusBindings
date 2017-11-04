@@ -5,6 +5,7 @@ from config_t3s import *
 from createCollection import createCollection
 from dumpCollection import dumpCollection
 
+testname = "Query_t3s"
 if len(sys.argv) > 1:
 	datadir = sys.argv[1]
 else:
@@ -14,14 +15,14 @@ if len(sys.argv) > 2:
 else:
 	outputdir = "."
 if len(sys.argv) > 3:
-	ctxconfig = getContextConfig( sys.argv[3])
+	ctxconfig = getContextConfig( sys.argv[3], testname)
 else:
 	ctxconfig = None
 
 storagedir = outputdir + "/storage"
 docfiles = ["A.xml","B.xml","C.xml"]
 withrpc = False
-if ctxconfig and ctxconfig['rpc']:
+if ctxconfig and 'rpc' in ctxconfig:
 	withrpc = True
 
 ctx = strus.Context( ctxconfig)
