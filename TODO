@@ -8,3 +8,4 @@ Elements of a returned structure with an interface can be specified as array
 In XML/JSON call interface call papuga in steps, returning a breakpoint id each step
 NodeJS Bindings
 
+Provide C++17 templates for papuga
