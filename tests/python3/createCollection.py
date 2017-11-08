@@ -38,7 +38,7 @@ def createCollection( strusctx, storagePath, metadata, analyzer, multipart, data
 			docclass = strusctx.detectDocumentClass( content)
 			doc = analyzer.analyzeSingle( content, docclass)
 			doc['attribute']['docid'] = fnam
-			doc['attribute']['docclass'] = "mimetype='%s', encoding='%s', scheme='%s'" % (docclass.get('mimetype',''), docclass.get('encoding',''), docclass.get('scheme',''))
+			doc['attribute']['docclass'] = "mimetype='%s', encoding='%s', scheme='%s'" % (docclass.mimetype, docclass.encoding, docclass.scheme)
 			if aclmap:
 				doc['access'] = aclmap[ fnam]
 			transaction.insertDocument( fnam, doc)

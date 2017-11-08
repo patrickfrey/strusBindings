@@ -41,9 +41,9 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 			$doc = $analyzer->analyzeSingle( $content);
 			$doc['attribute']['docid'] = $fnam;
 			$doc['attribute']['docclass'] =
-				"mimetype=" . $docclass['mimetype']
-				. ", encoding=" . $docclass['encoding']
-				. ", scheme=" . $docclass['scheme'];
+				"mimetype=" . $docclass->mimetype
+				. ", encoding=" . $docclass->encoding
+				. ", scheme=" . $docclass->scheme;
 			if ($aclmap && isset($aclmap[ $doc['attribute']['docid']])) {
 				$doc['access'] = $aclmap[ $doc['attribute']['docid'] ];
 			}

@@ -22,6 +22,7 @@
 #include "strus/statisticsViewerInterface.hpp"
 #include "impl/value/termExpression.hpp"
 #include "impl/value/metadataExpression.hpp"
+#include "strus/bindingObjects.h"
 #include <string>
 #include <vector>
 #include <utility>
@@ -32,6 +33,20 @@
 
 namespace strus {
 namespace bindings {
+
+template <typename Struct>
+class StructIdTemplate
+{
+public:
+	static void structid(){}
+};
+template <>
+class StructIdTemplate<analyzer::DocumentClass>
+{
+public:
+	static int structid()		{return STRUS_BINDINGS_STRUCTID_DocumentClass;}
+};
+
 
 class Serializer
 {
@@ -124,6 +139,7 @@ public:
 
 	struct atomictype_ {};
 	struct structtype_ {};
+	struct maptype_ {};
 
 	template <typename T>
 	static typename boost::enable_if_c<
@@ -137,13 +153,19 @@ public:
 
 	template <typename T>
 	static typename boost::enable_if_c<
+		boost::is_same<analyzer::DocumentClass,T>::value
+		,const structtype_&>::type getCategory( const T&) { static structtype_ rt; return rt;}
+
+	template <typename T>
+	static typename boost::enable_if_c<
 		!(boost::is_arithmetic<T>::value 
 		|| boost::is_same<std::string,T>::value
 		|| boost::is_same<char*,T>::value
 		|| boost::is_same<const char*,T>::value
 		|| boost::is_same<NumericVariant,T>::value
-		|| boost::is_same<papuga_ValueVariant,T>::value)
-		,const structtype_&>::type getCategory( const T&) { static structtype_ rt; return rt;}
+		|| boost::is_same<papuga_ValueVariant,T>::value
+		|| boost::is_same<analyzer::DocumentClass,T>::value)
+		,const maptype_&>::type getCategory( const T&) { static maptype_ rt; return rt;}
 
 	template<typename SERVAL>
 	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const atomictype_& category)
@@ -152,6 +174,15 @@ public:
 	}
 	template<typename SERVAL>
 	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const structtype_& category)
+	{
+		bool rt = true;
+		rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<SERVAL>::structid());
+		rt &= serialize_nothrow( result, val);
+		rt &= papuga_Serialization_pushClose( result);
+		return rt;
+	}
+	template<typename SERVAL>
+	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const maptype_& category)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushOpen( result);

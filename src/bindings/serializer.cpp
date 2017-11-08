@@ -64,11 +64,15 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val)
 {
 	bool rt = true;
+	if (papuga_Serialization_empty( result))
+	{
+		papuga_Serialization_set_structid( result, StructIdTemplate<analyzer::DocumentClass>::structid());
+	}
 	if (val.defined())
 	{
-		if (!val.mimeType().empty()) rt &= serializeStructMember( result, "mimetype", val.mimeType());
-		if (!val.encoding().empty()) rt &= serializeStructMember( result, "encoding", val.encoding());
-		if (!val.scheme().empty()) rt &= serializeStructMember( result, "scheme", val.scheme());
+		rt &= serialize_nothrow( result, val.mimeType());
+		rt &= serialize_nothrow( result, val.encoding());
+		rt &= serialize_nothrow( result, val.scheme());
 	}
 	else
 	{

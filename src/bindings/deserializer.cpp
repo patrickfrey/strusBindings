@@ -370,40 +370,62 @@ public:
 			Structure rt;
 			if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 			{
-				SimpleStructureParser::setSingleValue( rt, getValue( seriter));
+				int pos = 0;
+				do
+				{
+					SimpleStructureParser::setPositionalValue( rt, pos++, getValue( seriter));
+				}
+				while (papuga_SerializationIter_tag( &seriter) == papuga_TagValue);
 			}
 			else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 			{
-				papuga_SerializationIter_skip( &seriter);
 				if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 				{
-					static const StructureNameMap namemap( "name,value", ',');
-
-					std::string name;
-					const papuga_ValueVariant* value = 0;
-					do
+					static const StructureNameMap metanamemap( "name,value", ',');
+					for (;;)
 					{
-						int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-						papuga_SerializationIter_skip( &seriter);
-						switch (idx)
+						std::string name;
+						const papuga_ValueVariant* value = 0;
+						do
 						{
-							case 0: name = Deserializer::getString( seriter); break;
-							case 1: value = getValue( seriter); break;
-							default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+							int idx = metanamemap.index( *papuga_SerializationIter_value( &seriter));
+							papuga_SerializationIter_skip( &seriter);
+							switch (idx)
+							{
+								case 0: name = Deserializer::getString( seriter); break;
+								case 1: value = getValue( seriter); break;
+								default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+							}
+							papuga_SerializationIter_skip( &seriter);
+						}
+						while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+						if (!value) throw strus::runtime_error(_TXT("missing definition of value"));
+						SimpleStructureParser::setNamedValue( rt, name.c_str(), value);
+						Deserializer::consumeClose( seriter);
+
+						if (!papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+						{
+							break;
 						}
 						papuga_SerializationIter_skip( &seriter);
 					}
-					while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-					SimpleStructureParser::setNamedValue( rt, name.c_str(), value);
 				}
 				else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 				{
-					int pos = 0;
-					do
+					for(;;)
 					{
-						SimpleStructureParser::setPositionalValue( rt, pos++, getValue( seriter));
+						char buf[ 128];
+						const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
+						papuga_SerializationIter_skip( &seriter);
+						SimpleStructureParser::setNamedValue( rt, id, getValue( seriter));
+						Deserializer::consumeClose( seriter);
+
+						if (!papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+						{
+							break;
+						}
+						papuga_SerializationIter_skip( &seriter);
 					}
-					while (papuga_SerializationIter_tag( &seriter) == papuga_TagValue);
 				}
 				Deserializer::consumeClose( seriter);
 			}
