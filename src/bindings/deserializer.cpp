@@ -403,7 +403,7 @@ public:
 						SimpleStructureParser::setNamedValue( rt, name.c_str(), value);
 						Deserializer::consumeClose( seriter);
 
-						if (!papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+						if (papuga_SerializationIter_tag( &seriter) != papuga_TagOpen)
 						{
 							break;
 						}
@@ -420,7 +420,7 @@ public:
 						SimpleStructureParser::setNamedValue( rt, id, getValue( seriter));
 						Deserializer::consumeClose( seriter);
 
-						if (!papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+						if (papuga_SerializationIter_tag( &seriter) != papuga_TagOpen)
 						{
 							break;
 						}
