@@ -39,12 +39,12 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, co
 	}
 }
 
-std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const
+std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
 	if (!searcher) throw strus::runtime_error( "%s",  _TXT("calling vector storage searcher method after close"));
 
-	std::vector<VectorStorageSearchInterface::Result>
+	std::vector<VectorQueryResult>
 		res = searcher->findSimilar( Deserializer::getDoubleList( vec), maxNofResults);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -54,12 +54,12 @@ std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::fin
 	return res;
 }
 
-std::vector<VectorStorageSearchInterface::Result> VectorStorageSearcherImpl::findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const
+std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
 	if (!searcher) throw strus::runtime_error( "%s",  _TXT("calling vector storage searcher method after close"));
 
-	std::vector<VectorStorageSearchInterface::Result>
+	std::vector<VectorQueryResult>
 		res = searcher->findSimilarFromSelection(
 			Deserializer::getIndexList( featidxlist),
 			Deserializer::getDoubleList( vec),

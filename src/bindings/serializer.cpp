@@ -80,7 +80,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const VectorStorageSearchInterface::Result& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val)
 {
 	bool rt = true;
 	rt &= serializeStructMember( result, "featidx", (papuga_Int)val.featidx());
@@ -326,7 +326,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 		return false;
 	}
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsViewerInterface::DocumentFrequencyChange& val, papuga_Allocator* allocator)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_Allocator* allocator)
 {
 	bool rt = true;
 	const char* type = papuga_Allocator_copy_charp( allocator, val.type());
@@ -343,7 +343,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsView
 	rt &= papuga_Serialization_pushName_charp( result, "dfchange");
 	rt &= papuga_Serialization_pushOpen( result);
 
-	DocumentFrequencyChange rec;
+	TermStatisticsChange rec;
 	while (val.nextDfChange( rec))
 	{
 		rt &= papuga_Serialization_pushOpen( result);
@@ -384,7 +384,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<VectorStorageSearchInterface::Result>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val)
 {
 	return serializeArray( result, val);
 }

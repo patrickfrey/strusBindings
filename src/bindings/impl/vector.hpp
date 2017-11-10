@@ -35,14 +35,14 @@ public:
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
 	/// \return the list of most similar vectors (double[])
-	std::vector<VectorStorageSearchInterface::Result> findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const;
+	std::vector<VectorQueryResult> findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const;
 
 	/// \brief Find the most similar vectors to vector in a selection of features addressed by index
 	/// \param[in] featidxlist list of candidate indices (int[])
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
 	/// \return the list of most similar vectors (double[])
-	std::vector<VectorStorageSearchInterface::Result> findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const;
+	std::vector<VectorQueryResult> findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();

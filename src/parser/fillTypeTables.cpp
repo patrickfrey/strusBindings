@@ -166,7 +166,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 		("typename", "structure")
 	;
-	typesystem.defineType( "std::vector<VectorStorageSearchInterface::Result>")
+	typesystem.defineType( "std::vector<VectorQueryResult>")
 		("retv_map", "initCallResultAtomic( $name, $value);")
 		("typename", "structure")
 	;
