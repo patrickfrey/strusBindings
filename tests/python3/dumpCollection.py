@@ -63,14 +63,14 @@ def dumpCollection( strusctx, storagePath):
 	for blob in storage.getAllStatistics( True):
 		statview = strusctx.unpackStatisticBlob( blob, "default")
 		dfchangelist = []
-		for dfchange in statview[ "dfchange"]:
+		for dfchange in statview.dfchange:
 			dfchangelist.append( dfchange)
 
 		output_stat[ "dfchange"] = dfchangelist
 		if "nofdocs" in output_stat:
-			output_stat[ "nofdocs"] += statview[ "nofdocs"]
+			output_stat[ "nofdocs"] += statview.nofdocs
 		else:
-			output_stat[ "nofdocs"] = statview[ "nofdocs"]
+			output_stat[ "nofdocs"] = statview.nofdocs
 
 	output[ "stat"] = output_stat
 

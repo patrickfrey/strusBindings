@@ -16,7 +16,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericVariant& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericVariant& val, papuga_ErrorCode& errcode)
 {
 	switch (val.type)
 	{
@@ -29,50 +29,47 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const NumericV
 		case NumericVariant::Float:
 			return papuga_Serialization_pushValue_double( result, val.variant.Float);
 	}
-	throw strus::runtime_error( "%s", _TXT("unknown numeric type passed to serialization"));
+	errcode = papuga_TypeError;
+	return false;
 }
 
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "type", val.type());
-	rt &= serializeStructMember( result, "value", val.value());
-	if ((papuga_Int)val.len() > 1) rt &= serializeStructMember( result, "len", (papuga_Int)val.len());
-	if (variablename) rt &= serializeStructMember( result, "variable", variablename);
+	rt &= serializeStructMember( result, "type", val.type(), errcode);
+	rt &= serializeStructMember( result, "value", val.value(), errcode);
+	if ((papuga_Int)val.len() > 1) rt &= serializeStructMember( result, "len", (papuga_Int)val.len(), errcode);
+	if (variablename) rt &= serializeStructMember( result, "variable", variablename, errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "type", val.type());
-	rt &= serializeStructMember( result, "value", val.value());
-	if ((papuga_Int)val.pos()) rt &= serializeStructMember( result, "pos", (papuga_Int)val.pos());
+	rt &= serializeStructMember( result, "type", val.type(), errcode);
+	rt &= serializeStructMember( result, "value", val.value(), errcode);
+	if ((papuga_Int)val.pos()) rt &= serializeStructMember( result, "pos", (papuga_Int)val.pos(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, val.name().c_str(), val.value());
+	rt &= serializeStructMember( result, val.name().c_str(), val.value(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, val.name().c_str(), val.value());
+	rt &= serializeStructMember( result, val.name().c_str(), val.value(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	if (papuga_Serialization_empty( result))
-	{
-		papuga_Serialization_set_structid( result, StructIdTemplate<analyzer::DocumentClass>::structid());
-	}
 	if (val.defined())
 	{
-		rt &= serialize_nothrow( result, val.mimeType());
-		rt &= serialize_nothrow( result, val.encoding());
-		rt &= serialize_nothrow( result, val.scheme());
+		rt &= serialize_nothrow( result, val.mimeType(), errcode);
+		rt &= serialize_nothrow( result, val.encoding(), errcode);
+		rt &= serialize_nothrow( result, val.scheme(), errcode);
 	}
 	else
 	{
@@ -80,35 +77,36 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "featidx", (papuga_Int)val.featidx());
-	rt &= serializeStructMember( result, "weight", val.weight());
+	rt &= serializeStructMember( result, "featidx", (papuga_Int)val.featidx(), errcode);
+	rt &= serializeStructMember( result, "weight", val.weight(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const SummaryElement& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "name", val.name());
-	rt &= serializeStructMember( result, "value", val.value());
-	rt &= serializeStructMember( result, "weight", val.weight());
-	rt &= serializeStructMember( result, "index", (papuga_Int)val.index());
+	rt &= serializeStructMember( result, "name", val.name(), errcode);
+	rt &= serializeStructMember( result, "value", val.value(), errcode);
+	rt &= serializeStructMember( result, "weight", val.weight(), errcode);
+	rt &= serializeStructMember( result, "index", (papuga_Int)val.index(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "doctype", val.subDocumentTypeName());
-	rt &= serializeStructMember( result, "metadata", val.metadata());
-	rt &= serializeStructMember( result, "attribute", val.attributes());
-	rt &= serializeStructMember( result, "searchindex", val.searchIndexTerms());
-	rt &= serializeStructMember( result, "forwardindex", val.forwardIndexTerms());
+	rt &= serializeStructMember( result, "doctype", val.subDocumentTypeName(), errcode);
+	rt &= serializeStructMember( result, "metadata", val.metadata(), errcode);
+	rt &= serializeStructMember( result, "attribute", val.attributes(), errcode);
+	rt &= serializeStructMember( result, "searchindex", val.searchIndexTerms(), errcode);
+	rt &= serializeStructMember( result, "forwardindex", val.forwardIndexTerms(), errcode);
 	return rt;
 }
-static const char* getTermExpressionVariableName( const TermExpression& expr,
-				std::vector<analyzer::QueryTermExpression::Instruction>::const_iterator ii,
-				const std::vector<analyzer::QueryTermExpression::Instruction>::const_iterator& ie)
+static const char* getTermExpressionVariableName(
+		const TermExpression& expr,
+		std::vector<analyzer::QueryTermExpression::Instruction>::const_iterator ii,
+		const std::vector<analyzer::QueryTermExpression::Instruction>::const_iterator& ie)
 {
 	++ii;
 	if (ii != ie
@@ -119,7 +117,7 @@ static const char* getTermExpressionVariableName( const TermExpression& expr,
 	}
 	return 0;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpression& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode)
 {
 	try
 	{
@@ -139,7 +137,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					if (!ser) return false;
 					stk.push_back( ser);
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
-					rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename);
+					rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode);
 					break;
 				}
 				case analyzer::QueryTermExpression::Instruction::Operator:
@@ -152,9 +150,9 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					const TermExpression::Operator& op = val.operatorStruct( ii->idx());
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
 	
-					rt &= Serializer::serializeStructMember( ser, "op", op.name);
-					if (op.range) rt &= Serializer::serializeStructMember( ser, "range", (papuga_Int)op.range);
-					if (op.cardinality) rt &= Serializer::serializeStructMember( ser, "cardinality", (papuga_Int)op.cardinality);
+					rt &= Serializer::serializeStructMember( ser, "op", op.name, errcode);
+					if (op.range) rt &= Serializer::serializeStructMember( ser, "range", (papuga_Int)op.range, errcode);
+					if (op.cardinality) rt &= Serializer::serializeStructMember( ser, "cardinality", (papuga_Int)op.cardinality, errcode);
 	
 					rt &= papuga_Serialization_pushName_charp( ser, "arg");
 					rt &= papuga_Serialization_pushOpen( ser);
@@ -167,7 +165,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					rt &= papuga_Serialization_pushClose( ser);//... end arg
 					if (variablename)
 					{
-						rt &= Serializer::serializeStructMember( ser, "variable", variablename);
+						rt &= Serializer::serializeStructMember( ser, "variable", variablename, errcode);
 					}
 					stk.resize( stk.size() - ii->nofOperands());
 					stk.push_back( ser);
@@ -188,39 +186,29 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 		return false;
 	}
 }
-struct MetaDataComparison
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaDataComparison& val, papuga_ErrorCode& errcode)
 {
-	const char* cmpop;
-	const analyzer::QueryTerm* term;
-	bool newGroup;
-
-	MetaDataComparison( const char* cmpop_, const analyzer::QueryTerm* term_, bool newGroup_)
-		:cmpop(cmpop_),term(term_),newGroup(newGroup_){}
-	MetaDataComparison( const MetaDataComparison& o)
-		:cmpop(o.cmpop),term(o.term),newGroup(o.newGroup){}
-
-	bool serialize( papuga_Serialization* result) const
+	bool rt = true;
+	papuga_ErrorCode err = papuga_Ok;
+	papuga_ValueVariant buf;
+	papuga_ValueVariant termval;
+	papuga_init_ValueVariant_string( &termval, val.term()->value().c_str(), val.term()->value().size());
+	papuga_ValueVariant* num = papuga_ValueVariant_tonumeric( &termval, &buf, &err);
+	rt &= Serializer::serializeStructMember( result, "op", val.cmpop(), errcode);
+	rt &= Serializer::serializeStructMember( result, "name", val.term()->type(), errcode);
+	if (num)
 	{
-		bool rt = true;
-		papuga_ErrorCode err = papuga_Ok;
-		papuga_ValueVariant buf;
-		papuga_ValueVariant termval;
-		papuga_init_ValueVariant_string( &termval, term->value().c_str(), term->value().size());
-		papuga_ValueVariant* num = papuga_ValueVariant_tonumeric( &termval, &buf, &err);
-		rt &= Serializer::serializeStructMember( result, "op", cmpop);
-		rt &= Serializer::serializeStructMember( result, "name", term->type());
-		if (num)
-		{
-			rt &= Serializer::serializeStructMember( result, "value", *num);
-		}
-		else
-		{
-			rt &= Serializer::serializeStructMember( result, "value", term->value());
-		}
-		return rt;
+		rt &= Serializer::serializeStructMember( result, "value", *num, errcode);
 	}
-};
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& err)
+	else
+	{
+		rt &= Serializer::serializeStructMember( result, "value", val.term()->value(), errcode);
+	}
+	return rt;
+}
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& errcode)
 {
 	try
 	{
@@ -250,7 +238,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 					}
 					else
 					{
-						err = papuga_TypeError;
+						errcode = papuga_TypeError;
 						return false;
 					}
 					break;
@@ -266,7 +254,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 							{
 								if (termc > ii->nofOperands())
 								{
-									err = papuga_NofArgsError;
+									errcode = papuga_NofArgsError;
 									return false;
 								}
 								// We check that all operands of an OR are atomic terms (CNF):
@@ -274,7 +262,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 									ci = cmplist.end() - termc + 1, ce = cmplist.end();
 								for (; ci != ce; ++ci)
 								{
-									ci->newGroup = false;
+									ci->setNewGroup( false);
 								}
 							}
 						}
@@ -282,7 +270,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 					}
 					else
 					{
-						err = papuga_TypeError;
+						errcode = papuga_TypeError;
 						return false;
 					}
 					break;
@@ -297,46 +285,46 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 
 			std::vector<MetaDataComparison>::const_iterator cn = ci;
 			unsigned int argcnt = 1;
-			for (++cn; cn != ce && !cn->newGroup; ++cn,++argcnt){}
+			for (++cn; cn != ce && !cn->newGroup(); ++cn,++argcnt){}
 			if (argcnt > 1)
 			{
 				for (; ci != cn; ++ci)
 				{
 					rt &= papuga_Serialization_pushOpen( result);
-					rt &= ci->serialize( result);
+					rt &= serialize_nothrow( result, *ci, errcode);
 					rt &= papuga_Serialization_pushClose( result);
 				}
 				--ci;
 			}
 			else
 			{
-				rt &= ci->serialize( result);
+				rt &= serialize_nothrow( result, *ci, errcode);
 			}
 			rt &= papuga_Serialization_pushClose( result);
 		}
 		if (!rt)
 		{
-			err = papuga_NoMemError;
+			errcode = papuga_NoMemError;
 		}
 		return rt;
 	}
 	catch (const std::bad_alloc&)
 	{
-		err = papuga_NoMemError;
+		errcode = papuga_NoMemError;
 		return false;
 	}
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_Allocator* allocator)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	const char* type = papuga_Allocator_copy_charp( allocator, val.type());
-	rt &= serializeStructMember( result, "type", type);
-	const char* value = papuga_Allocator_copy_charp( allocator, val.value());
-	rt &= serializeStructMember( result, "value", value);
-	rt &= serializeStructMember( result, "increment", (papuga_Int)val.increment());
+	const char* type = papuga_Allocator_copy_charp( result->allocator, val.type());
+	rt &= serializeStructMember( result, "type", type, errcode);
+	const char* value = papuga_Allocator_copy_charp( result->allocator, val.value());
+	rt &= serializeStructMember( result, "value", value, errcode);
+	rt &= serializeStructMember( result, "increment", (papuga_Int)val.increment(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_Allocator* allocator)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
 
@@ -347,7 +335,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsView
 	while (val.nextDfChange( rec))
 	{
 		rt &= papuga_Serialization_pushOpen( result);
-		rt &= Serializer::serialize_nothrow( result, rec, allocator);
+		rt &= Serializer::serialize_nothrow( result, rec, errcode);
 		rt &= papuga_Serialization_pushClose( result);
 	}
 	rt &= papuga_Serialization_pushClose( result);
@@ -356,24 +344,24 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsView
 	rt &= papuga_Serialization_pushValue_int( result, val.nofDocumentsInsertedChange());
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const ResultDocument& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const ResultDocument& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "docno", (papuga_Int)val.docno());
-	rt &= serializeStructMember( result, "weight", val.weight());
-	rt &= serializeStructMember( result, "summary", val.summaryElements());
+	rt &= serializeStructMember( result, "docno", (papuga_Int)val.docno(), errcode);
+	rt &= serializeStructMember( result, "weight", val.weight(), errcode);
+	rt &= serializeStructMember( result, "summary", val.summaryElements(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const QueryResult& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const QueryResult& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
-	rt &= serializeStructMember( result, "pass", (papuga_Int)val.evaluationPass());
-	rt &= serializeStructMember( result, "nofranked", (papuga_Int)val.nofRanked());
-	rt &= serializeStructMember( result, "nofvisited", (papuga_Int)val.nofVisited());
-	rt &= serializeStructMember( result, "ranks", val.ranks());
+	rt &= serializeStructMember( result, "pass", (papuga_Int)val.evaluationPass(), errcode);
+	rt &= serializeStructMember( result, "nofranked", (papuga_Int)val.nofRanked(), errcode);
+	rt &= serializeStructMember( result, "nofvisited", (papuga_Int)val.nofVisited(), errcode);
+	rt &= serializeStructMember( result, "ranks", val.ranks(), errcode);
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
 	ConfigurationItemList::const_iterator ci = val.begin(), ce = val.end();
@@ -384,53 +372,53 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val, papuga_ErrorCode& errcode)
 {
-	return serializeArray( result, val);
+	return serializeArray( result, val, errcode);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val, papuga_ErrorCode& errcode)
 {
-	return serializeArray( result, val);
+	return serializeArray( result, val, errcode);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val, papuga_ErrorCode& errcode)
 {
-	return serializeIntArray( result, val);
+	return serializeIntArray( result, val, errcode);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val, papuga_ErrorCode& errcode)
 {
-	return serializeArray( result, val);
+	return serializeArray( result, val, errcode);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val, papuga_ErrorCode& errcode)
 {
-	return serializeArray( result, val);
+	return serializeArray( result, val, errcode);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentMetaData>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentMetaData>& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
 	std::vector<analyzer::DocumentMetaData>::const_iterator vi = val.begin(), ve = val.end();
 	for (; vi != ve; ++vi)
 	{
-		rt &= serializeStructMember( result, vi->name().c_str(), vi->value());
+		rt &= serializeStructMember( result, vi->name().c_str(), vi->value(), errcode);
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentAttribute>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentAttribute>& val, papuga_ErrorCode& errcode)
 {
 	bool rt = true;
 	std::vector<analyzer::DocumentAttribute>::const_iterator vi = val.begin(), ve = val.end();
 	for (; vi != ve; ++vi)
 	{
-		rt &= serializeStructMember( result, vi->name().c_str(), vi->value());
+		rt &= serializeStructMember( result, vi->name().c_str(), vi->value(), errcode);
 	}
 	return rt;
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode)
 {
-	return serializeArray( result, val);
+	return serializeArray( result, val, errcode);
 }
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val)
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val, papuga_ErrorCode& errcode)
 {
-	return serializeArray( result, val);
+	return serializeArray( result, val, errcode);
 }
 
 

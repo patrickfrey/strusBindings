@@ -192,7 +192,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 					}
 					if (ei->handle() >= 0)
 					{
-						ser &= Serializer::serialize_nothrow( serialization, metadatareader->getValue( ei->handle()));
+						Serializer::serialize( serialization, metadatareader->getValue( ei->handle()));
 						attributereader = (AttributeReaderInterface*)m_attributes.get();
 					}
 					else

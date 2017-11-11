@@ -60,15 +60,21 @@ def _dumpValue( obj, depth):
 			if i > 0:
 				s = s + ', '
 			i = i + 1
-			if isinstance(obj, (str,bytes)):
+			if isinstance(k, (str,bytes)):
+				if k[0] == '_':
+					continue
 				k = '"' + k + '"'
 			s = s + '[' + str(k) + '] = ' + _dumpValue( v, depth-1)
 		return s + '} '
 	else:
-		return "'" + str(obj) + "'"
+		attrdict = {}
+		for k in dir(obj):
+			if k[0] != '_':
+				attrdict[ k] = getattr( obj, k)
+		return _dumpValue( attrdict, depth)
 
 def dumpValue( o):
-	return _dumpValue( o, 10)
+	return _dumpValue( o, 20)
 
 def _dumpTree( indent, obj, depth):
 	if obj is None:
@@ -103,7 +109,10 @@ def _dumpTree( indent, obj, depth):
 			return "{...}"
 		s = ''
 		for k in sorted( obj.keys()):
-			ke = "\n" + indent + type(k).__name__ + " " + str(k)
+			kstr = str(k)
+			if kstr[0] == '_':
+				continue
+			ke = "\n" + indent + type(k).__name__ + " " + kstr
 			ve = _dumpTree( indent + '  ', obj[ k], depth-1)
 			if ve and ve[0] == "\n":
 				s = s + ke + ":" + ve
@@ -111,10 +120,14 @@ def _dumpTree( indent, obj, depth):
 				s = s + ke + ": " + ve
 		return s
 	else:
-		return "'" + str(obj) + "'"
+		attrdict = {}
+		for k in dir(obj):
+			if k[0] != '_':
+				attrdict[ k] = getattr( obj, k)
+		return _dumpTree( indent, attrdict, depth)
 
 def dumpTree( obj):
-	return _dumpTree( "", obj, 10)
+	return _dumpTree( "", obj, 20)
 
 def readFile( path):
 	with open( path) as f:

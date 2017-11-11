@@ -118,12 +118,12 @@ try
 	$results = $query->evaluate();
 	$output[ "QueryResult"] = $results;
 	$output_list = [];
-	foreach ($results['ranks'] as $pos => $result) {
-		$weightstr = number_format((float)$result['weight'], 5, '.', '');
-		$docno = $result['docno'];
+	foreach ($results->ranks as $pos => $result) {
+		$weightstr = number_format((float)$result->weight, 5, '.', '');
+		$docno = $result->docno;
 		array_push( $output_list, "rank $pos: $docno $weightstr");
-		foreach ($result['summary'] as $sidx => $si) {
-			array_push( $output_list, "    " . $si['name'] . ": '" . $si['value'] . "'");
+		foreach ($result->summary as $sidx => $si) {
+			array_push( $output_list, "    " . $si->name . ": '" . $si->value . "'");
 		}
 	}
 	

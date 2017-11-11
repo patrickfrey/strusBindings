@@ -118,10 +118,10 @@ output[ "QueryDump"] = query.tostring()
 results = query.evaluate()
 output[ "QueryResult"] = results
 output_list = []
-for pos,result in enumerate(results['ranks']):
-	output_list.append( "rank %u: %u %.5f" % (pos+1, result['docno'], result['weight']))
-	for summary in result['summary']:
-		output_list.append( "    %s: '%s'" % (summary['name'], summary['value']))
+for pos,result in enumerate(results.ranks):
+	output_list.append( "rank %u: %u %.5f" % (pos+1, result.docno, result.weight))
+	for summary in result.summary:
+		output_list.append( "    %s: '%s'" % (summary.name, summary.value))
 output[ "ResultList"] = output_list
 
 result = "query evaluation:" + dumpTree( output) + "\n"

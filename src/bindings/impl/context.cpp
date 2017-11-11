@@ -385,7 +385,7 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	}
 	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( blob, bloblen));
 	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
-	if (!strus::bindings::Serializer::serialize_nothrow( &rt.serialization, *viewer, &rt.allocator)) throw std::bad_alloc();
+	strus::bindings::Serializer::serialize( &rt.serialization, *viewer);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());

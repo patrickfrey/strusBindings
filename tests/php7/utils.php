@@ -33,8 +33,12 @@ function dumpValue_( $o, $depth) {
 	} elseif (is_numeric($o)) {
 		$num = round( floatval( $o), 5);
 		return "$num";
+	} elseif (is_string($o)) {
+		return "$o";
+	} elseif (is_null($o)) {
+		return "NULL";
 	} else {
-		return tostring( $o);
+		return dumpValue_( get_object_vars($o), $depth);
 	}
 }
 function dumpValue( $o) {
@@ -66,11 +70,11 @@ function dumpTree_( $indent, $o, $depth) {
 	} elseif (is_null($o)) {
 		return NULL;
 	} else {
-		return "$o";
+		return dumpTree_( $indent, get_object_vars($o), $depth);
 	}
 }
 function dumpTree( $o) {
-	return dumpTree_( "", $o, 10);
+	return dumpTree_( "", $o, 20);
 }
 
 function readFileContent( $path) {
