@@ -224,13 +224,19 @@ private:
 	}
 
 	template <typename TYPE>
+	static bool serializeArrayElement( papuga_Serialization* result, const TYPE& val, papuga_ErrorCode& errcode)
+	{
+		return serializeStructMemberValue( result, val, getCategory( val), errcode);
+	}
+
+	template <typename TYPE>
 	static bool serializeArray( papuga_Serialization* result, const std::vector<TYPE>& val, papuga_ErrorCode& errcode)
 	{
 		bool rt = true;
 		typename std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			rt &= serializeStructMemberValue( result, *vi, getCategory( *vi), errcode);
+			rt &= serializeArrayElement( result, *vi, errcode);
 		}
 		return rt;
 	}
@@ -241,7 +247,7 @@ private:
 		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			rt &= serialize_nothrow( result, (papuga_Int)*vi, errcode);
+			rt &= serializeArrayElement( result, (papuga_Int)*vi, errcode);
 		}
 		return rt;
 	}

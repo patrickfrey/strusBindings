@@ -334,9 +334,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsView
 	TermStatisticsChange rec;
 	while (val.nextDfChange( rec))
 	{
-		rt &= papuga_Serialization_pushOpen( result);
-		rt &= Serializer::serialize_nothrow( result, rec, errcode);
-		rt &= papuga_Serialization_pushClose( result);
+		rt &= serializeArrayElement( result, rec, errcode);
 	}
 	rt &= papuga_Serialization_pushClose( result);
 

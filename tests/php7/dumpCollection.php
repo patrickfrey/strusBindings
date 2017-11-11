@@ -68,7 +68,7 @@ function dumpCollection( $strusctx, $storagePath) {
 		$statview = $strusctx->unpackStatisticBlob( $blob, "default");
 		$dfchangelist = [];
 		foreach ($statview->dfchange as $dfchange) {
-			array_push( $dfchangelist, $dfchange);
+			array_push( $dfchangelist, ["value" => $dfchange->value, "type" => $dfchange->type, "increment" => $dfchange->increment]);
 		}
 		$output_stat[ "dfchange"] = $dfchangelist;
 		if (!isset($output_stat[ "nofdocs"])) {
