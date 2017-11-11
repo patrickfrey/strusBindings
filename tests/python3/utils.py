@@ -69,7 +69,7 @@ def _dumpValue( obj, depth):
 	else:
 		attrdict = {}
 		for k in dir(obj):
-			if k[0] != '_':
+			if k[0] != '_' and getattr( obj, k) != None:
 				attrdict[ k] = getattr( obj, k)
 		return _dumpValue( attrdict, depth)
 
@@ -122,7 +122,7 @@ def _dumpTree( indent, obj, depth):
 	else:
 		attrdict = {}
 		for k in dir(obj):
-			if k[0] != '_':
+			if k[0] != '_' and getattr( obj, k) != None:
 				attrdict[ k] = getattr( obj, k)
 		return _dumpTree( indent, attrdict, depth)
 
