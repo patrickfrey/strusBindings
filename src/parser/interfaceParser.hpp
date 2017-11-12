@@ -71,10 +71,10 @@ public:
 
 	std::string expand( 
 			const char* eventname,
-			const std::string& name=std::string(),
-			const std::string& value=std::string()) const
+			const std::string& name_=std::string(),
+			const std::string& value_=std::string()) const
 	{
-		return m_type->expand( eventname, m_defmap, name, value);
+		return m_type->expand( eventname, m_defmap, name_, value_);
 	}
 private:
 	const VariableType* m_type;

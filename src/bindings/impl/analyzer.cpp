@@ -424,8 +424,8 @@ QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& o
 	m_analyzer_impl.resetOwnership( objBuilder->createQueryAnalyzer(), "QueryAnalyzer");
 	if (!m_analyzer_impl.get())
 	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("failed to create query analyzer: %s"), errorhnd->fetchError());
+		ErrorBufferInterface* ehnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( _TXT("failed to create query analyzer: %s"), ehnd->fetchError());
 	}
 }
 

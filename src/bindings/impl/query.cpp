@@ -32,14 +32,14 @@ QueryEvalImpl::QueryEvalImpl( const ObjectRef& trace, const ObjectRef& objbuilde
 	m_queryproc = objBuilder->getQueryProcessor();
 	if (!m_queryproc)
 	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("error in get query processor: %s"), errorhnd->fetchError());
+		ErrorBufferInterface* ehnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( _TXT("error in get query processor: %s"), ehnd->fetchError());
 	}
 	m_queryeval_impl.resetOwnership( objBuilder->createQueryEval(), "QueryEval");
 	if (!m_queryeval_impl.get())
 	{
-		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("error creating query eval: %s"), errorhnd->fetchError());
+		ErrorBufferInterface* ehnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( _TXT("error creating query eval: %s"), ehnd->fetchError());
 	}
 }
 

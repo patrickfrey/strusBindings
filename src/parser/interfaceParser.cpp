@@ -572,8 +572,8 @@ public:
 	void print( 
 			std::string &out,
 			const std::map<std::string,std::string>& defmap,
-			const std::string& name,
-			const std::string& value) const
+			const std::string& name_,
+			const std::string& value_) const
 	{
 		std::vector<Chunk>::const_iterator ci = m_chunks.begin(), ce = m_chunks.end();
 		for (; ci != ce; ++ci)
@@ -584,13 +584,13 @@ public:
 					out.append( ci->m_value);
 					break;
 				case OuputVariable:
-					if (ci->m_value == "name" && !name.empty())
+					if (ci->m_value == "name" && !name_.empty())
 					{
-						out.append( name);
+						out.append( name_);
 					}
-					else if (ci->m_value == "value" && !value.empty())
+					else if (ci->m_value == "value" && !value_.empty())
 					{
-						out.append( value);
+						out.append( value_);
 					}
 					else
 					{
@@ -763,8 +763,8 @@ public:
 		expand(
 			const char* eventname,
 			const std::map<std::string,std::string>& defmap,
-			const std::string& name,
-			const std::string& value) const
+			const std::string& name_,
+			const std::string& value_) const
 	{
 		std::string out;
 		std::map<std::string,OutputDef>::const_iterator oi = m_output.find( eventname);
@@ -772,7 +772,7 @@ public:
 		{
 			try
 			{
-				oi->second.print( out, defmap, name, value);
+				oi->second.print( out, defmap, name_, value_);
 			}
 			catch (const std::runtime_error& err)
 			{
@@ -1359,8 +1359,7 @@ void InterfacesDef::parseClass( const std::string& className, const DocTagMap& c
 			{
 				continue;
 			}
-			else if (ident == "namespace" || ident == "enum" || ident == "typedef"
-				 || ident == "using" || ident == "struct")
+			else if (ident == "namespace" || ident == "enum" || ident == "typedef" || ident == "using" || ident == "struct")
 			{
 				skipStructure( si, se);
 			}
@@ -1417,8 +1416,8 @@ void InterfacesDef::parseClass( const std::string& className, const DocTagMap& c
 				{
 					if (si != se && isAlpha( *si))
 					{
-						std::string ident( parseIdentifier(si,se));
-						if (ident == "public")
+						std::string p_ident( parseIdentifier(si,se));
+						if (p_ident == "public")
 						{
 							if (si != se && *si == ':')
 							{

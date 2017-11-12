@@ -652,7 +652,6 @@ struct ParameterSructureExpanded
 
 	void printMethodCall( std::ostream& out, const std::string& indent, const std::string& methodname, const strus::VariableValue& returnvalue)
 	{
-		std::string expression;
 		if (param_converted.size() == 0)
 		{
 			out << indent << "if (argc > 0) throw strus::runtime_error( \"%s\", _TXT(\"no arguments expected\"));" << std::endl;

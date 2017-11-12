@@ -69,11 +69,11 @@ Index StorageClientImpl::documentFrequency( const std::string& type, const std::
 	return THIS->documentFrequency( type, term);
 }
 
-Index StorageClientImpl::documentNumber( const std::string& docid) const
+Index StorageClientImpl::documentNumber( const std::string& docid_) const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
 	if (!THIS) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
-	return THIS->documentNumber( docid);
+	return THIS->documentNumber( docid_);
 }
 
 Iterator StorageClientImpl::documentForwardIndexTerms( const Index& docno, const std::string& termtype, const Index& pos) const
