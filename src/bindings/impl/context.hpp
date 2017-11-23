@@ -175,9 +175,10 @@ public:
 	/// \example debug_serialize( [ surname:"John" lastname:"Doe" company:[ name:"ACME" url:"acme.com" ]] )
 	/// \note this function is used for verifying if the deserialization of binding language data structures work as expected
 	/// \param[in] arg structure to serialize as string for visualization (debuging)
+	/// \param[in] deterministic true, if output is deterministic
 	/// \return the input serialization as string
 	/// \example "open name 'surname' value 'John' name 'lastname' value 'Doe' name 'company' open name 'name' value 'ACME' name 'url' value 'acme.com' close close"
-	std::string debug_serialize( const ValueVariant& arg);
+	std::string debug_serialize( const ValueVariant& arg, bool deterministic=false);
 
 private:
 	void initStorageObjBuilder();

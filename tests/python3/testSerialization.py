@@ -41,11 +41,11 @@ estruct3 = OrderedDict((('foo', "bar"), ('spamm', "eggs"), ('ham', None)))
 estruct4 = ExampleTuple(  99, 1.23, "blabla" )
 
 result = "result:\n"
-result += "(%u)\n%s\n" % (1,ctx.debug_serialize( example))
-result += "(%u)\n%s\n" % (2,ctx.debug_serialize( estruct1))
-result += "(%u)\n%s\n" % (3,ctx.debug_serialize( estruct2))
-result += "(%u)\n%s\n" % (4,ctx.debug_serialize( estruct3))
-result += "(%u)\n%s\n" % (5,ctx.debug_serialize( estruct4))
+result += "(%u)\n%s\n" % (1,ctx.debug_serialize( example, True))
+result += "(%u)\n%s\n" % (2,ctx.debug_serialize( estruct1, True))
+result += "(%u)\n%s\n" % (3,ctx.debug_serialize( estruct2, True))
+result += "(%u)\n%s\n" % (4,ctx.debug_serialize( estruct3, True))
+result += "(%u)\n%s\n" % (5,ctx.debug_serialize( estruct4, True))
 
 expected = """result:
 (1)
@@ -111,10 +111,10 @@ close
 (4)
 name foo
 value 'bar'
-name spamm
-value 'eggs'
 name ham
 value NULL
+name spamm
+value 'eggs'
 
 (5)
 value 99

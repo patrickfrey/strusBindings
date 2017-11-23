@@ -34,6 +34,12 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "boolean")
 		("varname", "$val")
 	;
+	typesystem.defineType( "bool $val=false")
+		("argv_default", "false")
+		("argv_map", "ValueVariantWrap::tobool( $value)")
+		("typename", "boolean")
+		("varname", "$val")
+	;
 	typesystem.defineType( "Index")
 		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")

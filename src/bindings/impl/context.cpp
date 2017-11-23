@@ -402,7 +402,7 @@ void ContextImpl::close()
 	m_moduleloader_impl.reset();
 }
 
-std::string ContextImpl::debug_serialize( const ValueVariant& arg)
+std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool deterministic)
 {
 	if (!papuga_ValueVariant_defined( &arg))
 	{
@@ -413,7 +413,15 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg)
 		return ValueVariantWrap::tostring( arg);
 	}
 	papuga_ErrorCode errcode = papuga_Ok;
-	std::string rt = papuga::Serialization_tostring( *arg.value.serialization, errcode);
+	std::string rt;
+	if (deterministic)
+	{
+		rt = papuga::Serialization_tostring_deterministic( *arg.value.serialization, errcode);
+	}
+	else
+	{
+		rt = papuga::Serialization_tostring( *arg.value.serialization, errcode);
+	}
 	if (errcode != papuga_Ok)
 	{
 		throw papuga::error_exception( errcode, "method debug_serialize");

@@ -44,9 +44,9 @@ $estruct1 = new ExampleStruct( $e1, $e2);
 $estruct2 = new ExampleStruct( $example, $estruct1);
 
 $result = "result:\n";
-$result .= sprintf( "(%u)\n%s", 1, $ctx->debug_serialize( $example)) . "\n";
-$result .= sprintf( "(%u)\n%s", 2, $ctx->debug_serialize( $estruct1)) . "\n";
-$result .= sprintf( "(%u)\n%s", 3, $ctx->debug_serialize( $estruct2));
+$result .= sprintf( "(%u)\n%s", 1, $ctx->debug_serialize( $example, TRUE)) . "\n";
+$result .= sprintf( "(%u)\n%s", 2, $ctx->debug_serialize( $estruct1, TRUE)) . "\n";
+$result .= sprintf( "(%u)\n%s", 3, $ctx->debug_serialize( $estruct2, TRUE));
 }
 catch (Error $e)
 {
