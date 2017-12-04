@@ -464,6 +464,10 @@ make test
 %endif
 
 %changelog
+* Mon Dec 4 2017 Patrick Frey <patrickpfrey@yahoo.com> 0.15.4-0.1
+- adapt interface changes in papuga, reorganize code
+- added -Wshadow for C++ build
+
 * Fri Oct 13 2017 Patrick Frey <patrickpfrey@yahoo.com> 0.15.3-0.1
 - RPath fixes and some CMake file reorganization
 - some small fixes that came up with the travis build
