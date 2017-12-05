@@ -237,7 +237,10 @@ analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& co
 		if (!m_textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
 	}
 	Reference<analyzer::DocumentClass> dclass( new analyzer::DocumentClass());
-	if (m_textproc->detectDocumentClass( *dclass, content.c_str(), content.size()))
+	enum {MaxHdrSize = 8092};
+	std::size_t hdrsize = content.size() > MaxHdrSize ? MaxHdrSize : content.size();
+
+	if (m_textproc->detectDocumentClass( *dclass, content.c_str(), hdrsize, MaxHdrSize < content.size()))
 	{
 		return dclass.release();
 	}

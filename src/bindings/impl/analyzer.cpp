@@ -317,7 +317,10 @@ analyzer::DocumentClass DocumentAnalyzerImpl::getDocumentClass( const std::strin
 		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		if (!textproc) throw runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
-		if (!textproc->detectDocumentClass( detected_dclass, content.c_str(), content.size()))
+
+		enum {MaxHdrSize = 8092};
+		std::size_t hdrsize = content.size() > MaxHdrSize ? MaxHdrSize : content.size();
+		if (!textproc->detectDocumentClass( detected_dclass, content.c_str(), hdrsize, MaxHdrSize < content.size()))
 		{
 			if (errorhnd->hasError())
 			{
