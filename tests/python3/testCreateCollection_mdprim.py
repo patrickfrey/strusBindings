@@ -38,36 +38,16 @@ str config:
   str metadata: "lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
   str path: "storage"
 str docids:
-  number 1:
-    str docno: 10
-    str id: "1"
-  number 2:
-    str docno: 1
-    str id: "10"
-  number 3:
-    str docno: 9
-    str id: "2"
-  number 4:
-    str docno: 6
-    str id: "3"
-  number 5:
-    str docno: 5
-    str id: "4"
-  number 6:
-    str docno: 4
-    str id: "5"
-  number 7:
-    str docno: 8
-    str id: "6"
-  number 8:
-    str docno: 7
-    str id: "7"
-  number 9:
-    str docno: 2
-    str id: "8"
-  number 10:
-    str docno: 3
-    str id: "9"
+  number 1: "1"
+  number 2: "10"
+  number 3: "2"
+  number 4: "3"
+  number 5: "4"
+  number 6: "5"
+  number 7: "6"
+  number 8: "7"
+  number 9: "8"
+  number 10: "9"
 str docs:
   str 1:
     str ACL: "A"
@@ -173,21 +153,21 @@ str nofdocs: 10
 str stat:
   str dfchange:
     number 1:
-      str increment: 2
+      str increment: 5
       str type: "word"
-      str value: "5"
+      str value: "2"
     number 2:
       str increment: 3
       str type: "word"
       str value: "3"
     number 3:
+      str increment: 2
+      str type: "word"
+      str value: "5"
+    number 4:
       str increment: 1
       str type: "word"
       str value: "7"
-    number 4:
-      str increment: 5
-      str type: "word"
-      str value: "2"
   str nofdocs: 10
 str terms:
   str 10:word (f):

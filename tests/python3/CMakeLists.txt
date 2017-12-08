@@ -25,7 +25,5 @@ add_python3_test( CreateCollection_mdprim "${PY3_DATADIR}/mdprim" "${PY3_EXECDIR
 add_python3_test( Query_mdprim "${PY3_DATADIR}/mdprim"  "${PY3_EXECDIR}" )
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 add_python3_test( Vectors "${PY3_EXECDIR}" )
-add_python3_test( Serialization "${PY3_EXECDIR}" )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
-
-
+add_python3_test( Serialization "${PY3_EXECDIR}" )

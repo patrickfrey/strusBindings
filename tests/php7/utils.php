@@ -69,6 +69,15 @@ function dumpTree_( $indent, $o, $depth) {
 		return "\"$o\"";
 	} elseif (is_null($o)) {
 		return NULL;
+	} elseif (is_bool($o)) {
+		if ($o)
+		{
+			return "TRUE";
+		}
+		else
+		{
+			return "FALSE";
+		}
 	} else {
 		return dumpTree_( $indent, get_object_vars($o), $depth);
 	}

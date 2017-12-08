@@ -1,6 +1,16 @@
 <?php
 include_once "utils.php";
 
+function dfchange_compare( $a, $b) {
+	if ($a['type'] < $b['type']) {return -1;}
+	if ($a['type'] > $b['type']) {return +1;}
+	if ($a['value'] < $b['value']) {return -1;}
+	if ($a['value'] > $b['value']) {return +1;}
+	if ($a['increment'] < $b['increment']) {return -1;}
+	if ($a['increment'] > $b['increment']) {return +1;}
+	return 0;
+}
+
 function dumpCollection( $strusctx, $storagePath) {
 	$config = "path=" . $storagePath . '; cache=512M; statsproc=default';
 	$output = [];
@@ -24,8 +34,9 @@ function dumpCollection( $strusctx, $storagePath) {
 	$output_docids = [];
 	$dociditr = $storage->docids();
 	foreach ($dociditr as $tp) {
-		array_push( $output_docids, ['id' => $tp, 'docno' => $storage->documentNumber($tp)]);
+		array_push( $output_docids, $tp );
 	}
+	sort( $output_docids );
 	$output[ "docids"] = $output_docids;
 
 	# Term types:
@@ -64,19 +75,18 @@ function dumpCollection( $strusctx, $storagePath) {
 
 	# Term statistics:
 	$output_stat = [];
+	$dfchangelist = [];
+	$nofdocs = 0;
 	foreach ($storage->getAllStatistics( true) as $blob) {
 		$statview = $strusctx->unpackStatisticBlob( $blob, "default");
-		$dfchangelist = [];
+		$nofdocs += $statview->nofdocs;
 		foreach ($statview->dfchange as $dfchange) {
 			array_push( $dfchangelist, ["value" => $dfchange->value, "type" => $dfchange->type, "increment" => $dfchange->increment]);
 		}
-		$output_stat[ "dfchange"] = $dfchangelist;
-		if (!isset($output_stat[ "nofdocs"])) {
-			$output_stat[ "nofdocs"] = $statview->nofdocs;
-		} else {
-			$output_stat[ "nofdocs"] += $statview->nofdocs;
-		}
 	}
+	usort( $dfchangelist, "dfchange_compare");
+	$output_stat[ "dfchange"] = $dfchangelist;
+	$output_stat[ "nofdocs"] = $nofdocs;
 	$output[ "stat"] = $output_stat;
 
 	$storage->close();

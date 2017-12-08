@@ -24,8 +24,9 @@ function dumpCollection( strusctx, storagePath)
 	local output_docids = {}
 	local dociditr = storage:docids()
 	for tp in dociditr do
-		table.insert( output_docids, {id=tp,docno=storage:documentNumber(tp)})
+		table.insert( output_docids, tp)
 	end
+	table.sort( output_docids)
 	output[ "docids"] = output_docids
 
 	-- Term types:
@@ -63,17 +64,28 @@ function dumpCollection( strusctx, storagePath)
 	output[ "terms"] = output_terms
 
 	-- Term statistics:
-	local output_stat = {}
+	local dfchangelist = {}
+	local nofdocs = 0
+
+	function dfchange_less( a, b)
+		if a.type < b.type then return true end
+		if a.type > b.type then return false end
+		if a.value < b.value then return true end
+		if a.value > b.value then return false end
+		if a.increment < b.increment then return true end
+		if a.increment > b.increment then return false end
+		return false;
+	end
+
 	for blob in storage:getAllStatistics( true) do
 		local statview = strusctx:unpackStatisticBlob( blob, "default")
-		local dfchangelist = {}
+		nofdocs = nofdocs + statview[ "nofdocs"]
 		for _,dfchange in ipairs(statview[ "dfchange"]) do
 			table.insert( dfchangelist, dfchange)
 		end
-		output_stat[ "dfchange"] = dfchangelist
-		output_stat[ "nofdocs"] = (output_stat[ "nofdocs"] or 0) + statview[ "nofdocs"]
 	end
-	output[ "stat"] = output_stat
+	table.sort( dfchangelist, dfchange_less )
+	output[ "stat"] = { dfchange=dfchangelist, nofdocs=nofdocs }
 
 	storage:close()
 	return output

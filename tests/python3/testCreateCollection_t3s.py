@@ -37,15 +37,9 @@ str config:
   str metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
   str path: "storage"
 str docids:
-  number 1:
-    str docno: 3
-    str id: "A.xml"
-  number 2:
-    str docno: 2
-    str id: "B.xml"
-  number 3:
-    str docno: 1
-    str id: "C.xml"
+  number 1: "A.xml"
+  number 2: "B.xml"
+  number 3: "C.xml"
 str docs:
   str A.xml:
     str ACL: "a"
@@ -87,165 +81,165 @@ str nofdocs: 3
 str stat:
   str dfchange:
     number 1:
-      str increment: 1
-      str type: "word"
-      str value: "part"
+      str increment: 3
+      str type: "endtitle"
+      str value: ""
     number 2:
-      str increment: 1
+      str increment: 3
       str type: "word"
-      str value: "two"
+      str value: "a"
     number 3:
       str increment: 1
       str type: "word"
-      str value: "split"
+      str value: "as"
     number 4:
       str increment: 1
       str type: "word"
-      str value: "still"
+      str value: "can"
     number 5:
-      str increment: 1
+      str increment: 2
       str type: "word"
-      str value: "was"
+      str value: "citi"
     number 6:
       str increment: 1
       str type: "word"
-      str value: "first"
+      str value: "citizen"
     number 7:
       str increment: 1
       str type: "word"
-      str value: "i"
+      str value: "complet"
     number 8:
       str increment: 1
       str type: "word"
-      str value: "when"
+      str value: "day"
     number 9:
       str increment: 1
       str type: "word"
-      str value: "germani"
+      str value: "differ"
     number 10:
       str increment: 1
       str type: "word"
-      str value: "journey"
+      str value: "dimens"
     number 11:
       str increment: 1
       str type: "word"
-      str value: "can"
+      str value: "european"
     number 12:
       str increment: 1
       str type: "word"
-      str value: "dimens"
+      str value: "expect"
     number 13:
       str increment: 1
       str type: "word"
-      str value: "through"
+      str value: "first"
     number 14:
       str increment: 1
       str type: "word"
-      str value: "with"
+      str value: "germani"
     number 15:
       str increment: 1
       str type: "word"
-      str value: "t"
+      str value: "i"
     number 16:
       str increment: 1
       str type: "word"
       str value: "imagin"
     number 17:
-      str increment: 1
-      str type: "word"
-      str value: "new"
-    number 18:
       str increment: 2
       str type: "word"
-      str value: "visit"
-    number 19:
-      str increment: 1
-      str type: "word"
-      str value: "expect"
-    number 20:
-      str increment: 1
-      str type: "word"
-      str value: "citizen"
-    number 21:
+      str value: "in"
+    number 18:
       str increment: 1
       str type: "word"
       str value: "into"
-    number 22:
-      str increment: 1
+    number 19:
+      str increment: 2
       str type: "word"
-      str value: "what"
-    number 23:
+      str value: "is"
+    number 20:
       str increment: 1
       str type: "word"
       str value: "it"
+    number 21:
+      str increment: 1
+      str type: "word"
+      str value: "journey"
+    number 22:
+      str increment: 1
+      str type: "word"
+      str value: "new"
+    number 23:
+      str increment: 1
+      str type: "word"
+      str value: "one"
     number 24:
       str increment: 1
       str type: "word"
-      str value: "would"
+      str value: "part"
     number 25:
       str increment: 1
       str type: "word"
-      str value: "than"
+      str value: "split"
     number 26:
       str increment: 1
       str type: "word"
-      str value: "european"
+      str value: "still"
     number 27:
       str increment: 1
       str type: "word"
-      str value: "differ"
+      str value: "t"
     number 28:
       str increment: 1
       str type: "word"
-      str value: "complet"
+      str value: "than"
     number 29:
       str increment: 1
       str type: "word"
       str value: "that"
     number 30:
-      str increment: 2
-      str type: "word"
-      str value: "citi"
-    number 31:
-      str increment: 3
-      str type: "word"
-      str value: "a"
-    number 32:
-      str increment: 2
-      str type: "word"
-      str value: "is"
-    number 33:
-      str increment: 2
-      str type: "word"
-      str value: "in"
-    number 34:
       str increment: 1
       str type: "word"
-      str value: "york"
-    number 35:
-      str increment: 2
-      str type: "word"
-      str value: "you"
-    number 36:
+      str value: "through"
+    number 31:
       str increment: 1
       str type: "word"
       str value: "tokyo"
+    number 32:
+      str increment: 1
+      str type: "word"
+      str value: "two"
+    number 33:
+      str increment: 2
+      str type: "word"
+      str value: "visit"
+    number 34:
+      str increment: 1
+      str type: "word"
+      str value: "was"
+    number 35:
+      str increment: 1
+      str type: "word"
+      str value: "what"
+    number 36:
+      str increment: 1
+      str type: "word"
+      str value: "when"
     number 37:
       str increment: 1
       str type: "word"
-      str value: "day"
+      str value: "with"
     number 38:
       str increment: 1
       str type: "word"
-      str value: "as"
+      str value: "would"
     number 39:
       str increment: 1
       str type: "word"
-      str value: "one"
+      str value: "york"
     number 40:
-      str increment: 3
-      str type: "endtitle"
-      str value: ""
+      str increment: 2
+      str type: "word"
+      str value: "you"
   str nofdocs: 3
 str terms:
   str A.xml:endtitle (f): 

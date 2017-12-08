@@ -24,15 +24,9 @@ string config:
   string metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
   string path: "storage"
 string docids:
-  number 1:
-    string docno: 3
-    string id: "A.xml"
-  number 2:
-    string docno: 2
-    string id: "B.xml"
-  number 3:
-    string docno: 1
-    string id: "C.xml"
+  number 1: "A.xml"
+  number 2: "B.xml"
+  number 3: "C.xml"
 string docs:
   string A.xml:
     string ACL: "a"
@@ -74,165 +68,165 @@ string nofdocs: 3
 string stat:
   string dfchange:
     number 1:
-      string increment: 1
-      string type: "word"
-      string value: "part"
+      string increment: 3
+      string type: "endtitle"
+      string value: ""
     number 2:
-      string increment: 1
+      string increment: 3
       string type: "word"
-      string value: "two"
+      string value: "a"
     number 3:
       string increment: 1
       string type: "word"
-      string value: "split"
+      string value: "as"
     number 4:
       string increment: 1
       string type: "word"
-      string value: "still"
+      string value: "can"
     number 5:
-      string increment: 1
+      string increment: 2
       string type: "word"
-      string value: "was"
+      string value: "citi"
     number 6:
       string increment: 1
       string type: "word"
-      string value: "first"
+      string value: "citizen"
     number 7:
       string increment: 1
       string type: "word"
-      string value: "i"
+      string value: "complet"
     number 8:
       string increment: 1
       string type: "word"
-      string value: "when"
+      string value: "day"
     number 9:
       string increment: 1
       string type: "word"
-      string value: "germani"
+      string value: "differ"
     number 10:
       string increment: 1
       string type: "word"
-      string value: "journey"
+      string value: "dimens"
     number 11:
       string increment: 1
       string type: "word"
-      string value: "can"
+      string value: "european"
     number 12:
       string increment: 1
       string type: "word"
-      string value: "dimens"
+      string value: "expect"
     number 13:
       string increment: 1
       string type: "word"
-      string value: "through"
+      string value: "first"
     number 14:
       string increment: 1
       string type: "word"
-      string value: "with"
+      string value: "germani"
     number 15:
       string increment: 1
       string type: "word"
-      string value: "t"
+      string value: "i"
     number 16:
       string increment: 1
       string type: "word"
       string value: "imagin"
     number 17:
-      string increment: 1
-      string type: "word"
-      string value: "new"
-    number 18:
       string increment: 2
       string type: "word"
-      string value: "visit"
-    number 19:
-      string increment: 1
-      string type: "word"
-      string value: "expect"
-    number 20:
-      string increment: 1
-      string type: "word"
-      string value: "citizen"
-    number 21:
+      string value: "in"
+    number 18:
       string increment: 1
       string type: "word"
       string value: "into"
-    number 22:
-      string increment: 1
+    number 19:
+      string increment: 2
       string type: "word"
-      string value: "what"
-    number 23:
+      string value: "is"
+    number 20:
       string increment: 1
       string type: "word"
       string value: "it"
+    number 21:
+      string increment: 1
+      string type: "word"
+      string value: "journey"
+    number 22:
+      string increment: 1
+      string type: "word"
+      string value: "new"
+    number 23:
+      string increment: 1
+      string type: "word"
+      string value: "one"
     number 24:
       string increment: 1
       string type: "word"
-      string value: "would"
+      string value: "part"
     number 25:
       string increment: 1
       string type: "word"
-      string value: "than"
+      string value: "split"
     number 26:
       string increment: 1
       string type: "word"
-      string value: "european"
+      string value: "still"
     number 27:
       string increment: 1
       string type: "word"
-      string value: "differ"
+      string value: "t"
     number 28:
       string increment: 1
       string type: "word"
-      string value: "complet"
+      string value: "than"
     number 29:
       string increment: 1
       string type: "word"
       string value: "that"
     number 30:
-      string increment: 2
-      string type: "word"
-      string value: "citi"
-    number 31:
-      string increment: 3
-      string type: "word"
-      string value: "a"
-    number 32:
-      string increment: 2
-      string type: "word"
-      string value: "is"
-    number 33:
-      string increment: 2
-      string type: "word"
-      string value: "in"
-    number 34:
       string increment: 1
       string type: "word"
-      string value: "york"
-    number 35:
-      string increment: 2
-      string type: "word"
-      string value: "you"
-    number 36:
+      string value: "through"
+    number 31:
       string increment: 1
       string type: "word"
       string value: "tokyo"
+    number 32:
+      string increment: 1
+      string type: "word"
+      string value: "two"
+    number 33:
+      string increment: 2
+      string type: "word"
+      string value: "visit"
+    number 34:
+      string increment: 1
+      string type: "word"
+      string value: "was"
+    number 35:
+      string increment: 1
+      string type: "word"
+      string value: "what"
+    number 36:
+      string increment: 1
+      string type: "word"
+      string value: "when"
     number 37:
       string increment: 1
       string type: "word"
-      string value: "day"
+      string value: "with"
     number 38:
       string increment: 1
       string type: "word"
-      string value: "as"
+      string value: "would"
     number 39:
       string increment: 1
       string type: "word"
-      string value: "one"
+      string value: "york"
     number 40:
-      string increment: 3
-      string type: "endtitle"
-      string value: ""
+      string increment: 2
+      string type: "word"
+      string value: "you"
   string nofdocs: 3
 string terms:
   string A.xml:endtitle (f): 

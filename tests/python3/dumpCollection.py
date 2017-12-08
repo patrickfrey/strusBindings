@@ -23,9 +23,9 @@ def dumpCollection( strusctx, storagePath):
 	output_docids = []
 	dociditr = storage.docids()
 	for tp in dociditr:
-		output_docids.append( {'id':tp, 'docno':storage.documentNumber(tp)} )
+		output_docids.append( tp )
 
-	output[ "docids"] = output_docids
+	output[ "docids"] = sorted( output_docids)
 
 	# Term types:
 	termtypes = joinLists( storage.termTypes())
@@ -60,19 +60,17 @@ def dumpCollection( strusctx, storagePath):
 
 	# Term statistics:
 	output_stat = {}
+	dfchangelist = []
+	nofdocs = 0
 	for blob in storage.getAllStatistics( True):
 		statview = strusctx.unpackStatisticBlob( blob, "default")
-		dfchangelist = []
+		nofdocs += statview.nofdocs
 		for dfchange in statview.dfchange:
 			dfchangelist.append( {'type':dfchange.type, 'value':dfchange.value, 'increment':dfchange.increment})
 
-		output_stat[ "dfchange"] = dfchangelist
-		if "nofdocs" in output_stat:
-			output_stat[ "nofdocs"] += statview.nofdocs
-		else:
-			output_stat[ "nofdocs"] = statview.nofdocs
-
 	output[ "stat"] = output_stat
+	output_stat[ "dfchange"] = sorted( dfchangelist, key=lambda dfchange: "%s %s %d" % (dfchange['type'], dfchange['value'], dfchange['increment']) )
+	output_stat[ "nofdocs"] = nofdocs
 
 	storage.close()
 	return output
