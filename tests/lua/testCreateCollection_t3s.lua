@@ -33,7 +33,6 @@ string docs:
     string docclass: "mimetype=application/xml, encoding=UTF-8, scheme="
     string docid: "A.xml"
     string doclen: 20
-    string docno: 3
     string endtitle: ""
     string orig: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen."
     string title: "One day in Tokyo"
@@ -45,7 +44,6 @@ string docs:
     string docclass: "mimetype=application/xml, encoding=UTF-8, scheme="
     string docid: "B.xml"
     string doclen: 16
-    string docno: 2
     string endtitle: ""
     string orig: "A visit in New York New York is a city with dimensions you can't imagine."
     string title: "A visit in New York"
@@ -57,7 +55,6 @@ string docs:
     string docclass: "mimetype=application/xml, encoding=UTF-8, scheme="
     string docid: "C.xml"
     string doclen: 16
-    string docno: 1
     string endtitle: ""
     string orig: "A journey through Germany When I first visited germany it was still splitted into two parts."
     string title: "A journey through Germany"

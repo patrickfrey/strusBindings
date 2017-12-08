@@ -50,7 +50,10 @@ function dumpCollection( $strusctx, $storagePath) {
 	foreach ($storage->select( $selectids, NULL, NULL, 0) as $docrow) {
 		$flatdocrow = [];
 		foreach ($docrow as $colkey => $colval) {
-			$flatdocrow[ $colkey] = concatValues( $colval);
+			if ($colkey != 'docno')
+			{
+				$flatdocrow[ $colkey] = concatValues( $colval);
+			}
 		}
 		$output_docs[ $docrow['docid']] = $flatdocrow;
 

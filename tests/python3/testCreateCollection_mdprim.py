@@ -54,7 +54,6 @@ str docs:
     str cross: 1
     str docid: "1"
     str doclen: 0
-    str docno: 10
     str factors: 0
     str hi: 0
     str lo: 0
@@ -64,7 +63,6 @@ str docs:
     str cross: 1
     str docid: "10"
     str doclen: 2
-    str docno: 1
     str factors: 1
     str hi: 5
     str lo: 2
@@ -74,7 +72,6 @@ str docs:
     str cross: 2
     str docid: "2"
     str doclen: 1
-    str docno: 9
     str factors: 0
     str hi: 2
     str lo: 2
@@ -84,7 +81,6 @@ str docs:
     str cross: 3
     str docid: "3"
     str doclen: 1
-    str docno: 6
     str factors: 0
     str hi: 3
     str lo: 3
@@ -94,7 +90,6 @@ str docs:
     str cross: 4
     str docid: "4"
     str doclen: 2
-    str docno: 5
     str factors: 1
     str hi: 2
     str lo: 2
@@ -104,7 +99,6 @@ str docs:
     str cross: 5
     str docid: "5"
     str doclen: 1
-    str docno: 4
     str factors: 0
     str hi: 5
     str lo: 5
@@ -114,7 +108,6 @@ str docs:
     str cross: 6
     str docid: "6"
     str doclen: 2
-    str docno: 8
     str factors: 1
     str hi: 3
     str lo: 2
@@ -124,7 +117,6 @@ str docs:
     str cross: 7
     str docid: "7"
     str doclen: 1
-    str docno: 7
     str factors: 0
     str hi: 7
     str lo: 7
@@ -134,7 +126,6 @@ str docs:
     str cross: 8
     str docid: "8"
     str doclen: 3
-    str docno: 2
     str factors: 2
     str hi: 2
     str lo: 2
@@ -144,7 +135,6 @@ str docs:
     str cross: 9
     str docid: "9"
     str doclen: 2
-    str docno: 3
     str factors: 1
     str hi: 3
     str lo: 3

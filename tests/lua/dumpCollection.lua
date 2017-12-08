@@ -40,7 +40,9 @@ function dumpCollection( strusctx, storagePath)
 	for docrow in storage:select( selectids, nil, nil, 0) do
 		flatdocrow = {}
 		for colkey,colval in pairs(docrow) do
-			flatdocrow[ colkey] = concatValues( colval)
+			if colkey ~= "docno" then
+				flatdocrow[ colkey] = concatValues( colval)
+			end
 		end
 		output_docs[ docrow.docid] = flatdocrow
 

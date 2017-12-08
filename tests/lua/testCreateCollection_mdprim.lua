@@ -40,7 +40,6 @@ string docs:
     string cross: 1
     string docid: "1"
     string doclen: 0
-    string docno: 10
     string factors: 0
     string hi: 0
     string lo: 0
@@ -49,7 +48,6 @@ string docs:
     string cross: 1
     string docid: "10"
     string doclen: 2
-    string docno: 1
     string factors: 1
     string hi: 5
     string lo: 2
@@ -59,7 +57,6 @@ string docs:
     string cross: 2
     string docid: "2"
     string doclen: 1
-    string docno: 9
     string factors: 0
     string hi: 2
     string lo: 2
@@ -69,7 +66,6 @@ string docs:
     string cross: 3
     string docid: "3"
     string doclen: 1
-    string docno: 6
     string factors: 0
     string hi: 3
     string lo: 3
@@ -79,7 +75,6 @@ string docs:
     string cross: 4
     string docid: "4"
     string doclen: 2
-    string docno: 5
     string factors: 1
     string hi: 2
     string lo: 2
@@ -89,7 +84,6 @@ string docs:
     string cross: 5
     string docid: "5"
     string doclen: 1
-    string docno: 4
     string factors: 0
     string hi: 5
     string lo: 5
@@ -99,7 +93,6 @@ string docs:
     string cross: 6
     string docid: "6"
     string doclen: 2
-    string docno: 8
     string factors: 1
     string hi: 3
     string lo: 2
@@ -109,7 +102,6 @@ string docs:
     string cross: 7
     string docid: "7"
     string doclen: 1
-    string docno: 7
     string factors: 0
     string hi: 7
     string lo: 7
@@ -119,7 +111,6 @@ string docs:
     string cross: 8
     string docid: "8"
     string doclen: 3
-    string docno: 2
     string factors: 2
     string hi: 2
     string lo: 2
@@ -129,7 +120,6 @@ string docs:
     string cross: 9
     string docid: "9"
     string doclen: 2
-    string docno: 3
     string factors: 1
     string hi: 3
     string lo: 3
@@ -269,5 +259,4 @@ string types:
 ]]
 
 verifyTestOutput( outputdir, result, expected)
-
 

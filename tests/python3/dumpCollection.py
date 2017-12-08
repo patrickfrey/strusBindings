@@ -38,7 +38,8 @@ def dumpCollection( strusctx, storagePath):
 	for docrow in storage.select( selectids, None, None, 0):
 		flatdocrow = {}
 		for colkey,colval in docrow.items():
-			flatdocrow[ colkey] = concatValues( colval)
+			if colkey != 'docno':
+				flatdocrow[ colkey] = concatValues( colval)
 		output_docs[ docrow['docid']] = flatdocrow
 
 		for termtype in termtypes:
