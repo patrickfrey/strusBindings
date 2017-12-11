@@ -7,7 +7,6 @@ add_custom_target( LuaTestExecDir ALL COMMAND ${CMAKE_COMMAND} -E make_directory
 
 set( TEST_LD_LIBRARY_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/lua" )
 set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${CMAKE_CURRENT_BINARY_DIR}/../../src/bindings" )
-set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${Boost_LIBRARY_DIRS}" )
 
 macro( add_lua_test name )
     add_test( Lua${name} ${CMAKE_CURRENT_BINARY_DIR}/../../src/lang/lua/strusLua  "${PROJECT_SOURCE_DIR}/tests/lua/test${name}.lua"  ${ARGN}  )

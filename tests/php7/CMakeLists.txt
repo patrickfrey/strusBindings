@@ -13,7 +13,6 @@ add_custom_target( Php7TestExecDir ALL COMMAND ${CMAKE_COMMAND} -E make_director
 
 set( TEST_LD_LIBRARY_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/php7" )
 set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${CMAKE_CURRENT_BINARY_DIR}/../../src/bindings" )
-set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${Boost_LIBRARY_DIRS}" )
 
 macro(add_php7_test name )
     add_test( Php7${name} ${PHP7_EXECUTABLE} -c ${CMAKE_CURRENT_BINARY_DIR}/php.ini -f "${PHP7_TESTDIR}/test${name}.php"  ${ARGN} )

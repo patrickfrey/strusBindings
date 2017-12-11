@@ -7,7 +7,6 @@ add_custom_target( Python3TestExecDir ALL COMMAND ${CMAKE_COMMAND} -E make_direc
 
 set( TEST_LD_LIBRARY_PATH "${CMAKE_CURRENT_BINARY_DIR}/../../3rdParty/papuga/python3" )
 set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${CMAKE_CURRENT_BINARY_DIR}/../../src/bindings" )
-set( TEST_LD_LIBRARY_PATH "${TEST_LD_LIBRARY_PATH}:${Boost_LIBRARY_DIRS}" )
 
 macro(add_python3_test name )
     add_test( Python3${name} ${PYTHON3_EXECUTABLE}  "${PY3_TESTDIR}/test${name}.py"  ${ARGN} )
