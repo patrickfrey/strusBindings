@@ -11,6 +11,7 @@
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/base/string_conv.hpp"
 #include "papuga/serialization.h"
 #include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
@@ -18,7 +19,6 @@
 #include "internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
-#include "utils.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
 
@@ -507,15 +507,15 @@ void QueryAnalyzerImpl::definePatternMatcherPostProcFromFile(
 
 static QueryAnalyzerContextInterface::GroupBy getImplicitGroupBy( const std::string& name)
 {
-	if (name.empty() || utils::caseInsensitiveEquals( name, "all"))
+	if (name.empty() || strus::caseInsensitiveEquals( name, "all"))
 	{
 		return QueryAnalyzerContextInterface::GroupAll;
 	}
-	else if (utils::caseInsensitiveEquals( name, "position"))
+	else if (strus::caseInsensitiveEquals( name, "position"))
 	{
 		return QueryAnalyzerContextInterface::GroupByPosition;
 	}
-	else if (utils::caseInsensitiveEquals( name, "every"))
+	else if (strus::caseInsensitiveEquals( name, "every"))
 	{
 		throw strus::runtime_error(_TXT("'%s' does not make sense as implicit grouping operation"), name.c_str());
 	}

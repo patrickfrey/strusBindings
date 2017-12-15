@@ -12,7 +12,6 @@ set( bindings_source_files
 	deserializer.cpp
 	valueVariantWrap.cpp
 	callResultUtils.cpp
-	utils.cpp
 	traceUtils.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/internationalization.cpp
 	impl/value/termExpression.cpp

@@ -24,13 +24,13 @@
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/metadataComparison.hpp"
 #include "strus/bindingObjects.h"
+#include "strus/base/enable_if.hpp"
+#include "strus/base/type_traits.hpp"
 #include <string>
 #include <vector>
 #include <utility>
 #include <cstring>
 #include <stdexcept>
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits.hpp>
 
 namespace strus {
 namespace bindings {
@@ -67,7 +67,7 @@ class Serializer
 {
 public:
 	template<typename SERVAL>
-	static typename boost::enable_if_c<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, SERVAL& param)
+	static typename strus::enable_if<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, SERVAL& param)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
 		if (papuga_Serialization_empty( result))
@@ -77,7 +77,7 @@ public:
 		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 	template<typename SERVAL>
-	static typename boost::enable_if_c<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param)
+	static typename strus::enable_if<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
 		if (papuga_Serialization_empty( result))
@@ -87,7 +87,7 @@ public:
 		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 	template<typename SERVAL>
-	static typename boost::enable_if_c<!has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param)
+	static typename strus::enable_if<!has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
 		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
@@ -165,28 +165,28 @@ private:
 	struct maptype_ {};
 
 	template <typename T>
-	static typename boost::enable_if_c<
-		boost::is_arithmetic<T>::value 
-		|| boost::is_same<std::string,T>::value
-		|| boost::is_same<char*,T>::value
-		|| boost::is_same<const char*,T>::value
-		|| boost::is_same<NumericVariant,T>::value
-		|| boost::is_same<papuga_ValueVariant,T>::value
+	static typename strus::enable_if<
+		strus::is_arithmetic<T>::value 
+		|| strus::is_same<std::string,T>::value
+		|| strus::is_same<char*,T>::value
+		|| strus::is_same<const char*,T>::value
+		|| strus::is_same<NumericVariant,T>::value
+		|| strus::is_same<papuga_ValueVariant,T>::value
 		,const atomictype_&>::type getCategory( const T&) { static atomictype_ rt; return rt;}
 
 	template <typename T>
-	static typename boost::enable_if_c<
+	static typename strus::enable_if<
 		has_structid<T>::value
 		,const structtype_&>::type getCategory( const T&) { static structtype_ rt; return rt;}
 
 	template <typename T>
-	static typename boost::enable_if_c<
-		!(boost::is_arithmetic<T>::value 
-		|| boost::is_same<std::string,T>::value
-		|| boost::is_same<char*,T>::value
-		|| boost::is_same<const char*,T>::value
-		|| boost::is_same<NumericVariant,T>::value
-		|| boost::is_same<papuga_ValueVariant,T>::value
+	static typename strus::enable_if<
+		!(strus::is_arithmetic<T>::value 
+		|| strus::is_same<std::string,T>::value
+		|| strus::is_same<char*,T>::value
+		|| strus::is_same<const char*,T>::value
+		|| strus::is_same<NumericVariant,T>::value
+		|| strus::is_same<papuga_ValueVariant,T>::value
 		|| has_structid<T>::value)
 		,const maptype_&>::type getCategory( const T&) { static maptype_ rt; return rt;}
 

@@ -9,7 +9,7 @@
 #define _PAPUGA_OBJECT_REFERENCE_HPP_INCLUDED
 /// \brief Reference to host object from the scripting language
 /// \file ObjectRef.hpp
-#include <boost/shared_ptr.hpp>
+#include "strus/base/shared_ptr.hpp"
 #include <stdexcept>
 
 #define STRUS_USE_RTTI_TYPECHECK
@@ -193,7 +193,7 @@ public:
 		return obj;
 	}
 private:
-	boost::shared_ptr<void> m_ptr;
+	strus::shared_ptr<void> m_ptr;
 #ifdef STRUS_LOWLEVEL_DEBUG
 	const char* m_name;
 #endif

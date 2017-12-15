@@ -249,7 +249,7 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 			return val.value.Int; 
 		case papuga::ValueVariant::String:
 		{
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			double rt = doubleFromString( val.value.string, val.length(), err);
 			checkError( err, "double");
 			return rt;
@@ -258,7 +258,7 @@ double ValueVariantConv::todouble( const ValueVariant& val)
 		{
 			char buf[ 64];
 			std::size_t bufsize = map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to double"));
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			double rt = doubleFromString( buf, bufsize, err);
 			checkError( err, "double");
 			return rt;
@@ -309,7 +309,7 @@ static TYPE variant_touint( const ValueVariant& val)
 			return (TYPE)(papuga::ValueVariant::UIntType)val.value.Int; 
 		case papuga::ValueVariant::String:
 		{
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			TYPE rt = uintFromString( val.value.string, val.length(), std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
 			return rt;
@@ -318,7 +318,7 @@ static TYPE variant_touint( const ValueVariant& val)
 		{
 			char buf[ 64];
 			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to uint"));
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			TYPE rt = uintFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "uint");
 			return rt;
@@ -371,7 +371,7 @@ static TYPE variant_toint( const ValueVariant& val)
 			return val.value.Int; 
 		case papuga::ValueVariant::String:
 		{
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			TYPE rt = intFromString( val.value.string, val.length(), std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");
 			return rt;
@@ -380,7 +380,7 @@ static TYPE variant_toint( const ValueVariant& val)
 		{
 			char buf[ 64];
 			std::size_t bufsize = ValueVariantConv::map2ascii( buf, sizeof(buf), val.value.wstring, val.length(), _TXT("conversion to int"));
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			TYPE rt = intFromString( buf, bufsize, std::numeric_limits<TYPE>::max(), err);
 			checkError( err, "int");
 			return rt;
@@ -474,7 +474,7 @@ static bool try_convertStringToNumber( ValueVariant& val, const char* str, std::
 	{
 		if (sign)
 		{
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			int64_t res = uintFromString( str, strsize, std::numeric_limits<int64_t>::max(), err);
 			if (err == NumParserOk)
 			{
@@ -484,7 +484,7 @@ static bool try_convertStringToNumber( ValueVariant& val, const char* str, std::
 		}
 		else
 		{
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			uint64_t res = uintFromString( str, strsize, std::numeric_limits<uint64_t>::max(), err);
 			if (err == NumParserOk)
 			{
@@ -499,7 +499,7 @@ static bool try_convertStringToNumber( ValueVariant& val, const char* str, std::
 		for (; si != se && str[si] >= '0' && str[si] <= '9'; ++si){}
 		if (si == se)
 		{
-			NumParseError err;
+			NumParseError err = NumParseOk;
 			double res = doubleFromString( str, strsize, err);
 			if (err == NumParserOk)
 			{

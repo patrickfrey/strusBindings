@@ -16,6 +16,7 @@
 #include "strus/attributeReaderInterface.hpp"
 #include "strus/aclReaderInterface.hpp"
 #include "strus/constants.hpp"
+#include "strus/base/string_conv.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -89,15 +90,15 @@ SelectIterator::SelectIterator(
 	for (; ei != ee; ++ei)
 	{
 		Index eh;
-		if (utils::caseInsensitiveEquals( *ei, strus::Constants::identifier_position()))
+		if (strus::caseInsensitiveEquals( *ei, strus::Constants::identifier_position()))
 		{
 			m_items.push_back( ItemDef( *ei, ItemDef::Position));
 		}
-		else if (utils::caseInsensitiveEquals( *ei, strus::Constants::identifier_docno()))
+		else if (strus::caseInsensitiveEquals( *ei, strus::Constants::identifier_docno()))
 		{
 			m_items.push_back( ItemDef( *ei, ItemDef::Docno));
 		}
-		else if (utils::caseInsensitiveEquals( *ei, strus::Constants::identifier_acl()))
+		else if (strus::caseInsensitiveEquals( *ei, strus::Constants::identifier_acl()))
 		{
 			if (!aclreader)
 			{
