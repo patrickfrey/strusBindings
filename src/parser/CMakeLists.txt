@@ -10,7 +10,7 @@ set( source_files
 )
 
 include_directories(
-	"${Boost_INCLUDE_DIRS}"
+	${Boost_INCLUDE_DIRS}
 	"${Intl_INCLUDE_DIRS}"
 	"${BINDINGS_INCLUDE_DIRS}"
 	"${PAPUGA_INCLUDE_DIRS}"
@@ -20,7 +20,7 @@ include_directories(
 )
 
 link_directories(
-	"${Boost_LIBRARY_DIRS}"
+	${Boost_LIBRARY_DIRS}
 	"${strusbase_LIBRARY_DIRS}"
 	"${strus_LIBRARY_DIRS}"
 	"${strusanalyzer_LIBRARY_DIRS}"
