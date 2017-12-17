@@ -35,7 +35,7 @@ case $OS in
 		brew tap homebrew/homebrew-php
 		brew install \
 			gettext \
-			snappy 
+			snappy \
 			leveldb \
 			lapack \
 			blas \
