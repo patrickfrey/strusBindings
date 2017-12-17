@@ -33,15 +33,8 @@ case $OS in
 		brew upgrade cmake
 		brew upgrade boost
 		brew tap homebrew/homebrew-php
-		brew install \
-			gettext \
-			snappy \
-			leveldb \
-			lapack \
-			blas \
-			python3 \
-			php70 \
-			|| true
+		brew install cmake boost gettext snappy leveldb || true
+		brew install lapack blas python3 php70 || true
 		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
 		brew link leveldb || true
