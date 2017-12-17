@@ -19,7 +19,7 @@ case $OS in
 		sudo locale-gen en_US.UTF-8
 		sudo LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 add-apt-repository -y ppa:ondrej/php
 		sudo LC_ALL=en_US.UTF-8 apt-get update
-		sudo LC_ALL=en_US.UTF-8 apt-get install -y php7.1 php7.1-dev
+		sudo LC_ALL=en_US.UTF-8 apt-get install -y php7.0 php7.0-dev
 		;;
 
 	Darwin)
@@ -40,7 +40,7 @@ case $OS in
 			lapack \
 			blas \
 			python3 \
-			php71 \
+			php70 \
 			|| true
 		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
