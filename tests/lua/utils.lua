@@ -52,15 +52,17 @@ function dumpValue( o)
 	return dumpValue_( o, 10)
 end
 
-function dumpTree_( indent, o, depth)
+function dumpTree_( indent, o, depth, excludeSet)
 	if type(o) == 'table' then
 		if (depth == 0) then
 			return "{...}"
 		end
 		local keyset = {}
-		
+
 		for k,v in pairs(o) do
-			table.insert( keyset, k)
+			if (excludeSet[k] == nil) then
+				table.insert( keyset, k)
+			end
 		end
 		function compare(a,b)
 			return a < b
@@ -69,7 +71,7 @@ function dumpTree_( indent, o, depth)
 		local s = ''
 		for i,k in ipairs(keyset) do
 			local ke = "\n" .. indent .. type(k) .. " " .. k
-			local ve = dumpTree_( indent .. '  ', o[ k], depth-1)
+			local ve = dumpTree_( indent .. '  ', o[ k], depth-1, excludeSet)
 			if string.sub( ve,1,1) == "\n" then
 				s = s .. ke .. ":" .. ve
 			else
@@ -91,9 +93,15 @@ function dumpTree_( indent, o, depth)
 	end
 end
 function dumpTree( o)
-	return dumpTree_( "", o, 10)
+	return dumpTree_( "", o, 10, {})
 end
-
+function dumpTreeWithFilter( o, excludeList)
+	excludeSet = {}
+	for _,exl in ipairs(excludeList) do
+		excludeSet[ exl] = true
+	end
+	return dumpTree_( "", o, 10, excludeSet)
+end
 function readFile( path)
 	local file = io.open( path, "rb") -- r read mode and b binary mode
 	if not file then

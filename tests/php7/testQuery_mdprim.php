@@ -120,8 +120,7 @@ try
 	$output_list = [];
 	foreach ($results->ranks as $pos => $result) {
 		$weightstr = number_format((float)$result->weight, 5, '.', '');
-		$docno = $result->docno;
-		array_push( $output_list, "rank $pos: $docno $weightstr");
+		array_push( $output_list, "rank $pos: $weightstr");
 		foreach ($result->summary as $sidx => $si) {
 			array_push( $output_list, "    " . $si->name . ": '" . $si->value . "'");
 		}
@@ -129,7 +128,7 @@ try
 	
 	$output[ "ResultList"] = $output_list;
 	
-	$result = "query evaluation:" . dumpTree( $output);
+	$result = "query evaluation:" . dumpTreeWithFilter( $output, ['docno']);
 }
 catch (Error $e)
 {
@@ -147,6 +146,7 @@ string QueryDump: "query evaluation program:
 SELECT select;
 EVAL  tf( match= %seek);
 EVAL  metadata( name=doclen, weight=1);
+EVAL  metadata( name=docidx, weight=1);
 SUMMARIZE attribute( metaname='docid', resultname='docid');
 SUMMARIZE metadata( metaname='cross', resultname='cross');
 SUMMARIZE metadata( metaname='factors', resultname='factors');
@@ -251,7 +251,6 @@ string QueryResult:
   string pass: 0
   string ranks: 
     integer 0: 
-      string docno: 377
       string summary: 
         integer 0: 
           string index: -1
@@ -318,9 +317,8 @@ string QueryResult:
           string name: "word"
           string value: 3
           string weight: 1
-      string weight: 0.5
+      string weight: 0.50062
     integer 1: 
-      string docno: 376
       string summary: 
         integer 0: 
           string index: -1
@@ -387,9 +385,8 @@ string QueryResult:
           string name: "word"
           string value: 5
           string weight: 1
-      string weight: 0.5
+      string weight: 0.50004
     integer 2: 
-      string docno: 983
       string summary: 
         integer 0: 
           string index: -1
@@ -431,68 +428,8 @@ string QueryResult:
           string name: "word"
           string value: 5
           string weight: 1
-      string weight: 0.33333
+      string weight: 0.3343
     integer 3: 
-      string docno: 828
-      string summary: 
-        integer 0: 
-          string index: -1
-          string name: "docid"
-          string value: 240
-          string weight: 1
-        integer 1: 
-          string index: -1
-          string name: "cross"
-          string value: 6
-          string weight: 1
-        integer 2: 
-          string index: -1
-          string name: "factors"
-          string value: 5
-          string weight: 1
-        integer 3: 
-          string index: -1
-          string name: "lo"
-          string value: 2
-          string weight: 1
-        integer 4: 
-          string index: -1
-          string name: "hi"
-          string value: 5
-          string weight: 1
-        integer 5: 
-          string index: 1
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 6: 
-          string index: 2
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 7: 
-          string index: 3
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 8: 
-          string index: 4
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 9: 
-          string index: 5
-          string name: "word"
-          string value: 3
-          string weight: 1
-        integer 10: 
-          string index: 6
-          string name: "word"
-          string value: 5
-          string weight: 1
-      string weight: 0.33333
-    integer 4: 
-      string docno: 809
       string summary: 
         integer 0: 
           string index: -1
@@ -534,9 +471,8 @@ string QueryResult:
           string name: "word"
           string value: 7
           string weight: 1
-      string weight: 0.33333
-    integer 5: 
-      string docno: 716
+      string weight: 0.33429
+    integer 4: 
       string summary: 
         integer 0: 
           string index: -1
@@ -593,9 +529,66 @@ string QueryResult:
           string name: "word"
           string value: 3
           string weight: 1
-      string weight: 0.33333
+      string weight: 0.33424
+    integer 5: 
+      string summary: 
+        integer 0: 
+          string index: -1
+          string name: "docid"
+          string value: 240
+          string weight: 1
+        integer 1: 
+          string index: -1
+          string name: "cross"
+          string value: 6
+          string weight: 1
+        integer 2: 
+          string index: -1
+          string name: "factors"
+          string value: 5
+          string weight: 1
+        integer 3: 
+          string index: -1
+          string name: "lo"
+          string value: 2
+          string weight: 1
+        integer 4: 
+          string index: -1
+          string name: "hi"
+          string value: 5
+          string weight: 1
+        integer 5: 
+          string index: 1
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 6: 
+          string index: 2
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 7: 
+          string index: 3
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 8: 
+          string index: 4
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 9: 
+          string index: 5
+          string name: "word"
+          string value: 3
+          string weight: 1
+        integer 10: 
+          string index: 6
+          string name: "word"
+          string value: 5
+          string weight: 1
+      string weight: 0.33409
     integer 6: 
-      string docno: 599
       string summary: 
         integer 0: 
           string index: -1
@@ -657,58 +650,8 @@ string QueryResult:
           string name: "word"
           string value: 3
           string weight: 1
-      string weight: 0.28571
+      string weight: 0.28643
     integer 7: 
-      string docno: 996
-      string summary: 
-        integer 0: 
-          string index: -1
-          string name: "docid"
-          string value: 210
-          string weight: 1
-        integer 1: 
-          string index: -1
-          string name: "cross"
-          string value: 3
-          string weight: 1
-        integer 2: 
-          string index: -1
-          string name: "factors"
-          string value: 3
-          string weight: 1
-        integer 3: 
-          string index: -1
-          string name: "lo"
-          string value: 2
-          string weight: 1
-        integer 4: 
-          string index: -1
-          string name: "hi"
-          string value: 7
-          string weight: 1
-        integer 5: 
-          string index: 1
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 6: 
-          string index: 2
-          string name: "word"
-          string value: 3
-          string weight: 1
-        integer 7: 
-          string index: 3
-          string name: "word"
-          string value: 5
-          string weight: 1
-        integer 8: 
-          string index: 4
-          string name: "word"
-          string value: 7
-          string weight: 1
-      string weight: 0.25
-    integer 8: 
-      string docno: 789
       string summary: 
         integer 0: 
           string index: -1
@@ -755,9 +698,8 @@ string QueryResult:
           string name: "word"
           string value: 5
           string weight: 1
-      string weight: 0.25
-    integer 9: 
-      string docno: 774
+      string weight: 0.25094
+    integer 8: 
       string summary: 
         integer 0: 
           string index: -1
@@ -804,9 +746,8 @@ string QueryResult:
           string name: "word"
           string value: 5
           string weight: 1
-      string weight: 0.25
-    integer 10: 
-      string docno: 640
+      string weight: 0.25091
+    integer 9: 
       string summary: 
         integer 0: 
           string index: -1
@@ -853,9 +794,8 @@ string QueryResult:
           string name: "word"
           string value: 11
           string weight: 1
-      string weight: 0.25
-    integer 11: 
-      string docno: 627
+      string weight: 0.25087
+    integer 10: 
       string summary: 
         integer 0: 
           string index: -1
@@ -902,19 +842,18 @@ string QueryResult:
           string name: "word"
           string value: 5
           string weight: 1
-      string weight: 0.25
-    integer 12: 
-      string docno: 559
+      string weight: 0.25085
+    integer 11: 
       string summary: 
         integer 0: 
           string index: -1
           string name: "docid"
-          string value: 330
+          string value: 210
           string weight: 1
         integer 1: 
           string index: -1
           string name: "cross"
-          string value: 6
+          string value: 3
           string weight: 1
         integer 2: 
           string index: -1
@@ -929,7 +868,7 @@ string QueryResult:
         integer 4: 
           string index: -1
           string name: "hi"
-          string value: 11
+          string value: 7
           string weight: 1
         integer 5: 
           string index: 1
@@ -949,11 +888,10 @@ string QueryResult:
         integer 8: 
           string index: 4
           string name: "word"
-          string value: 11
+          string value: 7
           string weight: 1
-      string weight: 0.25
-    integer 13: 
-      string docno: 454
+      string weight: 0.25079
+    integer 12: 
       string summary: 
         integer 0: 
           string index: -1
@@ -1000,9 +938,56 @@ string QueryResult:
           string name: "word"
           string value: 7
           string weight: 1
-      string weight: 0.25
+      string weight: 0.25071
+    integer 13: 
+      string summary: 
+        integer 0: 
+          string index: -1
+          string name: "docid"
+          string value: 330
+          string weight: 1
+        integer 1: 
+          string index: -1
+          string name: "cross"
+          string value: 6
+          string weight: 1
+        integer 2: 
+          string index: -1
+          string name: "factors"
+          string value: 3
+          string weight: 1
+        integer 3: 
+          string index: -1
+          string name: "lo"
+          string value: 2
+          string weight: 1
+        integer 4: 
+          string index: -1
+          string name: "hi"
+          string value: 11
+          string weight: 1
+        integer 5: 
+          string index: 1
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 6: 
+          string index: 2
+          string name: "word"
+          string value: 3
+          string weight: 1
+        integer 7: 
+          string index: 3
+          string name: "word"
+          string value: 5
+          string weight: 1
+        integer 8: 
+          string index: 4
+          string name: "word"
+          string value: 11
+          string weight: 1
+      string weight: 0.25067
     integer 14: 
-      string docno: 7
       string summary: 
         integer 0: 
           string index: -1
@@ -1049,117 +1034,8 @@ string QueryResult:
           string name: "word"
           string value: 23
           string weight: 1
-      string weight: 0.25
+      string weight: 0.25003
     integer 15: 
-      string docno: 875
-      string summary: 
-        integer 0: 
-          string index: -1
-          string name: "docid"
-          string value: 300
-          string weight: 1
-        integer 1: 
-          string index: -1
-          string name: "cross"
-          string value: 3
-          string weight: 1
-        integer 2: 
-          string index: -1
-          string name: "factors"
-          string value: 4
-          string weight: 1
-        integer 3: 
-          string index: -1
-          string name: "lo"
-          string value: 2
-          string weight: 1
-        integer 4: 
-          string index: -1
-          string name: "hi"
-          string value: 5
-          string weight: 1
-        integer 5: 
-          string index: 1
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 6: 
-          string index: 2
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 7: 
-          string index: 3
-          string name: "word"
-          string value: 3
-          string weight: 1
-        integer 8: 
-          string index: 4
-          string name: "word"
-          string value: 5
-          string weight: 1
-        integer 9: 
-          string index: 5
-          string name: "word"
-          string value: 5
-          string weight: 1
-      string weight: 0.2
-    integer 16: 
-      string docno: 770
-      string summary: 
-        integer 0: 
-          string index: -1
-          string name: "docid"
-          string value: 180
-          string weight: 1
-        integer 1: 
-          string index: -1
-          string name: "cross"
-          string value: 9
-          string weight: 1
-        integer 2: 
-          string index: -1
-          string name: "factors"
-          string value: 4
-          string weight: 1
-        integer 3: 
-          string index: -1
-          string name: "lo"
-          string value: 2
-          string weight: 1
-        integer 4: 
-          string index: -1
-          string name: "hi"
-          string value: 5
-          string weight: 1
-        integer 5: 
-          string index: 1
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 6: 
-          string index: 2
-          string name: "word"
-          string value: 2
-          string weight: 1
-        integer 7: 
-          string index: 3
-          string name: "word"
-          string value: 3
-          string weight: 1
-        integer 8: 
-          string index: 4
-          string name: "word"
-          string value: 3
-          string weight: 1
-        integer 9: 
-          string index: 5
-          string name: "word"
-          string value: 5
-          string weight: 1
-      string weight: 0.2
-    integer 17: 
-      string docno: 677
       string summary: 
         integer 0: 
           string index: -1
@@ -1211,9 +1087,8 @@ string QueryResult:
           string name: "word"
           string value: 5
           string weight: 1
-      string weight: 0.2
-    integer 18: 
-      string docno: 598
+      string weight: 0.20088
+    integer 16: 
       string summary: 
         integer 0: 
           string index: -1
@@ -1265,9 +1140,114 @@ string QueryResult:
           string name: "word"
           string value: 7
           string weight: 1
-      string weight: 0.2
+      string weight: 0.20083
+    integer 17: 
+      string summary: 
+        integer 0: 
+          string index: -1
+          string name: "docid"
+          string value: 180
+          string weight: 1
+        integer 1: 
+          string index: -1
+          string name: "cross"
+          string value: 9
+          string weight: 1
+        integer 2: 
+          string index: -1
+          string name: "factors"
+          string value: 4
+          string weight: 1
+        integer 3: 
+          string index: -1
+          string name: "lo"
+          string value: 2
+          string weight: 1
+        integer 4: 
+          string index: -1
+          string name: "hi"
+          string value: 5
+          string weight: 1
+        integer 5: 
+          string index: 1
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 6: 
+          string index: 2
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 7: 
+          string index: 3
+          string name: "word"
+          string value: 3
+          string weight: 1
+        integer 8: 
+          string index: 4
+          string name: "word"
+          string value: 3
+          string weight: 1
+        integer 9: 
+          string index: 5
+          string name: "word"
+          string value: 5
+          string weight: 1
+      string weight: 0.20082
+    integer 18: 
+      string summary: 
+        integer 0: 
+          string index: -1
+          string name: "docid"
+          string value: 300
+          string weight: 1
+        integer 1: 
+          string index: -1
+          string name: "cross"
+          string value: 3
+          string weight: 1
+        integer 2: 
+          string index: -1
+          string name: "factors"
+          string value: 4
+          string weight: 1
+        integer 3: 
+          string index: -1
+          string name: "lo"
+          string value: 2
+          string weight: 1
+        integer 4: 
+          string index: -1
+          string name: "hi"
+          string value: 5
+          string weight: 1
+        integer 5: 
+          string index: 1
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 6: 
+          string index: 2
+          string name: "word"
+          string value: 2
+          string weight: 1
+        integer 7: 
+          string index: 3
+          string name: "word"
+          string value: 3
+          string weight: 1
+        integer 8: 
+          string index: 4
+          string name: "word"
+          string value: 5
+          string weight: 1
+        integer 9: 
+          string index: 5
+          string name: "word"
+          string value: 5
+          string weight: 1
+      string weight: 0.2007
     integer 19: 
-      string docno: 342
       string summary: 
         integer 0: 
           string index: -1
@@ -1319,7 +1299,7 @@ string QueryResult:
           string name: "word"
           string value: 7
           string weight: 1
-      string weight: 0.2
+      string weight: 0.20058
 string QueryString: "2 3"
 string QueryTerms: 
   integer 0: 
@@ -1329,7 +1309,7 @@ string QueryTerms:
     string type: "word"
     string value: 3
 string ResultList: 
-  integer 0: "rank 0: 377 0.50000"
+  integer 0: "rank 0: 0.50062"
   integer 1: "    docid: '384'"
   integer 2: "    cross: '15'"
   integer 3: "    factors: '7'"
@@ -1343,7 +1323,7 @@ string ResultList:
   integer 11: "    word: '2'"
   integer 12: "    word: '2'"
   integer 13: "    word: '3'"
-  integer 14: "rank 1: 376 0.50000"
+  integer 14: "rank 1: 0.50004"
   integer 15: "    docid: '960'"
   integer 16: "    cross: '15'"
   integer 17: "    factors: '7'"
@@ -1357,7 +1337,7 @@ string ResultList:
   integer 25: "    word: '2'"
   integer 26: "    word: '3'"
   integer 27: "    word: '5'"
-  integer 28: "rank 2: 983 0.33333"
+  integer 28: "rank 2: 0.33430"
   integer 29: "    docid: '30'"
   integer 30: "    cross: '3'"
   integer 31: "    factors: '2'"
@@ -1366,40 +1346,40 @@ string ResultList:
   integer 34: "    word: '2'"
   integer 35: "    word: '3'"
   integer 36: "    word: '5'"
-  integer 37: "rank 3: 828 0.33333"
-  integer 38: "    docid: '240'"
+  integer 37: "rank 3: 0.33429"
+  integer 38: "    docid: '42'"
   integer 39: "    cross: '6'"
-  integer 40: "    factors: '5'"
+  integer 40: "    factors: '2'"
   integer 41: "    lo: '2'"
-  integer 42: "    hi: '5'"
+  integer 42: "    hi: '7'"
   integer 43: "    word: '2'"
-  integer 44: "    word: '2'"
-  integer 45: "    word: '2'"
-  integer 46: "    word: '2'"
-  integer 47: "    word: '3'"
-  integer 48: "    word: '5'"
-  integer 49: "rank 4: 809 0.33333"
-  integer 50: "    docid: '42'"
-  integer 51: "    cross: '6'"
-  integer 52: "    factors: '2'"
-  integer 53: "    lo: '2'"
-  integer 54: "    hi: '7'"
+  integer 44: "    word: '3'"
+  integer 45: "    word: '7'"
+  integer 46: "rank 4: 0.33424"
+  integer 47: "    docid: '96'"
+  integer 48: "    cross: '15'"
+  integer 49: "    factors: '5'"
+  integer 50: "    lo: '2'"
+  integer 51: "    hi: '3'"
+  integer 52: "    word: '2'"
+  integer 53: "    word: '2'"
+  integer 54: "    word: '2'"
   integer 55: "    word: '2'"
-  integer 56: "    word: '3'"
-  integer 57: "    word: '7'"
-  integer 58: "rank 5: 716 0.33333"
-  integer 59: "    docid: '96'"
-  integer 60: "    cross: '15'"
+  integer 56: "    word: '2'"
+  integer 57: "    word: '3'"
+  integer 58: "rank 5: 0.33409"
+  integer 59: "    docid: '240'"
+  integer 60: "    cross: '6'"
   integer 61: "    factors: '5'"
   integer 62: "    lo: '2'"
-  integer 63: "    hi: '3'"
+  integer 63: "    hi: '5'"
   integer 64: "    word: '2'"
   integer 65: "    word: '2'"
   integer 66: "    word: '2'"
   integer 67: "    word: '2'"
-  integer 68: "    word: '2'"
-  integer 69: "    word: '3'"
-  integer 70: "rank 6: 599 0.28571"
+  integer 68: "    word: '3'"
+  integer 69: "    word: '5'"
+  integer 70: "rank 6: 0.28643"
   integer 71: "    docid: '288'"
   integer 72: "    cross: '18'"
   integer 73: "    factors: '6'"
@@ -1412,77 +1392,77 @@ string ResultList:
   integer 80: "    word: '2'"
   integer 81: "    word: '3'"
   integer 82: "    word: '3'"
-  integer 83: "rank 7: 996 0.25000"
-  integer 84: "    docid: '210'"
-  integer 85: "    cross: '3'"
+  integer 83: "rank 7: 0.25094"
+  integer 84: "    docid: '60'"
+  integer 85: "    cross: '6'"
   integer 86: "    factors: '3'"
   integer 87: "    lo: '2'"
-  integer 88: "    hi: '7'"
+  integer 88: "    hi: '5'"
   integer 89: "    word: '2'"
-  integer 90: "    word: '3'"
-  integer 91: "    word: '5'"
-  integer 92: "    word: '7'"
-  integer 93: "rank 8: 789 0.25000"
-  integer 94: "    docid: '60'"
-  integer 95: "    cross: '6'"
+  integer 90: "    word: '2'"
+  integer 91: "    word: '3'"
+  integer 92: "    word: '5'"
+  integer 93: "rank 8: 0.25091"
+  integer 94: "    docid: '90'"
+  integer 95: "    cross: '9'"
   integer 96: "    factors: '3'"
   integer 97: "    lo: '2'"
   integer 98: "    hi: '5'"
   integer 99: "    word: '2'"
-  integer 100: "    word: '2'"
+  integer 100: "    word: '3'"
   integer 101: "    word: '3'"
   integer 102: "    word: '5'"
-  integer 103: "rank 9: 774 0.25000"
-  integer 104: "    docid: '90'"
-  integer 105: "    cross: '9'"
+  integer 103: "rank 9: 0.25087"
+  integer 104: "    docid: '132'"
+  integer 105: "    cross: '6'"
   integer 106: "    factors: '3'"
   integer 107: "    lo: '2'"
-  integer 108: "    hi: '5'"
+  integer 108: "    hi: '11'"
   integer 109: "    word: '2'"
-  integer 110: "    word: '3'"
+  integer 110: "    word: '2'"
   integer 111: "    word: '3'"
-  integer 112: "    word: '5'"
-  integer 113: "rank 10: 640 0.25000"
-  integer 114: "    docid: '132'"
+  integer 112: "    word: '11'"
+  integer 113: "rank 10: 0.25085"
+  integer 114: "    docid: '150'"
   integer 115: "    cross: '6'"
   integer 116: "    factors: '3'"
   integer 117: "    lo: '2'"
-  integer 118: "    hi: '11'"
+  integer 118: "    hi: '5'"
   integer 119: "    word: '2'"
-  integer 120: "    word: '2'"
-  integer 121: "    word: '3'"
-  integer 122: "    word: '11'"
-  integer 123: "rank 11: 627 0.25000"
-  integer 124: "    docid: '150'"
-  integer 125: "    cross: '6'"
+  integer 120: "    word: '3'"
+  integer 121: "    word: '5'"
+  integer 122: "    word: '5'"
+  integer 123: "rank 11: 0.25079"
+  integer 124: "    docid: '210'"
+  integer 125: "    cross: '3'"
   integer 126: "    factors: '3'"
   integer 127: "    lo: '2'"
-  integer 128: "    hi: '5'"
+  integer 128: "    hi: '7'"
   integer 129: "    word: '2'"
   integer 130: "    word: '3'"
   integer 131: "    word: '5'"
-  integer 132: "    word: '5'"
-  integer 133: "rank 12: 559 0.25000"
-  integer 134: "    docid: '330'"
-  integer 135: "    cross: '6'"
+  integer 132: "    word: '7'"
+  integer 133: "rank 12: 0.25071"
+  integer 134: "    docid: '294'"
+  integer 135: "    cross: '15'"
   integer 136: "    factors: '3'"
   integer 137: "    lo: '2'"
-  integer 138: "    hi: '11'"
+  integer 138: "    hi: '7'"
   integer 139: "    word: '2'"
   integer 140: "    word: '3'"
-  integer 141: "    word: '5'"
-  integer 142: "    word: '11'"
-  integer 143: "rank 13: 454 0.25000"
-  integer 144: "    docid: '294'"
-  integer 145: "    cross: '15'"
+  integer 141: "    word: '7'"
+  integer 142: "    word: '7'"
+  integer 143: "rank 13: 0.25067"
+  integer 144: "    docid: '330'"
+  integer 145: "    cross: '6'"
   integer 146: "    factors: '3'"
   integer 147: "    lo: '2'"
-  integer 148: "    hi: '7'"
+  integer 148: "    hi: '11'"
   integer 149: "    word: '2'"
   integer 150: "    word: '3'"
-  integer 151: "    word: '7'"
-  integer 152: "    word: '7'"
-  integer 153: "rank 14: 7 0.25000"
+  integer 151: "    word: '5'"
+  integer 152: "    word: '11'"
+  integer 153: "rank 14: 0.25003"
   integer 154: "    docid: '966'"
   integer 155: "    cross: '21'"
   integer 156: "    factors: '3'"
@@ -1492,51 +1472,51 @@ string ResultList:
   integer 160: "    word: '3'"
   integer 161: "    word: '7'"
   integer 162: "    word: '23'"
-  integer 163: "rank 15: 875 0.20000"
-  integer 164: "    docid: '300'"
+  integer 163: "rank 15: 0.20088"
+  integer 164: "    docid: '120'"
   integer 165: "    cross: '3'"
   integer 166: "    factors: '4'"
   integer 167: "    lo: '2'"
   integer 168: "    hi: '5'"
   integer 169: "    word: '2'"
   integer 170: "    word: '2'"
-  integer 171: "    word: '3'"
-  integer 172: "    word: '5'"
+  integer 171: "    word: '2'"
+  integer 172: "    word: '3'"
   integer 173: "    word: '5'"
-  integer 174: "rank 16: 770 0.20000"
-  integer 175: "    docid: '180'"
-  integer 176: "    cross: '9'"
+  integer 174: "rank 16: 0.20083"
+  integer 175: "    docid: '168'"
+  integer 176: "    cross: '15'"
   integer 177: "    factors: '4'"
   integer 178: "    lo: '2'"
-  integer 179: "    hi: '5'"
+  integer 179: "    hi: '7'"
   integer 180: "    word: '2'"
   integer 181: "    word: '2'"
-  integer 182: "    word: '3'"
+  integer 182: "    word: '2'"
   integer 183: "    word: '3'"
-  integer 184: "    word: '5'"
-  integer 185: "rank 17: 677 0.20000"
-  integer 186: "    docid: '120'"
-  integer 187: "    cross: '3'"
+  integer 184: "    word: '7'"
+  integer 185: "rank 17: 0.20082"
+  integer 186: "    docid: '180'"
+  integer 187: "    cross: '9'"
   integer 188: "    factors: '4'"
   integer 189: "    lo: '2'"
   integer 190: "    hi: '5'"
   integer 191: "    word: '2'"
   integer 192: "    word: '2'"
-  integer 193: "    word: '2'"
+  integer 193: "    word: '3'"
   integer 194: "    word: '3'"
   integer 195: "    word: '5'"
-  integer 196: "rank 18: 598 0.20000"
-  integer 197: "    docid: '168'"
-  integer 198: "    cross: '15'"
+  integer 196: "rank 18: 0.20070"
+  integer 197: "    docid: '300'"
+  integer 198: "    cross: '3'"
   integer 199: "    factors: '4'"
   integer 200: "    lo: '2'"
-  integer 201: "    hi: '7'"
+  integer 201: "    hi: '5'"
   integer 202: "    word: '2'"
   integer 203: "    word: '2'"
-  integer 204: "    word: '2'"
-  integer 205: "    word: '3'"
-  integer 206: "    word: '7'"
-  integer 207: "rank 19: 342 0.20000"
+  integer 204: "    word: '3'"
+  integer 205: "    word: '5'"
+  integer 206: "    word: '5'"
+  integer 207: "rank 19: 0.20058"
   integer 208: "    docid: '420'"
   integer 209: "    cross: '6'"
   integer 210: "    factors: '4'"

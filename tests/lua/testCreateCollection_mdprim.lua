@@ -21,7 +21,7 @@ collection dump:
 string config:
   string acl: "true"
   string cache: "524288K"
-  string metadata: "lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
+  string metadata: "docidx UInt32,lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
   string path: "storage"
 string docids:
   number 1: "1"
@@ -39,6 +39,7 @@ string docs:
     string ACL: "A"
     string cross: 1
     string docid: "1"
+    string docidx: 1
     string doclen: 0
     string factors: 0
     string hi: 0
@@ -47,6 +48,7 @@ string docs:
     string ACL: "B"
     string cross: 1
     string docid: "10"
+    string docidx: 10
     string doclen: 2
     string factors: 1
     string hi: 5
@@ -56,6 +58,7 @@ string docs:
     string ACL: "A"
     string cross: 2
     string docid: "2"
+    string docidx: 2
     string doclen: 1
     string factors: 0
     string hi: 2
@@ -65,6 +68,7 @@ string docs:
     string ACL: "A"
     string cross: 3
     string docid: "3"
+    string docidx: 3
     string doclen: 1
     string factors: 0
     string hi: 3
@@ -74,6 +78,7 @@ string docs:
     string ACL: "A"
     string cross: 4
     string docid: "4"
+    string docidx: 4
     string doclen: 2
     string factors: 1
     string hi: 2
@@ -83,6 +88,7 @@ string docs:
     string ACL: "A"
     string cross: 5
     string docid: "5"
+    string docidx: 5
     string doclen: 1
     string factors: 0
     string hi: 5
@@ -92,6 +98,7 @@ string docs:
     string ACL: "B"
     string cross: 6
     string docid: "6"
+    string docidx: 6
     string doclen: 2
     string factors: 1
     string hi: 3
@@ -101,6 +108,7 @@ string docs:
     string ACL: "B"
     string cross: 7
     string docid: "7"
+    string docidx: 7
     string doclen: 1
     string factors: 0
     string hi: 7
@@ -110,6 +118,7 @@ string docs:
     string ACL: "B"
     string cross: 8
     string docid: "8"
+    string docidx: 8
     string doclen: 3
     string factors: 2
     string hi: 2
@@ -119,6 +128,7 @@ string docs:
     string ACL: "B"
     string cross: 9
     string docid: "9"
+    string docidx: 9
     string doclen: 2
     string factors: 1
     string hi: 3

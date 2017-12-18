@@ -45,20 +45,23 @@ function dumpValue( $o) {
 	return dumpValue_( $o, 10);
 }
 
-function dumpTree_( $indent, $o, $depth) {
+function dumpTree_( $indent, $o, $depth, $excludeSet) {
 	if (is_array($o)) {
 		if ($depth == 0) {
 			return "{...}";
 		}
 		$keyset = [];
 		foreach($o as $k => $v) {
-			array_push( $keyset, $k);
+			if ($excludeSet[$k] != TRUE)
+			{
+				array_push( $keyset, $k);
+			}
 		}
 		sort( $keyset);
 		$s = "";
 		foreach($keyset as $k) {
 			$ke = "\n" . $indent . gettype($k) . " " . $k;
-			$ve = dumpTree_( $indent . '  ', $o[ $k], $depth-1);
+			$ve = dumpTree_( $indent . '  ', $o[ $k], $depth-1, $excludeSet);
 			$s = $s . $ke . ": " . $ve;
 		}
 		return $s;
@@ -79,11 +82,20 @@ function dumpTree_( $indent, $o, $depth) {
 			return "FALSE";
 		}
 	} else {
-		return dumpTree_( $indent, get_object_vars($o), $depth);
+		return dumpTree_( $indent, get_object_vars($o), $depth, $excludeSet);
 	}
 }
 function dumpTree( $o) {
-	return dumpTree_( "", $o, 20);
+
+	return dumpTree_( "", $o, 20, []);
+}
+
+function dumpTreeWithFilter( $o, $excludeList) {
+	$excludeSet = [];
+	foreach ($excludeList as $exl) {
+		$excludeSet[ $exl] = TRUE;
+	}
+	return dumpTree_( "", $o, 20, $excludeSet);
 }
 
 function readFileContent( $path) {

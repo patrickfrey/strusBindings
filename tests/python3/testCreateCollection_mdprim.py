@@ -35,7 +35,7 @@ expected = """collection dump:
 str config:
   str acl: "true"
   str cache: "524288K"
-  str metadata: "lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
+  str metadata: "docidx UInt32,lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
   str path: "storage"
 str docids:
   number 1: "1"
@@ -53,6 +53,7 @@ str docs:
     str ACL: "A"
     str cross: 1
     str docid: "1"
+    str docidx: 1
     str doclen: 0
     str factors: 0
     str hi: 0
@@ -62,6 +63,7 @@ str docs:
     str ACL: "B"
     str cross: 1
     str docid: "10"
+    str docidx: 10
     str doclen: 2
     str factors: 1
     str hi: 5
@@ -71,6 +73,7 @@ str docs:
     str ACL: "A"
     str cross: 2
     str docid: "2"
+    str docidx: 2
     str doclen: 1
     str factors: 0
     str hi: 2
@@ -80,6 +83,7 @@ str docs:
     str ACL: "A"
     str cross: 3
     str docid: "3"
+    str docidx: 3
     str doclen: 1
     str factors: 0
     str hi: 3
@@ -89,6 +93,7 @@ str docs:
     str ACL: "A"
     str cross: 4
     str docid: "4"
+    str docidx: 4
     str doclen: 2
     str factors: 1
     str hi: 2
@@ -98,6 +103,7 @@ str docs:
     str ACL: "A"
     str cross: 5
     str docid: "5"
+    str docidx: 5
     str doclen: 1
     str factors: 0
     str hi: 5
@@ -107,6 +113,7 @@ str docs:
     str ACL: "B"
     str cross: 6
     str docid: "6"
+    str docidx: 6
     str doclen: 2
     str factors: 1
     str hi: 3
@@ -116,6 +123,7 @@ str docs:
     str ACL: "B"
     str cross: 7
     str docid: "7"
+    str docidx: 7
     str doclen: 1
     str factors: 0
     str hi: 7
@@ -125,6 +133,7 @@ str docs:
     str ACL: "B"
     str cross: 8
     str docid: "8"
+    str docidx: 8
     str doclen: 3
     str factors: 2
     str hi: 2
@@ -134,6 +143,7 @@ str docs:
     str ACL: "B"
     str cross: 9
     str docid: "9"
+    str docidx: 9
     str doclen: 2
     str factors: 1
     str hi: 3

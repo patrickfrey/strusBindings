@@ -76,7 +76,7 @@ def _dumpValue( obj, depth):
 def dumpValue( o):
 	return _dumpValue( o, 20)
 
-def _dumpTree( indent, obj, depth):
+def _dumpTree( indent, obj, depth, excludeList):
 	if obj is None:
 		return "None"
 	elif isinstance(obj, numbers.Number):
@@ -97,7 +97,7 @@ def _dumpTree( indent, obj, depth):
 		i = 0
 		for v in obj:
 			ke = "\n" + indent + "number " + str(i+1)
-			ve = _dumpTree( indent + '  ', v, depth-1)
+			ve = _dumpTree( indent + '  ', v, depth-1, excludeList)
 			if ve and ve[0] == "\n":
 				s = s + ke + ":" + ve
 			else:
@@ -112,8 +112,10 @@ def _dumpTree( indent, obj, depth):
 			kstr = str(k)
 			if kstr[0] == '_':
 				continue
+			if kstr in excludeList:
+				continue
 			ke = "\n" + indent + type(k).__name__ + " " + kstr
-			ve = _dumpTree( indent + '  ', obj[ k], depth-1)
+			ve = _dumpTree( indent + '  ', obj[ k], depth-1, excludeList)
 			if ve and ve[0] == "\n":
 				s = s + ke + ":" + ve
 			else:
@@ -124,10 +126,12 @@ def _dumpTree( indent, obj, depth):
 		for k in dir(obj):
 			if k[0] != '_' and getattr( obj, k) != None:
 				attrdict[ k] = getattr( obj, k)
-		return _dumpTree( indent, attrdict, depth)
+		return _dumpTree( indent, attrdict, depth, excludeList)
 
 def dumpTree( obj):
-	return _dumpTree( "", obj, 20)
+	return _dumpTree( "", obj, 20, {})
+def dumpTreeWithFilter( obj, excludeList):
+	return _dumpTree( "", obj, 20, excludeList)
 
 def readFile( path):
 	with open( path) as f:

@@ -24,6 +24,7 @@ def createDocumentAnalyzer_mdprim( strusctx):
 	analyzer.addSearchIndexFeature( "word", "/list/doc/content()", "word", "orig")
 	analyzer.addForwardIndexFeature( "word", "/list/doc/content()", "word", "orig")
 	analyzer.defineAttribute( "docid", "/list/doc@id", "content", "orig")
+	analyzer.defineMetaData( "docidx", "/list/doc@id", "content", "orig")
 	analyzer.defineAggregatedMetaData( "doclen", ["count", "word"])
 
 	return analyzer
@@ -37,7 +38,7 @@ def createQueryAnalyzer_mdprim( strusctx):
 	return analyzer
 
 def metadata_mdprim():
-	return 'cross UINT8, factors UINT8, lo UINT16, hi UINT16, doclen UINT16'
+	return 'cross UINT8, factors UINT8, lo UINT16, hi UINT16, doclen UINT16, docidx UINT32'
 
 def createQueryEval_mdprim( strusctx):
 	# Define the query evaluation scheme:
@@ -46,7 +47,7 @@ def createQueryEval_mdprim( strusctx):
 	# Here we define what query features decide, what is ranked for the result:
 	queryEval.addSelectionFeature( "select")
 	
-	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
+	# Here we define how we rank a document selected:
 	queryEval.addWeightingFunction(
 		"tf", {
 				'match':{'feature':"seek"}, 'debug':"debug_weighting"
@@ -55,7 +56,11 @@ def createQueryEval_mdprim( strusctx):
 		"metadata", {
 				'name':"doclen"
 			})
-	queryEval.defineWeightingFormula( "_0 / _1" )
+	queryEval.addWeightingFunction(
+		"metadata", {
+				'name':"docidx"
+			})
+	queryEval.defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
 
 	# Now we define what attributes of the documents are returned and how they are build:
 	queryEval.addSummarizer( "attribute", [["name", "docid"],["debug","debug_attribute"]])
