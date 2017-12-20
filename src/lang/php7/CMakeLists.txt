@@ -3,8 +3,6 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # PHP
 # --------------------------------------
-include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/php7/php.cmake )
-
 include_directories(
         ${PHP7_INCLUDE_DIRS}
 	${Intl_INCLUDE_DIRS}

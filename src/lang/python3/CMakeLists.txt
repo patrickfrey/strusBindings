@@ -3,8 +3,6 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # PYTHON
 # --------------------------------------
-include( ${PROJECT_SOURCE_DIR}/3rdParty/papuga/python3/python.cmake )
-
 set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions" )
 set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
 
