@@ -69,6 +69,10 @@ add_library( strus_bindings_php7 MODULE strus.c )
 add_dependencies( strus_bindings_php7 php7_mod )
 target_link_libraries( strus_bindings_php7 papuga_devel papuga_php7_dev strus_bindings )
 
+if(APPLE)
+set_target_properties( strus_bindings_php7 PROPERTIES LINK_FLAGS "-undefined dynamic_lookup" )
+endif(APPLE)
+
 set_target_properties( strus_bindings_php7 PROPERTIES OUTPUT_NAME strus PREFIX "" )
 
 # ------------------------------
