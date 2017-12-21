@@ -29,14 +29,14 @@ case $OS in
 		brew upgrade cmake
 		brew upgrade boost
 		brew tap homebrew/homebrew-php
-		brew install gettext snappy leveldb || true
-		brew install lapack blas python3 php70 || true
+		brew install gettext php70 python3 || true
+		brew install snappy leveldb lapack blas || true
 		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
 		brew link leveldb || true
 		brew link snappy || true
 		;;
-	
+
 	*)
 		echo "ERROR: unknown operating system '$OS'."
 		;;
