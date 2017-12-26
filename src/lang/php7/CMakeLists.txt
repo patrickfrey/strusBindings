@@ -26,7 +26,7 @@ link_directories(
 add_custom_command(
     OUTPUT      strus.c
     DEPENDS    ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../../src/gen/strusBindingsModuleGen php7 module strus.c 
+    COMMAND  strusBindingsModuleGen php7 module strus.c 
     COMMENT  "Generating PHP 7 module source strus.c"
     VERBATIM
  )
@@ -34,7 +34,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
     DEPENDS   ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen php7 doc ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
+    COMMAND  strusBindingsModuleGen php7 doc ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php
     COMMENT  "Generating bindings interface doc description file ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.php"
     VERBATIM
  )
@@ -42,7 +42,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT      php.ini
     DEPENDS    strusBindingsModuleGen strus_bindings_description
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen php7 ini php.ini "phpini=${PHP7_INI_FILE}"
+    COMMAND  strusBindingsModuleGen php7 ini php.ini "phpini=${PHP7_INI_FILE}"
     COMMENT  "Generating PHP 7 .ini file with strus extension loaded"
     VERBATIM
  )

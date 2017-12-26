@@ -29,7 +29,7 @@ link_directories(
 add_custom_command(
     OUTPUT      strus.c
     DEPENDS    ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strusBindingsModuleGen strus_bindings_description
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen python3 module strus.c 
+    COMMAND  strusBindingsModuleGen python3 module strus.c 
     COMMENT  "Generating Python3 module source strus.c"
     VERBATIM
  )
@@ -37,7 +37,7 @@ add_custom_command(
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.py
     DEPENDS   ${CMAKE_CURRENT_BINARY_DIR}/../../../include/strus/bindingObjects.h strus_bindings_description strusBindingsModuleGen
-    COMMAND  ${CMAKE_CURRENT_BINARY_DIR}/../../gen/strusBindingsModuleGen python3 doc ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.py
+    COMMAND  strusBindingsModuleGen python3 doc ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.py
     COMMENT  "Generating bindings interface doc description file ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.py"
     VERBATIM
  )
