@@ -9,6 +9,7 @@ else( APPLE )
 set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions" )
 endif( APPLE )
 set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
+message( STATUS "Python3 linker flags: ${PYTHON3_MODULE_LINK_FLAGS}" )
 
 include_directories(
         ${PYTHON3_INCLUDE_DIRS}
