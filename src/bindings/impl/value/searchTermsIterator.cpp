@@ -23,14 +23,17 @@ using namespace strus;
 using namespace strus::bindings;
 
 SearchTermsIterator::SearchTermsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, const std::string& termtype, const Index& docno)
-	:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_errorhnd_impl(errorhnd_),m_iter()
+	:m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_errorhnd_impl(errorhnd_),m_iter(),m_docno(0)
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!docno) throw strus::runtime_error(_TXT("zero passed as docno to %s"), ITERATOR_NAME);
 	m_iter.reset( storage->createDocumentTermIterator( termtype));
 	if (!m_iter.get()) throw strus::runtime_error(_TXT("failed to create %s: %s"), ITERATOR_NAME, errorhnd->fetchError());
-	m_iter->skipDoc( docno);
+	if (docno == m_iter->skipDoc( docno))
+	{
+		m_docno = docno;
+	}
 	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("error in %s get next: %s"), ITERATOR_NAME, errorhnd->fetchError());
 }
 
@@ -38,6 +41,7 @@ bool SearchTermsIterator::getNext( papuga_CallResult* result)
 {
 	try
 	{
+		if (!m_docno) return false;
 		bool ser = true;
 		DocumentTermIteratorInterface::Term term;
 		if (m_iter->nextTerm( term))

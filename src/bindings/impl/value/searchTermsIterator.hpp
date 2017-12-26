@@ -41,6 +41,7 @@ private:
 	ObjectRef m_storage_impl;
 	ObjectRef m_errorhnd_impl;
 	Reference<DocumentTermIteratorInterface> m_iter;
+	Index m_docno;
 };
 
 }}//namespace

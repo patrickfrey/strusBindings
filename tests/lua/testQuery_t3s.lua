@@ -102,14 +102,14 @@ local results = query:evaluate()
 output[ "QueryResult"] = results
 local output_list = {}
 for pos,result in ipairs(results.ranks) do
-	table.insert( output_list, string.format( "rank %u: %u %.5f", pos, result.docno, result.weight))
+	table.insert( output_list, string.format( "rank %u: %.5f", pos, result.weight))
 	for sidx,si in pairs(result.summary) do
 		table.insert( output_list, string.format( "    %s: '%s'", si.name, si.value))
 	end
 end
 output[ "ResultList"] = output_list
 
-local result = "query evaluation:" .. dumpTree( output) .. "\n"
+local result = "query evaluation:" .. dumpTreeWithFilter( output, {'docno'}) .. "\n"
 local expected = [[
 query evaluation:
 string QueryDump: "query evaluation program:
@@ -170,7 +170,6 @@ string QueryResult:
   string pass: 0
   string ranks:
     number 1:
-      string docno: 3
       string summary:
         number 1:
           string index: -1
@@ -189,7 +188,6 @@ string QueryResult:
           string weight: 1
       string weight: 0.64282
     number 2:
-      string docno: 2
       string summary:
         number 1:
           string index: -1
@@ -208,7 +206,6 @@ string QueryResult:
           string weight: 1
       string weight: 0.00017
     number 3:
-      string docno: 1
       string summary:
         number 1:
           string index: -1
@@ -238,15 +235,15 @@ string QueryTerms:
     string type: "word"
     string value: "tokyo"
 string ResultList:
-  number 1: "rank 1: 3 0.64282"
+  number 1: "rank 1: 0.64282"
   number 2: "    title: 'One day in Tokyo'"
   number 3: "    docid: 'A.xml'"
   number 4: "    docstart: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
-  number 5: "rank 2: 2 0.00017"
+  number 5: "rank 2: 0.00017"
   number 6: "    title: 'A visit in New York'"
   number 7: "    docid: 'B.xml'"
   number 8: "    docstart: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
-  number 9: "rank 3: 1 0.00009"
+  number 9: "rank 3: 0.00009"
   number 10: "    title: 'A journey through Germany'"
   number 11: "    docid: 'C.xml'"
   number 12: "    docstart: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"

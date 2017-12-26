@@ -110,12 +110,12 @@ results = query.evaluate()
 output[ "QueryResult"] = results
 output_list = []
 for pos,result in enumerate( results.ranks):
-	output_list.append( "rank %u: %u %.5f" % (pos+1, result.docno, result.weight))
+	output_list.append( "rank %u: %.5f" % (pos+1, result.weight))
 	for summary in result.summary:
 		output_list.append( "    %s: '%s'" % (summary.name, summary.value))
 output[ "ResultList"] = output_list
 
-result = "query evaluation:" + dumpTree( output) + "\n"
+result = "query evaluation:" + dumpTreeWithFilter( output, {'docno'}) + "\n"
 expected = """query evaluation:
 str QueryDump: "query evaluation program:
 SELECT select;
@@ -175,7 +175,6 @@ str QueryResult:
   str pass: 0
   str ranks:
     number 1:
-      str docno: 3
       str summary:
         number 1:
           str index: -1
@@ -194,7 +193,6 @@ str QueryResult:
           str weight: 1
       str weight: 0.64282
     number 2:
-      str docno: 2
       str summary:
         number 1:
           str index: -1
@@ -213,7 +211,6 @@ str QueryResult:
           str weight: 1
       str weight: 0.00017
     number 3:
-      str docno: 1
       str summary:
         number 1:
           str index: -1
@@ -243,15 +240,15 @@ str QueryTerms:
     str type: "word"
     str value: "tokyo"
 str ResultList:
-  number 1: "rank 1: 3 0.64282"
+  number 1: "rank 1: 0.64282"
   number 2: "    title: 'One day in Tokyo'"
   number 3: "    docid: 'A.xml'"
   number 4: "    docstart: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
-  number 5: "rank 2: 2 0.00017"
+  number 5: "rank 2: 0.00017"
   number 6: "    title: 'A visit in New York'"
   number 7: "    docid: 'B.xml'"
   number 8: "    docstart: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
-  number 9: "rank 3: 1 0.00009"
+  number 9: "rank 3: 0.00009"
   number 10: "    title: 'A journey through Germany'"
   number 11: "    docid: 'C.xml'"
   number 12: "    docstart: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"

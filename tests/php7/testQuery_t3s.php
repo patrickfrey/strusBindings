@@ -112,14 +112,14 @@ $output_list = [];
 foreach ($results->ranks as $pos => $result) {
 	$weightstr = number_format((float)$result->weight, 5, '.', '');
 	$docno = $result->docno;
-	array_push( $output_list, "rank $pos: $docno $weightstr");
+	array_push( $output_list, "rank $pos: $weightstr");
 	foreach ($result->summary as $sidx => $si) {
 		array_push( $output_list, "    " . $si->name . " '" . $si->value . "'");
 	}
 }
 $output[ "ResultList"] = $output_list;
 
-$result = "query evaluation:" . dumpTree( $output);
+$result = "query evaluation:" . dumpTreeWithFilter( $output, ['docno']);
 $expected = <<<END_expected
 query evaluation:
 string QueryDump: "query evaluation program:
@@ -180,7 +180,6 @@ string QueryResult:
   string pass: 0
   string ranks: 
     integer 0: 
-      string docno: 3
       string summary: 
         integer 0: 
           string index: -1
@@ -199,7 +198,6 @@ string QueryResult:
           string weight: 1
       string weight: 0.64282
     integer 1: 
-      string docno: 2
       string summary: 
         integer 0: 
           string index: -1
@@ -218,7 +216,6 @@ string QueryResult:
           string weight: 1
       string weight: 0.00017
     integer 2: 
-      string docno: 1
       string summary: 
         integer 0: 
           string index: -1
@@ -248,15 +245,15 @@ string QueryTerms:
     string type: "word"
     string value: "tokyo"
 string ResultList: 
-  integer 0: "rank 0: 3 0.64282"
+  integer 0: "rank 0: 0.64282"
   integer 1: "    title 'One day in Tokyo'"
   integer 2: "    docid 'A.xml'"
   integer 3: "    docstart 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
-  integer 4: "rank 1: 2 0.00017"
+  integer 4: "rank 1: 0.00017"
   integer 5: "    title 'A visit in New York'"
   integer 6: "    docid 'B.xml'"
   integer 7: "    docstart 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
-  integer 8: "rank 2: 1 0.00009"
+  integer 8: "rank 2: 0.00009"
   integer 9: "    title 'A journey through Germany'"
   integer 10: "    docid 'C.xml'"
   integer 11: "    docstart 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
