@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # PYTHON
 # --------------------------------------
 if( APPLE )
-set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker -Wl,-O1 -Wl,-Bsymbolic-functions" )
+set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker" )
 else( APPLE )
 set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions" )
 endif( APPLE )
