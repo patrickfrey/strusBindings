@@ -65,11 +65,18 @@ add_custom_target(
 
 add_library( strus_bindings_python3 MODULE strus.c )
 add_dependencies( strus_bindings_python3 python3_mod )
+if( APPLE )
+set_target_properties( strus_bindings_python3 PROPERTIES 
+				PREFIX "" 
+				OUTPUT_NAME strus )
+else( APPLE )
 set_target_properties( strus_bindings_python3 PROPERTIES 
 				PREFIX "" 
 				OUTPUT_NAME strus 
 				LINK_FLAGS ${PYTHON3_MODULE_LINK_FLAGS} 
 				COMPILE_FLAGS ${PYTHON3_MODULE_CXX_FLAGS} )
+endif( APPLE )
+
 target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
 				strus_bindings
 				papuga_python3_dev )
