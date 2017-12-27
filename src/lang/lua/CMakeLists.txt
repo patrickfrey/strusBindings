@@ -21,6 +21,7 @@ link_directories(
 	${strus_LIBRARY_DIRS}
 	${strusanalyzer_LIBRARY_DIRS}
 	${strustrace_LIBRARY_DIRS}
+	${Intl_LIBRARIES}
 )
 
 add_custom_command(

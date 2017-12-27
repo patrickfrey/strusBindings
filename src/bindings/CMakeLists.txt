@@ -61,6 +61,7 @@ link_directories(
 	${strusbase_LIBRARY_DIRS}
 	${strusmodule_LIBRARY_DIRS}
 	${strusrpc_LIBRARY_DIRS}
+	${Intl_LIBRARIES}
 )
 
 # ------------------------------
