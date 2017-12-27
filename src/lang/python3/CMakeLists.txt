@@ -4,12 +4,14 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # PYTHON
 # --------------------------------------
 if( APPLE )
-set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker" )
+set( PYTHON3_MODULE_CXX_FLAGS "" )
+set( PYTHON3_MODULE_LINK_FLAGS "-undefined dynamic_lookup" )
 else( APPLE )
+set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
 set( PYTHON3_MODULE_LINK_FLAGS "-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions" )
 endif( APPLE )
-set( PYTHON3_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
-message( STATUS "Python3 linker flags: ${PYTHON3_MODULE_LINK_FLAGS}" )
+message( STATUS "Python3 module compiler flags: ${PYTHON3_MODULE_CXX_FLAGS}" )
+message( STATUS "Python3 module linker flags: ${PYTHON3_MODULE_LINK_FLAGS}" )
 
 include_directories(
         ${PYTHON3_INCLUDE_DIRS}
@@ -65,17 +67,11 @@ add_custom_target(
 
 add_library( strus_bindings_python3 MODULE strus.c )
 add_dependencies( strus_bindings_python3 python3_mod )
-if( APPLE )
-set_target_properties( strus_bindings_python3 PROPERTIES 
-				PREFIX "" 
-				OUTPUT_NAME strus )
-else( APPLE )
 set_target_properties( strus_bindings_python3 PROPERTIES 
 				PREFIX "" 
 				OUTPUT_NAME strus 
 				LINK_FLAGS ${PYTHON3_MODULE_LINK_FLAGS} 
 				COMPILE_FLAGS ${PYTHON3_MODULE_CXX_FLAGS} )
-endif( APPLE )
 
 target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
 				strus_bindings
