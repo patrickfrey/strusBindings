@@ -70,10 +70,6 @@ add_library( strus_bindings SHARED ${bindings_source_files} )
 add_dependencies( strus_bindings  strus_bindings_c_interface )
 target_link_libraries( strus_bindings strus_base strus_error papuga_devel strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket ${Intl_LIBRARIES} )
 
-add_library( strus_bindings_description SHARED ${CMAKE_CURRENT_BINARY_DIR}/libstrus_bindings_description.cpp )
-add_dependencies( strus_bindings_description  strus_bindings_c_interface )
-target_link_libraries( strus_bindings_description ${Intl_LIBRARIES} )
-
 set_target_properties(
     strus_bindings
     PROPERTIES
@@ -82,10 +78,41 @@ set_target_properties(
     VERSION ${STRUS_VERSION}
 )
 
+add_library( strus_bindings_description SHARED ${CMAKE_CURRENT_BINARY_DIR}/libstrus_bindings_description.cpp )
+add_dependencies( strus_bindings_description  strus_bindings_c_interface )
+target_link_libraries( strus_bindings_description ${Intl_LIBRARIES} )
+
+set_target_properties(
+    strus_bindings_description
+    PROPERTIES
+    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
+    SOVERSION "${STRUS_MAJOR_VERSION}.${STRUS_MINOR_VERSION}"
+    VERSION ${STRUS_VERSION}
+)
+
+# Copy bindings shared library into a created directory easy relocatable by tests:
+add_custom_command( TARGET strus_bindings POST_BUILD
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/lib
+					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/lib/' " )
+add_custom_command( TARGET strus_bindings POST_BUILD
+					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings>  ${CMAKE_BINARY_DIR}/lib/
+					  COMMENT "Copy strus bindings shared library built to library directory" )
+
+# Copy bindings shared library into a created directory easy relocatable by tests:
+add_custom_command( TARGET strus_bindings_description POST_BUILD
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/lib
+					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/lib/' " )
+add_custom_command( TARGET strus_bindings_description POST_BUILD
+					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings_description>  ${CMAKE_BINARY_DIR}/lib/
+					  COMMENT "Copy strus bindings description shared library built to library directory" )
+
 # ------------------------------
 # INSTALLATION
 # ------------------------------
 install( TARGETS strus_bindings
+           LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus
+           RUNTIME DESTINATION bin )
+install( TARGETS strus_bindings_description
            LIBRARY DESTINATION ${LIB_INSTALL_DIR}/strus
            RUNTIME DESTINATION bin )
 

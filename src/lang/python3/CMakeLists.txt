@@ -72,7 +72,6 @@ set_target_properties( strus_bindings_python3 PROPERTIES
 				OUTPUT_NAME strus 
 				LINK_FLAGS "${PYTHON3_MODULE_LINK_FLAGS}"
 				COMPILE_FLAGS "${PYTHON3_MODULE_CXX_FLAGS}" )
-
 target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
 				strus_bindings
 				papuga_python3_dev )
@@ -82,6 +81,14 @@ find_library( LIBKVM_LIBRARIES kvm )
 if(LIBKVM_LIBRARIES)
 	target_link_libraries( strus_bindings_python3 ${LIBKVM_LIBRARIES} )
 endif()
+
+# Copy python3 module into a created directory easy relocatable by tests:
+add_custom_command( TARGET strus_bindings_python3 POST_BUILD
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/modules/python3
+					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/modules/python3/' " )
+add_custom_command( TARGET strus_bindings_python3 POST_BUILD
+					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings_python3>  ${CMAKE_BINARY_DIR}/modules/python3/
+					  COMMENT "Copy Python3 module built to module directory" )
 
 # ------------------------------
 # INSTALLATION

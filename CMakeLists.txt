@@ -63,11 +63,6 @@ find_strus_package( module )
 find_strus_package( trace )
 find_strus_package( rpc )
 
-if (NOT STRUS_MODULE_PATH)
-set( STRUS_MODULE_PATH  "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/strus/modules" )
-endif (NOT STRUS_MODULE_PATH)
-MESSAGE( STATUS  "Set strus module path: ${STRUS_MODULE_PATH}" )
-
 configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "${CMAKE_CURRENT_BINARY_DIR}/include/strus/versionBindings.hpp"   @ONLY )
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
@@ -94,6 +89,12 @@ set( PAPUGA_LUA_LIBRARY_DIRS   "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/lua"
 set( BINDINGS_INCLUDE_DIRS        "${CMAKE_CURRENT_BINARY_DIR}/include"  "${PROJECT_SOURCE_DIR}/include" )
 set( BINDINGS_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/bindings" )
 set( BINDINGS_LIBRARY_DIRS         "${CMAKE_CURRENT_BINARY_DIR}/src/bindings" )
+
+# Module path:
+if (NOT STRUS_MODULE_PATH)
+set( STRUS_MODULE_PATH  "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/strus/modules" )
+endif (NOT STRUS_MODULE_PATH)
+MESSAGE( STATUS  "Strus module path: ${STRUS_MODULE_PATH}" )
 
 # Subdirectories:
 add_subdirectory( 3rdParty )
