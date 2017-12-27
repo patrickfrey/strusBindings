@@ -21,7 +21,6 @@ link_directories(
 	${strus_LIBRARY_DIRS}
 	${strusanalyzer_LIBRARY_DIRS}
 	${strustrace_LIBRARY_DIRS}
-	${Intl_LIBRARIES}
 )
 
 add_custom_command(
@@ -68,7 +67,7 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/lang/lua/luaBindingsDoc.js  ${CMAKE_BI
 # ------------------------------
 add_library( strus_bindings_lua SHARED libstrus_bindings_lua.c )
 add_dependencies( strus_bindings_lua lua_mod )
-target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bindings strus_lua )
+target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bindings strus_lua ${Intl_LIBRARIES} )
 
 # ------------------------------
 # PROGRAMS

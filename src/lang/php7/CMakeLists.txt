@@ -21,7 +21,6 @@ link_directories(
 	${strus_LIBRARY_DIRS}
 	${strusanalyzer_LIBRARY_DIRS}
 	${strustrace_LIBRARY_DIRS}
-	${Intl_LIBRARIES}
 )
 
 add_custom_command(
@@ -68,7 +67,7 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/lang/php7/phpBindingsDoc.js  ${CMAKE_B
 # ------------------------------
 add_library( strus_bindings_php7 MODULE strus.c )
 add_dependencies( strus_bindings_php7 php7_mod )
-target_link_libraries( strus_bindings_php7 papuga_devel papuga_php7_dev strus_bindings )
+target_link_libraries( strus_bindings_php7 papuga_devel papuga_php7_dev strus_bindings ${Intl_LIBRARIES} )
 
 if(APPLE)
 set_target_properties( strus_bindings_php7 PROPERTIES LINK_FLAGS "-undefined dynamic_lookup" )
