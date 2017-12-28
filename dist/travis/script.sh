@@ -20,7 +20,7 @@ build_strus_project() {
 			sudo make VERBOSE=1 install
 			cd ..
 			;;
-	
+
 		Darwin)
 			# forcing brew versions (of gettext) over Mac versions
 			export CFLAGS=-I/usr/local
@@ -62,7 +62,18 @@ done
 
 # build the package itself
 cd $PROJECT
-build_strus_project "-DWITH_PHP=YES -DWITH_PYTHON=YES -DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=NO"
+case $OS in
+	Linux)
+		build_strus_project "-DWITH_PHP=YES -DWITH_PYTHON=YES -DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=NO"
+		;;
+	Darwin)
+		# Currently No Php7 on Darwin. The build succeedes, but PHP7 test SEGFAULT all, even the one that does not load strus at all
+		build_strus_project "-DWITH_PHP=NO -DWITH_PYTHON=YES -DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=NO"
+		;;
+	*)
+		echo "ERROR: unknown operating system '$OS'."
+		;;
+esac
 cd ..
 
 

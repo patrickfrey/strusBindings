@@ -3,6 +3,21 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # PHP
 # --------------------------------------
+if( APPLE )
+set( PHP7_MODULE_CXX_FLAGS "" )
+set( PHP7_MODULE_LINK_FLAGS "-undefined dynamic_lookup" )
+else( APPLE )
+if (CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")
+set( PHP7_MODULE_CXX_FLAGS "-g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
+else (CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")
+set( PHP7_MODULE_CXX_FLAGS "-Wl,-Bsymbolic-functions -Wl,-z,relro -g -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security" )
+endif (CMAKE_C_COMPILER_ID MATCHES "[Cc]lang")
+
+set( PHP7_MODULE_LINK_FLAGS "-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions" )
+endif( APPLE )
+message( STATUS "Php7 module compiler flags: ${PHP7_MODULE_CXX_FLAGS}" )
+message( STATUS "Php7 module linker flags: ${PHP7_MODULE_LINK_FLAGS}" )
+
 include_directories(
         ${PHP7_INCLUDE_DIRS}
 	${Intl_INCLUDE_DIRS}
@@ -69,11 +84,11 @@ add_library( strus_bindings_php7 MODULE strus.c )
 add_dependencies( strus_bindings_php7 php7_mod )
 target_link_libraries( strus_bindings_php7 papuga_devel papuga_php7_dev strus_bindings ${Intl_LIBRARIES} )
 
-if(APPLE)
-set_target_properties( strus_bindings_php7 PROPERTIES LINK_FLAGS "-undefined dynamic_lookup" )
-endif(APPLE)
-
-set_target_properties( strus_bindings_php7 PROPERTIES OUTPUT_NAME strus PREFIX "" )
+set_target_properties( strus_bindings_php7 PROPERTIES 
+					PREFIX "" 
+					OUTPUT_NAME strus 
+					LINK_FLAGS "${PHP7_MODULE_LINK_FLAGS}"
+					COMPILE_FLAGS "${PHP7_MODULE_CXX_FLAGS}" )
 
 # Copy Php7 module into a created directory easy relocatable by tests:
 add_custom_command( TARGET strus_bindings_php7 POST_BUILD
