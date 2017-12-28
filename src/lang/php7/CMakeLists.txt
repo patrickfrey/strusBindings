@@ -77,11 +77,10 @@ set_target_properties( strus_bindings_php7 PROPERTIES OUTPUT_NAME strus PREFIX "
 
 # Copy Php7 module into a created directory easy relocatable by tests:
 add_custom_command( TARGET strus_bindings_php7 POST_BUILD
-					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/modules/php7
-					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/modules/php7/' " )
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/modules/php7 )
 add_custom_command( TARGET strus_bindings_php7 POST_BUILD
 					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings_php7>  ${CMAKE_BINARY_DIR}/modules/php7/
-					  COMMENT "Copy Php7 module built to module directory" )
+					  COMMENT "Copy Php7 module built to ${CMAKE_BINARY_DIR}/modules/php7/" )
 
 # ------------------------------
 # INSTALLATION

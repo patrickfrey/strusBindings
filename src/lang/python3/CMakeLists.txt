@@ -84,11 +84,10 @@ endif()
 
 # Copy python3 module into a created directory easy relocatable by tests:
 add_custom_command( TARGET strus_bindings_python3 POST_BUILD
-					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/modules/python3
-					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/modules/python3/' " )
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/modules/python3 )
 add_custom_command( TARGET strus_bindings_python3 POST_BUILD
 					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings_python3>  ${CMAKE_BINARY_DIR}/modules/python3/
-					  COMMENT "Copy Python3 module built to module directory" )
+					  COMMENT "Copy Python3 module built to ${CMAKE_BINARY_DIR}/modules/python3/" )
 
 # ------------------------------
 # INSTALLATION

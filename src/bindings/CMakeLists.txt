@@ -92,19 +92,17 @@ set_target_properties(
 
 # Copy bindings shared library into a created directory easy relocatable by tests:
 add_custom_command( TARGET strus_bindings POST_BUILD
-					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/lib
-					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/lib/' " )
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/lib )
 add_custom_command( TARGET strus_bindings POST_BUILD
 					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings>  ${CMAKE_BINARY_DIR}/lib/
-					  COMMENT "Copy strus bindings shared library built to library directory" )
+					  COMMENT "Copy strus bindings shared library built to ${CMAKE_BINARY_DIR}/lib/" )
 
 # Copy bindings shared library into a created directory easy relocatable by tests:
 add_custom_command( TARGET strus_bindings_description POST_BUILD
-					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/lib
-					  COMMENT "Create local module directory '${CMAKE_BINARY_DIR}/lib/' " )
+					  COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_BINARY_DIR}/lib )
 add_custom_command( TARGET strus_bindings_description POST_BUILD
 					  COMMAND ${CMAKE_COMMAND} -E copy_if_different  $<TARGET_FILE:strus_bindings_description>  ${CMAKE_BINARY_DIR}/lib/
-					  COMMENT "Copy strus bindings description shared library built to library directory" )
+					  COMMENT "Copy strus bindings description shared library built to ${CMAKE_BINARY_DIR}/lib/" )
 
 # ------------------------------
 # INSTALLATION
