@@ -339,28 +339,10 @@ Packager: Patrick Frey <patrickpfrey@yahoo.com>
 %description
 Library implementing the loading of dynalically loadable of a text search engine.
 
-%if %{with_java}
-%package java
-Summary: strus Java language bindings
-Group: Development/Libraries/Java
-
-%description java
-Language bindings for the strus text search enginge in Java
-
-%if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel6} || %{centos6} || %{scilin6}
-Requires: java-1.8.0-openjdk
-%endif
-%else
-Requires: java-1.8.0-openjdk
-%endif
-
-%endif
-
 %if %{with_php}
 
 %package php
-Summary: strus Php language bindings
+Summary: Php language bindings for strus
 Group: Development/Libraries/Php
 
 %description php
@@ -383,7 +365,7 @@ Requires: php
 %if %{with_python}
 
 %package python
-Summary: strus Python language bindings
+Summary: Python language bindings for strus
 Group: Development/Libraries/Python
 
 %description python
