@@ -488,6 +488,9 @@ make test
 %endif
 
 %changelog
+* Fri Dec 29 2017 Patrick Frey <patrickpfrey@yahoo.com> 0.15.5-0.1
+- fixed several build issues: Build with Clang, Fix bugs in travis build
+
 * Mon Dec 4 2017 Patrick Frey <patrickpfrey@yahoo.com> 0.15.4-0.1
 - adapt interface changes in papuga, reorganize code
 - added -Wshadow for C++ build
