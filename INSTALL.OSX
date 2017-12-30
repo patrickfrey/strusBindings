@@ -12,15 +12,28 @@ brew install cmake boost snappy leveldb
 Install gettext with brew, draw necessary links:
 
 brew install gettext
-ln -s /usr/local/opt/gettext/lib/* /usr/local/lib/.
-ln -s /usr/local/opt/gettext/include/* /usr/local/include/.
-ln -s /usr/local/opt/gettext/bin/* /usr/local/bin/.
+brew link --force gettext
+echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile
+
+Install lapack and blas if compiling with vector and pattern support
+(-DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=YES):
+
+brew install lapack blas
+
+Install php70 when building the Php bindings (-DWITH_PHP=YES):
+
+brew tap homebrew/homebrew-php
+brew install php70
+
+Install python3 when building the Python bindings (-DWITH_PYTON=YES):
+
+brew install python3
 
 Build strus with:
 
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
-	-DWITH_JAVA="YES" -DWITH_PHP="YES" -DWITH_PYTHON="YES" \
-	-DPYTHON_LIBRARY="/usr/local/Cellar/python/2.7.11/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib" \
+	-DWITH_STRUS_VECTOR="YES" -DWITH_STRUS_PATTERN="YES" \
+	-DWITH_PHP="YES" -DWITH_PYTHON="YES" \
 	.
 
 xcodebuild -configuration Release -target ALL_BUILD
