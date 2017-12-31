@@ -5,25 +5,24 @@ Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
 Build-Depends: debhelper (>= 4.1.16), cmake,
  libboost-dev, libboost-thread-dev, libboost-system-dev,
  libboost-date-time-dev, strusbase-dev, strus-dev, strusanalyzer-dev, strusmodule-dev,
- strustrace-dev, strusrpc-dev, swig, php5-dev, php5-cli, openjdk-7-jdk,
- libboost-python-dev, python-dev
+ strustrace-dev, strusrpc-dev, swig, php7.0-dev, php7.0-cli, python3-dev
 Standards-Version: 3.8.3
 Homepage: http://project-strus.net
 
-Package: strusbindings-python
+Package: strusbindings-python3
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: strusbindings for the Python language
- Language bindings for the strus text search engine in Python 2.
+Description: strusbindings for the Python (3) language
+ Language bindings for the strus text search engine in Python 3.
 
-Package: strusbindings-php
+Package: strusbindings-php7
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: strusbindings for the Php language
- Language bindings for the strus text search engine in Php.
+Description: strusbindings for the Php (7) language
+ Language bindings for the strus text search engine in Php 7.
 
-Package: strusbindings-java
+Package: strusbindings-lua
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: strusbindings for the Java language
- Language bindings for the strus text search engine in Java.
+Description: strusbindings for the Lua language
+ Language bindings for the strus text search engine in Lua.

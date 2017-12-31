@@ -2,7 +2,7 @@
 # Maintainer: Patrick Frey <patrickpfrey@yahoo.com> 
 
 pkgbase=strusbindings
-pkgname=(strusbindings-php5 strusbindings-java strusbindings-python2)
+pkgname=(strusbindings-php7 strusbindings-lua strusbindings-python3)
 _deppkgver=@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
 _mainpkgver=@STRUS_VERSION@
 pkgver=${_mainpkgver}
@@ -11,8 +11,8 @@ pkgdesc='Language bindings for the strus text search engine.'
 license=('MPL2')
 arch=('i686' 'x86_64')
 url="http://project-strus.net"
-depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=${_deppkgver}" "strusanalyzer>=${_deppkgver}" "strusmodule>=${_deppkgver}" "strusrpc>=${_deppkgver}")
-makedepends=('cmake' 'swig' 'php56' 'java-environment' 'python2')
+depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=${_deppkgver}" "strusanalyzer>=${_deppkgver}" "strustrace>=${_deppkgver}" "strusmodule>=${_deppkgver}" "strusrpc>=${_deppkgver}")
+makedepends=('cmake' 'php7' 'python3')
 source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
 build() {
@@ -21,49 +21,37 @@ build() {
   msg "Building..."
   mkdir build
   cd build
-  JAVA_HOME=/usr/lib/jvm/default \
-	cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib \
-	-DWITH_PHP="YES" -DWITH_JAVA="YES" -DWITH_PYTHON="YES" \
-	-DJAVA_LIB_INSTALL_DIR=/usr/share/java \
-	-DPYTHON_LIBRARY=/usr/bin/python2.7 -DPYTHON_INCLUDE_DIR=/usr/include/python2.7 \
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=lib \
+	-DWITH_PHP="YES" -DWITH_PYTHON="YES" \
+	-DPYTHON_LIBRARY=/usr/bin/python3 -DPYTHON_INCLUDE_DIR=/usr/include/python3 \
 	..
   make
 }
 
-package_strusbindings-php5() {
+package_strusbindings-php7() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
 
-  msg "Installing Php5 bindings.."
+  msg "Installing Php7 bindings.."
   cd build
 
   cd lang/php
   make DESTDIR=${pkgdir} install
   cd ../..
   
-  mkdir -p ${pkgdir}/usr/share/php56
-  cp lang/php/strus.php ${pkgdir}/usr/share/php56/.
-  
-  mkdir -p ${pkgdir}/etc/php56/conf.d
-  cat > ${pkgdir}/etc/php56/conf.d/strus.ini << EOF
+  mkdir -p ${pkgdir}/usr/share/php7
+  cp lang/php/strus.php ${pkgdir}/usr/share/php7/.
+
+  mkdir -p ${pkgdir}/etc/php7/conf.d
+  cat > ${pkgdir}/etc/php7/conf.d/strus.ini << EOF
 ; Enable strus extensions module
 extension=strus.so
 EOF
 }
 
-package_strusbindings-java() {
-  cd ${srcdir}/${pkgbase}-${_mainpkgver}
-
-  msg "Installing Java bindings.."
-  cd build
-  cd lang/java
-  make DESTDIR=${pkgdir} install
-  cd ../..  
-}
-
-package_strusbindings-python2() {
+package_strusbindings-python3() {
   cd ${srcdir}/${pkgbase}-${_mainpkgver}
   
-  msg "Installing Python2 bindings.."
+  msg "Installing Python3 bindings.."
   cd build
   cd lang/python
   make DESTDIR=${pkgdir} install

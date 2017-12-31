@@ -1,4 +1,4 @@
-# StrusBindings spec file
+# StrusBindings spe<<c file
 
 # Set distribution based on some OpenSuse and distribution macros
 # this is only relevant when building on https://build.opensuse.org
@@ -112,7 +112,6 @@
 %if %{rhel}
 %if %{rhel7}
 %define with_php 0
-%define with_java 0
 %endif
 %endif
 
@@ -124,8 +123,7 @@
 %endif
 
 # Python cmake probing fails
-# Centos 6, Python 2.6 is too old, there is a python27 on EPEL but this requires
-# strusboost to be built against python27 EPEL, currenty disabled
+# Centos 6, There is a python3 on EPEL but this requires
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel6} || %{centos6} || %{scilin6}
 %define with_python 0
@@ -136,7 +134,7 @@
 %if %{sles}
 %if %{sles11}
 # Python support in cmake broken:
-# -- Found PythonLibs: /usr/bin/python2.6
+# -- Found PythonLibs: /usr/bin/python3
 # -- Found PythonLibs package
 %define with_python 0
 # ERROR: the files below contain java bytecode for something later than java 1.5 ?
@@ -166,7 +164,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 
 %if %{with_php}
 %if %{suse} || %{sles}
-%global phpdir php5
+%global phpdir php7
 %global php_extdir %{_libdir}/%{phpdir}/extensions
 %global php_inidir %{_sysconfdir}/%{phpdir}/conf.d
 %global php_datadir %{_datadir}/%{phpdir}
@@ -301,32 +299,19 @@ Requires: strusrpc >= %{dep_version}
 %if %{rhel6} || %{centos6} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
-BuildRequires: php-devel
+BuildRequires: php7.0-devel
 BuildRequires: php-cli
 %else
-BuildRequires: php-devel
+BuildRequires: php7.0-devel
 %endif
 %endif
 %if %{suse} || %{sles}
-BuildRequires: php5-devel
-%endif
-%endif
-
-%if %{with_java}
-%if %{rhel} || %{centos} || %{scilin} || %{fedora}
-%if %{rhel6} || %{centos6} || %{scilin6}
-BuildRequires: java-1.8.0-openjdk-devel
-%else
-BuildRequires: java-1.8.0-openjdk-devel
-%endif
-%endif
-%if %{suse} || %{sles}
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: php7.0-devel
 %endif
 %endif
 
 %if %{with_python}
-BuildRequires: python-devel
+BuildRequires: python3-devel
 %endif
 
 # Check if 'Distribution' is really set by OBS (as mentioned in bacula)
@@ -352,12 +337,12 @@ Language bindings for the strus text search engine in Php
 %if %{rhel6} || %{centos6} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
-Requires: php
+Requires: php7
 %else
-Requires: php
+Requires: php7
 %endif
 %else
-Requires: php
+Requires: php7
 %endif
 
 %endif
@@ -386,10 +371,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DLIB_INSTALL_DIR=%
 %if %{with_php}
 	-DWITH_PHP="YES" \
 %endif
-%if %{with_java}
-	-DWITH_JAVA="YES" \
-	-DJAVA_LIB_INSTALL_DIR=%{_jnidir} \
-%endif
 %if %{with_python}
 	-DWITH_PYTHON="YES" \
 %endif
@@ -416,12 +397,6 @@ EOF
 
 %endif
 
-%if %{with_java}
-cd lang/java
-make DESTDIR=$RPM_BUILD_ROOT install
-cd ../..
-%endif
-
 %if %{with_python}
 cd lang/python
 make DESTDIR=$RPM_BUILD_ROOT install
@@ -446,21 +421,6 @@ make test
 %config(noreplace) %{php_inidir}/%{php_inifile}
 %{php_extdir}/strus.so
 %{_datadir}/%{phpdir}/strus.php
-%endif
-
-%if %{with_java}
-%files java
-%defattr( -, root, root )
-%if %{suse} || %{sles}
-%dir %{_jnidir}
-%dir %{_jnidir}/strus
-%endif
-# TODO: should not be in libdir but in jni subdir (at
-# least on RHEL
-%{_libdir}/strus/libstrus_java.so
-%{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@
-%{_libdir}/strus/libstrus_java.so.@STRUS_MAJOR_VERSION@.@STRUS_MINOR_VERSION@.@STRUS_PATCH_VERSION@
-%{_jnidir}/strus/strus_api.jar
 %endif
 
 %if %{with_python}
