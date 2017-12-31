@@ -275,14 +275,14 @@ Requires: strusrpc >= %{dep_version}
 %if %{rhel6} || %{centos6} || %{scilin6}
 # Official Php is too old, so is EPEL, using Webtatic (TODO: have a SPEC-file switch
 # choosing your php)
-BuildRequires: php7.0-devel
-BuildRequires: php-cli
+BuildRequires: php7-devel
+BuildRequires: php7-cli
 %else
-BuildRequires: php7.0-devel
+BuildRequires: php7-devel
 %endif
 %endif
 %if %{suse} || %{sles}
-BuildRequires: php7.0-devel
+BuildRequires: php7-devel
 %endif
 %endif
 
