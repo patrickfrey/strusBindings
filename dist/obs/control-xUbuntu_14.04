@@ -5,7 +5,7 @@ Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
 Build-Depends: debhelper (>= 4.1.16), cmake,
  libboost-dev, libboost-thread-dev, libboost-system-dev,
  libboost-date-time-dev, strusbase-dev, strus-dev, strusanalyzer-dev, strusmodule-dev,
- strustrace-dev, strusrpc-dev, php7.0-dev, php7.0-cli, libxml2, python3-dev
+ strustrace-dev, strusrpc-dev, php7.0-dev, php7.0-cli, libxml2-dev, python3-dev
 Standards-Version: 3.8.3
 Homepage: http://project-strus.net
 
