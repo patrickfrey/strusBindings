@@ -73,6 +73,13 @@ src/parser/strusBindingsInterfaceGen
 src/gen/strusBindingsModuleGen
 src/lang/lua/strusLua
 
+# Generated sources
+doc/luaBindingsDoc.css
+doc/luaBindingsDoc.js
+src/lang/lua/dist.info
+src/lang/lua/strus.lua
+strusbindings-0.*.tar.gz
+
 # Generated test data
 tests/lua/exec
 
