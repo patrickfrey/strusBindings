@@ -82,5 +82,6 @@ endif( Boost_ATOMIC_FOUND )
 endif( BOOST_INSTALL_PATH )
 
 MESSAGE( STATUS "Boost includes: ${Boost_INCLUDE_DIRS}" )
+set( Boost_INCLUDE_DIR "${Boost_INCLUDE_DIRS}" )
 MESSAGE( STATUS "Boost library directories: ${Boost_LIBRARY_DIRS}" )
 MESSAGE( STATUS "Boost libraries: ${Boost_LIBRARIES}" )
