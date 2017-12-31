@@ -6,7 +6,6 @@
 
 %define with_php 1
 %define with_python 1
-%define with_java 1
 
 %define rhel 0
 %define rhel6 0
@@ -115,13 +114,6 @@
 %endif
 %endif
 
-# no openjdk anymore for modern distributions?
-%if %{rhel} || %{centos} || %{scilin}
-%if %{centos7} || %{scilin7}
-%define with_java 0
-%endif
-%endif
-
 # Python cmake probing fails
 # Centos 6, There is a python3 on EPEL but this requires
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
@@ -138,7 +130,6 @@
 # -- Found PythonLibs package
 %define with_python 0
 # ERROR: the files below contain java bytecode for something later than java 1.5 ?
-%define with_java 0
 # Too old:
 %define with_php 0
 %endif
@@ -258,21 +249,6 @@ Requires: libboost_system1_63_0 >= 1.63.0
 Requires: libboost_date_time1_63_0 >= 1.63.0
 BuildRequires: boost-devel
 %endif
-%endif
-
-%if %{rhel} || %{centos} || %{scilin}
-%if %{rhel7} || %{centos7} || %{scilin7}
-BuildRequires: swig
-%endif
-%if %{rhel6} || %{centos6} || %{scilin6}
-BuildRequires: swig2
-%endif
-%endif
-%if %{fedora} || %{suse}
-BuildRequires: swig
-%endif
-%if %{sles}
-BuildRequires: swig2
 %endif
 
 BuildRequires: strusbase-devel >= %{dep_version}
