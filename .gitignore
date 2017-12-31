@@ -67,18 +67,15 @@ include/strus/bindingObjects.h
 include/papuga/
 include/strus/versionBindings.hpp
 tests/php7/php.ini
+doc/luaBindingsDoc.css
+doc/luaBindingsDoc.js
+src/lang/lua/dist.info
+src/lang/lua/strus.lua
 
 # Compiled programs
 src/parser/strusBindingsInterfaceGen
 src/gen/strusBindingsModuleGen
 src/lang/lua/strusLua
-
-# Generated sources
-doc/luaBindingsDoc.css
-doc/luaBindingsDoc.js
-src/lang/lua/dist.info
-src/lang/lua/strus.lua
-strusbindings-0.*.tar.gz
 
 # Generated test data
 tests/lua/exec
@@ -86,5 +83,7 @@ tests/lua/exec
 # Language interpreter data:
 __pycache__
 
+# deploy to obs tar:
+strusbindings-*.tar.gz
 
 
