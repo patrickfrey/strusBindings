@@ -23,7 +23,7 @@ namespace bindings {
 class TermExpression
 {
 public:
-	enum {VariableOfs=1<<31,MaxValue=1<<28};
+	enum {VariableOfs=1<<30,MaxValue=(1<<30)-1};
 
 	struct Operator
 	{
