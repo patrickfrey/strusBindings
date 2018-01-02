@@ -23,7 +23,7 @@ namespace bindings {
 class MetaDataExpression
 {
 public:
-	enum {BooleanOpOfs=1<<31};
+	enum {BooleanOpOfs=1<<30};
 
 	/// \brief Constructor
 	MetaDataExpression( const QueryAnalyzerInterface* analyzer_, ErrorBufferInterface* errorhnd_)
