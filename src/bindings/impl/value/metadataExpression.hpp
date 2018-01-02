@@ -94,8 +94,8 @@ private:
 private:
 	ErrorBufferInterface* m_errorhnd;
 	QueryAnalyzerContextInterface* m_analyzer;
-	std::vector<unsigned int> m_fieldno_stack;
-	unsigned int m_fieldno_cnt;
+	std::vector<int> m_fieldno_stack;
+	int m_fieldno_cnt;
 	analyzer::QueryTermExpression m_expr;
 };
 
