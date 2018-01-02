@@ -72,7 +72,7 @@ set_target_properties( strus_bindings_python3 PROPERTIES
 				OUTPUT_NAME strus 
 				LINK_FLAGS "${PYTHON3_MODULE_LINK_FLAGS}"
 				COMPILE_FLAGS "${PYTHON3_MODULE_CXX_FLAGS}" )
-target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Boost_Python_LIBRARIES} ${Intl_LIBRARIES} 
+target_link_libraries( strus_bindings_python3 ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${Intl_LIBRARIES} 
 				strus_bindings
 				papuga_python3_dev )
 

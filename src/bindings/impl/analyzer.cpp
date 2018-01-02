@@ -442,8 +442,7 @@ void QueryAnalyzerImpl::addElement(
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
 
-	THIS->addElement(
-		featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
+	THIS->addElement( featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
 }
 
