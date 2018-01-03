@@ -34,18 +34,15 @@ package_strusbindings-php7() {
   msg "Installing Php7 bindings.."
   cd build
 
-  cd lang/php
+  cd src/lang/php7
   make DESTDIR=${pkgdir} install
-  cd ../..
+  cd ../../..
   
   mkdir -p ${pkgdir}/usr/share/php7
-  cp lang/php/strus.php ${pkgdir}/usr/share/php7/.
+  cp src/lang/php7/strus.php ${pkgdir}/usr/share/php7/.
 
   mkdir -p ${pkgdir}/etc/php7/conf.d
-  cat > ${pkgdir}/etc/php7/conf.d/strus.ini << EOF
-; Enable strus extensions module
-extension=strus.so
-EOF
+  cp src/lang/php7/php.ini ${pkgdir}/etc/php7/conf.d/
 }
 
 package_strusbindings-python3() {
@@ -53,9 +50,19 @@ package_strusbindings-python3() {
   
   msg "Installing Python3 bindings.."
   cd build
-  cd lang/python
+  cd src/lang/python3
   make DESTDIR=${pkgdir} install
-  cd ../..
+  cd ../../..
+}
+
+package_strusbindings-lua() {
+  cd ${srcdir}/${pkgbase}-${_mainpkgver}
+  
+  msg "Installing Lua bindings.."
+  cd build
+  cd src/lang/lua
+  make DESTDIR=${pkgdir} install
+  cd ../../..
 }
 
 check() {

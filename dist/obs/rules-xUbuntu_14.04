@@ -59,23 +59,17 @@ install: build
 
 	# Add here commands to install the package
 	# The DESTDIR Has To Be Exactly  /usr/src/packages/BUILD/debian/<nameOfPackage>
-	cd lang/php7
+	cd src/lang/php7
 	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-php7
-	cd ../..
+	cd ../../..
 
-	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php7/usr/share/php7/strus
-	cp debian/strus.ini /usr/src/packages/BUILD/debian/strusbindings-php7/usr/share/php7/strus/.
-
-	mkdir -p /usr/src/packages/BUILD/debian/strusbindings-php7/etc/php7/mods-available
-	cp debian/strus.ini /usr/src/packages/BUILD/debian/strusbindings-php/etc/php7/mods-available/.
-
-	cd lang/lua
-	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-lua
-	cd ../..
-
-	cd lang/python3
+	cd src/lang/python3
 	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-python3
-	cd ../..
+	cd ../../..
+
+	cd src/lang/lua
+	$(MAKE) install DESTDIR=/usr/src/packages/BUILD/debian/strusbindings-lua
+	cd ../../..
 	# --- end custom part for installing
 
 # Build architecture-independent files here.

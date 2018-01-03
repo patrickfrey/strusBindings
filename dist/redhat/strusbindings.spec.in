@@ -4,6 +4,7 @@
 # this is only relevant when building on https://build.opensuse.org
 ###
 
+%define with_lua 1
 %define with_php 1
 %define with_python 1
 
@@ -307,7 +308,7 @@ Summary: Php language bindings for strus
 Group: Development/Libraries/Php
 
 %description php
-Language bindings for the strus text search engine in Php
+Language bindings for the strus text search engine in Php7
 
 %if %{rhel} || %{centos} || %{scilin} || %{fedora}
 %if %{rhel6} || %{centos6} || %{scilin6}
@@ -326,13 +327,24 @@ Requires: php7
 %if %{with_python}
 
 %package python
-Summary: Python language bindings for strus
+Summary: Python3 language bindings for strus
 Group: Development/Libraries/Python
 
 %description python
 Language bindings for the strus text search engine in Python
 
 Requires: python
+
+%endif
+
+%if %{with_lua}
+
+%package lua
+Summary: Lua language bindings for strus
+Group: Development/Libraries/Lua
+
+%description lua
+Language bindings for the strus text search engine in Lua
 
 %endif
 
@@ -358,27 +370,29 @@ make %{?_smp_mflags}
 cd build
 
 %if %{with_php}
-cd lang/php
+cd src/lang/php7
 make DESTDIR=$RPM_BUILD_ROOT install
-cd ../..
-
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{phpdir}
-cp lang/php/strus.php $RPM_BUILD_ROOT/%{_datadir}/%{phpdir}/.
+cd ../../..
 
 mkdir -p $RPM_BUILD_ROOT/%{php_inidir}
-cat > $RPM_BUILD_ROOT/%{php_inidir}/%{php_inifile} <<EOF
-; Enable strus extensions module
-extension=strus.so
-EOF
+cp src/lang/php7/php.ini $RPM_BUILD_ROOT/%{php_inidir}/%{php_inifile}
 
 %endif
 
 %if %{with_python}
-cd lang/python
+cd src/lang/python3
 make DESTDIR=$RPM_BUILD_ROOT install
-cd ../..
+cd ../../..
 %endif
-  
+
+%if %{with_php}
+%files php
+%defattr( -, root, root )
+%config(noreplace) %{php_inidir}/%{php_inifile}
+%{php_extdir}/strus.so
+%{_datadir}/%{phpdir}/strus.php
+%endif
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -390,14 +404,6 @@ make test
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
-
-%if %{with_php}
-%files php
-%defattr( -, root, root )
-%config(noreplace) %{php_inidir}/%{php_inifile}
-%{php_extdir}/strus.so
-%{_datadir}/%{phpdir}/strus.php
-%endif
 
 %if %{with_python}
 %files python
