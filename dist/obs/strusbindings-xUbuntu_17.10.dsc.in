@@ -1,0 +1,13 @@
+Format: 3.0 (quilt)
+Source: strusbindings
+Version: @STRUS_VERSION@-xUbuntu17.10
+Binary: strusbindings
+Maintainer: Patrick Frey <patrickpfrey@yahoo.com>
+Architecture: any
+Build-Depends: debhelper (>= 4.1.16), cmake,
+ libboost-dev, libboost-thread-dev, libboost-system-dev,
+ libboost-date-time-dev, libboost-regex-dev,
+ strusbase-dev, strus-dev, strusanalyzer-dev,
+ strustrace-dev, strusmodule-dev, strusrpc-dev, php7-dev, php7-cli,
+ libxml2-dev, python3-dev
+Files:

@@ -48,6 +48,7 @@ dist/obs/strusbindings-Debian_7.0.dsc
 dist/obs/strusbindings-xUbuntu_12.04.dsc
 dist/obs/strusbindings-Debian_8.0.dsc
 dist/obs/strusbindings-xUbuntu_14.04.dsc
+dist/obs/strusbindings-xUbuntu_17.10.dsc
 dist/redhat/strusbindings.spec
 
 # Suggested build directories
