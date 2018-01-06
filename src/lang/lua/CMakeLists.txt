@@ -73,12 +73,17 @@ target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bind
 # PROGRAMS
 # ------------------------------
 add_executable( strusLua strusLua.c )
-target_link_libraries( strusLua  strus_bindings_lua papuga_devel strus_lua m dl ${Intl_LIBRARIES} )
+target_link_libraries( strusLua  strus_bindings_lua papuga_devel strus_lua m ${Intl_LIBRARIES} )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )
 if(LIBKVM_LIBRARIES)
         target_link_libraries( strusLua ${LIBKVM_LIBRARIES} )
+endif()
+
+find_library( LIBDL_LIBRARY dl )
+if(LIBDL_LIBRARY)
+        target_link_libraries( strusLua ${LIBDL_LIBRARY} )
 endif()
 
 # ------------------------------
