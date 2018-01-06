@@ -28,12 +28,13 @@ set( bindings_source_files
 	impl/vector.cpp
 	impl/context.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp
+	${CMAKE_CURRENT_BINARY_DIR}/bindingClasses.cpp
 )
 set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingClasses.cpp PROPERTIES GENERATED TRUE ) 
 set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/libstrus_bindings_description.cpp PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/lib/bindingObjects.h PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/../../include/strus/lib/bindings_description.hpp PROPERTIES GENERATED TRUE ) 
-set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingClassIds.hpp PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${BINDINGS_GEN_INCLUDE_DIR}/bindingObjects.h PROPERTIES GENERATED TRUE ) 
+set_source_files_properties( ${BINDINGS_GEN_INCLUDE_DIR}/lib/bindings_description.hpp PROPERTIES GENERATED TRUE ) 
 set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingClassTemplate.hpp PROPERTIES GENERATED TRUE ) 
 
 include_directories(

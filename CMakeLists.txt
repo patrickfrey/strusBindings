@@ -89,6 +89,7 @@ set( PAPUGA_LUA_LIBRARY_DIRS   "${CMAKE_CURRENT_BINARY_DIR}/3rdParty/papuga/lua"
 set( BINDINGS_INCLUDE_DIRS        "${CMAKE_CURRENT_BINARY_DIR}/include"  "${PROJECT_SOURCE_DIR}/include" )
 set( BINDINGS_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/bindings" )
 set( BINDINGS_LIBRARY_DIRS         "${CMAKE_CURRENT_BINARY_DIR}/src/bindings" )
+set( BINDINGS_GEN_INCLUDE_DIR  "${CMAKE_CURRENT_BINARY_DIR}/include/strus" )
 
 # Module path:
 if (NOT STRUS_MODULE_PATH)
