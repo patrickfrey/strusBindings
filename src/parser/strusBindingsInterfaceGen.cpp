@@ -971,6 +971,10 @@ static void print_methodIdsHpp( std::ostream& out, const strus::InterfacesDef& i
 	{
 		out << "struct " << ci->name() << std::endl;
 		out << "{" << std::endl;
+		if (!ci->constructorDefs().empty())
+		{
+			out << "\t" << "static const MethodId& constructor() {return MethodId( " << cidx << "," << 0 << ");}" << std::endl;
+		}
 		std::vector<strus::MethodDef>::const_iterator
 			mi = ci->methodDefs().begin(),
 			me = ci->methodDefs().end();

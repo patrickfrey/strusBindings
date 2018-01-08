@@ -77,7 +77,6 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_storage_objbuilder_impl()
 	,m_analyzer_objbuilder_impl()
 	,m_textproc(0)
-	,m_queryproc(0)
 {
 	ContextDef contextdef( descr);
 	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads);
@@ -105,6 +104,7 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 
 void ContextImpl::loadModule( const std::string& name_)
 {
+	strus::unique_lock lck( m_mutex);
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot load modules in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to load modules after the first use of objects"));
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to load modules after the first use of objects"));
@@ -118,6 +118,7 @@ void ContextImpl::loadModule( const std::string& name_)
 
 void ContextImpl::addModulePath( const ValueVariant& paths_)
 {
+	strus::unique_lock lck( m_mutex);
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot add a module path in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to set the module search path after the first use of objects"));
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to set the module search path after the first use of objects"));
@@ -137,6 +138,7 @@ void ContextImpl::addModulePath( const ValueVariant& paths_)
 
 void ContextImpl::addResourcePath( const ValueVariant& paths_)
 {
+	strus::unique_lock lck( m_mutex);
 	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot add a resource path in RPC client mode"));
 	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to add a resource path after the first use of objects"));
 	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to add a resource path after the first use of objects"));
@@ -156,6 +158,7 @@ void ContextImpl::addResourcePath( const ValueVariant& paths_)
 
 void ContextImpl::initStorageObjBuilder()
 {
+	strus::unique_lock lck( m_mutex);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	StorageObjectBuilderInterface* storageObjectBuilder = 0;
 	if (m_rpc_impl.get())
@@ -192,6 +195,7 @@ void ContextImpl::initStorageObjBuilder()
 
 void ContextImpl::initAnalyzerObjBuilder()
 {
+	strus::unique_lock lck( m_mutex);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	AnalyzerObjectBuilderInterface* analyzerObjectBuilder = 0;
 	if (m_rpc_impl.get())
@@ -224,18 +228,21 @@ void ContextImpl::initAnalyzerObjBuilder()
 		analyzerObjectBuilder = analyzerObjectBuilder_proxy;
 	}
 	m_analyzer_objbuilder_impl.resetOwnership( analyzerObjectBuilder, "AnalyzerObjectBuilder");
+	const AnalyzerObjectBuilderInterface* objBuilder = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
+	m_textproc = objBuilder->getTextProcessor();
+	if (!m_textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+}
+
+void ContextImpl::endConfig()
+{
+	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 }
 
 analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& content)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	const AnalyzerObjectBuilderInterface* objBuilder = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	if (!m_textproc)
-	{
-		m_textproc = objBuilder->getTextProcessor();
-		if (!m_textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
-	}
 	Reference<analyzer::DocumentClass> dclass( new analyzer::DocumentClass());
 	enum {MaxHdrSize = 8092};
 	std::size_t hdrsize = content.size() > MaxHdrSize ? MaxHdrSize : content.size();
@@ -268,16 +275,6 @@ VectorStorageClientImpl* ContextImpl::createVectorStorageClient( const ValueVari
 DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	if (!m_textproc)
-	{
-		AnalyzerObjectBuilderInterface* objBuilder = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-		m_textproc = objBuilder->getTextProcessor();
-		if (!m_textproc)
-		{
-			ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-			throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
-		}
-	}
 	return new DocumentAnalyzerImpl( m_trace_impl, m_analyzer_objbuilder_impl, m_errorhnd_impl, doctype, m_textproc);
 }
 

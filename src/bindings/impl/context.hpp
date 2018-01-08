@@ -12,6 +12,7 @@
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/statisticsViewerInterface.hpp"
+#include "strus/base/thread.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
 #include <vector>
@@ -60,6 +61,7 @@ public:
 	/// \param[in] name name of the module to load
 	/// \example "analyzer_pattern"
 	/// \example "storage_vector"
+	/// \note this function is not thread safe and should only be called in the initialization phase before calling endConfig when used in a multithreaded context.
 	void loadModule( const std::string& name);
 
 	/// \brief Add one or more paths from where to try to load modules from
@@ -68,6 +70,7 @@ public:
 	/// \param[in] paths a string or a list of module search paths
 	/// \example [ "/home/bob/modules" "/home/anne/modules" ]
 	/// \example "/home/bob/modules"
+	/// \note this function is not thread safe and should only be called in the initialization phase before calling endConfig when used in a multithreaded context.
 	void addModulePath( const ValueVariant& paths);
 
 	/// \brief Add a path where to load analyzer resource files from
@@ -76,6 +79,10 @@ public:
 	/// \example [ "/home/bob/resources" "/home/anne/resources" ]
 	/// \example "/home/bob/resources"
 	void addResourcePath( const ValueVariant& paths);
+
+	/// \brief End the configuration of the context, creates the object builders
+	/// \remark If this function is not called, then the object builders are created on the first request
+	void endConfig();
 
 	/// \brief Create a storage client instance
 	/// \example createStorageClient()
@@ -192,7 +199,7 @@ private:
 	ObjectRef m_storage_objbuilder_impl;
 	ObjectRef m_analyzer_objbuilder_impl;
 	const TextProcessorInterface* m_textproc;
-	const QueryProcessorInterface* m_queryproc;
+	std::mutex m_mutex;
 };
 
 }}//namespace
