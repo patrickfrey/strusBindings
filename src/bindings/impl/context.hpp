@@ -199,7 +199,7 @@ private:
 	ObjectRef m_storage_objbuilder_impl;
 	ObjectRef m_analyzer_objbuilder_impl;
 	const TextProcessorInterface* m_textproc;
-	std::mutex m_mutex;
+	strus::mutex m_mutex;
 };
 
 }}//namespace
