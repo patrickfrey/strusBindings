@@ -196,12 +196,12 @@ static bool getCompareOperator( MetaDataRestrictionInterface::CompareOperator& r
 	}
 	else if (si[0] == '>')
 	{
-		if (si[1] == '=')
+		if (si[1] == '=' && !si[2])
 		{
 			res = MetaDataRestrictionInterface::CompareGreaterEqual;
 			return true;
 		}
-		else
+		else if (!si[1])
 		{
 			res = MetaDataRestrictionInterface::CompareGreater;
 			return true;
@@ -209,7 +209,7 @@ static bool getCompareOperator( MetaDataRestrictionInterface::CompareOperator& r
 	}
 	else if (si[0] == '!')
 	{
-		if (si[1] == '=')
+		if (si[1] == '=' && !si[2])
 		{
 			res = MetaDataRestrictionInterface::CompareNotEqual;
 			return true;
@@ -217,16 +217,52 @@ static bool getCompareOperator( MetaDataRestrictionInterface::CompareOperator& r
 	}
 	else if (si[0] == '=')
 	{
-		if (si[1] == '=')
+		if (si[1] == '=' && !si[2])
 		{
 			res = MetaDataRestrictionInterface::CompareEqual;
 			return true;
 		}
-		else
+		else if (!si[1])
 		{
 			res = MetaDataRestrictionInterface::CompareEqual;
 			return true;
 		}
+	}
+	else if (si[0] == 'g')
+	{
+		if (si[1] == 't' && !si[2])
+		{
+			res = MetaDataRestrictionInterface::CompareGreater;
+			return true;
+		}
+		else if (si[1] == 'e' && !si[2])
+		{
+			res = MetaDataRestrictionInterface::CompareGreaterEqual;
+			return true;
+		}
+	}
+	else if (si[0] == 'l')
+	{
+		if (si[1] == 't' && !si[2])
+		{
+			res = MetaDataRestrictionInterface::CompareLess;
+			return true;
+		}
+		else if (si[1] == 'e' && !si[2])
+		{
+			res = MetaDataRestrictionInterface::CompareLessEqual;
+			return true;
+		}
+	}
+	else if (si[0] == 'e' && si[1] == 'q' && !si[2])
+	{
+		res = MetaDataRestrictionInterface::CompareEqual;
+		return true;
+	}
+	else if (si[0] == 'n' && si[1] == 'e' && !si[2])
+	{
+		res = MetaDataRestrictionInterface::CompareNotEqual;
+		return true;
 	}
 	return false;
 }
