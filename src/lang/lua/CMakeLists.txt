@@ -67,13 +67,13 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/lang/lua/luaBindingsDoc.js  ${CMAKE_BI
 # ------------------------------
 add_library( strus_bindings_lua SHARED libstrus_bindings_lua.c )
 add_dependencies( strus_bindings_lua lua_mod )
-target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bindings strus_lua ${Intl_LIBRARIES} )
+target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bindings papuga_lua ${Intl_LIBRARIES} )
 
 # ------------------------------
 # PROGRAMS
 # ------------------------------
 add_executable( strusLua strusLua.c )
-target_link_libraries( strusLua  strus_bindings_lua papuga_devel strus_lua m ${Intl_LIBRARIES} )
+target_link_libraries( strusLua  strus_bindings_lua papuga_devel papuga_lua m ${Intl_LIBRARIES} )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )
