@@ -822,8 +822,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 static void print_BindingClassesH( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHFrameHeader( out, "bindingClasses", "Provides binding classes as structures");
-	out << "#include \"papuga/typedefs.h\"" << std::endl;
-	out << "#include <stddef.h>" << std::endl;
+	out << "#include \"papuga/classdef.h\"" << std::endl;
 
 	out << "#ifdef __cplusplus" << std::endl;
 	out << "extern \"C\" {" << std::endl;
