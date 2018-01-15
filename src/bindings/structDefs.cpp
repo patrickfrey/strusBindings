@@ -535,7 +535,7 @@ MetaDataCompareDef::MetaDataCompareDef( papuga_SerializationIter& seriter)
 		cmpop = Deserializer::getMetaDataCmpOp( seriter);
 		name = Deserializer::getString( seriter);
 		const papuga_ValueVariant* valueref = getValue( seriter);
-		papuga_init_ValueVariant_copy( &value, valueref);
+		papuga_init_ValueVariant_value( &value, valueref);
 	}
 	else
 	{
@@ -553,7 +553,7 @@ MetaDataCompareDef::MetaDataCompareDef( papuga_SerializationIter& seriter)
 					name = Deserializer::getString( seriter);
 					break;
 				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
-					papuga_init_ValueVariant_copy( &value, getValue( seriter));
+					papuga_init_ValueVariant_value( &value, getValue( seriter));
 					break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'op' or 'name' or 'value' expected"), context);
 			}
