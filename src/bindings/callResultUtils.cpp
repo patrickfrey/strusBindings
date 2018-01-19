@@ -11,7 +11,7 @@
 
 void strus::initCallResultStruct( papuga_CallResult* retval, const strus::bindings::Struct& st)
 {
-	papuga_Allocator* allocator = papuga_Allocator_alloc_Allocator( &retval->allocator);
+	papuga_Allocator* allocator = papuga_Allocator_alloc_Allocator( retval->allocator);
 	if (!allocator) std::bad_alloc();
 	std::memcpy( allocator, &st.allocator, sizeof(st.allocator));
 	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();

@@ -26,7 +26,7 @@ void initCallResultIterator( papuga_CallResult* retval, const strus::bindings::I
 template <typename STRUCTVALUE>
 void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* st)
 {
-	papuga_HostObject* obj = papuga_Allocator_alloc_HostObject( &retval->allocator, strus::bindings::BindingClassTemplate<STRUCTVALUE>::classid(), st, strus::bindings::BindingClassTemplate<STRUCTVALUE>::getDestructor());
+	papuga_HostObject* obj = papuga_Allocator_alloc_HostObject( retval->allocator, strus::bindings::BindingClassTemplate<STRUCTVALUE>::classid(), st, strus::bindings::BindingClassTemplate<STRUCTVALUE>::getDestructor());
 	if (!obj)
 	{
 		strus::bindings::BindingClassTemplate<STRUCTVALUE>::getDestructor()( st);

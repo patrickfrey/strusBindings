@@ -211,7 +211,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 							attributereader->skipDoc( m_docno);
 						}
 						std::string attrvalstr = attributereader->getValue( ei->handle());
-						const char* attrvalptr = papuga_Allocator_copy_string( &result->allocator, attrvalstr.c_str(), attrvalstr.size());
+						const char* attrvalptr = papuga_Allocator_copy_string( result->allocator, attrvalstr.c_str(), attrvalstr.size());
 						if (!attrvalptr) throw std::bad_alloc();
 
 						ser &= papuga_Serialization_pushValue_string( serialization, attrvalptr, attrvalstr.size());
@@ -231,7 +231,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 					std::vector<std::string>::const_iterator ui = usernames.begin(), ue = usernames.end();
 					for (; ui != ue; ++ui)
 					{
-						const char* usernamestr = papuga_Allocator_copy_string( &result->allocator, ui->c_str(), ui->size());
+						const char* usernamestr = papuga_Allocator_copy_string( result->allocator, ui->c_str(), ui->size());
 						if (!usernamestr) throw std::bad_alloc();
 						ser &= papuga_Serialization_pushValue_string( serialization, usernamestr, ui->size());
 					}
@@ -248,7 +248,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 					while (0!=(pos=fitr->skipPos( pos+1)))
 					{
 						std::string value = fitr->fetch();
-						const char* valuestr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
+						const char* valuestr = papuga_Allocator_copy_string( result->allocator, value.c_str(), value.size());
 						if (!valuestr) throw std::bad_alloc();
 						ser &= papuga_Serialization_pushValue_string( serialization, valuestr, value.size());
 					}
@@ -266,7 +266,7 @@ bool SelectIterator::buildRow( papuga_CallResult* result)
 						while (titr->nextTerm( term))
 						{
 							std::string value = titr->termValue( term.termno);
-							const char* valuestr = papuga_Allocator_copy_string( &result->allocator, value.c_str(), value.size());
+							const char* valuestr = papuga_Allocator_copy_string( result->allocator, value.c_str(), value.size());
 							ser &= papuga_Serialization_pushValue_string( serialization, valuestr, value.size());
 						}
 						ser &= papuga_Serialization_pushClose( serialization);
