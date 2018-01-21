@@ -10,7 +10,7 @@
 #include "serializer.hpp"
 #include "papuga/valueVariant.h"
 #include "papuga/serialization.h"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "papuga/allocator.h"
 
 using namespace strus;

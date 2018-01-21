@@ -11,7 +11,7 @@
 #include "strus/traceObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include <memory>
 
 using namespace strus;

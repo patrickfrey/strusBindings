@@ -15,7 +15,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/base/configParser.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
 #include "callResultUtils.hpp"

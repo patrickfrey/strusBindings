@@ -38,7 +38,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/constants.hpp"
 #include "strus/base/configParser.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
 #include "structDefs.hpp"

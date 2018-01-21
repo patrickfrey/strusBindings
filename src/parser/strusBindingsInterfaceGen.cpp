@@ -302,7 +302,7 @@ static void print_BindingInterfaceDescriptionCpp( std::ostream& out, const strus
 	strus::printCppFrameHeader( out, "bindings_description", "Strus interface description used for generating language bindings");
 	out << "#include \"strus/lib/bindings_description.hpp\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out << "#include \"internationalization.hpp\"" << std::endl;
+	out << "#include \"private/internationalization.hpp\"" << std::endl;
 	out << "#include \"papuga/typedefs.h\"" << std::endl;
 
 	out << "#include <cstddef>" << std::endl;
@@ -683,7 +683,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#include \"papuga/callResult.h\"" << std::endl;
 	out << "#include \"papuga/serialization.h\"" << std::endl;
 	out << "#include \"papuga/errors.h\"" << std::endl;
-	out << "#include \"internationalization.hpp\"" << std::endl;
+	out << "#include \"private/internationalization.hpp\"" << std::endl;
 	out << "#include \"callResultUtils.hpp\"" << std::endl;
 	out << "#include \"valueVariantWrap.hpp\"" << std::endl;
 	out << std::endl

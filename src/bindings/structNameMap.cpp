@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "structNameMap.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "papuga/valueVariant.h"
 #include <cstring>
 

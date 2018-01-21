@@ -67,7 +67,7 @@ configure_file( "${PROJECT_SOURCE_DIR}/include/strus/versionBindings.hpp.in"   "
 
 set( STRUS_GETTEXT_PACKAGE "strus-dom" )	#... 1st parameter of bindtextdomain(...)
 set( STRUS_GETTEXT_LOCALEDIR "" )			#... 2nd parameter of bindtextdomain(...)
-configure_file( "${PROJECT_SOURCE_DIR}/src/bindings/internationalization.cpp.in"  "${CMAKE_CURRENT_BINARY_DIR}/src/bindings/internationalization.cpp"  @ONLY )
+configure_file( "${PROJECT_SOURCE_DIR}/src/utils/internationalization.cpp.in"  "${CMAKE_CURRENT_BINARY_DIR}/src/utils/internationalization.cpp"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh.in"  "${PROJECT_SOURCE_DIR}/dist/obs/deploy_to_obs.sh"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD.in"  "${PROJECT_SOURCE_DIR}/dist/archlinux/PKGBUILD"  @ONLY )
 configure_file( "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc.in"  "${PROJECT_SOURCE_DIR}/dist/obs/strusbindings.dsc"  @ONLY )
@@ -90,6 +90,7 @@ set( BINDINGS_INCLUDE_DIRS        "${CMAKE_CURRENT_BINARY_DIR}/include"  "${PROJ
 set( BINDINGS_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/bindings" )
 set( BINDINGS_LIBRARY_DIRS         "${CMAKE_CURRENT_BINARY_DIR}/src/bindings" )
 set( BINDINGS_GEN_INCLUDE_DIR  "${CMAKE_CURRENT_BINARY_DIR}/include/strus" )
+set( UTILS_GENSOURCE_DIR           "${CMAKE_CURRENT_BINARY_DIR}/src/utils" )
 
 # Module path:
 if (NOT STRUS_MODULE_PATH)

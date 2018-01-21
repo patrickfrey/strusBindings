@@ -30,7 +30,7 @@
 #include "papuga/serialization.h"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"

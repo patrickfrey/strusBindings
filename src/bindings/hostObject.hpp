@@ -11,7 +11,7 @@
 /// \file hostObject.hpp
 #include "papuga/hostObject.h"
 #include "bindingClassTemplate.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include <stdexcept>
 
 #define PAPUGA_USE_RTTI_TYPECHECK

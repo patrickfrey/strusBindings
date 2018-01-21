@@ -6,7 +6,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 #include "structDefs.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "deserializer.hpp"
 #include "papuga/serialization.h"
 #include "papuga/valueVariant.h"

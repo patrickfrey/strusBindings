@@ -15,7 +15,7 @@
 #include "strus/index.hpp"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "bindingClassTemplate.hpp"
 
 namespace strus {

@@ -11,7 +11,7 @@
 #include "strus/storageClientInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/statisticsIteratorInterface.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 
 #define ITERATOR_NAME "statistics iterator"
 

@@ -15,7 +15,7 @@
 #include "papuga/serialization.h"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include <limits>
 
 using namespace strus;

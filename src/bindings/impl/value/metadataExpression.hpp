@@ -12,7 +12,7 @@
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/queryAnalyzerContextInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include <vector>
 #include <string>
 

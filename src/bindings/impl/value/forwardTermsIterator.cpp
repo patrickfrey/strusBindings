@@ -15,7 +15,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 
 #define ITERATOR_NAME "forward terms iterator"
 

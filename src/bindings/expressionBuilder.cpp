@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "expressionBuilder.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "strus/base/stdint.h"
 #include "strus/base/utf8.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"

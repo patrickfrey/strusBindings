@@ -20,7 +20,7 @@
 #include "strus/attributeReaderInterface.hpp"
 #include "strus/aclReaderInterface.hpp"
 #include "impl/value/objectref.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include <vector>
 #include <string>
 

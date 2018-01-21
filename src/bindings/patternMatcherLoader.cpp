@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "patternMatcherLoader.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "strus/base/fileio.hpp"

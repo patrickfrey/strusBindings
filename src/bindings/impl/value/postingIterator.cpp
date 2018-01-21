@@ -14,7 +14,7 @@
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 
 #define ITERATOR_NAME "postings iterator"
 

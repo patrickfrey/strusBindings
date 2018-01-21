@@ -16,7 +16,7 @@
 #include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
 #include "patternMatcherLoader.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
 #include "callResultUtils.hpp"

@@ -12,7 +12,7 @@
 #include "strus/reference.hpp"
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include <vector>
 #include <string>
 

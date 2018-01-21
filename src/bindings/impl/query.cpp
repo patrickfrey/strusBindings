@@ -12,7 +12,7 @@
 #include "strus/queryInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
-#include "internationalization.hpp"
+#include "private/internationalization.hpp"
 #include "valueVariantWrap.hpp"
 #include "callResultUtils.hpp"
 #include "deserializer.hpp"

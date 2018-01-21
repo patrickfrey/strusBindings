@@ -13,7 +13,6 @@ set( bindings_source_files
 	valueVariantWrap.cpp
 	callResultUtils.cpp
 	traceUtils.cpp
-	${CMAKE_CURRENT_BINARY_DIR}/internationalization.cpp
 	impl/value/termExpression.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp
@@ -62,6 +61,7 @@ link_directories(
 	${strusbase_LIBRARY_DIRS}
 	${strusmodule_LIBRARY_DIRS}
 	${strusrpc_LIBRARY_DIRS}
+	${UTILS_GENSOURCE_DIR}
 )
 
 # ------------------------------
@@ -69,7 +69,7 @@ link_directories(
 # ------------------------------
 add_library( strus_bindings SHARED ${bindings_source_files} )
 add_dependencies( strus_bindings  strus_bindings_c_interface )
-target_link_libraries( strus_bindings strus_base strus_error papuga_devel strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket ${Intl_LIBRARIES} )
+target_link_libraries( strus_bindings strusbindings_private_utils strus_base strus_error papuga_devel strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket ${Intl_LIBRARIES} )
 
 set_target_properties(
     strus_bindings
