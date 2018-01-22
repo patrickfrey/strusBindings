@@ -27,12 +27,8 @@ public:
 	virtual WebRequestContextInterface* createRequestContext(
 			const char* schema,
 			const char* role,
-			int* errcode) const;
+			WebRequestAnswer& status) const;
 
-	virtual const char* errorstring( int errcode) const;
-	virtual int httpstatus( int errcode) const;
-
-	static int papugaErrorToHttpStatus( int errcode);
 private:
 	papuga_RequestHandler* m_impl;
 };

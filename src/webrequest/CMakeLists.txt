@@ -7,6 +7,7 @@ set( libstrus_webrequest_source_files
 	libstrus_webrequest.cpp
 	webRequestHandler.cpp
 	webRequestContext.cpp
+	webRequestUtils.cpp
 )
 
 include_directories(

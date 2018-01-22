@@ -44,7 +44,10 @@ public:
 
 	virtual bool addVariable( const std::string& name, const std::string& value);
 
-	virtual WebRequestAnswer execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen);
+	virtual bool execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& answer);
+
+private:
+	void clearContent();
 
 private:
 	papuga_RequestContext m_impl;

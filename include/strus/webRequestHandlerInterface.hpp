@@ -9,6 +9,7 @@
 /// \file "webRequestHandlerInterface.hpp"
 #ifndef _STRUS_WEB_REQUEST_HANDLER_INTERFACE_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_HANDLER_INTERFACE_HPP_INCLUDED
+#include "strus/webRequestAnswer.hpp"
 #include <cstddef>
 
 namespace strus
@@ -27,22 +28,12 @@ public:
 	/// \brief Create the structure for handling a request
 	/// \param[in] schema identifier defining what type of request to execute
 	/// \param[in] role role identifier of the request for checking permissions
-	/// \param[out] errcode error code in case of error
+	/// \param[out] status the status of the request
 	/// \return the context structure for handling a request or NULL in case of an error
 	virtual WebRequestContextInterface* createRequestContext(
 			const char* schema,
 			const char* role,
-			int* errcode) const=0;
-
-	/// \brief Get the string associated with an error code returned by 'createRequestContext(..)'
-	/// \param[in] errcode error code
-	/// \return the error message belonging to the error code
-	virtual const char* errorstring( int errcode) const=0;
-
-	/// \brief Get the http status associated with an error code returned by 'createRequestContext(..)'
-	/// \param[in] errcode error code
-	/// \return the http status code associated with the error code
-	virtual int httpstatus( int errcode) const=0;
+			WebRequestAnswer& status) const=0;
 };
 
 }//namespace

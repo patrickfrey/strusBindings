@@ -9,6 +9,7 @@
 /// \file "webRequestHandler.cpp"
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
+#include "webRequestUtils.hpp"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
 #include "private/internationalization.hpp"
@@ -29,65 +30,27 @@ WebRequestHandler::~WebRequestHandler()
 WebRequestContextInterface* WebRequestHandler::createRequestContext(
 			const char* schema,
 			const char* role,
-			int* errcode) const
+			WebRequestAnswer& status) const
 {
+	papuga_ErrorCode errcode = papuga_Ok;
 	try
 	{
 		return new WebRequestContext( m_impl, schema, role);
 	}
 	catch (const std::bad_alloc&)
 	{
-		*errcode = papuga_NoMemError;
+		errcode = papuga_NoMemError;
 	}
 	catch (const WebRequestContext::Exception& err)
 	{
-		*errcode = err.errcode();
+		errcode = err.errcode();
 	}
 	catch (...)
 	{
-		*errcode = papuga_UncaughtException;
+		errcode = papuga_UncaughtException;
 	}
+	status.setError( papugaErrorToHttpStatusCode( errcode), papuga_ErrorCode_tostring( errcode));
 	return NULL;
 }
 
-const char* WebRequestHandler::errorstring( int errcode) const
-{
-	return papuga_ErrorCode_tostring((papuga_ErrorCode)errcode);
-}
-
-int WebRequestHandler::httpstatus( int errcode) const
-{
-	return papugaErrorToHttpStatus( errcode);
-}
-
-int WebRequestHandler::papugaErrorToHttpStatus( int errcode)
-{
-	switch ((papuga_ErrorCode)errcode)
-	{
-		case papuga_Ok:				return 200 /*Ok*/;
-		case papuga_LogicError:			return 400 /*Bad Request*/;
-		case papuga_NoMemError:			return 500 /*Internal Server Error*/;
-		case papuga_TypeError:			return 400 /*Bad Request*/;
-		case papuga_EncodingError:		return 400 /*Bad Request*/;
-		case papuga_BufferOverflowError:	return 400 /*Bad Request*/;
-		case papuga_OutOfRangeError:		return 400 /*Bad Request*/;
-		case papuga_NofArgsError:		return 500 /*Internal Server Error*/;
-		case papuga_MissingSelf:		return 500 /*Internal Server Error*/;
-		case papuga_InvalidAccess:		return 500 /*Internal Server Error*/;
-		case papuga_UnexpectedEof:		return 500 /*Internal Server Error*/;
-		case papuga_NotImplemented:		return 501 /*Not Implemented*/;
-		case papuga_ValueUndefined:		return 400 /*Bad Request*/;
-		case papuga_MixedConstruction:		return 500 /*Internal Server Error*/;
-		case papuga_DuplicateDefinition:	return 500 /*Internal Server Error*/;
-		case papuga_SyntaxError:		return 500 /*Bad Request*/;
-		case papuga_UncaughtException:		return 500 /*Internal Server Error*/;
-		case papuga_ExecutionOrder:		return 500 /*Internal Server Error*/;
-		case papuga_AtomicValueExpected:	return 500 /*Internal Server Error*/;
-		case papuga_NotAllowed:			return 401 /*Unauthorized*/;
-		case papuga_IteratorFailed:		return 500 /*Internal Server Error*/;
-		case papuga_AddressedItemNotFound:	return 500 /*Internal Server Error*/;
-		case papuga_HostObjectError:		return 400 /*Bad Request*/;
-		case papuga_AmbiguousReference:		return 500 /*Internal Server Error*/;
-	}
-}
 
