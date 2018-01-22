@@ -10,6 +10,7 @@
 #include "strus/lib/webrequest.hpp"
 #include "webRequestHandler.hpp"
 #include "private/internationalization.hpp"
+#include <new>
 
 /// \brief strus toplevel namespace
 using namespace strus;
