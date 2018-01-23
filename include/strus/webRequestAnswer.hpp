@@ -20,13 +20,13 @@ class WebRequestAnswer
 public:
 	/// \brief Default constructor
 	WebRequestAnswer()
-		:m_errorstr(0),m_httpstatus(200),m_contentstr(0),m_contentlen(0){}
+		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_contentstr(0),m_contentlen(0){}
 	/// \brief Constructor
-	WebRequestAnswer( const char* errorstr_, int httpstatus_, const char* contentstr_, std::size_t contentlen_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_contentstr(contentstr_),m_contentlen(contentlen_){}
+	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_, const char* contentstr_, std::size_t contentlen_)
+		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_contentstr(contentstr_),m_contentlen(contentlen_){}
 	/// \brief Copy constructor
 	WebRequestAnswer( const WebRequestAnswer& o)
-		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_contentstr(o.m_contentstr),m_contentlen(o.m_contentlen){}
+		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_apperrorcode(o.m_apperrorcode),m_contentstr(o.m_contentstr),m_contentlen(o.m_contentlen){}
 
 
 	/// \brief Test if request succeeded
@@ -36,6 +36,8 @@ public:
 	const char* errorstr() const	{return m_errorstr;}
 	/// \brief HTTP status of the request
 	int httpstatus() const		{return m_httpstatus;}
+	/// \brief Application error code of the request
+	int apperror() const		{return m_apperrorcode;}
 	/// \brief Pointer to the answer content string of the request
 	const char* contentstr() const	{return m_contentstr;}
 	/// \brief Length of the answer in bytes
@@ -46,10 +48,11 @@ public:
 		m_errorstr = 0;
 		m_httpstatus = httpstatus_;
 	}
-	void setError( int httpstatus_, const char* errorstr_)
+	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_)
 	{
 		m_errorstr = errorstr_;
 		m_httpstatus = httpstatus_;
+		m_apperrorcode = apperrorcode_;
 	}
 	void setContent( const char* contentstr_, std::size_t contentlen_)
 	{
@@ -60,6 +63,7 @@ public:
 private:
 	const char* m_errorstr;		///< error message in case of failure or NULL
 	int m_httpstatus;		///< http status of the request
+	int m_apperrorcode;		///< application error code of the request
 	const char* m_contentstr;	///< pointer to the answer content string of the request
 	std::size_t m_contentlen;	///< length of the answer in bytes
 };

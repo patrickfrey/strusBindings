@@ -10,11 +10,13 @@
 #ifndef _STRUS_WEB_REQUEST_UTILS_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_UTILS_HPP_INCLUDED
 #include "papuga/typedefs.h"
+#include "strus/errorCodes.hpp"
 #include <cstddef>
 
 namespace strus {
 
-int papugaErrorToHttpStatusCode( papuga_ErrorCode errcode);
+ErrorCause papugaErrorToErrorCause( papuga_ErrorCode errcode);
+int errorCauseToHttpStatus( ErrorCause cause);
 
 }//namespace
 #endif

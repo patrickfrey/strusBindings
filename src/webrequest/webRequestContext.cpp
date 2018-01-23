@@ -93,22 +93,28 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 	if (m_encoding == papuga_Binary)
 	{
 		m_errcode = papuga_TypeError;
-		status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		ErrorCause errcause = ErrorCauseEncoding;
+		int httpstatus = errorCauseToHttpStatus( errcause);
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	// Evaluate the request content type:
-	m_doctype = doctype ? papuga_contentTypeFromName( doctype) : papuga_guess_ContentType( content, contentlen);
+	m_doctype = doctype ? papuga_contentTypeFromName( doctype) : papuga_guess_ContentType( content,contentlen);
 	if (m_doctype == papuga_ContentType_Unknown)
 	{
 		m_errcode = papuga_TypeError;
-		status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		ErrorCause errcause = ErrorCauseInputFormat;
+		int httpstatus = errorCauseToHttpStatus( errcause);
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	// Parse the request:
 	papuga_RequestParser* parser = papuga_create_RequestParser( m_doctype, m_encoding, content, contentlen, &m_errcode);
 	if (!parser)
 	{
-		status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		ErrorCause errcause = papugaErrorToErrorCause( m_errcode);
+		int httpstatus = errorCauseToHttpStatus( errcause);
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	if (!papuga_RequestParser_feed_request( parser, m_request, &m_errcode))
@@ -117,7 +123,9 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 		int pos = papuga_RequestParser_get_position( parser, buf, sizeof(buf));
 		papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error at position %d: %s, feeding request, location: %s"), pos, papuga_ErrorCode_tostring( m_errcode), buf);
 		papuga_destroy_RequestParser( parser);
-		status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
+		ErrorCause errcause = papugaErrorToErrorCause( m_errcode);
+		int httpstatus = errorCauseToHttpStatus( errcause);
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationScanInput, errcause), papuga_ErrorBuffer_lastError( &m_errbuf));
 		return false;
 	}
 	papuga_destroy_RequestParser( parser);
@@ -138,11 +146,15 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 					papuga_ErrorBuffer_appendMessage( &m_errbuf, " (error scope: %s)", locinfo);
 				}
 			}
-			status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
+			ErrorCause errcause = papugaErrorToErrorCause( m_errcode);
+			int httpstatus = errorCauseToHttpStatus( errcause);
+			status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationCallIndirection, errcause), papuga_ErrorBuffer_lastError( &m_errbuf));
 		}
 		else
 		{
-			status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+			ErrorCause errcause = papugaErrorToErrorCause( m_errcode);
+			int httpstatus = errorCauseToHttpStatus( errcause);
+			status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationCallIndirection, errcause), papuga_ErrorCode_tostring( m_errcode));
 		}
 		return false;
 	}
@@ -151,7 +163,9 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 	if (!papuga_set_RequestResult( &result, &m_impl, m_request))
 	{
 		m_errcode = papuga_NoMemError;
-		status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		ErrorCause errcause = papugaErrorToErrorCause( m_errcode);
+		int httpstatus = errorCauseToHttpStatus( errcause);
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	// Map the result:
@@ -170,7 +184,9 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 	}
 	else
 	{
-		status.setError( papugaErrorToHttpStatusCode( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		ErrorCause errcause = papugaErrorToErrorCause( m_errcode);
+		int httpstatus = errorCauseToHttpStatus( errcause);
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 }

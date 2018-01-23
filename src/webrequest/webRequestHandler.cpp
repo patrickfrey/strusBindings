@@ -10,6 +10,7 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "strus/errorCodes.hpp"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
 #include "private/internationalization.hpp"
@@ -49,7 +50,10 @@ WebRequestContextInterface* WebRequestHandler::createRequestContext(
 	{
 		errcode = papuga_UncaughtException;
 	}
-	status.setError( papugaErrorToHttpStatusCode( errcode), papuga_ErrorCode_tostring( errcode));
+	ErrorCause errcause = papugaErrorToErrorCause( errcode);
+	const char* errstr = papuga_ErrorCode_tostring( errcode);
+	int httpstatus = errorCauseToHttpStatus( errcause);
+	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), errstr);
 	return NULL;
 }
 

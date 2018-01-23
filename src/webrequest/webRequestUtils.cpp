@@ -11,35 +11,76 @@
 
 using namespace strus;
 
-int strus::papugaErrorToHttpStatusCode( papuga_ErrorCode errcode)
+ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 {
 	switch (errcode)
 	{
-		case papuga_Ok:				return 200 /*Ok*/;
-		case papuga_LogicError:			return 400 /*Bad Request*/;
-		case papuga_NoMemError:			return 500 /*Internal Server Error*/;
-		case papuga_TypeError:			return 400 /*Bad Request*/;
-		case papuga_EncodingError:		return 400 /*Bad Request*/;
-		case papuga_BufferOverflowError:	return 400 /*Bad Request*/;
-		case papuga_OutOfRangeError:		return 400 /*Bad Request*/;
-		case papuga_NofArgsError:		return 500 /*Internal Server Error*/;
-		case papuga_MissingSelf:		return 500 /*Internal Server Error*/;
-		case papuga_InvalidAccess:		return 500 /*Internal Server Error*/;
-		case papuga_UnexpectedEof:		return 500 /*Internal Server Error*/;
-		case papuga_NotImplemented:		return 501 /*Not Implemented*/;
-		case papuga_ValueUndefined:		return 400 /*Bad Request*/;
-		case papuga_MixedConstruction:		return 500 /*Internal Server Error*/;
-		case papuga_DuplicateDefinition:	return 500 /*Internal Server Error*/;
-		case papuga_SyntaxError:		return 500 /*Bad Request*/;
-		case papuga_UncaughtException:		return 500 /*Internal Server Error*/;
-		case papuga_ExecutionOrder:		return 500 /*Internal Server Error*/;
-		case papuga_AtomicValueExpected:	return 500 /*Internal Server Error*/;
-		case papuga_NotAllowed:			return 401 /*Unauthorized*/;
-		case papuga_IteratorFailed:		return 500 /*Internal Server Error*/;
-		case papuga_AddressedItemNotFound:	return 500 /*Internal Server Error*/;
-		case papuga_HostObjectError:		return 400 /*Bad Request*/;
-		case papuga_AmbiguousReference:		return 500 /*Internal Server Error*/;
+		case papuga_Ok:				return ErrorCauseUnknown;
+		case papuga_LogicError:			return ErrorCauseLogicError;
+		case papuga_NoMemError:			return ErrorCauseOutOfMem;
+		case papuga_TypeError:			return ErrorCauseBindingLanguageError;
+		case papuga_EncodingError:		return ErrorCauseEncoding;
+		case papuga_BufferOverflowError:	return ErrorCauseBufferOverflow;
+		case papuga_OutOfRangeError:		return ErrorCauseValueOutOfRange;
+		case papuga_NofArgsError:		return ErrorCauseInvalidArgument;
+		case papuga_MissingSelf:		return ErrorCauseBindingLanguageError;
+		case papuga_InvalidAccess:		return ErrorCauseBindingLanguageError;
+		case papuga_UnexpectedEof:		return ErrorCauseUnexpectedEof;
+		case papuga_NotImplemented:		return ErrorCauseNotImplemented;
+		case papuga_ValueUndefined:		return ErrorCauseBindingLanguageError;
+		case papuga_MixedConstruction:		return ErrorCauseBindingLanguageError;
+		case papuga_DuplicateDefinition:	return ErrorCauseBindingLanguageError;
+		case papuga_SyntaxError:		return ErrorCauseSyntax;
+		case papuga_UncaughtException:		return ErrorCauseUncaughtException;
+		case papuga_ExecutionOrder:		return ErrorCauseOperationOrder;
+		case papuga_AtomicValueExpected:	return ErrorCauseBindingLanguageError;
+		case papuga_NotAllowed:			return ErrorCauseNotAllowed;
+		case papuga_IteratorFailed:		return ErrorCauseHiddenError;
+		case papuga_AddressedItemNotFound:	return ErrorCauseBindingLanguageError;
+		case papuga_HostObjectError:		return ErrorCauseHiddenError;
+		case papuga_AmbiguousReference:		return ErrorCauseBindingLanguageError;
+	}
+}
+
+int strus::errorCauseToHttpStatus( ErrorCause cause)
+{
+	switch (cause)
+	{
+		case ErrorCauseUnknown: return 200 /*Ok*/;
+		case ErrorCauseErrno: return 500 /*Internal Server Error*/;
+		case ErrorCauseOutOfMem: return 500 /*Internal Server Error*/;
+		case ErrorCauseDataCorruption: return 500 /*Internal Server Error*/;
+		case ErrorCauseAvailability: return 503; /*Service not available*/;
+		case ErrorCauseNotAllowed: return 405; /* Method not allowed */
+		case ErrorCauseProtocolError: return 500 /*Internal Server Error*/;
+		case ErrorCauseSyntax: return 500 /*Internal Server Error*/;
+		case ErrorCauseNotFound: return 500 /*Internal Server Error*/;
+		case ErrorCauseIOError: return 500 /*Internal Server Error*/;
+		case ErrorCauseVersionMismatch: return 500 /*Internal Server Error*/;
+		case ErrorCauseInvalidArgument: return 500 /*Internal Server Error*/;
+		case ErrorCauseInvalidRegex: return 500 /*Internal Server Error*/;
+		case ErrorCauseInvalidOperation: return 500 /*Internal Server Error*/;
+		case ErrorCauseNotImplemented: return 500 /*Internal Server Error*/;
+		case ErrorCauseIncompleteDefinition: return 500 /*Internal Server Error*/;
+		case ErrorCauseBindingLanguageError: return 500 /*Internal Server Error*/;
+		case ErrorCauseUnknownIdentifier: return 400 /*Bad Request*/;
+		case ErrorCauseOperationOrder: return 500 /*Internal Server Error*/;
+		case ErrorCauseValueOutOfRange: return 500 /*Internal Server Error*/;
+		case ErrorCauseMaximumLimitReached: return 500 /*Internal Server Error*/;
+		case ErrorCauseBufferOverflow: return 500 /*Internal Server Error*/;
+		case ErrorCauseMaxNofItemsExceeded: return 500 /*Internal Server Error*/;
+		case ErrorCauseInputFormat: return 400 /*Bad Request*/;
+		case ErrorCauseLogicError: return 500 /*Internal Server Error*/;
+		case ErrorCauseRuntimeError: return 500 /*Internal Server Error*/;
+		case ErrorCauseUncaughtException: return 500 /*Internal Server Error*/;
+		case ErrorCauseIncompleteRequest: return 400 /*Bad Request*/;
+		case ErrorCauseUnexpectedEof: return 400 /*Bad Request*/;
+		case ErrorCausePlatformIncompatibility: return 400 /*Bad Request*/;
+		case ErrorCausePlatformRequirements: return 500 /*Internal Server Error*/;
+		case ErrorCauseHiddenError: return 500 /*Internal Server Error*/;
+		case ErrorCauseEncoding: return 400 /*Bad Request*/;
 	}
 	return 500 /*Internal Server Error*/;
 }
+
 
