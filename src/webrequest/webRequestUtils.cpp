@@ -22,7 +22,7 @@ ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 		case papuga_EncodingError:		return ErrorCauseEncoding;
 		case papuga_BufferOverflowError:	return ErrorCauseBufferOverflow;
 		case papuga_OutOfRangeError:		return ErrorCauseValueOutOfRange;
-		case papuga_NofArgsError:		return ErrorCauseInvalidArgument;
+		case papuga_NofArgsError:		return ErrorCauseMaxNofItemsExceeded;
 		case papuga_MissingSelf:		return ErrorCauseBindingLanguageError;
 		case papuga_InvalidAccess:		return ErrorCauseBindingLanguageError;
 		case papuga_UnexpectedEof:		return ErrorCauseUnexpectedEof;
@@ -30,9 +30,9 @@ ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 		case papuga_ValueUndefined:		return ErrorCauseBindingLanguageError;
 		case papuga_MixedConstruction:		return ErrorCauseBindingLanguageError;
 		case papuga_DuplicateDefinition:	return ErrorCauseBindingLanguageError;
-		case papuga_SyntaxError:		return ErrorCauseSyntax;
+		case papuga_SyntaxError:		return ErrorCauseInputFormat;
 		case papuga_UncaughtException:		return ErrorCauseUncaughtException;
-		case papuga_ExecutionOrder:		return ErrorCauseOperationOrder;
+		case papuga_ExecutionOrder:		return ErrorCauseLogicError;
 		case papuga_AtomicValueExpected:	return ErrorCauseBindingLanguageError;
 		case papuga_NotAllowed:			return ErrorCauseNotAllowed;
 		case papuga_IteratorFailed:		return ErrorCauseHiddenError;

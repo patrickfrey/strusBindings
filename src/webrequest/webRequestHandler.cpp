@@ -28,6 +28,14 @@ WebRequestHandler::~WebRequestHandler()
 	papuga_destroy_RequestHandler( m_impl);
 }
 
+static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papuga_ErrorCode errcode)
+{
+	ErrorCause errcause = papugaErrorToErrorCause( errcode);
+	const char* errstr = papuga_ErrorCode_tostring( errcode);
+	int httpstatus = errorCauseToHttpStatus( errcause);
+	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errstr);
+}
+
 WebRequestContextInterface* WebRequestHandler::createRequestContext(
 			const char* schema,
 			const char* role,
@@ -50,10 +58,7 @@ WebRequestContextInterface* WebRequestHandler::createRequestContext(
 	{
 		errcode = papuga_UncaughtException;
 	}
-	ErrorCause errcause = papugaErrorToErrorCause( errcode);
-	const char* errstr = papuga_ErrorCode_tostring( errcode);
-	int httpstatus = errorCauseToHttpStatus( errcause);
-	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, ErrorOperationBuildData, errcause), errstr);
+	setStatus( status, ErrorOperationBuildData, errcode);
 	return NULL;
 }
 

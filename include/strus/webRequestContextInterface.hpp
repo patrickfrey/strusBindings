@@ -37,6 +37,14 @@ public:
 	/// \param[out] answer the data of the answer of the request
 	/// \return bool if request succeeded, false else
 	virtual bool execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& answer)=0;
+
+	/// \brief Map an error answer to a standardised content in the encoding and content type of the request
+	/// \param[out] buf buffer to use for the result
+	/// \param[in] bufsize size of buffer in bytes
+	/// \param[out] len length of the result printed in bytes
+	/// \param[in] answer request answer to map
+	/// \return bool if request succeeded, false in case of buffer too small
+	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t* len, const WebRequestAnswer& answer)=0;
 };
 
 }//namespace
