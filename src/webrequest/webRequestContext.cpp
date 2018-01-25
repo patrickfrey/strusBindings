@@ -22,6 +22,7 @@
 #include "private/internationalization.hpp"
 #include <cstddef>
 #include <cstring>
+#include <cstdlib>
 
 using namespace strus;
 
