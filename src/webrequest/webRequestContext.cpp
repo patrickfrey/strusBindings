@@ -11,6 +11,7 @@
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
 #include "strus/errorCodes.hpp"
+#include "strus/lib/error.hpp"
 #include "papuga/errors.h"
 #include "papuga/request.h"
 #include "papuga/requestParser.h"
@@ -91,6 +92,13 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, Error
 	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, cause), errstr);
 }
 
+static void setStatus( WebRequestAnswer& status, int apperrorcode, const char* errstr)
+{
+	ErrorCode err( apperrorcode);
+	int httpstatus = errorCauseToHttpStatus( err.cause());
+	status.setError( httpstatus, apperrorcode, errstr);
+}
+
 bool WebRequestContext::execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
 {
 	int errpos = -1;
@@ -133,8 +141,20 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 	if (!papuga_RequestContext_execute_request( &m_impl, m_request, &m_errbuf, &errpos))
 	{
 		m_errcode = papuga_HostObjectError;
-		if (papuga_ErrorBuffer_lastError(&m_errbuf))
+		const char* errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
+;
+		int lastapperr = 0;
+		if (errmsg)
 		{
+			// Exract last error code and remove error codes from app error message:
+			char const* errmsgitr = errmsg;
+			int apperr = strus::errorCodeFromMessage( errmsgitr);
+			lastapperr = apperr;
+			while (0 <= (apperr = strus::errorCodeFromMessage( errmsgitr)))
+			{
+				if (apperr > 0) lastapperr = apperr;
+			}
+			// Add position info (scope of error in input) to error message, if available:
 			if (errpos >= 0)
 			{
 				// Evaluate more info about the location of the error, we append the scope of the document to the error message:
@@ -143,13 +163,27 @@ bool WebRequestContext::execute( const char* doctype, const char* encoding, cons
 				if (locinfo)
 				{
 					papuga_ErrorBuffer_appendMessage( &m_errbuf, " (error scope: %s)", locinfo);
+					errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
 				}
 			}
-			setStatus( status, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
+			if (lastapperr)
+			{
+				char* errmsgptr = papuga_ErrorBuffer_lastError(&m_errbuf);
+				removeErrorCodesFromMessage( errmsgptr);
+				errmsg = errmsgptr;
+			}
 		}
 		else
 		{
-			setStatus( status, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+			errmsg = papuga_ErrorCode_tostring( m_errcode);
+		}
+		if (lastapperr >= 0)
+		{
+			setStatus( status, lastapperr, errmsg);
+		}
+		else
+		{
+			setStatus( status, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), errmsg);
 		}
 		return false;
 	}
