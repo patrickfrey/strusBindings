@@ -265,53 +265,26 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t* l
 	switch (m_doctype)
 	{
 		case papuga_ContentType_XML:
-			if (appErrorCode.hasSysErrno())
-			{
-				bufpos = std::snprintf(
-						buf, bufsize, "<error id=\"%d\"><comp>%s</comp><op>%d</op><errno>%d</errno><msg>%s</msg><error>",
-						*appErrorCode,
-						getErrorComponentName( appErrorCode.component()),
-						appErrorCode.operation(),
-						appErrorCode.syserrno(),
-						answer.errorstr());
-				if (bufpos >= bufsize) return false;
-			}
-			else
-			{
-				bufpos = std::snprintf(
-						buf, bufsize, "<error id=\"%d\"><comp>%s</comp><op>%d</op><cause>%d</cause><msg>%s</msg><error>",
-						*appErrorCode,
-						getErrorComponentName( appErrorCode.component()),
-						appErrorCode.operation(),
-						appErrorCode.cause(),
-						answer.errorstr());
-				if (bufpos >= bufsize) return false;
-			}
+			bufpos = std::snprintf(
+					buf, bufsize, "<error id=\"%d\"><comp>%s</comp><op>%d</op><cause>%d</cause><msg>%s</msg><error>",
+					*appErrorCode,
+					getErrorComponentName( appErrorCode.component()),
+					(int)appErrorCode.operation(),
+					(int)appErrorCode.cause(),
+					answer.errorstr());
+			if (bufpos >= bufsize) return false;
+
 		case papuga_ContentType_JSON:
-			if (appErrorCode.hasSysErrno())
-			{
-				bufpos = std::snprintf(
-						buf, bufsize, "{\1error\1: {\n\t\1id\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1errno\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
-						*appErrorCode,
-						getErrorComponentName( appErrorCode.component()),
-						appErrorCode.operation(),
-						appErrorCode.syserrno(),
-						answer.errorstr());
-				if (bufpos >= bufsize) return false;
-				escJsonOutput( buf, bufpos);
-			}
-			else
-			{
-				bufpos = std::snprintf(
-						buf, bufsize, "{\1error\1: {\n\t\1id\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1cause\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
-						*appErrorCode,
-						getErrorComponentName( appErrorCode.component()),
-						appErrorCode.operation(),
-						appErrorCode.cause(),
-						answer.errorstr());
-				if (bufpos >= bufsize) return false;
-				escJsonOutput( buf, bufpos);
-			}
+			bufpos = std::snprintf(
+					buf, bufsize, "{\1error\1: {\n\t\1id\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1cause\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
+					*appErrorCode,
+					getErrorComponentName( appErrorCode.component()),
+					(int)appErrorCode.operation(),
+					(int)appErrorCode.cause(),
+					answer.errorstr());
+			if (bufpos >= bufsize) return false;
+			escJsonOutput( buf, bufpos);
+
 		case papuga_ContentType_Unknown:
 			bufpos = std::snprintf( buf, bufsize, "%d", *appErrorCode);
 			if (bufpos >= bufsize) return false;
