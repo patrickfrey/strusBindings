@@ -34,13 +34,14 @@ link_directories(
 	${strusrpc_LIBRARY_DIRS}
 	${strusmodule_LIBRARY_DIRS}
 	${UTILS_GENSOURCE_DIR}
+	${PAPUGA_LIBRARY_DIRS}
 )
 
 # ------------------------------
 # LIBRARY
 # ------------------------------
 add_library( strus_webrequest SHARED ${libstrus_webrequest_source_files} )
-target_link_libraries( strus_webrequest strus_base strus_bindings strus_bindings_description strusbindings_private_utils )
+target_link_libraries( strus_webrequest strus_base strus_bindings strus_bindings_description strusbindings_private_utils papuga_request_devel )
 
 set_target_properties(
     strus_webrequest
