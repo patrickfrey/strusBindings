@@ -15,13 +15,15 @@
 
 namespace strus
 {
+/// \brief Forward declaration
+class WebRequestLoggerInterface;
 
 /// \brief Implementation of the interface for executing XML/JSON requests on the strus bindings
 class WebRequestHandler
 	:public WebRequestHandlerInterface
 {
 public:
-	WebRequestHandler();
+	explicit WebRequestHandler( WebRequestLoggerInterface* logger_);
 	virtual ~WebRequestHandler();
 
 	virtual WebRequestContextInterface* createRequestContext(
@@ -30,6 +32,7 @@ public:
 			WebRequestAnswer& status) const;
 
 private:
+	papuga_RequestLogger m_logger;
 	papuga_RequestHandler* m_impl;
 };
 

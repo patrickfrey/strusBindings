@@ -15,8 +15,10 @@ namespace strus {
 
 /// \brief Forward declaration
 class WebRequestHandlerInterface;
+/// \brief Forward declaration
+class WebRequestLoggerInterface;
 
-WebRequestHandlerInterface* createWebRequestHandler();
+WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger);
 
 }//namespace
 #endif

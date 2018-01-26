@@ -15,9 +15,9 @@
 /// \brief strus toplevel namespace
 using namespace strus;
 
-WebRequestHandlerInterface* strus::createWebRequestHandler()
+WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger)
 {
-	return new (std::nothrow) WebRequestHandler();
+	return new (std::nothrow) WebRequestHandler( logger);
 }
 
 

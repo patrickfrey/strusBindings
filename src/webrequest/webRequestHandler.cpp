@@ -10,16 +10,119 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
+#include "papuga/valueVariant.hpp"
+#include "papuga/valueVariant.h"
 #include "private/internationalization.hpp"
+#include <vector>
+#include <sstream>
+#include <iostream>
+#include <cstring>
 
 using namespace strus;
 
-WebRequestHandler::WebRequestHandler()
+static std::vector<std::string> getLogArgument( std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype)
 {
-	m_impl = papuga_create_RequestHandler();
+	papuga_ErrorCode errcode = papuga_Ok;
+	std::vector<std::string> rt( nof_itypes);
+	std::size_t nofargs = 0;
+	int ai=0, ae=nof_arguments;
+	for(; ai < ae; ++ai)
+	{
+		typedef int inttype;
+		typedef const char* charp;
+
+		papuga_RequestLogItem aitype = (papuga_RequestLogItem)va_arg( arguments, inttype);
+		int ei=0, ee=nof_itypes;
+		for(; ei < ee && itype[ ei] != aitype; ++ei){}
+		switch (aitype)
+		{
+			case papuga_LogItemClassName:
+			case papuga_LogItemMethodName:
+			case papuga_LogItemMessage:
+				if (ei < ee) rt[ei] = va_arg( arguments,charp);
+				break;
+			case papuga_LogItemResult:
+				if (ei < ee) rt[ei] = papuga::ValueVariant_tostring( *va_arg( arguments, papuga_ValueVariant*), errcode);
+				break;
+			case papuga_LogItemArgc:
+			{
+				nofargs = va_arg( arguments,size_t);
+				if (ei < ee)
+				{
+					std::ostringstream num;
+					num << nofargs;
+					rt[ei] = num.str();
+				}
+				break;
+			}
+			case papuga_LogItemArgv:
+			{
+				if (ei < ee)
+				{
+					std::ostringstream argstr;
+					papuga_ValueVariant* ar = va_arg( arguments, papuga_ValueVariant*);
+					std::size_t ii=0, ie=nofargs;
+					for (; ii!=ie; ++ii)
+					{
+						if (ii) argstr << " ";
+						if (papuga_ValueVariant_isatomic( ar+ii))
+						{
+							argstr << '\"' << papuga::ValueVariant_tostring( ar[ii], errcode) << '\"';
+						}
+						else if (ar[ii].valuetype == papuga_TypeSerialization)
+						{
+							argstr << "{}";
+						}
+						else
+						{
+							argstr << "*";
+						}
+					}
+					rt[ei] = argstr.str();
+				}
+				break;
+			}
+		}
+	}
+	return rt;
+}
+
+static void logMethodCall( void* self_, int nofItems, ...)
+{
+	WebRequestLoggerInterface* self = (WebRequestLoggerInterface*)self_;
+	va_list arguments;
+	va_start( arguments, nofItems );
+
+	enum {nof_itypes=5};
+	static const papuga_RequestLogItem itypes[nof_itypes] = {
+		papuga_LogItemClassName,
+		papuga_LogItemMethodName,
+		papuga_LogItemArgv,
+		papuga_LogItemResult
+	};
+	try
+	{
+		std::vector<std::string> args = getLogArgument( nofItems, arguments, nof_itypes, itypes);
+		self->logMethodCall( args[0], args[1], args[2], args[3]);
+	}
+	catch (...){}
+	va_end( arguments);
+}
+
+/*
+ * @brief Logger structure with object and methods
+ */
+WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
+{
+	std::memset( &m_logger, 0, sizeof(m_logger));
+	m_logger.self = logger_;
+	int mask = logger_->logMask();
+	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_logger.logMethodCall = &logMethodCall;
+	m_impl = papuga_create_RequestHandler( &m_logger);
 	if (!m_impl) throw std::bad_alloc();
 }
 
