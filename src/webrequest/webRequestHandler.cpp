@@ -21,6 +21,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstring>
+#include <cstdarg>
 
 using namespace strus;
 
