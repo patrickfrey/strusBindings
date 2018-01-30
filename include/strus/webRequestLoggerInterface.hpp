@@ -10,6 +10,7 @@
 #ifndef _STRUS_WEB_REQUEST_LOGGER_INTERFACE_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_LOGGER_INTERFACE_HPP_INCLUDED
 #include <cstddef>
+#include <string>
 
 namespace strus
 {
@@ -21,7 +22,9 @@ public:
 	/// \brief Values joined as flags in an integer telling what is to log
 	enum Mask
 	{
-		LogMethodCalls=0x1
+		LogNothing=0x0,
+		LogMethodCalls=0x1,
+		LogAll=0xFF
 	};
 
 	/// \brief Destructor

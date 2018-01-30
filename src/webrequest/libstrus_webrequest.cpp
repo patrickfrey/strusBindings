@@ -8,6 +8,7 @@
 /// \brief Library for handling XML/JSON requests
 /// \file libstrus_webrequest.cpp
 #include "strus/lib/webrequest.hpp"
+#include "strus/base/dll_tags.hpp"
 #include "webRequestHandler.hpp"
 #include "private/internationalization.hpp"
 #include <new>
@@ -15,7 +16,7 @@
 /// \brief strus toplevel namespace
 using namespace strus;
 
-WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger)
+DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger)
 {
 	return new (std::nothrow) WebRequestHandler( logger);
 }
