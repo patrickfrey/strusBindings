@@ -47,7 +47,7 @@ public:
 
 	virtual bool execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& answer);
 
-	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t* len, const WebRequestAnswer& answer);
+	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer);
 
 private:
 	void clearContent();

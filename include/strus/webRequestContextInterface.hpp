@@ -44,7 +44,7 @@ public:
 	/// \param[out] len length of the result printed in bytes
 	/// \param[in] answer request answer to map
 	/// \return bool if request succeeded, false in case of buffer too small
-	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t* len, const WebRequestAnswer& answer)=0;
+	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer)=0;
 };
 
 }//namespace

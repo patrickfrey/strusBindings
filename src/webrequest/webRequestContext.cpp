@@ -259,7 +259,7 @@ static void escJsonOutput( char* buf, std::size_t buflen)
 	}
 }
 
-bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t* len, const WebRequestAnswer& answer)
+bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer)
 {
 	ErrorCode appErrorCode( answer.apperror());
 	std::size_t bufpos = 0;
@@ -294,7 +294,7 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t* l
 	}
 	if (m_encoding == papuga_UTF8)
 	{
-		*len = bufpos;
+		len = bufpos;
 	}
 	else
 	{
@@ -308,7 +308,7 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t* l
 		if (!papuga_ValueVariant_tostring_enc( &res, m_encoding, buf+bufpos, bufsize-bufpos, &outlen, &m_errcode)) return false;
 		outlen *= usize;
 		std::memmove( buf, buf+bufpos, outlen);
-		*len = outlen;
+		len = outlen;
 	}
 	return true;
 }
