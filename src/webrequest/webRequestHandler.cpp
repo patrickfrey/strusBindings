@@ -114,9 +114,6 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	va_end( arguments);
 }
 
-/*
- * @brief Logger structure with object and methods
- */
 WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 {
 	std::memset( &m_logger, 0, sizeof(m_logger));
@@ -141,14 +138,15 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 }
 
 WebRequestContextInterface* WebRequestHandler::createRequestContext(
-			const char* schema,
-			const char* role,
-			WebRequestAnswer& status) const
+		const char* context,
+		const char* schema,
+		const char* role,
+		WebRequestAnswer& status) const
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	try
 	{
-		return new WebRequestContext( m_impl, schema, role);
+		return new WebRequestContext( m_impl, context, schema, role);
 	}
 	catch (const std::bad_alloc&)
 	{

@@ -18,6 +18,9 @@ class WebRequestHandlerInterface;
 /// \brief Forward declaration
 class WebRequestLoggerInterface;
 
+/// \brief Create a web request handler
+/// \param[in] request logger interface
+/// \return pointer to handler in case of success, NULL in case of memory allocation error
 WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger);
 
 }//namespace

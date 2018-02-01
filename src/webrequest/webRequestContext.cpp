@@ -28,6 +28,7 @@ using namespace strus;
 
 WebRequestContext::WebRequestContext(
 	papuga_RequestHandler* handlerimpl,
+	const char* context,
 	const char* schema,
 	const char* role)
 		:m_request(0),m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_errcode(papuga_Ok),m_atm(0),m_resultstr(0),m_resultlen(0)
@@ -35,7 +36,7 @@ WebRequestContext::WebRequestContext(
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 	m_atm = papuga_RequestHandler_get_schema( handlerimpl, schema, role, &m_errcode);
 	if (!m_atm) throw Exception( m_errcode);
-	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, schema, role, &m_errcode)) throw Exception( m_errcode);
+	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode)) throw Exception( m_errcode);
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)
 	{
@@ -266,8 +267,9 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t* l
 	{
 		case papuga_ContentType_XML:
 			bufpos = std::snprintf(
-					buf, bufsize, "<error id=\"%d\"><comp>%s</comp><op>%d</op><cause>%d</cause><msg>%s</msg><error>",
+					buf, bufsize, "<result type='error'><err id=\"%d\"><status>%d</status><comp>%s</comp><op>%d</op><code>%d</code><msg>%s</msg><err></result>",
 					*appErrorCode,
+					answer.httpstatus(),
 					getErrorComponentName( appErrorCode.component()),
 					(int)appErrorCode.operation(),
 					(int)appErrorCode.cause(),
@@ -276,8 +278,9 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t* l
 
 		case papuga_ContentType_JSON:
 			bufpos = std::snprintf(
-					buf, bufsize, "{\1error\1: {\n\t\1id\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1cause\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
+					buf, bufsize, "{\1err\1: {\n\t\1id\1:%d\n\t\1status\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1code\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
 					*appErrorCode,
+					answer.httpstatus(),
 					getErrorComponentName( appErrorCode.component()),
 					(int)appErrorCode.operation(),
 					(int)appErrorCode.cause(),

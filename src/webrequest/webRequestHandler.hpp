@@ -27,6 +27,7 @@ public:
 	virtual ~WebRequestHandler();
 
 	virtual WebRequestContextInterface* createRequestContext(
+			const char* context,
 			const char* schema,
 			const char* role,
 			WebRequestAnswer& status) const;

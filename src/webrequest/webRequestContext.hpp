@@ -38,6 +38,7 @@ public:
 
 	WebRequestContext(
 		papuga_RequestHandler* handlerimpl,
+		const char* context,
 		const char* schema,
 		const char* role);
 	virtual ~WebRequestContext();
