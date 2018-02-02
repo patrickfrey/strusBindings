@@ -940,9 +940,9 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 	strus::printHppFrameTail( out);
 }
 
-static void print_methodIdsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
+static void print_bindingMethodIdsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
-	strus::printHppFrameHeader( out, "methodIds", "Provides identifiers for methods to address in request definitions");
+	strus::printHppFrameHeader( out, "bindingMethodIds", "Provides identifiers for methods to address in request definitions");
 	out << "#include \"strus/bindingObjects.h\"" << std::endl;
 	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
 	out << "#include \"papuga.h\"" << std::endl;
@@ -1080,7 +1080,7 @@ int main( int argc, const char* argv[])
 		printOutput( outputdir + "/include/strus/bindingClasses.h", &print_BindingClassesH, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingClasses.cpp", &print_BindingClassesCpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingClassTemplate.hpp", &print_BindingClassTemplatesHpp, interfaceDef);
-		printOutput( outputdir + "/src/bindings/methodIds.hpp", &print_methodIdsHpp, interfaceDef);
+		printOutput( outputdir + "/include/strus/bindingMethodIds.hpp", &print_bindingMethodIdsHpp, interfaceDef);
 		printOutput( outputdir + "/include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
 
