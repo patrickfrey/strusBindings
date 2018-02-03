@@ -123,7 +123,7 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 			location_explain.append( " ...");
 		}
 		msgbuf.append( msg);
-		if (errorhnd->hasError())
+		if (errorhnd && errorhnd->hasError())
 		{
 			msgbuf.append( ": ");
 			msgbuf.append(  errorhnd->fetchError());
@@ -2473,52 +2473,10 @@ std::string Deserializer::getConfigString( papuga_SerializationIter& seriter)
 	return cfg.cfgstring;
 }
 
-std::string Deserializer::getSubConfigString( papuga_SerializationIter& seriter)
+std::string Deserializer::getConfigString( const papuga_ValueVariant& content)
 {
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-	{
-		return Deserializer::getString( seriter);
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-		ConfigDef item( seriter);
-		Deserializer::consumeClose( seriter);
-		return item.cfgstring;
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("expected sub structure or string for config"));
-	}
-}
-
-std::string Deserializer::getConfigString(
-		const papuga_ValueVariant& content,
-		ErrorBufferInterface* errorhnd)
-{
-	static const char* context = _TXT("storage configuration");
-	if (!papuga_ValueVariant_defined( &content)) return std::string();
-	if (papuga_ValueVariant_isstring( &content))
-	{
-		return ValueVariantWrap::tostring( content);
-	}
-	if (content.valuetype != papuga_TypeSerialization)
-	{
-		throw strus::runtime_error(_TXT("serialized structure or string expected for %s"), context);
-	}
-	papuga_SerializationIter seriter, serstart;
-	papuga_init_SerializationIter( &serstart, content.value.serialization);
-	papuga_init_SerializationIter( &seriter, content.value.serialization);
-	try
-	{
-		ConfigDef cfg( seriter);
-		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
-		return cfg.cfgstring;
-	}
-	catch (const std::runtime_error& err)
-	{
-		throw runtime_error_with_location( err.what(), errorhnd, seriter, serstart);
-	}
+	ConfigDef cfg( content);
+	return cfg.cfgstring;
 }
 
 

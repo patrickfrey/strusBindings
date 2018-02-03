@@ -56,8 +56,13 @@ struct ConfigDef
 	std::string cfgstring;
 
 	ConfigDef( papuga_SerializationIter& seriter);
+	ConfigDef( const papuga_ValueVariant& def);
 	ConfigDef( const ConfigDef& o)
 		:cfgstring(o.cfgstring){}
+private:
+	void init( papuga_SerializationIter& seriter);
+	std::string parseValue( papuga_SerializationIter& seriter) const;
+	std::string parseValueTypeDefinitionList( papuga_SerializationIter& seriter) const;
 };
 
 struct KeyValueList

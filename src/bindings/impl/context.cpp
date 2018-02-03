@@ -260,16 +260,14 @@ analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& co
 
 StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_, errorhnd));
+	return new StorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_));
 }
 
 VectorStorageClientImpl* ContextImpl::createVectorStorageClient( const ValueVariant& config_)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_, errorhnd));
+	return new VectorStorageClientImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, Deserializer::getConfigString( config_));
 }
 
 DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& doctype)
@@ -292,9 +290,9 @@ QueryEvalImpl* ContextImpl::createQueryEval()
 
 void ContextImpl::createStorage( const ValueVariant& config_)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	std::string dbname;
-	std::string storagecfg( Deserializer::getConfigString( config_, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config_));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
@@ -308,10 +306,10 @@ void ContextImpl::createStorage( const ValueVariant& config_)
 
 void ContextImpl::createVectorStorage( const ValueVariant& config_)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	std::string dbname;
 	std::string storagename;
-	std::string storagecfg( Deserializer::getConfigString( config_, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config_));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 	if (!extractStringFromConfigString( dbname, storagename, "storage", errorhnd))
 	{
@@ -328,10 +326,10 @@ void ContextImpl::createVectorStorage( const ValueVariant& config_)
 
 void ContextImpl::destroyStorage( const ValueVariant& config)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (!papuga_ValueVariant_defined( &config)) throw strus::runtime_error( _TXT("called context method destroyStorage with undefined config"));
 	std::string dbname;
-	std::string storagecfg( Deserializer::getConfigString( config, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
@@ -348,7 +346,7 @@ bool ContextImpl::storageExists( const ValueVariant& config)
 	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("called context method storageExists with an unhandled error: %s"), errorhnd->fetchError());
 	if (!papuga_ValueVariant_defined( &config)) throw strus::runtime_error( _TXT("called storageExists with undefined config"));
 	std::string dbname;
-	std::string storagecfg( Deserializer::getConfigString( config, errorhnd));
+	std::string storagecfg( Deserializer::getConfigString( config));
 	(void)extractStringFromConfigString( dbname, storagecfg, "database", errorhnd);
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();

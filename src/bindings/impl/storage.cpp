@@ -224,7 +224,7 @@ Struct StorageClientImpl::config() const
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	typedef std::vector<std::pair<std::string,std::string> > Configuration;
-	Reference<Configuration> cfg( new Configuration( getConfigStringItems( storage->config(), errorhnd)));
+	Reference<Configuration> cfg( new Configuration( strus::getConfigStringItems( storage->config(), errorhnd)));
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
