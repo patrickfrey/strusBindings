@@ -80,6 +80,12 @@ public:
 	/// \example "/home/bob/resources"
 	void addResourcePath( const ValueVariant& paths);
 
+	/// \brief Define the working directory where files are written to
+	/// \note All paths used for data written must be relative from the working directory, if the working directory is defined
+	/// \param[in] path a string specifying the working directory
+	/// \example "/srv/strus"
+	void defineWorkingDirectory( const std::string& path);
+
 	/// \brief End the configuration of the context, creates the object builders
 	/// \remark If this function is not called, then the object builders are created on the first request
 	void endConfig();

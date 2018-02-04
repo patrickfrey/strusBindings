@@ -156,6 +156,21 @@ void ContextImpl::addResourcePath( const ValueVariant& paths_)
 	}
 }
 
+void ContextImpl::defineWorkingDirectory( const std::string& path)
+{
+	strus::unique_lock lck( m_mutex);
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot define the working directory in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to define the working directory after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to define the working directory after the first use of objects"));
+	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
+	moduleLoader->defineWorkingDirectory( path);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to define the working directory: %s"), errorhnd->fetchError());
+	}
+}
+
 void ContextImpl::initStorageObjBuilder()
 {
 	strus::unique_lock lck( m_mutex);

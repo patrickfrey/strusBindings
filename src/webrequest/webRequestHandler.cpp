@@ -10,8 +10,10 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "schemas.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
+#include "papuga/request.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.hpp"
@@ -116,12 +118,24 @@ static void logMethodCall( void* self_, int nofItems, ...)
 
 WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 {
+	papuga_ErrorCode errcode = papuga_Ok;
 	std::memset( &m_logger, 0, sizeof(m_logger));
 	m_logger.self = logger_;
 	int mask = logger_->logMask();
 	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_logger.logMethodCall = &logMethodCall;
 	m_impl = papuga_create_RequestHandler( &m_logger);
 	if (!m_impl) throw std::bad_alloc();
+
+	using namespace strus::webrequest;
+#define DEFINE_SCHEMA( EXTNAME, SCHEMANAME)\
+	static const Schema ## SCHEMANAME  schema ## SCHEMANAME;\
+	if (!papuga_RequestHandler_add_schema( m_impl, EXTNAME, schema ## SCHEMANAME .impl())) throw std::bad_alloc();\
+	if (!papuga_RequestHandler_allow_schema_access_all( m_impl, #EXTNAME, &errcode)) throw std::bad_alloc();
+
+	DEFINE_SCHEMA( "init", CreateContext);
+	DEFINE_SCHEMA( "create_storage", CreateStorage);
+	DEFINE_SCHEMA( "destroy_storage", DestroyStorage);
+	DEFINE_SCHEMA( "open_storage", OpenStorage);
 }
 
 WebRequestHandler::~WebRequestHandler()

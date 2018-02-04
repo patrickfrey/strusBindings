@@ -951,16 +951,6 @@ static void print_bindingMethodIdsHpp( std::ostream& out, const strus::Interface
 		<< "namespace bindings {" << std::endl
 		<< std::endl << std::endl;
 
-	out << "struct MethodId" << std::endl
-		<< "{" << std::endl
-		<< "\t" << "int classid;" << std::endl
-		<< "\t" << "int methodid;" << std::endl
-		<< "\t" << "MethodId( int classid_, int methodid_)" << std::endl
-		<< "\t\t" << ":classid(classid_),methodid(methodid_){}" << std::endl
-		<< "\t" << "MethodId( const MethodId& o)" << std::endl
-		<< "\t\t" << ":classid(o.classid),methodid(o.methodid){}" << std::endl
-		<< "};" << std::endl << std::endl;
-	
 	out << "namespace method {" << std::endl << std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
@@ -972,14 +962,14 @@ static void print_bindingMethodIdsHpp( std::ostream& out, const strus::Interface
 		out << "{" << std::endl;
 		if (!ci->constructorDefs().empty())
 		{
-			out << "\t" << "static const MethodId& constructor() {return MethodId( " << cidx << "," << 0 << ");}" << std::endl;
+			out << "\t" << "static papuga_RequestMethodId constructor() {papuga_RequestMethodId rt = {" << cidx << "," << 0 << "}; return rt;}" << std::endl;
 		}
 		std::vector<strus::MethodDef>::const_iterator
 			mi = ci->methodDefs().begin(),
 			me = ci->methodDefs().end();
 		for (int midx=1; mi != me; ++mi,++midx)
 		{
-			out << "\t" << "static const MethodId& " << mi->name() << "() {return MethodId( " << cidx << "," << midx << ");}" << std::endl;
+			out << "\t" << "static papuga_RequestMethodId " << mi->name() << "() {papuga_RequestMethodId rt = {" << cidx << "," << midx << "}; return rt;}" << std::endl;
 		}
 		out << "};" << std::endl;
 	}
