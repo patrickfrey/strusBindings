@@ -10,6 +10,7 @@
 #ifndef _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #include "strus/webRequestHandlerInterface.hpp"
+#include "strus/base/thread.hpp"
 #include "papuga/requestHandler.h"
 #include <cstddef>
 
@@ -17,6 +18,8 @@ namespace strus
 {
 /// \brief Forward declaration
 class WebRequestLoggerInterface;
+/// \brief Forward declaration
+class WebRequestContext;
 
 /// \brief Implementation of the interface for executing XML/JSON requests on the strus bindings
 class WebRequestHandler
@@ -26,15 +29,31 @@ public:
 	explicit WebRequestHandler( WebRequestLoggerInterface* logger_);
 	virtual ~WebRequestHandler();
 
-	virtual WebRequestContextInterface* createRequestContext(
+	virtual bool hasSchema( const char* schema) const;
+
+	virtual WebRequestContextInterface* createContext(
 			const char* context,
 			const char* schema,
 			const char* role,
 			WebRequestAnswer& status) const;
 
+	virtual bool executeConfiguration(
+			const char* destContext,
+			const char* srcContext,
+			const char* schema,
+			const char* doctype,
+			const char* encoding, 
+			const char* contentstr,
+			std::size_t contentlen,
+			WebRequestAnswer& status) const;
+
 private:
-	papuga_RequestLogger m_logger;
-	papuga_RequestHandler* m_impl;
+	WebRequestContext* createContext_( const char* context, const char* schema, const char* role, WebRequestAnswer& status) const;
+
+private:
+	strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
+	papuga_RequestLogger m_logger;		//< request logger
+	papuga_RequestHandler* m_impl;		//< request handler
 };
 
 }//namespace

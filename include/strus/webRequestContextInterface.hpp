@@ -30,7 +30,7 @@ public:
 	virtual bool addVariable( const std::string& name, const std::string& value)=0;
 
 	/// \brief Run the request
-	/// \param[in] doctype document content type "XML" or "JSON"
+	/// \param[in] doctype document content type "XML" (or "application/xml") or "JSON" (or "application/xml") 
 	/// \param[in] encoding character set encoding, e.g. "UTF-8' or "UTF-16"  or "UTF-16BE"
 	/// \param[in] content pointer to source
 	/// \param[in] contentlen length of source in bytes

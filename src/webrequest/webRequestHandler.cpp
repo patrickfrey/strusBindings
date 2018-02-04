@@ -13,6 +13,7 @@
 #include "schemas.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "papuga/request.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
@@ -143,6 +144,11 @@ WebRequestHandler::~WebRequestHandler()
 	papuga_destroy_RequestHandler( m_impl);
 }
 
+bool WebRequestHandler::hasSchema( const char* schema) const
+{
+	return papuga_RequestHandler_has_schema( m_impl, schema);
+}
+
 static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papuga_ErrorCode errcode)
 {
 	ErrorCause errcause = papugaErrorToErrorCause( errcode);
@@ -151,11 +157,7 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errstr);
 }
 
-WebRequestContextInterface* WebRequestHandler::createRequestContext(
-		const char* context,
-		const char* schema,
-		const char* role,
-		WebRequestAnswer& status) const
+WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, WebRequestAnswer& status) const
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	try
@@ -177,5 +179,33 @@ WebRequestContextInterface* WebRequestHandler::createRequestContext(
 	setStatus( status, ErrorOperationBuildData, errcode);
 	return NULL;
 }
+
+WebRequestContextInterface* WebRequestHandler::createContext(
+		const char* context,
+		const char* schema,
+		const char* role,
+		WebRequestAnswer& status) const
+{
+	return createContext_( context, schema, role, status);
+}
+
+bool WebRequestHandler::executeConfiguration(
+			const char* destContext,
+			const char* srcContext,
+			const char* schema,
+			const char* doctype,
+			const char* encoding, 
+			const char* contentstr,
+			std::size_t contentlen,
+			WebRequestAnswer& status) const
+{
+	static const char* role = "config";
+	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContext, schema, role, status));
+	if (!ctx.get()) return false;
+
+	return ctx->executeConfig( destContext, doctype, encoding, contentstr, contentlen, status);
+}
+
+
 
 

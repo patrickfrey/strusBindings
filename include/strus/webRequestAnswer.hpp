@@ -43,17 +43,27 @@ public:
 	/// \brief Length of the answer in bytes
 	std::size_t contentlen() const	{return m_contentlen;}
 
+	/// \brief Set http status and reset error
+	/// \param[in] httpstatus_ http status code
 	void setStatus( int httpstatus_)
 	{
 		m_errorstr = 0;
 		m_httpstatus = httpstatus_;
+		m_apperrorcode = 0;
 	}
+	/// \brief Set http status with error
+	/// \param[in] httpstatus_ http status code
+	/// \param[in] apperrorcode_ application error code
+	/// \param[in] errorstr_ pointer to error message
 	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_)
 	{
 		m_errorstr = errorstr_;
 		m_httpstatus = httpstatus_;
 		m_apperrorcode = apperrorcode_;
 	}
+	/// \brief Set content of answer
+	/// \param[in] contentstr_ pointer to content
+	/// \param[in] contentlen_ size of content in bytes
 	void setContent( const char* contentstr_, std::size_t contentlen_)
 	{
 		m_contentstr = contentstr_;

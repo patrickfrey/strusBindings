@@ -49,11 +49,23 @@ public:
 
 	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer);
 
+public:/*WebRequestHandler*/
+	bool executeConfig( const char* destContext, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status);
+
+private:
+	bool feedRequest( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status);
+	bool executeRequest( WebRequestAnswer& status, const char* content, std::size_t contentlen);
+	bool getRequestResult( WebRequestAnswer& status);
+
+	/// \brief Transfer this context with a name to the request handler
+	bool addToHandler( const char* name);
+	
 private:
 	void clearContent();
 
 private:
 	papuga_RequestContext m_impl;
+	papuga_RequestHandler* m_handler;
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;
