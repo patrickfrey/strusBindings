@@ -60,7 +60,7 @@ public:
 			const char* encoding, 
 			const char* contentstr,
 			std::size_t contentlen,
-			WebRequestAnswer& status) const=0;
+			WebRequestAnswer& status)=0;
 };
 
 }//namespace

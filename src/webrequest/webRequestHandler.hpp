@@ -45,7 +45,7 @@ public:
 			const char* encoding, 
 			const char* contentstr,
 			std::size_t contentlen,
-			WebRequestAnswer& status) const;
+			WebRequestAnswer& status);
 
 private:
 	WebRequestContext* createContext_( const char* context, const char* schema, const char* role, WebRequestAnswer& status) const;

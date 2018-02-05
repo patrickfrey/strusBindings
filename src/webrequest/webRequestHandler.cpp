@@ -197,12 +197,13 @@ bool WebRequestHandler::executeConfiguration(
 			const char* encoding, 
 			const char* contentstr,
 			std::size_t contentlen,
-			WebRequestAnswer& status) const
+			WebRequestAnswer& status)
 {
 	static const char* role = "config";
 	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContext, schema, role, status));
 	if (!ctx.get()) return false;
 
+	strus::unique_lock lock( m_mutex);
 	return ctx->executeConfig( destContext, doctype, encoding, contentstr, contentlen, status);
 }
 
