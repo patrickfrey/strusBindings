@@ -11,7 +11,7 @@ pkgdesc='Language bindings for the strus text search engine.'
 license=('MPL2')
 arch=('i686' 'x86_64')
 url="http://project-strus.net"
-depends=('boost>=1.53' 'boost-libs>=1.53' "strus>=${_deppkgver}" "strusanalyzer>=${_deppkgver}" "strusmodule>=${_deppkgver}" "strusrpc>=${_deppkgver}")
+depends=('boost>=1.57' 'boost-libs>=1.57' "strus>=${_deppkgver}" "strusanalyzer>=${_deppkgver}" "strusmodule>=${_deppkgver}" "strusrpc>=${_deppkgver}")
 makedepends=('cmake' 'swig' 'php56' 'java-environment' 'python2')
 source=("${pkgbase}-${_mainpkgver}.tar.gz")
 
