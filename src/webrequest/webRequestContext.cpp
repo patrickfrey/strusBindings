@@ -12,6 +12,7 @@
 #include "webRequestUtils.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/lib/error.hpp"
+#include "strus/base/string_format.hpp"
 #include "papuga/errors.h"
 #include "papuga/request.h"
 #include "papuga/requestParser.h"
@@ -23,8 +24,12 @@
 #include <cstddef>
 #include <cstring>
 #include <cstdlib>
+#include <cstdarg>
+#include <iostream>
 
 using namespace strus;
+
+#define STRUS_LOWLEVEL_DEBUG
 
 WebRequestContext::WebRequestContext(
 	papuga_RequestHandler* handlerimpl,
@@ -35,13 +40,19 @@ WebRequestContext::WebRequestContext(
 {
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 	m_atm = papuga_RequestHandler_get_schema( handlerimpl, schema, role, &m_errcode);
-	if (!m_atm) throw Exception( m_errcode);
-	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode)) throw Exception( m_errcode);
+	if (!m_atm)
+	{
+		throw Exception( m_errcode, "failed to get schema '%s' for '%s'", schema, role?role:"*");
+	}
+	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode))
+	{
+		throw Exception( m_errcode, "failed to instantiate context '%s' for '%s'", context?context:"", role?role:"*");
+	}
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)
 	{
 		papuga_destroy_RequestContext( &m_impl);
-		throw Exception( papuga_NoMemError);
+		throw Exception( papuga_NoMemError, "failed to create request structure '%s' on '%s' for '%s'", schema, context, role?role:"*");
 	}
 }
 
@@ -50,6 +61,15 @@ WebRequestContext::~WebRequestContext()
 	papuga_destroy_RequestContext( &m_impl);
 	papuga_destroy_Request( m_request);
 	if (m_resultstr) std::free( m_resultstr);
+}
+
+WebRequestContext::Exception::Exception( papuga_ErrorCode errcode_, const char* fmt_, ...)
+	:std::runtime_error("WebRequestContextException"),m_errcode(errcode_)
+{
+	va_list vl;
+	va_start(vl,fmt_);
+	std::vsnprintf( m_errmsg, sizeof(m_errmsg), fmt_, vl);
+	va_end(vl);
 }
 
 void WebRequestContext::clearContent()
@@ -88,7 +108,7 @@ static papuga_StringEncoding getStringEncoding( const char* encoding, const char
 	}
 }
 
-static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause cause, const char* errstr)
+static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause cause, const char* errstr, bool doCopy=false)
 {
 	int httpstatus = errorCauseToHttpStatus( cause);
 	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, cause), errstr);
@@ -101,24 +121,30 @@ static void setStatus( WebRequestAnswer& status, int apperrorcode, const char* e
 	status.setError( httpstatus, apperrorcode, errstr);
 }
 
-bool WebRequestContext::feedRequest( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
+bool WebRequestContext::feedRequest( WebRequestAnswer& status, const char* doctype, const char* encoding, const char* content, std::size_t contentlen)
 {
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "call WebRequestContext::feedRequest" << std::endl;
+#endif
 	clearContent();
 
 	// Evaluate the character set encoding:
 	m_encoding = getStringEncoding( encoding, content, contentlen);
 	if (m_encoding == papuga_Binary)
 	{
-		setStatus( status, ErrorOperationScanInput, ErrorCauseEncoding, papuga_ErrorCode_tostring( m_errcode = papuga_TypeError));
+		setStatus( status, ErrorOperationScanInput, ErrorCauseEncoding, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
 		return false;
 	}
 	// Evaluate the request content type:
 	m_doctype = doctype ? papuga_contentTypeFromName( doctype) : papuga_guess_ContentType( content,contentlen);
 	if (m_doctype == papuga_ContentType_Unknown)
 	{
-		setStatus( status, ErrorOperationScanInput, ErrorCauseInputFormat, papuga_ErrorCode_tostring( m_errcode = papuga_TypeError));
+		setStatus( status, ErrorOperationScanInput, ErrorCauseInputFormat, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
 		return false;
 	}
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "create the request parser" << std::endl;
+#endif
 	// Parse the request:
 	papuga_RequestParser* parser = papuga_create_RequestParser( m_doctype, m_encoding, content, contentlen, &m_errcode);
 	if (!parser)
@@ -126,6 +152,9 @@ bool WebRequestContext::feedRequest( const char* doctype, const char* encoding, 
 		setStatus( status, ErrorOperationScanInput, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "parse the request" << std::endl;
+#endif
 	if (!papuga_RequestParser_feed_request( parser, m_request, &m_errcode))
 	{
 		char buf[ 2048];
@@ -147,7 +176,10 @@ bool WebRequestContext::executeRequest( WebRequestAnswer& status, const char* co
 	{
 		m_errcode = papuga_HostObjectError;
 		const char* errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
-;
+
+#ifdef STRUS_LOWLEVEL_DEBUG
+		std::cerr << strus::string_format( "execute request failed, pos %d: %s", errpos, errmsg) << std::endl;
+#endif
 		int lastapperr = 0;
 		if (errmsg)
 		{
@@ -155,7 +187,7 @@ bool WebRequestContext::executeRequest( WebRequestAnswer& status, const char* co
 			char const* errmsgitr = errmsg;
 			int apperr = strus::errorCodeFromMessage( errmsgitr);
 			lastapperr = apperr;
-			while (0 <= (apperr = strus::errorCodeFromMessage( errmsgitr)))
+			if (0 <= apperr) while (0 <= (apperr = strus::errorCodeFromMessage( errmsgitr)))
 			{
 				if (apperr > 0) lastapperr = apperr;
 			}
@@ -228,36 +260,22 @@ bool WebRequestContext::getRequestResult( WebRequestAnswer& status)
 
 bool WebRequestContext::execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
 {
-	return feedRequest( doctype, encoding, content, contentlen, status)
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "call WebRequestContext::execute" << std::endl;
+#endif
+	return feedRequest( status, doctype, encoding, content, contentlen)
 	&&	executeRequest( status, content, contentlen)
 	&&	getRequestResult( status);
 }
 
-bool WebRequestContext::executeConfig( const char* destContext, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
+bool WebRequestContext::executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
 {
-	return feedRequest( doctype, encoding, content, contentlen, status)
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "call WebRequestContext::executeConfig" << std::endl;
+#endif
+	return feedRequest( status, doctype, encoding, content, contentlen)
 	&&	executeRequest( status, content, contentlen)
-	&&	addToHandler( destContext);
-}
-
-static const char* getErrorComponentName( ErrorComponent component)
-{
-	switch (component)
-	{
-		case StrusComponentUnknown: return "unknown";
-		case StrusComponentBase: return "base";
-		case StrusComponentCore: return "core";
-		case StrusComponentAnalyzer: return "analyzer";
-		case StrusComponentTrace: return "trace";
-		case StrusComponentModule: return "module";
-		case StrusComponentRpc: return "rpc";
-		case StrusComponentVector: return "vector";
-		case StrusComponentPattern: return "pattern";
-		case StrusComponentUtilities: return "utilities";
-		case StrusComponentBindings: return "bindings";
-		case StrusComponentWebService: return "webservice";
-		default: return "other";
-	}
+	&&	addToHandler( status, destContextName, destContextSchemaPrefix);
 }
 
 static void escJsonOutput( char* buf, std::size_t buflen)
@@ -292,7 +310,7 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& l
 					buf, bufsize, "<result type='error'><err id=\"%d\"><status>%d</status><comp>%s</comp><op>%d</op><code>%d</code><msg>%s</msg><err></result>",
 					*appErrorCode,
 					answer.httpstatus(),
-					getErrorComponentName( appErrorCode.component()),
+					strus::errorComponentName( appErrorCode.component()),
 					(int)appErrorCode.operation(),
 					(int)appErrorCode.cause(),
 					answer.errorstr());
@@ -303,7 +321,7 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& l
 					buf, bufsize, "{\1err\1: {\n\t\1id\1:%d\n\t\1status\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1code\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
 					*appErrorCode,
 					answer.httpstatus(),
-					getErrorComponentName( appErrorCode.component()),
+					strus::errorComponentName( appErrorCode.component()),
 					(int)appErrorCode.operation(),
 					(int)appErrorCode.cause(),
 					answer.errorstr());
@@ -335,8 +353,21 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& l
 	return true;
 }
 
-bool WebRequestContext::addToHandler( const char* name)
+bool WebRequestContext::addToHandler( WebRequestAnswer& status, const char* contextName, const char* schemaPrefix)
 {
-	return papuga_RequestHandler_add_context( m_handler, name, &m_impl, &m_errcode);
+	if (!papuga_RequestContext_set_schemaprefix( &m_impl, schemaPrefix))
+	{
+		m_errcode = papuga_NoMemError;
+		setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		return false;
+	}
+	if (!papuga_RequestHandler_add_context( m_handler, contextName, &m_impl, &m_errcode))
+	{
+		char buf[ 1024];
+		std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler: %s"), schemaPrefix, contextName, papuga_ErrorCode_tostring( m_errcode));
+		setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), buf, true);
+		return false;
+	}
+	return true;
 }
 

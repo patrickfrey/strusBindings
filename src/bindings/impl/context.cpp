@@ -79,7 +79,7 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_textproc(0)
 {
 	ContextDef contextdef( descr);
-	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads);
+	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
 	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
 
 	if (contextdef.rpc.empty())

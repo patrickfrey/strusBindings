@@ -50,9 +50,16 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 		case ErrorCauseErrno: return 500 /*Internal Server Error*/;
 		case ErrorCauseOutOfMem: return 500 /*Internal Server Error*/;
 		case ErrorCauseDataCorruption: return 500 /*Internal Server Error*/;
+		case ErrorCauseMutexLockFailed: return 500 /*Internal Server Error*/;
+		case ErrorCauseLogicError: return 500 /*Internal Server Error*/;
+		case ErrorCauseUncaughtException: return 500 /*Internal Server Error*/;
+
 		case ErrorCauseAvailability: return 503; /*Service not available*/;
 		case ErrorCauseNotAllowed: return 405; /* Method not allowed */
 		case ErrorCauseProtocolError: return 500 /*Internal Server Error*/;
+		case ErrorCausePlatformIncompatibility: return 400 /*Bad Request*/;
+		case ErrorCausePlatformRequirements: return 500 /*Internal Server Error*/;
+
 		case ErrorCauseSyntax: return 500 /*Internal Server Error*/;
 		case ErrorCauseNotFound: return 500 /*Internal Server Error*/;
 		case ErrorCauseIOError: return 500 /*Internal Server Error*/;
@@ -69,15 +76,11 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 		case ErrorCauseMaximumLimitReached: return 500 /*Internal Server Error*/;
 		case ErrorCauseBufferOverflow: return 500 /*Internal Server Error*/;
 		case ErrorCauseMaxNofItemsExceeded: return 500 /*Internal Server Error*/;
-		case ErrorCauseInputFormat: return 400 /*Bad Request*/;
-		case ErrorCauseLogicError: return 500 /*Internal Server Error*/;
 		case ErrorCauseRuntimeError: return 500 /*Internal Server Error*/;
-		case ErrorCauseUncaughtException: return 500 /*Internal Server Error*/;
 		case ErrorCauseIncompleteRequest: return 400 /*Bad Request*/;
 		case ErrorCauseUnexpectedEof: return 400 /*Bad Request*/;
-		case ErrorCausePlatformIncompatibility: return 400 /*Bad Request*/;
-		case ErrorCausePlatformRequirements: return 500 /*Internal Server Error*/;
 		case ErrorCauseHiddenError: return 500 /*Internal Server Error*/;
+		case ErrorCauseInputFormat: return 400 /*Bad Request*/;
 		case ErrorCauseEncoding: return 400 /*Bad Request*/;
 	}
 	return 500 /*Internal Server Error*/;

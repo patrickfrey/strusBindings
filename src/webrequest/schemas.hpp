@@ -25,6 +25,8 @@ namespace webrequest {
 
 enum
 {
+	NullValue,
+
 	ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
 
 	StorageConfig, StoragePath, StorageCachedTerms,
@@ -43,10 +45,10 @@ public:
 		getStrusClassDefs(), getBindingsInterfaceDescription()->structs,
 		"context",
 		{
-			{"/extensions", "directory()", ModuleDir},
-			{"/extensions", "modules()", ModuleName},
-			{"/data", "workdir()", WorkDir},
-			{"/data", "resources()", ResourceDir},
+			{"/extensions/directory", "()", ModuleDir},
+			{"/extensions/modules", "()", ModuleName},
+			{"/data/workdir", "()", WorkDir},
+			{"/data/resources", "()", ResourceDir},
 			{"/context/trace", "log()", TraceLogType},
 			{"/context/trace", "file()", TraceLogFile},
 			{"/context/trace", "groupby()", TraceGroupBy},
@@ -68,12 +70,12 @@ public:
 					{"threads", ContextThreads, '?'}
 				}
 			},
-			{"/context", "context", "", bindings::method::Context::constructor(), {{(int)ContextConfig}} },
-			{"/data", "", "context", bindings::method::Context::defineWorkingDirectory(), {{(int)WorkDir}} },
-			{"/data", "", "context", bindings::method::Context::addResourcePath(), {{(int)WorkDir}} },
-			{"/data", "", "context", bindings::method::Context::addModulePath(), {{(int)ModuleDir}} },
-			{"/data", "", "context", bindings::method::Context::loadModule(), {{(int)ModuleName}} },
-			{"/data", "", "context", bindings::method::Context::endConfig(), {} }
+			{"/", "context", "", bindings::method::Context::constructor(), {{(int)ContextConfig, '?'}} },
+			{"/data/workdir", "", "context", bindings::method::Context::defineWorkingDirectory(), {{(int)WorkDir}} },
+			{"/data/resources", "", "context", bindings::method::Context::addResourcePath(), {{(int)ResourceDir}} },
+			{"/extensions/directory", "", "context", bindings::method::Context::addModulePath(), {{(int)ModuleDir}} },
+			{"/extensions/modules", "", "context", bindings::method::Context::loadModule(), {{(int)ModuleName}} },
+			{"/", "", "context", bindings::method::Context::endConfig(), {} }
 		}
 	) {}
 };

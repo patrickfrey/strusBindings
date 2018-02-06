@@ -43,18 +43,20 @@ public:
 			WebRequestAnswer& status) const=0;
 
 	/// \brief Execute a configuration request
-	/// \param[in] destContext identifier defining the context created as execution result
-	/// \param[in] srcContext identifier defining where to execute the request (NULL for root context)
-	/// \param[in] schema identifier defining what type of request to execute
+	/// \param[in] destContextName identifier defining the name of the context created as result of loading the configuration
+	/// \param[in] destContextSchemaPrefix schemaprefix assigned to the created context
+	/// \param[in] srcContextName identifier defining the base context (NULL for none)
+	/// \param[in] schema identifier defining what type of request to execute for loading the configuration
 	/// \param[in] doctype document content type "XML" (or "application/xml") or "JSON" (or "application/xml") 
 	/// \param[in] encoding character set encoding, e.g. "UTF-8' or "UTF-16"  or "UTF-16BE"
 	/// \param[in] contentstr pointer to content of the request
 	/// \param[in] contentlen size of content in bytes
 	/// \param[out] status the status of the request
 	/// \return bool in case of success, false in case of error (inspect status for the error)
-	virtual bool executeConfiguration(
-			const char* destContext,
-			const char* srcContext,
+	virtual bool loadConfiguration(
+			const char* destContextName,
+			const char* destContextSchemaPrefix,
+			const char* srcContextName,
 			const char* schema,
 			const char* doctype,
 			const char* encoding, 

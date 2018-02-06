@@ -14,6 +14,7 @@
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/base/local_ptr.hpp"
+#include "strus/base/string_format.hpp"
 #include "papuga/request.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
@@ -27,6 +28,8 @@
 #include <cstdarg>
 
 using namespace strus;
+
+#define STRUS_LOWLEVEL_DEBUG
 
 static std::vector<std::string> getLogArgument( std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype)
 {
@@ -128,15 +131,15 @@ WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
-#define DEFINE_SCHEMA( EXTNAME, SCHEMANAME)\
+#define DEFINE_SCHEMA( EXTNAME, SCHEMANAME, ALLOW)\
 	static const Schema ## SCHEMANAME  schema ## SCHEMANAME;\
 	if (!papuga_RequestHandler_add_schema( m_impl, EXTNAME, schema ## SCHEMANAME .impl())) throw std::bad_alloc();\
-	if (!papuga_RequestHandler_allow_schema_access_all( m_impl, #EXTNAME, &errcode)) throw std::bad_alloc();
+	if (!papuga_RequestHandler_allow_schema_access( m_impl, EXTNAME, ALLOW, &errcode)) throw std::bad_alloc();
 
-	DEFINE_SCHEMA( "init", CreateContext);
-	DEFINE_SCHEMA( "create_storage", CreateStorage);
-	DEFINE_SCHEMA( "destroy_storage", DestroyStorage);
-	DEFINE_SCHEMA( "open_storage", OpenStorage);
+	DEFINE_SCHEMA( "init", CreateContext, "config");
+	DEFINE_SCHEMA( "create_storage", CreateStorage, "config");
+	DEFINE_SCHEMA( "destroy_storage", DestroyStorage, "config");
+	DEFINE_SCHEMA( "init_storage", OpenStorage, "config");
 }
 
 WebRequestHandler::~WebRequestHandler()
@@ -149,34 +152,44 @@ bool WebRequestHandler::hasSchema( const char* schema) const
 	return papuga_RequestHandler_has_schema( m_impl, schema);
 }
 
-static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papuga_ErrorCode errcode)
+static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papuga_ErrorCode errcode, const char* errmsg=0)
 {
 	ErrorCause errcause = papugaErrorToErrorCause( errcode);
 	const char* errstr = papuga_ErrorCode_tostring( errcode);
 	int httpstatus = errorCauseToHttpStatus( errcause);
-	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errstr);
+	if (errmsg)
+	{
+		char errbuf[ 1024];
+		if (sizeof(errbuf) >= std::snprintf( errbuf, sizeof(errbuf), "%s, %s", errmsg, errstr))
+		{
+			errbuf[ sizeof(errbuf)-1] = 0;
+		}
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errbuf, true);
+	}
+	else
+	{
+		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errstr);
+	}
 }
 
 WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, WebRequestAnswer& status) const
 {
-	papuga_ErrorCode errcode = papuga_Ok;
 	try
 	{
 		return new WebRequestContext( m_impl, context, schema, role);
 	}
 	catch (const std::bad_alloc&)
 	{
-		errcode = papuga_NoMemError;
+		setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
 	}
 	catch (const WebRequestContext::Exception& err)
 	{
-		errcode = err.errcode();
+		setStatus( status, ErrorOperationBuildData, err.errcode(), err.errmsg());
 	}
 	catch (...)
 	{
-		errcode = papuga_UncaughtException;
+		setStatus( status, ErrorOperationBuildData, papuga_UncaughtException);
 	}
-	setStatus( status, ErrorOperationBuildData, errcode);
 	return NULL;
 }
 
@@ -189,9 +202,10 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 	return createContext_( context, schema, role, status);
 }
 
-bool WebRequestHandler::executeConfiguration(
-			const char* destContext,
-			const char* srcContext,
+bool WebRequestHandler::loadConfiguration(
+			const char* destContextName,
+			const char* destContextSchemaPrefix,
+			const char* srcContextName,
 			const char* schema,
 			const char* doctype,
 			const char* encoding, 
@@ -199,12 +213,33 @@ bool WebRequestHandler::executeConfiguration(
 			std::size_t contentlen,
 			WebRequestAnswer& status)
 {
-	static const char* role = "config";
-	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContext, schema, role, status));
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::string co( contentstr, contentlen < 200 ? contentlen : 200);
+	std::cerr << strus::string_format( "load configuration: context %s %s <- %s, schema %s, doctype %s, encoding %s, content '%s'",
+						destContextSchemaPrefix, destContextName, srcContextName, schema, doctype, encoding, co.c_str()) << std::endl;
+#endif
+	const char* role = srcContextName ? "*":"config";
+	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, role, status));
 	if (!ctx.get()) return false;
 
 	strus::unique_lock lock( m_mutex);
-	return ctx->executeConfig( destContext, doctype, encoding, contentstr, contentlen, status);
+	if (ctx->executeConfig( destContextName, destContextSchemaPrefix, doctype, encoding, contentstr, contentlen, status))
+	{
+		papuga_ErrorCode errcode = papuga_Ok;
+#ifdef STRUS_LOWLEVEL_DEBUG
+		std::cerr << strus::string_format( "allow acccess to '%s'", role) << std::endl;
+#endif
+		if (!papuga_RequestHandler_allow_context_access( m_impl, destContextName, role, &errcode))
+		{
+			setStatus( status, ErrorOperationConfiguration, errcode);
+			return false;
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 

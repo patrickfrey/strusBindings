@@ -28,12 +28,17 @@ public:
 		:public std::runtime_error
 	{
 	public:
-		explicit Exception( papuga_ErrorCode errcode_)
-			:std::runtime_error("WebRequestContextException"),m_errcode(errcode_){}
+		Exception( papuga_ErrorCode errcode_, const char* fmt_, ...)
+#ifdef __GNUC__
+			__attribute__ ((format (printf, 3, 4)))
+#endif
+		;
 		papuga_ErrorCode errcode() const	{return m_errcode;}
+		const char* errmsg() const		{return m_errmsg;}
 	
 	private:
 		papuga_ErrorCode m_errcode;
+		char m_errmsg[ 1024];
 	};
 
 	WebRequestContext(
@@ -50,15 +55,15 @@ public:
 	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	bool executeConfig( const char* destContext, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status);
+	bool executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status);
 
 private:
-	bool feedRequest( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status);
+	bool feedRequest( WebRequestAnswer& status, const char* doctype, const char* encoding, const char* content, std::size_t contentlen);
 	bool executeRequest( WebRequestAnswer& status, const char* content, std::size_t contentlen);
 	bool getRequestResult( WebRequestAnswer& status);
 
 	/// \brief Transfer this context with a name to the request handler
-	bool addToHandler( const char* name);
+	bool addToHandler( WebRequestAnswer& status, const char* contextName, const char* schemaPrefix);
 	
 private:
 	void clearContent();

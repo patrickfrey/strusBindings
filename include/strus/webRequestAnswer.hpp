@@ -11,6 +11,7 @@
 #define _STRUS_WEB_REQUEST_ANSWER_HPP_INCLUDED
 #include <cstddef>
 #include <string>
+#include <cstdio>
 
 namespace strus
 {
@@ -55,9 +56,18 @@ public:
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] apperrorcode_ application error code
 	/// \param[in] errorstr_ pointer to error message
-	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_)
+	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_, bool doCopy=false)
 	{
-		m_errorstr = errorstr_;
+		if (doCopy)
+		{
+			std::size_t len = std::snprintf( m_errorbuf, sizeof(m_errorbuf), "%s", errorstr_);
+			if (len >= sizeof(m_errorbuf)) m_errorbuf[ sizeof(m_errorbuf)-1] = 0;
+			m_errorstr = m_errorbuf;
+		}
+		else
+		{
+			m_errorstr = errorstr_;
+		}
 		m_httpstatus = httpstatus_;
 		m_apperrorcode = apperrorcode_;
 	}
@@ -71,6 +81,7 @@ public:
 	}
 
 private:
+	char m_errorbuf[ 1024];		///< local buffer for error messages
 	const char* m_errorstr;		///< error message in case of failure or NULL
 	int m_httpstatus;		///< http status of the request
 	int m_apperrorcode;		///< application error code of the request

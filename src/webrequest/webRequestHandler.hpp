@@ -37,9 +37,10 @@ public:
 			const char* role,
 			WebRequestAnswer& status) const;
 
-	virtual bool executeConfiguration(
-			const char* destContext,
-			const char* srcContext,
+	virtual bool loadConfiguration(
+			const char* destContextName,
+			const char* destContextSchemaPrefix,
+			const char* srcContextName,
 			const char* schema,
 			const char* doctype,
 			const char* encoding, 
