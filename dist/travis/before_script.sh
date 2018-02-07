@@ -33,7 +33,6 @@ case $OS in
 		brew link leveldb || true
 		brew link snappy || true
 		brew install lapack openblas || true
-		brew tap homebrew/versions
 		brew tap homebrew/homebrew-php
 		brew install php70 python3 || true
 		# make sure cmake finds the brew version of gettext
