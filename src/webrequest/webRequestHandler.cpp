@@ -172,11 +172,11 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	}
 }
 
-WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, WebRequestAnswer& status) const
+WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, const char* accepted_charset, WebRequestAnswer& status) const
 {
 	try
 	{
-		return new WebRequestContext( m_impl, context, schema, role);
+		return new WebRequestContext( m_impl, context, schema, role, accepted_charset);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -197,9 +197,10 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 		const char* context,
 		const char* schema,
 		const char* role,
+		const char* accepted_charset,
 		WebRequestAnswer& status) const
 {
-	return createContext_( context, schema, role, status);
+	return createContext_( context, schema, role, accepted_charset, status);
 }
 
 bool WebRequestHandler::loadConfiguration(
@@ -207,22 +208,21 @@ bool WebRequestHandler::loadConfiguration(
 			const char* destContextSchemaPrefix,
 			const char* srcContextName,
 			const char* schema,
-			const char* doctype,
-			const char* encoding, 
-			const char* contentstr,
-			std::size_t contentlen,
+			const WebRequestContent& content,
 			WebRequestAnswer& status)
 {
 #ifdef STRUS_LOWLEVEL_DEBUG
-	std::string co( contentstr, contentlen < 200 ? contentlen : 200);
+	std::string co( webRequestContent_tostring( content));
+	if (co.size() > 200) co.resize( 200);
 	std::cerr << strus::string_format( "load configuration: context %s %s <- %s, schema %s, doctype %s, encoding %s, content '%s'",
-						destContextSchemaPrefix, destContextName, srcContextName, schema, doctype, encoding, co.c_str()) << std::endl;
+						destContextSchemaPrefix, destContextName, srcContextName, schema,
+						content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, status));
+	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, "UTF-8"/*accepted_charset*/, status));
 	if (!ctx.get()) return false;
 
 	strus::unique_lock lock( m_mutex);
-	if (ctx->executeConfig( destContextName, destContextSchemaPrefix, doctype, encoding, contentstr, contentlen, status))
+	if (ctx->executeConfig( destContextName, destContextSchemaPrefix, content, status))
 	{
 		papuga_ErrorCode errcode = papuga_Ok;
 #ifdef STRUS_LOWLEVEL_DEBUG

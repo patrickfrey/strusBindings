@@ -35,8 +35,9 @@ WebRequestContext::WebRequestContext(
 	papuga_RequestHandler* handlerimpl,
 	const char* context,
 	const char* schema,
-	const char* role)
-		:m_handler(handlerimpl),m_request(0),m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_errcode(papuga_Ok),m_atm(0),m_resultstr(0),m_resultlen(0)
+	const char* role,
+	const char* accepted_charset_)
+		:m_handler(handlerimpl),m_request(0),m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0),m_errcode(papuga_Ok),m_atm(0),m_accepted_charset(accepted_charset_),m_resultstr(0),m_resultlen(0)
 {
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode))
@@ -122,20 +123,20 @@ static papuga_StringEncoding getStringEncoding( const char* encoding, const char
 	}
 }
 
-static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause cause, const char* errstr, bool doCopy=false)
+static void setAnswer( WebRequestAnswer& answer, ErrorOperation operation, ErrorCause cause, const char* errstr, bool doCopy=false)
 {
 	int httpstatus = errorCauseToHttpStatus( cause);
-	status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, cause), errstr);
+	answer.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, cause), errstr);
 }
 
-static void setStatus( WebRequestAnswer& status, int apperrorcode, const char* errstr)
+static void setAnswer( WebRequestAnswer& answer, int apperrorcode, const char* errstr)
 {
 	ErrorCode err( apperrorcode);
 	int httpstatus = errorCauseToHttpStatus( err.cause());
-	status.setError( httpstatus, apperrorcode, errstr);
+	answer.setError( httpstatus, apperrorcode, errstr);
 }
 
-bool WebRequestContext::feedRequest( WebRequestAnswer& status, const char* doctype, const char* encoding, const char* content, std::size_t contentlen)
+bool WebRequestContext::feedRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::feedRequest" << std::endl;
@@ -143,27 +144,28 @@ bool WebRequestContext::feedRequest( WebRequestAnswer& status, const char* docty
 	clearContent();
 
 	// Evaluate the character set encoding:
-	m_encoding = getStringEncoding( encoding, content, contentlen);
+	m_encoding = getStringEncoding( content.charset(), content.str(), content.len());
 	if (m_encoding == papuga_Binary)
 	{
-		setStatus( status, ErrorOperationScanInput, ErrorCauseEncoding, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
+		setAnswer( answer, ErrorOperationScanInput, ErrorCauseEncoding, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
 		return false;
 	}
 	// Evaluate the request content type:
-	m_doctype = doctype ? papuga_contentTypeFromName( doctype) : papuga_guess_ContentType( content,contentlen);
+	m_doctype = content.doctype() ? papuga_contentTypeFromName( content.doctype()) : papuga_guess_ContentType( content.str(), content.len());
+	m_doctypestr = content.doctype();
 	if (m_doctype == papuga_ContentType_Unknown)
 	{
-		setStatus( status, ErrorOperationScanInput, ErrorCauseInputFormat, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
+		setAnswer( answer, ErrorOperationScanInput, ErrorCauseInputFormat, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
 		return false;
 	}
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "create the request parser" << std::endl;
 #endif
 	// Parse the request:
-	papuga_RequestParser* parser = papuga_create_RequestParser( m_doctype, m_encoding, content, contentlen, &m_errcode);
+	papuga_RequestParser* parser = papuga_create_RequestParser( m_doctype, m_encoding, content.str(), content.len(), &m_errcode);
 	if (!parser)
 	{
-		setStatus( status, ErrorOperationScanInput, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		setAnswer( answer, ErrorOperationScanInput, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 #ifdef STRUS_LOWLEVEL_DEBUG
@@ -176,14 +178,33 @@ bool WebRequestContext::feedRequest( WebRequestAnswer& status, const char* docty
 		papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error at position %d: %s, feeding request, location: %s"), pos, papuga_ErrorCode_tostring( m_errcode), buf);
 		papuga_destroy_RequestParser( parser);
 
-		setStatus( status, ErrorOperationScanInput, papugaErrorToErrorCause( m_errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
+		setAnswer( answer, ErrorOperationScanInput, papugaErrorToErrorCause( m_errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
 		return false;
 	}
 	papuga_destroy_RequestParser( parser);
 	return true;
 }
 
-bool WebRequestContext::executeRequest( WebRequestAnswer& status, const char* content, std::size_t contentlen)
+bool WebRequestContext::debugRequest( WebRequestAnswer& answer)
+{
+	papuga_StringEncoding result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
+	std::size_t result_length;
+	const char* result = papuga_Request_tostring( m_request, &m_impl.allocator, result_encoding, &result_length, &m_errcode);
+	if (result)
+	{
+		WebRequestContent content( papuga_stringEncodingName( result_encoding), "text/plain", result, result_length * papuga_StringEncoding_unit_size( result_encoding));
+		answer.setContent( content);
+		answer.setStatus( 200);
+		return true;
+	}
+	else
+	{
+		setAnswer( answer, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		return false;
+	}
+}
+
+bool WebRequestContext::executeRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	int errpos = -1;
 	if (!papuga_RequestContext_execute_request( &m_impl, m_request, &m_errbuf, &errpos))
@@ -210,7 +231,7 @@ bool WebRequestContext::executeRequest( WebRequestAnswer& status, const char* co
 			{
 				// Evaluate more info about the location of the error, we append the scope of the document to the error message:
 				char locinfobuf[ 4096];
-				const char* locinfo = papuga_request_error_location( m_doctype, m_encoding, content, contentlen, errpos, locinfobuf, sizeof(locinfobuf));
+				const char* locinfo = papuga_request_error_location( m_doctype, m_encoding, content.str(), content.len(), errpos, locinfobuf, sizeof(locinfobuf));
 				if (locinfo)
 				{
 					papuga_ErrorBuffer_appendMessage( &m_errbuf, " (error scope: %s)", locinfo);
@@ -230,66 +251,77 @@ bool WebRequestContext::executeRequest( WebRequestAnswer& status, const char* co
 		}
 		if (lastapperr >= 0)
 		{
-			setStatus( status, lastapperr, errmsg);
+			setAnswer( answer, lastapperr, errmsg);
 		}
 		else
 		{
-			setStatus( status, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), errmsg);
+			setAnswer( answer, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), errmsg);
 		}
 		return false;
 	}
 	return true;
 }
 
-bool WebRequestContext::getRequestResult( WebRequestAnswer& status)
+bool WebRequestContext::getRequestResult( WebRequestAnswer& answer)
 {
 	papuga_RequestResult result;
 	if (!papuga_set_RequestResult( &result, &m_impl, m_request))
 	{
 		m_errcode = papuga_NoMemError;
-		setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	// Map the result:
+	papuga_StringEncoding result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
 	switch (m_doctype)
 	{
-		case papuga_ContentType_XML:  m_resultstr = (char*)papuga_RequestResult_toxml( &result, m_encoding, &m_resultlen, &m_errcode); break;
-		case papuga_ContentType_JSON: m_resultstr = (char*)papuga_RequestResult_tojson( &result, m_encoding, &m_resultlen, &m_errcode); break;
+		case papuga_ContentType_XML:  m_resultstr = (char*)papuga_RequestResult_toxml( &result, result_encoding, &m_resultlen, &m_errcode); break;
+		case papuga_ContentType_JSON: m_resultstr = (char*)papuga_RequestResult_tojson( &result, result_encoding, &m_resultlen, &m_errcode); break;
 		case papuga_ContentType_Unknown:
 		default: break;
 	}
 	if (m_resultstr)
 	{
-		status.setContent( m_resultstr, m_resultlen);
-		status.setStatus( 200);
+		WebRequestContent content( papuga_stringEncodingName( result_encoding), m_doctypestr, m_resultstr, m_resultlen);
+		answer.setContent( content);
+		answer.setStatus( 200);
 		return true;
 	}
 	else
 	{
-		setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	return true;
 }
 
-bool WebRequestContext::execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
+bool WebRequestContext::execute( const WebRequestContent& content, WebRequestAnswer& answer)
 {
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::execute" << std::endl;
 #endif
-	return feedRequest( status, doctype, encoding, content, contentlen)
-	&&	executeRequest( status, content, contentlen)
-	&&	getRequestResult( status);
+	return feedRequest( answer, content)
+	&&	executeRequest( answer, content)
+	&&	getRequestResult( answer);
 }
 
-bool WebRequestContext::executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status)
+bool WebRequestContext::debug( const WebRequestContent& content, WebRequestAnswer& answer)
+{
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "call WebRequestContext::debug" << std::endl;
+#endif
+	return feedRequest( answer, content)
+	&&	debugRequest( answer);
+}
+
+bool WebRequestContext::executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::executeConfig" << std::endl;
 #endif
-	return feedRequest( status, doctype, encoding, content, contentlen)
-	&&	executeRequest( status, content, contentlen)
-	&&	addToHandler( status, destContextName, destContextSchemaPrefix);
+	return feedRequest( answer, content)
+	&&	executeRequest( answer, content)
+	&&	addToHandler( answer, destContextName, destContextSchemaPrefix);
 }
 
 static void escJsonOutput( char* buf, std::size_t buflen)
@@ -321,7 +353,7 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& l
 	{
 		case papuga_ContentType_XML:
 			bufpos = std::snprintf(
-					buf, bufsize, "<result type='error'><err id=\"%d\"><status>%d</status><comp>%s</comp><op>%d</op><code>%d</code><msg>%s</msg><err></result>",
+					buf, bufsize, "<error><code>%d<code><status>%d</status><comp>%s</comp><op>%d</op><no>%d</no><msg>%s</msg><error>",
 					*appErrorCode,
 					answer.httpstatus(),
 					strus::errorComponentName( appErrorCode.component()),
@@ -332,7 +364,7 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& l
 
 		case papuga_ContentType_JSON:
 			bufpos = std::snprintf(
-					buf, bufsize, "{\1err\1: {\n\t\1id\1:%d\n\t\1status\1:%d\n\t\1comp\1:%s\n\t\1op\1:%d\n\t\1code\1:%d\n\t\1msg\1:\1%s\1\n}}\n",
+					buf, bufsize, "{\n\t\1error\1: {\n\t\1code\1:%d,\n\t\1status\1:%d,\n\t\1comp\1:%s,\n\t\1op\1:%d,\n\t\1no\1:%d,\n\t\1msg\1:\1%s\1\n}}\n",
 					*appErrorCode,
 					answer.httpstatus(),
 					strus::errorComponentName( appErrorCode.component()),
@@ -367,19 +399,19 @@ bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& l
 	return true;
 }
 
-bool WebRequestContext::addToHandler( WebRequestAnswer& status, const char* contextName, const char* schemaPrefix)
+bool WebRequestContext::addToHandler( WebRequestAnswer& answer, const char* contextName, const char* schemaPrefix)
 {
 	if (!papuga_RequestContext_set_schemaprefix( &m_impl, schemaPrefix))
 	{
 		m_errcode = papuga_NoMemError;
-		setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 	if (!papuga_RequestHandler_add_context( m_handler, contextName, &m_impl, &m_errcode))
 	{
 		char buf[ 1024];
 		std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler: %s"), schemaPrefix, contextName, papuga_ErrorCode_tostring( m_errcode));
-		setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), buf, true);
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), buf, true);
 		return false;
 	}
 	return true;

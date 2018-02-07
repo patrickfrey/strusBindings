@@ -45,25 +45,28 @@ public:
 		papuga_RequestHandler* handlerimpl,
 		const char* context,
 		const char* schema,
-		const char* role);
+		const char* role,
+		const char* accepted_charset);
 	virtual ~WebRequestContext();
 
 	virtual bool addVariable( const std::string& name, const std::string& value);
 
-	virtual bool execute( const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& answer);
+	virtual bool execute( const WebRequestContent& content, WebRequestAnswer& answer);
+	virtual bool debug( const WebRequestContent& content, WebRequestAnswer& answer);
 
 	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	bool executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const char* doctype, const char* encoding, const char* content, std::size_t contentlen, WebRequestAnswer& status);
+	bool executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
-	bool feedRequest( WebRequestAnswer& status, const char* doctype, const char* encoding, const char* content, std::size_t contentlen);
-	bool executeRequest( WebRequestAnswer& status, const char* content, std::size_t contentlen);
-	bool getRequestResult( WebRequestAnswer& status);
+	bool feedRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool debugRequest( WebRequestAnswer& answer);
+	bool executeRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool getRequestResult( WebRequestAnswer& answer);
 
 	/// \brief Transfer this context with a name to the request handler
-	bool addToHandler( WebRequestAnswer& status, const char* contextName, const char* schemaPrefix);
+	bool addToHandler( WebRequestAnswer& answer, const char* contextName, const char* schemaPrefix);
 	
 private:
 	void clearContent();
@@ -74,9 +77,11 @@ private:
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;
+	const char* m_doctypestr;
 	papuga_ErrorCode m_errcode;
 	papuga_ErrorBuffer m_errbuf;
 	const papuga_RequestAutomaton* m_atm;
+	const char* m_accepted_charset;
 	char* m_resultstr;
 	std::size_t m_resultlen;
 	char m_errbuf_mem[ 4096];

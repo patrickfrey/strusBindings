@@ -35,6 +35,7 @@ public:
 			const char* context,
 			const char* schema,
 			const char* role,
+			const char* accepted_charset,
 			WebRequestAnswer& status) const;
 
 	virtual bool loadConfiguration(
@@ -42,14 +43,11 @@ public:
 			const char* destContextSchemaPrefix,
 			const char* srcContextName,
 			const char* schema,
-			const char* doctype,
-			const char* encoding, 
-			const char* contentstr,
-			std::size_t contentlen,
+			const WebRequestContent& content,
 			WebRequestAnswer& status);
 
 private:
-	WebRequestContext* createContext_( const char* context, const char* schema, const char* role, WebRequestAnswer& status) const;
+	WebRequestContext* createContext_( const char* context, const char* schema, const char* role, const char* accepted_charset, WebRequestAnswer& status) const;
 
 private:
 	strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests

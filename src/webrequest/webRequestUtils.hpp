@@ -11,12 +11,17 @@
 #define _STRUS_WEB_REQUEST_UTILS_HPP_INCLUDED
 #include "papuga/typedefs.h"
 #include "strus/errorCodes.hpp"
+#include "strus/webRequestContent.hpp"
 #include <cstddef>
+#include <string>
 
 namespace strus {
 
 ErrorCause papugaErrorToErrorCause( papuga_ErrorCode errcode);
 int errorCauseToHttpStatus( ErrorCause cause);
+
+std::string webRequestContent_tostring( const WebRequestContent& content);
+papuga_StringEncoding getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc);
 
 }//namespace
 #endif

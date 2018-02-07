@@ -8,6 +8,13 @@
 /// \brief Helper functions and classes for executing XML/JSON requests on the strus bindings
 /// \file "webRequestUtils.hpp"
 #include "webRequestUtils.hpp"
+#include "private/internationalization.hpp"
+#include "papuga/encoding.h"
+#include "papuga/errors.h"
+#include "papuga/typedefs.h"
+#include "papuga/valueVariant.h"
+#include "papuga/valueVariant.hpp"
+#include <stdexcept>
 
 using namespace strus;
 
@@ -84,6 +91,56 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 		case ErrorCauseEncoding: return 400 /*Bad Request*/;
 	}
 	return 500 /*Internal Server Error*/;
+}
+
+std::string webRequestContent_tostring( const WebRequestContent& content)
+{
+	papuga_StringEncoding encoding;
+	if (!papuga_getStringEncodingFromName( &encoding, content.charset()))
+	{
+		throw std::runtime_error( papuga_ErrorCode_tostring( papuga_EncodingError));
+	}
+	papuga_ValueVariant contentval;
+	papuga_ErrorCode errcode = papuga_Ok;
+	papuga_init_ValueVariant_string_enc( &contentval, encoding, content.str(), content.len());
+	std::string rt = papuga::ValueVariant_tostring( contentval, errcode);
+	if (errcode != papuga_Ok)
+	{
+		throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+	}
+	return rt;
+}
+
+static bool findStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
+{
+	const char* encstr = papuga_stringEncodingName( inputenc);
+	char const* ai = accepted_charset;
+	do
+	{
+		for (; (unsigned char)*ai <= 32; ++ai){}
+		char const* ei = encstr;
+		for (; *ei && *ai && *ai != ','; ++ei,++ai)
+		{
+			for (; *ai == ' ' || *ai == '-'; ++ai){}
+			for (; *ei == ' ' || *ei == '-'; ++ei){}
+			if ((*ei|32) != (*ai|32)) break;
+		}
+		for (; *ai == ' '; ++ai){}
+		if (!*ei && *ai == ',') return true;
+		++ai;
+	} while (*ai);
+	return false;
+}
+
+papuga_StringEncoding getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
+{
+	if (findStringEncoding( accepted_charset, inputenc)) return inputenc;
+	if (findStringEncoding( accepted_charset, papuga_UTF8)) return papuga_UTF8;
+	if (findStringEncoding( accepted_charset, papuga_UTF16BE)) return papuga_UTF16BE;
+	if (findStringEncoding( accepted_charset, papuga_UTF16LE)) return papuga_UTF16LE;
+	if (findStringEncoding( accepted_charset, papuga_UTF32BE)) return papuga_UTF32BE;
+	if (findStringEncoding( accepted_charset, papuga_UTF32LE)) return papuga_UTF32LE;
+	return papuga_Binary;
 }
 
 
