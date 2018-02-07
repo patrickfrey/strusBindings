@@ -132,7 +132,7 @@ static bool findStringEncoding( const char* accepted_charset, papuga_StringEncod
 	return false;
 }
 
-papuga_StringEncoding getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
+papuga_StringEncoding strus::getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
 {
 	if (findStringEncoding( accepted_charset, inputenc)) return inputenc;
 	if (findStringEncoding( accepted_charset, papuga_UTF8)) return papuga_UTF8;
