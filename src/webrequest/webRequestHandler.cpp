@@ -218,8 +218,7 @@ bool WebRequestHandler::loadConfiguration(
 	std::cerr << strus::string_format( "load configuration: context %s %s <- %s, schema %s, doctype %s, encoding %s, content '%s'",
 						destContextSchemaPrefix, destContextName, srcContextName, schema, doctype, encoding, co.c_str()) << std::endl;
 #endif
-	const char* role = srcContextName ? "*":"config";
-	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, role, status));
+	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, status));
 	if (!ctx.get()) return false;
 
 	strus::unique_lock lock( m_mutex);
@@ -227,9 +226,9 @@ bool WebRequestHandler::loadConfiguration(
 	{
 		papuga_ErrorCode errcode = papuga_Ok;
 #ifdef STRUS_LOWLEVEL_DEBUG
-		std::cerr << strus::string_format( "allow acccess to '%s'", role) << std::endl;
+		std::cerr << strus::string_format( "allow acccess to '%s'", srcContextName ? "*":"config") << std::endl;
 #endif
-		if (!papuga_RequestHandler_allow_context_access( m_impl, destContextName, role, &errcode))
+		if (!papuga_RequestHandler_allow_context_access( m_impl, destContextName, srcContextName ? "*":"config", &errcode))
 		{
 			setStatus( status, ErrorOperationConfiguration, errcode);
 			return false;

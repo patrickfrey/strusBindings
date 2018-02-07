@@ -39,14 +39,28 @@ WebRequestContext::WebRequestContext(
 		:m_handler(handlerimpl),m_request(0),m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_errcode(papuga_Ok),m_atm(0),m_resultstr(0),m_resultlen(0)
 {
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
-	m_atm = papuga_RequestHandler_get_schema( handlerimpl, schema, role, &m_errcode);
-	if (!m_atm)
-	{
-		throw Exception( m_errcode, "failed to get schema '%s' for '%s'", schema, role?role:"*");
-	}
 	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode))
 	{
 		throw Exception( m_errcode, "failed to instantiate context '%s' for '%s'", context?context:"", role?role:"*");
+	}
+	if (m_impl.schemaprefix)
+	{
+		char namespace_schema[ 256];
+		if (sizeof(namespace_schema) <= std::snprintf( namespace_schema, sizeof(namespace_schema), "%s_%s", m_impl.schemaprefix, schema))
+		{
+			m_errcode = papuga_BufferOverflowError;
+			throw Exception( m_errcode, "failed to get schema %s '%s'", m_impl.schemaprefix, schema);
+		}
+		m_atm = papuga_RequestHandler_get_schema( handlerimpl, namespace_schema, role, &m_errcode);
+	}
+	else
+	{
+		m_atm = papuga_RequestHandler_get_schema( handlerimpl, schema, role, &m_errcode);
+	}
+	if (!m_atm)
+	{
+		papuga_destroy_RequestContext( &m_impl);
+		throw Exception( m_errcode, "failed to get schema %s '%s' for '%s'", m_impl.schemaprefix?m_impl.schemaprefix:"", schema, role?role:"*");
 	}
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)

@@ -54,7 +54,7 @@ static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
 	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads);
 	if (!errorhnd)
 	{
-		throw strus::runtime_error( "%s", _TXT("failed to create error buffer object"));
+		throw strus::runtime_error( _TXT("failed to create error buffer object"));
 	}
 	return errorhnd;
 }
@@ -64,7 +64,7 @@ static ModuleLoaderInterface* createModuleLoader_( ErrorBufferInterface* errorhn
 	ModuleLoaderInterface* rt = createModuleLoader( errorhnd);
 	if (!rt)
 	{
-		throw strus::runtime_error( _TXT("failed to create module loader object: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return rt;
 }
@@ -95,9 +95,9 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	{
 		Reference<RpcClientMessagingInterface> messaging;
 		messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
-		if (!messaging.get()) throw strus::runtime_error(_TXT("failed to create client messaging: %s"), errorhnd->fetchError());
+		if (!messaging.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 		m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd), "RpcClient");
-		if (!m_rpc_impl.get()) throw strus::runtime_error(_TXT("failed to create rpc client: %s"), errorhnd->fetchError());
+		if (!m_rpc_impl.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 		(void)messaging.release();
 	}
 }
@@ -105,23 +105,23 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 void ContextImpl::loadModule( const std::string& name_)
 {
 	strus::unique_lock lck( m_mutex);
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot load modules in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to load modules after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to load modules after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot load modules in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to load modules after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	if (!moduleLoader->loadModule( name_))
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error(_TXT("failed to load module: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
 void ContextImpl::addModulePath( const ValueVariant& paths_)
 {
 	strus::unique_lock lck( m_mutex);
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot add a module path in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to set the module search path after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to set the module search path after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a module path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to set the module search path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	std::vector<std::string> pathlist = Deserializer::getStringList( paths_);
 	std::vector<std::string>::const_iterator pi = pathlist.begin(), pe = pathlist.end();
@@ -132,16 +132,16 @@ void ContextImpl::addModulePath( const ValueVariant& paths_)
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to add module path: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
 void ContextImpl::addResourcePath( const ValueVariant& paths_)
 {
 	strus::unique_lock lck( m_mutex);
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot add a resource path in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to add a resource path after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to add a resource path after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot add a resource path in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to add a resource path after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	std::vector<std::string> pathlist = Deserializer::getStringList( paths_);
 	std::vector<std::string>::const_iterator pi = pathlist.begin(), pe = pathlist.end();
@@ -152,22 +152,22 @@ void ContextImpl::addResourcePath( const ValueVariant& paths_)
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to add module path: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
 void ContextImpl::defineWorkingDirectory( const std::string& path)
 {
 	strus::unique_lock lck( m_mutex);
-	if (!m_moduleloader_impl.get()) throw strus::runtime_error( "%s", _TXT("cannot define the working directory in RPC client mode"));
-	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to define the working directory after the first use of objects"));
-	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( "%s", _TXT("tried to define the working directory after the first use of objects"));
+	if (!m_moduleloader_impl.get()) throw strus::runtime_error( _TXT("cannot define the working directory in RPC client mode"));
+	if (m_storage_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to define the working directory after the first use of objects"));
+	if (m_analyzer_objbuilder_impl.get()) throw strus::runtime_error( _TXT("tried to define the working directory after the first use of objects"));
 	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
 	moduleLoader->defineWorkingDirectory( path);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to define the working directory: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
@@ -188,11 +188,11 @@ void ContextImpl::initStorageObjBuilder()
 	}
 	else
 	{
-		throw strus::runtime_error( "%s", _TXT("bad state, no context initialized"));
+		throw strus::runtime_error( _TXT("bad state, no context initialized"));
 	}
 	if (!storageObjectBuilder)
 	{
-		throw strus::runtime_error(_TXT("failed to create storage object builder: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	TraceProxy* tp = m_trace_impl.getObject<TraceProxy>();
 	if (tp)
@@ -201,7 +201,7 @@ void ContextImpl::initStorageObjBuilder()
 		if (!storageObjectBuilder_proxy)
 		{
 			delete storageObjectBuilder;
-			throw strus::runtime_error(_TXT("failed to create storage object builder trace proxy: %s"), errorhnd->fetchError());
+			throw strus::runtime_error( "%s", errorhnd->fetchError());
 		}
 		storageObjectBuilder = storageObjectBuilder_proxy;
 	}
@@ -225,11 +225,11 @@ void ContextImpl::initAnalyzerObjBuilder()
 	}
 	else
 	{
-		throw strus::runtime_error( "%s", _TXT("bad state, no context initialized"));
+		throw strus::runtime_error( _TXT("bad state, no context initialized"));
 	}
 	if (!analyzerObjectBuilder)
 	{
-		throw strus::runtime_error( _TXT("failed to create analyzer object builder: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	TraceProxy* tp = m_trace_impl.getObject<TraceProxy>();
 	if (tp)
@@ -238,14 +238,14 @@ void ContextImpl::initAnalyzerObjBuilder()
 		if (!analyzerObjectBuilder_proxy)
 		{
 			delete analyzerObjectBuilder;
-			throw strus::runtime_error(_TXT("failed to create storage object builder trace proxy: %s"), errorhnd->fetchError());
+			throw strus::runtime_error( "%s", errorhnd->fetchError());
 		}
 		analyzerObjectBuilder = analyzerObjectBuilder_proxy;
 	}
 	m_analyzer_objbuilder_impl.resetOwnership( analyzerObjectBuilder, "AnalyzerObjectBuilder");
 	const AnalyzerObjectBuilderInterface* objBuilder = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 	m_textproc = objBuilder->getTextProcessor();
-	if (!m_textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+	if (!m_textproc) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }
 
 void ContextImpl::endConfig()
@@ -313,10 +313,10 @@ void ContextImpl::createStorage( const ValueVariant& config_)
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
-	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
+	if (!dbi) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	const StorageInterface* sti = objBuilder->getStorage();
-	if (!sti) throw strus::runtime_error( _TXT("failed to get storage: %s"), errorhnd->fetchError());
-	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( _TXT("failed to create storage: %s"), errorhnd->fetchError());
+	if (!sti) throw strus::runtime_error( "%s", errorhnd->fetchError());
+	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }
 
 void ContextImpl::createVectorStorage( const ValueVariant& config_)
@@ -333,10 +333,10 @@ void ContextImpl::createVectorStorage( const ValueVariant& config_)
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
-	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
+	if (!dbi) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	const VectorStorageInterface* sti = objBuilder->getVectorStorage( storagename);
-	if (!sti) throw strus::runtime_error( _TXT("failed to get vector storage: %s"), errorhnd->fetchError());
-	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( _TXT("failed to create vector storage: %s"), errorhnd->fetchError());
+	if (!sti) throw strus::runtime_error( "%s", errorhnd->fetchError());
+	if (!sti->createStorage( storagecfg, dbi)) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }
 
 void ContextImpl::destroyStorage( const ValueVariant& config)
@@ -349,10 +349,10 @@ void ContextImpl::destroyStorage( const ValueVariant& config)
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
-	if (!objBuilder) throw strus::runtime_error( _TXT("failed to get object builder: %s"), errorhnd->fetchError());
+	if (!objBuilder) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
 	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
-	if (!dbi->destroyDatabase( storagecfg)) throw strus::runtime_error( _TXT("failed to destroy database: %s"), errorhnd->fetchError());
+	if (!dbi->destroyDatabase( storagecfg)) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }
 
 bool ContextImpl::storageExists( const ValueVariant& config)
@@ -366,11 +366,11 @@ bool ContextImpl::storageExists( const ValueVariant& config)
 
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	StorageObjectBuilderInterface* objBuilder = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
-	if (!objBuilder) throw strus::runtime_error( _TXT("failed to get object builder: %s"), errorhnd->fetchError());
+	if (!objBuilder) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	const DatabaseInterface* dbi = objBuilder->getDatabase( dbname);
-	if (!dbi) throw strus::runtime_error( _TXT("failed to get database: %s"), errorhnd->fetchError());
+	if (!dbi) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	bool rt = dbi->exists( storagecfg);
-	if (!rt && errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to test if database exists: %s"), errorhnd->fetchError());
+	if (!rt && errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	return rt;
 }
 
@@ -384,7 +384,7 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	{
 		if (errorhnd->hasError())
 		{
-			throw strus::runtime_error(_TXT( "error getting statistics message processor: %s"), errorhnd->fetchError());
+			throw strus::runtime_error( "%s", errorhnd->fetchError());
 		}
 		throw strus::runtime_error(_TXT( "error statistics message processor '%s' not defined"), procname.c_str());
 	}

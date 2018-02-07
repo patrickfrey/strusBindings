@@ -51,28 +51,28 @@ StorageClientImpl::StorageClientImpl( const ObjectRef& trace, const ObjectRef& o
 	m_storage_impl.resetOwnership( createStorageClient( objBuilder, errorhnd, config_), "StorageClient");
 	if (!m_storage_impl.get())
 	{
-		throw strus::runtime_error( _TXT("failed to create storage client: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
 unsigned int StorageClientImpl::nofDocumentsInserted() const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
-	if (!THIS) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->nofDocumentsInserted();
 }
 
 Index StorageClientImpl::documentFrequency( const std::string& type, const std::string& term) const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
-	if (!THIS) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->documentFrequency( type, term);
 }
 
 Index StorageClientImpl::documentNumber( const std::string& docid_) const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
-	if (!THIS) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return THIS->documentNumber( docid_);
 }
 
@@ -116,9 +116,9 @@ Iterator StorageClientImpl::termTypes() const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ObjectRef itr( ObjectRef::createOwnership( storage->createTermTypeIterator(), "TermTypeIterator"));
-	if (!itr.get()) throw strus::runtime_error(_TXT("error creating term type iterator: %s"), errorhnd->fetchError());
+	if (!itr.get()) throw strus::runtime_error("%s", errorhnd->fetchError());
 	Iterator rt( new ValueIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, itr, m_errorhnd_impl), &ValueIterator::Deleter, &ValueIterator::GetNext);
 	rt.release();
 	return rt;
@@ -128,9 +128,9 @@ Iterator StorageClientImpl::docids() const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ObjectRef itr( ObjectRef::createOwnership( storage->createDocIdIterator(), "DocIdIterator"));
-	if (!itr.get()) throw strus::runtime_error(_TXT("error creating %s iterator: %s"), "docid", errorhnd->fetchError());
+	if (!itr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	Iterator rt( new ValueIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, itr, m_errorhnd_impl), &ValueIterator::Deleter, &ValueIterator::GetNext);
 	rt.release();
 	return rt;
@@ -139,9 +139,13 @@ Iterator StorageClientImpl::docids() const
 std::string StorageClientImpl::docid( const Index& docno) const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
-	if (!THIS) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	Reference<AttributeReaderInterface> areader( THIS->createAttributeReader());
-	if (!areader.get()) throw strus::runtime_error( "%s",  _TXT("failed to create attribute reader"));
+	if (!areader.get())
+	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
+	}
 	Index eh = areader->elementHandle( Constants::attribute_docid());
 	if (!eh) throw strus::runtime_error( _TXT("attribute '%s' not defined"), Constants::attribute_docid());
 	areader->skipDoc( docno);
@@ -152,9 +156,9 @@ Iterator StorageClientImpl::usernames() const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ObjectRef itr( ObjectRef::createOwnership( storage->createUserNameIterator(), "UserNameIterator"));
-	if (!itr.get()) throw strus::runtime_error(_TXT("error creating %s iterator: %s"), "username", errorhnd->fetchError());
+	if (!itr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	Iterator rt( new ValueIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, itr, m_errorhnd_impl), &ValueIterator::Deleter, &ValueIterator::GetNext);
 	rt.release();
 	return rt;
@@ -164,7 +168,11 @@ std::vector<std::string>* StorageClientImpl::attributeNames() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 	Reference<AttributeReaderInterface> reader( storage->createAttributeReader());
-	if (!reader.get()) throw strus::runtime_error( "%s",  _TXT("failed to create attribute reader"));
+	if (!reader.get())
+	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
+	}
 	return new std::vector<std::string>( reader->getNames());
 }
 
@@ -172,7 +180,11 @@ std::vector<std::string>* StorageClientImpl::metadataNames() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<const StorageClientInterface>();
 	Reference<MetaDataReaderInterface> reader( storage->createMetaDataReader());
-	if (!reader.get()) throw strus::runtime_error( "%s",  _TXT("failed to create metadata reader"));
+	if (!reader.get())
+	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
+	}
 	return new std::vector<std::string>( reader->getNames());
 }
 
@@ -192,13 +204,13 @@ Iterator StorageClientImpl::getChangeStatistics()
 
 StorageTransactionImpl* StorageClientImpl::createTransaction() const
 {
-	if (!m_storage_impl.get()) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return new StorageTransactionImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, m_storage_impl);
 }
 
 void StorageClientImpl::close()
 {
-	if (!m_storage_impl.get()) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	bool preverr = errorhnd->hasError();
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
@@ -213,21 +225,21 @@ void StorageClientImpl::close()
 std::string StorageClientImpl::configstring() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	return storage->config();
 }
 
 Struct StorageClientImpl::config() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
-	if (!storage) throw strus::runtime_error( "%s",  _TXT("calling storage client method after close"));
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	typedef std::vector<std::pair<std::string,std::string> > Configuration;
 	Reference<Configuration> cfg( new Configuration( strus::getConfigStringItems( storage->config(), errorhnd)));
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( _TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
 	}
 	Struct rt;
 	strus::bindings::Serializer::serialize( &rt.serialization, *cfg);
@@ -251,7 +263,7 @@ StorageTransactionImpl::StorageTransactionImpl( const ObjectRef& trace_, const O
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 	StorageTransactionInterface* transaction = storage->createTransaction();
-	if (!transaction) throw strus::runtime_error( _TXT("failed to create transaction: %s"), errorhnd->fetchError());
+	if (!transaction) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	m_transaction_impl.resetOwnership( transaction, "StorageTransaction");
 }
 
@@ -259,7 +271,7 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( "%s",  _TXT("try to insert document in a closed transaction"));
+	if (!transaction) throw strus::runtime_error( _TXT("try to insert document in a closed transaction"));
 	Reference<StorageDocumentInterface> document( transaction->createDocument( docid));
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
@@ -274,7 +286,7 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 void StorageTransactionImpl::deleteDocument( const std::string& docId)
 {
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( "%s",  _TXT("try to delete document in a closed transaction"));
+	if (!transaction) throw strus::runtime_error( _TXT("try to delete document in a closed transaction"));
 	transaction->deleteDocument( docId);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -286,7 +298,7 @@ void StorageTransactionImpl::deleteDocument( const std::string& docId)
 void StorageTransactionImpl::deleteUserAccessRights( const std::string& username)
 {
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( "%s",  _TXT("try to delete user access rights in a closed transaction"));
+	if (!transaction) throw strus::runtime_error( _TXT("try to delete user access rights in a closed transaction"));
 	transaction->deleteUserAccessRights( username);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())

@@ -694,7 +694,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#define CATCH_CONSTRUCTOR_CALL_ERROR( retval, classnam)\\" << std::endl;
 	out << "\t" << "catch (const std::runtime_error& err)\\" << std::endl;
 	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_ErrorBuffer_reportError( retval, _TXT(\"error calling constructor of %s: %s\"), classnam, err.what());\\" << std::endl;
+	out << "\t\t" << "papuga_ErrorBuffer_reportError( retval, _TXT(\"error calling the constructor of %s: %s\"), classnam, err.what());\\" << std::endl;
 	out << "\t" << "}\\" << std::endl;
 	out << "\t" << "catch (const std::bad_alloc& err)\\" << std::endl;
 	out << "\t" << "{\\" << std::endl;
@@ -709,7 +709,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	out << "#define CATCH_METHOD_CALL_ERROR( retval, classnam, methodnam)\\" << std::endl;
 	out << "\t" << "catch (const std::runtime_error& err)\\" << std::endl;
 	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"error calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
+	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"error calling the method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
 	out << "\t" << "}\\" << std::endl;
 	out << "\t" << "catch (const std::bad_alloc& err)\\" << std::endl;
 	out << "\t" << "{\\" << std::endl;

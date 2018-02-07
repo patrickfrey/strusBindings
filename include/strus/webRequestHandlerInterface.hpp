@@ -32,7 +32,7 @@ public:
 
 	/// \brief Create the structure for handling a request
 	/// \param[in] context identifier defining where to execute the request
-	/// \param[in] schema identifier defining what type of request to execute
+	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
 	/// \param[in] role role identifier of the request for checking permissions
 	/// \param[out] status the status of the request
 	/// \return the context structure for handling a request or NULL in case of an error

@@ -125,13 +125,13 @@ public:
 		getStrusClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",
 		{
-			{"/storage", "path()", StoragePath},
-			{"/storage", "cachedterms()", StorageCachedTerms},
-			{"/storage", "compression()", StorageEnableCompression},
-			{"/storage", "cache()", StorageLruCacheSize},
-			{"/storage", "max_open_files()", StorageMaxNofOpenFiles},
-			{"/storage", "write_buffer_size()", StorageWriteBufferSize},
-			{"/storage", "block_size()", StorageBlockSize},
+			{"/storage/path", "()", StoragePath},
+			{"/storage/cachedterms", "()", StorageCachedTerms},
+			{"/storage/compression", "()", StorageEnableCompression},
+			{"/storage/cache", "()", StorageLruCacheSize},
+			{"/storage/max_open_files", "()", StorageMaxNofOpenFiles},
+			{"/storage/write_buffer_size", "()", StorageWriteBufferSize},
+			{"/storage/block_size", "()", StorageBlockSize},
 			{"/storage", StorageConfig, {
 							{"path", StoragePath},
 							{"cachedterms", StorageCachedTerms, '?'},
@@ -142,7 +142,7 @@ public:
 							{"block_size", StorageBlockSize, '?'},
 						}
 			},
-			{"/storage", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
+			{"/", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
 		}
 	) {}
 };

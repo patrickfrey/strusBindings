@@ -56,12 +56,12 @@ DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& trace, const Object
 	}
 	if (!segmenter)
 	{
-		throw strus::runtime_error( _TXT("failed to get document document segmenter: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter, segmenteropt), "DocumentAnalyzer");
 	if (!m_analyzer_impl.get())
 	{
-		throw strus::runtime_error( _TXT("failed to create document analyzer: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
@@ -78,7 +78,7 @@ struct FeatureFuncDef
 	{
 		const AnalyzerObjectBuilderInterface* objBuilder = objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-		if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor object: %s"), errorhnd->fetchError());
+		if (!textproc) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 		if (papuga_ValueVariant_defined( &tokenizer_))
 		{
@@ -171,7 +171,7 @@ void DocumentAnalyzerImpl::defineAggregatedMetaData(
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 	const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-	if (!textproc) throw strus::runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+	if (!textproc) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	Reference<AggregatorFunctionInstanceInterface> functioninst( Deserializer::getAggregator( function, textproc, errorhnd));
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
@@ -298,7 +298,7 @@ static analyzer::Document* analyzeDoc( const DocumentAnalyzerInterface* THIS, co
 	Reference<analyzer::Document> doc( new analyzer::Document( THIS->analyze( content, dclass)));
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return doc.release();
 }
@@ -316,7 +316,7 @@ analyzer::DocumentClass DocumentAnalyzerImpl::getDocumentClass( const std::strin
 		const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		if (!textproc) throw runtime_error( _TXT("failed to get text processor: %s"), errorhnd->fetchError());
+		if (!textproc) throw runtime_error( "%s", errorhnd->fetchError());
 
 		enum {MaxHdrSize = 8092};
 		std::size_t hdrsize = content.size() > MaxHdrSize ? MaxHdrSize : content.size();
@@ -324,11 +324,11 @@ analyzer::DocumentClass DocumentAnalyzerImpl::getDocumentClass( const std::strin
 		{
 			if (errorhnd->hasError())
 			{
-				throw strus::runtime_error( _TXT( "failed to detect document class of document to analyze (%s)"), errorhnd->fetchError());
+				throw strus::runtime_error( "%s", errorhnd->fetchError());
 			}
 			else
 			{
-				throw strus::runtime_error( "%s", _TXT( "could not detect document class of document to analyze"));
+				throw strus::runtime_error( _TXT("could not detect document class of document to analyze"));
 			}
 		}
 		return detected_dclass;
@@ -353,7 +353,7 @@ public:
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		DocumentAnalyzerContextInterface* analyzerContext;
 		m_analyzercontext_impl.resetOwnership( analyzerContext = analyzer->createContext( dclass), "DocumentAnalyzerContext");
-		if (!analyzerContext) throw strus::runtime_error(_TXT("failed to create analyzer context: %s"), errorhnd->fetchError());
+		if (!analyzerContext) throw strus::runtime_error( "%s", errorhnd->fetchError());
 		analyzerContext->putInput( content.c_str(), content.size(), true);
 	}
 	virtual ~DocumentAnalyzeIterator(){}
@@ -369,7 +369,7 @@ public:
 				ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 				if (errorhnd->hasError())
 				{
-					throw strus::runtime_error( _TXT( "failed to analyze document (%s)"), errorhnd->fetchError());
+					throw strus::runtime_error( "%s", errorhnd->fetchError());
 				}
 				return false;
 			}
@@ -428,7 +428,7 @@ QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& o
 	if (!m_analyzer_impl.get())
 	{
 		ErrorBufferInterface* ehnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("failed to create query analyzer: %s"), ehnd->fetchError());
+		throw strus::runtime_error( "%s", ehnd->fetchError());
 	}
 }
 
@@ -535,7 +535,7 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& ex
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, errorhnd));
-	if (!termexpr.get()) throw strus::runtime_error( _TXT("failed to create term expression: %s"), errorhnd->fetchError());
+	if (!termexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
 	Deserializer::buildExpression( exprbuilder, expression, errorhnd, true);
@@ -543,7 +543,7 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& ex
 
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return termexpr.release();
 }
@@ -553,14 +553,14 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVar
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	Reference<MetaDataExpression> metaexpr( new MetaDataExpression( analyzer, errorhnd));
-	if (!metaexpr.get()) throw strus::runtime_error( _TXT("failed to create metadata expression: %s"), errorhnd->fetchError());
+	if (!metaexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	Deserializer::buildMetaDataRestriction( metaexpr.get(), expression, errorhnd);
 	metaexpr->analyze();
 
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error( _TXT( "failed to analyze query (%s)"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return metaexpr.release();
 }

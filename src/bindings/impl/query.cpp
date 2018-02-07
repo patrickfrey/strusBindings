@@ -33,13 +33,13 @@ QueryEvalImpl::QueryEvalImpl( const ObjectRef& trace, const ObjectRef& objbuilde
 	if (!m_queryproc)
 	{
 		ErrorBufferInterface* ehnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("error in get query processor: %s"), ehnd->fetchError());
+		throw strus::runtime_error( "%s", ehnd->fetchError());
 	}
 	m_queryeval_impl.resetOwnership( objBuilder->createQueryEval(), "QueryEval");
 	if (!m_queryeval_impl.get())
 	{
 		ErrorBufferInterface* ehnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-		throw strus::runtime_error( _TXT("error creating query eval: %s"), ehnd->fetchError());
+		throw strus::runtime_error( "%s", ehnd->fetchError());
 	}
 }
 
@@ -110,7 +110,7 @@ QueryImpl* QueryEvalImpl::createQuery( StorageClientImpl* storage) const
 	const StorageClientInterface* st = storage->m_storage_impl.getObject<StorageClientInterface>();
 	ObjectRef query;
 	query.resetOwnership( qe->createQuery( st), "Query");
-	if (!query.get()) throw strus::runtime_error( _TXT("failed to create query object: %s"), errorhnd->fetchError());
+	if (!query.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	return new QueryImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc);
 }
@@ -122,9 +122,9 @@ void QueryImpl::addFeature( const std::string& set_, const ValueVariant& expr_, 
 	QueryExpressionBuilder exprbuilder( THIS, m_queryproc, errorhnd);
 
 	Deserializer::buildExpression( exprbuilder, expr_, errorhnd, true);
-	if (errorhnd->hasError()) throw strus::runtime_error( _TXT("failed to create feature from expression: %s"), errorhnd->fetchError());
+	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	unsigned int ii=0, nn = exprbuilder.stackSize();
-	if (nn == 0) throw strus::runtime_error( "%s",  _TXT("feature defined without expression"));
+	if (nn == 0) throw strus::runtime_error( _TXT("feature defined without expression"));
 	for (; ii<nn; ++ii)
 	{
 		THIS->defineFeature( set_, weight_);
@@ -208,7 +208,7 @@ QueryResult* QueryImpl::evaluate() const
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("error in evaluate query: %s"), errorhnd->fetchError());
+		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return result.release();
 }
