@@ -93,7 +93,7 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 	return 500 /*Internal Server Error*/;
 }
 
-std::string webRequestContent_tostring( const WebRequestContent& content)
+std::string strus::webRequestContent_tostring( const WebRequestContent& content)
 {
 	papuga_StringEncoding encoding;
 	if (!papuga_getStringEncodingFromName( &encoding, content.charset()))
