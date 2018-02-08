@@ -55,8 +55,6 @@ public:
 	virtual bool execute( const WebRequestContent& content, WebRequestAnswer& answer);
 	virtual bool debug( const WebRequestContent& content, WebRequestAnswer& answer);
 
-	virtual bool mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer);
-
 public:/*WebRequestHandler*/
 	bool executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const WebRequestContent& content, WebRequestAnswer& answer);
 

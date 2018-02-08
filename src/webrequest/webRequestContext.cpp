@@ -158,6 +158,10 @@ bool WebRequestContext::feedRequest( WebRequestAnswer& answer, const WebRequestC
 	// Evaluate the request content type:
 	m_doctype = content.doctype() ? papuga_contentTypeFromName( content.doctype()) : papuga_guess_ContentType( content.str(), content.len());
 	m_doctypestr = content.doctype();
+	if (!setResultContentType( answer))
+	{
+		return false;
+	}
 	if (m_doctype == papuga_ContentType_Unknown)
 	{
 		setAnswer( answer, ErrorOperationScanInput, ErrorCauseInputFormat, papuga_ErrorCode_tostring( m_errcode = papuga_NotImplemented));
@@ -293,10 +297,6 @@ bool WebRequestContext::setResultContentType( WebRequestAnswer& answer)
 
 bool WebRequestContext::getRequestResult( WebRequestAnswer& answer)
 {
-	if (!setResultContentType( answer))
-	{
-		return false;
-	}
 	papuga_RequestResult result;
 	if (!papuga_set_RequestResult( &result, &m_impl, m_request))
 	{
@@ -353,81 +353,6 @@ bool WebRequestContext::executeConfig( const char* destContextName, const char* 
 	return feedRequest( answer, content)
 	&&	executeRequest( answer, content)
 	&&	addToHandler( answer, destContextName, destContextSchemaPrefix);
-}
-
-static void escJsonOutput( char* buf, std::size_t buflen)
-{
-	char* si = buf;
-	char* se = buf + buflen;
-	for (; si != se; ++si)
-	{
-		if (*si == '\\')
-		{
-			*si = ' ';
-		}
-		if (*si == '\"')
-		{
-			*si = '\'';
-		}
-		else if (*si == '\1')
-		{
-			*si = '\"';
-		}
-	}
-}
-
-bool WebRequestContext::mapError( char* buf, std::size_t bufsize, std::size_t& len, const WebRequestAnswer& answer)
-{
-	ErrorCode appErrorCode( answer.apperror());
-	std::size_t bufpos = 0;
-	switch (m_doctype)
-	{
-		case papuga_ContentType_XML:
-			bufpos = std::snprintf(
-					buf, bufsize, "<error><code>%d<code><status>%d</status><comp>%s</comp><op>%d</op><no>%d</no><msg>%s</msg><error>",
-					*appErrorCode,
-					answer.httpstatus(),
-					strus::errorComponentName( appErrorCode.component()),
-					(int)appErrorCode.operation(),
-					(int)appErrorCode.cause(),
-					answer.errorstr());
-			if (bufpos >= bufsize) return false;
-
-		case papuga_ContentType_JSON:
-			bufpos = std::snprintf(
-					buf, bufsize, "{\n\t\1error\1: {\n\t\1code\1:%d,\n\t\1status\1:%d,\n\t\1comp\1:%s,\n\t\1op\1:%d,\n\t\1no\1:%d,\n\t\1msg\1:\1%s\1\n}}\n",
-					*appErrorCode,
-					answer.httpstatus(),
-					strus::errorComponentName( appErrorCode.component()),
-					(int)appErrorCode.operation(),
-					(int)appErrorCode.cause(),
-					answer.errorstr());
-			if (bufpos >= bufsize) return false;
-			escJsonOutput( buf, bufpos);
-
-		case papuga_ContentType_Unknown:
-			bufpos = std::snprintf( buf, bufsize, "%d", *appErrorCode);
-			if (bufpos >= bufsize) return false;
-	}
-	if (m_encoding == papuga_UTF8)
-	{
-		len = bufpos;
-	}
-	else
-	{
-		papuga_ValueVariant res;
-		papuga_init_ValueVariant_string( &res, buf, bufpos);
-		std::size_t usize = papuga_StringEncoding_unit_size( m_encoding);
-		if (!usize) return false;
-		for (; bufpos % usize != 0; ++bufpos){}
-		if (bufpos >= bufsize) return false;
-		std::size_t outlen;
-		if (!papuga_ValueVariant_tostring_enc( &res, m_encoding, buf+bufpos, bufsize-bufpos, &outlen, &m_errcode)) return false;
-		outlen *= usize;
-		std::memmove( buf, buf+bufpos, outlen);
-		len = outlen;
-	}
-	return true;
 }
 
 bool WebRequestContext::addToHandler( WebRequestAnswer& answer, const char* contextName, const char* schemaPrefix)
