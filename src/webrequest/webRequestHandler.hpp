@@ -36,6 +36,7 @@ public:
 			const char* schema,
 			const char* role,
 			const char* accepted_charset,
+			const char* accepted_doctype,
 			WebRequestAnswer& status) const;
 
 	virtual bool loadConfiguration(
@@ -47,7 +48,9 @@ public:
 			WebRequestAnswer& status);
 
 private:
-	WebRequestContext* createContext_( const char* context, const char* schema, const char* role, const char* accepted_charset, WebRequestAnswer& status) const;
+	WebRequestContext* createContext_( const char* context, const char* schema, const char* role,
+						const char* accepted_charset, const char* accepted_doctype,
+						WebRequestAnswer& status) const;
 
 private:
 	strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests

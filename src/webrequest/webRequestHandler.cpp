@@ -172,11 +172,11 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	}
 }
 
-WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, const char* accepted_charset, WebRequestAnswer& status) const
+WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const
 {
 	try
 	{
-		return new WebRequestContext( m_impl, context, schema, role, accepted_charset);
+		return new WebRequestContext( m_impl, context, schema, role, accepted_charset, accepted_doctype);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -198,9 +198,10 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 		const char* schema,
 		const char* role,
 		const char* accepted_charset,
+		const char* accepted_doctype,
 		WebRequestAnswer& status) const
 {
-	return createContext_( context, schema, role, accepted_charset, status);
+	return createContext_( context, schema, role, accepted_charset, accepted_doctype, status);
 }
 
 bool WebRequestHandler::loadConfiguration(
@@ -218,7 +219,7 @@ bool WebRequestHandler::loadConfiguration(
 						destContextSchemaPrefix, destContextName, srcContextName, schema,
 						content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, "UTF-8"/*accepted_charset*/, status));
+	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 	if (!ctx.get()) return false;
 
 	strus::unique_lock lock( m_mutex);

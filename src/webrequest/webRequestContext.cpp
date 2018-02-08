@@ -36,8 +36,13 @@ WebRequestContext::WebRequestContext(
 	const char* context,
 	const char* schema,
 	const char* role,
-	const char* accepted_charset_)
-		:m_handler(handlerimpl),m_request(0),m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0),m_errcode(papuga_Ok),m_atm(0),m_accepted_charset(accepted_charset_),m_resultstr(0),m_resultlen(0)
+	const char* accepted_charset_,
+	const char* accepted_doctype_)
+		:m_handler(handlerimpl),m_request(0)
+		,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown)
+		,m_result_encoding(papuga_Binary),m_result_doctype(papuga_ContentType_Unknown)
+		,m_doctypestr(0),m_errcode(papuga_Ok),m_atm(0)
+		,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_),m_resultstr(0),m_resultlen(0)
 {
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode))
@@ -187,19 +192,24 @@ bool WebRequestContext::feedRequest( WebRequestAnswer& answer, const WebRequestC
 
 bool WebRequestContext::debugRequest( WebRequestAnswer& answer)
 {
-	papuga_StringEncoding result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
+	m_result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
+	if (m_result_encoding == papuga_Binary)
+	{
+		m_errcode = papuga_NotImplemented;
+		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( m_errcode), _TXT("none of the accept charsets implemented"));
+		return false;
+	}
 	std::size_t result_length;
-	const char* result = papuga_Request_tostring( m_request, &m_impl.allocator, result_encoding, &result_length, &m_errcode);
+	const char* result = papuga_Request_tostring( m_request, &m_impl.allocator, m_result_encoding, &result_length, &m_errcode);
 	if (result)
 	{
-		WebRequestContent content( papuga_stringEncodingName( result_encoding), "text/plain", result, result_length * papuga_StringEncoding_unit_size( result_encoding));
+		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), "text/plain", result, result_length * papuga_StringEncoding_unit_size( m_result_encoding));
 		answer.setContent( content);
-		answer.setStatus( 200);
 		return true;
 	}
 	else
 	{
-		setAnswer( answer, ErrorOperationCallIndirection, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
+		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
 		return false;
 	}
 }
@@ -262,8 +272,31 @@ bool WebRequestContext::executeRequest( WebRequestAnswer& answer, const WebReque
 	return true;
 }
 
+bool WebRequestContext::setResultContentType( WebRequestAnswer& answer)
+{
+	m_result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
+	m_result_doctype = getResultContentType( m_accepted_doctype, m_doctype);
+	if (m_result_encoding == papuga_Binary)
+	{
+		m_errcode = papuga_NotImplemented;
+		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( m_errcode), _TXT("none of the accept charsets implemented"));
+		return false;
+	}
+	if (m_result_doctype == papuga_ContentType_Unknown)
+	{
+		m_errcode = papuga_NotImplemented;
+		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( m_errcode), _TXT("none of the accept content types implemented"));
+		return false;
+	}
+	return true;
+}
+
 bool WebRequestContext::getRequestResult( WebRequestAnswer& answer)
 {
+	if (!setResultContentType( answer))
+	{
+		return false;
+	}
 	papuga_RequestResult result;
 	if (!papuga_set_RequestResult( &result, &m_impl, m_request))
 	{
@@ -272,19 +305,17 @@ bool WebRequestContext::getRequestResult( WebRequestAnswer& answer)
 		return false;
 	}
 	// Map the result:
-	papuga_StringEncoding result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
-	switch (m_doctype)
+	switch (m_result_doctype)
 	{
-		case papuga_ContentType_XML:  m_resultstr = (char*)papuga_RequestResult_toxml( &result, result_encoding, &m_resultlen, &m_errcode); break;
-		case papuga_ContentType_JSON: m_resultstr = (char*)papuga_RequestResult_tojson( &result, result_encoding, &m_resultlen, &m_errcode); break;
+		case papuga_ContentType_XML:  m_resultstr = (char*)papuga_RequestResult_toxml( &result, m_result_encoding, &m_resultlen, &m_errcode); break;
+		case papuga_ContentType_JSON: m_resultstr = (char*)papuga_RequestResult_tojson( &result, m_result_encoding, &m_resultlen, &m_errcode); break;
 		case papuga_ContentType_Unknown:
 		default: break;
 	}
 	if (m_resultstr)
 	{
-		WebRequestContent content( papuga_stringEncodingName( result_encoding), m_doctypestr, m_resultstr, m_resultlen);
+		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), papuga_ContentType_mime(m_result_doctype), m_resultstr, m_resultlen);
 		answer.setContent( content);
-		answer.setStatus( 200);
 		return true;
 	}
 	else

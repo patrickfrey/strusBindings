@@ -10,6 +10,7 @@
 #ifndef _STRUS_WEB_REQUEST_UTILS_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_UTILS_HPP_INCLUDED
 #include "papuga/typedefs.h"
+#include "papuga/requestParser.h"
 #include "strus/errorCodes.hpp"
 #include "strus/webRequestContent.hpp"
 #include <cstddef>
@@ -21,7 +22,9 @@ ErrorCause papugaErrorToErrorCause( papuga_ErrorCode errcode);
 int errorCauseToHttpStatus( ErrorCause cause);
 
 std::string webRequestContent_tostring( const WebRequestContent& content);
+
 papuga_StringEncoding getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc);
+papuga_ContentType getResultContentType( const char* http_accept, papuga_ContentType inputdoctype);
 
 }//namespace
 #endif

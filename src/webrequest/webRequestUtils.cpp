@@ -111,22 +111,22 @@ std::string strus::webRequestContent_tostring( const WebRequestContent& content)
 	return rt;
 }
 
-static bool findStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
+static bool findAccept( const char* http_accept_list, const char* suggestion)
 {
-	const char* encstr = papuga_stringEncodingName( inputenc);
-	char const* ai = accepted_charset;
+	char const* ai = http_accept_list;
 	do
 	{
 		for (; (unsigned char)*ai <= 32; ++ai){}
-		char const* ei = encstr;
-		for (; *ei && *ai && *ai != ','; ++ei,++ai)
+		char const* ei = suggestion;
+		for (; *ei && *ai && *ai != ',' && *ai != ';'; ++ei,++ai)
 		{
 			for (; *ai == ' ' || *ai == '-'; ++ai){}
 			for (; *ei == ' ' || *ei == '-'; ++ei){}
 			if ((*ei|32) != (*ai|32)) break;
 		}
+		if (*ai == ';') for (; *ai && *ai != ','; ++ai){} //... skip and ignore weighting with the quality value syntax (e.g. ";q=0.9")
 		for (; *ai == ' '; ++ai){}
-		if (!*ei && *ai == ',') return true;
+		if (!*ei && (*ai == ',' || *ai == '\0')) return true;
 		++ai;
 	} while (*ai);
 	return false;
@@ -134,13 +134,23 @@ static bool findStringEncoding( const char* accepted_charset, papuga_StringEncod
 
 papuga_StringEncoding strus::getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
 {
-	if (findStringEncoding( accepted_charset, inputenc)) return inputenc;
-	if (findStringEncoding( accepted_charset, papuga_UTF8)) return papuga_UTF8;
-	if (findStringEncoding( accepted_charset, papuga_UTF16BE)) return papuga_UTF16BE;
-	if (findStringEncoding( accepted_charset, papuga_UTF16LE)) return papuga_UTF16LE;
-	if (findStringEncoding( accepted_charset, papuga_UTF32BE)) return papuga_UTF32BE;
-	if (findStringEncoding( accepted_charset, papuga_UTF32LE)) return papuga_UTF32LE;
+	if (!accepted_charset || !accepted_charset[0]) return inputenc;
+	if (inputenc != papuga_Binary && findAccept( accepted_charset, papuga_stringEncodingName( inputenc))) return inputenc;
+	if (findAccept( accepted_charset, papuga_stringEncodingName( papuga_UTF8))) return papuga_UTF8;
+	if (findAccept( accepted_charset, papuga_stringEncodingName( papuga_UTF16BE))) return papuga_UTF16BE;
+	if (findAccept( accepted_charset, papuga_stringEncodingName( papuga_UTF16LE))) return papuga_UTF16LE;
+	if (findAccept( accepted_charset, papuga_stringEncodingName( papuga_UTF32BE))) return papuga_UTF32BE;
+	if (findAccept( accepted_charset, papuga_stringEncodingName( papuga_UTF32LE))) return papuga_UTF32LE;
 	return papuga_Binary;
+}
+
+papuga_ContentType strus::getResultContentType( const char* http_accept, papuga_ContentType inputdoctype)
+{
+	if (!http_accept || !http_accept[0]) return inputdoctype;
+	if (inputdoctype != papuga_ContentType_Unknown && findAccept( http_accept, papuga_ContentType_mime( inputdoctype))) return inputdoctype;
+	if (findAccept( http_accept, papuga_ContentType_mime( papuga_ContentType_JSON))) return papuga_ContentType_JSON;
+	if (findAccept( http_accept, papuga_ContentType_mime( papuga_ContentType_XML))) return papuga_ContentType_XML;
+	return papuga_ContentType_Unknown;
 }
 
 

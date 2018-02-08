@@ -46,7 +46,8 @@ public:
 		const char* context,
 		const char* schema,
 		const char* role,
-		const char* accepted_charset);
+		const char* accepted_charset,
+		const char* accepted_doctype);
 	virtual ~WebRequestContext();
 
 	virtual bool addVariable( const std::string& name, const std::string& value);
@@ -63,6 +64,7 @@ private:
 	bool feedRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool debugRequest( WebRequestAnswer& answer);
 	bool executeRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool setResultContentType( WebRequestAnswer& answer);
 	bool getRequestResult( WebRequestAnswer& answer);
 
 	/// \brief Transfer this context with a name to the request handler
@@ -77,11 +79,14 @@ private:
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;
+	papuga_StringEncoding m_result_encoding;
+	papuga_ContentType m_result_doctype;
 	const char* m_doctypestr;
 	papuga_ErrorCode m_errcode;
 	papuga_ErrorBuffer m_errbuf;
 	const papuga_RequestAutomaton* m_atm;
 	const char* m_accepted_charset;
+	const char* m_accepted_doctype;
 	char* m_resultstr;
 	std::size_t m_resultlen;
 	char m_errbuf_mem[ 4096];

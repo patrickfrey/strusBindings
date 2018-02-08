@@ -38,6 +38,7 @@ public:
 			const char* schema,
 			const char* role,
 			const char* accepted_charset,
+			const char* accepted_doctype,
 			WebRequestAnswer& answer) const=0;
 
 	/// \brief Test if a schema exists
