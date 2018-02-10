@@ -91,6 +91,7 @@ set( BINDINGS_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/bindings" )
 set( BINDINGS_LIBRARY_DIRS         "${CMAKE_CURRENT_BINARY_DIR}/src/bindings" )
 set( BINDINGS_GEN_INCLUDE_DIR  "${CMAKE_CURRENT_BINARY_DIR}/include/strus" )
 set( UTILS_GENSOURCE_DIR           "${CMAKE_CURRENT_BINARY_DIR}/src/utils" )
+set( REQUEST_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/webrequest"  "${CMAKE_CURRENT_BINARY_DIR}/src/webrequest" )
 
 # Module path:
 if (NOT STRUS_MODULE_PATH)

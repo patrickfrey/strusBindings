@@ -35,7 +35,7 @@ DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, ch
 	if (!usize) return NULL;
 
 	std::size_t pos = (std::size_t)destbuf % usize;
-	for (; pos % pos != 0; ++pos){}
+	for (; pos % usize != 0; ++pos){}
 	if (pos >= destbufsize) return NULL;
 	std::size_t outlen;
 	papuga_ErrorCode errcode = papuga_Ok;

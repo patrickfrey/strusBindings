@@ -18,12 +18,30 @@
 
 namespace strus {
 
+// \brief Maps a papuga error code to a strus error number
+// \param[in] errcode papuga error code
+// \return strus error number
 ErrorCause papugaErrorToErrorCause( papuga_ErrorCode errcode);
+
+// \brief Maps an error cause (part of error codes defined in strusBase or errno) to an HTTP request status code
+// \param[in] content web request content
+// \return HTTP status c
 int errorCauseToHttpStatus( ErrorCause cause);
 
+// \brief Contert a web request content to an UTF-8 string for printing and logging
+// \param[in] content web request content
+// \return content as UTF-8 string
 std::string webRequestContent_tostring( const WebRequestContent& content);
 
-papuga_StringEncoding getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc);
+// \brief Get the best choice for the character encoding type of a request result
+// \param[in] http_accept_charset value of HTTP header "Accept-Charset"
+// \return chosen charset
+papuga_StringEncoding getResultStringEncoding( const char* http_accept_charset, papuga_StringEncoding inputenc);
+
+// \brief Get the best choice for the content type of a request result
+// \param[in] http_accept value of HTTP header "Accept"
+// \note does not handle '*' for any in the HTTP header "Accept" (e.g. "application/*" or "*/*" etc. not respected)
+// \return chosen content type
 papuga_ContentType getResultContentType( const char* http_accept, papuga_ContentType inputdoctype);
 
 }//namespace
