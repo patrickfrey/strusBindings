@@ -11,6 +11,7 @@
 #define _STRUS_WEB_REQUEST_CONTENT_HPP_INCLUDED
 #include <cstddef>
 #include <string>
+#include <cstring>
 #include <cstdio>
 
 namespace strus
@@ -18,6 +19,36 @@ namespace strus
 
 class WebRequestContent
 {
+public:
+	/*
+	 * @brief Request content type enumeration
+	 */
+	enum Type {
+		Unknown,		///< Content type is not known */
+		XML,			///< Content type is XML*/
+		JSON,			///< Content type is JSON */
+		HTML,			///< Content type is HTML */
+		TEXT			///< Content type is TEXT */
+	};
+
+	/// \brief Get the content type name as used for MIME
+	/// \param[in] type the content type id
+	/// \return content type MIME name string
+	static const char* typeMime( Type type)
+	{
+		static const char* ar[] = {"application/octet-stream","application/xml","application/json","text/html","application/xhtml","text/plain"};
+		return ar[ type];
+	}
+
+	/// \brief Get the content type name as string
+	/// \param[in] type the content type id
+	/// \return content type name string
+	static const char* typeName( Type type)
+	{
+		static const char* ar[] = {"unknown","XML","JSON","HTML","XHTML","TEXT"};
+		return ar[ type];
+	}
+
 public:
 	/// \brief Default constructor
 	WebRequestContent()

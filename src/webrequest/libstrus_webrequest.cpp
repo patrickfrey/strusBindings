@@ -46,10 +46,14 @@ DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, ch
 
 DLL_PUBLIC const char* strus::selectAcceptedCharset( const char* http_accept_charset)
 {
-	papuga_StringEncoding enc = getResultStringEncoding( http_accept_charset, papuga_UTF8);
+	papuga_StringEncoding enc = strus::getResultStringEncoding( http_accept_charset, papuga_UTF8);
 	if (enc == papuga_Binary) return NULL;
 	return papuga_stringEncodingName( enc);
 }
 
+DLL_PUBLIC WebRequestContent::Type strus::selectAcceptedContentType( const char* http_accept)
+{
+	return strus::getResultContentType( http_accept, WebRequestContent::HTML);
+}
 
 

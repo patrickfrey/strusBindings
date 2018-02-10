@@ -339,7 +339,29 @@ papuga_StringEncoding strus::getResultStringEncoding( const char* accepted_chars
 	return papuga_Binary;
 }
 
-papuga_ContentType strus::getResultContentType( const char* http_accept, papuga_ContentType inputdoctype)
+WebRequestContent::Type strus::getResultContentType( const char* http_accept, WebRequestContent::Type inputdoctype)
+{
+	char strbuf[ 8092];
+	AcceptElem elembuf[ 512];
+
+	// Parse http accept list:
+	if (!http_accept || !http_accept[0]) return inputdoctype;
+	const AcceptElem* accepted_doctype_list = parseAccept( http_accept, strbuf, sizeof(strbuf), elembuf, sizeof(elembuf)/sizeof(*elembuf), false);
+	if (!accepted_doctype_list) return WebRequestContent::Unknown;
+
+	// Prioritise the content type specified as argument:
+	if (inputdoctype != WebRequestContent::Unknown && findAccept( accepted_doctype_list, WebRequestContent::typeMime( inputdoctype))) return inputdoctype;
+	// Find the content type supported with the highest priority in the accepted list:
+	AcceptElem const* ai = accepted_doctype_list;
+	for (; ai->type; ++ai)
+	{
+		WebRequestContent::Type doctype = strus::webRequestContentFromTypeName( ai->type);
+		if (doctype != WebRequestContent::Unknown) return doctype;
+	}
+	return WebRequestContent::Unknown;
+}
+
+papuga_ContentType strus::getPapugaResultContentType( const char* http_accept, papuga_ContentType inputdoctype)
 {
 	char strbuf[ 8092];
 	AcceptElem elembuf[ 512];
@@ -359,6 +381,84 @@ papuga_ContentType strus::getResultContentType( const char* http_accept, papuga_
 		if (doctype != papuga_ContentType_Unknown) return doctype;
 	}
 	return papuga_ContentType_Unknown;
+}
+
+WebRequestContent::Type strus::webRequestContentFromTypeName( const char* name)
+{
+	char namebuf[ 128];
+	char const* si = name;
+	if (!parseIdent( si, namebuf, sizeof(namebuf)))
+	{
+		return WebRequestContent::Unknown;
+	}
+	else if (*si == '/')
+	{
+		++si;
+		if (0==std::strcmp( namebuf, "application"))
+		{
+			if (!parseIdent( si, namebuf, sizeof(namebuf)))
+			{
+				return WebRequestContent::Unknown;
+			}
+			else if (0==std::strcmp( namebuf, "xml"))
+			{
+				return WebRequestContent::XML;
+			}
+			else if (0==std::strcmp( namebuf, "json"))
+			{
+				return WebRequestContent::JSON;
+			}
+		}
+		else if (0==std::strcmp( namebuf, "text"))
+		{
+			if (0==std::strcmp( namebuf, "html"))
+			{
+				return WebRequestContent::HTML;
+			}
+			else if (0==std::strcmp( namebuf, "plain"))
+			{
+				return WebRequestContent::TEXT;
+			}
+		}
+	}
+	else if (0==std::strcmp( namebuf, "xml"))
+	{
+		return WebRequestContent::XML;
+	}
+	else if (0==std::strcmp( namebuf, "json"))
+	{
+		return WebRequestContent::JSON;
+	}
+	else if (0==std::strcmp( namebuf, "html"))
+	{
+		return WebRequestContent::HTML;
+	}
+	else if (0==std::strcmp( namebuf, "text"))
+	{
+		return WebRequestContent::TEXT;
+	}
+	return WebRequestContent::Unknown;
+}
+
+papuga_ContentType strus::papugaContentType( WebRequestContent::Type doctype)
+{
+	static papuga_ContentType ar[] = {
+		papuga_ContentType_Unknown/*Unknown*/,
+		papuga_ContentType_XML/*XML*/,
+		papuga_ContentType_JSON/*JSON*/,
+		papuga_ContentType_Unknown/*HTML*/,
+		papuga_ContentType_Unknown/*TEXT*/};
+	return ar[doctype];
+}
+
+WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype)
+{
+	static WebRequestContent::Type ar[] = {
+		WebRequestContent::Unknown,
+		WebRequestContent::XML,
+		WebRequestContent::JSON
+	};
+	return ar[doctype];
 }
 
 

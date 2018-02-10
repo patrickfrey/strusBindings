@@ -9,6 +9,7 @@
 /// \file webrequest.hpp
 #ifndef _STRUS_WEBREQUEST_LIB_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_LIB_HPP_INCLUDED
+#include "strus/webRequestContent.hpp"
 #include <cstddef>
 
 /// \brief strus toplevel namespace
@@ -37,8 +38,13 @@ const char* convertContentCharset( const char* charset, char* destbuf, std::size
 
 /// \brief Select the best choice for the character set for messages not related to an answer of a request
 /// \param[in] http_accept_charset list of character sets accepted taken from the HTTP header
-/// \return best choice of character set
+/// \return best choice of a character set
 const char* selectAcceptedCharset( const char* http_accept_charset);
+
+/// \brief Select the best choice for the content type for messages not related to an answer of a request
+/// \param[in] http_accept list of content types accepted taken from the HTTP header
+/// \return best choice of a content type
+WebRequestContent::Type selectAcceptedContentType( const char* http_accept);
 
 }//namespace
 #endif

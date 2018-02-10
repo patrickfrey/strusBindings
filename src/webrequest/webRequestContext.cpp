@@ -29,7 +29,7 @@
 
 using namespace strus;
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 
 WebRequestContext::WebRequestContext(
 	papuga_RequestHandler* handlerimpl,
@@ -278,8 +278,8 @@ bool WebRequestContext::executeRequest( WebRequestAnswer& answer, const WebReque
 
 bool WebRequestContext::setResultContentType( WebRequestAnswer& answer)
 {
-	m_result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
-	m_result_doctype = getResultContentType( m_accepted_doctype, m_doctype);
+	m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, m_encoding);	
+	m_result_doctype = strus::getPapugaResultContentType( m_accepted_doctype, m_doctype);
 	if (m_result_encoding == papuga_Binary)
 	{
 		m_errcode = papuga_NotImplemented;
