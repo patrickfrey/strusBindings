@@ -12,6 +12,7 @@
 #include "strus/webRequestHandlerInterface.hpp"
 #include "strus/base/thread.hpp"
 #include "papuga/requestHandler.h"
+#include "papuga/requestLogger.h"
 #include <cstddef>
 
 namespace strus
