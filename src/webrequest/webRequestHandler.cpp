@@ -136,10 +136,10 @@ WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 	if (!papuga_RequestHandler_add_schema( m_impl, EXTNAME, schema ## SCHEMANAME .impl())) throw std::bad_alloc();\
 	if (!papuga_RequestHandler_allow_schema_access( m_impl, EXTNAME, ALLOW, &errcode)) throw std::bad_alloc();
 
-	DEFINE_SCHEMA( "init", CreateContext, "config");
-	DEFINE_SCHEMA( "create_storage", CreateStorage, "config");
-	DEFINE_SCHEMA( "destroy_storage", DestroyStorage, "config");
-	DEFINE_SCHEMA( "init_storage", OpenStorage, "config");
+	DEFINE_SCHEMA( "context", CreateContext, "config");
+	DEFINE_SCHEMA( "context_newstorage", CreateStorage, "config");
+	DEFINE_SCHEMA( "context_delstorage", DestroyStorage, "config");
+	DEFINE_SCHEMA( "context_storage", OpenStorage, "config");
 }
 
 WebRequestHandler::~WebRequestHandler()

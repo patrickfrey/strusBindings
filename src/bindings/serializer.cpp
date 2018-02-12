@@ -416,4 +416,34 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 	return serializeArray( result, val, errcode);
 }
 
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::FunctionDescription::Parameter>& val, papuga_ErrorCode& errcode)
+{
+	return serializeArray( result, val, errcode);
+}
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode)
+{
+	bool rt = true;
+	rt &= Serializer::serializeStructMember( result, "type", val.typeName(), errcode);
+	rt &= Serializer::serializeStructMember( result, "name", val.name(), errcode);
+	rt &= Serializer::serializeStructMember( result, "domain", val.domain(), errcode);
+	rt &= Serializer::serializeStructMember( result, "text", val.text(), errcode);
+	return rt;
+}
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode)
+{
+	bool rt = true;
+	rt &= Serializer::serializeStructMember( result, "text", val.text(), errcode);
+	rt &= Serializer::serializeStructMember( result, "parameter", val.parameter(), errcode);
+	return rt;
+}
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode)
+{
+	bool rt = true;
+	rt &= Serializer::serializeStructMember( result, "name", val.name(), errcode);
+	rt &= Serializer::serializeStructMember( result, "text", val.text(), errcode);
+	return rt;
+}
 

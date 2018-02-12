@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#include "traceUtils.hpp"
+#include "traceProxy.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/traceObjectBuilderInterface.hpp"
@@ -16,8 +16,8 @@
 
 using namespace strus;
 
-TraceProxy::TraceProxy( ModuleLoaderInterface* moduleLoader, const std::string& config, ErrorBufferInterface* errorhnd_)
-	:m_errorhnd(errorhnd_),m_traceObjectBuilder(moduleLoader->createTraceObjectBuilder(config))
+TraceProxy::TraceProxy( ModuleLoaderInterface* moduleLoader, const std::string& config_, ErrorBufferInterface* errorhnd_)
+	:m_errorhnd(errorhnd_),m_config(config_),m_traceObjectBuilder(moduleLoader->createTraceObjectBuilder(config_))
 {
 	if (!m_traceObjectBuilder) throw strus::runtime_error( "%s", _TXT("failed to create trace object builder"));
 }

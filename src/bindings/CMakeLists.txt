@@ -12,7 +12,8 @@ set( bindings_source_files
 	deserializer.cpp
 	valueVariantWrap.cpp
 	callResultUtils.cpp
-	traceUtils.cpp
+	traceProxy.cpp
+	impl/value/introspection.cpp
 	impl/value/termExpression.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp

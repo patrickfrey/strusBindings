@@ -5,8 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#ifndef _STRUS_UTILITIES_TRACE_UTILS_HPP_INCLUDED
-#define _STRUS_UTILITIES_TRACE_UTILS_HPP_INCLUDED
+#ifndef _STRUS_BINDINGS_TRACE_PROXY_HPP_INCLUDED
+#define _STRUS_BINDINGS_TRACE_PROXY_HPP_INCLUDED
 #include <string>
 
 namespace strus
@@ -40,8 +40,11 @@ public:
 	/// \return analyzer object builder with trace logging
 	AnalyzerObjectBuilderInterface* createProxy( AnalyzerObjectBuilderInterface* aob) const;
 
+	const std::string& config() const		{return m_config;}
+
 private:
 	ErrorBufferInterface* m_errorhnd;
+	std::string m_config;
 	TraceObjectBuilderInterface* m_traceObjectBuilder;
 };
 

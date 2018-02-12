@@ -42,7 +42,7 @@
 #include "deserializer.hpp"
 #include "serializer.hpp"
 #include "structDefs.hpp"
-#include "traceUtils.hpp"
+#include "traceProxy.hpp"
 #include "valueVariantWrap.hpp"
 #include <iostream>
 
@@ -94,7 +94,7 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	else
 	{
 		Reference<RpcClientMessagingInterface> messaging;
-		messaging.reset( createRpcClientMessaging( contextdef.rpc.c_str(), errorhnd));
+		messaging.reset( createRpcClientMessaging( contextdef.rpc, errorhnd));
 		if (!messaging.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 		m_rpc_impl.resetOwnership( createRpcClient( messaging.get(), errorhnd), "RpcClient");
 		if (!m_rpc_impl.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());

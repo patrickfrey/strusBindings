@@ -19,7 +19,9 @@
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
+#include "strus/functionDescription.hpp"
 #include "strus/statisticsViewerInterface.hpp"
+#include "strus/postingJoinOperatorInterface.hpp"
 #include "impl/value/termExpression.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/metadataComparison.hpp"
@@ -159,6 +161,10 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_ErrorCode& errcode);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::FunctionDescription::Parameter>& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode);
 
 	struct atomictype_ {};
 	struct structtype_ {};

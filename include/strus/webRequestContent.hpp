@@ -45,7 +45,7 @@ public:
 	/// \return content type name string
 	static const char* typeName( Type type)
 	{
-		static const char* ar[] = {"unknown","XML","JSON","HTML","XHTML","TEXT"};
+		static const char* ar[] = {"unknown","XML","JSON","HTML","XHTML","TEXT",0};
 		return ar[ type];
 	}
 
