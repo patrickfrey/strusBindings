@@ -30,7 +30,7 @@ public:
 	explicit WebRequestHandler( WebRequestLoggerInterface* logger_);
 	virtual ~WebRequestHandler();
 
-	virtual bool hasSchema( const char* schema) const;
+	virtual bool hasSchema( const char* context, const char* schema) const;
 
 	virtual WebRequestContextInterface* createContext(
 			const char* context,
@@ -41,8 +41,8 @@ public:
 			WebRequestAnswer& status) const;
 
 	virtual bool loadConfiguration(
+			const char* destContextType,
 			const char* destContextName,
-			const char* destContextSchemaPrefix,
 			const char* srcContextName,
 			const char* schema,
 			const WebRequestContent& content,

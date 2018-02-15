@@ -56,7 +56,7 @@ public:
 	virtual bool debug( const WebRequestContent& content, WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	bool executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeConfig( const char* destContextType, const char* destContextName, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
 	bool feedRequest( WebRequestAnswer& answer, const WebRequestContent& content);

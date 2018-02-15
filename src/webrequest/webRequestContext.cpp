@@ -49,24 +49,11 @@ WebRequestContext::WebRequestContext(
 	{
 		throw Exception( m_errcode, "failed to instantiate context '%s' for '%s'", context?context:"", role?role:"*");
 	}
-	if (m_impl.schemaprefix)
-	{
-		char namespace_schema[ 256];
-		if (sizeof(namespace_schema) <= std::snprintf( namespace_schema, sizeof(namespace_schema), "%s_%s", m_impl.schemaprefix, schema))
-		{
-			m_errcode = papuga_BufferOverflowError;
-			throw Exception( m_errcode, "failed to get schema %s '%s'", m_impl.schemaprefix, schema);
-		}
-		m_atm = papuga_RequestHandler_get_schema( handlerimpl, namespace_schema, role, &m_errcode);
-	}
-	else
-	{
-		m_atm = papuga_RequestHandler_get_schema( handlerimpl, schema, role, &m_errcode);
-	}
+	m_atm = papuga_RequestHandler_get_schema( handlerimpl, m_impl.type, schema, role, &m_errcode);
 	if (!m_atm)
 	{
 		papuga_destroy_RequestContext( &m_impl);
-		throw Exception( m_errcode, "failed to get schema %s '%s' for '%s'", m_impl.schemaprefix?m_impl.schemaprefix:"", schema, role?role:"*");
+		throw Exception( m_errcode, "failed to get schema %s '%s' for '%s'", m_impl.type?m_impl.type:"", schema, role?role:"*");
 	}
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)
@@ -345,19 +332,19 @@ bool WebRequestContext::debug( const WebRequestContent& content, WebRequestAnswe
 	&&	debugRequest( answer);
 }
 
-bool WebRequestContext::executeConfig( const char* destContextName, const char* destContextSchemaPrefix, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeConfig( const char* contextType, const char* contextName, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::executeConfig" << std::endl;
 #endif
 	return feedRequest( answer, content)
 	&&	executeRequest( answer, content)
-	&&	addToHandler( answer, destContextName, destContextSchemaPrefix);
+	&&	addToHandler( answer, contextType, contextName);
 }
 
-bool WebRequestContext::addToHandler( WebRequestAnswer& answer, const char* contextName, const char* schemaPrefix)
+bool WebRequestContext::addToHandler( WebRequestAnswer& answer, const char* contextType, const char* contextName)
 {
-	if (!papuga_RequestContext_set_schemaprefix( &m_impl, schemaPrefix))
+	if (contextType && !papuga_RequestContext_set_type( &m_impl, contextType))
 	{
 		m_errcode = papuga_NoMemError;
 		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), papuga_ErrorCode_tostring( m_errcode));
@@ -366,7 +353,7 @@ bool WebRequestContext::addToHandler( WebRequestAnswer& answer, const char* cont
 	if (!papuga_RequestHandler_add_context( m_handler, contextName, &m_impl, &m_errcode))
 	{
 		char buf[ 1024];
-		std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler: %s"), schemaPrefix, contextName, papuga_ErrorCode_tostring( m_errcode));
+		std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler: %s"), contextType, contextName, papuga_ErrorCode_tostring( m_errcode));
 		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( m_errcode), buf, true);
 		return false;
 	}

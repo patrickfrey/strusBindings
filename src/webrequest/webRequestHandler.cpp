@@ -131,15 +131,15 @@ WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
-#define DEFINE_SCHEMA( EXTNAME, SCHEMANAME, ALLOW)\
-	static const Schema ## SCHEMANAME  schema ## SCHEMANAME;\
-	if (!papuga_RequestHandler_add_schema( m_impl, EXTNAME, schema ## SCHEMANAME .impl())) throw std::bad_alloc();\
-	if (!papuga_RequestHandler_allow_schema_access( m_impl, EXTNAME, ALLOW, &errcode)) throw std::bad_alloc();
+#define DEFINE_SCHEMA( CONTEXT_TYPE, SCHEMA_NAME, SCHEMA_IMPL, ALLOW)\
+	static const Schema ## SCHEMA_IMPL  schema ## SCHEMA_IMPL;\
+	if (!papuga_RequestHandler_add_schema( m_impl, CONTEXT_TYPE, SCHEMA_NAME, schema ## SCHEMA_IMPL .impl())) throw std::bad_alloc();\
+	if (!papuga_RequestHandler_allow_schema_access( m_impl, CONTEXT_TYPE, SCHEMA_NAME, ALLOW, &errcode)) throw std::bad_alloc();
 
-	DEFINE_SCHEMA( "context", CreateContext, "config");
-	DEFINE_SCHEMA( "context_newstorage", CreateStorage, "config");
-	DEFINE_SCHEMA( "context_delstorage", DestroyStorage, "config");
-	DEFINE_SCHEMA( "context_storage", OpenStorage, "config");
+	DEFINE_SCHEMA( "", "init", CreateContext, "config");
+	DEFINE_SCHEMA( "context", "newstorage", CreateStorage, "config");
+	DEFINE_SCHEMA( "context", "delstorage", DestroyStorage, "config");
+	DEFINE_SCHEMA( "context", "storage", OpenStorage, "config");
 }
 
 WebRequestHandler::~WebRequestHandler()
@@ -147,9 +147,9 @@ WebRequestHandler::~WebRequestHandler()
 	papuga_destroy_RequestHandler( m_impl);
 }
 
-bool WebRequestHandler::hasSchema( const char* schema) const
+bool WebRequestHandler::hasSchema( const char* context, const char* schema) const
 {
-	return papuga_RequestHandler_has_schema( m_impl, schema);
+	return papuga_RequestHandler_has_schema( m_impl, context, schema);
 }
 
 static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papuga_ErrorCode errcode, const char* errmsg=0)
@@ -205,8 +205,8 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 }
 
 bool WebRequestHandler::loadConfiguration(
+			const char* destContextType,
 			const char* destContextName,
-			const char* destContextSchemaPrefix,
 			const char* srcContextName,
 			const char* schema,
 			const WebRequestContent& content,
@@ -223,7 +223,7 @@ bool WebRequestHandler::loadConfiguration(
 	if (!ctx.get()) return false;
 
 	strus::unique_lock lock( m_mutex);
-	if (ctx->executeConfig( destContextName, destContextSchemaPrefix, content, status))
+	if (ctx->executeConfig( destContextType, destContextName, content, status))
 	{
 		papuga_ErrorCode errcode = papuga_Ok;
 #ifdef STRUS_LOWLEVEL_DEBUG
