@@ -45,26 +45,6 @@ static void serializeIntrospection( papuga_Serialization& serialization, const c
 	if (!sc) throw std::bad_alloc();
 }
 
-template <class Struct>
-static void serializeSubStructure( papuga_Serialization& serialization, const char* name, const Struct& obj)
-{
-	bool sc = true;
-	sc &= papuga_Serialization_pushName_charp( &serialization, name);
-	sc &= papuga_Serialization_pushOpen( &serialization);
-	Serializer::serialize( &serialization, obj);
-	sc &= papuga_Serialization_pushClose( &serialization);
-	if (!sc) throw std::bad_alloc();
-}
-
-template <class AtomicValue>
-static void serializeValue( papuga_Serialization& serialization, const char* name, const AtomicValue& obj)
-{
-	bool sc = true;
-	sc &= papuga_Serialization_pushName_charp( &serialization, name);
-	Serializer::serialize( &serialization, obj);
-	if (!sc) throw std::bad_alloc();
-}
-
 /*
  * DECLARATION INTROSPECTION CONTEXT MEMBER INTERFACE
  */
@@ -274,7 +254,7 @@ void IntrospectionContext::serialize( papuga_Serialization& serialization) const
 	}
 	if (m_threads > 0)
 	{
-		serializeValue( serialization, "threads", (papuga_Int)m_threads);
+		Serializer::serializeWithName( &serialization, "threads", (papuga_Int)m_threads);
 	}
 	if (m_textproc)
 	{
@@ -311,8 +291,8 @@ std::vector<std::string> IntrospectionContext::list() const
 
 void IntrospectionRpcClient::serialize( papuga_Serialization& serialization) const
 {
-	serializeSubStructure( serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd));
-	if (m_errorhnd->hasError()) throw introspection_error( _TXT("failed to parse RPC configuration"), m_errorhnd);
+	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd));
+	if (m_errorhnd->hasError()) throw introspection_error( _TXT("serialization error"), m_errorhnd);
 }
 IntrospectionBase* IntrospectionRpcClient::open( const std::string& name) const
 {
@@ -325,8 +305,8 @@ std::vector<std::string> IntrospectionRpcClient::list() const
 
 void IntrospectionTraceProxy::serialize( papuga_Serialization& serialization) const
 {
-	serializeSubStructure( serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd));
-	if (m_errorhnd->hasError()) throw introspection_error( _TXT("failed to parse RPC configuration"), m_errorhnd);
+	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd));
+	if (m_errorhnd->hasError()) throw introspection_error( _TXT("serialization error"), m_errorhnd);
 }
 IntrospectionBase* IntrospectionTraceProxy::open( const std::string& name) const
 {
@@ -339,10 +319,10 @@ std::vector<std::string> IntrospectionTraceProxy::list() const
 
 void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization) const
 {
-	serializeSubStructure( serialization, "moduledir", m_impl->modulePaths());
-	serializeSubStructure( serialization, "modules", m_impl->modules());
-	serializeSubStructure( serialization, "resourcedir", m_impl->resourcePaths());
-	serializeSubStructure( serialization, "workdir", m_impl->workdir());
+	Serializer::serializeWithName( &serialization, "moduledir", m_impl->modulePaths());
+	Serializer::serializeWithName( &serialization, "modules", m_impl->modules());
+	Serializer::serializeWithName( &serialization, "resourcedir", m_impl->resourcePaths());
+	Serializer::serializeWithName( &serialization, "workdir", m_impl->workdir());
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name) const
 {

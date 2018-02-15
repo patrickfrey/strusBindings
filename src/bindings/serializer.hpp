@@ -95,6 +95,13 @@ public:
 		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 
+	template <typename TYPE>
+	static void serializeWithName( papuga_Serialization* result, const char* tagname, const TYPE& val)
+	{
+		papuga_ErrorCode errcode = papuga_NoMemError;
+		if (!serializeStructMember( result, tagname, val, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
+	}
+
 private:
 	static inline bool serialize_nothrow( papuga_Serialization* result, const double& val, papuga_ErrorCode& errcode)
 	{

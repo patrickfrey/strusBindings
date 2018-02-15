@@ -15,6 +15,7 @@
 #include "strus/base/thread.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
+#include "impl/value/introspection.hpp"
 #include <vector>
 #include <string>
 
@@ -193,9 +194,27 @@ public:
 	/// \example "open name 'surname' value 'John' name 'lastname' value 'Doe' name 'company' open name 'name' value 'ACME' name 'url' value 'acme.com' close close"
 	std::string debug_serialize( const ValueVariant& arg, bool deterministic=false);
 
+	/// \brief Get the list of items to introspect starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \example ["textproc","segmenter"]
+	/// \example ["queryproc"]
+	/// \example ["env","workdir"]
+	/// \example ["env"]
+	/// \return the list of items to introspect starting from the path
+	std::vector<std::string>* introspectionDir( const ValueVariant& path);
+
+	/// \brief Get the list of items to introspect starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \example ["queryproc","weightfunc"]
+	/// \example ["weightfunc"]
+	/// \example ["env"]
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path);
+
 private:
 	void initStorageObjBuilder();
 	void initAnalyzerObjBuilder();
+	IntrospectionBase* createIntrospectionContext( const ValueVariant& path);
 
 private:
 	mutable ObjectRef m_errorhnd_impl;
@@ -205,6 +224,7 @@ private:
 	ObjectRef m_storage_objbuilder_impl;
 	ObjectRef m_analyzer_objbuilder_impl;
 	const TextProcessorInterface* m_textproc;
+	int m_threads;
 	strus::mutex m_mutex;
 };
 

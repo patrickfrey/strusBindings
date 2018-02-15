@@ -38,6 +38,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/constants.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "private/internationalization.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -77,6 +78,8 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_storage_objbuilder_impl()
 	,m_analyzer_objbuilder_impl()
 	,m_textproc(0)
+	,m_threads(0)
+	,m_mutex()
 {
 	ContextDef contextdef( descr);
 	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
@@ -442,4 +445,43 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool determin
 	return rt;
 }
 
+IntrospectionBase* ContextImpl::createIntrospectionContext( const ValueVariant& arg)
+{
+	std::vector<std::string> path;
+	if (!papuga_ValueVariant_defined( &arg))
+	{
+	}
+	else if (arg.valuetype != papuga_TypeSerialization)
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
+	TraceProxy* trace = m_trace_impl.getObject<TraceProxy>();
+	StorageObjectBuilderInterface* storage = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
+	AnalyzerObjectBuilderInterface* analyzer = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
+	RpcClientInterface* rpc = m_rpc_impl.getObject<RpcClientInterface>();
+
+	strus::local_ptr<IntrospectionBase> ictx( new IntrospectionContext( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
+	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
+	for (; pi != pe; ++pi)
+	{
+		ictx.reset( ictx->open( *pi));
+	}
+	return ictx.release();
+}
+
+std::vector<std::string>* ContextImpl::introspectionDir( const ValueVariant& path)
+{
+	strus::local_ptr<IntrospectionBase> ictx( createIntrospectionContext( path));
+	return new std::vector<std::string>( ictx->list());
+}
+
+Struct ContextImpl::introspection( const ValueVariant& path)
+{
+	Struct rt;
+	strus::local_ptr<IntrospectionBase> ictx( createIntrospectionContext( path));
+	ictx->serialize( rt.serialization);
+	return rt;
+}
 
