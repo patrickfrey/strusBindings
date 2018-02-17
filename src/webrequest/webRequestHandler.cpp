@@ -212,36 +212,112 @@ bool WebRequestHandler::loadConfiguration(
 			const WebRequestContent& content,
 			WebRequestAnswer& status)
 {
-#ifdef STRUS_LOWLEVEL_DEBUG
-	std::string co( webRequestContent_tostring( content));
-	if (co.size() > 200) co.resize( 200);
-	std::cerr << strus::string_format( "load configuration: context %s %s <- %s, schema %s, doctype %s, encoding %s, content '%s'",
-						destContextSchemaPrefix, destContextName, srcContextName, schema,
-						content.doctype(), content.charset(), co.c_str()) << std::endl;
-#endif
-	strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
-	if (!ctx.get()) return false;
-
-	strus::unique_lock lock( m_mutex);
-	if (ctx->executeConfig( destContextType, destContextName, content, status))
+	try
 	{
-		papuga_ErrorCode errcode = papuga_Ok;
 #ifdef STRUS_LOWLEVEL_DEBUG
-		std::cerr << strus::string_format( "allow acccess to '%s'", srcContextName ? "*":"config") << std::endl;
+		std::string co( webRequestContent_tostring( content));
+		if (co.size() > 200) co.resize( 200);
+		std::cerr << strus::string_format( "load configuration: context %s %s <- %s, schema %s, doctype %s, encoding %s, content '%s'",
+							destContextSchemaPrefix, destContextName, srcContextName, schema,
+							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-		if (!papuga_RequestHandler_allow_context_access( m_impl, destContextName, srcContextName ? "*":"config", &errcode))
+		strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		if (!ctx.get()) return false;
+	
+		strus::unique_lock lock( m_mutex);
+		if (ctx->executeConfig( destContextType, destContextName, content, status))
 		{
-			setStatus( status, ErrorOperationConfiguration, errcode);
+			papuga_ErrorCode errcode = papuga_Ok;
+#ifdef STRUS_LOWLEVEL_DEBUG
+			std::cerr << strus::string_format( "allow acccess to '%s'", srcContextName ? "*":"config") << std::endl;
+#endif
+			if (!papuga_RequestHandler_allow_context_access( m_impl, destContextName, srcContextName ? "*":"config", &errcode))
+			{
+				setStatus( status, ErrorOperationConfiguration, errcode);
+				return false;
+			}
+			return true;
+		}
+		else
+		{
 			return false;
 		}
-		return true;
 	}
-	else
+	catch (...)
 	{
+		setStatus( status, ErrorOperationConfiguration, papuga_UncaughtException);
 		return false;
 	}
 }
 
+
+bool WebRequestHandler::executeList(
+		const std::vector<std::string>& path,
+		const char* role,
+		std::vector<std::string>& result,
+		WebRequestAnswer& status) const
+{
+	try
+	{
+		enum {lstbufsize=256};
+		char const* lstbuf[ lstbufsize];
+		std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
+
+		if (pi == pe)
+		{
+			char const** ti = papuga_RequestHandler_list_context_types( m_impl, role, lstbuf, lstbufsize);
+			if (!ti)
+			{
+				setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
+				return false;
+			}
+			for (; *ti; ++ti) result.push_back( *ti);
+			return true;
+		}
+		else
+		{
+			char const** ci = papuga_RequestHandler_list_contexts( m_impl, pi->c_str(), role, lstbuf, lstbufsize);
+			if (!ci) return false;
+			++pi;
+			if (pi == pe)
+			{
+				for (; *ci; ++ci) result.push_back( *ci);
+				return true;
+			}
+			else
+			{
+				papuga_ErrorCode errcode = papuga_Ok;
+				papuga_RequestContext context;
+				if (!papuga_init_RequestContext_child( &context, m_impl, pi->c_str(), role, &errcode))
+				{
+					setStatus( status, ErrorOperationBuildData, errcode);
+					return false;
+				}
+				++pi;
+				if (pi == pe)
+				{
+					/// !!!! HIER WEITER
+				}
+			}
+		}
+		return true;
+	}
+	catch (...)
+	{
+		setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
+		return false;
+	}
+}
+
+bool WebRequestHandler::executeView(
+		const std::vector<std::string>& path,
+		const char* role,
+		const char* accepted_charset,
+		const char* accepted_doctype,
+		WebRequestAnswer& answer) const
+{
+	return false;
+}
 
 
 

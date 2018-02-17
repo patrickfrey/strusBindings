@@ -401,7 +401,7 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	}
 	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( blob, bloblen));
 	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
-	strus::bindings::Serializer::serialize( &rt.serialization, *viewer);
+	strus::bindings::Serializer::serialize( &rt.serialization, *viewer, true);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());
@@ -482,6 +482,12 @@ Struct ContextImpl::introspection( const ValueVariant& path)
 	Struct rt;
 	strus::local_ptr<IntrospectionBase> ictx( createIntrospectionContext( path));
 	ictx->serialize( rt.serialization);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
 	return rt;
 }
 

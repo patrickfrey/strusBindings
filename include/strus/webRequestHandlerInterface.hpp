@@ -12,6 +12,8 @@
 #include "strus/webRequestAnswer.hpp"
 #include "strus/webRequestContent.hpp"
 #include <cstddef>
+#include <vector>
+#include <string>
 
 namespace strus
 {
@@ -45,6 +47,21 @@ public:
 	/// \param[in] schema identifier queried
 	/// \return true, if a schema with this name exists (including namespace prefix)
 	virtual bool hasSchema( const char* context, const char* schema) const=0;
+
+	/// \brief Execute a list command for introspection defined by a path (URL)
+	virtual bool executeList(
+			const std::vector<std::string>& path,
+			const char* role,
+			std::vector<std::string>& result,
+			WebRequestAnswer& answer) const=0;
+
+	/// \brief Execute a view command for introspection defined by a path (URL)
+	virtual bool executeView(
+			const std::vector<std::string>& path,
+			const char* role,
+			const char* accepted_charset,
+			const char* accepted_doctype,
+			WebRequestAnswer& answer) const=0;
 
 	/// \brief Execute a configuration request
 	/// \param[in] destContextType type of the created context

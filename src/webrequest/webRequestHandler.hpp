@@ -40,6 +40,19 @@ public:
 			const char* accepted_doctype,
 			WebRequestAnswer& status) const;
 
+	virtual bool executeList(
+			const std::vector<std::string>& path,
+			const char* role,
+			std::vector<std::string>& result,
+			WebRequestAnswer& status) const;
+
+	virtual bool executeView(
+			const std::vector<std::string>& path,
+			const char* role,
+			const char* accepted_charset,
+			const char* accepted_doctype,
+			WebRequestAnswer& answer) const;
+
 	virtual bool loadConfiguration(
 			const char* destContextType,
 			const char* destContextName,

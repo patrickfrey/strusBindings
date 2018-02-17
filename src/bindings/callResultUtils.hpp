@@ -33,21 +33,21 @@ void initCallResultStructureOwnership( papuga_CallResult* retval, STRUCTVALUE* s
 		throw std::bad_alloc();
 	}
 	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, *st);
+	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, *st, false/*deep*/);
 }
 
 template <typename STRUCTVALUE>
 static void initCallResultStructureConst( papuga_CallResult* retval, const STRUCTVALUE* st)
 {
 	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, *st);
+	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, *st, false/*deep*/);
 }
 
 template <typename STRUCTVALUE>
 static void initCallResultAtomic( papuga_CallResult* retval, const STRUCTVALUE& st)
 {
 	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, st);
+	strus::bindings::Serializer::serialize( retval->valuear[0].value.serialization, st, false/*deep*/);
 }
 
 template <typename OBJECT>

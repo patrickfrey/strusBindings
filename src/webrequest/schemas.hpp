@@ -147,7 +147,6 @@ public:
 	) {}
 };
 
-
 }}//namespace
 #endif
 

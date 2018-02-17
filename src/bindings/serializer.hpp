@@ -10,6 +10,7 @@
 /// \brief Serializers of all data types needed for the language bindings
 /// \file serializer.hpp
 #include "papuga/serialization.h"
+#include "papuga/allocator.h"
 #include "papuga/errors.h"
 #include "strus/numericVariant.hpp"
 #include "strus/analyzer/document.hpp"
@@ -69,109 +70,134 @@ class Serializer
 {
 public:
 	template<typename SERVAL>
-	static typename strus::enable_if<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, SERVAL& param)
+	static typename strus::enable_if<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, SERVAL& param, bool deep)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
 		if (papuga_Serialization_empty( result))
 		{
 			papuga_Serialization_set_structid( result, StructIdTemplate<SERVAL>::structid());
 		}
-		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
+		if (!serialize_nothrow( result, param, errcode, deep)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 	template<typename SERVAL>
-	static typename strus::enable_if<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param)
+	static typename strus::enable_if<has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param, bool deep)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
 		if (papuga_Serialization_empty( result))
 		{
 			papuga_Serialization_set_structid( result, StructIdTemplate<SERVAL>::structid());
 		}
-		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
+		if (!serialize_nothrow( result, param, errcode, deep)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 	template<typename SERVAL>
-	static typename strus::enable_if<!has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param)
+	static typename strus::enable_if<!has_structid<SERVAL>::value,void>::type serialize( papuga_Serialization* result, const SERVAL& param, bool deep)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
-		if (!serialize_nothrow( result, param, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
+		if (!serialize_nothrow( result, param, errcode, deep)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 
 	template <typename TYPE>
-	static void serializeWithName( papuga_Serialization* result, const char* tagname, const TYPE& val)
+	static void serializeWithName( papuga_Serialization* result, const char* tagname, const TYPE& val, bool deep)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
-		if (!serializeStructMember( result, tagname, val, errcode)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
+		if (!serializeStructMember( result, tagname, val, errcode, deep)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 
 private:
-	static inline bool serialize_nothrow( papuga_Serialization* result, const double& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const double& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		return papuga_Serialization_pushValue_double( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_Int& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_Int& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_int( papuga_Serialization* result, const papuga_Int& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_int( papuga_Serialization* result, const papuga_Int& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const bool& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const bool& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_bool( papuga_Serialization* result, const bool& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_bool( papuga_Serialization* result, const bool& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const std::string& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const std::string& val, papuga_ErrorCode& errcode, bool deep)
 	{
-		return papuga_Serialization_pushValue_string( result, val.c_str(), val.size());
+		const char* valstr;
+		if (deep)
+		{
+			valstr = papuga_Allocator_copy_string( result->allocator, val.c_str(), val.size());
+			if (!valstr) return false;
+		}
+		else
+		{
+			valstr = val.c_str();
+		}
+		return papuga_Serialization_pushValue_string( result, valstr, val.size());
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const char* val, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const char* val, papuga_ErrorCode& errcode, bool deep)
 	{
+		if (deep)
+		{
+			val = papuga_Allocator_copy_charp( result->allocator, val);
+			if (!val) return false;
+		}
 		return papuga_Serialization_pushValue_charp( result, val);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const char* val, std::size_t valsize, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const char* val, std::size_t valsize, papuga_ErrorCode& errcode, bool deep)
 	{
+		if (deep)
+		{
+			val = papuga_Allocator_copy_string( result->allocator, val, valsize);
+			if (!val) return false;
+		}
 		return papuga_Serialization_pushValue_string( result, val, valsize);
 	}
-	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_ValueVariant& val, papuga_ErrorCode& errcode)
+	static inline bool serialize_nothrow( papuga_Serialization* result, const papuga_ValueVariant& val, papuga_ErrorCode& errcode, bool deep)
 	{
+		if (deep)
+		{
+			errcode = papuga_NotImplemented;
+			return false;
+		}
 		return papuga_Serialization_pushValue( result, &val);
 	}
-	static bool serialize_nothrow( papuga_Serialization* result, const NumericVariant& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const NumericVariant& val, papuga_ErrorCode& errcode, bool deep);
 
 	typedef std::vector<std::pair<std::string,std::string> > ConfigurationItemList;
-	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode, bool deep);
 
-	static bool serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataComparison& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentMetaData>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentAttribute>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::FunctionDescription::Parameter>& val, papuga_ErrorCode& errcode);
-	static bool serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode);
+	static bool serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataComparison& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentMetaData>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentAttribute>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::FunctionDescription::Parameter>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode, bool deep);
 
 	struct atomictype_ {};
 	struct structtype_ {};
@@ -204,63 +230,63 @@ private:
 		,const maptype_&>::type getCategory( const T&) { static maptype_ rt; return rt;}
 
 	template<typename SERVAL>
-	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const atomictype_& category, papuga_ErrorCode& errcode)
+	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const atomictype_& category, papuga_ErrorCode& errcode, bool deep)
 	{
-		return serialize_nothrow( result, val, errcode);
+		return serialize_nothrow( result, val, errcode, deep);
 	}
 	template<typename SERVAL>
-	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const structtype_& category, papuga_ErrorCode& errcode)
+	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const structtype_& category, papuga_ErrorCode& errcode, bool deep)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<SERVAL>::structid());
-		rt &= serialize_nothrow( result, val, errcode);
+		rt &= serialize_nothrow( result, val, errcode, deep);
 		rt &= papuga_Serialization_pushClose( result);
 		return rt;
 	}
 	template<typename SERVAL>
-	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const maptype_& category, papuga_ErrorCode& errcode)
+	static bool serializeStructMemberValue( papuga_Serialization* result, const SERVAL& val, const maptype_& category, papuga_ErrorCode& errcode, bool deep)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushOpen( result);
-		rt &= serialize_nothrow( result, val, errcode);
+		rt &= serialize_nothrow( result, val, errcode, deep);
 		rt &= papuga_Serialization_pushClose( result);
 		return rt;
 	}
 
 	template <typename TYPE>
-	static bool serializeStructMember( papuga_Serialization* result, const char* tagname, const TYPE& val, papuga_ErrorCode& errcode)
+	static bool serializeStructMember( papuga_Serialization* result, const char* tagname, const TYPE& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushName_charp( result, tagname);
-		rt &= serializeStructMemberValue( result, val, getCategory( val), errcode);
+		rt &= serializeStructMemberValue( result, val, getCategory( val), errcode, deep);
 		return rt;
 	}
 
 	template <typename TYPE>
-	static bool serializeArrayElement( papuga_Serialization* result, const TYPE& val, papuga_ErrorCode& errcode)
+	static bool serializeArrayElement( papuga_Serialization* result, const TYPE& val, papuga_ErrorCode& errcode, bool deep)
 	{
-		return serializeStructMemberValue( result, val, getCategory( val), errcode);
+		return serializeStructMemberValue( result, val, getCategory( val), errcode, deep);
 	}
 
 	template <typename TYPE>
-	static bool serializeArray( papuga_Serialization* result, const std::vector<TYPE>& val, papuga_ErrorCode& errcode)
+	static bool serializeArray( papuga_Serialization* result, const std::vector<TYPE>& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		bool rt = true;
 		typename std::vector<TYPE>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			rt &= serializeArrayElement( result, *vi, errcode);
+			rt &= serializeArrayElement( result, *vi, errcode, deep);
 		}
 		return rt;
 	}
 	template <typename TYPE>
-	static bool serializeIntArray( papuga_Serialization* result, const std::vector<TYPE>& val, papuga_ErrorCode& errcode)
+	static bool serializeIntArray( papuga_Serialization* result, const std::vector<TYPE>& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		bool rt = true;
 		typename std::vector<int>::const_iterator vi = val.begin(), ve = val.end();
 		for (; vi != ve; ++vi)
 		{
-			rt &= serializeArrayElement( result, (papuga_Int)*vi, errcode);
+			rt &= serializeArrayElement( result, (papuga_Int)*vi, errcode, deep);
 		}
 		return rt;
 	}

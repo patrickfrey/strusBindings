@@ -242,7 +242,7 @@ Struct StorageClientImpl::config() const
 		throw strus::runtime_error( _TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
 	}
 	Struct rt;
-	strus::bindings::Serializer::serialize( &rt.serialization, *cfg);
+	strus::bindings::Serializer::serialize( &rt.serialization, *cfg, false/*deep*/);
 	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
 	cfg.release();
 	rt.release();

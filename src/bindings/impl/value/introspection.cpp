@@ -89,7 +89,7 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual void serialize( papuga_Serialization& serialization) const
 	{
-		Serializer::serialize( &serialization, m_impl->getDescription());
+		Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
 	}
 	virtual IntrospectionBase* open( const std::string& name) const
 	{
@@ -254,7 +254,7 @@ void IntrospectionContext::serialize( papuga_Serialization& serialization) const
 	}
 	if (m_threads > 0)
 	{
-		Serializer::serializeWithName( &serialization, "threads", (papuga_Int)m_threads);
+		Serializer::serializeWithName( &serialization, "threads", (papuga_Int)m_threads, true/*deep*/);
 	}
 	if (m_textproc)
 	{
@@ -289,9 +289,11 @@ std::vector<std::string> IntrospectionContext::list() const
 	return rt;
 }
 
+
+
 void IntrospectionRpcClient::serialize( papuga_Serialization& serialization) const
 {
-	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd));
+	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
 	if (m_errorhnd->hasError()) throw introspection_error( _TXT("serialization error"), m_errorhnd);
 }
 IntrospectionBase* IntrospectionRpcClient::open( const std::string& name) const
@@ -305,7 +307,7 @@ std::vector<std::string> IntrospectionRpcClient::list() const
 
 void IntrospectionTraceProxy::serialize( papuga_Serialization& serialization) const
 {
-	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd));
+	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
 	if (m_errorhnd->hasError()) throw introspection_error( _TXT("serialization error"), m_errorhnd);
 }
 IntrospectionBase* IntrospectionTraceProxy::open( const std::string& name) const
@@ -319,10 +321,10 @@ std::vector<std::string> IntrospectionTraceProxy::list() const
 
 void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization) const
 {
-	Serializer::serializeWithName( &serialization, "moduledir", m_impl->modulePaths());
-	Serializer::serializeWithName( &serialization, "modules", m_impl->modules());
-	Serializer::serializeWithName( &serialization, "resourcedir", m_impl->resourcePaths());
-	Serializer::serializeWithName( &serialization, "workdir", m_impl->workdir());
+	Serializer::serializeWithName( &serialization, "moduledir", m_impl->modulePaths(), true/*deep*/);
+	Serializer::serializeWithName( &serialization, "modules", m_impl->modules(), true/*deep*/);
+	Serializer::serializeWithName( &serialization, "resourcedir", m_impl->resourcePaths(), true/*deep*/);
+	Serializer::serializeWithName( &serialization, "workdir", m_impl->workdir(), true/*deep*/);
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name) const
 {
