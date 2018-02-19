@@ -35,7 +35,6 @@ WebRequestContext::WebRequestContext(
 	papuga_RequestHandler* handlerimpl,
 	const char* context,
 	const char* schema,
-	const char* role,
 	const char* accepted_charset_,
 	const char* accepted_doctype_)
 		:m_handler(handlerimpl),m_request(0)
@@ -45,21 +44,21 @@ WebRequestContext::WebRequestContext(
 		,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_),m_resultstr(0),m_resultlen(0)
 {
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
-	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, role, &m_errcode))
+	if (!papuga_init_RequestContext_child( &m_impl, handlerimpl, context, &m_errcode))
 	{
-		throw Exception( m_errcode, "failed to instantiate context '%s' for '%s'", context?context:"", role?role:"*");
+		throw Exception( m_errcode, "failed to instantiate context '%s'", context?context:"");
 	}
-	m_atm = papuga_RequestHandler_get_schema( handlerimpl, m_impl.type, schema, role, &m_errcode);
+	m_atm = papuga_RequestHandler_get_schema( handlerimpl, m_impl.type, schema, &m_errcode);
 	if (!m_atm)
 	{
 		papuga_destroy_RequestContext( &m_impl);
-		throw Exception( m_errcode, "failed to get schema %s '%s' for '%s'", m_impl.type?m_impl.type:"", schema, role?role:"*");
+		throw Exception( m_errcode, "failed to get schema %s '%s'", m_impl.type?m_impl.type:"", schema);
 	}
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)
 	{
 		papuga_destroy_RequestContext( &m_impl);
-		throw Exception( papuga_NoMemError, "failed to create request structure '%s' on '%s' for '%s'", schema, context, role?role:"*");
+		throw Exception( papuga_NoMemError, "failed to create request structure '%s' on '%s'", schema, context);
 	}
 }
 

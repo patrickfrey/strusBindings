@@ -35,20 +35,17 @@ public:
 	virtual WebRequestContextInterface* createContext(
 			const char* context,
 			const char* schema,
-			const char* role,
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			WebRequestAnswer& status) const;
 
 	virtual bool executeList(
 			const std::vector<std::string>& path,
-			const char* role,
 			std::vector<std::string>& result,
 			WebRequestAnswer& status) const;
 
 	virtual bool executeView(
 			const std::vector<std::string>& path,
-			const char* role,
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			WebRequestAnswer& answer) const;
@@ -62,7 +59,7 @@ public:
 			WebRequestAnswer& status);
 
 private:
-	WebRequestContext* createContext_( const char* context, const char* schema, const char* role,
+	WebRequestContext* createContext_( const char* context, const char* schema,
 						const char* accepted_charset, const char* accepted_doctype,
 						WebRequestAnswer& status) const;
 

@@ -122,7 +122,6 @@ static void logMethodCall( void* self_, int nofItems, ...)
 
 WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 {
-	papuga_ErrorCode errcode = papuga_Ok;
 	std::memset( &m_logger, 0, sizeof(m_logger));
 	m_logger.self = logger_;
 	int mask = logger_->logMask();
@@ -133,8 +132,7 @@ WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
 	using namespace strus::webrequest;
 #define DEFINE_SCHEMA( CONTEXT_TYPE, SCHEMA_NAME, SCHEMA_IMPL, ALLOW)\
 	static const Schema ## SCHEMA_IMPL  schema ## SCHEMA_IMPL;\
-	if (!papuga_RequestHandler_add_schema( m_impl, CONTEXT_TYPE, SCHEMA_NAME, schema ## SCHEMA_IMPL .impl())) throw std::bad_alloc();\
-	if (!papuga_RequestHandler_allow_schema_access( m_impl, CONTEXT_TYPE, SCHEMA_NAME, ALLOW, &errcode)) throw std::bad_alloc();
+	if (!papuga_RequestHandler_add_schema( m_impl, CONTEXT_TYPE, SCHEMA_NAME, schema ## SCHEMA_IMPL .impl())) throw std::bad_alloc();
 
 	DEFINE_SCHEMA( "", "init", CreateContext, "config");
 	DEFINE_SCHEMA( "context", "newstorage", CreateStorage, "config");
@@ -172,11 +170,11 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	}
 }
 
-WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* role, const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const
+WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const
 {
 	try
 	{
-		return new WebRequestContext( m_impl, context, schema, role, accepted_charset, accepted_doctype);
+		return new WebRequestContext( m_impl, context, schema, accepted_charset, accepted_doctype);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -196,12 +194,11 @@ WebRequestContext* WebRequestHandler::createContext_( const char* context, const
 WebRequestContextInterface* WebRequestHandler::createContext(
 		const char* context,
 		const char* schema,
-		const char* role,
 		const char* accepted_charset,
 		const char* accepted_doctype,
 		WebRequestAnswer& status) const
 {
-	return createContext_( context, schema, role, accepted_charset, accepted_doctype, status);
+	return createContext_( context, schema, accepted_charset, accepted_doctype, status);
 }
 
 bool WebRequestHandler::loadConfiguration(
@@ -221,27 +218,11 @@ bool WebRequestHandler::loadConfiguration(
 							destContextSchemaPrefix, destContextName, srcContextName, schema,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-		strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "config"/*role*/, "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
 	
 		strus::unique_lock lock( m_mutex);
-		if (ctx->executeConfig( destContextType, destContextName, content, status))
-		{
-			papuga_ErrorCode errcode = papuga_Ok;
-#ifdef STRUS_LOWLEVEL_DEBUG
-			std::cerr << strus::string_format( "allow acccess to '%s'", srcContextName ? "*":"config") << std::endl;
-#endif
-			if (!papuga_RequestHandler_allow_context_access( m_impl, destContextName, srcContextName ? "*":"config", &errcode))
-			{
-				setStatus( status, ErrorOperationConfiguration, errcode);
-				return false;
-			}
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return ctx->executeConfig( destContextType, destContextName, content, status);
 	}
 	catch (...)
 	{
@@ -253,7 +234,6 @@ bool WebRequestHandler::loadConfiguration(
 
 bool WebRequestHandler::executeList(
 		const std::vector<std::string>& path,
-		const char* role,
 		std::vector<std::string>& result,
 		WebRequestAnswer& status) const
 {
@@ -265,7 +245,7 @@ bool WebRequestHandler::executeList(
 
 		if (pi == pe)
 		{
-			char const** ti = papuga_RequestHandler_list_context_types( m_impl, role, lstbuf, lstbufsize);
+			char const** ti = papuga_RequestHandler_list_context_types( m_impl, lstbuf, lstbufsize);
 			if (!ti)
 			{
 				setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
@@ -276,7 +256,7 @@ bool WebRequestHandler::executeList(
 		}
 		else
 		{
-			char const** ci = papuga_RequestHandler_list_contexts( m_impl, pi->c_str(), role, lstbuf, lstbufsize);
+			char const** ci = papuga_RequestHandler_list_contexts( m_impl, pi->c_str(), lstbuf, lstbufsize);
 			if (!ci) return false;
 			++pi;
 			if (pi == pe)
@@ -288,7 +268,7 @@ bool WebRequestHandler::executeList(
 			{
 				papuga_ErrorCode errcode = papuga_Ok;
 				papuga_RequestContext context;
-				if (!papuga_init_RequestContext_child( &context, m_impl, pi->c_str(), role, &errcode))
+				if (!papuga_init_RequestContext_child( &context, m_impl, pi->c_str(), &errcode))
 				{
 					setStatus( status, ErrorOperationBuildData, errcode);
 					return false;
@@ -311,7 +291,6 @@ bool WebRequestHandler::executeList(
 
 bool WebRequestHandler::executeView(
 		const std::vector<std::string>& path,
-		const char* role,
 		const char* accepted_charset,
 		const char* accepted_doctype,
 		WebRequestAnswer& answer) const

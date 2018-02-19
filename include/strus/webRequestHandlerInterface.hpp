@@ -31,14 +31,12 @@ public:
 	/// \brief Create the structure for handling a request
 	/// \param[in] context identifier defining where to execute the request
 	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
-	/// \param[in] role role identifier of the request for checking permissions
 	/// \param[in] accepted_charset HTTP header variable 'Accept-Charset', a comma separated list of character set encodings accepted by the client
 	/// \param[out] answer the error status
 	/// \return the context structure for handling a request or NULL in case of an error (inspect answer for the error details)
 	virtual WebRequestContextInterface* createContext(
 			const char* context,
 			const char* schema,
-			const char* role,
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			WebRequestAnswer& answer) const=0;
@@ -51,14 +49,12 @@ public:
 	/// \brief Execute a list command for introspection defined by a path (URL)
 	virtual bool executeList(
 			const std::vector<std::string>& path,
-			const char* role,
 			std::vector<std::string>& result,
 			WebRequestAnswer& answer) const=0;
 
 	/// \brief Execute a view command for introspection defined by a path (URL)
 	virtual bool executeView(
 			const std::vector<std::string>& path,
-			const char* role,
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			WebRequestAnswer& answer) const=0;

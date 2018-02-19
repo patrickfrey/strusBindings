@@ -45,7 +45,6 @@ public:
 		papuga_RequestHandler* handlerimpl,
 		const char* context,
 		const char* schema,
-		const char* role,
 		const char* accepted_charset,
 		const char* accepted_doctype);
 	virtual ~WebRequestContext();
