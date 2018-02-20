@@ -23,70 +23,69 @@ class WebRequestContext
 	:public WebRequestContextInterface
 {
 public:
-	/// \brief Exception thrown by constructor of WebRequestContext
-	class Exception
-		:public std::runtime_error
-	{
-	public:
-		Exception( papuga_ErrorCode errcode_, const char* fmt_, ...)
-#ifdef __GNUC__
-			__attribute__ ((format (printf, 3, 4)))
-#endif
-		;
-		papuga_ErrorCode errcode() const	{return m_errcode;}
-		const char* errmsg() const		{return m_errmsg;}
-	
-	private:
-		papuga_ErrorCode m_errcode;
-		char m_errmsg[ 1024];
-	};
-
 	WebRequestContext(
 		papuga_RequestHandler* handlerimpl,
-		const char* context,
-		const char* schema,
 		const char* accepted_charset,
 		const char* accepted_doctype);
 	virtual ~WebRequestContext();
 
-	virtual bool addVariable( const std::string& name, const std::string& value);
+	virtual bool executeContent(
+			const std::string& context,
+			const std::string& schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
 
-	virtual bool execute( const WebRequestContent& content, WebRequestAnswer& answer);
-	virtual bool debug( const WebRequestContent& content, WebRequestAnswer& answer);
+	virtual bool debugContent(
+			const std::string& context,
+			const std::string& schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
+
+	virtual bool executeList(
+			const std::vector<std::string>& path,
+			WebRequestAnswer& answer);
+
+	virtual bool executeView(
+			const std::vector<std::string>& path,
+			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	bool executeConfig( const char* destContextType, const char* destContextName, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeConfig( const std::string& srcContextName, const std::string& schema, const char* destContextType, const char* destContextName, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
-	bool feedRequest( WebRequestAnswer& answer, const WebRequestContent& content);
-	bool debugRequest( WebRequestAnswer& answer);
-	bool executeRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool initContentRequest( const std::string& context, const std::string& schema);
+	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool debugContentRequest( WebRequestAnswer& answer);
+	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer);
-	bool getRequestResult( WebRequestAnswer& answer);
+	bool getContentRequestResult( WebRequestAnswer& answer);
 
 	/// \brief Transfer this context with a name to the request handler
 	bool addToHandler( WebRequestAnswer& answer, const char* contextName, const char* schemaPrefix);
-	
-private:
-	void clearContent();
+
+	bool callListMethod( papuga_ValueVariant* obj, WebRequestAnswer& answer) const;
+	bool callViewMethod( papuga_ValueVariant* obj, WebRequestAnswer& answer) const;
+
+	bool mapArray( WebRequestAnswer& answer, const std::vector<std::string>& ar);
+	bool mapArray( WebRequestAnswer& answer, const char** ar);
 
 private:
-	papuga_RequestContext m_impl;
+	papuga_Allocator m_allocator;
 	papuga_RequestHandler* m_handler;
+	papuga_RequestContext m_context;
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;
+	const char* m_doctypestr;
+	const papuga_RequestAutomaton* m_atm;
 	papuga_StringEncoding m_result_encoding;
 	papuga_ContentType m_result_doctype;
-	const char* m_doctypestr;
 	papuga_ErrorCode m_errcode;
 	papuga_ErrorBuffer m_errbuf;
-	const papuga_RequestAutomaton* m_atm;
 	const char* m_accepted_charset;
 	const char* m_accepted_doctype;
-	char* m_resultstr;
-	std::size_t m_resultlen;
 	char m_errbuf_mem[ 4096];
+	char m_allocator_mem[ 1<<14];
 };
 
 }//namespace

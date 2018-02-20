@@ -10,6 +10,7 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "strus/lib/bindings_description.hpp"
 #include "schemas.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
@@ -170,19 +171,15 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	}
 }
 
-WebRequestContext* WebRequestHandler::createContext_( const char* context, const char* schema, const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const
+WebRequestContext* WebRequestHandler::createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const
 {
 	try
 	{
-		return new WebRequestContext( m_impl, context, schema, accepted_charset, accepted_doctype);
+		return new WebRequestContext( m_impl, accepted_charset, accepted_doctype);
 	}
 	catch (const std::bad_alloc&)
 	{
 		setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
-	}
-	catch (const WebRequestContext::Exception& err)
-	{
-		setStatus( status, ErrorOperationBuildData, err.errcode(), err.errmsg());
 	}
 	catch (...)
 	{
@@ -192,13 +189,11 @@ WebRequestContext* WebRequestHandler::createContext_( const char* context, const
 }
 
 WebRequestContextInterface* WebRequestHandler::createContext(
-		const char* context,
-		const char* schema,
 		const char* accepted_charset,
 		const char* accepted_doctype,
 		WebRequestAnswer& status) const
 {
-	return createContext_( context, schema, accepted_charset, accepted_doctype, status);
+	return createContext_( accepted_charset, accepted_doctype, status);
 }
 
 bool WebRequestHandler::loadConfiguration(
@@ -218,11 +213,11 @@ bool WebRequestHandler::loadConfiguration(
 							destContextSchemaPrefix, destContextName, srcContextName, schema,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-		strus::local_ptr<WebRequestContext> ctx( createContext_( srcContextName, schema, "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
 	
 		strus::unique_lock lock( m_mutex);
-		return ctx->executeConfig( destContextType, destContextName, content, status);
+		return ctx->executeConfig( srcContextName, schema, destContextType, destContextName, content, status);
 	}
 	catch (...)
 	{
@@ -230,73 +225,4 @@ bool WebRequestHandler::loadConfiguration(
 		return false;
 	}
 }
-
-
-bool WebRequestHandler::executeList(
-		const std::vector<std::string>& path,
-		std::vector<std::string>& result,
-		WebRequestAnswer& status) const
-{
-	try
-	{
-		enum {lstbufsize=256};
-		char const* lstbuf[ lstbufsize];
-		std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
-
-		if (pi == pe)
-		{
-			char const** ti = papuga_RequestHandler_list_context_types( m_impl, lstbuf, lstbufsize);
-			if (!ti)
-			{
-				setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
-				return false;
-			}
-			for (; *ti; ++ti) result.push_back( *ti);
-			return true;
-		}
-		else
-		{
-			char const** ci = papuga_RequestHandler_list_contexts( m_impl, pi->c_str(), lstbuf, lstbufsize);
-			if (!ci) return false;
-			++pi;
-			if (pi == pe)
-			{
-				for (; *ci; ++ci) result.push_back( *ci);
-				return true;
-			}
-			else
-			{
-				papuga_ErrorCode errcode = papuga_Ok;
-				papuga_RequestContext context;
-				if (!papuga_init_RequestContext_child( &context, m_impl, pi->c_str(), &errcode))
-				{
-					setStatus( status, ErrorOperationBuildData, errcode);
-					return false;
-				}
-				++pi;
-				if (pi == pe)
-				{
-					/// !!!! HIER WEITER
-				}
-			}
-		}
-		return true;
-	}
-	catch (...)
-	{
-		setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
-		return false;
-	}
-}
-
-bool WebRequestHandler::executeView(
-		const std::vector<std::string>& path,
-		const char* accepted_charset,
-		const char* accepted_doctype,
-		WebRequestAnswer& answer) const
-{
-	return false;
-}
-
-
 

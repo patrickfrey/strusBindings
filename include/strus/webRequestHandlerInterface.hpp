@@ -29,14 +29,11 @@ public:
 	virtual ~WebRequestHandlerInterface(){}
 
 	/// \brief Create the structure for handling a request
-	/// \param[in] context identifier defining where to execute the request
-	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
 	/// \param[in] accepted_charset HTTP header variable 'Accept-Charset', a comma separated list of character set encodings accepted by the client
+	/// \param[in] accepted_doctype HTTP header variable 'Accept', a comma separated list of content types accepted by the client
 	/// \param[out] answer the error status
 	/// \return the context structure for handling a request or NULL in case of an error (inspect answer for the error details)
 	virtual WebRequestContextInterface* createContext(
-			const char* context,
-			const char* schema,
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			WebRequestAnswer& answer) const=0;
@@ -45,19 +42,6 @@ public:
 	/// \param[in] schema identifier queried
 	/// \return true, if a schema with this name exists (including namespace prefix)
 	virtual bool hasSchema( const char* context, const char* schema) const=0;
-
-	/// \brief Execute a list command for introspection defined by a path (URL)
-	virtual bool executeList(
-			const std::vector<std::string>& path,
-			std::vector<std::string>& result,
-			WebRequestAnswer& answer) const=0;
-
-	/// \brief Execute a view command for introspection defined by a path (URL)
-	virtual bool executeView(
-			const std::vector<std::string>& path,
-			const char* accepted_charset,
-			const char* accepted_doctype,
-			WebRequestAnswer& answer) const=0;
 
 	/// \brief Execute a configuration request
 	/// \param[in] destContextType type of the created context

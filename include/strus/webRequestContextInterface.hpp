@@ -13,6 +13,7 @@
 #include "strus/webRequestContent.hpp"
 #include <cstddef>
 #include <string>
+#include <vector>
 
 namespace strus
 {
@@ -24,23 +25,43 @@ public:
 	/// \brief Destructor
 	virtual ~WebRequestContextInterface(){}
 
-	/// \brief Add a variable of the request
-	/// \param[in] name name of the variable
-	/// \param[in] value value of the variable
-	/// \return true on success, false on failure (get the error with 'lastError()const')
-	virtual bool addVariable( const std::string& name, const std::string& value)=0;
+	/// \brief Run the content request
+	/// \param[in] context identifier defining where to execute the request
+	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
+	/// \param[in] content content of the request
+	/// \param[out] answer the data of the answer of the request
+	/// \return bool if succeeded, false else
+	virtual bool executeContent(
+			const std::string& context,
+			const std::string& schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer)=0;
 
-	/// \brief Run the request
+	/// \brief Describe in plain text what would be done to fulfill the content request without executing anything
+	/// \param[in] context identifier defining where to execute the request
+	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
 	/// \param[in] content content of the request
 	/// \param[out] answer the data of the answer of the request
 	/// \return bool if request succeeded, false else
-	virtual bool execute( const WebRequestContent& content, WebRequestAnswer& answer)=0;
+	virtual bool debugContent(
+			const std::string& context,
+			const std::string& schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer)=0;
 
-	/// \brief Describe in plain text what would be done to fulfill the request without executing anything
-	/// \param[in] content content of the request
-	/// \param[out] answer the data of the answer of the request
-	/// \return bool if request succeeded, false else
-	virtual bool debug( const WebRequestContent& content, WebRequestAnswer& answer)=0;
+	/// \brief Execute a list command for introspection defined by a path (URL)
+	/// \param[in] path path of the object to list contents
+	/// \return bool if succeeded, false else
+	virtual bool executeList(
+			const std::vector<std::string>& path,
+			WebRequestAnswer& answer)=0;
+
+	/// \brief Execute a view command for introspection defined by a path (URL)
+	/// \param[in] path path of the object to view content
+	/// \return bool if succeeded, false else
+	virtual bool executeView(
+			const std::vector<std::string>& path,
+			WebRequestAnswer& answer)=0;
 };
 
 }//namespace

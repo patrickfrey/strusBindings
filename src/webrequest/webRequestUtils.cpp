@@ -11,11 +11,16 @@
 #include "private/internationalization.hpp"
 #include "papuga/encoding.h"
 #include "papuga/errors.h"
+#include "papuga/errors.hpp"
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.h"
 #include "papuga/valueVariant.hpp"
 #include "papuga/requestParser.h"
+#include "papuga/requestResult.h"
+#include "papuga/allocator.h"
+#include "papuga/serialization.h"
 #include "strus/base/numstring.hpp"
+#include "strus/lib/bindings_description.hpp"
 #include <stdexcept>
 #include <algorithm>
 #include <cstring>
@@ -451,7 +456,7 @@ papuga_ContentType strus::papugaContentType( WebRequestContent::Type doctype)
 	return ar[doctype];
 }
 
-WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype)
+WebRequestContent::Type strus::papugaTranslatedContentType( papuga_ContentType doctype)
 {
 	static WebRequestContent::Type ar[] = {
 		WebRequestContent::Unknown,
@@ -460,5 +465,139 @@ WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype)
 	};
 	return ar[doctype];
 }
+
+namespace {
+template <class ResultType>
+bool serialize( papuga_Serialization* ser, const ResultType& result)
+{
+	return false;
+}
+template <>
+bool serialize<std::string>( papuga_Serialization* ser, const std::string& result)
+{
+	const char* str = papuga_Allocator_copy_string( ser->allocator, result.c_str(), result.size());
+	if (!str || !papuga_Serialization_pushValue_string( ser, str, result.size())) return false;
+	return true;
+}
+template <>
+bool serialize<std::vector<std::string> >( papuga_Serialization* ser, const std::vector<std::string>& result)
+{
+	if (!papuga_Serialization_pushOpen( ser)) return false;
+	std::vector<std::string>::const_iterator ri = result.begin(), re = result.end();
+	for (; ri != re; ++ri)
+	{
+		if (!serialize( ser, *ri)) return false;
+	}
+	if (!papuga_Serialization_pushClose( ser)) return false;
+	return true;
+}
+template <>
+bool serialize<std::map<std::string,std::string> >( papuga_Serialization* ser, const std::map<std::string, std::string>& result)
+{
+	if (!papuga_Serialization_pushOpen( ser)) return false;
+	std::map<std::string,std::string>::const_iterator ri = result.begin(), re = result.end();
+	for (; ri != re; ++ri)
+	{
+		const char* keystr = papuga_Allocator_copy_string( ser->allocator, ri->first.c_str(), ri->first.size());
+		if (!keystr || !papuga_Serialization_pushName_string( ser, keystr, ri->first.size())) return false;
+		if (!serialize( ser, ri->second)) return false;
+	}
+	if (!papuga_Serialization_pushClose( ser)) return false;
+	return true;
+}
+
+static void setAnswer( WebRequestAnswer& answer, ErrorOperation operation, ErrorCause cause, const char* errstr)
+{
+	int httpstatus = errorCauseToHttpStatus( cause);
+	answer.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, cause), errstr);
+}
+
+template <class ResultType>
+static bool mapResult(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const ResultType& input)
+{
+	papuga_ErrorCode errcode = papuga_Ok;
+	char* resultstr = 0;
+	std::size_t resultlen = 0;
+	papuga_RequestResult result;
+	papuga_ValueVariant value;
+	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( allocator);
+	if (!ser)
+	{
+		errcode = papuga_NoMemError;
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		return false;
+	}
+	serialize( ser, input);
+	papuga_init_ValueVariant_serialization( &value, ser);
+	if (!papuga_init_RequestResult_single( &result, allocator, rootname, elemname, strus::getBindingsInterfaceDescription()->structs, &value))
+	{
+		errcode = papuga_NoMemError;
+		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		return false;
+	}
+	// Map the result:
+	switch (doctype)
+	{
+		case papuga_ContentType_XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
+		case papuga_ContentType_JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
+		case papuga_ContentType_Unknown:
+		default: break;
+	}
+	if (resultstr)
+	{
+		WebRequestContent content( papuga_stringEncodingName( encoding), papuga_ContentType_mime(doctype), resultstr, resultlen);
+		answer.setContent( content);
+		return true;
+	}
+	else
+	{
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		return false;
+	}
+	return true;
+}
+}//namespace
+
+bool strus::mapStringToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* name,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const std::string& input)
+{
+	return mapResult( answer, allocator, 0, name, encoding, doctype, input);
+}
+
+bool strus::mapStringArrayToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const std::vector<std::string>& input)
+{
+	return mapResult( answer, allocator, rootname, elemname, encoding, doctype, input);
+}
+
+bool strus::mapStringMapToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* name,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const std::map<std::string,std::string>& input)
+{
+	return mapResult( answer, allocator, 0, name, encoding, doctype, input);
+}
+
 
 

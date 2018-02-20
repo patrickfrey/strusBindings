@@ -4,9 +4,9 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # SOURCES AND INCLUDES
 # --------------------------------------
 set( libstrus_webrequest_source_files
-	webRequestHandler.cpp
-	webRequestContext.cpp
 	webRequestUtils.cpp
+	webRequestContext.cpp
+	webRequestHandler.cpp
 )
 
 include_directories(

@@ -13,8 +13,11 @@
 #include "papuga/requestParser.h"
 #include "strus/errorCodes.hpp"
 #include "strus/webRequestContent.hpp"
+#include "strus/webRequestAnswer.hpp"
 #include <cstddef>
 #include <string>
+#include <vector>
+#include <map>
 
 namespace strus {
 
@@ -65,6 +68,51 @@ papuga_ContentType papugaContentType( WebRequestContent::Type doctype);
 // \return the correspoding web content type
 WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype);
 
+// \brief Map a string as content to an answer
+// \param[out] answer initialized answer object
+// \param[in] allocator allocator to use
+// \param[in] name name of the result
+// \param[in] encoding encoding of the result
+// \param[in] doctype content type of the result
+// \param[in] input input to map
+bool mapStringToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* name,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const std::string& input);
+
+// \brief Map a string vector as content to an answer
+// \param[out] answer initialized answer object
+// \param[in] allocator allocator to use
+// \param[in] name name of the result
+// \param[in] encoding encoding of the result
+// \param[in] doctype content type of the result
+// \param[in] input input to map
+bool mapStringArrayToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const std::vector<std::string>& input);
+
+// \brief Map a string to string map as content to an answer
+// \param[out] answer initialized answer object
+// \param[in] allocator allocator to use
+// \param[in] name name of the result
+// \param[in] encoding encoding of the result
+// \param[in] doctype content type of the result
+// \param[in] input input to map
+bool mapStringMapToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* name,
+		papuga_StringEncoding encoding,
+		papuga_ContentType doctype,
+		const std::map<std::string,std::string>& input);
 
 }//namespace
 #endif
