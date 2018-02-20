@@ -57,6 +57,7 @@ ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 		case papuga_HostObjectError:		return ErrorCauseHiddenError;
 		case papuga_AmbiguousReference:		return ErrorCauseBindingLanguageError;
 	}
+	return ErrorCauseUnknown;
 }
 
 int strus::errorCauseToHttpStatus( ErrorCause cause)
@@ -548,6 +549,10 @@ static bool mapResult(
 		case papuga_ContentType_XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
 		case papuga_ContentType_JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
 		case papuga_ContentType_Unknown:
+		{
+			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
+			return false;
+		}
 		default: break;
 	}
 	if (resultstr)

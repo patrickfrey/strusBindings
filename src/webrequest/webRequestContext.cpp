@@ -36,7 +36,7 @@
 
 using namespace strus;
 
-#undef STRUS_LOWLEVEL_DEBUG
+#define STRUS_LOWLEVEL_DEBUG
 
 WebRequestContext::WebRequestContext(
 		papuga_RequestHandler* handlerimpl,
@@ -260,6 +260,10 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		case papuga_ContentType_XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, m_result_encoding, &resultlen, &m_errcode); break;
 		case papuga_ContentType_JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, m_result_encoding, &resultlen, &m_errcode); break;
 		case papuga_ContentType_Unknown:
+		{
+			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
+			return false;
+		}
 		default: break;
 	}
 	if (resultstr)
@@ -276,13 +280,13 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	return true;
 }
 
-bool WebRequestContext::initContentRequest( const std::string& context, const std::string& schema)
+bool WebRequestContext::initContentRequest( const char* context, const char* schema)
 {
-	if (!papuga_init_RequestContext_child( &m_context, &m_allocator, m_handler, context.c_str(), &m_errcode))
+	if (!papuga_init_RequestContext_child( &m_context, &m_allocator, m_handler, context, &m_errcode))
 	{
 		return false;
 	}
-	m_atm = papuga_RequestHandler_get_schema( m_handler, m_context.type, schema.c_str(), &m_errcode);
+	m_atm = papuga_RequestHandler_get_schema( m_handler, m_context.type, schema, &m_errcode);
 	if (!m_atm)
 	{
 		return false;
@@ -315,13 +319,7 @@ bool WebRequestContext::addToHandler( WebRequestAnswer& answer, const char* cont
 
 bool WebRequestContext::mapArray( WebRequestAnswer& answer, const std::vector<std::string>& ar)
 {
-	if (!mapStringArrayToAnswer( answer, &m_allocator, "list", "elem", m_result_encoding, m_result_doctype, ar))
-	{
-		papuga_ErrorCode errcode = papuga_NoMemError;
-		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
-		return false;
-	}
-	return true;
+	return mapStringArrayToAnswer( answer, &m_allocator, "list", "elem", m_result_encoding, m_result_doctype, ar);
 }
 
 bool WebRequestContext::mapArray( WebRequestAnswer& answer, const char** ar)
@@ -429,7 +427,7 @@ bool WebRequestContext::executeContent( const std::string& context, const std::s
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::execute" << std::endl;
 #endif
-	return initContentRequest( context, schema)
+	return initContentRequest( context.c_str(), schema.c_str())
 	&&	feedContentRequest( answer, content)
 	&&	executeContentRequest( answer, content)
 	&&	getContentRequestResult( answer);
@@ -440,12 +438,12 @@ bool WebRequestContext::debugContent( const std::string& context, const std::str
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::debugContent" << std::endl;
 #endif
-	return initContentRequest( context, schema)
+	return initContentRequest( context.c_str(), schema.c_str())
 	&&	feedContentRequest( answer, content)
 	&&	debugContentRequest( answer);
 }
 
-bool WebRequestContext::executeConfig( const std::string& srcContextName, const std::string& schema, const char* contextType, const char* contextName, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeConfig( const char* srcContextName, const char* schema, const char* contextType, const char* contextName, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 #ifdef STRUS_LOWLEVEL_DEBUG
 	std::cerr << "call WebRequestContext::executeConfig" << std::endl;

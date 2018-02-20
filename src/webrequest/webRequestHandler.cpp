@@ -159,7 +159,7 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	if (errmsg)
 	{
 		char errbuf[ 1024];
-		if (sizeof(errbuf) >= std::snprintf( errbuf, sizeof(errbuf), "%s, %s", errmsg, errstr))
+		if ((int)sizeof(errbuf) >= std::snprintf( errbuf, sizeof(errbuf), "%s, %s", errmsg, errstr))
 		{
 			errbuf[ sizeof(errbuf)-1] = 0;
 		}
@@ -215,9 +215,10 @@ bool WebRequestHandler::loadConfiguration(
 #endif
 		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
+		WebRequestContext* ctxi = ctx.get();
 	
 		strus::unique_lock lock( m_mutex);
-		return ctx->executeConfig( srcContextName, schema, destContextType, destContextName, content, status);
+		return ctxi->executeConfig( srcContextName, schema, destContextType, destContextName, content, status);
 	}
 	catch (...)
 	{

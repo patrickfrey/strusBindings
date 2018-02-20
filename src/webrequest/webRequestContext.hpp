@@ -50,10 +50,10 @@ public:
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	bool executeConfig( const std::string& srcContextName, const std::string& schema, const char* destContextType, const char* destContextName, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeConfig( const char* srcContextName, const char* schema, const char* destContextType, const char* destContextName, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
-	bool initContentRequest( const std::string& context, const std::string& schema);
+	bool initContentRequest( const char* context, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool debugContentRequest( WebRequestAnswer& answer);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
