@@ -18,9 +18,9 @@
 /// \brief strus toplevel namespace
 using namespace strus;
 
-DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger)
+DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head)
 {
-	return new (std::nothrow) WebRequestHandler( logger);
+	return new (std::nothrow) WebRequestHandler( logger, html_head);
 }
 
 DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, char* destbuf, std::size_t destbufsize,  std::size_t& length, const char* src, std::size_t srcsize)

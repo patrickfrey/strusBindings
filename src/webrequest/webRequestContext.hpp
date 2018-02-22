@@ -18,13 +18,16 @@
 namespace strus
 {
 
+/// \brief Forward declaration
+class WebRequestHandler;
+
 /// \brief Implementation of the interface for executing an XML/JSON request on the strus bindings
 class WebRequestContext
 	:public WebRequestContextInterface
 {
 public:
 	WebRequestContext(
-		papuga_RequestHandler* handlerimpl,
+		const WebRequestHandler* handler_,
 		const char* accepted_charset,
 		const char* accepted_doctype);
 	virtual ~WebRequestContext();
@@ -50,28 +53,22 @@ public:
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	bool executeConfig( const char* srcContextName, const char* schema, const char* destContextType, const char* destContextName, const WebRequestContent& content, WebRequestAnswer& answer);
+	papuga_RequestContext* impl()			{return &m_context;}
 
 private:
 	bool initContentRequest( const char* context, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool debugContentRequest( WebRequestAnswer& answer);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
-	bool setResultContentType( WebRequestAnswer& answer);
+	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	bool getContentRequestResult( WebRequestAnswer& answer);
-
-	/// \brief Transfer this context with a name to the request handler
-	bool addToHandler( WebRequestAnswer& answer, const char* contextName, const char* schemaPrefix);
 
 	bool callListMethod( papuga_ValueVariant* obj, WebRequestAnswer& answer) const;
 	bool callViewMethod( papuga_ValueVariant* obj, WebRequestAnswer& answer) const;
 
-	bool mapArray( WebRequestAnswer& answer, const std::vector<std::string>& ar);
-	bool mapArray( WebRequestAnswer& answer, const char** ar);
-
 private:
+	const WebRequestHandler* m_handler;
 	papuga_Allocator m_allocator;
-	papuga_RequestHandler* m_handler;
 	papuga_RequestContext m_context;
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
@@ -79,7 +76,7 @@ private:
 	const char* m_doctypestr;
 	const papuga_RequestAutomaton* m_atm;
 	papuga_StringEncoding m_result_encoding;
-	papuga_ContentType m_result_doctype;
+	WebRequestContent::Type m_result_doctype;
 	papuga_ErrorCode m_errcode;
 	papuga_ErrorBuffer m_errbuf;
 	const char* m_accepted_charset;

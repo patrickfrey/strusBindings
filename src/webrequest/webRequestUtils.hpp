@@ -78,9 +78,10 @@ WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype)
 bool mapStringToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* name,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const std::string& input);
 
 // \brief Map a string vector as content to an answer
@@ -93,11 +94,29 @@ bool mapStringToAnswer(
 bool mapStringArrayToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const std::vector<std::string>& input);
+
+// \brief Map a NULL terminated C string array as content to an answer
+// \param[out] answer initialized answer object
+// \param[in] allocator allocator to use
+// \param[in] name name of the result
+// \param[in] encoding encoding of the result
+// \param[in] doctype content type of the result
+// \param[in] input input to map
+bool mapStringArrayToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* html_head,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		WebRequestContent::Type doctype,
+		const char** input);
 
 // \brief Map a string to string map as content to an answer
 // \param[out] answer initialized answer object
@@ -109,9 +128,10 @@ bool mapStringArrayToAnswer(
 bool mapStringMapToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* name,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const std::map<std::string,std::string>& input);
 
 }//namespace

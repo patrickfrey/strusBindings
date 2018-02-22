@@ -506,6 +506,20 @@ bool serialize<std::map<std::string,std::string> >( papuga_Serialization* ser, c
 	if (!papuga_Serialization_pushClose( ser)) return false;
 	return true;
 }
+typedef const char** CStringArray;
+template <>
+bool serialize<CStringArray>( papuga_Serialization* ser, const CStringArray& result)
+{
+	if (!papuga_Serialization_pushOpen( ser)) return false;
+	char const** ri = result;
+	for (; *ri; ++ri)
+	{
+		const char* str = papuga_Allocator_copy_charp( ser->allocator, *ri);
+		if (!str || !papuga_Serialization_pushValue_charp( ser, str)) return false;
+	}
+	if (!papuga_Serialization_pushClose( ser)) return false;
+	return true;
+}
 
 static void setAnswer( WebRequestAnswer& answer, ErrorOperation operation, ErrorCause cause, const char* errstr)
 {
@@ -517,10 +531,11 @@ template <class ResultType>
 static bool mapResult(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const ResultType& input)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
@@ -546,9 +561,11 @@ static bool mapResult(
 	// Map the result:
 	switch (doctype)
 	{
-		case papuga_ContentType_XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
-		case papuga_ContentType_JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
-		case papuga_ContentType_Unknown:
+		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
+		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, encoding, html_head, &resultlen, &errcode); break;
+		case WebRequestContent::TEXT:
+		case WebRequestContent::Unknown:
 		{
 			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
 			return false;
@@ -557,7 +574,7 @@ static bool mapResult(
 	}
 	if (resultstr)
 	{
-		WebRequestContent content( papuga_stringEncodingName( encoding), papuga_ContentType_mime(doctype), resultstr, resultlen);
+		WebRequestContent content( papuga_stringEncodingName( encoding), WebRequestContent::typeMime(doctype), resultstr, resultlen);
 		answer.setContent( content);
 		return true;
 	}
@@ -573,36 +590,51 @@ static bool mapResult(
 bool strus::mapStringToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* name,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const std::string& input)
 {
-	return mapResult( answer, allocator, 0, name, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, 0, name, encoding, doctype, input);
 }
 
 bool strus::mapStringArrayToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const std::vector<std::string>& input)
 {
-	return mapResult( answer, allocator, rootname, elemname, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, rootname, elemname, encoding, doctype, input);
 }
 
 bool strus::mapStringMapToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
+		const char* html_head,
 		const char* name,
 		papuga_StringEncoding encoding,
-		papuga_ContentType doctype,
+		WebRequestContent::Type doctype,
 		const std::map<std::string,std::string>& input)
 {
-	return mapResult( answer, allocator, 0, name, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, 0, name, encoding, doctype, input);
 }
 
+bool strus::mapStringArrayToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* html_head,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		WebRequestContent::Type doctype,
+		const char** input)
+{
+	return mapResult( answer, allocator, html_head, rootname, elemname, encoding, doctype, input);
+}
 
 

@@ -121,7 +121,10 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	va_end( arguments);
 }
 
-WebRequestHandler::WebRequestHandler( WebRequestLoggerInterface* logger_)
+WebRequestHandler::WebRequestHandler(
+		WebRequestLoggerInterface* logger_,
+		const std::string& html_head_)
+	:m_html_head(html_head_)
 {
 	std::memset( &m_logger, 0, sizeof(m_logger));
 	m_logger.self = logger_;
@@ -175,7 +178,7 @@ WebRequestContext* WebRequestHandler::createContext_( const char* accepted_chars
 {
 	try
 	{
-		return new WebRequestContext( m_impl, accepted_charset, accepted_doctype);
+		return new WebRequestContext( this, accepted_charset, accepted_doctype);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -218,7 +221,30 @@ bool WebRequestHandler::loadConfiguration(
 		WebRequestContext* ctxi = ctx.get();
 	
 		strus::unique_lock lock( m_mutex);
-		return ctxi->executeConfig( srcContextName, schema, destContextType, destContextName, content, status);
+		if (ctxi->executeContent( srcContextName, schema, content, status))
+		{
+			papuga_RequestContext* ctximpl = ctx->impl();
+			papuga_ErrorCode errcode = papuga_Ok;
+
+			if (destContextType && !papuga_RequestContext_set_type( ctximpl, destContextType))
+			{
+				errcode = papuga_NoMemError;
+				setStatus( status, ErrorOperationBuildData, errcode);
+				return false;
+			}
+			if (!papuga_RequestHandler_add_context( m_impl, destContextName, ctximpl, &errcode))
+			{
+				char buf[ 1024];
+				std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), destContextType, destContextName);
+				setStatus( status, ErrorOperationBuildData, errcode, buf);
+				return false;
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	catch (...)
 	{

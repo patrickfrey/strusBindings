@@ -27,7 +27,9 @@ class WebRequestHandler
 	:public WebRequestHandlerInterface
 {
 public:
-	explicit WebRequestHandler( WebRequestLoggerInterface* logger_);
+	WebRequestHandler( 
+			WebRequestLoggerInterface* logger_,
+			const std::string& html_head_);
 	virtual ~WebRequestHandler();
 
 	virtual bool hasSchema( const char* context, const char* schema) const;
@@ -45,6 +47,10 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& status);
 
+public:/*WebRequestContext*/
+	const papuga_RequestHandler* impl() const	{return m_impl;}
+	const char* html_head() const			{return m_html_head.c_str();}
+
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
 
@@ -52,6 +58,7 @@ private:
 	strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
 	papuga_RequestLogger m_logger;		//< request logger
 	papuga_RequestHandler* m_impl;		//< request handler
+	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 };
 
 }//namespace
