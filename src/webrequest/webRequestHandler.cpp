@@ -162,7 +162,7 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papug
 	if (errmsg)
 	{
 		char errbuf[ 1024];
-		if ((int)sizeof(errbuf) >= std::snprintf( errbuf, sizeof(errbuf), "%s, %s", errmsg, errstr))
+		if ((int)sizeof(errbuf)-1 >= std::snprintf( errbuf, sizeof(errbuf), "%s, %s", errmsg, errstr))
 		{
 			errbuf[ sizeof(errbuf)-1] = 0;
 		}

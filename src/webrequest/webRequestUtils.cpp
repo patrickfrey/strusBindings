@@ -469,55 +469,55 @@ WebRequestContent::Type strus::papugaTranslatedContentType( papuga_ContentType d
 
 namespace {
 template <class ResultType>
-bool serialize( papuga_Serialization* ser, const ResultType& result)
+bool serialize( papuga_Serialization* ser, bool start, const ResultType& result)
 {
 	return false;
 }
 template <>
-bool serialize<std::string>( papuga_Serialization* ser, const std::string& result)
+bool serialize<std::string>( papuga_Serialization* ser, bool start, const std::string& result)
 {
 	const char* str = papuga_Allocator_copy_string( ser->allocator, result.c_str(), result.size());
 	if (!str || !papuga_Serialization_pushValue_string( ser, str, result.size())) return false;
 	return true;
 }
 template <>
-bool serialize<std::vector<std::string> >( papuga_Serialization* ser, const std::vector<std::string>& result)
+bool serialize<std::vector<std::string> >( papuga_Serialization* ser, bool start, const std::vector<std::string>& result)
 {
-	if (!papuga_Serialization_pushOpen( ser)) return false;
+	if (!start && !papuga_Serialization_pushOpen( ser)) return false;
 	std::vector<std::string>::const_iterator ri = result.begin(), re = result.end();
 	for (; ri != re; ++ri)
 	{
-		if (!serialize( ser, *ri)) return false;
+		if (!serialize( ser, false, *ri)) return false;
 	}
-	if (!papuga_Serialization_pushClose( ser)) return false;
+	if (!start && !papuga_Serialization_pushClose( ser)) return false;
 	return true;
 }
 template <>
-bool serialize<std::map<std::string,std::string> >( papuga_Serialization* ser, const std::map<std::string, std::string>& result)
+bool serialize<std::map<std::string,std::string> >( papuga_Serialization* ser, bool start, const std::map<std::string, std::string>& result)
 {
-	if (!papuga_Serialization_pushOpen( ser)) return false;
+	if (!start && !papuga_Serialization_pushOpen( ser)) return false;
 	std::map<std::string,std::string>::const_iterator ri = result.begin(), re = result.end();
 	for (; ri != re; ++ri)
 	{
 		const char* keystr = papuga_Allocator_copy_string( ser->allocator, ri->first.c_str(), ri->first.size());
 		if (!keystr || !papuga_Serialization_pushName_string( ser, keystr, ri->first.size())) return false;
-		if (!serialize( ser, ri->second)) return false;
+		if (!serialize( ser, false, ri->second)) return false;
 	}
-	if (!papuga_Serialization_pushClose( ser)) return false;
+	if (!start && !papuga_Serialization_pushClose( ser)) return false;
 	return true;
 }
 typedef const char** CStringArray;
 template <>
-bool serialize<CStringArray>( papuga_Serialization* ser, const CStringArray& result)
+bool serialize<CStringArray>( papuga_Serialization* ser, bool start, const CStringArray& result)
 {
-	if (!papuga_Serialization_pushOpen( ser)) return false;
+	if (!start && !papuga_Serialization_pushOpen( ser)) return false;
 	char const** ri = result;
 	for (; *ri; ++ri)
 	{
 		const char* str = papuga_Allocator_copy_charp( ser->allocator, *ri);
 		if (!str || !papuga_Serialization_pushValue_charp( ser, str)) return false;
 	}
-	if (!papuga_Serialization_pushClose( ser)) return false;
+	if (!start && !papuga_Serialization_pushClose( ser)) return false;
 	return true;
 }
 
@@ -550,7 +550,7 @@ static bool mapResult(
 		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
-	serialize( ser, input);
+	serialize( ser, true, input);
 	papuga_init_ValueVariant_serialization( &value, ser);
 	if (!papuga_init_RequestResult_single( &result, allocator, rootname, elemname, strus::getBindingsInterfaceDescription()->structs, &value))
 	{
@@ -564,7 +564,7 @@ static bool mapResult(
 		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
 		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
 		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, encoding, html_head, &resultlen, &errcode); break;
-		case WebRequestContent::TEXT:
+		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, encoding, &resultlen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{
 			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));

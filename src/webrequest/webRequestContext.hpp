@@ -33,23 +33,23 @@ public:
 	virtual ~WebRequestContext();
 
 	virtual bool executeContent(
-			const std::string& context,
-			const std::string& schema,
+			const char* context,
+			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
 	virtual bool debugContent(
-			const std::string& context,
-			const std::string& schema,
+			const char* context,
+			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
 	virtual bool executeList(
-			const std::vector<std::string>& path,
+			const char* path_,
 			WebRequestAnswer& answer);
 
 	virtual bool executeView(
-			const std::vector<std::string>& path,
+			const char* path_,
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/

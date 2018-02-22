@@ -248,7 +248,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, m_result_encoding, &resultlen, &m_errcode); break;
 		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, m_result_encoding, &resultlen, &m_errcode); break;
 		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, m_result_encoding, m_handler->html_head(), &resultlen, &m_errcode); break;
-		case WebRequestContent::TEXT:
+		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, m_result_encoding, &resultlen, &m_errcode); break;
 		case WebRequestContent::Unknown:
 		{
 			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
@@ -289,20 +289,50 @@ bool WebRequestContext::initContentRequest( const char* context, const char* sch
 	return true;
 }
 
+class PathBuf
+{
+public:
+	PathBuf( const char* pt)
+	{
+		if ((int)sizeof(buf)-1 <= std::snprintf( buf, sizeof(buf), "%s", pt)) throw std::bad_alloc();
+		itr = buf;
+	}
+
+	const char* getNext()
+	{
+		if (!itr[0]) return 0;
+		char const* rt = itr;
+		char* itrnext = std::strchr( itr, '/');
+		if (itrnext)
+		{
+			*itrnext = 0;
+			itr = itrnext+1;
+		}
+		else
+		{
+			itr = std::strchr( itr, '\0');
+		}
+		return rt;
+	}
+
+private:
+	char* itr;
+	char buf[ 2048];
+};
+
 bool WebRequestContext::executeList(
-		const std::vector<std::string>& path,
+		const char* path_,
 		WebRequestAnswer& answer)
 {
 	try
 	{
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
+		PathBuf path( path_);
 
-		std::vector<std::string> list;
 		enum {lstbufsize=256};
 		char const* lstbuf[ lstbufsize];
-		std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
-
-		if (pi == pe)
+		const char* pathelem = path.getNext();
+		if (!pathelem)
 		{
 			char const** ti = papuga_RequestHandler_list_context_types( m_handler->impl(), lstbuf, lstbufsize);
 			if (!ti)
@@ -315,15 +345,15 @@ bool WebRequestContext::executeList(
 		}
 		else
 		{
-			char const** ci = papuga_RequestHandler_list_contexts( m_handler->impl(), pi->c_str(), lstbuf, lstbufsize);
+			char const** ci = papuga_RequestHandler_list_contexts( m_handler->impl(), pathelem, lstbuf, lstbufsize);
 			if (!ci)
 			{
 				papuga_ErrorCode errcode = papuga_BufferOverflowError;
 				setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
 				return false;
 			}
-			++pi;
-			if (pi == pe)
+			pathelem = path.getNext();
+			if (!pathelem)
 			{
 				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, ci);
 			}
@@ -331,13 +361,13 @@ bool WebRequestContext::executeList(
 			{
 				papuga_ErrorCode errcode = papuga_Ok;
 				papuga_RequestContext context;
-				if (!papuga_init_RequestContext_child( &context, &m_allocator, m_handler->impl(), pi->c_str(), &errcode))
+				if (!papuga_init_RequestContext_child( &context, &m_allocator, m_handler->impl(), pathelem, &errcode))
 				{
 					setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
 					return false;
 				}
-				++pi;
-				if (pi == pe)
+				pathelem = path.getNext();
+				if (!pathelem)
 				{
 					const char** vi = papuga_RequestContext_list_variables( &context, lstbuf, lstbufsize);
 					if (!vi)
@@ -368,27 +398,27 @@ bool WebRequestContext::executeList(
 }
 
 bool WebRequestContext::executeView(
-		const std::vector<std::string>& path,
+		const char* path_,
 		WebRequestAnswer& answer)
 {
 	if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
+	PathBuf path( path_);
 	return false;
 }
 
-bool WebRequestContext::executeContent( const std::string& context, const std::string& schema, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeContent( const char* context, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return initContentRequest( context.c_str(), schema.c_str())
+	return initContentRequest( context, schema)
 	&&	feedContentRequest( answer, content)
 	&&	executeContentRequest( answer, content)
 	&&	getContentRequestResult( answer);
 }
 
-bool WebRequestContext::debugContent( const std::string& context, const std::string& schema, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::debugContent( const char* context, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return initContentRequest( context.c_str(), schema.c_str())
+	return initContentRequest( context, schema)
 	&&	feedContentRequest( answer, content)
 	&&	debugContentRequest( answer);
 }
-
 
 

@@ -12,8 +12,6 @@
 #include "strus/webRequestAnswer.hpp"
 #include "strus/webRequestContent.hpp"
 #include <cstddef>
-#include <string>
-#include <vector>
 
 namespace strus
 {
@@ -32,8 +30,8 @@ public:
 	/// \param[out] answer the data of the answer of the request
 	/// \return bool if succeeded, false else
 	virtual bool executeContent(
-			const std::string& context,
-			const std::string& schema,
+			const char* context,
+			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
@@ -44,8 +42,8 @@ public:
 	/// \param[out] answer the data of the answer of the request
 	/// \return bool if request succeeded, false else
 	virtual bool debugContent(
-			const std::string& context,
-			const std::string& schema,
+			const char* context,
+			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
@@ -53,14 +51,14 @@ public:
 	/// \param[in] path path of the object to list contents
 	/// \return bool if succeeded, false else
 	virtual bool executeList(
-			const std::vector<std::string>& path,
+			const char* path,
 			WebRequestAnswer& answer)=0;
 
 	/// \brief Execute a view command for introspection defined by a path (URL)
 	/// \param[in] path path of the object to view content
 	/// \return bool if succeeded, false else
 	virtual bool executeView(
-			const std::vector<std::string>& path,
+			const char* path,
 			WebRequestAnswer& answer)=0;
 };
 
