@@ -167,19 +167,15 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 	if (!papuga_RequestContext_execute_request( &m_context, m_request, &m_errbuf, &errpos))
 	{
 		errcode = papuga_HostObjectError;
-		const char* errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
+		char* errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
 
-		int lastapperr = 0;
+		int apperr = 0;
 		if (errmsg)
 		{
 			// Exract last error code and remove error codes from app error message:
 			char const* errmsgitr = errmsg;
-			int apperr = strus::errorCodeFromMessage( errmsgitr);
-			lastapperr = apperr;
-			if (0 <= apperr) while (0 <= (apperr = strus::errorCodeFromMessage( errmsgitr)))
-			{
-				if (apperr > 0) lastapperr = apperr;
-			}
+			apperr = strus::errorCodeFromMessage( errmsgitr);
+
 			// Add position info (scope of error in input) to error message, if available:
 			if (errpos >= 0)
 			{
@@ -192,24 +188,12 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 					errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
 				}
 			}
-			if (lastapperr)
-			{
-				char* errmsgptr = papuga_ErrorBuffer_lastError(&m_errbuf);
-				removeErrorCodesFromMessage( errmsgptr);
-				errmsg = errmsgptr;
-			}
+			if (apperr) removeErrorCodesFromMessage( errmsg);
+			setAnswer( answer, apperr, errmsg);
 		}
 		else
 		{
-			errmsg = papuga_ErrorCode_tostring( errcode);
-		}
-		if (lastapperr >= 0)
-		{
-			setAnswer( answer, lastapperr, errmsg);
-		}
-		else
-		{
-			setAnswer( answer, ErrorOperationCallIndirection, papugaErrorToErrorCause( errcode), errmsg);
+			setAnswer( answer, ErrorOperationCallIndirection, papugaErrorToErrorCause( errcode));
 		}
 		return false;
 	}
@@ -383,7 +367,12 @@ bool WebRequestContext::callMethod( void* self, const papuga_RequestMethodId& mi
 	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
 	if (!(*method)( self, &retval, 1/*argc*/, &argv))
 	{
-		setAnswer( answer, ErrorOperationCallIndirection, ErrorCauseRuntimeError, papuga_CallResult_lastError( &retval), true);
+		char* errstr = papuga_CallResult_lastError( &retval);
+		char const* msgitr = errstr;
+		int apperr = strus::errorCodeFromMessage( msgitr);
+		if (apperr) strus::removeErrorCodesFromMessage( errstr);
+
+		setAnswer( answer, apperr, errstr);
 		return false;
 	}
 	if (retval.nofvalues == 0)
