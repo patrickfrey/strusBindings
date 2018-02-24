@@ -448,10 +448,7 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool determin
 IntrospectionBase* ContextImpl::createIntrospectionContext( const ValueVariant& arg)
 {
 	std::vector<std::string> path;
-	if (!papuga_ValueVariant_defined( &arg))
-	{
-	}
-	else if (arg.valuetype != papuga_TypeSerialization)
+	if (papuga_ValueVariant_defined( &arg))
 	{
 		path = Deserializer::getStringList( arg);
 	}
@@ -467,6 +464,11 @@ IntrospectionBase* ContextImpl::createIntrospectionContext( const ValueVariant& 
 	for (; pi != pe; ++pi)
 	{
 		ictx.reset( ictx->open( *pi));
+		if (!ictx.get())
+		{
+			throw strus::runtime_error( *ErrorCode( StrusComponentBindings, ErrorOperationCallIndirection, ErrorCauseRequestResolveError),
+						_TXT("failed to create introspection context"));
+		}
 	}
 	return ictx.release();
 }

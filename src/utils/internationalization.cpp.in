@@ -16,14 +16,42 @@
 #define STRUS_GETTEXT_PACKAGE		"@STRUS_GETTEXT_PACKAGE@"
 #define STRUS_GETTEXT_LOCALEDIR		"@STRUS_GETTEXT_LOCALEDIR@"
 
+enum {MsgBufSize=4096};
+
 std::runtime_error strus::runtime_error( const char* format, ...)
 {
-	char buffer[ 1024];
+	char buffer[ MsgBufSize];
 	va_list args;
 	va_start( args, format);
 	const char* formatTranslation = ::dgettext( STRUS_GETTEXT_PACKAGE, format);
-	int buffersize = vsnprintf( buffer, sizeof(buffer), formatTranslation, args);
-	buffer[ sizeof(buffer)-1] = 0;
+	std::size_t buffersize = vsnprintf( buffer, sizeof(buffer), formatTranslation, args);
+	if (buffersize > sizeof(buffer))
+	{
+		buffer[ sizeof(buffer)-1] = 0;
+		buffersize = sizeof(buffer)-1;
+	}
+	std::runtime_error rt( std::string( buffer, buffersize));
+	va_end (args);
+	return rt;
+}
+
+std::runtime_error strus::runtime_error( int apperrno, const char* format, ...)
+{
+	char buffer[ MsgBufSize];
+	std::size_t hdrlen = 0;
+	if (apperrno)
+	{
+		hdrlen = std::snprintf( buffer, sizeof(buffer), "[#%d] ", apperrno);
+	}
+	va_list args;
+	va_start( args, format);
+	const char* formatTranslation = ::dgettext( STRUS_GETTEXT_PACKAGE, format);
+	std::size_t buffersize = vsnprintf( buffer+hdrlen, sizeof(buffer)-hdrlen, formatTranslation, args);
+	if (buffersize > sizeof(buffer))
+	{
+		buffer[ sizeof(buffer)-1] = 0;
+		buffersize = sizeof(buffer)-1;
+	}
 	std::runtime_error rt( std::string( buffer, buffersize));
 	va_end (args);
 	return rt;
