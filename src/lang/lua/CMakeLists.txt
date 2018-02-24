@@ -65,6 +65,8 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/lang/lua/luaBindingsDoc.js  ${CMAKE_BI
 # ------------------------------
 # LIBRARIES
 # ------------------------------
+add_cppcheck( strus_bindings_lua  libstrus_bindings_lua.c strusLua.c )
+
 add_library( strus_bindings_lua SHARED libstrus_bindings_lua.c )
 add_dependencies( strus_bindings_lua lua_mod )
 target_link_libraries( strus_bindings_lua papuga_devel papuga_lua_dev strus_bindings papuga_lua ${Intl_LIBRARIES} )

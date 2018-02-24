@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # --------------------------------------
 # SOURCES AND INCLUDES
 # --------------------------------------
-set( libstrus_webrequest_source_files
+set( source_files
 	webRequestUtils.cpp
 	webRequestContext.cpp
 	webRequestHandler.cpp
@@ -39,7 +39,9 @@ link_directories(
 # ------------------------------
 # LIBRARY
 # ------------------------------
-add_library( strus_webrequest_static STATIC ${libstrus_webrequest_source_files} )
+add_cppcheck( strus_webrequest ${source_files}  libstrus_webrequest.cpp )
+
+add_library( strus_webrequest_static STATIC ${source_files} )
 target_link_libraries( strus_webrequest_static strus_base strus_bindings strus_bindings_description strusbindings_private_utils papuga_request_devel )
 
 add_library( strus_webrequest SHARED libstrus_webrequest.cpp )

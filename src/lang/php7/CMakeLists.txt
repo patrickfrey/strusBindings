@@ -80,6 +80,8 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/lang/php7/phpBindingsDoc.js  ${CMAKE_B
 # ------------------------------
 # LIBRARIES
 # ------------------------------
+add_cppcheck( strus_bindings_php7  strus.c  )
+
 add_library( strus_bindings_php7 MODULE strus.c )
 add_dependencies( strus_bindings_php7 php7_mod )
 target_link_libraries( strus_bindings_php7 papuga_devel papuga_php7_dev strus_bindings ${Intl_LIBRARIES} )

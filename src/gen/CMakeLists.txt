@@ -64,6 +64,8 @@ add_custom_command(
 # ------------------------------
 # PROGRAMS
 # ------------------------------
+add_cppcheck( strusBindingsModuleGen strusBindingsModuleGen.cpp )
+
 IF (WITH_PHP STREQUAL "YES")
 set( PHP7_GEN_LIBS  papuga_php7_gen )
 ENDIF (WITH_PHP STREQUAL "YES")

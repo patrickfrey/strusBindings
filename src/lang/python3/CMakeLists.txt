@@ -68,6 +68,8 @@ add_custom_target(
     DEPENDS strus.c ${CMAKE_CURRENT_BINARY_DIR}/strusdoc.py papuga_python3_gen ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.htm ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.css ${CMAKE_BINARY_DIR}/doc/pythonBindingsDoc.js 
 )
 
+add_cppcheck( strus_bindings_python3 strus.c  )
+
 add_library( strus_bindings_python3 MODULE strus.c )
 add_dependencies( strus_bindings_python3 python3_mod )
 set_target_properties( strus_bindings_python3 PROPERTIES 

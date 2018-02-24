@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 # --------------------------------------
 # SOURCES AND INCLUDES
 # --------------------------------------
-set( bindings_source_files
+set( source_files
 	expressionBuilder.cpp
 	patternMatcherLoader.cpp
 	structNameMap.cpp
@@ -68,7 +68,10 @@ link_directories(
 # ------------------------------
 # LIBRARIES
 # ------------------------------
-add_library( strus_bindings SHARED ${bindings_source_files} )
+add_cppcheck( strus_bindings  ${source_files} )
+add_cppcheck( strus_bindings_description  ${CMAKE_CURRENT_BINARY_DIR}/libstrus_bindings_description.cpp )
+
+add_library( strus_bindings SHARED ${source_files} )
 add_dependencies( strus_bindings  strus_bindings_c_interface )
 target_link_libraries( strus_bindings strusbindings_private_utils strus_base strus_error papuga_devel strus_storage_objbuild strus_analyzer_objbuild strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket ${Intl_LIBRARIES} )
 
