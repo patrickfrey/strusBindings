@@ -134,6 +134,22 @@ bool mapStringMapToAnswer(
 		WebRequestContent::Type doctype,
 		const std::map<std::string,std::string>& input);
 
+// \brief Map a value variant to an answer
+// \param[out] answer initialized answer object
+// \param[in] name name of the result
+// \param[in] encoding encoding of the result
+// \param[in] doctype content type of the result
+// \param[in] input input to map
+bool mapValueVariantToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* html_head,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		WebRequestContent::Type doctype,
+		const papuga_ValueVariant& input);
+
 }//namespace
 #endif
 

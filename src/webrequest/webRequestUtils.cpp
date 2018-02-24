@@ -44,7 +44,7 @@ ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 		case papuga_InvalidAccess:		return ErrorCauseBindingLanguageError;
 		case papuga_UnexpectedEof:		return ErrorCauseUnexpectedEof;
 		case papuga_NotImplemented:		return ErrorCauseNotImplemented;
-		case papuga_ValueUndefined:		return ErrorCauseBindingLanguageError;
+		case papuga_ValueUndefined:		return ErrorCauseIncompleteDefinition;
 		case papuga_MixedConstruction:		return ErrorCauseBindingLanguageError;
 		case papuga_DuplicateDefinition:	return ErrorCauseBindingLanguageError;
 		case papuga_SyntaxError:		return ErrorCauseInputFormat;
@@ -53,7 +53,7 @@ ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 		case papuga_AtomicValueExpected:	return ErrorCauseBindingLanguageError;
 		case papuga_NotAllowed:			return ErrorCauseNotAllowed;
 		case papuga_IteratorFailed:		return ErrorCauseHiddenError;
-		case papuga_AddressedItemNotFound:	return ErrorCauseBindingLanguageError;
+		case papuga_AddressedItemNotFound:	return ErrorCauseRequestResolveError;
 		case papuga_HostObjectError:		return ErrorCauseHiddenError;
 		case papuga_AmbiguousReference:		return ErrorCauseBindingLanguageError;
 	}
@@ -96,10 +96,12 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 		case ErrorCauseMaxNofItemsExceeded: return 500 /*Internal Server Error*/;
 		case ErrorCauseRuntimeError: return 500 /*Internal Server Error*/;
 		case ErrorCauseIncompleteRequest: return 400 /*Bad Request*/;
+		case ErrorCauseIncompleteResult: return 500 /*Internal Server Error*/;
 		case ErrorCauseUnexpectedEof: return 400 /*Bad Request*/;
 		case ErrorCauseHiddenError: return 500 /*Internal Server Error*/;
 		case ErrorCauseInputFormat: return 400 /*Bad Request*/;
 		case ErrorCauseEncoding: return 400 /*Bad Request*/;
+		case ErrorCauseRequestResolveError: return 404 /*Not found*/;
 	}
 	return 500 /*Internal Server Error*/;
 }
@@ -539,9 +541,6 @@ static bool mapResult(
 		const ResultType& input)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
-	char* resultstr = 0;
-	std::size_t resultlen = 0;
-	papuga_RequestResult result;
 	papuga_ValueVariant value;
 	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( allocator);
 	if (!ser)
@@ -552,38 +551,7 @@ static bool mapResult(
 	}
 	serialize( ser, true, input);
 	papuga_init_ValueVariant_serialization( &value, ser);
-	if (!papuga_init_RequestResult_single( &result, allocator, rootname, elemname, strus::getBindingsInterfaceDescription()->structs, &value))
-	{
-		errcode = papuga_NoMemError;
-		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
-		return false;
-	}
-	// Map the result:
-	switch (doctype)
-	{
-		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, encoding, html_head, &resultlen, &errcode); break;
-		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, encoding, &resultlen, &errcode); break;
-		case WebRequestContent::Unknown:
-		{
-			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
-			return false;
-		}
-		default: break;
-	}
-	if (resultstr)
-	{
-		WebRequestContent content( papuga_stringEncodingName( encoding), WebRequestContent::typeMime(doctype), resultstr, resultlen);
-		answer.setContent( content);
-		return true;
-	}
-	else
-	{
-		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
-		return false;
-	}
-	return true;
+	return strus::mapValueVariantToAnswer( answer, allocator, html_head, rootname, elemname, encoding, doctype, value);
 }
 }//namespace
 
@@ -637,4 +605,51 @@ bool strus::mapStringArrayToAnswer(
 	return mapResult( answer, allocator, html_head, rootname, elemname, encoding, doctype, input);
 }
 
+bool strus::mapValueVariantToAnswer(
+		WebRequestAnswer& answer,
+		papuga_Allocator* allocator,
+		const char* html_head,
+		const char* rootname,
+		const char* elemname,
+		papuga_StringEncoding encoding,
+		WebRequestContent::Type doctype,
+		const papuga_ValueVariant& value)
+{
+	papuga_ErrorCode errcode = papuga_Ok;
+	char* resultstr = 0;
+	std::size_t resultlen = 0;
+	papuga_RequestResult result;
+	if (!papuga_init_RequestResult_single( &result, allocator, rootname, elemname, strus::getBindingsInterfaceDescription()->structs, &value))
+	{
+		errcode = papuga_NoMemError;
+		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		return false;
+	}
+	// Map the result:
+	switch (doctype)
+	{
+		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
+		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, encoding, html_head, &resultlen, &errcode); break;
+		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, encoding, &resultlen, &errcode); break;
+		case WebRequestContent::Unknown:
+		{
+			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
+			return false;
+		}
+		default: break;
+	}
+	if (resultstr)
+	{
+		WebRequestContent content( papuga_stringEncodingName( encoding), WebRequestContent::typeMime(doctype), resultstr, resultlen);
+		answer.setContent( content);
+		return true;
+	}
+	else
+	{
+		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		return false;
+	}
+	return true;
+}
 

@@ -2,10 +2,7 @@ Fix CodeProject Articles
 Delete unused Docker images
 Publish Docker images on webpage and refurbish installation page
 
-Define structures with members instead of dictionary for return values (interface addressed by argument of OPEN)
-Elements of a returned structure with an interface can be specified as array
-
-In XML/JSON call interface call papuga in steps, returning a breakpoint id each step
 NodeJS Bindings
 
-Provide C++17 templates for papuga
+add strus_ namespace prefix to exported functions in C header files
+

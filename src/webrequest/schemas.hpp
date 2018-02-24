@@ -42,7 +42,7 @@ class SchemaCreateContext :public papuga::RequestAutomaton
 {
 public:
 	SchemaCreateContext() :papuga::RequestAutomaton(
-		getStrusClassDefs(), getBindingsInterfaceDescription()->structs,
+		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"context",
 		{
 			{"/extensions/directory", "()", ModuleDir},
@@ -84,7 +84,7 @@ class SchemaCreateStorage :public papuga::RequestAutomaton
 {
 public:
 	SchemaCreateStorage() :papuga::RequestAutomaton(
-		getStrusClassDefs(), getBindingsInterfaceDescription()->structs,
+		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",
 		{
 			{"/storage", "path()", StoragePath},
@@ -109,7 +109,7 @@ class SchemaDestroyStorage :public papuga::RequestAutomaton
 {
 public:
 	SchemaDestroyStorage() :papuga::RequestAutomaton(
-		getStrusClassDefs(), getBindingsInterfaceDescription()->structs,
+		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",
 		{
 			{"/storage", "path()", StoragePath},
@@ -122,7 +122,7 @@ class SchemaOpenStorage :public papuga::RequestAutomaton
 {
 public:
 	SchemaOpenStorage() :papuga::RequestAutomaton(
-		getStrusClassDefs(), getBindingsInterfaceDescription()->structs,
+		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",
 		{
 			{"/storage/path", "()", StoragePath},

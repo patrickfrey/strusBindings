@@ -32,7 +32,9 @@ public:
 			const std::string& html_head_);
 	virtual ~WebRequestHandler();
 
-	virtual bool hasSchema( const char* context, const char* schema) const;
+	virtual bool hasSchema(
+			const char* contextType,
+			const char* schema) const;
 
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
@@ -42,6 +44,7 @@ public:
 	virtual bool loadConfiguration(
 			const char* destContextType,
 			const char* destContextName,
+			const char* srcContextType,
 			const char* srcContextName,
 			const char* schema,
 			const WebRequestContent& content,

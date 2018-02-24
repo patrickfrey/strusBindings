@@ -24,25 +24,29 @@ public:
 	virtual ~WebRequestContextInterface(){}
 
 	/// \brief Run the content request
-	/// \param[in] context identifier defining where to execute the request
-	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
+	/// \param[in] contextType identifier defining the type of the context where to execute the request
+	/// \param[in] contextName identifier defining the name of the context where to execute the request
+	/// \param[in] schema identifier identifying the request to execute
 	/// \param[in] content content of the request
 	/// \param[out] answer the data of the answer of the request
 	/// \return bool if succeeded, false else
 	virtual bool executeContent(
-			const char* context,
+			const char* contextType,
+			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
 	/// \brief Describe in plain text what would be done to fulfill the content request without executing anything
-	/// \param[in] context identifier defining where to execute the request
-	/// \param[in] schema identifier defining what type of request to execute (without namespace prefix)
+	/// \param[in] contextType identifier defining the type of the context where to execute the request
+	/// \param[in] contextName identifier defining the name of the context where to execute the request
+	/// \param[in] schema identifier identifying the request to execute
 	/// \param[in] content content of the request
 	/// \param[out] answer the data of the answer of the request
 	/// \return bool if request succeeded, false else
 	virtual bool debugContent(
-			const char* context,
+			const char* contextType,
+			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;

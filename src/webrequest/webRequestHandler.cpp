@@ -11,6 +11,7 @@
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
 #include "strus/lib/bindings_description.hpp"
+#include "strus/lib/error.hpp"
 #include "schemas.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
@@ -149,15 +150,16 @@ WebRequestHandler::~WebRequestHandler()
 	papuga_destroy_RequestHandler( m_impl);
 }
 
-bool WebRequestHandler::hasSchema( const char* context, const char* schema) const
+bool WebRequestHandler::hasSchema(
+		const char* contextType,
+		const char* schema) const
 {
-	return papuga_RequestHandler_has_schema( m_impl, context, schema);
+	return papuga_RequestHandler_has_schema( m_impl, contextType, schema);
 }
 
-static void setStatus( WebRequestAnswer& status, ErrorOperation operation, papuga_ErrorCode errcode, const char* errmsg=0)
+static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause errcause, const char* errmsg=0)
 {
-	ErrorCause errcause = papugaErrorToErrorCause( errcode);
-	const char* errstr = papuga_ErrorCode_tostring( errcode);
+	const char* errstr = errorCauseMessage( errcause);
 	int httpstatus = errorCauseToHttpStatus( errcause);
 	if (errmsg)
 	{
@@ -182,11 +184,11 @@ WebRequestContext* WebRequestHandler::createContext_( const char* accepted_chars
 	}
 	catch (const std::bad_alloc&)
 	{
-		setStatus( status, ErrorOperationBuildData, papuga_NoMemError);
+		setStatus( status, ErrorOperationBuildData, ErrorCauseOutOfMem);
 	}
 	catch (...)
 	{
-		setStatus( status, ErrorOperationBuildData, papuga_UncaughtException);
+		setStatus( status, ErrorOperationBuildData, ErrorCauseUncaughtException);
 	}
 	return NULL;
 }
@@ -202,6 +204,7 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 bool WebRequestHandler::loadConfiguration(
 			const char* destContextType,
 			const char* destContextName,
+			const char* srcContextType,
 			const char* srcContextName,
 			const char* schema,
 			const WebRequestContent& content,
@@ -221,22 +224,16 @@ bool WebRequestHandler::loadConfiguration(
 		WebRequestContext* ctxi = ctx.get();
 	
 		strus::unique_lock lock( m_mutex);
-		if (ctxi->executeContent( srcContextName, schema, content, status))
+		if (ctxi->executeContent( srcContextType, srcContextName, schema, content, status))
 		{
 			papuga_RequestContext* ctximpl = ctx->impl();
 			papuga_ErrorCode errcode = papuga_Ok;
 
-			if (destContextType && !papuga_RequestContext_set_type( ctximpl, destContextType))
-			{
-				errcode = papuga_NoMemError;
-				setStatus( status, ErrorOperationBuildData, errcode);
-				return false;
-			}
-			if (!papuga_RequestHandler_add_context( m_impl, destContextName, ctximpl, &errcode))
+			if (!papuga_RequestHandler_add_context( m_impl, destContextType, destContextName, ctximpl, &errcode))
 			{
 				char buf[ 1024];
 				std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), destContextType, destContextName);
-				setStatus( status, ErrorOperationBuildData, errcode, buf);
+				setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), buf);
 				return false;
 			}
 			return true;
@@ -248,7 +245,7 @@ bool WebRequestHandler::loadConfiguration(
 	}
 	catch (...)
 	{
-		setStatus( status, ErrorOperationConfiguration, papuga_UncaughtException);
+		setStatus( status, ErrorOperationConfiguration, ErrorCauseUncaughtException);
 		return false;
 	}
 }
