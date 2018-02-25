@@ -288,7 +288,13 @@ bool WebRequestHandler::storeConfiguration(
 
 		std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, contextType, contextName, schema, doctypeName);
 		std::string filepath = strus::joinFilePath( m_config_store_dir, filename);
-		int ec = strus::writeFile( filepath, contentUtf8);
+		int ec = strus::createDir( filepath, false);
+		if (ec)
+		{
+			setStatus( status, ErrorOperationWriteFile, ErrorCause(ec));
+			return false;
+		}
+		ec = strus::writeFile( filepath, contentUtf8);
 		if (ec)
 		{
 			setStatus( status, ErrorOperationWriteFile, ErrorCause(ec));
