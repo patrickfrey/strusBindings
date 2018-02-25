@@ -14,6 +14,7 @@
 #include "papuga/requestHandler.h"
 #include "papuga/requestLogger.h"
 #include <cstddef>
+#include <utility>
 
 namespace strus
 {
@@ -29,7 +30,8 @@ class WebRequestHandler
 public:
 	WebRequestHandler( 
 			WebRequestLoggerInterface* logger_,
-			const std::string& html_head_);
+			const std::string& html_head_,
+			const std::string& config_store_dir_);
 	virtual ~WebRequestHandler();
 
 	virtual bool hasSchema(
@@ -42,13 +44,21 @@ public:
 			WebRequestAnswer& status) const;
 
 	virtual bool loadConfiguration(
-			const char* destContextType,
-			const char* destContextName,
-			const char* srcContextType,
-			const char* srcContextName,
+			const char* contextType,
+			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& status);
+
+	virtual bool storeConfiguration(
+			const char* contextType,
+			const char* contextName,
+			const char* schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& status);
+
+	virtual bool loadStoredConfigurations(
+			WebRequestAnswer& answer);
 
 public:/*WebRequestContext*/
 	const papuga_RequestHandler* impl() const	{return m_impl;}
@@ -57,11 +67,16 @@ public:/*WebRequestContext*/
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
 
+	/// \brief Get the [type,name] tuple of the context that is base of a context loaded by 'loadConfiguration':
+	std::pair<const char*,const char*> getConfigSourceContext( const char* contextType, const char* contextName);
+
 private:
 	strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
 	papuga_RequestLogger m_logger;		//< request logger
 	papuga_RequestHandler* m_impl;		//< request handler
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
+	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
+	int m_config_counter;			//< counter to order configurations stored that have the same date
 };
 
 }//namespace

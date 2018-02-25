@@ -17,6 +17,7 @@
 #include "strus/errorCodes.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/base/fileio.hpp"
 #include "papuga/request.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
@@ -28,6 +29,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdarg>
+#include <ctime>
 
 using namespace strus;
 
@@ -122,10 +124,17 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	va_end( arguments);
 }
 
+std::pair<const char*,const char*> WebRequestHandler::getConfigSourceContext( const char* contextType, const char* contextName)
+{
+	if (0==std::strcmp( contextType, "context")) return std::pair<const char*,const char*>(NULL,NULL);
+	return std::pair<const char*,const char*>("context","context");
+}
+
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
-		const std::string& html_head_)
-	:m_html_head(html_head_)
+		const std::string& html_head_,
+		const std::string& config_store_dir_)
+	:m_html_head(html_head_),m_config_store_dir(config_store_dir_),m_config_counter(0)
 {
 	std::memset( &m_logger, 0, sizeof(m_logger));
 	m_logger.self = logger_;
@@ -202,10 +211,8 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 }
 
 bool WebRequestHandler::loadConfiguration(
-			const char* destContextType,
-			const char* destContextName,
-			const char* srcContextType,
-			const char* srcContextName,
+			const char* contextType,
+			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& status)
@@ -215,24 +222,28 @@ bool WebRequestHandler::loadConfiguration(
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::string co( webRequestContent_tostring( content));
 		if (co.size() > 200) co.resize( 200);
-		std::cerr << strus::string_format( "load configuration: context %s %s <- %s, schema %s, doctype %s, encoding %s, content '%s'",
-							destContextSchemaPrefix, destContextName, srcContextName, schema,
+		std::cerr << strus::string_format( "load configuration: context %s %s, schema %s, doctype %s, encoding %s, content '%s'",
+							contextType, contextName, schema,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
+		std::pair<const char*,const char*> parentContext = getConfigSourceContext( contextType, contextName);
+		const char* parentContextType = parentContext.first;
+		const char* parentContextName = parentContext.second;
+
 		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
 		WebRequestContext* ctxi = ctx.get();
-	
+
 		strus::unique_lock lock( m_mutex);
-		if (ctxi->executeContent( srcContextType, srcContextName, schema, content, status))
+		if (ctxi->executeContent( parentContextType, parentContextName, schema, content, status))
 		{
 			papuga_RequestContext* ctximpl = ctx->impl();
 			papuga_ErrorCode errcode = papuga_Ok;
 
-			if (!papuga_RequestHandler_add_context( m_impl, destContextType, destContextName, ctximpl, &errcode))
+			if (!papuga_RequestHandler_add_context( m_impl, contextType, contextName, ctximpl, &errcode))
 			{
 				char buf[ 1024];
-				std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), destContextType, destContextName);
+				std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), contextType, contextName);
 				setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), buf);
 				return false;
 			}
@@ -249,4 +260,109 @@ bool WebRequestHandler::loadConfiguration(
 		return false;
 	}
 }
+
+bool WebRequestHandler::storeConfiguration(
+		const char* contextType,
+		const char* contextName,
+		const char* schema,
+		const WebRequestContent& content,
+		WebRequestAnswer& status)
+{
+	try
+	{
+		strus::unique_lock lock( m_mutex);
+		std::string contentUtf8 = webRequestContent_tostring( content);
+		char timebuf[ 256];
+		char idxbuf[ 32];
+		time_t timer;
+		struct tm* tm_info;
+		
+		time(&timer);
+		tm_info = localtime(&timer);
+
+		std::strftime( timebuf, sizeof(timebuf), "%Y%m%d_%H%M%S", tm_info);
+		std::snprintf( idxbuf, sizeof(idxbuf), "%03d", ++m_config_counter);
+		WebRequestContent::Type doctype = strus::webRequestContentFromTypeName( content.doctype());
+		const char* doctypeName = WebRequestContent::typeName( doctype);
+
+		std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, contextType, contextName, schema, doctypeName);
+		std::string filepath = strus::joinFilePath( m_config_store_dir, filename);
+		int ec = strus::writeFile( filepath, contentUtf8);
+		if (ec)
+		{
+			setStatus( status, ErrorOperationWriteFile, ErrorCause(ec));
+			return false;
+		}
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setStatus( status, ErrorOperationConfiguration, ErrorCauseOutOfMem);
+		return false;
+	}
+}
+
+static std::string getConfigFilenamePart( const std::string& filename, int pi)
+{
+	char const* si = filename.c_str();
+	while (pi--)
+	{
+		si = std::strchr( si, '.');
+		if (!si) return std::string();
+		++si;
+	}
+	const char* se = std::strchr( si, '.');
+	if (!se) se = std::strchr( si, '\0');
+	return std::string( si, se-si);
+}
+
+bool WebRequestHandler::loadStoredConfigurations(
+		WebRequestAnswer& status)
+{
+	try
+	{
+		std::vector<std::string> configFileNames;
+		int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
+		if (ec)
+		{
+			setStatus( status, ErrorOperationReadFile, ErrorCause(ec));
+			return false;
+		}
+		std::sort( configFileNames.begin(), configFileNames.end());
+		std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
+		for (; ci != ce; ++ci)
+		{
+			std::string doctype = getConfigFilenamePart( *ci, 4);
+			if (doctype.empty()) continue;
+			std::string schema = getConfigFilenamePart( *ci, 3);
+			std::string contextType = getConfigFilenamePart( *ci, 1);
+			std::string contextName = getConfigFilenamePart( *ci, 2);
+			std::string date = getConfigFilenamePart( *ci, 0);
+			std::string contentstr;
+			std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
+			ec = strus::readFile( filepath, contentstr);
+			if (ec)
+			{
+				setStatus( status, ErrorOperationReadFile, ErrorCause(ec));
+				return false;
+			}
+			WebRequestContent content( "UTF-8", doctype.c_str(), contentstr.c_str(), contentstr.size());
+			if (!loadConfiguration( contextType.c_str(), contextName.c_str(), schema.c_str(), content, status))
+			{
+				char msgbuf[ 1024];
+				std::snprintf( msgbuf, sizeof(msgbuf), _TXT("error loading configuration file %s"), ci->c_str());
+				msgbuf[ sizeof(msgbuf)-1] = 0;
+				status.explain( msgbuf);
+				return false;
+			}
+		}
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setStatus( status, ErrorOperationConfiguration, ErrorCauseOutOfMem);
+		return false;
+	}
+}
+
 

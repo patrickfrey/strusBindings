@@ -95,8 +95,36 @@ public:
 		m_content = content_;
 	}
 
+	/// \brief Add some explanation to error message
+	/// \param[in] msg explanation message
+	void explain( const char* msg)
+	{
+		if (m_errorstr == m_errorbuf)
+		{
+			char tmpbuf[ errorbufsize];
+			std::size_t tmpsize = std::snprintf( tmpbuf, sizeof(tmpbuf), "%s: %s", msg, m_errorstr);
+			if (tmpsize >= sizeof(tmpbuf)-1)
+			{
+				tmpsize = sizeof(tmpbuf)-1;
+				tmpbuf[ tmpsize] = 0;
+			}
+			std::memcpy( m_errorbuf, tmpbuf, tmpsize+1);
+		}
+		else
+		{
+			std::size_t tmpsize = std::snprintf( m_errorbuf, sizeof(m_errorbuf), "%s: %s", msg, m_errorstr);
+			if (tmpsize >= sizeof(m_errorbuf)-1)
+			{
+				tmpsize = sizeof(m_errorbuf)-1;
+				m_errorbuf[ tmpsize] = 0;
+			}
+		}
+		m_errorstr = m_errorbuf;
+	}
+
 private:
-	char m_errorbuf[ 1024];		///< local buffer for error messages
+	enum {errorbufsize=4096};
+	char m_errorbuf[ errorbufsize];	///< local buffer for error messages
 	const char* m_errorstr;		///< error message in case of failure or NULL
 	int m_httpstatus;		///< http status of the request
 	int m_apperrorcode;		///< application error code of the request answer

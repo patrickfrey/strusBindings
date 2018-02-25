@@ -47,21 +47,38 @@ public:
 			const char* schema) const=0;
 
 	/// \brief Execute a configuration request
-	/// \param[in] destContextType type of the created context
-	/// \param[in] destContextName identifier of the created context
-	/// \param[in] srcContextType identifier defining the type of the base context (NULL for none)
-	/// \param[in] srcContextName identifier defining the name of the base context (NULL for none)
+	/// \param[in] contextType type of the created context
+	/// \param[in] contextName identifier of the created context
 	/// \param[in] schema identifier defining what type of request to execute for loading the configuration
 	/// \param[in] content content of the configuration to load
 	/// \param[out] answer the error status
 	/// \return bool in case of success, false in case of an error (inspect answer for the error details)
+	/// \note the parent context is implicitely derived from the internal schema dependency definitions
 	virtual bool loadConfiguration(
-			const char* destContextType,
-			const char* destContextName,
-			const char* srcContextType,
-			const char* srcContextName,
+			const char* contextType,
+			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
+			WebRequestAnswer& answer)=0;
+
+	/// \brief Store configuration to be reloaded with loadStoredConfigurations()
+	/// \param[in] contextType type of the created context
+	/// \param[in] contextName identifier of the created context
+	/// \param[in] schema identifier defining what type of request to execute for loading the configuration
+	/// \param[in] content content of the configuration to load
+	/// \param[out] answer the error status
+	/// \return bool in case of success, false in case of an error (inspect answer for the error details)
+	virtual bool storeConfiguration(
+			const char* contextType,
+			const char* contextName,
+			const char* schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer)=0;
+
+	/// \brief Reload configurations stored with storedConfiguration()
+	/// \param[out] answer the error status
+	/// \return bool in case of success, false in case of an error (inspect answer for the error details)
+	virtual bool loadStoredConfigurations(
 			WebRequestAnswer& answer)=0;
 };
 

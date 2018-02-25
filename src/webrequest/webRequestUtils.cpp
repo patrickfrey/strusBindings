@@ -313,6 +313,23 @@ static bool findAccept( const AcceptElem* http_accept_list, const char* suggesti
 	return false;
 }
 
+papuga_StringEncoding strus::getStringEncoding( const char* encoding, const char* content, std::size_t contentlen)
+{
+	papuga_StringEncoding rt;
+	if (encoding)
+	{
+		if (!papuga_getStringEncodingFromName( &rt, encoding))
+		{
+			return papuga_Binary;
+		}
+		return rt;
+	}
+	else
+	{
+		return papuga_guess_StringEncoding( content, contentlen);
+	}
+}
+
 papuga_StringEncoding strus::getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
 {
 	char strbuf[ 8092];

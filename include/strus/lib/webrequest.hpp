@@ -24,7 +24,7 @@ class WebRequestLoggerInterface;
 /// \param[in] request logger interface
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \return pointer to handler in case of success, NULL in case of memory allocation error
-WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head);
+WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir);
 
 /// \brief Convert string from UTF-8 to a given charset encoding
 /// \param[in] charset character set encoding to convert to

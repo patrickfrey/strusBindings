@@ -41,6 +41,13 @@ std::string webRequestContent_tostring( const WebRequestContent& content);
 // \return type id or WebRequestContent::Unknown
 WebRequestContent::Type webRequestContentFromTypeName( const char* name);
 
+// \brief Evaluate the string encoding from name or content
+// \param[in] name encoding as string
+// \param[in] content pointer to content string
+// \param[in] contentlen size of content in bytes
+// \return string encoding enum
+papuga_StringEncoding getStringEncoding( const char* encoding, const char* content, std::size_t contentlen);
+
 // \brief Get the best choice for the character encoding type of a request result
 // \param[in] http_accept_charset value of HTTP header "Accept-Charset"
 // \return chosen charset

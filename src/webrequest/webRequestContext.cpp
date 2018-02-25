@@ -63,23 +63,6 @@ WebRequestContext::~WebRequestContext()
 	papuga_destroy_Allocator( &m_allocator);
 }
 
-static papuga_StringEncoding getStringEncoding( const char* encoding, const char* content, std::size_t contentlen)
-{
-	papuga_StringEncoding rt;
-	if (encoding)
-	{
-		if (!papuga_getStringEncodingFromName( &rt, encoding))
-		{
-			return papuga_Binary;
-		}
-		return rt;
-	}
-	else
-	{
-		return papuga_guess_StringEncoding( content, contentlen);
-	}
-}
-
 static void setAnswer( WebRequestAnswer& answer, ErrorOperation operation, ErrorCause cause, const char* errstr=0, bool doCopy=false)
 {
 	int httpstatus = errorCauseToHttpStatus( cause);
@@ -96,7 +79,7 @@ static void setAnswer( WebRequestAnswer& answer, int apperrorcode, const char* e
 bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	// Evaluate the character set encoding:
-	m_encoding = getStringEncoding( content.charset(), content.str(), content.len());
+	m_encoding = strus::getStringEncoding( content.charset(), content.str(), content.len());
 	if (m_encoding == papuga_Binary)
 	{
 		setAnswer( answer, ErrorOperationScanInput, ErrorCauseNotImplemented);
