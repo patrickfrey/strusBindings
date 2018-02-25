@@ -55,7 +55,7 @@ public:
 			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
-			WebRequestAnswer& status);
+			WebRequestAnswer& status) const;
 
 	virtual bool loadStoredConfigurations(
 			WebRequestAnswer& answer);
@@ -71,12 +71,12 @@ private:
 	std::pair<const char*,const char*> getConfigSourceContext( const char* contextType, const char* contextName);
 
 private:
-	strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
+	mutable strus::mutex m_mutex;		//< mutex for locking mutual exclusion of configuration requests
+	mutable int m_config_counter;		//< counter to order configurations stored that have the same date
 	papuga_RequestLogger m_logger;		//< request logger
 	papuga_RequestHandler* m_impl;		//< request handler
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
-	int m_config_counter;			//< counter to order configurations stored that have the same date
 };
 
 }//namespace

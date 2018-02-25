@@ -135,7 +135,7 @@ WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
 		const std::string& config_store_dir_)
-	:m_html_head(html_head_),m_config_store_dir(config_store_dir_),m_config_counter(0)
+	:m_config_counter(0),m_impl(0),m_html_head(html_head_),m_config_store_dir(config_store_dir_)
 {
 	std::memset( &m_logger, 0, sizeof(m_logger));
 	m_logger.self = logger_;
@@ -267,7 +267,7 @@ bool WebRequestHandler::storeConfiguration(
 		const char* contextName,
 		const char* schema,
 		const WebRequestContent& content,
-		WebRequestAnswer& status)
+		WebRequestAnswer& status) const
 {
 	try
 	{

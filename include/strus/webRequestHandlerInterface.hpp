@@ -73,7 +73,7 @@ public:
 			const char* contextName,
 			const char* schema,
 			const WebRequestContent& content,
-			WebRequestAnswer& answer)=0;
+			WebRequestAnswer& answer) const=0;
 
 	/// \brief Reload configurations stored with storedConfiguration()
 	/// \param[out] answer the error status
