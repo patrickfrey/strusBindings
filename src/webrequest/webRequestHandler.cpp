@@ -25,6 +25,7 @@
 #include "papuga/valueVariant.h"
 #include "private/internationalization.hpp"
 #include <vector>
+#include <algorithm>
 #include <sstream>
 #include <iostream>
 #include <cstring>
