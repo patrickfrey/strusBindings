@@ -28,7 +28,7 @@
 #include <cctype>
 #include <iostream>
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 using namespace strus;
 
 ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)

@@ -22,7 +22,11 @@ outmap[ 'struct_env' ] = ctx:introspection("env")
 local result = "introspection:" .. dumpTree( outmap) .. "\n"
 local expected = [[
 introspection:
-string list_env: 
+string list_env:
+  number 1: "moduledir"
+  number 2: "modules"
+  number 3: "resourcedir"
+  number 4: "workdir"
 string struct_env:
   string moduledir:
     number 1: "/usr/local/strus/lib/modules"
