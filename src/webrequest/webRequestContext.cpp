@@ -549,19 +549,19 @@ bool WebRequestContext::executeList(
 		const char* contextnam;
 		const char* varnam;
 
-		if (!(typenam  = path.getNext()))
+		if (!(typenam = path.getNext()))
 		{
 			char const** typelist = papuga_RequestHandler_list_context_types( m_handler->impl(), lstbuf, lstbufsize);
 			if (!checkPapugaListBufferOverflow( typelist, answer)) return false;
 			if (!checkPapugaListEmpty( typelist, answer)) return false;
 			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, typelist);
 		}
-		if (!(contextnam  = path.getNext()))
+		if (!(contextnam = path.getNext()))
 		{
 			char const** contextlist = papuga_RequestHandler_list_contexts( m_handler->impl(), typenam, lstbuf, lstbufsize);
 			if (!checkPapugaListBufferOverflow( contextlist, answer)) return false;
 			if (!checkPapugaListEmpty( contextlist, answer)) return false;
-			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, contextlist);
+			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", typenam, m_result_encoding, m_result_doctype, contextlist);
 		}
 		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 		if (context == NULL)
@@ -578,7 +578,7 @@ bool WebRequestContext::executeList(
 		else if (!(varnam = path.getNext()))
 		{
 			if (!checkPapugaListEmpty( varlist, answer)) return false;
-			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, varlist);
+			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", contextnam, m_result_encoding, m_result_doctype, varlist);
 		}
 		else
 		{
@@ -625,15 +625,15 @@ bool WebRequestContext::executeView(
 		papuga_ValueVariant result;
 		papuga_init_ValueVariant_serialization( &result, ser);
 
-		if (!(typenam  = path.getNext()))
+		if (!(typenam = path.getNext()))
 		{
 			if (!dumpViewAll( ser, answer)) return false;
 			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
 		}
-		else if (!(contextnam  = path.getNext()))
+		else if (!(contextnam = path.getNext()))
 		{
 			if (!dumpViewType( typenam, ser, answer)) return false;
-			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
+			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", typenam, m_result_encoding, m_result_doctype, result);
 		}
 		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 		if (context == NULL)
@@ -650,7 +650,7 @@ bool WebRequestContext::executeView(
 		else if (!(varnam = path.getNext()))
 		{
 			if (!dumpViewName( typenam, contextnam, ser, answer)) return false;
-			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
+			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", contextnam, m_result_encoding, m_result_doctype, result);
 		}
 		else
 		{
