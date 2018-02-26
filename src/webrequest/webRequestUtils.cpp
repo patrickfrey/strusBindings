@@ -19,13 +19,16 @@
 #include "papuga/requestResult.h"
 #include "papuga/allocator.h"
 #include "papuga/serialization.h"
+#include "papuga/serialization.hpp"
 #include "strus/base/numstring.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include <stdexcept>
 #include <algorithm>
 #include <cstring>
 #include <cctype>
+#include <iostream>
 
+#define STRUS_LOWLEVEL_DEBUG
 using namespace strus;
 
 ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
@@ -56,6 +59,7 @@ ErrorCause strus::papugaErrorToErrorCause( papuga_ErrorCode errcode)
 		case papuga_AddressedItemNotFound:	return ErrorCauseRequestResolveError;
 		case papuga_HostObjectError:		return ErrorCauseHiddenError;
 		case papuga_AmbiguousReference:		return ErrorCauseBindingLanguageError;
+		case papuga_MaxRecursionDepthReached:	return ErrorCauseMaxRecursionDepht;
 	}
 	return ErrorCauseUnknown;
 }
@@ -91,9 +95,10 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 		case ErrorCauseUnknownIdentifier: return 400 /*Bad Request*/;
 		case ErrorCauseOperationOrder: return 500 /*Internal Server Error*/;
 		case ErrorCauseValueOutOfRange: return 500 /*Internal Server Error*/;
-		case ErrorCauseMaximumLimitReached: return 500 /*Internal Server Error*/;
+		case ErrorCauseMaxLimitReached: return 500 /*Internal Server Error*/;
 		case ErrorCauseBufferOverflow: return 500 /*Internal Server Error*/;
 		case ErrorCauseMaxNofItemsExceeded: return 500 /*Internal Server Error*/;
+		case ErrorCauseMaxRecursionDepht: return 500 /*Internal Server Error*/;
 		case ErrorCauseRuntimeError: return 500 /*Internal Server Error*/;
 		case ErrorCauseIncompleteRequest: return 400 /*Bad Request*/;
 		case ErrorCauseIncompleteResult: return 500 /*Internal Server Error*/;
@@ -633,6 +638,21 @@ bool strus::mapValueVariantToAnswer(
 		const papuga_ValueVariant& value)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
+#ifdef STRUS_LOWLEVEL_DEBUG
+	std::cerr << "CALL strus::mapValueVariantToAnswer" << std::endl;
+	if (papuga_ValueVariant_isatomic( &value))
+	{
+		std::cerr << "  " << papuga::ValueVariant_tostring( value, errcode) << std::endl;
+	}
+	else if (value.valuetype == papuga_TypeSerialization)
+	{
+		std::cerr << papuga::Serialization_tostring( *value.value.serialization, "- ", errcode) << std::endl << "--" << std::endl;
+	}
+	else
+	{
+		std::cerr << "<" << papuga_Type_name( value.valuetype) << ">" << std::endl;
+	}
+#endif
 	char* resultstr = 0;
 	std::size_t resultlen = 0;
 	papuga_RequestResult result;

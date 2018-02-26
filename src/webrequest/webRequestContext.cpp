@@ -493,7 +493,7 @@ bool WebRequestContext::dumpViewName( const char* typenam, const char* contextna
 	const papuga_RequestContext* context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 	if (context != NULL)
 	{
-		char const** varlist = papuga_RequestContext_list_variables( context, 1, lstbuf, lstbufsize);
+		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
 		{
@@ -569,7 +569,7 @@ bool WebRequestContext::executeList(
 			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
 			return false;
 		}
-		char const** varlist = papuga_RequestContext_list_variables( context, 1, lstbuf, lstbufsize);
+		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
 		{
@@ -641,7 +641,7 @@ bool WebRequestContext::executeView(
 			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
 			return false;
 		}
-		char const** varlist = papuga_RequestContext_list_variables( context, 1, lstbuf, lstbufsize);
+		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
 		{

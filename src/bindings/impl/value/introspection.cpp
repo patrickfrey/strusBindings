@@ -121,6 +121,41 @@ DEFINE_CLASS_INTROSPECTION_CLASS_TPL( IntrospectionWeightingFunction, Introspect
 DEFINE_CLASS_INTROSPECTION_CLASS_TPL( IntrospectionSummarizerFunction, IntrospectionFunctionDescription, SummarizerFunctionInterface)
 DEFINE_CLASS_INTROSPECTION_CLASS_TPL( IntrospectionScalarFunctionParser, IntrospectionFunctionDescription, ScalarFunctionParserInterface)
 
+/*
+ * INTROSPECTION ATOMIC
+ */
+template <class TypeName>
+class IntrospectionAtomic
+	:public IntrospectionBase
+{
+public:
+	IntrospectionAtomic(
+			ErrorBufferInterface* errorhnd_,
+			const TypeName& value_)
+		:m_errorhnd(errorhnd_),m_value(value_){}
+	virtual void serialize( papuga_Serialization& serialization) const
+	{
+		Serializer::serialize( &serialization, m_value, true/*deep*/);
+	}
+	virtual IntrospectionBase* open( const std::string& name) const
+	{
+		return NULL;
+	}
+	virtual std::vector<std::string> list() const
+	{
+		return std::vector<std::string>();
+	}
+private:
+	ErrorBufferInterface* m_errorhnd;
+	TypeName m_value;
+};
+namespace {
+template <class TypeName>
+IntrospectionAtomic<TypeName>* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, const TypeName& val)
+{
+	return new IntrospectionAtomic<TypeName>( errorhnd, val);
+}
+}//namespace
 
 /*
  * INTROSPECTION FUNCTION LIST
@@ -267,7 +302,6 @@ void IntrospectionContext::serialize( papuga_Serialization& serialization) const
 		serializeIntrospection( serialization, "queryproc", introspection.get());
 	}
 }
-
 IntrospectionBase* IntrospectionContext::open( const std::string& name) const
 {
 	if (name == "env" && m_moduleloader) return createIntrospection( m_errorhnd, m_moduleloader);
@@ -277,7 +311,6 @@ IntrospectionBase* IntrospectionContext::open( const std::string& name) const
 	if (name == "textproc" && m_textproc) return createIntrospection( m_errorhnd, m_textproc);
 	return NULL;
 }
-
 std::vector<std::string> IntrospectionContext::list() const
 {
 	std::vector<std::string> rt;
@@ -298,11 +331,26 @@ void IntrospectionRpcClient::serialize( papuga_Serialization& serialization) con
 }
 IntrospectionBase* IntrospectionRpcClient::open( const std::string& name) const
 {
+	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
+	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
+	CfgItems::const_iterator ci = items.begin(), ce = items.end();
+	for (; ci != ce; ++ci)
+	{
+		if (name == ci->first) return createIntrospectionAtomic( m_errorhnd, ci->second);
+	}
 	return NULL;
 }
 std::vector<std::string> IntrospectionRpcClient::list() const
 {
-	return std::vector<std::string>();
+	std::vector<std::string> rt;
+	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
+	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
+	CfgItems::const_iterator ci = items.begin(), ce = items.end();
+	for (; ci != ce; ++ci)
+	{
+		rt.push_back( ci->first);
+	}
+	return rt;
 }
 
 void IntrospectionTraceProxy::serialize( papuga_Serialization& serialization) const
@@ -312,11 +360,26 @@ void IntrospectionTraceProxy::serialize( papuga_Serialization& serialization) co
 }
 IntrospectionBase* IntrospectionTraceProxy::open( const std::string& name) const
 {
+	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
+	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
+	CfgItems::const_iterator ci = items.begin(), ce = items.end();
+	for (; ci != ce; ++ci)
+	{
+		if (name == ci->first) return createIntrospectionAtomic( m_errorhnd, ci->second);
+	}
 	return NULL;
 }
 std::vector<std::string> IntrospectionTraceProxy::list() const
 {
-	return std::vector<std::string>();
+	std::vector<std::string> rt;
+	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
+	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
+	CfgItems::const_iterator ci = items.begin(), ce = items.end();
+	for (; ci != ce; ++ci)
+	{
+		rt.push_back( ci->first);
+	}
+	return rt;
 }
 
 void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization) const
@@ -328,11 +391,20 @@ void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization) 
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name) const
 {
+	if (name == "moduledir") return createIntrospectionAtomic( m_errorhnd, m_impl->modulePaths());
+	if (name == "modules") return createIntrospectionAtomic( m_errorhnd, m_impl->modules());
+	if (name == "resourcedir") return createIntrospectionAtomic( m_errorhnd, m_impl->resourcePaths());
+	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workdir());
 	return NULL;
 }
 std::vector<std::string> IntrospectionModuleLoader::list() const
 {
-	return std::vector<std::string>();
+	std::vector<std::string> rt;
+	rt.push_back( "moduledir");
+	rt.push_back( "modules");
+	rt.push_back( "resourcedir");
+	rt.push_back( "workdir");
+	return rt;
 }
 
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::Segmenter> IntrospectionSegmenterList;
