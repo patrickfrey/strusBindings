@@ -74,7 +74,7 @@ private:
 	bool dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer);
 	bool dumpViewType( const char* type_, papuga_Serialization* ser, WebRequestAnswer& answer);
 	bool dumpViewName( const char* type_, const char* name_, papuga_Serialization* ser, WebRequestAnswer& answer);
-	bool dumpViewVar( const papuga_RequestContext& context, const char* var_, papuga_Serialization* ser, WebRequestAnswer& answer);
+	bool dumpViewVar( const papuga_RequestContext* context, const char* var_, papuga_Serialization* ser, WebRequestAnswer& answer);
 
 private:
 	const WebRequestHandler* m_handler;

@@ -487,32 +487,36 @@ bool WebRequestContext::dumpViewType( const char* typenam, papuga_Serialization*
 bool WebRequestContext::dumpViewName( const char* typenam, const char* contextnam, papuga_Serialization* ser, WebRequestAnswer& answer)
 {
 	bool rt = true;
-	papuga_ErrorCode errcode = papuga_Ok;
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
-	papuga_RequestContext context;
 
-	if (!papuga_init_RequestContext_child( &context, &m_allocator, m_handler->impl(), typenam, contextnam, &errcode))
+	const papuga_RequestContext* context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
+	if (context != NULL)
 	{
-		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
-		return false;
-	}
-	char const** varlist = papuga_RequestContext_list_variables( &context, lstbuf, lstbufsize);
-	if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-	char const** vi = varlist;
-	for (; *vi; ++vi)
-	{
-		rt &= papuga_Serialization_pushName_charp( ser, *vi);
-		if (!dumpViewVar( context, *vi, ser, answer)) return false;
+		char const** varlist = papuga_RequestContext_list_variables( context, 1, lstbuf, lstbufsize);
+		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
+		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
+		{
+			if (!dumpViewVar( context, *varlist, ser, answer)) return false;
+		}
+		else
+		{
+			char const** vi = varlist;
+			for (; *vi; ++vi)
+			{
+				rt &= papuga_Serialization_pushName_charp( ser, *vi);
+				if (!dumpViewVar( context, *vi, ser, answer)) return false;
+			}
+		}
 	}
 	if (!rt) setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
 	return rt;
 }
 
-bool WebRequestContext::dumpViewVar( const papuga_RequestContext& context, const char* varnam, papuga_Serialization* ser, WebRequestAnswer& answer)
+bool WebRequestContext::dumpViewVar( const papuga_RequestContext* context, const char* varnam, papuga_Serialization* ser, WebRequestAnswer& answer)
 {
 	papuga_ValueVariant result;
-	const papuga_ValueVariant* obj = papuga_RequestContext_get_variable( &context, varnam);
+	const papuga_ValueVariant* obj = papuga_RequestContext_get_variable( context, varnam);
 	if (!obj)
 	{
 		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
@@ -535,16 +539,15 @@ bool WebRequestContext::executeList(
 	{
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
-		papuga_ErrorCode errcode = papuga_Ok;
 		PathBuf path( path_);
-		papuga_RequestContext context;
+		const papuga_RequestContext* context;
+		const papuga_ValueVariant* obj;
 
 		enum {lstbufsize=256};
 		char const* lstbuf[ lstbufsize];
 		const char* typenam;
 		const char* contextnam;
 		const char* varnam;
-		const papuga_ValueVariant* obj;
 
 		if (!(typenam  = path.getNext()))
 		{
@@ -560,19 +563,27 @@ bool WebRequestContext::executeList(
 			if (!checkPapugaListEmpty( contextlist, answer)) return false;
 			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, contextlist);
 		}
-		if (!papuga_init_RequestContext_child( &context, &m_allocator, m_handler->impl(), typenam, contextnam, &errcode))
+		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
+		if (context == NULL)
 		{
-			setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
 			return false;
 		}
-		if (!(varnam = path.getNext()))
+		char const** varlist = papuga_RequestContext_list_variables( context, 1, lstbuf, lstbufsize);
+		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
+		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
 		{
-			char const** varlist = papuga_RequestContext_list_variables( &context, lstbuf, lstbufsize);
-			if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
+			obj = papuga_RequestContext_get_variable( context, typenam);
+		}
+		else if (!(varnam = path.getNext()))
+		{
 			if (!checkPapugaListEmpty( varlist, answer)) return false;
 			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, varlist);
 		}
-		obj = papuga_RequestContext_get_variable( &context, varnam);
+		else
+		{
+			obj = papuga_RequestContext_get_variable( context, varnam);
+		}
 		if (!obj)
 		{
 			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
@@ -595,13 +606,15 @@ bool WebRequestContext::executeView(
 	{
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
-		papuga_ErrorCode errcode = papuga_Ok;
 		PathBuf path( path_);
+		const papuga_RequestContext* context;
+		const papuga_ValueVariant* obj;
 
+		enum {lstbufsize=256};
+		char const* lstbuf[ lstbufsize];
 		const char* typenam;
 		const char* contextnam;
 		const char* varnam;
-		papuga_RequestContext context;
 
 		papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
 		if (!ser)
@@ -622,17 +635,27 @@ bool WebRequestContext::executeView(
 			if (!dumpViewType( typenam, ser, answer)) return false;
 			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
 		}
+		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
+		if (context == NULL)
+		{
+			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			return false;
+		}
+		char const** varlist = papuga_RequestContext_list_variables( context, 1, lstbuf, lstbufsize);
+		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
+		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
+		{
+			obj = papuga_RequestContext_get_variable( context, typenam);
+		}
 		else if (!(varnam = path.getNext()))
 		{
 			if (!dumpViewName( typenam, contextnam, ser, answer)) return false;
 			return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
 		}
-		if (!papuga_init_RequestContext_child( &context, &m_allocator, m_handler->impl(), typenam, contextnam, &errcode))
+		else
 		{
-			setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
-			return false;
+			obj = papuga_RequestContext_get_variable( context, varnam);
 		}
-		const papuga_ValueVariant* obj = papuga_RequestContext_get_variable( &context, varnam);
 		if (!obj)
 		{
 			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
