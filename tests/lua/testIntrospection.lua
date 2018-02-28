@@ -24,18 +24,19 @@ local expected = [[
 introspection:
 string list_env:
   number 1: "moduledir"
-  number 2: "modules"
+  number 2: "module"
   number 3: "resourcedir"
   number 4: "workdir"
 string struct_env:
+  string module: 
   string moduledir:
     number 1: "/usr/local/strus/lib/modules"
     number 2: "/usr/lib/modules"
-  string modules: 
   string resourcedir:
     number 1: "/usr/share/resources"
     number 2: "/usr/share/strus"
-  string workdir: "/home/johndoe"
+  string workdir:
+    number 1: "/home/johndoe"
 ]]
 
 verifyTestOutput( outputdir, result, expected)

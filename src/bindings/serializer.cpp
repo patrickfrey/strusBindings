@@ -12,6 +12,8 @@
 #include "papuga/serialization.h"
 #include "private/internationalization.hpp"
 #include "papuga/allocator.h"
+#include "strus/base/localErrorBuffer.hpp"
+#include "strus/base/configParser.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -370,7 +372,23 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 			value = papuga_Allocator_copy_string( result->allocator, value, valuelen);
 		}
 		rt &= papuga_Serialization_pushName_string( result, name, namelen);
-		rt &= papuga_Serialization_pushValue_string( result, value, valuelen);
+		if (name[0] == 'm' && 0==std::strcmp( name, "metadata"))
+		{
+			rt &= papuga_Serialization_pushOpen( result);
+			strus::LocalErrorBuffer errbuf;
+			ConfigurationItemList subitems = strus::getSubConfigStringItems( ci->second, &errbuf);
+			if (errbuf.hasError())
+			{
+				errcode = (errbuf.cause() == ErrorCauseOutOfMem) ? papuga_NoMemError : papuga_SyntaxError;
+				return false;
+			}
+			rt &= serialize_nothrow( result, subitems, errcode, deep);
+			rt &= papuga_Serialization_pushClose( result);
+		}
+		else
+		{
+			rt &= papuga_Serialization_pushValue_string( result, value, valuelen);
+		}
 	}
 	return rt;
 }

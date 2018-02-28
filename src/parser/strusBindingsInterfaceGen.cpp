@@ -919,8 +919,8 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 		<< "\t" << "{" << std::endl
 		<< "\t\t" << "delete reinterpret_cast<ClassName*>( objref);" << std::endl
 		<< "\t" << "}" << std::endl
-		<< "\t" << "static papuga_Deleter getDestructor()	{return &deleter;}" << std::endl
-		<< "\t" << "static int classid()			{return 0;}" << std::endl
+		<< "\t" << "static papuga_Deleter getDestructor()" << "\t" << "{return &deleter;}" << std::endl
+		<< "\t" << "static int classid()" << "\t\t\t" << "{return 0;}" << std::endl
 		<< "};" << std::endl << std::endl;
 
 	std::vector<strus::ClassDef>::const_iterator
@@ -931,9 +931,9 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 		out << "template<>" << std::endl
 			<< "struct BindingClassTemplate<" << ci->name() << "Impl>" << std::endl
 			<< "{" << std::endl
-			<< "\t" << "static papuga_Deleter getDestructor()	{return &" << destructorFunctionName( ci->name()) << ";}" << std::endl
-			<< "\t" << "static int classid()			{return " << classid << ";}" << std::endl
-			<< "\t" << "static const char* name()			{return \"" << ci->name() << "\";}" << std::endl
+			<< "\t" << "static papuga_Deleter getDestructor()" << "\t" << "{return &" << destructorFunctionName( ci->name()) << ";}" << std::endl
+			<< "\t" << "static int classid()" << "\t\t\t" << "{return " << classid << ";}" << std::endl
+			<< "\t" << "static const char* name()" << "\t\t" << "{return \"" << ci->name() << "\";}" << std::endl
 			<< "};" << std::endl << std::endl;
 	}
 	out << "}}//namespace" << std::endl;

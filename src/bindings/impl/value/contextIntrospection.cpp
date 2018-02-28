@@ -5,8 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Interface to arbitrary structure as return value
-#include "introspection.hpp"
+/// \brief Interface for introspection of the root object
+#include "contextIntrospection.hpp"
+#include "introspectionTemplates.hpp"
 #include "serializer.hpp"
 #include "private/internationalization.hpp"
 #include "strus/base/local_ptr.hpp"
@@ -30,21 +31,6 @@
 using namespace strus;
 using namespace strus::bindings;
 
-static std::runtime_error introspection_error( const char* msg, ErrorBufferInterface* errorhnd)
-{
-	return strus::runtime_error( "%s: %s", msg, errorhnd->hasError() ? errorhnd->fetchError() : _TXT("unknown error"));
-}
-
-static void serializeIntrospection( papuga_Serialization& serialization, const char* name, IntrospectionBase* introspection)
-{
-	bool sc = true;
-	sc &= papuga_Serialization_pushName_charp( &serialization, name);
-	sc &= papuga_Serialization_pushOpen( &serialization);
-	introspection->serialize( serialization);
-	sc &= papuga_Serialization_pushClose( &serialization);
-	if (!sc) throw std::bad_alloc();
-}
-
 /*
  * DECLARATION INTROSPECTION CONTEXT MEMBER INTERFACE
  */
@@ -67,9 +53,13 @@ private:\
 static IntrospectionBase* createIntrospection( ErrorBufferInterface* errorhnd, const ClassName* obj)\
 	{return new IntrospectionClassName( errorhnd, obj);}
 
+#define DEFINE_CONFIG_INTROSPECTION( IntrospectionClassName, ClassName)\
+typedef IntrospectionConfig<ClassName> IntrospectionClassName;\
+static IntrospectionBase* createIntrospection( ErrorBufferInterface* errorhnd, const ClassName* obj)\
+	{return new IntrospectionClassName( errorhnd, obj);}
 
-DEFINE_CLASS_INTROSPECTION_CLASS( IntrospectionTraceProxy, TraceProxy)
-DEFINE_CLASS_INTROSPECTION_CLASS( IntrospectionRpcClient, RpcClientInterface)
+DEFINE_CONFIG_INTROSPECTION( IntrospectionTraceProxy, TraceProxy)
+DEFINE_CONFIG_INTROSPECTION( IntrospectionRpcClient, RpcClientInterface)
 DEFINE_CLASS_INTROSPECTION_CLASS( IntrospectionModuleLoader, ModuleLoaderInterface)
 DEFINE_CLASS_INTROSPECTION_CLASS( IntrospectionTextProcessor, TextProcessorInterface)
 DEFINE_CLASS_INTROSPECTION_CLASS( IntrospectionQueryProcessor, QueryProcessorInterface)
@@ -124,31 +114,6 @@ DEFINE_CLASS_INTROSPECTION_CLASS_TPL( IntrospectionScalarFunctionParser, Introsp
 /*
  * INTROSPECTION ATOMIC
  */
-template <class TypeName>
-class IntrospectionAtomic
-	:public IntrospectionBase
-{
-public:
-	IntrospectionAtomic(
-			ErrorBufferInterface* errorhnd_,
-			const TypeName& value_)
-		:m_errorhnd(errorhnd_),m_value(value_){}
-	virtual void serialize( papuga_Serialization& serialization) const
-	{
-		Serializer::serialize( &serialization, m_value, true/*deep*/);
-	}
-	virtual IntrospectionBase* open( const std::string& name) const
-	{
-		return NULL;
-	}
-	virtual std::vector<std::string> list() const
-	{
-		return std::vector<std::string>();
-	}
-private:
-	ErrorBufferInterface* m_errorhnd;
-	TypeName m_value;
-};
 namespace {
 template <class TypeName>
 IntrospectionAtomic<TypeName>* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, const TypeName& val)
@@ -156,6 +121,7 @@ IntrospectionAtomic<TypeName>* createIntrospectionAtomic( ErrorBufferInterface* 
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
 }
 }//namespace
+
 
 /*
  * INTROSPECTION FUNCTION LIST
@@ -247,18 +213,10 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual void serialize( papuga_Serialization& serialization) const
 	{
-		std::vector<std::string> flst = m_impl->getFunctionList( functionType);
-		std::vector<std::string>::const_iterator fi = flst.begin(), fe = flst.end();
-		for (; fi != fe; ++fi)
-		{
-			const typename Traits::FunctionClass* func = Traits::get( m_impl, *fi);
-			strus::local_ptr<IntrospectionBase> introspection( createIntrospection( m_errorhnd, func));
-			serializeIntrospection( serialization, fi->c_str(), introspection.get());
-		}
+		serializeList( serialization);
 	}
 	virtual IntrospectionBase* open( const std::string& name) const
 	{
-		
 		return createIntrospection( m_errorhnd, Traits::get( m_impl, name));
 	}
 	virtual std::vector<std::string> list() const
@@ -270,141 +228,43 @@ private:
 	const InterfaceClassName* m_impl;
 };
 
-void IntrospectionContext::serialize( papuga_Serialization& serialization) const
+void ContextIntrospection::serialize( papuga_Serialization& serialization) const
 {
-	if (m_moduleloader)
-	{
-		strus::local_ptr<IntrospectionBase> introspection( createIntrospection( m_errorhnd, m_moduleloader));
-		serializeIntrospection( serialization, "env", introspection.get());
-	}
-	if (m_trace)
-	{
-		strus::local_ptr<IntrospectionBase> introspection( createIntrospection( m_errorhnd, m_trace));
-		serializeIntrospection( serialization, "trace", introspection.get());
-	}
-	if (m_rpc)
-	{
-		strus::local_ptr<IntrospectionBase> introspection( createIntrospection( m_errorhnd, m_rpc));
-		serializeIntrospection( serialization, "rpc", introspection.get());
-	}
-	if (m_threads > 0)
-	{
-		Serializer::serializeWithName( &serialization, "threads", (papuga_Int)m_threads, true/*deep*/);
-	}
-	if (m_textproc)
-	{
-		strus::local_ptr<IntrospectionBase> introspection( createIntrospection( m_errorhnd, m_textproc));
-		serializeIntrospection( serialization, "textproc", introspection.get());
-	}
-	if (m_queryproc)
-	{
-		strus::local_ptr<IntrospectionBase> introspection( createIntrospection( m_errorhnd, m_queryproc));
-		serializeIntrospection( serialization, "queryproc", introspection.get());
-	}
+	serializeList( serialization);
 }
-IntrospectionBase* IntrospectionContext::open( const std::string& name) const
+IntrospectionBase* ContextIntrospection::open( const std::string& name) const
 {
 	if (name == "env" && m_moduleloader) return createIntrospection( m_errorhnd, m_moduleloader);
 	if (name == "trace" && m_trace) return createIntrospection( m_errorhnd, m_trace);
 	if (name == "rpc" && m_rpc) return createIntrospection( m_errorhnd, m_rpc);
 	if (name == "queryproc" && m_queryproc) return createIntrospection( m_errorhnd, m_queryproc);
 	if (name == "textproc" && m_textproc) return createIntrospection( m_errorhnd, m_textproc);
+	if (name == "threads") return createIntrospectionAtomic( m_errorhnd, (std::int64_t)m_threads);
 	return NULL;
 }
-std::vector<std::string> IntrospectionContext::list() const
+std::vector<std::string> ContextIntrospection::list() const
 {
-	std::vector<std::string> rt;
-	if (m_moduleloader) rt.push_back( "env");
-	if (m_trace) rt.push_back( "trace");
-	if (m_rpc) rt.push_back( "rpc");
-	if (m_queryproc) rt.push_back( "queryproc");
-	if (m_textproc) rt.push_back( "textproc");
-	return rt;
+	static const char* ar[] = {"env","trace","rpc","queryproc","textproc","threads",NULL};
+	return getList( ar);
 }
 
-
-
-void IntrospectionRpcClient::serialize( papuga_Serialization& serialization) const
-{
-	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
-	if (m_errorhnd->hasError()) throw introspection_error( _TXT("serialization error"), m_errorhnd);
-}
-IntrospectionBase* IntrospectionRpcClient::open( const std::string& name) const
-{
-	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
-	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
-	CfgItems::const_iterator ci = items.begin(), ce = items.end();
-	for (; ci != ce; ++ci)
-	{
-		if (name == ci->first) return createIntrospectionAtomic( m_errorhnd, ci->second);
-	}
-	return NULL;
-}
-std::vector<std::string> IntrospectionRpcClient::list() const
-{
-	std::vector<std::string> rt;
-	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
-	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
-	CfgItems::const_iterator ci = items.begin(), ce = items.end();
-	for (; ci != ce; ++ci)
-	{
-		rt.push_back( ci->first);
-	}
-	return rt;
-}
-
-void IntrospectionTraceProxy::serialize( papuga_Serialization& serialization) const
-{
-	Serializer::serializeWithName( &serialization, "config", strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
-	if (m_errorhnd->hasError()) throw introspection_error( _TXT("serialization error"), m_errorhnd);
-}
-IntrospectionBase* IntrospectionTraceProxy::open( const std::string& name) const
-{
-	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
-	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
-	CfgItems::const_iterator ci = items.begin(), ce = items.end();
-	for (; ci != ce; ++ci)
-	{
-		if (name == ci->first) return createIntrospectionAtomic( m_errorhnd, ci->second);
-	}
-	return NULL;
-}
-std::vector<std::string> IntrospectionTraceProxy::list() const
-{
-	std::vector<std::string> rt;
-	typedef std::vector<std::pair<std::string,std::string> > CfgItems;
-	CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
-	CfgItems::const_iterator ci = items.begin(), ce = items.end();
-	for (; ci != ce; ++ci)
-	{
-		rt.push_back( ci->first);
-	}
-	return rt;
-}
 
 void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization) const
 {
-	Serializer::serializeWithName( &serialization, "moduledir", m_impl->modulePaths(), true/*deep*/);
-	Serializer::serializeWithName( &serialization, "modules", m_impl->modules(), true/*deep*/);
-	Serializer::serializeWithName( &serialization, "resourcedir", m_impl->resourcePaths(), true/*deep*/);
-	Serializer::serializeWithName( &serialization, "workdir", m_impl->workdir(), true/*deep*/);
+	serializeList( serialization);
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name) const
 {
 	if (name == "moduledir") return createIntrospectionAtomic( m_errorhnd, m_impl->modulePaths());
-	if (name == "modules") return createIntrospectionAtomic( m_errorhnd, m_impl->modules());
+	if (name == "module") return createIntrospectionAtomic( m_errorhnd, m_impl->modules());
 	if (name == "resourcedir") return createIntrospectionAtomic( m_errorhnd, m_impl->resourcePaths());
 	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workdir());
 	return NULL;
 }
 std::vector<std::string> IntrospectionModuleLoader::list() const
 {
-	std::vector<std::string> rt;
-	rt.push_back( "moduledir");
-	rt.push_back( "modules");
-	rt.push_back( "resourcedir");
-	rt.push_back( "workdir");
-	return rt;
+	static const char* ar[] = {"moduledir","module","resourcedir","workdir",NULL};
+	return getList( ar);
 }
 
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::Segmenter> IntrospectionSegmenterList;
@@ -416,25 +276,7 @@ typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface
 
 void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization) const
 {
-	{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionSegmenterList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "segmenter", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionTokenizerFunctionList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "tokenizer", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionNormalizerFunctionList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "normalizer", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionAggregatorFunctionList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "aggregator", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionPatternLexerList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "patternlexer", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionPatternMatcherList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "patternmatcher", introspection.get());
-	}
+	serializeList( serialization);
 }
 IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name) const
 {
@@ -448,14 +290,8 @@ IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name) co
 }
 std::vector<std::string> IntrospectionTextProcessor::list() const
 {
-	std::vector<std::string> rt;
-	rt.push_back( "segmenter");
-	rt.push_back( "tokenizer");
-	rt.push_back( "normalizer");
-	rt.push_back( "aggregator");
-	rt.push_back( "patternlexer");
-	rt.push_back( "patternmatcher");
-	return rt;
+	static const char* ar[] = {"segmenter","tokenizer","normalizer","aggregator","patternlexer","patternmatcher",NULL};
+	return getList( ar);
 }
 
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::PostingJoinOperator> IntrospectionPostingJoinOperatorList;
@@ -465,19 +301,7 @@ typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterfa
 
 void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization) const
 {
-	{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionPostingJoinOperatorList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "segmenter", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionWeightingFunctionList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "weightfunc", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionSummarizerFunctionList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "summarizer", introspection.get());
-	}{
-		strus::local_ptr<IntrospectionBase> introspection( new IntrospectionScalarFunctionParserList( m_errorhnd, m_impl));
-		serializeIntrospection( serialization, "scalarfunc", introspection.get());
-	}
+	serializeList( serialization);
 }
 IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name) const
 {
@@ -489,12 +313,8 @@ IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name) c
 }
 std::vector<std::string> IntrospectionQueryProcessor::list() const
 {
-	std::vector<std::string> rt;
-	rt.push_back( "joinop");
-	rt.push_back( "weightfunc");
-	rt.push_back( "summarizer");
-	rt.push_back( "scalarfunc");
-	return rt;
+	static const char* ar[] = {"joinop","weightfunc","summarizer","scalarfunc",NULL};
+	return getList( ar);
 }
 
 

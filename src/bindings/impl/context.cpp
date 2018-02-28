@@ -10,6 +10,7 @@
 #include "impl/vector.hpp"
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
+#include "impl/value/contextIntrospection.hpp"
 #include "papuga/valueVariant.hpp"
 #include "papuga/serialization.hpp"
 #include "papuga/errors.hpp"
@@ -445,7 +446,7 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool determin
 	return rt;
 }
 
-IntrospectionBase* ContextImpl::createIntrospectionContext( const ValueVariant& arg)
+IntrospectionBase* ContextImpl::createIntrospection( const ValueVariant& arg)
 {
 	std::vector<std::string> path;
 	if (papuga_ValueVariant_defined( &arg))
@@ -459,7 +460,7 @@ IntrospectionBase* ContextImpl::createIntrospectionContext( const ValueVariant& 
 	AnalyzerObjectBuilderInterface* analyzer = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 	RpcClientInterface* rpc = m_rpc_impl.getObject<RpcClientInterface>();
 
-	strus::local_ptr<IntrospectionBase> ictx( new IntrospectionContext( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
+	strus::local_ptr<IntrospectionBase> ictx( new ContextIntrospection( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
 	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
 	for (; pi != pe; ++pi)
 	{
@@ -475,14 +476,14 @@ IntrospectionBase* ContextImpl::createIntrospectionContext( const ValueVariant& 
 
 std::vector<std::string>* ContextImpl::introspectionDir( const ValueVariant& path)
 {
-	strus::local_ptr<IntrospectionBase> ictx( createIntrospectionContext( path));
+	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
 	return new std::vector<std::string>( ictx->list());
 }
 
 Struct ContextImpl::introspection( const ValueVariant& path)
 {
 	Struct rt;
-	strus::local_ptr<IntrospectionBase> ictx( createIntrospectionContext( path));
+	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
 	ictx->serialize( rt.serialization);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())

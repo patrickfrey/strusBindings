@@ -5,10 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Interface for introspection
-#ifndef _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_HPP_INCLUDED
-#define _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_HPP_INCLUDED
-#include "papuga/serialization.h"
+/// \brief Interface for introspection of the root object
+#ifndef _STRUS_BINDING_IMPL_VALUE_CONTEXT_INTROSPECTION_HPP_INCLUDED
+#define _STRUS_BINDING_IMPL_VALUE_CONTEXT_INTROSPECTION_HPP_INCLUDED
+#include "introspectionBase.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/moduleLoaderInterface.hpp"
@@ -16,28 +16,15 @@
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "traceProxy.hpp"
-#include <string>
-#include <vector>
 
 namespace strus {
 namespace bindings {
 
-/// \brief Interface for introspection
-class IntrospectionBase
-{
-public:
-	virtual ~IntrospectionBase(){}
-
-	virtual void serialize( papuga_Serialization& serialization) const=0;
-	virtual IntrospectionBase* open( const std::string& name) const=0;
-	virtual std::vector<std::string> list() const=0;
-};
-
-class IntrospectionContext
+class ContextIntrospection
 	:public IntrospectionBase
 {
 public:
-	IntrospectionContext(
+	ContextIntrospection(
 			ErrorBufferInterface* errorhnd_,
 			const ModuleLoaderInterface* moduleloader_,
 			const TraceProxy* trace_,
@@ -54,7 +41,7 @@ public:
 		,m_threads(threads_)
 		{}
 
-	IntrospectionContext( const IntrospectionContext& o)
+	ContextIntrospection( const ContextIntrospection& o)
 		:m_errorhnd(o.m_errorhnd)
 		,m_moduleloader(o.m_moduleloader)
 		,m_trace(o.m_trace)

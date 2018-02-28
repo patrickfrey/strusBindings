@@ -15,7 +15,7 @@
 #include "strus/base/thread.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
-#include "impl/value/introspection.hpp"
+#include "impl/value/introspectionBase.hpp"
 #include <vector>
 #include <string>
 
@@ -203,7 +203,7 @@ public:
 	/// \return the list of items to introspect starting from the path
 	std::vector<std::string>* introspectionDir( const ValueVariant& path);
 
-	/// \brief Get the list of items to introspect starting from a root path
+	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \example ["queryproc","weightfunc"]
 	/// \example ["weightfunc"]
@@ -214,7 +214,7 @@ public:
 private:
 	void initStorageObjBuilder();
 	void initAnalyzerObjBuilder();
-	IntrospectionBase* createIntrospectionContext( const ValueVariant& path);
+	IntrospectionBase* createIntrospection( const ValueVariant& path);
 
 private:
 	mutable ObjectRef m_errorhnd_impl;

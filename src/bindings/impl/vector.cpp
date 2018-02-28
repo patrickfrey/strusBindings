@@ -109,14 +109,15 @@ Struct VectorStorageClientImpl::conceptClassNames() const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
-	Reference<std::vector<std::string> > cfg( new std::vector<std::string>( storage->conceptClassNames()));
+	typedef std::vector<std::string> NameList;
+	Reference<NameList> cfg( new NameList( storage->conceptClassNames()));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	Struct rt;
-	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
+	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<NameList>::getDestructor())) throw std::bad_alloc();
 	strus::bindings::Serializer::serialize( &rt.serialization, *cfg,false/*deep*/);
 	cfg.release();
 	rt.release();
@@ -240,21 +241,8 @@ Struct VectorStorageClientImpl::config() const
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
-	typedef std::vector<std::pair<std::string,std::string> > Configuration;
-	Reference<Configuration> cfg( new Configuration( strus::getConfigStringItems( storage->config(), errorhnd)));
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
-	}
-	Struct rt;
-	strus::bindings::Serializer::serialize( &rt.serialization, *cfg,false/*deep*/);
-	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
-	cfg.release();
+	ConfigStruct rt( storage->config(), errorhnd);
 	rt.release();
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
-	}
 	return rt;
 }
 

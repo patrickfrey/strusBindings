@@ -8,13 +8,14 @@
 /// \brief Interface to arbitrary structure as return value
 #ifndef _STRUS_BINDING_IMPL_STRUCT_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STRUCT_HPP_INCLUDED
-#include "papuga/serialization.h"
-#include "papuga/allocator.h"
+#include "papuga/typedefs.h"
 #include <string>
-#include <cstring>
-#include <stdexcept>
 
 namespace strus {
+
+/// \brief Forward declaration
+class ErrorBufferInterface;
+
 namespace bindings {
 
 /// \brief Object representing an arbitrary structure as return value
@@ -22,50 +23,30 @@ struct Struct
 {
 public:
 	/// \brief Constructor
-	Struct()
-		:released(false)
-	{
-		papuga_init_Allocator( &allocator, 0, 0);
-		papuga_init_Serialization( &serialization, &allocator);
-	}
+	Struct();
 
 	/// \brief "Move" constructor
-	Struct( const Struct& o)
-		:released(o.released)
-	{
-		// PF:HACK: We would like to have a move constructor only,
-		// but move semantics are not available in C++98, we should switch to C++11
-		if (released)
-		{
-			std::memcpy( &serialization, &o.serialization, sizeof(serialization));
-			std::memcpy( &allocator, &o.allocator, sizeof(allocator));
-		}
-		else
-		{
-			throw std::logic_error( "deep copy of Struct not allowed");
-		}
-	}
+	Struct( const Struct& o);
 
 	/// \brief Destructor
-	~Struct()
-	{
-		if (!released)
-		{
-			papuga_destroy_Allocator( &allocator);
-		}
-	}
+	~Struct();
 
-	void release()
-	{
-		released = true;
-	}
+	void release();
 
+public:
 	papuga_Serialization serialization;
 	papuga_Allocator allocator;
-
 private:
 	bool released;
 };
+
+
+struct ConfigStruct
+	:public Struct
+{
+	ConfigStruct( const std::string& config, ErrorBufferInterface* errorhnd);
+};
+
 
 }}//namespace
 #endif

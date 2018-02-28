@@ -303,8 +303,9 @@ static bool getListMethod( papuga_RequestMethodId& mid, int classid)
 {
 	switch (classid)
 	{
-		case STRUS_BINDINGS_CLASSID_Context:	mid = strus::bindings::method::Context::introspectionDir(); return true;
-		default:				return false;
+		case STRUS_BINDINGS_CLASSID_Context:		mid = strus::bindings::method::Context::introspectionDir(); return true;
+		case STRUS_BINDINGS_CLASSID_StorageClient:	mid = strus::bindings::method::StorageClient::introspectionDir(); return true;
+		default:					return false;
 	}
 }
 
@@ -312,8 +313,9 @@ static bool getViewMethod( papuga_RequestMethodId& mid, int classid)
 {
 	switch (classid)
 	{
-		case STRUS_BINDINGS_CLASSID_Context:	mid = strus::bindings::method::Context::introspection(); return true;
-		default:				return false;
+		case STRUS_BINDINGS_CLASSID_Context:		mid = strus::bindings::method::Context::introspection(); return true;
+		case STRUS_BINDINGS_CLASSID_StorageClient:	mid = strus::bindings::method::StorageClient::introspection(); return true;
+		default:					return false;
 	}
 }
 

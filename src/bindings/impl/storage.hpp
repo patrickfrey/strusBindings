@@ -14,6 +14,7 @@
 #include "impl/value/objectref.hpp"
 #include "impl/value/iterator.hpp"
 #include "impl/value/struct.hpp"
+#include "impl/value/introspectionBase.hpp"
 #include <vector>
 #include <string>
 
@@ -174,6 +175,26 @@ public:
 
 	/// \brief Close of the storage client
 	void close();
+
+	/// \brief Get the list of items to introspect starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \example ["config"]
+	/// \example ["config", "path"]
+	/// \example ["nofdocs"]
+	/// \return the list of items to introspect starting from the path
+	std::vector<std::string>* introspectionDir( const ValueVariant& path);
+
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \example ["config"]
+	/// \example ["termtypes"]
+	/// \example ["attributenames"]
+	/// \example ["metadatanames"]
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path);
+
+private:
+	IntrospectionBase* createIntrospection( const ValueVariant& path);
 
 private:
 	friend class ContextImpl;

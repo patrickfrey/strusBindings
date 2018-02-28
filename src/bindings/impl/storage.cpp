@@ -12,6 +12,7 @@
 #include "impl/value/statisticsIterator.hpp"
 #include "impl/value/forwardTermsIterator.hpp"
 #include "impl/value/searchTermsIterator.hpp"
+#include "impl/value/storageIntrospection.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/storageClientInterface.hpp"
 #include "strus/storageTransactionInterface.hpp"
@@ -27,6 +28,7 @@
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "papuga/serialization.h"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
@@ -235,21 +237,52 @@ Struct StorageClientImpl::config() const
 	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
-	typedef std::vector<std::pair<std::string,std::string> > Configuration;
-	Reference<Configuration> cfg( new Configuration( strus::getConfigStringItems( storage->config(), errorhnd)));
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
-	}
-	Struct rt;
-	strus::bindings::Serializer::serialize( &rt.serialization, *cfg, false/*deep*/);
-	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<std::vector<std::string> >::getDestructor())) throw std::bad_alloc();
-	cfg.release();
+	ConfigStruct rt( storage->config(), errorhnd);
 	rt.release();
+	return rt;
+}
+
+IntrospectionBase* StorageClientImpl::createIntrospection( const ValueVariant& arg)
+{
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+
+	strus::local_ptr<IntrospectionBase> ictx( new StorageIntrospection( errorhnd, storage));
+	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
+	for (; pi != pe; ++pi)
+	{
+		ictx.reset( ictx->open( *pi));
+		if (!ictx.get())
+		{
+			throw strus::runtime_error( *ErrorCode( StrusComponentBindings, ErrorOperationCallIndirection, ErrorCauseRequestResolveError),
+						_TXT("failed to create introspection"));
+		}
+	}
+	return ictx.release();
+}
+
+std::vector<std::string>* StorageClientImpl::introspectionDir( const ValueVariant& path)
+{
+	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
+	return new std::vector<std::string>( ictx->list());
+}
+
+Struct StorageClientImpl::introspection( const ValueVariant& path)
+{
+	Struct rt;
+	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
+	ictx->serialize( rt.serialization);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT("failed to get the storage configuration: %s"), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
 	}
+	rt.release();
 	return rt;
 }
 

@@ -13,7 +13,10 @@ set( source_files
 	valueVariantWrap.cpp
 	callResultUtils.cpp
 	traceProxy.cpp
-	impl/value/introspection.cpp
+	impl/value/struct.cpp
+	impl/value/introspectionBase.cpp
+	impl/value/contextIntrospection.cpp
+	impl/value/storageIntrospection.cpp
 	impl/value/termExpression.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp
