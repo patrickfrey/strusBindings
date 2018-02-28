@@ -27,7 +27,10 @@ collection dump:
 string config: 
   string acl: "true"
   string cache: "524288K"
-  string metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
+  string metadata: 
+    string doclen: "UInt16"
+    string title_end: "UInt8"
+    string title_start: "UInt8"
   string path: "storage"
 string docids: 
   integer 0: "A.xml"

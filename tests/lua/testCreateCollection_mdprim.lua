@@ -21,7 +21,13 @@ collection dump:
 string config:
   string acl: "true"
   string cache: "524288K"
-  string metadata: "docidx UInt32,lo UInt16,hi UInt16,doclen UInt16,cross UInt8,factors UInt8"
+  string metadata:
+    string cross: "UInt8"
+    string docidx: "UInt32"
+    string doclen: "UInt16"
+    string factors: "UInt8"
+    string hi: "UInt16"
+    string lo: "UInt16"
   string path: "storage"
 string docids:
   number 1: "1"

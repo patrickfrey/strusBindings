@@ -382,7 +382,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 				errcode = (errbuf.cause() == ErrorCauseOutOfMem) ? papuga_NoMemError : papuga_SyntaxError;
 				return false;
 			}
-			rt &= serialize_nothrow( result, subitems, errcode, deep);
+			rt &= serialize_nothrow( result, subitems, errcode, true);
 			rt &= papuga_Serialization_pushClose( result);
 		}
 		else

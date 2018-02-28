@@ -34,7 +34,10 @@ expected = """collection dump:
 str config:
   str acl: "true"
   str cache: "524288K"
-  str metadata: "doclen UInt16,title_start UInt8,title_end UInt8"
+  str metadata:
+    str doclen: "UInt16"
+    str title_end: "UInt8"
+    str title_start: "UInt8"
   str path: "storage"
 str docids:
   number 1: "A.xml"
