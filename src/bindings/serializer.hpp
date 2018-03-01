@@ -23,6 +23,7 @@
 #include "strus/functionDescription.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
+#include "strus/documentTermIteratorInterface.hpp"
 #include "impl/value/termExpression.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/metadataComparison.hpp"
@@ -43,6 +44,7 @@ template <> class StructIdTemplate<StatisticsViewerInterface> {public: static in
 template <> class StructIdTemplate<TermStatisticsChange> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_TermStatisticsChange;}};
 template <> class StructIdTemplate<analyzer::QueryTerm> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_QueryTerm;}};
 template <> class StructIdTemplate<analyzer::QueryTermExpression> {public: static int structid(){return STRUS_BINDINGS_STRUCTID_QueryTermExpression;}};
+template <> class StructIdTemplate<DocumentTermIteratorInterface::Term> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentInvTerm;}};
 template <> class StructIdTemplate<analyzer::DocumentTerm> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentTerm;}};
 template <> class StructIdTemplate<analyzer::Document> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_Document;}};
 template <> class StructIdTemplate<analyzer::DocumentClass> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentClass;}};
@@ -97,10 +99,16 @@ public:
 	}
 
 	template <typename TYPE>
-	static void serializeWithName( papuga_Serialization* result, const char* tagname, const TYPE& val, bool deep)
+	static void serializeWithConstName( papuga_Serialization* result, const char* tagname, const TYPE& val, bool deep)
 	{
 		papuga_ErrorCode errcode = papuga_NoMemError;
 		if (!serializeStructMember( result, tagname, val, errcode, deep)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
+	}
+	template <typename TYPE>
+	static void serializeWithName( papuga_Serialization* result, const char* tagname, const TYPE& val, bool deep)
+	{
+		papuga_ErrorCode errcode = papuga_NoMemError;
+		if (!serializeStructMemberConstName( result, tagname, val, errcode, deep)) throw std::runtime_error(papuga_ErrorCode_tostring(errcode));
 	}
 
 private:
@@ -171,6 +179,7 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode, bool deep);
 
 	static bool serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, DocumentTermIteratorInterface* dtitr, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val, papuga_ErrorCode& errcode, bool deep);
@@ -254,14 +263,35 @@ private:
 	}
 
 	template <typename TYPE>
-	static bool serializeStructMember( papuga_Serialization* result, const char* tagname, const TYPE& val, papuga_ErrorCode& errcode, bool deep)
+	static bool serializeStructMemberConstName( papuga_Serialization* result, const char* tagname, const TYPE& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		bool rt = true;
 		rt &= papuga_Serialization_pushName_charp( result, tagname);
 		rt &= serializeStructMemberValue( result, val, getCategory( val), errcode, deep);
 		return rt;
 	}
-
+	template <typename TYPE>
+	static bool serializeStructMember( papuga_Serialization* result, const char* tagname, const TYPE& val, papuga_ErrorCode& errcode, bool deep)
+	{
+		bool rt = true;
+		const char* tagnamestr;
+		if (deep)
+		{
+			tagnamestr = papuga_Allocator_copy_charp( result->allocator, tagname);
+			if (!tagnamestr)
+			{
+				errcode = papuga_NoMemError;
+				return false;
+			}
+		}
+		else
+		{
+			tagnamestr = tagname;
+		}
+		rt &= papuga_Serialization_pushName_charp( result, tagnamestr);
+		rt &= serializeStructMemberValue( result, val, getCategory( val), errcode, deep);
+		return rt;
+	}
 	template <typename TYPE>
 	static bool serializeArrayElement( papuga_Serialization* result, const TYPE& val, papuga_ErrorCode& errcode, bool deep)
 	{

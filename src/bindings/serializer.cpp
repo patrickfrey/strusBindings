@@ -64,6 +64,20 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= serializeStructMember( result, val.name().c_str(), val.value(), errcode, deep);
 	return rt;
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, DocumentTermIteratorInterface* dtitr, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	DocumentTermIteratorInterface::Term term;
+	while (rt && dtitr->nextTerm( term))
+	{
+		rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<DocumentTermIteratorInterface::Term>::structid());
+		rt &= serializeArrayElement( result, (int64_t)term.tf, errcode, deep);
+		rt &= serializeArrayElement( result, (int64_t)term.firstpos, errcode, deep);
+		rt &= serializeArrayElement( result, dtitr->termValue( term.termno), errcode, deep);
+		rt &= papuga_Serialization_pushClose( result);
+	}
+	return rt;
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
@@ -154,9 +168,9 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					const TermExpression::Operator& op = val.operatorStruct( ii->idx());
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
 
-					rt &= Serializer::serializeStructMember( ser, "op", op.name, errcode, deep);
-					if (op.range) rt &= Serializer::serializeStructMember( ser, "range", (papuga_Int)op.range, errcode, deep);
-					if (op.cardinality) rt &= Serializer::serializeStructMember( ser, "cardinality", (papuga_Int)op.cardinality, errcode, deep);
+					rt &= Serializer::serializeStructMemberConstName( ser, "op", op.name, errcode, deep);
+					if (op.range) rt &= Serializer::serializeStructMemberConstName( ser, "range", (papuga_Int)op.range, errcode, deep);
+					if (op.cardinality) rt &= Serializer::serializeStructMemberConstName( ser, "cardinality", (papuga_Int)op.cardinality, errcode, deep);
 	
 					rt &= papuga_Serialization_pushName_charp( ser, "arg");
 					rt &= papuga_Serialization_pushOpen( ser);
@@ -169,7 +183,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					rt &= papuga_Serialization_pushClose( ser);//... end arg
 					if (variablename)
 					{
-						rt &= Serializer::serializeStructMember( ser, "variable", variablename, errcode, deep);
+						rt &= Serializer::serializeStructMemberConstName( ser, "variable", variablename, errcode, deep);
 					}
 					stk.resize( stk.size() - ii->nofOperands());
 					stk.push_back( ser);
@@ -449,26 +463,26 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	rt &= Serializer::serializeStructMember( result, "type", val.typeName(), errcode, deep);
-	rt &= Serializer::serializeStructMember( result, "name", val.name(), errcode, deep);
-	rt &= Serializer::serializeStructMember( result, "domain", val.domain(), errcode, deep);
-	rt &= Serializer::serializeStructMember( result, "text", val.text(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "type", val.typeName(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "name", val.name(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "domain", val.domain(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "text", val.text(), errcode, deep);
 	return rt;
 }
 
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	rt &= Serializer::serializeStructMember( result, "text", val.text(), errcode, deep);
-	rt &= Serializer::serializeStructMember( result, "parameter", val.parameter(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "text", val.text(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "parameter", val.parameter(), errcode, deep);
 	return rt;
 }
 
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	rt &= Serializer::serializeStructMember( result, "name", val.name(), errcode, deep);
-	rt &= Serializer::serializeStructMember( result, "text", val.text(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "name", val.name(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "text", val.text(), errcode, deep);
 	return rt;
 }
 

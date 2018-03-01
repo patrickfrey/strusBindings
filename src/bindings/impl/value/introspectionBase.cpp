@@ -55,9 +55,9 @@ std::vector<std::string> IntrospectionBase::getKeyList( const std::vector<std::p
 	return rt;
 }
 
-void IntrospectionBase::serializeList( papuga_Serialization& serialization) const
+void IntrospectionBase::serializeList( papuga_Serialization& serialization, bool all) const
 {
-	std::vector<std::string> elems = this->list( false);
+	std::vector<std::string> elems = this->list( all);
 	std::vector<std::string>::const_iterator li = elems.begin(), le = elems.end();
 	for (; li != le; ++li)
 	{
@@ -118,6 +118,13 @@ IntrospectionBase* IntrospectionValueIterator::open( const std::string& name_) c
 }
 std::vector<std::string> IntrospectionValueIterator::list( bool all) const
 {
-	return std::vector<std::string>();
+	if (all)
+	{
+		return m_impl->fetchValues( PAPUGA_MAX_ITERATOR_EXPANSION_LENGTH);
+	}
+	else
+	{
+		return std::vector<std::string>();
+	}
 }
 

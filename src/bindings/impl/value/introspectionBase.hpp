@@ -35,7 +35,7 @@ public:
 	virtual std::vector<std::string> list( bool all) const=0;
 
 protected:
-	void serializeList( papuga_Serialization& serialization) const;
+	void serializeList( papuga_Serialization& serialization, bool all=false) const;
 	void serializeStructureAs( papuga_Serialization& serialization, const char* name) const;
 	static std::vector<std::string> getList( const char** ar, bool all);
 	static std::vector<std::string> getKeyList( const std::vector<std::pair<std::string,std::string> >& ar);

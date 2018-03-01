@@ -55,8 +55,15 @@ enum _QueryTerm {type,value,len,variable};
 /// \member variable (optional) name of the variable attached to this term
 enum _QueryTermExpression {op,range,cardinality,arg,variable};
 
+/// \struct DocumentInvTerm
+/// \brief Term structure provided by document term iterator
+/// \member tf term frequency in the document
+/// \member firstpos first occurrence ordinal term position in the document
+/// \member value term value string
+enum _DocumentInvTerm {tf,firstpos,value};
+
 /// \struct DocumentTerm
-/// \brief Query term structure
+/// \brief Document term
 /// \member type type name of the term
 /// \member value value of the term
 /// \member pos ordinal position of the term (>=1)
