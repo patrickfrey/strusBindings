@@ -102,7 +102,7 @@ IntrospectionValueIterator::~IntrospectionValueIterator()
 
 void IntrospectionValueIterator::serialize( papuga_Serialization& serialization) const
 {
-	std::vector<std::string> valuelist = m_impl->fetchValues( PAPUGA_MAX_ITERATOR_EXPANSION_LENGTH);
+	std::vector<std::string> valuelist = m_impl->fetchValues( MaxListSizeDeepExpansion);
 	Serializer::serialize( &serialization, valuelist, true/*deep*/);
 }
 IntrospectionBase* IntrospectionValueIterator::open( const std::string& name_) const
@@ -120,7 +120,7 @@ std::vector<std::string> IntrospectionValueIterator::list( bool all) const
 {
 	if (all)
 	{
-		return m_impl->fetchValues( PAPUGA_MAX_ITERATOR_EXPANSION_LENGTH);
+		return m_impl->fetchValues( MaxListSizeDeepExpansion);
 	}
 	else
 	{

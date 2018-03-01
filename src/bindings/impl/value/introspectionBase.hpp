@@ -34,9 +34,10 @@ public:
 	virtual IntrospectionBase* open( const std::string& name) const=0;
 	virtual std::vector<std::string> list( bool all) const=0;
 
+	void serializeStructureAs( papuga_Serialization& serialization, const char* name) const;
+
 protected:
 	void serializeList( papuga_Serialization& serialization, bool all=false) const;
-	void serializeStructureAs( papuga_Serialization& serialization, const char* name) const;
 	static std::vector<std::string> getList( const char** ar, bool all);
 	static std::vector<std::string> getKeyList( const std::vector<std::pair<std::string,std::string> >& ar);
 	static std::runtime_error unresolvable_exception();
@@ -51,6 +52,8 @@ class IntrospectionValueIterator
 	:public IntrospectionBase
 {
 public:
+	enum {MaxListSizeDeepExpansion=50};
+
 	IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_, const std::string& name_="");
 
 	~IntrospectionValueIterator();

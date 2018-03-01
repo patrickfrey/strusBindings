@@ -573,7 +573,7 @@ public:
 			strus::Index docno = m_impl->documentNumber( *ei);
 			if (!docno) throw unresolvable_exception();
 			DocumentIntrospection part( m_errorhnd, m_impl, *ei, docno);
-			part.serializeStructureAs( serialization, li->c_str());
+			part.serializeStructureAs( serialization, ei->c_str());
 		}
 	}
 
