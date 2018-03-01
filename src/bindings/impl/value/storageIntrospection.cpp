@@ -522,6 +522,10 @@ public:
 		{
 			return createIntrospectionAtomic( m_errorhnd, m_docid);
 		}
+		else if (name == "docno")
+		{
+			return createIntrospectionAtomic( m_errorhnd, (int64_t)m_docno);
+		}
 		else if (name == "sindex")
 		{
 			return new SearchIndexIntrospection( m_errorhnd, m_impl, m_docno);
@@ -562,19 +566,14 @@ public:
 
 	virtual void serialize( papuga_Serialization& serialization) const
 	{
-		if (m_docid.empty())
+		std::vector<std::string> elems = list( true/*all*/);
+		std::vector<std::string>::const_iterator ei = elems.begin(), ee = elems.end();
+		for (; ei != ee; ++ei)
 		{
-			serializeList( serialization, true/*all*/);
-		}
-		else
-		{
-			std::vector<std::string> elems = list( true/*all*/);
-			std::vector<std::string>::const_iterator ei = elems.begin(), ee = elems.end();
-			for (; ei != ee; ++ei)
-			{
-				DocidIntrospection part( m_errorhnd, m_impl, *ei);
-				part.serializeStructureAs( serialization, ei->c_str());
-			}
+			docno = m_impl->documentNumber( *ei);
+			if (!docno) throw unresolvable_exception();
+			DocumentIntrospection part( m_errorhnd, m_impl, *ei, docno);
+			part.serializeStructureAs( serialization, li->c_str());
 		}
 	}
 
