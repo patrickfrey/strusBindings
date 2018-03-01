@@ -32,12 +32,14 @@ public:
 
 	virtual void serialize( papuga_Serialization& serialization) const=0;
 	virtual IntrospectionBase* open( const std::string& name) const=0;
-	virtual std::vector<std::string> list() const=0;
+	virtual std::vector<std::string> list( bool all) const=0;
+
 protected:
 	void serializeList( papuga_Serialization& serialization) const;
 	void serializeStructureAs( papuga_Serialization& serialization, const char* name) const;
-	static std::vector<std::string> getList( const char** ar);
+	static std::vector<std::string> getList( const char** ar, bool all);
 	static std::vector<std::string> getKeyList( const std::vector<std::pair<std::string,std::string> >& ar);
+	static std::runtime_error unresolvable_exception();
 };
 
 
@@ -49,17 +51,18 @@ class IntrospectionValueIterator
 	:public IntrospectionBase
 {
 public:
-	IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_);
+	IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_, const std::string& name_="");
 
 	~IntrospectionValueIterator();
 
 	virtual void serialize( papuga_Serialization& serialization) const;
 	virtual IntrospectionBase* open( const std::string& name) const;
-	virtual std::vector<std::string> list() const;
+	virtual std::vector<std::string> list( bool all) const;
 
 private:
 	ErrorBufferInterface* m_errorhnd;
 	ValueIteratorInterface* m_impl;
+	std::string m_name;
 };
 
 }}//namespace

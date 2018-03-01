@@ -32,12 +32,13 @@ public:
 	~Struct();
 
 	void release();
+	bool released() const	{return m_released;}
 
 public:
 	papuga_Serialization serialization;
 	papuga_Allocator allocator;
 private:
-	bool released;
+	bool m_released;
 };
 
 

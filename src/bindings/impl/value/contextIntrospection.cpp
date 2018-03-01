@@ -10,6 +10,7 @@
 #include "introspectionTemplates.hpp"
 #include "serializer.hpp"
 #include "private/internationalization.hpp"
+#include "strus/base/stdint.h"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/segmenterInterface.hpp"
@@ -45,7 +46,7 @@ public:\
 		:m_errorhnd(errorhnd_),m_impl(impl_){}\
 	virtual void serialize( papuga_Serialization& serialization) const;\
 	virtual IntrospectionBase* open( const std::string& name) const;\
-	virtual std::vector<std::string> list() const;\
+	virtual std::vector<std::string> list( bool all) const;\
 private:\
 	ErrorBufferInterface* m_errorhnd;\
 	const ClassName* m_impl;\
@@ -85,7 +86,7 @@ public:
 	{
 		return NULL;
 	}
-	virtual std::vector<std::string> list() const
+	virtual std::vector<std::string> list( bool all) const
 	{
 		return std::vector<std::string>();
 	}
@@ -219,7 +220,7 @@ public:
 	{
 		return createIntrospection( m_errorhnd, Traits::get( m_impl, name));
 	}
-	virtual std::vector<std::string> list() const
+	virtual std::vector<std::string> list( bool all) const
 	{
 		return m_impl->getFunctionList( functionType);
 	}
@@ -239,13 +240,13 @@ IntrospectionBase* ContextIntrospection::open( const std::string& name) const
 	if (name == "rpc" && m_rpc) return createIntrospection( m_errorhnd, m_rpc);
 	if (name == "queryproc" && m_queryproc) return createIntrospection( m_errorhnd, m_queryproc);
 	if (name == "textproc" && m_textproc) return createIntrospection( m_errorhnd, m_textproc);
-	if (name == "threads") return createIntrospectionAtomic( m_errorhnd, (std::int64_t)m_threads);
+	if (name == "threads") return createIntrospectionAtomic( m_errorhnd, (int64_t)m_threads);
 	return NULL;
 }
-std::vector<std::string> ContextIntrospection::list() const
+std::vector<std::string> ContextIntrospection::list( bool all) const
 {
 	static const char* ar[] = {"env","trace","rpc","queryproc","textproc","threads",NULL};
-	return getList( ar);
+	return getList( ar, all);
 }
 
 
@@ -261,10 +262,10 @@ IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name) con
 	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workdir());
 	return NULL;
 }
-std::vector<std::string> IntrospectionModuleLoader::list() const
+std::vector<std::string> IntrospectionModuleLoader::list( bool all) const
 {
 	static const char* ar[] = {"moduledir","module","resourcedir","workdir",NULL};
-	return getList( ar);
+	return getList( ar, all);
 }
 
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::Segmenter> IntrospectionSegmenterList;
@@ -288,10 +289,10 @@ IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name) co
 	if (name == "patternmatcher") return new IntrospectionPatternMatcherList( m_errorhnd, m_impl);
 	return NULL;
 }
-std::vector<std::string> IntrospectionTextProcessor::list() const
+std::vector<std::string> IntrospectionTextProcessor::list( bool all) const
 {
 	static const char* ar[] = {"segmenter","tokenizer","normalizer","aggregator","patternlexer","patternmatcher",NULL};
-	return getList( ar);
+	return getList( ar, all);
 }
 
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::PostingJoinOperator> IntrospectionPostingJoinOperatorList;
@@ -311,10 +312,10 @@ IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name) c
 	if (name == "scalarfunc") return new IntrospectionScalarFunctionParserList( m_errorhnd, m_impl);
 	return NULL;
 }
-std::vector<std::string> IntrospectionQueryProcessor::list() const
+std::vector<std::string> IntrospectionQueryProcessor::list( bool all) const
 {
 	static const char* ar[] = {"joinop","weightfunc","summarizer","scalarfunc",NULL};
-	return getList( ar);
+	return getList( ar, all);
 }
 
 

@@ -33,7 +33,7 @@ public:
 	{
 		return NULL;
 	}
-	virtual std::vector<std::string> list() const
+	virtual std::vector<std::string> list( bool all) const
 	{
 		return std::vector<std::string>();
 	}
@@ -63,7 +63,7 @@ public:
 		for (; li != le && name != li->first; ++li){}
 		return (li == le) ? NULL : new IntrospectionAtomic<typename TypeName::value_type::second_type>( m_errorhnd, li->second);
 	}
-	virtual std::vector<std::string> list() const
+	virtual std::vector<std::string> list( bool all) const
 	{
 		return this->getKeyList( m_value);
 	}
@@ -107,7 +107,7 @@ public:
 		}
 		return NULL;
 	}
-	virtual std::vector<std::string> list() const
+	virtual std::vector<std::string> list( bool all) const
 	{
 		return this->getKeyList( strus::getConfigStringItems( m_impl->config(), m_errorhnd));
 	}

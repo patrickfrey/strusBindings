@@ -253,6 +253,7 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
+	if (m_request) papuga_destroy_Request( m_request);
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)
 	{

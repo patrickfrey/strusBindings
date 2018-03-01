@@ -13,6 +13,7 @@
 #include "papuga/serialization.h"
 #include "serializer.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/errorCodes.hpp"
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/base/local_ptr.hpp"
 #include <stdexcept>
@@ -20,13 +21,25 @@
 using namespace strus;
 using namespace strus::bindings;
 
-std::vector<std::string> IntrospectionBase::getList( const char** ar)
+std::runtime_error IntrospectionBase::unresolvable_exception()
+{
+	return strus::runtime_error( *ErrorCode( StrusComponentBindings, ErrorOperationCallIndirection, ErrorCauseRequestResolveError), _TXT("not found"));
+}
+
+std::vector<std::string> IntrospectionBase::getList( const char** ar, bool all)
 {
 	std::vector<std::string> rt;
 	char const** ai = ar;
 	for (; *ai; ++ai)
 	{
-		rt.push_back( *ai);
+		if (**ai == '.')
+		{
+			if (all) rt.push_back( *ai+1);
+		}
+		else
+		{
+			rt.push_back( *ai);
+		}
 	}
 	return rt;
 }
@@ -44,7 +57,7 @@ std::vector<std::string> IntrospectionBase::getKeyList( const std::vector<std::p
 
 void IntrospectionBase::serializeList( papuga_Serialization& serialization) const
 {
-	std::vector<std::string> elems = this->list();
+	std::vector<std::string> elems = this->list( false);
 	std::vector<std::string>::const_iterator li = elems.begin(), le = elems.end();
 	for (; li != le; ++li)
 	{
@@ -73,8 +86,14 @@ std::runtime_error bindings::introspection_error( const char* msg, ErrorBufferIn
 	return strus::runtime_error( "%s: %s", msg, errorhnd->hasError() ? errorhnd->fetchError() : _TXT("unknown error"));
 }
 
-IntrospectionValueIterator::IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_)
-	:m_errorhnd(errorhnd_),m_impl(impl_){}
+IntrospectionValueIterator::IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_, const std::string& name_)
+	:m_errorhnd(errorhnd_),m_impl(impl_),m_name(name_)
+{
+	if (!m_name.empty())
+	{
+		m_impl->skip( m_name.c_str(), m_name.size());
+	}
+}
 
 IntrospectionValueIterator::~IntrospectionValueIterator()
 {
@@ -86,11 +105,18 @@ void IntrospectionValueIterator::serialize( papuga_Serialization& serialization)
 	std::vector<std::string> valuelist = m_impl->fetchValues( PAPUGA_MAX_ITERATOR_EXPANSION_LENGTH);
 	Serializer::serialize( &serialization, valuelist, true/*deep*/);
 }
-IntrospectionBase* IntrospectionValueIterator::open( const std::string& name) const
+IntrospectionBase* IntrospectionValueIterator::open( const std::string& name_) const
 {
-	return NULL;
+	if (m_name.empty())
+	{
+		return new IntrospectionValueIterator( m_errorhnd, m_impl, name_);
+	}
+	else
+	{
+		return NULL;
+	}
 }
-std::vector<std::string> IntrospectionValueIterator::list() const
+std::vector<std::string> IntrospectionValueIterator::list( bool all) const
 {
 	return std::vector<std::string>();
 }

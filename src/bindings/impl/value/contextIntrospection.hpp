@@ -53,7 +53,7 @@ public:
 
 	virtual void serialize( papuga_Serialization& serialization) const;
 	virtual IntrospectionBase* open( const std::string& name) const;
-	virtual std::vector<std::string> list() const;
+	virtual std::vector<std::string> list( bool all) const;
 
 private:
 	ErrorBufferInterface* m_errorhnd;

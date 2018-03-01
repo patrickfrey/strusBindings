@@ -20,18 +20,18 @@ using namespace strus;
 using namespace strus::bindings;
 
 Struct::Struct()
-	:released(false)
+	:m_released(false)
 {
 	papuga_init_Allocator( &allocator, 0, 0);
 	papuga_init_Serialization( &serialization, &allocator);
 }
 
 Struct::Struct( const Struct& o)
-	:released(o.released)
+	:m_released(o.m_released)
 {
 	// PF:HACK: We would like to have a move constructor only,
 	// but move semantics are not available in C++98, we should switch to C++11
-	if (released)
+	if (m_released)
 	{
 		std::memcpy( &serialization, &o.serialization, sizeof(serialization));
 		std::memcpy( &allocator, &o.allocator, sizeof(allocator));
@@ -44,7 +44,7 @@ Struct::Struct( const Struct& o)
 
 Struct::~Struct()
 {
-	if (!released)
+	if (!m_released)
 	{
 		papuga_destroy_Allocator( &allocator);
 	}
@@ -52,7 +52,7 @@ Struct::~Struct()
 
 void Struct::release()
 {
-	released = true;
+	m_released = true;
 }
 
 ConfigStruct::ConfigStruct( const std::string& config, ErrorBufferInterface* errorhnd)

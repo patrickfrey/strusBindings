@@ -477,7 +477,7 @@ IntrospectionBase* ContextImpl::createIntrospection( const ValueVariant& arg)
 std::vector<std::string>* ContextImpl::introspectionDir( const ValueVariant& path)
 {
 	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
-	return new std::vector<std::string>( ictx->list());
+	return new std::vector<std::string>( ictx->list( true));
 }
 
 Struct ContextImpl::introspection( const ValueVariant& path)

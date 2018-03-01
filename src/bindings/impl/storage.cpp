@@ -269,7 +269,7 @@ IntrospectionBase* StorageClientImpl::createIntrospection( const ValueVariant& a
 std::vector<std::string>* StorageClientImpl::introspectionDir( const ValueVariant& path)
 {
 	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
-	return new std::vector<std::string>( ictx->list());
+	return new std::vector<std::string>( ictx->list( true));
 }
 
 Struct StorageClientImpl::introspection( const ValueVariant& path)
