@@ -347,8 +347,7 @@ public:
 		if (m_docno != pitr->skipDoc( m_docno)) return;
 		if (m_pos)
 		{
-			strus::Index pos = 0;
-			pos = pitr->skipDoc( pos+1);
+			strus::Index pos = pitr->skipPos( m_pos);
 			if (pos)
 			{
 				Serializer::serialize( &serialization, (int64_t)pos, true/*deep*/);
@@ -358,7 +357,7 @@ public:
 		{
 			std::vector<strus::Index> posar;
 			strus::Index pos = 0;
-			while (!!(pos = pitr->skipDoc( pos+1)))
+			while (!!(pos = pitr->skipPos( pos+1)))
 			{
 				posar.push_back( pos);
 			}
