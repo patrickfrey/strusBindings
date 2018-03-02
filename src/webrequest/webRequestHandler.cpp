@@ -332,7 +332,7 @@ bool WebRequestHandler::loadStoredConfigurations(
 		int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
 		if (ec)
 		{
-			setStatus( status, ErrorOperationReadFile, ErrorCause(ec));
+			setStatus( status, ErrorOperationReadFile, (ErrorCause)ec);
 			return false;
 		}
 		std::sort( configFileNames.begin(), configFileNames.end());

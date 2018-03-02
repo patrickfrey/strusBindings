@@ -69,18 +69,13 @@ public:
 	AttibuteIntrospection(
 			ErrorBufferInterface* errorhnd_,
 			const StorageClientInterface* impl_,
-			strus::Index docno_)
+			const strus::Index& docno_)
 		:m_errorhnd(errorhnd_)
-		,m_impl(impl_->createAttributeReader())
+		,m_impl(impl_)
 		,m_docno(docno_)
-	{
-		if (!m_impl) throw std::runtime_error( m_errorhnd->fetchError());
-		m_impl->skipDoc( m_docno);
-	}
+	{}
 	~AttibuteIntrospection()
-	{
-		delete m_impl;
-	}
+	{}
 
 	virtual void serialize( papuga_Serialization& serialization) const
 	{
@@ -89,42 +84,111 @@ public:
 
 	virtual IntrospectionBase* open( const std::string& name) const
 	{
-		strus::Index elemhandle = m_impl->elementHandle( name.c_str());
-		if (!elemhandle) return NULL;
-		std::string value = m_impl->getValue( elemhandle);
-		if (value.empty()) return NULL;
-		return createIntrospectionAtomic( m_errorhnd, value);
+		std::string value;
+		return getValue( value, name) ? createIntrospectionAtomic( m_errorhnd, value) : NULL;
 	}
 
 	virtual std::vector<std::string> list( bool all) const
 	{
 		std::vector<std::string> rt;
-		std::vector<std::string> candidates = m_impl->getNames();
+		strus::local_ptr<AttributeReaderInterface> areader( m_impl->createAttributeReader());
+		if (!areader.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		areader->skipDoc( m_docno);
+		std::vector<std::string> candidates = areader->getNames();
 		std::vector<std::string>::const_iterator ci = candidates.begin(), ce = candidates.end();
 		for (; ci != ce; ++ci)
 		{
-			strus::Index elemhandle = m_impl->elementHandle( ci->c_str());
-			if (!elemhandle) return std::vector<std::string>();
-			std::string value = m_impl->getValue( elemhandle);
-			if (!value.empty()) rt.push_back( *ci);
+			std::string value;
+			if (getValue( value, areader.get(), *ci)) rt.push_back( *ci);
 		}
 		return rt;
 	}
 
-	static IntrospectionBase* createSingle( ErrorBufferInterface* errorhnd_, const StorageClientInterface* sto, const std::string& name)
+private:
+	bool getValue( std::string& result, const std::string& name) const
 	{
-		strus::local_ptr<AttributeReaderInterface> areader( sto->createAttributeReader());
-		if (!areader.get()) throw std::runtime_error( errorhnd_->fetchError());
-		Index elemhandle = areader->elementHandle( name.c_str());
-		if (!elemhandle) return NULL;
-		std::string value = areader->getValue( elemhandle);
-		if (value.empty()) return NULL;
-		return createIntrospectionAtomic( errorhnd_, value);
+		strus::local_ptr<AttributeReaderInterface> areader( m_impl->createAttributeReader());
+		if (!areader.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		areader->skipDoc( m_docno);
+		return getValue( result, areader.get(), name);
+	}
+	bool getValue( std::string& result, AttributeReaderInterface* reader, const std::string& name) const
+	{
+		strus::Index elemhandle = reader->elementHandle( name.c_str());
+		if (!elemhandle) return false;
+		result = reader->getValue( elemhandle);
+		return true;
 	}
 
 private:
 	ErrorBufferInterface* m_errorhnd;
-	AttributeReaderInterface* m_impl;
+	const StorageClientInterface* m_impl;
+	strus::Index m_docno;
+	std::string m_name;
+};
+
+
+class MetaDataIntrospection
+	:public IntrospectionBase
+{
+public:
+	MetaDataIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const StorageClientInterface* impl_,
+			const strus::Index& docno_)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		,m_docno(docno_)
+	{}
+	~MetaDataIntrospection()
+	{}
+
+	virtual void serialize( papuga_Serialization& serialization) const
+	{
+		serializeList( serialization);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name) const
+	{
+		NumericVariant value;
+		return getValue( value, name) ? createIntrospectionAtomic( m_errorhnd, value) : NULL;
+	}
+
+	virtual std::vector<std::string> list( bool all) const
+	{
+		std::vector<std::string> rt;
+		strus::local_ptr<MetaDataReaderInterface> areader( m_impl->createMetaDataReader());
+		if (!areader.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		areader->skipDoc( m_docno);
+		std::vector<std::string> candidates = areader->getNames();
+		std::vector<std::string>::const_iterator ci = candidates.begin(), ce = candidates.end();
+		for (; ci != ce; ++ci)
+		{
+			NumericVariant value;
+			if (getValue( value, areader.get(), *ci)) rt.push_back( *ci);
+		}
+		return rt;
+	}
+
+private:
+	bool getValue( NumericVariant& result, const std::string& name) const
+	{
+		strus::local_ptr<MetaDataReaderInterface> areader( m_impl->createMetaDataReader());
+		if (!areader.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		areader->skipDoc( m_docno);
+		return getValue( result, areader.get(), name);
+	}
+	bool getValue( NumericVariant& result, MetaDataReaderInterface* reader, const std::string& name) const
+	{
+		strus::Index elemhandle = reader->elementHandle( name);
+		if (!elemhandle) return false;
+		result = reader->getValue( elemhandle);
+		return true;
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_impl;
 	strus::Index m_docno;
 	std::string m_name;
 };
@@ -525,6 +589,14 @@ public:
 		{
 			return createIntrospectionAtomic( m_errorhnd, (int64_t)m_docno);
 		}
+		else if (name == "attribute")
+		{
+			return new AttibuteIntrospection( m_errorhnd, m_impl, m_docno);
+		}
+		else if (name == "metadata")
+		{
+			return new MetaDataIntrospection( m_errorhnd, m_impl, m_docno);
+		}
 		else if (name == "sindex")
 		{
 			return new SearchIndexIntrospection( m_errorhnd, m_impl, m_docno);
@@ -538,7 +610,7 @@ public:
 
 	virtual std::vector<std::string> list( bool all) const
 	{
-		static const char* ar[] = {"docid","findex","sindex"};
+		static const char* ar[] = {"docid","docno","attribute","metadata","findex","sindex", NULL};
 		return getList( ar, all);
 	}
 
