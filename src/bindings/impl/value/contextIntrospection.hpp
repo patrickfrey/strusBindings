@@ -40,20 +40,11 @@ public:
 		,m_queryproc(storage_?storage_->getQueryProcessor():0)
 		,m_threads(threads_)
 		{}
+	virtual ~ContextIntrospection(){}
 
-	ContextIntrospection( const ContextIntrospection& o)
-		:m_errorhnd(o.m_errorhnd)
-		,m_moduleloader(o.m_moduleloader)
-		,m_trace(o.m_trace)
-		,m_rpc(o.m_rpc)
-		,m_textproc(o.m_textproc)
-		,m_queryproc(o.m_queryproc)
-		,m_threads(o.m_threads)
-		{}
-
-	virtual void serialize( papuga_Serialization& serialization) const;
-	virtual IntrospectionBase* open( const std::string& name) const;
-	virtual std::vector<std::string> list( bool all) const;
+	virtual void serialize( papuga_Serialization& serialization);
+	virtual IntrospectionBase* open( const std::string& name);
+	virtual std::vector<std::string> list( bool all);
 
 private:
 	ErrorBufferInterface* m_errorhnd;

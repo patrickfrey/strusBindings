@@ -25,15 +25,11 @@ public:
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
 		{}
+	virtual ~StorageIntrospection(){}
 
-	StorageIntrospection( const StorageIntrospection& o)
-		:m_errorhnd(o.m_errorhnd)
-		,m_impl(o.m_impl)
-		{}
-
-	virtual void serialize( papuga_Serialization& serialization) const;
-	virtual IntrospectionBase* open( const std::string& name) const;
-	virtual std::vector<std::string> list( bool all) const;
+	virtual void serialize( papuga_Serialization& serialization);
+	virtual IntrospectionBase* open( const std::string& name);
+	virtual std::vector<std::string> list( bool all);
 
 private:
 	ErrorBufferInterface* m_errorhnd;

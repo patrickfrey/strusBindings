@@ -25,15 +25,17 @@ public:
 			ErrorBufferInterface* errorhnd_,
 			const TypeName& value_)
 		:m_errorhnd(errorhnd_),m_value(value_){}
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual ~IntrospectionAtomic(){}
+
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		Serializer::serialize( &serialization, m_value, true/*deep*/);
 	}
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		return NULL;
 	}
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		return std::vector<std::string>();
 	}
@@ -52,18 +54,20 @@ public:
 			ErrorBufferInterface* errorhnd_,
 			const TypeName& value_)
 		:m_errorhnd(errorhnd_),m_value(value_){}
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual ~IntrospectionKeyValueList(){}
+
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		serializeList( serialization);
 	}
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		std::vector<std::string> rt;
 		typename TypeName::const_iterator li = m_value.begin(), le = m_value.end();
 		for (; li != le && name != li->first; ++li){}
 		return (li == le) ? NULL : new IntrospectionAtomic<typename TypeName::value_type::second_type>( m_errorhnd, li->second);
 	}
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		return this->getKeyList( m_value);
 	}
@@ -80,12 +84,13 @@ class IntrospectionConfig
 public:
 	IntrospectionConfig( ErrorBufferInterface* errorhnd_, const InterfaceType* impl_)
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
+	virtual ~IntrospectionConfig(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		Serializer::serialize( &serialization, strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
 	}
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		typedef std::vector<std::pair<std::string,std::string> > CfgItems;
 		CfgItems items = strus::getConfigStringItems( m_impl->config(), m_errorhnd);
@@ -107,7 +112,7 @@ public:
 		}
 		return NULL;
 	}
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		return this->getKeyList( strus::getConfigStringItems( m_impl->config(), m_errorhnd));
 	}

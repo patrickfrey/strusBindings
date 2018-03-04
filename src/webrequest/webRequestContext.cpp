@@ -475,6 +475,7 @@ bool WebRequestContext::dumpViewType( const char* typenam, papuga_Serialization*
 	char const* lstbuf[ lstbufsize];
 	char const** contextlist = papuga_RequestHandler_list_contexts( m_handler->impl(), typenam, lstbuf, lstbufsize);
 	if (!checkPapugaListBufferOverflow( contextlist, answer)) return false;
+	if (!checkPapugaListEmpty( contextlist, answer)) return false;
 	char const** ci = contextlist;
 	for (; *ci; ++ci)
 	{
@@ -494,7 +495,12 @@ bool WebRequestContext::dumpViewName( const char* typenam, const char* contextna
 	char const* lstbuf[ lstbufsize];
 
 	const papuga_RequestContext* context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
-	if (context != NULL)
+	if (context == NULL)
+	{
+		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+		return false;
+	}
+	else
 	{
 		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;

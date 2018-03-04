@@ -36,7 +36,7 @@ public:
 	/// \return content type MIME name string
 	static const char* typeMime( Type type)
 	{
-		static const char* ar[] = {"application/octet-stream","application/xml","application/json","text/html","application/xhtml","text/plain"};
+		static const char* ar[] = {"application/octet-stream","application/xml","application/json","text/html","text/plain"};
 		return ar[ type];
 	}
 
@@ -45,7 +45,7 @@ public:
 	/// \return content type name string
 	static const char* typeName( Type type)
 	{
-		static const char* ar[] = {"unknown","XML","JSON","HTML","XHTML","TEXT",0};
+		static const char* ar[] = {"unknown","XML","JSON","HTML","TEXT",0};
 		return ar[ type];
 	}
 

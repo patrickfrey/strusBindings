@@ -55,7 +55,7 @@ std::vector<std::string> IntrospectionBase::getKeyList( const std::vector<std::p
 	return rt;
 }
 
-void IntrospectionBase::serializeList( papuga_Serialization& serialization, bool all) const
+void IntrospectionBase::serializeList( papuga_Serialization& serialization, bool all)
 {
 	std::vector<std::string> elems = this->list( all);
 	std::vector<std::string>::const_iterator li = elems.begin(), le = elems.end();
@@ -69,7 +69,7 @@ void IntrospectionBase::serializeList( papuga_Serialization& serialization, bool
 	}
 }
 
-void IntrospectionBase::serializeStructureAs( papuga_Serialization& serialization, const char* name) const
+void IntrospectionBase::serializeStructureAs( papuga_Serialization& serialization, const char* name)
 {
 	bool sc = true;
 	const char* namecopy = papuga_Allocator_copy_charp( serialization.allocator, name);
@@ -81,42 +81,37 @@ void IntrospectionBase::serializeStructureAs( papuga_Serialization& serializatio
 	if (!sc) throw std::bad_alloc();
 }
 
-std::runtime_error bindings::introspection_error( const char* msg, ErrorBufferInterface* errorhnd)
-{
-	return strus::runtime_error( "%s: %s", msg, errorhnd->hasError() ? errorhnd->fetchError() : _TXT("unknown error"));
-}
 
-IntrospectionValueIterator::IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_, const std::string& name_)
-	:m_errorhnd(errorhnd_),m_impl(impl_),m_name(name_)
+IntrospectionValueIterator::IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, const strus::Reference<ValueIteratorInterface>& impl_, bool prefixBound_, const std::string& name_)
+	:m_errorhnd(errorhnd_),m_impl(impl_),m_name(name_),m_prefixBound(prefixBound_)
 {
-	if (!m_name.empty())
+	if (m_prefixBound)
+	{
+		m_impl->skipPrefix( m_name.c_str(), m_name.size());
+	}
+	else
 	{
 		m_impl->skip( m_name.c_str(), m_name.size());
 	}
 }
 
-IntrospectionValueIterator::~IntrospectionValueIterator()
-{
-	if (m_impl) delete m_impl;
-}
-
-void IntrospectionValueIterator::serialize( papuga_Serialization& serialization) const
+void IntrospectionValueIterator::serialize( papuga_Serialization& serialization)
 {
 	std::vector<std::string> valuelist = m_impl->fetchValues( MaxListSizeDeepExpansion);
 	Serializer::serialize( &serialization, valuelist, true/*deep*/);
 }
-IntrospectionBase* IntrospectionValueIterator::open( const std::string& name_) const
+IntrospectionBase* IntrospectionValueIterator::open( const std::string& name_)
 {
 	if (m_name.empty())
 	{
-		return new IntrospectionValueIterator( m_errorhnd, m_impl, name_);
+		return new IntrospectionValueIterator( m_errorhnd, m_impl, m_prefixBound, name_);
 	}
 	else
 	{
 		return NULL;
 	}
 }
-std::vector<std::string> IntrospectionValueIterator::list( bool all) const
+std::vector<std::string> IntrospectionValueIterator::list( bool all)
 {
 	if (all)
 	{

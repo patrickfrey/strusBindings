@@ -9,6 +9,7 @@
 #ifndef _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_BASE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_BASE_HPP_INCLUDED
 #include "papuga/serialization.h"
+#include "strus/reference.hpp"
 #include <string>
 #include <vector>
 #include <utility>
@@ -30,22 +31,18 @@ class IntrospectionBase
 public:
 	virtual ~IntrospectionBase(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const=0;
-	virtual IntrospectionBase* open( const std::string& name) const=0;
-	virtual std::vector<std::string> list( bool all) const=0;
+	virtual void serialize( papuga_Serialization& serialization)=0;
+	virtual IntrospectionBase* open( const std::string& name)=0;
+	virtual std::vector<std::string> list( bool all)=0;
 
-	void serializeStructureAs( papuga_Serialization& serialization, const char* name) const;
+	void serializeStructureAs( papuga_Serialization& serialization, const char* name);
 
 protected:
-	void serializeList( papuga_Serialization& serialization, bool all=false) const;
+	void serializeList( papuga_Serialization& serialization, bool all=false);
 	static std::vector<std::string> getList( const char** ar, bool all);
 	static std::vector<std::string> getKeyList( const std::vector<std::pair<std::string,std::string> >& ar);
 	static std::runtime_error unresolvable_exception();
 };
-
-
-std::runtime_error introspection_error( const char* msg, ErrorBufferInterface* errorhnd);
-
 
 
 class IntrospectionValueIterator
@@ -54,18 +51,19 @@ class IntrospectionValueIterator
 public:
 	enum {MaxListSizeDeepExpansion=50};
 
-	IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, ValueIteratorInterface* impl_, const std::string& name_="");
+	IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, const strus::Reference<ValueIteratorInterface>& impl_, bool prefixBound_, const std::string& name_="");
 
-	~IntrospectionValueIterator();
+	virtual ~IntrospectionValueIterator(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const;
-	virtual IntrospectionBase* open( const std::string& name) const;
-	virtual std::vector<std::string> list( bool all) const;
+	virtual void serialize( papuga_Serialization& serialization);
+	virtual IntrospectionBase* open( const std::string& name);
+	virtual std::vector<std::string> list( bool all);
 
 private:
 	ErrorBufferInterface* m_errorhnd;
-	ValueIteratorInterface* m_impl;
+	strus::Reference<ValueIteratorInterface> m_impl;
 	std::string m_name;
+	bool m_prefixBound;
 };
 
 }}//namespace

@@ -90,6 +90,7 @@ int strus::errorCauseToHttpStatus( ErrorCause cause)
 		case ErrorCauseInvalidRegex: return 500 /*Internal Server Error*/;
 		case ErrorCauseInvalidOperation: return 500 /*Internal Server Error*/;
 		case ErrorCauseNotImplemented: return 500 /*Internal Server Error*/;
+		case ErrorCauseIncompleteInitialization: return 500 /*Internal Server Error*/;
 		case ErrorCauseIncompleteDefinition: return 500 /*Internal Server Error*/;
 		case ErrorCauseBindingLanguageError: return 500 /*Internal Server Error*/;
 		case ErrorCauseUnknownIdentifier: return 400 /*Bad Request*/;
@@ -426,28 +427,30 @@ WebRequestContent::Type strus::webRequestContentFromTypeName( const char* name)
 		++si;
 		if (0==std::strcmp( namebuf, "application"))
 		{
-			if (!parseIdent( si, namebuf, sizeof(namebuf)))
+			if (parseIdent( si, namebuf, sizeof(namebuf)))
 			{
-				return WebRequestContent::Unknown;
-			}
-			else if (0==std::strcmp( namebuf, "xml"))
-			{
-				return WebRequestContent::XML;
-			}
-			else if (0==std::strcmp( namebuf, "json"))
-			{
-				return WebRequestContent::JSON;
+				if (0==std::strcmp( namebuf, "xml"))
+				{
+					return WebRequestContent::XML;
+				}
+				else if (0==std::strcmp( namebuf, "json"))
+				{
+					return WebRequestContent::JSON;
+				}
 			}
 		}
 		else if (0==std::strcmp( namebuf, "text"))
 		{
-			if (0==std::strcmp( namebuf, "html"))
+			if (parseIdent( si, namebuf, sizeof(namebuf)))
 			{
-				return WebRequestContent::HTML;
-			}
-			else if (0==std::strcmp( namebuf, "plain"))
-			{
-				return WebRequestContent::TEXT;
+				if (0==std::strcmp( namebuf, "html"))
+				{
+					return WebRequestContent::HTML;
+				}
+				else if (0==std::strcmp( namebuf, "plain"))
+				{
+					return WebRequestContent::TEXT;
+				}
 			}
 		}
 	}

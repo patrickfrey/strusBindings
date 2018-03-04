@@ -37,9 +37,10 @@ IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, co
 {
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
 }
-IntrospectionBase* createIntrospectionValueIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, const std::string& prefix="")
+IntrospectionBase* createIntrospectionValueIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, bool prefixBound, const std::string& prefix="")
 {
-	return val ? new IntrospectionValueIterator( errorhnd, val, prefix) : NULL;
+	if (!val) throw strus::runtime_error("%s", errorhnd->fetchError());
+	return new IntrospectionValueIterator( errorhnd, val, prefixBound, prefix);
 }
 static strus::Index parseIndex( const char* start, std::size_t size, const char* descr)
 {
@@ -74,21 +75,20 @@ public:
 		,m_impl(impl_)
 		,m_docno(docno_)
 	{}
-	~AttibuteIntrospection()
-	{}
+	virtual ~AttibuteIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		serializeList( serialization);
 	}
 
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		std::string value;
 		return getValue( value, name) ? createIntrospectionAtomic( m_errorhnd, value) : NULL;
 	}
 
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		std::vector<std::string> rt;
 		strus::local_ptr<AttributeReaderInterface> areader( m_impl->createAttributeReader());
@@ -140,21 +140,20 @@ public:
 		,m_impl(impl_)
 		,m_docno(docno_)
 	{}
-	~MetaDataIntrospection()
-	{}
+	virtual ~MetaDataIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		serializeList( serialization);
 	}
 
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		NumericVariant value;
 		return getValue( value, name) ? createIntrospectionAtomic( m_errorhnd, value) : NULL;
 	}
 
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		std::vector<std::string> rt;
 		strus::local_ptr<MetaDataReaderInterface> areader( m_impl->createMetaDataReader());
@@ -181,7 +180,7 @@ private:
 	bool getValue( NumericVariant& result, MetaDataReaderInterface* reader, const std::string& name) const
 	{
 		strus::Index elemhandle = reader->elementHandle( name);
-		if (!elemhandle) return false;
+		if (elemhandle < 0) return false;
 		result = reader->getValue( elemhandle);
 		return true;
 	}
@@ -191,65 +190,6 @@ private:
 	const StorageClientInterface* m_impl;
 	strus::Index m_docno;
 	std::string m_name;
-};
-
-
-class TermIntrospection
-	:public IntrospectionBase
-{
-public:
-	enum Function {Df};
-
-public:
-	TermIntrospection(
-			ErrorBufferInterface* errorhnd_,
-			const StorageClientInterface* impl_,
-			Function function_,
-			const std::string& type_="",
-			const std::string& value_="")
-		:m_errorhnd(errorhnd_)
-		,m_impl(impl_)
-		,m_function(function_)
-		,m_type(type_)
-		,m_value(value_)
-		{}
-
-	virtual void serialize( papuga_Serialization& serialization) const
-	{
-		throw unresolvable_exception();
-	}
-
-	virtual IntrospectionBase* open( const std::string& name) const
-	{
-		if (m_type.empty())
-		{
-			return new TermIntrospection( m_errorhnd, m_impl, m_function, name);
-		}
-		else if (m_value.empty())
-		{
-			return new TermIntrospection( m_errorhnd, m_impl, m_function, m_type, name);
-		}
-		else
-		{
-			switch (m_function)
-			{
-				case Df: return createIntrospectionAtomic( m_errorhnd, (int64_t)m_impl->documentFrequency( m_type, name));
-				default: return NULL;
-			}
-		}
-	}
-
-	virtual std::vector<std::string> list( bool all) const
-	{
-		throw unresolvable_exception();
-	}
-
-private:
-	ErrorBufferInterface* m_errorhnd;
-	const StorageClientInterface* m_impl;
-	Function m_function;
-	std::string m_type;
-	std::string m_value;
 };
 
 
@@ -271,10 +211,11 @@ public:
 		,m_pos(pos_)
 		,m_size(size_)
 		{}
+	virtual ~ForwardIndexIntrospection(){}
 
 	enum {PartialDumpSize=1024};
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		if (m_type.empty())
 		{
@@ -300,7 +241,7 @@ public:
 		}
 	}
 
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		if (m_type.empty())
 		{
@@ -319,7 +260,7 @@ public:
 		return NULL;
 	}
 
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		if (m_type.empty())
 		{
@@ -385,11 +326,11 @@ private:
 };
 
 
-class PostingsIntrospection
+class DocumentPostingsIntrospection
 	:public IntrospectionBase
 {
 public:
-	PostingsIntrospection(
+	DocumentPostingsIntrospection(
 			ErrorBufferInterface* errorhnd_,
 			const StorageClientInterface* impl_,
 			const strus::Index& docno_,
@@ -403,8 +344,9 @@ public:
 		,m_value(value_)
 		,m_pos(pos_)
 		{}
+	virtual ~DocumentPostingsIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		strus::local_ptr<PostingIteratorInterface> pitr( m_impl->createTermPostingIterator( m_type, m_value, 1));
 		if (!pitr.get()) throw std::runtime_error( m_errorhnd->fetchError());
@@ -428,19 +370,19 @@ public:
 			Serializer::serialize( &serialization, posar, true/*deep*/);
 		}
 	}
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		if (!m_pos)
 		{
 			strus::Index pos_ = parseIndex( name, _TXT("search index position"));
-			return new PostingsIntrospection( m_errorhnd, m_impl, m_docno, m_type, m_value, pos_);
+			return new DocumentPostingsIntrospection( m_errorhnd, m_impl, m_docno, m_type, m_value, pos_);
 		}
 		else
 		{
 			throw unresolvable_exception();
 		}
 	}
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		throw unresolvable_exception();
 	}
@@ -451,6 +393,116 @@ private:
 	strus::Index m_docno;
 	std::string m_type;
 	std::string m_value;
+	strus::Index m_pos;
+};
+
+
+class TermPostingsIntrospection
+	:public IntrospectionBase
+{
+public:
+	TermPostingsIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const StorageClientInterface* impl_,
+			const std::string& type_,
+			const std::string& value_,
+			const strus::Index& docno_=0)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		,m_areader(impl_->createAttributeReader())
+		,m_postings(impl_->createTermPostingIterator( type_, value_, 1))
+		,m_docid_handle(0)
+		,m_type(type_)
+		,m_value(value_)
+		,m_docno(docno_)
+	{
+		if (!m_areader.get() || !m_postings.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		m_docid_handle = m_areader->elementHandle( Constants::attribute_docid());
+	}
+	virtual ~TermPostingsIntrospection(){}
+
+	enum {MaxListSizeDeepExpansion=20};
+
+	virtual void serialize( papuga_Serialization& serialization)
+	{
+		Index dn = m_docno;
+		int cnt = MaxListSizeDeepExpansion;
+		while (cnt-- && !!(dn=m_postings->skipDoc( dn+1)))
+		{
+			if (!papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+			if (m_docid_handle)
+			{
+				m_areader->skipDoc( dn);
+				std::string docid = m_areader->getValue( m_docid_handle);
+				if (docid.empty() && m_errorhnd->hasError()) throw std::runtime_error( m_errorhnd->fetchError());
+				Serializer::serializeWithName( &serialization, "docid", docid, true/*deep*/);
+			}
+			Serializer::serializeWithName( &serialization, "docno", (int64_t)dn, true/*deep*/);
+			Serializer::serializeWithName( &serialization, "frequency", (int64_t)m_postings->frequency(), true/*deep*/);
+			Serializer::serializeWithName( &serialization, "pos", positions(), true/*deep*/);
+			if (!papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
+		}
+	}
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (!m_docno)
+		{
+			strus::Index docno_ = parseIndex( name, _TXT("document number"));
+			return new TermPostingsIntrospection( m_errorhnd, m_impl, m_type, m_value, docno_);
+		}
+		else if (name == "pos")
+		{
+			m_postings->skipDoc( m_docno);
+			return createIntrospectionAtomic( m_errorhnd, positions());
+		}
+		else if (name == "frequency")
+		{
+			m_postings->skipDoc( m_docno);
+			return createIntrospectionAtomic( m_errorhnd, (int64_t)m_postings->frequency());
+		}
+		else if (name == "docid")
+		{
+			m_areader->skipDoc( m_docno);
+			return createIntrospectionAtomic( m_errorhnd, m_areader->getValue( m_docid_handle));
+		}
+		else
+		{
+			throw unresolvable_exception();
+		}
+	}
+	virtual std::vector<std::string> list( bool all)
+	{
+		if (m_docno)
+		{
+			static const char* ar[] = {"docid","docno","tf","pos",NULL};
+			return getList( ar, all);
+		}
+		else
+		{
+			throw unresolvable_exception();
+		}
+	}
+
+private:
+	std::vector<strus::Index> positions( strus::Index pos_=0)
+	{
+		std::vector<strus::Index> rt;
+		while (!!(pos_=m_postings->skipPos(pos_+1)))
+		{
+			rt.push_back( pos_);
+		}
+		return rt;
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_impl;
+	strus::Reference<AttributeReaderInterface> m_areader;
+	strus::Reference<PostingIteratorInterface> m_postings;
+	strus::Index m_docid_handle;
+	std::string m_type;
+	std::string m_value;
+	strus::Index m_docno;
 	strus::Index m_pos;
 };
 
@@ -469,8 +521,9 @@ public:
 		,m_docno(docno_)
 		,m_type(type_)
 		{}
+	virtual ~SearchIndexIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		if (m_type.empty())
 		{
@@ -491,7 +544,7 @@ public:
 		}
 	}
 
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		if (m_type.empty())
 		{
@@ -499,12 +552,12 @@ public:
 		}
 		else
 		{
-			return new PostingsIntrospection( m_errorhnd, m_impl, m_docno, m_type, name);
+			return new DocumentPostingsIntrospection( m_errorhnd, m_impl, m_docno, m_type, name);
 		}
 		return NULL;
 	}
 
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
 		if (m_type.empty())
 		{
@@ -559,6 +612,77 @@ private:
 };
 
 
+class TermIntrospection
+	:public IntrospectionBase
+{
+public:
+	TermIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const StorageClientInterface* impl_,
+			const std::string& type_="",
+			const std::string& value_="")
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		,m_type(type_)
+		,m_value(value_)
+		{}
+	virtual ~TermIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization)
+	{
+		serializeList( serialization);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (m_type.empty())
+		{
+			return new TermIntrospection( m_errorhnd, m_impl, name);
+		}
+		else if (m_value.empty())
+		{
+			return new TermIntrospection( m_errorhnd, m_impl, m_type, name);
+		}
+		else if (name == "df")
+		{
+			return createIntrospectionAtomic( m_errorhnd, (int64_t)m_impl->documentFrequency( m_type, m_value));
+		}
+		else if (name == "postings")
+		{
+			return new TermPostingsIntrospection( m_errorhnd, m_impl, m_type, m_value);
+		}
+		else
+		{
+			throw unresolvable_exception();
+		}
+	}
+
+	virtual std::vector<std::string> list( bool all)
+	{
+		if (m_type.empty())
+		{
+			IntrospectionValueIterator vitr( m_errorhnd, m_impl->createTermValueIterator(), true/*prefixBound*/);
+			return vitr.list( all);
+		}
+		else if (m_value.empty())
+		{
+			throw unresolvable_exception();
+		}
+		else
+		{
+			static const char* ar[] = {"df","postings",0};
+			return getList( ar, all);
+		}
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_impl;
+	std::string m_type;
+	std::string m_value;
+};
+
+
 class DocumentIntrospection
 	:public IntrospectionBase
 {
@@ -573,19 +697,16 @@ public:
 		,m_docid(docid_)
 		,m_docno(docno_)
 		{}
+	virtual ~DocumentIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		serializeList( serialization);
 	}
 
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
-		if (name == "docid")
-		{
-			return createIntrospectionAtomic( m_errorhnd, m_docid);
-		}
-		else if (name == "docno")
+		if (name == "docno")
 		{
 			return createIntrospectionAtomic( m_errorhnd, (int64_t)m_docno);
 		}
@@ -608,9 +729,9 @@ public:
 		return NULL;
 	}
 
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
-		static const char* ar[] = {"docid","docno","attribute","metadata","findex","sindex", NULL};
+		static const char* ar[] = {"docno","attribute","metadata","findex","sindex", NULL};
 		return getList( ar, all);
 	}
 
@@ -634,8 +755,9 @@ public:
 		,m_impl(impl_)
 		,m_docid(docid_)
 		{}
+	virtual ~DocidIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization) const
+	virtual void serialize( papuga_Serialization& serialization)
 	{
 		std::vector<std::string> elems = list( true/*all*/);
 		std::vector<std::string>::const_iterator ei = elems.begin(), ee = elems.end();
@@ -648,7 +770,7 @@ public:
 		}
 	}
 
-	virtual IntrospectionBase* open( const std::string& name) const
+	virtual IntrospectionBase* open( const std::string& name)
 	{
 		strus::Index docno = 0;
 		if (m_docid.empty() && name[0] == '_')
@@ -673,10 +795,9 @@ public:
 		}
 	}
 
-	virtual std::vector<std::string> list( bool all) const
+	virtual std::vector<std::string> list( bool all)
 	{
-		strus::local_ptr<IntrospectionBase> values( createIntrospectionValueIterator( m_errorhnd, m_impl->createDocIdIterator(), m_docid));
-		if (!values.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		strus::local_ptr<IntrospectionBase> values( createIntrospectionValueIterator( m_errorhnd, m_impl->createDocIdIterator(), true/*prefixBound*/,m_docid));
 		return values->list( all);
 	}
 
@@ -687,6 +808,7 @@ private:
 		if (!areader.get()) throw std::runtime_error( m_errorhnd->fetchError());
 		Index elemhandle = areader->elementHandle( Constants::attribute_docid());
 		if (!elemhandle) return std::string();
+		areader->skipDoc( docno);
 		return areader->getValue( elemhandle);
 	}
 	bool isEmptyList( const std::string& prefix) const
@@ -704,34 +826,26 @@ private:
 }//namespace
 
 
-void StorageIntrospection::serialize( papuga_Serialization& serialization) const
+void StorageIntrospection::serialize( papuga_Serialization& serialization)
 {
 	serializeList( serialization);
 }
 
-IntrospectionBase* StorageIntrospection::open( const std::string& name) const
+IntrospectionBase* StorageIntrospection::open( const std::string& name)
 {
 	if (name == "config") return new IntrospectionConfig<StorageClientInterface>( m_errorhnd, m_impl);
 	else if (name == "nofdocs") return createIntrospectionAtomic( m_errorhnd, (int64_t) m_impl->nofDocumentsInserted());
 	else if (name == "maxdocno") return createIntrospectionAtomic( m_errorhnd, (int64_t) m_impl->maxDocumentNumber());
-	else if (name == "user") return createIntrospectionValueIterator( m_errorhnd, m_impl->createUserNameIterator());
-	else if (name == "termtype") return createIntrospectionValueIterator( m_errorhnd, m_impl->createTermTypeIterator());
-	else if (name == "metadataname")
-	{
-		strus::local_ptr<MetaDataReaderInterface> reader( m_impl->createMetaDataReader());
-		if (!reader.get()) throw std::runtime_error( m_errorhnd->fetchError());
-		return createIntrospectionAtomic( m_errorhnd, reader->getNames());
-	}
-	else if (name == "attributename")
+	else if (name == "user") return createIntrospectionValueIterator( m_errorhnd, m_impl->createUserNameIterator(), false/*prefixBound*/);
+	else if (name == "termtype") return createIntrospectionValueIterator( m_errorhnd, m_impl->createTermTypeIterator(), false/*prefixBound*/);
+	else if (name == "termvalue") return createIntrospectionValueIterator( m_errorhnd, m_impl->createTermValueIterator(), true/*prefixBound*/);
+	else if (name == "attribute")
 	{
 		strus::local_ptr<AttributeReaderInterface> reader( m_impl->createAttributeReader());
 		if (!reader.get()) throw std::runtime_error( m_errorhnd->fetchError());
 		return createIntrospectionAtomic( m_errorhnd, reader->getNames());
 	}
-	else if (name == "df")
-	{
-		return new TermIntrospection( m_errorhnd, m_impl, TermIntrospection::Df);
-	}
+	else if (name == "term") return new TermIntrospection( m_errorhnd, m_impl);
 	else if (name == "doc")
 	{
 		return new DocidIntrospection( m_errorhnd, m_impl);
@@ -739,9 +853,9 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name) const
 	return NULL;
 }
 
-std::vector<std::string> StorageIntrospection::list( bool all) const
+std::vector<std::string> StorageIntrospection::list( bool all)
 {
-	static const char* ar[] = {"config","nofdocs","maxdocno","user","termtype","metadataname","attributename",".df",".doc",NULL};
+	static const char* ar[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".term",".doc",NULL};
 	return getList( ar, all);
 }
 
