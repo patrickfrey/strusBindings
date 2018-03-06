@@ -86,6 +86,7 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
 	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
 
+	m_threads = contextdef.threads;
 	if (contextdef.rpc.empty())
 	{
 		ModuleLoaderInterface* moduleLoader = createModuleLoader_( errorhnd);

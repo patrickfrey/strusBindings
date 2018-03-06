@@ -12,7 +12,7 @@
 #include "webRequestUtils.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
-#include "schemas.hpp"
+#include "schemes.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/base/local_ptr.hpp"
@@ -145,14 +145,17 @@ WebRequestHandler::WebRequestHandler(
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
-#define DEFINE_SCHEMA( CONTEXT_TYPE, SCHEMA_NAME, SCHEMA_IMPL, ALLOW)\
-	static const Schema ## SCHEMA_IMPL  schema ## SCHEMA_IMPL;\
-	if (!papuga_RequestHandler_add_schema( m_impl, CONTEXT_TYPE, SCHEMA_NAME, schema ## SCHEMA_IMPL .impl())) throw std::bad_alloc();
+#define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
+	static const Scheme ## SCHEME_IMPL  scheme ## SCHEME_IMPL;\
+	if (!papuga_RequestHandler_add_scheme( m_impl, CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl())) throw std::bad_alloc();
 
-	DEFINE_SCHEMA( "", "init", CreateContext, "config");
-	DEFINE_SCHEMA( "context", "newstorage", CreateStorage, "config");
-	DEFINE_SCHEMA( "context", "delstorage", DestroyStorage, "config");
-	DEFINE_SCHEMA( "context", "storage", OpenStorage, "config");
+	DEFINE_SCHEME( "", "init", CreateContext);
+	DEFINE_SCHEME( "context", "newstorage", CreateStorage);
+	DEFINE_SCHEME( "context", "delstorage", DestroyStorage);
+	DEFINE_SCHEME( "context", "storage", OpenStorage);
+	DEFINE_SCHEME( "storage", "queryorig", QueryStorageOriginal); 
+	DEFINE_SCHEME( "storage", "queryana", QueryStorageAnalyzed); 
+	DEFINE_SCHEME( "storage", "analyzequery", AnalyzeQuery); 
 }
 
 WebRequestHandler::~WebRequestHandler()
@@ -160,11 +163,11 @@ WebRequestHandler::~WebRequestHandler()
 	papuga_destroy_RequestHandler( m_impl);
 }
 
-bool WebRequestHandler::hasSchema(
+bool WebRequestHandler::hasScheme(
 		const char* contextType,
-		const char* schema) const
+		const char* scheme) const
 {
-	return papuga_RequestHandler_has_schema( m_impl, contextType, schema);
+	return papuga_RequestHandler_has_scheme( m_impl, contextType, scheme);
 }
 
 static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause errcause, const char* errmsg=0)
@@ -214,7 +217,7 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 bool WebRequestHandler::loadConfiguration(
 			const char* contextType,
 			const char* contextName,
-			const char* schema,
+			const char* scheme,
 			const WebRequestContent& content,
 			WebRequestAnswer& status)
 {
@@ -223,8 +226,8 @@ bool WebRequestHandler::loadConfiguration(
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::string co( webRequestContent_tostring( content));
 		if (co.size() > 200) co.resize( 200);
-		std::cerr << strus::string_format( "load configuration: context %s %s, schema %s, doctype %s, encoding %s, content '%s'",
-							contextType, contextName, schema,
+		std::cerr << strus::string_format( "load configuration: context %s %s, scheme %s, doctype %s, encoding %s, content '%s'",
+							contextType, contextName, scheme,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
 		std::pair<const char*,const char*> parentContext = getConfigSourceContext( contextType, contextName);
@@ -236,7 +239,7 @@ bool WebRequestHandler::loadConfiguration(
 		WebRequestContext* ctxi = ctx.get();
 
 		strus::unique_lock lock( m_mutex);
-		if (ctxi->executeContent( parentContextType, parentContextName, schema, content, status))
+		if (ctxi->executeContent( parentContextType, parentContextName, scheme, content, status))
 		{
 			papuga_RequestContext* ctximpl = ctx->impl();
 			papuga_ErrorCode errcode = papuga_Ok;
@@ -265,7 +268,7 @@ bool WebRequestHandler::loadConfiguration(
 bool WebRequestHandler::storeConfiguration(
 		const char* contextType,
 		const char* contextName,
-		const char* schema,
+		const char* scheme,
 		const WebRequestContent& content,
 		WebRequestAnswer& status) const
 {
@@ -286,7 +289,7 @@ bool WebRequestHandler::storeConfiguration(
 		WebRequestContent::Type doctype = strus::webRequestContentFromTypeName( content.doctype());
 		const char* doctypeName = WebRequestContent::typeName( doctype);
 
-		std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, contextType, contextName, schema, doctypeName);
+		std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, contextType, contextName, scheme, doctypeName);
 		std::string filepath = strus::joinFilePath( m_config_store_dir, filename);
 		int ec = strus::createDir( filepath, false);
 		if (ec)
@@ -341,7 +344,7 @@ bool WebRequestHandler::loadStoredConfigurations(
 		{
 			std::string doctype = getConfigFilenamePart( *ci, 4);
 			if (doctype.empty()) continue;
-			std::string schema = getConfigFilenamePart( *ci, 3);
+			std::string scheme = getConfigFilenamePart( *ci, 3);
 			std::string contextType = getConfigFilenamePart( *ci, 1);
 			std::string contextName = getConfigFilenamePart( *ci, 2);
 			std::string date = getConfigFilenamePart( *ci, 0);
@@ -354,7 +357,7 @@ bool WebRequestHandler::loadStoredConfigurations(
 				return false;
 			}
 			WebRequestContent content( "UTF-8", doctype.c_str(), contentstr.c_str(), contentstr.size());
-			if (!loadConfiguration( contextType.c_str(), contextName.c_str(), schema.c_str(), content, status))
+			if (!loadConfiguration( contextType.c_str(), contextName.c_str(), scheme.c_str(), content, status))
 			{
 				char msgbuf[ 1024];
 				std::snprintf( msgbuf, sizeof(msgbuf), _TXT("error loading configuration file %s"), ci->c_str());

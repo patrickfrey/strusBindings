@@ -60,6 +60,12 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("argv_map", "ValueVariantWrap::toint( $value)")
 		("typename", "integer")
 	;
+	typesystem.defineType( "int $val=0")
+		("argv_default", "0")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+		("varname", "$val")
+	;
 	typesystem.defineType( "unsigned int")
 		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::touint( $value)")

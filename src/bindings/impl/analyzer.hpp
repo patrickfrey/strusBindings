@@ -408,7 +408,7 @@ public:
 	/// \example "position"
 	/// \example "all"
 	/// \example ""
-	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& opname, int range, unsigned int cardinality, const std::string& groupBy);
+	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& groupBy, const std::string& opname, int range=0, unsigned int cardinality=0);
 
 	/// \brief Analye the term expression and return the result structure
 	/// \param[in] expression query term expression tree

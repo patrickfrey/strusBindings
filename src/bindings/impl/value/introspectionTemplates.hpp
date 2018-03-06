@@ -37,7 +37,7 @@ public:
 	}
 	virtual std::vector<std::string> list( bool all)
 	{
-		return std::vector<std::string>();
+		throw unresolvable_exception();
 	}
 private:
 	ErrorBufferInterface* m_errorhnd;

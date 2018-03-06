@@ -2368,7 +2368,7 @@ static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_
 			Deserializer::consumeClose( seriter);
 		}
 	}
-	else
+	else if (!papuga_SerializationIter_eof( &seriter))
 	{
 		MetaDataCompareDef def( seriter);
 		builder.addCondition( def.cmpop, def.name, def.value, true);

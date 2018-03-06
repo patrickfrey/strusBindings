@@ -79,6 +79,12 @@ static void setAnswer( WebRequestAnswer& answer, int apperrorcode, const char* e
 bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	// Evaluate the character set encoding:
+	if (content.charset()[0] == '\0')
+	{
+		setAnswer( answer, ErrorOperationScanInput, ErrorCauseNotImplemented, "charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented");
+		/// ... according to https://www.w3.org/International/articles/http-charset/index we should use "ISO-8859-1" if not defined, currently not available
+		return false;
+	}
 	m_encoding = strus::getStringEncoding( content.charset(), content.str(), content.len());
 	if (m_encoding == papuga_Binary)
 	{
@@ -239,7 +245,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	return true;
 }
 
-bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* contextName, const char* schema)
+bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* contextName, const char* scheme)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	if (!papuga_init_RequestContext_child( &m_context, &m_allocator, m_handler->impl(), contextType, contextName, &errcode))
@@ -247,7 +253,7 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
-	m_atm = papuga_RequestHandler_get_schema( m_handler->impl(), m_context.type, schema, &errcode);
+	m_atm = papuga_RequestHandler_get_scheme( m_handler->impl(), m_context.type, scheme, &errcode);
 	if (!m_atm)
 	{
 		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
@@ -572,6 +578,12 @@ bool WebRequestContext::executeList(
 			if (!checkPapugaListEmpty( contextlist, answer)) return false;
 			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", typenam, m_result_encoding, m_result_doctype, contextlist);
 		}
+		if (std::strcmp( contextnam, "scheme") == 0)
+		{
+			const char** schemelist = papuga_RequestHandler_list_schemes( m_handler->impl(), typenam, lstbuf, lstbufsize);
+			if (!checkPapugaListBufferOverflow( schemelist, answer)) return false;
+			return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "scheme", m_result_encoding, m_result_doctype, schemelist);
+		}
 		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 		if (context == NULL)
 		{
@@ -679,17 +691,17 @@ bool WebRequestContext::executeView(
 	}
 }
 
-bool WebRequestContext::executeContent( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeContent( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return initContentRequest( answer, contextType, contextName, schema)
+	return initContentRequest( answer, contextType, contextName, scheme)
 	&&	feedContentRequest( answer, content)
 	&&	executeContentRequest( answer, content)
 	&&	getContentRequestResult( answer);
 }
 
-bool WebRequestContext::debugContent( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::debugContent( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return initContentRequest( answer, contextType, contextName, schema)
+	return initContentRequest( answer, contextType, contextName, scheme)
 	&&	feedContentRequest( answer, content)
 	&&	debugContentRequest( answer);
 }

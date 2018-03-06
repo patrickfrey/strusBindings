@@ -34,9 +34,9 @@ public:
 			const std::string& config_store_dir_);
 	virtual ~WebRequestHandler();
 
-	virtual bool hasSchema(
+	virtual bool hasScheme(
 			const char* contextType,
-			const char* schema) const;
+			const char* scheme) const;
 
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
@@ -46,14 +46,14 @@ public:
 	virtual bool loadConfiguration(
 			const char* contextType,
 			const char* contextName,
-			const char* schema,
+			const char* scheme,
 			const WebRequestContent& content,
 			WebRequestAnswer& status);
 
 	virtual bool storeConfiguration(
 			const char* contextType,
 			const char* contextName,
-			const char* schema,
+			const char* scheme,
 			const WebRequestContent& content,
 			WebRequestAnswer& status) const;
 
