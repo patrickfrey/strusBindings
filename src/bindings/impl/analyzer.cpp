@@ -530,11 +530,11 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& expression)
+TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& expression, bool unique) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
-	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, errorhnd));
+	const QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
+	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, unique, errorhnd));
 	if (!termexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
@@ -548,10 +548,20 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& ex
 	return termexpr.release();
 }
 
-MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVariant& expression)
+TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& expression) const
+{
+	return analyzeTermExpression_( expression, false/*unique*/);
+}
+
+TermExpression* QueryAnalyzerImpl::analyzeSingleTermExpression( const ValueVariant& expression) const
+{
+	return analyzeTermExpression_( expression, true/*unique*/);
+}
+
+MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVariant& expression) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
+	const QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 	Reference<MetaDataExpression> metaexpr( new MetaDataExpression( analyzer, errorhnd));
 	if (!metaexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 

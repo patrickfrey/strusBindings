@@ -36,9 +36,8 @@ using namespace strus;
 
 #undef STRUS_LOWLEVEL_DEBUG
 
-static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype)
+static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype, papuga_ErrorCode& errcode)
 {
-	papuga_ErrorCode errcode = papuga_Ok;
 	std::vector<std::string> rt( nof_itypes);
 	std::size_t nofargs = 0;
 	int ai=0, ae=nof_arguments;
@@ -66,16 +65,20 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 					{
 						if (structDepth > 0)
 						{
-							rt[ei] = papuga::Serialization_tostring( *val->value.serialization, false, structDepth, errcode);
+							rt[ei] = std::string("{") + papuga::Serialization_tostring( *val->value.serialization, false, structDepth, errcode) + "}";
 						}
 						else
 						{
 							rt[ei] = "{}";
 						}
 					}
-					else
+					else if (papuga_ValueVariant_isatomic( val))
 					{
 						rt[ei] = papuga::ValueVariant_tostring( *val, errcode);
+					}
+					else
+					{
+						rt[ei] = std::string("<") + papuga_Type_name( val->valuetype) + ">";
 					}
 				}
 				break;
@@ -100,7 +103,7 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 					std::size_t ii=0, ie=nofargs;
 					for (; ii!=ie; ++ii)
 					{
-						if (ii) argstr << " ";
+						if (ii) argstr << ", ";
 						if (papuga_ValueVariant_isatomic( ar+ii))
 						{
 							argstr << '\"' << papuga::ValueVariant_tostring( ar[ii], errcode) << '\"';
@@ -109,7 +112,7 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 						{
 							if (structDepth > 0)
 							{
-								argstr << papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode);
+								argstr << "{" << papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode) << "}";
 							}
 							else
 							{
@@ -118,7 +121,7 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 						}
 						else
 						{
-							argstr << "*";
+							argstr << "<" << papuga_Type_name( ar[ii].valuetype) << ">";
 						}
 					}
 					rt[ei] = argstr.str();
@@ -145,10 +148,29 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	};
 	try
 	{
-		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes);
-		self->logMethodCall( args[0], args[1], args[2], args[3]);
+		papuga_ErrorCode errcode = papuga_Ok;
+		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes, errcode);
+		if (errcode == papuga_Ok)
+		{
+			self->logMethodCall( args[0], args[1], args[2], args[3]);
+		}
+		else
+		{
+			self->logLoggerError( papuga_ErrorCode_tostring( errcode));
+		}
 	}
-	catch (...){}
+	catch (const std::bad_alloc&)
+	{
+		self->logLoggerError( papuga_ErrorCode_tostring( papuga_NoMemError));
+	}
+	catch (const std::runtime_error& err)
+	{
+		self->logLoggerError( err.what());
+	}
+	catch (...)
+	{
+		self->logLoggerError( papuga_ErrorCode_tostring( papuga_UncaughtException));
+	}
 	va_end( arguments);
 }
 

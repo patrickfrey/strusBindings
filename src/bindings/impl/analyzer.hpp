@@ -410,21 +410,34 @@ public:
 	/// \example ""
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& groupBy, const std::string& opname, int range=0, unsigned int cardinality=0);
 
-	/// \brief Analye the term expression and return the result structure
+	/// \brief Analye a term expression
 	/// \param[in] expression query term expression tree
 	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
 	/// \example  [ "word" "PUBLIC" ]
 	/// \return structure analyzed
 	/// \example  [ "within" 5 ["word" "world"]  ["word" "power"]]
 	/// \example  [ "word" "public" ]
-	TermExpression* analyzeTermExpression( const ValueVariant& expression);
+	TermExpression* analyzeTermExpression( const ValueVariant& expression) const;
 
-	/// \brief Analye the metadata expression and return the result structure
+	/// \brief Analye a unique term expression resulting in a single and unique result
+	/// \remark issues an error if the result does not exist or is not unique
+	/// \param[in] expression query term expression tree
+	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
+	/// \example  [ "word" "PUBLIC" ]
+	/// \return structure analyzed
+	/// \example  [ "within" 5 ["word" "world"]  ["word" "power"]]
+	/// \example  [ "word" "public" ]
+	TermExpression* analyzeSingleTermExpression( const ValueVariant& expression) const;
+
+	/// \brief Analye a metadata expression
 	/// \param[in] expression query metadata expression tree
 	/// \example  ["<" "year" "26.9.2017"]
 	/// \return structure analyzed
 	/// \example  ["<" "year" "17071"]
-	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression);
+	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression) const;
+
+private:
+	TermExpression* analyzeTermExpression_( const ValueVariant& expression, bool unique) const;
 
 private:
 	/// \brief Constructor used by Context

@@ -46,6 +46,10 @@ public:
 			const std::string& methodname,
 			const std::string& arguments,
 			const std::string& result)=0;
+
+	/// \brief Log an error during logging
+	/// \param[in] errmsg error message to log
+	virtual void logLoggerError( const char* errmsg)=0;
 };
 
 }//namespace

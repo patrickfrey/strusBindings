@@ -191,11 +191,36 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 				}
 			}
 		}
-		// Collect list of results from the stack:
-		std::vector<papuga_Serialization*>::const_iterator si = stk.begin(), se = stk.end();
-		for (; si != se; ++si)
+		if (val.singleUniqueResult())
 		{
-			rt &= papuga_Serialization_pushValue_serialization( result, *si);
+			// Copy serialization of unique result from the stack:
+			if (stk.size() == 1)
+			{
+				papuga_Serialization* ser = *stk.begin();
+				papuga_SerializationIter seriter;
+				papuga_init_SerializationIter( &seriter, ser);
+				for (; !papuga_SerializationIter_eof( &seriter); papuga_SerializationIter_skip( &seriter))
+				{
+					rt &= papuga_Serialization_push( result, papuga_SerializationIter_tag( &seriter), papuga_SerializationIter_value( &seriter));
+				}
+			}
+			else if (stk.empty())
+			{
+				throw strus::runtime_error( "%s", _TXT("no result returned by term expression analysis"));
+			}
+			else
+			{
+				throw strus::runtime_error( "%s", _TXT("result returned by term expression analysis is not unique"));
+			}
+		}
+		else
+		{
+			// Collect list of results from the stack:
+			std::vector<papuga_Serialization*>::const_iterator si = stk.begin(), se = stk.end();
+			for (; si != se; ++si)
+			{
+				rt &= papuga_Serialization_pushValue_serialization( result, *si);
+			}
 		}
 		return rt;
 	}
