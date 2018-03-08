@@ -109,11 +109,11 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 						{
 							if (structDepth > 0)
 							{
-								rt[ei] = papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode);
+								argstr << papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode);
 							}
 							else
 							{
-								rt[ei] = "{}";
+								argstr << "{}";
 							}
 						}
 						else
