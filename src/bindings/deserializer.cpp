@@ -1008,6 +1008,7 @@ static void deserializeQueryEvalFunctionParameter(
 			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 			{
 				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+				papuga_SerializationIter_skip( &seriter);
 				switch (idx)
 				{
 					case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", functionclass);

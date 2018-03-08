@@ -214,6 +214,7 @@ public:
 					{QueryEvalFunctionParameter, '*'},
 					{QueryEvalFunctionResult, '*'}}
 			},
+			{"/query/weighting/name", "()", QueryEvalFunctionName},
 			{"/query/weighting", 0, "queryeval", E::addWeightingFunction(), {
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*'}}
@@ -375,8 +376,8 @@ public:
 	{
 		typedef bindings::method::Query Q;
 		return {
-			{"/query/docno", "()", Docno},
-			{"/query", 0, "query", Q::addDocumentEvaluationSet(), {{Docno, '*'}} },
+			{"/query/evalset/docno", "()", Docno},
+			{"/query/evalset", 0, "query", Q::addDocumentEvaluationSet(), {{Docno, '*'}} },
 			{"/query/nofranks", "()", NumberOfResults},
 			{"/query/nofranks", 0, "query", Q::setMaxNofRanks(), {{NumberOfResults}} },
 			{"/query/minrank", "()", FirstResult},
@@ -424,9 +425,9 @@ public:
 			{defineQueryEval()},
 			{defineAnalyzer()},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
-			{buildQueryAnalyzed()},
-			{defineStatistics()},
-			{defineRankingParameter()}
+			{buildQueryOriginal()},
+			{defineRankingParameter()},
+			{"/query", "ranklist", "query", bindings::method::Query::evaluate(), {} }
 		}
 	) {}
 };
@@ -442,7 +443,8 @@ public:
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
 			{buildQueryAnalyzed()},
 			{defineStatistics()},
-			{defineRankingParameter()}
+			{defineRankingParameter()},
+			{"/query", "ranklist", "query", bindings::method::Query::evaluate(), {} }
 		}
 	) {}
 };

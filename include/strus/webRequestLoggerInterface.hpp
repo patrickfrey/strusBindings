@@ -33,6 +33,9 @@ public:
 	/// \brief Get the mask that tells what to log
 	virtual int logMask() const=0;
 
+	/// \brief Get the depth of structures to log
+	virtual int structDepth() const=0;
+
 	/// \brief Log a method call
 	/// \param[in] classname name identifier of the class called
 	/// \param[in] methodname name identifier of the method called

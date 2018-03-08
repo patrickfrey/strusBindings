@@ -63,6 +63,7 @@ public:
 public:/*WebRequestContext*/
 	const papuga_RequestHandler* impl() const	{return m_impl;}
 	const char* html_head() const			{return m_html_head.c_str();}
+	int debug_maxdepth() const			{return m_debug_maxdepth;}
 
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
@@ -73,7 +74,8 @@ private:
 private:
 	mutable strus::mutex m_mutex;		//< mutex for locking mutual exclusion of configuration requests
 	mutable int m_config_counter;		//< counter to order configurations stored that have the same date
-	papuga_RequestLogger m_logger;		//< request logger
+	int m_debug_maxdepth;			//< maximum depth for debug structures
+	papuga_RequestLogger m_logger;		//< request logger (for papuga)
 	papuga_RequestHandler* m_impl;		//< request handler
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request

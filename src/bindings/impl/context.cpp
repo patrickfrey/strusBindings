@@ -434,11 +434,11 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool determin
 	std::string rt;
 	if (deterministic)
 	{
-		rt = papuga::Serialization_tostring_deterministic( *arg.value.serialization, "", errcode);
+		rt = papuga::Serialization_tostring_deterministic( *arg.value.serialization, false/*linemode*/, std::numeric_limits<int>::max()/*maxdepth*/, errcode);
 	}
 	else
 	{
-		rt = papuga::Serialization_tostring( *arg.value.serialization, "", errcode);
+		rt = papuga::Serialization_tostring( *arg.value.serialization, false/*linemode*/, std::numeric_limits<int>::max()/*maxdepth*/, errcode);
 	}
 	if (errcode != papuga_Ok)
 	{

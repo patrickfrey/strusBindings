@@ -78,6 +78,11 @@ static void setAnswer( WebRequestAnswer& answer, int apperrorcode, const char* e
 
 bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
+	if (content.len() == 0)
+	{
+		setAnswer( answer, ErrorOperationScanInput, ErrorCauseIncompleteRequest, "request content is empty");
+		return false;
+	}
 	// Evaluate the character set encoding:
 	if (content.charset()[0] == '\0')
 	{
@@ -135,7 +140,7 @@ bool WebRequestContext::debugContentRequest( WebRequestAnswer& answer)
 		return false;
 	}
 	std::size_t result_length = 0;
-	const char* result = papuga_Request_tostring( m_request, &m_allocator, m_result_encoding, &result_length, &errcode);
+	const char* result = papuga_Request_tostring( m_request, &m_allocator, m_result_encoding, m_handler->debug_maxdepth(), &result_length, &errcode);
 	if (result)
 	{
 		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), "text/plain", result, result_length * papuga_StringEncoding_unit_size( m_result_encoding));

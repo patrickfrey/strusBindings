@@ -36,7 +36,7 @@ using namespace strus;
 
 #undef STRUS_LOWLEVEL_DEBUG
 
-static std::vector<std::string> getLogArgument( std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype)
+static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	std::vector<std::string> rt( nof_itypes);
@@ -58,8 +58,28 @@ static std::vector<std::string> getLogArgument( std::size_t nof_arguments, va_li
 				if (ei < ee) rt[ei] = va_arg( arguments,charp);
 				break;
 			case papuga_LogItemResult:
-				if (ei < ee) rt[ei] = papuga::ValueVariant_tostring( *va_arg( arguments, papuga_ValueVariant*), errcode);
+			{
+				if (ei < ee)
+				{
+					papuga_ValueVariant* val = va_arg( arguments, papuga_ValueVariant*);
+					if (val->valuetype == papuga_TypeSerialization)
+					{
+						if (structDepth > 0)
+						{
+							rt[ei] = papuga::Serialization_tostring( *val->value.serialization, false, structDepth, errcode);
+						}
+						else
+						{
+							rt[ei] = "{}";
+						}
+					}
+					else
+					{
+						rt[ei] = papuga::ValueVariant_tostring( *val, errcode);
+					}
+				}
 				break;
+			}
 			case papuga_LogItemArgc:
 			{
 				nofargs = va_arg( arguments,size_t);
@@ -87,7 +107,14 @@ static std::vector<std::string> getLogArgument( std::size_t nof_arguments, va_li
 						}
 						else if (ar[ii].valuetype == papuga_TypeSerialization)
 						{
-							argstr << "{}";
+							if (structDepth > 0)
+							{
+								rt[ei] = papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode);
+							}
+							else
+							{
+								rt[ei] = "{}";
+							}
 						}
 						else
 						{
@@ -118,7 +145,7 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	};
 	try
 	{
-		std::vector<std::string> args = getLogArgument( nofItems, arguments, nof_itypes, itypes);
+		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes);
 		self->logMethodCall( args[0], args[1], args[2], args[3]);
 	}
 	catch (...){}
@@ -135,7 +162,7 @@ WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
 		const std::string& config_store_dir_)
-	:m_config_counter(0),m_impl(0),m_html_head(html_head_),m_config_store_dir(config_store_dir_)
+	:m_config_counter(0),m_debug_maxdepth(logger_?logger_->structDepth():0),m_impl(0),m_html_head(html_head_),m_config_store_dir(config_store_dir_)
 {
 	std::memset( &m_logger, 0, sizeof(m_logger));
 	m_logger.self = logger_;

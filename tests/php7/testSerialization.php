@@ -62,65 +62,11 @@ catch (Exception $e)
 $expected = <<<END_expected
 result:
 (1)
-name a
-value 1
-name b
-value 'goloman'
-name xyz
-value 12.45
-
+a:1, b:"goloman", xyz:12.45
 (2)
-name e1
-open
-  name a
-  value 567
-  name b
-  value 'hoho'
-  name xyz
-  value 123.456
-close
-name e2
-open
-  name a
-  value 789
-  name b
-  value 'huhu'
-  name xyz
-  value 456.789
-close
-
+e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}
 (3)
-name e1
-open
-  name a
-  value 1
-  name b
-  value 'goloman'
-  name xyz
-  value 12.45
-close
-name e2
-open
-  name e1
-  open
-    name a
-    value 567
-    name b
-    value 'hoho'
-    name xyz
-    value 123.456
-  close
-  name e2
-  open
-    name a
-    value 789
-    name b
-    value 'huhu'
-    name xyz
-    value 456.789
-  close
-close
-
+e1:{a:1, b:"goloman", xyz:12.45}, e2:{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}
 END_expected;
 
 verifyTestOutput( $outputdir, $result, $expected);
