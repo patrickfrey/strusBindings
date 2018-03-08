@@ -28,13 +28,14 @@ case $OS in
 		brew update
 		brew upgrade cmake
 		brew upgrade boost
+		brew upgrade python
 		brew install gettext snappy leveldb || true
 		brew link --force gettext || true
 		brew link leveldb || true
 		brew link snappy || true
 		brew install lapack openblas || true
 		brew tap homebrew/homebrew-php
-		brew install php70 python3 || true
+		brew install php70 || true
 		# make sure cmake finds the brew version of gettext
 		;;
 
