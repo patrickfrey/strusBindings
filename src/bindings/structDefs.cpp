@@ -48,7 +48,7 @@ AnalyzerFunctionDef::AnalyzerFunctionDef( papuga_SerializationIter& seriter)
 			switch (idx)
 			{
 				case 0: name_defined = true; name = Deserializer::getString( seriter); break;
-				case 1: args = Deserializer::getStringList( seriter); break;
+				case 1: args = Deserializer::getStringListAsValue( seriter); break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 			}
 		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);

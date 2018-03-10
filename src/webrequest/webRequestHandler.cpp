@@ -184,13 +184,19 @@ WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
 		const std::string& config_store_dir_)
-	:m_config_counter(0),m_debug_maxdepth(logger_?logger_->structDepth():0),m_impl(0),m_html_head(html_head_),m_config_store_dir(config_store_dir_)
+	:m_mutex()
+	,m_config_counter(0)
+	,m_debug_maxdepth(logger_?logger_->structDepth():0)
+	,m_logger(logger_)
+	,m_impl(0)
+	,m_html_head(html_head_)
+	,m_config_store_dir(config_store_dir_)
 {
-	std::memset( &m_logger, 0, sizeof(m_logger));
-	m_logger.self = logger_;
+	std::memset( &m_call_logger, 0, sizeof(m_call_logger));
+	m_call_logger.self = logger_;
 	int mask = logger_->logMask();
-	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_logger.logMethodCall = &logMethodCall;
-	m_impl = papuga_create_RequestHandler( &m_logger);
+	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_call_logger.logMethodCall = &logMethodCall;
+	m_impl = papuga_create_RequestHandler( &m_call_logger);
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
@@ -242,7 +248,7 @@ WebRequestContext* WebRequestHandler::createContext_( const char* accepted_chars
 {
 	try
 	{
-		return new WebRequestContext( this, accepted_charset, accepted_doctype);
+		return new WebRequestContext( this, m_logger, accepted_charset, accepted_doctype);
 	}
 	catch (const std::bad_alloc&)
 	{

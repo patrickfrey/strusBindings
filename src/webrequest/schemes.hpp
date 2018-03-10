@@ -37,7 +37,9 @@ public:
 		StorageEnableAcl, StorageEnableCompression, StorageLruCacheSize,
 		StorageMaxNofOpenFiles, StorageWriteBufferSize, StorageBlockSize,
 	
-		AnalyzerElement,FeatureTypeName,FieldTypeName,TokenizerName,NormalizerName,
+		AnalyzerElement,FeatureTypeName,FieldTypeName,
+		TokenizerName,TokenizerArg,TokenizerDef,
+		NormalizerName,NormalizerArg,NormalizerDef,
 		JoinOperatorName,JoinOperatorRange,JoinOperatorCardinality,GroupBy,
 
 		FeatureSet, FeatureWeight,
@@ -234,13 +236,26 @@ public:
 			{"/query", "analyzer", "context", C::createQueryAnalyzer(), {} },
 			{"/query/element/type", "()", FeatureTypeName},
 			{"/query/element/field", "()", FieldTypeName},
-			{"/query/element/tokenizer", "()", TokenizerName},
-			{"/query/element/normalizer", "()", NormalizerName},
+			{"/query/element/tokenizer/name", "()", TokenizerName},
+			{"/query/element/tokenizer/arg", "()", TokenizerArg},
+			{"/query/element/tokenizer", TokenizerDef, {
+					{"name", TokenizerName, '!'},
+					{"arg", TokenizerArg, '*'}
+				}
+			},
+			{"/query/element/normalizer/name", "()", NormalizerName},
+			{"/query/element/normalizer/arg", "()", NormalizerArg},
+			{"/query/element/normalizer", NormalizerDef, {
+					{"name", NormalizerName, '!'},
+					{"arg", NormalizerArg, '*'}
+				}
+			},
 			{"/query/element", 0, "analyzer", A::addElement(), {
 					{FeatureTypeName},
 					{FieldTypeName},
-					{TokenizerName},
-					{NormalizerName,'*'}}
+					{TokenizerDef},
+					{NormalizerDef,'+'},
+				}
 			},
 			{"/query/group/field", "()", FieldTypeName},
 			{"/query/group/op", "()", JoinOperatorName},
@@ -311,7 +326,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{declareTermExpression()},
-			{"/query/feature", "+feature", "analyzer", A::analyzeTermExpression(), {{TermExpression}} },
+			{"/query/feature", "+feature", "analyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 		};
 	}
 
@@ -330,7 +345,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{declareTermExpression()},
-			{"/query/feature", "_feature", "analyzer", A::analyzeTermExpression(), {{TermExpression}} },
+			{"/query/feature", "_feature", "analyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
 
 			{declareMetaData()},

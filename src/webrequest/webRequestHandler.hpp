@@ -75,7 +75,8 @@ private:
 	mutable strus::mutex m_mutex;		//< mutex for locking mutual exclusion of configuration requests
 	mutable int m_config_counter;		//< counter to order configurations stored that have the same date
 	int m_debug_maxdepth;			//< maximum depth for debug structures
-	papuga_RequestLogger m_logger;		//< request logger (for papuga)
+	WebRequestLoggerInterface* m_logger;	//< request logger 
+	papuga_RequestLogger m_call_logger;	//< request call logger (for papuga)
 	papuga_RequestHandler* m_impl;		//< request handler
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request

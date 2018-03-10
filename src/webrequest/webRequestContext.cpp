@@ -39,13 +39,15 @@
 
 using namespace strus;
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 
 WebRequestContext::WebRequestContext(
 		const WebRequestHandler* handler_,
+		WebRequestLoggerInterface* logger_,
 		const char* accepted_charset_,
 		const char* accepted_doctype_)
 	:m_handler(handler_)
+	,m_logger(logger_)
 	,m_request(0)
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
@@ -110,7 +112,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	}
 	// Parse the request:
 	papuga_ErrorCode errcode = papuga_Ok;
-	papuga_RequestParser* parser = papuga_create_RequestParser( m_doctype, m_encoding, content.str(), content.len(), &errcode);
+	papuga_RequestParser* parser = papuga_create_RequestParser( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), &errcode);
 	if (!parser)
 	{
 		setAnswer( answer, ErrorOperationScanInput, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
@@ -127,6 +129,18 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		return false;
 	}
 	papuga_destroy_RequestParser( parser);
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogRequests))
+	{
+		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &errcode);
+		if (!reqstr)
+		{
+			m_logger->logLoggerError( papuga_ErrorCode_tostring( papuga_NoMemError));
+		}
+		else
+		{
+			m_logger->logRequest( reqstr);
+		}
+	}
 	return true;
 }
 
@@ -174,8 +188,7 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 			if (errpos >= 0)
 			{
 				// Evaluate more info about the location of the error, we append the scope of the document to the error message:
-				char locinfobuf[ 4096];
-				const char* locinfo = papuga_request_error_location( m_doctype, m_encoding, content.str(), content.len(), errpos, locinfobuf, sizeof(locinfobuf));
+				const char* locinfo = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), errpos, 4/*maxdepth*/, &errcode);
 				if (locinfo)
 				{
 					papuga_ErrorBuffer_appendMessage( &m_errbuf, " (error scope: %s)", locinfo);

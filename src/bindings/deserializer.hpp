@@ -52,6 +52,7 @@ struct Deserializer
 	static const char* getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter);
 
 	static std::vector<std::string> getStringList( papuga_SerializationIter& seriter);
+	static std::vector<std::string> getStringListAsValue( papuga_SerializationIter& seriter);
 
 	static std::vector<std::string> getStringList( const papuga_ValueVariant& val);
 
@@ -67,30 +68,26 @@ struct Deserializer
 
 	static NumericVariant getNumeric( papuga_SerializationIter& seriter);
 
-	static std::vector<int> getIntList(
-			const papuga_ValueVariant& val);
+	static std::vector<int> getIntList( const papuga_ValueVariant& val);
+	static std::vector<int> getIntListAsValue( const papuga_ValueVariant& val);
 
-	static std::vector<Index> getIndexList(
-			const papuga_ValueVariant& val);
+	static std::vector<Index> getIndexList( const papuga_ValueVariant& val);
+	static std::vector<Index> getIndexListAsValue( const papuga_ValueVariant& val);
 
-	static std::vector<double> getDoubleList(
-			const papuga_ValueVariant& val);
+	static std::vector<double> getDoubleList( const papuga_ValueVariant& val);
+	static std::vector<double> getDoubleListAsValue( const papuga_ValueVariant& val);
 
 	static const papuga_ValueVariant* getOptionalDefinition( papuga_SerializationIter& seriter, const char* name);
 
-	static analyzer::DocumentClass getDocumentClass(
-			const papuga_ValueVariant& val);
+	static analyzer::DocumentClass getDocumentClass( const papuga_ValueVariant& val);
 
 	static analyzer::FeatureOptions getFeatureOptions( papuga_SerializationIter& seriter);
 
-	static analyzer::FeatureOptions getFeatureOptions(
-			const papuga_ValueVariant& options);
+	static analyzer::FeatureOptions getFeatureOptions( const papuga_ValueVariant& options);
 
-	static TermStatistics getTermStatistics(
-			const papuga_ValueVariant& stats);
+	static TermStatistics getTermStatistics( const papuga_ValueVariant& stats);
 
-	static GlobalStatistics getGlobalStatistics(
-			const papuga_ValueVariant& stats);
+	static GlobalStatistics getGlobalStatistics( const papuga_ValueVariant& stats);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
 			papuga_SerializationIter& seriter,

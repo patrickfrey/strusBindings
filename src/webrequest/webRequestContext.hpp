@@ -10,6 +10,7 @@
 #ifndef _STRUS_WEB_REQUEST_CONTEXT_IMPL_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_CONTEXT_IMPL_HPP_INCLUDED
 #include "strus/webRequestContextInterface.hpp"
+#include "strus/webRequestLoggerInterface.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestParser.h"
 #include "papuga/request.h"
@@ -29,6 +30,7 @@ class WebRequestContext
 public:
 	WebRequestContext(
 		const WebRequestHandler* handler_,
+		WebRequestLoggerInterface* logger_,
 		const char* accepted_charset,
 		const char* accepted_doctype);
 	virtual ~WebRequestContext();
@@ -78,6 +80,7 @@ private:
 
 private:
 	const WebRequestHandler* m_handler;
+	WebRequestLoggerInterface* m_logger;
 	papuga_Allocator m_allocator;
 	papuga_RequestContext m_context;
 	papuga_Request* m_request;

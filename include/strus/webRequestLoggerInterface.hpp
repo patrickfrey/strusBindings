@@ -24,6 +24,7 @@ public:
 	{
 		LogNothing=0x0,
 		LogMethodCalls=0x1,
+		LogRequests=0x2,
 		LogAll=0xFF
 	};
 
@@ -35,6 +36,9 @@ public:
 
 	/// \brief Get the depth of structures to log
 	virtual int structDepth() const=0;
+
+	/// \brief Log a request
+	virtual void logRequest( const char* reqstr)=0;
 
 	/// \brief Log a method call
 	/// \param[in] classname name identifier of the class called

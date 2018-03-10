@@ -321,6 +321,30 @@ static std::vector<ATOMICTYPE> getAtomicTypeList( papuga_SerializationIter& seri
 	return rt;
 }
 
+template <typename ATOMICTYPE, ATOMICTYPE FUNC( papuga_SerializationIter& seriter)>
+static std::vector<ATOMICTYPE> getAtomicTypeListAsValue( papuga_SerializationIter& seriter)
+{
+	std::vector<ATOMICTYPE> rt;
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
+		{
+			rt.push_back( FUNC( seriter));
+		}
+		Deserializer::consumeClose( seriter);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		rt.push_back( FUNC( seriter));
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("list of atomic types expected"));
+	}
+	return rt;
+}
+
 template <typename ATOMICTYPE, ATOMICTYPE CONV( const papuga_ValueVariant& val), ATOMICTYPE FUNC( papuga_SerializationIter& seriter)>
 static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga_ValueVariant& val)
 {
@@ -344,6 +368,11 @@ static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga_ValueVariant& val
 std::vector<std::string> Deserializer::getStringList( papuga_SerializationIter& seriter)
 {
 	return getAtomicTypeList<std::string,getString>( seriter);
+}
+
+std::vector<std::string> Deserializer::getStringListAsValue( papuga_SerializationIter& seriter)
+{
+	return getAtomicTypeListAsValue<std::string,getString>( seriter);
 }
 
 std::vector<std::string> Deserializer::getStringList( const papuga_ValueVariant& val)
@@ -684,8 +713,8 @@ static Reference<NormalizerFunctionInstanceInterface> getNormalizer_(
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
-	const NormalizerFunctionInterface* nf = textproc->getNormalizer( name);
 	static const char* context = _TXT("normalizer function");
+	const NormalizerFunctionInterface* nf = textproc->getNormalizer( name);
 	if (!nf) throw strus::runtime_error( _TXT("failed to get %s '%s': %s"), context, name.c_str(), errorhnd->fetchError());
 
 	Reference<NormalizerFunctionInstanceInterface> function( nf->createInstance( arguments, textproc));
@@ -769,6 +798,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context =  _TXT("normalizers");
 	std::vector< Reference<NormalizerFunctionInstanceInterface> > rt;
 	while (papuga_SerializationIter_tag(&seriter) != papuga_TagClose)
 	{
@@ -780,9 +810,13 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 			{
 				if (papuga_SerializationIter_eof(&seriter))
 				{
-					throw strus::runtime_error( _TXT("unexpected eof in serialization of %s"), "normalizers");
+					throw strus::runtime_error( _TXT("unexpected eof in serialization of %s"), context);
 				}
 				papuga_SerializationIter_skip( &seriter);
+			}
+			else
+			{
+				throw strus::runtime_error( _TXT("unexpected tag in serialization of %s"), context);
 			}
 		}
 		else if (papuga_SerializationIter_tag(&seriter) == papuga_TagValue)
@@ -804,6 +838,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context =  _TXT("normalizers");
 	std::vector<Reference<NormalizerFunctionInstanceInterface> > rt;
 	if (normalizers.valuetype != papuga_TypeSerialization)
 	{
@@ -819,7 +854,7 @@ std::vector<Reference<NormalizerFunctionInstanceInterface> > Deserializer::getNo
 		try
 		{
 			rt = getNormalizers( seriter, textproc, errorhnd);
-			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), "normalizers");
+			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 		}
 		catch (const std::runtime_error& err)
 		{
@@ -835,6 +870,7 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context =  _TXT("tokenizer");
 	if (tokenizer.valuetype != papuga_TypeSerialization)
 	{
 		std::string name = ValueVariantWrap::tostring( tokenizer);
@@ -849,7 +885,7 @@ Reference<TokenizerFunctionInstanceInterface> Deserializer::getTokenizer(
 		try
 		{
 			rt = getTokenizer( seriter, textproc, errorhnd);
-			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), "tokenizer");
+			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 		}
 		catch (const std::runtime_error& err)
 		{
@@ -864,6 +900,7 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 		const TextProcessorInterface* textproc,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* context =  _TXT("aggregator");
 	if (aggregator.valuetype != papuga_TypeSerialization)
 	{
 		std::string name = ValueVariantWrap::tostring( aggregator);
@@ -878,7 +915,7 @@ Reference<AggregatorFunctionInstanceInterface> Deserializer::getAggregator(
 		try
 		{
 			rt = getAggregator( seriter, textproc, errorhnd);
-			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), "aggretator");
+			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 		}
 		catch (const std::runtime_error& err)
 		{
@@ -2067,103 +2104,61 @@ static void buildStorageDocumentDeletes(
 				papuga_SerializationIter_skip( &seriter);
 				switch (idx)
 				{
-					case 0: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							std::vector<std::string> deletes( Deserializer::getStringList( seriter));
+					case 0: {
+							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
 							{
 								document->clearAttribute( *di);
 							}
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "attribute", context);
 						}
 						break;
 
-					case 1: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							std::vector<std::string> deletes( Deserializer::getStringList( seriter));
+					case 1: {
+							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
 							{
 								document->setMetaData( *di, NumericVariant());
 							}
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "metadata", context);
 						}
 						break;
 
-					case 2: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							std::vector<std::string> deletes( Deserializer::getStringList( seriter));
+					case 2: {
+							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
 							{
 								document->clearSearchIndexTerm( *di);
 							}
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "searchindex", context);
 						}
 						break;
 
-					case 3: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							std::vector<std::string> deletes( Deserializer::getStringList( seriter));
+					case 3: {
+							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
 							{
 								document->clearForwardIndexTerm( *di);
 							}
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "forwardindex", context);
 						}
 						break;
-					case 4: 
-					{
-						std::vector<std::string> deletes;
-						if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							deletes = Deserializer::getStringList( seriter);
-							Deserializer::consumeClose( seriter);
-						}
-						else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-						{
-							deletes.push_back( Deserializer::getString( seriter));
-						}
-						std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
-						for (; di != de; ++di)
-						{
-							if (*di == "*") break;
-						}
-						if (di != de)
-						{
-							//... clear all
-							document->clearUserAccessRights();
-						}
-						else for (di = deletes.begin(); di != de; ++di)
-						{
-							document->clearUserAccessRight( *di);
+					case 4: {
+							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
+							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+							if (std::find( di, de, std::string("*")) != deletes.end())
+							{
+								document->clearUserAccessRights();
+							}
+							else for (; di != de; ++di)
+							{
+								document->clearForwardIndexTerm( *di);
+							}
 						}
 						break;
+					default: {
+							throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 					}
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
 			}
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens in serialization of %s"), context);
