@@ -38,6 +38,8 @@ public:
 			const char* contextType,
 			const char* scheme) const;
 
+	virtual char const** schemes() const;
+
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
 			const char* accepted_doctype,
@@ -80,6 +82,7 @@ private:
 	papuga_RequestHandler* m_impl;		//< request handler
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
+	char const** m_schemes;			//< NULL terminated list of schemes available */
 };
 
 }//namespace

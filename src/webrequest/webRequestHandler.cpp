@@ -191,6 +191,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_html_head(html_head_)
 	,m_config_store_dir(config_store_dir_)
+	,m_schemes(NULL)
 {
 	std::memset( &m_call_logger, 0, sizeof(m_call_logger));
 	m_call_logger.self = logger_;
@@ -199,10 +200,15 @@ WebRequestHandler::WebRequestHandler(
 	m_impl = papuga_create_RequestHandler( &m_call_logger);
 	if (!m_impl) throw std::bad_alloc();
 
+	std::size_t nofschemes = 0;
 	using namespace strus::webrequest;
 #define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
 	static const Scheme ## SCHEME_IMPL  scheme ## SCHEME_IMPL;\
-	if (!papuga_RequestHandler_add_scheme( m_impl, CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl())) throw std::bad_alloc();
+	if (!papuga_RequestHandler_add_scheme( m_impl, CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl())) throw std::bad_alloc();\
+	m_schemes = (char const**)std::realloc( m_schemes, (nofschemes+2) * sizeof(m_schemes[0]));\
+	if (!m_schemes) throw std::bad_alloc();\
+	m_schemes[ nofschemes++] = SCHEME_NAME;\
+	m_schemes[ nofschemes] = NULL;
 
 	DEFINE_SCHEME( "", "init", CreateContext);
 	DEFINE_SCHEME( "context", "newstorage", CreateStorage);
@@ -216,6 +222,7 @@ WebRequestHandler::WebRequestHandler(
 WebRequestHandler::~WebRequestHandler()
 {
 	papuga_destroy_RequestHandler( m_impl);
+	std::free( m_schemes);
 }
 
 bool WebRequestHandler::hasScheme(
@@ -223,6 +230,11 @@ bool WebRequestHandler::hasScheme(
 		const char* scheme) const
 {
 	return papuga_RequestHandler_has_scheme( m_impl, contextType, scheme);
+}
+
+char const** WebRequestHandler::schemes() const
+{
+	return m_schemes;
 }
 
 static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause errcause, const char* errmsg=0)

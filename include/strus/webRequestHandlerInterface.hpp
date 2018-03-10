@@ -41,10 +41,14 @@ public:
 	/// \brief Test if a scheme exists
 	/// \param[in] contextType identifier defining the type of the context for the scheme queried
 	/// \param[in] scheme identifier queried
-	/// \return true, if a scheme with this name exists (including namespace prefix)
+	/// \return true, if a scheme with this name exists
 	virtual bool hasScheme(
 			const char* contextType,
 			const char* scheme) const=0;
+
+	/// \brief Get the list of available schemes
+	/// \return the list of available schemes
+	virtual char const** schemes() const=0;
 
 	/// \brief Execute a configuration request
 	/// \param[in] contextType type of the created context
