@@ -15,6 +15,7 @@
 #include "valueVariantWrap.hpp"
 #include <string>
 #include <cstring>
+#include <algorithm>
 
 using namespace strus;
 using namespace strus::bindings;
