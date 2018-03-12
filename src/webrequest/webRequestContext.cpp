@@ -82,13 +82,13 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 {
 	if (content.len() == 0)
 	{
-		setAnswer( answer, ErrorOperationScanInput, ErrorCauseIncompleteRequest, "request content is empty");
+		setAnswer( answer, ErrorOperationScanInput, ErrorCauseIncompleteRequest, _TXT("request content is empty"));
 		return false;
 	}
 	// Evaluate the character set encoding:
 	if (content.charset()[0] == '\0')
 	{
-		setAnswer( answer, ErrorOperationScanInput, ErrorCauseNotImplemented, "charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented");
+		setAnswer( answer, ErrorOperationScanInput, ErrorCauseNotImplemented, _TXT("charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented"));
 		/// ... according to https://www.w3.org/International/articles/http-charset/index we should use "ISO-8859-1" if not defined, currently not available
 		return false;
 	}
@@ -235,13 +235,13 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	}
 	// Map the result:
 	char* resultstr = 0;
-	std::size_t resultlen = 0;
+	std::size_t resultulen = 0;
 	switch (m_result_doctype)
 	{
-		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, m_result_encoding, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, m_result_encoding, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, m_result_encoding, m_handler->html_head(), &resultlen, &errcode); break;
-		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, m_result_encoding, &resultlen, &errcode); break;
+		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, m_result_encoding, &resultulen, &errcode); break;
+		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, m_result_encoding, &resultulen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, m_result_encoding, m_handler->html_head(), &resultulen, &errcode); break;
+		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, m_result_encoding, &resultulen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{
 			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
@@ -251,7 +251,9 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	}
 	if (resultstr)
 	{
-		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), resultstr, resultlen);
+		int usize = papuga_StringEncoding_unit_size( m_result_encoding);
+		const char* encname = papuga_stringEncodingName( m_result_encoding);
+		WebRequestContent content( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultulen * usize);
 		answer.setContent( content);
 		return true;
 	}
