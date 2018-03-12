@@ -47,6 +47,18 @@ const char* selectAcceptedCharset( const char* http_accept_charset);
 /// \return best choice of a content type
 WebRequestContent::Type selectAcceptedContentType( const char* http_accept);
 
+/// \brief Guess the type of the document (without encoding) as string, e.g. "application/json"
+/// \param[in] content pointer to the content
+/// \param[in] contentsize number of bytes in content
+/// \return the mime type of the document as string or NULL if unknown
+const char* guessContentType( const char* content, std::size_t contentsize);
+
+/// \brief Guess the character set encoding of a document as string, e.g. "UTF-16BE"
+/// \param[in] content pointer to the content
+/// \param[in] contentsize number of bytes in content
+/// \return the encoding as string or NULL if unknown
+const char* guessCharsetEncoding( const char* content, std::size_t contentsize);
+
 }//namespace
 #endif
 

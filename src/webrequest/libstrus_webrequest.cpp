@@ -56,4 +56,16 @@ DLL_PUBLIC WebRequestContent::Type strus::selectAcceptedContentType( const char*
 	return strus::getResultContentType( http_accept, WebRequestContent::HTML);
 }
 
+DLL_PUBLIC const char* strus::guessContentType( const char* content, std::size_t contentsize)
+{
+	papuga_ContentType ct = papuga_guess_ContentType( content, contentsize);
+	return (ct == papuga_ContentType_Unknown) ? NULL : papuga_ContentType_mime(ct);
+}
+
+DLL_PUBLIC const char* strus::guessCharsetEncoding( const char* content, std::size_t contentsize)
+{
+	papuga_StringEncoding enc = papuga_guess_StringEncoding( content, contentsize);
+	return (enc == papuga_Binary) ? NULL : papuga_stringEncodingName( enc);
+}
+
 
