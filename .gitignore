@@ -40,7 +40,6 @@ Testing/
 CPackConfig.cmake
 CPackSourceConfig.cmake
 *.cmake.user
-src/bindings/internationalization.cpp
 dist/obs/deploy_to_obs.sh
 dist/archlinux/PKGBUILD
 dist/obs/strusbindings.dsc
@@ -60,12 +59,7 @@ lang/php
 lang/python
 include/strus/lib/lua.h
 src/lang/lua/libstrus_bindings_lua.c
-src/bindings/libstrus_bindings_description.cpp
-include/strus/lib/bindings_description.hpp
-src/bindings/bindingObjects.cpp
-include/strus/bindingObjects.h
 include/papuga/
-include/strus/versionBindings.hpp
 tests/php7/php.ini
 doc/luaBindingsDoc.css
 doc/luaBindingsDoc.js

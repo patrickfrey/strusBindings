@@ -259,8 +259,7 @@ IntrospectionBase* StorageClientImpl::createIntrospection( const ValueVariant& a
 		ictx.reset( ictx->open( *pi));
 		if (!ictx.get())
 		{
-			throw strus::runtime_error( *ErrorCode( StrusComponentBindings, ErrorOperationCallIndirection, ErrorCauseRequestResolveError),
-						_TXT("failed to create introspection"));
+			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("failed to create introspection"));
 		}
 	}
 	return ictx.release();

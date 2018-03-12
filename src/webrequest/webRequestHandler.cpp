@@ -237,10 +237,10 @@ char const** WebRequestHandler::schemes() const
 	return m_schemes;
 }
 
-static void setStatus( WebRequestAnswer& status, ErrorOperation operation, ErrorCause errcause, const char* errmsg=0)
+static void setStatus( WebRequestAnswer& status, ErrorCode errcode, const char* errmsg=0)
 {
-	const char* errstr = errorCauseMessage( errcause);
-	int httpstatus = errorCauseToHttpStatus( errcause);
+	const char* errstr = errorCodeToString( errcode);
+	int httpstatus = errorCodeToHttpStatus( errcode);
 	if (errmsg)
 	{
 		char errbuf[ 1024];
@@ -248,11 +248,11 @@ static void setStatus( WebRequestAnswer& status, ErrorOperation operation, Error
 		{
 			errbuf[ sizeof(errbuf)-1] = 0;
 		}
-		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errbuf, true);
+		status.setError( httpstatus, errcode, errbuf, true);
 	}
 	else
 	{
-		status.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, errcause), errstr);
+		status.setError( httpstatus, errcode, errstr);
 	}
 }
 
@@ -264,11 +264,11 @@ WebRequestContext* WebRequestHandler::createContext_( const char* accepted_chars
 	}
 	catch (const std::bad_alloc&)
 	{
-		setStatus( status, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setStatus( status, ErrorCodeOutOfMem);
 	}
 	catch (...)
 	{
-		setStatus( status, ErrorOperationBuildData, ErrorCauseUncaughtException);
+		setStatus( status, ErrorCodeUncaughtException);
 	}
 	return NULL;
 }
@@ -315,7 +315,7 @@ bool WebRequestHandler::loadConfiguration(
 			{
 				char buf[ 1024];
 				std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), contextType, contextName);
-				setStatus( status, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), buf);
+				setStatus( status, papugaErrorToErrorCode( errcode), buf);
 				return false;
 			}
 			return true;
@@ -327,7 +327,7 @@ bool WebRequestHandler::loadConfiguration(
 	}
 	catch (...)
 	{
-		setStatus( status, ErrorOperationConfiguration, ErrorCauseUncaughtException);
+		setStatus( status, ErrorCodeUncaughtException);
 		return false;
 	}
 }
@@ -361,20 +361,20 @@ bool WebRequestHandler::storeConfiguration(
 		int ec = strus::createDir( filepath, false);
 		if (ec)
 		{
-			setStatus( status, ErrorOperationWriteFile, ErrorCause(ec));
+			setStatus( status, (ErrorCode)ec);
 			return false;
 		}
 		ec = strus::writeFile( filepath, contentUtf8);
 		if (ec)
 		{
-			setStatus( status, ErrorOperationWriteFile, ErrorCause(ec));
+			setStatus( status, (ErrorCode)ec);
 			return false;
 		}
 		return true;
 	}
 	catch (const std::bad_alloc&)
 	{
-		setStatus( status, ErrorOperationConfiguration, ErrorCauseOutOfMem);
+		setStatus( status, ErrorCodeOutOfMem);
 		return false;
 	}
 }
@@ -402,7 +402,7 @@ bool WebRequestHandler::loadStoredConfigurations(
 		int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
 		if (ec)
 		{
-			setStatus( status, ErrorOperationReadFile, (ErrorCause)ec);
+			setStatus( status, (ErrorCode)ec);
 			return false;
 		}
 		std::sort( configFileNames.begin(), configFileNames.end());
@@ -420,7 +420,7 @@ bool WebRequestHandler::loadStoredConfigurations(
 			ec = strus::readFile( filepath, contentstr);
 			if (ec)
 			{
-				setStatus( status, ErrorOperationReadFile, ErrorCause(ec));
+				setStatus( status, (ErrorCode)ec);
 				return false;
 			}
 			WebRequestContent content( "UTF-8", doctype.c_str(), contentstr.c_str(), contentstr.size());
@@ -437,7 +437,7 @@ bool WebRequestHandler::loadStoredConfigurations(
 	}
 	catch (const std::bad_alloc&)
 	{
-		setStatus( status, ErrorOperationConfiguration, ErrorCauseOutOfMem);
+		setStatus( status, ErrorCodeOutOfMem);
 		return false;
 	}
 }

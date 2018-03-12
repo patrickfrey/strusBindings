@@ -24,12 +24,12 @@ namespace strus {
 // \brief Maps a papuga error code to a strus error number
 // \param[in] errcode papuga error code
 // \return strus error number
-ErrorCause papugaErrorToErrorCause( papuga_ErrorCode errcode);
+ErrorCode papugaErrorToErrorCode( papuga_ErrorCode errcode);
 
 // \brief Maps an error cause (part of error codes defined in strusBase or errno) to an HTTP request status code
 // \param[in] content web request content
 // \return HTTP status c
-int errorCauseToHttpStatus( ErrorCause cause);
+int errorCodeToHttpStatus( ErrorCode errcode);
 
 // \brief Contert a web request content to an UTF-8 string for printing and logging
 // \param[in] content web request content

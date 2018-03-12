@@ -418,7 +418,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 			ConfigurationItemList subitems = strus::getSubConfigStringItems( ci->second, &errbuf);
 			if (errbuf.hasError())
 			{
-				errcode = (errbuf.cause() == ErrorCauseOutOfMem) ? papuga_NoMemError : papuga_SyntaxError;
+				errcode = (errbuf.errorCode() == ErrorCodeOutOfMem) ? papuga_NoMemError : papuga_SyntaxError;
 				return false;
 			}
 			rt &= serialize_nothrow( result, subitems, errcode, true);

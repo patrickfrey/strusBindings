@@ -23,7 +23,7 @@ using namespace strus::bindings;
 
 std::runtime_error IntrospectionBase::unresolvable_exception()
 {
-	return strus::runtime_error( *ErrorCode( StrusComponentBindings, ErrorOperationCallIndirection, ErrorCauseRequestResolveError), _TXT("not found"));
+	return strus::runtime_error( ErrorCodeRequestResolveError, _TXT("not found"));
 }
 
 std::vector<std::string> IntrospectionBase::getList( const char** ar, bool all)

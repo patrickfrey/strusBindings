@@ -468,8 +468,7 @@ IntrospectionBase* ContextImpl::createIntrospection( const ValueVariant& arg)
 		ictx.reset( ictx->open( *pi));
 		if (!ictx.get())
 		{
-			throw strus::runtime_error( *ErrorCode( StrusComponentBindings, ErrorOperationCallIndirection, ErrorCauseRequestResolveError),
-						_TXT("failed to create introspection context"));
+			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("failed to create introspection context"));
 		}
 	}
 	return ictx.release();

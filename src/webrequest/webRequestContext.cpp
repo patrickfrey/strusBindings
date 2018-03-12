@@ -65,44 +65,43 @@ WebRequestContext::~WebRequestContext()
 	papuga_destroy_Allocator( &m_allocator);
 }
 
-static void setAnswer( WebRequestAnswer& answer, ErrorOperation operation, ErrorCause cause, const char* errstr=0, bool doCopy=false)
+static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, const char* errstr=0, bool doCopy=false)
 {
-	int httpstatus = errorCauseToHttpStatus( cause);
-	answer.setError( httpstatus, *ErrorCode( StrusComponentWebService, operation, cause), errstr?errstr : strus::errorCauseMessage(cause));
+	int httpstatus = errorCodeToHttpStatus( errcode);
+	answer.setError( httpstatus, errcode, errstr?errstr : strus::errorCodeToString(errcode));
 }
 
 static void setAnswer( WebRequestAnswer& answer, int apperrorcode, const char* errstr=0)
 {
-	ErrorCode err( apperrorcode);
-	int httpstatus = errorCauseToHttpStatus( err.cause());
-	answer.setError( httpstatus, apperrorcode, errstr?errstr : strus::errorCauseMessage(err.cause()));
+	int httpstatus = errorCodeToHttpStatus( (ErrorCode)apperrorcode);
+	answer.setError( httpstatus, apperrorcode, errstr?errstr : strus::errorCodeToString( apperrorcode));
 }
 
 bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	if (content.len() == 0)
 	{
-		setAnswer( answer, ErrorOperationScanInput, ErrorCauseIncompleteRequest, _TXT("request content is empty"));
+		setAnswer( answer, ErrorCodeIncompleteRequest, _TXT("request content is empty"));
 		return false;
 	}
 	// Evaluate the character set encoding:
 	if (content.charset()[0] == '\0')
 	{
-		setAnswer( answer, ErrorOperationScanInput, ErrorCauseNotImplemented, _TXT("charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented"));
+		setAnswer( answer, ErrorCodeNotImplemented, _TXT("charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented"));
 		/// ... according to https://www.w3.org/International/articles/http-charset/index we should use "ISO-8859-1" if not defined, currently not available
 		return false;
 	}
 	m_encoding = strus::getStringEncoding( content.charset(), content.str(), content.len());
 	if (m_encoding == papuga_Binary)
 	{
-		setAnswer( answer, ErrorOperationScanInput, ErrorCauseNotImplemented);
+		setAnswer( answer, ErrorCodeNotImplemented);
 		return false;
 	}
 	// Evaluate the request content type:
 	m_doctype = content.doctype() ? papuga_contentTypeFromName( content.doctype()) : papuga_guess_ContentType( content.str(), content.len());
 	if (m_doctype == papuga_ContentType_Unknown)
 	{
-		setAnswer( answer, ErrorOperationScanInput, ErrorCauseInputFormat);
+		setAnswer( answer, ErrorCodeInputFormat);
 		return false;
 	}
 	m_doctypestr = content.doctype();
@@ -115,7 +114,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	papuga_RequestParser* parser = papuga_create_RequestParser( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), &errcode);
 	if (!parser)
 	{
-		setAnswer( answer, ErrorOperationScanInput, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
 	if (!papuga_RequestParser_feed_request( parser, m_request, &errcode))
@@ -125,7 +124,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error at position %d: %s, feeding request, location: %s"), pos, papuga_ErrorCode_tostring( errcode), buf);
 		papuga_destroy_RequestParser( parser);
 
-		setAnswer( answer, ErrorOperationScanInput, papugaErrorToErrorCause( errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
 		return false;
 	}
 	papuga_destroy_RequestParser( parser);
@@ -150,7 +149,7 @@ bool WebRequestContext::debugContentRequest( WebRequestAnswer& answer)
 	m_result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
 	if (m_result_encoding == papuga_Binary)
 	{
-		setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("none of the accept charsets implemented"));
+		setAnswer( answer, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented"));
 		return false;
 	}
 	std::size_t result_length = 0;
@@ -163,7 +162,7 @@ bool WebRequestContext::debugContentRequest( WebRequestAnswer& answer)
 	}
 	else
 	{
-		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
 }
@@ -200,7 +199,7 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 		}
 		else
 		{
-			setAnswer( answer, ErrorOperationCallIndirection, papugaErrorToErrorCause( errcode));
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
 		}
 		return false;
 	}
@@ -213,12 +212,12 @@ bool WebRequestContext::setResultContentType( WebRequestAnswer& answer, papuga_S
 	m_result_doctype = strus::getResultContentType( m_accepted_doctype, default_doctype);
 	if (m_result_encoding == papuga_Binary)
 	{
-		setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("none of the accept charsets implemented"));
+		setAnswer( answer, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented"));
 		return false;
 	}
 	if (m_result_doctype == WebRequestContent::Unknown)
 	{
-		setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("none of the accept content types implemented"));
+		setAnswer( answer, ErrorCodeNotImplemented, _TXT("none of the accept content types implemented"));
 		return false;
 	}
 	return true;
@@ -230,7 +229,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	papuga_ErrorCode errcode = papuga_Ok;
 	if (!papuga_set_RequestResult( &result, &m_context, m_request))
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 	// Map the result:
@@ -244,7 +243,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, m_result_encoding, &resultulen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{
-			setAnswer( answer, ErrorOperationBuildResult, ErrorCauseNotImplemented, _TXT("output content type unknown"));
+			setAnswer( answer, ErrorCodeNotImplemented, _TXT("output content type unknown"));
 			return false;
 		}
 		default: break;
@@ -259,7 +258,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	}
 	else
 	{
-		setAnswer( answer, ErrorOperationBuildResult, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
 	return true;
@@ -270,20 +269,20 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 	papuga_ErrorCode errcode = papuga_Ok;
 	if (!papuga_init_RequestContext_child( &m_context, &m_allocator, m_handler->impl(), contextType, contextName, &errcode))
 	{
-		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
 	m_atm = papuga_RequestHandler_get_scheme( m_handler->impl(), m_context.type, scheme, &errcode);
 	if (!m_atm)
 	{
-		setAnswer( answer, ErrorOperationBuildData, papugaErrorToErrorCause( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
 		return false;
 	}
 	if (m_request) papuga_destroy_Request( m_request);
 	m_request = papuga_create_Request( m_atm);
 	if (!m_request)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 	return true;
@@ -352,7 +351,7 @@ bool WebRequestContext::callMethod( void* self, const papuga_RequestMethodId& mi
 	const papuga_ClassDef* cdef = &cdeflist[mid.classid-1];
 	if (mid.functionid == 0)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseNotAllowed);
+		setAnswer( answer, ErrorCodeNotAllowed);
 		return false;
 	}
 	papuga_ClassMethod method = cdef->methodtable[ mid.functionid-1];
@@ -362,7 +361,7 @@ bool WebRequestContext::callMethod( void* self, const papuga_RequestMethodId& mi
 	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
 	if (!ser)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 	papuga_init_ValueVariant_serialization( &argv, ser);
@@ -372,7 +371,7 @@ bool WebRequestContext::callMethod( void* self, const papuga_RequestMethodId& mi
 	{
 		if (!papuga_Serialization_pushValue_charp( ser, pathelem))
 		{
-			setAnswer( answer, ErrorOperationCallIndirection, ErrorCauseOutOfMem);
+			setAnswer( answer, ErrorCodeOutOfMem);
 			return false;
 		}
 	}
@@ -389,12 +388,12 @@ bool WebRequestContext::callMethod( void* self, const papuga_RequestMethodId& mi
 	}
 	if (retval.nofvalues == 0)
 	{
-		setAnswer( answer, ErrorOperationCallIndirection, ErrorCauseIncompleteResult);
+		setAnswer( answer, ErrorCodeIncompleteResult);
 		return false;
 	}
 	if (retval.nofvalues > 1)
 	{
-		setAnswer( answer, ErrorOperationCallIndirection, ErrorCauseRuntimeError, _TXT("only one result expected"));
+		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
 		return false;
 	}
 	papuga_init_ValueVariant_value( &result, &retval.valuear[0]);
@@ -408,7 +407,7 @@ bool WebRequestContext::callListMethod( const papuga_ValueVariant* obj, const ch
 		papuga_RequestMethodId mid;
 		if (!getListMethod( mid, obj->value.hostObject->classid))
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		void* self = obj->value.hostObject->data;
@@ -418,7 +417,7 @@ bool WebRequestContext::callListMethod( const papuga_ValueVariant* obj, const ch
 	}
 	else
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
 }
@@ -430,7 +429,7 @@ bool WebRequestContext::callViewMethod( const papuga_ValueVariant* obj, const ch
 		papuga_RequestMethodId mid;
 		if (!getViewMethod( mid, obj->value.hostObject->classid))
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		void* self = obj->value.hostObject->data;
@@ -442,7 +441,7 @@ bool WebRequestContext::callViewMethod( const papuga_ValueVariant* obj, const ch
 	}
 	else
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
 	return true;
@@ -459,7 +458,7 @@ static bool checkPapugaListBufferOverflow( const char** ci, WebRequestAnswer& an
 {
 	if (!ci)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseBufferOverflow);
+		setAnswer( answer, ErrorCodeBufferOverflow);
 		return false;
 	}
 	return true;
@@ -468,7 +467,7 @@ static bool checkPapugaListEmpty( const char** ci, WebRequestAnswer& answer)
 {
 	if (!*ci)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
 	return true;
@@ -490,7 +489,7 @@ bool WebRequestContext::dumpViewAll( papuga_Serialization* ser, WebRequestAnswer
 		if (!dumpViewType( *ti, ser, answer)) return false;
 		rt &= papuga_Serialization_pushClose( ser);
 	}
-	if (!rt) setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+	if (!rt) setAnswer( answer, ErrorCodeOutOfMem);
 	return rt;
 }
 
@@ -510,7 +509,7 @@ bool WebRequestContext::dumpViewType( const char* typenam, papuga_Serialization*
 		if (!dumpViewName( typenam, *ci, ser, answer)) return false;
 		rt &= papuga_Serialization_pushClose( ser);
 	}
-	if (!rt) setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+	if (!rt) setAnswer( answer, ErrorCodeOutOfMem);
 	return rt;
 }
 
@@ -523,7 +522,7 @@ bool WebRequestContext::dumpViewName( const char* typenam, const char* contextna
 	const papuga_RequestContext* context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 	if (context == NULL)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
 	else
@@ -544,7 +543,7 @@ bool WebRequestContext::dumpViewName( const char* typenam, const char* contextna
 			}
 		}
 	}
-	if (!rt) setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+	if (!rt) setAnswer( answer, ErrorCodeOutOfMem);
 	return rt;
 }
 
@@ -554,13 +553,13 @@ bool WebRequestContext::dumpViewVar( const papuga_RequestContext* context, const
 	const papuga_ValueVariant* obj = papuga_RequestContext_get_variable( context, varnam);
 	if (!obj)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
 	if (!callViewMethod( obj, "", result, answer)) return false;
 	if (!papuga_Serialization_pushValue( ser, &result))
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 	return true;
@@ -607,7 +606,7 @@ bool WebRequestContext::executeList(
 		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 		if (context == NULL)
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
@@ -627,14 +626,14 @@ bool WebRequestContext::executeList(
 		}
 		if (!obj)
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		return callListMethod( obj, path.getRest(), answer);
 	}
 	catch (...)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 }
@@ -660,7 +659,7 @@ bool WebRequestContext::executeView(
 		papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
 		if (!ser)
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+			setAnswer( answer, ErrorCodeOutOfMem);
 			return false;
 		}
 		papuga_ValueVariant result;
@@ -679,7 +678,7 @@ bool WebRequestContext::executeView(
 		context = papuga_RequestHandler_find_context( m_handler->impl(), typenam, contextnam);
 		if (context == NULL)
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
@@ -699,14 +698,14 @@ bool WebRequestContext::executeView(
 		}
 		if (!obj)
 		{
-			setAnswer( answer, ErrorOperationBuildData, ErrorCauseRequestResolveError);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		return callViewMethod( obj, path.getRest(), answer);
 	}
 	catch (...)
 	{
-		setAnswer( answer, ErrorOperationBuildData, ErrorCauseOutOfMem);
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 }
