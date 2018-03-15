@@ -531,6 +531,11 @@ make test
 %endif
 
 %changelog
+* Thu Mar 15 2018 Patrick Frey <patrickpfrey@yahoo.com> 0.15.7-0.1
+- added make target cppcheck for static code analysis
+- adapted changes in error handling defined in strus base: simplified error codes
+- reimplemented web request handler interface (less intrusive) for processing web requests (for example by the strusWebService)
+
 * Tue Feb 12 2018 Patrick Frey <patrickpfrey@yahoo.com> 0.15.6-0.1
 - added some functions for introspection needed by the webservice
 - adapted error handling to changes in base: mandatory error codes everywhere
