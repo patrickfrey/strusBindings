@@ -23,46 +23,16 @@ public:
 	/// \brief Destructor
 	virtual ~WebRequestContextInterface(){}
 
-	/// \brief Run the content request
-	/// \param[in] contextType identifier defining the type of the context where to execute the request
-	/// \param[in] contextName identifier defining the name of the context where to execute the request
-	/// \param[in] schema identifier identifying the request to execute
+	/// \brief Run the request
+	/// \param[in] method request method in uppercase
+	/// \param[in] path path of the request
 	/// \param[in] content content of the request
-	/// \param[out] answer the data of the answer of the request
-	/// \return bool if succeeded, false else
-	virtual bool executeContent(
-			const char* contextType,
-			const char* contextName,
-			const char* schema,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer)=0;
-
-	/// \brief Describe in plain text what would be done to fulfill the content request without executing anything
-	/// \param[in] contextType identifier defining the type of the context where to execute the request
-	/// \param[in] contextName identifier defining the name of the context where to execute the request
-	/// \param[in] schema identifier identifying the request to execute
-	/// \param[in] content content of the request
-	/// \param[out] answer the data of the answer of the request
-	/// \return bool if request succeeded, false else
-	virtual bool debugContent(
-			const char* contextType,
-			const char* contextName,
-			const char* schema,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer)=0;
-
-	/// \brief Execute a list command for introspection defined by a path (URL)
-	/// \param[in] path path of the object to list contents
-	/// \return bool if succeeded, false else
-	virtual bool executeList(
+	/// \param[out] answer result status and the data of the answer of the request
+	/// \return bool true if succeeded, false else
+	virtual bool executeRequest(
+			const char* method,
 			const char* path,
-			WebRequestAnswer& answer)=0;
-
-	/// \brief Execute a view command for introspection defined by a path (URL)
-	/// \param[in] path path of the object to view content
-	/// \return bool if succeeded, false else
-	virtual bool executeView(
-			const char* path,
+			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 };
 

@@ -9,6 +9,7 @@
 #ifndef _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_BASE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_BASE_HPP_INCLUDED
 #include "papuga/serialization.h"
+#include "strus/valueIteratorInterface.hpp"
 #include "strus/reference.hpp"
 #include <string>
 #include <vector>

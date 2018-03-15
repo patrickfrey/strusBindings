@@ -94,6 +94,7 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 		case ErrorCodeNotImplemented: return 500 /*Internal Server Error*/;
 		case ErrorCodeIncompleteInitialization: return 500 /*Internal Server Error*/;
 		case ErrorCodeIncompleteDefinition: return 500 /*Internal Server Error*/;
+		case ErrorCodeIncompleteConfiguration: return 500 /*Internal Server Error*/;
 		case ErrorCodeBindingLanguageError: return 500 /*Internal Server Error*/;
 		case ErrorCodeUnknownIdentifier: return 400 /*Bad Request*/;
 		case ErrorCodeOperationOrder: return 500 /*Internal Server Error*/;

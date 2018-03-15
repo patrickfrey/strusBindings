@@ -15,6 +15,7 @@
 #include "papuga/requestLogger.h"
 #include <cstddef>
 #include <utility>
+#include <set>
 
 namespace strus
 {
@@ -31,47 +32,61 @@ public:
 	WebRequestHandler( 
 			WebRequestLoggerInterface* logger_,
 			const std::string& html_head_,
-			const std::string& config_store_dir_);
+			const std::string& config_store_dir_,
+			const std::string& configstr_);
 	virtual ~WebRequestHandler();
-
-	virtual bool hasScheme(
-			const char* contextType,
-			const char* scheme) const;
-
-	virtual char const** schemes() const;
 
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			WebRequestAnswer& status) const;
 
-	virtual bool loadConfiguration(
+public:/*WebRequestContext*/
+	const papuga_RequestHandler* impl() const	{return m_impl;}
+	const char* html_head() const			{return m_html_head.c_str();}
+	int debug_maxdepth() const			{return m_debug_maxdepth;}
+
+	bool loadConfiguration(
 			const char* contextType,
 			const char* contextName,
 			const char* scheme,
+			bool storedForReload,
 			const WebRequestContent& content,
 			WebRequestAnswer& status);
 
-	virtual bool storeConfiguration(
+private:
+	struct ConfigurationTransaction
+	{
+		std::string failed_filename;
+		std::string filename;
+	};
+
+	bool storeConfiguration(
+			ConfigurationTransaction& transaction,
 			const char* contextType,
 			const char* contextName,
 			const char* scheme,
 			const WebRequestContent& content,
 			WebRequestAnswer& status) const;
+	bool commitStoreConfiguration(
+			const ConfigurationTransaction& transaction,
+			WebRequestAnswer& status) const;
 
-	virtual bool loadStoredConfigurations(
-			WebRequestAnswer& answer);
-
-public:/*WebRequestContext*/
-	const papuga_RequestHandler* impl() const	{return m_impl;}
-	const char* html_head() const			{return m_html_head.c_str();}
-	int debug_maxdepth() const			{return m_debug_maxdepth;}
+public:/*WebRequestContext: Get methods to execute beside schemes*/
+	bool getListMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getViewMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getPostMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getPutMethod( papuga_RequestMethodId& mid, int classid) const;
 
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
 
 	/// \brief Get the [type,name] tuple of the context that is base of a context loaded by 'loadConfiguration':
 	std::pair<const char*,const char*> getConfigSourceContext( const char* contextType, const char* contextName);
+	void addScheme( std::size_t idx, const char* type, const char* name, const papuga_RequestAutomaton* automaton);
+
+	void loadConfiguration( const std::string& configstr);
+	bool loadStoredConfigurations();
 
 private:
 	mutable strus::mutex m_mutex;		//< mutex for locking mutual exclusion of configuration requests
@@ -83,6 +98,9 @@ private:
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
 	char const** m_schemes;			//< NULL terminated list of schemes available */
+	int m_nofschemes;			//< number of elements in m_schemes
+	char const** m_context_schemes;		//< NULL terminated list of schemes of the main context available */
+	int m_nofcontext_schemes;		//< number of elements in m_context_schemes
 };
 
 }//namespace

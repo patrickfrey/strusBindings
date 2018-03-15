@@ -35,30 +35,41 @@ public:
 		const char* accepted_doctype);
 	virtual ~WebRequestContext();
 
-	virtual bool executeContent(
-			const char* contextType,
-			const char* contextName,
-			const char* schema,
+	virtual bool executeRequest(
+			const char* method,
+			const char* path,
 			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-	virtual bool debugContent(
-			const char* contextType,
-			const char* contextName,
-			const char* schema,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-	virtual bool executeList(
-			const char* path_,
-			WebRequestAnswer& answer);
-
-	virtual bool executeView(
-			const char* path_,
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
 	papuga_RequestContext* impl()			{return &m_context;}
+	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
+
+private:
+	bool executeGET(
+			const char* path,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
+
+	bool executePUT(
+			const char* path,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
+
+	bool executePOST(
+			const char* path,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
+
+	bool executeDELETE(
+			const char* path,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
+
+	bool executePATCH(
+			const char* path,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
 
 private:
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* contextName, const char* schema);
@@ -71,7 +82,13 @@ private:
 	bool callListMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer);
 	bool callViewMethod( const papuga_ValueVariant* obj, const char* path, papuga_ValueVariant& result, WebRequestAnswer& answer);
 	bool callViewMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer);
-	bool callMethod( void* self, const papuga_RequestMethodId& mid, const char* path_, papuga_ValueVariant& result, WebRequestAnswer& answer);
+	bool callPostMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool callPutMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+
+	bool callHostObjGetMethod( void* self, const papuga_RequestMethodId& mid, const char* path_, papuga_ValueVariant& result, WebRequestAnswer& answer);
+	bool callHostObjPostMethod( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer);
+	bool callHostObjPutMethod( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool callHostObjContentMethod( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, papuga_CallResult& callresult, WebRequestAnswer& answer);
 
 	bool dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer);
 	bool dumpViewType( const char* type_, papuga_Serialization* ser, WebRequestAnswer& answer);

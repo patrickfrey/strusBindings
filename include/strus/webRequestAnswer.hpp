@@ -49,7 +49,7 @@ public:
 	}
 
 	/// \brief Test if request succeeded
-	bool ok() const			{return !m_errorstr;}
+	bool ok() const					{return !m_errorstr;}
 
 	/// \brief Error message in case of failure or NULL
 	const char* errorstr() const			{return m_errorstr;}
