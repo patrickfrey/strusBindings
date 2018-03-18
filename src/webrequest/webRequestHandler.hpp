@@ -75,8 +75,9 @@ private:
 public:/*WebRequestContext: Get methods to execute beside schemes*/
 	bool getListMethod( papuga_RequestMethodId& mid, int classid) const;
 	bool getViewMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getPostMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getPutMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getPostContentMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getPutContentMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getDeleteMethod( papuga_RequestMethodId& mid, int classid) const;
 
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;

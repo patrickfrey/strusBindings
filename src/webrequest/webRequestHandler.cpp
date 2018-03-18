@@ -200,12 +200,17 @@ bool WebRequestHandler::getViewMethod( papuga_RequestMethodId& mid, int classid)
 	}
 }
 
-bool WebRequestHandler::getPostMethod( papuga_RequestMethodId& mid, int classid) const
+bool WebRequestHandler::getPostContentMethod( papuga_RequestMethodId& mid, int classid) const
 {
 	return false;
 }
 
-bool WebRequestHandler::getPutMethod( papuga_RequestMethodId& mid, int classid) const
+bool WebRequestHandler::getPutContentMethod( papuga_RequestMethodId& mid, int classid) const
+{
+	return false;
+}
+
+bool WebRequestHandler::getDeleteMethod( papuga_RequestMethodId& mid, int classid) const
 {
 	return false;
 }
