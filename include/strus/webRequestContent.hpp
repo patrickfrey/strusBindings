@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Structure holding the data belonging to an answer of an XML/JSON request on the strus bindings
+/// \brief Structure holding the data belonging to an input or an answer of an XML/JSON request on the strus bindings
 /// \file "webRequestContent.hpp"
 #ifndef _STRUS_WEB_REQUEST_CONTENT_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_CONTENT_HPP_INCLUDED
@@ -64,12 +64,14 @@ public:
 	const char* charset() const	{return m_charset;}
 	/// \brief Pointer to the document type identifier of this content
 	const char* doctype() const	{return m_doctype;}
-	/// \brief Pointer to the answer content string of the request
+	/// \brief Pointer to the content string of the request
 	const char* str() const		{return m_str;}
-	/// \brief Length of the answer in bytes
+	/// \brief Length of the content in bytes
 	std::size_t len() const		{return m_len;}
+	/// \brief Evaluate if the content is empty
+	bool empty() const		{return m_len==0;}
 
-	/// \brief Set content of answer
+	/// \brief Set the content data
 	/// \param[in] contentstr_ pointer to content
 	/// \param[in] contentlen_ size of content in bytes
 	void setContent( const char* contentstr_, std::size_t contentlen_)
@@ -77,13 +79,13 @@ public:
 		m_str = contentstr_;
 		m_len = contentlen_;
 	}
-	/// \brief Set the character set encoding of this answer
+	/// \brief Set the character set encoding of this content
 	/// \param[in] charset_ pointer to character set encoding identifier
 	void setCharset( const char* charset_)
 	{
 		m_charset = charset_;
 	}
-	/// \brief Set the document type of this answer
+	/// \brief Set the document type of this content
 	/// \param[in] doctype_ pointer to document type identifier
 	void setDoctype( const char* doctype_)
 	{
@@ -93,8 +95,8 @@ public:
 private:
 	const char* m_charset;	///< character set encoding, e.g. "UTF-8", "UTF-16BE", ...
 	const char* m_doctype;	///< document type, e.g. "application/xml", "application/json", "text/plain", ...
-	const char* m_str;	///< pointer to the answer content string of the request
-	std::size_t m_len;	///< length of the answer in bytes
+	const char* m_str;	///< pointer to the content string of the request
+	std::size_t m_len;	///< length of the content in bytes
 };
 
 }//namespace

@@ -38,6 +38,7 @@ public:
 	virtual int structDepth() const=0;
 
 	/// \brief Log a request
+	/// \remark expected to be thread safe
 	virtual void logRequest( const char* reqstr)=0;
 
 	/// \brief Log a method call
@@ -45,6 +46,7 @@ public:
 	/// \param[in] methodname name identifier of the method called
 	/// \param[in] arguments serialized arguments of the method called
 	/// \param[in] result serialized result of the method called
+	/// \remark expected to be thread safe
 	virtual void logMethodCall(
 			const std::string& classname,
 			const std::string& methodname,
@@ -53,6 +55,7 @@ public:
 
 	/// \brief Log an error during logging
 	/// \param[in] errmsg error message to log
+	/// \remark expected to be thread safe
 	virtual void logLoggerError( const char* errmsg)=0;
 };
 

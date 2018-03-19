@@ -43,6 +43,7 @@ public:
 
 public:/*WebRequestContext*/
 	const papuga_RequestHandler* impl() const	{return m_impl;}
+	papuga_RequestLogger* call_logger()		{return &m_call_logger;}
 	const char* html_head() const			{return m_html_head.c_str();}
 	int debug_maxdepth() const			{return m_debug_maxdepth;}
 
@@ -78,6 +79,7 @@ public:/*WebRequestContext: Get methods to execute beside schemes*/
 	bool getPostContentMethod( papuga_RequestMethodId& mid, int classid) const;
 	bool getPutContentMethod( papuga_RequestMethodId& mid, int classid) const;
 	bool getDeleteMethod( papuga_RequestMethodId& mid, int classid) const;
+	bool getPatchMethod( papuga_RequestMethodId& mid, int classid) const;
 
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;

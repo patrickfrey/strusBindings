@@ -215,6 +215,11 @@ bool WebRequestHandler::getDeleteMethod( papuga_RequestMethodId& mid, int classi
 	return false;
 }
 
+bool WebRequestHandler::getPatchMethod( papuga_RequestMethodId& mid, int classid) const
+{
+	return false;
+}
+
 static void addStringList( char const**& stringlist, int& stringlistsize, const char* elem)
 {
 	char const** new_stringlist = (char const**)std::realloc( stringlist, (stringlistsize+2) * sizeof(stringlist[0]));
