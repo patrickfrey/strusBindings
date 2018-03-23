@@ -36,6 +36,7 @@
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/textProcessorInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
+#include "strus/debugTraceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/constants.hpp"
 #include "strus/base/configParser.hpp"
@@ -53,9 +54,15 @@ using namespace strus::bindings;
 
 static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
 {
-	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads);
+	DebugTraceInterface* dbgtrace = createDebugTrace_standard( maxNofThreads);
+	if (!dbgtrace)
+	{
+		throw strus::runtime_error( _TXT("failed to create debug trace object"));
+	}
+	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads, dbgtrace);
 	if (!errorhnd)
 	{
+		delete dbgtrace;
 		throw strus::runtime_error( _TXT("failed to create error buffer object"));
 	}
 	return errorhnd;

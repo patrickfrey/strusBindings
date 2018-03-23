@@ -180,44 +180,52 @@ std::pair<const char*,const char*> WebRequestHandler::getConfigSourceContext( co
 	return std::pair<const char*,const char*>("context","context");
 }
 
-bool WebRequestHandler::getListMethod( papuga_RequestMethodId& mid, int classid) const
+const WebRequestHandler::MethodDescription* WebRequestHandler::getListMethod( int classid)
 {
+	static const MethodDescription::ParamType patharg[] = {MethodDescription::ParamPathArray,MethodDescription::ParamEnd};
+	static const MethodDescription context_method( strus::bindings::method::Context::introspectionDir(), patharg);
+	static const MethodDescription storage_method( strus::bindings::method::StorageClient::introspectionDir(), patharg);
+	
 	switch (classid)
 	{
-		case STRUS_BINDINGS_CLASSID_Context:		mid = strus::bindings::method::Context::introspectionDir(); return true;
-		case STRUS_BINDINGS_CLASSID_StorageClient:	mid = strus::bindings::method::StorageClient::introspectionDir(); return true;
-		default:					return false;
+		case STRUS_BINDINGS_CLASSID_Context:		return &context_method;
+		case STRUS_BINDINGS_CLASSID_StorageClient:	return &storage_method;
+		default:					return NULL;
 	}
 }
 
-bool WebRequestHandler::getViewMethod( papuga_RequestMethodId& mid, int classid) const
+const WebRequestHandler::MethodDescription* WebRequestHandler::getViewMethod( int classid)
 {
+	static const MethodDescription::ParamType patharg[] = {MethodDescription::ParamPathArray,MethodDescription::ParamEnd};
+	static const MethodDescription context_method( strus::bindings::method::Context::introspection(), patharg);
+	static const MethodDescription storage_method( strus::bindings::method::StorageClient::introspection(), patharg);
+	
 	switch (classid)
 	{
-		case STRUS_BINDINGS_CLASSID_Context:		mid = strus::bindings::method::Context::introspection(); return true;
-		case STRUS_BINDINGS_CLASSID_StorageClient:	mid = strus::bindings::method::StorageClient::introspection(); return true;
-		default:					return false;
+		case STRUS_BINDINGS_CLASSID_Context:		return &context_method;
+		case STRUS_BINDINGS_CLASSID_StorageClient:	return &storage_method;
+		default:					return NULL;
 	}
 }
 
-bool WebRequestHandler::getPostContentMethod( papuga_RequestMethodId& mid, int classid) const
+const WebRequestHandler::MethodDescription* WebRequestHandler::getPostDocumentMethod( int classid)
 {
-	return false;
+	return NULL;
 }
 
-bool WebRequestHandler::getPutContentMethod( papuga_RequestMethodId& mid, int classid) const
+const WebRequestHandler::MethodDescription* WebRequestHandler::getPutDocumentMethod( int classid)
 {
-	return false;
+	return NULL;
 }
 
-bool WebRequestHandler::getDeleteMethod( papuga_RequestMethodId& mid, int classid) const
+const WebRequestHandler::MethodDescription* WebRequestHandler::getDeleteMethod( int classid)
 {
-	return false;
+	return NULL;
 }
 
-bool WebRequestHandler::getPatchMethod( papuga_RequestMethodId& mid, int classid) const
+const WebRequestHandler::MethodDescription* WebRequestHandler::getPatchMethod( int classid)
 {
-	return false;
+	return NULL;
 }
 
 static void addStringList( char const**& stringlist, int& stringlistsize, const char* elem)

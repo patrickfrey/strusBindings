@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # --------------------------------------
 set( source_files
 	webRequestUtils.cpp
-	webRequestContext.cpp
 	webRequestHandler.cpp
+	webRequestContext.cpp
 )
 
 include_directories(

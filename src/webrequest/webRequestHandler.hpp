@@ -73,13 +73,24 @@ private:
 			const ConfigurationTransaction& transaction,
 			WebRequestAnswer& status) const;
 
-public:/*WebRequestContext: Get methods to execute beside schemes*/
-	bool getListMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getViewMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getPostContentMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getPutContentMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getDeleteMethod( papuga_RequestMethodId& mid, int classid) const;
-	bool getPatchMethod( papuga_RequestMethodId& mid, int classid) const;
+public:/*WebRequestContext: Get methods to execute*/
+	struct MethodDescription
+	{
+		enum ParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
+
+		papuga_RequestMethodId mid;
+		const ParamType* params;
+
+		MethodDescription( const papuga_RequestMethodId mid_, const ParamType* params_)
+			:params(params_){mid.classid=mid_.classid;mid.functionid=mid_.functionid;}
+	};
+
+	static const MethodDescription* getListMethod( int classid);
+	static const MethodDescription* getViewMethod( int classid);
+	static const MethodDescription* getPostDocumentMethod( int classid);
+	static const MethodDescription* getPutDocumentMethod( int classid);
+	static const MethodDescription* getDeleteMethod( int classid);
+	static const MethodDescription* getPatchMethod( int classid);
 
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;

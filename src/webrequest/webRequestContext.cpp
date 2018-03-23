@@ -22,6 +22,7 @@
 #include "strus/bindingObjects.h"
 #include "strus/bindingMethodIds.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/analyzer/documentClass.hpp"
 #include "papuga/errors.h"
 #include "papuga/request.h"
 #include "papuga/requestParser.h"
@@ -125,7 +126,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error at position %d: %s, feeding request, location: %s"), pos, papuga_ErrorCode_tostring( errcode), buf);
 		papuga_destroy_RequestParser( parser);
 
-		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorBuffer_lastError( &m_errbuf));
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorBuffer_lastError( &m_errbuf), true);
 		return false;
 	}
 	papuga_destroy_RequestParser( parser);
@@ -196,7 +197,7 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 				}
 			}
 			if (apperr) removeErrorCodesFromMessage( errmsg);
-			setAnswer( answer, apperr, errmsg);
+			setAnswer( answer, apperr, errmsg, true);
 		}
 		else
 		{
@@ -281,9 +282,16 @@ bool WebRequestContext::inheritRequestContext( WebRequestAnswer& answer, const c
 	}
 	return true;
 ERROR:
-	std::snprintf( buf, sizeof(buf), _TXT("failed to inherit from context %s '%s'"), contextType, contextName);
+	if (errcode == papuga_NotImplemented)
+	{
+		std::snprintf( buf, sizeof(buf), _TXT("undefined %s '%s'"), contextType, contextName);
+	}
+	else
+	{
+		std::snprintf( buf, sizeof(buf), _TXT("failed to inherit from %s '%s'"), contextType, contextName);
+	}
 	buf[ sizeof(buf)-1] = 0;
-	setAnswer( answer, errcode, buf, 0);
+	setAnswer( answer, errcode, buf, true);
 	return false;
 }
 
@@ -371,111 +379,97 @@ private:
 	char buf[ 2048];
 };
 
-bool WebRequestContext::callHostObjMethodPathArg( void* self, const papuga_RequestMethodId& mid, const char* path_, papuga_CallResult& retval, WebRequestAnswer& answer)
+static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler::MethodDescription::ParamType paramtype, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, strus::ErrorCode& errcode)
 {
+	papuga_Serialization* ser;
+	papuga_StringEncoding enc;
+	switch (paramtype)
+	{
+		case WebRequestHandler::MethodDescription::ParamEnd:
+			return false;
+		case WebRequestHandler::MethodDescription::ParamPathString:
+			papuga_init_ValueVariant_charp( &arg, path);
+			return true;
+		case WebRequestHandler::MethodDescription::ParamPathArray:
+			ser = papuga_Allocator_alloc_Serialization( allocator);
+			if (!ser)
+			{
+				errcode = ErrorCodeOutOfMem;
+				return false;
+			}
+			else
+			{
+				PathBuf pathsplit( path);
+				const char* pathelem;
+				while (!!(pathelem = pathsplit.getNext()))
+				{
+					if (!papuga_Serialization_pushValue_charp( ser, pathelem))
+					{
+						errcode = ErrorCodeOutOfMem;
+						return false;
+					}
+				}
+			}
+			papuga_init_ValueVariant_serialization( &arg, ser);
+			return true;
+		case WebRequestHandler::MethodDescription::ParamDocumentClass:
+			ser = papuga_Allocator_alloc_Serialization( allocator);
+			if (!ser)
+			{
+				errcode = ErrorCodeOutOfMem;
+				return false;
+			}
+			papuga_Serialization_set_structid( ser, STRUS_BINDINGS_STRUCTID_DocumentClass);
+			if (!papuga_Serialization_pushValue_charp( ser, content.doctype())
+			||	!papuga_Serialization_pushValue_charp( ser, content.charset()))
+			{
+				errcode = ErrorCodeOutOfMem;
+				return false;
+			}
+			papuga_init_ValueVariant_serialization( &arg, ser);
+			return true;
+		case WebRequestHandler::MethodDescription::ParamContent:
+			if (!papuga_getStringEncodingFromName( &enc, content.charset()))
+			{
+				enc = papuga_Binary;
+			}
+			papuga_init_ValueVariant_string_enc( &arg, enc, content.str(), content.len() / papuga_StringEncoding_unit_size(enc));
+			return true;
+	}
+	errcode = ErrorCodeLogicError;
+	return false;
+}
+
+static bool callHostObjMethod( void* self, const WebRequestHandler::MethodDescription* method_descr, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, papuga_CallResult& retval, WebRequestAnswer& answer)
+{
+	// Get method function pointer to call:
 	const papuga_ClassDef* cdeflist = getBindingsClassDefs();
-	const papuga_ClassDef* cdef = &cdeflist[mid.classid-1];
-	if (mid.functionid == 0)
+	const papuga_ClassDef* cdef = &cdeflist[ method_descr->mid.classid-1];
+	if (method_descr->mid.functionid == 0)
 	{
 		setAnswer( answer, ErrorCodeNotAllowed);
 		return false;
 	}
-	papuga_ClassMethod method = cdef->methodtable[ mid.functionid-1];
-	papuga_ValueVariant argv;
+	papuga_ClassMethod method = cdef->methodtable[ method_descr->mid.functionid-1];
 
-	// Map path to serialization that is the argument for the call:
-	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
-	if (!ser)
+	// Initialize the arguments:
+	enum {MaxNofArgs=32};
+	papuga_ValueVariant argv[MaxNofArgs];
+	int argc = 0;
+	strus::ErrorCode errcode = ErrorCodeUnknown;
+	for (; argc < MaxNofArgs && method_descr->params[argc] != WebRequestHandler::MethodDescription::ParamEnd; ++argc)
 	{
-		setAnswer( answer, ErrorCodeOutOfMem);
-		return false;
-	}
-	papuga_init_ValueVariant_serialization( &argv, ser);
-	PathBuf path( path_);
-	const char* pathelem;
-	while (!!(pathelem = path.getNext()))
-	{
-		if (!papuga_Serialization_pushValue_charp( ser, pathelem))
+		if (!initHostObjMethodParam( argv[ argc], method_descr->params[argc], path, content, allocator, errcode))
 		{
-			setAnswer( answer, ErrorCodeOutOfMem);
+			setAnswer( answer, errcode);
 			return false;
 		}
 	}
-	// Call the method:
-	if (!(*method)( self, &retval, 1/*argc*/, &argv))
+	if (argc == MaxNofArgs)
 	{
-		char* errstr = papuga_CallResult_lastError( &retval);
-		char const* msgitr = errstr;
-		int apperr = strus::errorCodeFromMessage( msgitr);
-		if (apperr) strus::removeErrorCodesFromMessage( errstr);
-
-		setAnswer( answer, apperr, errstr);
+		setAnswer( answer, ErrorCodeMaxNofItemsExceeded);
 		return false;
 	}
-	return true;
-}
-
-bool WebRequestContext::callHostObjMethodPathArgWithResult( void* self, const papuga_RequestMethodId& mid, const char* path, papuga_ValueVariant& result, WebRequestAnswer& answer)
-{
-	papuga_CallResult retval;
-	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
-
-	if (!callHostObjMethodPathArg( self, mid, path, retval, answer)) return false;
-
-	// Assign the result:
-	if (retval.nofvalues == 0)
-	{
-		setAnswer( answer, ErrorCodeIncompleteResult);
-		return false;
-	}
-	if (retval.nofvalues > 1)
-	{
-		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
-		return false;
-	}
-	papuga_init_ValueVariant_value( &result, &retval.valuear[0]);
-	return true;
-}
-
-bool WebRequestContext::callHostObjMethodPathArgWithoutResult( void* self, const papuga_RequestMethodId& mid, const char* path, WebRequestAnswer& answer)
-{
-	papuga_CallResult retval;
-	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
-
-	if (!callHostObjMethodPathArg( self, mid, path, retval, answer)) return false;
-	if (retval.nofvalues > 0)
-	{
-		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "no result expected"));
-		return false;
-	}
-	return true;
-}
-
-bool WebRequestContext::callHostObjMethodDocumentArg( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer)
-{
-	const papuga_ClassDef* cdeflist = getBindingsClassDefs();
-	const papuga_ClassDef* cdef = &cdeflist[mid.classid-1];
-	if (mid.functionid == 0)
-	{
-		setAnswer( answer, ErrorCodeNotAllowed);
-		return false;
-	}
-	papuga_ClassMethod method = cdef->methodtable[ mid.functionid-1];
-
-	// Initialize 4 arguments (path,doctype,charset,content):
-	papuga_StringEncoding content_charset;
-	papuga_ValueVariant argv[4];
-	papuga_init_ValueVariant_charp( &argv[0], path);
-	if (!papuga_getStringEncodingFromName( &content_charset, content.charset()))
-	{
-		content_charset = papuga_Binary;
-	}
-	papuga_init_ValueVariant_charp( &argv[1], content.doctype());
-	papuga_init_ValueVariant_charp( &argv[2], content.charset());
-	papuga_init_ValueVariant_string_enc( &argv[3], content_charset, content.str(), content.len() / papuga_StringEncoding_unit_size(content_charset));
-
 	// Call the method:
 	if (!(*method)( self, &retval, 1/*argc*/, argv))
 	{
@@ -490,13 +484,13 @@ bool WebRequestContext::callHostObjMethodDocumentArg( void* self, const papuga_R
 	return true;
 }
 
-bool WebRequestContext::callHostObjMethodDocumentArgWithResult( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer)
+static bool callHostObjMethodWithResult( void* self, const WebRequestHandler::MethodDescription* method, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, papuga_ValueVariant& result, WebRequestAnswer& answer)
 {
 	papuga_CallResult retval;
 	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
+	papuga_init_CallResult( &retval, allocator, true, membuf_err, sizeof(membuf_err));
 
-	if (!callHostObjMethodDocumentArg( self, mid, path, content, retval, answer)) return false;
+	if (!callHostObjMethod( self, method, path, content, allocator, retval, answer)) return false;
 
 	// Assign the result:
 	if (retval.nofvalues == 0)
@@ -513,13 +507,13 @@ bool WebRequestContext::callHostObjMethodDocumentArgWithResult( void* self, cons
 	return true;
 }
 
-bool WebRequestContext::callHostObjMethodDocumentArgWithoutResult( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
+static bool callHostObjMethodWithoutResult( void* self, const WebRequestHandler::MethodDescription* method, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, WebRequestAnswer& answer)
 {
 	papuga_CallResult retval;
 	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
+	papuga_init_CallResult( &retval, allocator, true, membuf_err, sizeof(membuf_err));
 
-	if (!callHostObjMethodDocumentArg( self, mid, path, content, retval, answer)) return false;
+	if (!callHostObjMethod( self, method, path, content, allocator, retval, answer)) return false;
 	if (retval.nofvalues > 0)
 	{
 		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "no result expected"));
@@ -528,145 +522,43 @@ bool WebRequestContext::callHostObjMethodDocumentArgWithoutResult( void* self, c
 	return true;
 }
 
-bool WebRequestContext::callListMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer)
+enum MethodType {MethodList,MethodView,MethodDelete,MethodPatch,MethodPostDocument,MethodPutDocument};
+bool WebRequestContext::callMethod( MethodType methodType, const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer)
 {
 	if (obj->valuetype == papuga_TypeHostObject)
 	{
-		papuga_RequestMethodId mid;
-		if (!m_handler->getListMethod( mid, obj->value.hostObject->classid))
+		bool with_result = false;
+		const WebRequestHandler::MethodDescription* method = 0;
+		switch (methodType)
+		{
+			case MethodList: method = m_handler->getListMethod( obj->value.hostObject->classid); with_result = true; break;
+			case MethodView: method = m_handler->getViewMethod( obj->value.hostObject->classid); with_result = true; break;
+			case MethodDelete: method = m_handler->getDeleteMethod( obj->value.hostObject->classid); with_result = false; break;
+			case MethodPatch: method = m_handler->getPatchMethod( obj->value.hostObject->classid); with_result = false; break;
+			case MethodPostDocument: method = m_handler->getPostDocumentMethod( obj->value.hostObject->classid); with_result = true; break;
+			case MethodPutDocument: method = m_handler->getPutDocumentMethod( obj->value.hostObject->classid); with_result = false; break;
+		}
+		if (!method)
 		{
 			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		void* self = obj->value.hostObject->data;
-		papuga_ValueVariant result;
-		if (!callHostObjMethodPathArgWithResult( self, mid, path, result, answer)) return false;
-		return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, result);
+		if (with_result)
+		{
+			return callHostObjMethodWithResult( self, method, path, content, &m_allocator, result, answer);
+		}
+		else
+		{
+			papuga_init_ValueVariant( &result);
+			return callHostObjMethodWithoutResult( self, method, path, content, &m_allocator, answer);
+		}
 	}
 	else
 	{
 		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
-}
-
-bool WebRequestContext::callViewMethod( const papuga_ValueVariant* obj, const char* path, papuga_ValueVariant& result, WebRequestAnswer& answer)
-{
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		papuga_RequestMethodId mid;
-		if (!m_handler->getViewMethod( mid, obj->value.hostObject->classid))
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		void* self = obj->value.hostObject->data;
-		if (!callHostObjMethodPathArgWithResult( self, mid, path, result, answer)) return false;
-	}
-	else if (*path == '\0')
-	{
-		papuga_init_ValueVariant_value( &result, obj);
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-	return true;
-}
-
-bool WebRequestContext::callViewMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer)
-{
-	papuga_ValueVariant result; 
-	if (!callViewMethod( obj, path, result, answer)) return false;
-	return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
-}
-
-bool WebRequestContext::callDeleteMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer)
-{
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		papuga_RequestMethodId mid;
-		if (!m_handler->getDeleteMethod( mid, obj->value.hostObject->classid))
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		void* self = obj->value.hostObject->data;
-		if (!callHostObjMethodPathArgWithoutResult( self, mid, path, answer)) return false;
-		return true;
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-}
-
-bool WebRequestContext::callPatchMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
-{
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		papuga_RequestMethodId mid;
-		if (!m_handler->getPatchMethod( mid, obj->value.hostObject->classid))
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		void* self = obj->value.hostObject->data;
-		if (!callHostObjMethodDocumentArgWithoutResult( self, mid, path, content, answer)) return false;
-		return true;
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-}
-
-bool WebRequestContext::callPostDocumentMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
-{
-	papuga_ValueVariant result; 
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		papuga_RequestMethodId mid;
-		if (!m_handler->getPostContentMethod( mid, obj->value.hostObject->classid))
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		void* self = obj->value.hostObject->data;
-		if (!callHostObjMethodDocumentArgWithResult( self, mid, path, content, result, answer)) return false;
-
-		return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "result", "elem", m_result_encoding, m_result_doctype, result);
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-	return true;
-}
-
-bool WebRequestContext::callPutDocumentMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
-{
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		papuga_RequestMethodId mid;
-		if (!m_handler->getPutContentMethod( mid, obj->value.hostObject->classid))
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		void* self = obj->value.hostObject->data;
-		if (!callHostObjMethodDocumentArgWithoutResult( self, mid, path, content, answer)) return false;
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-	return true;
 }
 
 static bool checkPapugaListBufferOverflow( const char** ci, WebRequestAnswer& answer)
@@ -771,7 +663,8 @@ bool WebRequestContext::dumpViewVar( const papuga_RequestContext* context, const
 		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
-	if (!callViewMethod( obj, "", result, answer)) return false;
+	static const WebRequestContent empty_content;
+	if (!callMethod( MethodView, obj, "", empty_content, result, answer)) return false;
 	if (!papuga_Serialization_pushValue( ser, &result))
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
@@ -893,7 +786,9 @@ bool WebRequestContext::executeGET(
 			}
 			else if (selector.obj)
 			{
-				return callListMethod( selector.obj, path.getRest(), answer);
+				papuga_ValueVariant result;
+				return callMethod( MethodList, selector.obj, path.getRest(), content, result, answer)
+					&& mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, result);
 			}
 			else if (!selector.typenam)
 			{
@@ -927,7 +822,9 @@ bool WebRequestContext::executeGET(
 			}
 			else if (selector.obj)
 			{
-				return callViewMethod( selector.obj, path.getRest(), answer);
+				papuga_ValueVariant result;
+				return callMethod( MethodView, selector.obj, path.getRest(), content, result, answer)
+					&& mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
 			}
 			else
 			{
@@ -1018,11 +915,8 @@ bool WebRequestContext::executePUT(
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
-			if (!callPutDocumentMethod( selection.obj, path.getRest(), content, answer))
-			{
-				return false;
-			}
-			return true;
+			papuga_ValueVariant result;
+			return callMethod( MethodPutDocument, selection.obj, path.getRest(), content, result, answer);
 		}
 		else
 		{
@@ -1063,11 +957,9 @@ bool WebRequestContext::executePOST(
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
-			if (!callPostDocumentMethod( selection.obj, path.getRest(), content, answer))
-			{
-				return false;
-			}
-			return true;
+			papuga_ValueVariant result;
+			return callMethod( MethodPostDocument, selection.obj, path.getRest(), content, result, answer)
+				&& mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "result", "elem", m_result_encoding, m_result_doctype, result);
 		}
 		else
 		{
@@ -1098,7 +990,8 @@ bool WebRequestContext::executeDELETE(
 
 	if (selector.obj)
 	{
-		return callDeleteMethod( selector.obj, path.getRest(), answer);
+		papuga_ValueVariant result;
+		return callMethod( MethodDelete, selector.obj, path.getRest(), content, result, answer);
 	}
 	else
 	{
@@ -1128,11 +1021,8 @@ bool WebRequestContext::executePATCH(
 			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
-		if (!callPatchMethod( selection.obj, path.getRest(), content, answer))
-		{
-			return false;
-		}
-		return true;
+		papuga_ValueVariant result;
+		return callMethod( MethodDelete, selection.obj, path.getRest(), content, result, answer);
 	}
 	else
 	{

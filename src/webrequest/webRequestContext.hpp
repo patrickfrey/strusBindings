@@ -81,21 +81,8 @@ private:
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	bool getContentRequestResult( WebRequestAnswer& answer);
 
-	bool callListMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer);
-	bool callViewMethod( const papuga_ValueVariant* obj, const char* path, papuga_ValueVariant& result, WebRequestAnswer& answer);
-	bool callViewMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer);
-	bool callDeleteMethod( const papuga_ValueVariant* obj, const char* path, WebRequestAnswer& answer);
-	bool callPatchMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool callPostDocumentMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool callPutDocumentMethod( const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-
-	bool callHostObjMethodPathArg( void* self, const papuga_RequestMethodId& mid, const char* path_, papuga_CallResult& callresult, WebRequestAnswer& answer);
-	bool callHostObjMethodPathArgWithResult( void* self, const papuga_RequestMethodId& mid, const char* path_, papuga_ValueVariant& result, WebRequestAnswer& answer);
-	bool callHostObjMethodPathArgWithoutResult( void* self, const papuga_RequestMethodId& mid, const char* path_, WebRequestAnswer& answer);
-
-	bool callHostObjMethodDocumentArg( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, papuga_CallResult& callresult, WebRequestAnswer& answer);
-	bool callHostObjMethodDocumentArgWithResult( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer);
-	bool callHostObjMethodDocumentArgWithoutResult( void* self, const papuga_RequestMethodId& mid, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	enum MethodType {MethodList,MethodView,MethodDelete,MethodPatch,MethodPostDocument,MethodPutDocument};
+	bool callMethod( MethodType methodType, const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer);
 
 	bool dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer);
 	bool dumpViewType( const char* type_, papuga_Serialization* ser, WebRequestAnswer& answer);

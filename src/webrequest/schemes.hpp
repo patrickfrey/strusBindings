@@ -65,7 +65,7 @@ class SchemeCreateContext :public papuga::RequestAutomaton, public AutomatonName
 public:
 	SchemeCreateContext() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"context",
+		"context",{},
 		{
 			{"/extensions/directory", "()", ModuleDir},
 			{"/extensions/modules", "()", ModuleName},
@@ -107,7 +107,7 @@ class SchemeCreateStorage :public papuga::RequestAutomaton, public AutomatonName
 public:
 	SchemeCreateStorage() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"storage",
+		"storage",{},
 		{
 			{"/storage", "path()", StoragePath},
 			{"/storage/metadata", "name()", StorageMetadataName},
@@ -132,7 +132,7 @@ class SchemeDestroyStorage :public papuga::RequestAutomaton, public AutomatonNam
 public:
 	SchemeDestroyStorage() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"storage",
+		"storage",{},
 		{
 			{"/storage", "path()", StoragePath},
 			{"/storage", "success", "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
@@ -145,7 +145,7 @@ class SchemeOpenStorage :public papuga::RequestAutomaton, public AutomatonNameSp
 public:
 	SchemeOpenStorage() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"storage",
+		"storage",{},
 		{
 			{"/storage/path", "()", StoragePath},
 			{"/storage/cachedterms", "()", StorageCachedTerms},
@@ -420,7 +420,7 @@ class SchemeAnalyzeQuery :public papuga::RequestAutomaton, public SchemeQueryPar
 public:
 	SchemeAnalyzeQuery() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",
+		"result",{},
 		{
 			{defineAnalyzer()},
 			{analyzeTermExpression()},
@@ -435,7 +435,7 @@ class SchemeQueryStorageOriginal :public papuga::RequestAutomaton, public Scheme
 public:
 	SchemeQueryStorageOriginal() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",
+		"result",{},
 		{
 			{defineQueryEval()},
 			{defineAnalyzer()},
@@ -452,7 +452,7 @@ class SchemeQueryStorageAnalyzed :public papuga::RequestAutomaton, public Scheme
 public:
 	SchemeQueryStorageAnalyzed() :papuga::RequestAutomaton(
 		getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",
+		"result",{},
 		{
 			{defineQueryEval()},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
