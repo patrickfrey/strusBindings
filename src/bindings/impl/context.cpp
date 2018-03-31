@@ -38,6 +38,7 @@
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/debugTraceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/debugTraceInterface.hpp"
 #include "strus/constants.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/local_ptr.hpp"
@@ -500,4 +501,29 @@ Struct ContextImpl::introspection( const ValueVariant& path)
 	rt.release();
 	return rt;
 }
+
+void ContextImpl::enableDebugTrace( const std::string& component)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DebugTraceInterface* dbgtrace = errorhnd->debugTrace();
+	if (!dbgtrace) throw strus::runtime_error(_TXT( "no debug trace interface defined"));
+	if (!dbgtrace->enable( component)) throw strus::runtime_error(_TXT( "failed to enable debug trace for %s: %s"), component.c_str(), errorhnd->fetchError());
+}
+
+Struct ContextImpl::fetchDebugTrace()
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DebugTraceInterface* dbgtrace = errorhnd->debugTrace();
+	Struct rt;
+	if (!dbgtrace) throw strus::runtime_error(_TXT( "no debug trace interface defined"));
+	std::vector<DebugTraceMessage> msglist = dbgtrace->fetchMessages();
+	strus::bindings::Serializer::serialize( &rt.serialization, msglist, true);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
+}
+
 

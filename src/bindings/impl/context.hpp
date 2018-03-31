@@ -211,6 +211,15 @@ public:
 	/// \return the structure to introspect starting from the path
 	Struct introspection( const ValueVariant& path);
 
+	/// \brief Enable the debug trace interface for a named component for the current thread
+	/// \param[in] component name of component to enable debug tracing for
+	void enableDebugTrace( const std::string& component);
+
+	/// \brief Fetch all debug trace messages of the current thread
+	/// \return all messages
+	/// \note Clears all messages stored for the current thread
+	Struct fetchDebugTrace();
+
 private:
 	void initStorageObjBuilder();
 	void initAnalyzerObjBuilder();
