@@ -174,12 +174,6 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	va_end( arguments);
 }
 
-std::pair<const char*,const char*> WebRequestHandler::getConfigSourceContext( const char* contextType, const char* contextName)
-{
-	if (0==std::strcmp( contextType, "context")) return std::pair<const char*,const char*>(NULL,NULL);
-	return std::pair<const char*,const char*>("context","context");
-}
-
 const WebRequestHandler::MethodDescription* WebRequestHandler::getListMethod( int classid)
 {
 	static const MethodDescription::ParamType patharg[] = {MethodDescription::ParamPathArray,MethodDescription::ParamEnd};
@@ -237,7 +231,7 @@ static void addStringList( char const**& stringlist, int& stringlistsize, const 
 	stringlist[ stringlistsize] = NULL;
 }
 
-void WebRequestHandler::addScheme( std::size_t nofschemes, const char* type, const char* name, const papuga_RequestAutomaton* automaton)
+void WebRequestHandler::addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton)
 {
 	if (!papuga_RequestHandler_add_scheme( m_impl, type, name, automaton)) throw std::bad_alloc();
 	if (0==std::strcmp(type,"context"))
@@ -272,11 +266,10 @@ WebRequestHandler::WebRequestHandler(
 	m_impl = papuga_create_RequestHandler( &m_call_logger);
 	if (!m_impl) throw std::bad_alloc();
 
-	std::size_t nofschemes = 0;
 	using namespace strus::webrequest;
 #define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
 	static const Scheme ## SCHEME_IMPL scheme ## SCHEME_IMPL;\
-	addScheme( nofschemes, CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());\
+	addScheme( CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());\
 
 	DEFINE_SCHEME( "", "init", CreateContext);
 	DEFINE_SCHEME( "context", "newstorage", CreateStorage);
@@ -533,6 +526,7 @@ bool WebRequestHandler::loadConfiguration(
 {
 	try
 	{
+		static const char* root_context = "context";
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::string co( webRequestContent_tostring( content));
 		if (co.size() > 1000) co.resize( 1000);
@@ -540,19 +534,17 @@ bool WebRequestHandler::loadConfiguration(
 							contextType, contextName, scheme,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-		std::pair<const char*,const char*> parentContext = getConfigSourceContext( contextType, contextName);
-		const char* parentContextType = parentContext.first;
-		const char* parentContextName = parentContext.second;
-
 		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
 		WebRequestContext* ctxi = ctx.get();
 
-		if (ctxi->executeContextScheme( parentContextType, parentContextName, scheme, content, status))
+		if (ctxi->executeContextScheme( root_context, root_context, scheme, content, status))
 		{
 			ConfigurationTransaction transaction;
-			if (storedForReload && !storeConfiguration( transaction, contextType, contextName, scheme, content, status)) return false;
-
+			if (storedForReload)
+			{
+				if (!storeConfiguration( transaction, contextType, contextName, scheme, content, status)) return false;
+			}
 			strus::unique_lock lock( m_mutex);
 			papuga_RequestContext* ctximpl = ctx->impl();
 			papuga_ErrorCode errcode = papuga_Ok;

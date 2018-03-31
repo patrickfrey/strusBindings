@@ -95,9 +95,8 @@ public:/*WebRequestContext: Get methods to execute*/
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
 
-	/// \brief Get the [type,name] tuple of the context that is base of a context loaded by 'loadConfiguration':
-	std::pair<const char*,const char*> getConfigSourceContext( const char* contextType, const char* contextName);
-	void addScheme( std::size_t idx, const char* type, const char* name, const papuga_RequestAutomaton* automaton);
+	/// \brief Add a scheme to the handler
+	void addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton);
 
 	void loadConfiguration( const std::string& configstr);
 	bool loadStoredConfigurations();
