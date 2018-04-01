@@ -325,11 +325,10 @@ bool WebRequestContext::initContentRequestContext( WebRequestAnswer& answer, con
 
 bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* scheme)
 {
-	papuga_ErrorCode errcode = papuga_Ok;
-	m_atm = papuga_RequestHandler_get_scheme( m_handler->impl(), contextType, scheme, &errcode);
+	m_atm = papuga_RequestHandler_get_scheme( m_handler->impl(), contextType, scheme);
 	if (!m_atm)
 	{
-		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, ErrorCodeRequestResolveError, _TXT("unknown scheme"));
 		return false;
 	}
 	if (m_request) papuga_destroy_Request( m_request);

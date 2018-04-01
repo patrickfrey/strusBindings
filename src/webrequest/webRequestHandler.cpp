@@ -12,6 +12,7 @@
 #include "webRequestUtils.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
+#include "strus/bindingClasses.h"
 #include "schemes.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
@@ -263,7 +264,7 @@ WebRequestHandler::WebRequestHandler(
 	m_call_logger.self = logger_;
 	int mask = logger_->logMask();
 	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_call_logger.logMethodCall = &logMethodCall;
-	m_impl = papuga_create_RequestHandler( &m_call_logger);
+	m_impl = papuga_create_RequestHandler( &m_call_logger, getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
@@ -534,6 +535,10 @@ bool WebRequestHandler::loadConfiguration(
 							contextType, contextName, scheme,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
+		{
+			strus::unique_lock lock( m_mutex);
+			(void)papuga_RequestHandler_destroy_context( m_impl, contextType, contextName);
+		}
 		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
 		WebRequestContext* ctxi = ctx.get();
