@@ -378,18 +378,18 @@ private:
 	char buf[ 2048];
 };
 
-static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler::MethodDescription::ParamType paramtype, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, strus::ErrorCode& errcode)
+static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler::MethodParamType paramtype, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, strus::ErrorCode& errcode)
 {
 	papuga_Serialization* ser;
 	papuga_StringEncoding enc;
 	switch (paramtype)
 	{
-		case WebRequestHandler::MethodDescription::ParamEnd:
+		case WebRequestHandler::ParamEnd:
 			return false;
-		case WebRequestHandler::MethodDescription::ParamPathString:
+		case WebRequestHandler::ParamPathString:
 			papuga_init_ValueVariant_charp( &arg, path);
 			return true;
-		case WebRequestHandler::MethodDescription::ParamPathArray:
+		case WebRequestHandler::ParamPathArray:
 			ser = papuga_Allocator_alloc_Serialization( allocator);
 			if (!ser)
 			{
@@ -411,7 +411,7 @@ static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler:
 			}
 			papuga_init_ValueVariant_serialization( &arg, ser);
 			return true;
-		case WebRequestHandler::MethodDescription::ParamDocumentClass:
+		case WebRequestHandler::ParamDocumentClass:
 			ser = papuga_Allocator_alloc_Serialization( allocator);
 			if (!ser)
 			{
@@ -427,7 +427,7 @@ static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler:
 			}
 			papuga_init_ValueVariant_serialization( &arg, ser);
 			return true;
-		case WebRequestHandler::MethodDescription::ParamContent:
+		case WebRequestHandler::ParamContent:
 			if (!papuga_getStringEncodingFromName( &enc, content.charset()))
 			{
 				enc = papuga_Binary;
@@ -439,26 +439,31 @@ static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler:
 	return false;
 }
 
-static bool callHostObjMethod( void* self, const WebRequestHandler::MethodDescription* method_descr, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, papuga_CallResult& retval, WebRequestAnswer& answer)
+bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
 {
+	papuga_CallResult retval;
+	char membuf_err[ 4096];
+	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
+
 	// Get method function pointer to call:
-	const papuga_ClassDef* cdeflist = getBindingsClassDefs();
-	const papuga_ClassDef* cdef = &cdeflist[ method_descr->mid.classid-1];
-	if (method_descr->mid.functionid == 0)
+	const papuga_ClassDef* cdeflist = strus_getBindingsClassDefs();
+	const papuga_ClassDef* cdef = &cdeflist[ methoddescr->id.classid-1];
+	if (methoddescr->id.functionid == 0)
 	{
 		setAnswer( answer, ErrorCodeNotAllowed);
 		return false;
 	}
-	papuga_ClassMethod method = cdef->methodtable[ method_descr->mid.functionid-1];
+	papuga_ClassMethod method = cdef->methodtable[ methoddescr->id.functionid-1];
 
 	// Initialize the arguments:
 	enum {MaxNofArgs=32};
 	papuga_ValueVariant argv[MaxNofArgs];
 	int argc = 0;
 	strus::ErrorCode errcode = ErrorCodeUnknown;
-	for (; argc < MaxNofArgs && method_descr->params[argc] != WebRequestHandler::MethodDescription::ParamEnd; ++argc)
+	for (; argc < MaxNofArgs && methoddescr->paramtypes[argc]; ++argc)
 	{
-		if (!initHostObjMethodParam( argv[ argc], method_descr->params[argc], path, content, allocator, errcode))
+		WebRequestHandler::MethodParamType paramtype = (WebRequestHandler::MethodParamType)methoddescr->paramtypes[argc];
+		if (!initHostObjMethodParam( argv[ argc], paramtype, path, content, &m_allocator, errcode))
 		{
 			setAnswer( answer, errcode);
 			return false;
@@ -480,84 +485,74 @@ static bool callHostObjMethod( void* self, const WebRequestHandler::MethodDescri
 		setAnswer( answer, apperr, errstr, true);
 		return false;
 	}
-	return true;
-}
-
-static bool callHostObjMethodWithResult( void* self, const WebRequestHandler::MethodDescription* method, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, papuga_ValueVariant& result, WebRequestAnswer& answer)
-{
-	papuga_CallResult retval;
-	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, allocator, true, membuf_err, sizeof(membuf_err));
-
-	if (!callHostObjMethod( self, method, path, content, allocator, retval, answer)) return false;
-
 	// Assign the result:
-	if (retval.nofvalues == 0)
+	if (methoddescr->resulttype)
 	{
-		setAnswer( answer, ErrorCodeIncompleteResult);
-		return false;
-	}
-	if (retval.nofvalues > 1)
-	{
-		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
-		return false;
-	}
-	papuga_init_ValueVariant_value( &result, &retval.valuear[0]);
-	return true;
-}
-
-static bool callHostObjMethodWithoutResult( void* self, const WebRequestHandler::MethodDescription* method, const char* path, const WebRequestContent& content, papuga_Allocator* allocator, WebRequestAnswer& answer)
-{
-	papuga_CallResult retval;
-	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, allocator, true, membuf_err, sizeof(membuf_err));
-
-	if (!callHostObjMethod( self, method, path, content, allocator, retval, answer)) return false;
-	if (retval.nofvalues > 0)
-	{
-		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "no result expected"));
-		return false;
-	}
-	return true;
-}
-
-enum MethodType {MethodList,MethodView,MethodDelete,MethodPatch,MethodPostDocument,MethodPutDocument};
-bool WebRequestContext::callMethod( MethodType methodType, const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer)
-{
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		bool with_result = false;
-		const WebRequestHandler::MethodDescription* method = 0;
-		switch (methodType)
+		if (retval.nofvalues == 0)
 		{
-			case MethodList: method = m_handler->getListMethod( obj->value.hostObject->classid); with_result = true; break;
-			case MethodView: method = m_handler->getViewMethod( obj->value.hostObject->classid); with_result = true; break;
-			case MethodDelete: method = m_handler->getDeleteMethod( obj->value.hostObject->classid); with_result = false; break;
-			case MethodPatch: method = m_handler->getPatchMethod( obj->value.hostObject->classid); with_result = false; break;
-			case MethodPostDocument: method = m_handler->getPostDocumentMethod( obj->value.hostObject->classid); with_result = true; break;
-			case MethodPutDocument: method = m_handler->getPutDocumentMethod( obj->value.hostObject->classid); with_result = false; break;
+			answer.setMessage( methoddescr->httpstatus_success, methoddescr->resulttype, "");
+			return true;
 		}
-		if (!method)
+		else if (retval.nofvalues > 1)
 		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
+			setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
 			return false;
-		}
-		void* self = obj->value.hostObject->data;
-		if (with_result)
-		{
-			return callHostObjMethodWithResult( self, method, path, content, &m_allocator, result, answer);
 		}
 		else
 		{
-			papuga_init_ValueVariant( &result);
-			return callHostObjMethodWithoutResult( self, method, path, content, &m_allocator, answer);
+			size_t msglen;
+			papuga_ErrorCode ec = papuga_Ok;
+			const char* msgstr = papuga_ValueVariant_tostring( &retval.valuear[0], &m_allocator, &msglen, &ec);
+			if (!msgstr)
+			{
+				setAnswer( answer, papugaErrorToErrorCode( ec));
+				return false;
+			}
+			else
+			{
+				answer.setMessage( methoddescr->httpstatus_success, methoddescr->resulttype, msgstr);
+				return true;
+			}
 		}
 	}
 	else
 	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
+		if (retval.nofvalues == 0)
+		{
+			answer.setStatus( methoddescr->httpstatus_success);
+			return true;
+		}
+		else if (retval.nofvalues > 1)
+		{
+			setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
+			return false;
+		}
+		else
+		{
+			if (!mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, retval.valuear[0]))
+			{
+				return false;
+			}
+			return true;
+		}
 	}
+}
+
+bool WebRequestContext::callObjMethod( const papuga_ValueVariant* obj, const char* methodname, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
+{
+	// Call object method with content if object defined and method defined, else fallback to next:
+	if (obj->valuetype == papuga_TypeHostObject)
+	{
+		int classid = obj->value.hostObject->classid;
+		void* self = obj->value.hostObject->data;
+		const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, methodname);
+		if (methoddescr)
+		{
+			return callHostObjMethod( self, methoddescr, path, content, answer);
+		}
+	}
+	setAnswer( answer, ErrorCodeRequestResolveError);
+	return false;
 }
 
 static bool checkPapugaListBufferOverflow( const char** ci, WebRequestAnswer& answer)
@@ -663,7 +658,7 @@ bool WebRequestContext::dumpViewVar( const papuga_RequestContext* context, const
 		return false;
 	}
 	static const WebRequestContent empty_content;
-	if (!callMethod( MethodView, obj, "", empty_content, result, answer)) return false;
+	if (!callObjMethod( obj, "GET", "", empty_content, answer)) return false;
 	if (!papuga_Serialization_pushValue( ser, &result))
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
@@ -686,15 +681,14 @@ struct ObjectDescr
 	ObjectDescr()
 		:context(0),obj(0),typenam(0),contextnam(0),varnam(0){}
 
-	bool init( const papuga_RequestHandler* handler, PathBuf& path, const char* typenam_, WebRequestAnswer& answer)
+	bool init( const papuga_RequestHandler* handler, PathBuf& path, WebRequestAnswer& answer)
 	{
-		typenam = typenam_;
+		if (!(typenam = path.getNext())) return true;
 		if (!(contextnam = path.getNext())) return true;
 		context = papuga_RequestHandler_find_context( handler, typenam, contextnam);
 		if (context == NULL)
 		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
+			return true;
 		}
 		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
@@ -712,12 +706,6 @@ struct ObjectDescr
 		}
 		return true;
 	}
-
-	bool init( const papuga_RequestHandler* handler, PathBuf& path, WebRequestAnswer& answer)
-	{
-		if (!(typenam = path.getNext())) return true;
-		return init( handler, path, typenam, answer);
-	}
 };
 
 bool WebRequestContext::executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
@@ -729,103 +717,127 @@ bool WebRequestContext::executeContextScheme( const char* contextType, const cha
 	&&	getContentRequestResult( answer);
 }
 
-bool WebRequestContext::executeGET(
+bool WebRequestContext::executeOPTIONS(
+		const char* path_,
+		const WebRequestContent& content,
+		WebRequestAnswer& answer)
+{
+	PathBuf path( path_);
+	ObjectDescr selector;
+	if (!selector.init( m_handler->impl(), path, answer)) return false;
+
+	if (!content.empty())
+	{
+		setAnswer( answer, ErrorCodeInvalidArgument);
+		return false;
+	}
+	else if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
+	{
+		std::string http_allow("OPTIONS,");
+		char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, selector.lstbuf, selector.lstbufsize);
+		if (!checkPapugaListBufferOverflow( sl, answer)) return false;
+		for (; *sl; ++sl) http_allow.append( *sl);
+		int classid = selector.obj->value.hostObject->classid;
+		char const** ml = papuga_RequestHandler_list_methods( m_handler->impl(), classid, selector.lstbuf, selector.lstbufsize);
+		if (!checkPapugaListBufferOverflow( ml, answer)) return false;
+		for (; *ml; ++ml) http_allow.append( *ml);
+		const char* msgstr = papuga_Allocator_copy_string( &m_allocator, http_allow.c_str(), http_allow.size());
+		if (!msgstr)
+		{
+			setAnswer( answer, ErrorCodeOutOfMem);
+			return false;
+		}
+		answer.setMessage( 200/*OK*/, "Allow", msgstr);
+		return true;
+	}
+	else
+	{
+		answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,LIST,GET");
+		return true;
+	}
+}
+
+bool WebRequestContext::executeRequest(
+		const char* method_,
 		const char* path_,
 		const WebRequestContent& content,
 		WebRequestAnswer& answer)
 {
 	try
 	{
-		PathBuf path( path_);
-		const char* what = path.getNext();
-		if (!what)
+		if (0==std::strcmp(method_,"OPTIONS"))
 		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
+			return executeOPTIONS( path_, content, answer);
+		}
+
+		PathBuf path( path_);
+		char const* method = method_;
+		std::size_t methodsize = std::strlen( method_);
+		bool debug = false;
+
+		if (methodsize > 4 && std::memcmp( method, "DBG_", 4) == 0)
+		{
+			debug = true;
+			method = method + 4;
 		}
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
-		if (0==std::strcmp(what,"scheme"))
-		{
-			ObjectDescr selector;
-			if (!selector.init( m_handler->impl(), path, answer)) return false;
+		ObjectDescr selector;
+		if (!selector.init( m_handler->impl(), path, answer)) return false;
 
-			if (!content.empty())
+		// Call object method with content if object defined and method defined, else fallback to next:
+		if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
+		{
+			int classid = selector.obj->value.hostObject->classid;
+			void* self = selector.obj->value.hostObject->data;
+			const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method);
+			if (methoddescr)
 			{
-				setAnswer( answer, ErrorCodeInvalidArgument);
-				return false;
+				if (debug)
+				{
+					setAnswer( answer, ErrorCodeRequestResolveError);
+					return false;
+					//... debug requests only available on request schemes
+				}
+				else
+				{
+					return callHostObjMethod( self, methoddescr, path.getRest(), content, answer);
+				}
 			}
-			else if (!selector.typenam)
-			{
-				const char** schemelist = papuga_RequestHandler_list_schemes( m_handler->impl(), NULL, selector.lstbuf, selector.lstbufsize);
-				if (!checkPapugaListBufferOverflow( schemelist, answer)) return false;
-				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "scheme", m_result_encoding, m_result_doctype, schemelist);
-			}
-			else if (!selector.contextnam)
-			{
-				const char** schemelist = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, selector.lstbuf, selector.lstbufsize);
-				if (!checkPapugaListBufferOverflow( schemelist, answer)) return false;
-				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "scheme", m_result_encoding, m_result_doctype, schemelist);
-			}
-			else
+		}
+		// Toplevel introspection if object not defined:
+		if (!selector.contextnam)
+		{
+			//... No object selected, handle LIST or GET for all
+			if (debug)
 			{
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
-		}
-		else if (0==std::strcmp(what,"list"))
-		{
-			ObjectDescr selector;
-			if (!selector.init( m_handler->impl(), path, answer)) return false;
-
 			if (!content.empty())
 			{
 				setAnswer( answer, ErrorCodeInvalidArgument);
 				return false;
 			}
-			else if (selector.obj)
+			if (0==std::strcmp( method,"LIST"))
 			{
-				papuga_ValueVariant result;
-				return callMethod( MethodList, selector.obj, path.getRest(), content, result, answer)
-					&& mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, result);
+				if (!selector.typenam)
+				{
+					char const** typelist = papuga_RequestHandler_list_context_types( m_handler->impl(), selector.lstbuf, selector.lstbufsize);
+					if (!checkPapugaListBufferOverflow( typelist, answer)) return false;
+					if (!checkPapugaListEmpty( typelist, answer)) return false;
+					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, typelist);
+				}
+				else
+				{
+					char const** contextlist = papuga_RequestHandler_list_contexts( m_handler->impl(), selector.typenam, selector.lstbuf, selector.lstbufsize);
+					if (!checkPapugaListBufferOverflow( contextlist, answer)) return false;
+					if (!checkPapugaListEmpty( contextlist, answer)) return false;
+					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", selector.typenam, m_result_encoding, m_result_doctype, contextlist);
+				}
+				
 			}
-			else if (!selector.typenam)
-			{
-				char const** typelist = papuga_RequestHandler_list_context_types( m_handler->impl(), selector.lstbuf, selector.lstbufsize);
-				if (!checkPapugaListBufferOverflow( typelist, answer)) return false;
-				if (!checkPapugaListEmpty( typelist, answer)) return false;
-				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, typelist);
-			}
-			else if (!selector.contextnam)
-			{
-				char const** contextlist = papuga_RequestHandler_list_contexts( m_handler->impl(), selector.typenam, selector.lstbuf, selector.lstbufsize);
-				if (!checkPapugaListBufferOverflow( contextlist, answer)) return false;
-				if (!checkPapugaListEmpty( contextlist, answer)) return false;
-				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", selector.typenam, m_result_encoding, m_result_doctype, contextlist);
-			}
-			else
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-		}
-		else if (0==std::strcmp(what,"view"))
-		{
-			ObjectDescr selector;
-			if (!selector.init( m_handler->impl(), path, answer)) return false;
-
-			if (!content.empty())
-			{
-				setAnswer( answer, ErrorCodeInvalidArgument);
-				return false;
-			}
-			else if (selector.obj)
-			{
-				papuga_ValueVariant result;
-				return callMethod( MethodView, selector.obj, path.getRest(), content, result, answer)
-					&& mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
-			}
-			else
+			else if (0==std::strcmp( method, "GET"))
 			{
 				papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
 				if (!ser)
@@ -841,10 +853,31 @@ bool WebRequestContext::executeGET(
 					if (!dumpViewAll( ser, answer)) return false;
 					return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
 				}
-				else if (!selector.contextnam)
+				else
 				{
 					if (!dumpViewType( selector.typenam, ser, answer)) return false;
 					return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", selector.typenam, m_result_encoding, m_result_doctype, result);
+				}
+			}
+			else
+			{
+				setAnswer( answer, ErrorCodeRequestResolveError);
+				return false;
+			}
+		}
+		else if (!selector.context)
+		{
+			// Object selected does not exist, we do a configuration request:
+			if (path.getRest()[0] != '\0')
+			{
+				if (0==std::strcmp(method,"PUT"))
+				{
+					//PF:HACK: Loading configuration is not const, but thread safe, so a const_cast is, though never good, Ok here:
+					if (!const_cast<WebRequestHandler*>( m_handler)->loadConfiguration( selector.typenam, selector.contextnam, true/*store for reload*/, content, answer))
+					{
+						return false;
+					}
+					return true;
 				}
 				else
 				{
@@ -852,216 +885,29 @@ bool WebRequestContext::executeGET(
 					return false;
 				}
 			}
+			else
+			{
+				setAnswer( answer, ErrorCodeRequestResolveError);
+				return false;
+			}
 		}
 		else
 		{
+			// Scheme execution else:
 			const char* contextType = path.getNext();
 			const char* contextName = path.getNext();
-			std::string put_schemename = std::string("GET/") + what;
 
-			return executeContextScheme( contextType, contextName, put_schemename.c_str(), content, answer);
+			return executeContextScheme( contextType, contextName, method, content, answer);
 		}
 	}
-	catch (...)
+	catch (const std::bad_alloc&)
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
-}
-
-bool WebRequestContext::executePUT(
-		const char* path_,
-		const WebRequestContent& content,
-		WebRequestAnswer& answer)
-{
-	try
-	{
-		PathBuf path( path_);
-		const char* what = path.getNext();
-		if (!what)
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		else if (0==std::strcmp( what,"config"))
-		{
-			const char* scheme = path.getNext();
-			if (!scheme)
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-			const char* contextType = path.getNext();
-			const char* contextName = path.getNext();
-			if (!contextName)
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-			//PF:HACK: Loading configuration is not const, but thread safe, so a const_cast is, though never good, Ok here:
-			if (!const_cast<WebRequestHandler*>( m_handler)->loadConfiguration( contextType, contextType, scheme, true/*store for reload*/, content, answer))
-			{
-				return false;
-			}
-			return true;
-		}
-		else if (0==std::strcmp( what, "content"))
-		{
-			ObjectDescr selection;
-			if (!selection.init( m_handler->impl(), path, answer)) return false;
-			if (!selection.obj)
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-			papuga_ValueVariant result;
-			return callMethod( MethodPutDocument, selection.obj, path.getRest(), content, result, answer);
-		}
-		else
-		{
-			const char* contextType = path.getNext();
-			const char* contextName = path.getNext();
-			std::string put_schemename = std::string("PUT/") + what;
-
-			return executeContextScheme( contextType, contextName, put_schemename.c_str(), content, answer);
-		}
-	}
 	catch (...)
 	{
-		setAnswer( answer, ErrorCodeOutOfMem);
-		return false;
-	}
-}
-
-bool WebRequestContext::executePOST(
-		const char* path_,
-		const WebRequestContent& content,
-		WebRequestAnswer& answer)
-{
-	try
-	{
-		PathBuf path( path_);
-		const char* what = path.getNext();
-		if (!what)
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		else if (0==std::strcmp( what, "content"))
-		{
-			ObjectDescr selection;
-			if (!selection.init( m_handler->impl(), path, answer)) return false;
-			if (!selection.obj)
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-			papuga_ValueVariant result;
-			return callMethod( MethodPostDocument, selection.obj, path.getRest(), content, result, answer)
-				&& mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "result", "elem", m_result_encoding, m_result_doctype, result);
-		}
-		else
-		{
-			const char* scheme = what;
-			const char* contextType = path.getNext();
-			const char* contextName = path.getNext();
-
-			return executeContextScheme( contextType, contextName, scheme, content, answer);
-		}
-	}
-	catch (...)
-	{
-		setAnswer( answer, ErrorCodeOutOfMem);
-		return false;
-	}
-	setAnswer( answer, ErrorCodeRequestResolveError);
-	return false;
-}
-
-bool WebRequestContext::executeDELETE(
-		const char* path_,
-		const WebRequestContent& content,
-		WebRequestAnswer& answer)
-{
-	PathBuf path( path_);
-	ObjectDescr selector;
-	if (!selector.init( m_handler->impl(), path, answer)) return false;
-
-	if (selector.obj)
-	{
-		papuga_ValueVariant result;
-		return callMethod( MethodDelete, selector.obj, path.getRest(), content, result, answer);
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-}
-
-bool WebRequestContext::executePATCH(
-		const char* path_,
-		const WebRequestContent& content,
-		WebRequestAnswer& answer)
-{
-	PathBuf path( path_);
-	const char* what = path.getNext();
-	if (!what)
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-	else if (0==std::strcmp( what, "content"))
-	{
-		ObjectDescr selection;
-		if (!selection.init( m_handler->impl(), path, answer)) return false;
-		if (!selection.obj)
-		{
-			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
-		}
-		papuga_ValueVariant result;
-		return callMethod( MethodDelete, selection.obj, path.getRest(), content, result, answer);
-	}
-	else
-	{
-		const char* contextType = path.getNext();
-		const char* contextName = path.getNext();
-		std::string patch_schemename = std::string("PUT/") + what;
-
-		return executeContextScheme( contextType, contextName, patch_schemename.c_str(), content, answer);
-	}
-}
-
-bool WebRequestContext::executeRequest(
-		const char* method,
-		const char* path,
-		const WebRequestContent& content,
-		WebRequestAnswer& answer)
-{
-	if (0==std::strcmp( method,"GET"))
-	{
-		return executeGET( path, content, answer);
-	}
-	else if (0==std::strcmp( method,"POST"))
-	{
-		return executePOST( path, content, answer);
-	}
-	else if (0==std::strcmp( method,"PATCH"))
-	{
-		return executePATCH( path, content, answer);
-	}
-	else if (0==std::strcmp( method,"PUT"))
-	{
-		return executePUT( path, content, answer);
-	}
-	else if (0==std::strcmp( method,"DELETE"))
-	{
-		return executeDELETE( path, content, answer);
-	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
+		setAnswer( answer, ErrorCodeUncaughtException);
 		return false;
 	}
 }

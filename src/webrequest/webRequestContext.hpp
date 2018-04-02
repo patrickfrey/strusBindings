@@ -46,32 +46,7 @@ public:/*WebRequestHandler*/
 	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
-	bool executeGET(
-			const char* path,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-	bool executePUT(
-			const char* path,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-	bool executePOST(
-			const char* path,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-	bool executeDELETE(
-			const char* path,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-	bool executePATCH(
-			const char* path,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
-
-private:
+	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool initContentRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
@@ -80,9 +55,8 @@ private:
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	bool getContentRequestResult( WebRequestAnswer& answer);
-
-	enum MethodType {MethodList,MethodView,MethodDelete,MethodPatch,MethodPostDocument,MethodPutDocument};
-	bool callMethod( MethodType methodType, const papuga_ValueVariant* obj, const char* path, const WebRequestContent& content, papuga_ValueVariant& result, WebRequestAnswer& answer);
+	bool callObjMethod( const papuga_ValueVariant* obj, const char* methodname, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 
 	bool dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer);
 	bool dumpViewType( const char* type_, papuga_Serialization* ser, WebRequestAnswer& answer);

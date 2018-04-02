@@ -175,56 +175,9 @@ static void logMethodCall( void* self_, int nofItems, ...)
 	va_end( arguments);
 }
 
-const WebRequestHandler::MethodDescription* WebRequestHandler::getListMethod( int classid)
-{
-	static const MethodDescription::ParamType patharg[] = {MethodDescription::ParamPathArray,MethodDescription::ParamEnd};
-	static const MethodDescription context_method( strus::bindings::method::Context::introspectionDir(), patharg);
-	static const MethodDescription storage_method( strus::bindings::method::StorageClient::introspectionDir(), patharg);
-	
-	switch (classid)
-	{
-		case STRUS_BINDINGS_CLASSID_Context:		return &context_method;
-		case STRUS_BINDINGS_CLASSID_StorageClient:	return &storage_method;
-		default:					return NULL;
-	}
-}
-
-const WebRequestHandler::MethodDescription* WebRequestHandler::getViewMethod( int classid)
-{
-	static const MethodDescription::ParamType patharg[] = {MethodDescription::ParamPathArray,MethodDescription::ParamEnd};
-	static const MethodDescription context_method( strus::bindings::method::Context::introspection(), patharg);
-	static const MethodDescription storage_method( strus::bindings::method::StorageClient::introspection(), patharg);
-	
-	switch (classid)
-	{
-		case STRUS_BINDINGS_CLASSID_Context:		return &context_method;
-		case STRUS_BINDINGS_CLASSID_StorageClient:	return &storage_method;
-		default:					return NULL;
-	}
-}
-
-const WebRequestHandler::MethodDescription* WebRequestHandler::getPostDocumentMethod( int classid)
-{
-	return NULL;
-}
-
-const WebRequestHandler::MethodDescription* WebRequestHandler::getPutDocumentMethod( int classid)
-{
-	return NULL;
-}
-
-const WebRequestHandler::MethodDescription* WebRequestHandler::getDeleteMethod( int classid)
-{
-	return NULL;
-}
-
-const WebRequestHandler::MethodDescription* WebRequestHandler::getPatchMethod( int classid)
-{
-	return NULL;
-}
-
 static void addStringList( char const**& stringlist, int& stringlistsize, const char* elem)
 {
+	for( char const** si=stringlist; *si; ++si) if (0==std::strcmp(*si,elem)) return;
 	char const** new_stringlist = (char const**)std::realloc( stringlist, (stringlistsize+2) * sizeof(stringlist[0]));
 	if (!new_stringlist) throw std::bad_alloc();
 	stringlist = new_stringlist;
@@ -235,13 +188,53 @@ static void addStringList( char const**& stringlist, int& stringlistsize, const 
 void WebRequestHandler::addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton)
 {
 	if (!papuga_RequestHandler_add_scheme( m_impl, type, name, automaton)) throw std::bad_alloc();
-	if (0==std::strcmp(type,"context"))
-	{
-		addStringList( m_context_schemes, m_nofcontext_schemes, name);
-	}
+	addStringList( m_context_types, m_nofcontext_types, type);
 	addStringList( m_schemes, m_nofschemes, name);
 }
 
+struct MethodDescription
+{
+	enum {MaxNofArgs=8};
+
+	const char* request_method;
+	papuga_RequestMethodDescription data;
+	int args[ MaxNofArgs-1];
+
+	MethodDescription(
+		const char* request_method_,
+		const papuga_RequestMethodId& id,
+		int httpstatus_success, 
+		const char* resulttype,
+		const char* result_rootelem,
+		const char* result_listelem,
+		int nofParams,
+		...)
+	{
+		va_list params;
+		va_start( params, nofParams);
+
+		if (nofParams >= MaxNofArgs) throw std::bad_alloc();
+		int ai = 0, ae = nofParams;
+		for (; ai != ae; ++ai)
+		{
+			args[ai] = (int)va_arg( params, int);
+		}
+		args[ai] = 0;
+		request_method = request_method_;
+		std::memcpy( &data.id, &id, sizeof( data.id));
+		data.paramtypes = args;
+		data.httpstatus_success = httpstatus_success;
+		data.resulttype = resulttype;
+		data.result_rootelem = result_rootelem;
+		data.result_listelem = result_listelem;
+		va_end( params);
+	}
+
+	void addToHandler( papuga_RequestHandler* handler) const
+	{
+		if (!papuga_RequestHandler_add_method( handler, request_method, &data)) throw std::bad_alloc();
+	}
+};
 
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
@@ -257,38 +250,66 @@ WebRequestHandler::WebRequestHandler(
 	,m_config_store_dir(config_store_dir_)
 	,m_schemes(NULL)
 	,m_nofschemes(0)
-	,m_context_schemes(NULL)
-	,m_nofcontext_schemes(0)
+	,m_context_types(NULL)
+	,m_nofcontext_types(0)
 {
 	std::memset( &m_call_logger, 0, sizeof(m_call_logger));
 	m_call_logger.self = logger_;
 	int mask = logger_->logMask();
 	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_call_logger.logMethodCall = &logMethodCall;
-	m_impl = papuga_create_RequestHandler( &m_call_logger, getBindingsClassDefs());
+	m_impl = papuga_create_RequestHandler( &m_call_logger, strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
 #define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
 	static const Scheme ## SCHEME_IMPL scheme ## SCHEME_IMPL;\
-	addScheme( CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());\
+	addScheme( CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());
 
-	DEFINE_SCHEME( "", "init", CreateContext);
-	DEFINE_SCHEME( "context", "newstorage", CreateStorage);
-	DEFINE_SCHEME( "context", "delstorage", DestroyStorage);
-	DEFINE_SCHEME( "context", "storage", OpenStorage);
-	DEFINE_SCHEME( "storage", "queryorig", QueryStorageOriginal); 
-	DEFINE_SCHEME( "storage", "queryana", QueryStorageAnalyzed); 
-	DEFINE_SCHEME( "storage", "analyzequery", AnalyzeQuery);
+#define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, ROOTELEM)\
+	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, "elem", 1, ParamPathArray);\
+	mt_ ## CLASS ## _ ## REQUEST_METHOD.addToHandler( m_impl);
 
-	loadConfiguration( configstr_);
-	loadStoredConfigurations();
+	try
+	{
+		DEFINE_SCHEME( "", "init", CreateContext);
+		DEFINE_SCHEME( "context", "newstorage", CreateStorage);
+		DEFINE_SCHEME( "storage", "DELETE", DestroyStorage);
+		DEFINE_SCHEME( "context", "storage", OpenStorage);
+		DEFINE_SCHEME( "storage", "queryorig", QueryStorageOriginal); 
+		DEFINE_SCHEME( "storage", "queryana", QueryStorageAnalyzed); 
+		DEFINE_SCHEME( "storage", "analyzequery", AnalyzeQuery);
+	
+		DEFINE_METHOD_VIEW_PATH( LIST, Context, introspectionDir, "list");
+		DEFINE_METHOD_VIEW_PATH( GET,  Context, introspection, "config");
+		DEFINE_METHOD_VIEW_PATH( LIST, StorageClient, introspectionDir, "list");
+		DEFINE_METHOD_VIEW_PATH( GET,  StorageClient, introspection, "storage");
+
+		loadConfiguration( configstr_);
+		loadStoredConfigurations();
+	}
+	catch (const std::bad_alloc&)
+	{
+		clear();
+		throw std::bad_alloc();
+	}
+	catch (const std::runtime_error& err)
+	{
+		clear();
+		throw err;
+	}
 }
+
+void WebRequestHandler::clear()
+{
+	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
+	if (m_schemes) {std::free( m_schemes); m_schemes=0;}
+	if (m_context_types) {std::free( m_context_types); m_context_types=0;}
+}
+	
 
 WebRequestHandler::~WebRequestHandler()
 {
-	papuga_destroy_RequestHandler( m_impl);
-	std::free( m_schemes);
-	std::free( m_context_schemes);
+	clear();
 }
 
 static void setStatus( WebRequestAnswer& status, ErrorCode errcode, const char* errmsg=0)
@@ -415,7 +436,7 @@ static SubConfig createSubConfig( const std::string& name, papuga_Allocator& all
 	return SubConfig( name, subconfidid.empty() ? name : subconfidid,  subcfgstr);
 }
 
-static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::size_t contentsize, const char** schemes)
+static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::size_t contentsize, const char** context_types)
 {
 	std::vector<SubConfig> rt;
 	papuga_ErrorCode errcode = papuga_Ok;
@@ -454,7 +475,7 @@ static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::siz
 						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &seriter));
 						if (nam)
 						{
-							char const** si = schemes;
+							char const** si = context_types;
 							for (; *si && 0!=std::strcmp(*si,nam); ++si){}
 							if (*si)
 							{
@@ -483,14 +504,13 @@ EXIT:
 void WebRequestHandler::loadConfiguration( const std::string& configstr)
 {
 	static const char* root_context = "context";
-	static const char* init_scheme = "init";
 	static const char* config_doctype = "json";
 	static const char* config_charset = "utf-8";
 	WebRequestAnswer status;
 
 	strus::WebRequestContent content( config_charset, config_doctype, configstr.c_str(), configstr.size());
 
-	if (!loadConfiguration( root_context/*destContextType*/, root_context/*destContextName*/, init_scheme, false/*do not store for reload*/, content, status))
+	if (!loadConfiguration( root_context/*destContextType*/, root_context/*destContextName*/, false/*do not store for reload*/, content, status))
 	{
 		if (status.apperror())
 		{
@@ -501,7 +521,7 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 			throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
 		}
 	}
-	std::vector<SubConfig> cfglist = getSubConfigList( configstr.c_str(), configstr.size(), m_context_schemes);
+	std::vector<SubConfig> cfglist = getSubConfigList( configstr.c_str(), configstr.size(), m_context_types);
 	std::vector<SubConfig>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
@@ -510,7 +530,7 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 #endif
 		strus::WebRequestContent subcontent( config_charset, config_doctype, ci->content.c_str(), ci->content.size());
 
-		if (!loadConfiguration( ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/, ci->name.c_str()/*scheme*/, false/*do not store for reload*/, subcontent, status))
+		if (!loadConfiguration( ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/, false/*do not store for reload*/, subcontent, status))
 		{
 			throw strus::runtime_error( _TXT("error loading sub configuration %s '%s': %s"), ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/, status.errorstr());
 		}
@@ -520,7 +540,6 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 bool WebRequestHandler::loadConfiguration(
 			const char* contextType,
 			const char* contextName,
-			const char* scheme,
 			bool storedForReload,
 			const WebRequestContent& content,
 			WebRequestAnswer& status)
@@ -531,24 +550,20 @@ bool WebRequestHandler::loadConfiguration(
 #ifdef STRUS_LOWLEVEL_DEBUG
 		std::string co( webRequestContent_tostring( content));
 		if (co.size() > 1000) co.resize( 1000);
-		std::cerr << strus::string_format( "load configuration: context %s %s, scheme %s, doctype %s, encoding %s, content '%s'",
-							contextType, contextName, scheme,
+		std::cerr << strus::string_format( "load configuration: context %s %s, doctype %s, encoding %s, content '%s'",
+							contextType, contextName,
 							content.doctype(), content.charset(), co.c_str()) << std::endl;
 #endif
-		{
-			strus::unique_lock lock( m_mutex);
-			(void)papuga_RequestHandler_destroy_context( m_impl, contextType, contextName);
-		}
 		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
 		if (!ctx.get()) return false;
 		WebRequestContext* ctxi = ctx.get();
 
-		if (ctxi->executeContextScheme( root_context, root_context, scheme, content, status))
+		if (ctxi->executeContextScheme( root_context, root_context, contextType/*scheme*/, content, status))
 		{
 			ConfigurationTransaction transaction;
 			if (storedForReload)
 			{
-				if (!storeConfiguration( transaction, contextType, contextName, scheme, content, status)) return false;
+				if (!storeConfiguration( transaction, contextType, contextName, content, status)) return false;
 			}
 			strus::unique_lock lock( m_mutex);
 			papuga_RequestContext* ctximpl = ctx->impl();
@@ -579,11 +594,46 @@ bool WebRequestHandler::loadConfiguration(
 	}
 }
 
+
+bool WebRequestHandler::deleteStoredConfiguration(
+		const char* contextType,
+		const char* contextName,
+		WebRequestAnswer& status) const
+{
+	try
+	{
+		strus::unique_lock lock( m_mutex);
+		std::string fileext = strus::string_format( ".%s.%s.conf", contextType, contextName);
+		std::vector<std::string> files;
+		int ec = strus::readDirFiles( m_config_store_dir, fileext, files);
+		if (ec)
+		{
+			setStatus( status, (ErrorCode)ec);
+			return false;
+		}
+		std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
+		for (; fi != fe; ++fi)
+		{
+			ec = removeFile( *fi, true);
+			if (ec)
+			{
+				setStatus( status, (ErrorCode)ec);
+				return false;
+			}
+		}
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setStatus( status, ErrorCodeOutOfMem);
+		return false;
+	}
+}
+
 bool WebRequestHandler::storeConfiguration(
 		ConfigurationTransaction& transaction,
 		const char* contextType,
 		const char* contextName,
-		const char* scheme,
 		const WebRequestContent& content,
 		WebRequestAnswer& status) const
 {
@@ -604,7 +654,7 @@ bool WebRequestHandler::storeConfiguration(
 		WebRequestContent::Type doctype = strus::webRequestContentFromTypeName( content.doctype());
 		const char* doctypeName = WebRequestContent::typeName( doctype);
 
-		std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, contextType, contextName, scheme, doctypeName);
+		std::string filename = strus::string_format( "%s_%s.%s.%s.%s.conf", timebuf, idxbuf, doctypeName, contextType, contextName);
 		transaction.filename = strus::joinFilePath( m_config_store_dir, filename);
 		transaction.failed_filename = transaction.filename + ".failed";
 		int ec = strus::createDir( m_config_store_dir, false);
@@ -663,11 +713,10 @@ bool WebRequestHandler::loadStoredConfigurations()
 	std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
 	for (; ci != ce; ++ci)
 	{
-		std::string doctype = getConfigFilenamePart( *ci, 4);
+		std::string doctype = getConfigFilenamePart( *ci, 1);
 		if (doctype.empty()) continue;
-		std::string scheme = getConfigFilenamePart( *ci, 3);
-		std::string contextType = getConfigFilenamePart( *ci, 1);
-		std::string contextName = getConfigFilenamePart( *ci, 2);
+		std::string contextType = getConfigFilenamePart( *ci, 2);
+		std::string contextName = getConfigFilenamePart( *ci, 3);
 		std::string date = getConfigFilenamePart( *ci, 0);
 		std::string contentstr;
 		std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
@@ -676,7 +725,7 @@ bool WebRequestHandler::loadStoredConfigurations()
 
 		WebRequestContent content( "UTF-8", doctype.c_str(), contentstr.c_str(), contentstr.size());
 		WebRequestAnswer status;
-		if (!loadConfiguration( contextType.c_str(), contextName.c_str(), scheme.c_str(), false/*do not store for reload*/, content, status))
+		if (!loadConfiguration( contextType.c_str(), contextName.c_str(), false/*do not store for reload*/, content, status))
 		{
 			if (status.apperror())
 			{

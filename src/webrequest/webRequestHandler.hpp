@@ -42,6 +42,8 @@ public:
 			WebRequestAnswer& status) const;
 
 public:/*WebRequestContext*/
+	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
+
 	const papuga_RequestHandler* impl() const	{return m_impl;}
 	papuga_RequestLogger* call_logger()		{return &m_call_logger;}
 	const char* html_head() const			{return m_html_head.c_str();}
@@ -50,7 +52,6 @@ public:/*WebRequestContext*/
 	bool loadConfiguration(
 			const char* contextType,
 			const char* contextName,
-			const char* scheme,
 			bool storedForReload,
 			const WebRequestContent& content,
 			WebRequestAnswer& status);
@@ -66,31 +67,15 @@ private:
 			ConfigurationTransaction& transaction,
 			const char* contextType,
 			const char* contextName,
-			const char* scheme,
 			const WebRequestContent& content,
 			WebRequestAnswer& status) const;
 	bool commitStoreConfiguration(
 			const ConfigurationTransaction& transaction,
 			WebRequestAnswer& status) const;
-
-public:/*WebRequestContext: Get methods to execute*/
-	struct MethodDescription
-	{
-		enum ParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
-
-		papuga_RequestMethodId mid;
-		const ParamType* params;
-
-		MethodDescription( const papuga_RequestMethodId mid_, const ParamType* params_)
-			:params(params_){mid.classid=mid_.classid;mid.functionid=mid_.functionid;}
-	};
-
-	static const MethodDescription* getListMethod( int classid);
-	static const MethodDescription* getViewMethod( int classid);
-	static const MethodDescription* getPostDocumentMethod( int classid);
-	static const MethodDescription* getPutDocumentMethod( int classid);
-	static const MethodDescription* getDeleteMethod( int classid);
-	static const MethodDescription* getPatchMethod( int classid);
+	bool deleteStoredConfigurations(
+			const char* contextType,
+			const char* contextName,
+			WebRequestAnswer& status) const;
 
 private:
 	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
@@ -100,6 +85,9 @@ private:
 
 	void loadConfiguration( const std::string& configstr);
 	bool loadStoredConfigurations();
+	bool deleteStoredConfiguration( const char* contextType, const char* contextName, WebRequestAnswer& status) const;
+
+	void clear();
 
 private:
 	mutable strus::mutex m_mutex;		//< mutex for locking mutual exclusion of configuration requests
@@ -112,8 +100,8 @@ private:
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
 	char const** m_schemes;			//< NULL terminated list of schemes available */
 	int m_nofschemes;			//< number of elements in m_schemes
-	char const** m_context_schemes;		//< NULL terminated list of schemes of the main context available */
-	int m_nofcontext_schemes;		//< number of elements in m_context_schemes
+	char const** m_context_types;		//< NULL terminated list of schemes of the main context available */
+	int m_nofcontext_types;			//< number of elements in m_context_types
 };
 
 }//namespace

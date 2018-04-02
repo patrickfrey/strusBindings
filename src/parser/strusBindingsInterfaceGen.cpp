@@ -828,7 +828,7 @@ static void print_BindingClassesH( std::ostream& out, const strus::InterfacesDef
 	out << "extern \"C\" {" << std::endl;
 	out << "#endif" << std::endl << std::endl;
 
-	out << "const papuga_ClassDef* getBindingsClassDefs();" << std::endl << std::endl;
+	out << "const papuga_ClassDef* strus_getBindingsClassDefs();" << std::endl << std::endl;
 
 	out << "#ifdef __cplusplus" << std::endl;
 	out << "}" << std::endl;
@@ -894,7 +894,7 @@ static void print_BindingClassesCpp( std::ostream& out, const strus::InterfacesD
 	}
 	out << "\t" << "{NULL,NULL,NULL,NULL,NULL,0}" << std::endl;
 	out << "};" << std::endl;
-	out << "extern \"C\" DLL_PUBLIC const papuga_ClassDef* getBindingsClassDefs()" << std::endl;
+	out << "extern \"C\" DLL_PUBLIC const papuga_ClassDef* strus_getBindingsClassDefs()" << std::endl;
 	out << "{" << std::endl;
 	out << "\t" << "return g_classdefs;" << std::endl;
 	out << "}" << std::endl;

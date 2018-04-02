@@ -52,6 +52,10 @@ public:
 	bool ok() const					{return !m_errorstr;}
 
 	/// \brief Error message in case of failure or NULL
+	const char* messagestr() const			{return m_messagestr;}
+	/// \brief Error message in case of failure or NULL
+	const char* messagetype() const			{return m_messagetype;}
+	/// \brief Error message in case of failure or NULL
 	const char* errorstr() const			{return m_errorstr;}
 	/// \brief HTTP status of the request
 	int httpstatus() const				{return m_httpstatus;}
@@ -72,7 +76,7 @@ public:
 	/// \brief Set http status with error
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] apperrorcode_ application error code
-	/// \param[in] errorstr_ pointer to error message
+	/// \param[in] errorstr_ pointer to the error message
 	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_, bool doCopy=false)
 	{
 		if (doCopy)
@@ -88,6 +92,17 @@ public:
 		m_httpstatus = httpstatus_;
 		m_apperrorcode = apperrorcode_;
 	}
+	/// \brief Set http status with a message (no error)
+	/// \param[in] httpstatus_ http status code
+	/// \param[in] type type of the message
+	/// \param[in] str pointer to the message (0-terminated string)
+	void setMessage( int httpstatus_, const char* type, const char* str)
+	{
+		m_httpstatus = httpstatus_;
+		m_messagetype = type;
+		m_messagestr = str;
+	}
+
 	/// \brief Set content of answer (shallow copy)
 	/// \param[in] content_ content structure
 	void setContent( const WebRequestContent& content_)
@@ -128,6 +143,8 @@ private:
 	const char* m_errorstr;		///< error message in case of failure or NULL
 	int m_httpstatus;		///< http status of the request
 	int m_apperrorcode;		///< application error code of the request answer
+	const char* m_messagetype;	///< type of the answer for answers returned in the HTTP header
+	const char* m_messagestr;	///< string of message
 	WebRequestContent m_content;	///< content of the answer
 };
 

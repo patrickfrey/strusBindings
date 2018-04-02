@@ -1,8 +1,1 @@
-Fix CodeProject Articles
-Delete unused Docker images
-Publish Docker images on webpage and refurbish installation page
-
-NodeJS Bindings
-
-add strus_ namespace prefix to exported functions in C header files
-
+Correct handling of DELETE requests. This is currently not possible. Neither update of configuration.
