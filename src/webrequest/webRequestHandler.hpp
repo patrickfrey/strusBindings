@@ -45,15 +45,20 @@ public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
 
 	const papuga_RequestHandler* impl() const	{return m_impl;}
-	papuga_RequestLogger* call_logger()		{return &m_call_logger;}
 	const char* html_head() const			{return m_html_head.c_str();}
 	int debug_maxdepth() const			{return m_debug_maxdepth;}
+	const char** contextTypes() const		{return m_context_types;}
+	std::vector<std::string> contextNames( const std::string& name) const;
 
 	bool loadConfiguration(
 			const char* contextType,
 			const char* contextName,
 			bool storedForReload,
 			const WebRequestContent& content,
+			WebRequestAnswer& status);
+	bool deleteConfiguration(
+			const char* contextType,
+			const char* contextName,
 			WebRequestAnswer& status);
 
 private:
@@ -85,7 +90,7 @@ private:
 
 	void loadConfiguration( const std::string& configstr);
 	bool loadStoredConfigurations();
-	bool deleteStoredConfiguration( const char* contextType, const char* contextName, WebRequestAnswer& status) const;
+	bool deleteStoredConfiguration( const char* contextType, const char* contextName, WebRequestAnswer& status);
 
 	void clear();
 
@@ -94,14 +99,15 @@ private:
 	mutable int m_config_counter;		//< counter to order configurations stored that have the same date
 	int m_debug_maxdepth;			//< maximum depth for debug structures
 	WebRequestLoggerInterface* m_logger;	//< request logger 
-	papuga_RequestLogger m_call_logger;	//< request call logger (for papuga)
 	papuga_RequestHandler* m_impl;		//< request handler
 	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
 	char const** m_schemes;			//< NULL terminated list of schemes available */
 	int m_nofschemes;			//< number of elements in m_schemes
-	char const** m_context_types;		//< NULL terminated list of schemes of the main context available */
+	char const** m_context_types;		//< NULL terminated list of context types available */
 	int m_nofcontext_types;			//< number of elements in m_context_types
+	typedef std::pair<std::string,std::string> ContextNameDef;
+	std::set<ContextNameDef> m_context_names; //< context definitions type name pairs
 };
 
 }//namespace

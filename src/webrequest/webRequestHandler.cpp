@@ -35,145 +35,7 @@
 
 using namespace strus;
 
-#undef STRUS_LOWLEVEL_DEBUG
-
-static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype, papuga_ErrorCode& errcode)
-{
-	std::vector<std::string> rt( nof_itypes);
-	std::size_t nofargs = 0;
-	int ai=0, ae=nof_arguments;
-	for(; ai < ae; ++ai)
-	{
-		typedef int inttype;
-		typedef const char* charp;
-
-		papuga_RequestLogItem aitype = (papuga_RequestLogItem)va_arg( arguments, inttype);
-		int ei=0, ee=nof_itypes;
-		for(; ei < ee && itype[ ei] != aitype; ++ei){}
-		switch (aitype)
-		{
-			case papuga_LogItemClassName:
-			case papuga_LogItemMethodName:
-			case papuga_LogItemMessage:
-				if (ei < ee) rt[ei] = va_arg( arguments,charp);
-				break;
-			case papuga_LogItemResult:
-			{
-				if (ei < ee)
-				{
-					papuga_ValueVariant* val = va_arg( arguments, papuga_ValueVariant*);
-					if (val->valuetype == papuga_TypeSerialization)
-					{
-						if (structDepth > 0)
-						{
-							rt[ei] = std::string("{") + papuga::Serialization_tostring( *val->value.serialization, false, structDepth, errcode) + "}";
-						}
-						else
-						{
-							rt[ei] = "{}";
-						}
-					}
-					else if (papuga_ValueVariant_isatomic( val))
-					{
-						rt[ei] = papuga::ValueVariant_tostring( *val, errcode);
-					}
-					else
-					{
-						rt[ei] = std::string("<") + papuga_Type_name( val->valuetype) + ">";
-					}
-				}
-				break;
-			}
-			case papuga_LogItemArgc:
-			{
-				nofargs = va_arg( arguments,size_t);
-				if (ei < ee)
-				{
-					std::ostringstream num;
-					num << nofargs;
-					rt[ei] = num.str();
-				}
-				break;
-			}
-			case papuga_LogItemArgv:
-			{
-				if (ei < ee)
-				{
-					std::ostringstream argstr;
-					papuga_ValueVariant* ar = va_arg( arguments, papuga_ValueVariant*);
-					std::size_t ii=0, ie=nofargs;
-					for (; ii!=ie; ++ii)
-					{
-						if (ii) argstr << ", ";
-						if (papuga_ValueVariant_isatomic( ar+ii))
-						{
-							argstr << '\"' << papuga::ValueVariant_tostring( ar[ii], errcode) << '\"';
-						}
-						else if (ar[ii].valuetype == papuga_TypeSerialization)
-						{
-							if (structDepth > 0)
-							{
-								argstr << "{" << papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode) << "}";
-							}
-							else
-							{
-								argstr << "{}";
-							}
-						}
-						else
-						{
-							argstr << "<" << papuga_Type_name( ar[ii].valuetype) << ">";
-						}
-					}
-					rt[ei] = argstr.str();
-				}
-				break;
-			}
-		}
-	}
-	return rt;
-}
-
-static void logMethodCall( void* self_, int nofItems, ...)
-{
-	WebRequestLoggerInterface* self = (WebRequestLoggerInterface*)self_;
-	va_list arguments;
-	va_start( arguments, nofItems );
-
-	enum {nof_itypes=5};
-	static const papuga_RequestLogItem itypes[nof_itypes] = {
-		papuga_LogItemClassName,
-		papuga_LogItemMethodName,
-		papuga_LogItemArgv,
-		papuga_LogItemResult
-	};
-	try
-	{
-		papuga_ErrorCode errcode = papuga_Ok;
-		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes, errcode);
-		if (errcode == papuga_Ok)
-		{
-			self->logMethodCall( args[0], args[1], args[2], args[3]);
-		}
-		else
-		{
-			self->logLoggerError( papuga_ErrorCode_tostring( errcode));
-		}
-	}
-	catch (const std::bad_alloc&)
-	{
-		self->logLoggerError( papuga_ErrorCode_tostring( papuga_NoMemError));
-	}
-	catch (const std::runtime_error& err)
-	{
-		self->logLoggerError( err.what());
-	}
-	catch (...)
-	{
-		self->logLoggerError( papuga_ErrorCode_tostring( papuga_UncaughtException));
-	}
-	va_end( arguments);
-}
+#define ROOT_CONTEXT_NAME "context"
 
 static void addStringList( char const**& stringlist, int& stringlistsize, const char* elem)
 {
@@ -253,11 +115,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_context_types(NULL)
 	,m_nofcontext_types(0)
 {
-	std::memset( &m_call_logger, 0, sizeof(m_call_logger));
-	m_call_logger.self = logger_;
-	int mask = logger_->logMask();
-	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_call_logger.logMethodCall = &logMethodCall;
-	m_impl = papuga_create_RequestHandler( &m_call_logger, strus_getBindingsClassDefs());
+	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
@@ -272,9 +130,9 @@ WebRequestHandler::WebRequestHandler(
 	try
 	{
 		DEFINE_SCHEME( "", "init", CreateContext);
-		DEFINE_SCHEME( "context", "newstorage", CreateStorage);
+		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "newstorage", CreateStorage);
 		DEFINE_SCHEME( "storage", "DELETE", DestroyStorage);
-		DEFINE_SCHEME( "context", "storage", OpenStorage);
+		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "storage", OpenStorage);
 		DEFINE_SCHEME( "storage", "queryorig", QueryStorageOriginal); 
 		DEFINE_SCHEME( "storage", "queryana", QueryStorageAnalyzed); 
 		DEFINE_SCHEME( "storage", "analyzequery", AnalyzeQuery);
@@ -422,18 +280,14 @@ static SubConfig createSubConfig( const std::string& name, papuga_Allocator& all
 	{
 		if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 	}
-#ifdef STRUS_LOWLEVEL_DEBUG
-	std::cerr << "sub configuration:" << std::endl << papuga::Serialization_tostring( ser, 1/*linemode*/, 100, errcode) << std::endl;
-#endif
 	papuga_ValueVariant subconfigval;
 	papuga_init_ValueVariant_serialization( &subconfigval, &ser);
-	papuga_RequestResult cfgst;
-
-	if (!papuga_init_RequestResult_single( &cfgst, &allocator, NULL, "elem", getBindingsInterfaceDescription()->structs, &subconfigval)) throw std::bad_alloc();
 	std::size_t subcfglen;
-	const char* subcfgstr = (const char*)papuga_RequestResult_tojson( &cfgst, papuga_UTF8, &subcfglen, &errcode);
+	const char* subcfgstr = (const char*)papuga_ValueVariant_tojson(
+					&subconfigval, &allocator, getBindingsInterfaceDescription()->structs,
+					papuga_UTF8, NULL, &subcfglen, &errcode);
 	if (!subcfgstr) throw std::bad_alloc();
-	return SubConfig( name, subconfidid.empty() ? name : subconfidid,  subcfgstr);
+	return SubConfig( name, subconfidid.empty() ? name : subconfidid,  std::string(subcfgstr, subcfglen));
 }
 
 static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::size_t contentsize, const char** context_types)
@@ -449,9 +303,6 @@ static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::siz
 		papuga_ValueVariant configstruct;
 		if (!papuga_init_ValueVariant_json( &configstruct, &allocator, papuga_UTF8, contentstr, contentsize, &errcode)) goto EXIT;
 		if (configstruct.valuetype != papuga_TypeSerialization) goto EXIT;
-#ifdef STRUS_LOWLEVEL_DEBUG
-		std::cerr << "configuration:" << std::endl << papuga::Serialization_tostring( *configstruct.value.serialization, 1/*linemode*/, 100, errcode) << std::endl;
-#endif
 		papuga_SerializationIter seriter;
 		papuga_init_SerializationIter( &seriter, configstruct.value.serialization);
 		int taglevel = 0;
@@ -503,14 +354,13 @@ EXIT:
 
 void WebRequestHandler::loadConfiguration( const std::string& configstr)
 {
-	static const char* root_context = "context";
 	static const char* config_doctype = "json";
 	static const char* config_charset = "utf-8";
 	WebRequestAnswer status;
 
 	strus::WebRequestContent content( config_charset, config_doctype, configstr.c_str(), configstr.size());
 
-	if (!loadConfiguration( root_context/*destContextType*/, root_context/*destContextName*/, false/*do not store for reload*/, content, status))
+	if (!loadConfiguration( ROOT_CONTEXT_NAME/*destContextType*/, ROOT_CONTEXT_NAME/*destContextName*/, false/*do not store for reload*/, content, status))
 	{
 		if (status.apperror())
 		{
@@ -525,15 +375,76 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 	std::vector<SubConfig>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-#ifdef STRUS_LOWLEVEL_DEBUG
-		std::cerr << strus::string_format( _TXT("sub configuration %s '%s':\n<config>\n%s\n</config>"), ci->name.c_str(), ci->id.c_str(), ci->content.c_str()) << std::endl;
-#endif
 		strus::WebRequestContent subcontent( config_charset, config_doctype, ci->content.c_str(), ci->content.size());
-
-		if (!loadConfiguration( ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/, false/*do not store for reload*/, subcontent, status))
+		if (!loadConfiguration(
+				ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/,
+				false/*do not store for reload*/, subcontent, status))
 		{
 			throw strus::runtime_error( _TXT("error loading sub configuration %s '%s': %s"), ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/, status.errorstr());
 		}
+	}
+}
+
+bool WebRequestHandler::deleteConfiguration(
+		const char* contextType,
+		const char* contextName,
+		WebRequestAnswer& status)
+{
+	try
+	{
+		bool rt = true;
+		papuga_ErrorCode errcode = papuga_Ok;
+		if (papuga_RequestHandler_destroy_context( m_impl, contextType, contextName, &errcode))
+		{
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+			{
+				m_logger->logAction( contextType, contextName, "unlink configured object");
+			}
+		}
+		if (deleteStoredConfiguration( contextType, contextName, status))
+		{
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+			{
+				m_logger->logAction( contextType, contextName, "delete configuration for load on restart");
+			}
+		}
+		else
+		{
+			rt = false;
+		}
+		strus::local_ptr<WebRequestContext> ctx( 
+			createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		WebRequestContext* ctxi = ctx.get();
+		if (!ctxi) return false;
+
+		char schemebuf[ 64];
+		const char* scheme;
+		std::snprintf( schemebuf, sizeof(schemebuf), "DELETE/%s", contextType);
+		scheme = schemebuf;
+		WebRequestContent content;
+
+		if (ctxi->executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, status))
+		{
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+			{
+				m_logger->logAction( contextType, contextName, "call scheme DELETE");
+			}
+		}
+		else
+		{
+			rt = false;
+		}
+		return rt;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setStatus( status, ErrorCodeOutOfMem);
+		return false;
+	}
+	catch (...)
+	{
+		setStatus( status, ErrorCodeUncaughtException);
+		return false;
 	}
 }
 
@@ -546,46 +457,82 @@ bool WebRequestHandler::loadConfiguration(
 {
 	try
 	{
-		static const char* root_context = "context";
-#ifdef STRUS_LOWLEVEL_DEBUG
-		std::string co( webRequestContent_tostring( content));
-		if (co.size() > 1000) co.resize( 1000);
-		std::cerr << strus::string_format( "load configuration: context %s %s, doctype %s, encoding %s, content '%s'",
-							contextType, contextName,
-							content.doctype(), content.charset(), co.c_str()) << std::endl;
-#endif
-		strus::local_ptr<WebRequestContext> ctx( createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
-		if (!ctx.get()) return false;
-		WebRequestContext* ctxi = ctx.get();
-
-		if (ctxi->executeContextScheme( root_context, root_context, contextType/*scheme*/, content, status))
+		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
 		{
-			ConfigurationTransaction transaction;
-			if (storedForReload)
-			{
-				if (!storeConfiguration( transaction, contextType, contextName, content, status)) return false;
-			}
-			strus::unique_lock lock( m_mutex);
-			papuga_RequestContext* ctximpl = ctx->impl();
-			papuga_ErrorCode errcode = papuga_Ok;
+			std::string co( webRequestContent_tostring( content, 1000));
+			m_logger->logPutConfiguration( contextType, contextName, co);
+		}
+		ContextNameDef cndef( contextType, contextName);
+		strus::local_ptr<WebRequestContext> ctx( 
+			createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		WebRequestContext* ctxi = ctx.get();
+		if (!ctxi) return false;
 
-			if (!papuga_RequestHandler_add_context( m_impl, contextType, contextName, ctximpl, &errcode))
+		char schemebuf[ 64];
+		const char* scheme;
+		const char* action;
+		if (storedForReload)
+		{
+			std::snprintf( schemebuf, sizeof(schemebuf), "PUT/%s", contextType);
+			scheme = schemebuf;
+			action = "call PUT";
+		}
+		else
+		{
+			scheme = contextType;
+			action = "call init";
+		}
+		if (ctxi->executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, status))
+		{
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
 			{
-				char buf[ 1024];
-				std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), contextType, contextName);
-				setStatus( status, papugaErrorToErrorCode( errcode), buf);
-				return false;
+				m_logger->logAction( contextType, contextName, action);
 			}
-			if (storedForReload && !commitStoreConfiguration( transaction, status))
-			{
-				return false;
-			}
-			return true;
 		}
 		else
 		{
 			return false;
 		}
+		ConfigurationTransaction transaction;
+		if (storedForReload)
+		{
+			if (!storeConfiguration( transaction, contextType, contextName, content, status)) return false;
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+			{
+				m_logger->logAction( contextType, contextName, "store configuration for load on restart");
+			}
+		}
+		strus::unique_lock lock( m_mutex);
+		m_context_names.erase( cndef);
+		papuga_RequestContext* ctximpl = ctx->impl();
+		papuga_ErrorCode errcode = papuga_Ok;
+
+		if (!papuga_RequestHandler_transfer_context( m_impl, contextType, contextName, ctximpl, &errcode))
+		{
+			char buf[ 1024];
+			std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), contextType, contextName);
+			setStatus( status, papugaErrorToErrorCode( errcode), buf);
+			return false;
+		}
+		m_context_names.insert( cndef);
+		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+		{
+			m_logger->logAction( contextType, contextName, "create object");
+		}
+		if (storedForReload && !commitStoreConfiguration( transaction, status))
+		{
+			return false;
+		}
+		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+		{
+			m_logger->logAction( contextType, contextName, "commit configuration");
+		}
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setStatus( status, ErrorCodeOutOfMem);
+		return false;
 	}
 	catch (...)
 	{
@@ -598,11 +545,14 @@ bool WebRequestHandler::loadConfiguration(
 bool WebRequestHandler::deleteStoredConfiguration(
 		const char* contextType,
 		const char* contextName,
-		WebRequestAnswer& status) const
+		WebRequestAnswer& status)
 {
 	try
 	{
 		strus::unique_lock lock( m_mutex);
+		ContextNameDef cndef( contextType, contextName);
+		m_context_names.erase( cndef);
+
 		std::string fileext = strus::string_format( ".%s.%s.conf", contextType, contextName);
 		std::vector<std::string> files;
 		int ec = strus::readDirFiles( m_config_store_dir, fileext, files);
@@ -612,6 +562,7 @@ bool WebRequestHandler::deleteStoredConfiguration(
 			return false;
 		}
 		std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
+		if (fi == fe) return false;
 		for (; fi != fe; ++fi)
 		{
 			ec = removeFile( *fi, true);
@@ -640,7 +591,7 @@ bool WebRequestHandler::storeConfiguration(
 	try
 	{
 		strus::unique_lock lock( m_mutex);
-		std::string contentUtf8 = webRequestContent_tostring( content);
+		std::string contentUtf8 = webRequestContent_tostring( content, -1);
 		char timebuf[ 256];
 		char idxbuf[ 32];
 		time_t timer;
@@ -740,4 +691,16 @@ bool WebRequestHandler::loadStoredConfigurations()
 	return true;
 }
 
+std::vector<std::string> WebRequestHandler::contextNames( const std::string& name) const
+{
+	std::vector<std::string> rt;
+	ContextNameDef cndef( name, std::string());
+	strus::unique_lock lock( m_mutex);
+	std::set<ContextNameDef>::const_iterator ci = m_context_names.upper_bound( cndef);
+	for (; ci != m_context_names.end() && ci->first == name; ++ci)
+	{
+		rt.push_back( ci->second);
+	}
+	return rt;
+}
 

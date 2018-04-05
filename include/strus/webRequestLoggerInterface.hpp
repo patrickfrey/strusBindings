@@ -25,6 +25,8 @@ public:
 		LogNothing=0x0,
 		LogMethodCalls=0x1,
 		LogRequests=0x2,
+		LogConfiguration=0x4,
+		LogAction=0x8,
 		LogAll=0xFF
 	};
 
@@ -40,6 +42,20 @@ public:
 	/// \brief Log a request
 	/// \remark expected to be thread safe
 	virtual void logRequest( const char* reqstr)=0;
+
+	/// \brief Log a loaded configuration
+	/// \param[in] type type of the configuration
+	/// \param[in] name name of the configuration
+	/// \param[in] configstr content string of the configuration
+	/// \remark expected to be thread safe
+	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr)=0;
+
+	/// \brief Log an action
+	/// \param[in] type type of the configuration
+	/// \param[in] name name of the configuration
+	/// \param[in] action string describing the action on the object
+	/// \remark expected to be thread safe
+	virtual void logAction( const char* type, const char* name, const char* action)=0;
 
 	/// \brief Log a method call
 	/// \param[in] classname name identifier of the class called

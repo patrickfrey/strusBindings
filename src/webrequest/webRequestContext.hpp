@@ -42,14 +42,15 @@ public:
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	papuga_RequestContext* impl()			{return &m_context;}
+	papuga_RequestContext* impl()			{return m_context;}
 	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
-	bool initContentRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
+	bool createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
+	bool initRequestContext( WebRequestAnswer& answer);
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool debugContentRequest( WebRequestAnswer& answer);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
@@ -57,6 +58,7 @@ private:
 	bool getContentRequestResult( WebRequestAnswer& answer);
 	bool callObjMethod( const papuga_ValueVariant* obj, const char* methodname, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 
 	bool dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer);
 	bool dumpViewType( const char* type_, papuga_Serialization* ser, WebRequestAnswer& answer);
@@ -66,8 +68,9 @@ private:
 private:
 	const WebRequestHandler* m_handler;
 	WebRequestLoggerInterface* m_logger;
+	papuga_RequestLogger m_callLogger;	//< request call logger (for papuga)
 	papuga_Allocator m_allocator;
-	papuga_RequestContext m_context;
+	papuga_RequestContext* m_context;
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;

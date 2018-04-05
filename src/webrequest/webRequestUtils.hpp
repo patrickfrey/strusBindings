@@ -33,8 +33,9 @@ int errorCodeToHttpStatus( ErrorCode errcode);
 
 // \brief Contert a web request content to an UTF-8 string for printing and logging
 // \param[in] content web request content
+// \param[in] maxsize maximum size to print or 0 for printing all
 // \return content as UTF-8 string
-std::string webRequestContent_tostring( const WebRequestContent& content);
+std::string webRequestContent_tostring( const WebRequestContent& content, int maxsize);
 
 // \brief Parse a content type from a string
 // \param[in] name content type as string

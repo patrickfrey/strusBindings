@@ -16,7 +16,6 @@
 #include "papuga/valueVariant.h"
 #include "papuga/valueVariant.hpp"
 #include "papuga/requestParser.h"
-#include "papuga/requestResult.h"
 #include "papuga/allocator.h"
 #include "papuga/serialization.h"
 #include "papuga/serialization.hpp"
@@ -116,7 +115,7 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 	return 500 /*Internal Server Error*/;
 }
 
-std::string strus::webRequestContent_tostring( const WebRequestContent& content)
+std::string strus::webRequestContent_tostring( const WebRequestContent& content, int maxsize)
 {
 	papuga_StringEncoding encoding;
 	if (!papuga_getStringEncodingFromName( &encoding, content.charset()))
@@ -130,6 +129,12 @@ std::string strus::webRequestContent_tostring( const WebRequestContent& content)
 	if (errcode != papuga_Ok)
 	{
 		throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+	}
+	if (maxsize > 0 && maxsize < (int)rt.size())
+	{
+		enum {B11000000 = 192, B10000000 = 128};
+		while (maxsize > 0 && (rt[ maxsize-1] & B11000000) == B10000000) --maxsize;
+		rt.resize( maxsize);
 	}
 	return rt;
 }
@@ -662,20 +667,14 @@ bool strus::mapValueVariantToAnswer(
 #endif
 	char* resultstr = 0;
 	std::size_t resultlen = 0;
-	papuga_RequestResult result;
-	if (!papuga_init_RequestResult_single( &result, allocator, rootname, elemname, strus::getBindingsInterfaceDescription()->structs, &value))
-	{
-		errcode = papuga_NoMemError;
-		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
-		return false;
-	}
+	const papuga_StructInterfaceDescription* structdefs = strus::getBindingsInterfaceDescription()->structs;
 	// Map the result:
 	switch (doctype)
 	{
-		case WebRequestContent::XML:  resultstr = (char*)papuga_RequestResult_toxml( &result, encoding, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: resultstr = (char*)papuga_RequestResult_tojson( &result, encoding, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_RequestResult_tohtml5( &result, encoding, html_head, &resultlen, &errcode); break;
-		case WebRequestContent::TEXT: resultstr = (char*)papuga_RequestResult_totext( &result, encoding, &resultlen, &errcode); break;
+		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
+		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, rootname, &resultlen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, rootname, elemname, html_head, &resultlen, &errcode); break;
+		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{
 			setAnswer( answer, ErrorCodeNotImplemented, _TXT("output content type unknown"));
