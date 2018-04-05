@@ -38,6 +38,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <iostream>
+#include <sstream>
 
 using namespace strus;
 
