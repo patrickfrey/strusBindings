@@ -67,6 +67,7 @@ struct MethodDescription
 		const char* resulttype,
 		const char* result_rootelem,
 		const char* result_listelem,
+		bool has_content,
 		int nofParams,
 		...)
 	{
@@ -83,6 +84,7 @@ struct MethodDescription
 		request_method = request_method_;
 		std::memcpy( &data.id, &id, sizeof( data.id));
 		data.paramtypes = args;
+		data.has_content = has_content;
 		data.httpstatus_success = httpstatus_success;
 		data.resulttype = resulttype;
 		data.result_rootelem = result_rootelem;
@@ -118,27 +120,27 @@ WebRequestHandler::WebRequestHandler(
 
 	using namespace strus::webrequest;
 #define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
-	static const Scheme ## SCHEME_IMPL scheme ## SCHEME_IMPL;\
+	static const Scheme_ ## SCHEME_IMPL scheme ## SCHEME_IMPL;\
 	addScheme( CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());
 
-#define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, ROOTELEM)\
-	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, "elem", 1, ParamPathArray);\
+#define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, HASCONTENT, ROOTELEM)\
+	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, "elem", HASCONTENT, 1, ParamPathArray);\
 	mt_ ## CLASS ## _ ## REQUEST_METHOD.addToHandler( m_impl);
 
 	try
 	{
-		DEFINE_SCHEME( "", "init", CreateContext);
-		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "newstorage", CreateStorage);
-		DEFINE_SCHEME( "storage", "DELETE", DestroyStorage);
-		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "storage", OpenStorage);
-		DEFINE_SCHEME( "storage", "queryorig", QueryStorageOriginal); 
-		DEFINE_SCHEME( "storage", "queryana", QueryStorageAnalyzed); 
-		DEFINE_SCHEME( "storage", "analyzequery", AnalyzeQuery);
-	
-		DEFINE_METHOD_VIEW_PATH( LIST, Context, introspectionDir, "list");
-		DEFINE_METHOD_VIEW_PATH( GET,  Context, introspection, "config");
-		DEFINE_METHOD_VIEW_PATH( LIST, StorageClient, introspectionDir, "list");
-		DEFINE_METHOD_VIEW_PATH( GET,  StorageClient, introspection, "storage");
+		DEFINE_SCHEME( "", ROOT_CONTEXT_NAME, INIT_Context);
+		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "PUT/storage", Context_PUT_Storage);
+		DEFINE_SCHEME( "storage", "DELETE", Context_DELETE_Storage);
+		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "storage", Context_INIT_Storage);
+		DEFINE_SCHEME( "storage", "QRYORG", Storage_QRYORG); 
+		DEFINE_SCHEME( "storage", "QRYANA", Storage_QRYANA); 
+		DEFINE_SCHEME( "queryanalyzer", "ANAQRY", QueryAnalyzer_GET_content);
+
+		DEFINE_METHOD_VIEW_PATH( LIST, Context, introspectionDir, false, "list");
+		DEFINE_METHOD_VIEW_PATH( GET,  Context, introspection, false, "config");
+		DEFINE_METHOD_VIEW_PATH( LIST, StorageClient, introspectionDir, false, "list");
+		DEFINE_METHOD_VIEW_PATH( GET,  StorageClient, introspection, false, "storage");
 
 		loadConfiguration( configstr_);
 		loadStoredConfigurations();

@@ -42,7 +42,8 @@
 
 using namespace strus;
 
-#undef STRUS_LOWLEVEL_DEBUG
+#define ROOT_CONTEXT_NAME "context"
+
 static void logMethodCall( void* self_, int nofItems, ...);
 
 WebRequestContext::WebRequestContext(
@@ -73,6 +74,11 @@ WebRequestContext::~WebRequestContext()
 	if (m_context) papuga_destroy_RequestContext( m_context);
 	if (m_request) papuga_destroy_Request( m_request);
 	papuga_destroy_Allocator( &m_allocator);
+}
+
+static inline bool isEqual( const char* name, const char* oth)
+{
+	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
 
 static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype, papuga_ErrorCode& errcode)
@@ -710,7 +716,7 @@ bool WebRequestContext::callObjMethod( const papuga_ValueVariant* obj, const cha
 	{
 		int classid = obj->value.hostObject->classid;
 		void* self = obj->value.hostObject->data;
-		const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, methodname);
+		const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, methodname, !content.empty());
 		if (methoddescr)
 		{
 			return callHostObjMethod( self, methoddescr, path, content, answer);
@@ -780,7 +786,7 @@ bool WebRequestContext::dumpViewName( const char* typenam, const char* contextna
 	}
 	char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 	if (!checkPapugaListBufferOverflow( varlist, answer)) goto ERROR;
-	if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
+	if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
 	{
 		if (!dumpViewVar( context, typenam, ser, answer)) goto ERROR;
 	}
@@ -852,7 +858,14 @@ struct ObjectDescr
 	{
 		papuga_ErrorCode errcode = papuga_Ok;
 		if (!(typenam = path.getNext())) return true;
-		if (!(contextnam = path.getNext())) return true;
+		if (isEqual( typenam, ROOT_CONTEXT_NAME))
+		{
+			contextnam = ROOT_CONTEXT_NAME;
+		}
+		else
+		{
+			if (!(contextnam = path.getNext())) return true;
+		}
 		context = papuga_create_RequestContext();
 		if (!context)
 		{
@@ -875,7 +888,7 @@ struct ObjectDescr
 		}
 		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-		if (varlist[0] && !varlist[1] && 0==std::strcmp( *varlist, typenam))
+		if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
 		{
 			obj = papuga_RequestContext_get_variable( context, typenam);
 			return true;
@@ -982,7 +995,7 @@ bool WebRequestContext::executeRequest(
 {
 	try
 	{
-		if (0==std::strcmp(method_,"OPTIONS"))
+		if (isEqual( method_, "OPTIONS"))
 		{
 			return executeOPTIONS( path_, content, answer);
 		}
@@ -1007,7 +1020,7 @@ bool WebRequestContext::executeRequest(
 		{
 			int classid = selector.obj->value.hostObject->classid;
 			void* self = selector.obj->value.hostObject->data;
-			const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method);
+			const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
 			if (methoddescr)
 			{
 				if (debug)
@@ -1036,7 +1049,7 @@ bool WebRequestContext::executeRequest(
 				setAnswer( answer, ErrorCodeInvalidArgument);
 				return false;
 			}
-			if (0==std::strcmp( method,"LIST"))
+			if (isEqual( method, "LIST"))
 			{
 				if (!selector.typenam)
 				{
@@ -1051,7 +1064,7 @@ bool WebRequestContext::executeRequest(
 					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", selector.typenam, m_result_encoding, m_result_doctype, contextlist);
 				}
 			}
-			else if (0==std::strcmp( method, "GET"))
+			else if (isEqual( method, "GET"))
 			{
 				papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
 				if (!ser)
@@ -1084,7 +1097,7 @@ bool WebRequestContext::executeRequest(
 			// Object selected does not exist, we do a configuration request:
 			if (path.getRest()[0] == '\0')
 			{
-				if (0==std::strcmp(method,"PUT"))
+				if (isEqual( method, "PUT"))
 				{
 					//PF:HACK: Loading configuration is not const, but thread safe, so a const_cast is, though never good, Ok here:
 					if (!const_cast<WebRequestHandler*>( m_handler)->loadConfiguration(
@@ -1095,7 +1108,7 @@ bool WebRequestContext::executeRequest(
 					}
 					return true;
 				}
-				else if (0==std::strcmp(method,"DELETE"))
+				else if (isEqual( method, "DELETE"))
 				{
 					//PF:HACK: Loading configuration is not const, but thread safe, so a const_cast is, though never good, Ok here:
 					if (!const_cast<WebRequestHandler*>( m_handler)->deleteConfiguration(
@@ -1117,7 +1130,7 @@ bool WebRequestContext::executeRequest(
 				return false;
 			}
 		}
-		else if (path.getRest()[0] == '\0' && 0==std::strcmp(method,"DELETE"))
+		else if (path.getRest()[0] == '\0' && isEqual( method, "DELETE"))
 		{
 			selector.reset();
 			if (!const_cast<WebRequestHandler*>( m_handler)->deleteConfiguration(

@@ -60,10 +60,10 @@ public:
 };
 
 
-class SchemeCreateContext :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Scheme_INIT_Context :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	SchemeCreateContext() :papuga::RequestAutomaton(
+	Scheme_INIT_Context() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"context",{},
 		{
@@ -102,10 +102,10 @@ public:
 	) {}
 };
 
-class SchemeCreateStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Scheme_Context_PUT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	SchemeCreateStorage() :papuga::RequestAutomaton(
+	Scheme_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",{},
 		{
@@ -115,22 +115,35 @@ public:
 			{"/storage/metadata", StorageMetadata, {{"name", StorageMetadataName}, {"value", StorageMetadataValue}} },
 			{"/storage", "acl()", StorageEnableAcl},
 			{"/storage", "compression()", StorageEnableCompression},
+			{"/storage/cachedterms", "()", StorageCachedTerms},
+			{"/storage/compression", "()", StorageEnableCompression},
+			{"/storage/cache", "()", StorageLruCacheSize},
+			{"/storage/max_open_files", "()", StorageMaxNofOpenFiles},
+			{"/storage/write_buffer_size", "()", StorageWriteBufferSize},
+			{"/storage/block_size", "()", StorageBlockSize},
 			{"/storage", StorageConfig, {
 					{"path", StoragePath},
+					{"cachedterms", StorageCachedTerms, '?'},
+					{"compression", StorageEnableCompression, '?'},
+					{"cache", StorageLruCacheSize, '?'},
+					{"max_open_files", StorageMaxNofOpenFiles, '?'},
+					{"write_buffer_size", StorageWriteBufferSize, '?'},
+					{"block_size", StorageBlockSize, '?'},
 					{"metadata", StorageMetadata, '*'},
 					{"acl", StorageEnableAcl, '?'},
 					{"compression", StorageEnableCompression, '?'}
 				}
 			},
-			{"/storage", "success", "context", bindings::method::Context::createStorage(), {{StorageConfig}} }
+			{"/storage", "_success", "context", bindings::method::Context::createStorage(), {{StorageConfig}} },
+			{"/storage", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
 		}
 	) {}
 };
 
-class SchemeDestroyStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Scheme_Context_DELETE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	SchemeDestroyStorage() :papuga::RequestAutomaton(
+	Scheme_Context_DELETE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",{},
 		{
@@ -140,10 +153,10 @@ public:
 	) {}
 };
 
-class SchemeOpenStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Scheme_Context_INIT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	SchemeOpenStorage() :papuga::RequestAutomaton(
+	Scheme_Context_INIT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"storage",{},
 		{
@@ -415,10 +428,10 @@ public:
 	}
 };
 
-class SchemeAnalyzeQuery :public papuga::RequestAutomaton, public SchemeQueryPart
+class Scheme_QueryAnalyzer_GET_content :public papuga::RequestAutomaton, public SchemeQueryPart
 {
 public:
-	SchemeAnalyzeQuery() :papuga::RequestAutomaton(
+	Scheme_QueryAnalyzer_GET_content() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
@@ -430,10 +443,10 @@ public:
 };
 
 
-class SchemeQueryStorageOriginal :public papuga::RequestAutomaton, public SchemeQueryPart
+class Scheme_Storage_QRYORG :public papuga::RequestAutomaton, public SchemeQueryPart
 {
 public:
-	SchemeQueryStorageOriginal() :papuga::RequestAutomaton(
+	Scheme_Storage_QRYORG() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
@@ -447,10 +460,10 @@ public:
 	) {}
 };
 
-class SchemeQueryStorageAnalyzed :public papuga::RequestAutomaton, public SchemeQueryPart
+class Scheme_Storage_QRYANA :public papuga::RequestAutomaton, public SchemeQueryPart
 {
 public:
-	SchemeQueryStorageAnalyzed() :papuga::RequestAutomaton(
+	Scheme_Storage_QRYANA() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
