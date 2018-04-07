@@ -19,7 +19,7 @@ using namespace strus;
 TraceProxy::TraceProxy( ModuleLoaderInterface* moduleLoader, const std::string& config_, ErrorBufferInterface* errorhnd_)
 	:m_errorhnd(errorhnd_),m_config(config_),m_traceObjectBuilder(moduleLoader->createTraceObjectBuilder(config_))
 {
-	if (!m_traceObjectBuilder) throw strus::runtime_error( "%s", _TXT("failed to create trace object builder"));
+	if (!m_traceObjectBuilder) throw std::runtime_error( _TXT("failed to create trace object builder"));
 }
 
 TraceProxy::~TraceProxy()

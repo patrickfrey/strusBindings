@@ -22,7 +22,7 @@ void MetaDataExpression::pushCompare( MetaDataRestrictionInterface::CompareOpera
 
 void MetaDataExpression::pushOperator( const BooleanOp& op, unsigned int argc)
 {
-	if (m_fieldno_stack.size() < argc) throw strus::runtime_error( "%s", _TXT("push metadata operator without all arguments defined"));
+	if (m_fieldno_stack.size() < argc) throw std::runtime_error( _TXT("push metadata operator without all arguments defined"));
 	int* fnstart = m_fieldno_stack.data() + m_fieldno_stack.size() - argc;
 	int* fnend = fnstart + argc;
 	std::vector<int> fieldnoList( fnstart, fnend);

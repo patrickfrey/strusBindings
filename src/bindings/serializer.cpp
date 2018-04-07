@@ -174,7 +174,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 	
 					rt &= papuga_Serialization_pushName_charp( ser, "arg");
 					rt &= papuga_Serialization_pushOpen( ser);
-					if ((std::size_t)ii->nofOperands() > stk.size()) throw strus::runtime_error( "%s", _TXT("number of query analyzer expression operands out of range"));
+					if ((std::size_t)ii->nofOperands() > stk.size()) throw std::runtime_error( _TXT("number of query analyzer expression operands out of range"));
 					std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
 					for (; si != se; ++si)
 					{
@@ -206,11 +206,11 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 			}
 			else if (stk.empty())
 			{
-				throw strus::runtime_error( "%s", _TXT("no result returned by term expression analysis"));
+				throw std::runtime_error( _TXT("no result returned by term expression analysis"));
 			}
 			else
 			{
-				throw strus::runtime_error( "%s", _TXT("result returned by term expression analysis is not unique"));
+				throw std::runtime_error( _TXT("result returned by term expression analysis is not unique"));
 			}
 		}
 		else
