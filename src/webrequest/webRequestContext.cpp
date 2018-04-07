@@ -458,9 +458,7 @@ ERROR:
 
 bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName)
 {
-	if (m_context) papuga_destroy_RequestContext( m_context);
-
-	m_context = papuga_create_RequestContext();
+	if (!createEmptyRequestContext( answer)) return false;
 	if (contextName)
 	{
 		if (!inheritRequestContext( answer, contextType, contextName)) return false;
@@ -471,6 +469,18 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 		setAnswer( answer, ErrorCodeRequestResolveError, _TXT("undefined object"));
 		return false;
 	}
+}
+
+bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer)
+{
+	if (m_context) papuga_destroy_RequestContext( m_context);
+	m_context = papuga_create_RequestContext();
+	if (!m_context)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
+	}
+	return true;
 }
 
 bool WebRequestContext::initRequestContext( WebRequestAnswer& answer)
@@ -621,7 +631,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	const papuga_ClassDef* cdef = &cdeflist[ methoddescr->id.classid-1];
 	if (methoddescr->id.functionid == 0)
 	{
-		setAnswer( answer, ErrorCodeNotAllowed);
+		setAnswer( answer, ErrorCodeInvalidArgument);
 		return false;
 	}
 	papuga_ClassMethod method = cdef->methodtable[ methoddescr->id.functionid-1];
@@ -903,6 +913,16 @@ struct ObjectDescr
 		return true;
 	}
 };
+
+bool WebRequestContext::executeInitScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
+{
+	return createEmptyRequestContext( answer)
+	&&	initContentRequest( answer, "", scheme)
+	&&	feedContentRequest( answer, content)
+	&&	initRequestContext( answer)
+	&&	executeContentRequest( answer, content)
+	&&	getContentRequestResult( answer);
+}
 
 bool WebRequestContext::executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
 {

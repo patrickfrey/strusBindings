@@ -37,7 +37,7 @@ using namespace strus;
 
 static void addStringList( char const**& stringlist, int& stringlistsize, const char* elem)
 {
-	for( char const** si=stringlist; *si; ++si) if (0==std::strcmp(*si,elem)) return;
+	if (stringlist) for( char const** si=stringlist; *si; ++si) if (0==std::strcmp(*si,elem)) return;
 	char const** new_stringlist = (char const**)std::realloc( stringlist, (stringlistsize+2) * sizeof(stringlist[0]));
 	if (!new_stringlist) throw std::bad_alloc();
 	stringlist = new_stringlist;
@@ -324,7 +324,7 @@ static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::siz
 					{
 						char nambuf[ 128];
 						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &seriter));
-						if (nam)
+						if (nam && 0!=std::strcmp( nam, ROOT_CONTEXT_NAME))
 						{
 							char const** si = context_types;
 							for (; *si && 0!=std::strcmp(*si,nam); ++si){}
@@ -354,27 +354,16 @@ EXIT:
 
 void WebRequestHandler::loadConfiguration( const std::string& configstr)
 {
-	static const char* config_doctype = "json";
-	static const char* config_charset = "utf-8";
-	WebRequestAnswer status;
+	const char* config_doctype = "json";
+	const char* config_charset = "utf-8";
 
-	strus::WebRequestContent content( config_charset, config_doctype, configstr.c_str(), configstr.size());
+	loadInitConfiguration( configstr);
 
-	if (!loadConfiguration( ROOT_CONTEXT_NAME/*destContextType*/, ROOT_CONTEXT_NAME/*destContextName*/, false/*do not store for reload*/, content, status))
-	{
-		if (status.apperror())
-		{
-			throw strus::runtime_error( status.apperror(), "%s", status.errorstr() ? status.errorstr() : _TXT("unknown error"));
-		}
-		else
-		{
-			throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
-		}
-	}
 	std::vector<SubConfig> cfglist = getSubConfigList( configstr.c_str(), configstr.size(), m_context_types);
 	std::vector<SubConfig>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
+		WebRequestAnswer status;
 		strus::WebRequestContent subcontent( config_charset, config_doctype, ci->content.c_str(), ci->content.size());
 		if (!loadConfiguration(
 				ci->name.c_str()/*context type*/, ci->id.c_str()/*context name*/,
@@ -448,6 +437,56 @@ bool WebRequestHandler::deleteConfiguration(
 	}
 }
 
+void WebRequestHandler::loadInitConfiguration( const std::string& configstr)
+{
+	const char* config_doctype = "json";
+	const char* config_charset = "utf-8";
+	const char* accepted_charset = "UTF-8";
+	const char* accepted_doctype = "application/json";
+	const char* scheme = ROOT_CONTEXT_NAME;
+	const char* contextType = ROOT_CONTEXT_NAME;
+	const char* contextName = ROOT_CONTEXT_NAME;
+
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
+	{
+		m_logger->logPutConfiguration( contextType, contextName, configstr);
+	}
+	WebRequestAnswer status;
+	strus::WebRequestContent content( config_charset, config_doctype, configstr.c_str(), configstr.size());
+
+	ContextNameDef cndef( contextType, contextName);
+	strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, status));
+	WebRequestContext* ctxi = ctx.get();
+	if (!ctxi) throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
+
+	if (ctxi->executeInitScheme( scheme, content, status))
+	{
+		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+		{
+			m_logger->logAction( contextType, contextName, "call init");
+		}
+	}
+	else
+	{
+		throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
+	}
+	strus::unique_lock lock( m_mutex);
+	m_context_names.erase( cndef);
+	papuga_ErrorCode errcode = papuga_Ok;
+
+	if (!papuga_RequestHandler_transfer_context( m_impl, contextType, contextName, ctx->fetchContext(), &errcode))
+	{
+		char buf[ 1024];
+		std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), contextType, contextName);
+		throw std::runtime_error( buf);
+	}
+	m_context_names.insert( cndef);
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+	{
+		m_logger->logAction( contextType, contextName, "initialized");
+	}
+}
+
 bool WebRequestHandler::loadConfiguration(
 			const char* contextType,
 			const char* contextName,
@@ -504,10 +543,9 @@ bool WebRequestHandler::loadConfiguration(
 		}
 		strus::unique_lock lock( m_mutex);
 		m_context_names.erase( cndef);
-		papuga_RequestContext* ctximpl = ctx->impl();
 		papuga_ErrorCode errcode = papuga_Ok;
 
-		if (!papuga_RequestHandler_transfer_context( m_impl, contextType, contextName, ctximpl, &errcode))
+		if (!papuga_RequestHandler_transfer_context( m_impl, contextType, contextName, ctx->fetchContext(), &errcode))
 		{
 			char buf[ 1024];
 			std::snprintf( buf, sizeof(buf), _TXT("error adding web request context %s '%s' to handler"), contextType, contextName);

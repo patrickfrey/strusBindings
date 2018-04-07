@@ -89,6 +89,7 @@ private:
 	void addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton);
 
 	void loadConfiguration( const std::string& configstr);
+	void loadInitConfiguration( const std::string& configstr);
 	bool loadStoredConfigurations();
 	bool deleteStoredConfiguration( const char* contextType, const char* contextName, WebRequestAnswer& status);
 

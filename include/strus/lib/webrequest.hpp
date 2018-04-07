@@ -19,6 +19,8 @@ namespace strus {
 class WebRequestHandlerInterface;
 /// \brief Forward declaration
 class WebRequestLoggerInterface;
+/// \brief Forward declaration
+class ErrorBufferInterface;
 
 /// \brief Create a web request handler
 /// \param[in] request logger interface
@@ -26,7 +28,7 @@ class WebRequestLoggerInterface;
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
 /// \param[in] config main configuration
 /// \return pointer to handler in case of success, NULL in case of memory allocation error
-WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir, const std::string& config);
+WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir, const std::string& config, ErrorBufferInterface* errorhnd);
 
 /// \brief Convert string from UTF-8 to a given charset encoding
 /// \param[in] charset character set encoding to convert to

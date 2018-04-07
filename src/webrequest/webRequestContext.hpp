@@ -42,13 +42,15 @@ public:
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	papuga_RequestContext* impl()			{return m_context;}
+	papuga_RequestContext* fetchContext()			{papuga_RequestContext* rt = m_context; m_context=0; return rt;}
 	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeInitScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool createEmptyRequestContext( WebRequestAnswer& answer);
 	bool createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool initRequestContext( WebRequestAnswer& answer);
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);

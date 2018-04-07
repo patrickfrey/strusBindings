@@ -76,12 +76,12 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 		case ErrorCodeUncaughtException: return 500 /*Internal Server Error*/;
 
 		case ErrorCodeAvailability: return 503; /*Service not available*/;
-		case ErrorCodeNotAllowed: return 405; /* Method not allowed */
-		case ErrorCodeProtocolError: return 400 /*Internal Server Error*/;
-		case ErrorCodePlatformIncompatibility: return 500 /*Bad Request*/;
+		case ErrorCodeNotAllowed: return 400; /*Bad Request*/
+		case ErrorCodeProtocolError: return 400 /*Bad Request*/;
+		case ErrorCodePlatformIncompatibility: return 500 /*Internal Server Error*/;
 		case ErrorCodePlatformRequirements: return 500 /*Internal Server Error*/;
 
-		case ErrorCodeSyntax: return 400 /*Internal Server Error*/;
+		case ErrorCodeSyntax: return 400 /*Bad Request*/;
 		case ErrorCodeNotFound: return 500 /*Internal Server Error*/;
 		case ErrorCodeIOError: return 500 /*Internal Server Error*/;
 		case ErrorCodeVersionMismatch: return 500 /*Internal Server Error*/;

@@ -9,18 +9,34 @@
 /// \file libstrus_webrequest.cpp
 #include "strus/lib/webrequest.hpp"
 #include "strus/base/dll_tags.hpp"
+#include "strus/errorBufferInterface.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
+#include "private/internationalization.hpp"
 #include "papuga/valueVariant.h"
 #include "papuga/encoding.h"
 #include <new>
+#include <stdexcept>
 
 /// \brief strus toplevel namespace
 using namespace strus;
 
-DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir, const std::string& config)
+DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir, const std::string& config, ErrorBufferInterface* errorhnd)
 {
-	return new (std::nothrow) WebRequestHandler( logger, html_head, config_store_dir, config);
+	try
+	{
+		return new WebRequestHandler( logger, html_head, config_store_dir, config);
+	}
+	catch (const std::bad_alloc&)
+	{
+		errorhnd->report( ErrorCodeOutOfMem, _TXT("out of memory"));
+		return NULL;
+	}
+	catch (const std::runtime_error& err)
+	{
+		errorhnd->report( ErrorCodeRuntimeError, _TXT("error creating web request handler: %s"), err.what());
+		return NULL;
+	}
 }
 
 DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, char* destbuf, std::size_t destbufsize,  std::size_t& length, const char* src, std::size_t srcsize)

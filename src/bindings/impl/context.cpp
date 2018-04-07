@@ -471,12 +471,18 @@ IntrospectionBase* ContextImpl::createIntrospection( const ValueVariant& arg)
 
 	strus::local_ptr<IntrospectionBase> ictx( new ContextIntrospection( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
 	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
+	std::string openedpath;
 	for (; pi != pe; ++pi)
 	{
 		ictx.reset( ictx->open( *pi));
 		if (!ictx.get())
 		{
-			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("failed to create introspection context"));
+			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("/%s not found in %s%s"), pi->c_str(), "/context", openedpath.c_str());
+		}
+		else
+		{
+			openedpath.push_back('/');
+			openedpath.append( *pi);
 		}
 	}
 	return ictx.release();
