@@ -243,15 +243,17 @@ static SubConfig createSubConfig( const std::string& name, papuga_Allocator& all
 
 		for (; taglevel > 0 && !papuga_SerializationIter_eof( &itr); papuga_SerializationIter_skip( &itr))
 		{
-			if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 			switch (papuga_SerializationIter_tag( &itr))
 			{
 				case papuga_TagValue:
+					if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 					break;
 				case papuga_TagOpen:
+					if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 					++taglevel;
 					break;
 				case papuga_TagClose:
+					if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 					--taglevel;
 					break;
 				case papuga_TagName:
@@ -272,6 +274,14 @@ static SubConfig createSubConfig( const std::string& name, papuga_Allocator& all
 								subconfidid = std::string( idval, idlen);
 							}
 						}
+						else
+						{
+							if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
+						}
+					}
+					else
+					{
+						if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 					}
 			}
 		}
