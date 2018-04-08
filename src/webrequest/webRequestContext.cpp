@@ -719,119 +719,11 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	}
 }
 
-bool WebRequestContext::callObjMethod( const papuga_ValueVariant* obj, const char* methodname, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
-{
-	// Call object method with content if object defined and method defined, else fallback to next:
-	if (obj->valuetype == papuga_TypeHostObject)
-	{
-		int classid = obj->value.hostObject->classid;
-		void* self = obj->value.hostObject->data;
-		const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, methodname, !content.empty());
-		if (methoddescr)
-		{
-			return callHostObjMethod( self, methoddescr, path, content, answer);
-		}
-	}
-	setAnswer( answer, ErrorCodeRequestResolveError);
-	return false;
-}
-
 static bool checkPapugaListBufferOverflow( const char** ci, WebRequestAnswer& answer)
 {
 	if (!ci)
 	{
 		setAnswer( answer, ErrorCodeBufferOverflow);
-		return false;
-	}
-	return true;
-}
-
-bool WebRequestContext::dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer)
-{
-	bool rt = true;
-	char const** ti = m_handler->contextTypes();
-	for (; *ti; ++ti)
-	{
-		rt &= papuga_Serialization_pushName_charp( ser, *ti);
-		rt &= papuga_Serialization_pushOpen( ser);
-		if (!dumpViewType( *ti, ser, answer)) return false;
-		rt &= papuga_Serialization_pushClose( ser);
-	}
-	if (!rt) setAnswer( answer, ErrorCodeOutOfMem);
-	return rt;
-}
-
-bool WebRequestContext::dumpViewType( const char* typenam, papuga_Serialization* ser, WebRequestAnswer& answer)
-{
-	bool rt = true;
-	std::vector<std::string> contextlist = m_handler->contextNames( typenam);
-	std::vector<std::string>::const_iterator ci = contextlist.begin(), ce = contextlist.end();
-	for (; ci != ce; ++ci)
-	{
-		rt &= papuga_Serialization_pushName_string( ser, ci->c_str(), ci->size());
-		rt &= papuga_Serialization_pushOpen( ser);
-		if (!dumpViewName( typenam, ci->c_str(), ser, answer)) return false;
-		rt &= papuga_Serialization_pushClose( ser);
-	}
-	if (!rt) setAnswer( answer, ErrorCodeOutOfMem);
-	return rt;
-}
-
-bool WebRequestContext::dumpViewName( const char* typenam, const char* contextnam, papuga_Serialization* ser, WebRequestAnswer& answer)
-{
-	bool rt = true;
-	enum {lstbufsize=256};
-	char const* lstbuf[ lstbufsize];
-
-	papuga_RequestContext* context = papuga_create_RequestContext();
-	if (!context)
-	{
-		setAnswer( answer, ErrorCodeOutOfMem);
-		return false;
-	}
-	if (!papuga_RequestContext_inherit( context, m_handler->impl(), typenam, contextnam))
-	{
-		setAnswer( answer, papugaErrorToErrorCode( papuga_RequestContext_last_error( context, true)));
-		return false;
-	}
-	char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
-	if (!checkPapugaListBufferOverflow( varlist, answer)) goto ERROR;
-	if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
-	{
-		if (!dumpViewVar( context, typenam, ser, answer)) goto ERROR;
-	}
-	else
-	{
-		char const** vi = varlist;
-		for (; *vi; ++vi)
-		{
-			rt &= papuga_Serialization_pushName_charp( ser, *vi);
-			if (!dumpViewVar( context, *vi, ser, answer)) goto ERROR;
-		}
-	}
-	if (!rt) setAnswer( answer, ErrorCodeOutOfMem);
-	goto EXIT;
-ERROR:
-	rt = false;
-EXIT:
-	papuga_destroy_RequestContext( context);
-	return rt;
-}
-
-bool WebRequestContext::dumpViewVar( const papuga_RequestContext* context, const char* varnam, papuga_Serialization* ser, WebRequestAnswer& answer)
-{
-	papuga_ValueVariant result;
-	const papuga_ValueVariant* obj = papuga_RequestContext_get_variable( context, varnam);
-	if (!obj)
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError);
-		return false;
-	}
-	static const WebRequestContent empty_content;
-	if (!callObjMethod( obj, "GET", "", empty_content, answer)) return false;
-	if (!papuga_Serialization_pushValue( ser, &result))
-	{
-		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 	return true;
@@ -1002,7 +894,7 @@ bool WebRequestContext::executeOPTIONS(
 	}
 	else
 	{
-		answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,LIST,GET");
+		answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,GET");
 		return true;
 	}
 }
@@ -1058,7 +950,7 @@ bool WebRequestContext::executeRequest(
 		// Toplevel introspection if object not defined:
 		if (!selector.contextnam)
 		{
-			//... No object selected, handle LIST or GET for all
+			//... No object selected, handle GET for all
 			if (debug)
 			{
 				setAnswer( answer, ErrorCodeRequestResolveError);
@@ -1069,41 +961,16 @@ bool WebRequestContext::executeRequest(
 				setAnswer( answer, ErrorCodeInvalidArgument);
 				return false;
 			}
-			if (isEqual( method, "LIST"))
+			if (isEqual( method, "GET"))
 			{
 				if (!selector.typenam)
 				{
-					char const** typelist = m_handler->contextTypes();
-					static const char* empty_typelist = NULL;
-					if (!typelist) typelist = &empty_typelist;
-					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "elem", m_result_encoding, m_result_doctype, typelist);
+					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "link", m_result_encoding, m_result_doctype, m_handler->contextTypes());
 				}
 				else
 				{
 					std::vector<std::string> contextlist = m_handler->contextNames( selector.typenam);
-					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", selector.typenam, m_result_encoding, m_result_doctype, contextlist);
-				}
-			}
-			else if (isEqual( method, "GET"))
-			{
-				papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( &m_allocator);
-				if (!ser)
-				{
-					setAnswer( answer, ErrorCodeOutOfMem);
-					return false;
-				}
-				papuga_ValueVariant result;
-				papuga_init_ValueVariant_serialization( &result, ser);
-		
-				if (!selector.typenam)
-				{
-					if (!dumpViewAll( ser, answer)) return false;
-					return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", "elem", m_result_encoding, m_result_doctype, result);
-				}
-				else
-				{
-					if (!dumpViewType( selector.typenam, ser, answer)) return false;
-					return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), "view", selector.typenam, m_result_encoding, m_result_doctype, result);
+					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "link", m_result_encoding, m_result_doctype, contextlist);
 				}
 			}
 			else
@@ -1159,6 +1026,20 @@ bool WebRequestContext::executeRequest(
 				return false;
 			}
 			return true;
+		}
+		else if (content.empty())
+		{
+			if (!selector.obj /*&& selector.context*/ && isEqual( method, "GET"))
+			{
+				char const** varlist = papuga_RequestContext_list_variables( selector.context, 0/*max inheritcnt*/, selector.lstbuf, selector.lstbufsize);
+				if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
+				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "link", m_result_encoding, m_result_doctype, varlist);
+			}
+			else
+			{
+				setAnswer( answer, ErrorCodeRequestResolveError);
+				return false;
+			}
 		}
 		else
 		{

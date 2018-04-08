@@ -23,7 +23,7 @@ class WebRequestLoggerInterface;
 class ErrorBufferInterface;
 
 /// \brief Create a web request handler
-/// \param[in] request logger interface
+/// \param[in] request logger interface (no ownership)
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
 /// \param[in] config main configuration

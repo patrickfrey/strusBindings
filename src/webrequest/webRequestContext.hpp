@@ -58,14 +58,8 @@ private:
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	bool getContentRequestResult( WebRequestAnswer& answer);
-	bool callObjMethod( const papuga_ValueVariant* obj, const char* methodname, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
-
-	bool dumpViewAll( papuga_Serialization* ser, WebRequestAnswer& answer);
-	bool dumpViewType( const char* type_, papuga_Serialization* ser, WebRequestAnswer& answer);
-	bool dumpViewName( const char* type_, const char* name_, papuga_Serialization* ser, WebRequestAnswer& answer);
-	bool dumpViewVar( const papuga_RequestContext* context, const char* var_, papuga_Serialization* ser, WebRequestAnswer& answer);
 
 private:
 	const WebRequestHandler* m_handler;

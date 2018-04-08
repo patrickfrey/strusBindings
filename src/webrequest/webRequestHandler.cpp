@@ -35,23 +35,6 @@ using namespace strus;
 
 #define ROOT_CONTEXT_NAME "context"
 
-static void addStringList( char const**& stringlist, int& stringlistsize, const char* elem)
-{
-	if (stringlist) for( char const** si=stringlist; *si; ++si) if (0==std::strcmp(*si,elem)) return;
-	char const** new_stringlist = (char const**)std::realloc( stringlist, (stringlistsize+2) * sizeof(stringlist[0]));
-	if (!new_stringlist) throw std::bad_alloc();
-	stringlist = new_stringlist;
-	stringlist[ stringlistsize++] = elem;
-	stringlist[ stringlistsize] = NULL;
-}
-
-void WebRequestHandler::addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton)
-{
-	if (!papuga_RequestHandler_add_scheme( m_impl, type, name, automaton)) throw std::bad_alloc();
-	addStringList( m_context_types, m_nofcontext_types, type);
-	addStringList( m_schemes, m_nofschemes, name);
-}
-
 struct MethodDescription
 {
 	enum {MaxNofArgs=8};
@@ -110,10 +93,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_html_head(html_head_)
 	,m_config_store_dir(config_store_dir_)
-	,m_schemes(NULL)
-	,m_nofschemes(0)
-	,m_context_types(NULL)
-	,m_nofcontext_types(0)
+	,m_context_types()
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
@@ -124,7 +104,7 @@ WebRequestHandler::WebRequestHandler(
 	addScheme( CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());
 
 #define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, HASCONTENT, ROOTELEM)\
-	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, "elem", HASCONTENT, 1, ParamPathArray);\
+	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, "", HASCONTENT, 1, ParamPathArray);\
 	mt_ ## CLASS ## _ ## REQUEST_METHOD.addToHandler( m_impl);
 
 	try
@@ -157,11 +137,18 @@ WebRequestHandler::WebRequestHandler(
 	}
 }
 
+void WebRequestHandler::addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton)
+{
+	if (!papuga_RequestHandler_add_scheme( m_impl, type, name, automaton)) throw std::bad_alloc();
+	if (std::find( m_context_types.begin(), m_context_types.end(), std::string(type)) == m_context_types.end())
+	{
+		m_context_types.push_back( type);
+	}
+}
+
 void WebRequestHandler::clear()
 {
 	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
-	if (m_schemes) {std::free( m_schemes); m_schemes=0;}
-	if (m_context_types) {std::free( m_context_types); m_context_types=0;}
 }
 	
 
@@ -189,7 +176,18 @@ static void setStatus( WebRequestAnswer& status, ErrorCode errcode, const char* 
 	}
 }
 
-WebRequestContext* WebRequestHandler::createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const
+WebRequestContextInterface* WebRequestHandler::createContext(
+		const char* accepted_charset,
+		const char* accepted_doctype,
+		WebRequestAnswer& status) const
+{
+	return createContext_( accepted_charset, accepted_doctype, status);
+}
+
+WebRequestContext* WebRequestHandler::createContext_(
+			const char* accepted_charset,
+			const char* accepted_doctype,
+			WebRequestAnswer& status) const
 {
 	try
 	{
@@ -206,27 +204,7 @@ WebRequestContext* WebRequestHandler::createContext_( const char* accepted_chars
 	return NULL;
 }
 
-WebRequestContextInterface* WebRequestHandler::createContext(
-		const char* accepted_charset,
-		const char* accepted_doctype,
-		WebRequestAnswer& status) const
-{
-	return createContext_( accepted_charset, accepted_doctype, status);
-}
-
-struct SubConfig
-{
-	std::string name;
-	std::string id;
-	std::string content;
-
-	SubConfig( const SubConfig& o)
-		:name(o.name),id(o.id),content(o.content){}
-	SubConfig( const std::string& name_, const std::string& id_,  const std::string& content_)
-		:name(name_),id(id_),content(content_){}
-};
-
-static SubConfig createSubConfig( const std::string& name, papuga_Allocator& allocator, papuga_SerializationIter& itr)
+static WebRequestHandler::SubConfig createSubConfig( const std::string& name, papuga_Allocator& allocator, papuga_SerializationIter& itr)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	std::string subconfidid;
@@ -297,10 +275,16 @@ static SubConfig createSubConfig( const std::string& name, papuga_Allocator& all
 					&subconfigval, &allocator, getBindingsInterfaceDescription()->structs,
 					papuga_UTF8, NULL, &subcfglen, &errcode);
 	if (!subcfgstr) throw std::bad_alloc();
-	return SubConfig( name, subconfidid.empty() ? name : subconfidid,  std::string(subcfgstr, subcfglen));
+	return WebRequestHandler::SubConfig( name, subconfidid.empty() ? name : subconfidid,  std::string(subcfgstr, subcfglen));
 }
 
-static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::size_t contentsize, const char** context_types)
+bool WebRequestHandler::isSubConfigSection( const std::string& name) const
+{
+	return (name != ROOT_CONTEXT_NAME
+	&&	std::find( m_context_types.begin(), m_context_types.end(), std::string(name)) != m_context_types.end());
+}
+
+std::vector<WebRequestHandler::SubConfig> WebRequestHandler::getSubConfigList( const std::string& content) const
 {
 	std::vector<SubConfig> rt;
 	papuga_ErrorCode errcode = papuga_Ok;
@@ -311,7 +295,7 @@ static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::siz
 	try
 	{
 		papuga_ValueVariant configstruct;
-		if (!papuga_init_ValueVariant_json( &configstruct, &allocator, papuga_UTF8, contentstr, contentsize, &errcode)) goto EXIT;
+		if (!papuga_init_ValueVariant_json( &configstruct, &allocator, papuga_UTF8, content.c_str(), content.size(), &errcode)) goto EXIT;
 		if (configstruct.valuetype != papuga_TypeSerialization) goto EXIT;
 		papuga_SerializationIter seriter;
 		papuga_init_SerializationIter( &seriter, configstruct.value.serialization);
@@ -334,16 +318,11 @@ static std::vector<SubConfig> getSubConfigList( const char* contentstr, std::siz
 					{
 						char nambuf[ 128];
 						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &seriter));
-						if (nam && 0!=std::strcmp( nam, ROOT_CONTEXT_NAME))
+						if (nam && isSubConfigSection( nam))
 						{
-							char const** si = context_types;
-							for (; *si && 0!=std::strcmp(*si,nam); ++si){}
-							if (*si)
-							{
-								papuga_SerializationIter_skip( &seriter);
-								rt.push_back( createSubConfig( nam, allocator, seriter));
-								continue;
-							}
+							papuga_SerializationIter_skip( &seriter);
+							rt.push_back( createSubConfig( nam, allocator, seriter));
+							continue;
 						}
 					}
 					break;
@@ -369,7 +348,7 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 
 	loadInitConfiguration( configstr);
 
-	std::vector<SubConfig> cfglist = getSubConfigList( configstr.c_str(), configstr.size(), m_context_types);
+	std::vector<SubConfig> cfglist = getSubConfigList( configstr);
 	std::vector<SubConfig>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
@@ -411,15 +390,15 @@ bool WebRequestHandler::deleteConfiguration(
 		{
 			rt = false;
 		}
-		strus::local_ptr<WebRequestContext> ctx( 
-			createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		const char* accepted_charset = "UTF-8";
+		const char* accepted_doctype = "application/json"; 
+		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, status));
 		WebRequestContext* ctxi = ctx.get();
 		if (!ctxi) return false;
 
-		char schemebuf[ 64];
-		const char* scheme;
-		std::snprintf( schemebuf, sizeof(schemebuf), "DELETE/%s", contextType);
-		scheme = schemebuf;
+		char scheme[ 64];
+		std::snprintf( scheme, sizeof(scheme)-1, "DELETE/%s", contextType);
+		scheme[ sizeof(scheme)-1] = 0;
 		WebRequestContent content;
 
 		if (ctxi->executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, status))
@@ -512,8 +491,9 @@ bool WebRequestHandler::loadConfiguration(
 			m_logger->logPutConfiguration( contextType, contextName, co);
 		}
 		ContextNameDef cndef( contextType, contextName);
-		strus::local_ptr<WebRequestContext> ctx( 
-			createContext_( "UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/, status));
+		const char* accepted_charset = "UTF-8";
+		const char* accepted_doctype = "application/json"; 
+		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, status));
 		WebRequestContext* ctxi = ctx.get();
 		if (!ctxi) return false;
 

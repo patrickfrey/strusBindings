@@ -44,10 +44,10 @@ public:
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
 
-	const papuga_RequestHandler* impl() const	{return m_impl;}
-	const char* html_head() const			{return m_html_head.c_str();}
-	int debug_maxdepth() const			{return m_debug_maxdepth;}
-	const char** contextTypes() const		{return m_context_types;}
+	const papuga_RequestHandler* impl() const			{return m_impl;}
+	const char* html_head() const					{return m_html_head.c_str();}
+	int debug_maxdepth() const					{return m_debug_maxdepth;}
+	const std::vector<std::string>& contextTypes() const		{return m_context_types;}
 	std::vector<std::string> contextNames( const std::string& name) const;
 
 	bool loadConfiguration(
@@ -61,7 +61,7 @@ public:/*WebRequestContext*/
 			const char* contextName,
 			WebRequestAnswer& status);
 
-private:
+private:/*Load store configuration source*/
 	struct ConfigurationTransaction
 	{
 		std::string failed_filename;
@@ -82,9 +82,7 @@ private:
 			const char* contextName,
 			WebRequestAnswer& status) const;
 
-private:
-	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
-
+private:/*Constructor/Destructor*/
 	/// \brief Add a scheme to the handler
 	void addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton);
 
@@ -95,20 +93,38 @@ private:
 
 	void clear();
 
+public:
+	/// \brief Configuration of an object
+	struct SubConfig
+	{
+		std::string name;
+		std::string id;
+		std::string content;
+	
+		SubConfig( const SubConfig& o)
+			:name(o.name),id(o.id),content(o.content){}
+		SubConfig( const std::string& name_, const std::string& id_,  const std::string& content_)
+			:name(name_),id(id_),content(content_){}
+	};
+
+private:/*Load configuration*/
+	std::vector<SubConfig> getSubConfigList( const std::string& content) const;
+	bool isSubConfigSection( const std::string& name) const;
+	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
+
 private:
-	mutable strus::mutex m_mutex;		//< mutex for locking mutual exclusion of configuration requests
-	mutable int m_config_counter;		//< counter to order configurations stored that have the same date
-	int m_debug_maxdepth;			//< maximum depth for debug structures
-	WebRequestLoggerInterface* m_logger;	//< request logger 
-	papuga_RequestHandler* m_impl;		//< request handler
-	std::string m_html_head;		//< header include for HTML output (for stylesheets, meta data etc.)
-	std::string m_config_store_dir;		//< directory where to store configurations loaded as request
-	char const** m_schemes;			//< NULL terminated list of schemes available */
-	int m_nofschemes;			//< number of elements in m_schemes
-	char const** m_context_types;		//< NULL terminated list of context types available */
-	int m_nofcontext_types;			//< number of elements in m_context_types
 	typedef std::pair<std::string,std::string> ContextNameDef;
-	std::set<ContextNameDef> m_context_names; //< context definitions type name pairs
+
+private:
+	mutable strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
+	mutable int m_config_counter;			//< counter to order configurations stored that have the same date
+	int m_debug_maxdepth;				//< maximum depth for debug structures
+	WebRequestLoggerInterface* m_logger;		//< request logger 
+	papuga_RequestHandler* m_impl;			//< request handler
+	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
+	std::string m_config_store_dir;			//< directory where to store configurations loaded as request
+	std::vector<std::string> m_context_types;	//< list of context types available */
+	std::set<ContextNameDef> m_context_names;	//< context definitions type name pairs
 };
 
 }//namespace
