@@ -32,7 +32,8 @@ public:
 		const WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		const char* accepted_charset,
-		const char* accepted_doctype);
+		const char* accepted_doctype,
+		const char* html_base_href);
 	virtual ~WebRequestContext();
 
 	virtual bool executeRequest(
@@ -77,6 +78,7 @@ private:
 	papuga_ErrorBuffer m_errbuf;
 	const char* m_accepted_charset;
 	const char* m_accepted_doctype;
+	const char* m_html_base_href;
 	char m_errbuf_mem[ 4096];
 	char m_allocator_mem[ 1<<14];
 };

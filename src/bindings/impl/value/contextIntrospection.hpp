@@ -42,9 +42,9 @@ public:
 		{}
 	virtual ~ContextIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization);
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path);
 	virtual IntrospectionBase* open( const std::string& name);
-	virtual std::vector<std::string> list( bool all);
+	virtual std::vector<IntrospectionLink> list();
 
 private:
 	ErrorBufferInterface* m_errorhnd;

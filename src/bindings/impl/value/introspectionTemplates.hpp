@@ -27,7 +27,7 @@ public:
 		:m_errorhnd(errorhnd_),m_value(value_){}
 	virtual ~IntrospectionAtomic(){}
 
-	virtual void serialize( papuga_Serialization& serialization)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
 		Serializer::serialize( &serialization, m_value, true/*deep*/);
 	}
@@ -35,7 +35,7 @@ public:
 	{
 		return NULL;
 	}
-	virtual std::vector<std::string> list( bool all)
+	virtual std::vector<IntrospectionLink> list()
 	{
 		throw unresolvable_exception();
 	}
@@ -56,9 +56,9 @@ public:
 		:m_errorhnd(errorhnd_),m_value(value_){}
 	virtual ~IntrospectionKeyValueList(){}
 
-	virtual void serialize( papuga_Serialization& serialization)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
-		serializeList( serialization);
+		serializeMembers( serialization, path);
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -67,10 +67,11 @@ public:
 		for (; li != le && name != li->first; ++li){}
 		return (li == le) ? NULL : new IntrospectionAtomic<typename TypeName::value_type::second_type>( m_errorhnd, li->second);
 	}
-	virtual std::vector<std::string> list( bool all)
+	virtual std::vector<IntrospectionLink> list()
 	{
-		return this->getKeyList( m_value);
+		return IntrospectionLink::getList( true, IntrospectionBase::getKeyList( m_value));
 	}
+
 private:
 	ErrorBufferInterface* m_errorhnd;
 	TypeName m_value;
@@ -86,7 +87,7 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionConfig(){}
 
-	virtual void serialize( papuga_Serialization& serialization)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
 		Serializer::serialize( &serialization, strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
 	}
@@ -112,9 +113,9 @@ public:
 		}
 		return NULL;
 	}
-	virtual std::vector<std::string> list( bool all)
+	virtual std::vector<IntrospectionLink> list()
 	{
-		return this->getKeyList( strus::getConfigStringItems( m_impl->config(), m_errorhnd));
+		return IntrospectionLink::getList( true, IntrospectionBase::getKeyList( strus::getConfigStringItems( m_impl->config(), m_errorhnd)));
 	}
 
 private:

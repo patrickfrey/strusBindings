@@ -568,6 +568,7 @@ static bool mapResult(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
+		const char* html_href_base,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
@@ -585,7 +586,7 @@ static bool mapResult(
 	}
 	serialize( ser, true, input);
 	papuga_init_ValueVariant_serialization( &value, ser);
-	return strus::mapValueVariantToAnswer( answer, allocator, html_head, rootname, elemname, encoding, doctype, value);
+	return strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, value);
 }
 }//namespace
 
@@ -593,56 +594,61 @@ bool strus::mapStringToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
+		const char* html_href_base,
 		const char* name,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
 		const std::string& input)
 {
-	return mapResult( answer, allocator, html_head, 0, name, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, 0, name, encoding, doctype, input);
 }
 
 bool strus::mapStringArrayToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
+		const char* html_href_base,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
 		const std::vector<std::string>& input)
 {
-	return mapResult( answer, allocator, html_head, rootname, elemname, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, input);
 }
 
 bool strus::mapStringMapToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
+		const char* html_href_base,
 		const char* name,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
 		const std::map<std::string,std::string>& input)
 {
-	return mapResult( answer, allocator, html_head, 0, name, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, 0/*elemname*/, name, encoding, doctype, input);
 }
 
 bool strus::mapStringArrayToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
+		const char* html_href_base,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
 		const char** input)
 {
-	return mapResult( answer, allocator, html_head, rootname, elemname, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, input);
 }
 
 bool strus::mapValueVariantToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
+		const char* html_href_base,
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
@@ -673,7 +679,7 @@ bool strus::mapValueVariantToAnswer(
 	{
 		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
 		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, rootname, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, rootname, elemname, html_head, &resultlen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, rootname, elemname, html_head, html_href_base, &resultlen, &errcode); break;
 		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{

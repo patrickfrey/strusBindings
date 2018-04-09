@@ -194,15 +194,6 @@ public:
 	/// \example "open name 'surname' value 'John' name 'lastname' value 'Doe' name 'company' open name 'name' value 'ACME' name 'url' value 'acme.com' close close"
 	std::string debug_serialize( const ValueVariant& arg, bool deterministic=false);
 
-	/// \brief Get the list of items to introspect starting from a root path
-	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
-	/// \example ["textproc","segmenter"]
-	/// \example ["queryproc"]
-	/// \example ["env","workdir"]
-	/// \example ["env"]
-	/// \return the list of items to introspect starting from the path
-	std::vector<std::string>* introspectionDir( const ValueVariant& path);
-
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \example ["queryproc","weightfunc"]
@@ -223,7 +214,6 @@ public:
 private:
 	void initStorageObjBuilder();
 	void initAnalyzerObjBuilder();
-	IntrospectionBase* createIntrospection( const ValueVariant& path);
 
 private:
 	mutable ObjectRef m_errorhnd_impl;

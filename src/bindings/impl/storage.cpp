@@ -242,8 +242,9 @@ Struct StorageClientImpl::config() const
 	return rt;
 }
 
-IntrospectionBase* StorageClientImpl::createIntrospection( const ValueVariant& arg)
+Struct StorageClientImpl::introspection( const ValueVariant& arg)
 {
+	Struct rt;
 	std::vector<std::string> path;
 	if (papuga_ValueVariant_defined( &arg))
 	{
@@ -253,30 +254,7 @@ IntrospectionBase* StorageClientImpl::createIntrospection( const ValueVariant& a
 	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new StorageIntrospection( errorhnd, storage));
-	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
-	for (; pi != pe; ++pi)
-	{
-		ictx.reset( ictx->open( *pi));
-		if (!ictx.get())
-		{
-			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("failed to create introspection"));
-		}
-	}
-	return ictx.release();
-}
-
-std::vector<std::string>* StorageClientImpl::introspectionDir( const ValueVariant& path)
-{
-	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
-	return new std::vector<std::string>( ictx->list( true));
-}
-
-Struct StorageClientImpl::introspection( const ValueVariant& path)
-{
-	Struct rt;
-	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
-	ictx->serialize( rt.serialization);
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ictx->getPathContent( rt.serialization, path);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

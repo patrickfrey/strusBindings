@@ -455,8 +455,9 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool determin
 	return rt;
 }
 
-IntrospectionBase* ContextImpl::createIntrospection( const ValueVariant& arg)
+Struct ContextImpl::introspection( const ValueVariant& arg)
 {
+	Struct rt;
 	std::vector<std::string> path;
 	if (papuga_ValueVariant_defined( &arg))
 	{
@@ -470,36 +471,7 @@ IntrospectionBase* ContextImpl::createIntrospection( const ValueVariant& arg)
 	RpcClientInterface* rpc = m_rpc_impl.getObject<RpcClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new ContextIntrospection( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
-	std::vector<std::string>::const_iterator pi = path.begin(), pe = path.end();
-	std::string openedpath;
-	for (; pi != pe; ++pi)
-	{
-		ictx.reset( ictx->open( *pi));
-		if (!ictx.get())
-		{
-			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("/%s not found in %s%s"), pi->c_str(), "/context", openedpath.c_str());
-		}
-		else
-		{
-			openedpath.push_back('/');
-			openedpath.append( *pi);
-		}
-	}
-	return ictx.release();
-}
-
-std::vector<std::string>* ContextImpl::introspectionDir( const ValueVariant& path)
-{
-	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
-	return new std::vector<std::string>( ictx->list( true));
-}
-
-Struct ContextImpl::introspection( const ValueVariant& path)
-{
-	Struct rt;
-	strus::local_ptr<IntrospectionBase> ictx( createIntrospection( path));
-	ictx->serialize( rt.serialization);
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ictx->getPathContent( rt.serialization, path);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

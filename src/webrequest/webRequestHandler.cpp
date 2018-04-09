@@ -24,6 +24,7 @@
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.hpp"
 #include "papuga/valueVariant.h"
+#include "papuga/constants.h"
 #include "private/internationalization.hpp"
 #include <vector>
 #include <algorithm>
@@ -93,7 +94,6 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_html_head(html_head_)
 	,m_config_store_dir(config_store_dir_)
-	,m_context_types()
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
@@ -101,10 +101,11 @@ WebRequestHandler::WebRequestHandler(
 	using namespace strus::webrequest;
 #define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
 	static const Scheme_ ## SCHEME_IMPL scheme ## SCHEME_IMPL;\
-	addScheme( CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl());
+	if (!papuga_RequestHandler_add_scheme( m_impl, CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl())) throw std::bad_alloc();\
+	m_context_typenames.insert( CONTEXT_TYPE);
 
-#define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, HASCONTENT, ROOTELEM)\
-	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, "", HASCONTENT, 1, ParamPathArray);\
+#define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, HASCONTENT, ROOTELEM, LISTELEM)\
+	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, LISTELEM, HASCONTENT, 1, ParamPathArray);\
 	mt_ ## CLASS ## _ ## REQUEST_METHOD.addToHandler( m_impl);
 
 	try
@@ -117,10 +118,8 @@ WebRequestHandler::WebRequestHandler(
 		DEFINE_SCHEME( "storage", "QRYANA", Storage_QRYANA); 
 		DEFINE_SCHEME( "queryanalyzer", "ANAQRY", QueryAnalyzer_GET_content);
 
-		DEFINE_METHOD_VIEW_PATH( LIST, Context, introspectionDir, false, "list");
-		DEFINE_METHOD_VIEW_PATH( GET,  Context, introspection, false, "config");
-		DEFINE_METHOD_VIEW_PATH( LIST, StorageClient, introspectionDir, false, "list");
-		DEFINE_METHOD_VIEW_PATH( GET,  StorageClient, introspection, false, "storage");
+		DEFINE_METHOD_VIEW_PATH( GET,  Context, introspection, false, "config", "value");
+		DEFINE_METHOD_VIEW_PATH( GET,  StorageClient, introspection, false, "storage", "value");
 
 		loadConfiguration( configstr_);
 		loadStoredConfigurations();
@@ -134,15 +133,6 @@ WebRequestHandler::WebRequestHandler(
 	{
 		clear();
 		throw err;
-	}
-}
-
-void WebRequestHandler::addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton)
-{
-	if (!papuga_RequestHandler_add_scheme( m_impl, type, name, automaton)) throw std::bad_alloc();
-	if (std::find( m_context_types.begin(), m_context_types.end(), std::string(type)) == m_context_types.end())
-	{
-		m_context_types.push_back( type);
 	}
 }
 
@@ -179,19 +169,21 @@ static void setStatus( WebRequestAnswer& status, ErrorCode errcode, const char* 
 WebRequestContextInterface* WebRequestHandler::createContext(
 		const char* accepted_charset,
 		const char* accepted_doctype,
+		const char* html_base_href,
 		WebRequestAnswer& status) const
 {
-	return createContext_( accepted_charset, accepted_doctype, status);
+	return createContext_( accepted_charset, accepted_doctype, html_base_href, status);
 }
 
 WebRequestContext* WebRequestHandler::createContext_(
 			const char* accepted_charset,
 			const char* accepted_doctype,
+			const char* html_base_href,
 			WebRequestAnswer& status) const
 {
 	try
 	{
-		return new WebRequestContext( this, m_logger, accepted_charset, accepted_doctype);
+		return new WebRequestContext( this, m_logger, accepted_charset, accepted_doctype, html_base_href);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -280,8 +272,7 @@ static WebRequestHandler::SubConfig createSubConfig( const std::string& name, pa
 
 bool WebRequestHandler::isSubConfigSection( const std::string& name) const
 {
-	return (name != ROOT_CONTEXT_NAME
-	&&	std::find( m_context_types.begin(), m_context_types.end(), std::string(name)) != m_context_types.end());
+	return (name != ROOT_CONTEXT_NAME && m_context_typenames.find( name) != m_context_typenames.end());
 }
 
 std::vector<WebRequestHandler::SubConfig> WebRequestHandler::getSubConfigList( const std::string& content) const
@@ -392,7 +383,7 @@ bool WebRequestHandler::deleteConfiguration(
 		}
 		const char* accepted_charset = "UTF-8";
 		const char* accepted_doctype = "application/json"; 
-		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, status));
+		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, ""/*html_base_href*/, status));
 		WebRequestContext* ctxi = ctx.get();
 		if (!ctxi) return false;
 
@@ -444,7 +435,7 @@ void WebRequestHandler::loadInitConfiguration( const std::string& configstr)
 	strus::WebRequestContent content( config_charset, config_doctype, configstr.c_str(), configstr.size());
 
 	ContextNameDef cndef( contextType, contextName);
-	strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, status));
+	strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, ""/*html_base_href*/, status));
 	WebRequestContext* ctxi = ctx.get();
 	if (!ctxi) throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
 
@@ -493,7 +484,7 @@ bool WebRequestHandler::loadConfiguration(
 		ContextNameDef cndef( contextType, contextName);
 		const char* accepted_charset = "UTF-8";
 		const char* accepted_doctype = "application/json"; 
-		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, status));
+		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, ""/*html_base_href*/, status));
 		WebRequestContext* ctxi = ctx.get();
 		if (!ctxi) return false;
 
@@ -731,4 +722,17 @@ std::vector<std::string> WebRequestHandler::contextNames( const std::string& nam
 	}
 	return rt;
 }
+
+std::vector<std::string> WebRequestHandler::contextTypes() const
+{
+	std::set<std::string> res;
+	strus::unique_lock lock( m_mutex);
+	std::set<ContextNameDef>::const_iterator ci = m_context_names.begin();
+	for (; ci != m_context_names.end(); ++ci)
+	{
+		res.insert( ci->first);
+	}
+	return std::vector<std::string>( res.begin(), res.end());
+}
+
 

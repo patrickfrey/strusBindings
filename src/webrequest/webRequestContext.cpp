@@ -31,6 +31,7 @@
 #include "papuga/valueVariant.hpp"
 #include "papuga/encoding.h"
 #include "papuga/allocator.h"
+#include "papuga/constants.h"
 #include "papuga/serialization.hpp"
 #include "private/internationalization.hpp"
 #include <cstddef>
@@ -50,7 +51,8 @@ WebRequestContext::WebRequestContext(
 		const WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		const char* accepted_charset_,
-		const char* accepted_doctype_)
+		const char* accepted_doctype_,
+		const char* html_base_href_)
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_context(0)
@@ -58,7 +60,7 @@ WebRequestContext::WebRequestContext(
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
-	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_)
+	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_),m_html_base_href(html_base_href_)
 {
 	std::memset( &m_callLogger, 0, sizeof(m_callLogger));
 	m_callLogger.self = logger_;
@@ -401,7 +403,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	{
 		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, &resultulen, &errcode); break;
 		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, &resultulen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, m_handler->html_head(), &resultulen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, m_handler->html_head(), m_html_base_href, &resultulen, &errcode); break;
 		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, &resultulen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{
@@ -710,7 +712,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 		}
 		else
 		{
-			if (!mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, retval.valuear[0]))
+			if (!mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, retval.valuear[0]))
 			{
 				return false;
 			}
@@ -788,7 +790,7 @@ struct ObjectDescr
 				return false;
 			}
 		}
-		char const** varlist = papuga_RequestContext_list_variables( context, 0/*max inheritcnt*/, lstbuf, lstbufsize);
+		char const** varlist = papuga_RequestContext_list_variables( context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 		if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
 		{
@@ -965,12 +967,20 @@ bool WebRequestContext::executeRequest(
 			{
 				if (!selector.typenam)
 				{
-					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "link", m_result_encoding, m_result_doctype, m_handler->contextTypes());
+					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, m_handler->contextTypes());
 				}
 				else
 				{
 					std::vector<std::string> contextlist = m_handler->contextNames( selector.typenam);
-					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "link", m_result_encoding, m_result_doctype, contextlist);
+					if (contextlist.empty())
+					{
+						setAnswer( answer, ErrorCodeRequestResolveError);
+						return false;
+					}
+					else
+					{
+						return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
+					}
 				}
 			}
 			else
@@ -1031,9 +1041,9 @@ bool WebRequestContext::executeRequest(
 		{
 			if (!selector.obj /*&& selector.context*/ && isEqual( method, "GET"))
 			{
-				char const** varlist = papuga_RequestContext_list_variables( selector.context, 0/*max inheritcnt*/, selector.lstbuf, selector.lstbufsize);
+				char const** varlist = papuga_RequestContext_list_variables( selector.context, 1/*max inheritcnt*/, selector.lstbuf, selector.lstbufsize);
 				if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), "list", "link", m_result_encoding, m_result_doctype, varlist);
+				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist);
 			}
 			else
 			{

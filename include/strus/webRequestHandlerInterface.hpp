@@ -31,11 +31,13 @@ public:
 	/// \brief Create the structure for handling a request
 	/// \param[in] accepted_charset HTTP header variable 'Accept-Charset', a comma separated list of character set encodings accepted by the client
 	/// \param[in] accepted_doctype HTTP header variable 'Accept', a comma separated list of content types accepted by the client
+	/// \param[in] html_base_href base link for HTML href links (base in HTML head)
 	/// \param[out] answer the error status
 	/// \return the context structure for handling a request or NULL in case of an error (inspect answer for the error details)
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
 			const char* accepted_doctype,
+			const char* html_base_href,
 			WebRequestAnswer& answer) const=0;
 };
 

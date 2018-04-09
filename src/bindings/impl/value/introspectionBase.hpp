@@ -25,6 +25,22 @@ class ValueIteratorInterface;
 
 namespace bindings {
 
+class IntrospectionLink
+{
+public:
+	IntrospectionLink( bool autoexpand_, const std::string& value_)
+		:m_autoexpand(autoexpand_),m_value(value_){}
+	IntrospectionLink( const IntrospectionLink& o)
+		:m_autoexpand(o.m_autoexpand),m_value(o.m_value){}
+
+	bool autoexpand() const			{return m_autoexpand;}
+	const std::string& value() const	{return m_value;}
+
+	static std::vector<IntrospectionLink> getList( bool autoexpand_, const std::vector<std::string>& values);
+
+	bool m_autoexpand;
+	std::string m_value;
+};
 
 /// \brief Interface for introspection
 class IntrospectionBase
@@ -32,15 +48,16 @@ class IntrospectionBase
 public:
 	virtual ~IntrospectionBase(){}
 
-	virtual void serialize( papuga_Serialization& serialization)=0;
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)=0;
 	virtual IntrospectionBase* open( const std::string& name)=0;
-	virtual std::vector<std::string> list( bool all)=0;
+	virtual std::vector<IntrospectionLink> list()=0;
 
-	void serializeStructureAs( papuga_Serialization& serialization, const char* name);
+	void serializeStructureAs( papuga_Serialization& serialization, const char* name, const std::string& path);
+	void getPathContent( papuga_Serialization& serialization, const std::vector<std::string>& path);
 
 protected:
-	void serializeList( papuga_Serialization& serialization, bool all=false);
-	static std::vector<std::string> getList( const char** ar, bool all);
+	void serializeMembers( papuga_Serialization& serialization, const std::string& path);
+	static std::vector<IntrospectionLink> getList( const char** ar);
 	static std::vector<std::string> getKeyList( const std::vector<std::pair<std::string,std::string> >& ar);
 	static std::runtime_error unresolvable_exception();
 };
@@ -56,9 +73,9 @@ public:
 
 	virtual ~IntrospectionValueIterator(){}
 
-	virtual void serialize( papuga_Serialization& serialization);
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path);
 	virtual IntrospectionBase* open( const std::string& name);
-	virtual std::vector<std::string> list( bool all);
+	virtual std::vector<IntrospectionLink> list();
 
 private:
 	ErrorBufferInterface* m_errorhnd;

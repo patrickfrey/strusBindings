@@ -39,6 +39,7 @@ public:
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
 			const char* accepted_doctype,
+			const char* html_base_href,
 			WebRequestAnswer& status) const;
 
 public:/*WebRequestContext*/
@@ -47,7 +48,7 @@ public:/*WebRequestContext*/
 	const papuga_RequestHandler* impl() const			{return m_impl;}
 	const char* html_head() const					{return m_html_head.c_str();}
 	int debug_maxdepth() const					{return m_debug_maxdepth;}
-	const std::vector<std::string>& contextTypes() const		{return m_context_types;}
+	std::vector<std::string> contextTypes() const;
 	std::vector<std::string> contextNames( const std::string& name) const;
 
 	bool loadConfiguration(
@@ -83,9 +84,6 @@ private:/*Load store configuration source*/
 			WebRequestAnswer& status) const;
 
 private:/*Constructor/Destructor*/
-	/// \brief Add a scheme to the handler
-	void addScheme( const char* type, const char* name, const papuga_RequestAutomaton* automaton);
-
 	void loadConfiguration( const std::string& configstr);
 	void loadInitConfiguration( const std::string& configstr);
 	bool loadStoredConfigurations();
@@ -110,7 +108,11 @@ public:
 private:/*Load configuration*/
 	std::vector<SubConfig> getSubConfigList( const std::string& content) const;
 	bool isSubConfigSection( const std::string& name) const;
-	WebRequestContext* createContext_( const char* accepted_charset, const char* accepted_doctype, WebRequestAnswer& status) const;
+	WebRequestContext* createContext_(
+			const char* accepted_charset,
+			const char* accepted_doctype,
+			const char* html_base_href,
+			WebRequestAnswer& status) const;
 
 private:
 	typedef std::pair<std::string,std::string> ContextNameDef;
@@ -123,8 +125,8 @@ private:
 	papuga_RequestHandler* m_impl;			//< request handler
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;			//< directory where to store configurations loaded as request
-	std::vector<std::string> m_context_types;	//< list of context types available */
 	std::set<ContextNameDef> m_context_names;	//< context definitions type name pairs
+	std::set<std::string> m_context_typenames;	//< defined context types
 };
 
 }//namespace

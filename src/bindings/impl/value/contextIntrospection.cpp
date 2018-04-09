@@ -45,9 +45,9 @@ public:\
 			const ClassName* impl_)\
 		:m_errorhnd(errorhnd_),m_impl(impl_){}\
 	virtual ~IntrospectionClassName(){}\
-	virtual void serialize( papuga_Serialization& serialization);\
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path);\
 	virtual IntrospectionBase* open( const std::string& name);\
-	virtual std::vector<std::string> list( bool all);\
+	virtual std::vector<IntrospectionLink> list();\
 private:\
 	ErrorBufferInterface* m_errorhnd;\
 	const ClassName* m_impl;\
@@ -81,7 +81,7 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionFunctionDescription(){}
 
-	virtual void serialize( papuga_Serialization& serialization)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
 		Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
 	}
@@ -89,9 +89,9 @@ public:
 	{
 		return NULL;
 	}
-	virtual std::vector<std::string> list( bool all)
+	virtual std::vector<IntrospectionLink> list()
 	{
-		return std::vector<std::string>();
+		return std::vector<IntrospectionLink>();
 	}
 private:
 	ErrorBufferInterface* m_errorhnd;
@@ -217,26 +217,26 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionFunctionList(){}
 
-	virtual void serialize( papuga_Serialization& serialization)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
-		serializeList( serialization);
+		serializeMembers( serialization, path);
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
 		return createIntrospection( m_errorhnd, Traits::get( m_impl, name));
 	}
-	virtual std::vector<std::string> list( bool all)
+	virtual std::vector<IntrospectionLink> list()
 	{
-		return m_impl->getFunctionList( functionType);
+		return IntrospectionLink::getList( false/*autoexpand*/, m_impl->getFunctionList( functionType));
 	}
 private:
 	ErrorBufferInterface* m_errorhnd;
 	const InterfaceClassName* m_impl;
 };
 
-void ContextIntrospection::serialize( papuga_Serialization& serialization)
+void ContextIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
 {
-	serializeList( serialization);
+	serializeMembers( serialization, path);
 }
 IntrospectionBase* ContextIntrospection::open( const std::string& name)
 {
@@ -248,16 +248,16 @@ IntrospectionBase* ContextIntrospection::open( const std::string& name)
 	if (name == "threads") return createIntrospectionAtomic( m_errorhnd, (int64_t)m_threads);
 	return NULL;
 }
-std::vector<std::string> ContextIntrospection::list( bool all)
+std::vector<IntrospectionLink> ContextIntrospection::list()
 {
 	static const char* ar[] = {"env","trace","rpc","queryproc","textproc","threads",NULL};
-	return getList( ar, all);
+	return getList( ar);
 }
 
 
-void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization)
+void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization, const std::string& path)
 {
-	serializeList( serialization);
+	serializeMembers( serialization, path);
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name)
 {
@@ -267,10 +267,10 @@ IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name)
 	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workdir());
 	return NULL;
 }
-std::vector<std::string> IntrospectionModuleLoader::list( bool all)
+std::vector<IntrospectionLink> IntrospectionModuleLoader::list()
 {
 	static const char* ar[] = {"moduledir","module","resourcedir","workdir",NULL};
-	return getList( ar, all);
+	return getList( ar);
 }
 
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::Segmenter> IntrospectionSegmenterList;
@@ -280,9 +280,9 @@ typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::PatternLexer> IntrospectionPatternLexerList;
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::PatternMatcher> IntrospectionPatternMatcherList;
 
-void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization)
+void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization, const std::string& path)
 {
-	serializeList( serialization);
+	serializeMembers( serialization, path);
 }
 IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name)
 {
@@ -294,10 +294,10 @@ IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name)
 	if (name == "patternmatcher") return new IntrospectionPatternMatcherList( m_errorhnd, m_impl);
 	return NULL;
 }
-std::vector<std::string> IntrospectionTextProcessor::list( bool all)
+std::vector<IntrospectionLink> IntrospectionTextProcessor::list()
 {
 	static const char* ar[] = {"segmenter","tokenizer","normalizer","aggregator","patternlexer","patternmatcher",NULL};
-	return getList( ar, all);
+	return getList( ar);
 }
 
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::PostingJoinOperator> IntrospectionPostingJoinOperatorList;
@@ -305,9 +305,9 @@ typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterfa
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::SummarizerFunction> IntrospectionSummarizerFunctionList;
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::ScalarFunctionParser> IntrospectionScalarFunctionParserList;
 
-void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization)
+void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization, const std::string& path)
 {
-	serializeList( serialization);
+	serializeMembers( serialization, path);
 }
 IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name)
 {
@@ -317,10 +317,10 @@ IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name)
 	if (name == "scalarfunc") return new IntrospectionScalarFunctionParserList( m_errorhnd, m_impl);
 	return NULL;
 }
-std::vector<std::string> IntrospectionQueryProcessor::list( bool all)
+std::vector<IntrospectionLink> IntrospectionQueryProcessor::list()
 {
 	static const char* ar[] = {"joinop","weightfunc","summarizer","scalarfunc",NULL};
-	return getList( ar, all);
+	return getList( ar);
 }
 
 
