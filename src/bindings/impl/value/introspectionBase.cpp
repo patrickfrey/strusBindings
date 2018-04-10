@@ -68,6 +68,7 @@ std::vector<std::string> IntrospectionBase::getKeyList( const std::vector<std::p
 
 void IntrospectionBase::serializeMembers( papuga_Serialization& serialization, const std::string& path)
 {
+	int nofLinks = 0;
 	std::vector<IntrospectionLink> elems = this->list();
 	std::vector<IntrospectionLink>::const_iterator li = elems.begin(), le = elems.end();
 	for (; li != le; ++li)
@@ -82,8 +83,22 @@ void IntrospectionBase::serializeMembers( papuga_Serialization& serialization, c
 		}
 		else
 		{
-			Serializer::serializeWithName( &serialization, PAPUGA_HTML_LINK_ELEMENT, path.empty() ? li->value() : (path + "/" + li->value()), true);
+			++nofLinks;
 		}
+	}
+	if (nofLinks)
+	{
+		if (!papuga_Serialization_pushName_charp( &serialization, PAPUGA_HTML_LINK_ELEMENT)
+		||  !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+		
+		for (li = elems.begin(); li != le; ++li)
+		{
+			if (!li->autoexpand())
+			{
+				Serializer::serialize( &serialization, path.empty() ? li->value() : (path + "/" + li->value()), true);
+			}
+		}
+		if (!papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
 }
 

@@ -24,7 +24,7 @@ class Transaction
 {
 public:
 	Transaction( papuga_RequestContext* context_, uint64_t tidx_, int* ref_, int timeout_after_s_)
-		:m_context(context_),m_ref(ref_),m_tidx(tidx_),m_timeout_after_s(timeout_after_s_){}
+		:m_context(context_),m_ref(ref_),m_timeout_after_s(timeout_after_s_),m_tidx(tidx_){}
 	~Transaction()
 	{
 		if (m_context) papuga_destroy_RequestContext( m_context);
@@ -38,6 +38,10 @@ public:
 	{
 		return m_timeout_after_s;
 	}
+	void setRef( int refidx)
+	{
+		*m_ref = refidx;
+	}
 
 private:
 	papuga_RequestContext* m_context;
@@ -47,19 +51,25 @@ private:
 };
 typedef strus::shared_ptr<Transaction> TransactionRef;
 
-
+/// \brief Pool for managing transaction objects
 class TransactionPool
 {
 public:
+	/// \brief Constructor
+	/// \param[in] maxTransactionTimeout_ maximum timeout value for untouched transactions
+	/// \param[in] nofTransactionPerSecond_ 2nd allocation dimension value for ar/refar besides maxTransactionTimeout
 	TransactionPool( int maxTransactionTimeout_, int nofTransactionPerSecond_);
+
+	/// \brief Destructor
 	~TransactionPool();
 
+	/// \brief Signal the garbagge collector to do its job
 	void tick();
 
 	/// \brief Create a transaction holding the context object passed
-	/// \param[in] context transaction context passed by ownership
-	/// \param[in] timeout_after_s maximum livetime of transaction
-	/// \return Transaction identifier
+	/// \param[in] context transaction context (passed with ownership)
+	/// \param[in] timeout_after_s maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
+	/// \return transaction identifier of the transaction created
 	std::string createTransaction( papuga_RequestContext* context, int timeout_after_s);
 
 	/// \brief Get a transaction object addressed by its identifier
@@ -77,13 +87,34 @@ public:
 	void releaseTransaction( const std::string& tid);
 
 private:
+	/// \brief Get the current time as pseudo random generator seed
 	static time_t time();
-	static TransactionRef newTransaction( papuga_RequestContext* context, int timeout_after_s);
+
+	/// \brief Create a new transaction
+	/// \param[in] context transaction context (passed with ownership)
+	/// \param[in] timeout_after_s maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
+	TransactionRef newTransaction( papuga_RequestContext* context, int timeout_after_s);
+
+	/// \brief Get a transaction identifier as string
+	/// \param[in] tidx internal transaction index
+	/// \return transaction id string
 	static std::string transactionId( uint64_t tidx);
+
+	/// \brief Get the internal transaction identifier from its string representation
+	/// \note inverse of transactionId
+	/// \param[in] tid transaction id string
+	/// \return internal transaction index
 	static uint64_t transactionIndex( const std::string& tid);
+
+	/// \brief Get a psuedo random number
+	/// \return an insecure psuedo random number
 	uint64_t nextRand();
+
+	/// \brief Clear all allocated structures
 	void clear();
-	int aridx( int timeout_after_s);
+
+	/// \brief Get a candidate for a transaction reference slot
+	int transactionRefIndexCandidate( int timeout_after_s);
 
 private:
 	TransactionRef* m_ar;				///< map expiration time to object reference
@@ -91,7 +122,7 @@ private:
 	std::size_t m_arsize;				///< size of refar/ar in elements
 	uint64_t m_lasttick;				///< last tick call index
 	int m_maxTransactionTimeout;			///< maximum timeout value for untouched transactions
-	int m_nofTransactionPerSecond;			///< allocation dimension value for ar/refar
+	int m_nofTransactionPerSecond;			///< 2nd allocation dimension value for ar/refar besides maxTransactionTimeout
 	int m_allocNofTries;				///< number of tries to get a lock
 	uint64_t m_randSeed;				///< seed for pseudo random numers
 	enum {NofMutex=32};				///< number of mutexes

@@ -32,7 +32,7 @@ TransactionPool::TransactionPool( int maxTransactionTimeout_, int nofTransaction
 	while (m_arsize < min_arsize) m_arsize *= 2;
 	m_allocNofTries = m_nofTransactionPerSecond * 8;
 	m_ar = new TransactionRef[ m_arsize];
-	m_refar = std::malloc( m_arsize * sizeof(m_refar[0]));
+	m_refar = (int*)std::malloc( m_arsize * sizeof(m_refar[0]));
 	if (!m_refar)
 	{
 		clear();
@@ -64,14 +64,15 @@ void TransactionPool::tick()
 	arend %= (m_arsize-1);
 	if (arend < aridx) arend += m_arsize;
 
-	for (; aridx < arend; ++aridx,--cnt)
+	for (; aridx < arend; ++aridx)
 	{
 		m_ar[ aridx & (m_arsize-1)].reset();
 	}
 	m_tickflag.set( false);
 }
 
-int TransactionPool::aridx( int timeout_after_s)
+
+int TransactionPool::transactionRefIndexCandidate( int timeout_after_s)
 {
 	return (((m_lasttick % (m_arsize-1)) + timeout_after_s) * m_nofTransactionPerSecond) % (m_arsize-1);
 }
@@ -83,53 +84,56 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 		timeout_after_s = m_maxTransactionTimeout;
 	}
 	uint64_t tidx = nextRand();
-	int cnt = m_arsize;
 	int* tidxref = 0;
-	while (cnt >= 0)
 	{
-		strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
-		tidxref = &m_refar[ tidx & (m_arsize-1)];
-		if (*tidxref == -1)
+		int cnt = m_allocNofTries;
+		while (cnt >= 0)
 		{
-			*tidxref = std::numeric_limits<int>::max(); 
-			break;
-		}
-		--cnt;
-		++tidx;
-	}
-	if (!cnt) return TransactionRef();
-
-	uint64_t eidx = aridx( timeout_after_s) + (tidx % m_nofTransactionPerSecond);
-	int cnt = m_allocNofTries;
-	while (cnt >= 0)
-	{
-		try
-		{
-			strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
-			TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
-			if (!tref.get())
+			strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
+			tidxref = &m_refar[ tidx & (m_arsize-1)];
+			if (*tidxref == -1)
 			{
-				TransactionRef rt( new Transaction( context, tidx, tidxref, timeout_after_s));
-				*tidxref = eidx & (m_arsize-1);
-				return m_ar[ eidx & (m_arsize-1)] = rt;
+				*tidxref = std::numeric_limits<int>::max(); 
+				break;
 			}
+			--cnt;
+			++tidx;
 		}
-		catch (...)
+		if (!cnt) return TransactionRef();
+	}{
+		uint64_t eidx = transactionRefIndexCandidate( timeout_after_s) + (tidx % m_nofTransactionPerSecond);
+		int cnt = m_allocNofTries;
+		while (cnt >= 0)
 		{
-			*tidxref = -1; //... roll back
-			throw std::bad_alloc();
+			try
+			{
+				strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
+				TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
+				if (!tref.get())
+				{
+					TransactionRef rt( new Transaction( context, tidx, tidxref, timeout_after_s));
+					*tidxref = eidx & (m_arsize-1);
+					return m_ar[ eidx & (m_arsize-1)] = rt;
+				}
+			}
+			catch (...)
+			{
+				*tidxref = -1; //... roll back
+				throw std::bad_alloc();
+			}
+			--cnt;
+			++eidx;
 		}
-		--cnt;
-		++eidx;
+		*tidxref = -1; //... roll back
+		return TransactionRef();
 	}
-	*tidxref = -1; //... roll back
 }
 
 std::string TransactionPool::createTransaction( papuga_RequestContext* context, int timeout_after_s)
 {
 	try
 	{
-		TransactionRef tr = newTransaction( timeout_after_s);
+		TransactionRef tr = newTransaction( context, timeout_after_s);
 		if (!tr.get()) return std::string();
 		return transactionId( tr->idx());
 	}
@@ -149,11 +153,12 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 		m_ar[ eidx & (m_arsize-1)].reset();
 		return rt;
 	}
+	return TransactionRef();
 }
 
 bool TransactionPool::returnTransaction( const TransactionRef& tr)
 {
-	uint64_t eidx = aridx( timeout_after_s) + (tr->idx() % m_nofTransactionPerSecond);
+	uint64_t eidx = transactionRefIndexCandidate( tr->timeout_after_s()) + (tr->idx() % m_nofTransactionPerSecond);
 	int cnt = m_allocNofTries;
 	while (cnt >= 0)
 	{
@@ -164,6 +169,7 @@ bool TransactionPool::returnTransaction( const TransactionRef& tr)
 			if (!tref.get())
 			{
 				m_ar[ eidx & (m_arsize-1)] = tr;
+				tr->setRef( eidx & (m_arsize-1));
 				return true;
 			}
 		}

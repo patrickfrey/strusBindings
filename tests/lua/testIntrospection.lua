@@ -14,19 +14,12 @@ ctx:defineWorkingDirectory( "/home/johndoe" )
 ctx:endConfig()
 
 local outmap = {}
-outmap[ 'list_env' ] = ctx:introspectionDir("env")
 outmap[ 'struct_env' ] = ctx:introspection("env")
--- outmap[ 'list_textproc_segmenter' ] = ctx:introspectionDir( { "textproc", "segmenter" } )
--- outmap[ 'textproc_segmenter' ] = ctx:introspection( { "textproc", "segmenter" } )
+outmap[ 'textproc_segmenter' ] = ctx:introspection( { "textproc", "segmenter" } )
 
 local result = "introspection:" .. dumpTree( outmap) .. "\n"
 local expected = [[
 introspection:
-string list_env:
-  number 1: "moduledir"
-  number 2: "module"
-  number 3: "resourcedir"
-  number 4: "workdir"
 string struct_env:
   string module: 
   string moduledir:
@@ -37,6 +30,12 @@ string struct_env:
     number 2: "/usr/share/strus"
   string workdir:
     number 1: "/home/johndoe"
+string textproc_segmenter:
+  string link:
+    number 1: "cjson"
+    number 2: "plain"
+    number 3: "textwolf"
+    number 4: "tsv"
 ]]
 
 verifyTestOutput( outputdir, result, expected)

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 # SOURCES AND INCLUDES
 # --------------------------------------
 set( source_files
-#	transaction.cpp
+	transaction.cpp
 	webRequestUtils.cpp
 	webRequestHandler.cpp
 	webRequestContext.cpp
