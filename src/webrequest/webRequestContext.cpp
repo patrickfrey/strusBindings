@@ -919,10 +919,10 @@ bool WebRequestContext::executeRequest(
 		std::size_t methodsize = std::strlen( method_);
 		bool debug = false;
 
-		if (methodsize > 4 && std::memcmp( method, "DBG_", 4) == 0)
+		if (methodsize > 6 && std::memcmp( method, "DEBUG_", 6) == 0)
 		{
 			debug = true;
-			method = method + 4;
+			method = method + 6;
 		}
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
