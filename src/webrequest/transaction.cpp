@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <limits>
 #include <cstdlib>
+#include <cstring>
 
 using namespace strus;
 
