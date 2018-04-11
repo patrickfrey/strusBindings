@@ -87,7 +87,7 @@ WebRequestHandler::WebRequestHandler(
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
 		const std::string& configstr_,
-		int maxTransactionKeepaliveTime,
+		int maxIdleTime,
 		int nofTransactionsPerSeconds)
 	:m_mutex()
 	,m_config_counter(0)
@@ -96,7 +96,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_html_head(html_head_)
 	,m_config_store_dir(config_store_dir_)
-	,m_transactionPool( ::time(NULL), maxTransactionKeepaliveTime, nofTransactionsPerSeconds, logger_)
+	,m_transactionPool( ::time(NULL), maxIdleTime, nofTransactionsPerSeconds, logger_)
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();

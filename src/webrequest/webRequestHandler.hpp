@@ -35,7 +35,7 @@ public:
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
 			const std::string& configstr_,
-			int maxTransactionKeepaliveTime,
+			int maxIdleTime,
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 

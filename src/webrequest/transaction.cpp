@@ -41,22 +41,22 @@ std::string Transaction::id() const
 	return transactionId_( m_tidx);
 }
 
-TransactionPool::TransactionPool( int64_t timecount, int maxTransactionTimeout_, int nofTransactionPerSecond_, WebRequestLoggerInterface* logger_)
+TransactionPool::TransactionPool( int64_t timecount, int maxIdleTime_, int nofTransactionPerSlot_, WebRequestLoggerInterface* logger_)
 		:m_logger(logger_)
 		,m_ar(0),m_refar(0),m_arsize(64),m_lasttick(timecount)
-		,m_maxTransactionTimeout(maxTransactionTimeout_)
-		,m_nofTransactionPerSecond(nofTransactionPerSecond_)
+		,m_maxIdleTime(maxIdleTime_)
+		,m_nofTransactionPerSlot(nofTransactionPerSlot_)
 		,m_allocNofTries(0)
 		,m_randSeed(timecount)
 		,m_tickflag(false)
 {
-	if (m_maxTransactionTimeout == 0) m_maxTransactionTimeout = 8;
-	if (m_nofTransactionPerSecond == 0) m_nofTransactionPerSecond = 1;
-	if (m_nofTransactionPerSecond < 0 || m_nofTransactionPerSecond >= (1<<20)) throw strus::runtime_error( ErrorCodeMaxLimitReached, _TXT("max transaction per second exceeds maximum limit"));
-	if (m_maxTransactionTimeout < 0 || m_maxTransactionTimeout >= (1<<20)) throw strus::runtime_error( ErrorCodeMaxLimitReached, _TXT("max transaction duration exceeds maximum limit"));
-	std::size_t min_arsize = m_maxTransactionTimeout * m_nofTransactionPerSecond;
+	if (m_maxIdleTime == 0) m_maxIdleTime = 8;
+	if (m_nofTransactionPerSlot == 0) m_nofTransactionPerSlot = 1;
+	if (m_nofTransactionPerSlot < 0 || m_nofTransactionPerSlot >= (1<<20)) throw strus::runtime_error( ErrorCodeMaxLimitReached, _TXT("max transaction per second exceeds maximum limit"));
+	if (m_maxIdleTime < 0 || m_maxIdleTime >= (1<<20)) throw strus::runtime_error( ErrorCodeMaxLimitReached, _TXT("max transaction duration exceeds maximum limit"));
+	std::size_t min_arsize = m_maxIdleTime * m_nofTransactionPerSlot;
 	while (m_arsize < min_arsize) m_arsize *= 2;
-	m_allocNofTries = m_nofTransactionPerSecond * 8;
+	m_allocNofTries = m_nofTransactionPerSlot * 8;
 	m_ar = new TransactionRef[ m_arsize];
 	m_refar = (int*)std::malloc( m_arsize * sizeof(m_refar[0]));
 	if (!m_refar)
@@ -84,8 +84,8 @@ void TransactionPool::collectGarbage( int64_t timecount)
 	int64_t aridx = m_lasttick % (m_arsize-1);
 	m_lasttick = timecount;
 	int64_t arend = m_lasttick % (m_arsize-1);
-	aridx *= m_nofTransactionPerSecond;
-	arend *= m_nofTransactionPerSecond;
+	aridx *= m_nofTransactionPerSlot;
+	arend *= m_nofTransactionPerSlot;
 	aridx %= (m_arsize-1);
 	arend %= (m_arsize-1);
 	if (arend < aridx) arend += m_arsize;
@@ -107,16 +107,16 @@ void TransactionPool::collectGarbage( int64_t timecount)
 }
 
 
-int TransactionPool::transactionRefIndexCandidate( int keepAliveTimeCount)
+int TransactionPool::transactionRefIndexCandidate( int maxIdleTime)
 {
-	return (((m_lasttick % (m_arsize-1)) + keepAliveTimeCount) * m_nofTransactionPerSecond) % (m_arsize-1);
+	return (((m_lasttick % (m_arsize-1)) + maxIdleTime) * m_nofTransactionPerSlot) % (m_arsize-1);
 }
 
-TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, int keepAliveTimeCount)
+TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, int maxIdleTime)
 {
-	if (keepAliveTimeCount <= 0 || keepAliveTimeCount > m_maxTransactionTimeout)
+	if (maxIdleTime <= 0 || maxIdleTime > m_maxIdleTime)
 	{
-		keepAliveTimeCount = m_maxTransactionTimeout;
+		maxIdleTime = m_maxIdleTime;
 	}
 	int64_t tidx;
 	int* tidxref = 0;
@@ -136,7 +136,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 		}
 		if (!cnt) return TransactionRef();
 	}{
-		int64_t eidx = transactionRefIndexCandidate( keepAliveTimeCount) + (tidx % m_nofTransactionPerSecond);
+		int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
 		int cnt = m_allocNofTries;
 		while (cnt >= 0)
 		{
@@ -146,7 +146,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 				TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
 				if (!tref.get())
 				{
-					TransactionRef rt( new Transaction( context, tidx, tidxref, keepAliveTimeCount));
+					TransactionRef rt( new Transaction( context, tidx, tidxref, maxIdleTime));
 					*tidxref = eidx & (m_arsize-1);
 					return m_ar[ eidx & (m_arsize-1)] = rt;
 				}
@@ -164,11 +164,11 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 	}
 }
 
-std::string TransactionPool::createTransaction( papuga_RequestContext* context, int keepAliveTimeCount)
+std::string TransactionPool::createTransaction( papuga_RequestContext* context, int maxIdleTime)
 {
 	try
 	{
-		TransactionRef tr = newTransaction( context, keepAliveTimeCount);
+		TransactionRef tr = newTransaction( context, maxIdleTime);
 		if (!tr.get()) return std::string();
 		return transactionId( tr->idx());
 	}
@@ -193,7 +193,7 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 
 bool TransactionPool::returnTransaction( const TransactionRef& tr)
 {
-	int64_t eidx = transactionRefIndexCandidate( tr->keepAliveTimeCount()) + (tr->idx() % m_nofTransactionPerSecond);
+	int64_t eidx = transactionRefIndexCandidate( tr->maxIdleTime()) + (tr->idx() % m_nofTransactionPerSlot);
 	int cnt = m_allocNofTries;
 	while (cnt >= 0)
 	{

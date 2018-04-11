@@ -25,8 +25,8 @@ class WebRequestLoggerInterface;
 class Transaction
 {
 public:
-	Transaction( papuga_RequestContext* context_, int64_t tidx_, int* ref_, int keepAliveTimeCount_)
-		:m_context(context_),m_ref(ref_),m_keepAliveTimeCount(keepAliveTimeCount_),m_tidx(tidx_){}
+	Transaction( papuga_RequestContext* context_, int64_t tidx_, int* ref_, int maxIdleTime_)
+		:m_context(context_),m_ref(ref_),m_maxIdleTime(maxIdleTime_),m_tidx(tidx_){}
 	~Transaction()
 	{
 		if (m_context) papuga_destroy_RequestContext( m_context);
@@ -36,9 +36,9 @@ public:
 	{
 		return m_tidx;
 	}
-	int keepAliveTimeCount() const
+	int maxIdleTime() const
 	{
-		return m_keepAliveTimeCount;
+		return m_maxIdleTime;
 	}
 	void setRef( int refidx)
 	{
@@ -53,7 +53,7 @@ public:
 private:
 	papuga_RequestContext* m_context;
 	int* m_ref;
-	int m_keepAliveTimeCount;
+	int m_maxIdleTime;
 	int64_t m_tidx;
 };
 typedef strus::shared_ptr<Transaction> TransactionRef;
@@ -66,10 +66,10 @@ public:
 	/// \brief Constructor
 	/// \param[in] timecount current time counter value
 	/// \note the time unit or granularity is defined by the caller
-	/// \param[in] maxTransactionKeepaliveTime_ maximum timeout value for untouched transactions in the unit provided by timecount
-	/// \param[in] nofTransactionsPerTimeUnit_ 2nd allocation dimension value for the sliding window used internally for open transactions besides maxTransactionKeepaliveTime
+	/// \param[in] maxIdleTime_ maximum timeout value for untouched transactions in the unit provided by timecount
+	/// \param[in] nofTransactionsPerSlot_ 2nd allocation dimension value for the sliding window used internally for open transactions besides maxIdleTime
 	/// \param[in] logger_ logger interface (NULL if not defined)
-	TransactionPool( int64_t timecount, int maxTransactionKeepaliveTime_, int nofTransactionsPerTimeUnit_, WebRequestLoggerInterface* logger_);
+	TransactionPool( int64_t timecount, int maxIdleTime_, int nofTransactionsPerSlot_, WebRequestLoggerInterface* logger_);
 
 	/// \brief Destructor
 	~TransactionPool();
@@ -81,9 +81,9 @@ public:
 
 	/// \brief Create a transaction holding the context object passed
 	/// \param[in] context transaction context (passed with ownership)
-	/// \param[in] keepAliveTimeCount maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
+	/// \param[in] maxIdleTime maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
 	/// \return transaction identifier of the transaction created
-	std::string createTransaction( papuga_RequestContext* context, int keepAliveTimeCount);
+	std::string createTransaction( papuga_RequestContext* context, int maxIdleTime);
 
 	/// \brief Get a transaction object addressed by its identifier
 	/// \param[in] tid transaction identifier
@@ -102,8 +102,8 @@ public:
 private:
 	/// \brief Create a new transaction
 	/// \param[in] context transaction context (passed with ownership)
-	/// \param[in] keepAliveTimeCount maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
-	TransactionRef newTransaction( papuga_RequestContext* context, int keepAliveTimeCount);
+	/// \param[in] maxIdleTime maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
+	TransactionRef newTransaction( papuga_RequestContext* context, int maxIdleTime);
 
 	/// \brief Get a transaction identifier as string
 	/// \param[in] tidx internal transaction index
@@ -124,7 +124,7 @@ private:
 	void clear();
 
 	/// \brief Get a candidate for a transaction reference slot
-	int transactionRefIndexCandidate( int keepAliveTimeCount);
+	int transactionRefIndexCandidate( int maxIdleTime);
 
 private:
 	WebRequestLoggerInterface* m_logger;		///< logger interface
@@ -132,8 +132,8 @@ private:
 	int* m_refar;					///< map transaction id to transaction object reference
 	std::size_t m_arsize;				///< size of refar/ar in elements
 	int64_t m_lasttick;				///< last tick call index
-	int m_maxTransactionTimeout;			///< maximum timeout value for untouched transactions
-	int m_nofTransactionPerSecond;			///< 2nd allocation dimension value for ar/refar besides maxTransactionTimeout
+	int m_maxIdleTime;				///< maximum timeout value for untouched transactions
+	int m_nofTransactionPerSlot;			///< 2nd allocation dimension value for ar/refar besides maxIdleTime
 	int m_allocNofTries;				///< number of tries to get a lock
 	int64_t m_randSeed;				///< seed for pseudo random numers
 	enum {NofMutex=64};				///< number of mutexes

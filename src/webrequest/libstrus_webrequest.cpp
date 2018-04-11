@@ -26,13 +26,13 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& config,
-		int maxTransactionKeepaliveTime,
+		int maxIdleTime,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd)
 {
 	try
 	{
-		return new WebRequestHandler( logger, html_head, config_store_dir, config, maxTransactionKeepaliveTime, nofTransactionsPerSeconds);
+		return new WebRequestHandler( logger, html_head, config_store_dir, config, maxIdleTime, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{

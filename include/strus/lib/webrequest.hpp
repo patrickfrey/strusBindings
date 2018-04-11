@@ -27,8 +27,8 @@ class ErrorBufferInterface;
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
 /// \param[in] config main configuration
-/// \param[in] maxTransactionKeepaliveTime maximum time of keepalive for untouched transactions in seconds
-/// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxTransactionKeepaliveTime
+/// \param[in] maxIdleTime maximum time of keepalive for untouched transactions in seconds
+/// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxIdleTime
 /// \param[in] errorhnd error buffer interface to use
 /// \return pointer to handler in case of success, NULL in case of memory allocation error
 WebRequestHandlerInterface* createWebRequestHandler(
@@ -36,7 +36,7 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& config,
-		int maxTransactionKeepaliveTime,
+		int maxIdleTime,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd);
 
