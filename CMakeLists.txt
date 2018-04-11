@@ -93,6 +93,9 @@ set( BINDINGS_LIBRARY_DIRS         "${CMAKE_CURRENT_BINARY_DIR}/src/bindings" )
 set( BINDINGS_GEN_INCLUDE_DIR  "${CMAKE_CURRENT_BINARY_DIR}/include/strus" )
 set( UTILS_GENSOURCE_DIR           "${CMAKE_CURRENT_BINARY_DIR}/src/utils" )
 set( REQUEST_SOURCE_DIRS         "${PROJECT_SOURCE_DIR}/src/webrequest"  "${CMAKE_CURRENT_BINARY_DIR}/src/webrequest" )
+set( BINDINGS_LUA_BUILD_DIR       "${CMAKE_CURRENT_BINARY_DIR}/src/lang/lua" )
+set( BINDINGS_PHP7_BUILD_DIR     "${CMAKE_CURRENT_BINARY_DIR}/src/lang/php7" )
+set( BINDINGS_PYTHON3_BUILD_DIR  "${CMAKE_CURRENT_BINARY_DIR}/src/lang/python3" )
 
 # Module path:
 if (NOT STRUS_MODULE_PATH)
