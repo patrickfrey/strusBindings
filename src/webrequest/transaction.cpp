@@ -17,12 +17,36 @@
 
 using namespace strus;
 
-TransactionPool::TransactionPool( int maxTransactionTimeout_, int nofTransactionPerSecond_)
-		:m_ar(0),m_refar(0),m_arsize(64),m_lasttick(time())
+static std::string transactionId_( int64_t tidx)
+{
+	char buf[ 64];
+	const int64_t mod32 = ((int64_t)1<<32);
+	std::snprintf( buf, sizeof(buf), "%08x%08x", (unsigned int)(tidx / mod32), (unsigned int)(tidx % mod32));
+	return std::string( buf, 16);
+}
+
+static int64_t transactionIndex_( const std::string& tid)
+{
+	unsigned int p1,p2;
+	if (2!=std::sscanf( tid.c_str(), "%08x%08x", &p1, &p2))
+	{
+		throw strus::runtime_error( ErrorCodeInvalidArgument, _TXT("illegal id of transaction"));
+	}
+	return ((int64_t)p1 << 32) + p2;
+}
+
+std::string Transaction::id() const
+{
+	return transactionId_( m_tidx);
+}
+
+
+TransactionPool::TransactionPool( int64_t timecount, int maxTransactionTimeout_, int nofTransactionPerSecond_)
+		:m_ar(0),m_refar(0),m_arsize(64),m_lasttick(timecount)
 		,m_maxTransactionTimeout(maxTransactionTimeout_)
 		,m_nofTransactionPerSecond(nofTransactionPerSecond_)
 		,m_allocNofTries(0)
-		,m_randSeed(time())
+		,m_randSeed(timecount)
 		,m_tickflag(false)
 {
 	if (m_maxTransactionTimeout == 0) m_maxTransactionTimeout = 8;
@@ -53,12 +77,12 @@ TransactionPool::~TransactionPool()
 	clear();
 }
 
-void TransactionPool::tick()
+void TransactionPool::collectGarbage( int64_t timecount)
 {
 	if (!m_tickflag.set( true)) return;
-	uint64_t aridx = m_lasttick % (m_arsize-1);
-	m_lasttick = (uint64_t)time();
-	uint64_t arend = m_lasttick % (m_arsize-1);
+	int64_t aridx = m_lasttick % (m_arsize-1);
+	m_lasttick = timecount;
+	int64_t arend = m_lasttick % (m_arsize-1);
 	aridx *= m_nofTransactionPerSecond;
 	arend *= m_nofTransactionPerSecond;
 	aridx %= (m_arsize-1);
@@ -73,23 +97,24 @@ void TransactionPool::tick()
 }
 
 
-int TransactionPool::transactionRefIndexCandidate( int timeout_after_s)
+int TransactionPool::transactionRefIndexCandidate( int keepAliveTimeCount)
 {
-	return (((m_lasttick % (m_arsize-1)) + timeout_after_s) * m_nofTransactionPerSecond) % (m_arsize-1);
+	return (((m_lasttick % (m_arsize-1)) + keepAliveTimeCount) * m_nofTransactionPerSecond) % (m_arsize-1);
 }
 
-TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, int timeout_after_s)
+TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, int keepAliveTimeCount)
 {
-	if (timeout_after_s <= 0 || timeout_after_s > m_maxTransactionTimeout)
+	if (keepAliveTimeCount <= 0 || keepAliveTimeCount > m_maxTransactionTimeout)
 	{
-		timeout_after_s = m_maxTransactionTimeout;
+		keepAliveTimeCount = m_maxTransactionTimeout;
 	}
-	uint64_t tidx = nextRand();
+	int64_t tidx;
 	int* tidxref = 0;
 	{
 		int cnt = m_allocNofTries;
 		while (cnt >= 0)
 		{
+			tidx = nextRand();
 			strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
 			tidxref = &m_refar[ tidx & (m_arsize-1)];
 			if (*tidxref == -1)
@@ -98,11 +123,10 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 				break;
 			}
 			--cnt;
-			++tidx;
 		}
 		if (!cnt) return TransactionRef();
 	}{
-		uint64_t eidx = transactionRefIndexCandidate( timeout_after_s) + (tidx % m_nofTransactionPerSecond);
+		int64_t eidx = transactionRefIndexCandidate( keepAliveTimeCount) + (tidx % m_nofTransactionPerSecond);
 		int cnt = m_allocNofTries;
 		while (cnt >= 0)
 		{
@@ -112,7 +136,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 				TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
 				if (!tref.get())
 				{
-					TransactionRef rt( new Transaction( context, tidx, tidxref, timeout_after_s));
+					TransactionRef rt( new Transaction( context, tidx, tidxref, keepAliveTimeCount));
 					*tidxref = eidx & (m_arsize-1);
 					return m_ar[ eidx & (m_arsize-1)] = rt;
 				}
@@ -130,11 +154,11 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 	}
 }
 
-std::string TransactionPool::createTransaction( papuga_RequestContext* context, int timeout_after_s)
+std::string TransactionPool::createTransaction( papuga_RequestContext* context, int keepAliveTimeCount)
 {
 	try
 	{
-		TransactionRef tr = newTransaction( context, timeout_after_s);
+		TransactionRef tr = newTransaction( context, keepAliveTimeCount);
 		if (!tr.get()) return std::string();
 		return transactionId( tr->idx());
 	}
@@ -146,7 +170,7 @@ std::string TransactionPool::createTransaction( papuga_RequestContext* context, 
 
 TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 {
-	uint64_t tidx = transactionIndex( tid);
+	int64_t tidx = transactionIndex( tid);
 	int eidx = m_refar[ tidx & (m_arsize-1)];
 	TransactionRef rt = m_ar[ eidx & (m_arsize-1)];
 	if (rt.get() && tidx == rt->idx())
@@ -159,7 +183,7 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 
 bool TransactionPool::returnTransaction( const TransactionRef& tr)
 {
-	uint64_t eidx = transactionRefIndexCandidate( tr->timeout_after_s()) + (tr->idx() % m_nofTransactionPerSecond);
+	int64_t eidx = transactionRefIndexCandidate( tr->keepAliveTimeCount()) + (tr->idx() % m_nofTransactionPerSecond);
 	int cnt = m_allocNofTries;
 	while (cnt >= 0)
 	{
@@ -184,36 +208,20 @@ bool TransactionPool::returnTransaction( const TransactionRef& tr)
 	return false;
 }
 
-time_t TransactionPool::time()
+std::string TransactionPool::transactionId( int64_t tidx)
 {
-	time_t seconds;
-
-	seconds = ::time (NULL);
-	return seconds;
+	return transactionId_( tidx);
 }
 
-std::string TransactionPool::transactionId( uint64_t tidx)
+int64_t TransactionPool::transactionIndex( const std::string& tid)
 {
-	char buf[ 64];
-	const uint64_t mod32 = ((uint64_t)1<<32);
-	std::snprintf( buf, sizeof(buf), "%08x%08x", (unsigned int)(tidx / mod32), (unsigned int)(tidx % mod32));
-	return std::string( buf, 16);
+	return transactionIndex_( tid);
 }
 
-uint64_t TransactionPool::transactionIndex( const std::string& tid)
-{
-	unsigned int p1,p2;
-	if (2!=std::sscanf( tid.c_str(), "%08x%08x", &p1, &p2))
-	{
-		throw strus::runtime_error( ErrorCodeInvalidArgument, _TXT("illegal id of transaction"));
-	}
-	return ((uint64_t)p1 << 32) + p2;
-}
-
-uint64_t TransactionPool::nextRand()
+int64_t TransactionPool::nextRand()
 {
 	/* Written in 2015 by Sebastiano Vigna (vigna@acm.org), see http://xorshift.di.unimi.it/splitmix64.c */
-	uint64_t rnd = m_lasttick + m_randSeed + 0x9e3779b97f4a7c15;
+	int64_t rnd = m_lasttick + m_randSeed + 0x9e3779b97f4a7c15;
 	rnd = (rnd ^ (rnd >> 30)) * 0xbf58476d1ce4e5b9;
 	rnd = (rnd ^ (rnd >> 27)) * 0x94d049bb133111eb;
 	rnd = rnd ^ (rnd >> 31);
