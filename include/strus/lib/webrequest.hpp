@@ -27,8 +27,18 @@ class ErrorBufferInterface;
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
 /// \param[in] config main configuration
+/// \param[in] maxTransactionKeepaliveTime maximum time of keepalive for untouched transactions in seconds
+/// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxTransactionKeepaliveTime
+/// \param[in] errorhnd error buffer interface to use
 /// \return pointer to handler in case of success, NULL in case of memory allocation error
-WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir, const std::string& config, ErrorBufferInterface* errorhnd);
+WebRequestHandlerInterface* createWebRequestHandler(
+		WebRequestLoggerInterface* logger,
+		const std::string& html_head,
+		const std::string& config_store_dir,
+		const std::string& config,
+		int maxTransactionKeepaliveTime,
+		int nofTransactionsPerSeconds,
+		ErrorBufferInterface* errorhnd);
 
 /// \brief Convert string from UTF-8 to a given charset encoding
 /// \param[in] charset character set encoding to convert to
@@ -39,7 +49,13 @@ WebRequestHandlerInterface* createWebRequestHandler( WebRequestLoggerInterface* 
 /// \param[in] srcsize number of bytes in src
 /// \return pointer to result string or NULL in case of error
 /// \note The error handling of this function is poor. Should only ne used for error or status messages, where any error can be assumed as fatal
-const char* convertContentCharset( const char* charset, char* destbuf, std::size_t destbufsize,  std::size_t& length, const char* src, std::size_t srcsize);
+const char* convertContentCharset(
+		const char* charset,
+		char* destbuf,
+		std::size_t destbufsize,
+		std::size_t& length,
+		const char* src,
+		std::size_t srcsize);
 
 /// \brief Select the best choice for the character set for messages not related to an answer of a request
 /// \param[in] http_accept_charset list of character sets accepted taken from the HTTP header

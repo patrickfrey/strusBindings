@@ -86,7 +86,9 @@ WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
-		const std::string& configstr_)
+		const std::string& configstr_,
+		int maxTransactionKeepaliveTime,
+		int nofTransactionsPerSeconds)
 	:m_mutex()
 	,m_config_counter(0)
 	,m_debug_maxdepth(logger_?logger_->structDepth():0)
@@ -94,6 +96,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_html_head(html_head_)
 	,m_config_store_dir(config_store_dir_)
+	,m_transactionPool( ::time(NULL), maxTransactionKeepaliveTime, nofTransactionsPerSeconds, logger_)
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
@@ -173,6 +176,11 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 		WebRequestAnswer& status) const
 {
 	return createContext_( accepted_charset, accepted_doctype, html_base_href, status);
+}
+
+void WebRequestHandler::tick()
+{
+	m_transactionPool.collectGarbage( ::time(NULL));
 }
 
 WebRequestContext* WebRequestHandler::createContext_(

@@ -13,6 +13,7 @@
 #include "strus/base/thread.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestLogger.h"
+#include "transaction.hpp"
 #include <cstddef>
 #include <utility>
 #include <set>
@@ -33,7 +34,9 @@ public:
 			WebRequestLoggerInterface* logger_,
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
-			const std::string& configstr_);
+			const std::string& configstr_,
+			int maxTransactionKeepaliveTime,
+			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 
 	virtual WebRequestContextInterface* createContext(
@@ -41,6 +44,8 @@ public:
 			const char* accepted_doctype,
 			const char* html_base_href,
 			WebRequestAnswer& status) const;
+
+	virtual void tick();
 
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
@@ -127,6 +132,7 @@ private:
 	std::string m_config_store_dir;			//< directory where to store configurations loaded as request
 	std::set<ContextNameDef> m_context_names;	//< context definitions type name pairs
 	std::set<std::string> m_context_typenames;	//< defined context types
+	TransactionPool m_transactionPool;		//< transaction pool
 };
 
 }//namespace

@@ -21,11 +21,18 @@
 /// \brief strus toplevel namespace
 using namespace strus;
 
-DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler( WebRequestLoggerInterface* logger, const std::string& html_head, const std::string& config_store_dir, const std::string& config, ErrorBufferInterface* errorhnd)
+DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
+		WebRequestLoggerInterface* logger,
+		const std::string& html_head,
+		const std::string& config_store_dir,
+		const std::string& config,
+		int maxTransactionKeepaliveTime,
+		int nofTransactionsPerSeconds,
+		ErrorBufferInterface* errorhnd)
 {
 	try
 	{
-		return new WebRequestHandler( logger, html_head, config_store_dir, config);
+		return new WebRequestHandler( logger, html_head, config_store_dir, config, maxTransactionKeepaliveTime, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{

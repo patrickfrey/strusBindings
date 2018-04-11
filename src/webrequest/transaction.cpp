@@ -9,6 +9,7 @@
  * @file requestResult.h
  */
 #include "transaction.hpp"
+#include "strus/webRequestLoggerInterface.hpp"
 #include "private/internationalization.hpp"
 #include <cstdio>
 #include <limits>
@@ -40,9 +41,9 @@ std::string Transaction::id() const
 	return transactionId_( m_tidx);
 }
 
-
-TransactionPool::TransactionPool( int64_t timecount, int maxTransactionTimeout_, int nofTransactionPerSecond_)
-		:m_ar(0),m_refar(0),m_arsize(64),m_lasttick(timecount)
+TransactionPool::TransactionPool( int64_t timecount, int maxTransactionTimeout_, int nofTransactionPerSecond_, WebRequestLoggerInterface* logger_)
+		:m_logger(logger_)
+		,m_ar(0),m_refar(0),m_arsize(64),m_lasttick(timecount)
 		,m_maxTransactionTimeout(maxTransactionTimeout_)
 		,m_nofTransactionPerSecond(nofTransactionPerSecond_)
 		,m_allocNofTries(0)
@@ -89,10 +90,19 @@ void TransactionPool::collectGarbage( int64_t timecount)
 	arend %= (m_arsize-1);
 	if (arend < aridx) arend += m_arsize;
 
-	for (; aridx < arend; ++aridx)
+	if (m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogAction) != 0)
 	{
-		m_ar[ aridx & (m_arsize-1)].reset();
+		for (; aridx < arend; ++aridx)
+		{
+			TransactionRef tref = m_ar[ aridx & (m_arsize-1)];
+			if (tref.get())
+			{
+				std::string tid = tref->id();
+				m_logger->logAction( "transaction", tid.c_str(), "dispose");
+			}
+		}
 	}
+	for (; aridx < arend; ++aridx) m_ar[ aridx & (m_arsize-1)].reset();
 	m_tickflag.set( false);
 }
 

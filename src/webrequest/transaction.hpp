@@ -19,6 +19,9 @@
 
 namespace strus {
 
+/// \brief Forward declaration
+class WebRequestLoggerInterface;
+
 class Transaction
 {
 public:
@@ -65,7 +68,8 @@ public:
 	/// \note the time unit or granularity is defined by the caller
 	/// \param[in] maxTransactionKeepaliveTime_ maximum timeout value for untouched transactions in the unit provided by timecount
 	/// \param[in] nofTransactionsPerTimeUnit_ 2nd allocation dimension value for the sliding window used internally for open transactions besides maxTransactionKeepaliveTime
-	TransactionPool( int64_t timecount, int maxTransactionKeepaliveTime_, int nofTransactionsPerTimeUnit_);
+	/// \param[in] logger_ logger interface (NULL if not defined)
+	TransactionPool( int64_t timecount, int maxTransactionKeepaliveTime_, int nofTransactionsPerTimeUnit_, WebRequestLoggerInterface* logger_);
 
 	/// \brief Destructor
 	~TransactionPool();
@@ -123,6 +127,7 @@ private:
 	int transactionRefIndexCandidate( int keepAliveTimeCount);
 
 private:
+	WebRequestLoggerInterface* m_logger;		///< logger interface
 	TransactionRef* m_ar;				///< map expiration time to object reference
 	int* m_refar;					///< map transaction id to transaction object reference
 	std::size_t m_arsize;				///< size of refar/ar in elements

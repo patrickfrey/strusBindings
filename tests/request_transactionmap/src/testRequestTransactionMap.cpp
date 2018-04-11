@@ -57,7 +57,7 @@ int main( int argc, const char* argv[])
 		int64_t timecount = g_random.get( 1, std::numeric_limits<int>::max());
 		timecount *= g_random.get( 1, std::numeric_limits<int>::max());
 		enum {MaxTransactionTimeout=60, MinNofTransactionPerSecond=10};
-		strus::TransactionPool tpool( timecount, MaxTransactionTimeout, nofIterations*2 + MinNofTransactionPerSecond);
+		strus::TransactionPool tpool( timecount, MaxTransactionTimeout, nofIterations*2 + MinNofTransactionPerSecond, NULL/*logger interface*/);
 
 		int ii;
 		std::map<std::string,int> refmap;
