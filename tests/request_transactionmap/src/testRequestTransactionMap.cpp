@@ -1,6 +1,11 @@
 #include "transaction.hpp"
 #include "strus/base/pseudoRandom.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/base/thread.hpp"
+#include "strus/base/atomic.hpp"
+#include "strus/base/sleep.hpp"
+#include "strus/base/unique_ptr.hpp"
+#include "strus/base/platform.hpp"
 #include "papuga/typedefs.h"
 #include "papuga/requestHandler.h"
 #include "papuga/valueVariant.h"
@@ -13,57 +18,28 @@
 #include <map>
 
 static strus::PseudoRandom g_random;
+static strus::AtomicCounter<int> g_errorCounter;
+static bool g_verbose = false;
+static int64_t g_timecnt_start = 0;
+static strus::AtomicCounter<int64_t> g_timecnt;
+static strus::unique_ptr<strus::TransactionPool> g_tpool;
 
 static bool odd( int num)
 {
 	return ((num & 1) == 1);
 }
 
-int main( int argc, const char* argv[])
-{
-	bool verbose = false;
-	int argi = 1;
 
-	for (; argv[argi][0] == '-'; ++argi)
-	{
-		if (0==std::strcmp( argv[argi], "--"))
-		{
-			++argi;
-			break;
-		}
-		else if (0==std::strcmp( argv[argi], "-h") || 0==std::strcmp( argv[argi], "--help"))
-		{
-			std::cerr << "Usage: testRequestTransactionMap [-h,-v] <nofIterations>" << std::endl;
-			return 0;
-		}
-		else if (0==std::strcmp( argv[argi], "-v") || 0==std::strcmp( argv[argi], "--verbose"))
-		{
-			verbose = true;
-		}
-		else
-		{
-			std::cerr << "unknown option " << argv[argi] << " (only --help|-h or --verbose|-v known)" << std::endl;
-			return -1;
-		}
-	}
-	int nofIterations = (argc == argi) ? 100 : atoi( argv[argi]);
-	if (nofIterations <= 0)
-	{
-		std::cerr << "Usage: testRequestTransactionMap [-h,-v] <nofIterations>" << std::endl;
-		return 1;
-	}
+static void runThread( int treadidx, int nofIterations, int randomSeed)
+{
 	try
 	{
-		int64_t timecount = g_random.get( 1, std::numeric_limits<int>::max());
-		timecount *= g_random.get( 1, std::numeric_limits<int>::max());
-		enum {MaxTransactionTimeout=60, MinNofTransactionPerSecond=10};
-		strus::TransactionPool tpool( timecount, MaxTransactionTimeout, nofIterations*2 + MinNofTransactionPerSecond, NULL/*logger interface*/);
-
+		strus::PseudoRandom random( randomSeed);
 		int ii;
 		std::map<std::string,int> refmap;
 		std::vector<std::string> tidlist;
 		papuga_ErrorCode errcode = papuga_Ok;
-
+	
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
@@ -71,8 +47,8 @@ int main( int argc, const char* argv[])
 			papuga_ValueVariant val;
 			papuga_init_ValueVariant_int( &val, idx);
 			if (!papuga_RequestContext_add_variable( ctx, "index", &val)) throw std::bad_alloc();
-			int timeout = odd(idx) ? g_random.get( 5, 9) : g_random.get( 1, 4);
-			std::string tid = tpool.createTransaction( ctx, timeout);
+			int timeout = odd(idx) ? random.get( 5, 9) : random.get( 1, 4);
+			std::string tid = g_tpool->createTransaction( ctx, timeout);
 			if (tid.empty())
 			{
 				papuga_destroy_RequestContext( ctx);
@@ -80,12 +56,12 @@ int main( int argc, const char* argv[])
 			}
 			tidlist.push_back( tid);
 			refmap[ tid] = idx;
-			if (verbose) std::cerr << strus::string_format( "create transaction %s [i=%d,t=%d]", tid.c_str(), idx, timeout) << std::endl;
+			if (g_verbose) std::cerr << strus::string_format( "create transaction %s [i=%d,t=%d]\n", tid.c_str(), idx, timeout);
 		}
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
-			strus::TransactionRef tref = tpool.fetchTransaction( tidlist[ ii]);
+			strus::TransactionRef tref = g_tpool->fetchTransaction( tidlist[ ii]);
 			if (!tref.get()) throw std::runtime_error("lost transaction");
 			papuga_RequestContext* ctx = tref->context();
 			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index");
@@ -94,32 +70,14 @@ int main( int argc, const char* argv[])
 			if (errcode != papuga_Ok) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
 			if (value != idx) throw std::runtime_error("index variable of context does not match");
 			std::string tid = tref->id();
-			if (verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]", tid.c_str(), idx) << std::endl;
-			if (!tpool.returnTransaction( tref)) throw std::bad_alloc();
+			if (g_verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]\n", tid.c_str(), idx);
+			if (!g_tpool->returnTransaction( tref)) throw std::bad_alloc();
 		}
-#if DISABLED_COLLECTION_IN_4_STEPS
-		if (g_random.get( 0, 2) == 1)
-		{
-			for (int kk=0; kk<4; ++kk)
-			{
-				if (verbose) std::cerr << "sleeping 1 second ..." << std::endl;
-				timecount += 1;
-				if (verbose) std::cerr << "collecting transactions run into timeout ..." << std::endl;
-				tpool.collectGarbage();
-			}
-		}
-		else
-#endif
-		{
-			if (verbose) std::cerr << "sleeping 4 seconds ..." << std::endl;
-			timecount += 4;
-			if (verbose) std::cerr << "collecting transactions run into timeout ..." << std::endl;
-			tpool.collectGarbage( timecount);
-		}
+		strus::sleep( 4);
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
-			strus::TransactionRef tref = tpool.fetchTransaction( tidlist[ ii]);
+			strus::TransactionRef tref = g_tpool->fetchTransaction( tidlist[ ii]);
 			if (odd( idx))
 			{
 				if (!tref.get()) throw std::runtime_error("lost transaction");
@@ -136,11 +94,105 @@ int main( int argc, const char* argv[])
 			if (errcode != papuga_Ok) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
 			if (value != idx) throw std::runtime_error("index variable of context does not match");
 			std::string tid = tref->id();
-			if (verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]", tid.c_str(), idx) << std::endl;
-			if (!tpool.returnTransaction( tref)) throw std::bad_alloc();
+			if (g_verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]\n", tid.c_str(), idx);
+			if (!g_tpool->returnTransaction( tref)) throw std::bad_alloc();
 		}
-		std::cerr << "OK" << std::endl;
-		return 0;
+	}
+	catch (const std::exception& err)
+	{
+		std::cerr << strus::string_format( "ERROR in thread %d: %s\n", treadidx, err.what());
+		g_errorCounter.increment();
+	}
+}
+
+static void runThreads( int nofThreads, int nofIterations)
+{
+	std::vector<strus::shared_ptr<strus::thread> > threadGroup;
+	for (int ti=0; ti < nofThreads; ++ti)
+	{
+		if (g_verbose) std::cerr << strus::string_format( "running thread %d ...\n", ti);
+		int randomSeed = g_random.get( 0, std::numeric_limits<int>::max());
+		strus::shared_ptr<strus::thread> th( new strus::thread( &runThread, ti, nofIterations, randomSeed));
+		threadGroup.push_back( th);
+	}
+	std::vector<strus::shared_ptr<strus::thread> >::iterator gi = threadGroup.begin(), ge = threadGroup.end();
+	for (int ti=0; gi != ge; ++gi,++ti)
+	{
+		(*gi)->join();
+		if (g_verbose) std::cerr << strus::string_format( "done thread %d\n", ti);
+	}
+}
+
+static void runTimerThread()
+{
+	for (int ii=0; ii<6; ++ii)
+	{
+		strus::sleep(1);
+		g_timecnt.increment();
+		if (g_verbose) std::cerr << "timer tick " << (g_timecnt.value() - g_timecnt_start) << std::endl;
+		g_tpool->collectGarbage( g_timecnt.value());
+	}
+}
+
+int main( int argc, const char* argv[])
+{
+	int argi = 1;
+
+	for (; argv[argi][0] == '-'; ++argi)
+	{
+		if (0==std::strcmp( argv[argi], "--"))
+		{
+			++argi;
+			break;
+		}
+		else if (0==std::strcmp( argv[argi], "-h") || 0==std::strcmp( argv[argi], "--help"))
+		{
+			std::cerr << "Usage: testRequestTransactionMap [-h,-v] <nofIterations>" << std::endl;
+			return 0;
+		}
+		else if (0==std::strcmp( argv[argi], "-v") || 0==std::strcmp( argv[argi], "--verbose"))
+		{
+			g_verbose = true;
+		}
+		else
+		{
+			std::cerr << "unknown option " << argv[argi] << " (only --help|-h or --verbose|-v known)" << std::endl;
+			return -1;
+		}
+	}
+	int nofIterations = (argc == argi) ? 100 : atoi( argv[argi++]);
+	int nofThreads = strus::platform::cores();
+	if (nofThreads <= 0)
+	{
+		std::cerr << "Failed to determine numer of cores, default to 2" << std::endl;
+		nofThreads = 2;
+	}
+	if (nofIterations <= 0 || argi < argc)
+	{
+		std::cerr << "Usage: testRequestTransactionMap [-h,-v] <nofIterations>" << std::endl;
+		return 1;
+	}
+	try
+	{
+		g_timecnt_start = g_random.get( 1, std::numeric_limits<int>::max());
+		g_timecnt.set( g_timecnt_start);
+
+		enum {MaxTransactionTimeout=60, MinNofTransactionPerSecond=10};
+		g_tpool.reset( new strus::TransactionPool( g_timecnt.value(), MaxTransactionTimeout, nofIterations*2 + MinNofTransactionPerSecond, NULL/*logger interface*/));
+		strus::thread timerThread( &runTimerThread);
+
+		runThreads( nofThreads, nofIterations);
+		timerThread.join();
+		if (g_errorCounter.value() == 0)
+		{
+			std::cerr << "OK" << std::endl;
+			return 0;
+		}
+		else
+		{
+			std::cerr << "ERR " << g_errorCounter.value() << " errors" << std::endl;
+			return -1;
+		}
 	}
 	catch (const std::exception& err)
 	{

@@ -48,7 +48,7 @@ using namespace strus;
 static void logMethodCall( void* self_, int nofItems, ...);
 
 WebRequestContext::WebRequestContext(
-		const WebRequestHandler* handler_,
+		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		const char* accepted_charset_,
 		const char* accepted_doctype_,
@@ -56,6 +56,7 @@ WebRequestContext::WebRequestContext(
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_context(0)
+	,m_context_ownership(false)
 	,m_request(0)
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
@@ -73,7 +74,7 @@ WebRequestContext::WebRequestContext(
 
 WebRequestContext::~WebRequestContext()
 {
-	if (m_context) papuga_destroy_RequestContext( m_context);
+	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
 	if (m_request) papuga_destroy_Request( m_request);
 	papuga_destroy_Allocator( &m_allocator);
 }
@@ -475,8 +476,9 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 
 bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer)
 {
-	if (m_context) papuga_destroy_RequestContext( m_context);
+	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
 	m_context = papuga_create_RequestContext();
+	m_context_ownership = true;
 	if (!m_context)
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
@@ -531,6 +533,12 @@ public:
 	{
 		if ((int)sizeof(buf)-1 <= std::snprintf( buf, sizeof(buf), "%s", pt)) throw std::bad_alloc();
 		itr = buf;
+	}
+
+	bool startsWith( const char* prefix, int prefixlen)
+	{
+		char* itrnext = std::strchr( itr, '/');
+		return (prefixlen == itrnext-itr && prefix[0] == itr[0] && 0==std::memcmp( prefix, itr, prefixlen));
 	}
 
 	const char* getNext()
@@ -622,12 +630,8 @@ static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler:
 	return false;
 }
 
-bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer)
 {
-	papuga_CallResult retval;
-	char membuf_err[ 4096];
-	papuga_init_CallResult( &retval, &m_allocator, true, membuf_err, sizeof(membuf_err));
-
 	// Get method function pointer to call:
 	const papuga_ClassDef* cdeflist = strus_getBindingsClassDefs();
 	const papuga_ClassDef* cdef = &cdeflist[ methoddescr->id.classid-1];
@@ -643,9 +647,11 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	papuga_ValueVariant argv[MaxNofArgs];
 	int argc = 0;
 	strus::ErrorCode errcode = ErrorCodeUnknown;
+	bool path_argument_used = false;
 	for (; argc < MaxNofArgs && methoddescr->paramtypes[argc]; ++argc)
 	{
 		WebRequestHandler::MethodParamType paramtype = (WebRequestHandler::MethodParamType)methoddescr->paramtypes[argc];
+		path_argument_used |= (paramtype == WebRequestHandler::ParamPathArray || WebRequestHandler::ParamPathString);
 		if (!initHostObjMethodParam( argv[ argc], paramtype, path, content, &m_allocator, errcode))
 		{
 			setAnswer( answer, errcode);
@@ -655,6 +661,12 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	if (argc == MaxNofArgs)
 	{
 		setAnswer( answer, ErrorCodeMaxNofItemsExceeded);
+		return false;
+	}
+	if (!path_argument_used && path[0])
+	{
+		// ... path defined but not required in method
+		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
 	// Call the method:
@@ -668,6 +680,46 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 		setAnswer( answer, apperr, errstr, true);
 		return false;
 	}
+	return true;
+}
+
+bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer)
+{
+	papuga_CallResult retval;
+	char membuf_err[ 4096];
+	papuga_init_CallResult( &retval, &m_allocator, false/*allocator ownerwhip*/, membuf_err, sizeof(membuf_err));
+	WebRequestContent content;
+
+	if (!callHostObjMethod( self, methoddescr, "", content, retval, answer))
+	{
+		return false;
+	}
+	// Assign the result to context:
+	if (retval.nofvalues == 0)
+	{
+		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "result expected"));
+		return false;
+	}
+	else if (retval.nofvalues > 1)
+	{
+		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
+		return false;
+	}
+	else if (!papuga_RequestContext_add_variable( context, resultname, &retval.valuear[0]))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer)
+{
+	papuga_CallResult retval;
+	char membuf_err[ 4096];
+	papuga_init_CallResult( &retval, &m_allocator, false/*allocator ownerwhip*/, membuf_err, sizeof(membuf_err));
+
+	if (!callHostObjMethod( self, methoddescr, path, content, retval, answer)) return false;
+
 	// Assign the result:
 	if (methoddescr->resulttype)
 	{
@@ -735,32 +787,48 @@ struct ObjectDescr
 {
 	papuga_RequestContext* context;
 	const papuga_ValueVariant* obj;
-
-	enum {lstbufsize=256};
-	char const* lstbuf[ lstbufsize];
 	const char* typenam;
 	const char* contextnam;
 	const char* varnam;
+	bool context_ownership;
 
 	ObjectDescr()
-		:context(0),obj(0),typenam(0),contextnam(0),varnam(0){}
+		:context(0),obj(0),typenam(0),contextnam(0),varnam(0),context_ownership(false){}
 	~ObjectDescr()
 	{
-		if (context) papuga_destroy_RequestContext( context);
+		if (context_ownership) papuga_destroy_RequestContext( context);
 	}
 	void reset()
 	{
-		if (context)
+		if (context_ownership)
 		{
 			papuga_destroy_RequestContext( context);
-			context = 0;
-			obj = 0;
 		}
+		context = 0;
+		obj = 0;
+	}
+	papuga_RequestContext* fetchContext()
+	{
+		context_ownership = false;
+		return context;
+	}
+
+	void init( papuga_RequestContext* context_, const char* typenam_, const char* contextnam_)
+	{
+		context = context_;
+		typenam = typenam_;
+		contextnam = contextnam_;
+		obj = papuga_RequestContext_get_variable( context, typenam);
+		varnam = 0;
+		context_ownership = false;
 	}
 
 	bool init( const papuga_RequestHandler* handler, PathBuf& path, WebRequestAnswer& answer)
 	{
 		papuga_ErrorCode errcode = papuga_Ok;
+		enum {lstbufsize=256};
+		char const* lstbuf[ lstbufsize];
+
 		if (!(typenam = path.getNext())) return true;
 		if (isEqual( typenam, ROOT_CONTEXT_NAME))
 		{
@@ -776,6 +844,7 @@ struct ObjectDescr
 			setAnswer( answer, ErrorCodeOutOfMem);
 			return false;
 		}
+		context_ownership = true;
 		if (!papuga_RequestContext_inherit( context, handler, typenam, contextnam))
 		{
 			errcode = papuga_RequestContext_last_error( context, true);
@@ -786,6 +855,7 @@ struct ObjectDescr
 			}
 			else
 			{
+				reset();
 				setAnswer( answer, papugaErrorToErrorCode( errcode));
 				return false;
 			}
@@ -801,12 +871,19 @@ struct ObjectDescr
 		obj = papuga_RequestContext_get_variable( context, varnam);
 		if (!obj)
 		{
+			reset();
 			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 		return true;
 	}
 };
+
+papuga_RequestContext* WebRequestContext::fetchContext()
+{
+	m_context_ownership = false;
+	return m_context;
+}
 
 bool WebRequestContext::executeInitScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
 {
@@ -830,7 +907,9 @@ bool WebRequestContext::executeContextScheme( const char* contextType, const cha
 
 bool WebRequestContext::executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
 {
+	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
 	m_context = context;
+	m_context_ownership = false;
 	return	initContentRequest( answer, contextType, scheme)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
@@ -845,6 +924,9 @@ bool WebRequestContext::executeOPTIONS(
 {
 	PathBuf path( path_);
 	ObjectDescr selector;
+	enum {lstbufsize=256};
+	char const* lstbuf[ lstbufsize];
+
 	if (!selector.init( m_handler->impl(), path, answer)) return false;
 
 	if (!content.empty())
@@ -855,11 +937,11 @@ bool WebRequestContext::executeOPTIONS(
 	else if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
 	{
 		std::string http_allow("OPTIONS,");
-		char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, selector.lstbuf, selector.lstbufsize);
+		char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( sl, answer)) return false;
 		for (; *sl; ++sl) http_allow.append( *sl);
 		int classid = selector.obj->value.hostObject->classid;
-		char const** ml = papuga_RequestHandler_list_methods( m_handler->impl(), classid, selector.lstbuf, selector.lstbufsize);
+		char const** ml = papuga_RequestHandler_list_methods( m_handler->impl(), classid, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( ml, answer)) return false;
 		for (; *ml; ++ml) http_allow.append( *ml);
 		const char* msgstr = papuga_Allocator_copy_string( &m_allocator, http_allow.c_str(), http_allow.size());
@@ -876,7 +958,7 @@ bool WebRequestContext::executeOPTIONS(
 		if (selector.context)
 		{
 			std::string http_allow("OPTIONS,");
-			char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, selector.lstbuf, selector.lstbufsize);
+			char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, lstbuf, lstbufsize);
 			if (!checkPapugaListBufferOverflow( sl, answer)) return false;
 			for (; *sl; ++sl) http_allow.append( *sl);
 			const char* msgstr = papuga_Allocator_copy_string( &m_allocator, http_allow.c_str(), http_allow.size());
@@ -901,19 +983,58 @@ bool WebRequestContext::executeOPTIONS(
 	}
 }
 
+bool WebRequestContext::executePostTransaction( void* self, int classid, const char* contextnam, WebRequestAnswer& answer)
+{
+	const char* method = "POST/transaction";
+	const char* resultname = "transaction";
+	const char* typenam = "transaction";
+	const papuga_RequestMethodDescription* methoddescr
+		= papuga_RequestHandler_get_method( m_handler->impl(), classid, method, false);
+	if (!methoddescr)
+	{
+		setAnswer( answer, ErrorCodeRequestResolveError);
+		return false;
+	}
+	papuga_RequestContext* tcontext = papuga_create_RequestContext();
+	if (!tcontext)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
+	}
+	if (!papuga_RequestContext_inherit( tcontext, m_handler->impl(), typenam, contextnam))
+	{
+		papuga_destroy_RequestContext( tcontext);
+		setAnswer( answer, papugaErrorToErrorCode( papuga_RequestContext_last_error( tcontext, true)));
+		return false;
+	}
+	if (!callExtensionMethod( self, methoddescr, tcontext, resultname, answer))
+	{
+		papuga_destroy_RequestContext( tcontext);
+		return false;
+	}
+	std::string tid = m_handler->postTransaction( tcontext);
+	if (tid.empty())
+	{
+		papuga_destroy_RequestContext( tcontext);
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
+	}
+	return (strus::mapStringToAnswer( answer, &m_allocator, "transaction", "", "id", m_result_encoding, m_result_doctype, tid));
+}
+
 bool WebRequestContext::executeRequest(
 		const char* method_,
 		const char* path_,
 		const WebRequestContent& content,
 		WebRequestAnswer& answer)
 {
+	TransactionRef transactionRef;
 	try
 	{
 		if (isEqual( method_, "OPTIONS"))
 		{
 			return executeOPTIONS( path_, content, answer);
 		}
-
 		PathBuf path( path_);
 		char const* method = method_;
 		std::size_t methodsize = std::strlen( method_);
@@ -927,25 +1048,48 @@ bool WebRequestContext::executeRequest(
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
 		ObjectDescr selector;
-		if (!selector.init( m_handler->impl(), path, answer)) return false;
-
+		if (path.startsWith( "transaction", 11/*"transaction"*/))
+		{
+			const char* typenam = path.getNext();
+			const char* contextnam = path.getNext();
+			transactionRef = m_handler->fetchTransaction( contextnam);
+			if (!transactionRef.get())
+			{
+				setAnswer( answer, ErrorCodeRequestResolveError);
+				return false;
+			}
+			selector.init( transactionRef->context(), typenam, contextnam);
+		}
+		else if (!selector.init( m_handler->impl(), path, answer))
+		{
+			return false;
+		}
 		// Call object method with content if object defined and method defined, else fallback to next:
 		if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
 		{
 			int classid = selector.obj->value.hostObject->classid;
 			void* self = selector.obj->value.hostObject->data;
-			const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
-			if (methoddescr)
+			const char* rest = path.getRest();
+			if (isEqual(method,"POST") && isEqual(rest,"transaction"))
 			{
-				if (debug)
+				return executePostTransaction( self, classid, selector.contextnam, answer);
+			}
+			else
+			{
+				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
+				if (methoddescr)
 				{
-					setAnswer( answer, ErrorCodeRequestResolveError);
-					return false;
-					//... debug requests only available on request schemes
-				}
-				else
-				{
-					return callHostObjMethod( self, methoddescr, path.getRest(), content, answer);
+					if (debug)
+					{
+						setAnswer( answer, ErrorCodeRequestResolveError);
+						return false;
+						//... debug requests only available calling schemes
+					}
+					else
+					{
+						if (!callHostObjMethod( self, methoddescr, rest, content, answer)) return false;
+						goto DONE;
+					}
 				}
 			}
 		}
@@ -991,13 +1135,13 @@ bool WebRequestContext::executeRequest(
 		}
 		else if (!selector.context)
 		{
+			const char* rest = path.getRest();
 			// Object selected does not exist, we do a configuration request:
-			if (path.getRest()[0] == '\0')
+			if (rest[0] == '\0')
 			{
 				if (isEqual( method, "PUT"))
 				{
-					//PF:HACK: Loading configuration is not const, but thread safe, so a const_cast is, though never good, Ok here:
-					if (!const_cast<WebRequestHandler*>( m_handler)->loadConfiguration(
+					if (!m_handler->loadConfiguration(
 							selector.typenam, selector.contextnam,
 							true/*store for reload*/, content, answer))
 					{
@@ -1007,9 +1151,7 @@ bool WebRequestContext::executeRequest(
 				}
 				else if (isEqual( method, "DELETE"))
 				{
-					//PF:HACK: Loading configuration is not const, but thread safe, so a const_cast is, though never good, Ok here:
-					if (!const_cast<WebRequestHandler*>( m_handler)->deleteConfiguration(
-							selector.typenam, selector.contextnam, answer))
+					if (!m_handler->deleteConfiguration( selector.typenam, selector.contextnam, answer))
 					{
 						return false;
 					}
@@ -1029,11 +1171,19 @@ bool WebRequestContext::executeRequest(
 		}
 		else if (path.getRest()[0] == '\0' && isEqual( method, "DELETE"))
 		{
-			selector.reset();
-			if (!const_cast<WebRequestHandler*>( m_handler)->deleteConfiguration(
-					selector.typenam, selector.contextnam, answer))
+			if (transactionRef.get())
 			{
-				return false;
+				transactionRef.reset();
+				m_handler->releaseTransaction( selector.contextnam);
+				return true;
+			}
+			else
+			{
+				selector.reset();
+				if (!m_handler->deleteConfiguration( selector.typenam, selector.contextnam, answer))
+				{
+					return false;
+				}
 			}
 			return true;
 		}
@@ -1041,9 +1191,12 @@ bool WebRequestContext::executeRequest(
 		{
 			if (!selector.obj /*&& selector.context*/ && isEqual( method, "GET"))
 			{
-				char const** varlist = papuga_RequestContext_list_variables( selector.context, 1/*max inheritcnt*/, selector.lstbuf, selector.lstbufsize);
+				enum {lstbufsize=256};
+				char const* lstbuf[ lstbufsize];
+				char const** varlist = papuga_RequestContext_list_variables( selector.context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
 				if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-				return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist);
+				if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist)) return false;
+				goto DONE;
 			}
 			else
 			{
@@ -1054,9 +1207,8 @@ bool WebRequestContext::executeRequest(
 		else
 		{
 			// Scheme execution else:
-			papuga_RequestContext* context = selector.context;
-			selector.context = NULL;
-			return executeContextScheme( context, selector.typenam, method, content, answer);
+			if (!executeContextScheme( selector.fetchContext(), selector.typenam, method, content, answer)) return false;
+			goto DONE;
 		}
 	}
 	catch (const std::bad_alloc&)
@@ -1069,5 +1221,15 @@ bool WebRequestContext::executeRequest(
 		setAnswer( answer, ErrorCodeUncaughtException);
 		return false;
 	}
+DONE:
+	if (transactionRef.get())
+	{
+		if (!m_handler->returnTransaction( transactionRef))
+		{
+			setAnswer( answer, ErrorCodeOutOfMem);
+			return false;
+		}
+	}
+	return true;
 }
 

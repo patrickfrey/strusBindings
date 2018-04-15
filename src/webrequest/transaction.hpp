@@ -127,6 +127,14 @@ private:
 	int transactionRefIndexCandidate( int maxIdleTime);
 
 private:
+#if __cplusplus >= 201103L
+	TransactionPool( const TransactionPool&)=delete;
+#else
+	TransactionPool( const TransactionPool&){}	///< noncopyable
+	void operator=( const TransactionPool&){}	///< noncopyable
+#endif
+
+private:
 	WebRequestLoggerInterface* m_logger;		///< logger interface
 	TransactionRef* m_ar;				///< map expiration time to object reference
 	int* m_refar;					///< map transaction id to transaction object reference

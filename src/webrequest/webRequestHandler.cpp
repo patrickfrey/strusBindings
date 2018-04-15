@@ -96,7 +96,8 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_html_head(html_head_)
 	,m_config_store_dir(config_store_dir_)
-	,m_transactionPool( ::time(NULL), maxIdleTime, nofTransactionsPerSeconds, logger_)
+	,m_transactionPool( ::time(NULL), maxIdleTime*2, nofTransactionsPerSeconds, logger_)
+	,m_maxIdleTime(maxIdleTime)
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
@@ -173,7 +174,7 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 		const char* accepted_charset,
 		const char* accepted_doctype,
 		const char* html_base_href,
-		WebRequestAnswer& status) const
+		WebRequestAnswer& status)
 {
 	return createContext_( accepted_charset, accepted_doctype, html_base_href, status);
 }
@@ -187,7 +188,7 @@ WebRequestContext* WebRequestHandler::createContext_(
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			const char* html_base_href,
-			WebRequestAnswer& status) const
+			WebRequestAnswer& status)
 {
 	try
 	{
@@ -741,6 +742,12 @@ std::vector<std::string> WebRequestHandler::contextTypes() const
 		res.insert( ci->first);
 	}
 	return std::vector<std::string>( res.begin(), res.end());
+}
+
+std::string WebRequestHandler::postTransaction(
+		papuga_RequestContext* context)
+{
+	return m_transactionPool.createTransaction( context, m_maxIdleTime);
 }
 
 

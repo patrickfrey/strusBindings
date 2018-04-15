@@ -29,7 +29,7 @@ class WebRequestContext
 {
 public:
 	WebRequestContext(
-		const WebRequestHandler* handler_,
+		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		const char* accepted_charset,
 		const char* accepted_doctype,
@@ -43,12 +43,13 @@ public:
 			WebRequestAnswer& answer);
 
 public:/*WebRequestHandler*/
-	papuga_RequestContext* fetchContext()			{papuga_RequestContext* rt = m_context; m_context=0; return rt;}
+	papuga_RequestContext* fetchContext();
 	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeInitScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executePostTransaction( void* self, int classid, const char* contextnam, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool createEmptyRequestContext( WebRequestAnswer& answer);
@@ -59,15 +60,18 @@ private:
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	bool getContentRequestResult( WebRequestAnswer& answer);
+	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
 	bool executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
-	const WebRequestHandler* m_handler;
+	WebRequestHandler* m_handler;
 	WebRequestLoggerInterface* m_logger;
 	papuga_RequestLogger m_callLogger;	//< request call logger (for papuga)
 	papuga_Allocator m_allocator;
 	papuga_RequestContext* m_context;
+	bool m_context_ownership;
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;

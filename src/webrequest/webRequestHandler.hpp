@@ -43,7 +43,7 @@ public:
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			const char* html_base_href,
-			WebRequestAnswer& status) const;
+			WebRequestAnswer& status);
 
 	virtual void tick();
 
@@ -66,6 +66,11 @@ public:/*WebRequestContext*/
 			const char* contextType,
 			const char* contextName,
 			WebRequestAnswer& status);
+
+	std::string postTransaction( papuga_RequestContext* context);
+	TransactionRef fetchTransaction( const std::string& tid);
+	bool returnTransaction( const TransactionRef& tr);
+	void releaseTransaction( const std::string& tid);
 
 private:/*Load store configuration source*/
 	struct ConfigurationTransaction
@@ -117,7 +122,7 @@ private:/*Load configuration*/
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			const char* html_base_href,
-			WebRequestAnswer& status) const;
+			WebRequestAnswer& status);
 
 private:
 	typedef std::pair<std::string,std::string> ContextNameDef;
@@ -133,6 +138,8 @@ private:
 	std::set<ContextNameDef> m_context_names;	//< context definitions type name pairs
 	std::set<std::string> m_context_typenames;	//< defined context types
 	TransactionPool m_transactionPool;		//< transaction pool
+	int m_maxIdleTime;				//< maximum idle time transactions
+	
 };
 
 }//namespace
