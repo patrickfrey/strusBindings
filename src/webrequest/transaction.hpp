@@ -93,11 +93,7 @@ public:
 
 	/// \brief Return a transaction object after operation
 	/// \param[in] tr transaction reference
-	bool returnTransaction( const TransactionRef& tr);
-
-	/// \brief Release a transaction object addressed by its identifier
-	/// \param[in] tid transaction identifier
-	void releaseTransaction( const std::string& tid);
+	void returnTransaction( const TransactionRef& tr);
 
 private:
 	/// \brief Create a new transaction

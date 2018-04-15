@@ -11,6 +11,7 @@
 #define _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #include "strus/webRequestHandlerInterface.hpp"
 #include "strus/base/thread.hpp"
+#include "strus/base/periodicTimerEvent.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestLogger.h"
 #include "transaction.hpp"
@@ -45,8 +46,6 @@ public:
 			const char* html_base_href,
 			WebRequestAnswer& status);
 
-	virtual void tick();
-
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
 
@@ -69,8 +68,11 @@ public:/*WebRequestContext*/
 
 	std::string postTransaction( papuga_RequestContext* context);
 	TransactionRef fetchTransaction( const std::string& tid);
-	bool returnTransaction( const TransactionRef& tr);
+	void returnTransaction( const TransactionRef& tr);
 	void releaseTransaction( const std::string& tid);
+
+public:/*Ticker*/
+	void tick();
 
 private:/*Load store configuration source*/
 	struct ConfigurationTransaction
@@ -127,6 +129,20 @@ private:/*Load configuration*/
 private:
 	typedef std::pair<std::string,std::string> ContextNameDef;
 
+	class Ticker
+		:public PeriodicTimerEvent
+	{
+	public:
+		Ticker( WebRequestHandler* handler_, int seconds_)
+			:PeriodicTimerEvent(seconds_),m_handler(handler_){}
+		virtual void tick()
+		{
+			m_handler->tick();
+		}
+	private:
+		WebRequestHandler* m_handler;
+	};
+
 private:
 	mutable strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
 	mutable int m_config_counter;			//< counter to order configurations stored that have the same date
@@ -139,7 +155,7 @@ private:
 	std::set<std::string> m_context_typenames;	//< defined context types
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
-	
+	Ticker m_ticker;				//< periodic timer event to handle timeout of transactions
 };
 
 }//namespace

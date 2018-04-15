@@ -1216,6 +1216,11 @@ bool WebRequestContext::executeRequest(
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
+	catch (const std::runtime_error& err)
+	{
+		setAnswer( answer, ErrorCodeRuntimeError, err.what(), true/*do copy*/);
+		return false;
+	}
 	catch (...)
 	{
 		setAnswer( answer, ErrorCodeUncaughtException);
@@ -1224,10 +1229,23 @@ bool WebRequestContext::executeRequest(
 DONE:
 	if (transactionRef.get())
 	{
-		if (!m_handler->returnTransaction( transactionRef))
+		try
+		{
+			m_handler->returnTransaction( transactionRef);
+		}
+		catch (const std::bad_alloc&)
 		{
 			setAnswer( answer, ErrorCodeOutOfMem);
 			return false;
+		}
+		catch (const std::exception& err)
+		{
+			setAnswer( answer, ErrorCodeRuntimeError, err.what(), true/*doCopa*/);
+			return false;
+		}
+		catch (...)
+		{
+			setAnswer( answer, ErrorCodeUncaughtException);
 		}
 	}
 	return true;

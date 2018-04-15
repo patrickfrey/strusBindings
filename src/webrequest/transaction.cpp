@@ -134,7 +134,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 			}
 			--cnt;
 		}
-		if (!cnt) return TransactionRef();
+		if (cnt==0) throw std::runtime_error(_TXT("failed to allocate transaction"));
 	}{
 		int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
 		int cnt = m_allocNofTries;
@@ -160,22 +160,14 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 			++eidx;
 		}
 		*tidxref = -1; //... roll back
-		return TransactionRef();
+		throw std::runtime_error(_TXT("failed to allocate transaction slot"));
 	}
 }
 
 std::string TransactionPool::createTransaction( papuga_RequestContext* context, int maxIdleTime)
 {
-	try
-	{
-		TransactionRef tr = newTransaction( context, maxIdleTime);
-		if (!tr.get()) return std::string();
-		return transactionId( tr->idx());
-	}
-	catch (...)
-	{
-		return std::string();
-	}
+	TransactionRef tr = newTransaction( context, maxIdleTime);
+	return transactionId( tr->idx());
 }
 
 TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
@@ -191,31 +183,24 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 	return TransactionRef();
 }
 
-bool TransactionPool::returnTransaction( const TransactionRef& tr)
+void TransactionPool::returnTransaction( const TransactionRef& tr)
 {
 	int64_t eidx = transactionRefIndexCandidate( tr->maxIdleTime()) + (tr->idx() % m_nofTransactionPerSlot);
 	int cnt = m_allocNofTries;
 	while (cnt >= 0)
 	{
-		try
+		strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
+		TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
+		if (!tref.get())
 		{
-			strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
-			TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
-			if (!tref.get())
-			{
-				m_ar[ eidx & (m_arsize-1)] = tr;
-				tr->setRef( eidx & (m_arsize-1));
-				return true;
-			}
-		}
-		catch (...)
-		{
-			return false;
+			m_ar[ eidx & (m_arsize-1)] = tr;
+			tr->setRef( eidx & (m_arsize-1));
+			return;
 		}
 		--cnt;
 		++eidx;
 	}
-	return false;
+	throw std::runtime_error(_TXT("failed to refresh transaction"));
 }
 
 std::string TransactionPool::transactionId( int64_t tidx)

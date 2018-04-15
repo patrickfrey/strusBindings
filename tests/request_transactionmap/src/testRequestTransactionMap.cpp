@@ -71,7 +71,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			if (value != idx) throw std::runtime_error("index variable of context does not match");
 			std::string tid = tref->id();
 			if (g_verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]\n", tid.c_str(), idx);
-			if (!g_tpool->returnTransaction( tref)) throw std::bad_alloc();
+			g_tpool->returnTransaction( tref);
 		}
 		strus::sleep( 4);
 		for (ii=0; ii<nofIterations; ++ii)
@@ -95,7 +95,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			if (value != idx) throw std::runtime_error("index variable of context does not match");
 			std::string tid = tref->id();
 			if (g_verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]\n", tid.c_str(), idx);
-			if (!g_tpool->returnTransaction( tref)) throw std::bad_alloc();
+			g_tpool->returnTransaction( tref);
 		}
 	}
 	catch (const std::exception& err)
@@ -178,7 +178,7 @@ int main( int argc, const char* argv[])
 		g_timecnt.set( g_timecnt_start);
 
 		enum {MaxTransactionTimeout=60, MinNofTransactionPerSecond=10};
-		g_tpool.reset( new strus::TransactionPool( g_timecnt.value(), MaxTransactionTimeout, nofIterations*2 + MinNofTransactionPerSecond, NULL/*logger interface*/));
+		g_tpool.reset( new strus::TransactionPool( g_timecnt.value(), MaxTransactionTimeout, nofIterations*2*nofThreads + MinNofTransactionPerSecond, NULL/*logger interface*/));
 		strus::thread timerThread( &runTimerThread);
 
 		runThreads( nofThreads, nofIterations);

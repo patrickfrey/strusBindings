@@ -39,9 +39,6 @@ public:
 			const char* accepted_doctype,
 			const char* html_base_href,
 			WebRequestAnswer& answer)=0;
-
-	/// \brief Send a time tick to the request handler that can be used as hint for maintenance (garbage collection)
-	virtual void tick()=0;
 };
 
 }//namespace

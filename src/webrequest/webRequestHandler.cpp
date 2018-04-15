@@ -98,6 +98,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_config_store_dir(config_store_dir_)
 	,m_transactionPool( ::time(NULL), maxIdleTime*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime)
+	,m_ticker(this,std::max( maxIdleTime/20, 10))
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
@@ -127,6 +128,7 @@ WebRequestHandler::WebRequestHandler(
 
 		loadConfiguration( configstr_);
 		loadStoredConfigurations();
+		if (!m_ticker.start()) throw std::bad_alloc();
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -148,6 +150,7 @@ void WebRequestHandler::clear()
 
 WebRequestHandler::~WebRequestHandler()
 {
+	m_ticker.stop();
 	clear();
 }
 
@@ -749,5 +752,21 @@ std::string WebRequestHandler::postTransaction(
 {
 	return m_transactionPool.createTransaction( context, m_maxIdleTime);
 }
+
+TransactionRef WebRequestHandler::fetchTransaction( const std::string& tid)
+{
+	return m_transactionPool.fetchTransaction( tid);
+}
+
+void WebRequestHandler::returnTransaction( const TransactionRef& tr)
+{
+	m_transactionPool.returnTransaction( tr);
+}
+
+void WebRequestHandler::releaseTransaction( const std::string& tid)
+{
+	(void)m_transactionPool.fetchTransaction( tid);
+}
+
 
 
