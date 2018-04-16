@@ -25,6 +25,11 @@ class ValueIteratorInterface;
 
 namespace bindings {
 
+/// \brief Maximum size of an auto expanded list
+enum {MaxListSizeDeepExpansion=20};
+
+
+/// \brief Introspection link element
 class IntrospectionLink
 {
 public:
@@ -67,8 +72,6 @@ class IntrospectionValueIterator
 	:public IntrospectionBase
 {
 public:
-	enum {MaxListSizeDeepExpansion=50};
-
 	IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, const strus::Reference<ValueIteratorInterface>& impl_, bool prefixBound_, const std::string& name_="");
 
 	virtual ~IntrospectionValueIterator(){}

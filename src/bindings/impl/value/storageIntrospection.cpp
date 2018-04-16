@@ -24,6 +24,7 @@
 #include "papuga/constants.h"
 #include <cstring>
 #include <vector>
+#include <set>
 #include <utility>
 #include <cstdint>
 #include <limits>
@@ -60,6 +61,24 @@ static strus::Index parseIndex( const std::string& val, const char* descr)
 	return parseIndex( val.c_str(), val.size(), descr);
 }
 }//namespace
+
+static std::string getDocidFromDocno( const StorageClientInterface* storage, const strus::Index& docno, ErrorBufferInterface* errorhnd)
+{
+	strus::local_ptr<AttributeReaderInterface> areader( storage->createAttributeReader());
+	if (!areader.get()) throw std::runtime_error( errorhnd->fetchError());
+	Index elemhandle = areader->elementHandle( Constants::attribute_docid());
+	if (!elemhandle) return std::string();
+	areader->skipDoc( docno);
+	return areader->getValue( elemhandle);
+}
+
+static bool isValidDocumentIdPrefix( const StorageClientInterface* storage, const std::string& prefix, ErrorBufferInterface* errorhnd)
+{
+	strus::local_ptr<ValueIteratorInterface> vitr( storage->createDocIdIterator());
+	if (!vitr.get()) throw std::runtime_error( errorhnd->fetchError());
+	vitr->skipPrefix( prefix.c_str(), prefix.size());
+	return !vitr->fetchValues( 1).empty();
+}
 
 
 namespace {
@@ -406,6 +425,7 @@ public:
 			const StorageClientInterface* impl_,
 			const std::string& type_,
 			const std::string& value_,
+			const std::string& docid_="",
 			const strus::Index& docno_=0)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
@@ -414,6 +434,7 @@ public:
 		,m_docid_handle(0)
 		,m_type(type_)
 		,m_value(value_)
+		,m_docid(docid_)
 		,m_docno(docno_)
 	{
 		if (!m_areader.get() || !m_postings.get()) throw std::runtime_error( m_errorhnd->fetchError());
@@ -421,11 +442,31 @@ public:
 	}
 	virtual ~TermPostingsIntrospection(){}
 
-	enum {MaxListSizeDeepExpansion=20};
-
 	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
-		Index dn = m_docno;
+		Index dn;
+		if (m_docno)
+		{
+			dn = m_docno -1;
+		}
+		else
+		{
+			if (!m_docid.empty())
+			{
+				strus::local_ptr<ValueIteratorInterface> vitr( m_impl->createDocIdIterator());
+				if (!vitr.get()) throw std::runtime_error( m_errorhnd->fetchError());
+				vitr->skipPrefix( m_docid.c_str(), m_docid.size());
+				std::vector<std::string> values = vitr->fetchValues( 1);
+				if (values.empty()) return;
+				dn = m_impl->documentNumber( values[0]);
+				if (!dn) return;
+				--dn;
+			}
+			else
+			{
+				dn = 0;
+			}
+		}
 		int cnt = MaxListSizeDeepExpansion;
 		while (cnt-- && !!(dn=m_postings->skipDoc( dn+1)))
 		{
@@ -447,8 +488,27 @@ public:
 	{
 		if (!m_docno)
 		{
-			strus::Index docno_ = parseIndex( name, _TXT("document number"));
-			return new TermPostingsIntrospection( m_errorhnd, m_impl, m_type, m_value, docno_);
+			strus::Index docno = 0;
+			if (m_docid.empty() && name[0] == '_')
+			{
+				docno = parseIndex( name.c_str()+1, name.size()-1, _TXT("document number"));
+				std::string docid = getDocidFromDocno( m_impl, docno, m_errorhnd);
+				return new TermPostingsIntrospection( m_errorhnd, m_impl, m_type, m_value, docid, docno);
+			}
+			std::string docidprefix = m_docid.empty() ? name : (m_docid + '/' + name);
+			docno = m_impl->documentNumber( docidprefix);
+			if (docno)
+			{
+				return new TermPostingsIntrospection( m_errorhnd, m_impl, m_type, m_value, docidprefix, docno);
+			}
+			else if (isValidDocumentIdPrefix( m_impl, docidprefix, m_errorhnd))
+			{
+				return new TermPostingsIntrospection( m_errorhnd, m_impl, m_type, m_value, docidprefix);
+			}
+			else
+			{
+				throw unresolvable_exception();
+			}
 		}
 		else if (name == "pos")
 		{
@@ -465,6 +525,10 @@ public:
 			m_areader->skipDoc( m_docno);
 			return createIntrospectionAtomic( m_errorhnd, m_areader->getValue( m_docid_handle));
 		}
+		else if (name == "docno")
+		{
+			return createIntrospectionAtomic( m_errorhnd, (int64_t)m_docno);
+		}
 		else
 		{
 			throw unresolvable_exception();
@@ -474,7 +538,7 @@ public:
 	{
 		if (m_docno)
 		{
-			static const char* ar[] = {"docid","docno","tf","pos",NULL};
+			static const char* ar[] = {"docid","docno","frequency","pos",NULL};
 			return getList( ar);
 		}
 		else
@@ -502,6 +566,7 @@ private:
 	strus::Index m_docid_handle;
 	std::string m_type;
 	std::string m_value;
+	std::string m_docid;
 	strus::Index m_docno;
 	strus::Index m_pos;
 };
@@ -661,12 +726,29 @@ public:
 	{
 		if (m_type.empty())
 		{
-			IntrospectionValueIterator vitr( m_errorhnd, m_impl->createTermValueIterator(), true/*prefixBound*/);
+			IntrospectionValueIterator vitr( m_errorhnd, m_impl->createTermTypeIterator(), false/*prefixBound*/);
 			return vitr.list();
 		}
 		else if (m_value.empty())
 		{
-			throw unresolvable_exception();
+			strus::local_ptr<DocumentTermIteratorInterface> itr( m_impl->createDocumentTermIterator( m_type));
+			if (!itr.get()) throw std::runtime_error( m_errorhnd->fetchError());
+			strus::Index docno = 0;
+			std::vector<IntrospectionLink> rt;
+			std::set<std::string> valueset;
+			while (!!(docno=itr->skipDoc(docno+1)) && rt.size() < MaxListSizeDeepExpansion)
+			{
+				DocumentTermIteratorInterface::Term term;
+				while (itr->nextTerm( term) && rt.size() < MaxListSizeDeepExpansion)
+				{
+					std::string value = itr->termValue( term.termno);
+					if (valueset.insert( value).second)
+					{
+						rt.push_back( IntrospectionLink( false/*autoexpand*/, value));
+					}
+				}
+			}
+			return rt;
 		}
 		else
 		{
@@ -776,7 +858,7 @@ public:
 		if (m_docid.empty() && name[0] == '_')
 		{
 			docno = parseIndex( name.c_str()+1, name.size()-1, _TXT("document number"));
-			std::string docid_ = getDocidFromDocno( docno);
+			std::string docid_ = getDocidFromDocno( m_impl, docno, m_errorhnd);
 			return new DocumentIntrospection( m_errorhnd, m_impl, docid_, docno);
 		}
 		std::string docidprefix = m_docid.empty() ? name : (m_docid + '/' + name);
@@ -785,7 +867,7 @@ public:
 		{
 			return new DocumentIntrospection( m_errorhnd, m_impl, docidprefix, docno);
 		}
-		else if (!isEmptyList( docidprefix))
+		else if (isValidDocumentIdPrefix( m_impl, docidprefix, m_errorhnd))
 		{
 			return new DocidIntrospection( m_errorhnd, m_impl, docidprefix);
 		}
@@ -799,23 +881,6 @@ public:
 	{
 		strus::local_ptr<IntrospectionBase> values( createIntrospectionValueIterator( m_errorhnd, m_impl->createDocIdIterator(), true/*prefixBound*/,m_docid));
 		return values->list();
-	}
-
-private:
-	std::string getDocidFromDocno( const strus::Index& docno) const
-	{
-		strus::local_ptr<AttributeReaderInterface> areader( m_impl->createAttributeReader());
-		if (!areader.get()) throw std::runtime_error( m_errorhnd->fetchError());
-		Index elemhandle = areader->elementHandle( Constants::attribute_docid());
-		if (!elemhandle) return std::string();
-		areader->skipDoc( docno);
-		return areader->getValue( elemhandle);
-	}
-	bool isEmptyList( const std::string& prefix) const
-	{
-		strus::local_ptr<ValueIteratorInterface> vitr( m_impl->createDocIdIterator());
-		vitr->skip( prefix.c_str(), prefix.size());
-		return vitr->fetchValues( 1).empty();
 	}
 
 private:
