@@ -81,18 +81,18 @@ TransactionPool::~TransactionPool()
 void TransactionPool::collectGarbage( int64_t timecount)
 {
 	if (!m_tickflag.set( true)) return;
-	int64_t aridx = m_lasttick % (m_arsize-1);
+	int64_t arstart = m_lasttick % (m_arsize-1);
 	m_lasttick = timecount;
 	int64_t arend = m_lasttick % (m_arsize-1);
-	aridx *= m_nofTransactionPerSlot;
+	arstart *= m_nofTransactionPerSlot;
 	arend *= m_nofTransactionPerSlot;
-	aridx %= (m_arsize-1);
+	arstart %= (m_arsize-1);
 	arend %= (m_arsize-1);
-	if (arend < aridx) arend += m_arsize;
+	if (arend < arstart) arend += m_arsize;
 
 	if (m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogAction) != 0)
 	{
-		for (; aridx < arend; ++aridx)
+		for (int64_t aridx = arstart; aridx < arend; ++aridx)
 		{
 			TransactionRef tref = m_ar[ aridx & (m_arsize-1)];
 			if (tref.get())
@@ -102,7 +102,10 @@ void TransactionPool::collectGarbage( int64_t timecount)
 			}
 		}
 	}
-	for (; aridx < arend; ++aridx) m_ar[ aridx & (m_arsize-1)].reset();
+	for (int64_t aridx = arstart; aridx < arend; ++aridx)
+	{
+		m_ar[ aridx & (m_arsize-1)].reset();
+	}
 	m_tickflag.set( false);
 }
 

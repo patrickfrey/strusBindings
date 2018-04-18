@@ -186,8 +186,14 @@ public:
 	Struct introspection( const ValueVariant& path);
 
 private:
+	/// \brief Constructor used by Context
 	friend class ContextImpl;
 	StorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config);
+
+	/// \brief Constructor used by Inserter
+	friend class InserterImpl;
+	StorageClientImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& errorhnd_, const ObjectRef& storage_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_){}
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;
@@ -232,7 +238,11 @@ public:
 
 private:
 	friend class StorageClientImpl;
-	StorageTransactionImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const ObjectRef& storage_);
+	StorageTransactionImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& errorhnd_, const ObjectRef& storage_);
+
+	friend class InserterTransactionImpl;
+	StorageTransactionImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& errorhnd_, const ObjectRef& storage_, const ObjectRef& transaction_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_storage_impl(storage_),m_transaction_impl(transaction_){}
 
 	friend class QueryImpl;
 	friend class QueryEvalImpl;

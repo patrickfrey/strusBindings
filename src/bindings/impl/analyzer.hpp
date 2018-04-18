@@ -296,6 +296,12 @@ private:
 	friend class ContextImpl;
 	DocumentAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const ValueVariant& doctype, const TextProcessorInterface* textproc_);
 
+	/// \brief Constructor used by Inserter
+	friend class InserterImpl;
+	friend class InserterTransactionImpl;
+	DocumentAnalyzerImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& errorhnd_, const ObjectRef& analyzer_, const TextProcessorInterface* textproc_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_analyzer_impl(analyzer_),m_textproc(textproc_){}
+
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
@@ -442,6 +448,8 @@ private:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
+	friend class InserterImpl;
+
 	QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd);
 
 	mutable ObjectRef m_errorhnd_impl;

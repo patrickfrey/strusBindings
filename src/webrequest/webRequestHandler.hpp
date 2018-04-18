@@ -94,6 +94,12 @@ private:/*Load store configuration source*/
 			const char* contextType,
 			const char* contextName,
 			WebRequestAnswer& status) const;
+	bool getStoredConfiguration(
+			const char* contextType,
+			const char* contextName,
+			std::string& buf,
+			WebRequestContent& content,
+			WebRequestAnswer& status);
 
 private:/*Constructor/Destructor*/
 	void loadConfiguration( const std::string& configstr);

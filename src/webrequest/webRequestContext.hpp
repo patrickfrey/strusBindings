@@ -49,7 +49,7 @@ public:/*WebRequestHandler*/
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executePostTransaction( void* self, int classid, const char* contextnam, WebRequestAnswer& answer);
+	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool createEmptyRequestContext( WebRequestAnswer& answer);

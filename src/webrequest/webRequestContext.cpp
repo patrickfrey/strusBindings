@@ -550,6 +550,7 @@ public:
 		{
 			*itrnext = 0;
 			itr = itrnext+1;
+			while (*itr == '/') ++itr;
 		}
 		else
 		{
@@ -561,6 +562,9 @@ public:
 	{
 		char const* rt = itr;
 		itr = std::strchr( itr, '\0');
+		char* enditr = itr;
+		while (enditr != buf && *(enditr-1) == '/') --enditr;
+		*enditr = '\0';
 		return rt;
 	}
 
@@ -670,7 +674,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 		return false;
 	}
 	// Call the method:
-	if (!(*method)( self, &retval, 1/*argc*/, argv))
+	if (!(*method)( self, &retval, argc, argv))
 	{
 		char* errstr = papuga_CallResult_lastError( &retval);
 		char const* msgitr = errstr;
@@ -680,6 +684,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 		setAnswer( answer, apperr, errstr, true);
 		return false;
 	}
+	answer.setStatus( methoddescr->httpstatus_success);
 	return true;
 }
 
@@ -983,11 +988,10 @@ bool WebRequestContext::executeOPTIONS(
 	}
 }
 
-bool WebRequestContext::executePostTransaction( void* self, int classid, const char* contextnam, WebRequestAnswer& answer)
+bool WebRequestContext::executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer)
 {
 	const char* method = "POST/transaction";
 	const char* resultname = "transaction";
-	const char* typenam = "transaction";
 	const papuga_RequestMethodDescription* methoddescr
 		= papuga_RequestHandler_get_method( m_handler->impl(), classid, method, false);
 	if (!methoddescr)
@@ -1003,8 +1007,8 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 	}
 	if (!papuga_RequestContext_inherit( tcontext, m_handler->impl(), typenam, contextnam))
 	{
-		papuga_destroy_RequestContext( tcontext);
 		setAnswer( answer, papugaErrorToErrorCode( papuga_RequestContext_last_error( tcontext, true)));
+		papuga_destroy_RequestContext( tcontext);
 		return false;
 	}
 	if (!callExtensionMethod( self, methoddescr, tcontext, resultname, answer))
@@ -1072,7 +1076,7 @@ bool WebRequestContext::executeRequest(
 			const char* rest = path.getRest();
 			if (isEqual(method,"POST") && isEqual(rest,"transaction"))
 			{
-				return executePostTransaction( self, classid, selector.contextnam, answer);
+				return executePostTransaction( self, classid, selector.typenam, selector.contextnam, answer);
 			}
 			else
 			{

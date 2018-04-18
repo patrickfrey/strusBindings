@@ -28,6 +28,7 @@ set( source_files
 	impl/analyzer.cpp
 	impl/query.cpp
 	impl/storage.cpp
+	impl/inserter.cpp
 	impl/vector.cpp
 	impl/context.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp

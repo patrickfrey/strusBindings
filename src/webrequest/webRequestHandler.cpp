@@ -82,6 +82,38 @@ struct MethodDescription
 	}
 };
 
+struct IntrospectionMethodDescription
+	:public MethodDescription
+{
+	IntrospectionMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
+		:MethodDescription( "GET", id, 200, NULL, rootelem, "value", false/*has content*/, 1, WebRequestHandler::ParamPathArray){}
+};
+struct PostTransactionMethodDescription
+	:public MethodDescription
+{
+	PostTransactionMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
+		:MethodDescription( "POST/transaction", id, 201, NULL, rootelem, "id", false/*has content*/, 0){}
+};
+
+template <class SCHEME>
+class DefineScheme
+	:public SCHEME
+{
+public:
+	DefineScheme( const char* contextType, const char* schemeName)
+		:m_contextType(contextType),m_schemeName(schemeName){}
+
+	void addToHandler( papuga_RequestHandler* handler, std::set<std::string>& context_typenames) const
+	{
+		if (!papuga_RequestHandler_add_scheme( handler, m_contextType, m_schemeName, papuga::RequestAutomaton::impl())) throw std::bad_alloc();\
+		context_typenames.insert( m_contextType);
+	}
+
+private:
+	const char* m_contextType;
+	const char* m_schemeName;
+};
+
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
@@ -104,27 +136,48 @@ WebRequestHandler::WebRequestHandler(
 	if (!m_impl) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
-#define DEFINE_SCHEME( CONTEXT_TYPE, SCHEME_NAME, SCHEME_IMPL)\
-	static const Scheme_ ## SCHEME_IMPL scheme ## SCHEME_IMPL;\
-	if (!papuga_RequestHandler_add_scheme( m_impl, CONTEXT_TYPE, SCHEME_NAME, scheme ## SCHEME_IMPL .impl())) throw std::bad_alloc();\
-	m_context_typenames.insert( CONTEXT_TYPE);
-
-#define DEFINE_METHOD_VIEW_PATH( REQUEST_METHOD, CLASS, METHOD, HASCONTENT, ROOTELEM, LISTELEM)\
-	static const MethodDescription mt_ ## CLASS ## _ ## REQUEST_METHOD( #REQUEST_METHOD, strus::bindings::method::CLASS::METHOD(), 200, NULL, ROOTELEM, LISTELEM, HASCONTENT, 1, ParamPathArray);\
-	mt_ ## CLASS ## _ ## REQUEST_METHOD.addToHandler( m_impl);
 
 	try
 	{
-		DEFINE_SCHEME( "", ROOT_CONTEXT_NAME, INIT_Context);
-		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "PUT/storage", Context_PUT_Storage);
-		DEFINE_SCHEME( "storage", "DELETE", Context_DELETE_Storage);
-		DEFINE_SCHEME( ROOT_CONTEXT_NAME, "storage", Context_INIT_Storage);
-		DEFINE_SCHEME( "storage", "QRYORG", Storage_QRYORG); 
-		DEFINE_SCHEME( "storage", "QRYANA", Storage_QRYANA); 
-		DEFINE_SCHEME( "queryanalyzer", "ANAQRY", QueryAnalyzer_GET_content);
+		namespace mt = strus::bindings::method;
 
-		DEFINE_METHOD_VIEW_PATH( GET,  Context, introspection, false, "config", "value");
-		DEFINE_METHOD_VIEW_PATH( GET,  StorageClient, introspection, false, "storage", "value");
+		// [1] Add schemes
+		static const DefineScheme<Scheme_INIT_Context> scheme_INIT_Context( ""/*type*/, ROOT_CONTEXT_NAME/*scheme name*/);
+		scheme_INIT_Context.addToHandler( m_impl, m_context_typenames);
+
+		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Storage( ROOT_CONTEXT_NAME/*type*/, "PUT/storage");
+		scheme_Context_PUT_Storage.addToHandler( m_impl, m_context_typenames);
+
+		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Analyzer( ROOT_CONTEXT_NAME/*type*/, "PUT/analyzer");
+		scheme_Context_PUT_Analyzer.addToHandler( m_impl, m_context_typenames);
+
+		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Inserter( ROOT_CONTEXT_NAME/*type*/, "PUT/inserter");
+		scheme_Context_PUT_Inserter.addToHandler( m_impl, m_context_typenames);
+		
+		static const DefineScheme<Scheme_Context_DELETE_Storage> scheme_Context_DELETE_Storage( ROOT_CONTEXT_NAME/*type*/, "DELETE/storage");
+		scheme_Context_DELETE_Storage.addToHandler( m_impl, m_context_typenames);
+
+		static const DefineScheme<Scheme_Context_INIT_Storage> scheme_Context_INIT_Storage( ROOT_CONTEXT_NAME/*type*/, "storage");
+		scheme_Context_INIT_Storage.addToHandler( m_impl, m_context_typenames);
+
+//		static const DefineScheme<Scheme_Context_INIT_DocumentAnalyzer> scheme_Context_INIT_DocumentAnalyzer( ROOT_CONTEXT_NAME/*type*/, "documentAnalyzer");
+//		scheme_Context_INIT_DocumentAnalyzer.addToHandler( m_impl, m_context_typenames);
+
+//		static const DefineScheme<Scheme_Context_INIT_Inserter> scheme_Context_INIT_Inserter( ROOT_CONTEXT_NAME/*type*/, "inserter");
+//		scheme_Context_INIT_Inserter.addToHandler( m_impl, m_context_typenames);
+
+		// [2] Add methods
+		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
+		mt_Context_GET.addToHandler( m_impl);
+
+		static const IntrospectionMethodDescription mt_StorageClient_GET( mt::Context::introspection(), "storage");
+		mt_StorageClient_GET.addToHandler( m_impl);
+		
+		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
+		mt_StorageClient_POST_transaction.addToHandler( m_impl);
+
+		static const PostTransactionMethodDescription mt_Inserter_POST_transaction( mt::Inserter::createTransaction(), "transaction");
+		mt_StorageClient_POST_transaction.addToHandler( m_impl);
 
 		loadConfiguration( configstr_);
 		loadStoredConfigurations();
@@ -374,12 +427,34 @@ bool WebRequestHandler::deleteConfiguration(
 	try
 	{
 		bool rt = true;
+		char scheme[ 64];
+		std::snprintf( scheme, sizeof(scheme)-1, "DELETE/%s", contextType);
+		scheme[ sizeof(scheme)-1] = 0;
+
+		bool has_destroy_scheme = !!papuga_RequestHandler_get_scheme( m_impl, contextType, contextName);
+
 		papuga_ErrorCode errcode = papuga_Ok;
 		if (papuga_RequestHandler_destroy_context( m_impl, contextType, contextName, &errcode))
 		{
 			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
 			{
 				m_logger->logAction( contextType, contextName, "unlink configured object");
+			}
+		}
+		std::string configBuf;
+		WebRequestContent configContent;
+		if (has_destroy_scheme)
+		{
+			if (getStoredConfiguration( contextType, contextName, configBuf, configContent, status))
+			{
+				if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+				{
+					m_logger->logAction( contextType, contextName, "get configuration content for delete");
+				}
+			}
+			else
+			{
+				rt = false;
 			}
 		}
 		if (deleteStoredConfiguration( contextType, contextName, status))
@@ -393,27 +468,25 @@ bool WebRequestHandler::deleteConfiguration(
 		{
 			rt = false;
 		}
-		const char* accepted_charset = "UTF-8";
-		const char* accepted_doctype = "application/json"; 
-		strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, ""/*html_base_href*/, status));
-		WebRequestContext* ctxi = ctx.get();
-		if (!ctxi) return false;
-
-		char scheme[ 64];
-		std::snprintf( scheme, sizeof(scheme)-1, "DELETE/%s", contextType);
-		scheme[ sizeof(scheme)-1] = 0;
-		WebRequestContent content;
-
-		if (ctxi->executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, status))
+		if (has_destroy_scheme)
 		{
-			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+			const char* accepted_charset = "UTF-8";
+			const char* accepted_doctype = "application/json"; 
+			strus::local_ptr<WebRequestContext> ctx( createContext_( accepted_charset, accepted_doctype, ""/*html_base_href*/, status));
+			WebRequestContext* ctxi = ctx.get();
+			if (!ctxi) return false;
+	
+			if (ctxi->executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, configContent, status))
 			{
-				m_logger->logAction( contextType, contextName, "call scheme DELETE");
+				if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+				{
+					m_logger->logAction( contextType, contextName, "call scheme DELETE");
+				}
 			}
-		}
-		else
-		{
-			rt = false;
+			else
+			{
+				rt = false;
+			}
 		}
 		return rt;
 	}
@@ -683,6 +756,48 @@ static std::string getConfigFilenamePart( const std::string& filename, int pi)
 	const char* se = std::strchr( si, '.');
 	if (!se) se = std::strchr( si, '\0');
 	return std::string( si, se-si);
+}
+
+struct greater
+{
+	template<class T>
+	bool operator()(T const &a, T const &b) const { return a > b; }
+};
+
+bool WebRequestHandler::getStoredConfiguration(
+		const char* contextType,
+		const char* contextName,
+		std::string& buf,
+		WebRequestContent& content,
+		WebRequestAnswer& status)
+{
+	std::vector<std::string> configFileNames;
+	int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
+	if (ec) throw strus::runtime_error( ec, _TXT("error loading stored configuration: %s"), std::strerror(ec));
+
+	std::sort( configFileNames.begin(), configFileNames.end(), greater());
+	std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
+	for (; ci != ce; ++ci)
+	{
+		std::string doctype = getConfigFilenamePart( *ci, 1);
+		if (doctype.empty()) continue;
+		std::string candidateContextType = getConfigFilenamePart( *ci, 2);
+		std::string candidateContextName = getConfigFilenamePart( *ci, 3);
+		if (candidateContextType != contextType || candidateContextName != contextName) continue;
+		std::string date = getConfigFilenamePart( *ci, 0);
+		std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
+		ec = strus::readFile( filepath, buf);
+		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file: %s"), std::strerror(ec));
+		std::size_t bufsize = buf.size();
+		buf.push_back( '\0');
+		std::size_t doctypeidx = buf.size();
+		buf.append( doctype);
+		content.setContent( buf.c_str(), bufsize);
+		content.setCharset( "UTF-8");
+		content.setDoctype( buf.c_str() + doctypeidx);
+		return true;
+	}
+	return false;
 }
 
 bool WebRequestHandler::loadStoredConfigurations()
