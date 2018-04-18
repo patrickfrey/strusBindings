@@ -88,6 +88,12 @@ struct IntrospectionMethodDescription
 	IntrospectionMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
 		:MethodDescription( "GET", id, 200, NULL, rootelem, "value", false/*has content*/, 1, WebRequestHandler::ParamPathArray){}
 };
+struct TransformationMethodDescription
+	:public MethodDescription
+{
+	TransformationMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
+		:MethodDescription( "GET", id, 200, NULL, rootelem, "value", true/*has content*/, 1, WebRequestHandler::ParamContent){}
+};
 struct PostTransactionMethodDescription
 	:public MethodDescription
 {
@@ -100,18 +106,17 @@ class DefineScheme
 	:public SCHEME
 {
 public:
-	DefineScheme( const char* contextType, const char* schemeName)
-		:m_contextType(contextType),m_schemeName(schemeName){}
+	explicit DefineScheme( const char* contextType)
+		:m_contextType(contextType){}
 
-	void addToHandler( papuga_RequestHandler* handler, std::set<std::string>& context_typenames) const
+	void addToHandler( papuga_RequestHandler* handler, std::set<std::string>& context_typenames, const char* schemeName) const
 	{
-		if (!papuga_RequestHandler_add_scheme( handler, m_contextType, m_schemeName, papuga::RequestAutomaton::impl())) throw std::bad_alloc();\
+		if (!papuga_RequestHandler_add_scheme( handler, m_contextType, schemeName, papuga::RequestAutomaton::impl())) throw std::bad_alloc();\
 		context_typenames.insert( m_contextType);
 	}
 
 private:
 	const char* m_contextType;
-	const char* m_schemeName;
 };
 
 WebRequestHandler::WebRequestHandler(
@@ -142,29 +147,19 @@ WebRequestHandler::WebRequestHandler(
 		namespace mt = strus::bindings::method;
 
 		// [1] Add schemes
-		static const DefineScheme<Scheme_INIT_Context> scheme_INIT_Context( ""/*type*/, ROOT_CONTEXT_NAME/*scheme name*/);
-		scheme_INIT_Context.addToHandler( m_impl, m_context_typenames);
+		static const DefineScheme<Scheme_INIT_Context> scheme_INIT_Context( ""/*type*/);
+		scheme_INIT_Context.addToHandler( m_impl, m_context_typenames, ROOT_CONTEXT_NAME/*scheme name*/);
 
-		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Storage( ROOT_CONTEXT_NAME/*type*/, "PUT/storage");
-		scheme_Context_PUT_Storage.addToHandler( m_impl, m_context_typenames);
+		static const DefineScheme<Scheme_Context_INIT_Storage> scheme_Context_INIT_Storage( ROOT_CONTEXT_NAME/*type*/);
+		scheme_Context_INIT_Storage.addToHandler( m_impl, m_context_typenames, "storage");
+		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Storage( ROOT_CONTEXT_NAME/*type*/);
+		scheme_Context_PUT_Storage.addToHandler( m_impl, m_context_typenames, "PUT/storage");
+		static const DefineScheme<Scheme_Context_DELETE_Storage> scheme_Context_DELETE_Storage( ROOT_CONTEXT_NAME/*type*/);
+		scheme_Context_DELETE_Storage.addToHandler( m_impl, m_context_typenames, "DELETE/storage");
 
-		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Analyzer( ROOT_CONTEXT_NAME/*type*/, "PUT/analyzer");
-		scheme_Context_PUT_Analyzer.addToHandler( m_impl, m_context_typenames);
-
-		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Inserter( ROOT_CONTEXT_NAME/*type*/, "PUT/inserter");
-		scheme_Context_PUT_Inserter.addToHandler( m_impl, m_context_typenames);
-		
-		static const DefineScheme<Scheme_Context_DELETE_Storage> scheme_Context_DELETE_Storage( ROOT_CONTEXT_NAME/*type*/, "DELETE/storage");
-		scheme_Context_DELETE_Storage.addToHandler( m_impl, m_context_typenames);
-
-		static const DefineScheme<Scheme_Context_INIT_Storage> scheme_Context_INIT_Storage( ROOT_CONTEXT_NAME/*type*/, "storage");
-		scheme_Context_INIT_Storage.addToHandler( m_impl, m_context_typenames);
-
-//		static const DefineScheme<Scheme_Context_INIT_DocumentAnalyzer> scheme_Context_INIT_DocumentAnalyzer( ROOT_CONTEXT_NAME/*type*/, "documentAnalyzer");
-//		scheme_Context_INIT_DocumentAnalyzer.addToHandler( m_impl, m_context_typenames);
-
-//		static const DefineScheme<Scheme_Context_INIT_Inserter> scheme_Context_INIT_Inserter( ROOT_CONTEXT_NAME/*type*/, "inserter");
-//		scheme_Context_INIT_Inserter.addToHandler( m_impl, m_context_typenames);
+		static const DefineScheme<Scheme_Context_PUT_DocumentAnalyzer> scheme_Context_PUT_DocumentAnalyzer( ROOT_CONTEXT_NAME/*type*/);
+		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, m_context_typenames, "docana");
+		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, m_context_typenames, "PUT/docana");
 
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
@@ -178,6 +173,9 @@ WebRequestHandler::WebRequestHandler(
 
 		static const PostTransactionMethodDescription mt_Inserter_POST_transaction( mt::Inserter::createTransaction(), "transaction");
 		mt_StorageClient_POST_transaction.addToHandler( m_impl);
+
+		static const TransformationMethodDescription mt_DocumentAnalyzer_GET( mt::DocumentAnalyzer::analyzeMultiPart(), "doc");
+		mt_DocumentAnalyzer_GET.addToHandler( m_impl);
 
 		loadConfiguration( configstr_);
 		loadStoredConfigurations();

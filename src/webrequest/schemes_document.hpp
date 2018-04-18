@@ -41,25 +41,25 @@ public:
 			},
 			{"/doc/analyzer", "analyzer", "context", C::createDocumentAnalyzer(), {DocumentClassDef} },
 
-			{"/doc/analyzer/feature/*/type", "()", FeatureTypeName},
-			{"/doc/analyzer/feature/*/select", "()", SelectExpression},
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/type", "()", FeatureTypeName},
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/select", "()", SelectExpression},
 
-			{"/doc/analyzer/feature/*/tokenizer/name", "()", TokenizerName},
-			{"/doc/analyzer/feature/*/tokenizer/arg", "()", TokenizerArg},
-			{"/doc/analyzer/feature/*/tokenizer", TokenizerDef, {
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer/name", "()", TokenizerName},
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer/arg", "()", TokenizerArg},
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"/doc/analyzer/feature/*/normalizer/name", "()", NormalizerName},
-			{"/doc/analyzer/feature/*/normalizer/arg", "()", NormalizerArg},
-			{"/doc/analyzer/feature/*/normalizer", NormalizerDef, {
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer/name", "()", NormalizerName},
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer/arg", "()", NormalizerArg},
+			{"/doc/analyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"/doc/analyzer/feature/*/option/position", "()", FeatureOptionPosition},
-			{"/doc/analyzer/feature/*/option", FeatureOptionDef, {
+			{"/doc/analyzer/feature/{search,forward}/option/position", "()", FeatureOptionPosition},
+			{"/doc/analyzer/feature/{search,forward}/option", FeatureOptionDef, {
 					{"position", FeatureOptionPosition, '?'},
 				}
 			},
@@ -112,89 +112,89 @@ public:
 					{AggregatorDef}
 				}
 			},
-			{"/doc/analyzer/feature/pattern/*/type", "()", FeatureTypeName},
+			{"/doc/analyzer/feature/pattern/{search,forward,metadata,attribute}/type", "()", FeatureTypeName},
+			{"/doc/analyzer/feature/pattern/{search,forward,metadata,attribute}/pattern", "()", PatternTypeName},
+			{"/doc/analyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer/name", "()", NormalizerName},
+			{"/doc/analyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer/arg", "()", NormalizerArg},
+			{"/doc/analyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer", NormalizerDef, {
+					{"name", NormalizerName, '!'},
+					{"arg", NormalizerArg, '*'}
+				}
+			},
+			{"/doc/analyzer/feature/pattern/{search,forward}/option/position", "()", FeatureOptionPosition},
+			{"/doc/analyzer/feature/pattern/{search,forward}/option", FeatureOptionDef, {
+					{"position", FeatureOptionPosition, '?'},
+				}
+			},
+			{"/doc/analyzer/feature/pattern/search", 0, "analyzer", A::addSearchIndexFeatureFromPatternMatch(), {
+					{FeatureTypeName},
+					{PatternTypeName},
+					{NormalizerDef,'+'},
+					{FeatureOptionDef,'*'}
+				}
+			},
+			{"/doc/analyzer/feature/pattern/forward", 0, "analyzer", A::addForwardIndexFeatureFromPatternMatch(), {
+					{FeatureTypeName},
+					{PatternTypeName},
+					{NormalizerDef,'+'},
+					{FeatureOptionDef,'*'}
+				}
+			},
+			{"/doc/analyzer/feature/pattern/metadata", 0, "analyzer", A::defineMetaDataFromPatternMatch(), {
+					{FeatureTypeName},
+					{PatternTypeName},
+					{NormalizerDef,'+'}
+				}
+			},
 			{"/doc/analyzer/feature/pattern/attribute", 0, "analyzer", A::defineAttributeFromPatternMatch(), {
 					{FeatureTypeName},
 					{PatternTypeName},
 					{NormalizerDef,'+'}
 				}
 			},
-			
-			{"/doc/analyzer/group/field", "()", FieldTypeName},
-			{"/doc/analyzer/group/op", "()", JoinOperatorName},
-			{"/doc/analyzer/group/range", "()", JoinOperatorRange},
-			{"/doc/analyzer/group/cardinality", "()", JoinOperatorCardinality},
-			{"/doc/analyzer/group@by", "", GroupBy},
-			{"/doc/analyzer/group", 0, "analyzer", A::defineImplicitGroupBy(), {
-					{FieldTypeName,'!'},
-					{GroupBy,'!'},
-					{JoinOperatorName,'!'},
-					{JoinOperatorRange,'?'},
-					{JoinOperatorCardinality,'?'}}
+			{"/doc/analyzer/postmatcher/name", "()", PatternTypeName},
+			{"/doc/analyzer/postmatcher/module", "()", PatternMatcherModule},
+			{"/doc/analyzer/postmatcher/lexem", "()", PatternMatcherLexemTypes},
+			{"/doc/analyzer/postmatcher/pattern/name", "()", PatternRuleName},
+			{"/doc/analyzer/postmatcher/pattern/visible", "()", PatternRuleVisible},
+			{"/doc/analyzer/postmatcher/pattern/expression", "()", PatternRuleExpression},
+			{"/doc/analyzer/postmatcher/pattern", PatternMatcherPatternDef, {
+					{"name", PatternRuleName, '!'},
+					{"visible", PatternRuleVisible, '?'},
+					{"expression", PatternRuleExpression, '!'}
+				}
+			},
+			{"/doc/analyzer/postpattern", 0, "analyzer", A::definePatternMatcherPostProc(), {
+					{PatternTypeName, '!'},
+					{PatternMatcherModule, '!'},
+					{PatternMatcherLexemTypes, '*'},
+					{PatternMatcherPatternDef, '*'}
+				}
 			}
-		};
-	}
-
-	static papuga::RequestAutomaton_NodeList declareTermExpression()
-	{
-		return {
-			{"/doc/feature//term/variable", "()", ExpressionVariableName},
-			{"/doc/feature//term/type", "()", FieldTypeName},
-			{"/doc/feature//term/value", "()", TermValue},
-			{"/doc/feature//term", TermExpression, {
-					{"variable", ExpressionVariableName, '?'},
-					{"type", FieldTypeName, '!'},
-					{"value", TermValue, '!'}
-				}
-			},
-			{"/doc/feature//expr/variable", "()", ExpressionVariableName},
-			{"/doc/feature//expr/op", "()", JoinOperatorName},
-			{"/doc/feature//expr/range", "()", JoinOperatorRange},
-			{"/doc/feature//expr/cardinality", "()", JoinOperatorCardinality},
-			{"/doc/feature//expr/arg", "()", TermExpression},
-			{"/doc/feature//expr", TermExpression, {
-					{"variable", ExpressionVariableName, '?'},
-					{"op", JoinOperatorName, '!'},
-					{"range", JoinOperatorRange, '?'},
-					{"cardinality", JoinOperatorRange, '?'},
-					{"arg", TermExpression, '*'}
-				}
-			},
-			{"/doc/feature/set", "()", FeatureSet},
-			{"/doc/feature/weight", "()", FeatureWeight},
-		};
-	}
-
-	static papuga::RequestAutomaton_NodeList declareMetaData()
-	{
-		return {
-			{"/doc/restriction//condition/op", "()", MetaDataConditionOp},
-			{"/doc/restriction//condition/name", "()", MetaDataConditionName},
-			{"/doc/restriction//condition/value", "()", MetaDataConditionValue},
-			{"/doc/restriction//condition", MetaDataCondition, {
-					{MetaDataConditionOp},
-					{MetaDataConditionName},
-					{MetaDataConditionValue}
-				}
-			},
-			{"/doc/restriction/union", MetaDataCondition, {
-					{MetaDataCondition, '*'}
-				}
-			},
 		};
 	}
 };
 
-class Scheme_QueryAnalyzer_GET_content :public papuga::RequestAutomaton, public SchemeQueryPart
+class Scheme_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemeDocumentPart
 {
 public:
-	Scheme_QueryAnalyzer_GET_content() :papuga::RequestAutomaton(
+	Scheme_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
-			{defineAnalyzer()},
-			{analyzeTermExpression()},
-			{analyzeMetaData()}
+			{defineAnalyzer()}
+		}
+	) {}
+};
+
+class Scheme_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemeDocumentPart
+{
+public:
+	Scheme_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		"result",{},
+		{
+			{defineAnalyzer()}
 		}
 	) {}
 };

@@ -14,6 +14,7 @@
 #include "schemes_context.hpp"
 #include "schemes_storage.hpp"
 #include "schemes_query.hpp"
+#include "schemes_document.hpp"
 #endif
 
 

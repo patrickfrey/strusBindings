@@ -35,7 +35,8 @@ public:
 	
 		Segmenter, MimeType, Charset, Scheme, DocumentClassDef,
 		AnalyzerElement,FeatureTypeName,FieldTypeName,SelectExpression,FeatureOptionPosition,FeatureOptionDef,
-		PatternTypeName,
+		PatternTypeName, PatternMatcherModule, PatternMatcherLexemTypes, PatternMatcherPatternDef,
+		PatternRuleName, PatternRuleVisible, PatternRuleExpression,
 		AggregatorName,AggregatorArg,AggregatorDef,
 		TokenizerName,TokenizerArg,TokenizerDef,
 		NormalizerName,NormalizerArg,NormalizerDef,
