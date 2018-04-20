@@ -15,7 +15,7 @@ require "string"
 function createDocumentAnalyzer_mdprim( strusctx)
 	local analyzer = strusctx:createDocumentAnalyzer( {"xml"})
 
-	analyzer:defineDocument( "doc", "/list/doc")
+	analyzer:defineSubDocument( "doc", "/list/doc")
 
 	-- Define the features and attributes to store:
 	mdelems = {'cross', 'factors', 'lo', 'hi' }

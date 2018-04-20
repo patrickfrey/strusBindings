@@ -533,6 +533,7 @@ public:
 	{
 		if ((int)sizeof(buf)-1 <= std::snprintf( buf, sizeof(buf), "%s", pt)) throw std::bad_alloc();
 		itr = buf;
+		while (*itr == '/') ++itr;
 	}
 
 	bool startsWith( const char* prefix, int prefixlen)
@@ -540,7 +541,10 @@ public:
 		char* itrnext = std::strchr( itr, '/');
 		return (prefixlen == itrnext-itr && prefix[0] == itr[0] && 0==std::memcmp( prefix, itr, prefixlen));
 	}
-
+	bool hasMore()
+	{
+		return itr[0];
+	}
 	const char* getNext()
 	{
 		if (!itr[0]) return 0;
@@ -566,6 +570,13 @@ public:
 		while (enditr != buf && *(enditr-1) == '/') --enditr;
 		*enditr = '\0';
 		return rt;
+	}
+	const char* rest()
+	{
+		char* enditr = std::strchr( itr, '\0');
+		while (enditr != buf && *(enditr-1) == '/') --enditr;
+		*enditr = '\0';
+		return itr;
 	}
 
 private:
@@ -1068,13 +1079,87 @@ bool WebRequestContext::executeRequest(
 		{
 			return false;
 		}
+		if (selector.typenam && !path.hasMore())
+		{
+			if (debug)
+			{
+				setAnswer( answer, ErrorCodeRequestResolveError);
+				return false;
+			}
+			if (selector.contextnam)
+			{
+				// PUT or DELETE of configuration/transaction or fallback to next:
+				if (isEqual(method,"PUT"))
+				{
+					if (transactionRef.get())
+					{
+						method = "commit";
+						// ... fallback with renamed method
+					}
+					else
+					{
+						return m_handler->loadConfiguration(
+							selector.typenam, selector.contextnam, true/*for reload*/, content, answer);
+					}
+				}
+				else if (isEqual(method,"DELETE"))
+				{
+					if (transactionRef.get())
+					{
+						transactionRef.reset();
+						m_handler->releaseTransaction( selector.contextnam);
+						return true;
+					}
+					else
+					{
+						selector.reset();
+						return m_handler->deleteConfiguration( selector.typenam, selector.contextnam, answer);
+					}
+				}
+				// else fallback
+			}
+			else
+			{
+				// Toplevel introspection without object defined:
+				if (!content.empty())
+				{
+					setAnswer( answer, ErrorCodeInvalidArgument);
+					return false;
+				}
+				if (isEqual( method, "GET"))
+				{
+					if (!selector.typenam)
+					{
+						return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, m_handler->contextTypes());
+					}
+					else
+					{
+						std::vector<std::string> contextlist = m_handler->contextNames( selector.typenam);
+						if (contextlist.empty())
+						{
+							setAnswer( answer, ErrorCodeRequestResolveError);
+							return false;
+						}
+						else
+						{
+							return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
+						}
+					}
+				}
+				else
+				{
+					setAnswer( answer, ErrorCodeRequestResolveError);
+					return false;
+				}
+			}
+		}
 		// Call object method with content if object defined and method defined, else fallback to next:
 		if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
 		{
 			int classid = selector.obj->value.hostObject->classid;
 			void* self = selector.obj->value.hostObject->data;
-			const char* rest = path.getRest();
-			if (isEqual(method,"POST") && isEqual(rest,"transaction"))
+
+			if (isEqual(method,"POST") && isEqual( path.rest(),"transaction"))
 			{
 				return executePostTransaction( self, classid, selector.typenam, selector.contextnam, answer);
 			}
@@ -1089,107 +1174,11 @@ bool WebRequestContext::executeRequest(
 						return false;
 						//... debug requests only available calling schemes
 					}
-					else
-					{
-						if (!callHostObjMethod( self, methoddescr, rest, content, answer)) return false;
-						goto DONE;
-					}
+					if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer)) return false;
+					goto DONE;
 				}
+				//... fallback
 			}
-		}
-		// Toplevel introspection if object not defined:
-		if (!selector.contextnam)
-		{
-			//... No object selected, handle GET for all
-			if (debug)
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-			if (!content.empty())
-			{
-				setAnswer( answer, ErrorCodeInvalidArgument);
-				return false;
-			}
-			if (isEqual( method, "GET"))
-			{
-				if (!selector.typenam)
-				{
-					return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, m_handler->contextTypes());
-				}
-				else
-				{
-					std::vector<std::string> contextlist = m_handler->contextNames( selector.typenam);
-					if (contextlist.empty())
-					{
-						setAnswer( answer, ErrorCodeRequestResolveError);
-						return false;
-					}
-					else
-					{
-						return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
-					}
-				}
-			}
-			else
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-		}
-		else if (!selector.context)
-		{
-			const char* rest = path.getRest();
-			// Object selected does not exist, we do a configuration request:
-			if (rest[0] == '\0')
-			{
-				if (isEqual( method, "PUT"))
-				{
-					if (!m_handler->loadConfiguration(
-							selector.typenam, selector.contextnam,
-							true/*store for reload*/, content, answer))
-					{
-						return false;
-					}
-					return true;
-				}
-				else if (isEqual( method, "DELETE"))
-				{
-					if (!m_handler->deleteConfiguration( selector.typenam, selector.contextnam, answer))
-					{
-						return false;
-					}
-					return true;
-				}
-				else
-				{
-					setAnswer( answer, ErrorCodeRequestResolveError);
-					return false;
-				}
-			}
-			else
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-		}
-		else if (path.getRest()[0] == '\0' && isEqual( method, "DELETE"))
-		{
-			if (transactionRef.get())
-			{
-				transactionRef.reset();
-				m_handler->releaseTransaction( selector.contextnam);
-				return true;
-			}
-			else
-			{
-				selector.reset();
-				if (!m_handler->deleteConfiguration( selector.typenam, selector.contextnam, answer))
-				{
-					return false;
-				}
-			}
-			return true;
 		}
 		else if (content.empty())
 		{

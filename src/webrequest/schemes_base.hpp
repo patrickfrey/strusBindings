@@ -34,6 +34,7 @@ public:
 		StorageMaxNofOpenFiles, StorageWriteBufferSize, StorageBlockSize,
 	
 		Segmenter, MimeType, Charset, Scheme, DocumentClassDef,
+		SubDocumentName, SubDocumentSelect, SubContentClassDef, SubContentSelect, 
 		AnalyzerElement,FeatureTypeName,FieldTypeName,SelectExpression,FeatureOptionPosition,FeatureOptionDef,
 		PatternTypeName, PatternMatcherModule, PatternMatcherLexemTypes, PatternMatcherPatternDef,
 		PatternRuleName, PatternRuleVisible, PatternRuleExpression,

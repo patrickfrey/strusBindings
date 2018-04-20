@@ -15,7 +15,7 @@ import strus
 def createDocumentAnalyzer_mdprim( strusctx):
 	analyzer = strusctx.createDocumentAnalyzer( ["xml"])
 
-	analyzer.defineDocument( "doc", "/list/doc")
+	analyzer.defineSubDocument( "doc", "/list/doc")
 
 	# Define the features and attributes to store:
 	mdelems = [ 'cross', 'factors', 'lo', 'hi' ]

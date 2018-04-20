@@ -109,10 +109,9 @@ public:
 	explicit DefineScheme( const char* contextType)
 		:m_contextType(contextType){}
 
-	void addToHandler( papuga_RequestHandler* handler, std::set<std::string>& context_typenames, const char* schemeName) const
+	void addToHandler( papuga_RequestHandler* handler, const char* schemeName) const
 	{
 		if (!papuga_RequestHandler_add_scheme( handler, m_contextType, schemeName, papuga::RequestAutomaton::impl())) throw std::bad_alloc();\
-		context_typenames.insert( m_contextType);
 	}
 
 private:
@@ -146,33 +145,39 @@ WebRequestHandler::WebRequestHandler(
 	{
 		namespace mt = strus::bindings::method;
 
-		// [1] Add schemes
+		// [1] Add context types
+		m_context_typenames.insert( ROOT_CONTEXT_NAME);
+		m_context_typenames.insert( "storage");
+		m_context_typenames.insert( "docanalyzer");
+		m_context_typenames.insert( "queryanalyzer");
+
+		// [2] Add schemes
 		static const DefineScheme<Scheme_INIT_Context> scheme_INIT_Context( ""/*type*/);
-		scheme_INIT_Context.addToHandler( m_impl, m_context_typenames, ROOT_CONTEXT_NAME/*scheme name*/);
+		scheme_INIT_Context.addToHandler( m_impl, ROOT_CONTEXT_NAME/*scheme name*/);
 
 		static const DefineScheme<Scheme_Context_INIT_Storage> scheme_Context_INIT_Storage( ROOT_CONTEXT_NAME/*type*/);
-		scheme_Context_INIT_Storage.addToHandler( m_impl, m_context_typenames, "storage");
+		scheme_Context_INIT_Storage.addToHandler( m_impl, "storage");
 		static const DefineScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Storage( ROOT_CONTEXT_NAME/*type*/);
-		scheme_Context_PUT_Storage.addToHandler( m_impl, m_context_typenames, "PUT/storage");
+		scheme_Context_PUT_Storage.addToHandler( m_impl, "PUT/storage");
 		static const DefineScheme<Scheme_Context_DELETE_Storage> scheme_Context_DELETE_Storage( ROOT_CONTEXT_NAME/*type*/);
-		scheme_Context_DELETE_Storage.addToHandler( m_impl, m_context_typenames, "DELETE/storage");
+		scheme_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
 
 		static const DefineScheme<Scheme_Context_PUT_DocumentAnalyzer> scheme_Context_PUT_DocumentAnalyzer( ROOT_CONTEXT_NAME/*type*/);
-		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, m_context_typenames, "docana");
-		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, m_context_typenames, "PUT/docana");
+		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "docanalyzer");
+		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
 
-		// [2] Add methods
+		// [3] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
 		mt_Context_GET.addToHandler( m_impl);
 
-		static const IntrospectionMethodDescription mt_StorageClient_GET( mt::Context::introspection(), "storage");
+		static const IntrospectionMethodDescription mt_StorageClient_GET( mt::StorageClient::introspection(), "storage");
 		mt_StorageClient_GET.addToHandler( m_impl);
 		
 		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
 		mt_StorageClient_POST_transaction.addToHandler( m_impl);
 
 		static const PostTransactionMethodDescription mt_Inserter_POST_transaction( mt::Inserter::createTransaction(), "transaction");
-		mt_StorageClient_POST_transaction.addToHandler( m_impl);
+		mt_Inserter_POST_transaction.addToHandler( m_impl);
 
 		static const TransformationMethodDescription mt_DocumentAnalyzer_GET( mt::DocumentAnalyzer::analyzeMultiPart(), "doc");
 		mt_DocumentAnalyzer_GET.addToHandler( m_impl);
@@ -335,7 +340,7 @@ static WebRequestHandler::SubConfig createSubConfig( const std::string& name, pa
 
 bool WebRequestHandler::isSubConfigSection( const std::string& name) const
 {
-	return (name != ROOT_CONTEXT_NAME && m_context_typenames.find( name) != m_context_typenames.end());
+	return (m_context_typenames.find( name) != m_context_typenames.end() && name != ROOT_CONTEXT_NAME);
 }
 
 std::vector<WebRequestHandler::SubConfig> WebRequestHandler::getSubConfigList( const std::string& content) const
@@ -634,6 +639,11 @@ bool WebRequestHandler::loadConfiguration(
 	catch (const std::bad_alloc&)
 	{
 		setStatus( status, ErrorCodeOutOfMem);
+		return false;
+	}
+	catch (const std::runtime_error& err)
+	{
+		setStatus( status, ErrorCodeRuntimeError, err.what());
 		return false;
 	}
 	catch (...)
