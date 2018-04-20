@@ -56,7 +56,14 @@ DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& trace, const Object
 	}
 	if (!segmenter)
 	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
+		if (errorhnd->hasError())
+		{
+			throw std::runtime_error( errorhnd->fetchError());
+		}
+		else
+		{
+			throw std::runtime_error( _TXT("no segmenter or document class defined"));
+		}
 	}
 	m_analyzer_impl.resetOwnership( objBuilder->createDocumentAnalyzer( segmenter, segmenteropt), "DocumentAnalyzer");
 	if (!m_analyzer_impl.get())
@@ -285,12 +292,21 @@ void DocumentAnalyzerImpl::definePatternMatcherPostProcFromFile(
 	pt.release();
 }
 
-void DocumentAnalyzerImpl::defineDocument(
+void DocumentAnalyzerImpl::defineSubDocument(
 	const std::string& subDocumentTypeName,
 	const std::string& selectexpr)
 {
 	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 	THIS->defineSubDocument( subDocumentTypeName, selectexpr);
+}
+
+void DocumentAnalyzerImpl::defineSubContent(
+		const std::string& selectexpr,
+		const ValueVariant& dclass)
+{
+	analyzer::DocumentClass documentClass = Deserializer::getDocumentClass( dclass);
+	DocumentAnalyzerInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
+	THIS->defineSubContent( selectexpr, documentClass);
 }
 
 static analyzer::Document* analyzeDoc( const DocumentAnalyzerInterface* THIS, const std::string& content, const analyzer::DocumentClass& dclass, ErrorBufferInterface* errorhnd)

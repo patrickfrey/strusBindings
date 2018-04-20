@@ -261,9 +261,18 @@ public:
 	/// \example "/doc/employee"
 	/// \param[in] subDocumentTypeName type name assinged to this sub document
 	/// \example "employee"
-	void defineDocument(
+	void defineSubDocument(
 			const std::string& subDocumentTypeName,
 			const std::string& selectexpr);
+
+	/// \brief Declare a sub parrt of a document with a different document class, needing a switching of the segmenter
+	/// \param[in] selectexpr an expression that defines the area of the sub content
+	/// \example "/doc/content"
+	/// \param[in] documentClass document class of the content, determines what segmenter to use for this part
+	/// \example [mimetype:"application/json" encoding:"UTF-8"]
+	void defineSubContent(
+			const std::string& selectexpr,
+			const ValueVariant& documentClass);
 
 	/// \brief Analye a content and return the analyzed document structure (analyzing single document)
 	/// \param[in] content content string (NOT a file name !) of the document to analyze
