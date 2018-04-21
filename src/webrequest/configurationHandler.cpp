@@ -117,8 +117,9 @@ void ConfigurationHandler::deleteStoredConfiguration(
 	std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
 	for (; fi != fe; ++fi)
 	{
-		ec = strus::removeFile( *fi, true);
-		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file '%s'"), fi->c_str());
+		std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
+		ec = strus::removeFile( filepath, true);
+		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
 
 		ContextNameDef namedef( contextType, contextName);
 		m_context_names.erase( namedef);
@@ -137,8 +138,9 @@ void ConfigurationHandler::clearUnfinishedTransactions()
 	std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
 	for (; fi != fe; ++fi)
 	{
-		ec = strus::removeFile( *fi, true);
-		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file '%s'"), fi->c_str());
+		std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
+		ec = strus::removeFile( filepath, true);
+		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to clear unfinished transaction (file %s): %s"), filepath.c_str(), std::strerror(ec));
 	}
 }
 
@@ -165,14 +167,14 @@ ConfigurationDescription ConfigurationHandler::getStoredConfiguration(
 		std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
 		std::string contentbuf;
 		ec = strus::readFile( filepath, contentbuf);
-		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file: %s"), std::strerror(ec));
+		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
 
 		return ConfigurationDescription( contextType, contextName, doctype, contentbuf);
 	}
 	return ConfigurationDescription();
 }
 
-std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurations()
+std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurations( bool doDeleteObsolete)
 {
 	strus::unique_lock lock( m_mutex);
 
@@ -192,18 +194,35 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 		if (doctype.empty()) continue;
 		std::string contextType = getConfigFilenamePart( *ci, 2);
 		std::string contextName = getConfigFilenamePart( *ci, 3);
-		if (!configItemSet.insert( ConfigItem( contextType, contextName)).second) continue;
-
 		std::string date = getConfigFilenamePart( *ci, 0);
-		std::string contentbuf;
 		std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
 
+		if (!configItemSet.insert( ConfigItem( contextType, contextName)).second)
+		{
+			if (doDeleteObsolete)
+			{
+				ec = strus::removeFile( filepath, true);
+				if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
+			}
+			continue;
+		}
+		std::string contentbuf;
 		ec = strus::readFile( filepath, contentbuf);
-		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file: %s"), std::strerror(ec));
+		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
 
 		rt.push_back( ConfigurationDescription( contextType, contextName, doctype, contentbuf));
 	}
 	return rt;
+}
+
+std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurations()
+{
+	return ConfigurationHandler::getStoredConfigurations( false);
+}
+
+void ConfigurationHandler::deleteObsoleteConfigurations()
+{
+	ConfigurationHandler::getStoredConfigurations( true);
 }
 
 static ConfigurationDescription createSubConfig( const std::string& name, papuga_Allocator& allocator, papuga_SerializationIter& itr)

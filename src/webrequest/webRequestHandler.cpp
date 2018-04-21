@@ -177,6 +177,7 @@ WebRequestHandler::WebRequestHandler(
 
 		loadConfiguration( configstr_);
 		m_configHandler.clearUnfinishedTransactions();
+		m_configHandler.deleteObsoleteConfigurations();
 		if (!m_ticker.start()) throw std::bad_alloc();
 	}
 	catch (const std::bad_alloc&)
@@ -286,7 +287,8 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 	}
 	// Load put configurations:
 	cfglist = m_configHandler.getStoredConfigurations();
-	for (ci = cfglist.begin(); ci != ce; ++ci)
+	ci = cfglist.begin(), ce = cfglist.end();
+	for (; ci != ce; ++ci)
 	{
 		strus::WebRequestContent subcontent( config_charset, ci->doctype.c_str(), ci->contentbuf.c_str(), ci->contentbuf.size());
 		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status))

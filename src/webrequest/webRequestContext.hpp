@@ -70,6 +70,7 @@ private:
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
+	bool executeMainScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 	void releaseContext();

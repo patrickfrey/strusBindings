@@ -64,7 +64,7 @@ public:
 			const std::string& config_store_dir_,
 			const char** context_typenames);
 
-	virtual ~ConfigurationHandler();
+	virtual ~ConfigurationHandler(){}
 
 	void storeConfiguration(
 			ConfigurationTransaction& transaction,
@@ -77,6 +77,7 @@ public:
 			const char* contextType,
 			const char* contextName);
 
+	void deleteObsoleteConfigurations();
 	void clearUnfinishedTransactions();
 
 	ConfigurationDescription getStoredConfiguration(
@@ -93,6 +94,7 @@ public:
 	std::vector<std::string> contextTypes() const;
 
 private:
+	std::vector<ConfigurationDescription> getStoredConfigurations( bool doDeleteObsolete);
 	typedef std::pair<std::string,std::string> ContextNameDef;
 
 private:

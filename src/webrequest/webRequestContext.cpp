@@ -470,13 +470,8 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 	if (contextName)
 	{
 		if (!inheritRequestContext( answer, contextType, contextName)) return false;
-		return true;
 	}
-	else
-	{
-		setAnswer( answer, ErrorCodeRequestResolveError, _TXT("undefined object"));
-		return false;
-	}
+	return true;
 }
 
 bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer)
@@ -904,6 +899,11 @@ void WebRequestContext::releaseContext()
 	m_context_ownership = false;
 }
 
+bool WebRequestContext::executeMainScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
+{
+	return executeContextScheme( (const char*)0, (const char*)0, scheme, content, answer);
+}
+
 bool WebRequestContext::executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	return	createRequestContext( answer, contextType, contextName)
@@ -1090,8 +1090,8 @@ bool WebRequestContext::executePutConfiguration( const char* typenam, const char
 
 bool WebRequestContext::executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	if (!executeContextScheme( "", "", ROOT_CONTEXT_NAME, content, answer)
-	||  m_handler->transferContext( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, m_context, answer))
+	if (!executeMainScheme( ROOT_CONTEXT_NAME, content, answer)
+	||  !m_handler->transferContext( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, m_context, answer))
 	{
 		return false;
 	}
@@ -1183,7 +1183,7 @@ bool WebRequestContext::executeRequest(
 		{
 			return false;
 		}
-		if (selector.typenam && !path.hasMore())
+		if (!path.hasMore())
 		{
 			if (debug)
 			{
