@@ -34,6 +34,26 @@ public:
 			const char* path,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
+
+	/// \brief Load the main configuration initializing the root context object
+	/// \param[in] content content of the configuration to load
+	/// \param[out] answer result status
+	/// \return bool true if succeeded, false else
+	virtual bool executeLoadMainConfiguration(
+			const WebRequestContent& content,
+			WebRequestAnswer& answer)=0;
+
+	/// \brief Load a sub configuration initializing an object addressable by type and name
+	/// \param[in] typenam type name of the object
+	/// \param[in] contextnam name of the object
+	/// \param[in] content content of the configuration to load
+	/// \param[out] answer result status
+	/// \return bool true if succeeded, false else
+	virtual bool executeLoadSubConfiguration(
+			const char* typenam,
+			const char* contextnam,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer)=0;
 };
 
 }//namespace

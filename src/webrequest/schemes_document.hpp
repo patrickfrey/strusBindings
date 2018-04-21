@@ -205,7 +205,7 @@ class Scheme_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton, pub
 public:
 	Scheme_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",{},
+		NULL/*resultname*/,{},
 		{
 			{defineAnalyzer()}
 		}
@@ -217,7 +217,7 @@ class Scheme_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, publ
 public:
 	Scheme_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",{},
+		NULL/*resultname*/,{},
 		{
 			{defineAnalyzer()}
 		}

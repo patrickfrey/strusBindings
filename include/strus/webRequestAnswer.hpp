@@ -18,24 +18,25 @@
 namespace strus
 {
 
+/// \brief Structure holding an answer of a webrequest
 class WebRequestAnswer
 {
 public:
 	/// \brief Default constructor
 	WebRequestAnswer()
-		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_content(){}
+		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(){m_errorbuf[0]=0;}
 	/// \brief Constructor
 	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_, const WebRequestContent& content_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_content(content_){}
+		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
 	/// \brief Constructor
 	WebRequestAnswer( const WebRequestContent& content_)
-		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_content(content_){}
+		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
 	/// \brief Constructor
 	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_content(){}
+		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(){m_errorbuf[0]=0;}
 	/// \brief Copy constructor
 	WebRequestAnswer( const WebRequestAnswer& o)
-		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_apperrorcode(o.m_apperrorcode),m_content(o.m_content)
+		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_apperrorcode(o.m_apperrorcode),m_messagetype(o.m_messagetype),m_messagestr(o.m_messagestr),m_content(o.m_content)
 	{
 		if (o.m_errorstr == o.m_errorbuf)
 		{
@@ -77,6 +78,7 @@ public:
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] apperrorcode_ application error code
 	/// \param[in] errorstr_ pointer to the error message
+	/// \param[in] doCopy is the message should be copied
 	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_, bool doCopy=false)
 	{
 		if (doCopy)
@@ -96,11 +98,22 @@ public:
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] type type of the message
 	/// \param[in] str pointer to the message (0-terminated string)
-	void setMessage( int httpstatus_, const char* type, const char* str)
+	/// \param[in] doCopy is the message should be copied
+	void setMessage( int httpstatus_, const char* type, const char* str, bool doCopy=false)
 	{
+		if (doCopy)
+		{
+			m_errorstr = 0;
+			std::size_t len = std::snprintf( m_errorbuf, sizeof(m_errorbuf), "%s", str);
+			if (len >= sizeof(m_errorbuf)) m_errorbuf[ sizeof(m_errorbuf)-1] = 0;
+			m_messagestr = m_errorbuf;
+		}
+		else
+		{
+			m_messagestr = str;
+		}
 		m_httpstatus = httpstatus_;
 		m_messagetype = type;
-		m_messagestr = str;
 	}
 
 	/// \brief Set content of answer (shallow copy)

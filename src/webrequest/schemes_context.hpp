@@ -24,7 +24,7 @@ class Scheme_INIT_Context :public papuga::RequestAutomaton, public AutomatonName
 public:
 	Scheme_INIT_Context() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"context",{},
+		NULL/*resultname*/,{},
 		{
 			{"/extensions/directory", "()", ModuleDir},
 			{"/extensions/modules", "()", ModuleName},

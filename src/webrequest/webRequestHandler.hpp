@@ -10,6 +10,7 @@
 #ifndef _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #include "strus/webRequestHandlerInterface.hpp"
+#include "configurationHandler.hpp"
 #include "strus/base/thread.hpp"
 #include "strus/base/periodicTimerEvent.hpp"
 #include "papuga/requestHandler.h"
@@ -18,6 +19,8 @@
 #include <cstddef>
 #include <utility>
 #include <set>
+
+#define ROOT_CONTEXT_NAME "context"
 
 namespace strus
 {
@@ -36,7 +39,7 @@ public:
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
 			const std::string& configstr_,
-			int maxIdleTime,
+			int maxIdleTime_,
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 
@@ -49,88 +52,26 @@ public:
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
 
-	const papuga_RequestHandler* impl() const			{return m_impl;}
+	const papuga_RequestHandler* impl()				{return m_impl;}
 	const char* html_head() const					{return m_html_head.c_str();}
 	int debug_maxdepth() const					{return m_debug_maxdepth;}
-	std::vector<std::string> contextTypes() const;
-	std::vector<std::string> contextNames( const std::string& name) const;
-
-	bool loadConfiguration(
+	int maxIdleTime() const						{return m_maxIdleTime;}
+	bool transferContext(
 			const char* contextType,
 			const char* contextName,
-			bool storedForReload,
-			const WebRequestContent& content,
+			papuga_RequestContext* context,
 			WebRequestAnswer& status);
-	bool deleteConfiguration(
+	bool removeContext(
 			const char* contextType,
 			const char* contextName,
 			WebRequestAnswer& status);
-
-	std::string postTransaction( papuga_RequestContext* context);
-	TransactionRef fetchTransaction( const std::string& tid);
-	void returnTransaction( const TransactionRef& tr);
-	void releaseTransaction( const std::string& tid);
 
 public:/*Ticker*/
 	void tick();
 
-private:/*Load store configuration source*/
-	struct ConfigurationTransaction
-	{
-		std::string failed_filename;
-		std::string filename;
-	};
-
-	bool storeConfiguration(
-			ConfigurationTransaction& transaction,
-			const char* contextType,
-			const char* contextName,
-			const WebRequestContent& content,
-			WebRequestAnswer& status) const;
-	bool commitStoreConfiguration(
-			const ConfigurationTransaction& transaction,
-			WebRequestAnswer& status) const;
-	bool deleteStoredConfigurations(
-			const char* contextType,
-			const char* contextName,
-			WebRequestAnswer& status) const;
-	bool getStoredConfiguration(
-			const char* contextType,
-			const char* contextName,
-			std::string& buf,
-			WebRequestContent& content,
-			WebRequestAnswer& status);
-
 private:/*Constructor/Destructor*/
 	void loadConfiguration( const std::string& configstr);
-	void loadInitConfiguration( const std::string& configstr);
-	bool loadStoredConfigurations();
-	bool deleteStoredConfiguration( const char* contextType, const char* contextName, WebRequestAnswer& status);
-
 	void clear();
-
-public:
-	/// \brief Configuration of an object
-	struct SubConfig
-	{
-		std::string name;
-		std::string id;
-		std::string content;
-	
-		SubConfig( const SubConfig& o)
-			:name(o.name),id(o.id),content(o.content){}
-		SubConfig( const std::string& name_, const std::string& id_,  const std::string& content_)
-			:name(name_),id(id_),content(content_){}
-	};
-
-private:/*Load configuration*/
-	std::vector<SubConfig> getSubConfigList( const std::string& content) const;
-	bool isSubConfigSection( const std::string& name) const;
-	WebRequestContext* createContext_(
-			const char* accepted_charset,
-			const char* accepted_doctype,
-			const char* html_base_href,
-			WebRequestAnswer& status);
 
 private:
 	typedef std::pair<std::string,std::string> ContextNameDef;
@@ -150,15 +91,13 @@ private:
 	};
 
 private:
-	mutable strus::mutex m_mutex;			//< mutex for locking mutual exclusion of configuration requests
-	mutable int m_config_counter;			//< counter to order configurations stored that have the same date
+	strus::mutex m_mutex_context_transfer;		//< mutual exclusion of request context access
 	int m_debug_maxdepth;				//< maximum depth for debug structures
 	WebRequestLoggerInterface* m_logger;		//< request logger 
 	papuga_RequestHandler* m_impl;			//< request handler
+	ConfigurationHandler m_configHandler;		//< configuration handler
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_store_dir;			//< directory where to store configurations loaded as request
-	std::set<ContextNameDef> m_context_names;	//< context definitions type name pairs
-	std::set<std::string> m_context_typenames;	//< defined context types
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
 	Ticker m_ticker;				//< periodic timer event to handle timeout of transactions

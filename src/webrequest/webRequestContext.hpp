@@ -11,6 +11,8 @@
 #define _STRUS_WEB_REQUEST_CONTEXT_IMPL_HPP_INCLUDED
 #include "strus/webRequestContextInterface.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
+#include "configurationHandler.hpp"
+#include "transaction.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestParser.h"
 #include "papuga/request.h"
@@ -31,9 +33,12 @@ public:
 	WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
+		ConfigurationHandler* confighandler_,
+		TransactionPool* transactionPool_,
 		const char* accepted_charset,
 		const char* accepted_doctype,
 		const char* html_base_href);
+
 	virtual ~WebRequestContext();
 
 	virtual bool executeRequest(
@@ -42,14 +47,16 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
-public:/*WebRequestHandler*/
-	papuga_RequestContext* fetchContext();
-	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeInitScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
+
+	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
+	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer);
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
+	bool executePutConfiguration( const char* typenam, const char* contextnam, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
+	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool createEmptyRequestContext( WebRequestAnswer& answer);
@@ -63,12 +70,16 @@ private:
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
+	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
+	void releaseContext();
 
 private:
 	WebRequestHandler* m_handler;
 	WebRequestLoggerInterface* m_logger;
+	ConfigurationHandler* m_confighandler;
 	papuga_RequestLogger m_callLogger;	//< request call logger (for papuga)
+	TransactionPool* m_transactionPool;	//< transaction pool
 	papuga_Allocator m_allocator;
 	papuga_RequestContext* m_context;
 	bool m_context_ownership;

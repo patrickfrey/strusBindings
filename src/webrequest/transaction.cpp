@@ -177,6 +177,8 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 {
 	int64_t tidx = transactionIndex( tid);
 	int eidx = m_refar[ tidx & (m_arsize-1)];
+
+	strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
 	TransactionRef rt = m_ar[ eidx & (m_arsize-1)];
 	if (rt.get() && tidx == rt->idx())
 	{
@@ -184,6 +186,11 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 		return rt;
 	}
 	return TransactionRef();
+}
+
+void TransactionPool::releaseTransaction( const std::string& tid)
+{
+	(void)fetchTransaction( tid);
 }
 
 void TransactionPool::returnTransaction( const TransactionRef& tr)

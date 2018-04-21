@@ -24,7 +24,7 @@ class Scheme_Context_PUT_Storage :public papuga::RequestAutomaton, public Automa
 public:
 	Scheme_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"storage",{},
+		NULL/*resultname*/,{},
 		{
 			{"/storage", "path()", StoragePath},
 			{"/storage/metadata", "name()", StorageMetadataName},
@@ -62,7 +62,7 @@ class Scheme_Context_DELETE_Storage :public papuga::RequestAutomaton, public Aut
 public:
 	Scheme_Context_DELETE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"storage",{},
+		NULL/*resultname*/,{},
 		{
 			{"/storage", "path()", StoragePath},
 			{"/storage", "success", "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
@@ -75,7 +75,7 @@ class Scheme_Context_INIT_Storage :public papuga::RequestAutomaton, public Autom
 public:
 	Scheme_Context_INIT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"storage",{},
+		NULL/*resultname*/,{},
 		{
 			{"/storage/path", "()", StoragePath},
 			{"/storage/cachedterms", "()", StorageCachedTerms},
