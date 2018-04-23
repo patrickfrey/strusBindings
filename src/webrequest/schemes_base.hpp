@@ -29,7 +29,7 @@ public:
 		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
 	
 		StorageConfig, StoragePath, StorageCachedTerms,
-		StorageMetadata, StorageMetadataName, StorageMetadataValue,
+		StorageMetadata, StorageMetadataName, StorageMetadataType,
 		StorageEnableAcl, StorageEnableCompression, StorageLruCacheSize,
 		StorageMaxNofOpenFiles, StorageWriteBufferSize, StorageBlockSize,
 	

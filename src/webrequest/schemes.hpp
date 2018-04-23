@@ -15,6 +15,7 @@
 #include "schemes_storage.hpp"
 #include "schemes_query.hpp"
 #include "schemes_document.hpp"
+#include "schemes_inserter.hpp"
 #endif
 
 

@@ -350,8 +350,19 @@ std::string ConfigDef::parseValue( papuga_SerializationIter& seriter) const
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
-		std::string rt = parseValueTypeDefinitionList( seriter);
+		std::string rt;
+		rt.push_back( '\"');
+		rt.append( parseValueTypeDefinitionList( seriter));
+		rt.push_back( '\"');
 		Deserializer::consumeClose( seriter);
+		return rt;
+	}
+	else if (papuga_SerializationIter_value(&seriter)->valuetype == papuga_TypeString)
+	{
+		std::string rt;
+		rt.push_back( '\"');
+		rt.append( Deserializer::getString( seriter));
+		rt.push_back( '\"');
 		return rt;
 	}
 	else
@@ -360,21 +371,12 @@ std::string ConfigDef::parseValue( papuga_SerializationIter& seriter) const
 	}
 }
 
-static void ConfigDef_appendKeyValueDefinition( std::string& res, const std::string& name, const papuga_ValueVariant& value)
+static void ConfigDef_appendKeyValueDefinition( std::string& res, const std::string& name, const std::string& value)
 {
 	if (!res.empty()) res.append("; ");
 	res.append( name);
 	res.push_back( '=');
-	if (value.valuetype == papuga_TypeString)
-	{
-		res.push_back( '\"');
-		res.append( ValueVariantWrap::tostring( value));
-		res.push_back( '\"');
-	}
-	else
-	{
-		res.append( ValueVariantWrap::tostring( value));
-	}
+	res.append( value);
 }
 
 ConfigDef::ConfigDef( const papuga_ValueVariant& def)
@@ -422,14 +424,14 @@ void ConfigDef::init( papuga_SerializationIter& seriter)
 			{
 				// [A] tuple definition:
 				std::string name = Deserializer::getString( seriter);
-				const papuga_ValueVariant* value = getValue( seriter);
-				ConfigDef_appendKeyValueDefinition( cfgstring, name, *value);
+				std::string value = ConfigDef::parseValue( seriter);
+				ConfigDef_appendKeyValueDefinition( cfgstring, name, value);
 			}
 			else
 			{
 				// [B] meta definition:
 				std::string name;
-				const papuga_ValueVariant* value = 0;
+				std::string value;
 				unsigned char defined[2] = {0,0};
 				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 				{
@@ -441,7 +443,7 @@ void ConfigDef::init( papuga_SerializationIter& seriter)
 							name = Deserializer::getString( seriter);
 							break;
 						case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "value", context);
-							value = getValue( seriter);
+							value = ConfigDef::parseValue( seriter);
 							break;
 						default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'name' or 'type' expected"), context);
 					}
@@ -450,7 +452,7 @@ void ConfigDef::init( papuga_SerializationIter& seriter)
 				{
 					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 				}
-				ConfigDef_appendKeyValueDefinition( cfgstring, name, *value);
+				ConfigDef_appendKeyValueDefinition( cfgstring, name, value);
 			}
 			Deserializer::consumeClose( seriter);
 		}
@@ -459,8 +461,8 @@ void ConfigDef::init( papuga_SerializationIter& seriter)
 			// [C] dictionary definition:
 			std::string name = ValueVariantWrap::tostring( *papuga_SerializationIter_value( &seriter));
 			papuga_SerializationIter_skip( &seriter);
-			const papuga_ValueVariant* value = getValue( seriter);
-			ConfigDef_appendKeyValueDefinition( cfgstring, name, *value);
+			std::string value = ConfigDef::parseValue( seriter);
+			ConfigDef_appendKeyValueDefinition( cfgstring, name, value);
 		}
 		else
 		{

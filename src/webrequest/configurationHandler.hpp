@@ -36,7 +36,7 @@ struct ConfigurationDescription
 	ConfigurationDescription( const ConfigurationDescription& o)
 		:type(o.type),name(o.name),doctype(o.doctype),contentbuf(o.contentbuf){}
 
-	bool valid() const	{return type.empty();}
+	bool valid() const	{return !type.empty();}
 };
 
 struct ConfigurationTransaction

@@ -206,20 +206,20 @@ static void logMethodCall( void* self_, int nofItems, ...)
 		}
 		else
 		{
-			self->logLoggerError( papuga_ErrorCode_tostring( errcode));
+			self->logError( papuga_ErrorCode_tostring( errcode));
 		}
 	}
 	catch (const std::bad_alloc&)
 	{
-		self->logLoggerError( papuga_ErrorCode_tostring( papuga_NoMemError));
+		self->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
 	}
 	catch (const std::runtime_error& err)
 	{
-		self->logLoggerError( err.what());
+		self->logError( err.what());
 	}
 	catch (...)
 	{
-		self->logLoggerError( papuga_ErrorCode_tostring( papuga_UncaughtException));
+		self->logError( papuga_ErrorCode_tostring( papuga_UncaughtException));
 	}
 	va_end( arguments);
 }
@@ -293,7 +293,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &errcode);
 		if (!reqstr)
 		{
-			m_logger->logLoggerError( papuga_ErrorCode_tostring( papuga_NoMemError));
+			m_logger->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
 		}
 		else
 		{
@@ -1085,6 +1085,7 @@ bool WebRequestContext::executePutConfiguration( const char* typenam, const char
 	{
 		m_logger->logAction( typenam, contextnam, init?_TXT("load configuration"):_TXT("put configuration"));
 	}
+	answer.setStatus( 204/*no content*/);
 	return true;
 }
 
@@ -1110,34 +1111,45 @@ bool WebRequestContext::executeLoadSubConfiguration( const char* typenam, const 
 
 bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer)
 {
+	bool configContextFound = true;
+	
 	char scheme[ 128];
 	if ((int)sizeof(scheme) <= std::snprintf( scheme, sizeof(scheme), "DELETE/%s", typenam))
 	{
 		setAnswer( answer, ErrorCodeBufferOverflow);
 		return false;
 	}
-	if (!m_handler->removeContext( typenam, contextnam, answer)) return false;
-
-	if (papuga_RequestHandler_get_scheme( m_handler->impl(), typenam, scheme))
+	configContextFound = m_handler->removeContext( typenam, contextnam, answer);
+	if (papuga_RequestHandler_get_scheme( m_handler->impl(), ROOT_CONTEXT_NAME, scheme))
 	{
 		ConfigurationDescription config = m_confighandler->getStoredConfiguration( typenam, contextnam);
 		if (!config.valid())
 		{
-			setAnswer( answer, ErrorCodeNotFound, _TXT("configuration to delete not found"));
-			return false;
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+			{
+				m_logger->logWarning( _TXT("configuration content not found, delete scheme not executed"));
+			}
 		}
-		WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
-		if (!executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, answer))
+		else
 		{
-			return false;
+			WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
+			if (!executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, answer))
+			{
+				return false;
+			}
 		}
 	}
 	m_confighandler->deleteStoredConfiguration( typenam, contextnam);
-
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
 	{
 		m_logger->logAction( typenam, contextnam, _TXT("delete configuration"));
 	}
+	if (!configContextFound)
+	{
+		setAnswer( answer, ErrorCodeRequestResolveError);
+		return false;
+	}
+	answer.setStatus( 204/*no content*/);
 	return true;
 }
 
@@ -1218,6 +1230,7 @@ bool WebRequestContext::executeRequest(
 						{
 							transactionRef.reset();
 							m_transactionPool->releaseTransaction( selector.contextnam);
+							answer.setStatus( 204/*no content*/);
 							return true;
 						}
 						//... else fallback

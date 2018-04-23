@@ -26,14 +26,13 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{"/storage", "path()", StoragePath},
-			{"/storage/metadata", "name()", StorageMetadataName},
-			{"/storage/metadata", "value()", StorageMetadataValue},
-			{"/storage/metadata", StorageMetadata, {{"name", StorageMetadataName}, {"value", StorageMetadataValue}} },
-			{"/storage", "acl()", StorageEnableAcl},
-			{"/storage", "compression()", StorageEnableCompression},
-			{"/storage/cachedterms", "()", StorageCachedTerms},
+			{"/storage/path", "()", StoragePath},
+			{"/storage/metadata/name", "()", StorageMetadataName},
+			{"/storage/metadata/type", "()", StorageMetadataType},
+			{"/storage/metadata", StorageMetadata, {{"name", StorageMetadataName}, {"type", StorageMetadataType}} },
+			{"/storage/acl", "()", StorageEnableAcl},
 			{"/storage/compression", "()", StorageEnableCompression},
+			{"/storage/cachedterms", "()", StorageCachedTerms},
 			{"/storage/cache", "()", StorageLruCacheSize},
 			{"/storage/max_open_files", "()", StorageMaxNofOpenFiles},
 			{"/storage/write_buffer_size", "()", StorageWriteBufferSize},
@@ -47,8 +46,7 @@ public:
 					{"write_buffer_size", StorageWriteBufferSize, '?'},
 					{"block_size", StorageBlockSize, '?'},
 					{"metadata", StorageMetadata, '*'},
-					{"acl", StorageEnableAcl, '?'},
-					{"compression", StorageEnableCompression, '?'}
+					{"acl", StorageEnableAcl, '?'}
 				}
 			},
 			{"/storage", "_success", "context", bindings::method::Context::createStorage(), {{StorageConfig}} },
@@ -64,7 +62,11 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{"/storage", "path()", StoragePath},
+			{"/storage/path", "()", StoragePath},
+			{"/storage", StorageConfig, {
+					{"path", StoragePath}
+				}
+			},
 			{"/storage", "success", "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
 		}
 	) {}

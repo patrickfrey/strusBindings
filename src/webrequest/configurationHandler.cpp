@@ -120,10 +120,9 @@ void ConfigurationHandler::deleteStoredConfiguration(
 		std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
 		ec = strus::removeFile( filepath, true);
 		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
-
-		ContextNameDef namedef( contextType, contextName);
-		m_context_names.erase( namedef);
 	}
+	ContextNameDef namedef( contextType, contextName);
+	m_context_names.erase( namedef);
 }
 
 void ConfigurationHandler::clearUnfinishedTransactions()

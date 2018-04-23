@@ -23,10 +23,12 @@ public:
 	enum Mask
 	{
 		LogNothing=0x0,
-		LogMethodCalls=0x1,
-		LogRequests=0x2,
-		LogConfiguration=0x4,
-		LogAction=0x8,
+		LogError=0x1,
+		LogWarning=0x2,
+		LogMethodCalls=0x4,
+		LogRequests=0x8,
+		LogConfiguration=0x10,
+		LogAction=0x20,
 		LogAll=0xFF
 	};
 
@@ -69,10 +71,15 @@ public:
 			const std::string& arguments,
 			const std::string& result)=0;
 
-	/// \brief Log an error during logging
+	/// \brief Log a warning message
+	/// \param[in] warnmsg warning message to log
+	/// \remark expected to be thread safe
+	virtual void logWarning( const char* warnmsg)=0;
+
+	/// \brief Log an error
 	/// \param[in] errmsg error message to log
 	/// \remark expected to be thread safe
-	virtual void logLoggerError( const char* errmsg)=0;
+	virtual void logError( const char* errmsg)=0;
 };
 
 }//namespace
