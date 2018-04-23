@@ -17,6 +17,7 @@
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/iterator.hpp"
+#include "impl/value/struct.hpp"
 #include "queryAnalyzerStruct.hpp"
 #include <vector>
 #include <string>
@@ -297,6 +298,11 @@ public:
 			const std::string& content,
 			const ValueVariant& documentClass=ValueVariant()) const;
 
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path);
+
 private:
 	analyzer::DocumentClass getDocumentClass( const std::string& content, const ValueVariant& dclass) const;
 
@@ -450,6 +456,11 @@ public:
 	/// \return structure analyzed
 	/// \example  ["<" "year" "17071"]
 	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression) const;
+
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path);
 
 private:
 	TermExpression* analyzeTermExpression_( const ValueVariant& expression, bool unique) const;

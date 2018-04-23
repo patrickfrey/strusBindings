@@ -6,12 +6,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/analyzer.hpp"
+#include "impl/value/documentAnalyzerIntrospection.hpp"
+#include "impl/value/queryAnalyzerIntrospection.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
 #include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/string_conv.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "papuga/serialization.h"
 #include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
@@ -432,6 +435,27 @@ Iterator DocumentAnalyzerImpl::analyzeMultiPart(
 	return rt;
 }
 
+Struct DocumentAnalyzerImpl::introspection( const ValueVariant& arg)
+{
+	Struct rt;
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
+
+	strus::local_ptr<IntrospectionBase> ictx( new DocumentAnalyzerIntrospection( errorhnd, analyzer));
+	ictx->getPathContent( rt.serialization, path);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
+}
+
 QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
@@ -589,5 +613,26 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVar
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return metaexpr.release();
+}
+
+Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg)
+{
+	Struct rt;
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
+
+	strus::local_ptr<IntrospectionBase> ictx( new QueryAnalyzerIntrospection( errorhnd, analyzer));
+	ictx->getPathContent( rt.serialization, path);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
 }
 
