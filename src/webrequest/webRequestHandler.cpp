@@ -96,7 +96,7 @@ struct PostTransactionMethodDescription
 	:public MethodDescription
 {
 	PostTransactionMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
-		:MethodDescription( "POST/transaction", id, 204/*http no content*/, NULL, rootelem, "id", false/*has content*/, 0){}
+		:MethodDescription( "POST/transaction", id, 200, NULL, rootelem, "id", false/*has content*/, 0){}
 };
 
 template <class SCHEME>
@@ -132,7 +132,7 @@ public:
 	DefineConfigScheme() :DefineScheme<SCHEME>( ROOT_CONTEXT_NAME){}
 };
 
-static const char* g_context_typenames[] = {"storage","docanalyzer","queryanalyzer",0};
+static const char* g_context_typenames[] = {"storage","docanalyzer","queryanalyzer","inserter",0};
 
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,

@@ -25,9 +25,11 @@ public:
 	Scheme_Context_PUT_Inserter() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{
-			{"analyzer","/inserter/analyzer()",true/*required*/},
+			{"docanalyzer","/inserter/docanalyzer()",true/*required*/},
 			{"storage","/inserter/storage()",true/*required*/}},
-		{}
+		{
+			{"/inserter", "inserter", "context", bindings::method::Context::createInserter(), {{"storage"},{"docanalyzer"}} }
+		}
 	) {}
 };
 

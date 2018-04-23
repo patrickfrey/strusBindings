@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <algorithm>
 
 using namespace strus;
 
@@ -211,6 +212,7 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 
 		rt.push_back( ConfigurationDescription( contextType, contextName, doctype, contentbuf));
 	}
+	std::reverse( rt.begin(), rt.end());
 	return rt;
 }
 

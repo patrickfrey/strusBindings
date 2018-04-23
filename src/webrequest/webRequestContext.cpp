@@ -1017,13 +1017,14 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 		return false;
 	}
 	std::string tid = m_transactionPool->createTransaction( m_context, m_handler->maxIdleTime());
-	if (tid.empty())
+	std::string tlink = strus::joinFilePath( m_html_base_href, tid);
+	if (tid.empty() || tlink.empty())
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
 	releaseContext();
-	return (strus::mapStringToAnswer( answer, &m_allocator, "transaction", "", "id", m_result_encoding, m_result_doctype, tid));
+	return strus::mapStringToAnswer( answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, tlink);
 }
 
 bool WebRequestContext::executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer)

@@ -10,6 +10,7 @@
 #include "impl/vector.hpp"
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
+#include "impl/inserter.hpp"
 #include "impl/value/contextIntrospection.hpp"
 #include "papuga/valueVariant.hpp"
 #include "papuga/serialization.hpp"
@@ -314,6 +315,11 @@ QueryEvalImpl* ContextImpl::createQueryEval()
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
 	return new QueryEvalImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl);
+}
+
+InserterImpl* ContextImpl::createInserter( StorageClientImpl* storage, DocumentAnalyzerImpl* analyzer)
+{
+	return new InserterImpl( storage, analyzer);
 }
 
 void ContextImpl::createStorage( const ValueVariant& config_)

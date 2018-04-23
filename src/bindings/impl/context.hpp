@@ -32,6 +32,8 @@ class DocumentAnalyzerImpl;
 class QueryAnalyzerImpl;
 /// \brief Forward declaration
 class QueryEvalImpl;
+/// \brief Forward declaration
+class InserterImpl;
 
 typedef papuga_ValueVariant ValueVariant;
 
@@ -171,8 +173,15 @@ public:
 
 	/// \brief Create a query evaluation instance
 	/// \example createQueryEval()
-	/// \return quer evaluation interface (class QueryEval)
+	/// \return query evaluation interface (class QueryEval)
 	QueryEvalImpl* createQueryEval();
+
+	/// \brief Create an inserter based on a storage and a document analyzer
+	/// \example createInserter( storage, analyzer)
+	/// \param[in] storage storage client to insert into
+	/// \param[in] analyzer document analyzer to use for preparing the documents to insert
+	/// \return inserter interface (class Inserter)
+	InserterImpl* createInserter( StorageClientImpl* storage, DocumentAnalyzerImpl* analyzer);
 
 	/// \brief Unpack a statistics blob retrieved from a storage
 	/// \param[in] blob binary blob with statistics to decode (created by StorageClient:getAllStatistics or StorageClient:getChangeStatistics)
