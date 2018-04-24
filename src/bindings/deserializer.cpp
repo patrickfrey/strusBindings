@@ -1974,12 +1974,108 @@ static void buildAccessRights( StorageDocumentAccess* document, papuga_Serializa
 }
 
 template <class StorageDocumentAccess>
+static void buildAttributesValue(
+		StorageDocumentAccess* document,
+		papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("document");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		buildAttributes( document, seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "attribute", context);
+	}
+}
+
+template <class StorageDocumentAccess>
+static void buildMetaDataValue(
+		StorageDocumentAccess* document,
+		papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("document");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		buildMetaData( document, seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "metadata", context);
+	}
+}
+
+template <class StorageDocumentAccess>
+static void buildStorageSearchIndexValue(
+		StorageDocumentAccess* document,
+		papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("document");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		StorageDocumentSearchIndexAccess<StorageDocumentAccess> da( document);
+		papuga_SerializationIter_skip( &seriter);
+		buildStorageIndex( &da, seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "searchindex", context);
+	}
+}
+
+template <class StorageDocumentAccess>
+static void buildStorageForwardIndexValue(
+		StorageDocumentAccess* document,
+		papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("document");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		StorageDocumentForwardIndexAccess<StorageDocumentAccess> da( document);
+		papuga_SerializationIter_skip( &seriter);
+		buildStorageIndex( &da, seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "forwardindex", context);
+	}
+}
+
+template <class StorageDocumentAccess>
+static void buildAccessRightsValue(
+		StorageDocumentAccess* document,
+		papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("document");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		buildAccessRights( document, seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		document->setUserAccessRight( Deserializer::getString( seriter));
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "access", context);
+	}
+}
+
+template <class StorageDocumentAccess>
 static void buildStorageDocument(
 		StorageDocumentAccess* document,
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "doctype,attribute,metadata,searchindex,forwardindex,access", ',');
+	static const StructureNameMap namemap( "doctype,attribute,metadata,forwardindex,searchindex,access", ',');
 	static const char* context = _TXT("document");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -2002,71 +2098,30 @@ static void buildStorageDocument(
 					case 0: (void)Deserializer::getString( seriter);
 						// ... ignore sub document type (output of analyzer)
 						break;
-					case 1: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							buildAttributes( document, seriter);
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "attribute", context);
-						}
+					case 1: buildAttributesValue( document, seriter);
 						break;
-					case 2: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							buildMetaData( document, seriter);
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "metadata", context);
-						}
+					case 2: buildMetaDataValue( document, seriter);
 						break;
-					case 3: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							StorageDocumentSearchIndexAccess<StorageDocumentAccess> da( document);
-							papuga_SerializationIter_skip( &seriter);
-							buildStorageIndex( &da, seriter);
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "searchindex", context);
-						}
+					case 3: buildStorageForwardIndexValue( document, seriter);
 						break;
-					case 4:if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							StorageDocumentForwardIndexAccess<StorageDocumentAccess> da( document);
-							papuga_SerializationIter_skip( &seriter);
-							buildStorageIndex( &da, seriter);
-							Deserializer::consumeClose( seriter);
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "forwardindex", context);
-						}
+					case 4: buildStorageSearchIndexValue( document, seriter);
 						break;
-					case 5: if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-						{
-							papuga_SerializationIter_skip( &seriter);
-							buildAccessRights( document, seriter);
-							Deserializer::consumeClose( seriter);
-							break;
-						}
-						else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-						{
-							document->setUserAccessRight( Deserializer::getString( seriter));
-						}
-						else
-						{
-							throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "access", context);
-						}
+					case 5: buildAccessRightsValue( document, seriter);
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
 			}
+			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
+		}
+		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			(void)Deserializer::getString( seriter);           if (papuga_SerializationIter_eof( &seriter)) return;
+			buildAttributesValue( document, seriter);          if (papuga_SerializationIter_eof( &seriter)) return;
+			buildMetaDataValue( document, seriter);	           if (papuga_SerializationIter_eof( &seriter)) return;
+			buildStorageForwardIndexValue( document, seriter); if (papuga_SerializationIter_eof( &seriter)) return;
+			buildStorageSearchIndexValue( document, seriter);  if (papuga_SerializationIter_eof( &seriter)) return;
+
+			buildAccessRightsValue( document, seriter);
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 		}
 		else

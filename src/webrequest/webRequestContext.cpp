@@ -1017,8 +1017,16 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 		return false;
 	}
 	std::string tid = m_transactionPool->createTransaction( m_context, m_handler->maxIdleTime());
-	std::string tlink = strus::joinFilePath( m_html_base_href, tid);
-	if (tid.empty() || tlink.empty())
+	std::string linkbase;
+	int ec = strus::getAncestorPath( m_html_base_href, 3, linkbase);
+	std::string tlinkparent = strus::joinFilePath( linkbase, "transaction");
+	std::string tlink = strus::joinFilePath( tlinkparent, tid);
+	if (ec)
+	{
+		setAnswer( answer, ErrorCode( ec), _TXT("failed to get link base"));
+		return false;
+	}
+	if (tid.empty() || tlinkparent.empty() || tlink.empty())
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
@@ -1036,7 +1044,7 @@ bool WebRequestContext::executeCommitTransaction( const papuga_ValueVariant* obj
 
 		const papuga_RequestMethodDescription* methoddescr
 			= papuga_RequestHandler_get_method(
-				m_handler->impl(), classid, "commit"/*method*/, false/*has content*/);
+				m_handler->impl(), classid, "PUT/transaction"/*method*/, false/*has content*/);
 		if (methoddescr)
 		{
 			WebRequestContent content;

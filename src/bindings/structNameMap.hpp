@@ -9,6 +9,7 @@
 #define _STRUS_BINDINGS_STRUCTURE_NAME_MAP_HPP_INCLUDED
 #include "papuga/typedefs.h"
 #include <vector>
+#include <string>
 
 namespace strus {
 namespace bindings {
@@ -24,10 +25,12 @@ public:
 	int index( const char* id, std::size_t idsize) const;
 	int index( const char* id) const;
 	int index( const papuga_ValueVariant& id) const;
+	const char* name( int idx) const;
 
 private:
 	const char* m_strings;
 	std::vector<signed char> m_ar;
+	std::vector<std::string> m_names;
 };
 
 }}//namespace

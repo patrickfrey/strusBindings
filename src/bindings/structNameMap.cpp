@@ -21,21 +21,29 @@ StructureNameMap::StructureNameMap( const char* strings_, char delim)
 	unsigned char idx = 0;
 	for (; sn; si=sn+1,sn=std::strchr( si, delim))
 	{
+		m_names.push_back( std::string( si, sn-si));
 		m_ar[ sn-m_strings] = idx++;
 		if (idx >= 127) throw std::runtime_error( _TXT("too many structure elements defined"));
 	}
+	m_names.push_back( si);
 	m_ar[ m_ar.size()-1] = idx;
 }
 
 int StructureNameMap::index( const char* id, std::size_t idsize) const
 {
 	char const* pi = std::strstr( m_strings, id);
-	return pi ? m_ar[ (pi-m_strings+std::strlen(id))] : Undefined;
+	return pi ? m_ar[ (pi-m_strings+idsize)] : Undefined;
 }
 	
 int StructureNameMap::index( const char* id) const
 {
 	return index( id, std::strlen(id));
+}
+
+const char* StructureNameMap::name( int idx) const
+{
+	if (idx < 0 || (int)m_names.size() >= idx) return NULL;
+	return m_names[ idx].c_str();
 }
 
 int StructureNameMap::index( const papuga_ValueVariant& id) const

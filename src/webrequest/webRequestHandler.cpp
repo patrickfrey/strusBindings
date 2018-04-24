@@ -92,6 +92,18 @@ struct TransformationMethodDescription
 	TransformationMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
 		:MethodDescription( "GET", id, 200, NULL, rootelem, "value", true/*has content*/, 1, WebRequestHandler::ParamContent){}
 };
+struct InsertMethodDescription
+	:public MethodDescription
+{
+	InsertMethodDescription( const papuga_RequestMethodId& id)
+		:MethodDescription( "PUT", id, 204/*no content*/, NULL, "insert", "value", true/*has content*/, 2, WebRequestHandler::ParamPathString, WebRequestHandler::ParamContent){}
+};
+struct CommitTransactionMethodDescription
+	:public MethodDescription
+{
+	CommitTransactionMethodDescription( const papuga_RequestMethodId& id)
+		:MethodDescription( "PUT/transaction", id, 204/*no content*/, NULL, "commit", "value", false/*has content*/, 0){}
+};
 struct PostTransactionMethodDescription
 	:public MethodDescription
 {
@@ -183,23 +195,26 @@ WebRequestHandler::WebRequestHandler(
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
 		mt_Context_GET.addToHandler( m_impl);
 
-		static const IntrospectionMethodDescription mt_StorageClient_GET( mt::StorageClient::introspection(), "storage");
-		mt_StorageClient_GET.addToHandler( m_impl);
-
 		static const IntrospectionMethodDescription mt_DocumentAnalyzer_GET( mt::DocumentAnalyzer::introspection(), "analyzer");
 		mt_DocumentAnalyzer_GET.addToHandler( m_impl);
+
+		static const TransformationMethodDescription mt_DocumentAnalyzer_GET_content( mt::DocumentAnalyzer::analyzeMultiPart(), "doc");
+		mt_DocumentAnalyzer_GET_content.addToHandler( m_impl);
 
 		static const IntrospectionMethodDescription mt_QueryAnalyzer_GET( mt::QueryAnalyzer::introspection(), "analyzer");
 		mt_QueryAnalyzer_GET.addToHandler( m_impl);
 
+		static const IntrospectionMethodDescription mt_StorageClient_GET( mt::StorageClient::introspection(), "storage");
+		mt_StorageClient_GET.addToHandler( m_impl);
 		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
 		mt_StorageClient_POST_transaction.addToHandler( m_impl);
 
 		static const PostTransactionMethodDescription mt_Inserter_POST_transaction( mt::Inserter::createTransaction(), "transaction");
 		mt_Inserter_POST_transaction.addToHandler( m_impl);
-
-		static const TransformationMethodDescription mt_DocumentAnalyzer_GET_content( mt::DocumentAnalyzer::analyzeMultiPart(), "doc");
-		mt_DocumentAnalyzer_GET_content.addToHandler( m_impl);
+		static const InsertMethodDescription mt_InserterTransaction_PUT( mt::InserterTransaction::insertDocument());
+		mt_InserterTransaction_PUT.addToHandler( m_impl);
+		static const CommitTransactionMethodDescription mt_InserterTransaction_COMMIT( mt::InserterTransaction::commit());
+		mt_InserterTransaction_COMMIT.addToHandler( m_impl);
 
 		loadConfiguration( configstr_);
 		m_configHandler.clearUnfinishedTransactions();

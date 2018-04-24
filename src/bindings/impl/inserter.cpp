@@ -11,6 +11,7 @@
 #include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/analyzer/document.hpp"
 #include "strus/analyzer/documentAttribute.hpp"
+#include "strus/lib/bindings_description.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "serializer.hpp"
 #include "papuga/allocator.h"
@@ -48,6 +49,7 @@ void InserterTransactionImpl::insertDocument( const std::string& docid, const st
 			Serializer::serialize( &docser, *doc, false/*deep*/);
 			papuga_ValueVariant docval;
 			papuga_init_ValueVariant_serialization( &docval, &docser);
+
 			std::string id;
 			if (docid.empty())
 			{
