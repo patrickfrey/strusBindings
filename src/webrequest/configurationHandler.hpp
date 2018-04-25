@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <set>
 
 #define ROOT_CONTEXT_NAME "context"
 
