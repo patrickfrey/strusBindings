@@ -1250,35 +1250,19 @@ void Deserializer::buildWeightingFormula(
 	std::vector<ParamDef> paramlist;
 	if (papuga_ValueVariant_defined( &parameter))
 	{
-		if (parameter.valuetype != papuga_TypeSerialization)
+		KeyValueList kvlist( parameter);
+		KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
+		for (; ki != ke; ++ki)
 		{
-			throw strus::runtime_error(_TXT("list of named arguments expected as parameters of %s"), context);
-		}
-		papuga_SerializationIter seriter, serstart;
-		papuga_init_SerializationIter( &seriter, parameter.value.serialization);
-		papuga_init_SerializationIter( &serstart, parameter.value.serialization);
-		try
-		{
-			KeyValueList kvlist( seriter);
-			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
-
-			KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
-			for (; ki != ke; ++ki)
+			if (ki->first == "parser")
 			{
-				if (ki->first == "parser")
-				{
-					parsername = ValueVariantWrap::tostring( *ki->second);
-				}
-				else
-				{
-					paramlist.push_back( ParamDef(
-						ki->first, ValueVariantWrap::todouble( *ki->second)));
-				}
+				parsername = ValueVariantWrap::tostring( *ki->second);
 			}
-		}
-		catch (const std::runtime_error& err)
-		{
-			throw runtime_error_with_location( err.what(), errorhnd, seriter, serstart);
+			else
+			{
+				paramlist.push_back( ParamDef(
+					ki->first, ValueVariantWrap::todouble( *ki->second)));
+			}
 		}
 	}
 	const ScalarFunctionParserInterface* scalarfuncparser = queryproc->getScalarFunctionParser( parsername);
