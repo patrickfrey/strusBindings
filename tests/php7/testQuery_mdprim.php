@@ -246,9 +246,9 @@ string QueryRestr:
     string op: ">"
     string value: 0
 string QueryResult: 
+  string evalpass: 0
   string nofranked: 70
   string nofvisited: 91
-  string pass: 0
   string ranks: 
     integer 0: 
       string summary: 

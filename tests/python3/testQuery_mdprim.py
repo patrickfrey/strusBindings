@@ -230,9 +230,9 @@ str QueryRestr:
     str op: ">"
     str value: 0
 str QueryResult:
+  str evalpass: 0
   str nofranked: 70
   str nofvisited: 91
-  str pass: 0
   str ranks:
     number 1:
       str summary:

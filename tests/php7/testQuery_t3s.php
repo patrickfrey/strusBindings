@@ -175,9 +175,9 @@ string QueryExpression:
     string op: "sequence"
     string range: 10
 string QueryResult: 
+  string evalpass: 0
   string nofranked: 3
   string nofvisited: 3
-  string pass: 0
   string ranks: 
     integer 0: 
       string summary: 

@@ -42,9 +42,9 @@ enum _TermStatisticsChange {type,value,increment};
 /// \brief Query term structure
 /// \member type type name of the term
 /// \member value value of the term
-/// \member len (optional) span of the term in number of ordinal position steps covered (>=1)
+/// \member length (optional) span of the term in number of ordinal position steps covered (>=1)
 /// \member variable (optional) name of the variable attached to this term
-enum _QueryTerm {type,value,len,variable};
+enum _QueryTerm {type,value,length,variable};
 
 /// \struct QueryTermExpression
 /// \brief Query term structure
@@ -116,11 +116,11 @@ enum _ResultDocument {docno,weight,summary};
 
 /// \struct QueryResult
 /// \brief storage query result
-/// \member pass index of query evaluation pass used for this result (multipass query evaluation)
+/// \member evalpass index of query evaluation pass used for this result (multipass query evaluation)
 /// \member nofranked number of documents ranked for this result
 /// \member nofvisited number of documents visited for this result
 /// \member ranks list of results with a maximum size specified in the query
-enum _QueryResult {pass,nofranked,nofvisited,ranks};
+enum _QueryResult {evalpass,nofranked,nofvisited,ranks};
 
 }}//namespace
 #endif

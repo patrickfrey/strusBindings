@@ -170,9 +170,9 @@ str QueryExpression:
     str op: "sequence"
     str range: 10
 str QueryResult:
+  str evalpass: 0
   str nofranked: 3
   str nofvisited: 3
-  str pass: 0
   str ranks:
     number 1:
       str summary:
