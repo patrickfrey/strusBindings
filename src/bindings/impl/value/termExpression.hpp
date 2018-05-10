@@ -39,7 +39,7 @@ public:
 
 	/// \brief Constructor
 	TermExpression( const QueryAnalyzerStruct* analyzerStruct_, const QueryAnalyzerInterface* analyzer_, bool singleUniqueResult_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_->createContext()),m_singleUniqueResult(singleUniqueResult_),m_fieldno_stack(),m_fieldno_cnt(0)
+		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_->createContext()),m_singleUniqueResult(singleUniqueResult_),m_fieldno_stack(),m_fieldar()
 		,m_expr(),m_operators(),m_variables()
 	{
 		if (!m_analyzer) throw strus::runtime_error(_TXT("failed to create analyzer context: %s"), m_errorhnd->fetchError());
@@ -87,6 +87,8 @@ public:
 
 	void pushField( const std::string& fieldtype, const std::string& value);
 
+	void groupBy( const std::vector<std::string>& fieldtypes, const std::string& op, const char* how);
+
 	void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 
 	void attachVariable( const std::string& name);
@@ -112,7 +114,7 @@ private:
 	QueryAnalyzerContextInterface* m_analyzer;
 	bool m_singleUniqueResult;
 	std::vector<int> m_fieldno_stack;
-	int m_fieldno_cnt;
+	std::vector<std::string> m_fieldar;
 	analyzer::QueryTermExpression m_expr;
 	std::vector<Operator> m_operators;
 	std::vector<std::string> m_variables;

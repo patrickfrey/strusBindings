@@ -431,6 +431,13 @@ public:
 	/// \example ""
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& groupBy, const std::string& opname, int range=0, unsigned int cardinality=0);
 
+	/// \brief That all query elements assigned to a feature type get a priority that causes the elimination of all elements with a lower priority that are completely covered by a single element of this type.
+	/// \param[in] type feature type name
+	/// \example "word"
+	/// \param[in] priority priority value assigned to 'type'
+	/// \example 1
+	void declareElementPriority( const std::string& type, int priority);
+
 	/// \brief Analye a term expression
 	/// \param[in] expression query term expression tree
 	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
