@@ -494,6 +494,14 @@ void ContextImpl::enableDebugTrace( const std::string& component)
 	if (!dbgtrace->enable( component)) throw strus::runtime_error(_TXT( "failed to enable debug trace for %s: %s"), component.c_str(), errorhnd->fetchError());
 }
 
+void ContextImpl::disableDebugTrace( const std::string& component)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DebugTraceInterface* dbgtrace = errorhnd->debugTrace();
+	if (!dbgtrace) throw strus::runtime_error(_TXT( "no debug trace interface defined"));
+	dbgtrace->disable( component);
+}
+
 Struct ContextImpl::fetchDebugTrace()
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();

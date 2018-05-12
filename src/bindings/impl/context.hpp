@@ -215,6 +215,10 @@ public:
 	/// \param[in] component name of component to enable debug tracing for
 	void enableDebugTrace( const std::string& component);
 
+	/// \brief Disable the debug trace interface for a named component for the current thread
+	/// \param[in] component name of component to disable debug tracing for
+	void disableDebugTrace( const std::string& component);
+
 	/// \brief Fetch all debug trace messages of the current thread
 	/// \return all messages
 	/// \note Clears all messages stored for the current thread

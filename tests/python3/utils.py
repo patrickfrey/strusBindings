@@ -2,7 +2,6 @@ import collections
 import numbers
 import sys
 import os
-from inspect import currentframe, getframeinfo   #... [-]
 
 def concatValues(obj):
 	if obj is None:
