@@ -177,42 +177,45 @@ ConfigurationDescription ConfigurationHandler::getStoredConfiguration(
 std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurations( bool doDeleteObsolete)
 {
 	strus::unique_lock lock( m_mutex);
-
 	std::vector<ConfigurationDescription> rt;
-	typedef std::pair<std::string,std::string> ConfigItem;
-	std::set<ConfigItem> configItemSet;
-	std::vector<std::string> configFileNames;
 
-	int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
-	if (ec) throw strus::runtime_error( ec, _TXT("error loading stored configuration in %s"), m_config_store_dir.c_str());
-
-	std::sort( configFileNames.begin(), configFileNames.end(), greater());
-	std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
-	for (; ci != ce; ++ci)
+	if (strus::isDir( m_config_store_dir))
 	{
-		std::string doctype = getConfigFilenamePart( *ci, 1);
-		if (doctype.empty()) continue;
-		std::string contextType = getConfigFilenamePart( *ci, 2);
-		std::string contextName = getConfigFilenamePart( *ci, 3);
-		std::string date = getConfigFilenamePart( *ci, 0);
-		std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
+		typedef std::pair<std::string,std::string> ConfigItem;
+		std::set<ConfigItem> configItemSet;
+		std::vector<std::string> configFileNames;
 
-		if (!configItemSet.insert( ConfigItem( contextType, contextName)).second)
+		int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
+		if (ec) throw strus::runtime_error( ec, _TXT("error loading stored configuration in %s"), m_config_store_dir.c_str());
+	
+		std::sort( configFileNames.begin(), configFileNames.end(), greater());
+		std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
+		for (; ci != ce; ++ci)
 		{
-			if (doDeleteObsolete)
+			std::string doctype = getConfigFilenamePart( *ci, 1);
+			if (doctype.empty()) continue;
+			std::string contextType = getConfigFilenamePart( *ci, 2);
+			std::string contextName = getConfigFilenamePart( *ci, 3);
+			std::string date = getConfigFilenamePart( *ci, 0);
+			std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
+	
+			if (!configItemSet.insert( ConfigItem( contextType, contextName)).second)
 			{
-				ec = strus::removeFile( filepath, true);
-				if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
+				if (doDeleteObsolete)
+				{
+					ec = strus::removeFile( filepath, true);
+					if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
+				}
+				continue;
 			}
-			continue;
+			std::string contentbuf;
+			ec = strus::readFile( filepath, contentbuf);
+			if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
+	
+			rt.push_back( ConfigurationDescription( contextType, contextName, doctype, contentbuf));
 		}
-		std::string contentbuf;
-		ec = strus::readFile( filepath, contentbuf);
-		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
-
-		rt.push_back( ConfigurationDescription( contextType, contextName, doctype, contentbuf));
+		std::reverse( rt.begin(), rt.end());
 	}
-	std::reverse( rt.begin(), rt.end());
 	return rt;
 }
 
