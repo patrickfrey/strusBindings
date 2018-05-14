@@ -130,17 +130,20 @@ void ConfigurationHandler::clearUnfinishedTransactions()
 {
 	strus::unique_lock lock( m_mutex);
 
-	std::string fileext = strus::string_format( ".conf.failed");
-	std::vector<std::string> files;
-	int ec = strus::readDirFiles( m_config_store_dir, fileext, files);
-	if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to read files '*%s' in config store directory '%s'"), fileext.c_str(), m_config_store_dir.c_str());
-
-	std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
-	for (; fi != fe; ++fi)
+	if (strus::isDir( m_config_store_dir))
 	{
-		std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
-		ec = strus::removeFile( filepath, true);
-		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to clear unfinished transaction (file %s): %s"), filepath.c_str(), std::strerror(ec));
+		std::string fileext = strus::string_format( ".conf.failed");
+		std::vector<std::string> files;
+		int ec = strus::readDirFiles( m_config_store_dir, fileext, files);
+		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to read files '*%s' in config store directory '%s'"), fileext.c_str(), m_config_store_dir.c_str());
+	
+		std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
+		for (; fi != fe; ++fi)
+		{
+			std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
+			ec = strus::removeFile( filepath, true);
+			if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to clear unfinished transaction (file %s): %s"), filepath.c_str(), std::strerror(ec));
+		}
 	}
 }
 
