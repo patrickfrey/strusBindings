@@ -125,7 +125,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 	int* tidxref = 0;
 	{
 		int cnt = m_allocNofTries;
-		while (cnt >= 0)
+		do
 		{
 			tidx = nextRand();
 			strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
@@ -136,7 +136,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 				break;
 			}
 			--cnt;
-		}
+		} while (cnt >= 0);
 		if (cnt==0) throw std::runtime_error(_TXT("failed to allocate transaction"));
 	}{
 		int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
