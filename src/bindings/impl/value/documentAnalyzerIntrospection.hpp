@@ -10,6 +10,7 @@
 #define _STRUS_BINDING_IMPL_VALUE_DOCUMENT_ANALYZER_INTROSPECTION_HPP_INCLUDED
 #include "introspectionBase.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
+#include "strus/analyzer/documentAnalyzerView.hpp"
 #include "strus/errorBufferInterface.hpp"
 
 namespace strus {
@@ -24,6 +25,7 @@ public:
 			const DocumentAnalyzerInterface* impl_)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
+		,m_view(impl_->view())
 		{}
 	virtual ~DocumentAnalyzerIntrospection(){}
 
@@ -34,6 +36,7 @@ public:
 private:
 	ErrorBufferInterface* m_errorhnd;
 	const DocumentAnalyzerInterface* m_impl;
+	analyzer::DocumentAnalyzerView m_view;
 };
 
 }}//namespace

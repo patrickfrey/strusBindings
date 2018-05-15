@@ -23,6 +23,7 @@
 #include "strus/bindingMethodIds.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/analyzer/documentClass.hpp"
+#include "strus/base/fileio.hpp"
 #include "papuga/errors.h"
 #include "papuga/request.h"
 #include "papuga/requestParser.h"
@@ -45,6 +46,14 @@ using namespace strus;
 
 static void logMethodCall( void* self_, int nofItems, ...);
 
+static std::string parentPath( const std::string& url)
+{
+	std::string rt;
+	int ec = strus::getParentPath( url, rt);
+	if (ec) throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("illegal URL"));
+	return rt;
+}
+
 WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
@@ -63,8 +72,21 @@ WebRequestContext::WebRequestContext(
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
-	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_),m_html_base_href(html_base_href_)
+	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_)
+	,m_html_base_href(html_base_href_)
 {
+	if (!m_html_base_href.empty())
+	{
+		if (m_html_base_href[m_html_base_href.size()-1] == '/' && m_html_base_href[ m_html_base_href.size()-2] == '*')
+		{
+			m_html_base_href.resize( m_html_base_href.size()-1);
+			m_html_base_href = parentPath( m_html_base_href) + "/";
+		}
+		else if (m_html_base_href[ m_html_base_href.size()-1] == '*')
+		{
+			m_html_base_href = parentPath( m_html_base_href);
+		}
+	}
 	std::memset( &m_callLogger, 0, sizeof(m_callLogger));
 	m_callLogger.self = logger_;
 	int mask = logger_->logMask();
@@ -408,7 +430,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		{
 			case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, &resultulen, &errcode); break;
 			case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, &resultulen, &errcode); break;
-			case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, m_handler->html_head(), m_html_base_href, &resultulen, &errcode); break;
+			case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultulen, &errcode); break;
 			case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, &resultulen, &errcode); break;
 			case WebRequestContent::Unknown:
 			{
@@ -780,7 +802,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 		}
 		else
 		{
-			if (!mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, retval.valuear[0]))
+			if (!mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, retval.valuear[0]))
 			{
 				return false;
 			}
@@ -1256,7 +1278,7 @@ bool WebRequestContext::executeRequest(
 					char const* lstbuf[ lstbufsize];
 					char const** varlist = papuga_RequestContext_list_variables( selector.context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
 					if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-					if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist)) return false;
+					if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist)) return false;
 					goto DONE;
 				}
 				// else fallback
@@ -1275,7 +1297,7 @@ bool WebRequestContext::executeRequest(
 					{
 						std::vector<std::string> contextTypes = m_confighandler->contextTypes();
 						contextTypes.push_back( ROOT_CONTEXT_NAME);
-						return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes);
+						return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes);
 					}
 					else
 					{
@@ -1287,7 +1309,7 @@ bool WebRequestContext::executeRequest(
 						}
 						else
 						{
-							return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href, "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
+							return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
 						}
 					}
 				}

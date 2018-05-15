@@ -10,6 +10,8 @@
 #define _STRUS_BINDING_IMPL_VALUE_INTROSPECTION_TEMPLATES_HPP_INCLUDED
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/base/string_format.hpp"
+#include "strus/base/numstring.hpp"
 #include "introspectionBase.hpp"
 #include "serializer.hpp"
 
@@ -75,6 +77,69 @@ public:
 private:
 	ErrorBufferInterface* m_errorhnd;
 	TypeName m_value;
+};
+
+
+template <class TypeName>
+class IntrospectionObjectList
+	:public IntrospectionBase
+{
+public:
+	typedef IntrospectionBase* (*ElementConstructor)( strus::ErrorBufferInterface*, const typename TypeName::value_type&);
+
+	IntrospectionObjectList(
+			ErrorBufferInterface* errorhnd_,
+			const TypeName& value_,
+			ElementConstructor elementConstructor_)
+		:m_errorhnd(errorhnd_),m_value(value_),m_elementConstructor(elementConstructor_){}
+	virtual ~IntrospectionObjectList(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		NumParseError err = strus::NumParseOk;
+		int64_t idx = strus::intFromString( name.c_str(), name.size(), m_value.size(), err);
+		if (err != strus::NumParseOk) return NULL;
+		return (*m_elementConstructor)( m_errorhnd, m_value[ idx]);
+	}
+	virtual std::vector<IntrospectionLink> list()
+	{
+		std::vector<IntrospectionLink> rt;
+		int ii=0, ie=m_value.size();
+		for (; ii != ie; ++ii)
+		{
+			rt.push_back( IntrospectionLink( true, strus::string_format( "%d", ii)));
+		}
+		return rt;
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	TypeName m_value;
+	ElementConstructor m_elementConstructor;
+};
+
+template <class TypeName>
+struct IntrospectionValueListConstructor
+{
+	static IntrospectionBase* func( strus::ErrorBufferInterface* errhnd, const TypeName& val)
+	{
+		return new IntrospectionAtomic<TypeName>( errhnd, val);
+	}
+};
+
+template <class TypeName>
+class IntrospectionValueList
+	:public IntrospectionObjectList<TypeName>
+{
+public:
+	IntrospectionValueList(
+			ErrorBufferInterface* errorhnd_,
+			const TypeName& value_)
+		:IntrospectionObjectList<TypeName>( errorhnd_, value_, &IntrospectionValueListConstructor<TypeName>::func){}
 };
 
 

@@ -28,25 +28,355 @@
 using namespace strus;
 using namespace strus::bindings;
 
+template <class IntrospectionType, typename ObjectType>
+struct ViewIntrospectionConstructor
+{
+	static IntrospectionBase* func( ErrorBufferInterface* errorhnd, const ObjectType& obj)
+	{
+		return new IntrospectionType( errorhnd, obj);
+	}
+};
+
+class FunctionViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	FunctionViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::FunctionView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~FunctionViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "name")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.name());
+		}
+		else if (name == "arg")
+		{
+			return new IntrospectionKeyValueList<ParameterList>( m_errorhnd, m_view.parameter());
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"name","arg",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	typedef std::vector<analyzer::FunctionView::NamedParameter> ParameterList;
+	const analyzer::FunctionView m_view;
+};
+
+class DocumentClassIntrospection
+	:public IntrospectionBase
+{
+public:
+	DocumentClassIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::DocumentClass& doctype_)
+		:m_errorhnd(errorhnd_)
+		,m_doctype(doctype_)
+		{}
+	virtual ~DocumentClassIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "encoding")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_doctype.encoding());
+		}
+		else if (name == "mimetype")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_doctype.mimeType());
+		}
+		else if (name == "scheme")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_doctype.scheme());
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"encoding","mimetype","scheme",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const analyzer::DocumentClass m_doctype;
+};
+
+class FeatureViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	FeatureViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::FeatureView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~FeatureViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "type")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.type());
+		}
+		else if (name == "select")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.selectexpr());
+		}
+		else if (name == "tokenizer")
+		{
+			return new FunctionViewIntrospection( m_errorhnd, m_view.tokenizer());
+		}
+		else if (name == "normalizer")
+		{
+			IntrospectionObjectList<std::vector<analyzer::FunctionView> >::ElementConstructor elementConstructor
+				= &ViewIntrospectionConstructor<FunctionViewIntrospection,analyzer::FunctionView>::func;
+			return new IntrospectionObjectList<std::vector<analyzer::FunctionView> >( m_errorhnd, m_view.normalizer(), elementConstructor);
+		}
+		else if (name == "posbind")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.posbindOption());
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"type","select","tokenizer","normalizer","posbind",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	analyzer::FeatureView m_view;
+};
+
+class AggregatorViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	AggregatorViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::AggregatorView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~AggregatorViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "type")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.type());
+		}
+		else if (name == "function")
+		{
+			return new FunctionViewIntrospection( m_errorhnd, m_view.function());
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"type","function",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	analyzer::AggregatorView m_view;
+};
+
+class SubDocumentDefinitionViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	SubDocumentDefinitionViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::SubDocumentDefinitionView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~SubDocumentDefinitionViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "name")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.subDocumentTypeName());
+		}
+		else if (name == "selection")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.selection());
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"name","selection",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	analyzer::SubDocumentDefinitionView m_view;
+};
+
+
+class SubContentDefinitionViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	SubContentDefinitionViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::SubContentDefinitionView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~SubContentDefinitionViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "class")
+		{
+			return new DocumentClassIntrospection( m_errorhnd, m_view.documentClass());
+		}
+		else if (name == "selection")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.selection());
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"class","selection",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	analyzer::SubContentDefinitionView m_view;
+};
+
+
 void DocumentAnalyzerIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
 {
 	serializeMembers( serialization, path);
 }
 
+static IntrospectionBase* createFeatureViewIntrospectionList( ErrorBufferInterface* errorhnd_, const std::vector<analyzer::FeatureView>& view_)
+{
+	typedef std::vector<analyzer::FeatureView> FeatureViewList;
+	IntrospectionObjectList<FeatureViewList>::ElementConstructor elementConstructor
+		= &ViewIntrospectionConstructor<FeatureViewIntrospection,analyzer::FeatureView>::func;
+	return new IntrospectionObjectList<FeatureViewList>( errorhnd_, view_, elementConstructor);
+}
+
+static IntrospectionBase* createAggregatorViewIntrospectionList( ErrorBufferInterface* errorhnd_, const std::vector<analyzer::AggregatorView>& view_)
+{
+	typedef std::vector<analyzer::AggregatorView> AggregatorViewList;
+	static IntrospectionObjectList<AggregatorViewList>::ElementConstructor elementConstructor
+		= &ViewIntrospectionConstructor<AggregatorViewIntrospection,analyzer::AggregatorView>::func;
+	return new IntrospectionObjectList<AggregatorViewList>( errorhnd_, view_, elementConstructor);
+}
+
+static IntrospectionBase* createSubDocumentDefinitionViewIntrospectionList( ErrorBufferInterface* errorhnd_, const std::vector<analyzer::SubDocumentDefinitionView>& view_)
+{
+	typedef std::vector<analyzer::SubDocumentDefinitionView> SubDocumentDefinitionViewList;
+	static IntrospectionObjectList<SubDocumentDefinitionViewList>::ElementConstructor elementConstructor
+		= &ViewIntrospectionConstructor<SubDocumentDefinitionViewIntrospection,analyzer::SubDocumentDefinitionView>::func;
+	return new IntrospectionObjectList<SubDocumentDefinitionViewList>( errorhnd_, view_, elementConstructor);
+}
+
+static IntrospectionBase* createSubContentDefinitionViewIntrospectionList( ErrorBufferInterface* errorhnd_, const std::vector<analyzer::SubContentDefinitionView>& view_)
+{
+	typedef std::vector<analyzer::SubContentDefinitionView> SubContentDefinitionViewList;
+	static IntrospectionObjectList<SubContentDefinitionViewList>::ElementConstructor elementConstructor
+		= &ViewIntrospectionConstructor<SubContentDefinitionViewIntrospection,analyzer::SubContentDefinitionView>::func;
+	return new IntrospectionObjectList<SubContentDefinitionViewList>( errorhnd_, view_, elementConstructor);
+}
+
 IntrospectionBase* DocumentAnalyzerIntrospection::open( const std::string& name)
 {
-	if (name == "feature") return NULL;
-	else if (name == "subdoc") return NULL;
-	else if (name == "subcontent") return NULL;
+	if (name == "attributes") return createFeatureViewIntrospectionList( m_errorhnd, m_view.attributes());
+	else if (name == "metadata") return createFeatureViewIntrospectionList( m_errorhnd, m_view.metadata());
+	else if (name == "searchindex") return createFeatureViewIntrospectionList( m_errorhnd, m_view.searchindex());
+	else if (name == "forwardindex") return createFeatureViewIntrospectionList( m_errorhnd, m_view.forwardindex());
+	else if (name == "aggregator") return createAggregatorViewIntrospectionList( m_errorhnd, m_view.aggregators());
+	else if (name == "subdoc") return createSubDocumentDefinitionViewIntrospectionList( m_errorhnd, m_view.subdocuments());
+	else if (name == "subcontent") return createSubContentDefinitionViewIntrospectionList( m_errorhnd, m_view.subcontents());
 	else if (name == "patternmatcher") return NULL;
 	else if (name == "patternlexer") return NULL;
-	else if (name == "segmenter") return NULL;
+	else if (name == "segmenter") return new FunctionViewIntrospection( m_errorhnd, m_view.segmenter());
 	return NULL;
 }
 
 std::vector<IntrospectionLink> DocumentAnalyzerIntrospection::list()
 {
-	static const char* ar[] = {".feature",".subdoc",".subcontent",".patternmatcher",".patternlexer",".segmenter",NULL};
+	static const char* ar[] = {".segmenter",".attributes",".metadata",".searchindex",".forwardindex",".aggregator",".subdoc",".subcontent",".patternmatcher",".patternlexer",NULL};
 	return getList( ar);
 }
 

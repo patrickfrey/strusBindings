@@ -94,7 +94,7 @@ private:
 	papuga_ErrorBuffer m_errbuf;
 	const char* m_accepted_charset;
 	const char* m_accepted_doctype;
-	const char* m_html_base_href;
+	std::string m_html_base_href;
 	char m_errbuf_mem[ 4096];
 	char m_allocator_mem[ 1<<14];
 };

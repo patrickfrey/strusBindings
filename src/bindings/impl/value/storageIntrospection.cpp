@@ -841,15 +841,7 @@ public:
 
 	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
 	{
-		std::vector<IntrospectionLink> elems = list();
-		std::vector<IntrospectionLink>::const_iterator ei = elems.begin(), ee = elems.end();
-		for (; ei != ee; ++ei)
-		{
-			strus::Index docno = m_impl->documentNumber( ei->value());
-			if (!docno) throw unresolvable_exception();
-			DocumentIntrospection part( m_errorhnd, m_impl, ei->value(), docno);
-			part.serializeStructureAs( serialization, ei->value().c_str(), path);
-		}
+		serializeMembers( serialization, path);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -862,18 +854,29 @@ public:
 			return new DocumentIntrospection( m_errorhnd, m_impl, docid_, docno);
 		}
 		std::string docidprefix = m_docid.empty() ? name : (m_docid + '/' + name);
-		docno = m_impl->documentNumber( docidprefix);
-		if (docno)
+		if (!docidprefix.empty() && docidprefix[ docidprefix.size()-1] == '*')
 		{
-			return new DocumentIntrospection( m_errorhnd, m_impl, docidprefix, docno);
-		}
-		else if (isValidDocumentIdPrefix( m_impl, docidprefix, m_errorhnd))
-		{
-			return new DocidIntrospection( m_errorhnd, m_impl, docidprefix);
+			docidprefix.resize( docidprefix.size()-1);
+			if (isValidDocumentIdPrefix( m_impl, docidprefix, m_errorhnd))
+			{
+				return new DocidIntrospection( m_errorhnd, m_impl, docidprefix);
+			}
+			else
+			{
+				throw unresolvable_exception();
+			}
 		}
 		else
 		{
-			throw unresolvable_exception();
+			docno = m_impl->documentNumber( docidprefix);
+			if (docno)
+			{
+				return new DocumentIntrospection( m_errorhnd, m_impl, docidprefix, docno);
+			}
+			else
+			{
+				throw unresolvable_exception();
+			}
 		}
 	}
 
