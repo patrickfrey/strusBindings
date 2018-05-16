@@ -16,6 +16,7 @@
 #include "strus/errorCodes.hpp"
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/base/local_ptr.hpp"
+#include "strus/base/fileio.hpp"
 #include <stdexcept>
 
 using namespace strus;
@@ -168,4 +169,81 @@ std::vector<IntrospectionLink> IntrospectionValueIterator::list()
 	return IntrospectionLink::getList( false, m_impl->fetchValues( MaxListSizeDeepExpansion));
 }
 
+
+IntrospectionDirectoryIterator::IntrospectionDirectoryIterator( ErrorBufferInterface* errorhnd_, const strus::Reference<ValueIteratorInterface>& impl_, const std::string& name_, bool complete_)
+	:m_errorhnd(errorhnd_),m_impl(impl_),m_name(name_),m_complete(complete_)
+{}
+
+std::vector<std::string> IntrospectionDirectoryIterator::fetchValues()
+{
+	std::vector<std::string> rt;
+	std::string pathprefix = m_name;
+	if (m_complete && !m_name.empty()) pathprefix.push_back('/');
+	std::string pathsearch = pathprefix;
+	std::string pathcontext = pathprefix;
+	if (!m_complete)
+	{
+		if (0!=std::strchr( m_name.c_str(), '/'))
+		{
+			int ec = strus::getParentPath( m_name, pathcontext);
+			if (ec)
+			{
+				throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("introspection failed: %s"), m_errorhnd->fetchError());
+			}
+			pathcontext.push_back( '/');
+		}
+	}
+	while (rt.size() < MaxListSizeDeepExpansion)
+	{
+		m_impl->skip( pathsearch.c_str(), pathsearch.size());
+		std::vector<std::string> valuelist = m_impl->fetchValues( MaxListSizeDeepExpansion);
+		if (valuelist.empty())
+		{
+			return rt;
+		}
+		std::vector<std::string>::const_iterator vi = valuelist.begin(), ve = valuelist.end();
+		for (; vi != ve && rt.size() < MaxListSizeDeepExpansion; ++vi)
+		{
+			if (!strus::stringStartsWith( *vi, pathprefix))
+			{
+				return rt;
+			}
+			char const* elem = vi->c_str() + pathcontext.size();
+			char const* delim = std::strchr( elem, '/');
+			if (!delim)
+			{
+				rt.push_back( elem);
+			}
+			else
+			{
+				std::string elemstr( elem, delim-elem);
+				rt.push_back( elemstr);
+				pathsearch = pathcontext + elemstr + "0";
+				break;
+			}
+		}
+	}
+	return rt;
+}
+
+void IntrospectionDirectoryIterator::serialize( papuga_Serialization& serialization, const std::string& path)
+{
+	std::vector<std::string> valuelist = fetchValues();
+	Serializer::serialize( &serialization, valuelist, true/*deep*/);
+}
+IntrospectionBase* IntrospectionDirectoryIterator::open( const std::string& name_)
+{
+	if (m_name.empty())
+	{
+		return new IntrospectionDirectoryIterator( m_errorhnd, m_impl, name_, true);
+	}
+	else
+	{
+		return NULL;
+	}
+}
+std::vector<IntrospectionLink> IntrospectionDirectoryIterator::list()
+{
+	return IntrospectionLink::getList( false, fetchValues());
+}
 

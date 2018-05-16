@@ -43,6 +43,7 @@ public:
 
 	static std::vector<IntrospectionLink> getList( bool autoexpand_, const std::vector<std::string>& values);
 
+private:
 	bool m_autoexpand;
 	std::string m_value;
 };
@@ -85,6 +86,28 @@ private:
 	strus::Reference<ValueIteratorInterface> m_impl;
 	std::string m_name;
 	bool m_prefixBound;
+};
+
+class IntrospectionDirectoryIterator
+	:public IntrospectionBase
+{
+public:
+	IntrospectionDirectoryIterator( ErrorBufferInterface* errorhnd_, const strus::Reference<ValueIteratorInterface>& impl_, const std::string& name_, bool complete_);
+
+	virtual ~IntrospectionDirectoryIterator(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path);
+	virtual IntrospectionBase* open( const std::string& name);
+	virtual std::vector<IntrospectionLink> list();
+
+private:
+	std::vector<std::string> fetchValues();
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	strus::Reference<ValueIteratorInterface> m_impl;
+	std::string m_name;
+	bool m_complete;
 };
 
 }}//namespace

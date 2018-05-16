@@ -14,7 +14,9 @@
 #include "strus/base/stdint.h"
 #include "strus/base/numstring.hpp"
 #include "strus/base/local_ptr.hpp"
+#include "strus/base/string_conv.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/base/fileio.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
 #include "strus/valueIteratorInterface.hpp"
@@ -42,6 +44,11 @@ IntrospectionBase* createIntrospectionValueIterator( ErrorBufferInterface* error
 {
 	if (!val) throw strus::runtime_error("%s", errorhnd->fetchError());
 	return new IntrospectionValueIterator( errorhnd, val, prefixBound, prefix);
+}
+IntrospectionBase* createIntrospectionDirectoryIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, const std::string& prefix, bool complete)
+{
+	if (!val) throw strus::runtime_error("%s", errorhnd->fetchError());
+	return new IntrospectionDirectoryIterator( errorhnd, val, prefix, complete);
 }
 static strus::Index parseIndex( const char* start, std::size_t size, const char* descr)
 {
@@ -832,10 +839,12 @@ public:
 	DocidIntrospection(
 			ErrorBufferInterface* errorhnd_,
 			const StorageClientInterface* impl_,
-			const std::string& docid_="")
+			const std::string& path_=std::string(),
+			bool complete_=true)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
-		,m_docid(docid_)
+		,m_path(path_)
+		,m_complete(complete_)
 		{}
 	virtual ~DocidIntrospection(){}
 
@@ -847,19 +856,21 @@ public:
 	virtual IntrospectionBase* open( const std::string& name)
 	{
 		strus::Index docno = 0;
-		if (m_docid.empty() && name[0] == '_')
+		if (name.empty()) return NULL;
+
+		std::string docidprefix = m_path.empty() ? name : (m_path + '/' + name);
+		if (m_path.empty() && name[0] == '_')
 		{
 			docno = parseIndex( name.c_str()+1, name.size()-1, _TXT("document number"));
-			std::string docid_ = getDocidFromDocno( m_impl, docno, m_errorhnd);
-			return new DocumentIntrospection( m_errorhnd, m_impl, docid_, docno);
+			std::string docid = getDocidFromDocno( m_impl, docno, m_errorhnd);
+			return new DocumentIntrospection( m_errorhnd, m_impl, docid, docno);
 		}
-		std::string docidprefix = m_docid.empty() ? name : (m_docid + '/' + name);
-		if (!docidprefix.empty() && docidprefix[ docidprefix.size()-1] == '*')
+		else if (!docidprefix.empty() && docidprefix[ docidprefix.size()-1] == '*')
 		{
 			docidprefix.resize( docidprefix.size()-1);
 			if (isValidDocumentIdPrefix( m_impl, docidprefix, m_errorhnd))
 			{
-				return new DocidIntrospection( m_errorhnd, m_impl, docidprefix);
+				return new DocidIntrospection( m_errorhnd, m_impl, docidprefix, false/*complete*/);
 			}
 			else
 			{
@@ -873,6 +884,10 @@ public:
 			{
 				return new DocumentIntrospection( m_errorhnd, m_impl, docidprefix, docno);
 			}
+			else if (isValidDocumentIdPrefix( m_impl, docidprefix+"/", m_errorhnd))
+			{
+				return new DocidIntrospection( m_errorhnd, m_impl, docidprefix, true/*complete*/);
+			}
 			else
 			{
 				throw unresolvable_exception();
@@ -882,14 +897,15 @@ public:
 
 	virtual std::vector<IntrospectionLink> list()
 	{
-		strus::local_ptr<IntrospectionBase> values( createIntrospectionValueIterator( m_errorhnd, m_impl->createDocIdIterator(), true/*prefixBound*/,m_docid));
+		strus::local_ptr<IntrospectionBase> values( createIntrospectionDirectoryIterator( m_errorhnd, m_impl->createDocIdIterator(), m_path, m_complete));
 		return values->list();
 	}
 
 private:
 	ErrorBufferInterface* m_errorhnd;
 	const StorageClientInterface* m_impl;
-	std::string m_docid;
+	std::string m_path;
+	bool m_complete;
 };
 }//namespace
 
