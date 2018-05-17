@@ -14,11 +14,74 @@
 #include "strus/lib/bindings_description.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "serializer.hpp"
+#include "deserializer.hpp"
 #include "papuga/allocator.h"
 #include "papuga/serialization.h"
 
 using namespace strus;
 using namespace strus::bindings;
+
+Struct InserterImpl::introspection( const ValueVariant& arg) const
+{
+	Struct rt;
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	strus::local_ptr<IntrospectionBase> ictx;
+	if (path.empty())
+	{
+		static const char* ar[] = {"analyzer","storage", 0};
+		ErrorBufferInterface* errorhnd = m_analyzer.m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		ictx.reset( new LinkIntrospection( errorhnd, ar));
+		ictx->getPathContent( rt.serialization, path);
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+		}
+	}
+	else if (path[0] == "analyzer" || path[0] == "storage")
+	{
+		papuga_Serialization ser;
+		papuga_Allocator allocator;
+		int allocator_mem[ 1024];
+		papuga_init_Allocator( &allocator, &allocator_mem, sizeof(allocator_mem));
+		papuga_init_Serialization( &ser, &allocator);
+		path.erase( path.begin());
+		Serializer::serialize( &ser, path, false/*deep*/);
+		papuga_ValueVariant subarg;
+		papuga_init_ValueVariant_serialization( &subarg, &ser);
+		try
+		{
+			if (path[0] == "analyzer")
+			{
+				rt = m_analyzer.introspection( subarg);
+			}
+			else//if (path[0] == "storage")
+			{
+				rt = m_storage.introspection( subarg);
+			}
+		}
+		catch (const std::bad_alloc&)
+		{
+			papuga_destroy_Allocator( &allocator);
+			throw std::bad_alloc();
+		}
+		catch (const std::runtime_error& err)
+		{
+			papuga_destroy_Allocator( &allocator);
+			throw std::runtime_error( err.what());
+		}
+		papuga_destroy_Allocator( &allocator);
+	}
+	else
+	{
+		throw strus::runtime_error( ErrorCodeRequestResolveError, "unknown inserter item '%s'", path[0].c_str());
+	}
+	rt.release();
+	return rt;
+}
 
 InserterTransactionImpl* InserterImpl::createTransaction() const
 {

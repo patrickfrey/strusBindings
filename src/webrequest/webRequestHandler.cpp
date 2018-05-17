@@ -209,8 +209,11 @@ WebRequestHandler::WebRequestHandler(
 		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
 		mt_StorageClient_POST_transaction.addToHandler( m_impl);
 
+		static const IntrospectionMethodDescription mt_Inserter_GET( mt::Inserter::introspection(), "inserter");
+		mt_Inserter_GET.addToHandler( m_impl);
 		static const PostTransactionMethodDescription mt_Inserter_POST_transaction( mt::Inserter::createTransaction(), "transaction");
 		mt_Inserter_POST_transaction.addToHandler( m_impl);
+
 		static const InsertMethodDescription mt_InserterTransaction_PUT( mt::InserterTransaction::insertDocument());
 		mt_InserterTransaction_PUT.addToHandler( m_impl);
 		static const CommitTransactionMethodDescription mt_InserterTransaction_COMMIT( mt::InserterTransaction::commit());

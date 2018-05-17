@@ -434,7 +434,7 @@ Iterator DocumentAnalyzerImpl::analyzeMultiPart(
 	return rt;
 }
 
-Struct DocumentAnalyzerImpl::introspection( const ValueVariant& arg)
+Struct DocumentAnalyzerImpl::introspection( const ValueVariant& arg) const
 {
 	Struct rt;
 	std::vector<std::string> path;
@@ -443,7 +443,7 @@ Struct DocumentAnalyzerImpl::introspection( const ValueVariant& arg)
 		path = Deserializer::getStringList( arg);
 	}
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
+	const DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new DocumentAnalyzerIntrospection( errorhnd, analyzer));
 	ictx->getPathContent( rt.serialization, path);
@@ -620,7 +620,7 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVar
 	return metaexpr.release();
 }
 
-Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg)
+Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg) const
 {
 	Struct rt;
 	std::vector<std::string> path;
@@ -629,7 +629,7 @@ Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg)
 		path = Deserializer::getStringList( arg);
 	}
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
+	const QueryAnalyzerInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new QueryAnalyzerIntrospection( errorhnd, analyzer));
 	ictx->getPathContent( rt.serialization, path);

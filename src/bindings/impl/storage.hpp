@@ -183,7 +183,7 @@ public:
 	/// \example ["attributenames"]
 	/// \example ["metadatanames"]
 	/// \return the structure to introspect starting from the path
-	Struct introspection( const ValueVariant& path);
+	Struct introspection( const ValueVariant& path) const;
 
 private:
 	/// \brief Constructor used by Context

@@ -461,7 +461,7 @@ std::string ContextImpl::debug_serialize( const ValueVariant& arg, bool determin
 	return rt;
 }
 
-Struct ContextImpl::introspection( const ValueVariant& arg)
+Struct ContextImpl::introspection( const ValueVariant& arg) const
 {
 	Struct rt;
 	std::vector<std::string> path;
@@ -470,11 +470,11 @@ Struct ContextImpl::introspection( const ValueVariant& arg)
 		path = Deserializer::getStringList( arg);
 	}
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
-	TraceProxy* trace = m_trace_impl.getObject<TraceProxy>();
-	StorageObjectBuilderInterface* storage = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
-	AnalyzerObjectBuilderInterface* analyzer = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	RpcClientInterface* rpc = m_rpc_impl.getObject<RpcClientInterface>();
+	const ModuleLoaderInterface* moduleLoader = m_moduleloader_impl.getObject<ModuleLoaderInterface>();
+	const TraceProxy* trace = m_trace_impl.getObject<TraceProxy>();
+	const StorageObjectBuilderInterface* storage = m_storage_objbuilder_impl.getObject<StorageObjectBuilderInterface>();
+	const AnalyzerObjectBuilderInterface* analyzer = m_analyzer_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
+	const RpcClientInterface* rpc = m_rpc_impl.getObject<RpcClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new ContextIntrospection( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
 	ictx->getPathContent( rt.serialization, path);

@@ -29,6 +29,11 @@ public:
 	/// \return the transaction object (class InserterTransaction) created
 	InserterTransactionImpl* createTransaction() const;
 
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path) const;
+
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
@@ -39,7 +44,6 @@ private:
 
 	StorageClientImpl m_storage;
 	DocumentAnalyzerImpl m_analyzer;
-
 };
 
 /// \class InserterTransactionImpl

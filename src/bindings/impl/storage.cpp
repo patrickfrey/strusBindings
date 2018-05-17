@@ -242,7 +242,7 @@ Struct StorageClientImpl::config() const
 	return rt;
 }
 
-Struct StorageClientImpl::introspection( const ValueVariant& arg)
+Struct StorageClientImpl::introspection( const ValueVariant& arg) const
 {
 	Struct rt;
 	std::vector<std::string> path;
@@ -251,7 +251,7 @@ Struct StorageClientImpl::introspection( const ValueVariant& arg)
 		path = Deserializer::getStringList( arg);
 	}
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new StorageIntrospection( errorhnd, storage));
 	ictx->getPathContent( rt.serialization, path);

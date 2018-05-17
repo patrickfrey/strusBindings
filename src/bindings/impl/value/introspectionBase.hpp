@@ -110,6 +110,32 @@ private:
 	bool m_complete;
 };
 
+
+class LinkIntrospection
+	:public IntrospectionBase
+{
+public:
+	explicit LinkIntrospection( ErrorBufferInterface* errorhnd_, const char** links)
+		:m_errorhnd(errorhnd_)
+	{
+		char const* const* li = links;
+		for (; *li; ++li) m_links.push_back( IntrospectionLink( false, *li));
+	}
+	virtual ~LinkIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& )	{return NULL;}
+	virtual std::vector<IntrospectionLink> list()		{return m_links;}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	std::vector<IntrospectionLink> m_links;
+};
+
 }}//namespace
 #endif
 

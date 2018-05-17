@@ -301,7 +301,7 @@ public:
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \return the structure to introspect starting from the path
-	Struct introspection( const ValueVariant& path);
+	Struct introspection( const ValueVariant& path) const;
 
 private:
 	analyzer::DocumentClass getDocumentClass( const std::string& content, const ValueVariant& dclass) const;
@@ -467,7 +467,7 @@ public:
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \return the structure to introspect starting from the path
-	Struct introspection( const ValueVariant& path);
+	Struct introspection( const ValueVariant& path) const;
 
 private:
 	TermExpression* analyzeTermExpression_( const ValueVariant& expression, bool unique) const;
