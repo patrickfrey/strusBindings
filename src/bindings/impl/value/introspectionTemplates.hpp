@@ -12,6 +12,7 @@
 #include "strus/base/configParser.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/numstring.hpp"
+#include "strus/base/stdint.h"
 #include "introspectionBase.hpp"
 #include "serializer.hpp"
 
@@ -71,7 +72,13 @@ public:
 	}
 	virtual std::vector<IntrospectionLink> list()
 	{
-		return IntrospectionLink::getList( true, IntrospectionBase::getKeyList( m_value));
+		std::vector<IntrospectionLink> rt;
+		typename TypeName::const_iterator vi = m_value.begin(), ve = m_value.end();
+		for (; vi != ve; ++vi)
+		{
+			rt.push_back( IntrospectionLink( true/*autoexpand*/, vi->first));
+		}
+		return rt;
 	}
 
 private:

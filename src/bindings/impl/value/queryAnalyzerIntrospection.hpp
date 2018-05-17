@@ -15,26 +15,7 @@
 namespace strus {
 namespace bindings {
 
-class QueryAnalyzerIntrospection
-	:public IntrospectionBase
-{
-public:
-	QueryAnalyzerIntrospection(
-			ErrorBufferInterface* errorhnd_,
-			const QueryAnalyzerInterface* impl_)
-		:m_errorhnd(errorhnd_)
-		,m_impl(impl_)
-		{}
-	virtual ~QueryAnalyzerIntrospection(){}
-
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path);
-	virtual IntrospectionBase* open( const std::string& name);
-	virtual std::vector<IntrospectionLink> list();
-
-private:
-	ErrorBufferInterface* m_errorhnd;
-	const QueryAnalyzerInterface* m_impl;
-};
+#error DEPRECATED
 
 }}//namespace
 #endif

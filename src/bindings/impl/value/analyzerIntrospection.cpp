@@ -5,8 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Interface for introspection of a document analyzer
-#include "documentAnalyzerIntrospection.hpp"
+/// \brief Interface for introspection of analyzers
+#include "analyzerIntrospection.hpp"
 #include "introspectionTemplates.hpp"
 #include "serializer.hpp"
 #include "private/internationalization.hpp"
@@ -377,6 +377,92 @@ IntrospectionBase* DocumentAnalyzerIntrospection::open( const std::string& name)
 std::vector<IntrospectionLink> DocumentAnalyzerIntrospection::list()
 {
 	static const char* ar[] = {".segmenter",".attributes",".metadata",".searchindex",".forwardindex",".aggregator",".subdoc",".subcontent",".patternmatcher",".patternlexer",NULL};
+	return getList( ar);
+}
+
+class QueryElementViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	QueryElementViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::QueryElementView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~QueryElementViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "type")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.type());
+		}
+		else if (name == "field")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.field());
+		}
+		else if (name == "tokenizer")
+		{
+			return new FunctionViewIntrospection( m_errorhnd, m_view.tokenizer());
+		}
+		else if (name == "normalizer")
+		{
+			IntrospectionObjectList<std::vector<analyzer::FunctionView> >::ElementConstructor elementConstructor
+				= &ViewIntrospectionConstructor<FunctionViewIntrospection,analyzer::FunctionView>::func;
+			return new IntrospectionObjectList<std::vector<analyzer::FunctionView> >( m_errorhnd, m_view.normalizer(), elementConstructor);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"type","field","tokenizer","normalizer",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	analyzer::QueryElementView m_view;
+};
+
+void QueryAnalyzerIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
+{
+	serializeMembers( serialization, path);
+}
+
+IntrospectionBase* QueryAnalyzerIntrospection::open( const std::string& name)
+{
+	if (name == "elements")
+	{
+		IntrospectionObjectList<std::vector<analyzer::QueryElementView> >::ElementConstructor elementConstructor
+			= &ViewIntrospectionConstructor<QueryElementViewIntrospection,analyzer::QueryElementView>::func;
+		return new IntrospectionObjectList<std::vector<analyzer::QueryElementView> >( m_errorhnd, m_view.elements(), elementConstructor);
+	}
+	else if (name == "lexems")
+	{
+		IntrospectionObjectList<std::vector<analyzer::QueryElementView> >::ElementConstructor elementConstructor
+			= &ViewIntrospectionConstructor<QueryElementViewIntrospection,analyzer::QueryElementView>::func;
+		return new IntrospectionObjectList<std::vector<analyzer::QueryElementView> >( m_errorhnd, m_view.patternLexems(), elementConstructor);
+	}
+	else if (name == "priorities")
+	{
+		return new IntrospectionKeyValueList<std::map<std::string,int> >( m_errorhnd, m_view.priorities());
+	}
+	return NULL;
+}
+
+std::vector<IntrospectionLink> QueryAnalyzerIntrospection::list()
+{
+	static const char* ar[] = {"elements","lexems","priorities",NULL};
 	return getList( ar);
 }
 

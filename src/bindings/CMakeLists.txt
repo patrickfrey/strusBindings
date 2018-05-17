@@ -17,8 +17,7 @@ set( source_files
 	impl/value/introspectionBase.cpp
 	impl/value/contextIntrospection.cpp
 	impl/value/storageIntrospection.cpp
-	impl/value/documentAnalyzerIntrospection.cpp
-	impl/value/queryAnalyzerIntrospection.cpp
+	impl/value/analyzerIntrospection.cpp
 	impl/value/termExpression.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp

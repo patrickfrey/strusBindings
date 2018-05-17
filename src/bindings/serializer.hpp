@@ -125,6 +125,11 @@ private:
 	{
 		return papuga_Serialization_pushValue_int( result, val);
 	}
+	static typename strus::enable_if<!strus::is_same<int,papuga_Int>::value,bool>::type 
+		serialize_nothrow( papuga_Serialization* result, const int& val, papuga_ErrorCode& errcode, bool deep)
+	{
+		return papuga_Serialization_pushValue_int( result, val);
+	}
 	static inline bool serialize_nothrow( papuga_Serialization* result, const bool& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		return papuga_Serialization_pushValue_int( result, val);

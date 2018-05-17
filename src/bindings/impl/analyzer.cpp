@@ -6,8 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/analyzer.hpp"
-#include "impl/value/documentAnalyzerIntrospection.hpp"
-#include "impl/value/queryAnalyzerIntrospection.hpp"
+#include "impl/value/analyzerIntrospection.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
 #include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"

@@ -28,26 +28,4 @@
 using namespace strus;
 using namespace strus::bindings;
 
-void QueryAnalyzerIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
-{
-	serializeMembers( serialization, path);
-}
-
-IntrospectionBase* QueryAnalyzerIntrospection::open( const std::string& name)
-{
-	if (name == "feature") return NULL;
-	else if (name == "subdoc") return NULL;
-	else if (name == "subcontent") return NULL;
-	else if (name == "patternmatcher") return NULL;
-	else if (name == "patternlexer") return NULL;
-	else if (name == "segmenter") return NULL;
-	return NULL;
-}
-
-std::vector<IntrospectionLink> QueryAnalyzerIntrospection::list()
-{
-	static const char* ar[] = {".feature",".subdoc",".subcontent",".patternmatcher",".patternlexer",".segmenter",NULL};
-	return getList( ar);
-}
-
-
+#error DEPRECATED
