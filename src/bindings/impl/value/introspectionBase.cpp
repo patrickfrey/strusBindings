@@ -180,7 +180,7 @@ std::vector<std::string> IntrospectionDirectoryIterator::fetchValues()
 	std::string pathprefix = m_name;
 	if (m_complete && !m_name.empty()) pathprefix.push_back('/');
 	std::string pathsearch = pathprefix;
-	std::string pathcontext = pathprefix;
+	std::string pathcontext;
 	if (!m_complete)
 	{
 		if (0!=std::strchr( m_name.c_str(), '/'))
@@ -192,6 +192,10 @@ std::vector<std::string> IntrospectionDirectoryIterator::fetchValues()
 			}
 			pathcontext.push_back( '/');
 		}
+	}
+	else
+	{
+		pathcontext = pathprefix;
 	}
 	while (rt.size() < MaxListSizeDeepExpansion)
 	{
