@@ -109,9 +109,9 @@ void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, un
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
 }
 
-void PostProcPatternExpressionBuilder::attachVariable( const std::string& name)
+void PostProcPatternExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
 {
-	m_matcher->attachVariable( name);
+	m_matcher->attachVariable( name, formatstring);
 }
 
 void PostProcPatternExpressionBuilder::definePattern( const std::string& name, bool visible)
@@ -181,9 +181,9 @@ void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, uns
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
 }
 
-void PreProcPatternExpressionBuilder::attachVariable( const std::string& name)
+void PreProcPatternExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
 {
-	m_matcher->attachVariable( name);
+	m_matcher->attachVariable( name, formatstring);
 }
 
 void PreProcPatternExpressionBuilder::defineLexem(
@@ -240,8 +240,12 @@ void QueryExpressionBuilder::pushExpression( const std::string& opname, unsigned
 	m_query->pushExpression( op, argc, range, cardinality);
 }
 
-void QueryExpressionBuilder::attachVariable( const std::string& name)
+void QueryExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
 {
+	if (!formatstring.empty())
+	{
+		throw strus::runtime_error(_TXT("format string does not make sense for query variables"));
+	}
 	m_query->attachVariable( name);
 }
 
@@ -280,8 +284,12 @@ void QueryAnalyzerTermExpressionBuilder::pushExpression( const std::string& op, 
 	m_expression->pushExpression( op, argc, range, cardinality);
 }
 
-void QueryAnalyzerTermExpressionBuilder::attachVariable( const std::string& name)
+void QueryAnalyzerTermExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
 {
+	if (!formatstring.empty())
+	{
+		throw strus::runtime_error(_TXT("format string does not make sense for query variables"));
+	}
 	m_expression->attachVariable( name);
 }
 
@@ -340,7 +348,7 @@ void PostingsExpressionBuilder::pushExpression( const std::string& op, unsigned 
 	}
 }
 
-void PostingsExpressionBuilder::attachVariable( const std::string& name)
+void PostingsExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
 {
 	throw strus::runtime_error(_TXT("%s is not implemented for %s"), "attach variable", "postings iterator");
 }

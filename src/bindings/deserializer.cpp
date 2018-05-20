@@ -1411,18 +1411,19 @@ static void builderPushTerm(
 	}
 	if (!def.variable.empty())
 	{
-		builder.attachVariable( def.variable);
+		builder.attachVariable( def.variable, def.formatstring);
 	}
 }
 
 static void buildExpressionJoin( ExpressionBuilder& builder, papuga_SerializationIter& seriter)
 {
 	static const char* context = _TXT("join expression");
-	static const StructureNameMap joinop_namemap( "variable,op,range,cardinality,arg", ',');
-	enum StructureNameId {JO_variable=0,JO_op=1, JO_range=2, JO_cardinality=3, JO_arg=4};
+	static const StructureNameMap joinop_namemap( "variable,format,op,range,cardinality,arg", ',');
+	enum StructureNameId {JO_variable=0,JO_format=1,JO_op=2, JO_range=3, JO_cardinality=4, JO_arg=5};
 	papuga_ErrorCode err = papuga_Ok;
 
 	std::string variable;
+	std::string formatstring;
 	std::string op;
 	unsigned int argc = 0;
 	int range = 0;
@@ -1430,7 +1431,7 @@ static void buildExpressionJoin( ExpressionBuilder& builder, papuga_Serializatio
 
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
-		int defined[ 5] = {0,0,0,0,0};
+		int defined[ 6] = {0,0,0,0,0,0};
 		do
 		{
 			StructureNameId idx = (StructureNameId)joinop_namemap.index( *papuga_SerializationIter_value( &seriter));
@@ -1440,6 +1441,10 @@ static void buildExpressionJoin( ExpressionBuilder& builder, papuga_Serializatio
 				case JO_variable:
 					if (defined[JO_variable]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "variable", context);
 					variable = Deserializer::getString( seriter);
+					break;
+				case JO_format:
+					if (defined[JO_format]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "format", context);
+					formatstring = Deserializer::getString( seriter);
 					break;
 				case JO_op:
 					if (defined[JO_op]++) throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), "op", context);
@@ -1488,16 +1493,17 @@ static void buildExpressionJoin( ExpressionBuilder& builder, papuga_Serializatio
 	{
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 		{
-			papuga_SerializationIter sernext;
-			papuga_init_SerializationIter_copy( &sernext, &seriter);
-			papuga_SerializationIter_skip( &sernext);
-			const papuga_ValueVariant* variable_ = Deserializer::getOptionalDefinition( sernext, "variable");
-			if (variable_)
+			papuga_SerializationIter_skip( &seriter);
+			const papuga_ValueVariant* variable_ = NULL;
+			const papuga_ValueVariant* format_ = NULL;
+			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 			{
-				variable = ValueVariantWrap::tostring( *variable_);
-				Deserializer::consumeClose( sernext);
-				papuga_init_SerializationIter_copy( &seriter, &sernext);
+				variable_ = Deserializer::getOptionalDefinition( seriter, "variable");
+				if (variable_) variable = ValueVariantWrap::tostring( *variable_);
+				format_ = Deserializer::getOptionalDefinition( seriter, "format");
+				if (format_) formatstring = ValueVariantWrap::tostring( *format_);
 			}
+			Deserializer::consumeClose( seriter);
 		}
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
@@ -1547,7 +1553,7 @@ static void buildExpressionJoin( ExpressionBuilder& builder, papuga_Serializatio
 	builder.pushExpression( op, argc, range, cardinality);
 	if (!variable.empty())
 	{
-		builder.attachVariable( variable);
+		builder.attachVariable( variable, formatstring);
 	}
 }
 
