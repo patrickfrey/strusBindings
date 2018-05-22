@@ -30,7 +30,6 @@ struct AnalyzerFunctionDef
 struct QueryTermDef
 {
 	std::string variable;
-	std::string formatstring;
 	std::string type;
 	std::string value;
 	unsigned int length;
@@ -39,7 +38,7 @@ struct QueryTermDef
 
 	QueryTermDef( papuga_SerializationIter& seriter);
 	QueryTermDef( const QueryTermDef& o)
-		:variable(o.variable),formatstring(o.formatstring),type(o.type),value(o.value),length(o.length),value_defined(o.value_defined),length_defined(o.length_defined){}
+		:variable(o.variable),type(o.type),value(o.value),length(o.length),value_defined(o.value_defined),length_defined(o.length_defined){}
 };
 
 struct MetaDataRangeDef

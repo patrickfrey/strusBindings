@@ -109,14 +109,14 @@ void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, un
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
 }
 
-void PostProcPatternExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
+void PostProcPatternExpressionBuilder::attachVariable( const std::string& name)
 {
-	m_matcher->attachVariable( name, formatstring);
+	m_matcher->attachVariable( name);
 }
 
-void PostProcPatternExpressionBuilder::definePattern( const std::string& name, bool visible)
+void PostProcPatternExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
-	m_matcher->definePattern( name, visible);
+	m_matcher->definePattern( name, formatstring, visible);
 }
 
 void PostProcPatternExpressionBuilder::defineLexem( const std::string& name)
@@ -181,9 +181,9 @@ void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, uns
 	m_matcher->pushExpression( joinop, argc, range, cardinality);
 }
 
-void PreProcPatternExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
+void PreProcPatternExpressionBuilder::attachVariable( const std::string& name)
 {
-	m_matcher->attachVariable( name, formatstring);
+	m_matcher->attachVariable( name);
 }
 
 void PreProcPatternExpressionBuilder::defineLexem(
@@ -202,9 +202,9 @@ void PreProcPatternExpressionBuilder::defineLexem(
 	m_lexer->defineLexem( termtypeid, expression, resultIndex, level, posbind);
 }
 
-void PreProcPatternExpressionBuilder::definePattern( const std::string& name, bool visible)
+void PreProcPatternExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
-	m_matcher->definePattern( name, visible);
+	m_matcher->definePattern( name, formatstring, visible);
 }
 
 void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
@@ -240,17 +240,17 @@ void QueryExpressionBuilder::pushExpression( const std::string& opname, unsigned
 	m_query->pushExpression( op, argc, range, cardinality);
 }
 
-void QueryExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
+void QueryExpressionBuilder::attachVariable( const std::string& name)
+{
+	m_query->attachVariable( name);
+}
+
+void QueryExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
 	if (!formatstring.empty())
 	{
 		throw strus::runtime_error(_TXT("format string does not make sense for query variables"));
 	}
-	m_query->attachVariable( name);
-}
-
-void QueryExpressionBuilder::definePattern( const std::string& name, bool visible)
-{
 	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
 }
 
@@ -284,16 +284,12 @@ void QueryAnalyzerTermExpressionBuilder::pushExpression( const std::string& op, 
 	m_expression->pushExpression( op, argc, range, cardinality);
 }
 
-void QueryAnalyzerTermExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
+void QueryAnalyzerTermExpressionBuilder::attachVariable( const std::string& name)
 {
-	if (!formatstring.empty())
-	{
-		throw strus::runtime_error(_TXT("format string does not make sense for query variables"));
-	}
 	m_expression->attachVariable( name);
 }
 
-void QueryAnalyzerTermExpressionBuilder::definePattern( const std::string& name, bool visible)
+void QueryAnalyzerTermExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
 	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
 }
@@ -348,12 +344,12 @@ void PostingsExpressionBuilder::pushExpression( const std::string& op, unsigned 
 	}
 }
 
-void PostingsExpressionBuilder::attachVariable( const std::string& name, const std::string& formatstring)
+void PostingsExpressionBuilder::attachVariable( const std::string& name)
 {
 	throw strus::runtime_error(_TXT("%s is not implemented for %s"), "attach variable", "postings iterator");
 }
 
-void PostingsExpressionBuilder::definePattern( const std::string& name, bool visible)
+void PostingsExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
 	throw strus::runtime_error(_TXT("%s is not implemented for %s"), "define pattern", "postings iterator");
 }

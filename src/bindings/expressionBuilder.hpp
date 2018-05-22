@@ -35,8 +35,8 @@ public:
 	virtual void pushTerm( const std::string& type)=0;
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)=0;
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)=0;
-	virtual void attachVariable( const std::string& name, const std::string& formatstring)=0;
-	virtual void definePattern( const std::string& name, bool visible)=0;
+	virtual void attachVariable( const std::string& name)=0;
+	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible)=0;
 };
 
 class PostProcPatternExpressionBuilder
@@ -52,8 +52,8 @@ public:
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
-	virtual void attachVariable( const std::string& name, const std::string& formatstring);
-	virtual void definePattern( const std::string& name, bool visible);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
 
 	void defineLexem( const std::string& name);
 	
@@ -82,8 +82,8 @@ public:
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
-	virtual void attachVariable( const std::string& name, const std::string& formatstring);
-	virtual void definePattern( const std::string& name, bool visible);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
 
 	void defineLexem(
 			const std::string& name,
@@ -116,8 +116,8 @@ public:
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
-	virtual void attachVariable( const std::string& name, const std::string& formatstring);
-	virtual void definePattern( const std::string& name, bool visible);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
 
 	unsigned int stackSize() const					{return m_stackSize > 0 ? m_stackSize:0;}
 
@@ -145,8 +145,8 @@ public:
 	virtual void pushTerm( const std::string& value);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
-	virtual void attachVariable( const std::string& name, const std::string& formatstring);
-	virtual void definePattern( const std::string& name, bool visible);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
 
 private:
 	QueryAnalyzerTermExpressionBuilder( const QueryAnalyzerTermExpressionBuilder&){}	//< non copyable
@@ -171,8 +171,8 @@ public:
 	virtual void pushTerm( const std::string& type);
 	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
-	virtual void attachVariable( const std::string& name, const std::string& formatstring);
-	virtual void definePattern( const std::string& name, bool visible);
+	virtual void attachVariable( const std::string& name);
+	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
 
 public:
 	Reference<PostingIteratorInterface> pop();
