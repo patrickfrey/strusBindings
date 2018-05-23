@@ -24,6 +24,7 @@ include_directories(
 )
 
 link_directories(
+	${Boost_LIBRARY_DIRS}
         ${PYTHON3_LIBRARY_DIRS}
         ${PAPUGA_PYTHON3_LIBRARY_DIRS}
 	${PAPUGA_LIBRARY_DIRS}

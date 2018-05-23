@@ -26,6 +26,7 @@ include_directories(
 )
 
 link_directories(
+	${Boost_LIBRARY_DIRS}
         ${PHP7_LIBRARY_DIRS}
         ${PAPUGA_PHP7_LIBRARY_DIRS}
 	${PAPUGA_LIBRARY_DIRS}

@@ -11,6 +11,7 @@ include_directories(
 )
 
 link_directories(
+	${Boost_LIBRARY_DIRS}
         ${LUA_LIBRARY_DIRS}
         ${PAPUGA_LUA_LIBRARY_DIRS}
 	${PAPUGA_LIBRARY_DIRS}
