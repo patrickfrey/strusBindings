@@ -35,7 +35,7 @@ std::vector<IntrospectionLink> IntrospectionLink::getList( bool autoexpand_, con
 
 std::runtime_error IntrospectionBase::unresolvable_exception()
 {
-	return strus::runtime_error( ErrorCodeRequestResolveError, _TXT("not found"));
+	return strus::runtime_error_ec( ErrorCodeRequestResolveError, _TXT("not found"));
 }
 
 std::vector<IntrospectionLink> IntrospectionBase::getList( const char** ar)
@@ -126,7 +126,7 @@ void IntrospectionBase::getPathContent( papuga_Serialization& serialization, con
 		ictx.reset( cur->open( *pi));
 		if (!ictx.get())
 		{
-			throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("/%s not found in %s%s"), pi->c_str(), "/context", openedpath.c_str());
+			throw strus::runtime_error_ec( ErrorCodeRequestResolveError, _TXT("/%s not found in %s%s"), pi->c_str(), "/context", openedpath.c_str());
 		}
 		cur = ictx.get();
 		openedpath.push_back('/');
@@ -188,7 +188,7 @@ std::vector<std::string> IntrospectionDirectoryIterator::fetchValues()
 			int ec = strus::getParentPath( m_name, pathcontext);
 			if (ec)
 			{
-				throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("introspection failed: %s"), m_errorhnd->fetchError());
+				throw strus::runtime_error_ec( ErrorCodeRequestResolveError, _TXT("introspection failed: %s"), m_errorhnd->fetchError());
 			}
 			pathcontext.push_back( '/');
 		}

@@ -31,7 +31,7 @@ static int64_t transactionIndex_( const std::string& tid)
 	unsigned int p1,p2;
 	if (2!=std::sscanf( tid.c_str(), "%08x%08x", &p1, &p2))
 	{
-		throw strus::runtime_error( ErrorCodeInvalidArgument, _TXT("illegal id of transaction"));
+		throw strus::runtime_error_ec( ErrorCodeInvalidArgument, _TXT("illegal id of transaction"));
 	}
 	return ((int64_t)p1 << 32) + p2;
 }
@@ -52,8 +52,8 @@ TransactionPool::TransactionPool( int64_t timecount, int maxIdleTime_, int nofTr
 {
 	if (m_maxIdleTime == 0) m_maxIdleTime = 8;
 	if (m_nofTransactionPerSlot == 0) m_nofTransactionPerSlot = 1;
-	if (m_nofTransactionPerSlot < 0 || m_nofTransactionPerSlot >= (1<<20)) throw strus::runtime_error( ErrorCodeMaxLimitReached, _TXT("max transaction per second exceeds maximum limit"));
-	if (m_maxIdleTime < 0 || m_maxIdleTime >= (1<<20)) throw strus::runtime_error( ErrorCodeMaxLimitReached, _TXT("max transaction duration exceeds maximum limit"));
+	if (m_nofTransactionPerSlot < 0 || m_nofTransactionPerSlot >= (1<<20)) throw strus::runtime_error_ec( ErrorCodeMaxLimitReached, _TXT("max transaction per second exceeds maximum limit"));
+	if (m_maxIdleTime < 0 || m_maxIdleTime >= (1<<20)) throw strus::runtime_error_ec( ErrorCodeMaxLimitReached, _TXT("max transaction duration exceeds maximum limit"));
 	std::size_t min_arsize = m_maxIdleTime * m_nofTransactionPerSlot;
 	while (m_arsize < min_arsize) m_arsize *= 2;
 	m_allocNofTries = m_nofTransactionPerSlot * 8;

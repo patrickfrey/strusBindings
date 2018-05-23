@@ -77,7 +77,7 @@ Struct InserterImpl::introspection( const ValueVariant& arg) const
 	}
 	else
 	{
-		throw strus::runtime_error( ErrorCodeRequestResolveError, "unknown inserter item '%s'", path[0].c_str());
+		throw strus::runtime_error_ec( ErrorCodeRequestResolveError, "unknown inserter item '%s'", path[0].c_str());
 	}
 	rt.release();
 	return rt;

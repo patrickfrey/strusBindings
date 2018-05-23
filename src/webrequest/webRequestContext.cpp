@@ -50,7 +50,7 @@ static std::string parentPath( const std::string& url)
 {
 	std::string rt;
 	int ec = strus::getParentPath( url, rt);
-	if (ec) throw strus::runtime_error( ErrorCodeRequestResolveError, _TXT("illegal URL"));
+	if (ec) throw strus::runtime_error_ec( ErrorCodeRequestResolveError, _TXT("illegal URL"));
 	return rt;
 }
 

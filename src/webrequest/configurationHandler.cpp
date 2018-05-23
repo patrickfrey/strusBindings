@@ -82,10 +82,10 @@ void ConfigurationHandler::storeConfiguration(
 	transaction.filename = strus::joinFilePath( m_config_store_dir, filename);
 	transaction.failed_filename = transaction.filename + ".failed";
 	int ec = strus::createDir( m_config_store_dir, false);
-	if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to create configuration directory '%s'"), m_config_store_dir.c_str());
+	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to create configuration directory '%s'"), m_config_store_dir.c_str());
 
 	ec = strus::writeFile( transaction.failed_filename, config.contentbuf);
-	if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to write configuration file '%s'"), transaction.filename.c_str());
+	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to write configuration file '%s'"), transaction.filename.c_str());
 }
 
 void ConfigurationHandler::commitStoreConfiguration(
@@ -100,7 +100,7 @@ void ConfigurationHandler::commitStoreConfiguration(
 	if (ec)
 	{
 		m_context_names.erase( namedef);
-		throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to commit configuration change '%s'"), transaction.filename.c_str());
+		throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to commit configuration change '%s'"), transaction.filename.c_str());
 	}
 }
 
@@ -113,14 +113,14 @@ void ConfigurationHandler::deleteStoredConfiguration(
 	std::string fileext = strus::string_format( ".%s.%s.conf", contextType, contextName);
 	std::vector<std::string> files;
 	int ec = strus::readDirFiles( m_config_store_dir, fileext, files);
-	if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to read files '*%s' in config store directory '%s'"), fileext.c_str(), m_config_store_dir.c_str());
+	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to read files '*%s' in config store directory '%s'"), fileext.c_str(), m_config_store_dir.c_str());
 
 	std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
 	for (; fi != fe; ++fi)
 	{
 		std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
 		ec = strus::removeFile( filepath, true);
-		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
+		if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
 	}
 	ContextNameDef namedef( contextType, contextName);
 	m_context_names.erase( namedef);
@@ -135,14 +135,14 @@ void ConfigurationHandler::clearUnfinishedTransactions()
 		std::string fileext = strus::string_format( ".conf.failed");
 		std::vector<std::string> files;
 		int ec = strus::readDirFiles( m_config_store_dir, fileext, files);
-		if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to read files '*%s' in config store directory '%s'"), fileext.c_str(), m_config_store_dir.c_str());
+		if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to read files '*%s' in config store directory '%s'"), fileext.c_str(), m_config_store_dir.c_str());
 	
 		std::vector<std::string>::const_iterator fi = files.begin(), fe = files.end();
 		for (; fi != fe; ++fi)
 		{
 			std::string filepath = strus::joinFilePath( m_config_store_dir, *fi);
 			ec = strus::removeFile( filepath, true);
-			if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to clear unfinished transaction (file %s): %s"), filepath.c_str(), std::strerror(ec));
+			if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to clear unfinished transaction (file %s): %s"), filepath.c_str(), std::strerror(ec));
 		}
 	}
 }
@@ -155,7 +155,7 @@ ConfigurationDescription ConfigurationHandler::getStoredConfiguration(
 	std::vector<std::string> configFileNames;
 
 	int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
-	if (ec) throw strus::runtime_error( ec, _TXT("error loading stored configuration: %s"), std::strerror(ec));
+	if (ec) throw strus::runtime_error_ec( ec, _TXT("error loading stored configuration: %s"), std::strerror(ec));
 
 	std::sort( configFileNames.begin(), configFileNames.end(), greater());
 	std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
@@ -170,7 +170,7 @@ ConfigurationDescription ConfigurationHandler::getStoredConfiguration(
 		std::string filepath = strus::joinFilePath( m_config_store_dir, *ci);
 		std::string contentbuf;
 		ec = strus::readFile( filepath, contentbuf);
-		if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
+		if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
 
 		return ConfigurationDescription( contextType, contextName, doctype, contentbuf);
 	}
@@ -189,7 +189,7 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 		std::vector<std::string> configFileNames;
 
 		int ec = strus::readDirFiles( m_config_store_dir, ".conf", configFileNames);
-		if (ec) throw strus::runtime_error( ec, _TXT("error loading stored configuration in %s"), m_config_store_dir.c_str());
+		if (ec) throw strus::runtime_error_ec( ec, _TXT("error loading stored configuration in %s"), m_config_store_dir.c_str());
 	
 		std::sort( configFileNames.begin(), configFileNames.end(), greater());
 		std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
@@ -207,13 +207,13 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 				if (doDeleteObsolete)
 				{
 					ec = strus::removeFile( filepath, true);
-					if (ec) throw strus::runtime_error( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
+					if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
 				}
 				continue;
 			}
 			std::string contentbuf;
 			ec = strus::readFile( filepath, contentbuf);
-			if (ec) throw strus::runtime_error( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
+			if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
 	
 			rt.push_back( ConfigurationDescription( contextType, contextName, doctype, contentbuf));
 		}
@@ -302,7 +302,7 @@ static ConfigurationDescription createSubConfig( const std::string& name, papuga
 	const char* subcfgstr = (const char*)papuga_ValueVariant_tojson(
 					&subconfigval, &allocator, getBindingsInterfaceDescription()->structs,
 					papuga_UTF8, NULL, &subcfglen, &errcode);
-	if (!subcfgstr) throw strus::runtime_error( papugaErrorToErrorCode( errcode), _TXT("failed to load sub configuration"));
+	if (!subcfgstr) throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to load sub configuration"));
 	const char* doctype = WebRequestContent::typeName( WebRequestContent::JSON);
 	return ConfigurationDescription( name, subconfidid.empty() ? name : subconfidid, doctype, std::string(subcfgstr, subcfglen));
 }
