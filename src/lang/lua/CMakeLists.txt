@@ -84,8 +84,7 @@ if(LIBKVM_LIBRARIES)
         target_link_libraries( strusLua ${LIBKVM_LIBRARIES} )
 endif()
 
-find_library( LIBDL_LIBRARY dl )
-if(LIBDL_LIBRARY)
+if( LIBDL_LIBRARY )
         target_link_libraries( strusLua ${LIBDL_LIBRARY} )
 endif()
 
