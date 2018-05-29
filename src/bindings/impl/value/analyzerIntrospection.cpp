@@ -434,6 +434,72 @@ private:
 	analyzer::QueryElementView m_view;
 };
 
+class ContentStatisticsElementViewIntrospection
+	:public IntrospectionBase
+{
+public:
+	ContentStatisticsElementViewIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const analyzer::ContentStatisticsElementView& view_)
+		:m_errorhnd(errorhnd_)
+		,m_view(view_)
+		{}
+	virtual ~ContentStatisticsElementViewIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	{
+		serializeMembers( serialization, path);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "type")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.type());
+		}
+		else if (name == "regex")
+		{
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.regex());
+		}
+		else if (name == "priority")
+		{
+			return new IntrospectionAtomic<int>( m_errorhnd, m_view.priority());
+		}
+		else if (name == "minlen")
+		{
+			return new IntrospectionAtomic<int>( m_errorhnd, m_view.minLen());
+		}
+		else if (name == "maxlen")
+		{
+			return new IntrospectionAtomic<int>( m_errorhnd, m_view.maxLen());
+		}
+		else if (name == "tokenizer")
+		{
+			return new FunctionViewIntrospection( m_errorhnd, m_view.tokenizer());
+		}
+		else if (name == "normalizer")
+		{
+			IntrospectionObjectList<std::vector<analyzer::FunctionView> >::ElementConstructor elementConstructor
+				= &ViewIntrospectionConstructor<FunctionViewIntrospection,analyzer::FunctionView>::func;
+			return new IntrospectionObjectList<std::vector<analyzer::FunctionView> >( m_errorhnd, m_view.normalizer(), elementConstructor);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"type","regex","priority","minlen","maxlen","tokenizer","normalizer",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	analyzer::ContentStatisticsElementView m_view;
+};
+
 void QueryAnalyzerIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
 {
 	serializeMembers( serialization, path);
@@ -466,4 +532,26 @@ std::vector<IntrospectionLink> QueryAnalyzerIntrospection::list()
 	return getList( ar);
 }
 
+
+void ContentStatisticsIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
+{
+	serializeMembers( serialization, path);
+}
+
+IntrospectionBase* ContentStatisticsIntrospection::open( const std::string& name)
+{
+	if (name == "elements")
+	{
+		IntrospectionObjectList<std::vector<analyzer::ContentStatisticsElementView> >::ElementConstructor elementConstructor
+			= &ViewIntrospectionConstructor<ContentStatisticsElementViewIntrospection,analyzer::ContentStatisticsElementView>::func;
+		return new IntrospectionObjectList<std::vector<analyzer::ContentStatisticsElementView> >( m_errorhnd, m_view.elements(), elementConstructor);
+	}
+	return NULL;
+}
+
+std::vector<IntrospectionLink> ContentStatisticsIntrospection::list()
+{
+	static const char* ar[] = {"elements",NULL};
+	return getList( ar);
+}
 

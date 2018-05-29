@@ -8,9 +8,7 @@
 #ifndef _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_ANALYZER_HPP_INCLUDED
 #include "papuga/valueVariant.h"
-#include "strus/numericVariant.hpp"
 #include "strus/textProcessorInterface.hpp"
-#include "strus/reference.hpp"
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/analyzer/document.hpp"
 #include "impl/value/termExpression.hpp"
@@ -477,13 +475,14 @@ private:
 	friend class ContextImpl;
 	friend class InserterImpl;
 
-	QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd);
+	QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const TextProcessorInterface* textproc_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_analyzer_impl;
 	QueryAnalyzerStruct m_queryAnalyzerStruct;
+	const TextProcessorInterface* m_textproc;
 };
 
 }}//namespace

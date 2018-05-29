@@ -11,8 +11,11 @@
 #include "introspectionBase.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
+#include "strus/contentStatisticsInterface.hpp"
+#include "strus/analyzer/contentStatisticsView.hpp"
 #include "strus/analyzer/documentAnalyzerView.hpp"
 #include "strus/analyzer/queryAnalyzerView.hpp"
+#include "strus/analyzer/documentAnalyzerView.hpp"
 #include "strus/errorBufferInterface.hpp"
 
 namespace strus {
@@ -62,6 +65,29 @@ private:
 	ErrorBufferInterface* m_errorhnd;
 	const QueryAnalyzerInterface* m_impl;
 	analyzer::QueryAnalyzerView m_view;
+};
+
+class ContentStatisticsIntrospection
+	:public IntrospectionBase
+{
+public:
+	ContentStatisticsIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const ContentStatisticsInterface* impl_)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		,m_view(impl_->view())
+		{}
+	virtual ~ContentStatisticsIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path);
+	virtual IntrospectionBase* open( const std::string& name);
+	virtual std::vector<IntrospectionLink> list();
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const ContentStatisticsInterface* m_impl;
+	analyzer::ContentStatisticsView m_view;
 };
 
 }}//namespace

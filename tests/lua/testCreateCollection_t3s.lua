@@ -33,7 +33,7 @@ string docids:
 string docs:
   string A.xml:
     string ACL: "a"
-    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme="
+    string docclass: "mimetype=application/xml, encoding=utf-8, scheme="
     string docid: "A.xml"
     string doclen: 20
     string endtitle: ""
@@ -44,7 +44,7 @@ string docs:
     string word: "one day in tokyo is a citi that complet differ than what you would expect as european citizen"
   string B.xml:
     string ACL: "b"
-    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme="
+    string docclass: "mimetype=application/xml, encoding=utf-8, scheme="
     string docid: "B.xml"
     string doclen: 16
     string endtitle: ""
@@ -55,7 +55,7 @@ string docs:
     string word: "in is a citi you visit new york with dimens can t imagin"
   string C.xml:
     string ACL: "c"
-    string docclass: "mimetype=application/xml, encoding=UTF-8, scheme="
+    string docclass: "mimetype=application/xml, encoding=utf-8, scheme="
     string docid: "C.xml"
     string doclen: 16
     string endtitle: ""

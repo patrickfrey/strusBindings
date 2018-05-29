@@ -174,6 +174,10 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "initCallResultIterator( $name, $value);")
 		("typename", "iterator")
 	;
+	typesystem.defineType( "analyzer::ContentStatisticsResult*")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
+		("typename", "structure")
+	;
 	typesystem.defineType( "QueryResult*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 		("typename", "structure")

@@ -471,6 +471,27 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 	}
 	return rt;
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsItem& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, val.select(), errcode, deep);
+	rt &= serializeArrayElement( result, val.type(), errcode, deep);
+	rt &= serializeArrayElement( result, val.example(), errcode, deep);
+	rt &= serializeArrayElement( result, (papuga_Int)val.df(), errcode, deep);
+	rt &= serializeArrayElement( result, (papuga_Int)val.tf(), errcode, deep);
+	return rt;
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::ContentStatisticsItem>& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val, errcode, deep);
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsResult& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, (papuga_Int)val.nofDocuments(), errcode, deep);
+	rt &= serializeArrayElement( result, val.items(), errcode, deep);
+	return rt;
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode, bool deep)
 {
 	return serializeArray( result, val, errcode, deep);

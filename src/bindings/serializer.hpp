@@ -16,6 +16,8 @@
 #include "strus/analyzer/document.hpp"
 #include "strus/analyzer/queryTermExpression.hpp"
 #include "strus/analyzer/documentClass.hpp"
+#include "strus/analyzer/contentStatisticsItem.hpp"
+#include "strus/analyzer/contentStatisticsResult.hpp"
 #include "strus/vectorStorageSearchInterface.hpp"
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
@@ -54,6 +56,8 @@ template <> class StructIdTemplate<SummaryElement> {public: static int structid(
 template <> class StructIdTemplate<MetaDataComparison> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_MetaDataComparison;}};
 template <> class StructIdTemplate<ResultDocument> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_ResultDocument;}};
 template <> class StructIdTemplate<QueryResult> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_QueryResult;}};
+template <> class StructIdTemplate<analyzer::ContentStatisticsItem> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_ContentStatisticsItem;}};
+template <> class StructIdTemplate<analyzer::ContentStatisticsResult> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_ContentStatisticsResult;}};
 
 template <typename T>
 struct has_structid
@@ -192,6 +196,9 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsItem& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::ContentStatisticsItem>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsResult& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode, bool deep);

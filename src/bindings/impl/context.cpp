@@ -11,6 +11,7 @@
 #include "impl/query.hpp"
 #include "impl/analyzer.hpp"
 #include "impl/inserter.hpp"
+#include "impl/contentstats.hpp"
 #include "impl/value/contextIntrospection.hpp"
 #include "papuga/valueVariant.hpp"
 #include "papuga/serialization.hpp"
@@ -287,6 +288,12 @@ analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& co
 	}
 }
 
+ContentStatisticsImpl* ContextImpl::createContentStatistics()
+{
+	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
+	return new ContentStatisticsImpl( m_trace_impl, m_errorhnd_impl, m_textproc);
+}
+
 StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
@@ -308,7 +315,7 @@ DocumentAnalyzerImpl* ContextImpl::createDocumentAnalyzer( const ValueVariant& d
 QueryAnalyzerImpl* ContextImpl::createQueryAnalyzer()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return new QueryAnalyzerImpl( m_trace_impl, m_analyzer_objbuilder_impl, m_errorhnd_impl);
+	return new QueryAnalyzerImpl( m_trace_impl, m_analyzer_objbuilder_impl, m_errorhnd_impl, m_textproc);
 }
 
 QueryEvalImpl* ContextImpl::createQueryEval()

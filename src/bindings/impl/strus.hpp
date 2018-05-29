@@ -15,6 +15,7 @@
 #include "impl/vector.hpp"
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"
+#include "impl/contentstats.hpp"
 
 #endif
 

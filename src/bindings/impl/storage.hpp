@@ -20,9 +20,6 @@
 
 namespace strus {
 
-///\brief Forward declaration
-class StorageTransactionInterface;
-
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;

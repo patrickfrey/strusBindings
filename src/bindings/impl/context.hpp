@@ -27,6 +27,8 @@ class StorageClientImpl;
 /// \brief Forward declaration
 class VectorStorageClientImpl;
 /// \brief Forward declaration
+class ContentStatisticsImpl;
+/// \brief Forward declaration
 class DocumentAnalyzerImpl;
 /// \brief Forward declaration
 class QueryAnalyzerImpl;
@@ -154,6 +156,10 @@ public:
 	/// \example [ mimetype:"application/xml" encoding:"UTF-8" scheme:"customer" ]
 	/// \example [ mimetype:"application/json" encoding:"UTF-8" ]
 	analyzer::DocumentClass* detectDocumentClass( const std::string& content);
+
+	/// \brief Create a content statistics library instance
+	/// \return content statistics library interface (class ContentStatistics)
+	ContentStatisticsImpl* createContentStatistics();
 
 	/// \brief Create a document analyzer instance
 	/// \example createDocumentAnalyzer( [ mimetype:"application/xml" encoding:"UTF-8" ] )

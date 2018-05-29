@@ -115,12 +115,27 @@ enum _MetaDataComparison {op,name,value};
 enum _ResultDocument {docno,weight,summary};
 
 /// \struct QueryResult
-/// \brief storage query result
+/// \brief Storage query result
 /// \member evalpass index of query evaluation pass used for this result (multipass query evaluation)
 /// \member nofranked number of documents ranked for this result
 /// \member nofvisited number of documents visited for this result
 /// \member ranks list of results with a maximum size specified in the query
 enum _QueryResult {evalpass,nofranked,nofvisited,ranks};
+
+/// \struct ContentStatisticsItem
+/// \brief One item of content statistics
+/// \member select select expression for the item
+/// \member type type name from the content statistics library assigned to it
+/// \member example first example found for this categorization (select expression + type)
+/// \member df document frequency
+/// \member tf total number of occurrencies
+enum _ContentStatisticsItem {select,type,example,df,tf};
+
+/// \struct ContentStatisticsResult
+/// \brief Overall content statistics structure
+/// \member nofdocs number of sample documents
+/// \member items list of item classes found
+enum _ContentStatisticsResult {nofdocs,items};
 
 }}//namespace
 #endif

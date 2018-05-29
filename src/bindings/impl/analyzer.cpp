@@ -7,6 +7,7 @@
  */
 #include "impl/analyzer.hpp"
 #include "impl/value/analyzerIntrospection.hpp"
+#include "impl/value/featureFuncDef.hpp"
 #include "strus/documentAnalyzerInterface.hpp"
 #include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/queryAnalyzerInterface.hpp"
@@ -74,42 +75,6 @@ DocumentAnalyzerImpl::DocumentAnalyzerImpl( const ObjectRef& trace, const Object
 	}
 }
 
-struct FeatureFuncDef
-{
-	std::vector<Reference<NormalizerFunctionInstanceInterface> > normalizers_ref;
-	std::vector<NormalizerFunctionInstanceInterface*> normalizers;
-	Reference<TokenizerFunctionInstanceInterface> tokenizer;
-
-	FeatureFuncDef( const ObjectRef& objbuilder_impl,
-			const ValueVariant& tokenizer_,
-			const ValueVariant& normalizers_,
-			ErrorBufferInterface* errorhnd)
-	{
-		const AnalyzerObjectBuilderInterface* objBuilder = objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-		const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-		if (!textproc) throw strus::runtime_error( "%s", errorhnd->fetchError());
-
-		if (papuga_ValueVariant_defined( &tokenizer_))
-		{
-			tokenizer = Deserializer::getTokenizer( tokenizer_, textproc, errorhnd);
-		}
-		normalizers_ref = Deserializer::getNormalizers( normalizers_, textproc, errorhnd);
-		std::vector<Reference<NormalizerFunctionInstanceInterface> >::iterator ni = normalizers_ref.begin(), ne = normalizers_ref.end();
-		for (; ni != ne; ++ni)
-		{
-			normalizers.push_back( ni->get());
-		}
-	}
-
-	void release()
-	{
-		(void)tokenizer.release();
-		std::vector<Reference<NormalizerFunctionInstanceInterface> >::iterator
-			ni = normalizers_ref.begin(), ne = normalizers_ref.end();
-		for (; ni != ne; ++ni) (void)ni->release();
-	}
-};
-
 void DocumentAnalyzerImpl::addSearchIndexFeature(
 	const std::string& type,
 	const std::string& selectexpr,
@@ -118,7 +83,7 @@ void DocumentAnalyzerImpl::addSearchIndexFeature(
 	const ValueVariant& options)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 	analyzer->addSearchIndexFeature(
 		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers,
@@ -134,7 +99,7 @@ void DocumentAnalyzerImpl::addForwardIndexFeature(
 	const ValueVariant& options)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->addForwardIndexFeature(
@@ -150,7 +115,7 @@ void DocumentAnalyzerImpl::addPatternLexem(
 		const ValueVariant& normalizers)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->addPatternLexem(
@@ -165,7 +130,7 @@ void DocumentAnalyzerImpl::defineMetaData(
 	const ValueVariant& normalizers)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->defineMetaData(
@@ -197,7 +162,7 @@ void DocumentAnalyzerImpl::defineAttribute(
 	const ValueVariant& normalizers)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->defineAttribute(
@@ -212,7 +177,7 @@ void DocumentAnalyzerImpl::addSearchIndexFeatureFromPatternMatch(
 	const ValueVariant& options)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, ValueVariant(), normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->addSearchIndexFeatureFromPatternMatch(
@@ -228,7 +193,7 @@ void DocumentAnalyzerImpl::addForwardIndexFeatureFromPatternMatch(
 	const ValueVariant& options)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, ValueVariant(), normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->addForwardIndexFeatureFromPatternMatch(
@@ -243,7 +208,7 @@ void DocumentAnalyzerImpl::defineMetaDataFromPatternMatch(
 	const ValueVariant& normalizers)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, ValueVariant(), normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->defineMetaDataFromPatternMatch(
@@ -257,7 +222,7 @@ void DocumentAnalyzerImpl::defineAttributeFromPatternMatch(
 	const ValueVariant& normalizers)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, ValueVariant(), normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
 	DocumentAnalyzerInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInterface>();
 
 	analyzer->defineAttributeFromPatternMatch(
@@ -455,12 +420,13 @@ Struct DocumentAnalyzerImpl::introspection( const ValueVariant& arg) const
 	return rt;
 }
 
-QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd)
+QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const TextProcessorInterface* textproc_)
 	:m_errorhnd_impl(errorhnd)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl()
 	,m_queryAnalyzerStruct()
+	,m_textproc(textproc_)
 {
 	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
 	m_analyzer_impl.resetOwnership( objBuilder->createQueryAnalyzer(), "QueryAnalyzer");
@@ -479,7 +445,7 @@ void QueryAnalyzerImpl::addElement(
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 
 	THIS->addElement( featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
@@ -492,7 +458,7 @@ void QueryAnalyzerImpl::addElementFromPatternMatch(
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, ValueVariant(), normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
 
 	THIS->addElementFromPatternMatch( type, patternTypeName, funcdef.normalizers);
 	funcdef.release();
@@ -506,7 +472,7 @@ void QueryAnalyzerImpl::addPatternLexem(
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryAnalyzerInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInterface>();
-	FeatureFuncDef funcdef( m_objbuilder_impl, tokenizer, normalizers, errorhnd);
+	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 
 	THIS->addPatternLexem( featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
