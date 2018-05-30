@@ -79,6 +79,8 @@ void ConfigurationHandler::storeConfiguration(
 	if (m_config_counter == MaxConfigCounter) m_config_counter = 0;
 
 	std::string filename = strus::string_format( "%s_%s.%s.%s.%s.conf", timebuf, idxbuf, doctypeName, config.type.c_str(), config.name.c_str());
+	transaction.type = config.type;
+	transaction.name = config.name;
 	transaction.filename = strus::joinFilePath( m_config_store_dir, filename);
 	transaction.failed_filename = transaction.filename + ".failed";
 	int ec = strus::createDir( m_config_store_dir, false);
