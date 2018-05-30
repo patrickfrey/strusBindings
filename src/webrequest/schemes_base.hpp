@@ -43,6 +43,8 @@ public:
 		NormalizerName,NormalizerArg,NormalizerDef,
 		JoinOperatorName,JoinOperatorRange,JoinOperatorCardinality,GroupBy,
 
+		ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
+
 		FeatureSet, FeatureWeight,
 		FeatureSetRestrictionDef, FeatureSetSelectionDef, FeatureSetExclusionDef,
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,

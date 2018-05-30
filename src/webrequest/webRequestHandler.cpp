@@ -80,6 +80,12 @@ struct MethodDescription
 	}
 };
 
+struct DumpMethodDescription
+	:public MethodDescription
+{
+	DumpMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
+		:MethodDescription( "GET", id, 200, NULL, rootelem, "value", false/*has content*/, 0){}
+};
 struct IntrospectionMethodDescription
 	:public MethodDescription
 {
@@ -144,7 +150,7 @@ public:
 	DefineConfigScheme() :DefineScheme<SCHEME>( ROOT_CONTEXT_NAME){}
 };
 
-static const char* g_context_typenames[] = {"storage","docanalyzer","queryanalyzer","inserter",0};
+static const char* g_context_typenames[] = {"contentstats","storage","docanalyzer","queryanalyzer","inserter",0};
 
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
@@ -191,6 +197,13 @@ WebRequestHandler::WebRequestHandler(
 		scheme_Context_PUT_Inserter.addToHandler( m_impl, "inserter");
 		scheme_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
 
+		static const DefineConfigScheme<Scheme_Context_PUT_ContentStatistics> scheme_Context_PUT_ContentStatistics;
+		scheme_Context_PUT_ContentStatistics.addToHandler( m_impl, "contentstats");
+		scheme_Context_PUT_ContentStatistics.addToHandler( m_impl, "PUT/contentstats");
+
+		static const DefineScheme<Scheme_Storage_QRYORG> scheme_Storage_QRYORG("storage");
+		scheme_Storage_QRYORG.addToHandler( m_impl, "GET");
+
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
 		mt_Context_GET.addToHandler( m_impl);
@@ -218,6 +231,15 @@ WebRequestHandler::WebRequestHandler(
 		mt_InserterTransaction_PUT.addToHandler( m_impl);
 		static const CommitTransactionMethodDescription mt_InserterTransaction_COMMIT( mt::InserterTransaction::commit());
 		mt_InserterTransaction_COMMIT.addToHandler( m_impl);
+
+		static const IntrospectionMethodDescription mt_ContentStatistics_GET( mt::ContentStatistics::introspection(), "contentstats");
+		mt_ContentStatistics_GET.addToHandler( m_impl);
+		static const PostTransactionMethodDescription mt_ContentStatistics_POST_transaction( mt::ContentStatistics::createCollector(), "transaction");
+		mt_ContentStatistics_POST_transaction.addToHandler( m_impl);
+		static const InsertMethodDescription mt_ContentStatisticsTransaction_PUT( mt::ContentStatisticsCollector::putContent());
+		mt_ContentStatisticsTransaction_PUT.addToHandler( m_impl);
+		static const DumpMethodDescription mt_ContentStatisticsTransaction_GET( mt::ContentStatisticsCollector::statistics(), "statistics");
+		mt_ContentStatisticsTransaction_GET.addToHandler( m_impl);
 
 		loadConfiguration( configstr_);
 		m_configHandler.clearUnfinishedTransactions();

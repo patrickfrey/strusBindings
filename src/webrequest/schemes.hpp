@@ -16,6 +16,7 @@
 #include "schemes_query.hpp"
 #include "schemes_document.hpp"
 #include "schemes_inserter.hpp"
+#include "schemes_contentstats.hpp"
 #endif
 
 

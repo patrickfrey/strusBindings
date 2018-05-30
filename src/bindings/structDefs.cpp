@@ -190,6 +190,10 @@ KeyValueList::KeyValueList( const papuga_ValueVariant& def)
 	}
 	papuga_SerializationIter seriter;
 	papuga_init_SerializationIter( &seriter, def.value.serialization);
+	if (papuga_SerializationIter_eof( &seriter))
+	{
+		return;
+	}
 	init( seriter);
 	if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
 }

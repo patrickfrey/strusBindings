@@ -67,9 +67,9 @@ public:
 	void addLibraryElement(
 		const std::string& type,
 		const std::string& regex,
-		int priority,
-		int minLength,
-		int maxLength,
+		const ValueVariant& priority,
+		const ValueVariant& minLength,
+		const ValueVariant& maxLength,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers);
 

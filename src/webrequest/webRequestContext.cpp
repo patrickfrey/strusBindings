@@ -1347,20 +1347,28 @@ bool WebRequestContext::executeRequest(
 				//... fallback
 			}
 		}
-		if (!content.empty())
+		if (selector.context)
 		{
-			// Scheme execution else:
-			if (!selector.setPath( path.rest()))
+			if (!content.empty())
 			{
-				setAnswer( answer, ErrorCodeOutOfMem);
+				// Scheme execution else:
+				if (!selector.setPath( path.rest()))
+				{
+					setAnswer( answer, ErrorCodeOutOfMem);
+					return false;
+				}
+				if (!executeContextScheme( selector.context, selector.typenam, method, content, answer)) return false;
+				goto DONE;
+			}
+			else
+			{
+				setAnswer( answer, ErrorCodeIncompleteRequest);
 				return false;
 			}
-			if (!executeContextScheme( selector.context, selector.typenam, method, content, answer)) return false;
-			goto DONE;
 		}
 		else
 		{
-			setAnswer( answer, ErrorCodeIncompleteRequest);
+			setAnswer( answer, ErrorCodeRequestResolveError);
 			return false;
 		}
 	}

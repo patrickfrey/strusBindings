@@ -9,6 +9,7 @@
 #include "strus/lib/detector_std.hpp"
 #include "strus/lib/contentstats_std.hpp"
 #include "strus/documentClassDetectorInterface.hpp"
+#include "valueVariantWrap.hpp"
 #include "impl/value/analyzerIntrospection.hpp"
 #include "impl/value/featureFuncDef.hpp"
 #include "strus/base/local_ptr.hpp"
@@ -36,15 +37,17 @@ ContentStatisticsImpl::ContentStatisticsImpl( const ObjectRef& trace_, const Obj
 void ContentStatisticsImpl::addLibraryElement(
 		const std::string& type,
 		const std::string& regex,
-		int priority,
-		int minLength,
-		int maxLength,
+		const ValueVariant& priority_,
+		const ValueVariant& minLength_,
+		const ValueVariant& maxLength_,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	ContentStatisticsInterface* contentstats = m_contentstats_impl.getObject<ContentStatisticsInterface>();
-
+	int priority = papuga_ValueVariant_defined( &priority_) ? ValueVariantWrap::toint( priority_) : 0;
+	int minLength = papuga_ValueVariant_defined( &minLength_) ? ValueVariantWrap::toint( minLength_) : -1;
+	int maxLength = papuga_ValueVariant_defined( &maxLength_) ? ValueVariantWrap::toint( maxLength_) : -1;
 	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
 	contentstats->addLibraryElement( type, regex, priority, minLength, maxLength, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();

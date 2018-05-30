@@ -95,7 +95,11 @@ static std::runtime_error runtime_error_with_location( const char* msg, ErrorBuf
 					location_explain.push_back( ':');
 					break;
 				case papuga_TagValue:
-					if (!papuga_ValueVariant_defined( value))
+					if (!value)
+					{
+						location_explain.append( "<null>");
+					}
+					else if (!papuga_ValueVariant_defined( value))
 					{
 						location_explain.append( "<null>");
 					}
@@ -1154,6 +1158,10 @@ static void deserializeQueryEvalFunctionResultNames(
 		papuga_SerializationIter seriter, serstart;
 		papuga_init_SerializationIter( &seriter, resultnames.value.serialization);
 		papuga_init_SerializationIter( &serstart, resultnames.value.serialization);
+		if (papuga_SerializationIter_eof( &seriter))
+		{
+			return;
+		}
 		try
 		{
 			KeyValueList kvlist( seriter);
