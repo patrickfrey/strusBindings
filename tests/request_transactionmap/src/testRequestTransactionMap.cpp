@@ -147,16 +147,16 @@ int main( int argc, const char* argv[])
 		}
 		else if (0==std::strcmp( argv[argi], "-h") || 0==std::strcmp( argv[argi], "--help"))
 		{
-			std::cerr << "Usage: testRequestTransactionMap [-h,-v] <nofIterations>" << std::endl;
+			std::cerr << "Usage: testRequestTransactionMap [-h,-V] <nofIterations>" << std::endl;
 			return 0;
 		}
-		else if (0==std::strcmp( argv[argi], "-v") || 0==std::strcmp( argv[argi], "--verbose"))
+		else if (0==std::strcmp( argv[argi], "-V") || 0==std::strcmp( argv[argi], "--verbose"))
 		{
 			g_verbose = true;
 		}
 		else
 		{
-			std::cerr << "unknown option " << argv[argi] << " (only --help|-h or --verbose|-v known)" << std::endl;
+			std::cerr << "unknown option " << argv[argi] << " (only --help|-h or --verbose|-V known)" << std::endl;
 			return -1;
 		}
 	}
@@ -169,7 +169,7 @@ int main( int argc, const char* argv[])
 	}
 	if (nofIterations <= 0 || argi < argc)
 	{
-		std::cerr << "Usage: testRequestTransactionMap [-h,-v] <nofIterations>" << std::endl;
+		std::cerr << "Usage: testRequestTransactionMap [-h,-V] <nofIterations>" << std::endl;
 		return 1;
 	}
 	try
