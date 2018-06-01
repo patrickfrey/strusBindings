@@ -138,7 +138,7 @@ int main( int argc, const char* argv[])
 {
 	int argi = 1;
 
-	for (; argv[argi][0] == '-'; ++argi)
+	for (; argi < argc && argv[argi][0] == '-'; ++argi)
 	{
 		if (0==std::strcmp( argv[argi], "--"))
 		{
