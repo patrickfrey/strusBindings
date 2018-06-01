@@ -167,6 +167,10 @@ int main( int argc, const char* argv[])
 		std::cerr << "Failed to determine numer of cores, default to 2" << std::endl;
 		nofThreads = 2;
 	}
+	else
+	{
+		std::cerr << "Found " << nofThreads << " cores" << std::endl;
+	}
 	if (nofIterations <= 0 || argi < argc)
 	{
 		std::cerr << "Usage: testRequestTransactionMap [-h,-V] <nofIterations>" << std::endl;
