@@ -47,7 +47,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			papuga_ValueVariant val;
 			papuga_init_ValueVariant_int( &val, idx);
 			if (!papuga_RequestContext_add_variable( ctx, "index", &val)) throw std::bad_alloc();
-			int timeout = odd(idx) ? random.get( 5, 9) : random.get( 1, 4);
+			int timeout = odd(idx) ? random.get( 6, 9) : random.get( 1, 4);
 			std::string tid = g_tpool->createTransaction( ctx, timeout);
 			if (tid.empty())
 			{
@@ -73,7 +73,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			if (g_verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]\n", tid.c_str(), idx);
 			g_tpool->returnTransaction( tref);
 		}
-		strus::sleep( 4);
+		strus::sleep( 5);
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
