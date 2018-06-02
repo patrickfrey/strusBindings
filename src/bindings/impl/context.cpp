@@ -291,7 +291,7 @@ analyzer::DocumentClass* ContextImpl::detectDocumentClass( const std::string& co
 ContentStatisticsImpl* ContextImpl::createContentStatistics()
 {
 	if (!m_analyzer_objbuilder_impl.get()) initAnalyzerObjBuilder();
-	return new ContentStatisticsImpl( m_trace_impl, m_errorhnd_impl, m_textproc);
+	return new ContentStatisticsImpl( m_trace_impl, m_analyzer_objbuilder_impl, m_errorhnd_impl, m_textproc);
 }
 
 StorageClientImpl* ContextImpl::createStorageClient( const ValueVariant& config_)

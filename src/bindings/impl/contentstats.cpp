@@ -6,9 +6,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/contentstats.hpp"
-#include "strus/lib/detector_std.hpp"
-#include "strus/lib/contentstats_std.hpp"
-#include "strus/documentClassDetectorInterface.hpp"
 #include "valueVariantWrap.hpp"
 #include "impl/value/analyzerIntrospection.hpp"
 #include "impl/value/featureFuncDef.hpp"
@@ -17,17 +14,12 @@
 using namespace strus;
 using namespace strus::bindings;
 
-ContentStatisticsImpl::ContentStatisticsImpl( const ObjectRef& trace_, const ObjectRef& errorhnd_, const TextProcessorInterface* textproc_)
-	:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_contentstats_impl(),m_detector_impl(),m_textproc(textproc_)
+ContentStatisticsImpl::ContentStatisticsImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& errorhnd_, const TextProcessorInterface* textproc_)
+	:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_contentstats_impl(),m_textproc(textproc_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	DocumentClassDetectorInterface* detector;
-	m_detector_impl.resetOwnership( detector=strus::createDetector_std( m_textproc, errorhnd), "Detector");
-	if (!m_detector_impl.get())
-	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
-	}
-	m_contentstats_impl.resetOwnership( strus::createContentStatistics_std( m_textproc, detector, errorhnd), "ContentStats");
+	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
+	m_contentstats_impl.resetOwnership( objBuilder->createContentStatistics(), "ContentStats");
 	if (!m_contentstats_impl.get())
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
@@ -55,7 +47,7 @@ void ContentStatisticsImpl::addLibraryElement(
 
 ContentStatisticsCollectorImpl* ContentStatisticsImpl::createCollector() const
 {
-	return new ContentStatisticsCollectorImpl( m_trace_impl, m_contentstats_impl, m_detector_impl, m_errorhnd_impl, m_textproc);
+	return new ContentStatisticsCollectorImpl( m_trace_impl, m_objbuilder_impl, m_contentstats_impl, m_errorhnd_impl, m_textproc);
 }
 
 
@@ -81,8 +73,8 @@ Struct ContentStatisticsImpl::introspection( const ValueVariant& arg) const
 }
 
 
-ContentStatisticsCollectorImpl::ContentStatisticsCollectorImpl( const ObjectRef& trace_, const ObjectRef& contentstat_, const ObjectRef& detector_, const ObjectRef& errorhnd_, const TextProcessorInterface* textproc_)
-	:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_contentstats_impl(contentstat_),m_detector_impl(detector_),m_context_impl(),m_textproc(textproc_)
+ContentStatisticsCollectorImpl::ContentStatisticsCollectorImpl( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& contentstat_, const ObjectRef& errorhnd_, const TextProcessorInterface* textproc_)
+	:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_),m_objbuilder_impl(objbuilder_),m_contentstats_impl(contentstat_),m_context_impl(),m_textproc(textproc_)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	ContentStatisticsInterface* contentstats = m_contentstats_impl.getObject<ContentStatisticsInterface>();

@@ -85,12 +85,12 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
-	ContentStatisticsImpl( const ObjectRef& trace, const ObjectRef& errorhnd, const TextProcessorInterface* textproc_);
+	ContentStatisticsImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd, const TextProcessorInterface* textproc_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
 	ObjectRef m_contentstats_impl;
-	ObjectRef m_detector_impl;
 	const TextProcessorInterface* m_textproc;
 };
 
@@ -123,12 +123,12 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContentStatisticsImpl;
-	ContentStatisticsCollectorImpl( const ObjectRef& trace, const ObjectRef& contentstat, const ObjectRef& detector, const ObjectRef& errorhnd, const TextProcessorInterface* textproc_);
+	ContentStatisticsCollectorImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& contentstat, const ObjectRef& errorhnd, const TextProcessorInterface* textproc_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
+	ObjectRef m_objbuilder_impl;
 	ObjectRef m_contentstats_impl;
-	ObjectRef m_detector_impl;
 	ObjectRef m_context_impl;
 	const TextProcessorInterface* m_textproc;
 };
