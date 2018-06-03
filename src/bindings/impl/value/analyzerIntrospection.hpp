@@ -9,8 +9,8 @@
 #ifndef _STRUS_BINDING_IMPL_VALUE_ANALYZER_INTROSPECTION_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VALUE_ANALYZER_INTROSPECTION_HPP_INCLUDED
 #include "introspectionBase.hpp"
-#include "strus/documentAnalyzerInterface.hpp"
-#include "strus/queryAnalyzerInterface.hpp"
+#include "strus/documentAnalyzerInstanceInterface.hpp"
+#include "strus/queryAnalyzerInstanceInterface.hpp"
 #include "strus/contentStatisticsInterface.hpp"
 #include "strus/analyzer/contentStatisticsView.hpp"
 #include "strus/analyzer/documentAnalyzerView.hpp"
@@ -27,7 +27,7 @@ class DocumentAnalyzerIntrospection
 public:
 	DocumentAnalyzerIntrospection(
 			ErrorBufferInterface* errorhnd_,
-			const DocumentAnalyzerInterface* impl_)
+			const DocumentAnalyzerInstanceInterface* impl_)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
 		,m_view(impl_->view())
@@ -40,7 +40,7 @@ public:
 
 private:
 	ErrorBufferInterface* m_errorhnd;
-	const DocumentAnalyzerInterface* m_impl;
+	const DocumentAnalyzerInstanceInterface* m_impl;
 	analyzer::DocumentAnalyzerView m_view;
 };
 
@@ -50,7 +50,7 @@ class QueryAnalyzerIntrospection
 public:
 	QueryAnalyzerIntrospection(
 			ErrorBufferInterface* errorhnd_,
-			const QueryAnalyzerInterface* impl_)
+			const QueryAnalyzerInstanceInterface* impl_)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
 		,m_view(impl_->view())
@@ -63,7 +63,7 @@ public:
 
 private:
 	ErrorBufferInterface* m_errorhnd;
-	const QueryAnalyzerInterface* m_impl;
+	const QueryAnalyzerInstanceInterface* m_impl;
 	analyzer::QueryAnalyzerView m_view;
 };
 

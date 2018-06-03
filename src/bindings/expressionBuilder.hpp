@@ -12,7 +12,7 @@
 #include "strus/patternTermFeederInstanceInterface.hpp"
 #include "strus/patternLexerInstanceInterface.hpp"
 #include "strus/queryProcessorInterface.hpp"
-#include "strus/queryAnalyzerInterface.hpp"
+#include "strus/queryAnalyzerInstanceInterface.hpp"
 #include "strus/queryAnalyzerContextInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"

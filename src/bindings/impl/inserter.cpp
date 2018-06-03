@@ -7,7 +7,7 @@
  */
 #include "inserter.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "strus/documentAnalyzerInterface.hpp"
+#include "strus/documentAnalyzerInstanceInterface.hpp"
 #include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/analyzer/document.hpp"
 #include "strus/analyzer/documentAttribute.hpp"
@@ -91,7 +91,7 @@ InserterTransactionImpl* InserterImpl::createTransaction() const
 
 void InserterTransactionImpl::insertDocument( const std::string& docid, const std::string& content, const ValueVariant& documentClass)
 {
-	const DocumentAnalyzerInterface* analyzer = m_analyzer.m_analyzer_impl.getObject<const DocumentAnalyzerInterface>();
+	const DocumentAnalyzerInstanceInterface* analyzer = m_analyzer.m_analyzer_impl.getObject<const DocumentAnalyzerInstanceInterface>();
 	ErrorBufferInterface* errorhnd = m_analyzer.m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	analyzer::DocumentClass dclass = m_analyzer.getDocumentClass( content, documentClass);
 	strus::local_ptr<DocumentAnalyzerContextInterface> analyzerContext( analyzer->createContext( dclass));
