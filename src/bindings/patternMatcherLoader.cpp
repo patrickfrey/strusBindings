@@ -11,6 +11,7 @@
 #include "deserializer.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/lib/pattern_serialize.hpp"
+#include "strus/lib/analyzer_prgload_std.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -64,9 +65,19 @@ PatternMatcherPostProc bindings::loadPatternMatcherPostProcFromFile(
 	std::string content;
 	unsigned int ec = readFile( filepath, content);
 	if (ec) throw strus::runtime_error(_TXT("failed to read serialized patterns from file '%s': %s"), filepath.c_str(), ::strerror(ec));
-	if (!loadPatternMatcherFromSerialization( content, rt.feeder.get(), rt.matcher.get(), errorhnd))
+	if (strus::isPatternSerializerContent( content, errorhnd))
 	{
-		throw strus::runtime_error(_TXT("failed to load pattern matcher from serialization: %s"), errorhnd->fetchError());
+		if (!loadPatternMatcherFromSerialization( content, rt.feeder.get(), rt.matcher.get(), errorhnd))
+		{
+			throw strus::runtime_error(_TXT("failed to load pattern matcher from serialization: %s"), errorhnd->fetchError());
+		}
+	}
+	else
+	{
+		if (!strus::load_PatternMatcher_program( textproc, rt.feeder.get(), rt.matcher.get(), content, errorhnd))
+		{
+			throw strus::runtime_error(_TXT("failed to load pattern matcher from source file: %s"), errorhnd->fetchError());
+		}
 	}
 	return rt;
 }

@@ -80,7 +80,7 @@ add_cppcheck( strus_bindings_description  ${CMAKE_CURRENT_BINARY_DIR}/libstrus_b
 
 add_library( strus_bindings SHARED ${source_files} )
 add_dependencies( strus_bindings  strus_bindings_c_interface )
-target_link_libraries( strus_bindings strusbindings_private_utils strus_base strus_error papuga_devel strus_storage_objbuild strus_analyzer_objbuild strus_detector_std strus_contentstats_std strus_pattern_serialize strus_module strus_rpc_client strus_rpc_client_socket strus_bindings_description ${Intl_LIBRARIES} )
+target_link_libraries( strus_bindings strusbindings_private_utils strus_base strus_error papuga_devel strus_storage_objbuild strus_analyzer_objbuild strus_detector_std strus_contentstats_std strus_pattern_serialize strus_analyzer_prgload_std strus_module strus_rpc_client strus_rpc_client_socket strus_bindings_description ${Intl_LIBRARIES} )
 
 set_target_properties(
     strus_bindings
