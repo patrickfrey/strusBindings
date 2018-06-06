@@ -535,10 +535,10 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-void QueryAnalyzerImpl::declareElementPriority( const std::string& type, int priority)
+void QueryAnalyzerImpl::declareTermPriority( const std::string& type, int priority)
 {
 	QueryAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-	analyzer->declareElementPriority( type, priority);
+	analyzer->declareTermPriority( type, priority);
 }
 
 TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& expression, bool unique) const

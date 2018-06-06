@@ -109,7 +109,7 @@ public:
 			const std::string& selectexpr,
 			const ValueVariant& tokenizer,
 			const ValueVariant& normalizers);
-	
+
 	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
 	/// \example "date"
@@ -434,7 +434,7 @@ public:
 	/// \example "word"
 	/// \param[in] priority priority value assigned to 'type'
 	/// \example 1
-	void declareElementPriority( const std::string& type, int priority);
+	void declareTermPriority( const std::string& type, int priority);
 
 	/// \brief Analye a term expression
 	/// \param[in] expression query term expression tree

@@ -57,7 +57,7 @@ PatternMatcherPostProc bindings::loadPatternMatcherPostProcFromFile(
 	rt.feeder.reset( feeder->createInstance());
 	if (!rt.feeder.get()) throw strus::runtime_error(_TXT("failed to create pattern feeder: %s"), errorhnd->fetchError());
 	if (!rt.matcher.get()) throw strus::runtime_error(_TXT("failed to create pattern matcher: %s"), errorhnd->fetchError());
-	if (!strus::load_PatternMatcher_program( textproc, rt.feeder.get(), rt.matcher.get(), content, errorhnd))
+	if (!strus::load_PatternMatcher_programfile( textproc, rt.feeder.get(), rt.matcher.get(), filename, errorhnd))
 	{
 		throw strus::runtime_error(_TXT("failed to load pattern matcher from source file: %s"), errorhnd->fetchError());
 	}
