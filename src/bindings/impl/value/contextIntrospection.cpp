@@ -264,7 +264,7 @@ IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name)
 	if (name == "moduledir") return createIntrospectionAtomic( m_errorhnd, m_impl->modulePaths());
 	if (name == "module") return createIntrospectionAtomic( m_errorhnd, m_impl->modules());
 	if (name == "resourcedir") return createIntrospectionAtomic( m_errorhnd, m_impl->resourcePaths());
-	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workdir());
+	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workingDirectory());
 	return NULL;
 }
 std::vector<IntrospectionLink> IntrospectionModuleLoader::list()
