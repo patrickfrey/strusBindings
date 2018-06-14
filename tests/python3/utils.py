@@ -133,11 +133,11 @@ def dumpTreeWithFilter( obj, excludeList):
 	return _dumpTree( "", obj, 20, excludeList)
 
 def readFile( path):
-	with open( path) as f:
+	with open( path, encoding='utf-8') as f:
 		return f.read()
 
 def writeFile( path, content):
-	with open( path,"w") as f:
+	with open( path,"w", encoding='utf-8') as f:
 		return f.write( content)
 
 def verifyTestOutput( outputdir, result, expected):
