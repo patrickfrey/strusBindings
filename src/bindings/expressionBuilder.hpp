@@ -44,7 +44,7 @@ class PostProcPatternExpressionBuilder
 {
 public:
 	PostProcPatternExpressionBuilder( PatternMatcherInstanceInterface* matcher_, PatternTermFeederInstanceInterface* feeder_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_matcher(matcher_),m_feeder(feeder_){}
+		:m_errorhnd(errorhnd_),m_matcher(matcher_),m_feeder(feeder_),m_termsymtab(errorhnd_),m_termtypetab(errorhnd_){}
 
 	virtual ~PostProcPatternExpressionBuilder(){}
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
@@ -58,7 +58,7 @@ public:
 	void defineLexem( const std::string& name);
 	
 private:
-	PostProcPatternExpressionBuilder( const PostProcPatternExpressionBuilder&){}	//< non copyable
+	PostProcPatternExpressionBuilder( const PostProcPatternExpressionBuilder& o) :m_termsymtab(o.m_errorhnd),m_termtypetab(o.m_errorhnd){}	//< non copyable
 	void operator=( const PostProcPatternExpressionBuilder&){}			//< non copyable
 
 private:
@@ -74,7 +74,7 @@ class PreProcPatternExpressionBuilder
 {
 public:
 	PreProcPatternExpressionBuilder( PatternMatcherInstanceInterface* matcher_, PatternLexerInstanceInterface* lexer_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_matcher(matcher_),m_lexer(lexer_){}
+		:m_errorhnd(errorhnd_),m_matcher(matcher_),m_lexer(lexer_),m_termsymtab(errorhnd_),m_termtypetab(errorhnd_){}
 
 	virtual ~PreProcPatternExpressionBuilder(){}
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
@@ -93,7 +93,7 @@ public:
 			analyzer::PositionBind posbind);
 
 private:
-	PreProcPatternExpressionBuilder( const PreProcPatternExpressionBuilder&){}	//< non copyable
+	PreProcPatternExpressionBuilder( const PreProcPatternExpressionBuilder& o) :m_termsymtab(o.m_errorhnd),m_termtypetab(o.m_errorhnd){}	//< non copyable
 	void operator=( const PreProcPatternExpressionBuilder&){}			//< non copyable
 
 private:
