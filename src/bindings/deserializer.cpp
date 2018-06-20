@@ -164,6 +164,12 @@ unsigned int Deserializer::getUint( papuga_SerializationIter& seriter)
 	return ValueVariantWrap::touint( *getValue( seriter));
 }
 
+int Deserializer::getInt( const papuga_ValueVariant& val, int defaultval)
+{
+	if (!papuga_ValueVariant_defined( &val)) return defaultval;
+	return ValueVariantWrap::toint( val);
+}
+
 int Deserializer::getInt( papuga_SerializationIter& seriter)
 {
 	return ValueVariantWrap::toint( *getValue( seriter));

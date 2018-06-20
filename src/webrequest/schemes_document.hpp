@@ -165,7 +165,7 @@ public:
 					{"expression", PatternRuleExpression, '!'}
 				}
 			},
-			{"docanalyzer/postpattern", 0, "docanalyzer", A::definePatternMatcherPostProc(), {
+			{"docanalyzer/postpattern", 0, "docanalyzer", A::defineTokenPatternMatcher(), {
 					{PatternTypeName, '!'},
 					{PatternMatcherModule, '!'},
 					{PatternMatcherLexemTypes, '*'},

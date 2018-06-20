@@ -519,10 +519,6 @@ IntrospectionBase* QueryAnalyzerIntrospection::open( const std::string& name)
 			= &ViewIntrospectionConstructor<QueryElementViewIntrospection,analyzer::QueryElementView>::func;
 		return new IntrospectionObjectList<std::vector<analyzer::QueryElementView> >( m_errorhnd, m_view.patternLexems(), elementConstructor);
 	}
-	else if (name == "priorities")
-	{
-		return new IntrospectionKeyValueList<std::map<std::string,int> >( m_errorhnd, m_view.priorities());
-	}
 	return NULL;
 }
 

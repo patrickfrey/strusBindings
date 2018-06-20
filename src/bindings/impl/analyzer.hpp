@@ -52,6 +52,10 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
 	/// \example "content"
 	/// \example "unique"
@@ -62,6 +66,7 @@ public:
 		const std::string& selectexpr,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers,
+		const ValueVariant& priority=ValueVariant(),
 		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a feature to insert into the forward index (for summarization) is selected, tokenized and normalized
@@ -78,6 +83,10 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	/// \param[in] options a list of options, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
 	/// \example "content"
 	/// \example "unique"
@@ -88,6 +97,7 @@ public:
 		const std::string& selectexpr,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers,
+		const ValueVariant& priority=ValueVariant(),
 		const ValueVariant& options=ValueVariant());
 
 	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of document analysis
@@ -104,11 +114,16 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	void addPatternLexem(
 			const std::string& type,
 			const std::string& selectexpr,
 			const ValueVariant& tokenizer,
-			const ValueVariant& normalizers);
+			const ValueVariant& normalizers,
+			const ValueVariant& priority=ValueVariant());
 
 	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] fieldname name of the addressed meta data field.
@@ -168,6 +183,10 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
 	/// \example "content"
 	/// \example "unique"
@@ -177,6 +196,7 @@ public:
 		const std::string& type,
 		const std::string& patternTypeName,
 		const ValueVariant& normalizers,
+		const ValueVariant& priority=ValueVariant(),
 		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a result of pattern matching as feature to insert into the forward index, normalized
@@ -188,6 +208,10 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	/// \param[in] options a list of options, elements one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
 	/// \example "content"
 	/// \example "unique"
@@ -197,6 +221,7 @@ public:
 		const std::string& type,
 		const std::string& patternTypeName,
 		const ValueVariant& normalizers,
+		const ValueVariant& priority=ValueVariant(),
 		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a result of pattern matching to insert as metadata, normalized
@@ -236,23 +261,11 @@ public:
 	/// \example "word"
 	/// \example ["word","number"]
 	/// \param[in] patterns structure with all patterns
-	void definePatternMatcherPostProc(
+	void defineTokenPatternMatcher(
 			const std::string& patternTypeName,
 			const std::string& patternMatcherModule,
 			const ValueVariant& lexems,
 			const ValueVariant& patterns);
-
-	/// \brief Declare a pattern matcher on the document features after other query analysis
-	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
-	/// \example "location"
-	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
-	/// \example ""
-	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
-	/// \example "/srv/strus/patterns.bin"
-	void definePatternMatcherPostProcFromFile(
-			const std::string& patternTypeName,
-			const std::string& patternMatcherModule,
-			const std::string& serializedPatternFile);
 
 	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content or documents of different types with one configuration
 	/// \note Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
@@ -348,11 +361,16 @@ public:
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	void addElement(
 			const std::string& featureType,
 			const std::string& fieldType,
 			const ValueVariant& tokenizer,
-			const ValueVariant& normalizers);
+			const ValueVariant& normalizers,
+			const ValueVariant& priority=ValueVariant());
 
 	/// \brief Defines an element from a pattern matching result.
 	/// \param[in] type element type created from this pattern match result type
@@ -361,10 +379,15 @@ public:
 	/// \example "entity"
 	/// \param[in] normalizers list of normalizer functions
 	/// \example ["lc",["stem", "en"]]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	void addElementFromPatternMatch(
 			const std::string& type,
 			const std::string& patternTypeName,
-			const ValueVariant& normalizers);
+			const ValueVariant& normalizers,
+			const ValueVariant& priority=ValueVariant());
 
 	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of query analysis
 	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
@@ -380,11 +403,16 @@ public:
 	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type in the ascending order of appearance
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
+	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
+	/// \example 3
+	/// \example 1
+	/// \example 0
 	void addPatternLexem(
 			const std::string& termtype,
 			const std::string& fieldtype,
 			const ValueVariant& tokenizer,
-			const ValueVariant& normalizers);
+			const ValueVariant& normalizers,
+			const ValueVariant& priority=ValueVariant());
 
 	/// \brief Declare a pattern matcher on the query features after other query analysis
 	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
@@ -395,20 +423,11 @@ public:
 	/// \example ["word" "number" "name"]
 	/// \example "word"
 	/// \param[in] patterns structure with all patterns
-	void definePatternMatcherPostProc(
+	void defineTokenPatternMatcher(
 			const std::string& patternTypeName,
 			const std::string& patternMatcherModule,
 			const ValueVariant& lexems,
 			const ValueVariant& patterns);
-
-	/// \brief Declare a pattern matcher on the query features after other query analysis
-	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
-	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
-	/// \param[in] serializedPatternFile path to file with serialized (binary) patterns
-	void definePatternMatcherPostProcFromFile(
-			const std::string& patternTypeName,
-			const std::string& patternMatcherModule,
-			const std::string& serializedPatternFile);
 
 	/// \brief Declare an implicit grouping operation for a query field type. The implicit group operation is always applied when more than one term are resulting from analysis of this field to ensure that you get only one node in the query from it.
 	/// \param[in] fieldtype name of the field type where this grouping operation applies
@@ -428,13 +447,6 @@ public:
 	/// \example "all"
 	/// \example ""
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& groupBy, const std::string& opname, int range=0, unsigned int cardinality=0);
-
-	/// \brief That all query elements assigned to a feature type get a priority that causes the elimination of all elements with a lower priority that are completely covered by a single element of this type.
-	/// \param[in] type feature type name
-	/// \example "word"
-	/// \param[in] priority priority value assigned to 'type'
-	/// \example 1
-	void declareTermPriority( const std::string& type, int priority);
 
 	/// \brief Analye a term expression
 	/// \param[in] expression query term expression tree

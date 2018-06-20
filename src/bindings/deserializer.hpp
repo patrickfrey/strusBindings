@@ -58,6 +58,7 @@ struct Deserializer
 
 	static unsigned int getUint( papuga_SerializationIter& seriter);
 
+	static int getInt( const papuga_ValueVariant& val, int defaultval);
 	static int getInt( papuga_SerializationIter& seriter);
 
 	static Index getIndex( papuga_SerializationIter& seriter);
