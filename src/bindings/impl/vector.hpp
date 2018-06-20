@@ -127,7 +127,7 @@ public:
 	/// \example 3785
 	/// \return the vector
 	/// \example [ 0.08721391 0.01232134 0.02342453 0.0011312 0.0012314 0.087232243 ]
-	std::vector<double> featureVector( int index) const;
+	std::vector<float> featureVector( int index) const;
 
 	/// \brief Get the name of a feature by its index starting from 0
 	/// \param[in] index index of the feature (starting from 0)

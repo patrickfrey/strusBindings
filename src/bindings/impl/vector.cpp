@@ -44,7 +44,7 @@ std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilar( const Val
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
 	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
 
-	std::vector<VectorQueryResult> res = searcher->findSimilar( Deserializer::getDoubleList( vec), maxNofResults);
+	std::vector<VectorQueryResult> res = searcher->findSimilar( Deserializer::getFloatList( vec), maxNofResults);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -61,7 +61,7 @@ std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilarFromSelecti
 	std::vector<VectorQueryResult>
 		res = searcher->findSimilarFromSelection(
 			Deserializer::getIndexList( featidxlist),
-			Deserializer::getDoubleList( vec),
+			Deserializer::getFloatList( vec),
 			maxNofResults);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -165,12 +165,12 @@ std::vector<Index> VectorStorageClientImpl::featureConcepts( const std::string& 
 	return rt;
 }
 
-std::vector<double> VectorStorageClientImpl::featureVector( int index) const
+std::vector<float> VectorStorageClientImpl::featureVector( int index) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
-	std::vector<double> rt( storage->featureVector( index));
+	std::vector<float> rt( storage->featureVector( index));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -273,7 +273,7 @@ void VectorStorageTransactionImpl::addFeature( const std::string& name, const Va
 		m_vector_transaction_impl.resetOwnership( transaction = storage->createTransaction(), "VectorStorageTransaction");
 		if (!transaction) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
-	transaction->addFeature( name, Deserializer::getDoubleList( vec));
+	transaction->addFeature( name, Deserializer::getFloatList( vec));
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());

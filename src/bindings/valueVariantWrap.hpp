@@ -29,6 +29,7 @@ struct ValueVariantWrap
 	static unsigned int touint( const papuga_ValueVariant& value);
 	static Index toindex( const papuga_ValueVariant& value);
 	static double todouble( const papuga_ValueVariant& value);
+	static float tofloat( const papuga_ValueVariant& value);
 	static bool tobool( const papuga_ValueVariant& value);
 	static strus::NumericVariant tonumeric( const papuga_ValueVariant& value);
 	static std::string tostring( const papuga_ValueVariant& value);

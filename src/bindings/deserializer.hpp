@@ -64,6 +64,7 @@ struct Deserializer
 	static Index getIndex( papuga_SerializationIter& seriter);
 
 	static double getDouble( papuga_SerializationIter& seriter);
+	static float getFloat( papuga_SerializationIter& seriter);
 
 	static MetaDataRestrictionInterface::CompareOperator getMetaDataCmpOp( papuga_SerializationIter& seriter);
 
@@ -76,7 +77,8 @@ struct Deserializer
 	static std::vector<Index> getIndexListAsValue( const papuga_ValueVariant& val);
 
 	static std::vector<double> getDoubleList( const papuga_ValueVariant& val);
-	static std::vector<double> getDoubleListAsValue( const papuga_ValueVariant& val);
+
+	static std::vector<float> getFloatList( const papuga_ValueVariant& val);
 
 	static const papuga_ValueVariant* getOptionalDefinition( papuga_SerializationIter& seriter, const char* name);
 

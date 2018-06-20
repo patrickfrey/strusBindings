@@ -447,6 +447,10 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 {
 	return serializeArray( result, val, errcode, deep);
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<float>& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val, errcode, deep);
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentTerm>& val, papuga_ErrorCode& errcode, bool deep)
 {
 	return serializeArray( result, val, errcode, deep);

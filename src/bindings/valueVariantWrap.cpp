@@ -66,6 +66,13 @@ double ValueVariantWrap::todouble( const papuga_ValueVariant& value)
 	if (err != papuga_Ok) throw papuga::error_exception( err, _TXT("todouble of variant value"));
 	return rt;
 }
+float ValueVariantWrap::tofloat( const papuga_ValueVariant& value)
+{
+	papuga_ErrorCode err = papuga_Ok;
+	float rt = papuga_ValueVariant_todouble( &value, &err);
+	if (err != papuga_Ok) throw papuga::error_exception( err, _TXT("todouble of variant value"));
+	return rt;
+}
 bool ValueVariantWrap::tobool( const papuga_ValueVariant& value)
 {
 	papuga_ErrorCode err = papuga_Ok;

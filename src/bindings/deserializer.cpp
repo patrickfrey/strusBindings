@@ -185,6 +185,11 @@ double Deserializer::getDouble( papuga_SerializationIter& seriter)
 	return ValueVariantWrap::todouble( *getValue( seriter));
 }
 
+float Deserializer::getFloat( papuga_SerializationIter& seriter)
+{
+	return ValueVariantWrap::tofloat( *getValue( seriter));
+}
+
 NumericVariant Deserializer::getNumeric( papuga_SerializationIter& seriter)
 {
 	return ValueVariantWrap::tonumeric( *getValue( seriter));
@@ -394,6 +399,11 @@ std::vector<std::string> Deserializer::getStringList( const papuga_ValueVariant&
 std::vector<double> Deserializer::getDoubleList( const papuga_ValueVariant& val)
 {
 	return getAtomicTypeList<double,ValueVariantWrap::todouble,Deserializer::getDouble>( val);
+}
+
+std::vector<float> Deserializer::getFloatList( const papuga_ValueVariant& val)
+{
+	return getAtomicTypeList<float,ValueVariantWrap::tofloat,Deserializer::getFloat>( val);
 }
 
 std::vector<int> Deserializer::getIntList( const papuga_ValueVariant& val)
