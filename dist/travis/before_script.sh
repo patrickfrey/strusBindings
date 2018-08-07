@@ -27,7 +27,7 @@ case $OS in
 	Darwin)
 		brew update
 		brew upgrade cmake
-		brew upgrade boost
+		# -- brew upgrade boost
 		brew upgrade python
 		brew install gettext snappy leveldb || true
 		brew link --force gettext || true
