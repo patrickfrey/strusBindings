@@ -73,11 +73,11 @@ public:
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers);
 
-	/// \brief Define an attribute to be displayed as condition in a content statistics path
-	/// \example addCollectedAttribute( "id")
+	/// \brief Define an attribute to be visible in content statistics path conditions
+	/// \example addVisibleAttribute( "id")
 	/// \param[in] name of the attribute to show in a path
 	/// \example "class"
-	void addCollectedAttribute( const std::string& name);
+	void addVisibleAttribute( const std::string& name);
 
 	/// \brief Create a collector for content statistics analysis
 	/// \return the collector object (class StorageTransaction) created

@@ -45,10 +45,10 @@ void ContentStatisticsImpl::addLibraryElement(
 	funcdef.release();
 }
 
-void ContentStatisticsImpl::addCollectedAttribute( const std::string& name)
+void ContentStatisticsImpl::addVisibleAttribute( const std::string& name)
 {
 	ContentStatisticsInterface* contentstats = m_contentstats_impl.getObject<ContentStatisticsInterface>();
-	contentstats->addCollectedAttribute( name);
+	contentstats->addVisibleAttribute( name);
 }
 
 ContentStatisticsCollectorImpl* ContentStatisticsImpl::createCollector() const

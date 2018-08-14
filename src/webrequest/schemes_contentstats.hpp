@@ -48,7 +48,7 @@ public:
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"library/attribute", 0, "contentstats", S::addCollectedAttribute(), {
+			{"library/attribute", 0, "contentstats", S::addVisibleAttribute(), {
 					{ContentAttribute}
 				}
 			},
