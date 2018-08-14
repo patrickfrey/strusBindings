@@ -28,7 +28,7 @@ public:
 		typedef bindings::method::Context C;
 		return {
 			{"library", "contentstats", "context", C::createContentStatistics(), {} },
-
+			{"library/attribute", "()", ContentAttribute},
 			{"library/element/type", "()", FeatureTypeName},
 			{"library/element/regex", "()", ContentRegexExpression},
 			{"library/element/priority", "()", ContentPriorityExpression},
@@ -46,6 +46,10 @@ public:
 			{"library/element/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
+				}
+			},
+			{"library/attribute", 0, "contentstats", S::addCollectedAttribute(), {
+					{ContentAttribute}
 				}
 			},
 			{"library/element", 0, "contentstats", S::addLibraryElement(), {
