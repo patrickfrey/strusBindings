@@ -331,7 +331,9 @@ bool WebRequestContext::debugContentRequest( WebRequestAnswer& answer)
 	m_result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
 	if (m_result_encoding == papuga_Binary)
 	{
-		setAnswer( answer, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented"));
+		char buf[ 2048];
+		std::snprintf( buf, sizeof(buf), _TXT("none of the accept charsets implemented: %s"), m_accepted_charset);
+		setAnswer( answer, ErrorCodeNotImplemented, buf);
 		return false;
 	}
 	std::size_t result_length = 0;
@@ -394,12 +396,16 @@ bool WebRequestContext::setResultContentType( WebRequestAnswer& answer, papuga_S
 	m_result_doctype = strus::getResultContentType( m_accepted_doctype, default_doctype);
 	if (m_result_encoding == papuga_Binary)
 	{
-		setAnswer( answer, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented"));
+		char buf[ 2048];
+		std::snprintf( buf, sizeof(buf), _TXT("none of the accept charsets implemented: %s"), m_accepted_charset);
+		setAnswer( answer, ErrorCodeNotImplemented, buf);
 		return false;
 	}
 	if (m_result_doctype == WebRequestContent::Unknown)
 	{
-		setAnswer( answer, ErrorCodeNotImplemented, _TXT("none of the accept content types implemented"));
+		char buf[ 2048];
+		std::snprintf( buf, sizeof(buf), _TXT("none of the accept content types implemented: %s"), m_accepted_doctype);
+		setAnswer( answer, ErrorCodeNotImplemented, buf);
 		return false;
 	}
 	return true;
