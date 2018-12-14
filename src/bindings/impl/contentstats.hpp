@@ -79,6 +79,12 @@ public:
 	/// \example "class"
 	void addVisibleAttribute( const std::string& name);
 
+	/// \brief Define a selector expression that is chosen for content elements that matches it
+	/// \example addSelectorExpression( "//@id")
+	/// \param[in] expression expression for selecting chunks
+	/// \example "//text()"
+	void addSelectorExpression( const std::string& expression);
+
 	/// \brief Create a collector for content statistics analysis
 	/// \return the collector object (class StorageTransaction) created
 	ContentStatisticsCollectorImpl* createCollector() const;

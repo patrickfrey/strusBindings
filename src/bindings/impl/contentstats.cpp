@@ -47,8 +47,18 @@ void ContentStatisticsImpl::addLibraryElement(
 
 void ContentStatisticsImpl::addVisibleAttribute( const std::string& name)
 {
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	ContentStatisticsInterface* contentstats = m_contentstats_impl.getObject<ContentStatisticsInterface>();
 	contentstats->addVisibleAttribute( name);
+	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
+}
+
+void ContentStatisticsImpl::addSelectorExpression( const std::string& expression)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ContentStatisticsInterface* contentstats = m_contentstats_impl.getObject<ContentStatisticsInterface>();
+	contentstats->addSelectorExpression( expression);
+	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 }
 
 ContentStatisticsCollectorImpl* ContentStatisticsImpl::createCollector() const

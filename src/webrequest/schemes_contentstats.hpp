@@ -29,6 +29,7 @@ public:
 		return {
 			{"library", "contentstats", "context", C::createContentStatistics(), {} },
 			{"library/attribute", "()", ContentAttribute},
+			{"library/select", "()", SelectExpression},
 			{"library/element/type", "()", FeatureTypeName},
 			{"library/element/regex", "()", ContentRegexExpression},
 			{"library/element/priority", "()", ContentPriorityExpression},
@@ -50,6 +51,10 @@ public:
 			},
 			{"library/attribute", 0, "contentstats", S::addVisibleAttribute(), {
 					{ContentAttribute}
+				}
+			},
+			{"library/select", 0, "contentstats", S::addSelectorExpression(), {
+					{SelectExpression}
 				}
 			},
 			{"library/element", 0, "contentstats", S::addLibraryElement(), {
