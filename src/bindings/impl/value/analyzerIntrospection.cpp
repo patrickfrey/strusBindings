@@ -542,12 +542,20 @@ IntrospectionBase* ContentStatisticsIntrospection::open( const std::string& name
 			= &ViewIntrospectionConstructor<ContentStatisticsElementViewIntrospection,analyzer::ContentStatisticsElementView>::func;
 		return new IntrospectionObjectList<std::vector<analyzer::ContentStatisticsElementView> >( m_errorhnd, m_view.elements(), elementConstructor);
 	}
+	else if (name == "attributes")
+	{
+		return new IntrospectionValueList<std::vector<std::string> >( m_errorhnd, m_view.attributes());
+	}
+	else if (name == "expressions")
+	{
+		return new IntrospectionValueList<std::vector<std::string> >( m_errorhnd, m_view.expressions());
+	}
 	return NULL;
 }
 
 std::vector<IntrospectionLink> ContentStatisticsIntrospection::list()
 {
-	static const char* ar[] = {"elements",NULL};
+	static const char* ar[] = {"elements","attributes","expressions",NULL};
 	return getList( ar);
 }
 

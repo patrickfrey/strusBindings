@@ -146,7 +146,7 @@ public:
 	IntrospectionValueList(
 			ErrorBufferInterface* errorhnd_,
 			const TypeName& value_)
-		:IntrospectionObjectList<TypeName>( errorhnd_, value_, &IntrospectionValueListConstructor<TypeName>::func){}
+		:IntrospectionObjectList<TypeName>( errorhnd_, value_, &IntrospectionValueListConstructor<typename TypeName::value_type>::func){}
 };
 
 
