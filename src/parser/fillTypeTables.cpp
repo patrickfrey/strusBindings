@@ -198,6 +198,10 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "initCallResultAtomic( $name, $value);")
 		("typename", "structure")
 	;
+	typesystem.defineType( "WordVector")
+		("retv_map", "initCallResultAtomic( $name, $value);")
+		("typename", "structure")
+	;
 	typesystem.defineType( "$objid~Interface*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 		("typename", "interface")

@@ -34,22 +34,16 @@ public:
 	/// \brief Find the most similar vectors to vector
 	/// \param[in] vec vector to search for (double[])
 	/// \param[in] maxNofResults maximum number of results to return
+	/// \param[in] minSimilarity value between 0.0 and 1.0 specifying the minimum similarity a result should have 
 	/// \return the list of most similar vectors (double[])
-	std::vector<VectorQueryResult> findSimilar( const ValueVariant& vec, unsigned int maxNofResults) const;
-
-	/// \brief Find the most similar vectors to vector in a selection of features addressed by index
-	/// \param[in] featidxlist list of candidate indices (int[])
-	/// \param[in] vec vector to search for (double[])
-	/// \param[in] maxNofResults maximum number of results to return
-	/// \return the list of most similar vectors (double[])
-	std::vector<VectorQueryResult> findSimilarFromSelection( const ValueVariant& featidxlist, const ValueVariant& vec, unsigned int maxNofResults) const;
+	std::vector<VectorQueryResult> findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
 
 private:
 	friend class VectorStorageClientImpl;
-	VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storage, int range_from, int range_to, const ObjectRef& errorhnd_);
+	VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storage, const std::string& type, int indexPart, int nofParts, bool realVecWeights, const ObjectRef& errorhnd_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_searcher_impl;
@@ -65,103 +59,83 @@ public:
 	/// \brief Destructor
 	virtual ~VectorStorageClientImpl(){}
 
-	/// \brief Create a searcher object for scanning the vectors for similarity
-	/// \param[in] range_from start range of the features for the searcher (possibility to split into multiple searcher instances)
+	/// \brief Create a searcher object for scanning the vectors assigned to a feature of a given type for similarity
+	/// \param[in] type type of the feature to search for
+	/// \example "verb"
+	/// \param[in] indexPart index part selected (starting with 0) from nofParts parts
 	/// \example 0
-	/// \example 1000000
-	/// \param[in] range_to end of range of the features for the searcher (possibility to split into multiple searcher instances)
-	/// \example 1000000
-	/// \example 2000000
+	/// \example 1
+	/// \param[in] nofParts number of parts to split the collection into for parallel search
+	/// \example 1
+	/// \example 4
+	/// \param[in] realVecWeights true, if the real weights of the similarities should be calculated in the final result (for the best matches), false, if the weights of the final result should be the approximated values from the LSH similarity
+	/// \example true
+	/// \example false
 	/// \return the vector search interface (with ownership)
-	VectorStorageSearcherImpl* createSearcher( int range_from, int range_to) const;
+	VectorStorageSearcherImpl* createSearcher( const std::string& type, int indexPart, int nofParts, bool realVecWeights) const;
 
 	/// \brief Create a vector storage transaction instance
 	/// \return the transaction instance
 	VectorStorageTransactionImpl* createTransaction();
 	
-	/// \brief Get the list of concept class names defined
+	/// \brief Get the list of feature types defined
 	/// \return the list
-	/// \example ["flections" "entityrel"]
-	Struct conceptClassNames() const;
+	/// \example ["noun","verb","adjectiv"]
+	Struct types() const;
 
-	/// \brief Get the list of indices of features represented by a learnt concept feature
-	/// \param[in] conceptClass name identifying a class of concepts learnt
-	/// \example "flections"
-	/// \example "entityrel"
-	/// \example ""
-	/// \param[in] conceptid index (indices of learnt concepts starting from 1) 
-	/// \example 1
-	/// \example 121
-	/// \example 3249432
-	/// \return the resulting vector indices (index is order of insertion starting from 0)
-	/// \example [ 2121 5355 35356 214242 8309732 32432424 ]
-	std::vector<Index> conceptFeatures( const std::string& conceptClass, int conceptid) const;
+	/// \brief Get the list of types assigned to a specific featureValue
+	/// \param[in] featureValue feature value to get the types assigned to
+	/// \example "house"
+	/// \example "running"
+	/// \return the list of types assigned to 'featureValue'
+	/// \example ["noun","verb"]
+	Struct featureTypes( const std::string& featureValue) const;
 
-	/// \brief Get the number of concept features learnt for a class
-	/// \param[in] conceptClass name identifying a class of concepts learnt.
-	/// \example "entityrel"
-	/// \example ""
-	/// \return the number of concept features and also the maximum number assigned to a feature (starting with 1)
-	/// \example 0
-	/// \example 3535
-	/// \example 324325
-	/// \example 2343246
-	unsigned int nofConcepts( const std::string& conceptClass) const;
-
-	/// \brief Get the set of learnt concepts of a class for a feature defined
-	/// \param[in] conceptClass name identifying a class of concepts learnt
-	/// \example "flections"
-	/// \example ""
-	/// \param[in] index index of vector in the order of insertion starting from 0
-	/// \example 0
-	/// \example 3785
-	/// \example 123325
-	/// \example 8793246
-	/// \return the resulting concept feature indices (indices of learnt concepts starting from 1)
-	/// \example [ 2121 5355 35356 214242 8309732 32432424 ]
-	std::vector<Index> featureConcepts( const std::string& conceptClass, int index) const;
+	/// \brief Get the number of vectors defined for the features of a type
+	/// \param[in] type name of the type
+	/// \example "verb"
+	/// \return the number of vectors
+	int nofVectors( const std::string& type) const;
 
 	/// \brief Get the vector assigned to a feature addressed by index
-	/// \param[in] index index of the feature (starting from 0)
-	/// \example 0
-	/// \example 3785
+	/// \param[in] type type of the feature to get the vector assiged to
+	/// \example "noun"
+	/// \example "verb"
+	/// \param[in] feat value of the feature to get the vector assiged to
+	/// \example "house"
+	/// \example "running"
 	/// \return the vector
 	/// \example [ 0.08721391 0.01232134 0.02342453 0.0011312 0.0012314 0.087232243 ]
-	std::vector<float> featureVector( int index) const;
+	WordVector featureVector( const std::string& type, const std::string& feat) const;
 
-	/// \brief Get the name of a feature by its index starting from 0
-	/// \param[in] index index of the feature (starting from 0)
-	/// \example 0
-	/// \example 71243
-	/// \return the name of the feature defined
-	/// \example "castle"
-	std::string featureName( int index) const;
+	/// \brief Calculate a value between 0.0 and 1.0 representing the similarity of two vectors
+	/// \param[in] v1 first input vector
+	/// \example [ 0.0322312 0.01121243 0.0078784 0.0012344 0.0064535 0.05454322 ]
+	/// \param[in] v2 second input vector
+	/// \example [ 0.0113123 0.094324 0.01242345 0.00479234 0.00423425 0.03213434 ]
+	/// \return the similarity measure
+	/// \example 0.978391
+	/// \example 0.768423
+	double vectorSimilarity( const ValueVariant& v1, const ValueVariant& v2) const;
 
-	/// \brief Get the index starting from 0 of a feature by its name
-	/// \param[in] name name of the feature
-	/// \example "castle"
-	/// \return index -1, if not found, else index of the feature to get the name of (index is order of insertion starting with 0)
-	/// \example -1
-	/// \example 52636
-	Index featureIndex( const std::string& name) const;
+	/// \brief Calculate the normalized vector representation of the argument vector
+	/// \param[in] vec input vector
+	/// \example [ 0.0322312 0.0112124 0.0078784 0.0012344 0.0064535 0.05454322 ]
+	/// \return the normalized vector
+	/// \example [ 0.0123124 0.0423423 0.0065654 0.0023133 0.0076574 0.06354521 ]
+	WordVector normalize( const ValueVariant& vec) const;
 
-	/// \brief Get the number of feature vectors defined
-	/// \return the number of features
-	/// \example 0
-	/// \example 15612336
-	unsigned int nofFeatures() const;
-
-	/// \brief Get the configuration of this vector storage
-	/// \return the configuration as structure
-	/// \example [ path:'storage' commit:10 dim:300 bit:64 var:32 simdist:340 maxdist:640 realvecweights:1 ]
+	/// \brief Get the configuration of this storage
+	/// \return the configuration structure
 	Struct config() const;
 
-	/// \brief Get the configuration of this vector storage as string
-	/// \return the configuration as string
-	/// \example "path=storage;commit=10;dim=300;bit=64;var=32;simdist=340;maxdist=640;realvecweights=1"
+	/// \brief Get the configuration of this storage as string
+	/// \return the configuration string
 	std::string configstring() const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
+	/// \remark This method is not implicitely called with the destructor because it might be a complicated operation that cannot be afforded in panic shutdown.
+	/// \note the method does not have to be called necessarily.
 	void close();
 
 private:
@@ -186,26 +160,32 @@ public:
 	virtual ~VectorStorageTransactionImpl(){}
 
 	/// \brief Add named feature to vector storage
-	/// \param[in] name unique name of the feature added
+	/// \param[in] type type of the feature added
+	/// \example "noun"
+	/// \example "verb"
+	/// \param[in] feat value of the feature added
 	/// \example "castle"
 	/// \example "conquest"
 	/// \param[in] vec vector assigned to the feature
 	/// \example [ 0.08721391 0.01232134 0.02342453 0.0011312 0.0012314 0.087232243 ]
-	void addFeature( 
-			const std::string& name,
-			const ValueVariant& vec);
+	void defineVector( const std::string& type, const std::string& feat, const ValueVariant& vec);
 
-	/// \brief Assign a concept (index) to a feature referenced by index
-	/// \param[in] conceptClass name of the relation
-	/// \example "entityrel"
-	/// \param[in] featidx index of the feature
-	/// \example 1242321
-	/// \param[in] conidx index of the concept
-	/// \example 32874
-	void defineFeatureConceptRelation(
-			const std::string& conceptClass,
-			int featidx,
-			int conidx);
+	/// \brief Define a feature without vector
+	/// \param[in] type of the feature to add
+	/// \param[in] feat name of the feature to add
+	void defineFeature( const std::string& type, const std::string& feat);
+
+	/// \brief Define some scalar configuration parameter used in calculation (depending on implementation)
+	/// \param[in] name name of the variable (depending on implementation)
+	/// \example "simdist"
+	/// \example "probsimdist"
+	/// \param[in] value value assigned to the variable
+	/// \example 340
+	/// \example 640
+	void defineScalar( const std::string& name, double value);
+
+	/// \brief Clear all vectors,types and feature names in the storage
+	void clear();
 
 	/// \brief Commit of the transaction
 	/// \remark throws an error on failure

@@ -96,7 +96,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	rt &= serializeArrayElement( result, (papuga_Int)val.featidx(), errcode, deep);
+	rt &= serializeArrayElement( result, val.value(), errcode, deep);
 	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
 	return rt;
 }
