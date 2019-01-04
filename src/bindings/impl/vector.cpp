@@ -23,7 +23,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storageref, const std::string& type, int indexPart, int nofParts, bool realVecWeights, const ObjectRef& errorhnd_)
+VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storageref, const std::string& type, int indexPart, int nofParts, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_searcher_impl()
 	,m_trace_impl( trace)
@@ -32,19 +32,19 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, co
 	const VectorStorageClientInterface* storage = storageref.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
-	m_searcher_impl.resetOwnership( storage->createSearcher( type, indexPart, nofParts, realVecWeights), "VectorStorageSearcher");
+	m_searcher_impl.resetOwnership( storage->createSearcher( type, indexPart, nofParts), "VectorStorageSearcher");
 	if (!m_searcher_impl.get())
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
 
-std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity) const
+std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
 	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
 
-	std::vector<VectorQueryResult> res = searcher->findSimilar( Deserializer::getFloatList( vec), maxNofResults, minSimilarity);
+	std::vector<VectorQueryResult> res = searcher->findSimilar( Deserializer::getFloatList( vec), maxNofResults, minSimilarity, realVecWeights);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -65,9 +65,9 @@ void VectorStorageSearcherImpl::close()
 	}
 }
 
-VectorStorageSearcherImpl* VectorStorageClientImpl::createSearcher( const std::string& type, int indexPart, int nofParts, bool realVecWeights) const
+VectorStorageSearcherImpl* VectorStorageClientImpl::createSearcher( const std::string& type, int indexPart, int nofParts) const
 {
-	return new VectorStorageSearcherImpl( m_trace_impl, m_vector_storage_impl, type, indexPart, nofParts, realVecWeights, m_errorhnd_impl);
+	return new VectorStorageSearcherImpl( m_trace_impl, m_vector_storage_impl, type, indexPart, nofParts, m_errorhnd_impl);
 }
 
 VectorStorageTransactionImpl* VectorStorageClientImpl::createTransaction()

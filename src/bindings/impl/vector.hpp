@@ -33,17 +33,25 @@ public:
 
 	/// \brief Find the most similar vectors to vector
 	/// \param[in] vec vector to search for (double[])
+	/// \example [ 0.0322312 0.01121243 0.0078784 0.0012344 0.0064535 0.05454322 ]
 	/// \param[in] maxNofResults maximum number of results to return
+	/// \example 20
+	/// \example 50
 	/// \param[in] minSimilarity value between 0.0 and 1.0 specifying the minimum similarity a result should have 
+	/// \example 0.9
+	/// \example 0.85
+	/// \param[in] realVecWeights true, if the real weights of the similarities should be calculated in the final result (for the best matches), false, if the weights of the final result should be the approximated values from the LSH similarity
+	/// \example true
+	/// \example false
 	/// \return the list of most similar vectors (double[])
-	std::vector<VectorQueryResult> findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity) const;
+	std::vector<VectorQueryResult> findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
 
 private:
 	friend class VectorStorageClientImpl;
-	VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storage, const std::string& type, int indexPart, int nofParts, bool realVecWeights, const ObjectRef& errorhnd_);
+	VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storage, const std::string& type, int indexPart, int nofParts, const ObjectRef& errorhnd_);
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_searcher_impl;
@@ -68,11 +76,8 @@ public:
 	/// \param[in] nofParts number of parts to split the collection into for parallel search
 	/// \example 1
 	/// \example 4
-	/// \param[in] realVecWeights true, if the real weights of the similarities should be calculated in the final result (for the best matches), false, if the weights of the final result should be the approximated values from the LSH similarity
-	/// \example true
-	/// \example false
 	/// \return the vector search interface (with ownership)
-	VectorStorageSearcherImpl* createSearcher( const std::string& type, int indexPart, int nofParts, bool realVecWeights) const;
+	VectorStorageSearcherImpl* createSearcher( const std::string& type, int indexPart, int nofParts) const;
 
 	/// \brief Create a vector storage transaction instance
 	/// \return the transaction instance
