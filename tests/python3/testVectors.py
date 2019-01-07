@@ -11,13 +11,7 @@ else:
 storage = outputdir + "/storage"
 config = {
 	'path':storage,
-	'commit':10,
-	'dim':10,
-	'bit':8,
-	'var':100,
-	'simdist':12,
-	'maxdist':20,
-	'realvecweights':True
+	'vecdim':10
 }
 vectors = []
 
@@ -37,16 +31,18 @@ ctx.createVectorStorage( config);
 storage = ctx.createVectorStorageClient( config)
 transaction = storage.createTransaction()
 for iv,vv in enumerate( vectors):
-	transaction.addFeature( "F%u" % (iv+1), vv)
-	transaction.defineFeatureConceptRelation( "main", iv, iv+1)
+	transaction.defineVector( "word", "F%u" % (iv+1), vv)
+	if iv % 2 == 1:
+		transaction.defineFeature( "nonvec", "F%u" % (iv+1))
 
 transaction.commit()
 transaction.close()
-output = dumpVectorStorage( ctx, config)
+examplevec = [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1]
+output = dumpVectorStorage( ctx, config, vectors, examplevec)
 
 storage = ctx.createVectorStorageClient( config)
-searcher = storage.createSearcher( 0, storage.nofFeatures())
-simlist = searcher.findSimilar( [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1], 10)
+searcher = storage.createSearcher( "word", 0, 1)
+simlist = searcher.findSimilar( examplevec, 10, 0.85, True)
 output[ 'simlist 0.1x10'] = simlist
 
 result = "vector storage dump:" + dumpTree( output) + "\n"

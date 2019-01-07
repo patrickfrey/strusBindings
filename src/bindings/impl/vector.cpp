@@ -39,7 +39,7 @@ VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, co
 	}
 }
 
-std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const
+Struct VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const
 {
 	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
 	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
@@ -50,7 +50,10 @@ std::vector<VectorQueryResult> VectorStorageSearcherImpl::findSimilar( const Val
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
-	return res;
+	Struct rt;
+	strus::bindings::Serializer::serialize( &rt.serialization, res, true/*deep*/);
+	rt.release();
+	return rt;
 }
 
 void VectorStorageSearcherImpl::close()
@@ -64,6 +67,9 @@ void VectorStorageSearcherImpl::close()
 		throw strus::runtime_error( _TXT("error detected after calling storage searcher close: %s"), errorhnd->fetchError());
 	}
 }
+
+VectorStorageClientImpl::~VectorStorageClientImpl()
+{}
 
 VectorStorageSearcherImpl* VectorStorageClientImpl::createSearcher( const std::string& type, int indexPart, int nofParts) const
 {

@@ -18,6 +18,7 @@
 #include "impl/value/introspectionBase.hpp"
 #include <vector>
 #include <string>
+#include <cstdio>
 
 namespace strus {
 namespace bindings {
@@ -58,7 +59,7 @@ public:
 	/// \example [ threads: 12 ]
 	explicit ContextImpl( const ValueVariant& config=ValueVariant());
 	/// \brief Destructor
-	~ContextImpl(){}
+	~ContextImpl();
 
 	/// \brief Load a module
 	/// \example loadModule( "storage_vector" )

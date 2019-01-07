@@ -9,14 +9,8 @@ if (isset($argv[1])) {
 $storage = $outputdir . "/storage";
 $config = [
 	'path' => $storage,
-	'commit' => 10,
-	'dim' => 10,
-	'bit' => 8,
-	'var' => 100,
-	'simdist' => 12,
-	'maxdist' => 20,
-	'realvecweights' => True
-];
+	'vecdim' => 10
+]
 $vectors = [];
 
 $ctx = new StrusContext();
@@ -40,17 +34,22 @@ $transaction = $storage->createTransaction();
 
 foreach ($vectors as $iv => $vv) {
 	$fidx = (int)$iv + 1;
-	$transaction->addFeature( "F$fidx", $vv);
-	$transaction->defineFeatureConceptRelation( "main", $iv, $fidx);
+	$transaction->defineVector( "word", "F$fidx", $vv);
+	if ($fidx % 2 == 1) {
+		$transaction->defineFeature( "nonvec", "F$fidx");
+	}
 }
 $transaction->commit();
 $transaction->close();
-$output = dumpVectorStorage( $ctx, $config);
+
+$examplevec = [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1]
+$output = dumpVectorStorage( $ctx, $config, $vectors, $examplevec);
 
 $storage = $ctx->createVectorStorageClient( $config);
-$searcher = $storage->createSearcher( 0, $storage->nofFeatures());
-$simlist = $searcher->findSimilar( [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1], 10);
+$searcher = $storage->createSearcher( "word", 0, 1);
+$simlist = $searcher->findSimilar( $examplevec, 10, 0.85, True);
 $output[ 'simlist 0.1x10'] = $simlist;
+
 
 $result = "vector storage dump:" . dumpTree( $output);
 $expected = <<<END_expected

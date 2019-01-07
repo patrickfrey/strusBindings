@@ -82,9 +82,9 @@ function dumpTree_( indent, o, depth, excludeSet)
 	elseif type(o) == 'number' then
 		num = tonumber( string.format("%.5f", o))
 		if (num == math.floor(num)) then
-			return string.format("%d", o)
+			return string.format("%d", num)
 		else
-			return string.format("%.5f", o)
+			return string.format("%.5f", num)
 		end
 	elseif type(o) == 'string' then
 		return '"' .. tostring(o) .. '"'
@@ -122,7 +122,7 @@ function verifyTestOutput( outputdir, result, expected)
 	if (result ~= expected) then
 		writeFile( outputdir .. "/RES", result)
 		writeFile( outputdir .. "/EXP", expected)
-
+		collectgarbage()
 		print "Failed"
 		os.exit( 1)
 	else

@@ -44,7 +44,7 @@ public:
 	/// \example true
 	/// \example false
 	/// \return the list of most similar vectors (double[])
-	std::vector<VectorQueryResult> findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const;
+	Struct findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const;
 
 	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
 	void close();
@@ -65,7 +65,7 @@ class VectorStorageClientImpl
 {
 public:
 	/// \brief Destructor
-	virtual ~VectorStorageClientImpl(){}
+	virtual ~VectorStorageClientImpl();
 
 	/// \brief Create a searcher object for scanning the vectors assigned to a feature of a given type for similarity
 	/// \param[in] type type of the feature to search for

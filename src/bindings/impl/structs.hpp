@@ -88,9 +88,9 @@ enum _DocumentClass {mimetype,encoding,scheme};
 
 /// \struct VectorQueryResult
 /// \brief Result of a similar vector query
-/// \member featidx index of the feature
-/// \member weight weight of the result (0.0 <= .. <= 1.0)
-enum _VectorQueryResult {featidx,weight};
+/// \member value feature string
+/// \member weight weight given to the feature (0.0 <= .. <= 1.0)
+enum _VectorQueryResult {value,weight};
 
 /// \struct SummaryElement
 /// \brief Summary element in a query result 

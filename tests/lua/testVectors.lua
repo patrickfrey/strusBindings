@@ -7,20 +7,17 @@ local outputdir = arg[1] or '.'
 local storage = outputdir .. "/storage"
 local config = {
 	path=storage,
-	['commit']=10,
-	dim=10,
-	bit=8,
-	var=100,
-	simdist=12,
-	maxdist=20,
-	realvecweights=true
+	vecdim=10
 }
 local vectors = {}
+math.randomseed(123)
 
+local examplevec = {0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1}
 for vi=1,100 do
 	vv = {}
 	for xi=1,10 do
-		table.insert( vv, 1.0 / math.sqrt(vi + xi))
+		local r = math.random()
+		table.insert( vv, examplevec[ xi] - r / 20)
 	end
 	table.insert( vectors, vv)
 end
@@ -36,16 +33,19 @@ ctx:createVectorStorage( config);
 local storage = ctx:createVectorStorageClient( config)
 local transaction = storage:createTransaction()
 for iv,vv in ipairs( vectors) do
-	transaction:addFeature( string.format( "F%u", iv), vv)
-	transaction:defineFeatureConceptRelation( "main", iv-1, iv)
+transaction:defineVector( "word", string.format( "F%u", iv), vv)
+if math.fmod(iv,2) == 1 then
+	transaction:defineFeature( "nonvec", string.format( "F%u", iv))
+end
 end
 transaction:commit()
 transaction:close()
-local output = dumpVectorStorage( ctx, config)
+
+local output = dumpVectorStorage( ctx, config, vectors, examplevec)
 
 local storage = ctx:createVectorStorageClient( config)
-local searcher = storage:createSearcher( 0, storage:nofFeatures())
-local simlist = searcher:findSimilar( {0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1}, 10)
+local searcher = storage:createSearcher( "word", 0, 1)
+local simlist = searcher:findSimilar( examplevec, 10, 0.85, true)
 output[ 'simlist 0.1x10'] = simlist
 
 local result = "vector storage dump:" .. dumpTree( output) .. "\n"

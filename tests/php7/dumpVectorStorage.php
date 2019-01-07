@@ -1,37 +1,26 @@
 <?php
 include_once "utils.php";
 
-function dumpVectorStorage( $strusctx, $config) {
+function dumpVectorStorage( $strusctx, $config, $vectors, $examplevec) {
 	$output = [];
 	// Get a client for the vector storage:
 	$storage = $strusctx->createVectorStorageClient( $config);
 
-	// Dump concept classes of the storage:
-	$classes = $storage->conceptClassNames();
-	$output[ 'classes'] = $classes;
-	foreach ($classes as $cl) {
-		$csize = $storage->nofConcepts( $cl);
-		for ($ci = 1; $ci < $csize; $ci++) {
-			$cfeats = $storage->conceptFeatures( $cl, $ci);
-			$output[ "class '$cl' concept $ci"] = $cfeats;
+	$output[ 'types'] = $storage->types()
+	$output[ "nof vec word"] = $storage->nofVectors( "word");
+	$output[ "nof vec nonvec"] = $storage->nofVectors( "nonvec");
+	foreach ($vectors as $iv => $vv) {
+		$fidx = (int)$iv + 1;
+		$output[ "types F$fidx"] = join( " ", $storage->featureTypes( "F$fidx"));
+		$output[ "vec F$fidx"] = $storage->featureVector( "word", "F$fidx");
+		$output[ "vec F$fidx example sim"] = storage.vectorSimilarity( vv, $examplevec)
+		
+		foreach ($vectors as $io => $vo) {
+			$oidx = (int)$io + 1;
+			output[ "sim F$fidx/$oidx"] = $storage->vectorSimilarity( $vv, $vo);
 		}
 	}
-	// Dump features of the storage:
-	$nofvecs = $storage->nofFeatures();
-	for ($fi = 0; $fi < $nofvecs-1; $fi++) {
-		$fname = $storage->featureName( $fi);
-		$fidx = $storage->featureIndex( $fname);
-		if ($fi != $fidx) {
-			fwrite(STDERR, "feature index does not match $fi ~= $fidx ($fname)");
-			exit(1);
-		}
-		foreach ($classes as $cl) {
-			$concepts = $storage->featureConcepts( $cl, $fi);
-			$output[ "class '$cl' feature $fi" ] = $concepts;
-		}
-		$fvector = $storage->featureVector( $fi);
-		$output[ "vector '$fname'"] = $fvector;
-	}
+
 	// Configuration of the storage:
 	$output_config = [];
 	foreach ($storage->config() as $key => $value) {
@@ -42,6 +31,7 @@ function dumpVectorStorage( $strusctx, $config) {
 		}
 	}
 	$output[ "config"] = $output_config;
+
 	$storage->close();
 	return $output;
 }

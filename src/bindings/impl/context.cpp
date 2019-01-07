@@ -50,7 +50,6 @@
 #include "structDefs.hpp"
 #include "traceProxy.hpp"
 #include "valueVariantWrap.hpp"
-#include <iostream>
 
 using namespace strus;
 using namespace strus::bindings;
@@ -116,6 +115,9 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 		(void)messaging.release();
 	}
 }
+
+ContextImpl::~ContextImpl()
+{}
 
 void ContextImpl::loadModule( const std::string& name_)
 {
