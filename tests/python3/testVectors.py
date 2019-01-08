@@ -1,5 +1,6 @@
 import strus
 import math
+import random
 from utils import *
 from dumpVectorStorage import *
 
@@ -11,14 +12,20 @@ else:
 storage = outputdir + "/storage"
 config = {
 	'path':storage,
-	'vecdim':10
+	'vecdim':10,
+	'simdist':20,
+	'probsimdist':40
 }
 vectors = []
 
+random.seed(123)
+
+examplevec = [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1]
 for vi in range( 1,101):
 	vv = []
 	for xi in range(1,11):
-		vv.append( 1.0 / math.sqrt(vi + xi))
+		r = random.random()
+		vv.append( examplevec[ xi-1] - r / 20)
 	vectors.append( vv)
 
 ctx = strus.Context()
@@ -32,12 +39,11 @@ storage = ctx.createVectorStorageClient( config)
 transaction = storage.createTransaction()
 for iv,vv in enumerate( vectors):
 	transaction.defineVector( "word", "F%u" % (iv+1), vv)
-	if iv % 2 == 1:
+	if (iv+1) % 2 == 1:
 		transaction.defineFeature( "nonvec", "F%u" % (iv+1))
 
 transaction.commit()
 transaction.close()
-examplevec = [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1]
 output = dumpVectorStorage( ctx, config, vectors, examplevec)
 
 storage = ctx.createVectorStorageClient( config)
@@ -47,1472 +53,502 @@ output[ 'simlist 0.1x10'] = simlist
 
 result = "vector storage dump:" + dumpTree( output) + "\n"
 expected = """vector storage dump:
-str class '' feature 0: 
-str class '' feature 1: 
-str class '' feature 10: 
-str class '' feature 11: 
-str class '' feature 12: 
-str class '' feature 13: 
-str class '' feature 14: 
-str class '' feature 15: 
-str class '' feature 16: 
-str class '' feature 17: 
-str class '' feature 18: 
-str class '' feature 19: 
-str class '' feature 2: 
-str class '' feature 20: 
-str class '' feature 21: 
-str class '' feature 22: 
-str class '' feature 23: 
-str class '' feature 24: 
-str class '' feature 25: 
-str class '' feature 26: 
-str class '' feature 27: 
-str class '' feature 28: 
-str class '' feature 29: 
-str class '' feature 3: 
-str class '' feature 30: 
-str class '' feature 31: 
-str class '' feature 32: 
-str class '' feature 33: 
-str class '' feature 34: 
-str class '' feature 35: 
-str class '' feature 36: 
-str class '' feature 37: 
-str class '' feature 38: 
-str class '' feature 39: 
-str class '' feature 4: 
-str class '' feature 40: 
-str class '' feature 41: 
-str class '' feature 42: 
-str class '' feature 43: 
-str class '' feature 44: 
-str class '' feature 45: 
-str class '' feature 46: 
-str class '' feature 47: 
-str class '' feature 48: 
-str class '' feature 49: 
-str class '' feature 5: 
-str class '' feature 50: 
-str class '' feature 51: 
-str class '' feature 52: 
-str class '' feature 53: 
-str class '' feature 54: 
-str class '' feature 55: 
-str class '' feature 56: 
-str class '' feature 57: 
-str class '' feature 58: 
-str class '' feature 59: 
-str class '' feature 6: 
-str class '' feature 60: 
-str class '' feature 61: 
-str class '' feature 62: 
-str class '' feature 63: 
-str class '' feature 64: 
-str class '' feature 65: 
-str class '' feature 66: 
-str class '' feature 67: 
-str class '' feature 68: 
-str class '' feature 69: 
-str class '' feature 7: 
-str class '' feature 70: 
-str class '' feature 71: 
-str class '' feature 72: 
-str class '' feature 73: 
-str class '' feature 74: 
-str class '' feature 75: 
-str class '' feature 76: 
-str class '' feature 77: 
-str class '' feature 78: 
-str class '' feature 79: 
-str class '' feature 8: 
-str class '' feature 80: 
-str class '' feature 81: 
-str class '' feature 82: 
-str class '' feature 83: 
-str class '' feature 84: 
-str class '' feature 85: 
-str class '' feature 86: 
-str class '' feature 87: 
-str class '' feature 88: 
-str class '' feature 89: 
-str class '' feature 9: 
-str class '' feature 90: 
-str class '' feature 91: 
-str class '' feature 92: 
-str class '' feature 93: 
-str class '' feature 94: 
-str class '' feature 95: 
-str class '' feature 96: 
-str class '' feature 97: 
-str class '' feature 98: 
-str class '' feature 99: 
-str class 'main' feature 0:
-  number 1: 1
-str class 'main' feature 1:
-  number 1: 2
-str class 'main' feature 10:
-  number 1: 11
-str class 'main' feature 11:
-  number 1: 12
-str class 'main' feature 12:
-  number 1: 13
-str class 'main' feature 13:
-  number 1: 14
-str class 'main' feature 14:
-  number 1: 15
-str class 'main' feature 15:
-  number 1: 16
-str class 'main' feature 16:
-  number 1: 17
-str class 'main' feature 17:
-  number 1: 18
-str class 'main' feature 18:
-  number 1: 19
-str class 'main' feature 19:
-  number 1: 20
-str class 'main' feature 2:
-  number 1: 3
-str class 'main' feature 20:
-  number 1: 21
-str class 'main' feature 21:
-  number 1: 22
-str class 'main' feature 22:
-  number 1: 23
-str class 'main' feature 23:
-  number 1: 24
-str class 'main' feature 24:
-  number 1: 25
-str class 'main' feature 25:
-  number 1: 26
-str class 'main' feature 26:
-  number 1: 27
-str class 'main' feature 27:
-  number 1: 28
-str class 'main' feature 28:
-  number 1: 29
-str class 'main' feature 29:
-  number 1: 30
-str class 'main' feature 3:
-  number 1: 4
-str class 'main' feature 30:
-  number 1: 31
-str class 'main' feature 31:
-  number 1: 32
-str class 'main' feature 32:
-  number 1: 33
-str class 'main' feature 33:
-  number 1: 34
-str class 'main' feature 34:
-  number 1: 35
-str class 'main' feature 35:
-  number 1: 36
-str class 'main' feature 36:
-  number 1: 37
-str class 'main' feature 37:
-  number 1: 38
-str class 'main' feature 38:
-  number 1: 39
-str class 'main' feature 39:
-  number 1: 40
-str class 'main' feature 4:
-  number 1: 5
-str class 'main' feature 40:
-  number 1: 41
-str class 'main' feature 41:
-  number 1: 42
-str class 'main' feature 42:
-  number 1: 43
-str class 'main' feature 43:
-  number 1: 44
-str class 'main' feature 44:
-  number 1: 45
-str class 'main' feature 45:
-  number 1: 46
-str class 'main' feature 46:
-  number 1: 47
-str class 'main' feature 47:
-  number 1: 48
-str class 'main' feature 48:
-  number 1: 49
-str class 'main' feature 49:
-  number 1: 50
-str class 'main' feature 5:
-  number 1: 6
-str class 'main' feature 50:
-  number 1: 51
-str class 'main' feature 51:
-  number 1: 52
-str class 'main' feature 52:
-  number 1: 53
-str class 'main' feature 53:
-  number 1: 54
-str class 'main' feature 54:
-  number 1: 55
-str class 'main' feature 55:
-  number 1: 56
-str class 'main' feature 56:
-  number 1: 57
-str class 'main' feature 57:
-  number 1: 58
-str class 'main' feature 58:
-  number 1: 59
-str class 'main' feature 59:
-  number 1: 60
-str class 'main' feature 6:
-  number 1: 7
-str class 'main' feature 60:
-  number 1: 61
-str class 'main' feature 61:
-  number 1: 62
-str class 'main' feature 62:
-  number 1: 63
-str class 'main' feature 63:
-  number 1: 64
-str class 'main' feature 64:
-  number 1: 65
-str class 'main' feature 65:
-  number 1: 66
-str class 'main' feature 66:
-  number 1: 67
-str class 'main' feature 67:
-  number 1: 68
-str class 'main' feature 68:
-  number 1: 69
-str class 'main' feature 69:
-  number 1: 70
-str class 'main' feature 7:
-  number 1: 8
-str class 'main' feature 70:
-  number 1: 71
-str class 'main' feature 71:
-  number 1: 72
-str class 'main' feature 72:
-  number 1: 73
-str class 'main' feature 73:
-  number 1: 74
-str class 'main' feature 74:
-  number 1: 75
-str class 'main' feature 75:
-  number 1: 76
-str class 'main' feature 76:
-  number 1: 77
-str class 'main' feature 77:
-  number 1: 78
-str class 'main' feature 78:
-  number 1: 79
-str class 'main' feature 79:
-  number 1: 80
-str class 'main' feature 8:
-  number 1: 9
-str class 'main' feature 80:
-  number 1: 81
-str class 'main' feature 81:
-  number 1: 82
-str class 'main' feature 82:
-  number 1: 83
-str class 'main' feature 83:
-  number 1: 84
-str class 'main' feature 84:
-  number 1: 85
-str class 'main' feature 85:
-  number 1: 86
-str class 'main' feature 86:
-  number 1: 87
-str class 'main' feature 87:
-  number 1: 88
-str class 'main' feature 88:
-  number 1: 89
-str class 'main' feature 89:
-  number 1: 90
-str class 'main' feature 9:
-  number 1: 10
-str class 'main' feature 90:
-  number 1: 91
-str class 'main' feature 91:
-  number 1: 92
-str class 'main' feature 92:
-  number 1: 93
-str class 'main' feature 93:
-  number 1: 94
-str class 'main' feature 94:
-  number 1: 95
-str class 'main' feature 95:
-  number 1: 96
-str class 'main' feature 96:
-  number 1: 97
-str class 'main' feature 97:
-  number 1: 98
-str class 'main' feature 98:
-  number 1: 99
-str class 'main' feature 99:
-  number 1: 100
-str classes:
-  number 1: ""
-  number 2: "main"
 str config:
-  str assignments: "7"
-  str baff: "0.10000"
-  str bit: "8"
-  str commit: "10"
-  str descendants: "10"
-  str dim: "10"
-  str eqdiff: "0.25000"
-  str eqdist: "2"
-  str fdf: "0.25000"
-  str forcesim: "no"
-  str greediness: "3"
-  str isaf: "0.60000"
-  str iterations: "20"
-  str logfile: ""
-  str maxage: "20"
-  str maxconcepts: "0"
-  str maxdist: "20"
-  str maxfeatures: "0"
-  str maxsimsam: "0"
-  str mutations: "50"
   str path: "storage"
-  str probdist: "18"
-  str probsim: "yes"
-  str raddist: "12"
-  str realvecweights: "yes"
-  str rndsimsam: "0"
-  str simdist: "12"
-  str singletons: "0"
-  str threads: "0"
-  str var: "100"
-  str votes: "13"
+  str probsimdist: "40"
+  str simdist: "20"
+  str vecdim: "10"
+str nof vec nonvec: 0
+str nof vec word: 100
+str rank   0: "0.99744 F9 {0.09326, 0.09034, 0.08718, 0.08240, 0.08640, 0.07829, 0.07898, 0.09457, 0.09687, 0.08225}"
+str rank   1: "0.99458 F2 {0.08314, 0.08331, 0.08774, 0.09992, 0.07819, 0.09562, 0.07012, 0.09651, 0.08423, 0.07758}"
+str rank   2: "0.99449 F56 {0.08307, 0.09154, 0.08126, 0.07070, 0.07546, 0.08138, 0.07893, 0.09114, 0.09476, 0.06713}"
+str rank   3: "0.99413 F55 {0.07603, 0.08142, 0.05960, 0.07673, 0.06761, 0.08579, 0.07307, 0.07187, 0.07067, 0.06070}"
+str rank   4: "0.99265 F83 {0.07675, 0.07476, 0.07820, 0.08449, 0.06197, 0.06814, 0.09293, 0.08329, 0.07795, 0.06258}"
 str simlist 0.1x10:
   number 1:
-    str featidx: 98
-    str weight: 0.99991
+    str value: "F9"
+    str weight: 0.99744
   number 2:
-    str featidx: 97
-    str weight: 0.99990
+    str value: "F2"
+    str weight: 0.99458
   number 3:
-    str featidx: 96
-    str weight: 0.99990
+    str value: "F56"
+    str weight: 0.99449
   number 4:
-    str featidx: 95
-    str weight: 0.99990
+    str value: "F55"
+    str weight: 0.99413
   number 5:
-    str featidx: 94
-    str weight: 0.99990
+    str value: "F83"
+    str weight: 0.99265
   number 6:
-    str featidx: 93
-    str weight: 0.99990
+    str value: "F69"
+    str weight: 0.99214
   number 7:
-    str featidx: 92
-    str weight: 0.99989
+    str value: "F86"
+    str weight: 0.99157
   number 8:
-    str featidx: 91
-    str weight: 0.99989
+    str value: "F26"
+    str weight: 0.99138
   number 9:
-    str featidx: 90
-    str weight: 0.99989
+    str value: "F61"
+    str weight: 0.99066
   number 10:
-    str featidx: 89
-    str weight: 0.99989
-str vector 'F1':
-  number 1: 0.70711
-  number 2: 0.57735
-  number 3: 0.50000
-  number 4: 0.44721
-  number 5: 0.40825
-  number 6: 0.37796
-  number 7: 0.35355
-  number 8: 0.33333
-  number 9: 0.31623
-  number 10: 0.30151
-str vector 'F10':
-  number 1: 0.30151
-  number 2: 0.28868
-  number 3: 0.27735
-  number 4: 0.26726
-  number 5: 0.25820
-  number 6: 0.25000
-  number 7: 0.24254
-  number 8: 0.23570
-  number 9: 0.22942
-  number 10: 0.22361
-str vector 'F100':
-  number 1: 0.09950
-  number 2: 0.09901
-  number 3: 0.09853
-  number 4: 0.09806
-  number 5: 0.09759
-  number 6: 0.09713
-  number 7: 0.09667
-  number 8: 0.09623
-  number 9: 0.09578
-  number 10: 0.09535
-str vector 'F11':
-  number 1: 0.28868
-  number 2: 0.27735
-  number 3: 0.26726
-  number 4: 0.25820
-  number 5: 0.25000
-  number 6: 0.24254
-  number 7: 0.23570
-  number 8: 0.22942
-  number 9: 0.22361
-  number 10: 0.21822
-str vector 'F12':
-  number 1: 0.27735
-  number 2: 0.26726
-  number 3: 0.25820
-  number 4: 0.25000
-  number 5: 0.24254
-  number 6: 0.23570
-  number 7: 0.22942
-  number 8: 0.22361
-  number 9: 0.21822
-  number 10: 0.21320
-str vector 'F13':
-  number 1: 0.26726
-  number 2: 0.25820
-  number 3: 0.25000
-  number 4: 0.24254
-  number 5: 0.23570
-  number 6: 0.22942
-  number 7: 0.22361
-  number 8: 0.21822
-  number 9: 0.21320
-  number 10: 0.20851
-str vector 'F14':
-  number 1: 0.25820
-  number 2: 0.25000
-  number 3: 0.24254
-  number 4: 0.23570
-  number 5: 0.22942
-  number 6: 0.22361
-  number 7: 0.21822
-  number 8: 0.21320
-  number 9: 0.20851
-  number 10: 0.20412
-str vector 'F15':
-  number 1: 0.25000
-  number 2: 0.24254
-  number 3: 0.23570
-  number 4: 0.22942
-  number 5: 0.22361
-  number 6: 0.21822
-  number 7: 0.21320
-  number 8: 0.20851
-  number 9: 0.20412
-  number 10: 0.20000
-str vector 'F16':
-  number 1: 0.24254
-  number 2: 0.23570
-  number 3: 0.22942
-  number 4: 0.22361
-  number 5: 0.21822
-  number 6: 0.21320
-  number 7: 0.20851
-  number 8: 0.20412
-  number 9: 0.20000
-  number 10: 0.19612
-str vector 'F17':
-  number 1: 0.23570
-  number 2: 0.22942
-  number 3: 0.22361
-  number 4: 0.21822
-  number 5: 0.21320
-  number 6: 0.20851
-  number 7: 0.20412
-  number 8: 0.20000
-  number 9: 0.19612
-  number 10: 0.19245
-str vector 'F18':
-  number 1: 0.22942
-  number 2: 0.22361
-  number 3: 0.21822
-  number 4: 0.21320
-  number 5: 0.20851
-  number 6: 0.20412
-  number 7: 0.20000
-  number 8: 0.19612
-  number 9: 0.19245
-  number 10: 0.18898
-str vector 'F19':
-  number 1: 0.22361
-  number 2: 0.21822
-  number 3: 0.21320
-  number 4: 0.20851
-  number 5: 0.20412
-  number 6: 0.20000
-  number 7: 0.19612
-  number 8: 0.19245
-  number 9: 0.18898
-  number 10: 0.18570
-str vector 'F2':
-  number 1: 0.57735
-  number 2: 0.50000
-  number 3: 0.44721
-  number 4: 0.40825
-  number 5: 0.37796
-  number 6: 0.35355
-  number 7: 0.33333
-  number 8: 0.31623
-  number 9: 0.30151
-  number 10: 0.28868
-str vector 'F20':
-  number 1: 0.21822
-  number 2: 0.21320
-  number 3: 0.20851
-  number 4: 0.20412
-  number 5: 0.20000
-  number 6: 0.19612
-  number 7: 0.19245
-  number 8: 0.18898
-  number 9: 0.18570
-  number 10: 0.18257
-str vector 'F21':
-  number 1: 0.21320
-  number 2: 0.20851
-  number 3: 0.20412
-  number 4: 0.20000
-  number 5: 0.19612
-  number 6: 0.19245
-  number 7: 0.18898
-  number 8: 0.18570
-  number 9: 0.18257
-  number 10: 0.17961
-str vector 'F22':
-  number 1: 0.20851
-  number 2: 0.20412
-  number 3: 0.20000
-  number 4: 0.19612
-  number 5: 0.19245
-  number 6: 0.18898
-  number 7: 0.18570
-  number 8: 0.18257
-  number 9: 0.17961
-  number 10: 0.17678
-str vector 'F23':
-  number 1: 0.20412
-  number 2: 0.20000
-  number 3: 0.19612
-  number 4: 0.19245
-  number 5: 0.18898
-  number 6: 0.18570
-  number 7: 0.18257
-  number 8: 0.17961
-  number 9: 0.17678
-  number 10: 0.17408
-str vector 'F24':
-  number 1: 0.20000
-  number 2: 0.19612
-  number 3: 0.19245
-  number 4: 0.18898
-  number 5: 0.18570
-  number 6: 0.18257
-  number 7: 0.17961
-  number 8: 0.17678
-  number 9: 0.17408
-  number 10: 0.17150
-str vector 'F25':
-  number 1: 0.19612
-  number 2: 0.19245
-  number 3: 0.18898
-  number 4: 0.18570
-  number 5: 0.18257
-  number 6: 0.17961
-  number 7: 0.17678
-  number 8: 0.17408
-  number 9: 0.17150
-  number 10: 0.16903
-str vector 'F26':
-  number 1: 0.19245
-  number 2: 0.18898
-  number 3: 0.18570
-  number 4: 0.18257
-  number 5: 0.17961
-  number 6: 0.17678
-  number 7: 0.17408
-  number 8: 0.17150
-  number 9: 0.16903
-  number 10: 0.16667
-str vector 'F27':
-  number 1: 0.18898
-  number 2: 0.18570
-  number 3: 0.18257
-  number 4: 0.17961
-  number 5: 0.17678
-  number 6: 0.17408
-  number 7: 0.17150
-  number 8: 0.16903
-  number 9: 0.16667
-  number 10: 0.16440
-str vector 'F28':
-  number 1: 0.18570
-  number 2: 0.18257
-  number 3: 0.17961
-  number 4: 0.17678
-  number 5: 0.17408
-  number 6: 0.17150
-  number 7: 0.16903
-  number 8: 0.16667
-  number 9: 0.16440
-  number 10: 0.16222
-str vector 'F29':
-  number 1: 0.18257
-  number 2: 0.17961
-  number 3: 0.17678
-  number 4: 0.17408
-  number 5: 0.17150
-  number 6: 0.16903
-  number 7: 0.16667
-  number 8: 0.16440
-  number 9: 0.16222
-  number 10: 0.16013
-str vector 'F3':
-  number 1: 0.50000
-  number 2: 0.44721
-  number 3: 0.40825
-  number 4: 0.37796
-  number 5: 0.35355
-  number 6: 0.33333
-  number 7: 0.31623
-  number 8: 0.30151
-  number 9: 0.28868
-  number 10: 0.27735
-str vector 'F30':
-  number 1: 0.17961
-  number 2: 0.17678
-  number 3: 0.17408
-  number 4: 0.17150
-  number 5: 0.16903
-  number 6: 0.16667
-  number 7: 0.16440
-  number 8: 0.16222
-  number 9: 0.16013
-  number 10: 0.15811
-str vector 'F31':
-  number 1: 0.17678
-  number 2: 0.17408
-  number 3: 0.17150
-  number 4: 0.16903
-  number 5: 0.16667
-  number 6: 0.16440
-  number 7: 0.16222
-  number 8: 0.16013
-  number 9: 0.15811
-  number 10: 0.15617
-str vector 'F32':
-  number 1: 0.17408
-  number 2: 0.17150
-  number 3: 0.16903
-  number 4: 0.16667
-  number 5: 0.16440
-  number 6: 0.16222
-  number 7: 0.16013
-  number 8: 0.15811
-  number 9: 0.15617
-  number 10: 0.15430
-str vector 'F33':
-  number 1: 0.17150
-  number 2: 0.16903
-  number 3: 0.16667
-  number 4: 0.16440
-  number 5: 0.16222
-  number 6: 0.16013
-  number 7: 0.15811
-  number 8: 0.15617
-  number 9: 0.15430
-  number 10: 0.15250
-str vector 'F34':
-  number 1: 0.16903
-  number 2: 0.16667
-  number 3: 0.16440
-  number 4: 0.16222
-  number 5: 0.16013
-  number 6: 0.15811
-  number 7: 0.15617
-  number 8: 0.15430
-  number 9: 0.15250
-  number 10: 0.15076
-str vector 'F35':
-  number 1: 0.16667
-  number 2: 0.16440
-  number 3: 0.16222
-  number 4: 0.16013
-  number 5: 0.15811
-  number 6: 0.15617
-  number 7: 0.15430
-  number 8: 0.15250
-  number 9: 0.15076
-  number 10: 0.14907
-str vector 'F36':
-  number 1: 0.16440
-  number 2: 0.16222
-  number 3: 0.16013
-  number 4: 0.15811
-  number 5: 0.15617
-  number 6: 0.15430
-  number 7: 0.15250
-  number 8: 0.15076
-  number 9: 0.14907
-  number 10: 0.14744
-str vector 'F37':
-  number 1: 0.16222
-  number 2: 0.16013
-  number 3: 0.15811
-  number 4: 0.15617
-  number 5: 0.15430
-  number 6: 0.15250
-  number 7: 0.15076
-  number 8: 0.14907
-  number 9: 0.14744
-  number 10: 0.14586
-str vector 'F38':
-  number 1: 0.16013
-  number 2: 0.15811
-  number 3: 0.15617
-  number 4: 0.15430
-  number 5: 0.15250
-  number 6: 0.15076
-  number 7: 0.14907
-  number 8: 0.14744
-  number 9: 0.14586
-  number 10: 0.14434
-str vector 'F39':
-  number 1: 0.15811
-  number 2: 0.15617
-  number 3: 0.15430
-  number 4: 0.15250
-  number 5: 0.15076
-  number 6: 0.14907
-  number 7: 0.14744
-  number 8: 0.14586
-  number 9: 0.14434
-  number 10: 0.14286
-str vector 'F4':
-  number 1: 0.44721
-  number 2: 0.40825
-  number 3: 0.37796
-  number 4: 0.35355
-  number 5: 0.33333
-  number 6: 0.31623
-  number 7: 0.30151
-  number 8: 0.28868
-  number 9: 0.27735
-  number 10: 0.26726
-str vector 'F40':
-  number 1: 0.15617
-  number 2: 0.15430
-  number 3: 0.15250
-  number 4: 0.15076
-  number 5: 0.14907
-  number 6: 0.14744
-  number 7: 0.14586
-  number 8: 0.14434
-  number 9: 0.14286
-  number 10: 0.14142
-str vector 'F41':
-  number 1: 0.15430
-  number 2: 0.15250
-  number 3: 0.15076
-  number 4: 0.14907
-  number 5: 0.14744
-  number 6: 0.14586
-  number 7: 0.14434
-  number 8: 0.14286
-  number 9: 0.14142
-  number 10: 0.14003
-str vector 'F42':
-  number 1: 0.15250
-  number 2: 0.15076
-  number 3: 0.14907
-  number 4: 0.14744
-  number 5: 0.14586
-  number 6: 0.14434
-  number 7: 0.14286
-  number 8: 0.14142
-  number 9: 0.14003
-  number 10: 0.13868
-str vector 'F43':
-  number 1: 0.15076
-  number 2: 0.14907
-  number 3: 0.14744
-  number 4: 0.14586
-  number 5: 0.14434
-  number 6: 0.14286
-  number 7: 0.14142
-  number 8: 0.14003
-  number 9: 0.13868
-  number 10: 0.13736
-str vector 'F44':
-  number 1: 0.14907
-  number 2: 0.14744
-  number 3: 0.14586
-  number 4: 0.14434
-  number 5: 0.14286
-  number 6: 0.14142
-  number 7: 0.14003
-  number 8: 0.13868
-  number 9: 0.13736
-  number 10: 0.13608
-str vector 'F45':
-  number 1: 0.14744
-  number 2: 0.14586
-  number 3: 0.14434
-  number 4: 0.14286
-  number 5: 0.14142
-  number 6: 0.14003
-  number 7: 0.13868
-  number 8: 0.13736
-  number 9: 0.13608
-  number 10: 0.13484
-str vector 'F46':
-  number 1: 0.14586
-  number 2: 0.14434
-  number 3: 0.14286
-  number 4: 0.14142
-  number 5: 0.14003
-  number 6: 0.13868
-  number 7: 0.13736
-  number 8: 0.13608
-  number 9: 0.13484
-  number 10: 0.13363
-str vector 'F47':
-  number 1: 0.14434
-  number 2: 0.14286
-  number 3: 0.14142
-  number 4: 0.14003
-  number 5: 0.13868
-  number 6: 0.13736
-  number 7: 0.13608
-  number 8: 0.13484
-  number 9: 0.13363
-  number 10: 0.13245
-str vector 'F48':
-  number 1: 0.14286
-  number 2: 0.14142
-  number 3: 0.14003
-  number 4: 0.13868
-  number 5: 0.13736
-  number 6: 0.13608
-  number 7: 0.13484
-  number 8: 0.13363
-  number 9: 0.13245
-  number 10: 0.13131
-str vector 'F49':
-  number 1: 0.14142
-  number 2: 0.14003
-  number 3: 0.13868
-  number 4: 0.13736
-  number 5: 0.13608
-  number 6: 0.13484
-  number 7: 0.13363
-  number 8: 0.13245
-  number 9: 0.13131
-  number 10: 0.13019
-str vector 'F5':
-  number 1: 0.40825
-  number 2: 0.37796
-  number 3: 0.35355
-  number 4: 0.33333
-  number 5: 0.31623
-  number 6: 0.30151
-  number 7: 0.28868
-  number 8: 0.27735
-  number 9: 0.26726
-  number 10: 0.25820
-str vector 'F50':
-  number 1: 0.14003
-  number 2: 0.13868
-  number 3: 0.13736
-  number 4: 0.13608
-  number 5: 0.13484
-  number 6: 0.13363
-  number 7: 0.13245
-  number 8: 0.13131
-  number 9: 0.13019
-  number 10: 0.12910
-str vector 'F51':
-  number 1: 0.13868
-  number 2: 0.13736
-  number 3: 0.13608
-  number 4: 0.13484
-  number 5: 0.13363
-  number 6: 0.13245
-  number 7: 0.13131
-  number 8: 0.13019
-  number 9: 0.12910
-  number 10: 0.12804
-str vector 'F52':
-  number 1: 0.13736
-  number 2: 0.13608
-  number 3: 0.13484
-  number 4: 0.13363
-  number 5: 0.13245
-  number 6: 0.13131
-  number 7: 0.13019
-  number 8: 0.12910
-  number 9: 0.12804
-  number 10: 0.12700
-str vector 'F53':
-  number 1: 0.13608
-  number 2: 0.13484
-  number 3: 0.13363
-  number 4: 0.13245
-  number 5: 0.13131
-  number 6: 0.13019
-  number 7: 0.12910
-  number 8: 0.12804
-  number 9: 0.12700
-  number 10: 0.12599
-str vector 'F54':
-  number 1: 0.13484
-  number 2: 0.13363
-  number 3: 0.13245
-  number 4: 0.13131
-  number 5: 0.13019
-  number 6: 0.12910
-  number 7: 0.12804
-  number 8: 0.12700
-  number 9: 0.12599
-  number 10: 0.12500
-str vector 'F55':
-  number 1: 0.13363
-  number 2: 0.13245
-  number 3: 0.13131
-  number 4: 0.13019
-  number 5: 0.12910
-  number 6: 0.12804
-  number 7: 0.12700
-  number 8: 0.12599
-  number 9: 0.12500
-  number 10: 0.12403
-str vector 'F56':
-  number 1: 0.13245
-  number 2: 0.13131
-  number 3: 0.13019
-  number 4: 0.12910
-  number 5: 0.12804
-  number 6: 0.12700
-  number 7: 0.12599
-  number 8: 0.12500
-  number 9: 0.12403
-  number 10: 0.12309
-str vector 'F57':
-  number 1: 0.13131
-  number 2: 0.13019
-  number 3: 0.12910
-  number 4: 0.12804
-  number 5: 0.12700
-  number 6: 0.12599
-  number 7: 0.12500
-  number 8: 0.12403
-  number 9: 0.12309
-  number 10: 0.12217
-str vector 'F58':
-  number 1: 0.13019
-  number 2: 0.12910
-  number 3: 0.12804
-  number 4: 0.12700
-  number 5: 0.12599
-  number 6: 0.12500
-  number 7: 0.12403
-  number 8: 0.12309
-  number 9: 0.12217
-  number 10: 0.12127
-str vector 'F59':
-  number 1: 0.12910
-  number 2: 0.12804
-  number 3: 0.12700
-  number 4: 0.12599
-  number 5: 0.12500
-  number 6: 0.12403
-  number 7: 0.12309
-  number 8: 0.12217
-  number 9: 0.12127
-  number 10: 0.12039
-str vector 'F6':
-  number 1: 0.37796
-  number 2: 0.35355
-  number 3: 0.33333
-  number 4: 0.31623
-  number 5: 0.30151
-  number 6: 0.28868
-  number 7: 0.27735
-  number 8: 0.26726
-  number 9: 0.25820
-  number 10: 0.25000
-str vector 'F60':
-  number 1: 0.12804
-  number 2: 0.12700
-  number 3: 0.12599
-  number 4: 0.12500
-  number 5: 0.12403
-  number 6: 0.12309
-  number 7: 0.12217
-  number 8: 0.12127
-  number 9: 0.12039
-  number 10: 0.11952
-str vector 'F61':
-  number 1: 0.12700
-  number 2: 0.12599
-  number 3: 0.12500
-  number 4: 0.12403
-  number 5: 0.12309
-  number 6: 0.12217
-  number 7: 0.12127
-  number 8: 0.12039
-  number 9: 0.11952
-  number 10: 0.11868
-str vector 'F62':
-  number 1: 0.12599
-  number 2: 0.12500
-  number 3: 0.12403
-  number 4: 0.12309
-  number 5: 0.12217
-  number 6: 0.12127
-  number 7: 0.12039
-  number 8: 0.11952
-  number 9: 0.11868
-  number 10: 0.11785
-str vector 'F63':
-  number 1: 0.12500
-  number 2: 0.12403
-  number 3: 0.12309
-  number 4: 0.12217
-  number 5: 0.12127
-  number 6: 0.12039
-  number 7: 0.11952
-  number 8: 0.11868
-  number 9: 0.11785
-  number 10: 0.11704
-str vector 'F64':
-  number 1: 0.12403
-  number 2: 0.12309
-  number 3: 0.12217
-  number 4: 0.12127
-  number 5: 0.12039
-  number 6: 0.11952
-  number 7: 0.11868
-  number 8: 0.11785
-  number 9: 0.11704
-  number 10: 0.11625
-str vector 'F65':
-  number 1: 0.12309
-  number 2: 0.12217
-  number 3: 0.12127
-  number 4: 0.12039
-  number 5: 0.11952
-  number 6: 0.11868
-  number 7: 0.11785
-  number 8: 0.11704
-  number 9: 0.11625
-  number 10: 0.11547
-str vector 'F66':
-  number 1: 0.12217
-  number 2: 0.12127
-  number 3: 0.12039
-  number 4: 0.11952
-  number 5: 0.11868
-  number 6: 0.11785
-  number 7: 0.11704
-  number 8: 0.11625
-  number 9: 0.11547
-  number 10: 0.11471
-str vector 'F67':
-  number 1: 0.12127
-  number 2: 0.12039
-  number 3: 0.11952
-  number 4: 0.11868
-  number 5: 0.11785
-  number 6: 0.11704
-  number 7: 0.11625
-  number 8: 0.11547
-  number 9: 0.11471
-  number 10: 0.11396
-str vector 'F68':
-  number 1: 0.12039
-  number 2: 0.11952
-  number 3: 0.11868
-  number 4: 0.11785
-  number 5: 0.11704
-  number 6: 0.11625
-  number 7: 0.11547
-  number 8: 0.11471
-  number 9: 0.11396
-  number 10: 0.11323
-str vector 'F69':
-  number 1: 0.11952
-  number 2: 0.11868
-  number 3: 0.11785
-  number 4: 0.11704
-  number 5: 0.11625
-  number 6: 0.11547
-  number 7: 0.11471
-  number 8: 0.11396
-  number 9: 0.11323
-  number 10: 0.11251
-str vector 'F7':
-  number 1: 0.35355
-  number 2: 0.33333
-  number 3: 0.31623
-  number 4: 0.30151
-  number 5: 0.28868
-  number 6: 0.27735
-  number 7: 0.26726
-  number 8: 0.25820
-  number 9: 0.25000
-  number 10: 0.24254
-str vector 'F70':
-  number 1: 0.11868
-  number 2: 0.11785
-  number 3: 0.11704
-  number 4: 0.11625
-  number 5: 0.11547
-  number 6: 0.11471
-  number 7: 0.11396
-  number 8: 0.11323
-  number 9: 0.11251
-  number 10: 0.11180
-str vector 'F71':
-  number 1: 0.11785
-  number 2: 0.11704
-  number 3: 0.11625
-  number 4: 0.11547
-  number 5: 0.11471
-  number 6: 0.11396
-  number 7: 0.11323
-  number 8: 0.11251
-  number 9: 0.11180
-  number 10: 0.11111
-str vector 'F72':
-  number 1: 0.11704
-  number 2: 0.11625
-  number 3: 0.11547
-  number 4: 0.11471
-  number 5: 0.11396
-  number 6: 0.11323
-  number 7: 0.11251
-  number 8: 0.11180
-  number 9: 0.11111
-  number 10: 0.11043
-str vector 'F73':
-  number 1: 0.11625
-  number 2: 0.11547
-  number 3: 0.11471
-  number 4: 0.11396
-  number 5: 0.11323
-  number 6: 0.11251
-  number 7: 0.11180
-  number 8: 0.11111
-  number 9: 0.11043
-  number 10: 0.10976
-str vector 'F74':
-  number 1: 0.11547
-  number 2: 0.11471
-  number 3: 0.11396
-  number 4: 0.11323
-  number 5: 0.11251
-  number 6: 0.11180
-  number 7: 0.11111
-  number 8: 0.11043
-  number 9: 0.10976
-  number 10: 0.10911
-str vector 'F75':
-  number 1: 0.11471
-  number 2: 0.11396
-  number 3: 0.11323
-  number 4: 0.11251
-  number 5: 0.11180
-  number 6: 0.11111
-  number 7: 0.11043
-  number 8: 0.10976
-  number 9: 0.10911
-  number 10: 0.10847
-str vector 'F76':
-  number 1: 0.11396
-  number 2: 0.11323
-  number 3: 0.11251
-  number 4: 0.11180
-  number 5: 0.11111
-  number 6: 0.11043
-  number 7: 0.10976
-  number 8: 0.10911
-  number 9: 0.10847
-  number 10: 0.10783
-str vector 'F77':
-  number 1: 0.11323
-  number 2: 0.11251
-  number 3: 0.11180
-  number 4: 0.11111
-  number 5: 0.11043
-  number 6: 0.10976
-  number 7: 0.10911
-  number 8: 0.10847
-  number 9: 0.10783
-  number 10: 0.10721
-str vector 'F78':
-  number 1: 0.11251
-  number 2: 0.11180
-  number 3: 0.11111
-  number 4: 0.11043
-  number 5: 0.10976
-  number 6: 0.10911
-  number 7: 0.10847
-  number 8: 0.10783
-  number 9: 0.10721
-  number 10: 0.10660
-str vector 'F79':
-  number 1: 0.11180
-  number 2: 0.11111
-  number 3: 0.11043
-  number 4: 0.10976
-  number 5: 0.10911
-  number 6: 0.10847
-  number 7: 0.10783
-  number 8: 0.10721
-  number 9: 0.10660
-  number 10: 0.10600
-str vector 'F8':
-  number 1: 0.33333
-  number 2: 0.31623
-  number 3: 0.30151
-  number 4: 0.28868
-  number 5: 0.27735
-  number 6: 0.26726
-  number 7: 0.25820
-  number 8: 0.25000
-  number 9: 0.24254
-  number 10: 0.23570
-str vector 'F80':
-  number 1: 0.11111
-  number 2: 0.11043
-  number 3: 0.10976
-  number 4: 0.10911
-  number 5: 0.10847
-  number 6: 0.10783
-  number 7: 0.10721
-  number 8: 0.10660
-  number 9: 0.10600
-  number 10: 0.10541
-str vector 'F81':
-  number 1: 0.11043
-  number 2: 0.10976
-  number 3: 0.10911
-  number 4: 0.10847
-  number 5: 0.10783
-  number 6: 0.10721
-  number 7: 0.10660
-  number 8: 0.10600
-  number 9: 0.10541
-  number 10: 0.10483
-str vector 'F82':
-  number 1: 0.10976
-  number 2: 0.10911
-  number 3: 0.10847
-  number 4: 0.10783
-  number 5: 0.10721
-  number 6: 0.10660
-  number 7: 0.10600
-  number 8: 0.10541
-  number 9: 0.10483
-  number 10: 0.10426
-str vector 'F83':
-  number 1: 0.10911
-  number 2: 0.10847
-  number 3: 0.10783
-  number 4: 0.10721
-  number 5: 0.10660
-  number 6: 0.10600
-  number 7: 0.10541
-  number 8: 0.10483
-  number 9: 0.10426
-  number 10: 0.10370
-str vector 'F84':
-  number 1: 0.10847
-  number 2: 0.10783
-  number 3: 0.10721
-  number 4: 0.10660
-  number 5: 0.10600
-  number 6: 0.10541
-  number 7: 0.10483
-  number 8: 0.10426
-  number 9: 0.10370
-  number 10: 0.10314
-str vector 'F85':
-  number 1: 0.10783
-  number 2: 0.10721
-  number 3: 0.10660
-  number 4: 0.10600
-  number 5: 0.10541
-  number 6: 0.10483
-  number 7: 0.10426
-  number 8: 0.10370
-  number 9: 0.10314
-  number 10: 0.10260
-str vector 'F86':
-  number 1: 0.10721
-  number 2: 0.10660
-  number 3: 0.10600
-  number 4: 0.10541
-  number 5: 0.10483
-  number 6: 0.10426
-  number 7: 0.10370
-  number 8: 0.10314
-  number 9: 0.10260
-  number 10: 0.10206
-str vector 'F87':
-  number 1: 0.10660
-  number 2: 0.10600
-  number 3: 0.10541
-  number 4: 0.10483
-  number 5: 0.10426
-  number 6: 0.10370
-  number 7: 0.10314
-  number 8: 0.10260
-  number 9: 0.10206
-  number 10: 0.10153
-str vector 'F88':
-  number 1: 0.10600
-  number 2: 0.10541
-  number 3: 0.10483
-  number 4: 0.10426
-  number 5: 0.10370
-  number 6: 0.10314
-  number 7: 0.10260
-  number 8: 0.10206
-  number 9: 0.10153
-  number 10: 0.10102
-str vector 'F89':
-  number 1: 0.10541
-  number 2: 0.10483
-  number 3: 0.10426
-  number 4: 0.10370
-  number 5: 0.10314
-  number 6: 0.10260
-  number 7: 0.10206
-  number 8: 0.10153
-  number 9: 0.10102
-  number 10: 0.10050
-str vector 'F9':
-  number 1: 0.31623
-  number 2: 0.30151
-  number 3: 0.28868
-  number 4: 0.27735
-  number 5: 0.26726
-  number 6: 0.25820
-  number 7: 0.25000
-  number 8: 0.24254
-  number 9: 0.23570
-  number 10: 0.22942
-str vector 'F90':
-  number 1: 0.10483
-  number 2: 0.10426
-  number 3: 0.10370
-  number 4: 0.10314
-  number 5: 0.10260
-  number 6: 0.10206
-  number 7: 0.10153
-  number 8: 0.10102
-  number 9: 0.10050
-  number 10: 0.10000
-str vector 'F91':
-  number 1: 0.10426
-  number 2: 0.10370
-  number 3: 0.10314
-  number 4: 0.10260
-  number 5: 0.10206
-  number 6: 0.10153
-  number 7: 0.10102
-  number 8: 0.10050
-  number 9: 0.10000
-  number 10: 0.09950
-str vector 'F92':
-  number 1: 0.10370
-  number 2: 0.10314
-  number 3: 0.10260
-  number 4: 0.10206
-  number 5: 0.10153
-  number 6: 0.10102
-  number 7: 0.10050
-  number 8: 0.10000
-  number 9: 0.09950
-  number 10: 0.09901
-str vector 'F93':
-  number 1: 0.10314
-  number 2: 0.10260
-  number 3: 0.10206
-  number 4: 0.10153
-  number 5: 0.10102
-  number 6: 0.10050
-  number 7: 0.10000
-  number 8: 0.09950
-  number 9: 0.09901
-  number 10: 0.09853
-str vector 'F94':
-  number 1: 0.10260
-  number 2: 0.10206
-  number 3: 0.10153
-  number 4: 0.10102
-  number 5: 0.10050
-  number 6: 0.10000
-  number 7: 0.09950
-  number 8: 0.09901
-  number 9: 0.09853
-  number 10: 0.09806
-str vector 'F95':
-  number 1: 0.10206
-  number 2: 0.10153
-  number 3: 0.10102
-  number 4: 0.10050
-  number 5: 0.10000
-  number 6: 0.09950
-  number 7: 0.09901
-  number 8: 0.09853
-  number 9: 0.09806
-  number 10: 0.09759
-str vector 'F96':
-  number 1: 0.10153
-  number 2: 0.10102
-  number 3: 0.10050
-  number 4: 0.10000
-  number 5: 0.09950
-  number 6: 0.09901
-  number 7: 0.09853
-  number 8: 0.09806
-  number 9: 0.09759
-  number 10: 0.09713
-str vector 'F97':
-  number 1: 0.10102
-  number 2: 0.10050
-  number 3: 0.10000
-  number 4: 0.09950
-  number 5: 0.09901
-  number 6: 0.09853
-  number 7: 0.09806
-  number 8: 0.09759
-  number 9: 0.09713
-  number 10: 0.09667
-str vector 'F98':
-  number 1: 0.10050
-  number 2: 0.10000
-  number 3: 0.09950
-  number 4: 0.09901
-  number 5: 0.09853
-  number 6: 0.09806
-  number 7: 0.09759
-  number 8: 0.09713
-  number 9: 0.09667
-  number 10: 0.09623
-str vector 'F99':
-  number 1: 0.10000
-  number 2: 0.09950
-  number 3: 0.09901
-  number 4: 0.09853
-  number 5: 0.09806
-  number 6: 0.09759
-  number 7: 0.09713
-  number 8: 0.09667
-  number 9: 0.09623
-  number 10: 0.09578
+    str value: "F85"
+    str weight: 0.99008
+str types:
+  number 1: "nonvec"
+  number 2: "word"
+str types F1:
+  number 1: "word"
+  number 2: "nonvec"
+str types F10:
+  number 1: "word"
+str types F100:
+  number 1: "word"
+str types F11:
+  number 1: "word"
+  number 2: "nonvec"
+str types F12:
+  number 1: "word"
+str types F13:
+  number 1: "word"
+  number 2: "nonvec"
+str types F14:
+  number 1: "word"
+str types F15:
+  number 1: "word"
+  number 2: "nonvec"
+str types F16:
+  number 1: "word"
+str types F17:
+  number 1: "word"
+  number 2: "nonvec"
+str types F18:
+  number 1: "word"
+str types F19:
+  number 1: "word"
+  number 2: "nonvec"
+str types F2:
+  number 1: "word"
+str types F20:
+  number 1: "word"
+str types F21:
+  number 1: "word"
+  number 2: "nonvec"
+str types F22:
+  number 1: "word"
+str types F23:
+  number 1: "word"
+  number 2: "nonvec"
+str types F24:
+  number 1: "word"
+str types F25:
+  number 1: "word"
+  number 2: "nonvec"
+str types F26:
+  number 1: "word"
+str types F27:
+  number 1: "word"
+  number 2: "nonvec"
+str types F28:
+  number 1: "word"
+str types F29:
+  number 1: "word"
+  number 2: "nonvec"
+str types F3:
+  number 1: "word"
+  number 2: "nonvec"
+str types F30:
+  number 1: "word"
+str types F31:
+  number 1: "word"
+  number 2: "nonvec"
+str types F32:
+  number 1: "word"
+str types F33:
+  number 1: "word"
+  number 2: "nonvec"
+str types F34:
+  number 1: "word"
+str types F35:
+  number 1: "word"
+  number 2: "nonvec"
+str types F36:
+  number 1: "word"
+str types F37:
+  number 1: "word"
+  number 2: "nonvec"
+str types F38:
+  number 1: "word"
+str types F39:
+  number 1: "word"
+  number 2: "nonvec"
+str types F4:
+  number 1: "word"
+str types F40:
+  number 1: "word"
+str types F41:
+  number 1: "word"
+  number 2: "nonvec"
+str types F42:
+  number 1: "word"
+str types F43:
+  number 1: "word"
+  number 2: "nonvec"
+str types F44:
+  number 1: "word"
+str types F45:
+  number 1: "word"
+  number 2: "nonvec"
+str types F46:
+  number 1: "word"
+str types F47:
+  number 1: "word"
+  number 2: "nonvec"
+str types F48:
+  number 1: "word"
+str types F49:
+  number 1: "word"
+  number 2: "nonvec"
+str types F5:
+  number 1: "word"
+  number 2: "nonvec"
+str types F50:
+  number 1: "word"
+str types F51:
+  number 1: "word"
+  number 2: "nonvec"
+str types F52:
+  number 1: "word"
+str types F53:
+  number 1: "word"
+  number 2: "nonvec"
+str types F54:
+  number 1: "word"
+str types F55:
+  number 1: "word"
+  number 2: "nonvec"
+str types F56:
+  number 1: "word"
+str types F57:
+  number 1: "word"
+  number 2: "nonvec"
+str types F58:
+  number 1: "word"
+str types F59:
+  number 1: "word"
+  number 2: "nonvec"
+str types F6:
+  number 1: "word"
+str types F60:
+  number 1: "word"
+str types F61:
+  number 1: "word"
+  number 2: "nonvec"
+str types F62:
+  number 1: "word"
+str types F63:
+  number 1: "word"
+  number 2: "nonvec"
+str types F64:
+  number 1: "word"
+str types F65:
+  number 1: "word"
+  number 2: "nonvec"
+str types F66:
+  number 1: "word"
+str types F67:
+  number 1: "word"
+  number 2: "nonvec"
+str types F68:
+  number 1: "word"
+str types F69:
+  number 1: "word"
+  number 2: "nonvec"
+str types F7:
+  number 1: "word"
+  number 2: "nonvec"
+str types F70:
+  number 1: "word"
+str types F71:
+  number 1: "word"
+  number 2: "nonvec"
+str types F72:
+  number 1: "word"
+str types F73:
+  number 1: "word"
+  number 2: "nonvec"
+str types F74:
+  number 1: "word"
+str types F75:
+  number 1: "word"
+  number 2: "nonvec"
+str types F76:
+  number 1: "word"
+str types F77:
+  number 1: "word"
+  number 2: "nonvec"
+str types F78:
+  number 1: "word"
+str types F79:
+  number 1: "word"
+  number 2: "nonvec"
+str types F8:
+  number 1: "word"
+str types F80:
+  number 1: "word"
+str types F81:
+  number 1: "word"
+  number 2: "nonvec"
+str types F82:
+  number 1: "word"
+str types F83:
+  number 1: "word"
+  number 2: "nonvec"
+str types F84:
+  number 1: "word"
+str types F85:
+  number 1: "word"
+  number 2: "nonvec"
+str types F86:
+  number 1: "word"
+str types F87:
+  number 1: "word"
+  number 2: "nonvec"
+str types F88:
+  number 1: "word"
+str types F89:
+  number 1: "word"
+  number 2: "nonvec"
+str types F9:
+  number 1: "word"
+  number 2: "nonvec"
+str types F90:
+  number 1: "word"
+str types F91:
+  number 1: "word"
+  number 2: "nonvec"
+str types F92:
+  number 1: "word"
+str types F93:
+  number 1: "word"
+  number 2: "nonvec"
+str types F94:
+  number 1: "word"
+str types F95:
+  number 1: "word"
+  number 2: "nonvec"
+str types F96:
+  number 1: "word"
+str types F97:
+  number 1: "word"
+  number 2: "nonvec"
+str types F98:
+  number 1: "word"
+str types F99:
+  number 1: "word"
+  number 2: "nonvec"
+str vec F1: "{0.09738, 0.09564, 0.07964, 0.09461, 0.05494, 0.09809, 0.07319, 0.08339, 0.05740, 0.09202}"
+str vec F1 example sim: 0.98315
+str vec F10: "{0.09556, 0.07834, 0.09957, 0.07321, 0.09633, 0.06529, 0.07979, 0.05073, 0.08687, 0.07637}"
+str vec F10 example sim: 0.98426
+str vec F100: "{0.08952, 0.08859, 0.05637, 0.09365, 0.08762, 0.09316, 0.07089, 0.08088, 0.06257, 0.05394}"
+str vec F100 example sim: 0.98262
+str vec F11: "{0.06246, 0.08326, 0.08258, 0.06804, 0.05152, 0.05581, 0.07905, 0.06411, 0.06605, 0.08139}"
+str vec F11 example sim: 0.98781
+str vec F12: "{0.08825, 0.09608, 0.05605, 0.09714, 0.07407, 0.07312, 0.09269, 0.06720, 0.05421, 0.06119}"
+str vec F12 example sim: 0.97936
+str vec F13: "{0.08054, 0.09368, 0.05125, 0.07414, 0.06852, 0.05989, 0.08069, 0.09690, 0.09320, 0.06658}"
+str vec F13 example sim: 0.98250
+str vec F14: "{0.08252, 0.05645, 0.06299, 0.05098, 0.06656, 0.08481, 0.06044, 0.09859, 0.07392, 0.05643}"
+str vec F14 example sim: 0.97900
+str vec F15: "{0.07426, 0.09313, 0.07499, 0.07273, 0.08155, 0.05533, 0.08300, 0.08641, 0.07468, 0.08984}"
+str vec F15 example sim: 0.99161
+str vec F16: "{0.08390, 0.08009, 0.05309, 0.09598, 0.09015, 0.09003, 0.05024, 0.05546, 0.09029, 0.07177}"
+str vec F16 example sim: 0.97741
+str vec F17: "{0.09574, 0.08415, 0.08294, 0.07312, 0.05353, 0.05955, 0.07329, 0.06070, 0.07580, 0.06347}"
+str vec F17 example sim: 0.98552
+str vec F18: "{0.06115, 0.08716, 0.05836, 0.07110, 0.07569, 0.08021, 0.08879, 0.07494, 0.09369, 0.06826}"
+str vec F18 example sim: 0.98946
+str vec F19: "{0.05509, 0.06047, 0.06954, 0.07528, 0.06521, 0.09388, 0.09738, 0.05692, 0.08191, 0.06655}"
+str vec F19 example sim: 0.98173
+str vec F2: "{0.08314, 0.08331, 0.08774, 0.09992, 0.07819, 0.09562, 0.07012, 0.09651, 0.08423, 0.07758}"
+str vec F2 example sim: 0.99458
+str vec F20: "{0.07896, 0.08207, 0.06149, 0.08285, 0.06231, 0.05898, 0.09097, 0.05114, 0.09688, 0.07926}"
+str vec F20 example sim: 0.98206
+str vec F21: "{0.07498, 0.05853, 0.09126, 0.07205, 0.08157, 0.05392, 0.09388, 0.08673, 0.05901, 0.08389}"
+str vec F21 example sim: 0.98413
+str vec F22: "{0.05279, 0.09742, 0.08058, 0.09463, 0.07132, 0.05184, 0.08377, 0.06766, 0.08670, 0.07804}"
+str vec F22 example sim: 0.98157
+str vec F23: "{0.07142, 0.08758, 0.06548, 0.07495, 0.05473, 0.08625, 0.05226, 0.09089, 0.09900, 0.06699}"
+str vec F23 example sim: 0.98090
+str vec F24: "{0.06331, 0.07613, 0.09786, 0.05009, 0.09292, 0.05648, 0.05542, 0.08896, 0.05680, 0.07683}"
+str vec F24 example sim: 0.97427
+str vec F25: "{0.05502, 0.05562, 0.06129, 0.08556, 0.07099, 0.05093, 0.08397, 0.08067, 0.06560, 0.09687}"
+str vec F25 example sim: 0.97904
+str vec F26: "{0.08733, 0.09160, 0.07920, 0.07875, 0.06965, 0.07516, 0.09176, 0.09767, 0.07376, 0.06181}"
+str vec F26 example sim: 0.99138
+str vec F27: "{0.05366, 0.05802, 0.08486, 0.05672, 0.07663, 0.08588, 0.09539, 0.07786, 0.07275, 0.08604}"
+str vec F27 example sim: 0.98388
+str vec F28: "{0.09024, 0.05296, 0.09661, 0.05303, 0.07968, 0.06042, 0.09445, 0.07150, 0.06192, 0.07820}"
+str vec F28 example sim: 0.97819
+str vec F29: "{0.08218, 0.07534, 0.09028, 0.08942, 0.08793, 0.09812, 0.05450, 0.09633, 0.05364, 0.09945}"
+str vec F29 example sim: 0.98202
+str vec F3: "{0.05473, 0.09536, 0.09289, 0.06050, 0.09894, 0.05444, 0.07133, 0.08673, 0.05811, 0.06156}"
+str vec F3 example sim: 0.97378
+str vec F30: "{0.06719, 0.07265, 0.09791, 0.05293, 0.06346, 0.05604, 0.07822, 0.08543, 0.09070, 0.09436}"
+str vec F30 example sim: 0.98058
+str vec F31: "{0.06645, 0.05891, 0.08940, 0.09870, 0.08192, 0.09236, 0.08875, 0.08890, 0.06688, 0.07827}"
+str vec F31 example sim: 0.98846
+str vec F32: "{0.07198, 0.08050, 0.05082, 0.07515, 0.09787, 0.09304, 0.06344, 0.05437, 0.09370, 0.07699}"
+str vec F32 example sim: 0.97991
+str vec F33: "{0.05689, 0.07241, 0.09913, 0.07396, 0.08556, 0.08933, 0.05317, 0.09471, 0.05851, 0.06235}"
+str vec F33 example sim: 0.97802
+str vec F34: "{0.07036, 0.08376, 0.09586, 0.06656, 0.05204, 0.09101, 0.09369, 0.07624, 0.05743, 0.09973}"
+str vec F34 example sim: 0.98020
+str vec F35: "{0.06056, 0.09568, 0.09839, 0.09268, 0.07712, 0.05315, 0.06693, 0.09702, 0.09242, 0.07693}"
+str vec F35 example sim: 0.98177
+str vec F36: "{0.09549, 0.06658, 0.08205, 0.05220, 0.05901, 0.05915, 0.08824, 0.07843, 0.06642, 0.09553}"
+str vec F36 example sim: 0.98028
+str vec F37: "{0.09952, 0.08363, 0.07996, 0.06066, 0.05927, 0.09710, 0.09677, 0.05376, 0.08560, 0.09374}"
+str vec F37 example sim: 0.98025
+str vec F38: "{0.06037, 0.06075, 0.06977, 0.06163, 0.05702, 0.05734, 0.08684, 0.07896, 0.05078, 0.08161}"
+str vec F38 example sim: 0.98537
+str vec F39: "{0.06870, 0.05767, 0.05616, 0.06987, 0.08251, 0.06549, 0.09984, 0.08247, 0.06206, 0.06767}"
+str vec F39 example sim: 0.98441
+str vec F4: "{0.08283, 0.05993, 0.08966, 0.06955, 0.07365, 0.05953, 0.08424, 0.08009, 0.06154, 0.07436}"
+str vec F4 example sim: 0.99047
+str vec F40: "{0.09601, 0.06402, 0.06950, 0.07776, 0.09477, 0.07018, 0.06272, 0.09006, 0.06825, 0.09647}"
+str vec F40 example sim: 0.98634
+str vec F41: "{0.08973, 0.08209, 0.06110, 0.08584, 0.05548, 0.05085, 0.09183, 0.09866, 0.06356, 0.06178}"
+str vec F41 example sim: 0.97643
+str vec F42: "{0.05495, 0.06638, 0.06100, 0.08172, 0.09496, 0.05000, 0.06977, 0.08648, 0.05536, 0.09632}"
+str vec F42 example sim: 0.97535
+str vec F43: "{0.09716, 0.08726, 0.09350, 0.07946, 0.06895, 0.07403, 0.07231, 0.09403, 0.07325, 0.05124}"
+str vec F43 example sim: 0.98586
+str vec F44: "{0.08351, 0.06004, 0.06810, 0.06190, 0.06710, 0.07802, 0.08825, 0.09532, 0.09434, 0.09495}"
+str vec F44 example sim: 0.98613
+str vec F45: "{0.06163, 0.05813, 0.05912, 0.05576, 0.08206, 0.06630, 0.05899, 0.09338, 0.09998, 0.08952}"
+str vec F45 example sim: 0.97634
+str vec F46: "{0.05421, 0.05962, 0.09352, 0.05764, 0.09127, 0.08667, 0.09159, 0.05580, 0.05860, 0.09675}"
+str vec F46 example sim: 0.97325
+str vec F47: "{0.09881, 0.06044, 0.08032, 0.07158, 0.06809, 0.07282, 0.09060, 0.08448, 0.07013, 0.06079}"
+str vec F47 example sim: 0.98784
+str vec F48: "{0.08309, 0.09887, 0.09274, 0.08576, 0.05194, 0.07865, 0.07513, 0.07886, 0.05669, 0.05997}"
+str vec F48 example sim: 0.98179
+str vec F49: "{0.09230, 0.06670, 0.07251, 0.05512, 0.09686, 0.07109, 0.09051, 0.07153, 0.05914, 0.07830}"
+str vec F49 example sim: 0.98474
+str vec F5: "{0.06576, 0.06808, 0.06667, 0.05550, 0.07569, 0.06658, 0.08127, 0.09841, 0.06229, 0.09093}"
+str vec F5 example sim: 0.98517
+str vec F50: "{0.07326, 0.08174, 0.05276, 0.05688, 0.09552, 0.09786, 0.07325, 0.08443, 0.09844, 0.06624}"
+str vec F50 example sim: 0.98054
+str vec F51: "{0.09219, 0.06781, 0.09507, 0.06430, 0.05813, 0.06014, 0.05585, 0.06924, 0.08331, 0.09088}"
+str vec F51 example sim: 0.98144
+str vec F52: "{0.06711, 0.05129, 0.06710, 0.09480, 0.09782, 0.09239, 0.05986, 0.09320, 0.06470, 0.07081}"
+str vec F52 example sim: 0.97835
+str vec F53: "{0.08176, 0.07896, 0.08684, 0.07945, 0.09080, 0.07354, 0.06696, 0.07251, 0.05043, 0.05375}"
+str vec F53 example sim: 0.98572
+str vec F54: "{0.05549, 0.06980, 0.09280, 0.06206, 0.05282, 0.06997, 0.07730, 0.06724, 0.06865, 0.05862}"
+str vec F54 example sim: 0.98690
+str vec F55: "{0.07603, 0.08142, 0.05960, 0.07673, 0.06761, 0.08579, 0.07307, 0.07187, 0.07067, 0.06070}"
+str vec F55 example sim: 0.99413
+str vec F56: "{0.08307, 0.09154, 0.08126, 0.07070, 0.07546, 0.08138, 0.07893, 0.09114, 0.09476, 0.06713}"
+str vec F56 example sim: 0.99449
+str vec F57: "{0.09636, 0.07131, 0.05123, 0.07468, 0.06436, 0.06182, 0.07559, 0.07372, 0.08841, 0.06864}"
+str vec F57 example sim: 0.98619
+str vec F58: "{0.07374, 0.08324, 0.05311, 0.06842, 0.07919, 0.05487, 0.06183, 0.05150, 0.08311, 0.07596}"
+str vec F58 example sim: 0.98557
+str vec F59: "{0.08824, 0.06356, 0.05797, 0.06546, 0.06444, 0.09281, 0.05334, 0.09298, 0.05964, 0.09164}"
+str vec F59 example sim: 0.97838
+str vec F6: "{0.05899, 0.05432, 0.06710, 0.09149, 0.08315, 0.08044, 0.09634, 0.07716, 0.07134, 0.08319}"
+str vec F6 example sim: 0.98625
+str vec F60: "{0.06571, 0.06278, 0.09106, 0.07209, 0.08755, 0.05236, 0.09087, 0.05085, 0.07499, 0.09974}"
+str vec F60 example sim: 0.97739
+str vec F61: "{0.09221, 0.08249, 0.06617, 0.06808, 0.08876, 0.07866, 0.05757, 0.07638, 0.08407, 0.06811}"
+str vec F61 example sim: 0.99066
+str vec F62: "{0.05676, 0.06514, 0.05099, 0.07783, 0.09928, 0.09810, 0.05141, 0.08174, 0.06108, 0.05147}"
+str vec F62 example sim: 0.96860
+str vec F63: "{0.07259, 0.06633, 0.07190, 0.06353, 0.05889, 0.06524, 0.06672, 0.09837, 0.09367, 0.07756}"
+str vec F63 example sim: 0.98618
+str vec F64: "{0.05922, 0.05818, 0.07857, 0.05810, 0.08259, 0.06755, 0.09375, 0.05228, 0.08218, 0.08446}"
+str vec F64 example sim: 0.98254
+str vec F65: "{0.09643, 0.08971, 0.09765, 0.07208, 0.05116, 0.09950, 0.07570, 0.07898, 0.06479, 0.09679}"
+str vec F65 example sim: 0.98251
+str vec F66: "{0.09058, 0.08255, 0.08355, 0.07927, 0.07558, 0.08020, 0.08205, 0.05309, 0.09487, 0.08714}"
+str vec F66 example sim: 0.99137
+str vec F67: "{0.06538, 0.08159, 0.09050, 0.05672, 0.07889, 0.06773, 0.05393, 0.05355, 0.07816, 0.07763}"
+str vec F67 example sim: 0.98532
+str vec F68: "{0.09798, 0.09742, 0.05319, 0.05267, 0.08037, 0.05834, 0.06342, 0.08161, 0.09684, 0.06972}"
+str vec F68 example sim: 0.97450
+str vec F69: "{0.09395, 0.07778, 0.07500, 0.09835, 0.08977, 0.08565, 0.06485, 0.09241, 0.06975, 0.08197}"
+str vec F69 example sim: 0.99214
+str vec F7: "{0.09055, 0.09559, 0.06858, 0.09936, 0.08240, 0.08854, 0.07340, 0.06382, 0.05454, 0.06806}"
+str vec F7 example sim: 0.98406
+str vec F70: "{0.07328, 0.05672, 0.06922, 0.05808, 0.08960, 0.08796, 0.07621, 0.08892, 0.08439, 0.06117}"
+str vec F70 example sim: 0.98668
+str vec F71: "{0.09016, 0.07588, 0.08346, 0.06868, 0.07684, 0.05450, 0.07818, 0.05432, 0.09603, 0.08032}"
+str vec F71 example sim: 0.98582
+str vec F72: "{0.07670, 0.09507, 0.05642, 0.05778, 0.08086, 0.07181, 0.07348, 0.08834, 0.09713, 0.06519}"
+str vec F72 example sim: 0.98454
+str vec F73: "{0.06050, 0.07779, 0.06952, 0.06963, 0.06115, 0.09125, 0.07399, 0.05460, 0.07914, 0.06318}"
+str vec F73 example sim: 0.98933
+str vec F74: "{0.09586, 0.08072, 0.09684, 0.07671, 0.06837, 0.09326, 0.09159, 0.06502, 0.09358, 0.05177}"
+str vec F74 example sim: 0.98394
+str vec F75: "{0.06008, 0.07920, 0.09198, 0.08659, 0.08840, 0.05918, 0.08516, 0.07060, 0.09754, 0.05664}"
+str vec F75 example sim: 0.98380
+str vec F76: "{0.05353, 0.06161, 0.06944, 0.09871, 0.09208, 0.08335, 0.06671, 0.09194, 0.09802, 0.08783}"
+str vec F76 example sim: 0.98218
+str vec F77: "{0.08263, 0.09582, 0.05436, 0.07824, 0.09527, 0.07219, 0.09746, 0.06715, 0.06728, 0.07928}"
+str vec F77 example sim: 0.98561
+str vec F78: "{0.09221, 0.06640, 0.09146, 0.06176, 0.07090, 0.06310, 0.05215, 0.06923, 0.08445, 0.07841}"
+str vec F78 example sim: 0.98540
+str vec F79: "{0.06995, 0.05428, 0.09281, 0.08856, 0.06280, 0.06047, 0.07471, 0.05053, 0.07062, 0.05281}"
+str vec F79 example sim: 0.97991
+str vec F8: "{0.05041, 0.05180, 0.06850, 0.08833, 0.07581, 0.09112, 0.05040, 0.07778, 0.06242, 0.09779}"
+str vec F8 example sim: 0.97376
+str vec F80: "{0.09013, 0.07353, 0.08838, 0.05519, 0.09406, 0.08487, 0.09114, 0.09918, 0.06405, 0.06865}"
+str vec F80 example sim: 0.98566
+str vec F81: "{0.06658, 0.08843, 0.06811, 0.08841, 0.06898, 0.05402, 0.05024, 0.09610, 0.08659, 0.07192}"
+str vec F81 example sim: 0.98093
+str vec F82: "{0.08670, 0.05173, 0.06913, 0.05091, 0.09956, 0.06441, 0.09547, 0.07435, 0.05114, 0.09645}"
+str vec F82 example sim: 0.96993
+str vec F83: "{0.07675, 0.07476, 0.07820, 0.08449, 0.06197, 0.06814, 0.09293, 0.08329, 0.07795, 0.06258}"
+str vec F83 example sim: 0.99265
+str vec F84: "{0.07661, 0.08488, 0.06517, 0.07601, 0.08246, 0.05744, 0.08846, 0.08208, 0.05371, 0.08728}"
+str vec F84 example sim: 0.98795
+str vec F85: "{0.07129, 0.09539, 0.09954, 0.06432, 0.08129, 0.07749, 0.08063, 0.09108, 0.09103, 0.06624}"
+str vec F85 example sim: 0.99008
+str vec F86: "{0.08965, 0.07734, 0.09282, 0.06110, 0.07258, 0.06316, 0.07858, 0.08112, 0.08708, 0.07135}"
+str vec F86 example sim: 0.99157
+str vec F87: "{0.05820, 0.05139, 0.08023, 0.06488, 0.06564, 0.09972, 0.05395, 0.05081, 0.08873, 0.07011}"
+str vec F87 example sim: 0.97459
+str vec F88: "{0.09226, 0.07005, 0.07776, 0.06434, 0.08398, 0.06444, 0.06737, 0.08316, 0.05088, 0.09729}"
+str vec F88 example sim: 0.98410
+str vec F89: "{0.09886, 0.09334, 0.08646, 0.07542, 0.06651, 0.06733, 0.09204, 0.07347, 0.09135, 0.08617}"
+str vec F89 example sim: 0.99144
+str vec F9: "{0.09326, 0.09034, 0.08718, 0.08240, 0.08640, 0.07829, 0.07898, 0.09457, 0.09687, 0.08225}"
+str vec F9 example sim: 0.99744
+str vec F90: "{0.07993, 0.07628, 0.08092, 0.07903, 0.05132, 0.06530, 0.08375, 0.09324, 0.08839, 0.06155}"
+str vec F90 example sim: 0.98732
+str vec F91: "{0.05002, 0.08489, 0.09539, 0.08168, 0.05178, 0.08611, 0.06172, 0.07283, 0.07593, 0.09799}"
+str vec F91 example sim: 0.97855
+str vec F92: "{0.08804, 0.07678, 0.07860, 0.09485, 0.07528, 0.05452, 0.06894, 0.06891, 0.06074, 0.05116}"
+str vec F92 example sim: 0.98352
+str vec F93: "{0.09344, 0.09035, 0.09901, 0.05203, 0.09638, 0.07311, 0.07599, 0.06867, 0.08545, 0.05338}"
+str vec F93 example sim: 0.97957
+str vec F94: "{0.08379, 0.08039, 0.06861, 0.09006, 0.06889, 0.05867, 0.09825, 0.06612, 0.05591, 0.06868}"
+str vec F94 example sim: 0.98489
+str vec F95: "{0.08503, 0.05696, 0.08565, 0.07306, 0.08045, 0.09368, 0.09237, 0.05251, 0.06831, 0.05215}"
+str vec F95 example sim: 0.97976
+str vec F96: "{0.09468, 0.07810, 0.09719, 0.06243, 0.08150, 0.06211, 0.07177, 0.06759, 0.08046, 0.06371}"
+str vec F96 example sim: 0.98750
+str vec F97: "{0.06253, 0.06721, 0.09144, 0.09020, 0.06158, 0.05703, 0.08484, 0.07940, 0.07786, 0.06872}"
+str vec F97 example sim: 0.98770
+str vec F98: "{0.08987, 0.08347, 0.05387, 0.07082, 0.06170, 0.08728, 0.06869, 0.08154, 0.07078, 0.09209}"
+str vec F98 example sim: 0.98755
+str vec F99: "{0.07515, 0.09675, 0.09336, 0.06801, 0.06298, 0.06667, 0.08033, 0.07535, 0.08945, 0.08357}"
+str vec F99 example sim: 0.99048
 """
 
 verifyTestOutput( outputdir, result, expected)
