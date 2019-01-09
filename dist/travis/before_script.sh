@@ -12,8 +12,12 @@ case $OS in
 			libleveldb-dev \
 			libatlas-dev \
 			liblapack-dev \
-			libblas-dev \
-			libboost-all-dev
+			libblas-dev
+		# Boost 1.58
+		sudo add-apt-repository -y ppa:kojoley/boost
+		sudo apt-get -q update
+		sudo apt-get install libboost-atomic1.58-dev libboost-thread1.58-dev libboost-system1.58-dev libboost-filesystem1.58-dev libboost-regex1.58-dev
+
 		if test "x$PAPUGA_WITH_PYTHON" = "xYES"; then
 			sudo apt-get install -y python3-dev
 		fi
@@ -30,7 +34,7 @@ case $OS in
 	Darwin)
 		brew update
 		brew upgrade cmake
-		brew upgrade boost
+		# -- brew upgrade boost
 		if test "x$PAPUGA_WITH_PHP" = "xYES"; then
 			brew install openssl php71 || true
 		fi

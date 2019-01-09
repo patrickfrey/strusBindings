@@ -64,11 +64,11 @@ done
 cd $PROJECT
 case $OS in
 	Linux)
-		build_strus_project "-DWITH_LUA=${${STRUS_WITH_LUA} -DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=NO"
+		build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
 		;;
 	Darwin)
 		# Currently No Php7 on Darwin. The build succeedes, but PHP7 test SEGFAULT all, even the one that does not load strus at all
-		build_strus_project "-DWITH_LUA=${${STRUS_WITH_LUA} -DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=NO"
+		build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
 		;;
 	*)
 		echo "ERROR: unknown operating system '$OS'."
