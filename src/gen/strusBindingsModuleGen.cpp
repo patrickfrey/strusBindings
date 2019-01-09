@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <map>
 #include <cstring>
 #include <iostream>
 #include <sstream>
