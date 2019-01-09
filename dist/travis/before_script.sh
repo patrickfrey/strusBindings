@@ -34,8 +34,8 @@ case $OS in
 		if test "x$PAPUGA_WITH_PHP" = "xYES"; then
 			brew install openssl php71 || true
 		fi
-		# make sure cmake finds the brew version of gettext
 		brew install gettext snappy leveldb || true
+		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
 		brew link leveldb || true
 		brew link snappy || true
