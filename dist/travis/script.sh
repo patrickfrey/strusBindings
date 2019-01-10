@@ -52,6 +52,7 @@ cd ..
 for i in $DEPS; do
 	git clone `echo $GITURL | sed "s@/$PROJECT\.@/$i.@g"` $i
 	cd $i
+	echo "BUILD $i"
 	git submodule update --init --recursive
 	git submodule foreach --recursive git checkout master
 	git submodule foreach --recursive git pull
@@ -62,18 +63,8 @@ done
 
 # build the package itself
 cd $PROJECT
-case $OS in
-	Linux)
-		build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
-		;;
-	Darwin)
-		# Currently No Php7 on Darwin. The build succeedes, but PHP7 test SEGFAULT all, even the one that does not load strus at all
-		build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
-		;;
-	*)
-		echo "ERROR: unknown operating system '$OS'."
-		;;
-esac
+echo "BUILD $PROJECT WITH -DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
+build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
 cd ..
 
 
