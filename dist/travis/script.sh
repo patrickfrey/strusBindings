@@ -45,7 +45,13 @@ build_strus_project() {
 }
 
 # build pre-requisites
-DEPS="strusBase strus strusAnalyzer strusTrace strusModule strusRpc strusVector"
+DEPS="strusBase strus strusAnalyzer strusTrace strusModule strusRpc"
+if test "x$STRUS_WITH_PATTERN" = "xYES"; then
+	DEPS="${DEPS} strusPattern"
+fi
+if test "x$STRUS_WITH_VECTOR" = "xYES"; then
+	DEPS="${DEPS} strusVector"
+fi
 
 GITURL=`git config remote.origin.url`
 cd ..
@@ -63,8 +69,7 @@ done
 
 # build the package itself
 cd $PROJECT
-echo "BUILD $PROJECT WITH -DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
-build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=NO -DWITH_STRUS_PATTERN=NO"
+echo "BUILD $PROJECT WITH -DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=${STRUS_WITH_VECTOR} -DWITH_STRUS_PATTERN=${STRUS_WITH_PATTERN}"
+build_strus_project "-DWITH_PHP=${STRUS_WITH_PHP} -DWITH_PYTHON=${STRUS_WITH_PYTHON} -DWITH_LUA=${STRUS_WITH_LUA} -DWITH_STRUS_VECTOR=${STRUS_WITH_VECTOR} -DWITH_STRUS_PATTERN=${STRUS_WITH_PATTERN}"
 cd ..
-
 

@@ -29,7 +29,7 @@ each of these flags toggled to YES another section.
 	ragel libtre-dev boost-all >= 1.57
 
 ## Required packages with -DWITH_STRUS_VECTOR=YES
-	atlas-dev lapack-dev blas-dev
+	atlas-dev lapack-dev blas-dev libarmadillo-dev
 
 ## Required packages with -DWITH_STRUS_PYTHON=YES
 	python3-dev

@@ -18,7 +18,7 @@ echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile
 Install lapack and blas if compiling with vector and pattern support
 (-DWITH_STRUS_VECTOR=YES -DWITH_STRUS_PATTERN=YES):
 
-brew install lapack blas
+brew install lapack blas armadillo
 
 Install php70 when building the Php bindings (-DWITH_PHP=YES):
 
