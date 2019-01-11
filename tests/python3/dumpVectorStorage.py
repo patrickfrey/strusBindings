@@ -21,18 +21,18 @@ def dumpVectorStorage( strusctx, config, vectors, examplevec):
 	output[ "nof vec nonvec"] = storage.nofVectors( "nonvec")
 	for iv,vv in enumerate( vectors):
 		featstr = "F%u" % (iv+1)
-		featsim = storage.vectorSimilarity( vv, examplevec)
+		featsim = float( "%.3f" % storage.vectorSimilarity( vv, examplevec))
 		featvec = storage.featureVector( "word", featstr)
 		output[ "types %s" % featstr] = storage.featureTypes( featstr)
 		output[ "vec %s" % featstr] = "{" + vecToString( featvec, ", ") + "}"
-		output[ "vec %s example sim" % featstr] = storage.vectorSimilarity( vv, examplevec)
+		output[ "vec %s example sim" % featstr] = featsim
 		ranklist.append( [featstr,featsim,featvec] )
 
 	ranklist.sort( key = lambda x: (x[1], x[0]), reverse=True)
 	for iv,vv in enumerate( ranklist):
 		if iv >= 5:
 			break
-		output[ "rank %3d" % iv] = "%.4f %s {%s}" % (vv[1], vv[0], vecToString( vv[2],", "))
+		output[ "rank %3d" % iv] = "%.3f %s {%s}" % (vv[1], vv[0], vecToString( vv[2],", "))
 
 	# Configuration of the storage:
 	output_config = {}

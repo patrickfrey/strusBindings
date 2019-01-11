@@ -26,7 +26,7 @@ function dumpVectorStorage( strusctx, config, vectors, examplevec)
 	output[ "nof vec nonvec"] = storage:nofVectors( "nonvec")
 	for iv,vv in ipairs( vectors) do
 		featstr = string.format( "F%u", iv)
-		featsim = storage:vectorSimilarity( vv, examplevec)
+		featsim = tonumber( string.format( "%.3f", storage:vectorSimilarity( vv, examplevec)))
 		featvec = storage:featureVector( "word", featstr)
 		ftypes = storage:featureTypes( featstr)
 		output[ string.format( "types F%u", iv)] = ftypes
@@ -37,7 +37,7 @@ function dumpVectorStorage( strusctx, config, vectors, examplevec)
 	table.sort( ranklist, function( a, b ) return a[2] > b[2] or (a[2] == b[2] and a[1] > b[1]) end )
 	for iv,vv in ipairs( ranklist) do
 		if iv > 5 then break end
-		output[ string.format( "rank %3d", iv)] = string.format( "%.4f %s {%s}", vv[2], vv[1], vecToString( vv[3],", "))
+		output[ string.format( "rank %3d", iv)] = string.format( "%.3f %s {%s}", vv[2], vv[1], vecToString( vv[3],", "))
 	end
 	-- Configuration of the storage:
 	local output_config = {}
