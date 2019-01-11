@@ -52,7 +52,11 @@ $output = dumpVectorStorage( $ctx, $config, $vectors, $examplevec);
 $storage = $ctx->createVectorStorageClient( $config);
 $searcher = $storage->createSearcher( "word", 0, 1);
 $simlist = $searcher->findSimilar( $examplevec, 10, 0.85, True);
-$output[ 'simlist 0.1x10'] = $simlist;
+$simliststr = "";
+foreach ($simlist as $si => $sv) {
+	$simliststr .= sprintf( " %s=%.3f", $sv->value, $sv->weight);
+}
+$output[ 'simlist 0.1x10'] = $simliststr;
 
 
 $result = "vector storage dump:" . dumpTree( $output);
@@ -70,37 +74,7 @@ string rank 2: "0.922 F99 0.09578, 0.08003, 0.08905, 0.05257, 0.08979, 0.0774, 0
 string rank 3: "0.907 F56 0.0659, 0.0824, 0.02909, 0.01525, 0.09679, 0.08474, 0.02225, 0.05726, 0.05545, 0.0873"
 string rank 4: "0.9 F26 0.06899, 0.06983, 0.04096, 0.06066, 0.05447, 0.03385, 0.0485, -0.00174, 0.01908, 0.04396"
 string rank 5: "0.894 F42 0.08711, 0.06851, 0.03634, 0.02676, 0.04412, 0.09243, 0.04544, 0.09176, 0.09294, 0.00739"
-string simlist 0.1x10: 
-  integer 0: 
-    string value: "F72"
-    string weight: 0.93067
-  integer 1: 
-    string value: "F99"
-    string weight: 0.92193
-  integer 2: 
-    string value: "F56"
-    string weight: 0.90712
-  integer 3: 
-    string value: "F26"
-    string weight: 0.89976
-  integer 4: 
-    string value: "F42"
-    string weight: 0.89383
-  integer 5: 
-    string value: "F94"
-    string weight: 0.87256
-  integer 6: 
-    string value: "F8"
-    string weight: 0.86347
-  integer 7: 
-    string value: "F10"
-    string weight: 0.85896
-  integer 8: 
-    string value: "F30"
-    string weight: 0.85214
-  integer 9: 
-    string value: "F50"
-    string weight: 0.84614
+string simlist 0.1x10: " F72=0.931 F99=0.922 F56=0.907 F26=0.900 F42=0.894 F94=0.873 F8=0.863 F10=0.859 F30=0.852 F50=0.846"
 string types: 
   integer 0: "nonvec"
   integer 1: "word"

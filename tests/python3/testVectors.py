@@ -49,7 +49,10 @@ output = dumpVectorStorage( ctx, config, vectors, examplevec)
 storage = ctx.createVectorStorageClient( config)
 searcher = storage.createSearcher( "word", 0, 1)
 simlist = searcher.findSimilar( examplevec, 10, 0.85, True)
-output[ 'simlist 0.1x10'] = simlist
+simliststr = ""
+for iv,sv in enumerate( simlist):
+    simliststr += " %s=%.3f" % (sv.value, sv.weight)
+output[ 'simlist 0.1x10'] = simliststr
 
 result = "vector storage dump:" + dumpTree( output) + "\n"
 expected = """vector storage dump:
@@ -65,37 +68,7 @@ str rank   1: "0.995 F2 {0.08314, 0.08331, 0.08774, 0.09992, 0.07819, 0.09562, 0
 str rank   2: "0.994 F56 {0.08307, 0.09154, 0.08126, 0.07070, 0.07546, 0.08138, 0.07893, 0.09114, 0.09476, 0.06713}"
 str rank   3: "0.994 F55 {0.07603, 0.08142, 0.05960, 0.07673, 0.06761, 0.08579, 0.07307, 0.07187, 0.07067, 0.06070}"
 str rank   4: "0.993 F83 {0.07675, 0.07476, 0.07820, 0.08449, 0.06197, 0.06814, 0.09293, 0.08329, 0.07795, 0.06258}"
-str simlist 0.1x10:
-  number 1:
-    str value: "F9"
-    str weight: 0.99744
-  number 2:
-    str value: "F2"
-    str weight: 0.99458
-  number 3:
-    str value: "F56"
-    str weight: 0.99449
-  number 4:
-    str value: "F55"
-    str weight: 0.99413
-  number 5:
-    str value: "F83"
-    str weight: 0.99265
-  number 6:
-    str value: "F69"
-    str weight: 0.99214
-  number 7:
-    str value: "F86"
-    str weight: 0.99157
-  number 8:
-    str value: "F26"
-    str weight: 0.99138
-  number 9:
-    str value: "F61"
-    str weight: 0.99066
-  number 10:
-    str value: "F85"
-    str weight: 0.99008
+str simlist 0.1x10: " F9=0.997 F2=0.995 F56=0.994 F55=0.994 F83=0.993 F69=0.992 F86=0.992 F26=0.991 F61=0.991 F85=0.990"
 str types:
   number 1: "nonvec"
   number 2: "word"

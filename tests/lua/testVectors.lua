@@ -48,7 +48,11 @@ local output = dumpVectorStorage( ctx, config, vectors, examplevec)
 local storage = ctx:createVectorStorageClient( config)
 local searcher = storage:createSearcher( "word", 0, 1)
 local simlist = searcher:findSimilar( examplevec, 10, 0.85, true)
-output[ 'simlist 0.1x10'] = simlist
+local simliststr = ""
+for si,sv in ipairs( simlist) do
+	simliststr = simliststr .. string.format( " %s=%.3f", sv.value, sv.weight)
+end
+output[ 'simlist 0.1x10'] = simliststr
 
 local result = "vector storage dump:" .. dumpTree( output) .. "\n"
 local expected = [[
@@ -65,37 +69,7 @@ string rank   2: "0.980 F56 {0.06114, 0.07913, 0.06968, 0.06678, 0.05327, 0.0751
 string rank   3: "0.971 F27 {0.02547, 0.09039, 0.07448, 0.09069, 0.07830, 0.08444, 0.08651, 0.09313, 0.09488, 0.09935}"
 string rank   4: "0.970 F22 {0.04691, 0.07283, 0.06515, 0.06316, 0.05879, 0.05849, 0.05577, 0.07531, 0.09776, 0.03660}"
 string rank   5: "0.969 F96 {0.06311, 0.06332, 0.06552, 0.07182, 0.06648, 0.03503, 0.08762, 0.09228, 0.04861, 0.04993}"
-string simlist 0.1x10:
-  number 1:
-    string value: "F68"
-    string weight: 0.98028
-  number 2:
-    string value: "F56"
-    string weight: 0.97954
-  number 3:
-    string value: "F27"
-    string weight: 0.97117
-  number 4:
-    string value: "F22"
-    string weight: 0.96990
-  number 5:
-    string value: "F96"
-    string weight: 0.96892
-  number 6:
-    string value: "F53"
-    string weight: 0.96774
-  number 7:
-    string value: "F57"
-    string weight: 0.96637
-  number 8:
-    string value: "F61"
-    string weight: 0.96307
-  number 9:
-    string value: "F28"
-    string weight: 0.96301
-  number 10:
-    string value: "F36"
-    string weight: 0.96247
+string simlist 0.1x10: " F68=0.980 F56=0.980 F27=0.971 F22=0.970 F96=0.969 F53=0.968 F57=0.966 F61=0.963 F28=0.963 F36=0.962"
 string types:
   number 1: "nonvec"
   number 2: "word"
