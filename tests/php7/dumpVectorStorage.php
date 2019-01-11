@@ -32,7 +32,7 @@ function dumpVectorStorage( $strusctx, $config, $vectors, $examplevec) {
 	foreach ($vectors as $iv => $vv) {
 		$fidx = (int)$iv + 1;
 		$featstr = "F$fidx";
-		$featsim = floatval( sprintf( "%.4f", $storage->vectorSimilarity( $vv, $examplevec)));
+		$featsim = floatval( sprintf( "%.3f", round( $storage->vectorSimilarity( $vv, $examplevec), 4)));
 		$featvec = $storage->featureVector( "word", $featstr);
 		$output[ "types $featstr"] = $storage->featureTypes( $featstr);
 		$output[ "vec $featstr"] = $featvec;
@@ -47,7 +47,7 @@ function dumpVectorStorage( $strusctx, $config, $vectors, $examplevec) {
 			break;
 		}
 		$ridx = $ir + 1;
-		$weight = round( floatval( $rr[1]), 5);
+		$weight = floatval( sprintf( "%.3f", round( floatval( $rr[1]), 4)));
 		$feat = $rr[0];
 		$vec = vecToString( $rr[2], ", ");
 		$output[ "rank $ridx"] = "$weight $feat {$vec}";
