@@ -47,7 +47,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			papuga_ValueVariant val;
 			papuga_init_ValueVariant_int( &val, idx);
 			if (!papuga_RequestContext_add_variable( ctx, "index", &val)) throw std::bad_alloc();
-			int timeout = odd(idx) ? random.get( 5, 9) : random.get( 1, 4);
+			int timeout = odd(idx) ? random.get( 7, 10) : random.get( 1, 3);
 			std::string tid = g_tpool->createTransaction( ctx, timeout);
 			if (tid.empty())
 			{
@@ -73,7 +73,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			if (g_verbose) std::cerr << strus::string_format( "check transaction %s [i=%d]\n", tid.c_str(), idx);
 			g_tpool->returnTransaction( tref);
 		}
-		strus::sleep( 4);
+		strus::sleep( 5);
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
@@ -137,7 +137,7 @@ static void runTimerThread()
 int main( int argc, const char* argv[])
 {
 	int argi = 1;
-
+	int nofThreads = -1;
 	for (; argi < argc && argv[argi][0] == '-'; ++argi)
 	{
 		if (0==std::strcmp( argv[argi], "--"))
@@ -150,6 +150,16 @@ int main( int argc, const char* argv[])
 			std::cerr << "Usage: testRequestTransactionMap [-h,-V] <nofIterations>" << std::endl;
 			return 0;
 		}
+		else if (0==std::strcmp( argv[argi], "-t") || 0==std::strcmp( argv[argi], "--threads"))
+		{
+			const char* optarg_ = argv[++argi];
+			nofThreads = optarg_ ? atoi( optarg_) : -1;
+			if (nofThreads <= 0)
+			{
+				std::cerr << "argument of option --threads|-t has to be a positive integer: " << (optarg_?optarg_:"NULL") << std::endl;
+				return -1;
+			}
+		}
 		else if (0==std::strcmp( argv[argi], "-V") || 0==std::strcmp( argv[argi], "--verbose"))
 		{
 			g_verbose = true;
@@ -161,19 +171,26 @@ int main( int argc, const char* argv[])
 		}
 	}
 	int nofIterations = (argc == argi) ? 100 : atoi( argv[argi++]);
-	int nofThreads = strus::platform::cores();
 	if (nofThreads <= 0)
 	{
-		std::cerr << "Failed to determine numer of cores, default to 2" << std::endl;
-		nofThreads = 2;
+		nofThreads = strus::platform::cores();
+		if (nofThreads <= 0)
+		{
+			std::cerr << "failed to determine numer of cores, default to 2" << std::endl;
+			nofThreads = 2;
+		}
+		else
+		{
+			std::cerr << "found " << nofThreads << " cores" << std::endl;
+		}
 	}
 	else
 	{
-		std::cerr << "Found " << nofThreads << " cores" << std::endl;
+		std::cerr << "number of threads " << nofThreads << " specified as program option." << std::endl;
 	}
 	if (nofIterations <= 0 || argi < argc)
 	{
-		std::cerr << "Usage: testRequestTransactionMap [-h,-V] <nofIterations>" << std::endl;
+		std::cerr << "Usage: testRequestTransactionMap [-h,-V,-t <threads>] <nofIterations>" << std::endl;
 		return 1;
 	}
 	try
