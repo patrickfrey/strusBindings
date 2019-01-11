@@ -1,8 +1,10 @@
 cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 
 # Subdirectories:
+if( STRUS_CXX_STD_11 )
 add_subdirectory( request_transactionmap )
 add_subdirectory( request_parse )
+endif( STRUS_CXX_STD_11 )
 
 IF (WITH_LUA STREQUAL "YES")
 add_subdirectory( lua )

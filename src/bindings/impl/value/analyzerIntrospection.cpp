@@ -22,7 +22,6 @@
 #include <vector>
 #include <set>
 #include <utility>
-#include <cstdint>
 #include <limits>
 
 using namespace strus;
