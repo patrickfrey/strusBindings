@@ -30,7 +30,7 @@ function dumpVectorStorage( strusctx, config, vectors, examplevec)
 		featvec = storage:featureVector( "word", featstr)
 		ftypes = storage:featureTypes( featstr)
 		output[ string.format( "types F%u", iv)] = ftypes
-		output[ string.format( "vec F%u", iv)] = "{" .. vecToString( featvec, ", ") .. "}"
+		output[ string.format( "vec F%u", iv)] = "(" .. vecToString( featvec, ", ") .. ")"
 		output[ string.format( 'vec F%u example sim', iv)] = featsim
 		table.insert( ranklist, {featstr,featsim,featvec} )
 	end

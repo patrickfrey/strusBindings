@@ -35,7 +35,7 @@ function dumpVectorStorage( $strusctx, $config, $vectors, $examplevec) {
 		$featsim = floatval( sprintf( "%.3f", round( $storage->vectorSimilarity( $vv, $examplevec), 4)));
 		$featvec = $storage->featureVector( "word", $featstr);
 		$output[ "types $featstr"] = $storage->featureTypes( $featstr);
-		$output[ "vec $featstr"] = $featvec;
+		$output[ "vec $featstr"] = "(" . vecToString( $featvec, ", ") . ")";
 		$output[ "vec $featstr example sim"] = $featsim;
 
 		array_push( $ranklist, [$featstr,$featsim,$featvec] );

@@ -22,13 +22,16 @@ if ($ctx->storageExists( $config)) {
 	$ctx->destroyStorage( $config);
 }
 
-srand( 123);
+$seed = 123;
+$cur_rand = $seed;
+
 $examplevec = [0.1,0.1,0.1,0.1,0.1, 0.1,0.1,0.1,0.1,0.1];
 for ($vi = 1; $vi <= 100; $vi++) {
 	$vv = [];
 	for ($xi = 1; $xi <= 10; $xi++) {
-		$r = floatval( rand( 0, 9999)) / 10000.0;
-		array_push( $vv, $examplevec[ $xi-1] - $r / 8.0);
+		$cur_rand = ($cur_rand * 2654435761) % 2000003 + 1001;
+		$r = floatval( $cur_rand % 1000) / 1000.0;
+		array_push( $vv, $examplevec[ $xi-1] - $r / 12.0);
 	}
 	array_push( $vectors, $vv);
 }
@@ -58,7 +61,6 @@ foreach ($simlist as $si => $sv) {
 }
 $output[ 'simlist 0.1x10'] = $simliststr;
 
-
 $result = "vector storage dump:" . dumpTree( $output);
 $expected = <<<END_expected
 vector storage dump:
@@ -69,12 +71,12 @@ string config:
   string vecdim: 10
 string nof vec nonvec: 0
 string nof vec word: 100
-string rank 1: "0.931 F72 0.04617, 0.04461, 0.06265, 0.05407, 0.02148, 0.08911, 0.0493, 0.02789, 0.05985, 0.09084"
-string rank 2: "0.922 F99 0.09578, 0.08003, 0.08905, 0.05257, 0.08979, 0.0774, 0.00829, 0.08126, 0.07861, 0.02279"
-string rank 3: "0.907 F56 0.0659, 0.0824, 0.02909, 0.01525, 0.09679, 0.08474, 0.02225, 0.05726, 0.05545, 0.0873"
-string rank 4: "0.9 F26 0.06899, 0.06983, 0.04096, 0.06066, 0.05447, 0.03385, 0.0485, -0.00174, 0.01908, 0.04396"
-string rank 5: "0.894 F42 0.08711, 0.06851, 0.03634, 0.02676, 0.04412, 0.09243, 0.04544, 0.09176, 0.09294, 0.00739"
-string simlist 0.1x10: " F72=0.931 F99=0.922 F56=0.907 F26=0.900 F42=0.894 F94=0.873 F8=0.863 F10=0.859 F30=0.852 F50=0.846"
+string rank 1: "0.985 F70 0.05458, 0.07975, 0.094, 0.09075, 0.08125, 0.09408, 0.06642, 0.07125, 0.06058, 0.07125"
+string rank 2: "0.981 F85 0.09683, 0.06875, 0.06675, 0.08675, 0.07208, 0.07017, 0.09083, 0.07408, 0.04925, 0.0525"
+string rank 3: "0.97 F52 0.06525, 0.07225, 0.09442, 0.05633, 0.05425, 0.04, 0.062, 0.07992, 0.09942, 0.0805"
+string rank 4: "0.967 F91 0.04592, 0.02458, 0.04142, 0.05233, 0.032, 0.02517, 0.05725, 0.0385, 0.03233, 0.0385"
+string rank 5: "0.964 F99 0.08575, 0.09733, 0.03875, 0.03775, 0.08208, 0.0605, 0.07317, 0.08875, 0.06908, 0.0905"
+string simlist 0.1x10: " F70=0.985 F85=0.981 F52=0.970 F91=0.967 F99=0.964 F97=0.960 F90=0.957 F39=0.957 F34=0.957 F14=0.957"
 string types: 
   integer 0: "nonvec"
   integer 1: "word"
@@ -328,1206 +330,206 @@ string types F98:
 string types F99: 
   integer 0: "word"
   integer 1: "nonvec"
-string vec F1: 
-  integer 0: 0.07023
-  integer 1: -0.02236
-  integer 2: -0.01378
-  integer 3: -0.00763
-  integer 4: -0.01975
-  integer 5: 0.00197
-  integer 6: -0.01108
-  integer 7: 0.01179
-  integer 8: 0.02876
-  integer 9: -0.02193
-string vec F1 example sim: 0.059
-string vec F10: 
-  integer 0: 0.00491
-  integer 1: 0.02159
-  integer 2: 0.02046
-  integer 3: 0.08727
-  integer 4: 0.01194
-  integer 5: 0.06611
-  integer 6: 0.07989
-  integer 7: 0.07177
-  integer 8: 0.07575
-  integer 9: 0.0675
-string vec F10 example sim: 0.859
-string vec F100: 
-  integer 0: 0.05619
-  integer 1: 0.06584
-  integer 2: 0.05746
-  integer 3: 0.00912
-  integer 4: 0.04781
-  integer 5: 0.08313
-  integer 6: 0.04796
-  integer 7: 0.08624
-  integer 8: -0.01338
-  integer 9: -0.01831
-string vec F100 example sim: 0.766
-string vec F11: 
-  integer 0: 0.02279
-  integer 1: 0.02565
-  integer 2: 0.01617
-  integer 3: 0.00719
-  integer 4: 0.05599
-  integer 5: -0.02324
-  integer 6: -0.01575
-  integer 7: 0.01034
-  integer 8: -0.01831
-  integer 9: 0.0062
-string vec F11 example sim: 0.358
-string vec F12: 
-  integer 0: -0.0107
-  integer 1: 0.00486
-  integer 2: 0.01559
-  integer 3: 0.09093
-  integer 4: 0.04396
-  integer 5: 0.06696
-  integer 6: -0.00634
-  integer 7: -0.00826
-  integer 8: 0.00929
-  integer 9: 0.00811
-string vec F12 example sim: 0.548
-string vec F13: 
-  integer 0: 0.08989
-  integer 1: -0.01782
-  integer 2: -0.00384
-  integer 3: 0.04526
-  integer 4: 0.09876
-  integer 5: 0.07956
-  integer 6: 0.0073
-  integer 7: -0.01257
-  integer 8: 0.05973
-  integer 9: -0.02311
-string vec F13 example sim: 0.582
-string vec F14: 
-  integer 0: -0.02209
-  integer 1: 0.09283
-  integer 2: 0.06493
-  integer 3: 0.04456
-  integer 4: -0.01411
-  integer 5: -0.00548
-  integer 6: 0.08425
-  integer 7: 0.07593
-  integer 8: 0.05086
-  integer 9: 0.05733
-string vec F14 example sim: 0.733
-string vec F15: 
-  integer 0: 0.07339
-  integer 1: -0.01396
-  integer 2: -0.02217
-  integer 3: 0.04987
-  integer 4: 0.05256
-  integer 5: -0.01125
-  integer 6: -0.01964
-  integer 7: 0.06639
-  integer 8: 0.04481
-  integer 9: 0.05424
-string vec F15 example sim: 0.596
-string vec F16: 
-  integer 0: 0.0314
-  integer 1: -0.01906
-  integer 2: 0.0477
-  integer 3: 0.02544
-  integer 4: 0.01892
-  integer 5: 0.00483
-  integer 6: 0.06441
-  integer 7: 0.05466
-  integer 8: 0.0177
-  integer 9: 0.02969
-string vec F16 example sim: 0.765
-string vec F17: 
-  integer 0: 0.08284
-  integer 1: 0.09659
-  integer 2: -0.022
-  integer 3: -0.02244
-  integer 4: 0.00064
-  integer 5: 0.00219
-  integer 6: 0.09996
-  integer 7: 0.09915
-  integer 8: 0.05263
-  integer 9: 0.09671
-string vec F17 example sim: 0.694
-string vec F18: 
-  integer 0: 0.03604
-  integer 1: 0.04352
-  integer 2: 0.08905
-  integer 3: 0.05759
-  integer 4: 0.05095
-  integer 5: 0.07102
-  integer 6: -0.01135
-  integer 7: 0.00056
-  integer 8: 0.04405
-  integer 9: 0.05916
-string vec F18 example sim: 0.838
-string vec F19: 
-  integer 0: 0.03611
-  integer 1: 0.09813
-  integer 2: 0.0731
-  integer 3: -0.00187
-  integer 4: 0.06624
-  integer 5: 0.02685
-  integer 6: 0.00085
-  integer 7: 0.02061
-  integer 8: 0.03155
-  integer 9: -0.01425
-string vec F19 example sim: 0.703
-string vec F2: 
-  integer 0: -0.00514
-  integer 1: 0.05349
-  integer 2: 0.09792
-  integer 3: 0.01599
-  integer 4: 0.0836
-  integer 5: -0.00061
-  integer 6: 0.01483
-  integer 7: 0.05061
-  integer 8: 0.07609
-  integer 9: 0.009
-string vec F2 example sim: 0.743
-string vec F20: 
-  integer 0: 0.01751
-  integer 1: 0.0248
-  integer 2: 0.0068
-  integer 3: 0.04749
-  integer 4: 0.0923
-  integer 5: 0.0729
-  integer 6: -0.00265
-  integer 7: -0.01592
-  integer 8: 0.07061
-  integer 9: 0.05407
-string vec F20 example sim: 0.733
-string vec F21: 
-  integer 0: -0.00816
-  integer 1: 0.05044
-  integer 2: 0.0921
-  integer 3: -0.02177
-  integer 4: 0.05652
-  integer 5: 0.03539
-  integer 6: -0.01918
-  integer 7: -0.00728
-  integer 8: 0.0229
-  integer 9: -0.01229
-string vec F21 example sim: 0.456
-string vec F22: 
-  integer 0: 0.01008
-  integer 1: 0.09705
-  integer 2: 0.01805
-  integer 3: -0.02131
-  integer 4: 0.07267
-  integer 5: 0.07626
-  integer 6: 0.03139
-  integer 7: -0.02469
-  integer 8: 0.02744
-  integer 9: 0.00465
-string vec F22 example sim: 0.598
-string vec F23: 
-  integer 0: 0.05426
-  integer 1: 0.06739
-  integer 2: 0.03511
-  integer 3: -0.01251
-  integer 4: 0.08923
-  integer 5: 0.0509
-  integer 6: 0.07911
-  integer 7: 0.00661
-  integer 8: 0.09759
-  integer 9: 0.02796
-string vec F23 example sim: 0.826
-string vec F24: 
-  integer 0: 0.08239
-  integer 1: 0.0661
-  integer 2: -0.02038
-  integer 3: 0.03071
-  integer 4: 0.00714
-  integer 5: -0.01981
-  integer 6: 0.03577
-  integer 7: 0.02794
-  integer 8: 0.08457
-  integer 9: 0.02397
-string vec F24 example sim: 0.668
-string vec F25: 
-  integer 0: 0.06922
-  integer 1: 0.09584
-  integer 2: -0.01551
-  integer 3: 0.08476
-  integer 4: 0.06917
-  integer 5: -0.02074
-  integer 6: 0.01743
-  integer 7: -0.01608
-  integer 8: -0.02329
-  integer 9: -0.02471
-string vec F25 example sim: 0.444
-string vec F26: 
-  integer 0: 0.06899
-  integer 1: 0.06983
-  integer 2: 0.04096
-  integer 3: 0.06066
-  integer 4: 0.05447
-  integer 5: 0.03385
-  integer 6: 0.0485
-  integer 7: -0.00174
-  integer 8: 0.01908
-  integer 9: 0.04396
-string vec F26 example sim: 0.9
-string vec F27: 
-  integer 0: 0.04044
-  integer 1: 0.00428
-  integer 2: 0.02287
-  integer 3: 0.03266
-  integer 4: 0.09131
-  integer 5: 0.01129
-  integer 6: -0.01934
-  integer 7: 0.02889
-  integer 8: 0.06083
-  integer 9: 0.04966
-string vec F27 example sim: 0.739
-string vec F28: 
-  integer 0: 0.05656
-  integer 1: 0.03536
-  integer 2: 0.00563
-  integer 3: 0.07234
-  integer 4: 0.03886
-  integer 5: -0.00328
-  integer 6: -0.0122
-  integer 7: 0.0801
-  integer 8: 0.01691
-  integer 9: -0.02349
-string vec F28 example sim: 0.618
-string vec F29: 
-  integer 0: 0.03535
-  integer 1: 0.07135
-  integer 2: 0.00874
-  integer 3: 0.0158
-  integer 4: 0.0501
-  integer 5: 0.07845
-  integer 6: 0.06969
-  integer 7: 0.04138
-  integer 8: -0.01966
-  integer 9: 0.08059
-string vec F29 example sim: 0.805
-string vec F3: 
-  integer 0: -0.00438
-  integer 1: 0.0248
-  integer 2: 0.04181
-  integer 3: 0.00629
-  integer 4: 0.05676
-  integer 5: 0.06123
-  integer 6: 0.04224
-  integer 7: 0.09055
-  integer 8: 0.012
-  integer 9: 0.0828
-string vec F3 example sim: 0.806
-string vec F30: 
-  integer 0: -0.01846
-  integer 1: 0.04845
-  integer 2: 0.05409
-  integer 3: 0.07461
-  integer 4: 0.03286
-  integer 5: 0.08125
-  integer 6: 0.07338
-  integer 7: 0.01247
-  integer 8: 0.06595
-  integer 9: 0.07476
-string vec F30 example sim: 0.852
-string vec F31: 
-  integer 0: 0.0028
-  integer 1: -0.02164
-  integer 2: 0.09251
-  integer 3: 0.01766
-  integer 4: 0.03251
-  integer 5: 0.09858
-  integer 6: 0.00574
-  integer 7: 0.06179
-  integer 8: 0.02191
-  integer 9: 0.01114
-string vec F31 example sim: 0.652
-string vec F32: 
-  integer 0: 0.02809
-  integer 1: -0.02381
-  integer 2: 0.03207
-  integer 3: 0.05697
-  integer 4: 0.02644
-  integer 5: 0.08507
-  integer 6: 0.0485
-  integer 7: 0.02794
-  integer 8: 0.0522
-  integer 9: -0.01171
-string vec F32 example sim: 0.728
-string vec F33: 
-  integer 0: 0.01936
-  integer 1: 0.01996
-  integer 2: 0.06616
-  integer 3: -0.01921
-  integer 4: 0.05131
-  integer 5: -0.02427
-  integer 6: 0.09276
-  integer 7: 0.01859
-  integer 8: 0.05931
-  integer 9: -0.01202
-string vec F33 example sim: 0.589
-string vec F34: 
-  integer 0: 0.01165
-  integer 1: 0.01053
-  integer 2: -0.01366
-  integer 3: 0.08249
-  integer 4: 0.0865
-  integer 5: 0.08709
-  integer 6: 0.03795
-  integer 7: 0.08528
-  integer 8: 0.03291
-  integer 9: 0.0865
-string vec F34 example sim: 0.806
-string vec F35: 
-  integer 0: 0.02054
-  integer 1: 0.01049
-  integer 2: 0.07258
-  integer 3: 0.05235
-  integer 4: 0.00025
-  integer 5: 0.07105
-  integer 6: 0.05896
-  integer 7: 0.06776
-  integer 8: -0.01261
-  integer 9: 0.03331
-string vec F35 example sim: 0.782
-string vec F36: 
-  integer 0: 0.01481
-  integer 1: 0.09065
-  integer 2: 0.06484
-  integer 3: 0.0563
-  integer 4: 0.09554
-  integer 5: 0.00051
-  integer 6: -0.00649
-  integer 7: 0.05043
-  integer 8: 0.04902
-  integer 9: 0.02211
-string vec F36 example sim: 0.794
-string vec F37: 
-  integer 0: -0.01957
-  integer 1: 0.04065
-  integer 2: 0.07434
-  integer 3: 0.0816
-  integer 4: 0.0466
-  integer 5: -0.01378
-  integer 6: 0.0257
-  integer 7: -0.01538
-  integer 8: 0.08361
-  integer 9: 0.06959
-string vec F37 example sim: 0.69
-string vec F38: 
-  integer 0: -0.0022
-  integer 1: 0.06921
-  integer 2: 0.02442
-  integer 3: 0.07023
-  integer 4: 0.06595
-  integer 5: 0.01086
-  integer 6: -0.00119
-  integer 7: 0.03607
-  integer 8: 0.04294
-  integer 9: 0.05955
-string vec F38 example sim: 0.811
-string vec F39: 
-  integer 0: 0.04474
-  integer 1: 0.0888
-  integer 2: 0.03431
-  integer 3: -0.00681
-  integer 4: 0.07738
-  integer 5: -0.00112
-  integer 6: 0.01017
-  integer 7: 0.02911
-  integer 8: 0.00927
-  integer 9: 0.06951
-string vec F39 example sim: 0.742
-string vec F4: 
-  integer 0: 0.02355
-  integer 1: 0.02419
-  integer 2: 0.02471
-  integer 3: 0.09776
-  integer 4: -0.01942
-  integer 5: 0.06855
-  integer 6: 0.02811
-  integer 7: 0.03977
-  integer 8: 0.07375
-  integer 9: -0.02119
-string vec F4 example sim: 0.684
-string vec F40: 
-  integer 0: 0.08456
-  integer 1: -0.01572
-  integer 2: -0.01328
-  integer 3: 0.00519
-  integer 4: -0.0069
-  integer 5: 0.08715
-  integer 6: 0.02659
-  integer 7: 0.03364
-  integer 8: 0.08793
-  integer 9: -0.02258
-string vec F40 example sim: 0.53
-string vec F41: 
-  integer 0: 0.05534
-  integer 1: 0.01269
-  integer 2: 0.04927
-  integer 3: 0.03061
-  integer 4: 0.0908
-  integer 5: 0.03056
-  integer 6: -0.00241
-  integer 7: 0.01616
-  integer 8: 0.01983
-  integer 9: 0.08171
-string vec F41 example sim: 0.8
-string vec F42: 
-  integer 0: 0.08711
-  integer 1: 0.06851
-  integer 2: 0.03634
-  integer 3: 0.02676
-  integer 4: 0.04412
-  integer 5: 0.09243
-  integer 6: 0.04544
-  integer 7: 0.09176
-  integer 8: 0.09294
-  integer 9: 0.00739
-string vec F42 example sim: 0.894
-string vec F43: 
-  integer 0: -0.01986
-  integer 1: 0.03989
-  integer 2: 0.08999
-  integer 3: -0.01284
-  integer 4: 0.00224
-  integer 5: -0.01831
-  integer 6: -0.00141
-  integer 7: 0.09534
-  integer 8: 0.02024
-  integer 9: 0.05452
-string vec F43 example sim: 0.52
-string vec F44: 
-  integer 0: 0.07348
-  integer 1: 0.01504
-  integer 2: -0.02421
-  integer 3: 0.08314
-  integer 4: 0.048
-  integer 5: -0.01498
-  integer 6: 0.01791
-  integer 7: 0.0456
-  integer 8: 0.03122
-  integer 9: 0.01365
-string vec F44 example sim: 0.659
-string vec F45: 
-  integer 0: 0.08147
-  integer 1: 0.05616
-  integer 2: 0.0892
-  integer 3: 0.01445
-  integer 4: -0.00568
-  integer 5: 0.02598
-  integer 6: 0.03911
-  integer 7: 0.08488
-  integer 8: 0.01154
-  integer 9: 0.07542
-string vec F45 example sim: 0.82
-string vec F46: 
-  integer 0: 0.03999
-  integer 1: 0.003
-  integer 2: 0.059
-  integer 3: -0.01202
-  integer 4: 0.06593
-  integer 5: 0.07354
-  integer 6: 0.00161
-  integer 7: 0.05923
-  integer 8: 0.07764
-  integer 9: 0.09342
-string vec F46 example sim: 0.8
-string vec F47: 
-  integer 0: 0.07584
-  integer 1: 0.09645
-  integer 2: 0.01649
-  integer 3: -0.00681
-  integer 4: 0.03054
-  integer 5: 0.09023
-  integer 6: 0.02116
-  integer 7: -0.01792
-  integer 8: 0.06912
-  integer 9: -0.00545
-string vec F47 example sim: 0.675
-string vec F48: 
-  integer 0: 0.08847
-  integer 1: -0.00749
-  integer 2: 0.07764
-  integer 3: 0.09059
-  integer 4: -0.00577
-  integer 5: 0.07593
-  integer 6: 0.0306
-  integer 7: 0.03176
-  integer 8: -0.00261
-  integer 9: -0.01644
-string vec F48 example sim: 0.661
-string vec F49: 
-  integer 0: 0.0082
-  integer 1: -0.0191
-  integer 2: 0.09742
-  integer 3: 0.07463
-  integer 4: -0.00916
-  integer 5: 0.05663
-  integer 6: -0.01966
-  integer 7: -0.01381
-  integer 8: 0.02835
-  integer 9: 0.04276
-string vec F49 example sim: 0.525
-string vec F5: 
-  integer 0: 0.0827
-  integer 1: 0.00624
-  integer 2: 0.0778
-  integer 3: -9.0E-5
-  integer 4: 0.07609
-  integer 5: -0.00964
-  integer 6: 0.02485
-  integer 7: 0.04985
-  integer 8: 0.09115
-  integer 9: 0.06152
-string vec F5 example sim: 0.79
-string vec F50: 
-  integer 0: 0.06238
-  integer 1: 0.04197
-  integer 2: 0.06644
-  integer 3: 0.0428
-  integer 4: 0.08363
-  integer 5: 0.04098
-  integer 6: 0.01206
-  integer 7: 0.02507
-  integer 8: -0.01077
-  integer 9: 0.04763
-string vec F50 example sim: 0.846
-string vec F51: 
-  integer 0: -0.0202
-  integer 1: 0.08057
-  integer 2: -0.02229
-  integer 3: 0.08449
-  integer 4: 0.0492
-  integer 5: 0.06063
-  integer 6: -0.01284
-  integer 7: 0.03261
-  integer 8: -0.00771
-  integer 9: 0.01506
-string vec F51 example sim: 0.551
-string vec F52: 
-  integer 0: 0.01991
-  integer 1: 0.07921
-  integer 2: 0.0808
-  integer 3: 0.02387
-  integer 4: 0.07806
-  integer 5: 0.02743
-  integer 6: 0.03641
-  integer 7: -0.00486
-  integer 8: 0.07783
-  integer 9: -0.00214
-string vec F52 example sim: 0.787
-string vec F53: 
-  integer 0: -0.01205
-  integer 1: 0.06761
-  integer 2: -0.02087
-  integer 3: 0.0328
-  integer 4: 0.03271
-  integer 5: -0.02356
-  integer 6: -0.00336
-  integer 7: 0.0093
-  integer 8: 0.0663
-  integer 9: 0.00061
-string vec F53 example sim: 0.425
-string vec F54: 
-  integer 0: 0.04786
-  integer 1: 0.01619
-  integer 2: 0.0182
-  integer 3: 0.02647
-  integer 4: 0.06179
-  integer 5: -0.01989
-  integer 6: 0.09134
-  integer 7: 0.04236
-  integer 8: -0.00999
-  integer 9: 0.0778
-string vec F54 example sim: 0.718
-string vec F55: 
-  integer 0: 0.04741
-  integer 1: 0.09475
-  integer 2: 0.0145
-  integer 3: 0.09195
-  integer 4: 0.04609
-  integer 5: 0.09943
-  integer 6: 0.07876
-  integer 7: 0.02494
-  integer 8: 0.06459
-  integer 9: -0.00817
-string vec F55 example sim: 0.846
-string vec F56: 
-  integer 0: 0.0659
-  integer 1: 0.0824
-  integer 2: 0.02909
-  integer 3: 0.01525
-  integer 4: 0.09679
-  integer 5: 0.08474
-  integer 6: 0.02225
-  integer 7: 0.05726
-  integer 8: 0.05545
-  integer 9: 0.0873
-string vec F56 example sim: 0.907
-string vec F57: 
-  integer 0: 0.0391
-  integer 1: 0.05615
-  integer 2: -0.01228
-  integer 3: 0.0231
-  integer 4: 0.09241
-  integer 5: 0.09521
-  integer 6: 0.00823
-  integer 7: -0.01314
-  integer 8: -0.00629
-  integer 9: 0.01849
-string vec F57 example sim: 0.62
-string vec F58: 
-  integer 0: 0.02321
-  integer 1: 0.07644
-  integer 2: 0.08245
-  integer 3: 0.00717
-  integer 4: -0.02119
-  integer 5: 0.0264
-  integer 6: 0.0868
-  integer 7: 0.09169
-  integer 8: 0.00029
-  integer 9: 0.04405
-string vec F58 example sim: 0.735
-string vec F59: 
-  integer 0: 0.04727
-  integer 1: 0.03554
-  integer 2: 0.02036
-  integer 3: 0.06614
-  integer 4: 0.01801
-  integer 5: 0.05334
-  integer 6: 0.04377
-  integer 7: -0.01483
-  integer 8: 0.03548
-  integer 9: 0.07251
-string vec F59 example sim: 0.842
-string vec F6: 
-  integer 0: 0.00059
-  integer 1: 0.01734
-  integer 2: 0.09432
-  integer 3: 0.03842
-  integer 4: 0.06086
-  integer 5: 0.03598
-  integer 6: 0.07259
-  integer 7: 0.00705
-  integer 8: 0.0775
-  integer 9: 0.00556
-string vec F6 example sim: 0.789
-string vec F60: 
-  integer 0: 0.05156
-  integer 1: -0.01881
-  integer 2: -0.01064
-  integer 3: 0.06104
-  integer 4: 0.00169
-  integer 5: 0.05236
-  integer 6: 0.03413
-  integer 7: 0.03663
-  integer 8: 0.07858
-  integer 9: 0.06136
-string vec F60 example sim: 0.741
-string vec F61: 
-  integer 0: 0.03539
-  integer 1: 0.04649
-  integer 2: 0.05884
-  integer 3: 0.0233
-  integer 4: 0.0704
-  integer 5: 0.09098
-  integer 6: -0.01124
-  integer 7: 0.08951
-  integer 8: -0.00392
-  integer 9: 0.01049
-string vec F61 example sim: 0.763
-string vec F62: 
-  integer 0: 0.08426
-  integer 1: 0.08708
-  integer 2: -0.00502
-  integer 3: 0.01531
-  integer 4: 0.09689
-  integer 5: 0.04261
-  integer 6: 0.04111
-  integer 7: -0.00581
-  integer 8: 0.00307
-  integer 9: -0.01905
-string vec F62 example sim: 0.641
-string vec F63: 
-  integer 0: 0.07924
-  integer 1: -0.01315
-  integer 2: 0.02048
-  integer 3: -0.00838
-  integer 4: 0.04706
-  integer 5: -0.01016
-  integer 6: -0.00809
-  integer 7: 0.03675
-  integer 8: 0.07341
-  integer 9: -0.02129
-string vec F63 example sim: 0.482
-string vec F64: 
-  integer 0: 0.02983
-  integer 1: -0.0221
-  integer 2: 0.01928
-  integer 3: 0.03683
-  integer 4: 0.0636
-  integer 5: -0.01142
-  integer 6: 0.08631
-  integer 7: 0.08695
-  integer 8: 0.03856
-  integer 9: 0.05591
-string vec F64 example sim: 0.74
-string vec F65: 
-  integer 0: 0.09076
-  integer 1: 0.05231
-  integer 2: 0.0664
-  integer 3: 0.07704
-  integer 4: -0.01089
-  integer 5: 0.02733
-  integer 6: 0.04784
-  integer 7: 0.0417
-  integer 8: -0.02128
-  integer 9: -0.00719
-string vec F65 example sim: 0.704
-string vec F66: 
-  integer 0: 0.07468
-  integer 1: 0.0901
-  integer 2: 0.0914
-  integer 3: 0.07182
-  integer 4: 0.04565
-  integer 5: 0.07394
-  integer 6: 0.05156
-  integer 7: -0.00623
-  integer 8: 0.08921
-  integer 9: -0.00405
-string vec F66 example sim: 0.858
-string vec F67: 
-  integer 0: 0.02356
-  integer 1: -0.02444
-  integer 2: 0.08669
-  integer 3: -0.01429
-  integer 4: 0.00639
-  integer 5: 0.0791
-  integer 6: 0.0638
-  integer 7: 0.04199
-  integer 8: -0.02478
-  integer 9: 0.06675
-string vec F67 example sim: 0.597
-string vec F68: 
-  integer 0: 0.03111
-  integer 1: 0.02578
-  integer 2: 0.01145
-  integer 3: 0.01361
-  integer 4: -0.00994
-  integer 5: 0.02386
-  integer 6: 0.05595
-  integer 7: 0.0475
-  integer 8: 0.02296
-  integer 9: 0.08415
-string vec F68 example sim: 0.776
-string vec F69: 
-  integer 0: 0.03829
-  integer 1: 0.07643
-  integer 2: 0.00132
-  integer 3: 0.04478
-  integer 4: 0.06171
-  integer 5: 0.03571
-  integer 6: -0.02179
-  integer 7: -0.01129
-  integer 8: 0.05815
-  integer 9: 0.01724
-string vec F69 example sim: 0.695
-string vec F7: 
-  integer 0: 0.00387
-  integer 1: -0.00806
-  integer 2: 0.0706
-  integer 3: 0.08026
-  integer 4: 0.08157
-  integer 5: 0.06487
-  integer 6: 0.08308
-  integer 7: -0.00247
-  integer 8: 0.01024
-  integer 9: 0.05097
-string vec F7 example sim: 0.769
-string vec F70: 
-  integer 0: 0.00328
-  integer 1: -0.01269
-  integer 2: 0.0089
-  integer 3: 0.03655
-  integer 4: 0.0582
-  integer 5: 0.07391
-  integer 6: 0.01263
-  integer 7: 0.07106
-  integer 8: 1.0E-5
-  integer 9: 0.01224
-string vec F70 example sim: 0.664
-string vec F71: 
-  integer 0: -0.00692
-  integer 1: 0.05248
-  integer 2: 0.02041
-  integer 3: 0.06553
-  integer 4: -0.02324
-  integer 5: 0.03555
-  integer 6: -0.01101
-  integer 7: 0.00059
-  integer 8: 0.06924
-  integer 9: 0.00451
-string vec F71 example sim: 0.549
-string vec F72: 
-  integer 0: 0.04617
-  integer 1: 0.04461
-  integer 2: 0.06265
-  integer 3: 0.05407
-  integer 4: 0.02148
-  integer 5: 0.08911
-  integer 6: 0.0493
-  integer 7: 0.02789
-  integer 8: 0.05985
-  integer 9: 0.09084
-string vec F72 example sim: 0.931
-string vec F73: 
-  integer 0: 0.08561
-  integer 1: 0.03128
-  integer 2: 0.09175
-  integer 3: 0.05104
-  integer 4: -0.00645
-  integer 5: 0.03395
-  integer 6: -0.01049
-  integer 7: -0.01189
-  integer 8: 0.07189
-  integer 9: 0.00306
-string vec F73 example sim: 0.667
-string vec F74: 
-  integer 0: 0.01569
-  integer 1: 0.03903
-  integer 2: 0.02555
-  integer 3: 0.07019
-  integer 4: 0.08194
-  integer 5: 0.01274
-  integer 6: -0.0131
-  integer 7: 0.08489
-  integer 8: 0.07985
-  integer 9: 0.03054
-string vec F74 example sim: 0.795
-string vec F75: 
-  integer 0: 0.00479
-  integer 1: -0.011
-  integer 2: 0.04653
-  integer 3: 0.0366
-  integer 4: 0.09503
-  integer 5: 0.07442
-  integer 6: 0.07609
-  integer 7: 0.06635
-  integer 8: 0.06872
-  integer 9: 0.02681
-string vec F75 example sim: 0.833
-string vec F76: 
-  integer 0: 0.01105
-  integer 1: 0.08987
-  integer 2: -0.01785
-  integer 3: 0.09683
-  integer 4: -0.02466
-  integer 5: 0.08996
-  integer 6: 0.07101
-  integer 7: 0.08624
-  integer 8: 0.08515
-  integer 9: 0.05302
-string vec F76 example sim: 0.771
-string vec F77: 
-  integer 0: 0.08273
-  integer 1: 0.05606
-  integer 2: 0.00066
-  integer 3: -0.00283
-  integer 4: 0.04714
-  integer 5: -0.00982
-  integer 6: 0.03735
-  integer 7: -0.00618
-  integer 8: 0.03365
-  integer 9: 0.03676
-string vec F77 example sim: 0.684
-string vec F78: 
-  integer 0: -0.01863
-  integer 1: 0.08027
-  integer 2: 0.06515
-  integer 3: -0.0219
-  integer 4: 0.0578
-  integer 5: 0.01464
-  integer 6: 0.05241
-  integer 7: -0.01127
-  integer 8: -0.0197
-  integer 9: 0.00387
-string vec F78 example sim: 0.473
-string vec F79: 
-  integer 0: 0.0577
-  integer 1: 0.09261
-  integer 2: 0.07534
-  integer 3: 0.03712
-  integer 4: -0.01406
-  integer 5: 0.03413
-  integer 6: 0.012
-  integer 7: 0.05335
-  integer 8: -0.00299
-  integer 9: -0.02175
-string vec F79 example sim: 0.663
-string vec F8: 
-  integer 0: 0.07855
-  integer 1: 0.04901
-  integer 2: 0.03866
-  integer 3: 0.07506
-  integer 4: 0.00944
-  integer 5: 0.04705
-  integer 6: 0.01983
-  integer 7: 0.01295
-  integer 8: 0.07373
-  integer 9: 0.02364
-string vec F8 example sim: 0.864
-string vec F80: 
-  integer 0: -0.00111
-  integer 1: 0.0364
-  integer 2: 0.02286
-  integer 3: 0.0083
-  integer 4: 0.0942
-  integer 5: -0.00406
-  integer 6: 0.03644
-  integer 7: 0.08353
-  integer 8: -0.01699
-  integer 9: 0.02992
-string vec F80 example sim: 0.643
-string vec F81: 
-  integer 0: 0.0085
-  integer 1: -0.0199
-  integer 2: 0.09355
-  integer 3: 0.05315
-  integer 4: -0.0138
-  integer 5: 0.05659
-  integer 6: -0.00971
-  integer 7: 0.0102
-  integer 8: 0.04091
-  integer 9: 0.08526
-string vec F81 example sim: 0.615
-string vec F82: 
-  integer 0: -0.01598
-  integer 1: 0.07204
-  integer 2: 0.02434
-  integer 3: -0.02425
-  integer 4: 0.00484
-  integer 5: 0.07203
-  integer 6: 0.03831
-  integer 7: 0.06501
-  integer 8: 0.00521
-  integer 9: 0.00237
-string vec F82 example sim: 0.582
-string vec F83: 
-  integer 0: 0.06296
-  integer 1: 0.09742
-  integer 2: 0.02634
-  integer 3: -0.01706
-  integer 4: 0.00695
-  integer 5: -0.00823
-  integer 6: -0.01736
-  integer 7: 0.06912
-  integer 8: 0.03244
-  integer 9: 0.00429
-string vec F83 example sim: 0.565
-string vec F84: 
-  integer 0: 0.08284
-  integer 1: 0.02491
-  integer 2: -0.00276
-  integer 3: 0.03849
-  integer 4: 0.03815
-  integer 5: 0.05863
-  integer 6: 0.05825
-  integer 7: -0.01653
-  integer 8: 0.04489
-  integer 9: 0.02344
-string vec F84 example sim: 0.781
-string vec F85: 
-  integer 0: 0.05313
-  integer 1: -0.02266
-  integer 2: 0.07151
-  integer 3: 0.05056
-  integer 4: -0.02091
-  integer 5: 0.05427
-  integer 6: 0.00419
-  integer 7: 0.07096
-  integer 8: 0.06849
-  integer 9: 0.09476
-string vec F85 example sim: 0.737
-string vec F86: 
-  integer 0: 0.0981
-  integer 1: 0.05616
-  integer 2: 0.09134
-  integer 3: 0.03766
-  integer 4: 0.07625
-  integer 5: -0.00568
-  integer 6: -0.00349
-  integer 7: 0.05373
-  integer 8: 0.00962
-  integer 9: 0.05843
-string vec F86 example sim: 0.8
-string vec F87: 
-  integer 0: 0.07854
-  integer 1: 0.05071
-  integer 2: 0.09319
-  integer 3: 0.03941
-  integer 4: 0.00259
-  integer 5: 0.04112
-  integer 6: 0.01132
-  integer 7: 0.03842
-  integer 8: 0.07755
-  integer 9: -0.00571
-string vec F87 example sim: 0.803
-string vec F88: 
-  integer 0: -0.01837
-  integer 1: 0.0056
-  integer 2: -0.01092
-  integer 3: 0.02529
-  integer 4: 0.02816
-  integer 5: 0.02342
-  integer 6: 0.0975
-  integer 7: 0.05894
-  integer 8: 0.02716
-  integer 9: 0.00864
-string vec F88 example sim: 0.609
-string vec F89: 
-  integer 0: 0.02276
-  integer 1: 0.0943
-  integer 2: 0.06831
-  integer 3: -0.01579
-  integer 4: 0.059
-  integer 5: 0.06119
-  integer 6: -0.01829
-  integer 7: 0.01617
-  integer 8: 0.05096
-  integer 9: 0.00034
-string vec F89 example sim: 0.681
-string vec F9: 
-  integer 0: 0.00596
-  integer 1: 0.08427
-  integer 2: 0.0096
-  integer 3: 0.09992
-  integer 4: 0.09042
-  integer 5: 0.03761
-  integer 6: 0.03735
-  integer 7: 0.07691
-  integer 8: -0.01854
-  integer 9: 0.08952
-string vec F9 example sim: 0.787
-string vec F90: 
-  integer 0: 0.01686
-  integer 1: 0.08834
-  integer 2: 0.0438
-  integer 3: 0.00137
-  integer 4: 0.04834
-  integer 5: 0.07126
-  integer 6: 0.07622
-  integer 7: 0.0447
-  integer 8: 0.09723
-  integer 9: 0.03602
-string vec F90 example sim: 0.874
-string vec F91: 
-  integer 0: 0.02269
-  integer 1: 0.03371
-  integer 2: -0.01951
-  integer 3: 0.07311
-  integer 4: 0.00215
-  integer 5: 0.09905
-  integer 6: 0.08874
-  integer 7: -0.02381
-  integer 8: 0.0303
-  integer 9: 0.06453
-string vec F91 example sim: 0.669
-string vec F92: 
-  integer 0: 0.0015
-  integer 1: -0.01219
-  integer 2: 0.08695
-  integer 3: 0.06718
-  integer 4: 0.01731
-  integer 5: 0.03484
-  integer 6: -0.00421
-  integer 7: 0.09204
-  integer 8: 0.09872
-  integer 9: 0.04118
-string vec F92 example sim: 0.73
-string vec F93: 
-  integer 0: -0.00288
-  integer 1: -0.01066
-  integer 2: 0.08105
-  integer 3: -0.01292
-  integer 4: 0.00292
-  integer 5: 0.0146
-  integer 6: -0.02159
-  integer 7: 0.09416
-  integer 8: -0.01974
-  integer 9: 0.06038
-string vec F93 example sim: 0.41
-string vec F94: 
-  integer 0: 0.08686
-  integer 1: 0.00717
-  integer 2: 0.01689
-  integer 3: 0.02985
-  integer 4: 0.09287
-  integer 5: 0.06991
-  integer 6: 0.04174
-  integer 7: 0.03714
-  integer 8: 0.0956
-  integer 9: 0.06964
-string vec F94 example sim: 0.873
-string vec F95: 
-  integer 0: 0.01325
-  integer 1: -0.0148
-  integer 2: 0.08964
-  integer 3: 0.06346
-  integer 4: 0.09209
-  integer 5: -0.02296
-  integer 6: 0.01462
-  integer 7: -0.00224
-  integer 8: 0.07651
-  integer 9: 0.07099
-string vec F95 example sim: 0.667
-string vec F96: 
-  integer 0: 0.03864
-  integer 1: 0.06361
-  integer 2: 0.01727
-  integer 3: 0.00105
-  integer 4: 0.0567
-  integer 5: 0.04522
-  integer 6: -0.00237
-  integer 7: 0.04217
-  integer 8: -0.01056
-  integer 9: 0.05243
-string vec F96 example sim: 0.767
-string vec F97: 
-  integer 0: 0.03834
-  integer 1: 0.0682
-  integer 2: 0.09599
-  integer 3: -0.008
-  integer 4: -0.00309
-  integer 5: 0.01711
-  integer 6: 0.01001
-  integer 7: 0.02874
-  integer 8: 0.06406
-  integer 9: 0.0705
-string vec F97 example sim: 0.753
-string vec F98: 
-  integer 0: -0.00861
-  integer 1: 0.09063
-  integer 2: -0.02086
-  integer 3: 0.06293
-  integer 4: -0.01549
-  integer 5: 0.0674
-  integer 6: -0.00988
-  integer 7: 0.01415
-  integer 8: 0.03639
-  integer 9: -0.02145
-string vec F98 example sim: 0.442
-string vec F99: 
-  integer 0: 0.09578
-  integer 1: 0.08003
-  integer 2: 0.08905
-  integer 3: 0.05257
-  integer 4: 0.08979
-  integer 5: 0.0774
-  integer 6: 0.00829
-  integer 7: 0.08126
-  integer 8: 0.07861
-  integer 9: 0.02279
-string vec F99 example sim: 0.922
+string vec F1: "(0.02808, 0.07333, 0.04258, 0.09158, 0.03267, 0.06975, 0.0785, 0.03942, 0.06367, 0.08683)"
+string vec F1 example sim: 0.94
+string vec F10: "(0.08808, 0.0325, 0.03317, 0.02733, 0.02825, 0.0665, 0.04683, 0.08608, 0.08042, 0.05425)"
+string vec F10 example sim: 0.92
+string vec F100: "(0.09625, 0.09225, 0.06542, 0.04225, 0.04142, 0.0385, 0.08775, 0.08633, 0.03858, 0.05983)"
+string vec F100 example sim: 0.944
+string vec F11: "(0.09475, 0.06392, 0.09, 0.02558, 0.06375, 0.03958, 0.03042, 0.03042, 0.02375, 0.09483)"
+string vec F11 example sim: 0.894
+string vec F12: "(0.0355, 0.02217, 0.08475, 0.09, 0.03217, 0.05117, 0.02033, 0.06192, 0.03567, 0.05317)"
+string vec F12 example sim: 0.903
+string vec F13: "(0.0495, 0.04867, 0.047, 0.05667, 0.02217, 0.09567, 0.03225, 0.02833, 0.03867, 0.09025)"
+string vec F13 example sim: 0.909
+string vec F14: "(0.04425, 0.08025, 0.08333, 0.07133, 0.05925, 0.09008, 0.03875, 0.06967, 0.07125, 0.0285)"
+string vec F14 example sim: 0.957
+string vec F15: "(0.07308, 0.06692, 0.07325, 0.09792, 0.09458, 0.02458, 0.02333, 0.03725, 0.02192, 0.03867)"
+string vec F15 example sim: 0.892
+string vec F16: "(0.07208, 0.09167, 0.0615, 0.01958, 0.04183, 0.0365, 0.08375, 0.0895, 0.01675, 0.03192)"
+string vec F16 example sim: 0.894
+string vec F17: "(0.06183, 0.03975, 0.08392, 0.03967, 0.08058, 0.05133, 0.038, 0.0895, 0.02942, 0.02925)"
+string vec F17 example sim: 0.927
+string vec F18: "(0.0685, 0.034, 0.0325, 0.04542, 0.03867, 0.06992, 0.074, 0.04733, 0.03758, 0.02)"
+string vec F18 example sim: 0.938
+string vec F19: "(0.05517, 0.03183, 0.03625, 0.09308, 0.09667, 0.04483, 0.0965, 0.0825, 0.06917, 0.06208)"
+string vec F19 example sim: 0.943
+string vec F2: "(0.01767, 0.06358, 0.02492, 0.07917, 0.052, 0.07775, 0.09817, 0.04717, 0.02733, 0.09508)"
+string vec F2 example sim: 0.903
+string vec F20: "(0.08167, 0.04875, 0.09717, 0.02075, 0.06842, 0.09333, 0.019, 0.03892, 0.05475, 0.064)"
+string vec F20 example sim: 0.913
+string vec F21: "(0.05033, 0.07375, 0.04817, 0.09625, 0.02092, 0.02017, 0.03258, 0.05167, 0.03208, 0.04225)"
+string vec F21 example sim: 0.902
+string vec F22: "(0.0585, 0.0695, 0.086, 0.02392, 0.05325, 0.07367, 0.01767, 0.0835, 0.03592, 0.0955)"
+string vec F22 example sim: 0.92
+string vec F23: "(0.03067, 0.0905, 0.0515, 0.03617, 0.04192, 0.06183, 0.083, 0.05817, 0.02067, 0.052)"
+string vec F23 example sim: 0.929
+string vec F24: "(0.05442, 0.07525, 0.04408, 0.04558, 0.07658, 0.02325, 0.04708, 0.0645, 0.09175, 0.08742)"
+string vec F24 example sim: 0.947
+string vec F25: "(0.01692, 0.05683, 0.0195, 0.04292, 0.04442, 0.0395, 0.09658, 0.068, 0.02275, 0.0365)"
+string vec F25 example sim: 0.886
+string vec F26: "(0.03417, 0.0715, 0.08725, 0.03175, 0.04633, 0.05967, 0.04033, 0.04008, 0.0975, 0.04083)"
+string vec F26 example sim: 0.928
+string vec F27: "(0.03925, 0.0945, 0.09175, 0.07483, 0.06742, 0.09058, 0.02167, 0.04792, 0.0345, 0.06617)"
+string vec F27 example sim: 0.931
+string vec F28: "(0.03833, 0.02433, 0.06567, 0.09958, 0.07592, 0.04808, 0.06383, 0.02033, 0.03983, 0.03708)"
+string vec F28 example sim: 0.909
+string vec F29: "(0.04175, 0.08333, 0.02817, 0.02275, 0.03442, 0.061, 0.02733, 0.02658, 0.02608, 0.07033)"
+string vec F29 example sim: 0.899
+string vec F3: "(0.09442, 0.0495, 0.03017, 0.06625, 0.05583, 0.06842, 0.02967, 0.05367, 0.09992, 0.04442)"
+string vec F3 example sim: 0.934
+string vec F30: "(0.08975, 0.03667, 0.04267, 0.07817, 0.01842, 0.09667, 0.07633, 0.06958, 0.06592, 0.08783)"
+string vec F30 example sim: 0.939
+string vec F31: "(0.07808, 0.03808, 0.01975, 0.05425, 0.03258, 0.03958, 0.05958, 0.03058, 0.04658, 0.05283)"
+string vec F31 example sim: 0.943
+string vec F32: "(0.04583, 0.08567, 0.08583, 0.04342, 0.04633, 0.08583, 0.0475, 0.04783, 0.02517, 0.02883)"
+string vec F32 example sim: 0.927
+string vec F33: "(0.02267, 0.02133, 0.04633, 0.06833, 0.02742, 0.097, 0.026, 0.04483, 0.04767, 0.05167)"
+string vec F33 example sim: 0.896
+string vec F34: "(0.055, 0.0195, 0.05792, 0.0755, 0.04492, 0.05408, 0.08392, 0.05758, 0.08292, 0.06392)"
+string vec F34 example sim: 0.957
+string vec F35: "(0.03525, 0.05042, 0.08567, 0.03283, 0.04, 0.07875, 0.08558, 0.01933, 0.036, 0.08408)"
+string vec F35 example sim: 0.912
+string vec F36: "(0.02508, 0.03758, 0.0305, 0.03508, 0.02458, 0.04825, 0.02008, 0.03775, 0.03408, 0.06183)"
+string vec F36 example sim: 0.95
+string vec F37: "(0.02817, 0.09175, 0.05325, 0.04583, 0.034, 0.04117, 0.08908, 0.06333, 0.079, 0.08492)"
+string vec F37 example sim: 0.938
+string vec F38: "(0.05275, 0.04575, 0.03683, 0.07742, 0.02333, 0.07442, 0.09917, 0.09592, 0.075, 0.08192)"
+string vec F38 example sim: 0.94
+string vec F39: "(0.03283, 0.073, 0.07617, 0.06117, 0.05358, 0.05, 0.08742, 0.05933, 0.08225, 0.03158)"
+string vec F39 example sim: 0.957
+string vec F4: "(0.04858, 0.09975, 0.02592, 0.09892, 0.086, 0.09033, 0.06533, 0.09175, 0.06408, 0.02383)"
+string vec F4 example sim: 0.931
+string vec F40: "(0.05208, 0.03983, 0.06458, 0.06117, 0.085, 0.06192, 0.0175, 0.07358, 0.08233, 0.06575)"
+string vec F40 example sim: 0.954
+string vec F41: "(0.02442, 0.03067, 0.06683, 0.03333, 0.05717, 0.07283, 0.04192, 0.03975, 0.05458, 0.02767)"
+string vec F41 example sim: 0.941
+string vec F42: "(0.06, 0.01717, 0.03667, 0.03458, 0.05933, 0.07208, 0.06967, 0.08067, 0.02975, 0.07758)"
+string vec F42 example sim: 0.93
+string vec F43: "(0.03908, 0.06158, 0.03333, 0.07567, 0.0505, 0.05567, 0.08533, 0.09933, 0.09933, 0.08592)"
+string vec F43 example sim: 0.949
+string vec F44: "(0.01783, 0.09533, 0.06042, 0.03675, 0.02442, 0.075, 0.02375, 0.07225, 0.05658, 0.06908)"
+string vec F44 example sim: 0.906
+string vec F45: "(0.05808, 0.07017, 0.04767, 0.09108, 0.05783, 0.0805, 0.04225, 0.0345, 0.07975, 0.09267)"
+string vec F45 example sim: 0.959
+string vec F46: "(0.0785, 0.08733, 0.07133, 0.05942, 0.09883, 0.04942, 0.0705, 0.04125, 0.02967, 0.056)"
+string vec F46 example sim: 0.954
+string vec F47: "(0.07683, 0.07517, 0.09792, 0.07683, 0.05825, 0.05317, 0.04358, 0.02383, 0.06992, 0.084)"
+string vec F47 example sim: 0.955
+string vec F48: "(0.07675, 0.02442, 0.04908, 0.08025, 0.08975, 0.023, 0.08067, 0.03442, 0.08117, 0.09467)"
+string vec F48 example sim: 0.923
+string vec F49: "(0.094, 0.08533, 0.09025, 0.03958, 0.07667, 0.0275, 0.03892, 0.09083, 0.07525, 0.04967)"
+string vec F49 example sim: 0.941
+string vec F5: "(0.07283, 0.0325, 0.0385, 0.05008, 0.0555, 0.07142, 0.082, 0.05558, 0.092, 0.027)"
+string vec F5 example sim: 0.942
+string vec F50: "(0.04867, 0.0455, 0.08892, 0.08158, 0.07758, 0.04117, 0.0615, 0.02617, 0.056, 0.04925)"
+string vec F50 example sim: 0.951
+string vec F51: "(0.03467, 0.08758, 0.04942, 0.01917, 0.02142, 0.07033, 0.05508, 0.08525, 0.07817, 0.03908)"
+string vec F51 example sim: 0.913
+string vec F52: "(0.06525, 0.07225, 0.09442, 0.05633, 0.05425, 0.04, 0.062, 0.07992, 0.09942, 0.0805)"
+string vec F52 example sim: 0.97
+string vec F53: "(0.08467, 0.05992, 0.09183, 0.0185, 0.07392, 0.02908, 0.03592, 0.07642, 0.05467, 0.03042)"
+string vec F53 example sim: 0.914
+string vec F54: "(0.02658, 0.05208, 0.0915, 0.04867, 0.06117, 0.08233, 0.09092, 0.09367, 0.03358, 0.05425)"
+string vec F54 example sim: 0.938
+string vec F55: "(0.04408, 0.06725, 0.08892, 0.06917, 0.02675, 0.05358, 0.06175, 0.09142, 0.04375, 0.0265)"
+string vec F55 example sim: 0.936
+string vec F56: "(0.03967, 0.04008, 0.09283, 0.03442, 0.07967, 0.07033, 0.01875, 0.06975, 0.09225, 0.07575)"
+string vec F56 example sim: 0.928
+string vec F57: "(0.0965, 0.02325, 0.04967, 0.04475, 0.02625, 0.04492, 0.09833, 0.07942, 0.04317, 0.07767)"
+string vec F57 example sim: 0.913
+string vec F58: "(0.044, 0.04608, 0.08242, 0.02917, 0.08667, 0.03883, 0.06417, 0.0905, 0.03575, 0.02475)"
+string vec F58 example sim: 0.918
+string vec F59: "(0.09483, 0.04383, 0.0675, 0.06333, 0.03642, 0.02067, 0.09425, 0.04125, 0.05733, 0.05767)"
+string vec F59 example sim: 0.931
+string vec F6: "(0.024, 0.07558, 0.02, 0.09925, 0.06808, 0.08858, 0.021, 0.03842, 0.08775, 0.05925)"
+string vec F6 example sim: 0.896
+string vec F60: "(0.05717, 0.02367, 0.06958, 0.03058, 0.02992, 0.07175, 0.03783, 0.02867, 0.01858, 0.04408)"
+string vec F60 example sim: 0.916
+string vec F61: "(0.03708, 0.04192, 0.09233, 0.03883, 0.02358, 0.0875, 0.06217, 0.09358, 0.0365, 0.028)"
+string vec F61 example sim: 0.901
+string vec F62: "(0.07033, 0.07175, 0.07033, 0.07275, 0.0845, 0.02033, 0.04458, 0.08825, 0.05467, 0.02883)"
+string vec F62 example sim: 0.941
+string vec F63: "(0.034, 0.03317, 0.09133, 0.04233, 0.04542, 0.05025, 0.08883, 0.09267, 0.08483, 0.04775)"
+string vec F63 example sim: 0.932
+string vec F64: "(0.01983, 0.08817, 0.02767, 0.07558, 0.07617, 0.02442, 0.04875, 0.02842, 0.0625, 0.03817)"
+string vec F64 example sim: 0.9
+string vec F65: "(0.07233, 0.06583, 0.029, 0.09708, 0.08225, 0.09933, 0.04967, 0.02008, 0.04767, 0.099)"
+string vec F65 example sim: 0.924
+string vec F66: "(0.09133, 0.06083, 0.07967, 0.032, 0.04808, 0.06125, 0.07017, 0.04133, 0.07383, 0.05775)"
+string vec F66 example sim: 0.964
+string vec F67: "(0.05425, 0.02317, 0.09492, 0.02333, 0.05592, 0.06517, 0.03083, 0.03242, 0.03, 0.04775)"
+string vec F67 example sim: 0.905
+string vec F68: "(0.07942, 0.02242, 0.09158, 0.02675, 0.01933, 0.06892, 0.06067, 0.07533, 0.07842, 0.0835)"
+string vec F68 example sim: 0.919
+string vec F69: "(0.04583, 0.02358, 0.07925, 0.03458, 0.05325, 0.09175, 0.06258, 0.02933, 0.01692, 0.09475)"
+string vec F69 example sim: 0.893
+string vec F7: "(0.03808, 0.02983, 0.07467, 0.09208, 0.06758, 0.03158, 0.08733, 0.05017, 0.03025, 0.06525)"
+string vec F7 example sim: 0.928
+string vec F70: "(0.05458, 0.07975, 0.094, 0.09075, 0.08125, 0.09408, 0.06642, 0.07125, 0.06058, 0.07125)"
+string vec F70 example sim: 0.985
+string vec F71: "(0.04583, 0.074, 0.04608, 0.09967, 0.09875, 0.03158, 0.05508, 0.06292, 0.099, 0.086)"
+string vec F71 example sim: 0.946
+string vec F72: "(0.03833, 0.05217, 0.02683, 0.09625, 0.09175, 0.05833, 0.06858, 0.06125, 0.04633, 0.04092)"
+string vec F72 example sim: 0.939
+string vec F73: "(0.03283, 0.09058, 0.05767, 0.06533, 0.05717, 0.05017, 0.06775, 0.02742, 0.04008, 0.08975)"
+string vec F73 example sim: 0.943
+string vec F74: "(0.02033, 0.05592, 0.04658, 0.03542, 0.08067, 0.06608, 0.06325, 0.089, 0.03042, 0.07108)"
+string vec F74 example sim: 0.935
+string vec F75: "(0.04758, 0.07708, 0.04367, 0.04125, 0.09317, 0.03933, 0.03717, 0.08742, 0.05283, 0.0295)"
+string vec F75 example sim: 0.932
+string vec F76: "(0.07217, 0.02225, 0.05792, 0.0375, 0.07258, 0.09192, 0.04092, 0.04533, 0.02258, 0.08567)"
+string vec F76 example sim: 0.918
+string vec F77: "(0.06125, 0.02908, 0.058, 0.075, 0.06608, 0.07992, 0.04708, 0.07633, 0.03042, 0.09317)"
+string vec F77 example sim: 0.951
+string vec F78: "(0.04617, 0.08825, 0.09317, 0.06175, 0.03408, 0.06183, 0.08167, 0.07242, 0.05875, 0.03175)"
+string vec F78 example sim: 0.952
+string vec F79: "(0.04025, 0.02275, 0.0655, 0.07483, 0.07775, 0.0615, 0.08708, 0.05908, 0.07483, 0.08942)"
+string vec F79 example sim: 0.957
+string vec F8: "(0.03892, 0.01867, 0.02175, 0.03267, 0.02458, 0.08658, 0.04425, 0.02692, 0.06192, 0.08217)"
+string vec F8 example sim: 0.881
+string vec F80: "(0.04467, 0.06283, 0.093, 0.03908, 0.08508, 0.06217, 0.019, 0.04133, 0.02292, 0.08383)"
+string vec F80 example sim: 0.912
+string vec F81: "(0.09883, 0.08083, 0.07933, 0.06758, 0.05217, 0.03508, 0.03742, 0.06167, 0.09467, 0.09608)"
+string vec F81 example sim: 0.953
+string vec F82: "(0.02842, 0.03175, 0.02267, 0.06825, 0.09333, 0.07375, 0.07067, 0.08417, 0.068, 0.04792)"
+string vec F82 example sim: 0.93
+string vec F83: "(0.02242, 0.03708, 0.05867, 0.09825, 0.04208, 0.06242, 0.08692, 0.02733, 0.03933, 0.0485)"
+string vec F83 example sim: 0.913
+string vec F84: "(0.0725, 0.06583, 0.08408, 0.09708, 0.05558, 0.08817, 0.05533, 0.02067, 0.0885, 0.05925)"
+string vec F84 example sim: 0.955
+string vec F85: "(0.09683, 0.06875, 0.06675, 0.08675, 0.07208, 0.07017, 0.09083, 0.07408, 0.04925, 0.0525)"
+string vec F85 example sim: 0.981
+string vec F86: "(0.09867, 0.07292, 0.0175, 0.03542, 0.04442, 0.04158, 0.06667, 0.0415, 0.09192, 0.02117)"
+string vec F86 example sim: 0.894
+string vec F87: "(0.01967, 0.05533, 0.09708, 0.04642, 0.06417, 0.08875, 0.03417, 0.07825, 0.09358, 0.0675)"
+string vec F87 example sim: 0.934
+string vec F88: "(0.05058, 0.04808, 0.02442, 0.01775, 0.06242, 0.05275, 0.08275, 0.0485, 0.07292, 0.02817)"
+string vec F88 example sim: 0.927
+string vec F89: "(0.088, 0.07258, 0.03183, 0.04608, 0.02708, 0.0855, 0.08133, 0.04725, 0.06542, 0.08667)"
+string vec F89 example sim: 0.944
+string vec F9: "(0.05733, 0.03883, 0.02483, 0.07892, 0.04767, 0.03958, 0.0825, 0.09117, 0.046, 0.05883)"
+string vec F9 example sim: 0.941
+string vec F90: "(0.04567, 0.03475, 0.08358, 0.03642, 0.05033, 0.07475, 0.08908, 0.07583, 0.06733, 0.08092)"
+string vec F90 example sim: 0.958
+string vec F91: "(0.04592, 0.02458, 0.04142, 0.05233, 0.032, 0.02517, 0.05725, 0.0385, 0.03233, 0.0385)"
+string vec F91 example sim: 0.967
+string vec F92: "(0.02458, 0.07458, 0.09258, 0.02392, 0.04342, 0.0265, 0.09283, 0.0525, 0.07108, 0.0355)"
+string vec F92 example sim: 0.901
+string vec F93: "(0.07783, 0.08333, 0.02633, 0.08342, 0.07925, 0.06658, 0.09025, 0.01708, 0.05892, 0.04467)"
+string vec F93 example sim: 0.933
+string vec F94: "(0.1, 0.08692, 0.09633, 0.088, 0.05242, 0.07367, 0.0945, 0.0575, 0.02517, 0.06842)"
+string vec F94 example sim: 0.957
+string vec F95: "(0.04158, 0.06667, 0.095, 0.07283, 0.02667, 0.08892, 0.06183, 0.07867, 0.02283, 0.07567)"
+string vec F95 example sim: 0.936
+string vec F96: "(0.08775, 0.09408, 0.02925, 0.02383, 0.02242, 0.06258, 0.06942, 0.09617, 0.09467, 0.08892)"
+string vec F96 example sim: 0.916
+string vec F97: "(0.06258, 0.063, 0.03442, 0.04125, 0.05825, 0.02733, 0.03475, 0.06267, 0.03825, 0.03533)"
+string vec F97 example sim: 0.96
+string vec F98: "(0.05542, 0.08458, 0.03258, 0.087, 0.03342, 0.08058, 0.0615, 0.05342, 0.04158, 0.045)"
+string vec F98 example sim: 0.947
+string vec F99: "(0.08575, 0.09733, 0.03875, 0.03775, 0.08208, 0.0605, 0.07317, 0.08875, 0.06908, 0.0905)"
+string vec F99 example sim: 0.964
 END_expected;
 
 verifyTestOutput( $outputdir, $result, $expected);

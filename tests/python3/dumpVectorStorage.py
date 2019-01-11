@@ -24,7 +24,7 @@ def dumpVectorStorage( strusctx, config, vectors, examplevec):
 		featsim = float( "%.3f" % storage.vectorSimilarity( vv, examplevec))
 		featvec = storage.featureVector( "word", featstr)
 		output[ "types %s" % featstr] = storage.featureTypes( featstr)
-		output[ "vec %s" % featstr] = "{" + vecToString( featvec, ", ") + "}"
+		output[ "vec %s" % featstr] = "(" + vecToString( featvec, ", ") + ")"
 		output[ "vec %s example sim" % featstr] = featsim
 		ranklist.append( [featstr,featsim,featvec] )
 
