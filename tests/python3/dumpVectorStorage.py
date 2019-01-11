@@ -32,7 +32,7 @@ def dumpVectorStorage( strusctx, config, vectors, examplevec):
 	for iv,vv in enumerate( ranklist):
 		if iv >= 5:
 			break
-		output[ "rank %3d" % iv] = "%.5f %s {%s}" % (vv[1], vv[0], vecToString( vv[2],", "))
+		output[ "rank %3d" % iv] = "%.4f %s {%s}" % (vv[1], vv[0], vecToString( vv[2],", "))
 
 	# Configuration of the storage:
 	output_config = {}

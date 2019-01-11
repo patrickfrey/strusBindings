@@ -37,7 +37,7 @@ function dumpVectorStorage( strusctx, config, vectors, examplevec)
 	table.sort( ranklist, function( a, b ) return a[2] > b[2] or (a[2] == b[2] and a[1] > b[1]) end )
 	for iv,vv in ipairs( ranklist) do
 		if iv > 5 then break end
-		output[ string.format( "rank %3d", iv)] = string.format( "%.5f %s {%s}", vv[2], vv[1], vecToString( vv[3],", "))
+		output[ string.format( "rank %3d", iv)] = string.format( "%.4f %s {%s}", vv[2], vv[1], vecToString( vv[3],", "))
 	end
 	-- Configuration of the storage:
 	local output_config = {}
