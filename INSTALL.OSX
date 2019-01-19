@@ -29,7 +29,9 @@ Install python3 when building the Python bindings (-DWITH_PYTON=YES):
 
 brew install python3
 
-Build strus with:
+If support for pattern matching is build (-DWITH_STRUS_PATTERN=YES), build and install hyperscan from source.
+
+Build strusBindings with:
 
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
 	-DWITH_STRUS_VECTOR="YES" -DWITH_STRUS_PATTERN="YES" \
