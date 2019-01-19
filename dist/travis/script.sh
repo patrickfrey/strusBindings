@@ -6,6 +6,42 @@ OS=$(uname -s)
 
 PROJECT=strusBindings
 
+build_dep_project() {
+	prj_cmakeflags=$1
+	case $OS in
+		Linux)
+			mkdir build
+			cd build
+			cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release \
+				-DLIB_INSTALL_DIR=lib -DCMAKE_CXX_FLAGS=-g $prj_cmakeflags \
+				..
+			make
+			sudo make install
+			cd ..
+			;;
+	
+		Darwin)
+			# forcing brew versions (of gettext) over Mac versions
+			export CFLAGS=-I/usr/local
+			export CXXFLAGS=-I/usr/local
+			export LDFLAGS=-L/usr/local/lib
+			mkdir build
+			cd build
+			cmake \
+				-DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
+				-DCMAKE_CXX_FLAGS='-g -Wno-error=format-nonliteral -Wno-error=format-security' -G Xcode $prj_cmakeflags \
+				..
+			xcodebuild -configuration Release -target ALL_BUILD
+			sudo xcodebuild -configuration Release -target install
+			cd ..
+			;;
+			
+		*)
+			echo "ERROR: unknown operating system '$OS'."
+			;;
+	esac
+}
+
 build_strus_project() {
 	prj_cmakeflags=$1
 	case $OS in
@@ -46,7 +82,14 @@ build_strus_project() {
 
 # build pre-requisites
 DEPS="strusBase strus strusAnalyzer strusTrace strusModule strusRpc"
+
 if test "x$STRUS_WITH_PATTERN" = "xYES"; then
+	# install hyperscan
+	git clone https://github.com/intel/hyperscan.git
+	cd hyperscan
+	build_dep_project ""
+	cd ..
+
 	DEPS="${DEPS} strusPattern"
 fi
 if test "x$STRUS_WITH_VECTOR" = "xYES"; then
