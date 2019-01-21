@@ -8,7 +8,6 @@
 #include "impl/vector.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
-#include "strus/vectorStorageSearchInterface.hpp"
 #include "strus/vectorStorageDumpInterface.hpp"
 #include "strus/vectorStorageTransactionInterface.hpp"
 #include "strus/vectorStorageInterface.hpp"
@@ -23,28 +22,22 @@
 using namespace strus;
 using namespace strus::bindings;
 
-VectorStorageSearcherImpl::VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storageref, const std::string& type, int indexPart, int nofParts, const ObjectRef& errorhnd_)
-	:m_errorhnd_impl(errorhnd_)
-	,m_searcher_impl()
-	,m_trace_impl( trace)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	const VectorStorageClientInterface* storage = storageref.getObject<VectorStorageClientInterface>();
-	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+VectorStorageClientImpl::~VectorStorageClientImpl()
+{}
 
-	m_searcher_impl.resetOwnership( storage->createSearcher( type, indexPart, nofParts), "VectorStorageSearcher");
-	if (!m_searcher_impl.get())
-	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
-	}
+void VectorStorageClientImpl::prepareSearch( const std::string& type)
+{
+	VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	storage->prepareSearch( type);
 }
 
-Struct VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const
+Struct VectorStorageClientImpl::findSimilar( const std::string& type, const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const
 {
-	const VectorStorageSearchInterface* searcher = m_searcher_impl.getObject<VectorStorageSearchInterface>();
-	if (!searcher) throw strus::runtime_error( _TXT("calling vector storage searcher method after close"));
+	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
-	std::vector<VectorQueryResult> res = searcher->findSimilar( Deserializer::getFloatList( vec), maxNofResults, minSimilarity, realVecWeights);
+	std::vector<VectorQueryResult> res = storage->findSimilar( type, Deserializer::getFloatList( vec), maxNofResults, minSimilarity, realVecWeights);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -54,26 +47,6 @@ Struct VectorStorageSearcherImpl::findSimilar( const ValueVariant& vec, unsigned
 	strus::bindings::Serializer::serialize( &rt.serialization, res, true/*deep*/);
 	rt.release();
 	return rt;
-}
-
-void VectorStorageSearcherImpl::close()
-{
-	if (!m_searcher_impl.get()) throw strus::runtime_error( _TXT("calling storage searcher method after close"));
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	bool preverr = errorhnd->hasError();
-	m_searcher_impl.reset();
-	if (!preverr && errorhnd->hasError())
-	{
-		throw strus::runtime_error( _TXT("error detected after calling storage searcher close: %s"), errorhnd->fetchError());
-	}
-}
-
-VectorStorageClientImpl::~VectorStorageClientImpl()
-{}
-
-VectorStorageSearcherImpl* VectorStorageClientImpl::createSearcher( const std::string& type, int indexPart, int nofParts) const
-{
-	return new VectorStorageSearcherImpl( m_trace_impl, m_vector_storage_impl, type, indexPart, nofParts, m_errorhnd_impl);
 }
 
 VectorStorageTransactionImpl* VectorStorageClientImpl::createTransaction()

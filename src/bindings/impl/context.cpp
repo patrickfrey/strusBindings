@@ -29,7 +29,6 @@
 #include "strus/vectorStorageInterface.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageTransactionInterface.hpp"
-#include "strus/vectorStorageSearchInterface.hpp"
 #include "strus/statisticsProcessorInterface.hpp"
 #include "strus/rpcClientInterface.hpp"
 #include "strus/rpcClientMessagingInterface.hpp"

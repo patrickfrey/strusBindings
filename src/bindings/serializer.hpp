@@ -18,7 +18,7 @@
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/analyzer/contentStatisticsItem.hpp"
 #include "strus/analyzer/contentStatisticsResult.hpp"
-#include "strus/vectorStorageSearchInterface.hpp"
+#include "strus/vectorQueryResult.hpp"
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"

@@ -8,9 +8,9 @@
 #ifndef _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_VECTOR_STORAGE_HPP_INCLUDED
 #include "papuga/valueVariant.h"
-#include "strus/vectorStorageSearchInterface.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
+#include "strus/wordVector.hpp"
 #include <vector>
 #include <string>
 
@@ -22,16 +22,25 @@ typedef papuga_ValueVariant ValueVariant;
 /// \brief Forward declaration
 class VectorStorageTransactionImpl;
 
-/// \class VectorStorageSearcherImpl
-/// \brief Object used to search for similar vectors in the collection
-/// \note The only way to construct a vector storage searcher instance is to call VectorStorageClient::createSearcher( from, to)
-class VectorStorageSearcherImpl
+
+/// \class VectorStorageClientImpl
+/// \brief Object representing a client connection to a vector storage 
+/// \note The only way to construct a vector storage client instance is to call Context::createVectorStorageClient( config) or Context::createVectorStorageClient()
+class VectorStorageClientImpl
 {
 public:
 	/// \brief Destructor
-	virtual ~VectorStorageSearcherImpl(){}
+	virtual ~VectorStorageClientImpl();
 
-	/// \brief Find the most similar vectors to vector
+	/// \brief Prepare datastructures for calling findSimilar
+	/// \remark This method does not have to be called, because the structures for search are built implicitely on the first search. It just avoids a massive delay on the first call of findSimilar.
+	/// \param[in] type type of the features to search for
+	/// \example "verb"
+	void prepareSearch( const std::string& type);
+
+	/// \brief For a defined type find the most similar vectors to a vector
+	/// \param[in] type type of the features to search for
+	/// \example "verb"
 	/// \param[in] vec vector to search for (double[])
 	/// \example [ 0.0322312 0.01121243 0.0078784 0.0012344 0.0064535 0.05454322 ]
 	/// \param[in] maxNofResults maximum number of results to return
@@ -44,40 +53,7 @@ public:
 	/// \example true
 	/// \example false
 	/// \return the list of most similar vectors (double[])
-	Struct findSimilar( const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const;
-
-	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
-	void close();
-
-private:
-	friend class VectorStorageClientImpl;
-	VectorStorageSearcherImpl( const ObjectRef& trace, const ObjectRef& storage, const std::string& type, int indexPart, int nofParts, const ObjectRef& errorhnd_);
-
-	mutable ObjectRef m_errorhnd_impl;
-	ObjectRef m_searcher_impl;
-	ObjectRef m_trace_impl;
-};
-
-/// \class VectorStorageClientImpl
-/// \brief Object representing a client connection to a vector storage 
-/// \note The only way to construct a vector storage client instance is to call Context::createVectorStorageClient( config) or Context::createVectorStorageClient()
-class VectorStorageClientImpl
-{
-public:
-	/// \brief Destructor
-	virtual ~VectorStorageClientImpl();
-
-	/// \brief Create a searcher object for scanning the vectors assigned to a feature of a given type for similarity
-	/// \param[in] type type of the feature to search for
-	/// \example "verb"
-	/// \param[in] indexPart index part selected (starting with 0) from nofParts parts
-	/// \example 0
-	/// \example 1
-	/// \param[in] nofParts number of parts to split the collection into for parallel search
-	/// \example 1
-	/// \example 4
-	/// \return the vector search interface (with ownership)
-	VectorStorageSearcherImpl* createSearcher( const std::string& type, int indexPart, int nofParts) const;
+	Struct findSimilar( const std::string& type, const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const;
 
 	/// \brief Create a vector storage transaction instance
 	/// \return the transaction instance

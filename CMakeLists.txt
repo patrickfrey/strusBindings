@@ -36,6 +36,10 @@ include( cmake/build_rules.cmake )
 include( cmake/boost.cmake)
 include( cmake/link_rules.cmake )
 include( cmake/standard_targets.cmake )
+IF (WITH_STRUS_PATTERN STREQUAL "YES")
+include( cmake/find_tre.cmake )
+include( cmake/find_hyperscan.cmake )
+ENDIF (WITH_STRUS_PATTERN STREQUAL "YES")
 include( cmake/intl.cmake )
 include( cmake/libdl.cmake )
 include( cmake/cppcheck.cmake )
@@ -106,15 +110,19 @@ set( STRUS_MODULE_PATH  "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/strus/module
 endif (NOT STRUS_MODULE_PATH)
 MESSAGE( STATUS  "Strus module path: ${STRUS_MODULE_PATH}" )
 
+if(NOT STRUS_ALL)
+if( DEFINED HYPERSCAN_PKGCONFIG )
+	file( COPY  "${HYPERSCAN_PKGCONFIG}"  DESTINATION  ${CMAKE_BINARY_DIR}/ )
+	# ... PF:HACK For hyperscan as submodule with out of source build
+endif( DEFINED HYPERSCAN_PKGCONFIG )
+include( cmake/report_build_settings.cmake )
+endif()
+
 # Subdirectories:
 add_subdirectory( 3rdParty )
 add_subdirectory( src )
 add_subdirectory( tests )
   
-if(NOT STRUS_ALL)
-include( cmake/report_build_settings.cmake )
-endif()
-
 # Install header files:
 install(DIRECTORY include/strus
           DESTINATION include
