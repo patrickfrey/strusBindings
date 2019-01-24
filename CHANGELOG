@@ -1,3 +1,11 @@
+strusBindings (0.17.0)
+  * implement interface changes in analyzer pattern matcher interface
+  * implement interface changes in strus vector storage interface
+  * make Lua support enabled by option and not implicitely
+  * reorganized travis build, define build options solely by includes without using excludes 
+  * add some schemas to support web requests (strusWebService)
+ -- Patrick Frey <patrickpfrey@yahoo.com>  Thu, 24 Jan 2019 07:30:00 +0100
+
 strusBindings (0.16.0)
   * change handling of gettext to avoid warning: return a const char* 
   * renamed query evaluation result member pass to evalpass to remove conflict with python keyword
