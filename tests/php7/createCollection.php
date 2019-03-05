@@ -8,7 +8,7 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 			"path" => $storagePath,
 			"metadata" => $metadata,
 			"cache" => '512M',
-			"statsproc" => 'default'
+			"statsproc" => 'std'
 		];
 		if ($aclmap) {
 			$config['acl'] = True;

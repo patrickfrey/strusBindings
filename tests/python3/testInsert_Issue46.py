@@ -4,7 +4,7 @@ ctx = strus.Context(None)
 config = {
     'path': 'instance/',
     'cache': '512M',
-    'statsproc': 'default'
+    'statsproc': 'std'
 }
 if ctx.storageExists(config):
     ctx.destroyStorage(config)

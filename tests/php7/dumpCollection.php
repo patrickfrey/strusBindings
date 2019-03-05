@@ -12,7 +12,7 @@ function dfchange_compare( $a, $b) {
 }
 
 function dumpCollection( $strusctx, $storagePath) {
-	$config = "path=" . $storagePath . '; cache=512M; statsproc=default';
+	$config = "path=" . $storagePath . '; cache=512M; statsproc=std';
 	$output = [];
 
 	# Get a client for the storage:
@@ -81,7 +81,7 @@ function dumpCollection( $strusctx, $storagePath) {
 	$dfchangelist = [];
 	$nofdocs = 0;
 	foreach ($storage->getAllStatistics( true) as $blob) {
-		$statview = $strusctx->unpackStatisticBlob( $blob, "default");
+		$statview = $strusctx->unpackStatisticBlob( $blob, "std");
 		$nofdocs += $statview->nofdocs;
 		foreach ($statview->dfchange as $dfchange) {
 			array_push( $dfchangelist, ["value" => $dfchange->value, "type" => $dfchange->type, "increment" => $dfchange->increment]);

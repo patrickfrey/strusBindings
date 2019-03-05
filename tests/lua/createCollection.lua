@@ -8,7 +8,7 @@ function createCollection( strusctx, storagePath, metadata, analyzer, multipart,
 			path = storagePath,
 			metadata = metadata,
 			cache = '512M',
-			statsproc = 'default'
+			statsproc = 'std'
 		}
 		if aclmap then
 			config.acl = true

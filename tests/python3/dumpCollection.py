@@ -2,7 +2,7 @@ import strus
 from utils import *
 
 def dumpCollection( strusctx, storagePath):
-	config = "path=%s; cache=512M; statsproc=default" % storagePath
+	config = "path=%s; cache=512M; statsproc=std" % storagePath
 	output = {}
 
 	# Get a client for the storage:
@@ -64,7 +64,7 @@ def dumpCollection( strusctx, storagePath):
 	dfchangelist = []
 	nofdocs = 0
 	for blob in storage.getAllStatistics( True):
-		statview = strusctx.unpackStatisticBlob( blob, "default")
+		statview = strusctx.unpackStatisticBlob( blob, "std")
 		nofdocs += statview.nofdocs
 		for dfchange in statview.dfchange:
 			dfchangelist.append( {'type':dfchange.type, 'value':dfchange.value, 'increment':dfchange.increment})

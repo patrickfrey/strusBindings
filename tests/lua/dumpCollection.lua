@@ -2,7 +2,7 @@ require "string"
 require "utils"
 
 function dumpCollection( strusctx, storagePath)
-	local config = string.format( "path=%s; cache=512M; statsproc=default", storagePath)
+	local config = string.format( "path=%s; cache=512M; statsproc=std", storagePath)
 	local output = {}
 
 	-- Get a client for the storage:
@@ -80,7 +80,7 @@ function dumpCollection( strusctx, storagePath)
 	end
 
 	for blob in storage:getAllStatistics( true) do
-		local statview = strusctx:unpackStatisticBlob( blob, "default")
+		local statview = strusctx:unpackStatisticBlob( blob, "std")
 		nofdocs = nofdocs + statview[ "nofdocs"]
 		for _,dfchange in ipairs(statview[ "dfchange"]) do
 			table.insert( dfchangelist, dfchange)

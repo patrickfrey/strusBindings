@@ -9,7 +9,7 @@ def createCollection( strusctx, storagePath, metadata, analyzer, multipart, data
 			'path': storagePath,
 			'metadata': metadata,
 			'cache': '512M',
-			'statsproc': 'default'
+			'statsproc': 'std'
 		}
 		if aclmap:
 			config['acl'] = True
