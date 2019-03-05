@@ -44,8 +44,7 @@ brew install python3
 
 cmake -G Xcode -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release \
 	-DWITH_STRUS_VECTOR="YES" -DWITH_STRUS_PATTERN="YES" \
-	-DWITH_PHP="YES" -DWITH_PYTHON="YES" \
-	.
+	-DWITH_PHP="YES" -DWITH_PYTHON="YES" -DWITH_LUA="YES" .
 
 xcodebuild -configuration Release -target ALL_BUILD
 xcodebuild -configuration Release -target install
