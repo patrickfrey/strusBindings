@@ -10,8 +10,6 @@ $storage = $outputdir . "/storage";
 $config = [
 	'path' => $storage,
 	'vecdim' => 10,
-	'simdist' => 20,
-	'probsimdist' => 40
 ];
 $vectors = [];
 
@@ -53,7 +51,7 @@ $transaction->close();
 $output = dumpVectorStorage( $ctx, $config, $vectors, $examplevec);
 
 $storage = $ctx->createVectorStorageClient( $config);
-$simlist = $storage->findSimilar( "word", $examplevec, 8, 0.85, 0.9, True);
+$simlist = array_slice( $storage->findSimilar( "word", $examplevec, 8, 0.85, 0.9, True), 0, 4);
 $simliststr = "";
 foreach ($simlist as $si => $sv) {
 	$simliststr .= sprintf( " %s=%.3f", $sv->value, $sv->weight);
@@ -65,8 +63,6 @@ $expected = <<<END_expected
 vector storage dump:
 string config: 
   string path: "storage"
-  string probsimdist: 40
-  string simdist: 20
   string vecdim: 10
 string nof vec nonvec: 0
 string nof vec word: 100
@@ -75,7 +71,7 @@ string rank 2: "0.981 F85 0.09683, 0.06875, 0.06675, 0.08675, 0.07208, 0.07017, 
 string rank 3: "0.97 F52 0.06525, 0.07225, 0.09442, 0.05633, 0.05425, 0.04, 0.062, 0.07992, 0.09942, 0.0805"
 string rank 4: "0.967 F91 0.04592, 0.02458, 0.04142, 0.05233, 0.032, 0.02517, 0.05725, 0.0385, 0.03233, 0.0385"
 string rank 5: "0.964 F99 0.08575, 0.09733, 0.03875, 0.03775, 0.08208, 0.0605, 0.07317, 0.08875, 0.06908, 0.0905"
-string simlist 0.1x10: " F70=0.985 F85=0.981 F52=0.970 F91=0.967 F99=0.964 F97=0.960 F39=0.957 F34=0.957"
+string simlist 0.1x10: " F70=0.985 F85=0.981 F91=0.967 F99=0.964"
 string types: 
   integer 0: "nonvec"
   integer 1: "word"
