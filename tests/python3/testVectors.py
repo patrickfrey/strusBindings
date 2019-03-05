@@ -48,7 +48,7 @@ transaction.close()
 output = dumpVectorStorage( ctx, config, vectors, examplevec)
 
 storage = ctx.createVectorStorageClient( config)
-simlist = storage.findSimilar( "word", examplevec, 8, 0.85, True)
+simlist = storage.findSimilar( "word", examplevec, 8, 0.85, 0,9, True)
 simliststr = ""
 for iv,sv in enumerate( simlist):
     simliststr += " %s=%.3f" % (sv.value, sv.weight)

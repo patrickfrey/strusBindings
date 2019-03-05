@@ -32,12 +32,12 @@ void VectorStorageClientImpl::prepareSearch( const std::string& type)
 	storage->prepareSearch( type);
 }
 
-Struct VectorStorageClientImpl::findSimilar( const std::string& type, const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const
+Struct VectorStorageClientImpl::findSimilar( const std::string& type, const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, double speedRecallFactor, bool realVecWeights) const
 {
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 
-	std::vector<VectorQueryResult> res = storage->findSimilar( type, Deserializer::getFloatList( vec), maxNofResults, minSimilarity, realVecWeights);
+	std::vector<VectorQueryResult> res = storage->findSimilar( type, Deserializer::getFloatList( vec), maxNofResults, minSimilarity, speedRecallFactor, realVecWeights);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -223,19 +223,6 @@ void VectorStorageTransactionImpl::defineFeature( const std::string& type, const
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	transaction->defineFeature( type, feat);
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
-	}
-}
-
-void VectorStorageTransactionImpl::defineScalar( const std::string& name, double value)
-{
-	VectorStorageTransactionInterface* transaction = m_vector_transaction_impl.getObject<VectorStorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( _TXT("calling vector storage transaction method after close"));
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-
-	transaction->defineScalar( name, value);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());

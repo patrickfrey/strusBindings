@@ -49,11 +49,15 @@ public:
 	/// \param[in] minSimilarity value between 0.0 and 1.0 specifying the minimum similarity a result should have 
 	/// \example 0.9
 	/// \example 0.85
+ 	/// \param[in] speedRecallFactor factor bigger than 0.0 used to adjust performance/recall, smaller value = better performance, bigger value = better recall
+	/// \example 0.9
+	/// \example 0.5
+	/// \remark for the standard LSH implementation a good value is 0.8. In the standard LSH implementation the value describes the accepted difference in bits of a sample, compared with the average error accepted. For example if the accepted difference in bits of the LSH values compared is 400 out of 2048, then the accepted difference for a sample of 64 bits that decides wheter a candidate should be considered further is (1.0 + speedRecallFactor) * 400 / (2048/64)) = (1.0 + speedRecallFactor) * 12.5 bits.
 	/// \param[in] realVecWeights true, if the real weights of the similarities should be calculated in the final result (for the best matches), false, if the weights of the final result should be the approximated values from the LSH similarity
 	/// \example true
 	/// \example false
 	/// \return the list of most similar vectors (double[])
-	Struct findSimilar( const std::string& type, const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, bool realVecWeights) const;
+	Struct findSimilar( const std::string& type, const ValueVariant& vec, unsigned int maxNofResults, double minSimilarity, double speedRecallFactor, bool realVecWeights) const;
 
 	/// \brief Create a vector storage transaction instance
 	/// \return the transaction instance
@@ -155,15 +159,6 @@ public:
 	/// \param[in] type of the feature to add
 	/// \param[in] feat name of the feature to add
 	void defineFeature( const std::string& type, const std::string& feat);
-
-	/// \brief Define some scalar configuration parameter used in calculation (depending on implementation)
-	/// \param[in] name name of the variable (depending on implementation)
-	/// \example "simdist"
-	/// \example "probsimdist"
-	/// \param[in] value value assigned to the variable
-	/// \example 340
-	/// \example 640
-	void defineScalar( const std::string& name, double value);
 
 	/// \brief Clear all vectors,types and feature names in the storage
 	void clear();

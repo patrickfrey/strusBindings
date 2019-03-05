@@ -53,7 +53,7 @@ $transaction->close();
 $output = dumpVectorStorage( $ctx, $config, $vectors, $examplevec);
 
 $storage = $ctx->createVectorStorageClient( $config);
-$simlist = $storage->findSimilar( "word", $examplevec, 8, 0.85, True);
+$simlist = $storage->findSimilar( "word", $examplevec, 8, 0.85, 0.9, True);
 $simliststr = "";
 foreach ($simlist as $si => $sv) {
 	$simliststr .= sprintf( " %s=%.3f", $sv->value, $sv->weight);

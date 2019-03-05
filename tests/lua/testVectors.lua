@@ -48,7 +48,7 @@ transaction:close()
 local output = dumpVectorStorage( ctx, config, vectors, examplevec)
 
 local storage = ctx:createVectorStorageClient( config)
-local simlist = storage:findSimilar( "word", examplevec, 8, 0.85, true)
+local simlist = storage:findSimilar( "word", examplevec, 8, 0.85, 0.9, true)
 local simliststr = ""
 for si,sv in ipairs( simlist) do
 	simliststr = simliststr .. string.format( " %s=%.3f", sv.value, sv.weight)
