@@ -32,6 +32,7 @@ set( source_files
 	impl/storage.cpp
 	impl/inserter.cpp
 	impl/vector.cpp
+	impl/sentence.cpp
 	impl/context.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingClasses.cpp

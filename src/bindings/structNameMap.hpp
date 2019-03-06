@@ -23,6 +23,10 @@ public:
 	~StructureNameMap(){}
 
 	int index( const char* id, std::size_t idsize) const;
+	int index( const std::string& nam) const
+	{
+		return index( nam.c_str(), nam.size());
+	}
 	int index( const char* id) const;
 	int index( const papuga_ValueVariant& id) const;
 	const char* name( int idx) const;

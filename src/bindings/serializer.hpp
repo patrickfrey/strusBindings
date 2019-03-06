@@ -22,6 +22,7 @@
 #include "strus/summaryElement.hpp"
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
+#include "strus/sentenceGuess.hpp"
 #include "strus/functionDescription.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
@@ -52,12 +53,15 @@ template <> class StructIdTemplate<analyzer::DocumentTerm> {public: static int s
 template <> class StructIdTemplate<analyzer::Document> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_Document;}};
 template <> class StructIdTemplate<analyzer::DocumentClass> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentClass;}};
 template <> class StructIdTemplate<VectorQueryResult> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_VectorQueryResult;}};
+template <> class StructIdTemplate<SentenceTerm> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_SentenceTerm;}};
+template <> class StructIdTemplate<SentenceGuess> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_SentenceGuess;}};
 template <> class StructIdTemplate<SummaryElement> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_SummaryElement;}};
 template <> class StructIdTemplate<MetaDataComparison> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_MetaDataComparison;}};
 template <> class StructIdTemplate<ResultDocument> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_ResultDocument;}};
 template <> class StructIdTemplate<QueryResult> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_QueryResult;}};
 template <> class StructIdTemplate<analyzer::ContentStatisticsItem> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_ContentStatisticsItem;}};
 template <> class StructIdTemplate<analyzer::ContentStatisticsResult> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_ContentStatisticsResult;}};
+
 
 template <typename T>
 struct has_structid
@@ -200,6 +204,8 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::ContentStatisticsItem>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsResult& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const SentenceTerm& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const SentenceGuess& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& errcode, bool deep);
@@ -207,6 +213,8 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const QueryResult& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<SentenceTerm>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<SentenceGuess>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val, papuga_ErrorCode& errcode, bool deep);

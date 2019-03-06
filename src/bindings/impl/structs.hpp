@@ -92,6 +92,19 @@ enum _DocumentClass {mimetype,encoding,scheme};
 /// \member weight weight given to the feature (0.0 <= .. <= 1.0)
 enum _VectorQueryResult {value,weight};
 
+/// \struct SentenceTerm
+/// \brief Term in a sentence analyzer result
+/// \member type type of the term
+/// \member value string value of the term
+enum _SentenceTerm {type,value};
+
+/// \struct SentenceGuess
+/// \brief Result of sentence analyzer
+/// \member classname name of the sentence class, eventually used to determine what query evaluation method to use
+/// \member terms list of terms of the sentence
+/// \member weight given to the sentence, used to decide what recognized pattern is the most probably to for the query sentence
+enum _SentenceGuess {classname,terms,weight};
+
 /// \struct SummaryElement
 /// \brief Summary element in a query result 
 /// \member name name of the summary element

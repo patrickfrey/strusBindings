@@ -26,6 +26,8 @@
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageDocumentUpdateInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
+#include "strus/sentenceAnalyzerInstanceInterface.hpp"
+#include "strus/sentenceLexerInstanceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
@@ -50,6 +52,9 @@ struct Deserializer
 	static std::string getString( papuga_SerializationIter& seriter);
 
 	static const char* getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter);
+	static int getCharUnicode( papuga_SerializationIter& seriter);
+	static std::vector<int> getCharListUnicode( papuga_SerializationIter& seriter);
+	static char getCharAscii( papuga_SerializationIter& seriter);
 
 	static std::vector<std::string> getStringList( papuga_SerializationIter& seriter);
 	static std::vector<std::string> getStringListAsValue( papuga_SerializationIter& seriter);
@@ -144,7 +149,10 @@ struct Deserializer
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
-	static void buildExpression( ExpressionBuilder& builder, papuga_SerializationIter& seriter, bool allowList);
+	static void buildExpression(
+			ExpressionBuilder& builder,
+			papuga_SerializationIter& seriter,
+			bool allowList);
 
 	static void buildExpression(
 			ExpressionBuilder& builder,
@@ -152,7 +160,9 @@ struct Deserializer
 			ErrorBufferInterface* errorhnd,
 			bool allowLists);
 
-	static void buildPattern( ExpressionBuilder& builder, papuga_SerializationIter& seriter, ErrorBufferInterface* errorhnd);
+	static void buildPattern( ExpressionBuilder& builder,
+			papuga_SerializationIter& seriter,
+			ErrorBufferInterface* errorhnd);
 
 	static void buildPatterns(
 			ExpressionBuilder& builder,
@@ -192,6 +202,22 @@ struct Deserializer
 
 	static std::string getConfigString( papuga_SerializationIter& seriter);
 	static std::string getConfigString( const papuga_ValueVariant& content);
+
+	static int buildSentencePatternExpressionArguments(
+			SentenceAnalyzerInstanceInterface* analyzer,
+			papuga_SerializationIter& seriter,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildSentencePatternExpression(
+			SentenceAnalyzerInstanceInterface* analyzer,
+			papuga_SerializationIter& seriter,
+			ErrorBufferInterface* errorhnd);
+
+	static void buildSentenceAnalyzer(
+			SentenceAnalyzerInstanceInterface* analyzer,
+			SentenceLexerInstanceInterface* lexer,
+			const papuga_ValueVariant& content,
+			ErrorBufferInterface* errorhnd);
 };
 
 }}//namespace

@@ -100,6 +100,21 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const VectorQu
 	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
 	return rt;
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const SentenceTerm& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, val.type(), errcode, deep);
+	rt &= serializeArrayElement( result, val.value(), errcode, deep);
+	return rt;
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const SentenceGuess& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, val.classname(), errcode, deep);
+	rt &= serializeArrayElement( result, val.terms(), errcode, deep);
+	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
+	return rt;
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
@@ -432,6 +447,14 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Configur
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<VectorQueryResult>& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val, errcode, deep);
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<SentenceTerm>& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val, errcode, deep);
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<SentenceGuess>& val, papuga_ErrorCode& errcode, bool deep)
 {
 	return serializeArray( result, val, errcode, deep);
 }
