@@ -6,6 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 #include "impl/vector.hpp"
+#include "impl/sentence.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageDumpInterface.hpp"
@@ -14,6 +15,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/constants.hpp"
 #include "private/internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
@@ -186,6 +188,23 @@ void VectorStorageClientImpl::close()
 	}
 }
 
+SentenceAnalyzerImpl* VectorStorageClientImpl::createSentenceAnalyzer( const ValueVariant& analyzerconfig) const
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
+	SentenceAnalyzerInstanceInterface* analyzer = objBuilder->createSentenceAnalyzer( Constants::standard_sentence_analyzer());
+	if (!analyzer) throw strus::runtime_error( _TXT("failed to create sentence analyzer: %s"), errorhnd->fetchError());
+	ObjectRef analyzer_impl;
+	ObjectRef lexer_impl;
+	analyzer_impl.resetOwnership( analyzer, "SentenceAnalyzer");
+	SentenceLexerInstanceInterface* lexer = storage->createSentenceLexer();
+	if (!lexer) throw strus::runtime_error( _TXT("failed to create sentence lexer: %s"), errorhnd->fetchError());
+	lexer_impl.resetOwnership( analyzer, "SentenceLexer");
+	return new SentenceAnalyzerImpl( m_trace_impl, m_objbuilder_impl, analyzer_impl, lexer_impl, m_errorhnd_impl, analyzerconfig);
+}
+
 VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace)
@@ -297,6 +316,7 @@ VectorStorageTransactionImpl::VectorStorageTransactionImpl( const ObjectRef& tra
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 }
+
 
 
 

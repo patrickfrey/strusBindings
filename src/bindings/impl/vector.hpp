@@ -21,6 +21,8 @@ typedef papuga_ValueVariant ValueVariant;
 
 /// \brief Forward declaration
 class VectorStorageTransactionImpl;
+/// \brief Forward declaration
+class SentenceAnalyzerImpl;
 
 
 /// \class VectorStorageClientImpl
@@ -109,6 +111,12 @@ public:
 	/// \return the normalized vector
 	/// \example [ 0.0123124 0.0423423 0.0065654 0.0023133 0.0076574 0.06354521 ]
 	WordVector normalize( const ValueVariant& vec) const;
+
+	/// \brief Create an analyzer for parsing query sentences based on features inserted in a vector storage
+	/// \param[in] analyzerconfig the configuration of the analyzer and the lexer it is based on
+	/// \example [ separator: '.', space: [' ','\t'], link: [[chr:'_ \t',subst:'_'],[chr:'()/&.,', lnk:'-']], sentence: ['repeat', 0, 3,['any',[['T'],['W']]] ]]
+	/// \return the analyzer
+	SentenceAnalyzerImpl* createSentenceAnalyzer( const ValueVariant& analyzerconfig) const;
 
 	/// \brief Get the configuration of this storage
 	/// \return the configuration structure

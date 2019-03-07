@@ -39,6 +39,7 @@ add_custom_command(
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/inserter.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp
+    DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/sentence.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/contentstats.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
@@ -53,7 +54,7 @@ add_custom_command(
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/postingIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/valueIterator.hpp
     DEPENDS   ${PROJECT_SOURCE_DIR}/src/bindings/impl/value/searchTermsIterator.hpp
-    COMMAND  strusBindingsInterfaceGen  "${MAIN_BINARY_DIR}"  ${PROJECT_SOURCE_DIR}/src/bindings/impl/structs.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/inserter.hpp  ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/contentstats.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
+    COMMAND  strusBindingsInterfaceGen  "${MAIN_BINARY_DIR}"  ${PROJECT_SOURCE_DIR}/src/bindings/impl/structs.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/context.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/storage.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/inserter.hpp  ${PROJECT_SOURCE_DIR}/src/bindings/impl/vector.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/sentence.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/contentstats.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/analyzer.hpp ${PROJECT_SOURCE_DIR}/src/bindings/impl/query.hpp
     COMMENT  "Generating strus bindings C header and implementation (output root dir: ${CMAKE_CURRENT_BINARY_DIR})"
     VERBATIM
  )

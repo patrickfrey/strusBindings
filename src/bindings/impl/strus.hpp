@@ -13,6 +13,7 @@
 #include "impl/storage.hpp"
 #include "impl/inserter.hpp"
 #include "impl/vector.hpp"
+#include "impl/sentence.hpp"
 #include "impl/analyzer.hpp"
 #include "impl/query.hpp"
 #include "impl/contentstats.hpp"

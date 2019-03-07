@@ -2919,7 +2919,7 @@ void Deserializer::buildSentenceAnalyzer(
 						}
 						case 2/*link*/:
 						{
-							int link_chr = 0;
+							std::vector<int> link_chrs;
 							char link_subst = 0;
 							if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 							{
@@ -2934,7 +2934,7 @@ void Deserializer::buildSentenceAnalyzer(
 										switch (link_idx)
 										{
 											case 0/*chr*/:
-												link_chr = Deserializer::getCharUnicode( seriter);
+												link_chrs = Deserializer::getCharListUnicode( seriter);
 											break;
 											case 1/*subst*/:
 												link_subst = Deserializer::getCharAscii( seriter);
@@ -2946,7 +2946,7 @@ void Deserializer::buildSentenceAnalyzer(
 								}
 								else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 								{
-									link_chr = Deserializer::getCharUnicode( seriter);
+									link_chrs = Deserializer::getCharListUnicode( seriter);
 									link_subst = Deserializer::getCharAscii( seriter);
 								}
 								else
@@ -2959,19 +2959,12 @@ void Deserializer::buildSentenceAnalyzer(
 							{
 								throw strus::runtime_error(_TXT("structure expected for value of '%s' in %s"), namemap.name(idx), context);
 							}
-							if (link_chr)
+							if (!link_chrs.empty() && link_subst)
 							{
-								if (link_subst)
+								std::vector<int>::const_iterator li = link_chrs.begin(), le = link_chrs.end();
+								for (; li != le; ++li)
 								{
-									lexer->addLink( link_chr, link_subst);
-								}
-								else if (link_chr > 127)
-								{
-									throw strus::runtime_error(_TXT("incomplete definition of '%s' in %s"), namemap.name(idx), context);
-								}
-								else
-								{
-									lexer->addLink( link_chr, link_chr);
+									lexer->addLink( *li, link_subst);
 								}
 							}
 							else
