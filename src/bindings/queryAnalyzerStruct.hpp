@@ -53,15 +53,7 @@ public:
 	{
 		std::string fieldtype = string_conv::tolower( fieldtype_);
 		GroupOperator gop( Operator( name, 0, range, cardinality), groupBy, groupSingle);
-		GroupMap::iterator gi = m_groupmap.find( fieldtype);
-		if (gi == m_groupmap.end())
-		{
-			m_groupmap[ fieldtype].push_back( gop);
-		}
-		else
-		{
-			gi->second.push_back( gop);
-		}
+		m_groupmap[ fieldtype].push_back( gop);
 	}
 
 	const GroupOperatorList& autoGroupOperators( const std::string& fieldtype_) const
