@@ -61,6 +61,11 @@ Struct SentenceAnalyzerImpl::analyze( const std::string& source, unsigned int ma
 	return rt;
 }
 
+TermExpression* SentenceAnalyzerImpl::analyzeTermExpression( const ValueVariant& termExpression, const std::string& sentenceFeatType, int maxNofResults, double minWeight) const
+{
+	throw std::runtime_error( "not implemented");
+}
+
 void SentenceAnalyzerImpl::close()
 {
 	m_analyzer_impl.reset();
