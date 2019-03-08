@@ -200,9 +200,11 @@ int main( int argc, const char* argv[])
 			case LUA_ERRMEM:
 				fprintf( stderr, "out of memory in script '%s'\n", inputfile);
 				break;
+#ifdef LUA_ERRGCMM
 			case LUA_ERRGCMM:
 				fprintf( stderr, "internal error in destructor call (call of __gc metamethod) in script '%s'\n", inputfile);
 				break;
+#endif
 			case LUA_ERRERR:
 				fprintf( stderr, "error in lua error handler executing script '%s'\n", inputfile);
 				break;
