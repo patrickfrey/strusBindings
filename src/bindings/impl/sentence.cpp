@@ -42,14 +42,12 @@ SentenceAnalyzerImpl::SentenceAnalyzerImpl( const ObjectRef& trace_impl, const O
 	}
 }
 
-Struct SentenceAnalyzerImpl::analyze( const std::string& source, unsigned int maxNofResults) const
+Struct SentenceAnalyzerImpl::analyze( const std::string& source, int maxNofResults, double minWeight) const
 {
 	const SentenceAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<SentenceAnalyzerInstanceInterface>();
-	if (!analyzer) throw strus::runtime_error( _TXT("calling sentence analyzer method after close"));
 	const SentenceLexerInstanceInterface* lexer = m_lexer_impl.getObject<SentenceLexerInstanceInterface>();
-	if (!lexer) throw strus::runtime_error( _TXT("calling sentence analyzer method after close"));
 
-	std::vector<SentenceGuess> res = analyzer->analyzeSentence( lexer, source, maxNofResults);
+	std::vector<SentenceGuess> res = analyzer->analyzeSentence( lexer, source, maxNofResults, minWeight);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -61,15 +59,5 @@ Struct SentenceAnalyzerImpl::analyze( const std::string& source, unsigned int ma
 	return rt;
 }
 
-TermExpression* SentenceAnalyzerImpl::analyzeTermExpression( const ValueVariant& termExpression, const std::string& sentenceFeatType, int maxNofResults, double minWeight) const
-{
-	throw std::runtime_error( "not implemented");
-}
-
-void SentenceAnalyzerImpl::close()
-{
-	m_analyzer_impl.reset();
-	m_lexer_impl.reset();
-}
 
 

@@ -201,7 +201,7 @@ SentenceAnalyzerImpl* VectorStorageClientImpl::createSentenceAnalyzer( const Val
 	analyzer_impl.resetOwnership( analyzer, "SentenceAnalyzer");
 	SentenceLexerInstanceInterface* lexer = storage->createSentenceLexer();
 	if (!lexer) throw strus::runtime_error( _TXT("failed to create sentence lexer: %s"), errorhnd->fetchError());
-	lexer_impl.resetOwnership( analyzer, "SentenceLexer");
+	lexer_impl.resetOwnership( lexer, "SentenceLexer");
 	return new SentenceAnalyzerImpl( m_trace_impl, m_objbuilder_impl, analyzer_impl, lexer_impl, m_errorhnd_impl, analyzerconfig);
 }
 

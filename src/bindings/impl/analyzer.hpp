@@ -24,6 +24,9 @@ namespace strus {
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
+///\brief Forward declaration
+class SentenceAnalyzerImpl;
+
 
 /// \class DocumentAnalyzerImpl
 /// \brief Analyzer object representing a program for segmenting, 
@@ -372,6 +375,23 @@ public:
 			const ValueVariant& normalizers,
 			const ValueVariant& priority=ValueVariant());
 
+	
+	/// \brief Define a field containing sentence, meaning that the content of the field is a text string whose content requires syntactical and semantical analysis to determine its class and to decide what to do with it.
+	/// \param[in] fieldType field type name
+	/// \example "querystr"
+	/// \param[in] tokenizer tokenizer function description to use for the features of this field type before normalizing it
+	/// \example "content"
+	/// \example "word"
+	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type (in the ascending order of appearance) before passing it to analysis.
+	/// \example "uc"
+	/// \example ["lc",["convdia", "en"]]
+	/// \param[in] analyzer the sentence analyzer to use
+	void addSentenceType(
+			const std::string& fieldType,
+			const ValueVariant& tokenizer,
+			const ValueVariant& normalizers,
+			SentenceAnalyzerImpl* analyzer);
+
 	/// \brief Defines an element from a pattern matching result.
 	/// \param[in] type element type created from this pattern match result type
 	/// \example "name"
@@ -474,6 +494,24 @@ public:
 	/// \example  ["<" "year" "17071"]
 	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression) const;
 
+	/// \brief Analyzes a field as sentence, meaning that the content of the field is tokenized,normalized,concatenated by spaces ' ' and split into lexems by a sentence analyzer that finds the most probable patterns matching the field.
+	/// \param[in] fieldType field type name
+	/// \example "querystr"
+ 	/// \param[in] fieldContent source to analyze
+	/// \example "best football manager in the world"
+	/// \param[in] maxNofResults maximum number of results to return by the sentence analyzer
+	/// \example 4
+	/// \param[in] minWeight minimum weight to accept of a result of the sentence analyzer, best result has weight 1.0 and the others are normalized to be smaller or equal to 1.0
+	/// \example 0.99
+	/// \example 0.8
+	/// \return list of named sentence guesses with weight (same as SentenceAnalyzer::analyze(..))
+	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
+	Struct analyzeSentence(
+			const std::string& fieldType,
+			const std::string& fieldContent,
+			int maxNofResults,
+			double minWeight);
+
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \return the structure to introspect starting from the path
@@ -493,6 +531,7 @@ private:
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_analyzer_impl;
+	ObjectRef m_sentence_analyzer_map_impl;
 	QueryAnalyzerStruct m_queryAnalyzerStruct;
 	const TextProcessorInterface* m_textproc;
 };

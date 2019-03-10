@@ -503,6 +503,10 @@ static QueryAnalyzerContextInterface::GroupBy getImplicitGroupBy( const std::str
 	{
 		throw strus::runtime_error(_TXT("'%s' does not make sense as implicit grouping operation"), name.c_str());
 	}
+	else if (strus::caseInsensitiveEquals( name, "unique"))
+	{
+		throw strus::runtime_error(_TXT("'%s' does not make sense as implicit grouping operation"), name.c_str());
+	}
 	else
 	{
 		throw strus::runtime_error(_TXT("unknown group by operation '%s'"), name.c_str());
@@ -558,6 +562,165 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression( const ValueVar
 		throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	return metaexpr.release();
+}
+
+struct SentenceAnalyzerPrivateImpl
+{
+	std::string fieldType;
+	ObjectRef analyzer_impl;
+	ObjectRef lexer_impl;
+	FeatureFuncDef featureFuncDef;
+
+	SentenceAnalyzerPrivateImpl( const std::string& fieldType_, const ObjectRef& analyzer_impl_, const ObjectRef& lexer_impl_, const FeatureFuncDef& featureFuncDef_)
+		:fieldType(fieldType_),analyzer_impl(analyzer_impl_),lexer_impl(lexer_impl_),featureFuncDef(featureFuncDef_){}
+	SentenceAnalyzerPrivateImpl( const SentenceAnalyzerPrivateImpl& o)
+		:fieldType(o.fieldType),analyzer_impl(o.analyzer_impl),lexer_impl(o.lexer_impl),featureFuncDef(o.featureFuncDef){}
+};
+
+typedef std::vector<SentenceAnalyzerPrivateImpl> SentenceAnalyzerArrayPrivateImpl;
+
+void QueryAnalyzerImpl::addSentenceType(
+		const std::string& fieldType,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers,
+		SentenceAnalyzerImpl* analyzer)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ObjectRef sentence_analyzer_map_impl_copy = m_sentence_analyzer_map_impl;
+	ObjectRef sentence_analyzer_map_impl_new;
+	SentenceAnalyzerArrayPrivateImpl* sar = sentence_analyzer_map_impl_copy.getObject<SentenceAnalyzerArrayPrivateImpl>();
+	if (sar)
+	{
+		sentence_analyzer_map_impl_new.resetOwnership( sar = new SentenceAnalyzerArrayPrivateImpl( *sar), "array of sentence analyzers");
+	}
+	else
+	{
+		if (sentence_analyzer_map_impl_copy.get()) throw strus::runtime_error(_TXT( "logic error: type mismatch accessing '%s'"), "sentence analyzer");
+		sentence_analyzer_map_impl_new.resetOwnership( sar = new SentenceAnalyzerArrayPrivateImpl(), "array of sentence analyzers");
+	}
+	sar->push_back( SentenceAnalyzerPrivateImpl(
+				fieldType, analyzer->m_analyzer_impl, analyzer->m_lexer_impl,
+				FeatureFuncDef( m_textproc, tokenizer, normalizers, errorhnd)));
+	m_sentence_analyzer_map_impl = sentence_analyzer_map_impl_new;
+}
+
+static std::string normalize_field(
+	const char* tok, std::size_t toksize, 
+	std::vector<NormalizerFunctionInstanceInterface*>::const_iterator ci,
+	const std::vector<NormalizerFunctionInstanceInterface*>::const_iterator& ce)
+{
+	if (ci == ce) return std::string( tok, toksize);
+
+	std::string rt;
+	std::string origstr;
+	for (; ci != ce; ++ci)
+	{
+		rt = (*ci)->normalize( tok, toksize);
+		if (ci + 1 != ce)
+		{
+			if (!rt.empty() && rt[0] == '\0')
+			{
+				std::string reslist;
+				char const* vi = rt.c_str();
+				char const* ve = vi + rt.size();
+				for (++vi; vi < ve; vi = std::strchr( vi, '\0')+1)
+				{
+					std::string partres = normalize_field( vi, std::strlen(vi), ci+1, ce);
+					if (!partres.empty() && partres[0] == '\0')
+					{
+						reslist.append( partres);
+					}
+					else if (reslist.empty())
+					{
+						reslist.push_back( '\0');
+						reslist.append( partres);
+					}
+					else
+					{
+						reslist.append( partres);
+					}
+				}
+				return reslist;
+			}
+			else
+			{
+				origstr.swap( rt);
+				tok = origstr.c_str();
+				toksize = origstr.size();
+			}
+		}
+	}
+	return rt;
+}
+
+static void appendNormTokenToSentenceString( std::string& result, const std::string& normtok, char separator)
+{
+	if (!normtok.empty() && normtok[0] == '\0')
+	{
+		char const* vi = normtok.c_str();
+		char const* ve = vi + normtok.size();
+		for (++vi; vi < ve; vi = std::strchr( vi, '\0')+1)
+		{
+			if (!result.empty()) result.push_back( separator);
+			result.append( vi);
+		}
+	}
+	else
+	{
+		if (!result.empty()) result.push_back( separator);
+		result.append( normtok);
+	}
+	
+}
+
+Struct QueryAnalyzerImpl::analyzeSentence(
+		const std::string& fieldType,
+		const std::string& fieldContent,
+		int maxNofResults,
+		double minWeight)
+{
+	ObjectRef sentence_analyzer_map_impl_copy = m_sentence_analyzer_map_impl;
+	SentenceAnalyzerArrayPrivateImpl* sar = sentence_analyzer_map_impl_copy.getObject<SentenceAnalyzerArrayPrivateImpl>();
+	if (!sar) throw strus::runtime_error(_TXT( "unknown '%s' (none defined)"), "sentence analyzer");
+	SentenceAnalyzerArrayPrivateImpl::const_iterator si = sar->begin(), se = sar->end();
+	for (; si != se && !strus::caseInsensitiveEquals( si->fieldType, fieldType); ++si){}
+	if (si == se) throw strus::runtime_error(_TXT( "unknown '%s' (not found)"), "sentence analyzer");
+
+	const SentenceAnalyzerInstanceInterface* analyzer = si->analyzer_impl.getObject<SentenceAnalyzerInstanceInterface>();
+	const SentenceLexerInstanceInterface* lexer = si->lexer_impl.getObject<SentenceLexerInstanceInterface>();
+
+	std::string source;
+	const TokenizerFunctionInstanceInterface* tokenizer = si->featureFuncDef.tokenizer.get();
+	if (tokenizer)
+	{
+		std::vector<analyzer::Token> tokens = tokenizer->tokenize( fieldContent.c_str(), fieldContent.size());
+		std::vector<analyzer::Token>::const_iterator ti = tokens.begin(), te = tokens.end();
+		for (; ti != te; ++ti)
+		{
+			std::string normtok
+				= normalize_field(
+					fieldContent.c_str() + ti->origpos().ofs(), ti->origsize(),
+					si->featureFuncDef.normalizers.begin(), si->featureFuncDef.normalizers.end());
+			appendNormTokenToSentenceString( source, normtok, ' ');
+		}
+	}
+	else
+	{
+		std::string normtok
+				= normalize_field(
+					fieldContent.c_str(), fieldContent.size(),
+					si->featureFuncDef.normalizers.begin(), si->featureFuncDef.normalizers.end());
+		appendNormTokenToSentenceString( source, normtok, ' ');
+	}
+	std::vector<SentenceGuess> res = analyzer->analyzeSentence( lexer, source, maxNofResults, minWeight);
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
+
+	Struct rt;
+	strus::bindings::Serializer::serialize( &rt.serialization, res, true/*deep*/);
+	rt.release();
+	return rt;
+	
 }
 
 Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg) const

@@ -49,19 +49,19 @@ static QueryAnalyzerContextInterface::GroupBy groupByOpFromName( const char* nam
 	QueryAnalyzerContextInterface::GroupBy rt = QueryAnalyzerContextInterface::GroupAll;
 	if (!name)
 	{}
-	else if (0==std::strcmp( name, "pos"))
+	else if (strus::caseInsensitiveEquals( name, "pos"))
 	{
 		rt = QueryAnalyzerContextInterface::GroupByPosition;
 	}
-	else if (0==std::strcmp( name, "every"))
+	else if (strus::caseInsensitiveEquals( name, "every"))
 	{
 		rt = QueryAnalyzerContextInterface::GroupEvery;
 	}
-	else if (0==std::strcmp( name, "all"))
+	else if (strus::caseInsensitiveEquals( name, "all"))
 	{
 		rt = QueryAnalyzerContextInterface::GroupAll;
 	}
-	else if (0==std::strcmp( name, "unique"))
+	else if (strus::caseInsensitiveEquals( name, "unique"))
 	{
 		rt = QueryAnalyzerContextInterface::GroupUnique;
 	}

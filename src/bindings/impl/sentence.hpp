@@ -32,37 +32,22 @@ public:
 	/// \param[in] source source to analyze
 	/// \example "best football manager in the world"
 	/// \example "discography of the rolling stones"
-	/// \param[in] maxNofResults maximum number of results to return
+	/// \param[in] maxNofResults maximum number of results to return or -1 if not specified
 	/// \example 2
 	/// \example 5
+	/// \example -1
+	/// \param[in] minWeight defines cut of results with a lower weight
+	/// \example 0.8
+	/// \example 0.9
 	/// \return the list of the most probable query term lists with weights
 	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
-	Struct analyze( const std::string& source, unsigned int maxNofResults) const;
-
-	/// \brief Analyze all terms of a selected type as sentences and duplicate the term expression for each instance found
-	/// \param[in] termExpression expression tree to analyze
-	/// \example "best football manager in the world"
-	/// \example "discography of the rolling stones"
-	/// \param[in] sentenceFeatType type of the feature containing sentences to analyze
-	/// \example "SENT"
-	/// \param[in] maxNofResults maximum number of results to return
-	/// \example 4
-	/// \param[in] minWeight minimum weight to accept of a result, best result has weight 1.0 and the others are normalized to be smaller or equal to 1.0
-	/// \example 0.99
-	/// \example 0.8
-	/// \return the term expression tree after analysis
-	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
-	TermExpression* analyzeTermExpression( const ValueVariant& termExpression, const std::string& sentenceFeatType, int maxNofResults, double minWeight) const;
-
-	/// \brief Controlled close to free resources (forcing free resources in interpreter context with garbage collector)
-	/// \remark This method is not implicitely called with the destructor because it might be a complicated operation that cannot be afforded in panic shutdown.
-	/// \note the method does not have to be called necessarily.
-	void close();
+	Struct analyze( const std::string& source, int maxNofResults, double minWeight) const;
 
 private:
 	friend class VectorStorageClientImpl;
 	SentenceAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& analyzer, const ObjectRef& lexer, const ObjectRef& errorhnd_, const ValueVariant& config);
 
+	friend class QueryAnalyzerImpl;
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;

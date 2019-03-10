@@ -23,6 +23,9 @@ struct FeatureFuncDef
 	std::vector<NormalizerFunctionInstanceInterface*> normalizers;
 	Reference<TokenizerFunctionInstanceInterface> tokenizer;
 
+	FeatureFuncDef( const FeatureFuncDef& o)
+		:normalizers_ref(o.normalizers_ref),normalizers(o.normalizers),tokenizer(o.tokenizer){}
+
 	FeatureFuncDef( const TextProcessorInterface* textproc,
 			const ValueVariant& tokenizer_,
 			const ValueVariant& normalizers_,
