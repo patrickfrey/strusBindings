@@ -1221,13 +1221,16 @@ bool WebRequestContext::executeRequest(
 			}
 			else
 			{
-				papuga_ContentType schema_doctype = papuga_ContentType_JSON;
+				papuga_ContentType schema_doctype = papuga_ContentType_Unknown;
 				switch (m_result_doctype)
 				{
 					case WebRequestContent::Unknown:
-					case WebRequestContent::JSON:
 					case WebRequestContent::HTML:
 					case WebRequestContent::TEXT:
+						setAnswer( answer, ErrorCodeNotImplemented);
+						return false;
+					case WebRequestContent::JSON:
+						schema_doctype = papuga_ContentType_JSON;
 						break;
 					case WebRequestContent::XML:
 						schema_doctype = papuga_ContentType_XML;
