@@ -536,12 +536,12 @@ bool WebRequestContext::initRequestContext( WebRequestAnswer& answer)
 	return true;
 }
 
-bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* scheme)
+bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema)
 {
-	m_atm = papuga_RequestHandler_get_scheme( m_handler->impl(), contextType, scheme);
+	m_atm = papuga_RequestHandler_get_automaton( m_handler->impl(), contextType, schema);
 	if (!m_atm)
 	{
-		setAnswer( answer, ErrorCodeRequestResolveError, _TXT("unknown scheme"));
+		setAnswer( answer, ErrorCodeRequestResolveError, _TXT("unknown schema"));
 		return false;
 	}
 	if (m_request) papuga_destroy_Request( m_request);
@@ -927,27 +927,27 @@ void WebRequestContext::releaseContext()
 	m_context_ownership = false;
 }
 
-bool WebRequestContext::executeMainScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return executeContextScheme( (const char*)0, (const char*)0, scheme, content, answer);
+	return executeContextSchema( (const char*)0, (const char*)0, schema, content, answer);
 }
 
-bool WebRequestContext::executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	return	createRequestContext( answer, contextType, contextName)
-	&&	initContentRequest( answer, contextType, scheme)
+	&&	initContentRequest( answer, contextType, schema)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
 	&&	executeContentRequest( answer, content)
 	&&	getContentRequestResult( answer);
 }
 
-bool WebRequestContext::executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
 	m_context = context;
 	m_context_ownership = false;
-	return	initContentRequest( answer, contextType, scheme)
+	return	initContentRequest( answer, contextType, schema)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
 	&&	executeContentRequest( answer, content)
@@ -974,7 +974,7 @@ bool WebRequestContext::executeOPTIONS(
 	else if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
 	{
 		std::string http_allow("OPTIONS,");
-		char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, lstbuf, lstbufsize);
+		char const** sl = papuga_RequestHandler_list_schema_names( m_handler->impl(), selector.typenam, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( sl, answer)) return false;
 		for (; *sl; ++sl) http_allow.append( *sl);
 		int classid = selector.obj->value.hostObject->classid;
@@ -995,7 +995,7 @@ bool WebRequestContext::executeOPTIONS(
 		if (selector.context)
 		{
 			std::string http_allow("OPTIONS,");
-			char const** sl = papuga_RequestHandler_list_schemes( m_handler->impl(), selector.typenam, lstbuf, lstbufsize);
+			char const** sl = papuga_RequestHandler_list_schema_names( m_handler->impl(), selector.typenam, lstbuf, lstbufsize);
 			if (!checkPapugaListBufferOverflow( sl, answer)) return false;
 			for (; *sl; ++sl) http_allow.append( *sl);
 			const char* msgstr = papuga_Allocator_copy_string( &m_allocator, http_allow.c_str(), http_allow.size());
@@ -1096,19 +1096,19 @@ bool WebRequestContext::executePutConfiguration( const char* typenam, const char
 	ConfigurationTransaction cfgtransaction;
 	std::string configstr = webRequestContent_tostring( content, 0);
 	ConfigurationDescription cfgdescr( typenam, contextnam, content.doctype(), configstr);
-	char schemebuf[ 128];
-	const char* scheme = typenam;
+	char schemabuf[ 128];
+	const char* schema = typenam;
 	if (!init)
 	{
-		if ((int)sizeof(schemebuf) <= std::snprintf( schemebuf, sizeof(schemebuf), "PUT/%s", typenam))
+		if ((int)sizeof(schemabuf) <= std::snprintf( schemabuf, sizeof(schemabuf), "PUT/%s", typenam))
 		{
 			setAnswer( answer, ErrorCodeBufferOverflow);
 			return false;
 		}
-		scheme = schemebuf;
+		schema = schemabuf;
 		m_confighandler->storeConfiguration( cfgtransaction, cfgdescr);
 	}
-	if (!executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, answer)
+	if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer)
 	||  !m_handler->transferContext( typenam, contextnam, m_context, answer))
 	{
 		return false;
@@ -1128,7 +1128,7 @@ bool WebRequestContext::executePutConfiguration( const char* typenam, const char
 
 bool WebRequestContext::executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	if (!executeMainScheme( ROOT_CONTEXT_NAME, content, answer)
+	if (!executeMainSchema( ROOT_CONTEXT_NAME, content, answer)
 	||  !m_handler->transferContext( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, m_context, answer))
 	{
 		return false;
@@ -1150,27 +1150,27 @@ bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const c
 {
 	bool configContextFound = true;
 	
-	char scheme[ 128];
-	if ((int)sizeof(scheme) <= std::snprintf( scheme, sizeof(scheme), "DELETE/%s", typenam))
+	char schema[ 128];
+	if ((int)sizeof(schema) <= std::snprintf( schema, sizeof(schema), "DELETE/%s", typenam))
 	{
 		setAnswer( answer, ErrorCodeBufferOverflow);
 		return false;
 	}
 	configContextFound = m_handler->removeContext( typenam, contextnam, answer);
-	if (papuga_RequestHandler_get_scheme( m_handler->impl(), ROOT_CONTEXT_NAME, scheme))
+	if (papuga_RequestHandler_get_automaton( m_handler->impl(), ROOT_CONTEXT_NAME, schema))
 	{
 		ConfigurationDescription config = m_confighandler->getStoredConfiguration( typenam, contextnam);
 		if (!config.valid())
 		{
 			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
 			{
-				m_logger->logWarning( _TXT("configuration content not found, delete scheme not executed"));
+				m_logger->logWarning( _TXT("configuration content not found, delete schema not executed"));
 			}
 		}
 		else
 		{
 			WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
-			if (!executeContextScheme( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, scheme, content, answer))
+			if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer))
 			{
 				return false;
 			}
@@ -1199,11 +1199,46 @@ bool WebRequestContext::executeRequest(
 	TransactionRef transactionRef;
 	try
 	{
+		PathBuf path( path_);
 		if (isEqual( method_, "OPTIONS"))
 		{
 			return executeOPTIONS( path_, content, answer);
 		}
-		PathBuf path( path_);
+		else if (isEqual( method_, "SCHEMA"))
+		{
+			const char* contextType = path.getNext();
+			if (!contextType)
+			{
+				setAnswer( answer, ErrorCodeIncompleteRequest);
+				return false;
+			}
+			const char* schema = path.rest();
+			const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), contextType, schema);
+			if (!descr)
+			{
+				setAnswer( answer, ErrorCodeRequestResolveError);
+				return false;
+			}
+			else
+			{
+				papuga_ContentType schema_doctype = papuga_ContentType_JSON;
+				switch (m_result_doctype)
+				{
+					case WebRequestContent::Unknown:
+					case WebRequestContent::JSON:
+					case WebRequestContent::HTML:
+					case WebRequestContent::TEXT:
+						break;
+					case WebRequestContent::XML:
+						schema_doctype = papuga_ContentType_XML;
+						break;
+				}
+				const char* txt = papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding);
+				WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, std::strlen(txt));
+				answer.setContent( answerContent);
+				return true;
+			}
+		}
 		char const* method = method_;
 		std::size_t methodsize = std::strlen( method_);
 		bool debug = false;
@@ -1220,6 +1255,11 @@ bool WebRequestContext::executeRequest(
 		{
 			const char* typenam = path.getNext();
 			const char* contextnam = path.getNext();
+			if (!typenam || !contextnam)
+			{
+				setAnswer( answer, ErrorCodeIncompleteRequest);
+				return false;
+			}
 			transactionRef = m_transactionPool->fetchTransaction( contextnam);
 			if (!transactionRef.get())
 			{
@@ -1236,7 +1276,7 @@ bool WebRequestContext::executeRequest(
 		{
 			if (debug)
 			{
-				//... debug requests only available calling schemes
+				//... debug requests only available calling schemas
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
@@ -1345,7 +1385,7 @@ bool WebRequestContext::executeRequest(
 					{
 						setAnswer( answer, ErrorCodeRequestResolveError);
 						return false;
-						//... debug requests only available calling schemes
+						//... debug requests only available calling schemas
 					}
 					if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer)) return false;
 					goto DONE;
@@ -1357,13 +1397,13 @@ bool WebRequestContext::executeRequest(
 		{
 			if (!content.empty())
 			{
-				// Scheme execution else:
+				// schema execution else:
 				if (!selector.setPath( path.rest()))
 				{
 					setAnswer( answer, ErrorCodeOutOfMem);
 					return false;
 				}
-				if (!executeContextScheme( selector.context, selector.typenam, method, content, answer)) return false;
+				if (!executeContextSchema( selector.context, selector.typenam, method, content, answer)) return false;
 				goto DONE;
 			}
 			else

@@ -5,11 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Defining common datastructures used to define schemes
- * @file schemes_base.hpp
+/* \brief Defining common datastructures used to define schemas
+ * @file schemas_base.hpp
  */
-#ifndef _STRUS_WEBREQUEST_SCHEMES_BASE_HPP_INCLUDED
-#define _STRUS_WEBREQUEST_SCHEMES_BASE_HPP_INCLUDED
+#ifndef _STRUS_WEBREQUEST_SCHEMAS_BASE_HPP_INCLUDED
+#define _STRUS_WEBREQUEST_SCHEMAS_BASE_HPP_INCLUDED
 #include "papuga.hpp"
 #include "strus/bindingClasses.h"
 #include "strus/bindingObjects.h"
@@ -33,7 +33,7 @@ public:
 		StorageEnableAcl, StorageEnableCompression, StorageLruCacheSize,
 		StorageMaxNofOpenFiles, StorageWriteBufferSize, StorageBlockSize,
 	
-		Segmenter, MimeType, Charset, Scheme, DocumentClassDef,
+		Segmenter, MimeType, Charset, Schema, DocumentClassDef,
 		SubDocumentName, SubDocumentSelect, SubContentClassDef, SubContentSelect, 
 		AnalyzerElement,FeatureTypeName,FieldTypeName,SelectExpression,FeatureOptionPosition,FeatureOptionDef,
 		PatternTypeName, PatternMatcherModule, PatternMatcherLexemTypes, PatternMatcherPatternDef,

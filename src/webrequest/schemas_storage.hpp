@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Schemes for storages
- * @file schemes_storage.hpp
+/* \brief Schemas for storages
+ * @file schemas_storage.hpp
  */
-#ifndef _STRUS_WEBREQUEST_SCHEMES_STORAGE_HPP_INCLUDED
-#define _STRUS_WEBREQUEST_SCHEMES_STORAGE_HPP_INCLUDED
-#include "schemes_base.hpp"
+#ifndef _STRUS_WEBREQUEST_SCHEMAS_STORAGE_HPP_INCLUDED
+#define _STRUS_WEBREQUEST_SCHEMAS_STORAGE_HPP_INCLUDED
+#include "schemas_base.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -19,10 +19,10 @@
 namespace strus {
 namespace webrequest {
 
-class Scheme_Context_PUT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Scheme_Context_PUT_Storage() :papuga::RequestAutomaton(
+	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
@@ -55,10 +55,10 @@ public:
 	) {}
 };
 
-class Scheme_Context_DELETE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_DELETE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Scheme_Context_DELETE_Storage() :papuga::RequestAutomaton(
+	Schema_Context_DELETE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
@@ -72,10 +72,10 @@ public:
 	) {}
 };
 
-class Scheme_Context_INIT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_INIT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Scheme_Context_INIT_Storage() :papuga::RequestAutomaton(
+	Schema_Context_INIT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{

@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Scheme for initial configuration
- * @file schemes_context.hpp
+/* \brief Schema for initial configuration
+ * @file schemas_context.hpp
  */
-#ifndef _STRUS_WEBREQUEST_SCHEMES_CONTEXT_HPP_INCLUDED
-#define _STRUS_WEBREQUEST_SCHEMES_CONTEXT_HPP_INCLUDED
-#include "schemes_base.hpp"
+#ifndef _STRUS_WEBREQUEST_SCHEMAS_CONTEXT_HPP_INCLUDED
+#define _STRUS_WEBREQUEST_SCHEMAS_CONTEXT_HPP_INCLUDED
+#include "schemas_base.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -19,10 +19,10 @@
 namespace strus {
 namespace webrequest {
 
-class Scheme_INIT_Context :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_INIT_Context :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Scheme_INIT_Context() :papuga::RequestAutomaton(
+	Schema_INIT_Context() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{

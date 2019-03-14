@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Scheme for document analysis
- * @file schemes_document.hpp
+/* \brief Schema for document analysis
+ * @file schemas_document.hpp
  */
-#ifndef _STRUS_WEBREQUEST_SCHEMES_DOCUMENT_HPP_INCLUDED
-#define _STRUS_WEBREQUEST_SCHEMES_DOCUMENT_HPP_INCLUDED
-#include "schemes_base.hpp"
+#ifndef _STRUS_WEBREQUEST_SCHEMAS_DOCUMENT_HPP_INCLUDED
+#define _STRUS_WEBREQUEST_SCHEMAS_DOCUMENT_HPP_INCLUDED
+#include "schemas_base.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -19,7 +19,7 @@
 namespace strus {
 namespace webrequest {
 
-class SchemeDocumentPart :public AutomatonNameSpace
+class SchemaDocumentPart :public AutomatonNameSpace
 {
 public:
 	static papuga::RequestAutomaton_NodeList defineAnalyzer()
@@ -31,12 +31,12 @@ public:
 			{"docanalyzer/class/mimetype", "()", MimeType},
 			{"docanalyzer/class/encoding", "()", Charset},
 			{"docanalyzer/class/segmenter", "()", Segmenter},
-			{"docanalyzer/class/scheme", "()", Scheme},
+			{"docanalyzer/class/schema", "()", Schema},
 			{"docanalyzer/class", DocumentClassDef, {
 					{"segmenter", Segmenter, '?'},
 					{"mimetype", MimeType, '?'},
 					{"encoding", Charset, '?'},
-					{"scheme", Scheme, '?'}
+					{"schema", Schema, '?'}
 				}
 			},
 			{"docanalyzer", "docanalyzer", "context", C::createDocumentAnalyzer(), {DocumentClassDef} },
@@ -188,7 +188,7 @@ public:
 					{"segmenter", Segmenter, '?'},
 					{"mime", MimeType, '?'},
 					{"encoding", Charset, '?'},
-					{"scheme", Scheme, '?'}
+					{"schema", Schema, '?'}
 				}
 			},
 			{"docanalyzer/subcontent", 0, "docanalyzer", A::defineSubContent(), {
@@ -200,10 +200,10 @@ public:
 	}
 };
 
-class Scheme_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemeDocumentPart
+class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemaDocumentPart
 {
 public:
-	Scheme_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
+	Schema_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
@@ -212,10 +212,10 @@ public:
 	) {}
 };
 
-class Scheme_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemeDocumentPart
+class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemaDocumentPart
 {
 public:
-	Scheme_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
+	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{

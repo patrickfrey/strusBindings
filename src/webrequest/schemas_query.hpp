@@ -5,12 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Scheme for query analysis and evaluation
- * @file schemes_query.hpp
+/* \brief Schema for query analysis and evaluation
+ * @file schemas_query.hpp
  */
-#ifndef _STRUS_WEBREQUEST_SCHEMES_QUERY_HPP_INCLUDED
-#define _STRUS_WEBREQUEST_SCHEMES_QUERY_HPP_INCLUDED
-#include "schemes_base.hpp"
+#ifndef _STRUS_WEBREQUEST_SCHEMAS_QUERY_HPP_INCLUDED
+#define _STRUS_WEBREQUEST_SCHEMAS_QUERY_HPP_INCLUDED
+#include "schemas_base.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -19,7 +19,7 @@
 namespace strus {
 namespace webrequest {
 
-class SchemeQueryPart :public AutomatonNameSpace
+class SchemaQueryPart :public AutomatonNameSpace
 {
 public:
 	static papuga::RequestAutomaton_NodeList defineQueryEval()
@@ -266,10 +266,10 @@ public:
 	}
 };
 
-class Scheme_QueryAnalyzer_GET_content :public papuga::RequestAutomaton, public SchemeQueryPart
+class Schema_QueryAnalyzer_GET_content :public papuga::RequestAutomaton, public SchemaQueryPart
 {
 public:
-	Scheme_QueryAnalyzer_GET_content() :papuga::RequestAutomaton(
+	Schema_QueryAnalyzer_GET_content() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
@@ -281,10 +281,10 @@ public:
 };
 
 
-class Scheme_Storage_QRYORG :public papuga::RequestAutomaton, public SchemeQueryPart
+class Schema_Storage_QRYORG :public papuga::RequestAutomaton, public SchemaQueryPart
 {
 public:
-	Scheme_Storage_QRYORG() :papuga::RequestAutomaton(
+	Schema_Storage_QRYORG() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
@@ -298,10 +298,10 @@ public:
 	) {}
 };
 
-class Scheme_Storage_QRYANA :public papuga::RequestAutomaton, public SchemeQueryPart
+class Schema_Storage_QRYANA :public papuga::RequestAutomaton, public SchemaQueryPart
 {
 public:
-	Scheme_Storage_QRYANA() :papuga::RequestAutomaton(
+	Schema_Storage_QRYANA() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{

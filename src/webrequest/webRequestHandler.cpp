@@ -13,7 +13,7 @@
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/bindingClasses.h"
-#include "schemes.hpp"
+#include "schemas.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/base/local_ptr.hpp"
@@ -117,37 +117,37 @@ struct PostTransactionMethodDescription
 		:MethodDescription( "POST/transaction", id, 200, NULL, rootelem, "id", false/*has content*/, 0){}
 };
 
-template <class SCHEME>
-class DefineScheme
-	:public SCHEME
+template <class SCHEMA>
+class DefineSchema
+	:public SCHEMA
 {
 public:
-	explicit DefineScheme( const char* contextType)
+	explicit DefineSchema( const char* contextType)
 		:m_contextType(contextType){}
 
-	void addToHandler( papuga_RequestHandler* handler, const char* schemeName) const
+	void addToHandler( papuga_RequestHandler* handler, const char* schemaName) const
 	{
-		if (!papuga_RequestHandler_add_scheme( handler, m_contextType, schemeName, papuga::RequestAutomaton::impl())) throw std::bad_alloc();\
+		if (!papuga_RequestHandler_add_schema( handler, m_contextType, schemaName, papuga::RequestAutomaton::impl(), papuga::RequestAutomaton::description())) throw std::bad_alloc();\
 	}
 
 private:
 	const char* m_contextType;
 };
 
-template <class SCHEME>
-class DefineMainScheme
-	:public DefineScheme<SCHEME>
+template <class SCHEMA>
+class DefineMainSchema
+	:public DefineSchema<SCHEMA>
 {
 public:
-	DefineMainScheme() :DefineScheme<SCHEME>(""){}
+	DefineMainSchema() :DefineSchema<SCHEMA>(""){}
 };
 
-template <class SCHEME>
-class DefineConfigScheme
-	:public DefineScheme<SCHEME>
+template <class SCHEMA>
+class DefineConfigSchema
+	:public DefineSchema<SCHEMA>
 {
 public:
-	DefineConfigScheme() :DefineScheme<SCHEME>( ROOT_CONTEXT_NAME){}
+	DefineConfigSchema() :DefineSchema<SCHEMA>( ROOT_CONTEXT_NAME){}
 };
 
 static const char* g_context_typenames[] = {"contentstats","storage","docanalyzer","queryanalyzer","inserter",0};
@@ -178,31 +178,28 @@ WebRequestHandler::WebRequestHandler(
 	{
 		namespace mt = strus::bindings::method;
 
-		// [1] Add schemes
-		static const DefineMainScheme<Scheme_INIT_Context> scheme_INIT_Context;
-		scheme_INIT_Context.addToHandler( m_impl, ROOT_CONTEXT_NAME/*scheme name*/);
+		// [1] Add schemas
+		static const DefineMainSchema<Schema_INIT_Context> schema_INIT_Context;
+		schema_INIT_Context.addToHandler( m_impl, ROOT_CONTEXT_NAME/*schema name*/);
 
-		static const DefineConfigScheme<Scheme_Context_INIT_Storage> scheme_Context_INIT_Storage;
-		scheme_Context_INIT_Storage.addToHandler( m_impl, "storage");
-		static const DefineConfigScheme<Scheme_Context_PUT_Storage> scheme_Context_PUT_Storage;
-		scheme_Context_PUT_Storage.addToHandler( m_impl, "PUT/storage");
-		static const DefineConfigScheme<Scheme_Context_DELETE_Storage> scheme_Context_DELETE_Storage;
-		scheme_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
+		static const DefineConfigSchema<Schema_Context_INIT_Storage> schema_Context_INIT_Storage;
+		schema_Context_INIT_Storage.addToHandler( m_impl, "storage");
+		static const DefineConfigSchema<Schema_Context_PUT_Storage> schema_Context_PUT_Storage;
+		schema_Context_PUT_Storage.addToHandler( m_impl, "PUT/storage");
+		static const DefineConfigSchema<Schema_Context_DELETE_Storage> schema_Context_DELETE_Storage;
+		schema_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
 
-		static const DefineConfigScheme<Scheme_Context_PUT_DocumentAnalyzer> scheme_Context_PUT_DocumentAnalyzer;
-		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "docanalyzer");
-		scheme_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
+		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_PUT_DocumentAnalyzer;
+		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
 
-		static const DefineConfigScheme<Scheme_Context_PUT_Inserter> scheme_Context_PUT_Inserter;
-		scheme_Context_PUT_Inserter.addToHandler( m_impl, "inserter");
-		scheme_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
+		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
+		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
 
-		static const DefineConfigScheme<Scheme_Context_PUT_ContentStatistics> scheme_Context_PUT_ContentStatistics;
-		scheme_Context_PUT_ContentStatistics.addToHandler( m_impl, "contentstats");
-		scheme_Context_PUT_ContentStatistics.addToHandler( m_impl, "PUT/contentstats");
+		static const DefineConfigSchema<Schema_Context_PUT_ContentStatistics> schema_Context_PUT_ContentStatistics;
+		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "PUT/contentstats");
 
-		static const DefineScheme<Scheme_Storage_QRYORG> scheme_Storage_QRYORG("storage");
-		scheme_Storage_QRYORG.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_Storage_QRYORG> schema_Storage_QRYORG("storage");
+		schema_Storage_QRYORG.addToHandler( m_impl, "GET");
 
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");

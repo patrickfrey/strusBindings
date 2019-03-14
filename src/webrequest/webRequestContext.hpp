@@ -53,6 +53,7 @@ public:
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool executePutConfiguration( const char* typenam, const char* contextnam, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
@@ -70,9 +71,9 @@ private:
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
-	bool executeMainScheme( const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextScheme( const char* contextType, const char* contextName, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextScheme( papuga_RequestContext* context, const char* contextType, const char* scheme, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
 	void releaseContext();
 
 private:
