@@ -68,6 +68,7 @@ public:
 					{SelectExpression},
 					{TokenizerDef},
 					{NormalizerDef,'+'},
+					{FeaturePriority,'?'},
 					{FeatureOptionDef,'*'}
 				}
 			},
@@ -76,6 +77,7 @@ public:
 					{SelectExpression},
 					{TokenizerDef},
 					{NormalizerDef,'+'},
+					{FeaturePriority,'?'},
 					{FeatureOptionDef,'*'}
 				}
 			},
@@ -83,7 +85,8 @@ public:
 					{FeatureTypeName},
 					{SelectExpression},
 					{TokenizerDef},
-					{NormalizerDef,'+'}
+					{NormalizerDef,'+'},
+					{FeaturePriority,'?'}
 				}
 			},
 			{"docanalyzer/feature/metadata", 0, "docanalyzer", A::defineMetaData(), {
@@ -131,6 +134,7 @@ public:
 					{FeatureTypeName},
 					{PatternTypeName},
 					{NormalizerDef,'+'},
+					{FeaturePriority,'?'},
 					{FeatureOptionDef,'*'}
 				}
 			},
@@ -138,6 +142,7 @@ public:
 					{FeatureTypeName},
 					{PatternTypeName},
 					{NormalizerDef,'+'},
+					{FeaturePriority,'?'},
 					{FeatureOptionDef,'*'}
 				}
 			},

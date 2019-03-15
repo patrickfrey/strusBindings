@@ -35,7 +35,7 @@ public:
 	
 		Segmenter, MimeType, Charset, Schema, DocumentClassDef,
 		SubDocumentName, SubDocumentSelect, SubContentClassDef, SubContentSelect, 
-		AnalyzerElement,FeatureTypeName,FieldTypeName,SelectExpression,FeatureOptionPosition,FeatureOptionDef,
+		AnalyzerElement,FeatureTypeName,FieldTypeName,SelectExpression,FeatureOptionPosition,FeatureOptionDef,FeaturePriority,
 		PatternTypeName, PatternMatcherModule, PatternMatcherLexemTypes, PatternMatcherPatternDef,
 		PatternRuleName, PatternRuleVisible, PatternRuleExpression,
 		AggregatorName,AggregatorArg,AggregatorDef,
