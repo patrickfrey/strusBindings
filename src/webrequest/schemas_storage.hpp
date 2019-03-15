@@ -19,10 +19,10 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_CREATE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
+	Schema_Context_CREATE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{

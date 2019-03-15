@@ -47,7 +47,6 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
-
 	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
 	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer);
 
@@ -55,7 +54,7 @@ private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
-	bool executePutConfiguration( const char* typenam, const char* contextnam, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
@@ -75,6 +74,7 @@ private:
 	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
 	void releaseContext();
+	bool executeSchemaDescriptionRequest( const char* method, const char* path, WebRequestAnswer& answer);
 
 private:
 	WebRequestHandler* m_handler;

@@ -24,6 +24,8 @@
 #include "strus/base/string_format.hpp"
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/base/fileio.hpp"
+#include "strus/base/string_conv.hpp"
+#include "strus/base/string_format.hpp"
 #include "papuga/errors.h"
 #include "papuga/request.h"
 #include "papuga/requestParser.h"
@@ -1091,13 +1093,13 @@ bool WebRequestContext::executeCommitTransaction( const papuga_ValueVariant* obj
 	}
 }
 
-bool WebRequestContext::executePutConfiguration( const char* typenam, const char* contextnam, bool init, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	ConfigurationTransaction cfgtransaction;
 	std::string configstr = webRequestContent_tostring( content, 0);
 	ConfigurationDescription cfgdescr( typenam, contextnam, content.doctype(), configstr);
 	char schema[ 128];
-	if ((int)sizeof(schema) <= std::snprintf( schema, sizeof(schema), "PUT/%s", typenam))
+	if ((int)sizeof(schema) <= std::snprintf( schema, sizeof(schema), "%s/%s", request_method, typenam))
 	{
 		setAnswer( answer, ErrorCodeBufferOverflow);
 		return false;
@@ -1141,7 +1143,7 @@ bool WebRequestContext::executeLoadMainConfiguration( const WebRequestContent& c
 
 bool WebRequestContext::executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return executePutConfiguration( typenam, contextnam, true/*init*/, content, answer);
+	return executeDeclareConfiguration( typenam, contextnam, "PUT", true/*init*/, content, answer);
 }
 
 bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer)
@@ -1188,8 +1190,76 @@ bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const c
 	return true;
 }
 
+bool WebRequestContext::executeSchemaDescriptionRequest(
+		const char* method,
+		const char* pathstr,
+		WebRequestAnswer& answer)
+{
+	PathBuf path( pathstr);
+
+	std::string schema;
+	const char* typenam = path.getNext();
+	const char* contextType = "";
+	if (!typenam)
+	{
+		schema = ROOT_CONTEXT_NAME;
+	}
+	else if (isEqual( method, "POST") || isEqual( method, "PUT") || isEqual( method, "DELETE"))
+	{
+		contextType = ROOT_CONTEXT_NAME;
+		schema = strus::string_format( "%s/%s", method, typenam);
+	}
+	else
+	{
+		contextType = typenam;
+		schema = method;
+	}
+	if (path.hasMore())
+	{
+		setAnswer( answer, ErrorCodeRequestResolveError);
+		return false;
+	}
+	const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), contextType, schema.c_str());
+	if (!descr)
+	{
+		setAnswer( answer, ErrorCodeRequestResolveError);
+		return false;
+	}
+	else
+	{
+		papuga_ContentType schema_doctype = papuga_ContentType_Unknown;
+		switch (m_result_doctype)
+		{
+			case WebRequestContent::Unknown:
+			case WebRequestContent::HTML:
+			case WebRequestContent::TEXT:
+				setAnswer( answer, ErrorCodeNotImplemented);
+				return false;
+			case WebRequestContent::JSON:
+				schema_doctype = papuga_ContentType_JSON;
+				break;
+			case WebRequestContent::XML:
+				schema_doctype = papuga_ContentType_XML;
+				break;
+		}
+		const char* txt = papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding);
+		if (txt)
+		{
+			WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, std::strlen(txt));
+			answer.setContent( answerContent);
+			return true;
+		}
+		else
+		{
+			papuga_ErrorCode errcode = papuga_SchemaDescription_last_error( descr);
+			setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+			return false;
+		}
+	}
+}
+
 bool WebRequestContext::executeRequest(
-		const char* method_,
+		const char* method,
 		const char* path_,
 		const WebRequestContent& content,
 		WebRequestAnswer& answer)
@@ -1198,56 +1268,9 @@ bool WebRequestContext::executeRequest(
 	try
 	{
 		PathBuf path( path_);
-		if (isEqual( method_, "OPTIONS"))
+		if (isEqual( method, "OPTIONS"))
 		{
 			return executeOPTIONS( path_, content, answer);
-		}
-		else if (isEqual( method_, "SCHEMA"))
-		{
-			const char* contextType = path.getNext();
-			if (!contextType)
-			{
-				setAnswer( answer, ErrorCodeIncompleteRequest);
-				return false;
-			}
-			const char* schema = path.rest();
-			const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), contextType, schema);
-			if (!descr)
-			{
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
-			else
-			{
-				papuga_ContentType schema_doctype = papuga_ContentType_Unknown;
-				switch (m_result_doctype)
-				{
-					case WebRequestContent::Unknown:
-					case WebRequestContent::HTML:
-					case WebRequestContent::TEXT:
-						setAnswer( answer, ErrorCodeNotImplemented);
-						return false;
-					case WebRequestContent::JSON:
-						schema_doctype = papuga_ContentType_JSON;
-						break;
-					case WebRequestContent::XML:
-						schema_doctype = papuga_ContentType_XML;
-						break;
-				}
-				const char* txt = papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding);
-				WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, std::strlen(txt));
-				answer.setContent( answerContent);
-				return true;
-			}
-		}
-		char const* method = method_;
-		std::size_t methodsize = std::strlen( method_);
-		bool debug = false;
-
-		if (methodsize > 6 && std::memcmp( method, "DEBUG_", 6) == 0)
-		{
-			debug = true;
-			method = method + 6;
 		}
 		if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
@@ -1269,22 +1292,36 @@ bool WebRequestContext::executeRequest(
 			}
 			selector.init( transactionRef->context(), typenam, contextnam);
 		}
+		if (path.startsWith( "schema", 6/*"schema"*/))
+		{
+			(void)path.getNext();//... "schema" is not part of request
+			if (isEqual(method,"GET"))
+			{
+				const char* schema_method_ptr = path.getNext();
+				if (!schema_method_ptr)
+				{
+					setAnswer( answer, ErrorCodeIncompleteRequest);
+					return false;
+				}
+				std::string schema_method = strus::string_conv::toupper( schema_method_ptr);
+				return executeSchemaDescriptionRequest( schema_method.c_str(), path.rest(), answer);
+			}
+			else
+			{
+				setAnswer( answer, ErrorCodeNotImplemented);
+				return false;
+			}
+		}
 		else if (!selector.init( m_handler->impl(), path, answer))
 		{
 			return false;
 		}
 		if (!path.hasMore())
 		{
-			if (debug)
-			{
-				//... debug requests only available calling schemas
-				setAnswer( answer, ErrorCodeRequestResolveError);
-				return false;
-			}
 			if (selector.contextnam)
 			{
 				// PUT or DELETE of configuration/transaction or fallback to next:
-				if (isEqual(method,"PUT"))
+				if (isEqual(method,"PUT") || isEqual(method,"POST"))
 				{
 					if (transactionRef.get())
 					{
@@ -1297,7 +1334,7 @@ bool WebRequestContext::executeRequest(
 					else
 					{
 						selector.reset();
-						return executePutConfiguration( selector.typenam, selector.contextnam, false/*init*/, content, answer);
+						return executeDeclareConfiguration( selector.typenam, selector.contextnam, method, false/*init*/, content, answer);
 					}
 				}
 				else if (isEqual(method,"DELETE"))
@@ -1382,12 +1419,6 @@ bool WebRequestContext::executeRequest(
 				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
 				if (methoddescr)
 				{
-					if (debug)
-					{
-						setAnswer( answer, ErrorCodeRequestResolveError);
-						return false;
-						//... debug requests only available calling schemas
-					}
 					if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer)) return false;
 					goto DONE;
 				}

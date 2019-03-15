@@ -183,20 +183,23 @@ WebRequestHandler::WebRequestHandler(
 		schema_INIT_Context.addToHandler( m_impl, ROOT_CONTEXT_NAME/*schema name*/);
 
 		static const DefineConfigSchema<Schema_Context_INIT_Storage> schema_Context_INIT_Storage;
-		schema_Context_INIT_Storage.addToHandler( m_impl, "storage");
-		static const DefineConfigSchema<Schema_Context_PUT_Storage> schema_Context_PUT_Storage;
-		schema_Context_PUT_Storage.addToHandler( m_impl, "PUT/storage");
+		schema_Context_INIT_Storage.addToHandler( m_impl, "PUT/storage");
+		static const DefineConfigSchema<Schema_Context_CREATE_Storage> schema_Context_CREATE_Storage;
+		schema_Context_CREATE_Storage.addToHandler( m_impl, "POST/storage");
 		static const DefineConfigSchema<Schema_Context_DELETE_Storage> schema_Context_DELETE_Storage;
 		schema_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
 
 		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_PUT_DocumentAnalyzer;
 		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
+		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "POST/docanalyzer");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
+		schema_Context_PUT_Inserter.addToHandler( m_impl, "POST/inserter");
 
 		static const DefineConfigSchema<Schema_Context_PUT_ContentStatistics> schema_Context_PUT_ContentStatistics;
 		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "PUT/contentstats");
+		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "POST/contentstats");
 
 		static const DefineSchema<Schema_Storage_QRYORG> schema_Storage_QRYORG("storage");
 		schema_Storage_QRYORG.addToHandler( m_impl, "GET");
