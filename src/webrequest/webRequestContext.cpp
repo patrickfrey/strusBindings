@@ -1096,16 +1096,14 @@ bool WebRequestContext::executePutConfiguration( const char* typenam, const char
 	ConfigurationTransaction cfgtransaction;
 	std::string configstr = webRequestContent_tostring( content, 0);
 	ConfigurationDescription cfgdescr( typenam, contextnam, content.doctype(), configstr);
-	char schemabuf[ 128];
-	const char* schema = typenam;
+	char schema[ 128];
+	if ((int)sizeof(schema) <= std::snprintf( schema, sizeof(schema), "PUT/%s", typenam))
+	{
+		setAnswer( answer, ErrorCodeBufferOverflow);
+		return false;
+	}
 	if (!init)
 	{
-		if ((int)sizeof(schemabuf) <= std::snprintf( schemabuf, sizeof(schemabuf), "PUT/%s", typenam))
-		{
-			setAnswer( answer, ErrorCodeBufferOverflow);
-			return false;
-		}
-		schema = schemabuf;
 		m_confighandler->storeConfiguration( cfgtransaction, cfgdescr);
 	}
 	if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer)
