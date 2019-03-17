@@ -52,8 +52,8 @@ public:
 		QueryEvalFunctionFeatureName, QueryEvalFunctionFeatureValue, QueryEvalFunctionFeature,
 		QueryEvalFunctionName,
 
-		TermExpression, ExpressionVariableName, TermType, TermValue,
-		MetaDataCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue,
+		TermExpression, ExpressionVariableName, TermType, TermValue, TermLen,
+		MetaDataCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue, MetaDataRangeFrom, MetaDataRangeTo, 
 
 		TermStats, TermDocumentFrequency, CollectionNofDocs, GlobalStats,
 		Docno,NumberOfResults,FirstResult,AccessRight,

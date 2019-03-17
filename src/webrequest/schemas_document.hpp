@@ -11,6 +11,7 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_DOCUMENT_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_DOCUMENT_HPP_INCLUDED
 #include "schemas_base.hpp"
+#include "schemas_expression.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -160,16 +161,16 @@ public:
 			{"docanalyzer/postmatcher/name", "()", PatternTypeName, papuga_TypeString, "bibref"},
 			{"docanalyzer/postmatcher/module", "()", PatternMatcherModule, papuga_TypeString, "analyzer_pattern"},
 			{"docanalyzer/postmatcher/lexem", "()", PatternMatcherLexemTypes, papuga_TypeString, "lexem"},
+			{SchemaExpressionPart::declarePatternExpression().root("docanalyzer/postmatcher/pattern")},
 			{"docanalyzer/postmatcher/pattern/name", "()", PatternRuleName, papuga_TypeString, "bibref"},
 			{"docanalyzer/postmatcher/pattern/visible", "()", PatternRuleVisible, papuga_TypeBool, "true"},
-			{"docanalyzer/postmatcher/pattern/expression", "()", PatternRuleExpression, papuga_TypeVoid, NULL},
 			{"docanalyzer/postmatcher/pattern", PatternMatcherPatternDef, {
 					{"name", PatternRuleName, '!'},
 					{"visible", PatternRuleVisible, '?'},
-					{"expression", PatternRuleExpression, '!'}
+					{"expression", TermExpression, '!'}
 				}
 			},
-			{"docanalyzer/postpattern", 0, "docanalyzer", A::defineTokenPatternMatcher(), {
+			{"docanalyzer/postmatcher", 0, "docanalyzer", A::defineTokenPatternMatcher(), {
 					{PatternTypeName, '!'},
 					{PatternMatcherModule, '!'},
 					{PatternMatcherLexemTypes, '*'},

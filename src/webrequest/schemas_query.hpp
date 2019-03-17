@@ -11,6 +11,7 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_QUERY_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_QUERY_HPP_INCLUDED
 #include "schemas_base.hpp"
+#include "schemas_expression.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -123,36 +124,6 @@ public:
 		};
 	}
 
-	static papuga::RequestAutomaton_NodeList declareTermExpression()
-	{
-		return {
-			{"/query/feature//term/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
-			{"/query/feature//term/type", "()", FieldTypeName, papuga_TypeString, "word"},
-			{"/query/feature//term/value", "()", TermValue, papuga_TypeString, "city"},
-			{"/query/feature//term", TermExpression, {
-					{"variable", ExpressionVariableName, '?'},
-					{"type", FieldTypeName, '!'},
-					{"value", TermValue, '!'}
-				}
-			},
-			{"/query/feature//expr/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
-			{"/query/feature//expr/op", "()", JoinOperatorName, papuga_TypeString, "within_struct"},
-			{"/query/feature//expr/range", "()", JoinOperatorRange, papuga_TypeInt, "12"},
-			{"/query/feature//expr/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
-			{"/query/feature//expr/arg", "()", TermExpression, papuga_TypeVoid, ""},
-			{"/query/feature//expr", TermExpression, {
-					{"variable", ExpressionVariableName, '?'},
-					{"op", JoinOperatorName, '!'},
-					{"range", JoinOperatorRange, '?'},
-					{"cardinality", JoinOperatorRange, '?'},
-					{"arg", TermExpression, '*'}
-				}
-			},
-			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
-			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75:1.0"},
-		};
-	}
-
 	static papuga::RequestAutomaton_NodeList declareMetaData()
 	{
 		return {
@@ -176,7 +147,9 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {
-			{declareTermExpression()},
+			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
+			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75:1.0"},
 			{"/query/feature", "+feature", "analyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 		};
 	}
@@ -195,7 +168,9 @@ public:
 		typedef bindings::method::Query Q;
 		typedef bindings::method::QueryAnalyzer A;
 		return {
-			{declareTermExpression()},
+			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
+			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75:1.0"},
 			{"/query/feature", "_feature", "analyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
 
@@ -209,7 +184,9 @@ public:
 	{
 		typedef bindings::method::Query Q;
 		return {
-			{declareTermExpression()},
+			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
+			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75:1.0"},
 			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression}, {FeatureWeight, '?'}} },
 
 			{declareMetaData()},
