@@ -26,15 +26,15 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{"/extensions/directory", "()", ModuleDir},
-			{"/extensions/modules", "()", ModuleName},
-			{"/data/workdir", "()", WorkDir},
-			{"/data/resources", "()", ResourceDir},
-			{"/context/trace", "log()", TraceLogType},
-			{"/context/trace", "file()", TraceLogFile},
-			{"/context/trace", "groupby()", TraceGroupBy},
-			{"/context/trace", "call()", TraceCall},
-			{"/context/trace", "count()", TraceCount},
+			{"/extensions/directory", "()", ModuleDir, papuga_TypeString, "/usr/lib/modules"},
+			{"/extensions/modules", "()", ModuleName, papuga_TypeString, "analyzer_pattern"},
+			{"/data/workdir", "()", WorkDir, papuga_TypeString, "/srv/strus"},
+			{"/data/resources", "()", ResourceDir, papuga_TypeString, "/usr/share/strus"},
+			{"/context/trace", "log()", TraceLogType, papuga_TypeString, "dump;count"},
+			{"/context/trace", "file()", TraceLogFile, papuga_TypeString, "stdout;stderr;/run/log/strus"},
+			{"/context/trace", "groupby()", TraceGroupBy, papuga_TypeString, "Query::pushTerm"},
+			{"/context/trace", "call()", TraceCall, papuga_TypeString, "213\\,214\\,512"},
+			{"/context/trace", "count()", TraceCount, papuga_TypeString, "Query::pushTerm"},
 			{"/context/trace", ContextTrace, {
 					{"log",  TraceLogType, '!'},
 					{"file", TraceLogFile, '?'},
@@ -43,8 +43,8 @@ public:
 					{"count", TraceCount, '?'}
 				}
 			},
-			{"/context/rpc", "()", ContextRpc},
-			{"/context/threads", "()", ContextThreads},
+			{"/context/rpc", "()", ContextRpc, papuga_TypeString, "localhost:1313"},
+			{"/context/threads", "()", ContextThreads, papuga_TypeInt, "16"},
 			{"/context", ContextConfig, {
 					{"rpc", ContextRpc, '?'},
 					{"trace", ContextTrace, '?'},

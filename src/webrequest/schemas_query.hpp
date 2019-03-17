@@ -28,45 +28,45 @@ public:
 		typedef bindings::method::Context C;
 		return {
 			{"/query/eval", "queryeval", "context", C::createQueryEval(), {} },
-			{"/query/eval/cterm/set", "()", FeatureSet},
-			{"/query/eval/cterm/type", "()", TermType},
-			{"/query/eval/cterm/name", "()", TermValue},
+			{"/query/eval/cterm/set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"/query/eval/cterm/type", "()", TermType, papuga_TypeString, "word"},
+			{"/query/eval/cterm/name", "()", TermValue, papuga_TypeString, "town"},
 			{"/query/eval/cterm", 0, "queryeval", E::addTerm(), {{FeatureSet},{TermType},{TermValue}} },
-			{"/query/eval/restriction", "()", FeatureSetRestrictionDef},
+			{"/query/eval/restriction", "()", FeatureSetRestrictionDef, papuga_TypeString, "restrict"},
 			{"/query/eval/restriction", 0, "queryeval", E::addRestrictionFeature(), {{FeatureSetRestrictionDef}} },
-			{"/query/eval/selection", "()", FeatureSetSelectionDef},
+			{"/query/eval/selection", "()", FeatureSetSelectionDef, papuga_TypeString, "select"},
 			{"/query/eval/selection", 0, "queryeval", E::addSelectionFeature(), {{FeatureSetSelectionDef}} },
-			{"/query/eval/exclusion", "()", FeatureSetExclusionDef},
+			{"/query/eval/exclusion", "()", FeatureSetExclusionDef, papuga_TypeString, "exclude"},
 			{"/query/eval/exclusion", 0, "queryeval", E::addExclusionFeature(), {{FeatureSetExclusionDef}} },
 
-			{"/query/eval//result/name", "()", QueryEvalFunctionResultName},
-			{"/query/eval//result/value", "()", QueryEvalFunctionResultValue},
+			{"/query/eval//result/name", "()", QueryEvalFunctionResultName, papuga_TypeString, NULL},
+			{"/query/eval//result/value", "()", QueryEvalFunctionResultValue, papuga_TypeString, NULL},
 			{"/query/eval//result", QueryEvalFunctionResult, {
 					{"name", QueryEvalFunctionResultName},
 					{"value", QueryEvalFunctionResultValue}
 				}
 			},
-			{"/query/eval//param/name", "()", QueryEvalFunctionParameterName},
-			{"/query/eval//param/value", "()", QueryEvalFunctionParameterValue},
+			{"/query/eval//param/name", "()", QueryEvalFunctionParameterName, papuga_TypeString, NULL},
+			{"/query/eval//param/value", "()", QueryEvalFunctionParameterValue, papuga_TypeString, NULL},
 			{"/query/eval//param", QueryEvalFunctionParameter, {
 					{"name", QueryEvalFunctionParameterName},
 					{"value", QueryEvalFunctionParameterValue}
 				}
 			},
-			{"/query/eval//feature/name", "()", QueryEvalFunctionFeatureName},
-			{"/query/eval//feature/value", "()", QueryEvalFunctionFeatureValue},
+			{"/query/eval//feature/name", "()", QueryEvalFunctionFeatureName, papuga_TypeString, NULL},
+			{"/query/eval//feature/value", "()", QueryEvalFunctionFeatureValue, papuga_TypeString, NULL},
 			{"/query/eval//feature", QueryEvalFunctionParameter, {
 					{"name", QueryEvalFunctionFeatureName},
 					{"feature", QueryEvalFunctionFeatureValue}
 				}
 			},
-			{"/query/eval/summarizer/name", "()", QueryEvalFunctionName},
+			{"/query/eval/summarizer/name", "()", QueryEvalFunctionName, papuga_TypeString, "matchphrase"},
 			{"/query/eval/summarizer", 0, "queryeval", E::addSummarizer(), {
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*'},
 					{QueryEvalFunctionResult, '*'}}
 			},
-			{"/query/eval/weighting/name", "()", QueryEvalFunctionName},
+			{"/query/eval/weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
 			{"/query/eval/weighting", 0, "queryeval", E::addWeightingFunction(), {
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*'}}
@@ -84,18 +84,18 @@ public:
 		typedef bindings::method::Context C;
 		return {
 			{"/query/analyzer", "analyzer", "context", C::createQueryAnalyzer(), {} },
-			{"/query/analyzer/element/type", "()", FeatureTypeName},
-			{"/query/analyzer/element/field", "()", FieldTypeName},
+			{"/query/analyzer/element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"/query/analyzer/element/field", "()", FieldTypeName, papuga_TypeString, "text"},
 
-			{"/query/analyzer/element/tokenizer/name", "()", TokenizerName},
-			{"/query/analyzer/element/tokenizer/arg", "()", TokenizerArg},
+			{"/query/analyzer/element/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
+			{"/query/analyzer/element/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[a-zA-Z0-9]+"},
 			{"/query/analyzer/element/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"/query/analyzer/element/normalizer/name", "()", NormalizerName},
-			{"/query/analyzer/element/normalizer/arg", "()", NormalizerArg},
+			{"/query/analyzer/element/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
+			{"/query/analyzer/element/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
 			{"/query/analyzer/element/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
@@ -108,11 +108,11 @@ public:
 					{NormalizerDef,'+'},
 				}
 			},
-			{"/query/analyzer/group/field", "()", FieldTypeName},
-			{"/query/analyzer/group/op", "()", JoinOperatorName},
-			{"/query/analyzer/group/range", "()", JoinOperatorRange},
-			{"/query/analyzer/group/cardinality", "()", JoinOperatorCardinality},
-			{"/query/analyzer/group@by", "", GroupBy},
+			{"/query/analyzer/group/field", "()", FieldTypeName, papuga_TypeString, "text"},
+			{"/query/analyzer/group/op", "()", JoinOperatorName, papuga_TypeString, "sequence_imm"},
+			{"/query/analyzer/group/range", "()", JoinOperatorRange, papuga_TypeInt, "5"},
+			{"/query/analyzer/group/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
+			{"/query/analyzer/group@by", "", GroupBy, papuga_TypeString, "position;every;all;unique"},
 			{"/query/analyzer/group", 0, "analyzer", A::defineImplicitGroupBy(), {
 					{FieldTypeName,'!'},
 					{GroupBy,'!'},
@@ -126,20 +126,20 @@ public:
 	static papuga::RequestAutomaton_NodeList declareTermExpression()
 	{
 		return {
-			{"/query/feature//term/variable", "()", ExpressionVariableName},
-			{"/query/feature//term/type", "()", FieldTypeName},
-			{"/query/feature//term/value", "()", TermValue},
+			{"/query/feature//term/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
+			{"/query/feature//term/type", "()", FieldTypeName, papuga_TypeString, "word"},
+			{"/query/feature//term/value", "()", TermValue, papuga_TypeString, "city"},
 			{"/query/feature//term", TermExpression, {
 					{"variable", ExpressionVariableName, '?'},
 					{"type", FieldTypeName, '!'},
 					{"value", TermValue, '!'}
 				}
 			},
-			{"/query/feature//expr/variable", "()", ExpressionVariableName},
-			{"/query/feature//expr/op", "()", JoinOperatorName},
-			{"/query/feature//expr/range", "()", JoinOperatorRange},
-			{"/query/feature//expr/cardinality", "()", JoinOperatorCardinality},
-			{"/query/feature//expr/arg", "()", TermExpression},
+			{"/query/feature//expr/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
+			{"/query/feature//expr/op", "()", JoinOperatorName, papuga_TypeString, "within_struct"},
+			{"/query/feature//expr/range", "()", JoinOperatorRange, papuga_TypeInt, "12"},
+			{"/query/feature//expr/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
+			{"/query/feature//expr/arg", "()", TermExpression, papuga_TypeVoid, ""},
 			{"/query/feature//expr", TermExpression, {
 					{"variable", ExpressionVariableName, '?'},
 					{"op", JoinOperatorName, '!'},
@@ -148,17 +148,17 @@ public:
 					{"arg", TermExpression, '*'}
 				}
 			},
-			{"/query/feature/set", "()", FeatureSet},
-			{"/query/feature/weight", "()", FeatureWeight},
+			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75:1.0"},
 		};
 	}
 
 	static papuga::RequestAutomaton_NodeList declareMetaData()
 	{
 		return {
-			{"/query/restriction//condition/op", "()", MetaDataConditionOp},
-			{"/query/restriction//condition/name", "()", MetaDataConditionName},
-			{"/query/restriction//condition/value", "()", MetaDataConditionValue},
+			{"/query/restriction//condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
+			{"/query/restriction//condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
+			{"/query/restriction//condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
 			{"/query/restriction//condition", MetaDataCondition, {
 					{MetaDataConditionOp},
 					{MetaDataConditionName},
@@ -221,15 +221,15 @@ public:
 	{
 		typedef bindings::method::Query Q;
 		return {
-			{"/query/termstats/type", "()", TermType},
-			{"/query/termstats/value", "()", TermValue},
-			{"/query/termstats/df", "()", TermDocumentFrequency},
+			{"/query/termstats/type", "()", TermType, papuga_TypeString, "word"},
+			{"/query/termstats/value", "()", TermValue, papuga_TypeString, "country"},
+			{"/query/termstats/df", "()", TermDocumentFrequency, papuga_TypeInt, "312367"},
 			{"/query/termstats", TermStats, {
 					{"df", TermDocumentFrequency}
 				}
 			},
 			{"/query/termstats", 0, "query", Q::defineTermStatistics(), {{TermType},{TermValue},{TermStats}} },
-			{"/query/globalstats/nofdocs", "()", CollectionNofDocs},
+			{"/query/globalstats/nofdocs", "()", CollectionNofDocs, papuga_TypeInt, "112739087"},
 			{"/query/globalstats", GlobalStats, {
 					{"nofdocs", CollectionNofDocs}
 				}
@@ -242,26 +242,16 @@ public:
 	{
 		typedef bindings::method::Query Q;
 		return {
-			{"/query/evalset/docno", "()", Docno},
+			{"/query/evalset/docno", "()", Docno, papuga_TypeInt, "21345"},
 			{"/query/evalset", 0, "query", Q::addDocumentEvaluationSet(), {{Docno, '*'}} },
-			{"/query/nofranks", "()", NumberOfResults},
+			{"/query/nofranks", "()", NumberOfResults, papuga_TypeInt, "20"},
 			{"/query/nofranks", 0, "query", Q::setMaxNofRanks(), {{NumberOfResults}} },
-			{"/query/minrank", "()", FirstResult},
+			{"/query/minrank", "()", FirstResult, papuga_TypeInt, "0:10"},
 			{"/query/minrank", 0, "query", Q::setMinRank(), {{FirstResult}} },
-			{"/query/access", "()", AccessRight},
+			{"/query/access", "()", AccessRight, papuga_TypeString, "customer"},
 			{"/query/access", 0, "query", Q::addAccess(), {{AccessRight, '*'}} },
 
-			{"/query/weightvar/name", "()", VariableName},
-			{"/query/weightvar/value", "()", VariableValue},
-			{"/query/weightvar", VariableDef, {
-					{VariableName},
-					{VariableValue}
-				}
-			},
-			{"/query", 0, "query", Q::setWeightingVariables(), {{VariableDef, '*'}} },
-			{"/query/debugmode", "()", DebugModeFlag},
-			{"/query/debugmode", 0, "query", Q::setDebugMode(), {{DebugModeFlag}} },
-			{"/query/tostring", "dump", "query", Q::tostring(), {} }
+			{"/query", 0, "query", Q::setWeightingVariables(), {{VariableDef, '*'}} }
 		};
 	}
 };

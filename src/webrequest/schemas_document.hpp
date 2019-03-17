@@ -27,11 +27,10 @@ public:
 		typedef bindings::method::DocumentAnalyzer A;
 		typedef bindings::method::Context C;
 		return {
-			{"docanalyzer/class/segmenter", "()", Segmenter},
-			{"docanalyzer/class/mimetype", "()", MimeType},
-			{"docanalyzer/class/encoding", "()", Charset},
-			{"docanalyzer/class/segmenter", "()", Segmenter},
-			{"docanalyzer/class/schema", "()", Schema},
+			{"docanalyzer/class/segmenter", "()", Segmenter, papuga_TypeString, "textwolf"},
+			{"docanalyzer/class/mimetype", "()", MimeType, papuga_TypeString, "application/xml"},
+			{"docanalyzer/class/encoding", "()", Charset, papuga_TypeString, "UTF-8"},
+			{"docanalyzer/class/schema", "()", Schema, papuga_TypeString, "company"},
 			{"docanalyzer/class", DocumentClassDef, {
 					{"segmenter", Segmenter, '?'},
 					{"mimetype", MimeType, '?'},
@@ -41,24 +40,24 @@ public:
 			},
 			{"docanalyzer", "docanalyzer", "context", C::createDocumentAnalyzer(), {DocumentClassDef} },
 
-			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/type", "()", FeatureTypeName},
-			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/select", "()", SelectExpression},
+			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/select", "()", SelectExpression, papuga_TypeString, "/doc/employee/name()"},
 
-			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer/name", "()", TokenizerName},
-			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer/arg", "()", TokenizerArg},
+			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
+			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[A-Za-z]+"},
 			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer/name", "()", NormalizerName},
-			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer/arg", "()", NormalizerArg},
+			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
+			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
 			{"docanalyzer/feature/{search,forward,metadata,attribute,lexem}/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"docanalyzer/feature/{search,forward}/option/position", "()", FeatureOptionPosition},
+			{"docanalyzer/feature/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ:pred:content:unique"},
 			{"docanalyzer/feature/{search,forward}/option", FeatureOptionDef, {
 					{"position", FeatureOptionPosition, '?'},
 				}
@@ -103,9 +102,9 @@ public:
 					{NormalizerDef,'+'}
 				}
 			},
-			{"docanalyzer/feature/aggregate/type", "()", FeatureTypeName},
-			{"docanalyzer/feature/aggregate/function/name", "()", AggregatorName},
-			{"docanalyzer/feature/aggregate/function/arg", "()", AggregatorArg},
+			{"docanalyzer/feature/aggregate/type", "()", FeatureTypeName, papuga_TypeString, "nofdocs"},
+			{"docanalyzer/feature/aggregate/function/name", "()", AggregatorName, papuga_TypeString, "count"},
+			{"docanalyzer/feature/aggregate/function/arg", "()", AggregatorArg, papuga_TypeString, "word"},
 			{"docanalyzer/feature/aggregate/function", AggregatorDef, {
 					{"name", AggregatorName, '!'},
 					{"arg", AggregatorArg, '*'}
@@ -116,16 +115,16 @@ public:
 					{AggregatorDef}
 				}
 			},
-			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/type", "()", FeatureTypeName},
-			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/pattern", "()", PatternTypeName},
-			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer/name", "()", NormalizerName},
-			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer/arg", "()", NormalizerArg},
+			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/pattern", "()", PatternTypeName, papuga_TypeString, "bibref"},
+			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
+			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "en"},
 			{"docanalyzer/feature/pattern/{search,forward,metadata,attribute}/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"docanalyzer/feature/pattern/{search,forward}/option/position", "()", FeatureOptionPosition},
+			{"docanalyzer/feature/pattern/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ;pred;content;unique"},
 			{"docanalyzer/feature/pattern/{search,forward}/option", FeatureOptionDef, {
 					{"position", FeatureOptionPosition, '?'},
 				}
@@ -158,12 +157,12 @@ public:
 					{NormalizerDef,'+'}
 				}
 			},
-			{"docanalyzer/postmatcher/name", "()", PatternTypeName},
-			{"docanalyzer/postmatcher/module", "()", PatternMatcherModule},
-			{"docanalyzer/postmatcher/lexem", "()", PatternMatcherLexemTypes},
-			{"docanalyzer/postmatcher/pattern/name", "()", PatternRuleName},
-			{"docanalyzer/postmatcher/pattern/visible", "()", PatternRuleVisible},
-			{"docanalyzer/postmatcher/pattern/expression", "()", PatternRuleExpression},
+			{"docanalyzer/postmatcher/name", "()", PatternTypeName, papuga_TypeString, "bibref"},
+			{"docanalyzer/postmatcher/module", "()", PatternMatcherModule, papuga_TypeString, "analyzer_pattern"},
+			{"docanalyzer/postmatcher/lexem", "()", PatternMatcherLexemTypes, papuga_TypeString, "lexem"},
+			{"docanalyzer/postmatcher/pattern/name", "()", PatternRuleName, papuga_TypeString, "bibref"},
+			{"docanalyzer/postmatcher/pattern/visible", "()", PatternRuleVisible, papuga_TypeBool, "true"},
+			{"docanalyzer/postmatcher/pattern/expression", "()", PatternRuleExpression, papuga_TypeVoid, NULL},
 			{"docanalyzer/postmatcher/pattern", PatternMatcherPatternDef, {
 					{"name", PatternRuleName, '!'},
 					{"visible", PatternRuleVisible, '?'},
@@ -177,18 +176,17 @@ public:
 					{PatternMatcherPatternDef, '*'}
 				}
 			},
-			{"docanalyzer/subdoc/name", "()", SubDocumentName},
-			{"docanalyzer/subdoc/select", "()", SubDocumentSelect},
+			{"docanalyzer/subdoc/name", "()", SubDocumentName, papuga_TypeString, "annotation"},
+			{"docanalyzer/subdoc/select", "()", SubDocumentSelect, papuga_TypeString, "/doc/annotation"},
 			{"docanalyzer/subdoc", 0, "docanalyzer", A::defineSubDocument(), {
 					{SubDocumentName, '!'},
 					{SubDocumentSelect, '!'}
 				}
 			},
-			{"docanalyzer/subcontent/select", "()", SubContentSelect},
-			{"docanalyzer/subcontent/class/segmenter", "()", Segmenter},
-			{"docanalyzer/subcontent/class/mime", "()", MimeType},
-			{"docanalyzer/subcontent/class/encoding", "()", Charset},
-			{"docanalyzer/subcontent/class/segmenter", "()", Segmenter},
+			{"docanalyzer/subcontent/select", "()", SubContentSelect, papuga_TypeString, "/doc/list/customer()"},
+			{"docanalyzer/subcontent/class/segmenter", "()", Segmenter, papuga_TypeString, "cjson"},
+			{"docanalyzer/subcontent/class/mime", "()", MimeType, papuga_TypeString, "application/json"},
+			{"docanalyzer/subcontent/class/encoding", "()", Charset, papuga_TypeString, "isolatin-1"},
 			{"docanalyzer/subcontent/class", SubContentClassDef, {
 					{"segmenter", Segmenter, '?'},
 					{"mime", MimeType, '?'},

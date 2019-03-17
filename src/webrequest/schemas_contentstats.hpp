@@ -28,22 +28,22 @@ public:
 		typedef bindings::method::Context C;
 		return {
 			{"library", "contentstats", "context", C::createContentStatistics(), {} },
-			{"library/attribute", "()", ContentAttribute},
-			{"library/select", "()", SelectExpression},
-			{"library/element/type", "()", FeatureTypeName},
-			{"library/element/regex", "()", ContentRegexExpression},
-			{"library/element/priority", "()", ContentPriorityExpression},
-			{"library/element/minlen", "()", ContentMinLength},
-			{"library/element/maxlen", "()", ContentMaxLength},
-			{"library/element/tokenizer/name", "()", TokenizerName},
-			{"library/element/tokenizer/arg", "()", TokenizerArg},
+			{"library/attribute", "()", ContentAttribute, papuga_TypeString, "id"},
+			{"library/select", "()", SelectExpression, papuga_TypeString, "/doc/text()"},
+			{"library/element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"library/element/regex", "()", ContentRegexExpression, papuga_TypeString, "[A-Za-z0-9 ]+"},
+			{"library/element/priority", "()", ContentPriorityExpression, papuga_TypeInt, "0;1;2"},
+			{"library/element/minlen", "()", ContentMinLength, papuga_TypeInt, "10"},
+			{"library/element/maxlen", "()", ContentMaxLength, papuga_TypeInt, "160"},
+			{"library/element/tokenizer/name", "()", TokenizerName, papuga_TypeString, "text"},
+			{"library/element/tokenizer/arg", "()", TokenizerArg, papuga_TypeVoid, NULL},
 			{"library/element/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"library/element/normalizer/name", "()", NormalizerName},
-			{"library/element/normalizer/arg", "()", NormalizerArg},
+			{"library/element/normalizer/name", "()", NormalizerName, papuga_TypeString, "regex"},
+			{"library/element/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "[A-Za-z0-9 ]+"},
 			{"library/element/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
