@@ -136,6 +136,7 @@ public:
 					{MetaDataConditionValue}
 				}
 			},
+			{"/query/restriction/condition", "()", MetaDataCondition, papuga_TypeVoid, NULL},
 			{"/query/restriction/union", MetaDataCondition, {
 					{MetaDataCondition, '*'}
 				}

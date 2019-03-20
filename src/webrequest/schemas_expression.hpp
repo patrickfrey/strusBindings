@@ -45,7 +45,7 @@ public:
 					{"op", JoinOperatorName, '!'},
 					{"range", JoinOperatorRange, '?'},
 					{"cardinality", JoinOperatorRange, '?'},
-					{"arg", TermExpression, '$'}
+					{"arg", TermExpression, '*'}
 				}
 			},
 		};
