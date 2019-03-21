@@ -337,7 +337,8 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir, const s
 			const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_impl, *ti/*schematype*/, *ni/*schemaname*/);
 			papuga_Allocator allocator;
 			papuga_init_Allocator( &allocator, NULL, 0);
-			const char* text = papuga_SchemaDescription_get_text( descr, &allocator, contentType, papuga_UTF8);
+			std::size_t textlen;
+			const char* text = (const char*)papuga_SchemaDescription_get_text( descr, &allocator, contentType, papuga_UTF8, &textlen);
 			if (!text)
 			{
 				papuga_destroy_Allocator( &allocator);
@@ -345,7 +346,8 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir, const s
 			}
 			try
 			{
-				ec = strus::writeFile( schemaFileName + extension, text);
+				std::string textstr( text, textlen);
+				ec = strus::writeFile( schemaFileName + extension, textstr);
 				papuga_destroy_Allocator( &allocator);
 				if (ec) throw strus::runtime_error( _TXT("error writing file for schema description '%s': %s"), schemaFileName.c_str(), ::strerror(ec));
 			}

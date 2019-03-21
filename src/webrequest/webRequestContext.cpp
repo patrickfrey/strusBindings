@@ -1242,10 +1242,11 @@ bool WebRequestContext::executeSchemaDescriptionRequest(
 				schema_doctype = papuga_ContentType_XML;
 				break;
 		}
-		const char* txt = papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding);
+		std::size_t txtlen;
+		const char* txt = (const char*)papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding, &txtlen);
 		if (txt)
 		{
-			WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, std::strlen(txt));
+			WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, txtlen);
 			answer.setContent( answerContent);
 			return true;
 		}
