@@ -40,6 +40,18 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd);
 
+/// \brief Store all request schemas of a given type of the web request handler provided here to a directory
+/// \param[in] config main configuration
+/// \param[in] dir absolute path where to write the descriptions to (created if it does not exist)
+/// \param[in] doctype type of the schema ("xml"/"xsd" for XML Schema and "json" for JSON Schema)
+/// \param[in] errorhnd error buffer interface to use
+/// \return true in case of success, false else
+bool storeWebRequestSchemaDescriptions(
+		const std::string& config,
+		const std::string& dir,
+		const std::string& doctype,
+		ErrorBufferInterface* errorhnd);
+
 /// \brief Convert string from UTF-8 to a given charset encoding
 /// \param[in] charset character set encoding to convert to
 /// \param[in] destbuf where to write result to

@@ -66,6 +66,11 @@ public:/*WebRequestContext*/
 			const char* contextName,
 			WebRequestAnswer& status);
 
+public:/*libstrus_webrequest*/
+	/// \brief Store all request schemas in a tree with a given directory as root
+	void storeSchemaDescriptions( const std::string& dir) const;
+	void storeSchemaDescriptions( const std::string& dir, const std::string& doctype) const;
+
 public:/*Ticker*/
 	void tick();
 
@@ -97,7 +102,6 @@ private:
 	papuga_RequestHandler* m_impl;			//< request handler
 	ConfigurationHandler m_configHandler;		//< configuration handler
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
-	std::string m_config_store_dir;			//< directory where to store configurations loaded as request
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
 	Ticker m_ticker;				//< periodic timer event to handle timeout of transactions

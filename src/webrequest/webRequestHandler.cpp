@@ -18,6 +18,7 @@
 #include "strus/errorCodes.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/base/string_conv.hpp"
 #include "strus/base/fileio.hpp"
 #include "papuga/request.h"
 #include "papuga/errors.h"
@@ -164,7 +165,6 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_configHandler(logger_,config_store_dir_,g_context_typenames)
 	,m_html_head(html_head_)
-	,m_config_store_dir(config_store_dir_)
 	,m_transactionPool( ::time(NULL), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
 	,m_ticker(this,std::max( maxIdleTime_/20, 10))
@@ -256,6 +256,112 @@ WebRequestHandler::WebRequestHandler(
 		clear();
 		throw err;
 	}
+}
+
+static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
+{
+	std::string filename( strus::joinFilePath( dir, doctype));
+	if (schematype == "" && schemaname == ROOT_CONTEXT_NAME)
+	{
+		filename = strus::joinFilePath( filename, "config");
+	}
+	else if (schematype == ROOT_CONTEXT_NAME)
+	{
+		filename = strus::joinFilePath( filename, schemaname);
+	}
+	else
+	{
+		filename = strus::joinFilePath( strus::joinFilePath( filename, schemaname), schematype);
+	}
+	return filename;
+}
+
+static papuga_ContentType getSchemaContentType( const std::string& doctype)
+{
+	if (strus::caseInsensitiveEquals( doctype, "xml") || strus::caseInsensitiveEquals( doctype, "xsd"))
+	{
+		return papuga_ContentType_XML;
+	}
+	else if (strus::caseInsensitiveEquals( doctype, "json"))
+	{
+		return papuga_ContentType_JSON;
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("unknown content type to print schemas: '%s'"), doctype.c_str());
+	}
+}
+
+static std::string getSchemaExtension( const std::string& doctype)
+{
+	if (strus::caseInsensitiveEquals( doctype, "xml") || strus::caseInsensitiveEquals( doctype, "xsd"))
+	{
+		return ".xsd";
+	}
+	else if (strus::caseInsensitiveEquals( doctype, "json"))
+	{
+		return ".jsd";
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("unknown content type to print schemas: '%s'"), doctype.c_str());
+	}
+}
+
+void WebRequestHandler::storeSchemaDescriptions( const std::string& dir, const std::string& doctype) const
+{
+	enum {BufSize=1024};
+	char const* typebuf[ BufSize];
+	char const* namebuf[ BufSize];
+	int ec;
+	papuga_ContentType contentType = getSchemaContentType( doctype);
+	std::string extension = getSchemaExtension( doctype);
+
+	char const** types = papuga_RequestHandler_list_schema_types( m_impl, typebuf, BufSize);
+	const char* const* ti = types;
+	for (; *ti; ++ti)
+	{
+		char const** names = papuga_RequestHandler_list_schema_names( m_impl, *ti, namebuf, BufSize);
+		const char* const* ni = names;
+		for (; *ni; ++ni)
+		{
+			std::string schemaFileName( getSchemaFileName( dir, doctype, *ti/*schematype*/, *ni/*schemaname*/));
+			std::string schemaDirName;
+			ec = strus::getParentPath( schemaFileName, schemaDirName);
+			if (ec) throw strus::runtime_error( _TXT("error evaluating directory for schema descriptions for file '%s': %s"), schemaFileName.c_str(), ::strerror(ec));
+			if (!schemaDirName.empty())
+			{
+				ec = strus::mkdirp( schemaDirName);
+				if (ec) throw strus::runtime_error( _TXT("error creating directory for schema descriptions '%s': %s"), schemaDirName.c_str(), ::strerror(ec));
+			}
+			const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_impl, *ti/*schematype*/, *ni/*schemaname*/);
+			papuga_Allocator allocator;
+			papuga_init_Allocator( &allocator, NULL, 0);
+			const char* text = papuga_SchemaDescription_get_text( descr, &allocator, contentType, papuga_UTF8);
+			if (!text)
+			{
+				papuga_destroy_Allocator( &allocator);
+				throw strus::runtime_error( _TXT("error creating schema descriptions '%s': %s"), schemaFileName.c_str(), papuga_ErrorCode_tostring( papuga_SchemaDescription_last_error( descr)));
+			}
+			try
+			{
+				ec = strus::writeFile( schemaFileName + extension, text);
+				papuga_destroy_Allocator( &allocator);
+				if (ec) throw strus::runtime_error( _TXT("error writing file for schema description '%s': %s"), schemaFileName.c_str(), ::strerror(ec));
+			}
+			catch (const std::bad_alloc&)
+			{
+				papuga_destroy_Allocator( &allocator);
+				throw std::bad_alloc();
+			}
+		}
+	}
+}
+
+void WebRequestHandler::storeSchemaDescriptions( const std::string& dir) const
+{
+	storeSchemaDescriptions( dir, "xml");
+	storeSchemaDescriptions( dir, "json");
 }
 
 void WebRequestHandler::clear()

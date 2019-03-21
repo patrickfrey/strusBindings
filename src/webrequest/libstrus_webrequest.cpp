@@ -9,7 +9,9 @@
 /// \file libstrus_webrequest.cpp
 #include "strus/lib/webrequest.hpp"
 #include "strus/base/dll_tags.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/webRequestLoggerInterface.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
 #include "private/internationalization.hpp"
@@ -20,6 +22,28 @@
 
 /// \brief strus toplevel namespace
 using namespace strus;
+
+class WebRequestLogger_null
+	:public WebRequestLoggerInterface
+{
+public:
+	virtual ~WebRequestLogger_null(){}
+
+	virtual int logMask() const {return 0;}
+	virtual int structDepth() const {return 0;}
+	virtual void logRequest( const char* reqstr) {}
+	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr) {}
+	virtual void logAction( const char* type, const char* name, const char* action) {}
+	virtual void logMethodCall(
+			const std::string& classname,
+			const std::string& methodname,
+			const std::string& arguments,
+			const std::string& result){};
+	virtual void logWarning( const char* warnmsg){}
+	virtual void logError( const char* errmsg){}
+};
+
+static WebRequestLogger_null g_logger_null;
 
 DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 		WebRequestLoggerInterface* logger,
@@ -32,7 +56,7 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 {
 	try
 	{
-		return new WebRequestHandler( logger, html_head, config_store_dir, config, maxIdleTime, nofTransactionsPerSeconds);
+		return new WebRequestHandler( logger ? logger:&g_logger_null, html_head, config_store_dir, config, maxIdleTime, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -43,6 +67,26 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 	{
 		errorhnd->report( ErrorCodeRuntimeError, _TXT("error creating web request handler: %s"), err.what());
 		return NULL;
+	}
+}
+
+DLL_PUBLIC bool strus::storeWebRequestSchemaDescriptions( const std::string& config, const std::string& dir, const std::string& doctype, ErrorBufferInterface* errorhnd)
+{
+	try
+	{
+		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_logger_null, "", "./"/*config_store_dir*/, config, 30/*maxIdleTime*/, 1/*nofTransactionsPerSeconds*/));
+		hnd->storeSchemaDescriptions( dir, doctype);
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		errorhnd->report( ErrorCodeOutOfMem, _TXT("out of memory"));
+		return false;
+	}
+	catch (const std::runtime_error& err)
+	{
+		errorhnd->report( ErrorCodeRuntimeError, _TXT("error creating web request handler: %s"), err.what());
+		return false;
 	}
 }
 
