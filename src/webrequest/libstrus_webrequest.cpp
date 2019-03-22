@@ -90,7 +90,7 @@ DLL_PUBLIC bool strus::storeWebRequestSchemaDescriptions( const std::string& con
 	}
 }
 
-DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, char* destbuf, std::size_t destbufsize,  std::size_t& length, const char* src, std::size_t srcsize)
+DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, char* destbuf, std::size_t destbufsize, std::size_t& length, const char* src, std::size_t srcsize)
 {
 	papuga_StringEncoding encoding;
 	if (!papuga_getStringEncodingFromName( &encoding, charsetname)) return NULL;
@@ -104,10 +104,8 @@ DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, ch
 	std::size_t pos = (std::size_t)destbuf % usize;
 	for (; pos % usize != 0; ++pos){}
 	if (pos >= destbufsize) return NULL;
-	std::size_t outlen;
 	papuga_ErrorCode errcode = papuga_Ok;
-	const char* rt = (const char*)papuga_ValueVariant_tostring_enc( &res, encoding, destbuf+pos, destbufsize-pos, &outlen, &errcode);
-	length = outlen * usize;
+	const char* rt = (const char*)papuga_ValueVariant_tostring_enc( &res, encoding, destbuf+pos, destbufsize-pos, &length, &errcode);
 	return rt;
 }
 

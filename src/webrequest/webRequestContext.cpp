@@ -342,7 +342,7 @@ bool WebRequestContext::debugContentRequest( WebRequestAnswer& answer)
 	const char* result = papuga_Request_tostring( m_request, &m_allocator, m_result_encoding, m_handler->debug_maxdepth(), &result_length, &errcode);
 	if (result)
 	{
-		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), "text/plain", result, result_length * papuga_StringEncoding_unit_size( m_result_encoding));
+		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), "text/plain", result, result_length);
 		answer.setContent( content);
 		return true;
 	}
@@ -449,9 +449,8 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		}
 		if (resultstr)
 		{
-			int usize = papuga_StringEncoding_unit_size( m_result_encoding);
 			const char* encname = papuga_stringEncodingName( m_result_encoding);
-			WebRequestContent content( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultulen * usize);
+			WebRequestContent content( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultulen);
 			answer.setContent( content);
 			return true;
 		}
@@ -668,7 +667,7 @@ static bool initHostObjMethodParam( papuga_ValueVariant& arg, WebRequestHandler:
 			{
 				enc = papuga_Binary;
 			}
-			papuga_init_ValueVariant_string_enc( &arg, enc, content.str(), content.len() / papuga_StringEncoding_unit_size(enc));
+			papuga_init_ValueVariant_string_enc( &arg, enc, content.str(), content.len());
 			return true;
 	}
 	errcode = ErrorCodeLogicError;
