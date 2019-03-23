@@ -35,12 +35,12 @@ public:
 					{"value", TermValue, '!'}
 				}
 			},
-			{"//expr/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
-			{"//expr/op", "()", JoinOperatorName, papuga_TypeString, "within_struct"},
-			{"//expr/range", "()", JoinOperatorRange, papuga_TypeInt, "12"},
-			{"//expr/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
-			{"//expr/arg", "()", TermExpression, papuga_TypeVoid, ""},
-			{"//expr", TermExpression, {
+			{"//expression/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
+			{"//expression/op", "()", JoinOperatorName, papuga_TypeString, "within_struct"},
+			{"//expression/range", "()", JoinOperatorRange, papuga_TypeInt, "12"},
+			{"//expression/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
+			{"//expression/arg", "()", TermExpression, papuga_TypeVoid, ""},
+			{"//expression", TermExpression, {
 					{"variable", ExpressionVariableName, '?'},
 					{"op", JoinOperatorName, '!'},
 					{"range", JoinOperatorRange, '?'},
