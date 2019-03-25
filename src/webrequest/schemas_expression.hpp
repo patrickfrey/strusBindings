@@ -44,7 +44,7 @@ public:
 					{"variable", ExpressionVariableName, '?'},
 					{"op", JoinOperatorName, '!'},
 					{"range", JoinOperatorRange, '?'},
-					{"cardinality", JoinOperatorRange, '?'},
+					{"cardinality", JoinOperatorCardinality, '?'},
 					{"arg", TermExpression, '*'}
 				}
 			},
