@@ -242,9 +242,6 @@ WebRequestHandler::WebRequestHandler(
 		mt_ContentStatisticsTransaction_GET.addToHandler( m_impl);
 
 		loadConfiguration( configstr_);
-		m_configHandler.clearUnfinishedTransactions();
-		m_configHandler.deleteObsoleteConfigurations();
-		if (!m_ticker.start()) throw std::bad_alloc();
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -256,6 +253,19 @@ WebRequestHandler::WebRequestHandler(
 		clear();
 		throw err;
 	}
+}
+
+bool WebRequestHandler::start()
+{
+	m_configHandler.clearUnfinishedTransactions();
+	m_configHandler.deleteObsoleteConfigurations();
+
+	return m_ticker.start();
+}
+
+void WebRequestHandler::stop()
+{
+	m_ticker.stop();
 }
 
 static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
@@ -368,13 +378,13 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir) const
 
 void WebRequestHandler::clear()
 {
+	m_ticker.stop();
 	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
 }
 	
 
 WebRequestHandler::~WebRequestHandler()
 {
-	m_ticker.stop();
 	clear();
 }
 
