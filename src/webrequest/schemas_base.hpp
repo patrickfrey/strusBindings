@@ -32,16 +32,18 @@ public:
 		StorageMetadata, StorageMetadataName, StorageMetadataType,
 		StorageEnableAcl, StorageEnableCompression, StorageLruCacheSize,
 		StorageMaxNofOpenFiles, StorageWriteBufferSize, StorageBlockSize,
-	
+
 		Segmenter, MimeType, Charset, Schema, DocumentClassDef,
 		SubDocumentName, SubDocumentSelect, SubContentClassDef, SubContentSelect, 
-		AnalyzerElement,FeatureTypeName,FieldTypeName,SelectExpression,FeatureOptionPosition,FeatureOptionDef,FeaturePriority,
+		AnalyzerElement,FeatureTypeName,FieldTypeName,FieldValue,
+		SelectExpression,FeatureOptionPosition,FeatureOptionDef,FeaturePriority,
 		PatternTypeName, PatternMatcherModule, PatternMatcherLexemTypes, PatternMatcherPatternDef,
 		PatternRuleName, PatternRuleVisible, PatternRuleExpression,
 		AggregatorName,AggregatorArg,AggregatorDef,
 		TokenizerName,TokenizerArg,TokenizerDef,
 		NormalizerName,NormalizerArg,NormalizerDef,
 		JoinOperatorName,JoinOperatorRange,JoinOperatorCardinality,GroupBy,
+		MinWeight,
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 
@@ -50,7 +52,9 @@ public:
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,
 		QueryEvalFunctionFeatureName, QueryEvalFunctionFeatureValue, QueryEvalFunctionFeature,
-		QueryEvalFunctionName,
+		QueryEvalFunctionName, QueryEvalFormulaSource,
+		QueryEvalSummarizer, QueryEvalWeighting, 
+		QueryEvalFormulaParameterName, QueryEvalFormulaParameterValue, QueryEvalFormulaParameter,
 
 		TermExpression, ExpressionVariableName, TermType, TermValue, TermLen,
 		MetaDataCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue, MetaDataRangeFrom, MetaDataRangeTo, 

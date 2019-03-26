@@ -204,6 +204,9 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineSchema<Schema_Storage_QRYORG> schema_Storage_QRYORG("storage");
 		schema_Storage_QRYORG.addToHandler( m_impl, "GET");
 
+		static const DefineSchema<Schema_QueryAnalyzer_GET_content> schema_QueryAnalyzer_GET_content("analyzer");
+		schema_QueryAnalyzer_GET_content.addToHandler( m_impl, "GET");
+				
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
 		mt_Context_GET.addToHandler( m_impl);
