@@ -224,6 +224,19 @@ void StorageClientImpl::close()
 	}
 }
 
+void StorageClientImpl::compaction()
+{
+	if (!m_storage_impl.get()) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	bool preverr = errorhnd->hasError();
+	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	storage->compaction();
+	if (!preverr && errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error detected after calling storage client close: %s"), errorhnd->fetchError());
+	}
+}
+
 std::string StorageClientImpl::configstring() const
 {
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();

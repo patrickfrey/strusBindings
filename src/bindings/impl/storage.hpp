@@ -173,6 +173,9 @@ public:
 	/// \brief Close of the storage client
 	void close();
 
+	/// \brief Call compaction method of the database if provided
+	void compaction();
+
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \example ["config"]
