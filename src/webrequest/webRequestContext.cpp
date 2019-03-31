@@ -495,7 +495,7 @@ ERROR:
 
 bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName)
 {
-	if (!createEmptyRequestContext( answer)) return false;
+	if (!createEmptyRequestContext( answer, 0/*classname*/)) return false;
 	if (contextName)
 	{
 		if (!inheritRequestContext( answer, contextType, contextName)) return false;
@@ -503,10 +503,10 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 	return true;
 }
 
-bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer)
+bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer, const char* className)
 {
 	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-	m_context = papuga_create_RequestContext();
+	m_context = papuga_create_RequestContext( className);
 	m_context_ownership = true;
 	if (!m_context)
 	{
@@ -833,12 +833,13 @@ struct ObjectDescr
 	papuga_RequestContext* context;
 	const papuga_ValueVariant* obj;
 	const char* typenam;
+	const char* classnam;
 	const char* contextnam;
 	const char* varnam;
 	bool context_ownership;
 
 	ObjectDescr()
-		:context(0),obj(0),typenam(0),contextnam(0),varnam(0),context_ownership(false){}
+		:context(0),obj(0),typenam(0),classnam(0),contextnam(0),varnam(0),context_ownership(false){}
 	~ObjectDescr()
 	{
 		if (context_ownership) papuga_destroy_RequestContext( context);
@@ -850,10 +851,11 @@ struct ObjectDescr
 		obj = 0;
 	}
 
-	void init( papuga_RequestContext* context_, const char* typenam_, const char* contextnam_)
+	void init( papuga_RequestContext* context_, const char* typenam_, const char* classnam_, const char* contextnam_)
 	{
 		context = context_;
 		typenam = typenam_;
+		classnam = classnam_;
 		contextnam = contextnam_;
 		obj = papuga_RequestContext_get_variable( context, typenam);
 		varnam = 0;
@@ -882,7 +884,7 @@ struct ObjectDescr
 		{
 			if (!(contextnam = path.getNext())) return true;
 		}
-		context = papuga_create_RequestContext();
+		context = papuga_create_RequestContext( 0/*className*/);
 		if (!context)
 		{
 			setAnswer( answer, ErrorCodeOutOfMem);
@@ -1032,7 +1034,8 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
-	if (!createEmptyRequestContext( answer))
+	std::string className = strus::string_format( "transaction/%s", typenam);
+	if (!createEmptyRequestContext( answer, className.c_str()))
 	{
 		return false;
 	}
@@ -1290,9 +1293,10 @@ bool WebRequestContext::executeRequest(
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
-			selector.init( transactionRef->context(), typenam, contextnam);
+			const char* className = papuga_RequestContext_classname( transactionRef->context());
+			selector.init( transactionRef->context(), typenam, className, contextnam);
 		}
-		if (path.startsWith( "schema", 6/*"schema"*/))
+		else if (path.startsWith( "schema", 6/*"schema"*/))
 		{
 			(void)path.getNext();//... "schema" is not part of request
 			if (isEqual(method,"GET"))
@@ -1435,7 +1439,7 @@ bool WebRequestContext::executeRequest(
 					setAnswer( answer, ErrorCodeOutOfMem);
 					return false;
 				}
-				if (!executeContextSchema( selector.context, selector.typenam, method, content, answer)) return false;
+				if (!executeContextSchema( selector.context, selector.classnam ? selector.classnam : selector.typenam, method, content, answer)) return false;
 				goto DONE;
 			}
 			else

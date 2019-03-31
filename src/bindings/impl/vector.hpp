@@ -10,6 +10,8 @@
 #include "papuga/valueVariant.h"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
+#include "impl/value/iterator.hpp"
+#include "impl/value/introspectionBase.hpp"
 #include "strus/wordVector.hpp"
 #include <vector>
 #include <string>
@@ -78,6 +80,10 @@ public:
 	/// \example ["noun","verb"]
 	Struct featureTypes( const std::string& featureValue) const;
 
+	/// \brief Get an iterator on the feature strings inserted
+	/// \return iterator on the feature values
+	Iterator featureValues();
+
 	/// \brief Get the number of vectors defined for the features of a type
 	/// \param[in] type name of the type
 	/// \example "verb"
@@ -130,6 +136,17 @@ public:
 	/// \remark This method is not implicitely called with the destructor because it might be a complicated operation that cannot be afforded in panic shutdown.
 	/// \note the method does not have to be called necessarily.
 	void close();
+
+	/// \brief Call compaction method of the database if provided
+	void compaction();
+
+	/// \brief Introspect the storage structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \example ["config"]
+	/// \example ["types"]
+	/// \example ["values"]
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path) const;
 
 private:
 	friend class ContextImpl;

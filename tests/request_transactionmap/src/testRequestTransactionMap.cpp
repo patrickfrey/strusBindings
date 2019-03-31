@@ -43,7 +43,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
-			papuga_RequestContext* ctx = papuga_create_RequestContext();
+			papuga_RequestContext* ctx = papuga_create_RequestContext( 0/*class name*/);
 			papuga_ValueVariant val;
 			papuga_init_ValueVariant_int( &val, idx);
 			if (!papuga_RequestContext_add_variable( ctx, "index", &val)) throw std::bad_alloc();

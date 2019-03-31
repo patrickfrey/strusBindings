@@ -9,6 +9,7 @@
 #ifndef _STRUS_BINDING_IMPL_ITERATOR_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_ITERATOR_HPP_INCLUDED
 #include "papuga/iterator.h"
+#include <cstring>
 
 namespace strus {
 namespace bindings {
@@ -36,7 +37,7 @@ public:
 		// but move semantics are not available in C++98, we should switch to C++11
 		if (released)
 		{
-			memcpy( &iterator, &o.iterator, sizeof(iterator));
+			std::memcpy( &iterator, &o.iterator, sizeof(iterator));
 		}
 		else
 		{

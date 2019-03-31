@@ -59,7 +59,7 @@ private:
 	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
-	bool createEmptyRequestContext( WebRequestAnswer& answer);
+	bool createEmptyRequestContext( WebRequestAnswer& answer, const char* className);
 	bool createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool initRequestContext( WebRequestAnswer& answer);
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);

@@ -27,11 +27,14 @@ public:
 		NullValue,
 	
 		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
-	
-		StorageConfig, StoragePath, StorageCachedTerms,
+
+		StorageConfig, DatabasePath, StorageCachedTerms,
 		StorageMetadata, StorageMetadataName, StorageMetadataType,
-		StorageEnableAcl, StorageEnableCompression, StorageLruCacheSize,
-		StorageMaxNofOpenFiles, StorageWriteBufferSize, StorageBlockSize,
+		StorageEnableAcl, DatabaseEnableCompression, DatabaseEnableAutoCompact,
+		DatabaseLruCacheSize, DatabaseMaxNofOpenFiles, DatabaseWriteBufferSize, DatabaseBlockSize,
+
+		VectorMemType, VectorLexemPrunning, VectorDim, VectorBits, VectorVariations,
+		VectorFeatureName,VectorFeatureType,VectorFeatureVector,VectorFeature,
 
 		Segmenter, MimeType, Charset, Schema, DocumentClassDef,
 		SubDocumentName, SubDocumentSelect, SubContentClassDef, SubContentSelect, 
@@ -44,6 +47,12 @@ public:
 		NormalizerName,NormalizerArg,NormalizerDef,
 		JoinOperatorName,JoinOperatorRange,JoinOperatorCardinality,GroupBy,
 		MinWeight,
+
+		DocumentDef,DocumentDefList,DocumentId,DocumentAccess,
+		DocumentAttributeDef,DocumentAttributeName,DocumentAttributeValue,
+		DocumentMetaDataDef,DocumentMetaDataName,DocumentMetaDataValue,
+		DocumentSearchIndexFeatureDef, DocumentForwardIndexFeatureDef,
+		DocumentFeatureType,DocumentFeatureValue,DocumentFeaturePos,DocumentFeatureLen,
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 

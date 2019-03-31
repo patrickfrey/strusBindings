@@ -120,6 +120,11 @@ public:
 	/// \return iterator on the term types
 	Iterator termTypes() const;
 
+	/// \brief Get an iterator on the term values inserted
+	/// \note Unfortunately there is no iterator avalable for the term values of a given term type. So this method is not very useful
+	/// \return iterator on the term values
+	Iterator termValues() const;
+
 	/// \brief Get an iterator on the document identifiers inserted
 	/// \return iterator on the docids
 	Iterator docids() const;
@@ -176,7 +181,7 @@ public:
 	/// \brief Call compaction method of the database if provided
 	void compaction();
 
-	/// \brief Introspect a structure starting from a root path
+	/// \brief Introspect the storage structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
 	/// \example ["config"]
 	/// \example ["termtypes"]

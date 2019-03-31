@@ -182,12 +182,23 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineMainSchema<Schema_INIT_Context> schema_INIT_Context;
 		schema_INIT_Context.addToHandler( m_impl, ROOT_CONTEXT_NAME/*schema name*/);
 
-		static const DefineConfigSchema<Schema_Context_INIT_Storage> schema_Context_INIT_Storage;
-		schema_Context_INIT_Storage.addToHandler( m_impl, "PUT/storage");
 		static const DefineConfigSchema<Schema_Context_CREATE_Storage> schema_Context_CREATE_Storage;
 		schema_Context_CREATE_Storage.addToHandler( m_impl, "POST/storage");
 		static const DefineConfigSchema<Schema_Context_DELETE_Storage> schema_Context_DELETE_Storage;
 		schema_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
+		static const DefineConfigSchema<Schema_Context_INIT_Storage> schema_Context_INIT_Storage;
+		schema_Context_INIT_Storage.addToHandler( m_impl, "PUT/storage");
+		static const DefineSchema<Schema_Context_PUT_StorageTransaction> schema_Context_PUT_StorageTransaction("transaction/storage");
+		schema_Context_PUT_StorageTransaction.addToHandler( m_impl, "PUT");
+
+		static const DefineConfigSchema<Schema_Context_CREATE_VectorStorage> schema_Context_CREATE_VectorStorage;
+		schema_Context_CREATE_VectorStorage.addToHandler( m_impl, "POST/vstorage");
+		static const DefineConfigSchema<Schema_Context_DELETE_VectorStorage> schema_Context_DELETE_VectorStorage;
+		schema_Context_DELETE_VectorStorage.addToHandler( m_impl, "DELETE/vstorage");
+		static const DefineConfigSchema<Schema_Context_INIT_VectorStorage> schema_Context_INIT_VectorStorage;
+		schema_Context_INIT_VectorStorage.addToHandler( m_impl, "PUT/vstorage");
+		static const DefineSchema<Schema_Context_PUT_VectorStorageTransaction> schema_Context_PUT_VectorStorageTransaction("transaction/vstorage");
+		schema_Context_PUT_VectorStorageTransaction.addToHandler( m_impl, "PUT");
 
 		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_PUT_DocumentAnalyzer;
 		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
@@ -225,11 +236,17 @@ WebRequestHandler::WebRequestHandler(
 		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
 		mt_StorageClient_POST_transaction.addToHandler( m_impl);
 
+		static const IntrospectionMethodDescription mt_VectorStorageClient_GET( mt::VectorStorageClient::introspection(), "vstorage");
+		mt_VectorStorageClient_GET.addToHandler( m_impl);
+		static const PostTransactionMethodDescription mt_VectorStorageClient_POST_transaction( mt::VectorStorageClient::createTransaction(), "transaction");
+		mt_VectorStorageClient_POST_transaction.addToHandler( m_impl);
+		static const CommitTransactionMethodDescription mt_VectorStorageTransaction_COMMIT( mt::VectorStorageTransaction::commit());
+		mt_VectorStorageTransaction_COMMIT.addToHandler( m_impl);
+
 		static const IntrospectionMethodDescription mt_Inserter_GET( mt::Inserter::introspection(), "inserter");
 		mt_Inserter_GET.addToHandler( m_impl);
 		static const PostTransactionMethodDescription mt_Inserter_POST_transaction( mt::Inserter::createTransaction(), "transaction");
 		mt_Inserter_POST_transaction.addToHandler( m_impl);
-
 		static const InsertMethodDescription mt_InserterTransaction_PUT( mt::InserterTransaction::insertDocument());
 		mt_InserterTransaction_PUT.addToHandler( m_impl);
 		static const CommitTransactionMethodDescription mt_InserterTransaction_COMMIT( mt::InserterTransaction::commit());

@@ -13,8 +13,9 @@
 #include "schemas_base.hpp"
 #include "schemas_context.hpp"
 #include "schemas_storage.hpp"
+#include "schemas_vector.hpp"
 #include "schemas_query.hpp"
-#include "schemas_document.hpp"
+#include "schemas_analyzer.hpp"
 #include "schemas_inserter.hpp"
 #include "schemas_contentstats.hpp"
 #endif

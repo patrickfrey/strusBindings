@@ -7,6 +7,8 @@
  */
 #include "impl/vector.hpp"
 #include "impl/sentence.hpp"
+#include "impl/value/vectorStorageIntrospection.hpp"
+#include "impl/value/valueIterator.hpp"
 #include "strus/lib/storage_objbuild.hpp"
 #include "strus/vectorStorageClientInterface.hpp"
 #include "strus/vectorStorageDumpInterface.hpp"
@@ -15,6 +17,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/base/configParser.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "strus/constants.hpp"
 #include "private/internationalization.hpp"
 #include "serializer.hpp"
@@ -90,6 +93,18 @@ Struct VectorStorageClientImpl::featureTypes( const std::string& featureValue) c
 	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<NameList>::getDestructor())) throw std::bad_alloc();
 	strus::bindings::Serializer::serialize( &rt.serialization, *cfg,false/*deep*/);
 	cfg.release();
+	rt.release();
+	return rt;
+}
+
+Iterator VectorStorageClientImpl::featureValues()
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const VectorStorageClientInterface* vstorage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
+	if (!vstorage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	ObjectRef itr( ObjectRef::createOwnership( vstorage->createFeatureValueIterator(), "FeatureValueIterator"));
+	if (!itr.get()) throw strus::runtime_error("%s", errorhnd->fetchError());
+	Iterator rt( new ValueIterator( m_trace_impl, m_objbuilder_impl, m_vector_storage_impl, itr, m_errorhnd_impl), &ValueIterator::Deleter, &ValueIterator::GetNext);
 	rt.release();
 	return rt;
 }
@@ -188,6 +203,40 @@ void VectorStorageClientImpl::close()
 	}
 }
 
+void VectorStorageClientImpl::compaction()
+{
+	VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	bool preverr = errorhnd->hasError();
+	storage->compaction();
+	if (!preverr && errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("error detected after calling vector storage client close: %s"), errorhnd->fetchError());
+	}
+}
+
+Struct VectorStorageClientImpl::introspection( const ValueVariant& arg) const
+{
+	Struct rt;
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const VectorStorageClientInterface* vstorage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
+
+	strus::local_ptr<IntrospectionBase> ictx( new VectorStorageIntrospection( errorhnd, vstorage));
+	ictx->getPathContent( rt.serialization, path);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
+}
+
 SentenceAnalyzerImpl* VectorStorageClientImpl::createSentenceAnalyzer( const ValueVariant& analyzerconfig) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -228,7 +277,15 @@ void VectorStorageTransactionImpl::defineVector( const std::string& type, const 
 	if (!transaction) throw strus::runtime_error( _TXT("calling vector storage transaction method after close"));
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
-	transaction->defineVector( type, feat, Deserializer::getFloatList( vec));
+	WordVector vv = Deserializer::getFloatList( vec);
+	if (vv.empty())
+	{
+		transaction->defineFeature( type, feat);
+	}
+	else
+	{
+		transaction->defineVector( type, feat, vv);
+	}
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error( "%s", errorhnd->fetchError());

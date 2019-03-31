@@ -12,6 +12,7 @@
 #define _STRUS_WEBREQUEST_SCHEMAS_QUERY_HPP_INCLUDED
 #include "schemas_base.hpp"
 #include "schemas_expression.hpp"
+#include "schemas_analyzer.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -98,58 +99,6 @@ public:
 		};
 	}
 
-	static papuga::RequestAutomaton_NodeList defineAnalyzer()
-	{
-		typedef bindings::method::QueryAnalyzer A;
-		typedef bindings::method::Context C;
-		return {
-			{"/query/analyzer", "analyzer", "context", C::createQueryAnalyzer(), {} },
-			{"/query/analyzer/element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
-			{"/query/analyzer/{element,sentence}/field", "()", FieldTypeName, papuga_TypeString, "text"},
-
-			{"/query/analyzer/{element,sentence}/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
-			{"/query/analyzer/{element,sentence}/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[a-zA-Z0-9]+"},
-			{"/query/analyzer/{element,sentence}/tokenizer", TokenizerDef, {
-					{"name", TokenizerName, '!'},
-					{"arg", TokenizerArg, '*'}
-				}
-			},
-			{"/query/analyzer/{element,sentence}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
-			{"/query/analyzer/{element,sentence}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
-			{"/query/analyzer/{element,sentence}/normalizer", NormalizerDef, {
-					{"name", NormalizerName, '!'},
-					{"arg", NormalizerArg, '*'}
-				}
-			},
-			{"/query/analyzer/element", 0, "analyzer", A::addElement(), {
-					{FeatureTypeName},
-					{FieldTypeName},
-					{TokenizerDef},
-					{NormalizerDef,'+'},
-				}
-			},
-			{"/query/analyzer/sentence", 0, "analyzer", A::addSentenceType(), {
-					{FieldTypeName},
-					{TokenizerDef},
-					{NormalizerDef,'+'},
-					{"sentenceana"}
-				}
-			},
-			{"/query/analyzer/group/field", "()", FieldTypeName, papuga_TypeString, "text"},
-			{"/query/analyzer/group/op", "()", JoinOperatorName, papuga_TypeString, "sequence_imm"},
-			{"/query/analyzer/group/range", "()", JoinOperatorRange, papuga_TypeInt, "5"},
-			{"/query/analyzer/group/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
-			{"/query/analyzer/group@by", "", GroupBy, papuga_TypeString, "position;every;all;unique"},
-			{"/query/analyzer/group", 0, "analyzer", A::defineImplicitGroupBy(), {
-					{FieldTypeName,'!'},
-					{GroupBy,'!'},
-					{JoinOperatorName,'!'},
-					{JoinOperatorRange,'?'},
-					{JoinOperatorCardinality,'?'}}
-			}
-		};
-	}
-
 	static papuga::RequestAutomaton_NodeList declareMetaData()
 	{
 		return {
@@ -185,7 +134,7 @@ public:
 			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
 			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
-			{"/query/feature", "+feature", "analyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
+			{"/query/feature", "+feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 		};
 	}
 
@@ -197,7 +146,7 @@ public:
 			{"/query/sentence/content", "()", FieldValue, papuga_TypeString, "bla bla"},
 			{"/query/sentence/results", "()", NumberOfResults, papuga_TypeDouble, "1;2"},
 			{"/query/sentence/minweight", "()", MinWeight, papuga_TypeDouble, "0.75;1.0"},
-			{"/query/sentence", "+feature", "analyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+			{"/query/sentence", "+feature", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
 		};
 	}
 
@@ -206,7 +155,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{declareMetaData()},
-			{"/query/restriction", "+condition", "analyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
+			{"/query/restriction", "+condition", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
 		};
 	}
 
@@ -218,11 +167,11 @@ public:
 			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
 			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
-			{"/query/feature", "_feature", "analyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
+			{"/query/feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
 
 			{declareMetaData()},
-			{"/query/restriction", "_condition", "analyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
+			{"/query/restriction", "_condition", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
 			{"/query/restriction", 0, "query", Q::addMetaDataRestriction(),  {"_condition"} }
 		};
 	}
@@ -280,14 +229,14 @@ public:
 	}
 };
 
-class Schema_QueryAnalyzer_GET_content :public papuga::RequestAutomaton, public SchemaQueryPart
+class Schema_QueryAnalyzer_GET_content :public papuga::RequestAutomaton, public SchemaQueryPart, public SchemaAnalyzerPart
 {
 public:
 	Schema_QueryAnalyzer_GET_content() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
-			{defineAnalyzer()},
+			{defineQueryAnalyzer().root("/query/analyzer")},
 			{analyzeTermExpression()},
 			{analyzeMetaData()}
 		}
@@ -295,7 +244,7 @@ public:
 };
 
 
-class Schema_Storage_QRYORG :public papuga::RequestAutomaton, public SchemaQueryPart
+class Schema_Storage_QRYORG :public papuga::RequestAutomaton, public SchemaQueryPart, public SchemaAnalyzerPart
 {
 public:
 	Schema_Storage_QRYORG() :papuga::RequestAutomaton(
@@ -303,7 +252,7 @@ public:
 		"result",{},
 		{
 			{defineQueryEval()},
-			{defineAnalyzer()},
+			{defineQueryAnalyzer().root("/query/analyzer")},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
 			{buildQueryOriginal()},
 			{defineRankingParameter()},

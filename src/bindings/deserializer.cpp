@@ -2050,6 +2050,11 @@ static void buildStorageIndex( StorageDocumentIndexAccess* document, papuga_Seri
 				std::string type = Deserializer::getString( seriter);
 				std::string value = Deserializer::getString( seriter);
 				unsigned int pos = Deserializer::getUint( seriter);
+				if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+				{
+					(void)Deserializer::getUint( seriter);
+					// ... len that is part of analyzer output is ignored
+				}
 				document->addTerm( type, value, pos);
 			}
 			else

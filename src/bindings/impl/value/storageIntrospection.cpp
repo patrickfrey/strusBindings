@@ -33,18 +33,17 @@
 using namespace strus;
 using namespace strus::bindings;
 
-namespace {
 template <class TypeName>
-IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, const TypeName& val)
+static IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, const TypeName& val)
 {
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
 }
-IntrospectionBase* createIntrospectionValueIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, bool prefixBound, const std::string& prefix="")
+static IntrospectionBase* createIntrospectionValueIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, bool prefixBound, const std::string& prefix="")
 {
 	if (!val) throw strus::runtime_error("%s", errorhnd->fetchError());
 	return new IntrospectionValueIterator( errorhnd, val, prefixBound, prefix);
 }
-IntrospectionBase* createIntrospectionDirectoryIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, const std::string& prefix, bool complete)
+static IntrospectionBase* createIntrospectionDirectoryIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, const std::string& prefix, bool complete)
 {
 	if (!val) throw strus::runtime_error("%s", errorhnd->fetchError());
 	return new IntrospectionDirectoryIterator( errorhnd, val, prefix, complete);
@@ -66,7 +65,6 @@ static strus::Index parseIndex( const std::string& val, const char* descr)
 {
 	return parseIndex( val.c_str(), val.size(), descr);
 }
-}//namespace
 
 static std::string getDocidFromDocno( const StorageClientInterface* storage, const strus::Index& docno, ErrorBufferInterface* errorhnd)
 {

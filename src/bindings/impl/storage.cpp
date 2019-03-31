@@ -126,6 +126,18 @@ Iterator StorageClientImpl::termTypes() const
 	return rt;
 }
 
+Iterator StorageClientImpl::termValues() const
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	if (!storage) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	ObjectRef itr( ObjectRef::createOwnership( storage->createTermValueIterator(), "TermTypeIterator"));
+	if (!itr.get()) throw strus::runtime_error("%s", errorhnd->fetchError());
+	Iterator rt( new ValueIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, itr, m_errorhnd_impl), &ValueIterator::Deleter, &ValueIterator::GetNext);
+	rt.release();
+	return rt;
+}
+
 Iterator StorageClientImpl::docids() const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
