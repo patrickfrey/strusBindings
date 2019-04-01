@@ -23,11 +23,12 @@ namespace webrequest {
 class SchemaAnalyzerPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList defineDocumentAnalyzer()
+	static papuga::RequestAutomaton_NodeList defineDocumentAnalyzer( const char* rootexpr)
 	{
 		typedef bindings::method::DocumentAnalyzer A;
 		typedef bindings::method::Context C;
-		return {
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
 			{"class/segmenter", "()", Segmenter, papuga_TypeString, "textwolf"},
 			{"class/mimetype", "()", MimeType, papuga_TypeString, "application/xml"},
 			{"class/encoding", "()", Charset, papuga_TypeString, "UTF-8"},
@@ -39,7 +40,7 @@ public:
 					{"schema", Schema, '?'}
 				}
 			},
-			{"docanalyzer", "docanalyzer", "context", C::createDocumentAnalyzer(), {DocumentClassDef} },
+			{"/", "docanalyzer", "context", C::createDocumentAnalyzer(), {DocumentClassDef} },
 
 			{"feature/{search,forward,metadata,attribute,lexem}/type", "()", FeatureTypeName, papuga_TypeString, "word"},
 			{"feature/{search,forward,metadata,attribute,lexem}/select", "()", SelectExpression, papuga_TypeString, "/doc/employee/name()"},
@@ -161,7 +162,7 @@ public:
 			{"postmatcher/name", "()", PatternTypeName, papuga_TypeString, "bibref"},
 			{"postmatcher/module", "()", PatternMatcherModule, papuga_TypeString, "analyzer_pattern"},
 			{"postmatcher/lexem", "()", PatternMatcherLexemTypes, papuga_TypeString, "lexem"},
-			{SchemaExpressionPart::declarePatternExpression().root("postmatcher/pattern")},
+			{SchemaExpressionPart::declarePatternExpression( "postmatcher/pattern")},
 			{"postmatcher/pattern/name", "()", PatternRuleName, papuga_TypeString, "bibref"},
 			{"postmatcher/pattern/visible", "()", PatternRuleVisible, papuga_TypeBool, "true"},
 			{"postmatcher/pattern", PatternMatcherPatternDef, {
@@ -200,16 +201,17 @@ public:
 					{SubContentClassDef, '!'}
 				}
 			}
-		};
+		});
 	}
 
-	static papuga::RequestAutomaton_NodeList defineQueryAnalyzer()
+	static papuga::RequestAutomaton_NodeList defineQueryAnalyzer( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		typedef bindings::method::Context C;
-		return {
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
 			{"/", "qryanalyzer", "context", C::createQueryAnalyzer(), {} },
-			{"doc/element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
 			{"{element,sentence}/field", "()", FieldTypeName, papuga_TypeString, "text"},
 
 			{"{element,sentence}/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
@@ -252,18 +254,18 @@ public:
 					{JoinOperatorRange,'?'},
 					{JoinOperatorCardinality,'?'}}
 			}
-		};
+		});
 	}
 };
 
-class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemaAnalyzerPart
+class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineDocumentAnalyzer().root("/analyzer/doc")}
+			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/analyzer/doc")}
 		}
 	) {}
 };
@@ -275,7 +277,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineDocumentAnalyzer().root("/analyzer/doc")}
+			{defineDocumentAnalyzer( "/analyzer/doc")}
 		}
 	) {}
 };
@@ -287,7 +289,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineQueryAnalyzer().root("/analyzer/query")}
+			{defineQueryAnalyzer( "/analyzer/query")}
 		}
 	) {}
 };
@@ -299,7 +301,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineQueryAnalyzer().root("/analyzer/query")}
+			{defineQueryAnalyzer( "/analyzer/query")}
 		}
 	) {}
 };

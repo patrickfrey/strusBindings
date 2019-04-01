@@ -56,7 +56,7 @@ public:
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 
-		FeatureSet, FeatureWeight,
+		FeatureDef, FeatureSet, FeatureWeight,
 		FeatureSetRestrictionDef, FeatureSetSelectionDef, FeatureSetExclusionDef,
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,

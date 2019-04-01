@@ -131,9 +131,15 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {
-			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
+			{SchemaExpressionPart::declarePostingsExpression( "/query/feature")},
 			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
+			{"/query/feature", FeatureDef, {
+					{"set", FeatureSet},
+					{"weight", FeatureWeight},
+					{"content", TermExpression},
+				}
+			},
 			{"/query/feature", "+feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 		};
 	}
@@ -164,7 +170,7 @@ public:
 		typedef bindings::method::Query Q;
 		typedef bindings::method::QueryAnalyzer A;
 		return {
-			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
+			{SchemaExpressionPart::declarePostingsExpression( "/query/feature")},
 			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
 			{"/query/feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
@@ -180,7 +186,7 @@ public:
 	{
 		typedef bindings::method::Query Q;
 		return {
-			{SchemaExpressionPart::declarePostingsExpression().root("/query/feature")},
+			{SchemaExpressionPart::declarePostingsExpression( "/query/feature")},
 			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
 			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression}, {FeatureWeight, '?'}} },
@@ -236,7 +242,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"result",{},
 		{
-			{defineQueryAnalyzer().root("/query/analyzer")},
+			{defineQueryAnalyzer( "/query/analyzer")},
 			{analyzeTermExpression()},
 			{analyzeMetaData()}
 		}
@@ -252,7 +258,7 @@ public:
 		"result",{},
 		{
 			{defineQueryEval()},
-			{defineQueryAnalyzer().root("/query/analyzer")},
+			{defineQueryAnalyzer( "/query/analyzer")},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
 			{buildQueryOriginal()},
 			{defineRankingParameter()},

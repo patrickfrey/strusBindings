@@ -22,9 +22,10 @@ namespace webrequest {
 class SchemaExpressionPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList declareTermExpression()
+	static papuga::RequestAutomaton_NodeList declareTermExpression( const char* rootexpr)
 	{
-		return {
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
 			{"//term/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
 			{"//term/type", "()", TermType, papuga_TypeString, "word"},
 			{"//term/value", "()", TermValue, papuga_TypeString, "city"},
@@ -48,13 +49,14 @@ public:
 					{"arg", TermExpression, '*'}
 				}
 			},
-		};
+		});
 	}
 
-	static papuga::RequestAutomaton_NodeList declarePostingsExpression()
+	static papuga::RequestAutomaton_NodeList declarePostingsExpression( const char* rootexpr)
 	{
-		return {
-			{declareTermExpression()},
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
+			{declareTermExpression("")},
 			{"/meta/from", "()", MetaDataRangeFrom, papuga_TypeString, "title_start"},
 			{"/meta/to", "()", MetaDataRangeTo, papuga_TypeString, "title_end"},
 			{"/meta", TermExpression, {
@@ -62,12 +64,12 @@ public:
 					{"to", MetaDataRangeTo, '?'}
 				}
 			}
-		};
+		});
 	}
 
-	static papuga::RequestAutomaton_NodeList declarePatternExpression()
+	static papuga::RequestAutomaton_NodeList declarePatternExpression( const char* rootexpr)
 	{
-		return declareTermExpression();
+		return declareTermExpression( rootexpr);
 	}
 };
 
