@@ -12,6 +12,7 @@
 #define _STRUS_WEBREQUEST_SCHEMAS_DOCUMENT_HPP_INCLUDED
 #include "schemas_base.hpp"
 #include "schemas_expression.hpp"
+#include "schemas_query_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -256,6 +257,33 @@ public:
 			}
 		});
 	}
+
+	static papuga::RequestAutomaton_NodeList analyzeFeature()
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {
+			{SchemaQueryDeclPart::declareFeature()},
+			{"/query/feature", "+feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
+		};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeSentence()
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {
+			{SchemaQueryDeclPart::declareSentence()},
+			{"/query/sentence", "+feature", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+		};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeMetaData()
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {
+			{SchemaQueryDeclPart::declareMetaData()},
+			{"/query/restriction", "+condition", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
+		};
+	}
 };
 
 class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton
@@ -270,38 +298,57 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, public SchemaAnalyzerPart
+class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineDocumentAnalyzer( "/analyzer/doc")}
+			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/analyzer/doc")}
 		}
 	) {}
 };
 
-class Schema_Context_INIT_QueryAnalyzer :public papuga::RequestAutomaton, public SchemaAnalyzerPart
+class Schema_Context_INIT_QueryAnalyzer :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_INIT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineQueryAnalyzer( "/analyzer/query")}
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")}
 		}
 	) {}
 };
 
-class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton, public SchemaAnalyzerPart
+class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		NULL/*resultname*/,{},
 		{
-			{defineQueryAnalyzer( "/analyzer/query")}
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")},
+			{SchemaAnalyzerPart::analyzeFeature()},
+			{SchemaAnalyzerPart::analyzeMetaData()},
+			{SchemaAnalyzerPart::analyzeSentence()}
+		}
+	) {}
+};
+
+class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton
+{
+public:
+	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		NULL/*resultname*/,{
+			{"qryanalyzer","/query/analyzerid()",false/*required*/}},
+		{
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
+			{SchemaAnalyzerPart::analyzeFeature()},
+			{SchemaAnalyzerPart::analyzeMetaData()},
+			{SchemaAnalyzerPart::analyzeSentence()}
 		}
 	) {}
 };

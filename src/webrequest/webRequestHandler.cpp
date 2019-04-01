@@ -200,9 +200,15 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineSchema<Schema_Context_PUT_VectorStorageTransaction> schema_Context_PUT_VectorStorageTransaction("transaction/vstorage");
 		schema_Context_PUT_VectorStorageTransaction.addToHandler( m_impl, "PUT");
 
+		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_INIT_DocumentAnalyzer;
+		schema_Context_INIT_DocumentAnalyzer.addToHandler( m_impl, "POST/docanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_PUT_DocumentAnalyzer;
 		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
-		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "POST/docanalyzer");
+
+		static const DefineConfigSchema<Schema_Context_INIT_QueryAnalyzer> schema_Context_INIT_QueryAnalyzer;
+		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
+		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
+		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
@@ -215,8 +221,8 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineSchema<Schema_Storage_QRYORG> schema_Storage_QRYORG("storage");
 		schema_Storage_QRYORG.addToHandler( m_impl, "GET");
 
-		static const DefineSchema<Schema_QueryAnalyzer_GET_content> schema_QueryAnalyzer_GET_content("analyzer");
-		schema_QueryAnalyzer_GET_content.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
+		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
 				
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
