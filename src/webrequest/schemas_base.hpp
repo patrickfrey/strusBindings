@@ -36,7 +36,7 @@ public:
 		VectorMemType, VectorLexemPrunning, VectorDim, VectorBits, VectorVariations,
 		VectorFeatureName,VectorFeatureType,VectorFeatureVector,VectorFeature,
 
-		Segmenter, MimeType, Charset, Schema, DocumentClassDef,
+		AnalyzerName, Segmenter, MimeType, Charset, Schema, DocumentClassDef,
 		SubDocumentName, SubDocumentSelect, SubContentClassDef, SubContentSelect, 
 		AnalyzerElement,FeatureTypeName,FieldTypeName,FieldValue,
 		SelectExpression,FeatureOptionPosition,FeatureOptionDef,FeaturePriority,
@@ -56,7 +56,7 @@ public:
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 
-		FeatureDef, FeatureSet, FeatureWeight,
+		QueryDef, FeatureDef, FeatureSet, FeatureWeight,
 		FeatureSetRestrictionDef, FeatureSetSelectionDef, FeatureSetExclusionDef,
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,

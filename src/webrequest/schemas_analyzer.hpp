@@ -330,9 +330,6 @@ public:
 		NULL/*resultname*/,{},
 		{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")},
-			{SchemaAnalyzerPart::analyzeFeature()},
-			{SchemaAnalyzerPart::analyzeMetaData()},
-			{SchemaAnalyzerPart::analyzeSentence()}
 		}
 	) {}
 };
@@ -342,10 +339,10 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{
-			{"qryanalyzer","/query/analyzerid()",false/*required*/}},
-		{
+		"query",{},{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
+			{"/query", QueryDef, {{"analyzer", AnalyzerName, '?'}}},
+
 			{SchemaAnalyzerPart::analyzeFeature()},
 			{SchemaAnalyzerPart::analyzeMetaData()},
 			{SchemaAnalyzerPart::analyzeSentence()}

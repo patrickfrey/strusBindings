@@ -866,7 +866,7 @@ struct ObjectDescr
 	{
 		papuga_ValueVariant pathvalue;
 		papuga_init_ValueVariant_charp( &pathvalue, path);
-		return papuga_RequestContext_add_variable( context, "path", &pathvalue);
+		return papuga_RequestContext_add_variable( context, "_path", &pathvalue);
 	}
 
 	bool init( const papuga_RequestHandler* handler, PathBuf& path, WebRequestAnswer& answer)

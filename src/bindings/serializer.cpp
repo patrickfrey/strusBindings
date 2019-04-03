@@ -214,6 +214,14 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 				papuga_Serialization* ser = *stk.begin();
 				papuga_SerializationIter seriter;
 				papuga_init_SerializationIter( &seriter, ser);
+				if (ser->structid)
+				{
+					if (result->head.size > 0)
+					{
+						throw std::runtime_error( _TXT("appending structure with id to single unique result"));
+					}
+					papuga_Serialization_set_structid( result, ser->structid);
+				}
 				for (; !papuga_SerializationIter_eof( &seriter); papuga_SerializationIter_skip( &seriter))
 				{
 					rt &= papuga_Serialization_push( result, papuga_SerializationIter_tag( &seriter), papuga_SerializationIter_value( &seriter));

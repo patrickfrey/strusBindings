@@ -206,9 +206,9 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
 
 		static const DefineConfigSchema<Schema_Context_INIT_QueryAnalyzer> schema_Context_INIT_QueryAnalyzer;
-		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
+		schema_Context_INIT_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
-		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
+		schema_Context_PUT_QueryAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
