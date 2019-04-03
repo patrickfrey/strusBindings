@@ -341,7 +341,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		"query",{},{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
-			{"/query", QueryDef, {{"analyzer", AnalyzerName, '?'}}},
+			{"/query/analyzer", '?'},
 
 			{SchemaAnalyzerPart::analyzeFeature()},
 			{SchemaAnalyzerPart::analyzeMetaData()},
