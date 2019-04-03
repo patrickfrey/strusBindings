@@ -334,7 +334,7 @@ public:
 	) {}
 };
 
-class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton
+class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
