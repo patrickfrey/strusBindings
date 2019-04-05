@@ -59,7 +59,7 @@ class Schema_Storage_QRYORG :public papuga::RequestAutomaton
 public:
 	Schema_Storage_QRYORG() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",{},
+		"result", false/*do not merge*/,{},
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval()},
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
@@ -76,7 +76,7 @@ class Schema_Storage_QRYANA :public papuga::RequestAutomaton, public SchemaQuery
 public:
 	Schema_Storage_QRYANA() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"result",{},
+		"result", false/*do not merge*/,{},
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval()},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },

@@ -413,7 +413,7 @@ bool WebRequestContext::setResultContentType( WebRequestAnswer& answer, papuga_S
 	return true;
 }
 
-bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
+bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	const char* resultname = papuga_Request_resultname( m_request);
@@ -425,10 +425,26 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	{
 		// Serialize the result:
 		papuga_Serialization* resultser = papuga_Allocator_alloc_Serialization( &m_allocator);
-		if (!resultser || !papuga_Serialization_serialize_request_result( resultser, m_context, m_request))
+		if (!resultser)
 		{
 			setAnswer( answer, ErrorCodeOutOfMem);
 			return false;
+		}
+		if (papuga_Request_resultmerge( m_request))
+		{
+			if (!papuga_Serialization_merge_request_result( resultser, m_context, m_request, m_encoding, m_doctype, content.str(), content.len(), &errcode))
+			{
+				setAnswer( answer, papugaErrorToErrorCode( errcode));
+				return false;
+			}
+		}
+		else
+		{
+			if (!papuga_Serialization_serialize_request_result( resultser, m_context, m_request, &errcode))
+			{
+				setAnswer( answer, papugaErrorToErrorCode( errcode));
+				return false;
+			}
 		}
 		papuga_ValueVariant resultval;
 		papuga_init_ValueVariant_serialization( &resultval, resultser);
@@ -450,8 +466,8 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		if (resultstr)
 		{
 			const char* encname = papuga_stringEncodingName( m_result_encoding);
-			WebRequestContent content( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultulen);
-			answer.setContent( content);
+			WebRequestContent resultContent( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultulen);
+			answer.setContent( resultContent);
 			return true;
 		}
 		else
@@ -857,7 +873,7 @@ struct ObjectDescr
 		typenam = typenam_;
 		classnam = classnam_;
 		contextnam = contextnam_;
-		obj = papuga_RequestContext_get_variable( context, typenam);
+		obj = papuga_RequestContext_get_variable( context, typenam, NULL/*param[out] isArray*/);
 		varnam = 0;
 		context_ownership = false;
 	}
@@ -910,11 +926,11 @@ struct ObjectDescr
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 		if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
 		{
-			obj = papuga_RequestContext_get_variable( context, typenam);
+			obj = papuga_RequestContext_get_variable( context, typenam, NULL/*param[out] isArray*/);
 			return true;
 		}
 		if (!(varnam = path.getNext())) return true;
-		obj = papuga_RequestContext_get_variable( context, varnam);
+		obj = papuga_RequestContext_get_variable( context, varnam, NULL/*param[out] isArray*/);
 		if (!obj)
 		{
 			reset();
@@ -942,7 +958,7 @@ bool WebRequestContext::executeContextSchema( const char* contextType, const cha
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
 	&&	executeContentRequest( answer, content)
-	&&	getContentRequestResult( answer);
+	&&	getContentRequestResult( answer, content);
 }
 
 bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
@@ -954,7 +970,7 @@ bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, co
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
 	&&	executeContentRequest( answer, content)
-	&&	getContentRequestResult( answer);
+	&&	getContentRequestResult( answer, content);
 }
 
 bool WebRequestContext::executeOPTIONS(

@@ -24,7 +24,7 @@ class Schema_Context_CREATE_VectorStorage :public papuga::RequestAutomaton, publ
 public:
 	Schema_Context_CREATE_VectorStorage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{"/vstorage/path", "()", DatabasePath, papuga_TypeString, "strus/vstorage"},
 			{"/vstorage/vecdim", "()", VectorDim, papuga_TypeInt, "256;300;500"},
@@ -58,7 +58,7 @@ class Schema_Context_DELETE_VectorStorage :public papuga::RequestAutomaton, publ
 public:
 	Schema_Context_DELETE_VectorStorage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{"/vstorage/path", "()", DatabasePath, papuga_TypeString, "strus/vstorage"},
 			{"/vstorage", StorageConfig, {
@@ -75,7 +75,7 @@ class Schema_Context_INIT_VectorStorage :public papuga::RequestAutomaton, public
 public:
 	Schema_Context_INIT_VectorStorage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{"/vstorage/path", "()", DatabasePath, papuga_TypeString, "strus/vstorage"},
 			{"/vstorage/memtypes", "()", VectorMemType, papuga_TypeString, "V;A"},
@@ -108,7 +108,7 @@ class Schema_Context_PUT_VectorStorageTransaction :public papuga::RequestAutomat
 public:
 	Schema_Context_PUT_VectorStorageTransaction() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{"/vstorage/feature/name", "()", VectorFeatureName, papuga_TypeString, "main_station"},
 			{"/vstorage/feature/type", "()", VectorFeatureType, papuga_TypeString, "N;E"},

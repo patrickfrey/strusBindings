@@ -64,7 +64,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			strus::TransactionRef tref = g_tpool->fetchTransaction( tidlist[ ii]);
 			if (!tref.get()) throw std::runtime_error("lost transaction");
 			papuga_RequestContext* ctx = tref->context();
-			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index");
+			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index", NULL/*param[out] isArray*/);
 			if (!var) throw std::runtime_error("index variable of context undefined");
 			int value = papuga_ValueVariant_toint( var, &errcode);
 			if (errcode != papuga_Ok) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
@@ -88,7 +88,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 				continue;
 			}
 			papuga_RequestContext* ctx = tref->context();
-			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index");
+			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index", NULL/*param[out] isArray*/);
 			if (!var) throw std::runtime_error("index variable of context undefined");
 			int value = papuga_ValueVariant_toint( var, &errcode);
 			if (errcode != papuga_Ok) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));

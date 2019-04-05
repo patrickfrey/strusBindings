@@ -178,7 +178,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 
 					papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( result->allocator);
 					if (!ser) return false;
-					papuga_Serialization_set_structid( ser, StructIdTemplate<analyzer::QueryTermExpression>::structid());
 
 					const TermExpression::Operator& op = val.operatorStruct( ii->idx());
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);

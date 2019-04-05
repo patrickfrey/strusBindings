@@ -76,7 +76,7 @@ class Schema_Context_INIT_ContentStatistics :public papuga::RequestAutomaton, pu
 public:
 	Schema_Context_INIT_ContentStatistics() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{defineContentStatistics()}
 		}
@@ -88,7 +88,7 @@ class Schema_Context_PUT_ContentStatistics :public papuga::RequestAutomaton, pub
 public:
 	Schema_Context_PUT_ContentStatistics() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{defineContentStatistics()}
 		}

@@ -24,7 +24,7 @@ class Schema_INIT_Context :public papuga::RequestAutomaton, public AutomatonName
 public:
 	Schema_INIT_Context() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/,{},
+		NULL/*resultname*/, false/*do not merge*/,{},
 		{
 			{"/extensions/directory", "()", ModuleDir, papuga_TypeString, "/usr/lib/modules"},
 			{"/extensions/modules", "()", ModuleName, papuga_TypeString, "analyzer_pattern"},
