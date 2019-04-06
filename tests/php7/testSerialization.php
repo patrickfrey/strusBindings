@@ -62,11 +62,11 @@ catch (Exception $e)
 $expected = <<<END_expected
 result:
 (1)
-a:1, b:"goloman", xyz:12.45
+{a:1, b:"goloman", xyz:12.45}
 (2)
-e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}
+{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}
 (3)
-e1:{a:1, b:"goloman", xyz:12.45}, e2:{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}
+{e1:{a:1, b:"goloman", xyz:12.45}, e2:{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}}
 END_expected;
 
 verifyTestOutput( $outputdir, $result, $expected);

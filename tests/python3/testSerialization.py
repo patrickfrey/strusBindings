@@ -49,15 +49,15 @@ result += "(%u)\n%s\n" % (5,ctx.debug_serialize( estruct4, True))
 
 expected = """result:
 (1)
-a:1, b:"goloman", xyz:12.45
+{a:1, b:"goloman", xyz:12.45}
 (2)
-e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}
+{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}
 (3)
-e1:{a:1, b:"goloman", xyz:12.45}, e2:{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}
+{e1:{a:1, b:"goloman", xyz:12.45}, e2:{e1:{a:567, b:"hoho", xyz:123.456}, e2:{a:789, b:"huhu", xyz:456.789}}}
 (4)
-foo:"bar", ham:NULL, spamm:"eggs"
+{foo:"bar", ham:NULL, spamm:"eggs"}
 (5)
-99, 1.23, "blabla"
+{99, 1.23, "blabla"}
 """
 
 utils.verifyTestOutput( outputdir, result, expected)
