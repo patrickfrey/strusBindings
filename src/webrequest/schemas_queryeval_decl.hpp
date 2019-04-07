@@ -61,6 +61,8 @@ public:
 				}
 			},
 			{"/query/eval/summarizer/name", "()", QueryEvalFunctionName, papuga_TypeString, "matchphrase"},
+			{"/query/eval/summarizer/arg", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
+			{"/query/eval/summarizer/result", "()", QueryEvalFunctionResult, papuga_TypeVoid, NULL},
 			{"/query/eval/summarizer", QueryEvalSummarizer, {
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*'},
@@ -73,6 +75,7 @@ public:
 					{QueryEvalFunctionResult, '*'}}
 			},
 			{"/query/eval/weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
+			{"/query/eval/weighting/arg", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
 			{"/query/eval/weighting", QueryEvalWeighting, {
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*'},

@@ -40,7 +40,7 @@ public:
 			{"//expression/op", "()", JoinOperatorName, papuga_TypeString, "within_struct"},
 			{"//expression/range", "()", JoinOperatorRange, papuga_TypeInt, "12"},
 			{"//expression/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
-			{"//expression/arg", "()", TermExpression, papuga_TypeVoid, ""},
+			{"//expression/arg", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"//expression", TermExpression, {
 					{"variable", ExpressionVariableName, '?'},
 					{"op", JoinOperatorName, '!'},
@@ -48,7 +48,7 @@ public:
 					{"cardinality", JoinOperatorCardinality, '?'},
 					{"arg", TermExpression, '*'}
 				}
-			},
+			}
 		});
 	}
 
@@ -57,9 +57,9 @@ public:
 		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
 			{declareTermExpression("")},
-			{"/meta/from", "()", MetaDataRangeFrom, papuga_TypeString, "title_start"},
-			{"/meta/to", "()", MetaDataRangeTo, papuga_TypeString, "title_end"},
-			{"/meta", TermExpression, {
+			{"//meta/from", "()", MetaDataRangeFrom, papuga_TypeString, "title_start"},
+			{"//meta/to", "()", MetaDataRangeTo, papuga_TypeString, "title_end"},
+			{"//meta", TermExpression, {
 					{"from", MetaDataRangeFrom, '?'},
 					{"to", MetaDataRangeTo, '?'}
 				}

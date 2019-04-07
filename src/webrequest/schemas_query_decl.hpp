@@ -54,13 +54,14 @@ public:
 	static papuga::RequestAutomaton_NodeList declareFeature()
 	{
 		return {
-			{SchemaExpressionPart::declarePostingsExpression( "/query/feature")},
+			{SchemaExpressionPart::declarePostingsExpression( "/query/feature/content")},
 			{"/query/feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"/query/feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
+			{"/query/feature/content", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"/query/feature", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
-					{"content", TermExpression},
+					{"expression", TermExpression, '!'},
 				}
 			},
 		};

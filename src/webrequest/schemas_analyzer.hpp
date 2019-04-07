@@ -166,6 +166,7 @@ public:
 			{SchemaExpressionPart::declarePatternExpression( "postmatcher/pattern")},
 			{"postmatcher/pattern/name", "()", PatternRuleName, papuga_TypeString, "bibref"},
 			{"postmatcher/pattern/visible", "()", PatternRuleVisible, papuga_TypeBool, "true"},
+			{"postmatcher/pattern/content", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"postmatcher/pattern", PatternMatcherPatternDef, {
 					{"name", PatternRuleName, '!'},
 					{"visible", PatternRuleVisible, '?'},

@@ -36,7 +36,7 @@ public:
 			{"library/element/minlen", "()", ContentMinLength, papuga_TypeInt, "10"},
 			{"library/element/maxlen", "()", ContentMaxLength, papuga_TypeInt, "160"},
 			{"library/element/tokenizer/name", "()", TokenizerName, papuga_TypeString, "text"},
-			{"library/element/tokenizer/arg", "()", TokenizerArg, papuga_TypeVoid, NULL},
+			{"library/element/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "de"},
 			{"library/element/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
