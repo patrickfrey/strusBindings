@@ -32,7 +32,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
+			{"/query/feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression, '!', 2/*tag diff*/}} },
 			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
 
 			{SchemaQueryDeclPart::declareMetaData()},
@@ -46,7 +46,7 @@ public:
 		typedef bindings::method::Query Q;
 		return {
 			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression}, {FeatureWeight, '?'}} },
+			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '!', 2/*tag diff*/}, {FeatureWeight, '?'}} },
 
 			{SchemaQueryDeclPart::declareMetaData()},
 			{"/query/restriction", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }

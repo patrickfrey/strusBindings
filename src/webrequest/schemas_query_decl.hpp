@@ -61,7 +61,7 @@ public:
 			{"/query/feature", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
-					{"expression", TermExpression, '!'},
+					{"expression", TermExpression, '!', 2/*tag diff*/},
 				}
 			},
 		};

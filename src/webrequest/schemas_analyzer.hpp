@@ -264,7 +264,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature", "+feature/analyzed", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
+			{"/query/feature/content", "+feature/analyzed", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
 		};
 	}
 
