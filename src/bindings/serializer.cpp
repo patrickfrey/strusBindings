@@ -166,10 +166,21 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 				{
 					papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( result->allocator);
 					if (!ser) return false;
-					papuga_Serialization_set_structid( ser, StructIdTemplate<analyzer::QueryTerm>::structid());
 					stk.push_back( ser);
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
-					rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode, deep);
+
+					if (val.schemaTypedOutput())
+					{
+						rt &= papuga_Serialization_pushName_charp( ser, "term");
+						rt &= papuga_Serialization_pushOpen_struct( ser, StructIdTemplate<analyzer::QueryTerm>::structid());
+						rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode, deep);
+						rt &= papuga_Serialization_pushClose( ser);
+					}
+					else
+					{
+						papuga_Serialization_set_structid( ser, StructIdTemplate<analyzer::QueryTerm>::structid());
+						rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode, deep);
+					}
 					break;
 				}
 				case analyzer::QueryTermExpression::Instruction::Operator:
@@ -182,6 +193,11 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					const TermExpression::Operator& op = val.operatorStruct( ii->idx());
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
 
+					if (val.schemaTypedOutput())
+					{
+						rt &= papuga_Serialization_pushName_charp( ser, "expression");
+						rt &= papuga_Serialization_pushOpen( ser);
+					}
 					rt &= Serializer::serializeStructMemberConstName( ser, "op", op.name, errcode, deep);
 					if (op.range) rt &= Serializer::serializeStructMemberConstName( ser, "range", (papuga_Int)op.range, errcode, deep);
 					if (op.cardinality) rt &= Serializer::serializeStructMemberConstName( ser, "cardinality", (papuga_Int)op.cardinality, errcode, deep);
@@ -192,12 +208,16 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
 					for (; si != se; ++si)
 					{
-						papuga_Serialization_pushValue_serialization( ser, stk[si]);
+						rt &= papuga_Serialization_pushValue_serialization( ser, stk[si]);
 					}
 					rt &= papuga_Serialization_pushClose( ser);//... end arg
 					if (variablename)
 					{
 						rt &= Serializer::serializeStructMemberConstName( ser, "variable", variablename, errcode, deep);
+					}
+					if (val.schemaTypedOutput())
+					{
+						rt &= papuga_Serialization_pushClose( ser);
 					}
 					stk.resize( stk.size() - ii->nofOperands());
 					stk.push_back( ser);
@@ -205,7 +225,19 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 				}
 			}
 		}
-		if (val.singleUniqueResult())
+		if (val.schemaTypedOutput() && stk.size() > 1)
+		{
+			rt &= papuga_Serialization_pushName_charp( result, "list");
+			rt &= papuga_Serialization_pushOpen( result);
+			// Collect list of results from the stack:
+			std::vector<papuga_Serialization*>::const_iterator si = stk.begin(), se = stk.end();
+			for (; si != se; ++si)
+			{
+				rt &= papuga_Serialization_pushValue_serialization( result, *si);
+			}
+			rt &= papuga_Serialization_pushClose( result);
+		}
+		else if (val.singleUniqueResult())
 		{
 			// Copy serialization of unique result from the stack:
 			if (stk.size() == 1)

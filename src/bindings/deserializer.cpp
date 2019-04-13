@@ -1660,11 +1660,9 @@ static void buildExpressionJoin( ExpressionBuilder& builder, papuga_Serializatio
 	}
 }
 
-void Deserializer::buildExpression( ExpressionBuilder& builder, papuga_SerializationIter& seriter, bool allowLists)
+static void buildExpressionTyped( ExpressionBuilder& builder, ExpressionType etype, papuga_SerializationIter& seriter, bool allowLists)
 {
 	const char* context = "expression";
-
-	ExpressionType etype = getExpressionType( seriter);
 	switch (etype)
 	{
 		case ExpressionUnknown:
@@ -1697,10 +1695,42 @@ void Deserializer::buildExpression( ExpressionBuilder& builder, papuga_Serializa
 			while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 			{
 				papuga_SerializationIter_skip( &seriter);
-				buildExpression( builder, seriter, false);
+				Deserializer::buildExpression( builder, seriter, false);
 				Deserializer::consumeClose( seriter);
 			}
 		}
+	}
+}
+
+void Deserializer::buildExpression( ExpressionBuilder& builder, papuga_SerializationIter& seriter, bool allowLists)
+{
+	const char* context = "expression";
+	static const StructureNameMap keywords( "expression,term,meta,list", ',');
+	int ki;
+	ExpressionType etype;
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName && 0 <= (ki = keywords.index( *papuga_SerializationIter_value( &seriter))))
+	{
+		papuga_SerializationIter_skip( &seriter);
+		if (papuga_SerializationIter_tag( &seriter) != papuga_TagOpen)
+		{
+			throw strus::runtime_error(_TXT("unable to interpret %s"), context);
+		}
+		papuga_SerializationIter_skip( &seriter);
+		switch (ki) 
+		{
+			case 0: etype = ExpressionJoin; break;
+			case 1: etype = ExpressionTerm; break;
+			case 2: etype = ExpressionMetaDataRange; break;
+			case 3: etype = ExpressionList; break;
+		}
+		buildExpressionTyped( builder, etype, seriter, allowLists);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		etype = getExpressionType( seriter);
+		buildExpressionTyped( builder, etype, seriter, allowLists);
 	}
 }
 
