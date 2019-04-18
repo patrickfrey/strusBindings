@@ -303,6 +303,25 @@ std::string Deserializer::getString( papuga_SerializationIter& seriter)
 	return ValueVariantWrap::tostring( *getValue( seriter));
 }
 
+bool Deserializer::compareName( const papuga_SerializationIter& seriter, const char* name, std::size_t namelen)
+{
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		const papuga_ValueVariant* val = papuga_SerializationIter_value( &seriter);
+		if (val->valuetype == papuga_TypeString && val->encoding == papuga_UTF8)
+		{
+			return (namelen == val->length && 0==std::memcmp( name, val->value.string, namelen));
+		}
+		else
+		{
+			char buf[ 256];
+			const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), val);
+			return (id && namelen < sizeof(buf) && std::strlen(id) == namelen && 0==std::memcmp( name, buf, namelen));
+		}
+	}
+	return false;
+}
+
 const char* Deserializer::getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter)
 {
 	const papuga_ValueVariant* vp = getValue( seriter);
@@ -2526,32 +2545,105 @@ private:
 	unsigned int m_termc;
 };
 
+template <class Builder>
+static void buildMetaDataRestrictionConditionJoin( Builder& builder, papuga_SerializationIter& seriter, bool doGroup)
+{
+	bool newGroup = true;
+	while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		MetaDataCompareDef def( seriter);
+		builder.addCondition( def.cmpop, def.name, def.value, newGroup);
+		if (doGroup) newGroup = false;
+		Deserializer::consumeClose( seriter);
+	}
+}
+
+template <class Builder>
+static void buildMetaDataRestrictionConditionJoinStruct( Builder& builder, papuga_SerializationIter& seriter, bool doGroup)
+{
+	static const char* context = "metadata condition expression";
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			buildMetaDataRestrictionConditionJoin( builder, seriter, doGroup);
+		}
+		else
+		{
+			MetaDataCompareDef def( seriter);
+			builder.addCondition( def.cmpop, def.name, def.value, true/*new group*/);
+		}
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected after tag in %s"), context);
+	}
+}
+
 template <class RestrictionInterface>
 static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_SerializationIter& seriter)
 {
-	WrapMetaDataRestriction<RestrictionInterface> builder( builderobj);
+	static const char* context = "metadata condition expression";
+	static const StructureNameMap namemap( "union,condition", ',');
+	typedef WrapMetaDataRestriction<RestrictionInterface> Builder;
+	Builder builder( builderobj);
 
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
-		while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		if (papuga_SerializationIter_follow_tag( &seriter) == papuga_TagName)
 		{
 			papuga_SerializationIter_skip( &seriter);
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			if (idx < 0) throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+			papuga_SerializationIter_skip( &seriter);
+
 			if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 			{
-				bool newGroup = true;
-				while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+				if (idx == 0/*union*/)
 				{
-					papuga_SerializationIter_skip( &seriter);
-					MetaDataCompareDef def( seriter);
-					builder.addCondition( def.cmpop, def.name, def.value, newGroup);
-					newGroup = false;
-					Deserializer::consumeClose( seriter);
+					if (papuga_SerializationIter_follow_tag( &seriter) == papuga_TagName)
+					{
+						papuga_SerializationIter_skip( &seriter);
+						if (Deserializer::compareName( seriter, "condition", 9/*strlen condition*/))
+						{
+							papuga_SerializationIter_skip( &seriter);
+							buildMetaDataRestrictionConditionJoinStruct( builder, seriter, true/*do group*/);
+						}
+						else
+						{
+							throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						}
+					}
+					else
+					{
+						buildMetaDataRestrictionConditionJoinStruct( builder, seriter, false/*do not group*/);
+					}
+					
+				}
+				else/*condition*/
+				{
+					buildMetaDataRestrictionConditionJoinStruct( builder, seriter, false);
 				}
 			}
 			else
 			{
+				throw strus::runtime_error(_TXT("structure expected after tag in %s"), context);
+			}
+		}
+		else while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+			{
+				buildMetaDataRestrictionConditionJoin( builder, seriter, true/*do group*/);
+			}
+			else
+			{
 				MetaDataCompareDef def( seriter);
-				builder.addCondition( def.cmpop, def.name, def.value, true);
+				builder.addCondition( def.cmpop, def.name, def.value, true/*new group*/);
 			}
 			Deserializer::consumeClose( seriter);
 		}
@@ -2559,7 +2651,7 @@ static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_
 	else if (!papuga_SerializationIter_eof( &seriter))
 	{
 		MetaDataCompareDef def( seriter);
-		builder.addCondition( def.cmpop, def.name, def.value, true);
+		builder.addCondition( def.cmpop, def.name, def.value, true/*new group*/);
 	}
 	builder.done();
 }
@@ -2777,6 +2869,7 @@ void Deserializer::buildSentencePatternExpression(
 						if (eType == ETypeTerm) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
 						argc = buildSentencePatternExpressionArguments( analyzer, seriter, errorhnd);
 					break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
 			} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
 		}

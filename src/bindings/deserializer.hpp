@@ -50,6 +50,7 @@ struct Deserializer
 	static bool skipStructure( papuga_SerializationIter& seriter);
 
 	static std::string getString( papuga_SerializationIter& seriter);
+	static bool compareName( const papuga_SerializationIter& seriter, const char* name, std::size_t namelen);
 
 	static const char* getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter);
 	static int getCharUnicode( papuga_SerializationIter& seriter);

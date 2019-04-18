@@ -264,7 +264,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature/content", "+feature/analyzed", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression}} },
+			{"/query/feature/content", "+feature/analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
 		};
 	}
 
@@ -282,7 +282,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareMetaData()},
-			{"/query/restriction", "+restriction", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
+			{"/query/restriction", "+restriction/analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*', 2/*tag diff*/}} },
 		};
 	}
 };

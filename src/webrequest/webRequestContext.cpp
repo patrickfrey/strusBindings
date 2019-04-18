@@ -44,6 +44,7 @@
 #include <iostream>
 #include <sstream>
 
+#define STRUS_LOWLEVEL_DEBUG
 using namespace strus;
 
 static void logMethodCall( void* self_, int nofItems, ...);
@@ -448,7 +449,12 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer, const
 		}
 		papuga_ValueVariant resultval;
 		papuga_init_ValueVariant_serialization( &resultval, resultser);
-	
+#ifdef STRUS_LOWLEVEL_DEBUG
+		if (!papuga_ValueVariant_isvalid( &resultval))
+		{
+			std::cerr << "Illegal result" << std::endl;
+		}
+#endif
 		// Map the result:
 		switch (m_result_doctype)
 		{

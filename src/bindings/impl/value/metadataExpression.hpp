@@ -26,8 +26,8 @@ public:
 	enum {BooleanOpOfs=1<<30};
 
 	/// \brief Constructor
-	MetaDataExpression( const QueryAnalyzerInstanceInterface* analyzer_, ErrorBufferInterface* errorhnd_)
-		:m_errorhnd(errorhnd_),m_analyzer(analyzer_->createContext()),m_fieldno_stack(),m_fieldno_cnt(0),m_expr()
+	MetaDataExpression( const QueryAnalyzerInstanceInterface* analyzer_, bool schemaOutput_, ErrorBufferInterface* errorhnd_)
+		:m_errorhnd(errorhnd_),m_analyzer(analyzer_->createContext()),m_fieldno_stack(),m_fieldno_cnt(0),m_schemaOutput(schemaOutput_),m_expr()
 	{
 		if (!m_analyzer) throw strus::runtime_error(_TXT("failed to create analyzer context: %s"), m_errorhnd->fetchError());
 	}
@@ -87,6 +87,11 @@ public:
 		if (m_errorhnd->hasError()) throw strus::runtime_error(_TXT("failed to analyze metadata expression: %s"), m_errorhnd->fetchError());
 	}
 
+	bool schemaOutput() const
+	{
+		return m_schemaOutput;
+	}
+
 private:
 	MetaDataExpression( const MetaDataExpression&){}	//... non copyable
 	void operator=( const MetaDataExpression&){}		//... non copyable
@@ -96,6 +101,7 @@ private:
 	QueryAnalyzerContextInterface* m_analyzer;
 	std::vector<int> m_fieldno_stack;
 	int m_fieldno_cnt;
+	bool m_schemaOutput;
 	analyzer::QueryTermExpression m_expr;
 };
 

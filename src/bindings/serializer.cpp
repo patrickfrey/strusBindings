@@ -375,28 +375,60 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 			}
 		}
 		// Serialize the CNF:
-		std::vector<MetaDataComparison>::const_iterator ci = cmplist.begin(), ce = cmplist.end();
-		for (; ci != ce; ++ci)
+		if (val.schemaOutput())
 		{
-			std::vector<MetaDataComparison>::const_iterator cn = ci;
-			unsigned int argcnt = 1;
-			for (++cn; cn != ce && !cn->newGroup(); ++cn,++argcnt){}
-			if (argcnt > 1)
+			std::vector<MetaDataComparison>::const_iterator ci = cmplist.begin(), ce = cmplist.end();
+			for (; ci != ce; ++ci)
 			{
-				rt &= papuga_Serialization_pushOpen( result);
-				for (; ci != cn; ++ci)
+				std::vector<MetaDataComparison>::const_iterator cn = ci;
+				unsigned int argcnt = 1;
+				for (++cn; cn != ce && !cn->newGroup(); ++cn,++argcnt){}
+				if (argcnt > 1)
+				{
+					rt &= papuga_Serialization_pushName_charp( result, "union");
+					rt &= papuga_Serialization_pushOpen( result);
+					for (; ci != cn; ++ci)
+					{
+						rt &= papuga_Serialization_pushOpen( result);
+						rt &= serializeStructMember( result, "condition", *ci, errcode, deep);
+						rt &= papuga_Serialization_pushClose( result);
+					}
+					--ci;
+					rt &= papuga_Serialization_pushClose( result);
+				}
+				else
+				{
+					rt &= papuga_Serialization_pushOpen( result);
+					rt &= serializeStructMember( result, "condition", *ci, errcode, deep);
+					rt &= papuga_Serialization_pushClose( result);
+				}
+			}
+		}
+		else
+		{
+			std::vector<MetaDataComparison>::const_iterator ci = cmplist.begin(), ce = cmplist.end();
+			for (; ci != ce; ++ci)
+			{
+				std::vector<MetaDataComparison>::const_iterator cn = ci;
+				unsigned int argcnt = 1;
+				for (++cn; cn != ce && !cn->newGroup(); ++cn,++argcnt){}
+				if (argcnt > 1)
+				{
+					rt &= papuga_Serialization_pushOpen( result);
+					for (; ci != cn; ++ci)
+					{
+						rt &= serializeArrayElement( result, *ci, errcode, deep);
+					}
+					--ci;
+					rt &= papuga_Serialization_pushClose( result);
+				}
+				else
 				{
 					rt &= serializeArrayElement( result, *ci, errcode, deep);
 				}
-				--ci;
-				rt &= papuga_Serialization_pushClose( result);
-			}
-			else
-			{
-				rt &= serializeArrayElement( result, *ci, errcode, deep);
 			}
 		}
-		if (!rt)
+		if (!rt && errcode == papuga_Ok)
 		{
 			errcode = papuga_NoMemError;
 		}

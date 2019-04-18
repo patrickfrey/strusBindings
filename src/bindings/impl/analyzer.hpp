@@ -289,7 +289,7 @@ public:
 			const std::string& selectexpr,
 			const ValueVariant& documentClass);
 
-	/// \brief Analye a content and return the analyzed document structure (analyzing single document)
+	/// \brief Analyze a content and return the analyzed document structure (analyzing single document)
 	/// \param[in] content content string (NOT a file name !) of the document to analyze
 	/// \example "<?xml version='1.0' encoding='UTF-8' standalone=yes?><doc>...</doc>"
 	/// \param[in] documentClass document class of the document to analyze, if not specified the document class is guessed from the content with document class detection
@@ -300,7 +300,7 @@ public:
 			const std::string& content,
 			const ValueVariant& documentClass=ValueVariant()) const;
 
-	/// \brief Analye a content and return the analyzed document structures as iterator (analyzing multipart document)
+	/// \brief Analyze a content and return the analyzed document structures as iterator (analyzing multipart document)
 	/// \note If you are not sure if to use analyzeSingle or analyzeMultiPart, then take analyzeMultiPart, because it covers analyzeSingle, returning an iterator on a set containing the single document only
 	/// \param[in] content content string (NOT a file name !) with the documents to analyze
 	/// \example "<?xml version='1.0' encoding='UTF-8' standalone=yes?><doc>...</doc>"
@@ -468,7 +468,7 @@ public:
 	/// \example ""
 	void defineImplicitGroupBy( const std::string& fieldtype, const std::string& groupBy, const std::string& opname, int range=0, unsigned int cardinality=0);
 
-	/// \brief Analye a term expression
+	/// \brief Analyze a term expression
 	/// \param[in] expression query term expression tree
 	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
 	/// \example  [ "word" "PUBLIC" ]
@@ -477,7 +477,7 @@ public:
 	/// \example  [ "word" "public" ]
 	TermExpression* analyzeTermExpression( const ValueVariant& expression) const;
 
-	/// \brief Analye a unique term expression resulting in a single and unique result
+	/// \brief Analyze a unique term expression resulting in a single and unique result
 	/// \remark issues an error if the result does not exist or is not unique
 	/// \param[in] expression query term expression tree
 	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
@@ -487,7 +487,7 @@ public:
 	/// \example  [ "word" "public" ]
 	TermExpression* analyzeSingleTermExpression( const ValueVariant& expression) const;
 
-	/// \brief Analye a term expression having expression,term,list typeing tags in the output, following a stricter schema more suitable for web requests
+	/// \brief Analyze a term expression having expression,term,list typeing tags in the output, following a stricter schema more suitable for web requests
 	/// \param[in] expression query term expression tree
 	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
 	/// \example  [ "word" "PUBLIC" ]
@@ -496,12 +496,19 @@ public:
 	/// \example  [ term: [ "word" "public" ] ]
 	TermExpression* analyzeSchemaTermExpression( const ValueVariant& expression) const;
 	
-	/// \brief Analye a metadata expression
+	/// \brief Analyze a metadata expression
 	/// \param[in] expression query metadata expression tree
 	/// \example  ["<" "year" "26.9.2017"]
 	/// \return structure analyzed
 	/// \example  ["<" "year" "17071"]
 	MetaDataExpression* analyzeMetaDataExpression( const ValueVariant& expression) const;
+
+	/// \brief Analyze a metadata expression having union,condition typeing tags in the output, following a stricter schema more suitable for web requests
+	/// \param[in] expression query metadata expression tree
+	/// \example  [ condition: ["<" "year" "26.9.2017"] ]
+	/// \return structure analyzed
+	/// \example  [ condition: ["<" "year" "17071"] ]
+	MetaDataExpression* analyzeSchemaMetaDataExpression( const ValueVariant& expression) const;
 
 	/// \brief Analyzes a field as sentence, meaning that the content of the field is tokenized,normalized,concatenated by spaces ' ' and split into lexems by a sentence analyzer that finds the most probable patterns matching the field.
 	/// \param[in] fieldType field type name
@@ -528,6 +535,7 @@ public:
 
 private:
 	TermExpression* analyzeTermExpression_( const ValueVariant& expression, bool unique, bool schemaTypedOutput) const;
+	MetaDataExpression* analyzeMetaDataExpression_( const ValueVariant& expression, bool schemaTypedOutput) const;
 
 private:
 	/// \brief Constructor used by Context
