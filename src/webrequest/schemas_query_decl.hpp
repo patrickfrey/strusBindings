@@ -38,14 +38,14 @@ public:
 			{"/query/restriction/union/condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
 			{"/query/restriction/union/condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
 			{"/query/restriction/union/condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
-			{"/query/restriction/union/condition", MetaDataCondition, {
+			{"/query/restriction/union/condition", MetaDataUnionCondition, {
 					{MetaDataConditionOp},
 					{MetaDataConditionName},
 					{MetaDataConditionValue}
 				}
 			},
 			{"/query/restriction/union", MetaDataCondition, {
-					{MetaDataCondition, '*'}
+					{MetaDataUnionCondition, '*', 2/*tag diff*/}
 				}
 			},
 		};

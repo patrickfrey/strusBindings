@@ -378,30 +378,68 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const MetaData
 		if (val.schemaOutput())
 		{
 			std::vector<MetaDataComparison>::const_iterator ci = cmplist.begin(), ce = cmplist.end();
-			for (; ci != ce; ++ci)
+			int nofUnions = 0;
+			int nofSingleConditions = 0;
+			while (ci != ce)
 			{
-				std::vector<MetaDataComparison>::const_iterator cn = ci;
-				unsigned int argcnt = 1;
-				for (++cn; cn != ce && !cn->newGroup(); ++cn,++argcnt){}
-				if (argcnt > 1)
+				++ci;
+				if (ci == ce || ci->newGroup())
 				{
-					rt &= papuga_Serialization_pushName_charp( result, "union");
-					rt &= papuga_Serialization_pushOpen( result);
-					for (; ci != cn; ++ci)
-					{
-						rt &= papuga_Serialization_pushOpen( result);
-						rt &= serializeStructMember( result, "condition", *ci, errcode, deep);
-						rt &= papuga_Serialization_pushClose( result);
-					}
-					--ci;
-					rt &= papuga_Serialization_pushClose( result);
+					++nofSingleConditions;
 				}
 				else
 				{
-					rt &= papuga_Serialization_pushOpen( result);
-					rt &= serializeStructMember( result, "condition", *ci, errcode, deep);
-					rt &= papuga_Serialization_pushClose( result);
+					for (; ci != ce && !ci->newGroup(); ++ci){}
+					++nofUnions;
 				}
+			}
+			if (nofUnions)
+			{
+				// Serialize unions:
+				rt &= papuga_Serialization_pushName_charp( result, "union");
+				if (nofUnions > 1) rt &= papuga_Serialization_pushOpen( result);
+				ci = cmplist.begin();
+				while (ci != ce)
+				{
+					std::vector<MetaDataComparison>::const_iterator cn = ci;
+					++cn;
+					if (!cn->newGroup())//... is union
+					{
+						rt &= papuga_Serialization_pushOpen( result);
+						rt &= papuga_Serialization_pushName_charp( result, "condition");
+						rt &= papuga_Serialization_pushOpen( result);
+						for (; ci != ce && !cn->newGroup(); ++ci)
+						{
+							rt &= serializeArrayElement( result, *ci, errcode, deep);
+						}
+						rt &= papuga_Serialization_pushClose( result);
+						rt &= papuga_Serialization_pushClose( result);
+					}
+					else
+					{
+						++ci;
+					}
+				}
+				if (nofUnions > 1) rt &= papuga_Serialization_pushClose( result);
+			}
+			if (nofSingleConditions)
+			{
+				// Serialize single conditions:
+				rt &= papuga_Serialization_pushName_charp( result, "condition");
+				if (nofSingleConditions > 1) rt &= papuga_Serialization_pushOpen( result);
+
+				ci = cmplist.begin();
+				while (ci != ce)
+				{
+					std::vector<MetaDataComparison>::const_iterator cn = ci;
+					++cn;
+					if (cn->newGroup())//... is single condition
+					{
+						rt &= serializeArrayElement( result, *ci, errcode, deep);
+					}
+					++ci;
+				}
+				if (nofSingleConditions > 1) rt &= papuga_Serialization_pushClose( result);
 			}
 		}
 		else

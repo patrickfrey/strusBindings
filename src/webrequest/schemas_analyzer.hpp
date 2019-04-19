@@ -264,7 +264,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature/content", "+feature/analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
+			{"/query/feature/content", "+feature/content", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
 		};
 	}
 
@@ -273,7 +273,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareSentence()},
-			{"/query/sentence", "+sentence/analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+			{"/query/sentence", "+sentence", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
 		};
 	}
 
@@ -282,7 +282,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareMetaData()},
-			{"/query/restriction", "+restriction/analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*', 2/*tag diff*/}} },
+			{"/query/restriction/{union,condition}", "+restriction", "qryanalyzer", A::analyzeSchemaMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
 		};
 	}
 };

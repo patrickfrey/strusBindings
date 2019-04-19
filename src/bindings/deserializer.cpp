@@ -2583,23 +2583,24 @@ static void buildMetaDataRestrictionConditionJoinStruct( Builder& builder, papug
 	}
 }
 
-template <class RestrictionInterface>
-static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_SerializationIter& seriter)
+template <class Builder>
+static void buildMetaDataRestrictionNamed( Builder& builder, papuga_SerializationIter& seriter)
 {
 	static const char* context = "metadata condition expression";
-	static const StructureNameMap namemap( "union,condition", ',');
-	typedef WrapMetaDataRestriction<RestrictionInterface> Builder;
-	Builder builder( builderobj);
+	static const StructureNameMap namemap( "union,condition,op,name,value", ',');
 
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
-		if (papuga_SerializationIter_follow_tag( &seriter) == papuga_TagName)
+		int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+		if (idx < 0) throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+		if (idx >= 2)
+		{
+			MetaDataCompareDef def( seriter);
+			builder.addCondition( def.cmpop, def.name, def.value, true/*new group*/);
+		}
+		else
 		{
 			papuga_SerializationIter_skip( &seriter);
-			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-			if (idx < 0) throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-			papuga_SerializationIter_skip( &seriter);
-
 			if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 			{
 				if (idx == 0/*union*/)
@@ -2623,7 +2624,7 @@ static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_
 					}
 					
 				}
-				else/*condition*/
+				else /*condition*/
 				{
 					buildMetaDataRestrictionConditionJoinStruct( builder, seriter, false);
 				}
@@ -2633,10 +2634,39 @@ static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_
 				throw strus::runtime_error(_TXT("structure expected after tag in %s"), context);
 			}
 		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("name expected opening named structure in %s"), context);
+	}
+}
+
+template <class RestrictionInterface>
+static void buildMetaDataRestriction_( RestrictionInterface* builderobj, papuga_SerializationIter& seriter)
+{
+	static const StructureNameMap namemap( "union,condition", ',');
+	typedef WrapMetaDataRestriction<RestrictionInterface> Builder;
+	Builder builder( builderobj);
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		buildMetaDataRestrictionNamed( builder, seriter);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		if (papuga_SerializationIter_follow_tag( &seriter) == papuga_TagName)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			buildMetaDataRestrictionNamed( builder, seriter);
+		}
 		else while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 		{
 			papuga_SerializationIter_skip( &seriter);
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+			if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+			{
+				buildMetaDataRestrictionNamed( builder, seriter);
+			}
+			else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 			{
 				buildMetaDataRestrictionConditionJoin( builder, seriter, true/*do group*/);
 			}

@@ -44,7 +44,7 @@
 #include <iostream>
 #include <sstream>
 
-#define STRUS_LOWLEVEL_DEBUG
+#undef STRUS_LOWLEVEL_DEBUG
 using namespace strus;
 
 static void logMethodCall( void* self_, int nofItems, ...);

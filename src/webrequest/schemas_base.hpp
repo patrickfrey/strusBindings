@@ -66,7 +66,8 @@ public:
 		QueryEvalFormulaParameterName, QueryEvalFormulaParameterValue, QueryEvalFormulaParameter,
 
 		TermExpression, ExpressionVariableName, TermType, TermValue, TermLen,
-		MetaDataCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue, MetaDataRangeFrom, MetaDataRangeTo, 
+		MetaDataCondition, MetaDataUnionCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue,
+		MetaDataRangeFrom, MetaDataRangeTo, 
 
 		TermStats, TermDocumentFrequency, CollectionNofDocs, GlobalStats,
 		Docno,NumberOfResults,FirstResult,AccessRight,
