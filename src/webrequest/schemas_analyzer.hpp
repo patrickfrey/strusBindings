@@ -253,8 +253,7 @@ public:
 			{"vstorage/sentanalyzer//spattern/op", "()", SentenceAnalyzerSentencePatternOp, papuga_TypeString, "seq;alt;repeat"},
 			{"vstorage/sentanalyzer//spattern/min", "()", SentenceAnalyzerSentencePatternMinOccurrence, papuga_TypeString, "1;2;4"},
 			{"vstorage/sentanalyzer//spattern/max", "()", SentenceAnalyzerSentencePatternMaxOccurrence, papuga_TypeString, "1;2;10"},
-			{"vstorage/sentanalyzer//spattern/spattern", "()", SentenceAnalyzerSentencePattern, papuga_TypeVoid, NULL},
-			{"vstorage/sentanalyzer/sentence//spattern", SentenceAnalyzerSentencePattern, {
+			{"vstorage/sentanalyzer//spattern", SentenceAnalyzerSentencePattern, {
 					{"type", SentenceAnalyzerSentenceTermType, '?'},
 					{"value", SentenceAnalyzerSentenceTermValue, '?'},
 					{"weight", SentenceAnalyzerSentencePatternWeight, '?'},
@@ -264,6 +263,9 @@ public:
 					{"spattern", SentenceAnalyzerSentencePattern, '?'}
 				}
 			},
+			{"vstorage/sentanalyzer/sentence/name", "()", SentenceAnalyzerSentenceName, papuga_TypeString, "question"},
+			{"vstorage/sentanalyzer/sentence/weight", "()", SentenceAnalyzerSentenceWeight, papuga_TypeDouble, "0.3;0.9;1"},
+			{"vstorage/sentanalyzer/sentence/spattern", "()", SentenceAnalyzerSentencePattern, papuga_TypeVoid, NULL},
 			{"vstorage/sentanalyzer/sentence", SentenceAnalyzerSentenceConfig, {
 					{"name", SentenceAnalyzerSentenceName},
 					{"weight", SentenceAnalyzerSentenceWeight},
