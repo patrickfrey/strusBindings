@@ -13,8 +13,10 @@
 #include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/utf8.hpp"
+#include "strus/base/numstring.hpp"
 #include "valueVariantWrap.hpp"
 #include <string>
+#include <limits>
 #include <cstring>
 #include <algorithm>
 
@@ -330,6 +332,35 @@ const char* Deserializer::getCharpAscii( char* buf, std::size_t bufsize, papuga_
 	return rt;
 }
 
+static int getUnicodeCharValueFromString( const char* str, std::size_t length)
+{
+	if (!length)
+	{
+		throw strus::runtime_error(_TXT("single unicode character or decimal or hexadecimal number representation of it expected"));
+	}
+	else if (length != strus::utf8charlen( str[0]))
+	{
+		if (str[0] >= '0' && str[0] <= '9')
+		{
+			strus::NumParseError err = NumParseOk;
+			int rt = strus::uintFromString( str, length, std::numeric_limits<int>::max(), err);
+			if (!rt || err != NumParseOk)
+			{
+				throw strus::runtime_error(_TXT("failed to parse unicode character as decimal or hexadecimal number in the allowed range"));
+			}
+			return rt;
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("single unicode character or decimal or hexadecimal number representation of it expected"));
+		}
+	}
+	else
+	{
+		return strus::utf8decode( str, length);
+	}
+}
+
 int Deserializer::getCharUnicode( papuga_SerializationIter& seriter)
 {
 	const papuga_ValueVariant* vp = getValue( seriter);
@@ -339,17 +370,12 @@ int Deserializer::getCharUnicode( papuga_SerializationIter& seriter)
 	}
 	else if (vp->valuetype == papuga_TypeString && vp->encoding == papuga_UTF8)
 	{
-		const char* str = vp->value.string;
-		if (!vp->length || vp->length != strus::utf8charlen( str[0])) throw strus::runtime_error(_TXT("single unicode character expected"));
-		return strus::utf8decode( str, vp->length);
+		return getUnicodeCharValueFromString( vp->value.string, vp->length);
 	}
 	else 
 	{
 		std::string str = ValueVariantWrap::tostring( *vp);
-		if (str.empty()) throw strus::runtime_error(_TXT("single unicode character expected"));
-		std::size_t chrlen = strus::utf8charlen( str[0]);
-		if (str.size() != chrlen) throw strus::runtime_error(_TXT("single unicode character expected, not a string"));
-		return strus::utf8decode( str.c_str(), chrlen);
+		return getUnicodeCharValueFromString( str.c_str(), str.size());
 	}
 }
 
@@ -2818,7 +2844,7 @@ void Deserializer::buildSentencePatternExpression(
 		papuga_SerializationIter& seriter,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "type,value,weight,op,min,max,expression", ',');
+	static const StructureNameMap namemap( "type,value,weight,op,min,max,spattern", ',');
 	static const StructureNameMap op_namemap( "seq,alt,repeat", ',');
 	static const char* context = _TXT("sentence expression");
 
@@ -2895,7 +2921,7 @@ void Deserializer::buildSentencePatternExpression(
 						eType = ETypeRepeat;
 						repeat_max = getInt( seriter);
 					break;
-					case 6/*expression*/:
+					case 6/*spattern*/:
 						if (eType == ETypeTerm) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
 						argc = buildSentencePatternExpressionArguments( analyzer, seriter, errorhnd);
 					break;
@@ -3031,7 +3057,7 @@ void Deserializer::buildSentenceAnalyzer(
 {
 	static const StructureNameMap namemap( "separator,space,link,sentence", ',');
 	static const StructureNameMap link_namemap( "chr,subst", ',');
-	static const StructureNameMap sentence_namemap( "name,weight,expression", ',');
+	static const StructureNameMap sentence_namemap( "name,weight,spattern", ',');
 	static const char* context = _TXT("sentence analyzer/lexer");
 
 	if (!papuga_ValueVariant_defined( &content)) return;
@@ -3152,7 +3178,7 @@ void Deserializer::buildSentenceAnalyzer(
 											case 1/*weight*/:
 												weight = Deserializer::getFloat( seriter);
 											break;
-											case 2/*expression*/:
+											case 2/*spattern*/:
 												buildSentencePatternExpression( analyzer, seriter, errorhnd);
 											break;
 										}

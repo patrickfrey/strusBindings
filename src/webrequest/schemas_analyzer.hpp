@@ -210,6 +210,7 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		typedef bindings::method::Context C;
+		typedef bindings::method::VectorStorageClient V;
 		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
 			{"/", "qryanalyzer", "context", C::createQueryAnalyzer(), {} },
@@ -235,6 +236,49 @@ public:
 					{FieldTypeName},
 					{TokenizerDef},
 					{NormalizerDef,'+'},
+				}
+			},
+			{"vstorage/sentanalyzer/separator", "()", SentenceAnalyzerSeparatorChar, papuga_TypeString, "0x22;0x3b;0xa"},
+			{"vstorage/sentanalyzer/space", "()", SentenceAnalyzerSpaceChar, papuga_TypeString, "_;32;44;08;0xA0;0x2008;0x200B"},
+			{"vstorage/sentanalyzer/link/chr", "()", SentenceAnalyzerLinkChar, papuga_TypeString, "0x22;0x2019;0x60;0x27;0x3f;0x21;0x2f;0x3b;0x3a;0x2e;0x2c;0x2d;0x2014;0x20;0x29;0x28;0x5b;0x5d;0x7b;0x7d;0x3c;0x3e;0x5f"},
+			{"vstorage/sentanalyzer/link/subst", "()", SentenceAnalyzerLinkSubst, papuga_TypeString, "-;_"},
+			{"vstorage/sentanalyzer/link", SentenceAnalyzerLinkDef, {
+					{"chr", SentenceAnalyzerLinkChar, '+'},
+					{"subst", SentenceAnalyzerLinkSubst, '!'}
+				}
+			},
+			{"vstorage/sentanalyzer//spattern/type", "()", SentenceAnalyzerSentenceTermType, papuga_TypeString, "word"},
+			{"vstorage/sentanalyzer//spattern/value", "()", SentenceAnalyzerSentenceTermValue, papuga_TypeString, "i;where;who"},
+			{"vstorage/sentanalyzer//spattern/weight", "()", SentenceAnalyzerSentenceWeight, papuga_TypeDouble, "0.5;0.7;1"},
+			{"vstorage/sentanalyzer//spattern/op", "()", SentenceAnalyzerSentencePatternOp, papuga_TypeString, "seq;alt;repeat"},
+			{"vstorage/sentanalyzer//spattern/min", "()", SentenceAnalyzerSentencePatternMinOccurrence, papuga_TypeString, "1;2;4"},
+			{"vstorage/sentanalyzer//spattern/max", "()", SentenceAnalyzerSentencePatternMaxOccurrence, papuga_TypeString, "1;2;10"},
+			{"vstorage/sentanalyzer//spattern/spattern", "()", SentenceAnalyzerSentencePattern, papuga_TypeVoid, NULL},
+			{"vstorage/sentanalyzer/sentence//spattern", SentenceAnalyzerSentencePattern, {
+					{"type", SentenceAnalyzerSentenceTermType, '?'},
+					{"value", SentenceAnalyzerSentenceTermValue, '?'},
+					{"weight", SentenceAnalyzerSentencePatternWeight, '?'},
+					{"op", SentenceAnalyzerSentencePatternOp, '?'},
+					{"min", SentenceAnalyzerSentencePatternMinOccurrence, '?'},
+					{"max", SentenceAnalyzerSentencePatternMaxOccurrence, '?'},
+					{"spattern", SentenceAnalyzerSentencePattern, '?'}
+				}
+			},
+			{"vstorage/sentanalyzer/sentence", SentenceAnalyzerSentenceConfig, {
+					{"name", SentenceAnalyzerSentenceName},
+					{"weight", SentenceAnalyzerSentenceWeight},
+					{"spattern", SentenceAnalyzerSentencePattern}
+				}
+			},
+			{"vstorage/sentanalyzer", SentenceAnalyzerConfig, {
+					{"separator", SentenceAnalyzerSeparatorChar, '*'},
+					{"space", SentenceAnalyzerSpaceChar, '*'},
+					{"link", SentenceAnalyzerLinkDef, '*'},
+					{"sentence", SentenceAnalyzerSentenceConfig, '*'}
+				}
+			},
+			{"vstorage", "vstorage", "sentanalyzer", V::createSentenceAnalyzer(), {
+					{SentenceAnalyzerConfig}
 				}
 			},
 			{"sentence", 0, "qryanalyzer", A::addSentenceType(), {
@@ -273,7 +317,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareSentence()},
-			{"/query/sentence", "+sentence", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+			{"/query/sentence", "+sentence/content", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
 		};
 	}
 
@@ -316,7 +360,10 @@ class Schema_Context_INIT_QueryAnalyzer :public papuga::RequestAutomaton
 public:
 	Schema_Context_INIT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		NULL/*resultname*/, false/*do not merge*/,
+		{
+			{"vstorage","/analyzer/query/vstorage/name()",false/*not required*/}
+		},
 		{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")}
 		}
@@ -328,7 +375,10 @@ class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton
 public:
 	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		NULL/*resultname*/, false/*do not merge*/,
+		{
+			{"vstorage","/analyzer/query/vstorage/name()",false/*not required*/}
+		},
 		{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")},
 		}
@@ -340,7 +390,11 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"query"/*result name*/, true/*do merge*/,{},{
+		"query"/*result name*/, true/*do merge*/,
+		{
+			{"vstorage","/query/analyzer/vstorage/name()",false/*not required*/}
+		},
+		{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
 			{"/query/analyzer", '?'},
 

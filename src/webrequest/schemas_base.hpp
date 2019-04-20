@@ -56,6 +56,13 @@ public:
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 
+		SentenceAnalyzerSeparatorChar,SentenceAnalyzerSpaceChar,
+		SentenceAnalyzerLinkChar,SentenceAnalyzerLinkSubst,SentenceAnalyzerLinkDef,
+		SentenceAnalyzerSentenceTermType,SentenceAnalyzerSentenceTermValue,SentenceAnalyzerSentencePatternWeight,
+		SentenceAnalyzerSentencePatternOp,SentenceAnalyzerSentencePatternMinOccurrence,SentenceAnalyzerSentencePatternMaxOccurrence,
+		SentenceAnalyzerSentencePattern,SentenceAnalyzerSentenceConfig,SentenceAnalyzerSentenceName,
+		SentenceAnalyzerSentenceWeight,SentenceAnalyzerConfig,
+
 		QueryDef, FeatureDef, FeatureSet, FeatureWeight,
 		FeatureSetRestrictionDef, FeatureSetSelectionDef, FeatureSetExclusionDef,
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
