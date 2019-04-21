@@ -680,7 +680,7 @@ bool strus::mapValueVariantToAnswer(
 	switch (doctype)
 	{
 		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, rootname, &resultlen, &errcode); break;
+		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
 		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, rootname, elemname, html_head, html_href_base, &resultlen, &errcode); break;
 		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
 		case WebRequestContent::Unknown:

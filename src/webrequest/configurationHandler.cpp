@@ -303,7 +303,7 @@ static ConfigurationDescription createSubConfig( const std::string& name, papuga
 	std::size_t subcfglen;
 	const char* subcfgstr = (const char*)papuga_ValueVariant_tojson(
 					&subconfigval, &allocator, getBindingsInterfaceDescription()->structs,
-					papuga_UTF8, NULL, &subcfglen, &errcode);
+					papuga_UTF8, NULL/*rootname*/, NULL/*elemname*/, &subcfglen, &errcode);
 	if (!subcfgstr) throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to load sub configuration"));
 	const char* doctype = WebRequestContent::typeName( WebRequestContent::JSON);
 	return ConfigurationDescription( name, subconfidid.empty() ? name : subconfidid, doctype, std::string(subcfgstr, subcfglen));

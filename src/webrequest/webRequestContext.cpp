@@ -458,10 +458,10 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer, const
 		// Map the result:
 		switch (m_result_doctype)
 		{
-			case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, &resultulen, &errcode); break;
-			case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, &resultulen, &errcode); break;
-			case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultulen, &errcode); break;
-			case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, 0/*no array possible*/, &resultulen, &errcode); break;
+			case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, &resultulen, &errcode); break;
+			case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, &resultulen, &errcode); break;
+			case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultulen, &errcode); break;
+			case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, &resultulen, &errcode); break;
 			case WebRequestContent::Unknown:
 			{
 				setAnswer( answer, ErrorCodeNotImplemented, _TXT("output content type unknown"));
