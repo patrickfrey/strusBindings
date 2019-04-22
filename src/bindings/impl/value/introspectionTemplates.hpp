@@ -30,9 +30,48 @@ public:
 		:m_errorhnd(errorhnd_),m_value(value_){}
 	virtual ~IntrospectionAtomic(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
 		Serializer::serialize( &serialization, m_value, true/*deep*/);
+	}
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		return NULL;
+	}
+	virtual std::vector<IntrospectionLink> list()
+	{
+		throw unresolvable_exception();
+	}
+private:
+	ErrorBufferInterface* m_errorhnd;
+	TypeName m_value;
+};
+
+template <class TypeName>
+class IntrospectionStructure
+	:public IntrospectionBase
+{
+public:
+	IntrospectionStructure(
+			ErrorBufferInterface* errorhnd_,
+			const TypeName& value_)
+		:m_errorhnd(errorhnd_),m_value(value_){}
+	virtual ~IntrospectionStructure(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	{
+		if (substructure)
+		{
+			bool sc = true;
+			sc &= papuga_Serialization_pushOpen( &serialization);
+			Serializer::serialize( &serialization, m_value, true/*deep*/);
+			sc &= papuga_Serialization_pushClose( &serialization);
+			if (!sc) throw std::bad_alloc();
+		}
+		else
+		{
+			Serializer::serialize( &serialization, m_value, true/*deep*/);
+		}
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -59,9 +98,9 @@ public:
 		:m_errorhnd(errorhnd_),m_value(value_){}
 	virtual ~IntrospectionKeyValueList(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -101,9 +140,9 @@ public:
 		:m_errorhnd(errorhnd_),m_value(value_),m_elementConstructor(elementConstructor_){}
 	virtual ~IntrospectionObjectList(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -159,9 +198,20 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionConfig(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		Serializer::serialize( &serialization, strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
+		if (substructure)
+		{
+			bool sc = true;
+			sc &= papuga_Serialization_pushOpen( &serialization);
+			Serializer::serialize( &serialization, strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
+			sc &= papuga_Serialization_pushClose( &serialization);
+			if (!sc) throw std::bad_alloc();
+		}
+		else
+		{
+			Serializer::serialize( &serialization, strus::getConfigStringItems( m_impl->config(), m_errorhnd), true/*deep*/);
+		}
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{

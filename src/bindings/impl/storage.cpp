@@ -279,7 +279,7 @@ Struct StorageClientImpl::introspection( const ValueVariant& arg) const
 	const StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new StorageIntrospection( errorhnd, storage));
-	ictx->getPathContent( rt.serialization, path);
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

@@ -28,8 +28,7 @@ string struct_env:
   string resourcedir:
     number 1: "/usr/share/resources"
     number 2: "/usr/share/strus"
-  string workdir:
-    number 1: "/home/johndoe"
+  string workdir: "/home/johndoe"
 string textproc_segmenter:
   string link:
     number 1: "cjson"

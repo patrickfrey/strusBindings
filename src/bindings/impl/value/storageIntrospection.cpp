@@ -38,6 +38,11 @@ static IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* error
 {
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
 }
+template <class TypeName>
+static IntrospectionBase* createIntrospectionStructure( ErrorBufferInterface* errorhnd, const TypeName& val)
+{
+	return new IntrospectionStructure<TypeName>( errorhnd, val);
+}
 static IntrospectionBase* createIntrospectionValueIterator( ErrorBufferInterface* errorhnd, ValueIteratorInterface* val, bool prefixBound, const std::string& prefix="")
 {
 	if (!val) throw strus::runtime_error("%s", errorhnd->fetchError());
@@ -100,9 +105,9 @@ public:
 	{}
 	virtual ~AttibuteIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -165,9 +170,9 @@ public:
 	{}
 	virtual ~MetaDataIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -238,8 +243,10 @@ public:
 
 	enum {PartialDumpSize=1024};
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
+		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+
 		if (m_type.empty())
 		{
 			std::vector<std::string> typelist = types();
@@ -262,6 +269,7 @@ public:
 		{
 			Serializer::serialize( &serialization, dumpContent( m_type, m_pos, m_size), true/*deep*/);
 		}
+		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -369,8 +377,10 @@ public:
 		{}
 	virtual ~DocumentPostingsIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
+		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+
 		strus::local_ptr<PostingIteratorInterface> pitr( m_impl->createTermPostingIterator( m_type, m_value, 1));
 		if (!pitr.get()) throw std::runtime_error( m_errorhnd->fetchError());
 		if (m_docno != pitr->skipDoc( m_docno)) return;
@@ -392,6 +402,7 @@ public:
 			}
 			Serializer::serialize( &serialization, posar, true/*deep*/);
 		}
+		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -446,8 +457,10 @@ public:
 	}
 	virtual ~TermPostingsIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
+		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+
 		Index dn;
 		if (m_docno)
 		{
@@ -487,6 +500,7 @@ public:
 			Serializer::serializeWithName( &serialization, "pos", positions(), true/*deep*/);
 			if (!papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 		}
+		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -517,7 +531,7 @@ public:
 		else if (name == "pos")
 		{
 			m_postings->skipDoc( m_docno);
-			return createIntrospectionAtomic( m_errorhnd, positions());
+			return createIntrospectionStructure( m_errorhnd, positions());
 		}
 		else if (name == "frequency")
 		{
@@ -592,8 +606,10 @@ public:
 		{}
 	virtual ~SearchIndexIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
+		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+
 		if (m_type.empty())
 		{
 			std::vector<std::string> typelist = types();
@@ -611,6 +627,7 @@ public:
 			if (m_docno != itr->skipDoc( m_docno)) return;
 			Serializer::serialize( &serialization, itr.get(), true/*deep*/);
 		}
+		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -697,9 +714,9 @@ public:
 		{}
 	virtual ~TermIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -785,9 +802,9 @@ public:
 		{}
 	virtual ~DocumentIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -845,9 +862,9 @@ public:
 		{}
 	virtual ~DocidIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -907,9 +924,9 @@ private:
 }//namespace
 
 
-void StorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
+void StorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	serializeMembers( serialization, path);
+	serializeMembers( serialization, path, substructure);
 }
 
 IntrospectionBase* StorageIntrospection::open( const std::string& name)
@@ -924,7 +941,7 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 	{
 		strus::local_ptr<AttributeReaderInterface> reader( m_impl->createAttributeReader());
 		if (!reader.get()) throw std::runtime_error( m_errorhnd->fetchError());
-		return createIntrospectionAtomic( m_errorhnd, reader->getNames());
+		return createIntrospectionStructure( m_errorhnd, reader->getNames());
 	}
 	else if (name == "term") return new TermIntrospection( m_errorhnd, m_impl);
 	else if (name == "doc")

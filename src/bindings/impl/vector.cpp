@@ -228,7 +228,7 @@ Struct VectorStorageClientImpl::introspection( const ValueVariant& arg) const
 	const VectorStorageClientInterface* vstorage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new VectorStorageIntrospection( errorhnd, vstorage));
-	ictx->getPathContent( rt.serialization, path);
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

@@ -45,7 +45,7 @@ public:\
 			const ClassName* impl_)\
 		:m_errorhnd(errorhnd_),m_impl(impl_){}\
 	virtual ~IntrospectionClassName(){}\
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path);\
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure);\
 	virtual IntrospectionBase* open( const std::string& name);\
 	virtual std::vector<IntrospectionLink> list();\
 private:\
@@ -81,9 +81,20 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionFunctionDescription(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
+		if (substructure)
+		{
+			bool sc = true;
+			sc &= papuga_Serialization_pushOpen( &serialization);
+			Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
+			sc &= papuga_Serialization_pushClose( &serialization);
+			if (!sc) throw std::bad_alloc();
+		}
+		else
+		{
+			Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
+		}
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -120,9 +131,14 @@ DEFINE_CLASS_INTROSPECTION_CLASS_TPL( IntrospectionScalarFunctionParser, Introsp
  */
 namespace {
 template <class TypeName>
-IntrospectionAtomic<TypeName>* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, const TypeName& val)
+IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* errorhnd, const TypeName& val)
 {
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
+}
+template <class TypeName>
+IntrospectionBase* createIntrospectionStructure( ErrorBufferInterface* errorhnd, const TypeName& val)
+{
+	return new IntrospectionStructure<TypeName>( errorhnd, val);
 }
 }//namespace
 
@@ -217,9 +233,9 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionFunctionList(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -234,9 +250,9 @@ private:
 	const InterfaceClassName* m_impl;
 };
 
-void ContextIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
+void ContextIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	serializeMembers( serialization, path);
+	serializeMembers( serialization, path, substructure);
 }
 IntrospectionBase* ContextIntrospection::open( const std::string& name)
 {
@@ -255,15 +271,15 @@ std::vector<IntrospectionLink> ContextIntrospection::list()
 }
 
 
-void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization, const std::string& path)
+void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	serializeMembers( serialization, path);
+	serializeMembers( serialization, path, substructure);
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name)
 {
-	if (name == "moduledir") return createIntrospectionAtomic( m_errorhnd, m_impl->modulePaths());
-	if (name == "module") return createIntrospectionAtomic( m_errorhnd, m_impl->modules());
-	if (name == "resourcedir") return createIntrospectionAtomic( m_errorhnd, m_impl->resourcePaths());
+	if (name == "moduledir") return createIntrospectionStructure( m_errorhnd, m_impl->modulePaths());
+	if (name == "module") return createIntrospectionStructure( m_errorhnd, m_impl->modules());
+	if (name == "resourcedir") return createIntrospectionStructure( m_errorhnd, m_impl->resourcePaths());
 	if (name == "workdir") return createIntrospectionAtomic( m_errorhnd, m_impl->workingDirectory());
 	return NULL;
 }
@@ -280,9 +296,9 @@ typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::PatternLexer> IntrospectionPatternLexerList;
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::PatternMatcher> IntrospectionPatternMatcherList;
 
-void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization, const std::string& path)
+void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	serializeMembers( serialization, path);
+	serializeMembers( serialization, path, substructure);
 }
 IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name)
 {
@@ -305,9 +321,9 @@ typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterfa
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::SummarizerFunction> IntrospectionSummarizerFunctionList;
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::ScalarFunctionParser> IntrospectionScalarFunctionParserList;
 
-void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization, const std::string& path)
+void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	serializeMembers( serialization, path);
+	serializeMembers( serialization, path, substructure);
 }
 IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name)
 {

@@ -79,7 +79,7 @@ Struct ContentStatisticsImpl::introspection( const ValueVariant& arg) const
 	const ContentStatisticsInterface* contentstats = m_contentstats_impl.getObject<ContentStatisticsInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new ContentStatisticsIntrospection( errorhnd, contentstats));
-	ictx->getPathContent( rt.serialization, path);
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

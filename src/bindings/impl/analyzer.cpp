@@ -403,7 +403,7 @@ Struct DocumentAnalyzerImpl::introspection( const ValueVariant& arg) const
 	const DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new DocumentAnalyzerIntrospection( errorhnd, analyzer));
-	ictx->getPathContent( rt.serialization, path);
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
@@ -750,7 +750,7 @@ Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg) const
 	const QueryAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new QueryAnalyzerIntrospection( errorhnd, analyzer));
-	ictx->getPathContent( rt.serialization, path);
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

@@ -35,6 +35,11 @@ static IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* error
 {
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
 }
+template <class TypeName>
+static IntrospectionBase* createIntrospectionStructure( ErrorBufferInterface* errorhnd, const TypeName& val)
+{
+	return new IntrospectionStructure<TypeName>( errorhnd, val);
+}
 
 static bool isValidFeatureValuePrefix( const VectorStorageClientInterface* vstorage, const std::string& prefix, ErrorBufferInterface* errorhnd)
 {
@@ -63,9 +68,9 @@ public:
 		{}
 	virtual ~FeatureTypeListIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual std::vector<IntrospectionLink> list()
@@ -109,9 +114,9 @@ public:
 		{}
 	virtual ~FeatureValueIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path)
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path);
+		serializeMembers( serialization, path, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -175,9 +180,9 @@ private:
 }//anonymous namespace
 
 
-void VectorStorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path)
+void VectorStorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	serializeMembers( serialization, path);
+	serializeMembers( serialization, path, substructure);
 }
 
 IntrospectionBase* VectorStorageIntrospection::open( const std::string& name)

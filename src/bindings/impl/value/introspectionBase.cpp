@@ -67,11 +67,13 @@ std::vector<std::string> IntrospectionBase::getKeyList( const std::vector<std::p
 	return rt;
 }
 
-void IntrospectionBase::serializeMembers( papuga_Serialization& serialization, const std::string& path)
+void IntrospectionBase::serializeMembers( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
 	int nofLinks = 0;
 	std::vector<IntrospectionLink> elems = this->list();
 	std::vector<IntrospectionLink>::const_iterator li = elems.begin(), le = elems.end();
+	if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+
 	for (; li != le; ++li)
 	{
 		if (li->autoexpand())
@@ -101,6 +103,7 @@ void IntrospectionBase::serializeMembers( papuga_Serialization& serialization, c
 		}
 		if (!papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
+	if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 }
 
 void IntrospectionBase::serializeStructureAs( papuga_Serialization& serialization, const char* name, const std::string& path)
@@ -109,13 +112,11 @@ void IntrospectionBase::serializeStructureAs( papuga_Serialization& serializatio
 	const char* namecopy = papuga_Allocator_copy_charp( serialization.allocator, name);
 	if (!namecopy) throw std::bad_alloc();
 	sc &= papuga_Serialization_pushName_charp( &serialization, namecopy);
-	sc &= papuga_Serialization_pushOpen( &serialization);
-	this->serialize( serialization, path);
-	sc &= papuga_Serialization_pushClose( &serialization);
+	this->serialize( serialization, path, true/*substructure*/);
 	if (!sc) throw std::bad_alloc();
 }
 
-void IntrospectionBase::getPathContent( papuga_Serialization& serialization, const std::vector<std::string>& path)
+void IntrospectionBase::getPathContent( papuga_Serialization& serialization, const std::vector<std::string>& path, bool substructure)
 {
 	strus::local_ptr<IntrospectionBase> ictx;
 	IntrospectionBase* cur = this;
@@ -132,7 +133,7 @@ void IntrospectionBase::getPathContent( papuga_Serialization& serialization, con
 		openedpath.push_back('/');
 		openedpath.append( *pi);
 	}
-	cur->serialize( serialization, std::string());
+	cur->serialize( serialization, std::string(), substructure);
 }
 
 IntrospectionValueIterator::IntrospectionValueIterator( ErrorBufferInterface* errorhnd_, const strus::Reference<ValueIteratorInterface>& impl_, bool prefixBound_, const std::string& name_)
@@ -148,11 +149,23 @@ IntrospectionValueIterator::IntrospectionValueIterator( ErrorBufferInterface* er
 	}
 }
 
-void IntrospectionValueIterator::serialize( papuga_Serialization& serialization, const std::string& path)
+void IntrospectionValueIterator::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
 	std::vector<std::string> valuelist = m_impl->fetchValues( MaxListSizeDeepExpansion);
-	Serializer::serialize( &serialization, valuelist, true/*deep*/);
+	if (substructure)
+	{
+		bool sc = true;
+		sc &= papuga_Serialization_pushOpen( &serialization);
+		Serializer::serialize( &serialization, valuelist, true/*deep*/);
+		sc &= papuga_Serialization_pushClose( &serialization);
+		if (!sc) throw std::bad_alloc();
+	}
+	else
+	{
+		Serializer::serialize( &serialization, valuelist, true/*deep*/);
+	}
 }
+
 IntrospectionBase* IntrospectionValueIterator::open( const std::string& name_)
 {
 	if (m_name.empty())
@@ -230,11 +243,23 @@ std::vector<std::string> IntrospectionDirectoryIterator::fetchValues()
 	return rt;
 }
 
-void IntrospectionDirectoryIterator::serialize( papuga_Serialization& serialization, const std::string& path)
+void IntrospectionDirectoryIterator::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
 	std::vector<std::string> valuelist = fetchValues();
-	Serializer::serialize( &serialization, valuelist, true/*deep*/);
+	if (substructure)
+	{
+		bool sc = true;
+		sc &= papuga_Serialization_pushOpen( &serialization);
+		Serializer::serialize( &serialization, valuelist, true/*deep*/);
+		sc &= papuga_Serialization_pushClose( &serialization);
+		if (!sc) throw std::bad_alloc();
+	}
+	else
+	{
+		Serializer::serialize( &serialization, valuelist, true/*deep*/);
+	}
 }
+
 IntrospectionBase* IntrospectionDirectoryIterator::open( const std::string& name_)
 {
 	if (m_name.empty())
@@ -251,6 +276,10 @@ std::vector<IntrospectionLink> IntrospectionDirectoryIterator::list()
 	return IntrospectionLink::getList( false, fetchValues());
 }
 
+void LinkIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+{
+	serializeMembers( serialization, path, substructure);
+}
 
 
 

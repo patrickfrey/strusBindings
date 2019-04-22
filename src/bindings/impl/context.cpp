@@ -485,7 +485,7 @@ Struct ContextImpl::introspection( const ValueVariant& arg) const
 	const RpcClientInterface* rpc = m_rpc_impl.getObject<RpcClientInterface>();
 
 	strus::local_ptr<IntrospectionBase> ictx( new ContextIntrospection( errorhnd, moduleLoader, trace, storage, analyzer, rpc, m_threads));
-	ictx->getPathContent( rt.serialization, path);
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());

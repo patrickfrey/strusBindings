@@ -35,7 +35,7 @@ Struct InserterImpl::introspection( const ValueVariant& arg) const
 		static const char* ar[] = {"analyzer","storage", 0};
 		ErrorBufferInterface* errorhnd = m_analyzer.m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		ictx.reset( new LinkIntrospection( errorhnd, ar));
-		ictx->getPathContent( rt.serialization, path);
+		ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 		if (errorhnd->hasError())
 		{
 			throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
