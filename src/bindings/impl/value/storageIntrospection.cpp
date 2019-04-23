@@ -221,6 +221,63 @@ private:
 };
 
 
+class ForwardIndexListIntrospection
+	:public IntrospectionBase
+{
+public:
+	ForwardIndexListIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const StorageClientInterface* impl_,
+			const strus::Index& docno_,
+			const std::string& type_)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		,m_docno(docno_)
+		,m_type(type_)
+		{}
+	virtual ~ForwardIndexListIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	{
+		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+		strus::local_ptr<ForwardIteratorInterface> itr( m_impl->createForwardIterator( m_type));
+		if (!itr.get()) throw std::runtime_error( m_errorhnd->fetchError());
+		itr->skipDoc( m_docno);
+		strus::Index pos = 0;
+		while (!!(pos = itr->skipPos( pos+1)))
+		{
+			std::string value = itr->fetch();
+			char* valuestr_copy = papuga_Allocator_copy_string( serialization.allocator, value.c_str(), value.size());
+			if (!valuestr_copy) throw std::bad_alloc();
+
+			papuga_Serialization_pushOpen( &serialization);
+			papuga_Serialization_pushName_charp( &serialization, "value");
+			papuga_Serialization_pushValue_string( &serialization, valuestr_copy, value.size());
+			papuga_Serialization_pushName_charp( &serialization, "pos");
+			papuga_Serialization_pushValue_int( &serialization, pos);
+			papuga_Serialization_pushClose( &serialization);
+		}
+		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		return NULL;
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		throw unresolvable_exception();
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_impl;
+	strus::Index m_docno;
+	std::string m_type;
+};
+
+
 class ForwardIndexIntrospection
 	:public IntrospectionBase
 {
@@ -280,8 +337,15 @@ public:
 		}
 		else if (!m_pos)
 		{
-			strus::Index pos_ = parseIndex( name, _TXT("forward index position"));
-			return new ForwardIndexIntrospection( m_errorhnd, m_impl, m_docno, m_type, pos_);
+			if (name == "list")
+			{
+				return new ForwardIndexListIntrospection( m_errorhnd, m_impl, m_docno, m_type);
+			}
+			else
+			{
+				strus::Index pos_ = parseIndex( name, _TXT("forward index position"));
+				return new ForwardIndexIntrospection( m_errorhnd, m_impl, m_docno, m_type, pos_);
+			}
 		}
 		else
 		{
@@ -299,7 +363,8 @@ public:
 		}
 		else
 		{
-			throw unresolvable_exception();
+			static const char* ar[] = {"list",NULL};
+			return getList( ar);
 		}
 	}
 
@@ -327,7 +392,7 @@ private:
 		itr->skipDoc( m_docno);
 		strus::Index pos = startpos, prevpos = startpos+1, endpos = dumpsize ? (startpos + dumpsize) : std::numeric_limits<strus::Index>::max();
 		std::string content;
-		while (!!(pos = itr->skipPos( pos+1)) && pos < endpos)
+		while (!!(pos = itr->skipPos( pos)) && pos < endpos)
 		{
 			if (!content.empty())
 			{
@@ -343,6 +408,7 @@ private:
 			}
 			content.append( itr->fetch());
 			prevpos = pos;
+			++pos;
 		}
 		return content;
 	}
