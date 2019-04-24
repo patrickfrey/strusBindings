@@ -895,12 +895,16 @@ public:
 		{
 			return new ForwardIndexIntrospection( m_errorhnd, m_impl, m_docno);
 		}
+		else if (name == "access")
+		{
+			return createIntrospectionValueIterator( m_errorhnd, m_impl->createUserNameIterator(), false/*prefixBound*/);
+		}
 		return NULL;
 	}
 
 	virtual std::vector<IntrospectionLink> list()
 	{
-		static const char* ar[] = {"docno","attribute","metadata","findex","sindex", NULL};
+		static const char* ar[] = {"docno","attribute","metadata","findex","sindex","access",NULL};
 		return getList( ar);
 	}
 
