@@ -1752,7 +1752,7 @@ void Deserializer::buildExpression( ExpressionBuilder& builder, papuga_Serializa
 	const char* context = "expression";
 	static const StructureNameMap keywords( "expression,term,meta,list", ',');
 	int ki;
-	ExpressionType etype;
+	ExpressionType etype = ExpressionUnknown;
 
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName && 0 <= (ki = keywords.index( *papuga_SerializationIter_value( &seriter))))
 	{
