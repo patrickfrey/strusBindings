@@ -35,6 +35,13 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
+	/// \brief Create the answer structure for a simple message string
+	/// \param[out] answer result status and the data of the answer of the request
+	/// \return bool true if succeeded, false else
+	virtual bool getMessageAnswer(
+			const std::string& message,
+			WebRequestAnswer& answer)=0;
+
 	/// \brief Load the main configuration initializing the root context object
 	/// \param[in] content content of the configuration to load
 	/// \param[out] answer result status

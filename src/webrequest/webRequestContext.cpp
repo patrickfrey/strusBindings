@@ -1283,6 +1283,14 @@ bool WebRequestContext::executeSchemaDescriptionRequest(
 	}
 }
 
+bool WebRequestContext::getMessageAnswer(
+		const std::string& message,
+		WebRequestAnswer& answer)
+{
+	if (!setResultContentType( answer, papuga_UTF8, WebRequestContent::HTML)) return false;
+	return strus::mapStringToAnswer( answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, "", m_result_encoding, m_result_doctype, message);
+}
+
 bool WebRequestContext::executeRequest(
 		const char* method,
 		const char* path_,

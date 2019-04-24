@@ -47,6 +47,10 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
+	virtual bool getMessageAnswer(
+			const std::string& message,
+			WebRequestAnswer& answer);
+
 	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
 	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer);
 
