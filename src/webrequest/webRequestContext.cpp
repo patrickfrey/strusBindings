@@ -1368,8 +1368,16 @@ bool WebRequestContext::executeRequest(
 					}
 					else
 					{
-						selector.reset();
-						return executeDeclareConfiguration( selector.typenam, selector.contextnam, method, false/*init*/, content, answer);
+						if (content.empty())
+						{
+							setAnswer( answer, ErrorCodeIncompleteRequest);
+							return false;
+						}
+						else
+						{
+							selector.reset();
+							return executeDeclareConfiguration( selector.typenam, selector.contextnam, method, false/*init*/, content, answer);
+						}
 					}
 				}
 				else if (isEqual(method,"DELETE"))
