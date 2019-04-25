@@ -25,6 +25,12 @@ ELSE (WITH_PYTHON STREQUAL "YES")
 MESSAGE( STATUS  "Python bindings generation is not enabled. Start cmake with -DWITH_PYTHON=YES to enable it." )
 ENDIF (WITH_PYTHON STREQUAL "YES")
     
+IF (WITH_LUA STREQUAL "YES")
+MESSAGE( STATUS  "Lua (v5.2) bindings generation is enabled." )
+ELSE (WITH_LUA STREQUAL "YES")
+MESSAGE( STATUS  "Lua bindings generation is not enabled. Start cmake with -DWITH_LUA=YES to enable it." )
+ENDIF (WITH_LUA STREQUAL "YES")
+
 if(NOT STRUS_ALL)
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
 include( cmake/cxx11.cmake )
