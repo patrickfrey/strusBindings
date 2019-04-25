@@ -48,6 +48,7 @@ public:
 			WebRequestAnswer& answer);
 
 	virtual bool getMessageAnswer(
+			const std::string& name,
 			const std::string& message,
 			WebRequestAnswer& answer);
 

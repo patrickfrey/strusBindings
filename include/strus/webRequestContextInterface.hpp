@@ -36,9 +36,12 @@ public:
 			WebRequestAnswer& answer)=0;
 
 	/// \brief Create the answer structure for a simple message string
+	/// \param[in] name key used for the message in a markup language
+	/// \param[in] message content string for the message
 	/// \param[out] answer result status and the data of the answer of the request
 	/// \return bool true if succeeded, false else
 	virtual bool getMessageAnswer(
+			const std::string& name,
 			const std::string& message,
 			WebRequestAnswer& answer)=0;
 
