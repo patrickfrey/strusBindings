@@ -2256,7 +2256,7 @@ static void buildStorageDocument(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "doctype,attribute,metadata,forwardindex,searchindex,access", ',');
+	static const StructureNameMap namemap( "docid,doctype,attribute,metadata,forwardindex,searchindex,access", ',');
 	static const char* context = _TXT("document");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -2279,15 +2279,18 @@ static void buildStorageDocument(
 					case 0: (void)Deserializer::getString( seriter);
 						// ... ignore sub document type (output of analyzer)
 						break;
-					case 1: buildAttributesValue( document, seriter);
+					case 1: (void)Deserializer::getString( seriter);
+						// ... ignore document identifier (part of schema)
 						break;
-					case 2: buildMetaDataValue( document, seriter);
+					case 2: buildAttributesValue( document, seriter);
 						break;
-					case 3: buildStorageForwardIndexValue( document, seriter);
+					case 3: buildMetaDataValue( document, seriter);
 						break;
-					case 4: buildStorageSearchIndexValue( document, seriter);
+					case 4: buildStorageForwardIndexValue( document, seriter);
 						break;
-					case 5: buildAccessRightsValue( document, seriter);
+					case 5: buildStorageSearchIndexValue( document, seriter);
+						break;
+					case 6: buildAccessRightsValue( document, seriter);
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
@@ -2301,7 +2304,6 @@ static void buildStorageDocument(
 			buildMetaDataValue( document, seriter);	           if (papuga_SerializationIter_eof( &seriter)) return;
 			buildStorageForwardIndexValue( document, seriter); if (papuga_SerializationIter_eof( &seriter)) return;
 			buildStorageSearchIndexValue( document, seriter);  if (papuga_SerializationIter_eof( &seriter)) return;
-
 			buildAccessRightsValue( document, seriter);
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 		}
