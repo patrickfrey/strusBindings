@@ -2127,7 +2127,7 @@ static void buildStorageIndex( StorageDocumentIndexAccess* document, papuga_Seri
 				unsigned int pos = Deserializer::getUint( seriter);
 				if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 				{
-					(void)Deserializer::getUint( seriter);
+					papuga_SerializationIter_skip( &seriter);
 					// ... len that is part of analyzer output is ignored
 				}
 				document->addTerm( type, value, pos);
@@ -2242,7 +2242,14 @@ static void buildAccessRightsValue(
 	}
 	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
-		document->setUserAccessRight( Deserializer::getString( seriter));
+		if (papuga_SerializationIter_value( &seriter)->valuetype == papuga_TypeVoid)
+		{
+			papuga_SerializationIter_skip( &seriter);
+		}
+		else
+		{
+			document->setUserAccessRight( Deserializer::getString( seriter));
+		}
 	}
 	else
 	{

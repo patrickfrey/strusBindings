@@ -233,11 +233,17 @@ std::vector<std::string> IntrospectionDirectoryIterator::fetchValues()
 			}
 			else
 			{
+				// Take only directory as element and set the key to skip all elements of this directory
 				std::string elemstr( elem, delim-elem);
 				rt.push_back( elemstr);
-				pathsearch = pathcontext + elemstr + "0";
+				pathsearch = pathcontext + elemstr + "\1";
 				break;
 			}
+		}
+		if (vi == ve)
+		{
+			// ... we are done as we did not reinitialize 'pathsearch'
+			break;
 		}
 	}
 	return rt;
