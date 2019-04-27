@@ -241,6 +241,8 @@ WebRequestHandler::WebRequestHandler(
 		mt_StorageClient_GET.addToHandler( m_impl);
 		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
 		mt_StorageClient_POST_transaction.addToHandler( m_impl);
+		static const CommitTransactionMethodDescription mt_StorageTransaction_COMMIT( mt::StorageTransaction::commit());
+		mt_StorageTransaction_COMMIT.addToHandler( m_impl);
 
 		static const IntrospectionMethodDescription mt_VectorStorageClient_GET( mt::VectorStorageClient::introspection(), "vstorage");
 		mt_VectorStorageClient_GET.addToHandler( m_impl);

@@ -1553,7 +1553,7 @@ DONE:
 			setAnswer( answer, ErrorCodeUncaughtException);
 		}
 	}
-	return true;
+	return rt;
 }
 
 
