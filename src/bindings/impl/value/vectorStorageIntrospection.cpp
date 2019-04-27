@@ -196,7 +196,7 @@ IntrospectionBase* VectorStorageIntrospection::open( const std::string& name)
 
 std::vector<IntrospectionLink> VectorStorageIntrospection::list()
 {
-	static const char* ar[] = {"config","noftypes","noffeats","feature",NULL};
+	static const char* ar[] = {"config","noftypes","noffeats",".feature",NULL};
 	return getList( ar);
 }
 
