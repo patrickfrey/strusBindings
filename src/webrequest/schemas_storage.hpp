@@ -163,7 +163,6 @@ public:
 				}
 			},
 			{"/storage/document", "", "transaction", bindings::method::StorageTransaction::insertDocument(), {{DocumentId},{DocumentDef}} },
-			{"/storage", "", "transaction", bindings::method::StorageTransaction::commit(), {}}
 		}
 	) {}
 };

@@ -1299,6 +1299,7 @@ bool WebRequestContext::executeRequest(
 		WebRequestAnswer& answer)
 {
 	TransactionRef transactionRef;
+	bool rt = true;
 	try
 	{
 		PathBuf path( path_);
@@ -1404,8 +1405,14 @@ bool WebRequestContext::executeRequest(
 					enum {lstbufsize=256};
 					char const* lstbuf[ lstbufsize];
 					char const** varlist = papuga_RequestContext_list_variables( selector.context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
-					if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-					if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist)) return false;
+					if (!checkPapugaListBufferOverflow( varlist, answer))
+					{
+						rt = false;
+					}
+					else if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist))
+					{
+						rt = false;
+					}
 					goto DONE;
 				}
 				// else fallback
@@ -1416,7 +1423,8 @@ bool WebRequestContext::executeRequest(
 				if (!content.empty())
 				{
 					setAnswer( answer, ErrorCodeInvalidArgument);
-					return false;
+					rt = false;
+					goto DONE;
 				}
 				if (isEqual( method, "GET"))
 				{
@@ -1424,7 +1432,11 @@ bool WebRequestContext::executeRequest(
 					{
 						std::vector<std::string> contextTypes = m_confighandler->contextTypes();
 						contextTypes.push_back( ROOT_CONTEXT_NAME);
-						return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes);
+						if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes))
+						{
+							rt = false;
+						}
+						goto DONE;
 					}
 					else
 					{
@@ -1432,18 +1444,20 @@ bool WebRequestContext::executeRequest(
 						if (contextlist.empty())
 						{
 							setAnswer( answer, ErrorCodeRequestResolveError);
-							return false;
+							rt = false;
 						}
 						else
 						{
-							return strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
+							rt = strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
 						}
+						goto DONE;
 					}
 				}
 				else
 				{
 					setAnswer( answer, ErrorCodeRequestResolveError);
-					return false;
+					rt = false;
+					goto DONE;
 				}
 			}
 		}
@@ -1455,14 +1469,18 @@ bool WebRequestContext::executeRequest(
 
 			if (isEqual(method,"POST") && isEqual( path.rest(),"transaction"))
 			{
-				return executePostTransaction( self, classid, selector.typenam, selector.contextnam, answer);
+				rt = executePostTransaction( self, classid, selector.typenam, selector.contextnam, answer);
+				goto DONE;
 			}
 			else
 			{
 				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
 				if (methoddescr)
 				{
-					if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer)) return false;
+					if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer))
+					{
+						rt = false;
+					}
 					goto DONE;
 				}
 				//... fallback
@@ -1476,21 +1494,26 @@ bool WebRequestContext::executeRequest(
 				if (!selector.setPath( path.rest()))
 				{
 					setAnswer( answer, ErrorCodeOutOfMem);
-					return false;
+					rt = false;
 				}
-				if (!executeContextSchema( selector.context, selector.classnam ? selector.classnam : selector.typenam, method, content, answer)) return false;
+				else if (!executeContextSchema( selector.context, selector.classnam ? selector.classnam : selector.typenam, method, content, answer))
+				{
+					rt = false;
+				}
 				goto DONE;
 			}
 			else
 			{
 				setAnswer( answer, ErrorCodeIncompleteRequest);
-				return false;
+				rt = false;
+				goto DONE;
 			}
 		}
 		else
 		{
 			setAnswer( answer, ErrorCodeRequestResolveError);
-			return false;
+			rt = false;
+			goto DONE;
 		}
 	}
 	catch (const std::bad_alloc&)
