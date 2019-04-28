@@ -46,7 +46,7 @@ public:
 					{"op", JoinOperatorName, '!'},
 					{"range", JoinOperatorRange, '?'},
 					{"cardinality", JoinOperatorCardinality, '?'},
-					{"arg", TermExpression, '*'}
+					{"arg", TermExpression, '*', 2/*tag diff*/}
 				}
 			}
 		});

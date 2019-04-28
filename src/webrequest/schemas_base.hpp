@@ -56,12 +56,12 @@ public:
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 
-		SentenceAnalyzerSeparatorChar,SentenceAnalyzerSpaceChar,
+		SentenceAnalyzerSeparatorChar=400,SentenceAnalyzerSpaceChar,
 		SentenceAnalyzerLinkChar,SentenceAnalyzerLinkSubst,SentenceAnalyzerLinkDef,
 		SentenceAnalyzerSentenceTermType,SentenceAnalyzerSentenceTermValue,SentenceAnalyzerSentencePatternWeight,
 		SentenceAnalyzerSentencePatternOp,SentenceAnalyzerSentencePatternMinOccurrence,SentenceAnalyzerSentencePatternMaxOccurrence,
-		SentenceAnalyzerSentencePattern,SentenceAnalyzerSentenceConfig,SentenceAnalyzerSentenceName,
-		SentenceAnalyzerSentenceWeight,SentenceAnalyzerConfig,
+		SentenceAnalyzerSentencePattern=450,SentenceAnalyzerSentenceConfig,SentenceAnalyzerSentenceName,
+		SentenceAnalyzerSentenceWeight,SentenceAnalyzerConfig=500,
 
 		QueryDef, FeatureDef, FeatureSet, FeatureWeight,
 		FeatureSetRestrictionDef, FeatureSetSelectionDef, FeatureSetExclusionDef,

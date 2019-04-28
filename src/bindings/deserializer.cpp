@@ -406,7 +406,7 @@ std::vector<int> Deserializer::getCharListUnicode( papuga_SerializationIter& ser
 	{
 		std::vector<int> rt;
 		papuga_SerializationIter_skip( &seriter);
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
 			rt.push_back( getCharUnicode( seriter));
 		}
@@ -2772,7 +2772,7 @@ void Deserializer::buildMetaDataRestriction(
 		buildMetaDataRestriction_<QueryInterface>( builder, seriter);
 		if (errorhnd->hasError())
 		{
-			throw strus::runtime_error(_TXT("error defining metadata restriction: %s"), errorhnd->fetchError());
+			throw strus::runtime_error(_TXT("error defining %s: %s"), context, errorhnd->fetchError());
 		}
 		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 	}
@@ -2802,7 +2802,7 @@ void Deserializer::buildMetaDataRestriction(
 		buildMetaDataRestriction_<MetaDataExpression>( builder, seriter);
 		if (errorhnd->hasError())
 		{
-			throw strus::runtime_error(_TXT("error defining metadata restriction: %s"), errorhnd->fetchError());
+			throw strus::runtime_error(_TXT("error defining %s: %s"), context, errorhnd->fetchError());
 		}
 		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 	}
@@ -2853,7 +2853,7 @@ void Deserializer::buildSentencePatternExpression(
 		papuga_SerializationIter& seriter,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "type,value,weight,op,min,max,spattern", ',');
+	static const StructureNameMap namemap( "type,value,weight,op,min,max,arg", ',');
 	static const StructureNameMap op_namemap( "seq,alt,repeat", ',');
 	static const char* context = _TXT("sentence expression");
 
@@ -2930,7 +2930,7 @@ void Deserializer::buildSentencePatternExpression(
 						eType = ETypeRepeat;
 						repeat_max = getInt( seriter);
 					break;
-					case 6/*spattern*/:
+					case 6/*arg*/:
 						if (eType == ETypeTerm) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
 						argc = buildSentencePatternExpressionArguments( analyzer, seriter, errorhnd);
 					break;
@@ -3058,6 +3058,112 @@ void Deserializer::buildSentencePatternExpression(
 	}
 }
 
+static void buildSentenceAnalyzerLinkDef( SentenceLexerInstanceInterface* lexer, papuga_SerializationIter& seriter)
+{
+	static const StructureNameMap namemap( "chr,subst", ',');
+	static const char* context = _TXT("sentence analyzer/lexer link definition");
+
+	std::vector<int> link_chrs;
+	char link_subst = 0;
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		do
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0/*chr*/:
+					if (!link_chrs.empty()) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
+					link_chrs = Deserializer::getCharListUnicode( seriter);
+					break;
+				case 1/*subst*/:
+					if (link_subst) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
+					link_subst = Deserializer::getCharAscii( seriter);
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name for '%s' in '%s' structure"), namemap.name(idx), context);
+			}
+		}
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		link_chrs = Deserializer::getCharListUnicode( seriter);
+		link_subst = Deserializer::getCharAscii( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("dictionary or list of values expected for %s"), context);
+	}
+	if (!link_chrs.empty() && link_subst)
+	{
+		std::vector<int>::const_iterator li = link_chrs.begin(), le = link_chrs.end();
+		for (; li != le; ++li)
+		{
+			lexer->addLink( *li, link_subst);
+		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("incomplete definition of %s"), context);
+	}
+}
+
+static void buildSentenceAnalyzerSentenceDef(
+		SentenceAnalyzerInstanceInterface* analyzer,
+		papuga_SerializationIter& seriter,
+		ErrorBufferInterface* errorhnd)
+{
+	static const StructureNameMap namemap( "name,weight,sentpattern", ',');
+	static const char* context = _TXT("sentence analyzer/lexer sentence pattern definition");
+	std::string classname;
+	double weight = 1.0;
+	bool weight_defined = false;
+	bool pattern_defined = false;
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		do
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0/*name*/:
+					if (!classname.empty()) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
+					classname = Deserializer::getString( seriter);
+					break;
+				case 1/*weight*/:
+					if (weight_defined) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
+					weight_defined = true;
+					weight = Deserializer::getFloat( seriter);
+					break;
+				case 2/*sentpattern*/:
+					if (pattern_defined) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
+					pattern_defined = true;
+					Deserializer::buildSentencePatternExpression( analyzer, seriter, errorhnd);
+					break;
+			}
+		}
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		classname = Deserializer::getString( seriter);
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			weight = Deserializer::getFloat( seriter);
+		}
+		Deserializer::buildSentencePatternExpression( analyzer, seriter, errorhnd);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("dictionary of list of values expected for %s"), context);
+	}
+	if (!pattern_defined) throw strus::runtime_error(_TXT("missing defition of '%s' in '%s' structure"), "sentpattern", context);
+	analyzer->defineSentence( classname, weight);
+}
+
 void Deserializer::buildSentenceAnalyzer(
 		SentenceAnalyzerInstanceInterface* analyzer,
 		SentenceLexerInstanceInterface* lexer,
@@ -3065,8 +3171,6 @@ void Deserializer::buildSentenceAnalyzer(
 		ErrorBufferInterface* errorhnd)
 {
 	static const StructureNameMap namemap( "separator,space,link,sentence", ',');
-	static const StructureNameMap link_namemap( "chr,subst", ',');
-	static const StructureNameMap sentence_namemap( "name,weight,spattern", ',');
 	static const char* context = _TXT("sentence analyzer/lexer");
 
 	if (!papuga_ValueVariant_defined( &content)) return;
@@ -3079,161 +3183,98 @@ void Deserializer::buildSentenceAnalyzer(
 	papuga_init_SerializationIter( &seriter, content.value.serialization);
 	try
 	{
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 		{
-			papuga_SerializationIter_skip( &seriter);
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+			do
 			{
-				do
+				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+				papuga_SerializationIter_skip( &seriter);
+				switch (idx)
 				{
-					int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-					papuga_SerializationIter_skip( &seriter);
-					switch (idx)
+					case 0/*separator*/:
 					{
-						case 0/*separator*/:
+						std::vector<int> separators = Deserializer::getCharListUnicode( seriter);
+						std::vector<int>::const_iterator si = separators.begin(), se = separators.end();
+						for (; si != se; ++si)
 						{
-							std::vector<int> separators = Deserializer::getCharListUnicode( seriter);
-							std::vector<int>::const_iterator si = separators.begin(), se = separators.end();
-							for (; si != se; ++si)
-							{
-								lexer->addSeparator( *si);
-							}
-							break;
+							lexer->addSeparator( *si);
 						}
-						case 1/*space*/:
-						{
-							std::vector<int> spaces = Deserializer::getCharListUnicode( seriter);
-							std::vector<int>::const_iterator si = spaces.begin(), se = spaces.end();
-							for (; si != se; ++si)
-							{
-								lexer->addSpace( *si);
-							}
-							break;
-						}
-						case 2/*link*/:
-						{
-							std::vector<int> link_chrs;
-							char link_subst = 0;
-							if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-							{
-								papuga_SerializationIter_skip( &seriter);
-
-								if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-								{
-									do
-									{
-										int link_idx = link_namemap.index( *papuga_SerializationIter_value( &seriter));
-										papuga_SerializationIter_skip( &seriter);
-										switch (link_idx)
-										{
-											case 0/*chr*/:
-												link_chrs = Deserializer::getCharListUnicode( seriter);
-											break;
-											case 1/*subst*/:
-												link_subst = Deserializer::getCharAscii( seriter);
-											break;
-											default: throw strus::runtime_error(_TXT("unknown tag name for '%s' in '%s'' structure"), namemap.name(idx), context);
-										}
-									}
-									while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-								}
-								else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-								{
-									link_chrs = Deserializer::getCharListUnicode( seriter);
-									link_subst = Deserializer::getCharAscii( seriter);
-								}
-								else
-								{
-									throw strus::runtime_error(_TXT("dictionary or list of values expected for value of '%s' in %s"), namemap.name(idx), context);
-								}
-								Deserializer::consumeClose( seriter);
-							}
-							else
-							{
-								throw strus::runtime_error(_TXT("structure expected for value of '%s' in %s"), namemap.name(idx), context);
-							}
-							if (!link_chrs.empty() && link_subst)
-							{
-								std::vector<int>::const_iterator li = link_chrs.begin(), le = link_chrs.end();
-								for (; li != le; ++li)
-								{
-									lexer->addLink( *li, link_subst);
-								}
-							}
-							else
-							{
-								throw strus::runtime_error(_TXT("incomplete definition of '%s' in %s"), namemap.name(idx), context);
-							}
-							break;
-						}
-						case 3:/*sentence*/
-						{
-							if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-							{
-								papuga_SerializationIter_skip( &seriter);
-								std::string classname;
-								double weight = 1.0;
-								if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-								{
-									do
-									{
-										int sentence_idx = sentence_namemap.index( *papuga_SerializationIter_value( &seriter));
-										papuga_SerializationIter_skip( &seriter);
-										switch (sentence_idx)
-										{
-											case 0/*name*/:
-												classname = Deserializer::getString( seriter);
-											break;
-											case 1/*weight*/:
-												weight = Deserializer::getFloat( seriter);
-											break;
-											case 2/*spattern*/:
-												buildSentencePatternExpression( analyzer, seriter, errorhnd);
-											break;
-										}
-									}
-									while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-								}
-								else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-								{
-									classname = Deserializer::getString( seriter);
-									if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-									{
-										weight = Deserializer::getFloat( seriter);
-									}
-									buildSentencePatternExpression( analyzer, seriter, errorhnd);
-								}
-								else
-								{
-									throw strus::runtime_error(_TXT("dictionary of list of values expected for value of '%s' in %s"), namemap.name(idx), context);
-								}
-								Deserializer::consumeClose( seriter);
-								analyzer->defineSentence( classname, weight);
-							}
-							else
-							{
-								throw strus::runtime_error(_TXT("structure expected for value of '%s' in %s"), namemap.name(idx), context);
-							}
-							break;
-						}
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						break;
 					}
+					case 1/*space*/:
+					{
+						std::vector<int> spaces = Deserializer::getCharListUnicode( seriter);
+						std::vector<int>::const_iterator si = spaces.begin(), se = spaces.end();
+						for (; si != se; ++si)
+						{
+							lexer->addSpace( *si);
+						}
+						break;
+					}
+					case 2/*link*/:
+					{
+						if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+						{
+							papuga_SerializationIter_skip( &seriter);
+							if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+							{
+								while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+								{
+									papuga_SerializationIter_skip( &seriter);
+									buildSentenceAnalyzerLinkDef( lexer, seriter);
+									Deserializer::consumeClose( seriter);
+								}
+							}
+							else
+							{
+								buildSentenceAnalyzerLinkDef( lexer, seriter);
+							}
+							Deserializer::consumeClose( seriter);
+						}
+						else
+						{
+							throw strus::runtime_error(_TXT("structure expected for value of '%s' in %s"), namemap.name(idx), context);
+						}
+						break;
+					}
+					case 3:/*sentence*/
+					{
+						if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+						{
+							papuga_SerializationIter_skip( &seriter);
+							if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+							{
+								while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+								{
+									papuga_SerializationIter_skip( &seriter);
+									buildSentenceAnalyzerSentenceDef( analyzer, seriter, errorhnd);
+									Deserializer::consumeClose( seriter);
+								}
+							}
+							else
+							{
+								buildSentenceAnalyzerSentenceDef( analyzer, seriter, errorhnd);
+							}
+							Deserializer::consumeClose( seriter);
+						}
+						else
+						{
+							throw strus::runtime_error(_TXT("structure expected for value of '%s' in %s"), namemap.name(idx), context);
+						}
+						break;
+					}
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
-				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
 			}
-			else
-			{
-				throw strus::runtime_error(_TXT("structure expected with named elements for %s"), context);
-			}
-			Deserializer::consumeClose( seriter);
+			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("structure expected for %s definition"), context);
+			throw strus::runtime_error(_TXT("structure expected with named elements for %s"), context);
 		}
 		if (errorhnd->hasError())
 		{
-			throw strus::runtime_error(_TXT("error defining metadata restriction: %s"), errorhnd->fetchError());
+			throw strus::runtime_error(_TXT("error defining %s: %s"), context, errorhnd->fetchError());
 		}
 		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 	}
