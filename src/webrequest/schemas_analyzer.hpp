@@ -215,18 +215,18 @@ public:
 		{
 			{"/", "qryanalyzer", "context", C::createQueryAnalyzer(), {} },
 			{"element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
-			{"{element,sentence}/field", "()", FieldTypeName, papuga_TypeString, "text"},
+			{"element/field", "()", FieldTypeName, papuga_TypeString, "text"},
 
-			{"{element,sentence}/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
-			{"{element,sentence}/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[a-zA-Z0-9]+"},
-			{"{element,sentence}/tokenizer", TokenizerDef, {
+			{"element/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
+			{"element/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[a-zA-Z0-9]+"},
+			{"element/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"{element,sentence}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
-			{"{element,sentence}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
-			{"{element,sentence}/normalizer", NormalizerDef, {
+			{"element/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
+			{"element/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
+			{"element/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
 				}
@@ -276,6 +276,22 @@ public:
 					{"sentpattern", SentenceAnalyzerSentencePattern}
 				}
 			},
+			{"vstorage/sentanalyzer/field", "()", FieldTypeName, papuga_TypeString, "text"},
+			
+			{"vstorage/sentanalyzer/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
+			{"vstorage/sentanalyzer/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[a-zA-Z0-9]+"},
+			{"vstorage/sentanalyzer/tokenizer", TokenizerDef, {
+					{"name", TokenizerName, '!'},
+					{"arg", TokenizerArg, '*'}
+				}
+			},
+			{"vstorage/sentanalyzer/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
+			{"vstorage/sentanalyzer/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
+			{"vstorage/sentanalyzer/normalizer", NormalizerDef, {
+					{"name", NormalizerName, '!'},
+					{"arg", NormalizerArg, '*'}
+				}
+			},
 			{"vstorage/sentanalyzer", SentenceAnalyzerConfig, {
 					{"separator", SentenceAnalyzerSeparatorChar, '*'},
 					{"space", SentenceAnalyzerSpaceChar, '*'},
@@ -287,10 +303,10 @@ public:
 					{SentenceAnalyzerConfig}
 				}
 			},
-			{"sentence", 0, "qryanalyzer", A::addSentenceType(), {
-					{FieldTypeName},
-					{TokenizerDef},
-					{NormalizerDef,'+'},
+			{"vstorage", 0, "qryanalyzer", A::addSentenceType(), {
+					{FieldTypeName, '!', 2/*tag diff*/},
+					{TokenizerDef, '!', 2/*tag diff*/},
+					{NormalizerDef,'+', 2/*tag diff*/},
 					{"sentanalyzer"}
 				}
 			},

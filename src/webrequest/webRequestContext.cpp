@@ -328,32 +328,6 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	return true;
 }
 
-bool WebRequestContext::debugContentRequest( WebRequestAnswer& answer)
-{
-	papuga_ErrorCode errcode = papuga_Ok;
-	m_result_encoding = getResultStringEncoding( m_accepted_charset, m_encoding);
-	if (m_result_encoding == papuga_Binary)
-	{
-		char buf[ 2048];
-		std::snprintf( buf, sizeof(buf), _TXT("none of the accept charsets implemented: %s"), m_accepted_charset);
-		setAnswer( answer, ErrorCodeNotImplemented, buf);
-		return false;
-	}
-	std::size_t result_length = 0;
-	const char* result = papuga_Request_tostring( m_request, &m_allocator, m_result_encoding, m_handler->debug_maxdepth(), &result_length, &errcode);
-	if (result)
-	{
-		WebRequestContent content( papuga_stringEncodingName( m_result_encoding), "text/plain", result, result_length);
-		answer.setContent( content);
-		return true;
-	}
-	else
-	{
-		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
-		return false;
-	}
-}
-
 bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	papuga_ErrorCode errcode = papuga_Ok;

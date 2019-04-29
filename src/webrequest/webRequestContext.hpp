@@ -68,7 +68,6 @@ private:
 	bool createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool initRequestContext( WebRequestAnswer& answer);
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
-	bool debugContentRequest( WebRequestAnswer& answer);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	bool getContentRequestResult( WebRequestAnswer& answer, const WebRequestContent& content);
