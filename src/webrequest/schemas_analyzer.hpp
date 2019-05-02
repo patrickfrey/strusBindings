@@ -299,7 +299,7 @@ public:
 					{"sentence", SentenceAnalyzerSentenceConfig, '*'}
 				}
 			},
-			{"vstorage", "sentanalyzer", "vstorage", V::createSentenceAnalyzer(), {
+			{"vstorage", "_sentanalyzer", "vstorage", V::createSentenceAnalyzer(), {
 					{SentenceAnalyzerConfig}
 				}
 			},
@@ -307,7 +307,7 @@ public:
 					{FieldTypeName, '!', 2/*tag diff*/},
 					{TokenizerDef, '!', 2/*tag diff*/},
 					{NormalizerDef,'+', 2/*tag diff*/},
-					{"sentanalyzer"}
+					{"_sentanalyzer"}
 				}
 			},
 			{"group/field", "()", FieldTypeName, papuga_TypeString, "text"},
