@@ -3170,7 +3170,7 @@ void Deserializer::buildSentenceAnalyzer(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "separator,space,link,sentence", ',');
+	static const StructureNameMap namemap( "separator,space,link,groupsim,sentence", ',');
 	static const char* context = _TXT("sentence analyzer/lexer");
 
 	if (!papuga_ValueVariant_defined( &content)) return;
@@ -3237,7 +3237,19 @@ void Deserializer::buildSentenceAnalyzer(
 						}
 						break;
 					}
-					case 3:/*sentence*/
+					case 3:/*groupsim*/
+					{
+						if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+						{
+							lexer->defineGroupSimilarityDistance( Deserializer::getDouble( seriter));
+						}
+						else
+						{
+							throw strus::runtime_error(_TXT("value expected for '%s' in %s"), namemap.name(idx), context);
+						}
+						break;
+					}
+					case 4:/*sentence*/
 					{
 						if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 						{
