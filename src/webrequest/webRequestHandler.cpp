@@ -15,6 +15,7 @@
 #include "strus/bindingClasses.h"
 #include "schemas.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
+#include "strus/webRequestDelegateContextInterface.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/string_format.hpp"
@@ -153,6 +154,12 @@ public:
 
 static const char* g_context_typenames[] = {"contentstats","storage","docanalyzer","queryanalyzer","inserter",0};
 
+static void jobHandlerTicker( void* context_)
+{
+	WebRequestHandler* handler = (WebRequestHandler*)context_;
+	handler->tick();
+}
+
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
@@ -167,8 +174,10 @@ WebRequestHandler::WebRequestHandler(
 	,m_html_head(html_head_)
 	,m_transactionPool( ::time(NULL), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
-	,m_ticker(this,std::max( maxIdleTime_/20, 10))
+	,m_jobqueue( std::max( maxIdleTime_/20, 10), true/*use listeners on socket events*/)
 {
+	m_jobqueue.pushTicker( &jobHandlerTicker, this);
+
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
 
@@ -288,12 +297,12 @@ bool WebRequestHandler::start()
 	m_configHandler.clearUnfinishedTransactions();
 	m_configHandler.deleteObsoleteConfigurations();
 
-	return m_ticker.start();
+	return m_jobqueue.start();
 }
 
 void WebRequestHandler::stop()
 {
-	m_ticker.stop();
+	m_jobqueue.stop();
 }
 
 static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
@@ -406,10 +415,9 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir) const
 
 void WebRequestHandler::clear()
 {
-	m_ticker.stop();
+	m_jobqueue.stop();
 	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
 }
-	
 
 WebRequestHandler::~WebRequestHandler()
 {
@@ -454,6 +462,25 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 		setStatus( status, ErrorCodeUncaughtException);
 	}
 	return NULL;
+}
+
+static void jobDeleterProc( void* context_)
+{
+	WebRequestDelegateContextInterface* context = (WebRequestDelegateContextInterface*)context_;
+	delete context;
+}
+
+static void jobHandlerProc( void* context_)
+{
+	WebRequestDelegateContextInterface* context = (WebRequestDelegateContextInterface*)context_;
+}
+
+bool WebRequestHandler::delegateRequest(
+		const std::string& address,
+		WebRequestContent& content,
+		WebRequestDelegateContextInterface* context)
+{
+	return m_jobqueue.pushJob( jobHandlerProc, (void*)context, jobDeleterProc);
 }
 
 void WebRequestHandler::tick()

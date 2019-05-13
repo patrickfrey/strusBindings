@@ -20,6 +20,8 @@ namespace strus
 
 /// \brief Forward declaration
 class WebRequestContextInterface;
+/// \brief Forward declaration
+class WebRequestDelegateContextInterface;
 
 /// \brief Interface for executing XML/JSON requests based on the strus bindings API
 class WebRequestHandlerInterface
@@ -47,6 +49,15 @@ public:
 			const char* accepted_doctype,
 			const char* html_base_href,
 			WebRequestAnswer& answer)=0;
+
+	/// \brief Send a request to another server and get notified by a callback
+	/// \param[in] address where to send the request
+	/// \param[in] content what to send as request
+	/// \param[in] context pointer to object processing the answer of the request
+	virtual bool delegateRequest(
+			const std::string& address,
+			WebRequestContent& content,
+			WebRequestDelegateContextInterface* context)=0;
 };
 
 }//namespace

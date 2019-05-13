@@ -31,6 +31,12 @@ ELSE (WITH_LUA STREQUAL "YES")
 MESSAGE( STATUS  "Lua bindings generation is not enabled. Start cmake with -DWITH_LUA=YES to enable it." )
 ENDIF (WITH_LUA STREQUAL "YES")
 
+if( WITH_WEBREQUEST STREQUAL "YES" )
+MESSAGE( STATUS  "Web request bindings generation is enabled." )
+ELSE (WITH_WEBREQUEST "YES")
+MESSAGE( STATUS  "Web request generation is not enabled. Start cmake with -DWITH_WEBREQUEST=YES to enable it." )
+ENDIF (WITH_WEBREQUEST STREQUAL "YES")
+
 if(NOT STRUS_ALL)
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
 include( cmake/cxx11.cmake )
@@ -54,16 +60,23 @@ endif(NOT STRUS_ALL)
 if (WITH_PHP STREQUAL "YES")
 include( 3rdParty/papuga/cmake/php7.cmake )
 endif (WITH_PHP STREQUAL "YES")
+
 if (WITH_PYTHON STREQUAL "YES")
 include( 3rdParty/papuga/cmake/python3.cmake )
 endif (WITH_PYTHON STREQUAL "YES")
 
+if (WITH_WEBREQUEST STREQUAL "YES")
+include( cmake/FindCURL.cmake )
+endif (WITH_WEBREQUEST STREQUAL "YES")
+
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 MESSAGE( STATUS  "Tests for strusVector enabled." )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
+
 IF (WITH_STRUS_PATTERN STREQUAL "YES")
 MESSAGE( STATUS  "Tests for strusPattern enabled." )
 ENDIF (WITH_STRUS_PATTERN STREQUAL "YES")
+
 
 find_strus_package( base )
 find_strus_package( core )

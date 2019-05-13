@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
+if( NOT STRUS_CXX_STD_11 )
+MESSAGE( ERROR "Compiling with C++ version lower than 11, the webrequest bindings can not be built" )
+endif( NOT STRUS_CXX_STD_11 )
+
 # --------------------------------------
 # SOURCES AND INCLUDES
 # --------------------------------------
@@ -9,6 +13,7 @@ set( source_files
 	webRequestUtils.cpp
 	webRequestHandler.cpp
 	webRequestContext.cpp
+	webRequestDelegateConnection.cpp
 )
 
 include_directories(

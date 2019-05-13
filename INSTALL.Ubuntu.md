@@ -23,7 +23,7 @@ each of these flags toggled to YES another section.
 
 ## Required packages
 	boost-all >= 1.57
-	snappy-dev leveldb-dev libuv-dev
+	snappy-dev leveldb-dev libuv-dev libcurl4-openssl-dev
 
 ## Required packages with -DWITH_STRUS_PATTERN=YES
 	ragel libtre-dev boost-all >= 1.57 hyperscan >= 4.7

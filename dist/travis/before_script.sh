@@ -9,7 +9,8 @@ case $OS in
 		sudo apt-get update -qq
 		sudo apt-get install -y \
 			cmake \
-			libleveldb-dev
+			libleveldb-dev \
+			libcurl4-openssl-dev
 		if test "x$STRUS_WITH_VECTOR" = "xYES"; then
 			sudo apt-get install -y libatlas-dev liblapack-dev libblas-dev libarmadillo-dev
 		fi
@@ -41,7 +42,7 @@ case $OS in
 		if test "x$STRUS_WITH_PHP" = "xYES"; then
 			brew install openssl php71 || true
 		fi
-		brew install gettext snappy leveldb || true
+		brew install gettext snappy leveldb curl || true
 		# make sure cmake finds the brew version of gettext
 		brew link --force gettext || true
 		brew link leveldb || true

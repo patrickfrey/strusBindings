@@ -10,7 +10,7 @@ OSX
 
 # 2.1) Install required packages:
 
-brew install cmake boost snappy leveldb
+brew install cmake boost snappy leveldb curl-openssl
 
 # 2.2) Install packages required if strus vector is enabled (-DWITH_STRUS_VECTOR=YES):
 

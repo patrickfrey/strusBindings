@@ -12,7 +12,7 @@
 #include "strus/webRequestHandlerInterface.hpp"
 #include "configurationHandler.hpp"
 #include "strus/base/thread.hpp"
-#include "strus/base/periodicTimerEvent.hpp"
+#include "strus/base/jobQueueWorker.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestLogger.h"
 #include "transaction.hpp"
@@ -34,7 +34,7 @@ class WebRequestHandler
 	:public WebRequestHandlerInterface
 {
 public:
-	WebRequestHandler( 
+	WebRequestHandler(
 			WebRequestLoggerInterface* logger_,
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
@@ -51,6 +51,11 @@ public:
 			const char* accepted_doctype,
 			const char* html_base_href,
 			WebRequestAnswer& status);
+
+	virtual bool delegateRequest(
+			const std::string& address,
+			WebRequestContent& content,
+			WebRequestDelegateContextInterface* context);
 
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
@@ -74,29 +79,12 @@ public:/*libstrus_webrequest*/
 	void storeSchemaDescriptions( const std::string& dir) const;
 	void storeSchemaDescriptions( const std::string& dir, const std::string& doctype) const;
 
-public:/*Ticker*/
+public:/*JobQueueWorker*/
 	void tick();
 
 private:/*Constructor/Destructor*/
 	void loadConfiguration( const std::string& configstr);
 	void clear();
-
-private:
-	typedef std::pair<std::string,std::string> ContextNameDef;
-
-	class Ticker
-		:public PeriodicTimerEvent
-	{
-	public:
-		Ticker( WebRequestHandler* handler_, int seconds_)
-			:PeriodicTimerEvent(seconds_),m_handler(handler_){}
-		virtual void tick()
-		{
-			m_handler->tick();
-		}
-	private:
-		WebRequestHandler* m_handler;
-	};
 
 private:
 	strus::mutex m_mutex_context_transfer;		//< mutual exclusion of request context access
@@ -107,7 +95,7 @@ private:
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
-	Ticker m_ticker;				//< periodic timer event to handle timeout of transactions
+	JobQueueWorker m_jobqueue;			//< job queue for requests to other servers and periodic timer event to handle timeout of transactions
 };
 
 }//namespace
