@@ -9,8 +9,10 @@ case $OS in
 		sudo apt-get update -qq
 		sudo apt-get install -y \
 			cmake \
-			libleveldb-dev \
-			libcurl4-openssl-dev
+			libleveldb-dev
+		if test "x$STRUS_WITH_WEBREQUEST" = "xYES"; then
+			sudo apt-get install -y libcurl4-openssl-dev
+		fi
 		if test "x$STRUS_WITH_VECTOR" = "xYES"; then
 			sudo apt-get install -y libatlas-dev liblapack-dev libblas-dev libarmadillo-dev
 		fi
@@ -29,7 +31,7 @@ case $OS in
 			sudo apt-get install -y libssl-dev
 			sudo apt-get install -y language-pack-en-base
 			sudo locale-gen en_US.UTF-8
-			sudo LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 add-apt-repository -y ppa:ondrej/php
+			sudo LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 add-apt-repository -y ppa:ondrej/php-7.0
 			sudo LC_ALL=en_US.UTF-8 apt-get update
 			sudo LC_ALL=en_US.UTF-8 apt-get install -y php7.0 php7.0-dev
 		fi
