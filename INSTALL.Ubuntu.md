@@ -3,16 +3,20 @@ Ubuntu 16.04 on x86_64, i686
 
 # Build system
 Cmake with gcc or clang. Here in this description we build with 
-gcc >= 4.9 (has C++11 support). Build with C++98 is possible.
+gcc >= 4.9 (has C++11 support). Build with C++98 is possible but not with WITH_WEBREQUEST=YES
 
 # Prerequisites
 Install packages with 'apt-get'/aptitude.
 
 ## CMake flags
+	-DWITH_LUA=YES
+	to enable build with Lua (>= 5.2) language bindings.
 	-DWITH_PHP=YES
 	to enable build with Php 7 language bindings.
 	-DWITH_PYTHON=YES
 	to enable build with Python 3 language bindings.
+	-DWITH_WEBREQUEST=YES
+	to enable web request bindings
 	-DWITH_STRUS_VECTOR=YES
 	to build with a module for vector search (e.g. word2vec).
 	-DWITH_STRUS_PATTERN=YES
@@ -23,7 +27,7 @@ each of these flags toggled to YES another section.
 
 ## Required packages
 	boost-all >= 1.57
-	snappy-dev leveldb-dev libuv-dev libcurl4-openssl-dev
+	snappy-dev leveldb-dev libuv-dev
 
 ## Required packages with -DWITH_STRUS_PATTERN=YES
 	ragel libtre-dev boost-all >= 1.57 hyperscan >= 4.7
@@ -44,6 +48,9 @@ each of these flags toggled to YES another section.
 
 ## Required packages with -DWITH_STRUS_PHP=YES
 	php7.0-dev zlib1g-dev libxml2-dev
+
+## Required packages with -DWITH_WEBREQUEST=YES
+	libcurl4-openssl-dev
 
 # Strus prerequisite packages to install before
 	strusBase strus strusAnalyzer strusTrace strusModule strusRpc  
@@ -90,7 +97,7 @@ each of these flags toggled to YES another section.
 	done
 
 # Configure with GNU C/C++
-	With all bindings and strusVector and strusPattern enabled:
+	With PHP and Python bindings and strusVector and strusPattern enabled:
 	cmake -DCMAKE_BUILD_TYPE=Release \
 		-DWITH_PYTHON=YES \
 		-DWITH_PHP=YES \

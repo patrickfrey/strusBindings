@@ -27,16 +27,17 @@ static void set_curl_opt( CURL *curl, CURLoption opt, const DATA& data)
 	}
 }
 
-static void set_http_header( struct curl_slist*& headers, const char* name, const std::string& value)
+static bool set_http_header( struct curl_slist*& headers, const char* name, const std::string& value)
 {
 	char buf[1024];
-	if ((int)sizeof(buf) < std::snprintf( buf, sizeof(buf), "%s: %s", name, value.c_str())) throw std::bad_alloc();
+	if ((int)sizeof(buf) < std::snprintf( buf, sizeof(buf), "%s: %s", name, value.c_str())) return false;
 	struct curl_slist* new_headers = curl_slist_append( headers, buf);
-	if (!new_headers) throw std::bad_alloc();
+	if (!new_headers) return false;
 	headers = new_headers;
+	return true;
 }
 
-static size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
+static size_t std_string_append_callback(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t nn = size*nmemb;
 	std::string* output = (std::string*)userdata;
@@ -55,11 +56,18 @@ struct WebRequestDelegateConnectionGlobals
 {
 	std::string user_agent;
 	struct curl_slist* headers;
+	bool valid;
 
 	WebRequestDelegateConnectionGlobals()
 		:user_agent(strus::string_format( "libcurl/%s",curl_version_info(CURLVERSION_NOW)->version)),headers(0)
 	{
 		curl_global_init( CURL_GLOBAL_ALL);
+		valid = true;
+
+		valid &= set_http_header( headers, "Expect", "");
+		valid &= set_http_header( headers, "Content-Type", "application/json; charset=utf-8");
+		valid &= set_http_header( headers, "Accept", "application/json");
+		valid &= set_http_header( headers, "Accept-Charset", "UTF-8");
 	}
 };
 static WebRequestDelegateConnectionGlobals g_delegateRequestGlobals;
@@ -84,6 +92,12 @@ static void parseAddress( const std::string& address, std::string& url, int& por
 
 void WebRequestDelegateConnection::connect()
 {
+	if (!g_delegateRequestGlobals.valid) throw std::runtime_error(_TXT("fatal: delegate connection globals initialization failed"));
+
+	if (m_curl) curl_easy_cleanup( m_curl);
+	m_curl = curl_easy_init();
+	if (m_curl == NULL) throw std::bad_alloc();
+
 	set_curl_opt( m_curl, CURLOPT_USERAGENT, g_delegateRequestGlobals.user_agent.c_str());
 	set_curl_opt( m_curl, CURLOPT_POST, 1);
 	set_curl_opt( m_curl, CURLOPT_HTTPHEADER, g_delegateRequestGlobals.headers);
@@ -103,226 +117,216 @@ void WebRequestDelegateConnection::connect()
 	m_state = Connected;
 }
 
-void WebRequestDelegateConnection::sendData()
+WebRequestDelegateConnection::WebRequestDelegateConnection( const std::string& address, CurlEventLoop* eventloop_)
+	:m_curl(NULL)
+	,m_url()
+	,m_port(80)
+	,m_state(Init)
+	,m_mutex()
+	,m_requestQueue()
+	,m_eventloop(eventloop_)
 {
-	if (m_requestQueue.empty()) handleConnectionException( ErrorCodeRuntimeError);
-
-	RequestData& current = m_requestQueue.front();
-	if (current.dataSent == 0)
-	{
-		m_response_content.clear();
-		m_response_errbuf[0] = '\0';
-		m_response_result = CURLE_OK;
-
-		set_curl_opt( m_curl, CURLOPT_ERRORBUFFER, m_response_errbuf);
-		set_curl_opt( m_curl, CURLOPT_CUSTOMREQUEST, current.method.c_str());
-	}
-	std::size_t dataSent = 0;
-	const void* dataPtr = current.content.c_str() + current.dataSent;
-	std::size_t dataSize = current.content.size() - current.dataSent;
-
-	m_response_result = curl_easy_send( m_curl, dataPtr, dataSize, &dataSent);
-	if (m_response_result == CURLE_AGAIN)
-	{
-		m_response_result = CURLE_OK;
-	}
-	else if (m_response_result == CURLE_OK)
-	{
-		current.dataSent += dataSent;
-		if (current.dataSent >= current.content.size())
-		{
-			if (current.dataSent > current.content.size())
-			{
-				handleConnectionException( ErrorCodeRuntimeError);
-			}
-			else
-			{
-				m_state = ReceiveAnswer;
-			}
-		}
-	}
-	else
-	{
-		completeResponse();
-	}
-}
-
-void WebRequestDelegateConnection::receiveData()
-{
-	m_state = Done;
-}
-
-void WebRequestDelegateConnection::returnAnswer( const WebRequestAnswer& answer)
-{
-	if (m_requestQueue.empty())
-	{
-		handleConnectionException( ErrorCodeRuntimeError);
-	}
-	else
-	{
-		RequestData& current = m_requestQueue.front();
-		current.receiver->putAnswer( answer);
-		m_requestQueue.pop();
-		m_state = Connected;
-	}
-}
-
-void WebRequestDelegateConnection::completeResponse()
-{
-	if (m_response_result == CURLE_OK)
-	{
-		long http_code = 0;
-		curl_easy_getinfo( m_curl, CURLINFO_RESPONSE_CODE, &http_code);
-		WebRequestContent answerContent( "UTF-8", "application/json", m_response_content.c_str(), m_response_content.size());
-		WebRequestAnswer answer( "", http_code, 0/*apperrorcode*/, answerContent);
-		returnAnswer( answer);
-	}
-	else
-	{
-		long http_code = 500;
-		curl_easy_getinfo( m_curl, CURLINFO_RESPONSE_CODE, &http_code);
-		WebRequestAnswer answer( m_response_errbuf, http_code, ErrorCodeDelegateRequestFailed);
-		returnAnswer( answer);
-	}
-}
-
-WebRequestDelegateConnection::WebRequestDelegateConnection( const std::string& address)
-	:m_curl(curl_easy_init()),m_url(),m_port(80),m_response_content(),m_response_result(CURLE_OK),m_state(Init)
-{
-	m_response_errbuf[0] = '\0';
-
-	if (m_curl == NULL) throw std::bad_alloc();
 	parseAddress( address, m_url, m_port);
-
 	connect();
 }
 
-void WebRequestDelegateConnection::send( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
+void WebRequestDelegateConnection::push( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
 {
 	strus::unique_lock lock( m_mutex);
 	if (m_state == Init)
 	{
 		connect();
 	}
-	m_requestQueue.push( RequestData( method_, content_, receiver_));
-	if (m_state == Connected)
+	m_requestQueue.push( WebRequestDelegateDataRef( new WebRequestDelegateData( method_, content_, receiver_)));
+}
+
+WebRequestDelegateDataRef WebRequestDelegateConnection::fetch()
+{
+	strus::unique_lock lock( m_mutex);
+	if (m_state == Connected && !m_requestQueue.empty())
 	{
-		sendData();
+		WebRequestDelegateDataRef rt = m_requestQueue.front();
+		m_requestQueue.pop();
+		m_state = Process;
+		return rt;
+	}
+	else
+	{
+		return WebRequestDelegateDataRef();
 	}
 }
-	
 
-SocketHandle WebRequestDelegateConnection::socket()
+void WebRequestDelegateConnection::done()
 {
-#if LIBCURL_VERSION_NUM >= 0x072D00
-	curl_socket_t sockfd = 0;
-	CURLcode res = curl_easy_getinfo( m_curl, CURLINFO_ACTIVESOCKET, &sockfd);
-#else
-	long sockfd = 0;
-	CURLcode res = curl_easy_getinfo( m_curl, CURLINFO_LASTSOCKET, &sockfd);
-#endif
-	if (res != CURLE_OK)
+	strus::unique_lock lock( m_mutex);
+	if (m_state == Process)
 	{
-		throw strus::runtime_error( _TXT("failed get socket info for %s:%d: %s"), m_url.c_str(), m_port, curl_easy_strerror(res));
+		m_state = Connected;
 	}
-	return sockfd;
+	else if (m_state == Init)
+	{
+		connect();
+	}
+}
+
+void WebRequestDelegateConnection::dropAllPendingRequests( const char* errmsg)
+{
+	strus::unique_lock lock( m_mutex);
+	for (; !m_requestQueue.empty(); m_requestQueue.pop())
+	{
+		WebRequestDelegateDataRef data = m_requestQueue.front();
+		WebRequestAnswer answer( errmsg, 500, ErrorCodeDelegateRequestFailed);
+		data->receiver->putAnswer( answer);
+	}
+	m_state = Init;
+}
+
+void WebRequestDelegateConnection::reconnect()
+{
+	try
+	{
+		strus::unique_lock lock( m_mutex);
+		connect();
+	}
+	catch (const std::runtime_error& err)
+	{
+		dropAllPendingRequests( err.what());
+	}
+	catch (const std::bad_alloc&)
+	{
+		dropAllPendingRequests( _TXT("memory allocation error"));
+	}
+	catch (...)
+	{
+		dropAllPendingRequests( _TXT("unexpected exception"));
+	}
 }
 
 WebRequestDelegateConnection::~WebRequestDelegateConnection()
 {
 	if (m_curl) curl_easy_cleanup( m_curl);
 }
-	
-struct ConnectionContext
-{
-	WebRequestDelegateConnectionRef conn;
 
-	ConnectionContext( WebRequestDelegateConnectionRef conn_) :conn(conn_){}
-	~ConnectionContext(){}
-};
-
-static void connectionDeleterProc( void* context)
+WebRequestDelegateJob::WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop* eventloop_)
+	:CurlEventLoop::Job(conn_->handle())
+	,m_conn(conn_),m_data(data_),m_eventloop(eventloop_)
+	,m_response_content()
 {
-	ConnectionContext* contextObj = (ConnectionContext*)context;
-	if (contextObj) delete contextObj;
+	m_response_errbuf[0] = '\0';
+	CURL* curl = conn_->handle();
+
+	set_curl_opt( curl, CURLOPT_POSTFIELDSIZE, m_data->content.size());
+	set_curl_opt( curl, CURLOPT_POSTFIELDS, m_data->content.c_str());
+	set_curl_opt( curl, CURLOPT_WRITEDATA, &m_response_content);
+	set_curl_opt( curl, CURLOPT_WRITEFUNCTION, std_string_append_callback); 
+	set_curl_opt( curl, CURLOPT_FAILONERROR, 0);
+	set_curl_opt( curl, CURLOPT_ERRORBUFFER, m_response_errbuf);
+	set_curl_opt( curl, CURLOPT_CUSTOMREQUEST, m_data->method.c_str());
 }
 
-void WebRequestDelegateConnection::connectionResume( void* context_, ErrorCode status)
+void WebRequestDelegateJob::resume( CURLcode ec)
 {
-	ConnectionContext* context = (ConnectionContext*)context_;
-}
-
-void WebRequestDelegateConnection::connectionReadProc( void* context_)
-{
-	ConnectionContext* context = (ConnectionContext*)context_;
-	strus::unique_lock lock( context->conn->m_mutex);
-	if (context->conn->m_state == Connected)
+	try
 	{
-		context->conn->sendData();
+		CURL* curl = m_conn->handle();
+		if (ec == CURLE_OK)
+		{
+			long http_code = 0;
+			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
+			WebRequestContent answerContent( "UTF-8", "application/json", m_response_content.c_str(), m_response_content.size());
+			WebRequestAnswer answer( "", http_code, 0/*apperrorcode*/, answerContent);
+			m_data->receiver->putAnswer( answer);
+			m_conn->done();
+		}
+		else
+		{
+			long http_code = 500;
+			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
+			WebRequestAnswer answer( m_response_errbuf, http_code, ErrorCodeDelegateRequestFailed);
+			m_data->receiver->putAnswer( answer);
+			m_conn->reconnect();
+		}
+		WebRequestDelegateDataRef next = m_conn->fetch();
+		if (next.get())
+		{
+			(void)m_eventloop->pushJob( new WebRequestDelegateJob( m_conn, next, m_eventloop));
+		}
+	}
+	catch (const std::runtime_error& err)
+	{
+		m_eventloop->handleException( err.what());
+		m_conn->dropAllPendingRequests( err.what());
+	}
+	catch (const std::bad_alloc& )
+	{
+		m_eventloop->handleException( _TXT("memory allocation error"));
+		m_conn->dropAllPendingRequests( _TXT("memory allocation error"));
+	}
+	catch (...)
+	{
+		m_eventloop->handleException( _TXT("unexpected exception"));
+		m_conn->dropAllPendingRequests( _TXT("unexpected exception"));
 	}
 }
 
-void WebRequestDelegateConnection::connectionWriteProc( void* context_)
+WebRequestDelegateConnectionRef WebRequestDelegateConnectionPool::getConnection( const std::string& address)
 {
-	ConnectionContext* context = (ConnectionContext*)context_;
-	strus::unique_lock lock( context->conn->m_mutex);
-	if (context->conn->m_state == ReceiveAnswer)
-	{
-		context->conn->receiveData();
-	}
+	strus::unique_lock lock( m_mutex);
+	ConnectionMap::const_iterator ci = m_connectionMap.find( address);
+	return ci == m_connectionMap.end() ? WebRequestDelegateConnectionRef() : ci->second;
 }
 
-void WebRequestDelegateConnection::connectionExceptProc( void* context_)
+void WebRequestDelegateConnectionPool::setConnection( const std::string& address, const WebRequestDelegateConnectionRef& ref)
 {
-	ConnectionContext* context = (ConnectionContext*)context_;
-	if (context->conn->m_state == Done)
-	{
-		context->conn->connectionResume( context, (ErrorCode)0);
-	}
-	else
-	{
-		context->conn->connectionResume( context, ErrorCodeRuntimeError);
-	}
+	strus::unique_lock lock( m_mutex);
+	m_connectionMap[ address] = ref;
 }
 
 WebRequestDelegateConnectionRef WebRequestDelegateConnectionPool::getOrCreateConnection( const std::string& address)
 {
-	ConnectionMap::const_iterator ci = connectionMap.find( address);
-	if (ci == connectionMap.end())
+	WebRequestDelegateConnectionRef rt = getConnection( address);
+	if (!rt.get())
 	{
-		WebRequestDelegateConnectionRef conn( new WebRequestDelegateConnection( address));
-		SocketHandle socket = conn->socket();
-		connectionMap[ address] = conn;
-		{
-			strus::Reference<ConnectionContext> context( new ConnectionContext(conn));
-			if (!jobqueue->pushListener( &WebRequestDelegateConnection::connectionReadProc, context.get(), connectionDeleterProc, socket, JobQueueWorker::FdRead))
-			{
-				connectionMap.erase( address);
-				throw strus::runtime_error(_TXT("failed to listen to connection events of '%s'"), address.c_str());
-			}
-			context.release();
-		}{
-			strus::Reference<ConnectionContext> context( new ConnectionContext(conn));
-			if (!jobqueue->pushListener( &WebRequestDelegateConnection::connectionWriteProc, context.get(), connectionDeleterProc, socket, JobQueueWorker::FdWrite))
-			{
-				connectionMap.erase( address);
-				throw strus::runtime_error(_TXT("failed to listen to connection events of '%s'"), address.c_str());
-			}
-			context.release();
-		}{
-			strus::Reference<ConnectionContext> context( new ConnectionContext(conn));
-			if (!jobqueue->pushListener( &WebRequestDelegateConnection::connectionExceptProc, context.get(), connectionDeleterProc, socket, JobQueueWorker::FdExcept))
-			{
-				connectionMap.erase( address);
-				throw strus::runtime_error(_TXT("failed to listen to connection events of '%s'"), address.c_str());
-			}
-			context.release();
-		}
-		return conn;
+		rt.reset( new WebRequestDelegateConnection( address, m_eventloop));
+		setConnection( address, rt);
 	}
-	else
+	return rt;
+}
+
+void WebRequestDelegateConnectionPool::send( const std::string& address_, const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
+{
+	WebRequestDelegateConnectionRef conn;
+	try
 	{
-		return ci->second;
+		conn = getOrCreateConnection( address_);
+		conn->push( method_, content_, receiver_);
+		WebRequestDelegateDataRef data( conn->fetch());
+		if (data.get())
+		{
+			m_eventloop->pushJob( new WebRequestDelegateJob( conn, data, m_eventloop));
+		}
+	}
+	catch (const std::runtime_error& err)
+	{
+		WebRequestAnswer answer( err.what(), 500, ErrorCodeDelegateRequestFailed);
+		receiver_->putAnswer( answer);
+		m_eventloop->handleException( err.what());
+		if (conn.get()) conn->dropAllPendingRequests(  err.what());
+	}
+	catch (const std::bad_alloc& )
+	{
+		WebRequestAnswer answer( _TXT("memory allocation error"), 500, ErrorCodeOutOfMem);
+		receiver_->putAnswer( answer);
+		m_eventloop->handleException( _TXT("memory allocation error"));
+		if (conn.get()) conn->dropAllPendingRequests( _TXT("memory allocation error"));
+	}
+	catch (...)
+	{
+		WebRequestAnswer answer( _TXT("unexpected exception"), 500, ErrorCodeDelegateRequestFailed);
+		receiver_->putAnswer( answer);
+		m_eventloop->handleException( _TXT("unexpected exception"));
+		if (conn.get()) conn->dropAllPendingRequests( _TXT("unexpected exception"));
 	}
 }
+
 

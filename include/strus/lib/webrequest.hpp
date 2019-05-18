@@ -28,6 +28,8 @@ class ErrorBufferInterface;
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
 /// \param[in] config main configuration
 /// \param[in] maxIdleTime maximum time of keepalive for untouched transactions in seconds
+/// \param[in] maxDelegateTotalConn max simultaneously open connections to delegate sub requests
+/// \param[in] maxDelegateHostConn set max number of simultaneous delegate request connections to a single host
 /// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxIdleTime
 /// \param[in] errorhnd error buffer interface to use
 /// \return pointer to handler in case of success, NULL in case of memory allocation error
@@ -37,6 +39,8 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		const std::string& config_store_dir,
 		const std::string& config,
 		int maxIdleTime,
+		int maxDelegateTotalConn,
+		int maxDelegateHostConn,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd);
 

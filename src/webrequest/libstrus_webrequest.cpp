@@ -51,12 +51,14 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 		const std::string& config_store_dir,
 		const std::string& config,
 		int maxIdleTime,
+		int maxDelegateTotalConn,
+		int maxDelegateHostConn,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd)
 {
 	try
 	{
-		return new WebRequestHandler( logger ? logger:&g_logger_null, html_head, config_store_dir, config, maxIdleTime, nofTransactionsPerSeconds);
+		return new WebRequestHandler( logger ? logger:&g_logger_null, html_head, config_store_dir, config, maxIdleTime, maxDelegateTotalConn,maxDelegateHostConn, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -74,7 +76,7 @@ DLL_PUBLIC bool strus::storeWebRequestSchemaDescriptions( const std::string& con
 {
 	try
 	{
-		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_logger_null, "", "./"/*config_store_dir*/, config, 30/*maxIdleTime*/, 1/*nofTransactionsPerSeconds*/));
+		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_logger_null, "", "./"/*config_store_dir*/, config, 30/*maxIdleTime*/, 0/*maxDelegateTotalConn*/, 0/*maxDelegateHostConn*/, 1/*nofTransactionsPerSeconds*/));
 		hnd->storeSchemaDescriptions( dir, doctype);
 		return true;
 	}

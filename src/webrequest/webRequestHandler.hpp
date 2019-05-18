@@ -12,10 +12,11 @@
 #include "strus/webRequestHandlerInterface.hpp"
 #include "configurationHandler.hpp"
 #include "strus/base/thread.hpp"
-#include "strus/base/jobQueueWorker.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestLogger.h"
 #include "transaction.hpp"
+#include "curlEventLoop.hpp"
+#include "webRequestDelegateConnection.hpp"
 #include <cstddef>
 #include <utility>
 #include <set>
@@ -40,6 +41,8 @@ public:
 			const std::string& config_store_dir_,
 			const std::string& configstr_,
 			int maxIdleTime_,
+			int maxDelegateTotalConn_,
+			int maxDelegateHostConn_,
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 
@@ -54,7 +57,8 @@ public:
 
 	virtual bool delegateRequest(
 			const std::string& address,
-			WebRequestContent& content,
+			const std::string& method,
+			const std::string& content,
 			WebRequestDelegateContextInterface* context);
 
 public:/*WebRequestContext*/
@@ -79,7 +83,7 @@ public:/*libstrus_webrequest*/
 	void storeSchemaDescriptions( const std::string& dir) const;
 	void storeSchemaDescriptions( const std::string& dir, const std::string& doctype) const;
 
-public:/*JobQueueWorker*/
+public:/*CurlEventLoopTicker*/
 	void tick();
 
 private:/*Constructor/Destructor*/
@@ -95,7 +99,8 @@ private:
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
-	JobQueueWorker m_jobqueue;			//< job queue for requests to other servers and periodic timer event to handle timeout of transactions
+	CurlEventLoop m_eventLoop;			//< queue for requests to other servers and periodic timer event to handle timeout of transactions
+	WebRequestDelegateConnectionPool m_connPool;	//< connection pool for sending delegate requests
 };
 
 }//namespace

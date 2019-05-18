@@ -20,6 +20,7 @@
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/string_conv.hpp"
+#include "strus/base/shared_ptr.hpp"
 #include "strus/base/fileio.hpp"
 #include "papuga/request.h"
 #include "papuga/errors.h"
@@ -35,6 +36,75 @@
 #include <ctime>
 
 using namespace strus;
+
+class EventLoopTicker
+	:public CurlEventLoop::Ticker
+{
+public:
+	EventLoopTicker( WebRequestHandler* webRequestHandler_)
+		:m_webRequestHandler(webRequestHandler_){}
+
+	virtual ~EventLoopTicker(){}
+
+	virtual void tick()
+	{
+		m_webRequestHandler->tick();
+	}
+
+private:
+	WebRequestHandler* m_webRequestHandler;
+};
+
+class EventLoopLogger
+	:public CurlEventLoop::Logger
+{
+public:
+	explicit EventLoopLogger( WebRequestLoggerInterface* logger_)
+		:CurlEventLoop::Logger( logLevel(logger_)),m_logger(logger_){}
+
+	virtual ~EventLoopLogger(){}
+
+	virtual void print( LogType logtype, const char* fmt, ...)
+	{
+		char msgbuf[ 1024];
+		va_list ap;
+		va_start( ap, fmt);
+		if ((int)sizeof(msgbuf) <= std::vsnprintf( msgbuf, sizeof(msgbuf), fmt, ap)) msgbuf[ sizeof(msgbuf)-1] = 0;
+		va_end( ap);
+
+		switch (logtype)
+		{
+			case LogFatal:
+				m_logger->logError( msgbuf);
+				break;
+			case LogError:
+				m_logger->logError( msgbuf);
+				break;
+			case LogWarning:
+				m_logger->logWarning( msgbuf);
+				break;
+		}
+	}
+
+private:
+	static LogType logLevel( WebRequestLoggerInterface* logger_)
+	{
+		if ((logger_->logMask() & WebRequestLoggerInterface::LogWarning) != 0)
+		{
+			return LogWarning;
+		}
+		else if ((logger_->logMask() & WebRequestLoggerInterface::LogError) != 0)
+		{
+			return LogError;
+		}
+		else
+		{
+			return LogFatal;
+		}
+	}
+private:
+	WebRequestLoggerInterface* m_logger;
+};
 
 struct MethodDescription
 {
@@ -154,11 +224,6 @@ public:
 
 static const char* g_context_typenames[] = {"contentstats","storage","docanalyzer","queryanalyzer","inserter",0};
 
-static void jobHandlerTicker( void* context_)
-{
-	WebRequestHandler* handler = (WebRequestHandler*)context_;
-	handler->tick();
-}
 
 WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
@@ -166,6 +231,8 @@ WebRequestHandler::WebRequestHandler(
 		const std::string& config_store_dir_,
 		const std::string& configstr_,
 		int maxIdleTime_,
+		int maxDelegateTotalConn_,
+		int maxDelegateHostConn_,
 		int nofTransactionsPerSeconds)
 	:m_debug_maxdepth(logger_?logger_->structDepth():0)
 	,m_logger(logger_)
@@ -174,10 +241,9 @@ WebRequestHandler::WebRequestHandler(
 	,m_html_head(html_head_)
 	,m_transactionPool( ::time(NULL), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
-	,m_jobqueue( std::max( maxIdleTime_/20, 10), true/*use listeners on socket events*/)
+	,m_eventLoop( std::max( maxIdleTime_/20, 10)/*timeout*/, new EventLoopLogger(logger_), new EventLoopTicker(this), maxDelegateTotalConn_, maxDelegateHostConn_)
+	,m_connPool(&m_eventLoop)
 {
-	m_jobqueue.pushTicker( &jobHandlerTicker, this);
-
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
 
@@ -297,12 +363,12 @@ bool WebRequestHandler::start()
 	m_configHandler.clearUnfinishedTransactions();
 	m_configHandler.deleteObsoleteConfigurations();
 
-	return m_jobqueue.start();
+	return m_eventLoop.start();
 }
 
 void WebRequestHandler::stop()
 {
-	m_jobqueue.stop();
+	m_eventLoop.stop();
 }
 
 static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
@@ -415,7 +481,7 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir) const
 
 void WebRequestHandler::clear()
 {
-	m_jobqueue.stop();
+	m_eventLoop.stop();
 	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
 }
 
@@ -464,23 +530,22 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 	return NULL;
 }
 
-static void jobDeleterProc( void* context_)
-{
-	WebRequestDelegateContextInterface* context = (WebRequestDelegateContextInterface*)context_;
-	delete context;
-}
-
-static void jobHandlerProc( void* context_)
-{
-	WebRequestDelegateContextInterface* context = (WebRequestDelegateContextInterface*)context_;
-}
-
 bool WebRequestHandler::delegateRequest(
 		const std::string& address,
-		WebRequestContent& content,
+		const std::string& method,
+		const std::string& content,
 		WebRequestDelegateContextInterface* context)
 {
-	return m_jobqueue.pushJob( jobHandlerProc, (void*)context, jobDeleterProc);
+	try
+	{
+		strus::shared_ptr<WebRequestDelegateContextInterface> receiver( context);
+		m_connPool.send( address, method, content, receiver);
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
 }
 
 void WebRequestHandler::tick()

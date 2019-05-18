@@ -11,10 +11,10 @@
 #define _STRUS_WEB_REQUEST_DELEGATE_CONNECTION_HPP_INCLUDED
 #include "strus/base/shared_ptr.hpp"
 #include "strus/base/filehandle.hpp"
-#include "strus/base/jobQueueWorker.hpp"
 #include "strus/base/thread.hpp"
 #include "strus/webRequestAnswer.hpp"
 #include "strus/errorCodes.hpp"
+#include "curlEventLoop.hpp"
 #include <curl/curl.h>
 #include <map>
 #include <queue>
@@ -26,76 +26,92 @@ namespace strus {
 /// \brief Forward declaration
 class WebRequestDelegateContextInterface;
 
+struct WebRequestDelegateData
+{
+	std::string method;
+	std::string content;
+	strus::shared_ptr<WebRequestDelegateContextInterface> receiver;
+
+	WebRequestDelegateData( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
+		:method(method_),content(content_),receiver(receiver_){}
+	WebRequestDelegateData( const WebRequestDelegateData& o)
+		:method(o.method),content(o.content),receiver(o.receiver){}
+};
+
+typedef strus::shared_ptr<WebRequestDelegateData> WebRequestDelegateDataRef;
+
+
 class WebRequestDelegateConnection
 {
 public:
-	explicit WebRequestDelegateConnection( const std::string& address);
+	WebRequestDelegateConnection( const std::string& address, CurlEventLoop* eventloop_);
 	~WebRequestDelegateConnection();
 
-	void send( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
-	SocketHandle socket();
+	void push( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
+	WebRequestDelegateDataRef fetch();
+
+	void reconnect();
+	void done();
+	void dropAllPendingRequests( const char* errmsg);
+
+	CURL* handle() const {return m_curl;}
 
 private:
-	enum State {Init,Connected,ReceiveAnswer,Done};
-
-	struct RequestData
-	{
-		std::string method;
-		std::string content;
-		std::size_t dataSent;
-		strus::shared_ptr<WebRequestDelegateContextInterface> receiver;
-
-		RequestData( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
-			:method(method_),content(content_),dataSent(0),receiver(receiver_){}
-		RequestData( const RequestData& o)
-			:method(o.method),content(o.content),dataSent(o.dataSent),receiver(o.receiver){}
-	};
+	enum State {Init,Connected,Process};
 
 private:
 	CURL* m_curl;
 	std::string m_url;
 	int m_port;
-	std::string m_response_content;
-	char m_response_errbuf[ CURL_ERROR_SIZE];
-	CURLcode m_response_result;
 	State m_state;
 	strus::mutex m_mutex;
-	std::queue<RequestData> m_requestQueue;
+	std::queue<WebRequestDelegateDataRef> m_requestQueue;
+	CurlEventLoop* m_eventloop;
 
 private:
-	friend class WebRequestDelegateConnectionPool;
-	static void connectionResume( void* context, ErrorCode status);
-	static void connectionReadProc( void* context_);
-	static void connectionWriteProc( void* context_);
-	static void connectionExceptProc( void* context_);
-
 	void connect();
-	void completeResponse();
-	void returnAnswer( const WebRequestAnswer& answer);
-	void sendData();
-	void receiveData();
-	void handleConnectionException( ErrorCode status);
 };
 
 typedef strus::shared_ptr<WebRequestDelegateConnection> WebRequestDelegateConnectionRef;
+typedef strus::shared_ptr<WebRequestDelegateContextInterface> WebRequestDelegateContextRef;
 
+
+class WebRequestDelegateJob
+	:public CurlEventLoop::Job {
+public:
+	WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop* eventloop_);
+
+	virtual ~WebRequestDelegateJob(){}
+	virtual void resume( CURLcode ec);
+
+private:
+	WebRequestDelegateConnectionRef m_conn;
+	WebRequestDelegateDataRef m_data;
+	CurlEventLoop* m_eventloop;
+
+	std::string m_response_content;
+	char m_response_errbuf[ CURL_ERROR_SIZE];
+};
 
 class WebRequestDelegateConnectionPool
 {
 public:
-	explicit WebRequestDelegateConnectionPool( JobQueueWorker* jobqueue_)
-		:connectionMap(),jobqueue(jobqueue_){}
-	~WebRequestDelegateConnectionPool()
-	{}
+	explicit WebRequestDelegateConnectionPool( CurlEventLoop* eventloop_)
+		:m_connectionMap(),m_eventloop(eventloop_){}
+	~WebRequestDelegateConnectionPool(){}
 
-	WebRequestDelegateConnectionRef getOrCreateConnection( const std::string& address);
+	void send( const std::string& address_, const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
 
 private:
 	typedef std::map<std::string,WebRequestDelegateConnectionRef> ConnectionMap;
+	WebRequestDelegateConnectionRef getConnection( const std::string& address);
+	void setConnection( const std::string& address, const WebRequestDelegateConnectionRef& ref);
+	WebRequestDelegateConnectionRef getOrCreateConnection( const std::string& address);
 
 private:
-	ConnectionMap connectionMap;
-	JobQueueWorker* jobqueue;
+	strus::mutex m_mutex;
+	ConnectionMap m_connectionMap;
+	CurlEventLoop* m_eventloop;
 };
 
 

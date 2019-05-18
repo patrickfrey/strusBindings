@@ -10,10 +10,11 @@ endif( NOT STRUS_CXX_STD_11 )
 set( source_files
 	configurationHandler.cpp
 	transaction.cpp
+	curlEventLoop.cpp
 	webRequestUtils.cpp
+	webRequestDelegateConnection.cpp
 	webRequestHandler.cpp
 	webRequestContext.cpp
-	webRequestDelegateConnection.cpp
 )
 
 include_directories(
@@ -23,6 +24,7 @@ include_directories(
 	${BINDINGS_SOURCE_DIRS}
 	${CMAKE_CURRENT_BINARY_DIR}
 	${PAPUGA_INCLUDE_DIRS}
+	${CURL_INCLUDE_DIRS}
 	${strusbase_INCLUDE_DIRS}
 	${strus_INCLUDE_DIRS}
 	${strusanalyzer_INCLUDE_DIRS}
@@ -49,7 +51,7 @@ link_directories(
 add_cppcheck( strus_webrequest ${source_files}  libstrus_webrequest.cpp )
 
 add_library( strus_webrequest_static STATIC ${source_files} )
-target_link_libraries( strus_webrequest_static strus_bindings strus_bindings_description strusbindings_private_utils strus_base papuga_request_devel papuga_devel )
+target_link_libraries( strus_webrequest_static strus_bindings strus_bindings_description strusbindings_private_utils strus_base papuga_request_devel papuga_devel ${CURL_LIBRARIES} )
 
 add_library( strus_webrequest SHARED libstrus_webrequest.cpp )
 target_link_libraries( strus_webrequest strus_webrequest_static )

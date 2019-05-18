@@ -10,7 +10,7 @@ include_directories(
 )
 
 link_directories(
-	${REQUEST_SOURCE_DIRS}
+	${REQUEST_LIBRARY_DIRS}
 	${PAPUGA_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIRS}
 	"${strusbase_LIBRARY_DIRS}"

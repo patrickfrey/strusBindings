@@ -52,11 +52,13 @@ public:
 
 	/// \brief Send a request to another server and get notified by a callback
 	/// \param[in] address where to send the request
-	/// \param[in] content what to send as request
-	/// \param[in] context pointer to object processing the answer of the request
+	/// \param[in] method request method of the request
+	/// \param[in] content data of the request (content type is "application/json; charset=utf-8")
+	/// \param[in] context pointer to object processing the answer of the request (with ownership)
 	virtual bool delegateRequest(
 			const std::string& address,
-			WebRequestContent& content,
+			const std::string& method,
+			const std::string& content,
 			WebRequestDelegateContextInterface* context)=0;
 };
 
