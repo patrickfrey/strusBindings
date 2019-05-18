@@ -15,6 +15,7 @@
 #include "private/errorUtils.hpp"
 #include <queue>
 #include <ctime>
+#include <map>
 #include <unistd.h>
 #include <fcntl.h>
 
