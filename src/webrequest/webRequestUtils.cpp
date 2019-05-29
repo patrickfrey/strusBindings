@@ -113,6 +113,7 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 		case ErrorCodeEncoding: return 400 /*Bad Request*/;
 		case ErrorCodeRequestResolveError: return 404 /*Not found*/;
 		case ErrorCodeNotAcceptable: return 406 /*Not acceptable*/;
+		case ErrorCodeDelegateRequestFailed: return 500 /*Internal Server Error*/;
 	}
 	return 500 /*Internal Server Error*/;
 }
