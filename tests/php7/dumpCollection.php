@@ -79,8 +79,11 @@ function dumpCollection( $strusctx, $storagePath) {
 	# Term statistics:
 	$output_stat = [];
 	$dfchangelist = [];
+	$bloblist = [];
 	$nofdocs = 0;
-	foreach ($storage->getAllStatistics( true) as $blob) {
+	foreach ($storage->getAllStatistics() as $blob) {
+		$blob->timestamp->unixtime = 1;
+		array_push( $bloblist, $blob);
 		$statview = $strusctx->unpackStatisticBlob( $blob, "std");
 		$nofdocs += $statview->nofdocs;
 		foreach ($statview->dfchange as $dfchange) {
@@ -90,6 +93,7 @@ function dumpCollection( $strusctx, $storagePath) {
 	usort( $dfchangelist, "dfchange_compare");
 	$output_stat[ "dfchange"] = $dfchangelist;
 	$output_stat[ "nofdocs"] = $nofdocs;
+	$output_stat[ "statblobs"] = $bloblist;
 	$output[ "stat"] = $output_stat;
 
 	$storage->close();

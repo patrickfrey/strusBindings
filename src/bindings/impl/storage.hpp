@@ -152,14 +152,14 @@ public:
 
 	/// \brief Get an iterator on message blobs that all statistics of the storage (e.g. feature occurrencies and number of documents inserted)
 	/// \note The blobs an be decoded with Context::unpackStatisticBlob
-	/// \param[in] sign true = registration, false = deregistration, if false the sign of all statistics is inverted
 	/// \return iterator on the encoded blobs of the complete statistics of the storage
-	Iterator getAllStatistics( bool sign=true);
+	Iterator getAllStatistics();
 
 	/// \brief Get an iterator on message blobs that encode changes in statistics of the storage (e.g. feature occurrencies and number of documents inserted)
+	/// \param[in] timestamp date/time of the snapshot from which to get the change statistics
 	/// \note The blobs an be decoded with Context::unpackStatisticBlob
 	/// \return iterator on the encoded blobs of the statistic changes of the storage
-	Iterator getChangeStatistics();
+	Iterator getChangeStatistics( const ValueVariant& timestamp);
 
 	/// \brief Create a transaction
 	/// \return the transaction object (class StorageTransaction) created

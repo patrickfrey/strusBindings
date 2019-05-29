@@ -23,6 +23,8 @@
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
 #include "strus/sentenceGuess.hpp"
+#include "strus/timeStamp.hpp"
+#include "strus/statisticsMessage.hpp"
 #include "strus/functionDescription.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
@@ -34,6 +36,7 @@
 #include "strus/bindingObjects.h"
 #include "strus/base/enable_if.hpp"
 #include "strus/base/type_traits.hpp"
+#include "strus/base/base64.hpp"
 #include <string>
 #include <vector>
 #include <utility>
@@ -46,6 +49,8 @@ namespace bindings {
 template <typename Struct> class StructIdTemplate { public:static void structid(){}};
 template <> class StructIdTemplate<StatisticsViewerInterface> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_StatisticsChange;}};
 template <> class StructIdTemplate<TermStatisticsChange> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_TermStatisticsChange;}};
+template <> class StructIdTemplate<TimeStamp> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_TimeStamp;}};
+template <> class StructIdTemplate<StatisticsMessage> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_StatisticsMessage;}};
 template <> class StructIdTemplate<analyzer::QueryTerm> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_QueryTerm;}};
 template <> class StructIdTemplate<analyzer::QueryTermExpression> {public: static int structid(){return STRUS_BINDINGS_STRUCTID_QueryTermExpression;}};
 template <> class StructIdTemplate<DocumentTermIteratorInterface::Term> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentInvTerm;}};
@@ -149,6 +154,7 @@ private:
 	static inline bool serialize_nothrow( papuga_Serialization* result, const std::string& val, papuga_ErrorCode& errcode, bool deep)
 	{
 		const char* valstr;
+		if (val.empty()) return papuga_Serialization_pushValue_string( result, "", 0);
 		if (deep)
 		{
 			valstr = papuga_Allocator_copy_string( result->allocator, val.c_str(), val.size());
@@ -193,6 +199,8 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode, bool deep);
 
 	static bool serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const TimeStamp& timestamp, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const StatisticsMessage& msg, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, DocumentTermIteratorInterface* dtitr, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val, papuga_ErrorCode& errcode, bool deep);

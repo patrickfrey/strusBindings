@@ -79,7 +79,10 @@ function dumpCollection( strusctx, storagePath)
 		return false;
 	end
 
-	for blob in storage:getAllStatistics( true) do
+	local bloblist = {}
+	for blob in storage:getAllStatistics() do
+		blob.timestamp.unixtime = 1
+		table.insert( bloblist, blob);
 		local statview = strusctx:unpackStatisticBlob( blob, "std")
 		nofdocs = nofdocs + statview[ "nofdocs"]
 		for _,dfchange in ipairs(statview[ "dfchange"]) do
@@ -87,6 +90,7 @@ function dumpCollection( strusctx, storagePath)
 		end
 	end
 	table.sort( dfchangelist, dfchange_less )
+	output[ "statblobs"] = bloblist
 	output[ "stat"] = { dfchange=dfchangelist, nofdocs=nofdocs }
 
 	storage:close()

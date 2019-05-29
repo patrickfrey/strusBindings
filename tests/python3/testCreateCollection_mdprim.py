@@ -175,6 +175,12 @@ str stat:
       str type: "word"
       str value: "7"
   str nofdocs: 10
+str statblobs:
+  number 1:
+    str blob: "AAAACgAId29yZAA1AAIFAzMAAwUDNwABBQMyAAU="
+    str timestamp:
+      str counter: 0
+      str unixtime: 1
 str terms:
   str 10:word (f):
     number 1:

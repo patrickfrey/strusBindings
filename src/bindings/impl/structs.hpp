@@ -26,17 +26,29 @@ namespace strus {
 namespace bindings {
 
 /// \struct StatisticsChange
-/// \brief local change of statistics in a storage (distributed search index)
+/// \brief Local change of statistics in a storage (distributed search index)
 /// \member dfchange array of document frequency changes (_TermStatisticsChange)
 /// \member nofdocs change in number of documents inserted
 enum _StatisticsChange {dfchange,nofdocs};
 
 /// \struct TermStatisticsChange
-/// \brief Document class structure
+/// \brief Change of term statistics
 /// \member type type name of the term
 /// \member value value of the term
 /// \member increment increment of the df (global document term frequency)
 enum _TermStatisticsChange {type,value,increment};
+
+/// \struct TimeStamp
+/// \brief Timestamp datatype for specifying snapshots for example for changes in the global term statistics
+/// \member unixtime number of seconds since 1/1/1970
+/// \member counter counter value to order events within the same second (unixtime)
+enum _TimeStamp {unixtime,counter};
+
+/// \struct StatisticsMessage
+/// \brief One message blob containing global term statistics and changes of the number of documents
+/// \member timestamp specifies the time of the transaction where this message blob was created
+/// \member blob blob with the statistics changes encoded as base64
+enum _StatisticsMessage {timestamp,blob};
 
 /// \struct QueryTerm
 /// \brief Query term structure

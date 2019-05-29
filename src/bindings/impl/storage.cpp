@@ -202,16 +202,16 @@ std::vector<std::string>* StorageClientImpl::metadataNames() const
 	return new std::vector<std::string>( reader->getNames());
 }
 
-Iterator StorageClientImpl::getAllStatistics( bool sign)
+Iterator StorageClientImpl::getAllStatistics()
 {
-	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, false, sign), &StatisticsIterator::Deleter, &StatisticsIterator::GetNext);
+	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl), &StatisticsIterator::Deleter, &StatisticsIterator::GetNext);
 	rt.release();
 	return rt;
 }
 
-Iterator StorageClientImpl::getChangeStatistics()
+Iterator StorageClientImpl::getChangeStatistics( const ValueVariant& timestamp)
 {
-	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, true, true), &StatisticsIterator::Deleter, &StatisticsIterator::GetNext);
+	Iterator rt( new StatisticsIterator( m_trace_impl, m_objbuilder_impl, m_storage_impl, m_errorhnd_impl, timestamp), &StatisticsIterator::Deleter, &StatisticsIterator::GetNext);
 	rt.release();
 	return rt;
 }

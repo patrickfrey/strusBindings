@@ -17,10 +17,13 @@
 namespace strus {
 namespace bindings {
 
+typedef papuga_ValueVariant ValueVariant;
+
 class StatisticsIterator
 {
 public:
-	StatisticsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, bool differential, bool sign);
+	StatisticsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_, const ValueVariant& timestamp_);
+	StatisticsIterator( const ObjectRef& trace_, const ObjectRef& objbuilder_, const ObjectRef& storage_, const ObjectRef& errorhnd_);
 	virtual ~StatisticsIterator(){}
 
 	bool getNext( papuga_CallResult* result);

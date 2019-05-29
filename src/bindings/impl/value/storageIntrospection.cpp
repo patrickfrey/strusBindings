@@ -994,6 +994,91 @@ private:
 }//namespace
 
 
+class StatisticsDumpIntrospection
+	:public IntrospectionBase
+{
+public:
+	StatisticsDumpIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const StorageClientInterface* impl_,
+			bool all_)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		,m_all(all_)
+		{}
+	virtual ~StatisticsDumpIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	{
+		serializeMembers( serialization, path, substructure);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "update")
+		{
+			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, false);
+		}
+		else if (name == "all")
+		{
+			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, true);
+		}
+		return NULL;
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"update","all",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_impl;
+	bool m_all;
+};
+
+class StatisticsIntrospection
+	:public IntrospectionBase
+{
+public:
+	StatisticsIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			const StorageClientInterface* impl_)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+		{}
+	virtual ~StatisticsIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	{
+		serializeMembers( serialization, path, substructure);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		if (name == "update")
+		{
+			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, false);
+		}
+		else if (name == "all")
+		{
+			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, true);
+		}
+		return NULL;
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		static const char* ar[] = {"update","all",NULL};
+		return getList( ar);
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	const StorageClientInterface* m_impl;
+};
+
 void StorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
 	serializeMembers( serialization, path, substructure);
@@ -1018,12 +1103,16 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 	{
 		return new DocidIntrospection( m_errorhnd, m_impl);
 	}
+	else if (name == "statistics")
+	{
+		return new StatisticsIntrospection( m_errorhnd, m_impl);
+	}
 	return NULL;
 }
 
 std::vector<IntrospectionLink> StorageIntrospection::list()
 {
-	static const char* ar[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".term",".doc",NULL};
+	static const char* ar[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue","statblobs",".term",".doc",NULL};
 	return getList( ar);
 }
 

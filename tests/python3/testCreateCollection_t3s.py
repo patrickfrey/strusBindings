@@ -241,6 +241,12 @@ str stat:
       str type: "word"
       str value: "you"
   str nofdocs: 3
+str statblobs:
+  number 1:
+    str blob: "AAAAAwALd29yZABwYXJ0AAEFBXR3bwABBQdzcGxpdAABBgZ0aWxsAAEFBXdhcwABBQdmaXJzdAABBQNpAAEFBndoZW4AAQUJZ2VybWFuaQABBQlqb3VybmV5AAEFBWNhbgABBQhkaW1lbnMAAQUJdGhyb3VnaAABBQZ3aXRoAAEFA3QAAQUIaW1hZ2luAAEFBW5ldwABBQd2aXNpdAACBQhleHBlY3QAAQUJY2l0aXplbgABBQZpbnRvAAEFBndoYXQAAQUEaXQAAQUHd291bGQAAQUGdGhhbgABBQpldXJvcGVhbgABBQhkaWZmZXIAAQUJY29tcGxldAABBQZ0aGF0AAEFBmNpdGkAAgUDYQADBQRpcwACBgNuAAIFBnlvcmsAAQcDdQACBQd0b2t5bwABBQVkYXkAAQUEYXMAAQUFb25lAAEAC2VuZHRpdGxlAAAD"
+    str timestamp:
+      str counter: 0
+      str unixtime: 1
 str terms:
   str A.xml:endtitle (f): 
   str A.xml:endtitle (s):

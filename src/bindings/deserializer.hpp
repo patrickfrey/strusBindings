@@ -51,6 +51,8 @@ struct Deserializer
 
 	static std::string getString( papuga_SerializationIter& seriter);
 	static bool compareName( const papuga_SerializationIter& seriter, const char* name, std::size_t namelen);
+	static std::string getBlobBase64Decoded( papuga_SerializationIter& seriter);
+	static std::string getBlobBase64Decoded( const papuga_ValueVariant& val);
 
 	static const char* getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter);
 	static int getCharUnicode( papuga_SerializationIter& seriter);
@@ -97,6 +99,12 @@ struct Deserializer
 	static TermStatistics getTermStatistics( const papuga_ValueVariant& stats);
 
 	static GlobalStatistics getGlobalStatistics( const papuga_ValueVariant& stats);
+
+	static TimeStamp getTimeStamp( papuga_SerializationIter& seriter);
+	static TimeStamp getTimeStamp( const papuga_ValueVariant& tmstmp);
+
+	static StatisticsMessage getStatisticsMessage( papuga_SerializationIter& seriter);
+	static StatisticsMessage getStatisticsMessage( const papuga_ValueVariant& msg);
 
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
 			papuga_SerializationIter& seriter,

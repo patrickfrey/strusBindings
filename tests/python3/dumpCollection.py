@@ -62,13 +62,17 @@ def dumpCollection( strusctx, storagePath):
 	# Term statistics:
 	output_stat = {}
 	dfchangelist = []
+	bloblist = []
 	nofdocs = 0
-	for blob in storage.getAllStatistics( True):
+	for blob in storage.getAllStatistics():
+		blob.timestamp.unixtime = 1
+		bloblist.append( blob)
 		statview = strusctx.unpackStatisticBlob( blob, "std")
 		nofdocs += statview.nofdocs
 		for dfchange in statview.dfchange:
 			dfchangelist.append( {'type':dfchange.type, 'value':dfchange.value, 'increment':dfchange.increment})
 
+	output[ "statblobs"] = bloblist
 	output[ "stat"] = output_stat
 	output_stat[ "dfchange"] = sorted( dfchangelist, key=lambda dfchange: "%s %s %d" % (dfchange['type'], dfchange['value'], dfchange['increment']) )
 	output_stat[ "nofdocs"] = nofdocs

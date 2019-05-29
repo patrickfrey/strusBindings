@@ -486,6 +486,54 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermStat
 	rt &= serializeArrayElement( result, (papuga_Int)val.increment(), errcode, deep);
 	return rt;
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const TimeStamp& timestamp, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, timestamp.unixtime(), errcode, deep);
+	rt &= serializeArrayElement( result, timestamp.counter(), errcode, deep);
+	return rt;
+}
+static bool serialize_base64( papuga_Serialization* result, const std::string& val, papuga_ErrorCode& errcode)
+{
+	if (val.empty()) return papuga_Serialization_pushValue_string( result, "", 0);
+	std::size_t allocsize = strus::base64EncodeLength( val.size());
+	if (!allocsize)
+	{
+		errcode = papuga_NoMemError;
+		return false;
+	}
+	char* valstr = (char*)papuga_Allocator_alloc( result->allocator, allocsize+1, 1);
+	if (!valstr)
+	{
+		errcode = papuga_NoMemError;
+		return false;
+	}
+	strus::ErrorCode ec = (strus::ErrorCode)0;
+	std::size_t len = strus::encodeBase64( valstr, allocsize, val.c_str(), val.size(), ec);
+	if (!len && ec)
+	{
+		errcode = papuga_NoMemError;
+		return false;
+	}
+	valstr[ len] = 0;
+	return papuga_Serialization_pushValue_string( result, valstr, len);
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const StatisticsMessage& msg, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	if (msg.timestamp().unixtime())
+	{
+		rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<TimeStamp>::structid());
+		rt &= serialize_nothrow( result, msg.timestamp(), errcode, deep);
+		rt &= papuga_Serialization_pushClose( result);
+	}
+	else
+	{
+		rt &= papuga_Serialization_pushValue_void( result);
+	}
+	rt &= serialize_base64( result, msg.blob(), errcode);
+	return rt;
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;

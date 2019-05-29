@@ -201,6 +201,12 @@ str stat:
       str type: "word"
       str value: "wie"
   str nofdocs: 3
+str statblobs:
+  number 1:
+    str blob: "AAAAAwALd29yZAB0ZXh0AAEFBWVpbgABBQRodQABBgZvbGxhAAEFBWRhcwABBQZhYmVyAAEFBW1hbgABBQZ3ZWl0AAEFB3VlYmVyAAEFB2ZsaWVnAAEFBWlzdAABBQVodWIAAQUFYWxsAAIFBWxvdwACBQZ3ZW5uAAEFBWRpZQACBQdrb25udAABBQZ1YmVyAAIFBnNpY2gAAgUIYXVmcmVnAAEFDHZlcnNhbW1lbG4AAQYGb2dlbAABBQhiZXNvbmQAAQUGZHJ1YgABBQphZWhubGljaAABBQRlcwABBQV3aWUAAQUFdW5kAAEFB21hcmNoAAEAC2VuZHRpdGxlAAAD"
+    str timestamp:
+      str counter: 0
+      str unixtime: 1
 str terms:
   str A.xml:endtitle (f): 
   str A.xml:endtitle (s):

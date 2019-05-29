@@ -167,6 +167,12 @@ string stat:
       string type: "word"
       string value: 7
   string nofdocs: 10
+  string statblobs: 
+    integer 0: 
+      string blob: "AAAACgAId29yZAA1AAIFAzMAAwUDNwABBQMyAAU="
+      string timestamp: 
+        string counter: 0
+        string unixtime: 1
 string terms: 
   string 10:word (f): 
     integer 0: 
