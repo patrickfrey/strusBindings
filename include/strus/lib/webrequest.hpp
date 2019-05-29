@@ -11,6 +11,7 @@
 #define _STRUS_WEBREQUEST_LIB_HPP_INCLUDED
 #include "strus/webRequestContent.hpp"
 #include <cstddef>
+#include <string>
 
 /// \brief strus toplevel namespace
 namespace strus {

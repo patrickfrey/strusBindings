@@ -12,6 +12,7 @@
 #include "strus/base/local_ptr.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
+#include "strus/webRequestHandlerInterface.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
 #include "private/internationalization.hpp"
