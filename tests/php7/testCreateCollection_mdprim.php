@@ -169,7 +169,7 @@ string stat:
   string nofdocs: 10
   string statblobs: 
     integer 0: 
-      string blob: "AAAACgAId29yZAA1AAIFAzMAAwUDNwABBQMyAAU="
+      string blob: "AAAACgAId29yZAAyAAUFAzMAAwUDNQACBQM3AAE="
       string timestamp: 
         string counter: 0
         string unixtime: 1

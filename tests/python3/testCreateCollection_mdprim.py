@@ -177,7 +177,7 @@ str stat:
   str nofdocs: 10
 str statblobs:
   number 1:
-    str blob: "AAAACgAId29yZAA1AAIFAzMAAwUDNwABBQMyAAU="
+    str blob: "AAAACgAId29yZAAyAAUFAzMAAwUDNQACBQM3AAE="
     str timestamp:
       str counter: 0
       str unixtime: 1
