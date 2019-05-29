@@ -489,8 +489,8 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermStat
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const TimeStamp& timestamp, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	rt &= serializeArrayElement( result, timestamp.unixtime(), errcode, deep);
-	rt &= serializeArrayElement( result, timestamp.counter(), errcode, deep);
+	rt &= serializeArrayElement( result, (papuga_Int)timestamp.unixtime(), errcode, deep);
+	rt &= serializeArrayElement( result, (papuga_Int)timestamp.counter(), errcode, deep);
 	return rt;
 }
 static bool serialize_base64( papuga_Serialization* result, const std::string& val, papuga_ErrorCode& errcode)
