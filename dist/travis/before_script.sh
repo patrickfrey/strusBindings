@@ -24,8 +24,6 @@ case $OS in
 			sudo apt-get install -y python3-dev
 		fi
 		if test "x$STRUS_WITH_PHP" = "xYES"; then
-			# The ppa:ondrej/php repository stopped support of Ubuntu 14.04. We have to find another solution meanwhile.
-			# One idea is to switch to dist: xenial instead of trusty (May 19, 2019)
 			sudo apt-get install -y libssl-dev
 			sudo apt-get install -y language-pack-en-base
 			sudo apt-get install -y php7.0 php7.0-dev

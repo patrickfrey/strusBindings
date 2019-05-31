@@ -7,6 +7,7 @@
  */
 /// \brief Interface for introspection of a storage client
 #include "storageIntrospection.hpp"
+#include "strus/lib/error.hpp"
 #include "introspectionTemplates.hpp"
 #include "serializer.hpp"
 #include "private/internationalization.hpp"
@@ -17,11 +18,13 @@
 #include "strus/base/string_conv.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/fileio.hpp"
+#include "strus/base/base64.hpp"
 #include "strus/metaDataReaderInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
+#include "strus/statisticsIteratorInterface.hpp"
 #include "papuga/allocator.h"
 #include "papuga/constants.h"
 #include <cstring>
@@ -994,19 +997,40 @@ private:
 }//namespace
 
 
-class StatisticsDumpIntrospection
+static IntrospectionBase* createSnapshotIntrospection(
+		ErrorBufferInterface* errorhnd,
+		const StorageClientInterface* impl)
+{
+	strus::local_ptr<StatisticsIteratorInterface> statitr( impl->createAllStatisticsIterator());
+	std::vector<std::string> blobs;
+	StatisticsMessage msg = statitr->getNext();
+	for (; !msg.empty(); msg = statitr->getNext())
+	{
+		std::string buf( strus::base64EncodeLength( msg.size()), '\0');
+		ErrorCode errcode = (ErrorCode)0;
+		buf.resize( encodeBase64( const_cast<char*>(buf.c_str()), buf.size(), msg.ptr(), msg.size(), errcode));
+		if (errcode) throw std::runtime_error( errorCodeToString( errcode));
+		blobs.push_back( buf);
+	}
+	return strus::bindings::IntrospectionValueListConstructor<std::vector<std::string> >::func( errorhnd, blobs);
+}
+
+
+class StatisticsIncrementIntrospection
 	:public IntrospectionBase
 {
 public:
-	StatisticsDumpIntrospection(
+	StatisticsIncrementIntrospection(
 			ErrorBufferInterface* errorhnd_,
-			const StorageClientInterface* impl_,
-			bool all_)
+			const StorageClientInterface* impl_)
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
-		,m_all(all_)
-		{}
-	virtual ~StatisticsDumpIntrospection(){}
+		,m_timestamps()
+	{
+		std::vector<TimeStamp> tms = m_impl->getChangeStatisticTimeStamps();
+		m_timestamps.insert( tms.begin(), tms.end());
+	}
+	virtual ~StatisticsIncrementIntrospection(){}
 
 	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
@@ -1015,27 +1039,45 @@ public:
 
 	virtual IntrospectionBase* open( const std::string& name)
 	{
-		if (name == "update")
+		ErrorCode errcode = (ErrorCode)0;
+		TimeStamp tms = TimeStamp::fromstring( name, errcode);
+		if (errcode) throw std::runtime_error( strus::errorCodeToString( errcode));
+		if (tms.defined())
 		{
-			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, false);
+			StatisticsMessage msg = m_impl->loadChangeStatisticsMessage( tms);
+			if (msg.empty())
+			{
+				if (m_errorhnd->hasError()) throw std::runtime_error( m_errorhnd->fetchError());
+				return NULL;
+			}
+			else
+			{
+				return new IntrospectionStructure<StatisticsMessage>( m_errorhnd, msg);
+			}
 		}
-		else if (name == "all")
+		else
 		{
-			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, true);
+			return NULL;
 		}
-		return NULL;
 	}
 
 	virtual std::vector<IntrospectionLink> list()
 	{
-		static const char* ar[] = {"update","all",NULL};
-		return getList( ar);
+		std::vector<std::string> lst;
+		ErrorCode errcode = (ErrorCode)0;
+		std::set<TimeStamp>::const_iterator ti = m_timestamps.begin(), te = m_timestamps.end();
+		for (; ti != te; ++ti)
+		{
+			lst.push_back( TimeStamp::tostring( *ti, errcode));
+			if (errcode) throw std::runtime_error( strus::errorCodeToString( errcode));
+		}
+		return IntrospectionLink::getList( false/*autoexpand*/, lst);
 	}
 
 private:
 	ErrorBufferInterface* m_errorhnd;
 	const StorageClientInterface* m_impl;
-	bool m_all;
+	std::set<TimeStamp> m_timestamps;
 };
 
 class StatisticsIntrospection
@@ -1057,20 +1099,20 @@ public:
 
 	virtual IntrospectionBase* open( const std::string& name)
 	{
-		if (name == "update")
+		if (name == "increment")
 		{
-			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, false);
+			return new StatisticsIncrementIntrospection( m_errorhnd, m_impl);
 		}
-		else if (name == "all")
+		else if (name == "snapshot")
 		{
-			return new StatisticsDumpIntrospection( m_errorhnd, m_impl, true);
+			return createSnapshotIntrospection( m_errorhnd, m_impl);
 		}
 		return NULL;
 	}
 
 	virtual std::vector<IntrospectionLink> list()
 	{
-		static const char* ar[] = {"update","all",NULL};
+		static const char* ar[] = {"increment","snapshot",NULL};
 		return getList( ar);
 	}
 
@@ -1103,7 +1145,7 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 	{
 		return new DocidIntrospection( m_errorhnd, m_impl);
 	}
-	else if (name == "statistics")
+	else if (name == "statistics" && m_impl->getStatisticsProcessor())
 	{
 		return new StatisticsIntrospection( m_errorhnd, m_impl);
 	}
@@ -1112,8 +1154,9 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 
 std::vector<IntrospectionLink> StorageIntrospection::list()
 {
-	static const char* ar[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue","statblobs",".term",".doc",NULL};
-	return getList( ar);
+	static const char* ar_withStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue","statistics",".term",".doc",NULL};
+	static const char* ar_withoutStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".term",".doc",NULL};
+	return getList( (m_impl->getStatisticsProcessor()) ? ar_withStats : ar_withoutStats);
 }
 
 
