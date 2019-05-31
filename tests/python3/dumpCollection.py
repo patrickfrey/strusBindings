@@ -65,7 +65,6 @@ def dumpCollection( strusctx, storagePath):
 	bloblist = []
 	nofdocs = 0
 	for blob in storage.getAllStatistics():
-		blob.timestamp.unixtime = 1
 		bloblist.append( blob)
 		statview = strusctx.unpackStatisticBlob( blob, "std")
 		nofdocs += statview.nofdocs

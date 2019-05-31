@@ -938,6 +938,7 @@ StatisticsMessage Deserializer::getStatisticsMessage( papuga_SerializationIter& 
 					if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 					{
 						timestamp = getTimeStamp( *papuga_SerializationIter_value( &seriter));
+						papuga_SerializationIter_skip( &seriter);
 					}
 					else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 					{

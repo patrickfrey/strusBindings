@@ -231,9 +231,6 @@ string stat:
 string statblobs:
   number 1:
     string blob: "AAAAAwALZW5kdGl0bGUAAAMACHdvcmQAYQADBgNzAAEFBWNhbgABBgVpdGkAAgkFemVuAAEGCG9tcGxldAABBQVkYXkAAQYHaWZmZXIAAQcGbWVucwABBQpldXJvcGVhbgABBgd4cGVjdAABBQdmaXJzdAABBQlnZXJtYW5pAAEFA2kAAQYHbWFnaW4AAQYDbgACBwR0bwABBgNzAAIGA3QAAQUJam91cm5leQABBQVuZXcAAQUFb25lAAEFBnBhcnQAAQUHc3BsaXQAAQYGdGlsbAABBQN0AAEGBWhhbgABCAN0AAEHB3JvdWdoAAEGBm9reW8AAQYEd28AAQUHdmlzaXQAAgUFd2FzAAEGBWhhdAABBwRlbgABBgVpdGgAAQYGb3VsZAABBQZ5b3JrAAEHA3UAAg=="
-    string timestamp:
-      string counter: 0
-      string unixtime: 1
 string terms:
   string A.xml:endtitle (f): 
   string A.xml:endtitle (s):

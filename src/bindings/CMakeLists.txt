@@ -16,6 +16,7 @@ set( source_files
 	impl/value/struct.cpp
 	impl/value/introspectionBase.cpp
 	impl/value/contextIntrospection.cpp
+	impl/value/statisticsIntrospection.cpp
 	impl/value/storageIntrospection.cpp
 	impl/value/vectorStorageIntrospection.cpp
 	impl/value/analyzerIntrospection.cpp
@@ -35,6 +36,7 @@ set( source_files
 	impl/vector.cpp
 	impl/sentence.cpp
 	impl/context.cpp
+	impl/statistics.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingClasses.cpp
 )

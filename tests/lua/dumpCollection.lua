@@ -81,7 +81,6 @@ function dumpCollection( strusctx, storagePath)
 
 	local bloblist = {}
 	for blob in storage:getAllStatistics() do
-		blob.timestamp.unixtime = 1
 		table.insert( bloblist, blob);
 		local statview = strusctx:unpackStatisticBlob( blob, "std")
 		nofdocs = nofdocs + statview[ "nofdocs"]

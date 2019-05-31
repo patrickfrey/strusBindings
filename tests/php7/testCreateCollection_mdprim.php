@@ -171,8 +171,6 @@ string stat:
     integer 0: 
       string blob: "AAAACgAId29yZAAyAAUFAzMAAwUDNQACBQM3AAE="
       string timestamp: 
-        string counter: 0
-        string unixtime: 1
 string terms: 
   string 10:word (f): 
     integer 0: 

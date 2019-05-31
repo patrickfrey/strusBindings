@@ -55,6 +55,21 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "integer")
 		("varname", "$val")
 	;
+	typesystem.defineType( "GlobalCounter")
+		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+	;
+	typesystem.defineType( "const GlobalCounter&")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+	;
+	typesystem.defineType( "const GlobalCounter& $val=0")
+		("argv_default", "0")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+		("varname", "$val")
+	;
 	typesystem.defineType( "int")
 		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
 		("argv_map", "ValueVariantWrap::toint( $value)")

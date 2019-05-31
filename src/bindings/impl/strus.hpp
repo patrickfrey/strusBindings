@@ -10,6 +10,7 @@
 #define _STRUS_BINDING_IMPL_STRUS_HPP_INCLUDED
 
 #include "impl/context.hpp"
+#include "impl/statistics.hpp"
 #include "impl/storage.hpp"
 #include "impl/inserter.hpp"
 #include "impl/vector.hpp"

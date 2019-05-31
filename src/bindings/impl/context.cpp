@@ -12,6 +12,7 @@
 #include "impl/analyzer.hpp"
 #include "impl/inserter.hpp"
 #include "impl/contentstats.hpp"
+#include "impl/statistics.hpp"
 #include "impl/value/contextIntrospection.hpp"
 #include "papuga/valueVariant.hpp"
 #include "papuga/serialization.hpp"
@@ -41,6 +42,8 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/debugTraceInterface.hpp"
 #include "strus/constants.hpp"
+#include "strus/numericVariant.hpp"
+#include "strus/statisticsMessage.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "private/internationalization.hpp"
@@ -417,6 +420,7 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	}
 	Struct rt;
 	StatisticsMessage msg = Deserializer::getStatisticsMessage( blob_);
+	
 	Reference<StatisticsViewerInterface> viewer( statsproc->createViewer( msg.ptr(), msg.size()));
 	if (!viewer.get()) throw strus::runtime_error(_TXT( "error decoding statistics from blob: %s"), errorhnd->fetchError());
 	strus::bindings::Serializer::serialize( &rt.serialization, *viewer, true);
@@ -426,6 +430,12 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	}
 	rt.release();
 	return rt;
+}
+
+StatisticsMapImpl* ContextImpl::createStatisticsMap( const std::string& procname)
+{
+	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
+	return new StatisticsMapImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, procname);
 }
 
 void ContextImpl::close()

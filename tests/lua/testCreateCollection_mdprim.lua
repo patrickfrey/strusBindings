@@ -163,9 +163,6 @@ string stat:
 string statblobs:
   number 1:
     string blob: "AAAACgAId29yZAAyAAUFAzMAAwUDNQACBQM3AAE="
-    string timestamp:
-      string counter: 0
-      string unixtime: 1
 string terms:
   string 10:word (f):
     number 1:

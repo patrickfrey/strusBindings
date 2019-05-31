@@ -204,9 +204,6 @@ str stat:
 str statblobs:
   number 1:
     str blob: "AAAAAwALZW5kdGl0bGUAAAMAC3dvcmQAYWJlcgABBgllaG5saWNoAAEGBGxsAAIGB3VmcmVnAAEFCGJlc29uZAABBQVkYXMAAQYEaWUAAgYFcnViAAEFBWVpbgABBgNzAAEFB2ZsaWVnAAEFB2hvbGxhAAEGA3UAAQcDYgABBQVpc3QAAQUHa29ubnQAAQUFbG93AAIFBW1hbgABBwVyY2gAAQUGc2ljaAACBQZ0ZXh0AAEFBnViZXIAAgYGZWJlcgABBgRuZAABBQx2ZXJzYW1tZWxuAAEGBm9nZWwAAQUGd2VpdAABBwRubgABBgRpZQAB"
-    str timestamp:
-      str counter: 0
-      str unixtime: 1
 str terms:
   str A.xml:endtitle (f): 
   str A.xml:endtitle (s):

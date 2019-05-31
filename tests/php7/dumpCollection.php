@@ -82,7 +82,6 @@ function dumpCollection( $strusctx, $storagePath) {
 	$bloblist = [];
 	$nofdocs = 0;
 	foreach ($storage->getAllStatistics() as $blob) {
-		$blob->timestamp->unixtime = 1;
 		array_push( $bloblist, $blob);
 		$statview = $strusctx->unpackStatisticBlob( $blob, "std");
 		$nofdocs += $statview->nofdocs;
