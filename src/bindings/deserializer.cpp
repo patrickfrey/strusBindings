@@ -2698,7 +2698,7 @@ void Deserializer::buildStatistics(
 					}
 					case 1:
 					{
-						builder->setNofDocumentsInsertedChange( Deserializer::getInt( seriter));
+						builder->addNofDocumentsInsertedChange( Deserializer::getInt( seriter));
 						break;
 					}
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
