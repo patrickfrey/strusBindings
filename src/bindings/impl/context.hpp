@@ -198,11 +198,16 @@ public:
 	Struct unpackStatisticBlob( const ValueVariant& blob, const std::string& procname="");
 
 	/// \brief Create a map for global term/document statistics for a distributed search index
-	/// \param[in] procname name of statistics processor to use for decoding the message (use default processor, if not defined)
-	/// \example "default"
-	/// \example ""
+	/// \example createStatisticsMap()
+	/// \example createStatisticsMap( "proc=std; blocks=100000" )
+	/// \example createStatisticsMap( [ proc: "std" metadata: "blocks=5K" ] )
+	/// \example createStatisticsMap( [
+	///	proc: "std"
+	///	blocks: "100K"
+	///	] )
+	/// \param[in] config configuration (string or structure with named elements) of the statistics map including the name of the statistics processor (config variable 'proc') or undefined if the defaults are taken as configuration.
 	/// \return the statistics map
-	StatisticsMapImpl* createStatisticsMap( const std::string& procname="");
+	StatisticsMapImpl* createStatisticsMap( const ValueVariant& config=ValueVariant());
 
 	/// \brief Force cleanup to circumvent object pooling mechanisms in an interpreter context
 	void close();

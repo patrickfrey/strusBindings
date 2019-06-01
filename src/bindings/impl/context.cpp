@@ -432,10 +432,11 @@ Struct ContextImpl::unpackStatisticBlob( const ValueVariant& blob_, const std::s
 	return rt;
 }
 
-StatisticsMapImpl* ContextImpl::createStatisticsMap( const std::string& procname)
+StatisticsMapImpl* ContextImpl::createStatisticsMap( const ValueVariant& config_)
 {
 	if (!m_storage_objbuilder_impl.get()) initStorageObjBuilder();
-	return new StatisticsMapImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, procname);
+	std::string config = Deserializer::getConfigString( config_);
+	return new StatisticsMapImpl( m_trace_impl, m_storage_objbuilder_impl, m_errorhnd_impl, config);
 }
 
 void ContextImpl::close()

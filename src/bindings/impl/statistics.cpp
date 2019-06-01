@@ -14,23 +14,29 @@
 #include "strus/statisticsMapInterface.hpp"
 #include "strus/statisticsProcessorInterface.hpp"
 #include "strus/base/local_ptr.hpp"
+#include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
 
-StatisticsMapImpl::StatisticsMapImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& statsprocname)
+StatisticsMapImpl::StatisticsMapImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_statmap_impl()
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+
+	std::string configstr = config;
+	std::string statsprocname;
+	(void)extractStringFromConfigString( statsprocname, configstr, "proc", errorhnd);
+
 	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
 	m_statsproc = objBuilder->getStatisticsProcessor( statsprocname);
 	if (!m_statsproc) throw strus::runtime_error( _TXT("unknown statistics processor '%s'"), statsprocname.c_str());
 
-	m_statmap_impl.resetOwnership( m_statsproc->createMap(), "statistics map");
+	m_statmap_impl.resetOwnership( m_statsproc->createMap( configstr), "statistics map");
 	if (!m_statmap_impl.get())
 	{
 		throw strus::runtime_error( _TXT("failed to create statistics map: %s"), errorhnd->fetchError());
