@@ -222,7 +222,7 @@ public:
 	DefineConfigSchema() :DefineSchema<SCHEMA>( ROOT_CONTEXT_NAME){}
 };
 
-static const char* g_context_typenames[] = {"contentstats","storage","docanalyzer","queryanalyzer","inserter",0};
+static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","queryanalyzer","inserter",0};
 
 
 WebRequestHandler::WebRequestHandler(
@@ -284,6 +284,10 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_INIT_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
 		schema_Context_PUT_QueryAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
+
+		static const DefineConfigSchema<Schema_Context_PUT_Inserter> Schema_Context_PUT_StatisticsServer;
+		Schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");
+		Schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "POST/statserver");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");

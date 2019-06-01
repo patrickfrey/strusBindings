@@ -12,6 +12,7 @@
 #define _STRUS_WEBREQUEST_SCHEMAS_HPP_INCLUDED
 #include "schemas_base.hpp"
 #include "schemas_context.hpp"
+#include "schemas_statistics.hpp"
 #include "schemas_storage.hpp"
 #include "schemas_vector.hpp"
 #include "schemas_query.hpp"
