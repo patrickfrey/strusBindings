@@ -316,6 +316,9 @@ WebRequestHandler::WebRequestHandler(
 		static const IntrospectionMethodDescription mt_QueryAnalyzer_GET( mt::QueryAnalyzer::introspection(), "analyzer");
 		mt_QueryAnalyzer_GET.addToHandler( m_impl);
 
+		static const IntrospectionMethodDescription mt_StatisticsServer_GET( mt::StatisticsMap::introspection(), "statserver");
+		mt_StatisticsServer_GET.addToHandler( m_impl);
+
 		static const IntrospectionMethodDescription mt_StorageClient_GET( mt::StorageClient::introspection(), "storage");
 		mt_StorageClient_GET.addToHandler( m_impl);
 		static const PostTransactionMethodDescription mt_StorageClient_POST_transaction( mt::StorageClient::createTransaction(), "transaction");
