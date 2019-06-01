@@ -33,7 +33,7 @@ public:
 					{"blocks", StatisticsMapBlocks, '?'},
 				}
 			},
-			{"/", "statserver", "context", bindings::method::Context::createStatisticsMap(), {{StorageConfig}} }
+			{"/", "statserver", "context", bindings::method::Context::createStatisticsMap(), {{StatisticsMapConfig}} }
 		}
 	) {}
 };
