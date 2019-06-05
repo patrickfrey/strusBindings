@@ -1436,28 +1436,35 @@ bool WebRequestContext::executeRequest(
 			}
 		}
 		// Call object method with content if object defined and method defined, else fallback to next:
-		if (selector.obj && selector.obj->valuetype == papuga_TypeHostObject)
+		if (selector.obj)
 		{
-			int classid = selector.obj->value.hostObject->classid;
-			void* self = selector.obj->value.hostObject->data;
-
-			if (isEqual(method,"POST") && isEqual( path.rest(),"transaction"))
+			if (selector.obj->valuetype == papuga_TypeHostObject)
 			{
-				rt = executePostTransaction( self, classid, selector.typenam, selector.contextnam, answer);
-				goto DONE;
+				int classid = selector.obj->value.hostObject->classid;
+				void* self = selector.obj->value.hostObject->data;
+	
+				if (isEqual(method,"POST") && isEqual( path.rest(),"transaction"))
+				{
+					rt = executePostTransaction( self, classid, selector.typenam, selector.contextnam, answer);
+					goto DONE;
+				}
+				else
+				{
+					const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
+					if (methoddescr)
+					{
+						if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer))
+						{
+							rt = false;
+						}
+						goto DONE;
+					}
+					//... fallback
+				}
 			}
 			else
 			{
-				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, !content.empty());
-				if (methoddescr)
-				{
-					if (!callHostObjMethod( self, methoddescr, path.rest(), content, answer))
-					{
-						rt = false;
-					}
-					goto DONE;
-				}
-				//... fallback
+				return mapValueVariantToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", "value", m_result_encoding, m_result_doctype, *selector.obj);
 			}
 		}
 		if (selector.context)
