@@ -330,7 +330,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature/content", "+feature/content", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
+			{"/query/feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
 		};
 	}
 
@@ -339,7 +339,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareSentence()},
-			{"/query/sentence", "+sentence/content", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+			{"/query/sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
 		};
 	}
 
@@ -348,7 +348,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {
 			{SchemaQueryDeclPart::declareMetaData()},
-			{"/query/restriction/{union,condition}", "+restriction", "qryanalyzer", A::analyzeSchemaMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
+			{"/query/restriction/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeSchemaMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
 		};
 	}
 };
@@ -358,7 +358,8 @@ class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton
 public:
 	Schema_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		{},
+		{},
 		{
 			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/analyzer/doc")}
 		}
@@ -370,7 +371,8 @@ class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton
 public:
 	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		{},
+		{},
 		{
 			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/analyzer/doc")}
 		}
@@ -382,7 +384,7 @@ class Schema_Context_INIT_QueryAnalyzer :public papuga::RequestAutomaton
 public:
 	Schema_Context_INIT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,
+		{},
 		{
 			{"vstorage","/analyzer/query/vstorage/name()",false/*not required*/}
 		},
@@ -397,7 +399,7 @@ class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton
 public:
 	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,
+		{},
 		{
 			{"vstorage","/analyzer/query/vstorage/name()",false/*not required*/}
 		},
@@ -412,7 +414,23 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		"query"/*result name*/, true/*do merge*/,
+		{{"result", {
+			{"/query", "query"},
+			{"/query/feature", "feature"},
+			{"/query/feature/set", "set", FeatureSet},
+			{"/query/feature/weight", "weight", FeatureWeight, '?'},
+			{"/query/feature", "content", "_analyzed", '!'},
+
+			{"/query/sentence", "content"},
+			{"/query/sentence/field", "field", FieldTypeName},
+			{"/query/sentence/results", "results", NumberOfResults},
+			{"/query/sentence/minweight", "minweight", MinWeight},
+			{"/query/sentence/content", "content", "_analyzed", '!'},
+
+			{"/query/union", "union"},
+			{"/query/condition", "condition"},
+			{"/query/{union,condition}", "restriction", "_analyzed", '!'}
+		}}},
 		{
 			{"vstorage","/query/analyzer/vstorage/name()",false/*not required*/}
 		},

@@ -24,7 +24,8 @@ class Schema_Context_CREATE_Storage :public papuga::RequestAutomaton, public Aut
 public:
 	Schema_Context_CREATE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		{},
+		{},
 		{
 			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
 			{"/storage/metadata/name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
@@ -60,7 +61,8 @@ class Schema_Context_DELETE_Storage :public papuga::RequestAutomaton, public Aut
 public:
 	Schema_Context_DELETE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		{},
+		{},
 		{
 			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
 			{"/storage", StorageConfig, {
@@ -77,7 +79,8 @@ class Schema_Context_INIT_Storage :public papuga::RequestAutomaton, public Autom
 public:
 	Schema_Context_INIT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		{},
+		{},
 		{
 			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
 			{"/storage/cachedterms", "()", StorageCachedTerms, papuga_TypeString, "/srv/strus/termlist.txt"},
@@ -108,7 +111,8 @@ class Schema_Context_PUT_StorageTransaction :public papuga::RequestAutomaton, pu
 public:
 	Schema_Context_PUT_StorageTransaction() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{},
+		{},
+		{},
 		{
 			{"/storage/document/id", "()", DocumentId, papuga_TypeString, "/company/ACME"},
 			{"/storage/document/doctype", "()", SubDocumentName, papuga_TypeString, "article"},

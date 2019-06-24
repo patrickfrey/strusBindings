@@ -24,7 +24,8 @@ class Schema_Context_PUT_Inserter :public papuga::RequestAutomaton, public Autom
 public:
 	Schema_Context_PUT_Inserter() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		NULL/*resultname*/, false/*do not merge*/,{
+		{},
+		{
 			{"docanalyzer","/inserter/docanalyzer()",true/*required*/},
 			{"storage","/inserter/storage()",true/*required*/}},
 		{

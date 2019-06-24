@@ -391,51 +391,25 @@ bool WebRequestContext::setResultContentType( WebRequestAnswer& answer, papuga_S
 bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
-	const char* resultname = papuga_Request_resultname( m_request);
 	const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
 	char* resultstr = 0;
-	std::size_t resultulen = 0;
+	std::size_t resultlen = 0;
 
-	if (resultname)
+	int nofResults = papuga_RequestContext_nof_results( m_context);
+	if (nofResults > 0)
 	{
-		// Serialize the result:
-		papuga_Serialization* resultser = papuga_Allocator_alloc_Serialization( &m_allocator);
-		if (!resultser)
-		{
-			setAnswer( answer, ErrorCodeOutOfMem);
-			return false;
-		}
-		if (papuga_Request_resultmerge( m_request))
-		{
-			if (!papuga_Serialization_merge_request_result( resultser, m_context, m_request, m_encoding, m_doctype, content.str(), content.len(), &errcode))
-			{
-				setAnswer( answer, papugaErrorToErrorCode( errcode));
-				return false;
-			}
-		}
-		else
-		{
-			if (!papuga_Serialization_serialize_request_result( resultser, m_context, m_request, &errcode))
-			{
-				setAnswer( answer, papugaErrorToErrorCode( errcode));
-				return false;
-			}
-		}
+		papuga_RequestResult* result = papuga_RequestContext_get_result( m_context, 0);
+	
 		papuga_ValueVariant resultval;
-		papuga_init_ValueVariant_serialization( &resultval, resultser);
-#ifdef STRUS_LOWLEVEL_DEBUG
-		if (!papuga_ValueVariant_isvalid( &resultval))
-		{
-			std::cerr << "Illegal result" << std::endl;
-		}
-#endif
+		papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
+
 		// Map the result:
 		switch (m_result_doctype)
 		{
-			case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, &resultulen, &errcode); break;
-			case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, &resultulen, &errcode); break;
-			case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultulen, &errcode); break;
-			case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, resultname, NULL/*no array possible*/, &resultulen, &errcode); break;
+			case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultlen, &errcode); break;
+			case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
 			case WebRequestContent::Unknown:
 			{
 				setAnswer( answer, ErrorCodeNotImplemented, _TXT("output content type unknown"));
@@ -446,7 +420,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer, const
 		if (resultstr)
 		{
 			const char* encname = papuga_stringEncodingName( m_result_encoding);
-			WebRequestContent resultContent( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultulen);
+			WebRequestContent resultContent( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultlen);
 			answer.setContent( resultContent);
 			return true;
 		}
