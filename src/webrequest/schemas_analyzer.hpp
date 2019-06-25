@@ -414,22 +414,20 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		{{"result", {
-			{"/query", "query"},
-			{"/query/feature", "feature"},
+		{{"query", {
+			{"/query/feature", "feature", true},
 			{"/query/feature/set", "set", FeatureSet},
 			{"/query/feature/weight", "weight", FeatureWeight, '?'},
-			{"/query/feature", "content", "_analyzed", '!'},
+			{"/query/feature/content", "content", "_analyzed", '!'},
 
-			{"/query/sentence", "content"},
+			{"/query/sentence", "sentence", true},
 			{"/query/sentence/field", "field", FieldTypeName},
 			{"/query/sentence/results", "results", NumberOfResults},
 			{"/query/sentence/minweight", "minweight", MinWeight},
 			{"/query/sentence/content", "content", "_analyzed", '!'},
 
-			{"/query/union", "union"},
-			{"/query/condition", "condition"},
-			{"/query/{union,condition}", "restriction", "_analyzed", '!'}
+			{"/query/restriction", "restriction", true},
+			{"/query/restriction/{union,condition}", 0, "_analyzed", '!'}
 		}}},
 		{
 			{"vstorage","/query/analyzer/vstorage/name()",false/*not required*/}
