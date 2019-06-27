@@ -117,53 +117,68 @@ int TransactionPool::transactionRefIndexCandidate( int maxIdleTime)
 
 TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, int maxIdleTime)
 {
-	if (maxIdleTime <= 0 || maxIdleTime > m_maxIdleTime)
+	try
 	{
-		maxIdleTime = m_maxIdleTime;
-	}
-	int64_t tidx;
-	int* tidxref = 0;
-	{
-		int cnt = m_allocNofTries;
-		do
+		if (maxIdleTime <= 0 || maxIdleTime > m_maxIdleTime)
 		{
-			tidx = nextRand();
-			strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
-			tidxref = &m_refar[ tidx & (m_arsize-1)];
-			if (*tidxref == -1)
-			{
-				*tidxref = std::numeric_limits<int>::max(); 
-				break;
-			}
-			--cnt;
-		} while (cnt >= 0);
-		if (cnt==0) throw std::runtime_error(_TXT("failed to allocate transaction"));
-	}{
-		int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
-		int cnt = m_allocNofTries;
-		while (cnt >= 0)
-		{
-			try
-			{
-				strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
-				TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
-				if (!tref.get())
-				{
-					TransactionRef rt( new Transaction( context, tidx, tidxref, maxIdleTime));
-					*tidxref = eidx & (m_arsize-1);
-					return m_ar[ eidx & (m_arsize-1)] = rt;
-				}
-			}
-			catch (...)
-			{
-				*tidxref = -1; //... roll back
-				throw std::bad_alloc();
-			}
-			--cnt;
-			++eidx;
+			maxIdleTime = m_maxIdleTime;
 		}
-		*tidxref = -1; //... roll back
-		throw std::runtime_error(_TXT("failed to allocate transaction slot"));
+		int64_t tidx;
+		int* tidxref = 0;
+		{
+			int cnt = m_allocNofTries;
+			do
+			{
+				tidx = nextRand();
+				strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
+				tidxref = &m_refar[ tidx & (m_arsize-1)];
+				if (*tidxref == -1)
+				{
+					*tidxref = std::numeric_limits<int>::max(); 
+					break;
+				}
+				--cnt;
+			} while (cnt >= 0);
+			if (cnt==0) throw std::runtime_error(_TXT("failed to allocate transaction"));
+		}{
+			int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
+			int cnt = m_allocNofTries;
+			while (cnt >= 0)
+			{
+				try
+				{
+					strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
+					TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
+					if (!tref.get())
+					{
+						Transaction* tr = new Transaction( context, tidx, tidxref, maxIdleTime);
+						context = 0;
+						TransactionRef rt( tr);
+						*tidxref = eidx & (m_arsize-1);
+						return m_ar[ eidx & (m_arsize-1)] = rt;
+					}
+				}
+				catch (...)
+				{
+					*tidxref = -1; //... roll back
+					throw std::bad_alloc();
+				}
+				--cnt;
+				++eidx;
+			}
+			*tidxref = -1; //... roll back
+			throw std::runtime_error(_TXT("failed to allocate transaction slot"));
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		if (context) papuga_destroy_RequestContext( context);
+		throw std::bad_alloc();
+	}
+	catch (const std::runtime_error& err)
+	{
+		if (context) papuga_destroy_RequestContext( context);
+		throw std::runtime_error( err.what());
 	}
 }
 

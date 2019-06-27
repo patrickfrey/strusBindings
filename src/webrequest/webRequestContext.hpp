@@ -45,6 +45,12 @@ public:
 			const char* method,
 			const char* path,
 			const WebRequestContent& content,
+			WebRequestAnswer& answer,
+			std::vector<WebRequestDelegateRequest>& delegateRequests);
+
+	virtual bool executeSchemaPartialRequest(
+			const char* schema,
+			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
 	virtual bool getMessageAnswer(
@@ -53,13 +59,13 @@ public:
 			WebRequestAnswer& answer);
 
 	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
-	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer);
+	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
-	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
 	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
@@ -70,13 +76,13 @@ private:
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
-	bool getContentRequestResult( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool getContentRequestResult( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests, const WebRequestContent& content);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
-	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
+	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
+	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	void releaseContext();
 	bool executeSchemaDescriptionRequest( const char* method, const char* path, WebRequestAnswer& answer);
 

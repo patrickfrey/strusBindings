@@ -48,6 +48,25 @@ public:
 			m_errorbuf[0] = 0;
 		}
 	}
+	WebRequestAnswer& operator=( const WebRequestAnswer& o)
+	{
+		m_errorstr = o.m_errorstr;
+		m_httpstatus = o.m_httpstatus;
+		m_apperrorcode = o.m_apperrorcode;
+		m_messagetype = o.m_messagetype;
+		m_messagestr = o.m_messagestr;
+		m_content = o.m_content;
+		if (o.m_errorstr == o.m_errorbuf)
+		{
+			std::memcpy( m_errorbuf, o.m_errorbuf, sizeof(m_errorbuf));
+			m_errorstr = m_errorbuf;
+		}
+		else
+		{
+			m_errorbuf[0] = 0;
+		}
+		return *this;
+	}
 
 	/// \brief Test if request succeeded
 	bool ok() const					{return !m_errorstr;}
@@ -140,7 +159,15 @@ public:
 		}
 		else
 		{
-			std::size_t tmpsize = std::snprintf( m_errorbuf, sizeof(m_errorbuf), "%s: %s", msg, m_errorstr);
+			std::size_t tmpsize;
+			if (m_errorstr)
+			{
+				tmpsize = std::snprintf( m_errorbuf, sizeof(m_errorbuf), "%s: %s", msg, m_errorstr);
+			}
+			else
+			{
+				tmpsize = std::snprintf( m_errorbuf, sizeof(m_errorbuf), "%s: http status %d", msg, m_httpstatus);
+			}
 			if (tmpsize >= sizeof(m_errorbuf)-1)
 			{
 				tmpsize = sizeof(m_errorbuf)-1;

@@ -245,6 +245,7 @@ void WebRequestDelegateJob::resume( CURLcode ec)
 			WebRequestAnswer answer( m_response_errbuf, http_code, ErrorCodeDelegateRequestFailed);
 			m_data->receiver->putAnswer( answer);
 			m_conn->reconnect();
+			m_data->receiver.reset();
 		}
 		WebRequestDelegateDataRef next = m_conn->fetch();
 		if (next.get())

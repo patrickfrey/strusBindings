@@ -587,12 +587,19 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 	std::vector<ConfigurationDescription>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
+		std::vector<WebRequestDelegateRequest> delegates;
 		strus::WebRequestContent subcontent( config_charset, ci->doctype.c_str(), ci->contentbuf.c_str(), ci->contentbuf.size());
-		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status))
+		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status, delegates))
 		{
 			throw strus::runtime_error(
 				_TXT("error loading sub configuration %s '%s': %s"),
 				ci->type.c_str(), ci->name.c_str(), status.errorstr());
+		}
+		if (!delegates.empty())
+		{
+			throw strus::runtime_error(
+				_TXT("error loading sub configuration %s '%s': %s"),
+				ci->type.c_str(), ci->name.c_str(), _TXT("delegate requests in configuration not implemented yet"));
 		}
 		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
 	}
@@ -602,11 +609,18 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 	for (; ci != ce; ++ci)
 	{
 		strus::WebRequestContent subcontent( config_charset, ci->doctype.c_str(), ci->contentbuf.c_str(), ci->contentbuf.size());
-		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status))
+		std::vector<WebRequestDelegateRequest> delegates;
+		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status, delegates))
 		{
 			throw strus::runtime_error(
 				_TXT("error loading stored sub configuration %s '%s': %s"),
 				ci->type.c_str(), ci->name.c_str(), status.errorstr());
+		}
+		if (!delegates.empty())
+		{
+			throw strus::runtime_error(
+				_TXT("error loading sub configuration %s '%s': %s"),
+				ci->type.c_str(), ci->name.c_str(), _TXT("delegate requests in configuration not implemented yet"));
 		}
 		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
 	}
