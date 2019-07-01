@@ -48,7 +48,7 @@ public:
 			WebRequestAnswer& answer,
 			std::vector<WebRequestDelegateRequest>& delegateRequests);
 
-	virtual bool executeSchemaPartialRequest(
+	virtual bool returnDelegateRequestAnswer(
 			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
@@ -61,6 +61,12 @@ public:
 	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
 	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 
+	virtual bool returnConfigurationDelegateRequestAnswer(
+			const char* typenam,
+			const char* contextnam,
+			const char* schema,
+			const WebRequestContent& content,
+			WebRequestAnswer& answer);
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);

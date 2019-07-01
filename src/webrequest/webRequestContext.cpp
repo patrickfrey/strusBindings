@@ -1253,7 +1253,7 @@ bool WebRequestContext::getMessageAnswer(
 	return strus::mapStringToAnswer( answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, name.c_str(), m_result_encoding, m_result_doctype, message);
 }
 
-bool WebRequestContext::executeSchemaPartialRequest(
+bool WebRequestContext::returnDelegateRequestAnswer(
 		const char* schema,
 		const WebRequestContent& content,
 		WebRequestAnswer& answer)
@@ -1268,6 +1268,57 @@ bool WebRequestContext::executeSchemaPartialRequest(
 			return false;
 		}
 		return rt;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
+	}
+	catch (const std::runtime_error& err)
+	{
+		setAnswer( answer, ErrorCodeRuntimeError, err.what(), true/*do copy*/);
+		return false;
+	}
+	catch (...)
+	{
+		setAnswer( answer, ErrorCodeUncaughtException);
+		return false;
+	}
+}
+
+bool WebRequestContext::returnConfigurationDelegateRequestAnswer(
+		const char* typenam,
+		const char* contextnam,
+		const char* schema,
+		const WebRequestContent& content,
+		WebRequestAnswer& answer)
+{
+	try
+	{
+		if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
+		m_context = papuga_create_RequestContext( 0/*className*/);
+		m_context_ownership = true;
+		if (!m_context)
+		{
+			setAnswer( answer, ErrorCodeOutOfMem);
+			return false;
+		}
+		if (!papuga_RequestContext_inherit( m_context, m_handler->impl(), typenam, contextnam))
+		{
+			papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context, true);
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
+			return false;
+		}
+		if (!returnDelegateRequestAnswer( schema, content, answer))
+		{
+			return false;
+		}
+		if (!m_handler->transferContext( typenam, contextnam, m_context, answer))
+		{
+			return false;
+		}
+		releaseContext();
+		return true;
 	}
 	catch (const std::bad_alloc&)
 	{

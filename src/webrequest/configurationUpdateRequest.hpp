@@ -14,14 +14,27 @@
 
 namespace strus {
 
+/// \brief Forward declaration
+class WebRequestHandlerInterface;
+/// \brief Forward declaration
+class WebRequestLoggerInterface;
+
 /// \brief Job queue worker and periodic timer event ticker thread
 class ConfigurationUpdateRequestContext
 	:public WebRequestDelegateContextInterface
 {
 public:
+	ConfigurationUpdateRequestContext( WebRequestHandlerInterface* handler_, WebRequestLoggerInterface* logger_, const std::string& type_, const std::string& name_, const std::string& schema_)
+		:m_handler(handler_),m_logger(logger_),m_type(type_),m_name(name_),m_schema(schema_){}
+
 	virtual void putAnswer( const WebRequestAnswer& status);
 
 private:
+	WebRequestHandlerInterface* m_handler;
+	WebRequestLoggerInterface* m_logger;
+	std::string m_type;
+	std::string m_name;
+	std::string m_schema;
 };
 
 }//namespace

@@ -10,6 +10,7 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "configurationUpdateRequest.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/bindingClasses.h"
@@ -595,11 +596,16 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 				_TXT("error loading sub configuration %s '%s': %s"),
 				ci->type.c_str(), ci->name.c_str(), status.errorstr());
 		}
-		if (!delegates.empty())
+		std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
+		for (; di != de; ++di)
 		{
-			throw strus::runtime_error(
-				_TXT("error loading sub configuration %s '%s': %s"),
-				ci->type.c_str(), ci->name.c_str(), _TXT("delegate requests in configuration not implemented yet"));
+			if (0!=std::strcmp( di->content().charset(), accepted_charset) || 0!=std::strcmp( di->content().charset(), accepted_doctype))
+			{
+				throw strus::runtime_error( _TXT("expected delegate request to be JSON/UTF-8"));
+			}
+			std::string contentstr( di->content().str(), di->content().len());
+			strus::shared_ptr<WebRequestDelegateContextInterface> receiver( new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));
+			m_connPool.send( di->url(), di->method(), contentstr, receiver);
 		}
 		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
 	}
