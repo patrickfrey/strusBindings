@@ -16,7 +16,7 @@
 #include "papuga/requestLogger.h"
 #include "transaction.hpp"
 #include "curlEventLoop.hpp"
-#include "webRequestDelegateConnection.hpp"
+#include "webRequestDelegateConnector.hpp"
 #include <cstddef>
 #include <utility>
 #include <set>
@@ -100,7 +100,7 @@ private:
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
 	CurlEventLoop m_eventLoop;			//< queue for requests to other servers and periodic timer event to handle timeout of transactions
-	WebRequestDelegateConnectionPool m_connPool;	//< connection pool for sending delegate requests
+	WebRequestDelegateConnector m_connector;	//< connection pool for sending delegate requests
 };
 
 }//namespace

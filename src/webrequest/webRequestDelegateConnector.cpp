@@ -6,8 +6,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 /// \brief Implementation of the context of a delegated request (sub request to another server)
-/// \file "webRequestDelegateConnection.cpp"
-#include "webRequestDelegateConnection.hpp"
+/// \file "webRequestDelegateConnector.cpp"
+#include "webRequestDelegateConnector.hpp"
 #include "strus/reference.hpp"
 #include "strus/webRequestContent.hpp"
 #include "strus/webRequestDelegateContextInterface.hpp"
@@ -270,20 +270,20 @@ void WebRequestDelegateJob::resume( CURLcode ec)
 	}
 }
 
-WebRequestDelegateConnectionRef WebRequestDelegateConnectionPool::getConnection( const std::string& address)
+WebRequestDelegateConnectionRef WebRequestDelegateConnector::getConnection( const std::string& address)
 {
 	strus::unique_lock lock( m_mutex);
 	ConnectionMap::const_iterator ci = m_connectionMap.find( address);
 	return ci == m_connectionMap.end() ? WebRequestDelegateConnectionRef() : ci->second;
 }
 
-void WebRequestDelegateConnectionPool::setConnection( const std::string& address, const WebRequestDelegateConnectionRef& ref)
+void WebRequestDelegateConnector::setConnection( const std::string& address, const WebRequestDelegateConnectionRef& ref)
 {
 	strus::unique_lock lock( m_mutex);
 	m_connectionMap[ address] = ref;
 }
 
-WebRequestDelegateConnectionRef WebRequestDelegateConnectionPool::getOrCreateConnection( const std::string& address)
+WebRequestDelegateConnectionRef WebRequestDelegateConnector::getOrCreateConnection( const std::string& address)
 {
 	WebRequestDelegateConnectionRef rt = getConnection( address);
 	if (!rt.get())
@@ -294,7 +294,7 @@ WebRequestDelegateConnectionRef WebRequestDelegateConnectionPool::getOrCreateCon
 	return rt;
 }
 
-void WebRequestDelegateConnectionPool::send( const std::string& address_, const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
+void WebRequestDelegateConnector::send( const std::string& address_, const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
 {
 	WebRequestDelegateConnectionRef conn;
 	try

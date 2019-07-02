@@ -243,7 +243,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_transactionPool( ::time(NULL), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
 	,m_eventLoop( std::max( maxIdleTime_/20, 10)/*timeout*/, new EventLoopLogger(logger_), new EventLoopTicker(this), maxDelegateTotalConn_, maxDelegateHostConn_)
-	,m_connPool(&m_eventLoop)
+	,m_connector(&m_eventLoop)
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
 	if (!m_impl) throw std::bad_alloc();
@@ -547,7 +547,7 @@ bool WebRequestHandler::delegateRequest(
 	try
 	{
 		strus::shared_ptr<WebRequestDelegateContextInterface> receiver( context);
-		m_connPool.send( address, method, content, receiver);
+		m_connector.send( address, method, content, receiver);
 		return true;
 	}
 	catch (...)
@@ -605,7 +605,7 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 			}
 			std::string contentstr( di->content().str(), di->content().len());
 			strus::shared_ptr<WebRequestDelegateContextInterface> receiver( new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));
-			m_connPool.send( di->url(), di->method(), contentstr, receiver);
+			m_connector.send( di->url(), di->method(), contentstr, receiver);
 		}
 		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
 	}

@@ -5,14 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/// \brief Implementation of the context of a delegated request (sub request to another server)
-/// \file "webRequestDelegateConnection.hpp"
-#ifndef _STRUS_WEB_REQUEST_DELEGATE_CONNECTION_HPP_INCLUDED
-#define _STRUS_WEB_REQUEST_DELEGATE_CONNECTION_HPP_INCLUDED
+/// \brief Implementation of the connector for delegated request (sub request to another server)
+/// \file "webRequestDelegateConnector.hpp"
+#ifndef _STRUS_WEB_REQUEST_DELEGATE_CONNECTOR_HPP_INCLUDED
+#define _STRUS_WEB_REQUEST_DELEGATE_CONNECTOR_HPP_INCLUDED
 #include "strus/base/shared_ptr.hpp"
 #include "strus/base/filehandle.hpp"
 #include "strus/base/thread.hpp"
 #include "strus/webRequestAnswer.hpp"
+#include "strus/webRequestDelegateConnectorInterface.hpp"
 #include "strus/errorCodes.hpp"
 #include "curlEventLoop.hpp"
 #include <curl/curl.h>
@@ -93,14 +94,15 @@ private:
 	char m_response_errbuf[ CURL_ERROR_SIZE];
 };
 
-class WebRequestDelegateConnectionPool
+class WebRequestDelegateConnector
+	:public WebRequestDelegateConnectorInterface
 {
 public:
-	explicit WebRequestDelegateConnectionPool( CurlEventLoop* eventloop_)
+	explicit WebRequestDelegateConnector( CurlEventLoop* eventloop_)
 		:m_connectionMap(),m_eventloop(eventloop_){}
-	~WebRequestDelegateConnectionPool(){}
+	virtual ~WebRequestDelegateConnector(){}
 
-	void send( const std::string& address_, const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
+	virtual void send( const std::string& address_, const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
 
 private:
 	typedef std::map<std::string,WebRequestDelegateConnectionRef> ConnectionMap;

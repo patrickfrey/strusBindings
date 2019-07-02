@@ -13,7 +13,7 @@ set( source_files
 	transaction.cpp
 	curlEventLoop.cpp
 	webRequestUtils.cpp
-	webRequestDelegateConnection.cpp
+	webRequestDelegateConnector.cpp
 	webRequestHandler.cpp
 	webRequestContext.cpp
 )
