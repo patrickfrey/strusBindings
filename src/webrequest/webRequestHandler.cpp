@@ -38,75 +38,6 @@
 
 using namespace strus;
 
-class EventLoopTicker
-	:public CurlEventLoop::Ticker
-{
-public:
-	EventLoopTicker( WebRequestHandler* webRequestHandler_)
-		:m_webRequestHandler(webRequestHandler_){}
-
-	virtual ~EventLoopTicker(){}
-
-	virtual void tick()
-	{
-		m_webRequestHandler->tick();
-	}
-
-private:
-	WebRequestHandler* m_webRequestHandler;
-};
-
-class EventLoopLogger
-	:public CurlEventLoop::Logger
-{
-public:
-	explicit EventLoopLogger( WebRequestLoggerInterface* logger_)
-		:CurlEventLoop::Logger( logLevel(logger_)),m_logger(logger_){}
-
-	virtual ~EventLoopLogger(){}
-
-	virtual void print( LogType logtype, const char* fmt, ...)
-	{
-		char msgbuf[ 1024];
-		va_list ap;
-		va_start( ap, fmt);
-		if ((int)sizeof(msgbuf) <= std::vsnprintf( msgbuf, sizeof(msgbuf), fmt, ap)) msgbuf[ sizeof(msgbuf)-1] = 0;
-		va_end( ap);
-
-		switch (logtype)
-		{
-			case LogFatal:
-				m_logger->logError( msgbuf);
-				break;
-			case LogError:
-				m_logger->logError( msgbuf);
-				break;
-			case LogWarning:
-				m_logger->logWarning( msgbuf);
-				break;
-		}
-	}
-
-private:
-	static LogType logLevel( WebRequestLoggerInterface* logger_)
-	{
-		if ((logger_->logMask() & WebRequestLoggerInterface::LogWarning) != 0)
-		{
-			return LogWarning;
-		}
-		else if ((logger_->logMask() & WebRequestLoggerInterface::LogError) != 0)
-		{
-			return LogError;
-		}
-		else
-		{
-			return LogFatal;
-		}
-	}
-private:
-	WebRequestLoggerInterface* m_logger;
-};
-
 struct MethodDescription
 {
 	enum {MaxNofArgs=8};
@@ -225,15 +156,19 @@ public:
 
 static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","queryanalyzer","inserter",0};
 
+static void tickerFunction( void* THIS)
+{
+	((WebRequestHandler*)THIS)->tick();
+}
+
 
 WebRequestHandler::WebRequestHandler(
+		WebRequestEventLoopInterface* eventLoop_,
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
 		const std::string& configstr_,
 		int maxIdleTime_,
-		int maxDelegateTotalConn_,
-		int maxDelegateHostConn_,
 		int nofTransactionsPerSeconds)
 	:m_debug_maxdepth(logger_?logger_->structDepth():0)
 	,m_logger(logger_)
@@ -242,14 +177,12 @@ WebRequestHandler::WebRequestHandler(
 	,m_html_head(html_head_)
 	,m_transactionPool( ::time(NULL), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
-	,m_eventLoop( std::max( maxIdleTime_/20, 10)/*timeout*/, new EventLoopLogger(logger_), new EventLoopTicker(this), maxDelegateTotalConn_, maxDelegateHostConn_)
-	,m_connector(&m_eventLoop)
+	,m_eventLoop( eventLoop_)
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
-	if (!m_impl) throw std::bad_alloc();
+	if (!m_impl || !m_eventLoop->addTickerEvent( this, &tickerFunction)) throw std::bad_alloc();
 
 	using namespace strus::webrequest;
-
 	try
 	{
 		namespace mt = strus::bindings::method;
@@ -371,12 +304,12 @@ bool WebRequestHandler::start()
 	m_configHandler.clearUnfinishedTransactions();
 	m_configHandler.deleteObsoleteConfigurations();
 
-	return m_eventLoop.start();
+	return m_eventLoop->start();
 }
 
 void WebRequestHandler::stop()
 {
-	m_eventLoop.stop();
+	m_eventLoop->stop();
 }
 
 static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
@@ -489,7 +422,7 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir) const
 
 void WebRequestHandler::clear()
 {
-	m_eventLoop.stop();
+	m_eventLoop->stop();
 	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
 }
 
@@ -544,15 +477,7 @@ bool WebRequestHandler::delegateRequest(
 		const std::string& content,
 		WebRequestDelegateContextInterface* context)
 {
-	try
-	{
-		m_connector.send( address, method, content, context);
-		return true;
-	}
-	catch (...)
-	{
-		return false;
-	}
+	return m_eventLoop->send( address, method, content, context);
 }
 
 void WebRequestHandler::tick()
@@ -603,7 +528,7 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 				throw strus::runtime_error( _TXT("expected delegate request to be JSON/UTF-8"));
 			}
 			std::string contentstr( di->content().str(), di->content().len());
-			m_connector.send(
+			m_eventLoop->send(
 				di->url(), di->method(), contentstr,
 				new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));
 		}

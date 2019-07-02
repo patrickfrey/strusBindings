@@ -7,6 +7,11 @@
  */
 /// \brief Periodic timer event
 #include "curlEventLoop.hpp"
+#include "strus/webRequestDelegateContextInterface.hpp"
+#include "strus/webRequestAnswer.hpp"
+#include "strus/webRequestLoggerInterface.hpp"
+#include "strus/base/shared_ptr.hpp"
+#include "strus/base/thread.hpp"
 #include "strus/base/atomic.hpp"
 #include "strus/base/bitset.hpp"
 #include "strus/base/string_format.hpp"
@@ -14,7 +19,10 @@
 #include "strus/reference.hpp"
 #include "private/internationalization.hpp"
 #include "private/errorUtils.hpp"
+#include <stdexcept>
+#include <new>
 #include <queue>
+#include <curl/curl.h>
 #include <ctime>
 #include <map>
 #include <unistd.h>
@@ -56,6 +64,131 @@ static size_t std_string_append_callback(char *ptr, size_t size, size_t nmemb, v
 	}
 	return nn;
 }
+
+class Logger {
+public:
+	enum LogType {LogFatal,LogError,LogWarning};
+
+	explicit Logger( WebRequestLoggerInterface* logger_)
+		:m_logger(logger_),m_loglevel(evalLogLevel( logger_)){}
+	~Logger(){}
+
+	void print( LogType logtype, const char* fmt, ...)
+	{
+		char msgbuf[ 1024];
+		va_list ap;
+		va_start( ap, fmt);
+		if ((int)sizeof(msgbuf) <= std::vsnprintf( msgbuf, sizeof(msgbuf), fmt, ap)) msgbuf[ sizeof(msgbuf)-1] = 0;
+		va_end( ap);
+
+		switch (logtype)
+		{
+			case LogFatal:
+				m_logger->logError( msgbuf);
+				break;
+			case LogError:
+				m_logger->logError( msgbuf);
+				break;
+			case LogWarning:
+				m_logger->logWarning( msgbuf);
+				break;
+		}
+	}
+
+	LogType loglevel() const	{return m_loglevel;}
+
+private:
+	static LogType evalLogLevel( WebRequestLoggerInterface* logger_)
+	{
+		if ((logger_->logMask() & WebRequestLoggerInterface::LogWarning) != 0)
+		{
+			return LogWarning;
+		}
+		else if ((logger_->logMask() & WebRequestLoggerInterface::LogError) != 0)
+		{
+			return LogError;
+		}
+		else
+		{
+			return LogFatal;
+		}
+	}
+private:
+	WebRequestLoggerInterface* m_logger;
+	LogType m_loglevel;
+};
+
+
+struct WebRequestDelegateData
+{
+	std::string method;
+	std::string content;
+	strus::shared_ptr<WebRequestDelegateContextInterface> receiver;
+
+	WebRequestDelegateData( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
+		:method(method_),content(content_),receiver(receiver_){}
+	WebRequestDelegateData( const WebRequestDelegateData& o)
+		:method(o.method),content(o.content),receiver(o.receiver){}
+};
+
+typedef strus::shared_ptr<WebRequestDelegateData> WebRequestDelegateDataRef;
+
+class WebRequestDelegateConnection
+{
+public:
+	WebRequestDelegateConnection( const std::string& address, CurlEventLoop::Data* eventloopdata_);
+	~WebRequestDelegateConnection();
+
+	void push( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
+	WebRequestDelegateDataRef fetchNewIfNotProcessing();
+
+	void reconnect();
+	void done();
+	void dropAllPendingRequests( const char* errmsg);
+
+	CURL* handle() const {return m_curl;}
+
+private:
+	enum State {Init,Connected,Process};
+
+private:
+	CURL* m_curl;
+	std::string m_url;
+	int m_port;
+	State m_state;
+	strus::mutex m_mutex;
+	std::queue<WebRequestDelegateDataRef> m_requestQueue;
+	CurlEventLoop::Data* m_eventloopdata;
+
+private:
+	void connect();
+};
+
+typedef strus::shared_ptr<WebRequestDelegateConnection> WebRequestDelegateConnectionRef;
+typedef strus::shared_ptr<WebRequestDelegateContextInterface> WebRequestDelegateContextRef;
+
+
+class WebRequestDelegateJob
+{
+public:
+	WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop::Data* eventloopdata_);
+
+	~WebRequestDelegateJob(){}
+	void resume( CURLcode ec);
+	void feedNextJobForThisConnection();
+
+public:
+	CURL* handle() const {return m_handle;}
+
+private:
+	CURL* m_handle;
+	WebRequestDelegateConnectionRef m_conn;
+	WebRequestDelegateDataRef m_data;
+	CurlEventLoop::Data* m_eventloopdata;
+
+	std::string m_response_content;
+	char m_response_errbuf[ CURL_ERROR_SIZE];
+};
 
 struct WebRequestDelegateConnectionGlobals
 {
@@ -122,14 +255,14 @@ void WebRequestDelegateConnection::connect()
 	m_state = Connected;
 }
 
-WebRequestDelegateConnection::WebRequestDelegateConnection( const std::string& address, CurlEventLoop* eventloop_)
+WebRequestDelegateConnection::WebRequestDelegateConnection( const std::string& address, CurlEventLoop::Data* eventloopdata_)
 	:m_curl(NULL)
 	,m_url()
 	,m_port(80)
 	,m_state(Init)
 	,m_mutex()
 	,m_requestQueue()
-	,m_eventloop(eventloop_)
+	,m_eventloopdata(eventloopdata_)
 {
 	parseAddress( address, m_url, m_port);
 	connect();
@@ -145,7 +278,7 @@ void WebRequestDelegateConnection::push( const std::string& method_, const std::
 	m_requestQueue.push( WebRequestDelegateDataRef( new WebRequestDelegateData( method_, content_, receiver_)));
 }
 
-WebRequestDelegateDataRef WebRequestDelegateConnection::fetch()
+WebRequestDelegateDataRef WebRequestDelegateConnection::fetchNewIfNotProcessing()
 {
 	strus::unique_lock lock( m_mutex);
 	if (m_state == Connected && !m_requestQueue.empty())
@@ -212,82 +345,19 @@ WebRequestDelegateConnection::~WebRequestDelegateConnection()
 	if (m_curl) curl_easy_cleanup( m_curl);
 }
 
-WebRequestDelegateJob::WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop* eventloop_)
-	:m_handle(conn_->handle())
-	,m_conn(conn_),m_data(data_),m_eventloop(eventloop_)
-	,m_response_content()
-{
-	m_response_errbuf[0] = '\0';
-	CURL* curl = conn_->handle();
-
-	set_curl_opt( curl, CURLOPT_POSTFIELDSIZE, m_data->content.size());
-	set_curl_opt( curl, CURLOPT_POSTFIELDS, m_data->content.c_str());
-	set_curl_opt( curl, CURLOPT_WRITEDATA, &m_response_content);
-	set_curl_opt( curl, CURLOPT_WRITEFUNCTION, std_string_append_callback); 
-	set_curl_opt( curl, CURLOPT_FAILONERROR, 0);
-	set_curl_opt( curl, CURLOPT_ERRORBUFFER, m_response_errbuf);
-	set_curl_opt( curl, CURLOPT_CUSTOMREQUEST, m_data->method.c_str());
-}
-
-void WebRequestDelegateJob::resume( CURLcode ec)
-{
-	try
-	{
-		CURL* curl = m_conn->handle();
-		if (ec == CURLE_OK)
-		{
-			long http_code = 0;
-			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
-			WebRequestContent answerContent( "UTF-8", "application/json", m_response_content.c_str(), m_response_content.size());
-			WebRequestAnswer answer( "", http_code, 0/*apperrorcode*/, answerContent);
-			m_data->receiver->putAnswer( answer);
-			m_conn->done();
-		}
-		else
-		{
-			long http_code = 500;
-			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
-			WebRequestAnswer answer( m_response_errbuf, http_code, ErrorCodeDelegateRequestFailed);
-			m_data->receiver->putAnswer( answer);
-			m_conn->reconnect();
-			m_data->receiver.reset();
-		}
-		WebRequestDelegateDataRef next = m_conn->fetch();
-		if (next.get())
-		{
-			(void)m_eventloop->pushJob( new WebRequestDelegateJob( m_conn, next, m_eventloop));
-		}
-	}
-	catch (const std::runtime_error& err)
-	{
-		m_eventloop->handleException( err.what());
-		m_conn->dropAllPendingRequests( err.what());
-	}
-	catch (const std::bad_alloc& )
-	{
-		m_eventloop->handleException( _TXT("memory allocation error"));
-		m_conn->dropAllPendingRequests( _TXT("memory allocation error"));
-	}
-	catch (...)
-	{
-		m_eventloop->handleException( _TXT("unexpected exception"));
-		m_conn->dropAllPendingRequests( _TXT("unexpected exception"));
-	}
-}
-
-typedef strus::Reference<WebRequestDelegateJob> JobRef;
-typedef strus::Reference<CurlEventLoop::Ticker> TickerRef;
-typedef strus::Reference<CurlEventLoop::Logger> LoggerRef;
+typedef strus::Reference<WebRequestDelegateJob> WebRequestDelegateJobRef;
+typedef std::map<std::string,WebRequestDelegateConnectionRef> ConnectionMap;
 
 struct CurlEventLoop::Data
 {
-	explicit Data( int secondsPeriod_, Logger* logger_, Ticker* ticker_, int max_total_conn, int max_host_conn)
+	explicit Data( WebRequestLoggerInterface* logger_, int secondsPeriod_, int max_total_conn, int max_host_conn)
 		:m_multi_handle(0)
-		,m_mutex()
 		,m_thread(0)
-		,m_waitingList()
+		,m_waitingList(),m_waitingList_mutex()
 		,m_activatedMap()
-		,m_ticker(ticker_)
+		,m_tickerar()
+		,m_logger(logger_)
+		,m_connectionMap(),m_connectionMap_mutex()
 		,m_milliSecondsPeriod(secondsPeriod_*1000)
 		,m_requestCount(0)
 		,m_numberOfRequestsBeforeTick(secondsPeriod_*NumberOfRequestsBeforeTick)
@@ -316,12 +386,36 @@ struct CurlEventLoop::Data
 		::close( m_pipfd[0]);
 		::close( m_pipfd[1]);
 		curl_easy_cleanup( m_pip_handle);
-		std::map<CURL*,JobRef>::iterator ai = m_activatedMap.begin(), ae = m_activatedMap.end();
+		std::map<CURL*,WebRequestDelegateJobRef>::iterator ai = m_activatedMap.begin(), ae = m_activatedMap.end();
 		for (; ai != ae; ++ai)
 		{
 			curl_multi_remove_handle( m_multi_handle, ai->first);
 		}
 		curl_multi_cleanup( m_multi_handle);
+	}
+
+	
+	WebRequestDelegateConnectionRef getConnection( const std::string& address)
+	{
+		strus::unique_lock lock( m_connectionMap_mutex);
+		ConnectionMap::const_iterator ci = m_connectionMap.find( address);
+		return ci == m_connectionMap.end() ? WebRequestDelegateConnectionRef() : ci->second;
+	}
+
+	WebRequestDelegateConnectionRef getOrCreateConnection( const std::string& address)
+	{
+		strus::unique_lock lock( m_connectionMap_mutex);
+		ConnectionMap::const_iterator ci = m_connectionMap.find( address);
+		if (ci == m_connectionMap.end())
+		{
+			WebRequestDelegateConnectionRef rt( new WebRequestDelegateConnection( address, this));
+			m_connectionMap[ address] = rt;
+			return rt;
+		}
+		else
+		{
+			return ci->second;
+		}
 	}
 
 	void openSelfSignalingPipe()
@@ -403,34 +497,93 @@ struct CurlEventLoop::Data
 
 	void handleException( const char* msg)
 	{
-		m_logger->print( CurlEventLoop::Logger::LogFatal, _TXT("connection exception: %s"), msg);
+		m_logger.print( Logger::LogFatal, _TXT("connection exception: %s"), msg);
 		notify();
 	}
 
-	bool pushJob( const JobRef& job)
+	void pushJob( const WebRequestDelegateJobRef& job)
 	{
+		{
+			strus::unique_lock lock( m_waitingList_mutex);
+			m_waitingList.push_back( job);
+		}
+		notify();
+	}
+
+	bool send(
+		const std::string& address,
+		const std::string& method,
+		const std::string& content,
+		WebRequestDelegateContextInterface* receiver)
+	{
+		WebRequestDelegateConnectionRef conn;
 		try
 		{
-			strus::unique_lock lock( m_mutex);
-			m_waitingList.push_back( job);
-			notify();
+			strus::shared_ptr<WebRequestDelegateContextInterface> receiverRef( receiver);
+			conn = getOrCreateConnection( address);
+			conn->push( method, content, receiverRef);
+			WebRequestDelegateDataRef data( conn->fetchNewIfNotProcessing());
+			if (data.get())
+			{
+				WebRequestDelegateJobRef job( new WebRequestDelegateJob( conn, data, this));
+				pushJob( job);
+			}
 			return true;
+		}
+		catch (const std::runtime_error& err)
+		{
+			WebRequestAnswer answer( err.what(), 500, ErrorCodeDelegateRequestFailed);
+			receiver->putAnswer( answer);
+			handleException( err.what());
+			if (conn.get()) conn->dropAllPendingRequests(  err.what());
+			return false;
+		}
+		catch (const std::bad_alloc& )
+		{
+			WebRequestAnswer answer( _TXT("memory allocation error"), 500, ErrorCodeOutOfMem);
+			receiver->putAnswer( answer);
+			handleException( _TXT("memory allocation error"));
+			if (conn.get()) conn->dropAllPendingRequests( _TXT("memory allocation error"));
+			return false;
 		}
 		catch (...)
 		{
+			WebRequestAnswer answer( _TXT("unexpected exception"), 500, ErrorCodeDelegateRequestFailed);
+			receiver->putAnswer( answer);
+			handleException( _TXT("unexpected exception"));
+			if (conn.get()) conn->dropAllPendingRequests( _TXT("unexpected exception"));
 			return false;
 		}
 	}
 
+	typedef std::pair<WebRequestEventLoopInterface::TickerFunction,void*> TickerFunctionDef;
+
+	bool addTickerEvent( void* obj, WebRequestEventLoopInterface::TickerFunction func)
+	{
+		try
+		{
+			m_tickerar.push_back( TickerFunctionDef( func, obj));
+			return true;
+		}
+		catch (const std::bad_alloc&)
+		{
+			return false;
+		}
+	}
+	
 	void tick()
 	{
-		m_ticker->tick();
+		std::vector<TickerFunctionDef>::const_iterator ti = m_tickerar.begin(), te = m_tickerar.end();
+		for (; ti != te; ++ti)
+		{
+			ti->first( ti->second);
+		}
 	}
 
 	void activateIdleJobs()
 	{
-		strus::unique_lock lock( m_mutex);
-		std::vector<JobRef>::iterator wi = m_waitingList.begin(), we = m_waitingList.end();
+		strus::unique_lock lock( m_waitingList_mutex);
+		std::vector<WebRequestDelegateJobRef>::iterator wi = m_waitingList.begin(), we = m_waitingList.end();
 		for (; wi != we; ++wi)
 		{
 			CURLMcode ec = curl_multi_add_handle( m_multi_handle, (*wi)->handle());
@@ -444,12 +597,11 @@ struct CurlEventLoop::Data
 		m_waitingList.clear();
 	}
 
-	JobRef fetchJob( CURL* handle)
+	WebRequestDelegateJobRef fetchJob( CURL* handle)
 	{
-		strus::unique_lock lock( m_mutex);
-		std::map<CURL*,JobRef>::iterator ai = m_activatedMap.find( handle);
-		if (ai == m_activatedMap.end()) return JobRef();
-		JobRef rt = ai->second;
+		std::map<CURL*,WebRequestDelegateJobRef>::iterator ai = m_activatedMap.find( handle);
+		if (ai == m_activatedMap.end()) return WebRequestDelegateJobRef();
+		WebRequestDelegateJobRef rt = ai->second;
 		m_activatedMap.erase( ai);
 		return rt;
 	}
@@ -502,9 +654,9 @@ struct CurlEventLoop::Data
 	{
 		if (ec != CURLM_OK)
 		{
-			if (CurlEventLoop::Logger::LogError <= m_logger->loglevel())
+			if (Logger::LogError <= m_logger.loglevel())
 			{
-				m_logger->print( CurlEventLoop::Logger::LogError, _TXT("error in %s: %s"), context, curl_multi_strerror(ec));
+				m_logger.print( Logger::LogError, _TXT("error in %s: %s"), context, curl_multi_strerror(ec));
 			}
 		}
 	}
@@ -545,12 +697,12 @@ struct CurlEventLoop::Data
 					}
 					else if (msg->msg == CURLMSG_DONE)
 					{
-						JobRef job = fetchJob( msg->easy_handle);
+						WebRequestDelegateJobRef job = fetchJob( msg->easy_handle);
 						if (!job.get())
 						{
-							if (CurlEventLoop::Logger::LogError <= m_logger->loglevel())
+							if (Logger::LogError <= m_logger.loglevel())
 							{
-								m_logger->print( CurlEventLoop::Logger::LogError, _TXT("logic error: lost handle"));
+								m_logger.print( Logger::LogError, _TXT("logic error: lost handle"));
 							}
 						}
 						else
@@ -563,42 +715,114 @@ struct CurlEventLoop::Data
 			}
 			catch (const std::runtime_error& err)
 			{
-				if (CurlEventLoop::Logger::LogFatal <= m_logger->loglevel())
+				if (Logger::LogFatal <= m_logger.loglevel())
 				{
-					m_logger->print( CurlEventLoop::Logger::LogFatal, _TXT("runtime error in CURL event loop: %s"), err.what());
+					m_logger.print( Logger::LogFatal, _TXT("runtime error in CURL event loop: %s"), err.what());
 				}
 			}
 			catch (const std::bad_alloc& err)
 			{
-				if (CurlEventLoop::Logger::LogFatal <= m_logger->loglevel())
+				if (Logger::LogFatal <= m_logger.loglevel())
 				{
-					m_logger->print( CurlEventLoop::Logger::LogFatal, _TXT("out of memory in CURL event loop"));
+					m_logger.print( Logger::LogFatal, _TXT("out of memory in CURL event loop"));
 				}
 			}
 		}
 	}
 
 private:
-	CURLM* m_multi_handle;
-	strus::mutex m_mutex;
-	strus::thread* m_thread;
-	std::vector<JobRef> m_waitingList;
-	std::map<CURL*,JobRef> m_activatedMap;
-	TickerRef m_ticker;
-	LoggerRef m_logger;
-	int m_milliSecondsPeriod;
-	int m_requestCount;
-	int m_numberOfRequestsBeforeTick;
-	AtomicFlag m_terminate;
-	int m_pipfd[2];				//< pipe to listen for queue events in select: "self pipe trick"
-	curl_socket_t m_pipcurlfd;		//< copy of read end of m_pipfd
-	CURL* m_pip_handle;			//< CURL handle corresponding to pipe
+	CURLM* m_multi_handle;					//< handle to listen for multiple connections simultaneously
+	strus::thread* m_thread;				//< background thread of the eventloop 
+	std::vector<WebRequestDelegateJobRef> m_waitingList;	//< list of jobs in the queue to process
+	strus::mutex m_waitingList_mutex;			//< mutex for job queue monitor
+	std::map<CURL*,WebRequestDelegateJobRef> m_activatedMap;//< map of jobs bound to a cURL handle
+	std::vector<TickerFunctionDef> m_tickerar;		//< tickers to call after timeout or a number of requests
+	Logger m_logger;					//< logger for logging
+	ConnectionMap m_connectionMap;				//< map of connections
+	strus::mutex m_connectionMap_mutex;			//< mutex for connection map monitor
+	int m_milliSecondsPeriod;				//< milliseconds to wait for a request until a timeout is signalled
+	int m_requestCount;					//< counter of subsequent requests signalled without timeout
+	int m_numberOfRequestsBeforeTick;			//< number of times a wait on a request or a timeout is interrupted by a request before a tick is inserted that normally occurrs on a timeout
+	AtomicFlag m_terminate;					//< flag that determines the termination of the eventloop
+	int m_pipfd[2];						//< pipe to listen for queue events in select: "self pipe trick"
+	curl_socket_t m_pipcurlfd;				//< copy of read end of m_pipfd
+	CURL* m_pip_handle;					//< CURL handle for listener on the pipe used for notifying new incoming requests
 };
 
 
-CurlEventLoop::CurlEventLoop( int secondsPeriod_, Logger* logger_, Ticker* ticker_, int max_total_conn, int max_host_conn)
+WebRequestDelegateJob::WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop::Data* eventloopdata_)
+	:m_handle(conn_->handle())
+	,m_conn(conn_),m_data(data_),m_eventloopdata(eventloopdata_)
+	,m_response_content()
 {
-	m_data = new Data( secondsPeriod_, logger_, ticker_, max_total_conn, max_host_conn);
+	m_response_errbuf[0] = '\0';
+	CURL* curl = conn_->handle();
+
+	set_curl_opt( curl, CURLOPT_POSTFIELDSIZE, m_data->content.size());
+	set_curl_opt( curl, CURLOPT_POSTFIELDS, m_data->content.c_str());
+	set_curl_opt( curl, CURLOPT_WRITEDATA, &m_response_content);
+	set_curl_opt( curl, CURLOPT_WRITEFUNCTION, std_string_append_callback); 
+	set_curl_opt( curl, CURLOPT_FAILONERROR, 0);
+	set_curl_opt( curl, CURLOPT_ERRORBUFFER, m_response_errbuf);
+	set_curl_opt( curl, CURLOPT_CUSTOMREQUEST, m_data->method.c_str());
+}
+
+void WebRequestDelegateJob::resume( CURLcode ec)
+{
+	try
+	{
+		CURL* curl = m_conn->handle();
+		if (ec == CURLE_OK)
+		{
+			long http_code = 0;
+			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
+			WebRequestContent answerContent( "UTF-8", "application/json", m_response_content.c_str(), m_response_content.size());
+			WebRequestAnswer answer( "", http_code, 0/*apperrorcode*/, answerContent);
+			m_data->receiver->putAnswer( answer);
+			m_conn->done();
+		}
+		else
+		{
+			long http_code = 500;
+			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
+			WebRequestAnswer answer( m_response_errbuf, http_code, ErrorCodeDelegateRequestFailed);
+			m_data->receiver->putAnswer( answer);
+			m_conn->reconnect();
+			m_data->receiver.reset();
+		}
+		feedNextJobForThisConnection();
+	}
+	catch (const std::runtime_error& err)
+	{
+		m_eventloopdata->handleException( err.what());
+		m_conn->dropAllPendingRequests( err.what());
+	}
+	catch (const std::bad_alloc& )
+	{
+		m_eventloopdata->handleException( _TXT("memory allocation error"));
+		m_conn->dropAllPendingRequests( _TXT("memory allocation error"));
+	}
+	catch (...)
+	{
+		m_eventloopdata->handleException( _TXT("unexpected exception"));
+		m_conn->dropAllPendingRequests( _TXT("unexpected exception"));
+	}
+}
+
+void WebRequestDelegateJob::feedNextJobForThisConnection()
+{
+	WebRequestDelegateDataRef next = m_conn->fetchNewIfNotProcessing();
+	if (next.get())
+	{
+		WebRequestDelegateJobRef job( new WebRequestDelegateJob( m_conn, next, m_eventloopdata));
+		m_eventloopdata->pushJob( job);
+	}
+}
+
+
+CurlEventLoop::CurlEventLoop( WebRequestLoggerInterface* logger_, int secondsPeriod_, int max_total_conn, int max_host_conn)
+{
+	m_data = new Data( logger_, secondsPeriod_, max_total_conn, max_host_conn);
 }
 
 CurlEventLoop::~CurlEventLoop()
@@ -630,9 +854,18 @@ void CurlEventLoop::stop()
 	m_data->stop();
 }
 
-bool CurlEventLoop::pushJob( WebRequestDelegateJob* job)
+bool CurlEventLoop::send(
+		const std::string& address,
+		const std::string& method,
+		const std::string& content,
+		WebRequestDelegateContextInterface* receiver)
 {
-	return m_data->pushJob( job);
+	return m_data->send( address, method, content, receiver);
+}
+
+bool CurlEventLoop::addTickerEvent( void* obj, TickerFunction func)
+{
+	return m_data->addTickerEvent( obj, func);
 }
 
 void CurlEventLoop::handleException( const char* msg)

@@ -21,27 +21,37 @@ class WebRequestHandlerInterface;
 /// \brief Forward declaration
 class WebRequestLoggerInterface;
 /// \brief Forward declaration
+class WebRequestEventLoopInterface;
+/// \brief Forward declaration
 class ErrorBufferInterface;
 
+/// \brief Create an eventloop interface for handling delegated sub requests to other webservices and some timer events
+/// \param[in] logger interface for logging
+/// \param[in] timeout timeout in seconds to wait for request and initiating ticker event
+/// \param[in] maxDelegateTotalConn max simultaneously open connections to delegate sub requests
+/// \param[in] maxDelegateHostConn set max number of simultaneous delegate request connections to a single host
+/// \param[in] errorhnd error buffer interface to use for reporting errors of this function
+/// \return pointer to evenmt loop in case of success, NULL in case of an error
+WebRequestEventLoopInterface* createCurlEventLoop( WebRequestLoggerInterface* logger, int timeout, int maxDelegateTotalConn, int maxDelegateHostConn, ErrorBufferInterface* errorhnd);
+
+
 /// \brief Create a web request handler
+/// \param[in] eventloop event loop interface for timer events and delegating sub requests (no ownership)
 /// \param[in] request logger interface (no ownership)
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
 /// \param[in] config main configuration
 /// \param[in] maxIdleTime maximum time of keepalive for untouched transactions in seconds
-/// \param[in] maxDelegateTotalConn max simultaneously open connections to delegate sub requests
-/// \param[in] maxDelegateHostConn set max number of simultaneous delegate request connections to a single host
 /// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxIdleTime
 /// \param[in] errorhnd error buffer interface to use
 /// \return pointer to handler in case of success, NULL in case of memory allocation error
 WebRequestHandlerInterface* createWebRequestHandler(
+		WebRequestEventLoopInterface* eventloop,
 		WebRequestLoggerInterface* logger,
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& config,
 		int maxIdleTime,
-		int maxDelegateTotalConn,
-		int maxDelegateHostConn,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd);
 

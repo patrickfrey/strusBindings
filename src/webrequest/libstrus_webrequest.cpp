@@ -15,6 +15,7 @@
 #include "strus/webRequestHandlerInterface.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
+#include "curlEventLoop.hpp"
 #include "private/internationalization.hpp"
 #include "papuga/valueVariant.h"
 #include "papuga/encoding.h"
@@ -44,22 +45,58 @@ public:
 	virtual void logError( const char* errmsg){}
 };
 
+class WebRequestEventLoop_null
+	:public WebRequestEventLoopInterface
+{
+public:
+	virtual ~WebRequestEventLoop_null(){}
+
+	virtual bool start(){return false;}
+	virtual void stop(){}
+	virtual bool send( const std::string& address,
+			const std::string& method,
+			const std::string& content,
+			WebRequestDelegateContextInterface* receiver) {return false;}
+	virtual bool addTickerEvent( void* obj, TickerFunction func)  {return true;}
+	virtual void handleException( const char* msg) {}
+};
+
 static WebRequestLogger_null g_logger_null;
+static WebRequestEventLoop_null g_eventlopp_null;
+
+
+DLL_PUBLIC WebRequestEventLoopInterface* createCurlEventLoop( WebRequestLoggerInterface* logger, int timeout, int maxDelegateTotalConn, int maxDelegateHostConn, ErrorBufferInterface* errorhnd)
+{
+	try
+	{
+		return new CurlEventLoop( logger, timeout, maxDelegateTotalConn, maxDelegateHostConn);
+	}
+	catch (const std::bad_alloc&)
+	{
+		errorhnd->report( ErrorCodeOutOfMem, _TXT("out of memory"));
+		return NULL;
+	}
+	catch (const std::runtime_error& err)
+	{
+		errorhnd->report( ErrorCodeRuntimeError, _TXT("error creating web request handler: %s"), err.what());
+		return NULL;
+	}
+}
 
 DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
+		WebRequestEventLoopInterface* eventloop,
 		WebRequestLoggerInterface* logger,
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& config,
 		int maxIdleTime,
-		int maxDelegateTotalConn,
-		int maxDelegateHostConn,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd)
 {
 	try
 	{
-		return new WebRequestHandler( logger ? logger:&g_logger_null, html_head, config_store_dir, config, maxIdleTime, maxDelegateTotalConn,maxDelegateHostConn, nofTransactionsPerSeconds);
+		if (!logger) logger = &g_logger_null;
+		return new WebRequestHandler( eventloop, logger, html_head, config_store_dir, config, maxIdleTime, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -77,7 +114,7 @@ DLL_PUBLIC bool strus::storeWebRequestSchemaDescriptions( const std::string& con
 {
 	try
 	{
-		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_logger_null, "", "./"/*config_store_dir*/, config, 30/*maxIdleTime*/, 0/*maxDelegateTotalConn*/, 0/*maxDelegateHostConn*/, 1/*nofTransactionsPerSeconds*/));
+		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_eventlopp_null, &g_logger_null, "", "./"/*config_store_dir*/, config, 30/*maxIdleTime*/, 1/*nofTransactionsPerSeconds*/));
 		hnd->storeSchemaDescriptions( dir, doctype);
 		return true;
 	}

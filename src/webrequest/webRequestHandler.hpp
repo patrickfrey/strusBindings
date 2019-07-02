@@ -16,7 +16,6 @@
 #include "papuga/requestLogger.h"
 #include "transaction.hpp"
 #include "curlEventLoop.hpp"
-#include "webRequestDelegateConnector.hpp"
 #include <cstddef>
 #include <utility>
 #include <set>
@@ -29,6 +28,8 @@ namespace strus
 class WebRequestLoggerInterface;
 /// \brief Forward declaration
 class WebRequestContext;
+/// \brief Forward declaration
+class WebRequestEventLoopInterface;
 
 /// \brief Implementation of the interface for executing XML/JSON requests on the strus bindings
 class WebRequestHandler
@@ -36,13 +37,12 @@ class WebRequestHandler
 {
 public:
 	WebRequestHandler(
+			WebRequestEventLoopInterface* eventloop_,
 			WebRequestLoggerInterface* logger_,
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
 			const std::string& configstr_,
 			int maxIdleTime_,
-			int maxDelegateTotalConn_,
-			int maxDelegateHostConn_,
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 
@@ -99,8 +99,7 @@ private:
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
-	CurlEventLoop m_eventLoop;			//< queue for requests to other servers and periodic timer event to handle timeout of transactions
-	WebRequestDelegateConnector m_connector;	//< connection pool for sending delegate requests
+	WebRequestEventLoopInterface* m_eventLoop;	//< queue for requests to other servers and periodic timer event to handle timeout of transactions
 };
 
 }//namespace
