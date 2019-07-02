@@ -9,11 +9,91 @@
 /// \file "curlEventLoop.hpp"
 #ifndef _STRUS_CURL_EVENT_LOOP_HPP_INCLUDED
 #define _STRUS_CURL_EVENT_LOOP_HPP_INCLUDED
+#include "strus/webRequestAnswer.hpp"
+#include "strus/webRequestDelegateConnectorInterface.hpp"
+#include "strus/webRequestDelegateContextInterface.hpp"
+#include "strus/base/shared_ptr.hpp"
+#include "strus/base/thread.hpp"
 #include <stdexcept>
 #include <new>
+#include <queue>
 #include <curl/curl.h>
 
 namespace strus {
+
+/// \brief Forward declaration
+class CurlEventLoop;
+
+struct WebRequestDelegateData
+{
+	std::string method;
+	std::string content;
+	strus::shared_ptr<WebRequestDelegateContextInterface> receiver;
+
+	WebRequestDelegateData( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_)
+		:method(method_),content(content_),receiver(receiver_){}
+	WebRequestDelegateData( const WebRequestDelegateData& o)
+		:method(o.method),content(o.content),receiver(o.receiver){}
+};
+
+typedef strus::shared_ptr<WebRequestDelegateData> WebRequestDelegateDataRef;
+
+
+class WebRequestDelegateConnection
+{
+public:
+	WebRequestDelegateConnection( const std::string& address, CurlEventLoop* eventloop_);
+	~WebRequestDelegateConnection();
+
+	void push( const std::string& method_, const std::string& content_, const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver_);
+	WebRequestDelegateDataRef fetch();
+
+	void reconnect();
+	void done();
+	void dropAllPendingRequests( const char* errmsg);
+
+	CURL* handle() const {return m_curl;}
+
+private:
+	enum State {Init,Connected,Process};
+
+private:
+	CURL* m_curl;
+	std::string m_url;
+	int m_port;
+	State m_state;
+	strus::mutex m_mutex;
+	std::queue<WebRequestDelegateDataRef> m_requestQueue;
+	CurlEventLoop* m_eventloop;
+
+private:
+	void connect();
+};
+
+typedef strus::shared_ptr<WebRequestDelegateConnection> WebRequestDelegateConnectionRef;
+typedef strus::shared_ptr<WebRequestDelegateContextInterface> WebRequestDelegateContextRef;
+
+
+class WebRequestDelegateJob
+{
+public:
+	WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop* eventloop_);
+
+	~WebRequestDelegateJob(){}
+	void resume( CURLcode ec);
+
+public:
+	CURL* handle() const {return m_handle;}
+
+private:
+	CURL* m_handle;
+	WebRequestDelegateConnectionRef m_conn;
+	WebRequestDelegateDataRef m_data;
+	CurlEventLoop* m_eventloop;
+
+	std::string m_response_content;
+	char m_response_errbuf[ CURL_ERROR_SIZE];
+};
 
 /// \brief Job queue worker and periodic timer event ticker thread
 class CurlEventLoop
@@ -36,19 +116,6 @@ public:
 		LogType loglevel() const	{return m_loglevel;}
 	private:
 		LogType m_loglevel;
-	};
-	class Job {
-	public:
-		Job( CURL* handle_) :m_handle(handle_){}
-
-		virtual ~Job(){}
-		virtual void resume( CURLcode ec)=0;
-
-	public:
-		CURL* handle() const {return m_handle;}
-
-	private:
-		CURL* m_handle;
 	};
 
 	/// \brief Constructor
@@ -73,7 +140,7 @@ public:
 	/// \brief Push a new job
 	/// \param[in] job pointer to job (passed with ownership)
 	/// \return true on success, false on error
-	bool pushJob( Job* job);
+	bool pushJob( WebRequestDelegateJob* job);
 
 	/// \brief Handle an exception
 	/// \param[in] message of the exception

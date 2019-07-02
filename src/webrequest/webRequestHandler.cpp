@@ -546,8 +546,7 @@ bool WebRequestHandler::delegateRequest(
 {
 	try
 	{
-		strus::shared_ptr<WebRequestDelegateContextInterface> receiver( context);
-		m_connector.send( address, method, content, receiver);
+		m_connector.send( address, method, content, context);
 		return true;
 	}
 	catch (...)
@@ -604,8 +603,9 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 				throw strus::runtime_error( _TXT("expected delegate request to be JSON/UTF-8"));
 			}
 			std::string contentstr( di->content().str(), di->content().len());
-			strus::shared_ptr<WebRequestDelegateContextInterface> receiver( new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));
-			m_connector.send( di->url(), di->method(), contentstr, receiver);
+			m_connector.send(
+				di->url(), di->method(), contentstr,
+				new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));
 		}
 		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
 	}

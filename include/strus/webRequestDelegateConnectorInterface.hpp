@@ -22,14 +22,14 @@ public:
 	/// \param[in] address where to send the request to
 	/// \param[in] method request method
 	/// \param[in] content content of the request
-	/// \param[in] receiver delegate (callback with closure)
+	/// \param[in] receiver delegate (callback with closure) (passed with ownership)
 	/// \note Used to delegate part of a request to a sub service
 	/// \note Response is handled via a callback with a closure encapsulated in a receiver object
 	virtual void send( 
 		const std::string& address,
 		const std::string& method,
 		const std::string& content,
-		const strus::shared_ptr<WebRequestDelegateContextInterface>& receiver)=0;
+		WebRequestDelegateContextInterface* receiver)=0;
 };
 
 }//namespace
