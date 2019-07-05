@@ -420,7 +420,7 @@ const char* WebRequestContext::getResultString( papuga_RequestResult* result, st
 		case WebRequestContent::Unknown:
 		{
 			errcode = papuga_NotImplemented;
-			return false;
+			return NULL;
 		}
 		default: break;
 	}
@@ -434,8 +434,7 @@ const char* WebRequestContext::getDelegateRequestString( papuga_RequestResult* r
 	papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
 	const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
 
-	rt = (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
-	return rt;
+	return (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
 }
 
 bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
