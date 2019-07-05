@@ -299,17 +299,10 @@ WebRequestHandler::WebRequestHandler(
 	}
 }
 
-bool WebRequestHandler::start()
+void WebRequestHandler::init()
 {
 	m_configHandler.clearUnfinishedTransactions();
 	m_configHandler.deleteObsoleteConfigurations();
-
-	return m_eventLoop->start();
-}
-
-void WebRequestHandler::stop()
-{
-	m_eventLoop->stop();
 }
 
 static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
@@ -523,11 +516,7 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 		std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
 		for (; di != de; ++di)
 		{
-			if (0!=std::strcmp( di->content().charset(), accepted_charset) || 0!=std::strcmp( di->content().charset(), accepted_doctype))
-			{
-				throw strus::runtime_error( _TXT("expected delegate request to be JSON/UTF-8"));
-			}
-			std::string contentstr( di->content().str(), di->content().len());
+			std::string contentstr( di->contentstr(), di->contentlen());
 			m_eventLoop->send(
 				di->url(), di->method(), contentstr,
 				new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));

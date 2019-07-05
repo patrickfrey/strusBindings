@@ -45,7 +45,6 @@ public:
 			const char* method,
 			const char* path,
 			const WebRequestContent& content,
-			WebRequestAnswer& answer,
 			std::vector<WebRequestDelegateRequest>& delegateRequests);
 
 	virtual bool returnDelegateRequestAnswer(
@@ -53,10 +52,11 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
-	virtual bool getMessageAnswer(
+	virtual WebRequestAnswer getRequestAnswer();
+
+	virtual WebRequestAnswer buildSimpleRequestAnswer(
 			const std::string& name,
-			const std::string& message,
-			WebRequestAnswer& answer);
+			const std::string& message);
 
 	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
 	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
@@ -82,7 +82,10 @@ private:
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
-	bool getContentRequestResult( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests, const WebRequestContent& content);
+	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
+	const char* getDelegateRequestString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
+	bool getContentRequestDelegateRequests( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
+	bool getContentRequestResult( WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
@@ -109,6 +112,7 @@ private:
 	papuga_StringEncoding m_result_encoding;
 	WebRequestContent::Type m_result_doctype;
 	papuga_ErrorBuffer m_errbuf;
+	WebRequestAnswer m_answer;
 	const char* m_accepted_charset;
 	const char* m_accepted_doctype;
 	std::string m_html_base_href;

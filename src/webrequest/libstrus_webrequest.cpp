@@ -65,7 +65,7 @@ static WebRequestLogger_null g_logger_null;
 static WebRequestEventLoop_null g_eventlopp_null;
 
 
-DLL_PUBLIC WebRequestEventLoopInterface* createCurlEventLoop( WebRequestLoggerInterface* logger, int timeout, int maxDelegateTotalConn, int maxDelegateHostConn, ErrorBufferInterface* errorhnd)
+DLL_PUBLIC WebRequestEventLoopInterface* strus::createCurlEventLoop( WebRequestLoggerInterface* logger, int timeout, int maxDelegateTotalConn, int maxDelegateHostConn, ErrorBufferInterface* errorhnd)
 {
 	try
 	{

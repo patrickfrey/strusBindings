@@ -82,8 +82,10 @@ public:
 	/// \brief Application error code of the request
 	int apperror() const				{return m_apperrorcode;}
 
-	/// \brief content of the answer
+	/// \brief Get content of the answer
 	const WebRequestContent& content() const	{return m_content;}
+	/// \brief Access content of the answer
+	WebRequestContent& content()			{return m_content;}
 
 	/// \brief Set http status and reset error
 	/// \param[in] httpstatus_ http status code

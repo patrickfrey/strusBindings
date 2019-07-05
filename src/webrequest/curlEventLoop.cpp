@@ -175,6 +175,7 @@ public:
 
 	~WebRequestDelegateJob(){}
 	void resume( CURLcode ec);
+	void dropRequest( const char* errmsg);
 	void feedNextJobForThisConnection();
 
 public:
@@ -661,6 +662,26 @@ struct CurlEventLoop::Data
 		}
 	}
 
+	void dropAllPendingRequests( const char* errmsg)
+	{
+		{
+			strus::unique_lock lock( m_connectionMap_mutex);
+			ConnectionMap::iterator ci = m_connectionMap.begin(), ce = m_connectionMap.end();
+			for (; ci != ce; ++ci)
+			{
+				WebRequestDelegateConnectionRef conn = ci->second;
+				conn->dropAllPendingRequests( errmsg);
+			}
+		}{
+			std::map<CURL*,WebRequestDelegateJobRef>::iterator ai = m_activatedMap.begin(), ae = m_activatedMap.end();
+			for (; ai != ae; ++ai)
+			{
+				WebRequestDelegateJobRef job = ai->second;
+				job->dropRequest( errmsg);
+			}
+		}
+	}
+
 	void run()
 	{
 		int still_running = 1;
@@ -767,6 +788,12 @@ WebRequestDelegateJob::WebRequestDelegateJob( const WebRequestDelegateConnection
 	set_curl_opt( curl, CURLOPT_CUSTOMREQUEST, m_data->method.c_str());
 }
 
+void WebRequestDelegateJob::dropRequest( const char* errmsg)
+{
+	WebRequestAnswer answer( errmsg, 500, ErrorCodeDelegateRequestFailed);
+	m_data->receiver->putAnswer( answer);
+}
+
 void WebRequestDelegateJob::resume( CURLcode ec)
 {
 	try
@@ -834,6 +861,7 @@ CurlEventLoop::~CurlEventLoop()
 void CurlEventLoop::run()
 {
 	m_data->run();
+	m_data->dropAllPendingRequests( _TXT("service terminated"));
 }
 
 bool CurlEventLoop::start()

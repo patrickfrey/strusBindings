@@ -29,14 +29,12 @@ public:
 	/// \param[in] method request method in uppercase
 	/// \param[in] path path of the request
 	/// \param[in] content content of the request
-	/// \param[out] answer result status and the data of the answer of the request
 	/// \param[out] delegateRequests delegate requests to perform for the completion of the request
 	/// \return bool true if succeeded, false else
 	virtual bool executeRequest(
 			const char* method,
 			const char* path,
 			const WebRequestContent& content,
-			WebRequestAnswer& answer,
 			std::vector<WebRequestDelegateRequest>& delegateRequests)=0;
 
 	/// \brief Return the result of a delegate request with the name of a schema to execute to process the answer in the current context created with exewcuteRequest()
@@ -49,15 +47,17 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
+	/// \brief Get the result answer of the request executed with 'executeRequest(const char*,const char*,const WebRequestContent&,std::vector<WebRequestDelegateRequest>&)'
+	/// \return answer result status and the data of the answer of the request
+	virtual WebRequestAnswer getRequestAnswer()=0;
+
 	/// \brief Create the answer structure for a simple message string
 	/// \param[in] name key used for the message in a markup language
 	/// \param[in] message content string for the message
-	/// \param[out] answer result status and the data of the answer of the request
-	/// \return bool true if succeeded, false else
-	virtual bool getMessageAnswer(
+	/// \return answer answer structure (as error if an error occurred)
+	virtual WebRequestAnswer buildSimpleRequestAnswer(
 			const std::string& name,
-			const std::string& message,
-			WebRequestAnswer& answer)=0;
+			const std::string& message)=0;
 
 	/// \brief Load the main configuration initializing the root context object
 	/// \param[in] content content of the configuration to load

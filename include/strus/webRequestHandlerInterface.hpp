@@ -30,13 +30,9 @@ public:
 	/// \brief Destructor
 	virtual ~WebRequestHandlerInterface(){}
 
-	/// \brief Start background thread (for garbage collector or similar stuff)
-	/// \note Has to be called after constructor in the main loop if serving requests
-	virtual bool start()=0;
-
-	/// \brief Stop background thread (for garbage collector or similar stuff)
-	/// \note Has to be called after constructor in the main loop if serving requests
-	virtual void stop()=0;
+	/// \brief Do some initiali cleanup and organization
+	/// \note Has to be called after constructor
+	virtual void init()=0;
 
 	/// \brief Create the structure for handling a request
 	/// \param[in] accepted_charset HTTP header variable 'Accept-Charset', a comma separated list of character set encodings accepted by the client

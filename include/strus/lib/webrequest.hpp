@@ -32,8 +32,12 @@ class ErrorBufferInterface;
 /// \param[in] maxDelegateHostConn set max number of simultaneous delegate request connections to a single host
 /// \param[in] errorhnd error buffer interface to use for reporting errors of this function
 /// \return pointer to evenmt loop in case of success, NULL in case of an error
-WebRequestEventLoopInterface* createCurlEventLoop( WebRequestLoggerInterface* logger, int timeout, int maxDelegateTotalConn, int maxDelegateHostConn, ErrorBufferInterface* errorhnd);
-
+WebRequestEventLoopInterface* createCurlEventLoop(
+		WebRequestLoggerInterface* logger,
+		int timeout,
+		int maxDelegateTotalConn,
+		int maxDelegateHostConn,
+		ErrorBufferInterface* errorhnd);
 
 /// \brief Create a web request handler
 /// \param[in] eventloop event loop interface for timer events and delegating sub requests (no ownership)

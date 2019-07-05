@@ -46,8 +46,7 @@ public:
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 
-	virtual bool start();
-	virtual void stop();
+	virtual void init();
 
 	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
