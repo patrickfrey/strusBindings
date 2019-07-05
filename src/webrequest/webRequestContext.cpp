@@ -429,7 +429,6 @@ const char* WebRequestContext::getResultString( papuga_RequestResult* result, st
 
 const char* WebRequestContext::getDelegateRequestString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode)
 {
-	const char* rt = 0;
 	papuga_ValueVariant resultval;
 	papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
 	const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
