@@ -5,17 +5,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+#include "strus/lib/error.hpp"
+#include "strus/lib/webrequest.hpp"
 #include "strus/webRequestHandlerInterface.hpp"
 #include "strus/webRequestContextInterface.hpp"
 #include "strus/webRequestEventLoopInterface.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/webRequestDelegateContextInterface.hpp"
+#include "strus/errorBufferInterface.hpp"
+#include "strus/debugTraceInterface.hpp"
 #include "strus/reference.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/shared_ptr.hpp"
 #include "strus/base/string_format.hpp"
-#include "strus/lib/error.hpp"
+#include "strus/base/string_conv.hpp"
+#include "strus/base/numstring.hpp"
+#include "strus/base/stdint.h"
 #include "private/internationalization.hpp"
 extern "C" {
 #include "lua.h"
@@ -27,6 +33,7 @@ extern "C" {
 #include <string.h>
 #include <string>
 #include <vector>
+#include <limits>
 #include <map>
 #include <cstdbool>
 #include <iostream>
@@ -137,23 +144,25 @@ static Logger g_logger;
 static const char* g_charset = "UTF-8";
 static const char* g_doctype = "application/json";
 
+typedef std::map<std::string,std::string> Configuration;
+
 
 class Processor
 {
 public:
-	typedef std::map<std::string,std::string> Config;
-
-public:
-	Processor( const std::string& hostname_, const Config& config_)
-		:m_hostname(hostname_),m_config(config_),m_handler(){}
+	Processor( const std::string& hostname_, const Configuration& config_, const std::string& configjson_)
+		:m_hostname(hostname_),m_config(config_),m_handler(createWebRequestHandler(config_,configjson_)){}
 	Processor( const Processor& o)
 		:m_hostname(o.m_hostname),m_handler(o.m_handler){}
 
 	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& path, const strus::WebRequestContent& content);
 
 private:
+	static strus::WebRequestHandlerInterface* createWebRequestHandler( const Configuration& config_, const std::string& configjson_);
+
+private:
 	std::string m_hostname;
-	Config m_config;
+	Configuration m_config;
 	strus::shared_ptr<strus::WebRequestHandlerInterface> m_handler;
 };
 
@@ -162,9 +171,9 @@ class GlobalContext
 public:
 	GlobalContext(){}
 
-	void defineServer( const std::string& hostname, const Processor::Config& configmap)
+	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson)
 	{
-		if (m_procMap.insert( ProcMap::value_type( hostname, Processor( hostname, configmap))).second == false)
+		if (m_procMap.insert( ProcMap::value_type( hostname, Processor( hostname, configmap, configjson))).second == false)
 		{
 			reportError( _TXT("duplicate definition of server '%s'"), hostname.c_str());
 		}
@@ -183,7 +192,7 @@ class EventLoop
 {
 public:
 	EventLoop()
-		:m_tickers(),m_time(0){}
+		:m_tickers(),m_time(0),m_lastTickTime(0),m_timerEventSecondsPeriod(30){}
 
 	virtual ~EventLoop(){}
 
@@ -220,7 +229,14 @@ public:
 	void setTime( long time_)
 	{
 		m_time = time_;
+		if (m_time - m_lastTickTime >= m_timerEventSecondsPeriod)
+		{
+			m_timerEventSecondsPeriod = m_time;
+			callTickers();
+		}
 	}
+
+	void initConfiguration( const Configuration& config);
 
 public:
 	void callTickers()
@@ -236,6 +252,8 @@ private:
 	typedef std::pair<TickerFunction,void*> TickerDef;
 	std::vector<TickerDef> m_tickers;
 	long m_time;
+	long m_lastTickTime;
+	int m_timerEventSecondsPeriod;
 };
 
 class WebRequestDelegateContext
@@ -264,6 +282,8 @@ private:
 
 static GlobalContext g_globalContext;
 static EventLoop g_eventLoop;
+static strus::DebugTraceInterface* g_debugTrace = 0;
+static strus::ErrorBufferInterface* g_errorhnd = 0;
 
 static std::pair<std::string,std::string> splitUrl( const std::string& url)
 {
@@ -278,6 +298,27 @@ static std::pair<std::string,std::string> splitUrl( const std::string& url)
 	return rt;
 }
 
+static int64_t getConfigurationValue( const Configuration& config, const std::string& key, const int& defaultValue)
+{
+	Configuration::const_iterator ci = config.find( key);
+	if (ci == config.end()) return defaultValue;
+	return strus::numstring_conv::toint( ci->second, std::numeric_limits<int64_t>::max());
+}
+
+static std::string getConfigurationValue( const Configuration& config, const std::string& key, const char* defaultValue)
+{
+	Configuration::const_iterator ci = config.find( key);
+	if (ci == config.end()) return defaultValue;
+	return ci->second;
+}
+
+
+void EventLoop::initConfiguration( const Configuration& config)
+{
+	int max_idle_time = getConfigurationValue( config, "transactions.max_idle_time", 600);
+	m_timerEventSecondsPeriod = std::max( 10, max_idle_time/20);
+}
+		
 bool EventLoop::send( const std::string& address,
 		const std::string& method,
 		const std::string& contentstr,
@@ -327,6 +368,20 @@ void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status
 		m_answer->explain( msg.c_str());
 	}
 	m_requestContext.reset();
+}
+
+strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Configuration& config_, const std::string& configjson_)
+{
+	strus::WebRequestHandlerInterface* rt =
+		strus::createWebRequestHandler(
+			&g_eventLoop, &g_logger, ""/*html head*/,
+			getConfigurationValue( config_, "data.configdir", "./"),
+			configjson_,
+			getConfigurationValue( config_, "transactions.max_idle_time", 600),
+			getConfigurationValue( config_, "transactions.nof_per_sec", 60),
+			g_errorhnd);
+	if (!rt) throw strus::runtime_error( _TXT("error creating web request handler: %s"), g_errorhnd->fetchError());
+	return rt;
 }
 
 std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::string& method, const std::string& path, const strus::WebRequestContent& content)
@@ -407,7 +462,7 @@ void GlobalContext::reportError( const char* fmt, ...)
 	std::cerr << "ERROR " << msg << std::endl;
 }
 
-static void convertConfig( lua_State *L, int luaddr, Processor::Config& config, const std::string& prefix_=std::string())
+static void convertConfig_( lua_State *L, int luaddr, Configuration& config, const std::string& prefix)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -421,28 +476,90 @@ static void convertConfig( lua_State *L, int luaddr, Processor::Config& config, 
 		}
 		else if (lua_isnumber( L, -2))
 		{
-			luaL_error( L, _TXT("arrays are not supported in config definition"));
+			luaL_error( L, _TXT("arrays are not supported in configuration definition"));
 		}
 		else {
-			luaL_error( L, _TXT("non string type keys are not supported in config definition"));
+			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
 		}
 		if (lua_isstring( L, -1))
 		{
-			config[ prefix_ + key] = lua_tostring( L, -1);
+			config[ prefix + key] = lua_tostring( L, -1);
 		}
 		else if (lua_istable( L, -1))
 		{
-			convertConfig( L, -1, config, prefix_.empty() ? key : (prefix_ + "." + key));
+			convertConfig_( L, -1, config, prefix.empty() ? key : (prefix + "." + key));
 		}
 		else
 		{
 			lua_pushvalue( L, -1);
-			config[ prefix_ + key] = lua_tostring( L, -1);
+			config[ prefix + key] = lua_tostring( L, -1);
 			lua_pop( L, 1);
 		}
 		lua_pop( L, 1 );
 	}
 	lua_pop( L, 1); // Get luaddr-value from stack
+}
+
+static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configstr)
+{
+	lua_pushvalue( L, luaddr);
+	lua_pushnil( L );
+	int itercnt = -1;
+
+	while (lua_next( L, -2) != 0)
+	{
+		const char* key = 0;
+		++itercnt;
+
+		if (lua_isstring( L, -2))
+		{
+			key = lua_tostring( L, -2);
+		}
+		else if (lua_isnumber( L, -2))
+		{
+			luaL_error( L, _TXT("arrays are not supported in configuration definition"));
+		}
+		else {
+			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
+		}
+		configstr.append( itercnt ? ", \"" : "\"");
+		configstr.append( key);
+		configstr.append( "\": ");
+
+		if (lua_isstring( L, -1))
+		{
+			configstr.append( lua_tostring( L, -1));
+		}
+		else if (lua_istable( L, -1))
+		{
+			configstr.append( "{ ");
+			convertConfigToJson_( L, -1, configstr);
+			configstr.append( " }");
+		}
+		else
+		{
+			lua_pushvalue( L, -1);
+			configstr.append( lua_tostring( L, -1));
+			lua_pop( L, 1);
+		}
+		lua_pop( L, 1 );
+	}
+	lua_pop( L, 1); // Get luaddr-value from stack
+}
+
+static Configuration convertConfig( lua_State *L, int luaddr)
+{
+	Configuration rt;
+	convertConfig_( L, luaddr, rt, std::string());
+	return rt;
+}
+
+static std::string convertConfigToJson( lua_State *L, int luaddr)
+{
+	std::string rt( "{");
+	convertConfigToJson_( L, luaddr, rt);
+	rt.append( "}");
+	return rt;
 }
 
 static int l_set_time( lua_State *L)
@@ -462,7 +579,7 @@ static int l_set_time( lua_State *L)
 	return 0;
 }
 
-static int l_server( lua_State *L)
+static int l_def_server( lua_State *L)
 {
 	try
 	{
@@ -470,10 +587,10 @@ static int l_server( lua_State *L)
 		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'server': expected <host> <config>"));
 		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'server': expected <host> <config>"));
 		const char* hostname = lua_tostring( L, 1);
-		Processor::Config configmap;
-		convertConfig( L, 2, configmap);
+		Configuration configmap = convertConfig( L, 2);
+		std::string configjson = convertConfigToJson( L, 2);
 
-		g_globalContext.defineServer( hostname, configmap);
+		g_globalContext.defineServer( hostname, configmap, configjson);
 	}
 	catch (const std::exception& err)
 	{
@@ -482,7 +599,7 @@ static int l_server( lua_State *L)
 	return 0;
 }
 
-static int l_call( lua_State *L)
+static int l_call_server( lua_State *L)
 {
 	try
 	{
@@ -519,8 +636,8 @@ static void declareFunctions( lua_State *L)
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
 
 	DEFINE_FUNCTION( set_time );
-	DEFINE_FUNCTION( server );
-	DEFINE_FUNCTION( call );
+	DEFINE_FUNCTION( def_server );
+	DEFINE_FUNCTION( call_server );
 }
 
 static void printUsage()
@@ -584,6 +701,47 @@ static void setLuaPathParentDir( lua_State* ls, const char* path)
 	setLuaPath( ls, pathbuf);
 }
 
+static void handleLuaScriptError( lua_State* L, int errcode, const char* inputfile, const char* context)
+{
+	switch (errcode)
+	{
+		case LUA_OK:
+			break;
+		case LUA_ERRRUN:
+			fprintf( stderr, _TXT("error %s '%s': '%s'\n"), context, inputfile, lua_tostring( L, -1));
+			break;
+		case LUA_ERRMEM:
+			fprintf( stderr, _TXT("out of memory %s '%s'\n"), context, inputfile);
+			break;
+#ifdef LUA_ERRGCMM
+		case LUA_ERRGCMM:
+			fprintf( stderr, _TXT("internal error in destructor call (call of __gc metamethod) %s '%s'\n"), context, inputfile);
+			break;
+#endif
+		case LUA_ERRERR:
+			fprintf( stderr, _TXT("error in lua error handler %s '%s'\n"), context, inputfile);
+			break;
+		default:
+			fprintf( stderr, _TXT("unknown error %s '%s'\n"), context, inputfile);
+			break;
+	}
+}
+
+static void printDebugTraceMessages()
+{
+	if (g_debugTrace)
+	{
+		std::vector<strus::DebugTraceMessage> messages = g_debugTrace->fetchMessages();
+		std::vector<strus::DebugTraceMessage>::const_iterator mi = messages.begin(), me = messages.end();
+		fprintf( stderr, "DEBUG:\n");
+		for (; mi != me; ++mi)
+		{
+			fprintf( stderr, "%s %s %s: %s\n", mi->typeName(), mi->component(), mi->id(), mi->content().c_str());
+		}
+		fprintf( stderr, "\n");
+	}
+}
+
 #define MaxModPaths 64
 int main( int argc, const char* argv[])
 {
@@ -597,141 +755,150 @@ int main( int argc, const char* argv[])
 	int verbosity = 0;
 	const char* modpath[ MaxModPaths];
 
-	/* Parse command line arguments: */
-	for (; argi < argc; ++argi)
+	try
 	{
-		if (argv[argi][0] != '-')
+		g_debugTrace = strus::createDebugTrace_standard( 2);
+		g_errorhnd = strus::createErrorBuffer_standard( NULL, 2, g_debugTrace);
+		if (!g_debugTrace || !g_errorhnd)
 		{
-			break;
+			fprintf( stderr, _TXT( "out of memory creating error handler\n"));
+			return -1;
 		}
-		else if (0==strcmp( argv[argi], "--help") || 0==strcmp( argv[argi], "-h"))
+		/* Parse command line arguments: */
+		for (; argi < argc; ++argi)
 		{
-			printUsage();
-			return 0;
-		}
-		else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV"))
-		{
-			verbosity += std::strlen(argv[argi])-1;
-		}
-		else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))
-		{
-			++argi;
-			if (argi == argc || argv[argi][0] == '-')
+			if (argv[argi][0] != '-')
 			{
-				fprintf( stderr, _TXT("option -m (--mod) needs argument\n"));
-				return 1;
+				break;
 			}
-			if (modi >= MaxModPaths)
+			else if (0==strcmp( argv[argi], "--help") || 0==strcmp( argv[argi], "-h"))
 			{
-				fprintf( stderr, _TXT("too many options -m (--mod) specified in argument list\n"));
+				printUsage();
+				return 0;
 			}
-			modpath[ modi++] = argv[argi];
+			else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV"))
+			{
+				verbosity += std::strlen(argv[argi])-1;
+			}
+			else if (0==strcmp( argv[argi], "--debug") || 0==strcmp( argv[argi], "-G"))
+			{
+				++argi;
+				if (argi == argc || argv[argi][0] == '-')
+				{
+					fprintf( stderr, _TXT("option -G (--debug) needs argument\n"));
+					return 1;
+				}
+				g_debugTrace->enable( argv[argi]);
+			}
+			else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))
+			{
+				++argi;
+				if (argi == argc || argv[argi][0] == '-')
+				{
+					fprintf( stderr, _TXT("option -m (--mod) needs argument\n"));
+					return 1;
+				}
+				if (modi >= MaxModPaths)
+				{
+					fprintf( stderr, _TXT("too many options -m (--mod) specified in argument list\n"));
+				}
+				modpath[ modi++] = argv[argi];
+			}
+			else if (0==strcmp( argv[argi], "--"))
+			{
+				++argi;
+				break;
+			}
 		}
-		else if (0==strcmp( argv[argi], "--"))
+		if (argi == argc)
 		{
-			++argi;
-			break;
+			fprintf( stderr, _TXT("too few arguments (less than one)\n"));
+			return -1;
 		}
+		inputfile = argv[ argi];
+		g_logger.init( verbosity);
+	
+#ifdef STRUS_LOWLEVEL_DEBUG
+		fprintf( stderr, "create lua state\n");
+#endif
+		/* Define the lua state: */
+		ls = luaL_newstate();
+		luaL_openlibs( ls);
+		luaopen_strus( ls);
+	
+		/* Set module directories: */
+		setLuaPathParentDir( ls, inputfile);
+		for (mi=0,me=modi; mi != me; ++mi)
+		{
+			setLuaPath( ls, modpath[ mi]);
+		}
+	
+		/* Define program arguments for lua script: */
+		lua_newtable( ls);
+		for (ai=0,ae=argc-argi; ai != ae; ++ai)
+		{
+			lua_pushinteger( ls, ai);
+			lua_pushstring( ls, argv[argi+ai]);
+			lua_rawset( ls, -3);
+		}
+		lua_setglobal( ls, "arg");
+		declareFunctions( ls);
+	
+		/* Load the script: */
+#ifdef STRUS_LOWLEVEL_DEBUG
+		fprintf( stderr, "load script file: '%s'\n", inputfile);
+#endif
+		errcode = luaL_loadfile( ls, inputfile);
+		if (errcode != LUA_OK)
+		{
+			handleLuaScriptError( ls, errcode, inputfile, _TXT("loading script"));
+			lua_close( ls);
+			if (g_errorhnd) delete g_errorhnd;
+			return -2;
+		}
+#ifdef STRUS_LOWLEVEL_DEBUG
+		fprintf( stderr, "starting ...\n");
+#endif
+		/* Run the script: */
+		errcode = lua_pcall( ls, 0, LUA_MULTRET, 0);
+		if (errcode != LUA_OK)
+		{
+			handleLuaScriptError( ls, errcode, inputfile, _TXT("executing script"));
+			lua_close( ls);
+			if (g_errorhnd) delete g_errorhnd;
+			return -3;
+		}
+		lua_close( ls);
+		printDebugTraceMessages();
+
+		if (g_errorhnd)
+		{
+			if (g_errorhnd->hasError())
+			{
+				fprintf( stderr, _TXT("error in strus context: %s\n"), g_errorhnd->fetchError());
+				return -4;
+			}
+			delete g_errorhnd;
+		}
+		return 0;
 	}
-	if (argi == argc)
+	catch (const std::bad_alloc&)
 	{
-		fprintf( stderr, _TXT("too few arguments (less than one)\n"));
+		if (g_errorhnd) delete g_errorhnd;
+		fprintf( stderr, _TXT( "out of memory\n"));
 		return -1;
 	}
-	inputfile = argv[ argi];
-	g_logger.init( verbosity);
-
-#ifdef STRUS_LOWLEVEL_DEBUG
-	fprintf( stderr, "create lua state\n");
-#endif
-	/* Define the lua state: */
-	ls = luaL_newstate();
-	luaL_openlibs( ls);
-	luaopen_strus( ls);
-
-	/* Set module directories: */
-	setLuaPathParentDir( ls, inputfile);
-	for (mi=0,me=modi; mi != me; ++mi)
+	catch (const std::runtime_error& err)
 	{
-		setLuaPath( ls, modpath[ mi]);
+		if (g_errorhnd) delete g_errorhnd;
+		fprintf( stderr, _TXT( "runtime error: %s\n"), err.what());
+		return -1;
 	}
-
-	/* Define program arguments for lua script: */
-	lua_newtable( ls);
-	for (ai=0,ae=argc-argi; ai != ae; ++ai)
+	catch (const std::exception& err)
 	{
-		lua_pushinteger( ls, ai);
-		lua_pushstring( ls, argv[argi+ai]);
-		lua_rawset( ls, -3);
+		if (g_errorhnd) delete g_errorhnd;
+		fprintf( stderr, _TXT( "uncaught exception: %s\n"), err.what());
+		return -1;
 	}
-	lua_setglobal( ls, "arg");
-	declareFunctions( ls);
-
-	/* Load the script: */
-#ifdef STRUS_LOWLEVEL_DEBUG
-	fprintf( stderr, "load script file: '%s'\n", inputfile);
-#endif
-	errcode = luaL_loadfile( ls, inputfile);
-	if (errcode != LUA_OK)
-	{
-		switch (errcode)
-		{
-			case LUA_ERRSYNTAX:
-			{
-				fprintf( stderr, _TXT("LUA_ERRSYNTAX %s loading script '%s'\n"), lua_tostring( ls, -1), inputfile);
-				break;
-			}
-			case LUA_ERRMEM:
-			{
-				fprintf( stderr, _TXT("out of memory loading script '%s'\n"), inputfile);
-				break;
-			}
-			case LUA_ERRFILE:
-			{
-				fprintf( stderr, _TXT("LUA_ERRFILE loading script '%s'\n"), inputfile);
-				break;
-			}
-			default:
-				fprintf( stderr, _TXT("unknown error loading script '%s'\n"), inputfile);
-				break;
-		}
-		lua_close( ls);
-		return -2;
-	}
-#ifdef STRUS_LOWLEVEL_DEBUG
-	fprintf( stderr, "starting ...\n");
-#endif
-	/* Run the script: */
-	errcode = lua_pcall( ls, 0, LUA_MULTRET, 0);
-	if (errcode)
-	{
-		switch (errcode)
-		{
-			case LUA_OK:
-				lua_close( ls);
-				return 0;
-			case LUA_ERRRUN:
-				fprintf( stderr, _TXT("error in script '%s': '%s'\n"), inputfile, lua_tostring( ls, -1));
-				break;
-			case LUA_ERRMEM:
-				fprintf( stderr, _TXT("out of memory in script '%s'\n"), inputfile);
-				break;
-#ifdef LUA_ERRGCMM
-			case LUA_ERRGCMM:
-				fprintf( stderr, _TXT("internal error in destructor call (call of __gc metamethod) in script '%s'\n"), inputfile);
-				break;
-#endif
-			case LUA_ERRERR:
-				fprintf( stderr, _TXT("error in lua error handler executing script '%s'\n"), inputfile);
-				break;
-			default:
-				fprintf( stderr, _TXT("unknown error in script '%s'\n"), inputfile);
-				break;
-		}
-		lua_close( ls);
-		return -3;
-	}
-	lua_close( ls);
-	return 0;
 }
 
