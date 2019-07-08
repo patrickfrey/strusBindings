@@ -882,6 +882,11 @@ void CurlEventLoop::stop()
 	m_data->stop();
 }
 
+long CurlEventLoop::time() const
+{
+	return ::time(NULL);
+}
+
 bool CurlEventLoop::send(
 		const std::string& address,
 		const std::string& method,

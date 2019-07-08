@@ -10,6 +10,6 @@ if( WITH_WEBREQUEST STREQUAL "YES" )
 add_subdirectory( webrequest )
 endif( WITH_WEBREQUEST STREQUAL "YES" )
 if( WITH_WEBREQUEST STREQUAL "YES" AND WITH_LUA STREQUAL "YES" )
-# add_subdirectory( webrequest_luasim )
+add_subdirectory( webrequest_luasim )
 endif( WITH_WEBREQUEST STREQUAL "YES" AND WITH_LUA STREQUAL "YES" )
 

@@ -51,6 +51,11 @@ public:
 	/// \brief Handle an exception
 	/// \param[in] message of the exception
 	virtual void handleException( const char* msg)=0;
+
+	/// \brief Get the current time
+	/// \return Get the current time in seconds (unixtime)
+	/// \note Wrapper to empower tests to create their own emulation of time
+	virtual long time() const=0;
 };
 
 }//namespace

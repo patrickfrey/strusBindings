@@ -59,6 +59,7 @@ public:
 			WebRequestDelegateContextInterface* receiver) {return false;}
 	virtual bool addTickerEvent( void* obj, TickerFunction func)  {return true;}
 	virtual void handleException( const char* msg) {}
+	virtual long time() const {return 0;}
 };
 
 static WebRequestLogger_null g_logger_null;

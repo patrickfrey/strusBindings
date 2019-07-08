@@ -10,6 +10,7 @@
 #include "strus/webRequestEventLoopInterface.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/webRequestDelegateContextInterface.hpp"
+#include "strus/reference.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/shared_ptr.hpp"
@@ -140,8 +141,11 @@ static const char* g_doctype = "application/json";
 class Processor
 {
 public:
-	explicit Processor( const std::string& hostname_)
-		:m_hostname(hostname_),m_handler(){}
+	typedef std::map<std::string,std::string> Config;
+
+public:
+	Processor( const std::string& hostname_, const Config& config_)
+		:m_hostname(hostname_),m_config(config_),m_handler(){}
 	Processor( const Processor& o)
 		:m_hostname(o.m_hostname),m_handler(o.m_handler){}
 
@@ -149,6 +153,7 @@ public:
 
 private:
 	std::string m_hostname;
+	Config m_config;
 	strus::shared_ptr<strus::WebRequestHandlerInterface> m_handler;
 };
 
@@ -157,7 +162,16 @@ class GlobalContext
 public:
 	GlobalContext(){}
 
-	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& url, const strus::WebRequestContent& content);
+	void defineServer( const std::string& hostname, const Processor::Config& configmap)
+	{
+		if (m_procMap.insert( ProcMap::value_type( hostname, Processor( hostname, configmap))).second == false)
+		{
+			reportError( _TXT("duplicate definition of server '%s'"), hostname.c_str());
+		}
+	}
+
+	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& url, const std::string& content);
+	void reportError( const char* fmt, ...);
 
 private:
 	typedef std::map<std::string,Processor> ProcMap;
@@ -168,6 +182,9 @@ class EventLoop
 	:public strus::WebRequestEventLoopInterface
 {
 public:
+	EventLoop()
+		:m_tickers(),m_time(0){}
+
 	virtual ~EventLoop(){}
 
 	virtual bool start(){return true;}
@@ -195,6 +212,15 @@ public:
 	{
 		g_logger.logError( msg);
 	}
+	virtual long time() const
+	{
+		return m_time;
+	}
+
+	void setTime( long time_)
+	{
+		m_time = time_;
+	}
 
 public:
 	void callTickers()
@@ -209,8 +235,31 @@ public:
 private:
 	typedef std::pair<TickerFunction,void*> TickerDef;
 	std::vector<TickerDef> m_tickers;
+	long m_time;
 };
 
+class WebRequestDelegateContext
+	:public strus::WebRequestDelegateContextInterface
+{
+public:
+	WebRequestDelegateContext(
+			strus::WebRequestAnswer* answer_,
+			const strus::Reference<strus::WebRequestContextInterface>& requestContext_,
+			const std::string& url_,
+			const std::string& schema_)
+		:m_requestContext(requestContext_)
+		,m_url(url_),m_schema(schema_)
+		,m_answer(answer_){}
+
+	virtual ~WebRequestDelegateContext(){}
+	virtual void putAnswer( const strus::WebRequestAnswer& status);
+
+private:
+	strus::Reference<strus::WebRequestContextInterface> m_requestContext;
+	std::string m_url;
+	std::string m_schema;
+	strus::WebRequestAnswer* m_answer;
+};
 
 
 static GlobalContext g_globalContext;
@@ -236,8 +285,7 @@ bool EventLoop::send( const std::string& address,
 {
 	try
 	{
-		strus::WebRequestContent content( g_charset, g_doctype, contentstr.c_str(), contentstr.size());
-		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, address, content);
+		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, address, contentstr);
 		receiver->putAnswer( result.first);
 		return true;
 	}
@@ -247,49 +295,95 @@ bool EventLoop::send( const std::string& address,
 	}
 }
 
+void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status)
+{
+	unsigned int rc = m_requestContext.refcnt();
+	bool success = true;
+	if (!m_answer->ok()) return;
+
+	if (status.ok() && status.httpstatus() >= 200 && status.httpstatus() < 300)
+	{
+		if (!m_requestContext->returnDelegateRequestAnswer( m_schema.c_str(), status.content(), *m_answer))
+		{
+			success = false;
+		}
+	}
+	else
+	{
+		*m_answer = status;
+		success = false;
+	}
+	if (success)
+	{
+		if (rc <= 1)
+		{
+			//... last delegate request reply
+			*m_answer = m_requestContext->getRequestAnswer();
+		}
+	}
+	else
+	{
+		std::string msg( strus::string_format( _TXT( "delegate request to %s failed"), m_url.c_str()));
+		m_answer->explain( msg.c_str());
+	}
+	m_requestContext.reset();
+}
+
 std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::string& method, const std::string& path, const strus::WebRequestContent& content)
 {
 	std::pair<strus::WebRequestAnswer,std::string> rt;
 	std::string html_base_href = strus::string_format( "http://%s/", m_hostname.c_str());
 
-	strus::local_ptr<strus::WebRequestContextInterface> ctx( m_handler->createContext( 
+	strus::Reference<strus::WebRequestContextInterface> ctx( m_handler->createContext( 
 				g_charset, g_doctype, html_base_href.c_str(), rt.first));
 	if (!ctx.get()) return rt;
 
 	std::vector<strus::WebRequestDelegateRequest> delegateRequests;
-	if (!ctx->executeRequest( method.c_str(), path.c_str(), content, rt.first, delegateRequests)) return rt;
-
-	if (delegateRequests.empty())
+	if (!ctx->executeRequest( method.c_str(), path.c_str(), content, delegateRequests))
 	{
-		if (!rt.first.content().empty())
-		{
-			rt.second.append( rt.first.content().str(), rt.first.content().len());
-			rt.first.content().setContent( rt.second.c_str(), rt.second.size());
-		}
+		rt.first = ctx->getRequestAnswer();
+	}
+	else if (delegateRequests.empty())
+	{
+		rt.first = ctx->getRequestAnswer();
 	}
 	else
 	{
+		std::vector<strus::Reference<strus::WebRequestDelegateContextInterface> > receivers;
 		std::vector<strus::WebRequestDelegateRequest>::const_iterator di = delegateRequests.begin(), de = delegateRequests.end();
 		for (; di != de; ++di)
 		{
-			std::pair<strus::WebRequestAnswer,std::string> delegateResult = g_globalContext.call( di->method(), di->url(), di->content());
-			strus::WebRequestAnswer delegatePutAnswer;
-			if (!ctx->returnDelegateRequestAnswer( di->schema(), delegateResult.first.content(), delegatePutAnswer))
+			strus::Reference<strus::WebRequestDelegateContextInterface> receiver(
+				new WebRequestDelegateContext( &rt.first, ctx, di->url(), di->schema()));
+			receivers.push_back( receiver);
+		}
+		di = delegateRequests.begin();
+		for (int didx=0; di != de; ++di,++didx)
+		{
+			std::string delegateContent( di->contentstr(), di->contentlen());
+
+			strus::Reference<strus::WebRequestDelegateContextInterface>& receiver = receivers[ didx];
+			if (!m_handler->delegateRequest( di->url(), di->method(), delegateContent, receiver.release()))
 			{
-				std::string errexplanation = strus::string_format( _TXT("error delegating sub request to server '%s'"), m_hostname.c_str());
-				delegatePutAnswer.explain( errexplanation.c_str());
-				return std::pair<strus::WebRequestAnswer,std::string>( delegatePutAnswer, std::string());
+				g_globalContext.reportError( _TXT("delegate request failed, out of memory"));
+				break;
 			}
 		}
+	}
+	if (!rt.first.content().empty())
+	{
+		rt.second.append( rt.first.content().str(), rt.first.content().len());
+		rt.first.content().setContent( rt.second.c_str(), rt.second.size());
 	}
 	return rt;
 }
 
-std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::string& method, const std::string& url, const strus::WebRequestContent& content)
+std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
 {
 	std::pair<std::string,std::string> serverPathPair = splitUrl( url);
 	const std::string& proc = serverPathPair.first;
 	const std::string& path = serverPathPair.second;
+	strus::WebRequestContent content( g_charset, g_doctype, contentstr.c_str(), contentstr.size());
 
 	ProcMap::iterator pi = m_procMap.find( proc);
 	if (pi == m_procMap.end())
@@ -304,39 +398,129 @@ std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::s
 	}
 }
 
-static int l_call( lua_State *L) {
-	const char* method = 0;
-	const char* url = 0;
-	const char* arg = "";
-	std::size_t arglen = 0;
-	int nofArgs = lua_gettop(L);
-	if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'call': expected <method> <addr> [<arg>]"));
-	if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'call': expected <method> <addr> [<arg>]"));
-	switch (nofArgs)
+void GlobalContext::reportError( const char* fmt, ...)
+{
+	va_list ap;
+	va_start( ap, fmt);
+
+	std::string msg = strus::string_format_va( fmt, ap);
+	std::cerr << "ERROR " << msg << std::endl;
+}
+
+static void convertConfig( lua_State *L, int luaddr, Processor::Config& config, const std::string& prefix_=std::string())
+{
+	lua_pushvalue( L, luaddr);
+	lua_pushnil( L );
+
+	while (lua_next( L, -2) != 0)
 	{
-		case 3: arg = lua_tolstring( L, 3, &arglen);
-		case 2: url = lua_tostring( L, 2);
-		case 1: method = lua_tostring( L, 1);
+		const char* key = 0;
+		if (lua_isstring( L, -2))
+		{
+			key = lua_tostring( L, -2);
+		}
+		else if (lua_isnumber( L, -2))
+		{
+			luaL_error( L, _TXT("arrays are not supported in config definition"));
+		}
+		else {
+			luaL_error( L, _TXT("non string type keys are not supported in config definition"));
+		}
+		if (lua_isstring( L, -1))
+		{
+			config[ prefix_ + key] = lua_tostring( L, -1);
+		}
+		else if (lua_istable( L, -1))
+		{
+			convertConfig( L, -1, config, prefix_.empty() ? key : (prefix_ + "." + key));
+		}
+		else
+		{
+			lua_pushvalue( L, -1);
+			config[ prefix_ + key] = lua_tostring( L, -1);
+			lua_pop( L, 1);
+		}
+		lua_pop( L, 1 );
 	}
-	strus::WebRequestContent content( g_charset, g_doctype, arg, arglen);
-	std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, content);
-	if (result.second.empty())
+	lua_pop( L, 1); // Get luaddr-value from stack
+}
+
+static int l_set_time( lua_State *L)
+{
+	try
 	{
-		lua_pushinteger(L, result.first.httpstatus()); /* first return value */
-		return 1;
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'timenow': expected <seconds>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'timenow': expected <seconds>"));
+		long newtime = lua_tointeger( L, 1);
+		g_eventLoop.setTime( newtime);
 	}
-	else
+	catch (const std::exception& err)
 	{
-		lua_pushinteger(L, result.first.httpstatus()); /* first return value */
-		lua_pushlstring(L, result.second.c_str(), result.second.size()); 
-		return 2;
+		luaL_error( L, err.what());
+	}
+	return 0;
+}
+
+static int l_server( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'server': expected <host> <config>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'server': expected <host> <config>"));
+		const char* hostname = lua_tostring( L, 1);
+		Processor::Config configmap;
+		convertConfig( L, 2, configmap);
+
+		g_globalContext.defineServer( hostname, configmap);
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, err.what());
+	}
+	return 0;
+}
+
+static int l_call( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'call': expected <method> <addr> [<arg>]"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'call': expected <method> <addr> [<arg>]"));
+		const char* method = lua_tostring( L, 1);
+		const char* url = lua_tostring( L, 2);
+		std::size_t arglen = 0;
+		const char* arg = nofArgs < 3 ? "" : lua_tolstring( L, 3, &arglen);
+
+		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, arg);
+		if (result.second.empty())
+		{
+			lua_pushinteger(L, result.first.httpstatus()); /* first return value */
+			return 1;
+		}
+		else
+		{
+			lua_pushinteger(L, result.first.httpstatus()); /* first return value */
+			lua_pushlstring(L, result.second.c_str(), result.second.size()); 
+			return 2;
+		}
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, err.what());
+		return 0;
 	}
 }
 
 static void declareFunctions( lua_State *L)
 {
-	lua_pushcfunction( L, l_call);
-	lua_setglobal( L, "call");
+#define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
+
+	DEFINE_FUNCTION( set_time );
+	DEFINE_FUNCTION( server );
+	DEFINE_FUNCTION( call );
 }
 
 static void printUsage()

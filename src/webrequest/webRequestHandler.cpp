@@ -175,7 +175,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_configHandler(logger_,config_store_dir_,g_context_typenames)
 	,m_html_head(html_head_)
-	,m_transactionPool( ::time(NULL), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
+	,m_transactionPool( eventLoop_->time(), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
 	,m_eventLoop( eventLoop_)
 {
@@ -475,7 +475,7 @@ bool WebRequestHandler::delegateRequest(
 
 void WebRequestHandler::tick()
 {
-	m_transactionPool.collectGarbage( ::time(NULL));
+	m_transactionPool.collectGarbage( m_eventLoop->time());
 }
 
 void WebRequestHandler::loadConfiguration( const std::string& configstr)

@@ -38,6 +38,7 @@ public:
 
 	virtual bool start();
 	virtual void stop();
+	virtual long time() const;
 
 	bool send( const std::string& address,
 			const std::string& method,
