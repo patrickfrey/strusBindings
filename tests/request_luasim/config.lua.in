@@ -1,0 +1,26 @@
+config = {
+	data = {
+		workdir     = "/srv/strus",
+		configdir   = "/srv/strus/config",
+		resources   = "/usr/share/strus"
+	},
+	transactions = {
+		max_idle_time  = 600,
+		nof_per_second = 60
+	},
+	extensions = {
+		directory = "@STRUS_MODULE_PATH@",
+		modules = {
+			"modstrus_analyzer_pattern",
+			"modstrus_storage_vector_std"
+		}
+	}
+}
+
+CSERVER1="http://127.0.0.1:7182"
+SSERVER1="http://127.0.0.1:7183"
+ISERVER1="http://127.0.0.1:7184"
+ISERVER2="http://127.0.0.1:7185"
+ISERVER3="http://127.0.0.1:7186"
+ISERVER4="http://127.0.0.1:7187"
+VSERVER1="http://127.0.0.1:7191"

@@ -21,6 +21,7 @@
 #include "strus/base/string_format.hpp"
 #include "strus/base/string_conv.hpp"
 #include "strus/base/numstring.hpp"
+#include "strus/base/fileio.hpp"
 #include "strus/base/stdint.h"
 #include "private/internationalization.hpp"
 extern "C" {
@@ -171,14 +172,7 @@ class GlobalContext
 public:
 	GlobalContext(){}
 
-	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson)
-	{
-		if (m_procMap.insert( ProcMap::value_type( hostname, Processor( hostname, configmap, configjson))).second == false)
-		{
-			reportError( _TXT("duplicate definition of server '%s'"), hostname.c_str());
-		}
-	}
-
+	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson);
 	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& url, const std::string& content);
 	void reportError( const char* fmt, ...);
 
@@ -280,8 +274,9 @@ private:
 };
 
 
-static GlobalContext g_globalContext;
 static EventLoop g_eventLoop;
+static GlobalContext g_globalContext;
+static std::string g_scriptDir;
 static strus::DebugTraceInterface* g_debugTrace = 0;
 static strus::ErrorBufferInterface* g_errorhnd = 0;
 
@@ -433,6 +428,19 @@ std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::strin
 	return rt;
 }
 
+void GlobalContext::defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson)
+{
+	std::pair<std::string,std::string> serverPathPair = splitUrl( hostname);
+	if (!serverPathPair.second.empty())
+	{
+		reportError( _TXT("not accepted name for a host '%s'"), hostname.c_str());
+	}
+	if (m_procMap.insert( ProcMap::value_type( serverPathPair.first, Processor( serverPathPair.first, configmap, configjson))).second == false)
+	{
+		reportError( _TXT("duplicate definition of server '%s'"), serverPathPair.first.c_str());
+	}
+}
+
 std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
 {
 	std::pair<std::string,std::string> serverPathPair = splitUrl( url);
@@ -469,30 +477,34 @@ static void convertConfig_( lua_State *L, int luaddr, Configuration& config, con
 
 	while (lua_next( L, -2) != 0)
 	{
-		const char* key = 0;
-		if (lua_isstring( L, -2))
+		std::string key;
+		if (lua_isnumber( L, -2))
+		{
+			lua_pushvalue( L, -2);
+			key = lua_tostring( L, -1);
+			lua_pop( L, 1);
+		}
+		else if (lua_isstring( L, -2))
 		{
 			key = lua_tostring( L, -2);
-		}
-		else if (lua_isnumber( L, -2))
-		{
-			luaL_error( L, _TXT("arrays are not supported in configuration definition"));
 		}
 		else {
 			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
 		}
+		std::string fullkey = prefix.empty() ? key : (prefix + "." + key);
+
 		if (lua_isstring( L, -1))
 		{
-			config[ prefix + key] = lua_tostring( L, -1);
+			config[ fullkey] = lua_tostring( L, -1);
 		}
 		else if (lua_istable( L, -1))
 		{
-			convertConfig_( L, -1, config, prefix.empty() ? key : (prefix + "." + key));
+			convertConfig_( L, -1, config, fullkey);
 		}
 		else
 		{
 			lua_pushvalue( L, -1);
-			config[ prefix + key] = lua_tostring( L, -1);
+			config[ fullkey] = lua_tostring( L, -1);
 			lua_pop( L, 1);
 		}
 		lua_pop( L, 1 );
@@ -500,7 +512,21 @@ static void convertConfig_( lua_State *L, int luaddr, Configuration& config, con
 	lua_pop( L, 1); // Get luaddr-value from stack
 }
 
-static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configstr)
+static bool isArray( lua_State *L, int luaddr)
+{
+	lua_pushvalue( L, luaddr);
+	lua_pushnil( L );
+	if (lua_next( L, -2) != 0)
+	{
+		bool rt = (lua_isnumber( L, -2) && lua_tointeger( L, -2) == 1);
+		lua_pop( L, 3 );
+		return rt;
+	}
+	lua_pop( L, 1 );
+	return false;
+}
+
+static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configstr, bool array)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -511,30 +537,48 @@ static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configs
 		const char* key = 0;
 		++itercnt;
 
-		if (lua_isstring( L, -2))
+		if (lua_isnumber( L, -2))
 		{
-			key = lua_tostring( L, -2);
+			if (!array) luaL_error( L, _TXT("mixing array and table"));
 		}
-		else if (lua_isnumber( L, -2))
+		else if (lua_isstring( L, -2))
 		{
-			luaL_error( L, _TXT("arrays are not supported in configuration definition"));
+			if (array) luaL_error( L, _TXT("mixing array and table"));
+			key = lua_tostring( L, -2);
 		}
 		else {
 			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
 		}
-		configstr.append( itercnt ? ", \"" : "\"");
-		configstr.append( key);
-		configstr.append( "\": ");
-
+		if (key)
+		{
+			configstr.append( itercnt ? ", \"" : "\"");
+			configstr.append( key);
+			configstr.append( "\": ");
+		}
+		else if (itercnt)
+		{
+			configstr.append( ", ");
+		}
 		if (lua_isstring( L, -1))
 		{
+			configstr.push_back( '"');
 			configstr.append( lua_tostring( L, -1));
+			configstr.push_back( '"');
 		}
 		else if (lua_istable( L, -1))
 		{
-			configstr.append( "{ ");
-			convertConfigToJson_( L, -1, configstr);
-			configstr.append( " }");
+			if (isArray( L, -1))
+			{
+				configstr.append( "[ ");
+				convertConfigToJson_( L, -1, configstr, true/*array*/);
+				configstr.append( " ]");
+			}
+			else
+			{
+				configstr.append( "{ ");
+				convertConfigToJson_( L, -1, configstr, false/*!array*/);
+				configstr.append( " }");
+			}
 		}
 		else
 		{
@@ -557,7 +601,7 @@ static Configuration convertConfig( lua_State *L, int luaddr)
 static std::string convertConfigToJson( lua_State *L, int luaddr)
 {
 	std::string rt( "{");
-	convertConfigToJson_( L, luaddr, rt);
+	convertConfigToJson_( L, luaddr, rt, false/*!array*/);
 	rt.append( "}");
 	return rt;
 }
@@ -567,8 +611,8 @@ static int l_set_time( lua_State *L)
 	try
 	{
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'timenow': expected <seconds>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'timenow': expected <seconds>"));
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'set_time': expected <seconds>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'set_time': expected <seconds>"));
 		long newtime = lua_tointeger( L, 1);
 		g_eventLoop.setTime( newtime);
 	}
@@ -584,8 +628,8 @@ static int l_def_server( lua_State *L)
 	try
 	{
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'server': expected <host> <config>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'server': expected <host> <config>"));
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'def_server': expected <host> <config>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'def_server': expected <host> <config>"));
 		const char* hostname = lua_tostring( L, 1);
 		Configuration configmap = convertConfig( L, 2);
 		std::string configjson = convertConfigToJson( L, 2);
@@ -604,14 +648,29 @@ static int l_call_server( lua_State *L)
 	try
 	{
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'call': expected <method> <addr> [<arg>]"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'call': expected <method> <addr> [<arg>]"));
+		if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'call_server': expected <method> <addr> [<arg>]"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'call_server': expected <method> <addr> [<arg>]"));
 		const char* method = lua_tostring( L, 1);
 		const char* url = lua_tostring( L, 2);
 		std::size_t arglen = 0;
 		const char* arg = nofArgs < 3 ? "" : lua_tolstring( L, 3, &arglen);
-
-		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, arg);
+		std::pair<strus::WebRequestAnswer,std::string> result;
+		if (arg[0] == '@')
+		{
+			std::string content;
+			std::string fullpath = strus::joinFilePath( g_scriptDir, arg+1);
+			int ec = strus::readFile( fullpath, content);
+			if (ec)
+			{
+				std::string msg = strus::string_format( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
+				return luaL_error(L, msg.c_str());
+			}
+			result = g_globalContext.call( method, url, content.c_str());
+		}
+		else
+		{
+			result = g_globalContext.call( method, url, arg);
+		}
 		if (result.second.empty())
 		{
 			lua_pushinteger(L, result.first.httpstatus()); /* first return value */
@@ -631,6 +690,61 @@ static int l_call_server( lua_State *L)
 	}
 }
 
+static void push_linestring( lua_State *L, char const* ln)
+{
+	char const* end = std::strchr( ln, '\n');
+	if (!ln) end = std::strchr( ln, '\0');
+	lua_pushlstring( L, ln, end-ln);
+}
+
+static int l_cmp_content( lua_State *L)
+{
+	int linecnt = 1;
+	int nofArgs = lua_gettop(L);
+	if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'cmp_content': expected <result> <expected>"));
+	if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'cmp_content': expected <result> <expected>"));
+	char const* ai = lua_tostring( L, 1);
+	char const* bi = lua_tostring( L, 2);
+	const char* a_ln = ai;
+	const char* b_ln = bi;
+	while (*ai && *bi)
+	{
+		if (*ai == *bi) {++ai; ++bi; continue;}
+		if ((*ai == '\r' || *ai == '\n') && (*bi == '\r' || *bi == '\n'))
+		{
+			++linecnt;
+			if (*ai == '\r') ++ai;
+			if (*bi == '\r') ++bi;
+			if (*ai == '\n' && *bi == '\n')
+			{
+				++ai; a_ln = ai;
+				++bi; b_ln = bi;
+				continue;
+			}
+		}
+		lua_pushboolean( L, false);
+		lua_pushinteger( L, linecnt);
+		push_linestring( L, a_ln);
+		push_linestring( L, b_ln);
+		return 4;
+	}
+	while (*ai == '\r' || *ai == '\n') ++ai;
+	while (*bi == '\r' || *bi == '\n') ++bi;
+	if (!*ai && !*bi)
+	{
+		lua_pushboolean( L, true);
+		return 1;
+	}
+	else
+	{
+		lua_pushboolean( L, false);
+		lua_pushinteger( L, linecnt);
+		push_linestring( L, a_ln);
+		push_linestring( L, b_ln);
+		return 4;
+	}
+}
+
 static void declareFunctions( lua_State *L)
 {
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
@@ -638,6 +752,7 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( set_time );
 	DEFINE_FUNCTION( def_server );
 	DEFINE_FUNCTION( call_server );
+	DEFINE_FUNCTION( cmp_content );
 }
 
 static void printUsage()
@@ -708,10 +823,13 @@ static void handleLuaScriptError( lua_State* L, int errcode, const char* inputfi
 		case LUA_OK:
 			break;
 		case LUA_ERRRUN:
-			fprintf( stderr, _TXT("error %s '%s': '%s'\n"), context, inputfile, lua_tostring( L, -1));
+			fprintf( stderr, _TXT("runtime error %s '%s': '%s'\n"), context, inputfile, lua_tostring( L, -1));
 			break;
 		case LUA_ERRMEM:
 			fprintf( stderr, _TXT("out of memory %s '%s'\n"), context, inputfile);
+			break;
+		case LUA_ERRSYNTAX:
+			fprintf( stderr, _TXT("syntax error error %s '%s': '%s'\n"), context, inputfile, lua_tostring( L, -1));
 			break;
 #ifdef LUA_ERRGCMM
 		case LUA_ERRGCMM:
@@ -816,6 +934,12 @@ int main( int argc, const char* argv[])
 			return -1;
 		}
 		inputfile = argv[ argi];
+		int ec = strus::getParentPath( inputfile, g_scriptDir);
+		if (ec)
+		{
+			fprintf( stderr, _TXT("failed to get directory of the script to execute\n"));
+			return -1;
+		}
 		g_logger.init( verbosity);
 	
 #ifdef STRUS_LOWLEVEL_DEBUG
