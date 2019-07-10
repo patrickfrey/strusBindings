@@ -15,6 +15,7 @@
 #include "transaction.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestParser.h"
+#include "papuga/requestResult.h"
 #include "papuga/request.h"
 #include "papuga/typedefs.h"
 #include <stdexcept>

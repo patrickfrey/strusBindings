@@ -507,6 +507,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 
+	if (!m_context) return true;
 	int ri = 0, re = papuga_RequestContext_nof_results( m_context);
 	for (; ri != re; ++ri)
 	{
