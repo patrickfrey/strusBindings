@@ -7,6 +7,8 @@
  */
 /// \brief Periodic timer event
 #include "curlEventLoop.hpp"
+#include "webRequestUtils.hpp"
+#include "strus/lib/error.hpp"
 #include "strus/webRequestDelegateContextInterface.hpp"
 #include "strus/webRequestAnswer.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
@@ -144,7 +146,7 @@ public:
 
 	void reconnect();
 	void done();
-	void dropAllPendingRequests( const char* errmsg);
+	void dropAllPendingRequests( const strus::ErrorCode& errcode, const char* errmsg);
 
 	CURL* handle() const {return m_curl;}
 
@@ -308,13 +310,13 @@ void WebRequestDelegateConnection::done()
 	}
 }
 
-void WebRequestDelegateConnection::dropAllPendingRequests( const char* errmsg)
+void WebRequestDelegateConnection::dropAllPendingRequests( const strus::ErrorCode& errcode, const char* errmsg)
 {
 	strus::unique_lock lock( m_mutex);
 	for (; !m_requestQueue.empty(); m_requestQueue.pop())
 	{
 		WebRequestDelegateDataRef data = m_requestQueue.front();
-		WebRequestAnswer answer( errmsg, 500, ErrorCodeDelegateRequestFailed);
+		WebRequestAnswer answer( errmsg, strus::errorCodeToHttpStatus(errcode), errcode);
 		data->receiver->putAnswer( answer);
 	}
 	m_state = Init;
@@ -329,15 +331,15 @@ void WebRequestDelegateConnection::reconnect()
 	}
 	catch (const std::runtime_error& err)
 	{
-		dropAllPendingRequests( err.what());
+		dropAllPendingRequests( ErrorCodeRuntimeError, err.what());
 	}
 	catch (const std::bad_alloc&)
 	{
-		dropAllPendingRequests( _TXT("memory allocation error"));
+		dropAllPendingRequests( ErrorCodeOutOfMem, strus::errorCodeToString( ErrorCodeOutOfMem));
 	}
 	catch (...)
 	{
-		dropAllPendingRequests( _TXT("unexpected exception"));
+		dropAllPendingRequests( ErrorCodeUncaughtException, strus::errorCodeToString( ErrorCodeUncaughtException));
 	}
 }
 
@@ -363,8 +365,6 @@ struct CurlEventLoop::Data
 		,m_requestCount(0)
 		,m_numberOfRequestsBeforeTick(secondsPeriod_*NumberOfRequestsBeforeTick)
 		,m_terminate(false)
-		,m_pipcurlfd(0)
-		,m_pip_handle(0)
 	{
 		bool sc = true;
 		m_multi_handle = curl_multi_init();
@@ -378,15 +378,37 @@ struct CurlEventLoop::Data
 #endif
 		if (!sc) throw strus::runtime_error(_TXT("curl handle setting options failed"));
 
-		openSelfSignalingPipe();
-		if (!initSelfPipeTrickCurlHandle()) throw strus::runtime_error(_TXT("self pipe initialization failed"));
+		// open self signaling pipe ("self pipe trick"):
+		int ec = 0;
+		m_pipfd[0] = 0;
+		m_pipfd[1] = 0;
+		if (::pipe( m_pipfd) == -1) throw strus::runtime_error(_TXT("failed to open pipe: %s"), ::strerror(errno));
+
+		int flags = ::fcntl( m_pipfd[0], F_GETFL);
+		if (flags == -1) goto ERROR;
+		flags |= O_NONBLOCK;
+		if (::fcntl( m_pipfd[0], F_SETFL, flags) == -1) goto ERROR;
+		flags = ::fcntl( m_pipfd[1], F_GETFL);
+		if (flags == -1) goto ERROR;
+		flags |= O_NONBLOCK;
+		if (::fcntl( m_pipfd[1], F_SETFL, flags) == -1) goto ERROR;
+
+		// PF:NOTE For the following 3 lines thanks to the author of 'http://eao197.blogspot.com/2018/03/progc-async-processing-of-incoming-and.html':
+		m_pipcurl_notify_fd.fd = m_pipfd[0]; //... read end of the pipe
+		m_pipcurl_notify_fd.events = CURL_WAIT_POLLIN;
+		m_pipcurl_notify_fd.revents = 0;     //... here the result is signalled
+		return;
+	ERROR:
+		ec = errno;
+		::close( m_pipfd[0]);
+		::close( m_pipfd[1]);
+		throw strus::runtime_error(_TXT("failed to open pipe: %s"), ::strerror(ec));
 	}
 
 	~Data()
 	{
 		::close( m_pipfd[0]);
 		::close( m_pipfd[1]);
-		curl_easy_cleanup( m_pip_handle);
 		std::map<CURL*,WebRequestDelegateJobRef>::iterator ai = m_activatedMap.begin(), ae = m_activatedMap.end();
 		for (; ai != ae; ++ai)
 		{
@@ -419,30 +441,6 @@ struct CurlEventLoop::Data
 		}
 	}
 
-	void openSelfSignalingPipe()
-	{
-		int ec = 0;
-		m_pipfd[0] = 0;
-		m_pipfd[1] = 0;
-		if (::pipe( m_pipfd) == -1) throw strus::runtime_error(_TXT("failed to open pipe: %s"), ::strerror(errno));
-
-		int flags = fcntl( m_pipfd[0], F_GETFL);
-		if (flags == -1) goto ERROR;
-		flags |= O_NONBLOCK;
-		if (fcntl( m_pipfd[0], F_SETFL, flags) == -1) goto ERROR;
-		flags = fcntl( m_pipfd[1], F_GETFL);
-		if (flags == -1) goto ERROR;
-		flags |= O_NONBLOCK;
-		if (fcntl( m_pipfd[1], F_SETFL, flags) == -1) goto ERROR;
-		m_pipcurlfd = m_pipfd[0];
-		return;
-	ERROR:
-		ec = errno;
-		::close( m_pipfd[0]);
-		::close( m_pipfd[1]);
-		throw strus::runtime_error(_TXT("failed to open pipe: %s"), ::strerror(ec));
-	}
-
 	static curl_socket_t opensocket( void *clientp, curlsocktype purpose, struct curl_sockaddr *address)
 	{
 		curl_socket_t sockfd;
@@ -456,26 +454,6 @@ struct CurlEventLoop::Data
 		return CURL_SOCKOPT_ALREADY_CONNECTED;
 	}
 
-	bool initSelfPipeTrickCurlHandle()
-	{
-		bool rt = true;
-		m_pip_handle = curl_easy_init();
-		if (m_pip_handle)
-		{
-			rt &= (CURLE_OK == curl_easy_setopt( m_pip_handle, CURLOPT_OPENSOCKETFUNCTION, opensocket));
-			rt &= (CURLE_OK == curl_easy_setopt( m_pip_handle, CURLOPT_OPENSOCKETDATA, &m_pipcurlfd));
-			rt &= (CURLE_OK == curl_easy_setopt( m_pip_handle, CURLOPT_SOCKOPTFUNCTION, sockopt_callback));
-			if (!rt) goto ERROR;
-			rt &= (CURLM_OK == curl_multi_add_handle( m_multi_handle, m_pip_handle));
-			if (!rt) goto ERROR;
-			return true;
-		}
-	ERROR:
-		curl_easy_cleanup( m_pip_handle);
-		m_pip_handle = 0;
-		return false;
-	}
-
 	void notify()
 	{
 		::write( m_pipfd[1], "x", 1);
@@ -483,15 +461,19 @@ struct CurlEventLoop::Data
 
 	void consumeSelfPipeWrites()
 	{
-		int readCnt = 0;
-		for (;;++readCnt)
+		for (;;)
 		{
-			char ch;
-			if (::read( m_pipfd[0], &ch, 1) == -1) {
+			char ch[32];
+			ssize_t nn = ::read( m_pipfd[0], ch, sizeof(ch));
+			if (nn == -1) {
 				int ec = errno;
 				if (ec == EAGAIN) break;
-				if (ec == EINTR) {--readCnt; continue;}
+				if (ec == EINTR) continue;
 				throw strus::runtime_error(_TXT("failed to read from pipe: %s"), ::strerror(ec));
+			}
+			else if (nn == 0)
+			{
+				break;
 			}
 		}
 	}
@@ -536,7 +518,7 @@ struct CurlEventLoop::Data
 			WebRequestAnswer answer( err.what(), 500, ErrorCodeDelegateRequestFailed);
 			receiver->putAnswer( answer);
 			handleException( err.what());
-			if (conn.get()) conn->dropAllPendingRequests(  err.what());
+			if (conn.get()) conn->dropAllPendingRequests( ErrorCodeRuntimeError, err.what());
 			return false;
 		}
 		catch (const std::bad_alloc& )
@@ -544,7 +526,7 @@ struct CurlEventLoop::Data
 			WebRequestAnswer answer( _TXT("memory allocation error"), 500, ErrorCodeOutOfMem);
 			receiver->putAnswer( answer);
 			handleException( _TXT("memory allocation error"));
-			if (conn.get()) conn->dropAllPendingRequests( _TXT("memory allocation error"));
+			if (conn.get()) conn->dropAllPendingRequests( ErrorCodeOutOfMem, strus::errorCodeToString( ErrorCodeOutOfMem));
 			return false;
 		}
 		catch (...)
@@ -552,7 +534,7 @@ struct CurlEventLoop::Data
 			WebRequestAnswer answer( _TXT("unexpected exception"), 500, ErrorCodeDelegateRequestFailed);
 			receiver->putAnswer( answer);
 			handleException( _TXT("unexpected exception"));
-			if (conn.get()) conn->dropAllPendingRequests( _TXT("unexpected exception"));
+			if (conn.get()) conn->dropAllPendingRequests( ErrorCodeUncaughtException, strus::errorCodeToString( ErrorCodeUncaughtException));
 			return false;
 		}
 	}
@@ -662,7 +644,7 @@ struct CurlEventLoop::Data
 		}
 	}
 
-	void dropAllPendingRequests( const char* errmsg)
+	void dropAllPendingRequests( const strus::ErrorCode& errcode, const char* errmsg)
 	{
 		{
 			strus::unique_lock lock( m_connectionMap_mutex);
@@ -670,7 +652,7 @@ struct CurlEventLoop::Data
 			for (; ci != ce; ++ci)
 			{
 				WebRequestDelegateConnectionRef conn = ci->second;
-				conn->dropAllPendingRequests( errmsg);
+				conn->dropAllPendingRequests( errcode, errmsg);
 			}
 		}{
 			std::map<CURL*,WebRequestDelegateJobRef>::iterator ai = m_activatedMap.begin(), ae = m_activatedMap.end();
@@ -684,39 +666,42 @@ struct CurlEventLoop::Data
 
 	void run()
 	{
-		int still_running = 1;
-		while (still_running && !m_terminate.test())
+		while (!m_terminate.test())
 		{
 			try
 			{
-				int tickEvent = 0;
 				int numfds = 0;
+				int running_handles = 1;
+
 				activateIdleJobs();
-				LOG( _TXT("wait event"), curl_multi_wait( m_multi_handle, NULL, 0, m_milliSecondsPeriod, &numfds));
-				if (numfds == 0)
+				LOG( _TXT("perform event"), curl_multi_perform( m_multi_handle, &running_handles));
+				LOG( _TXT("wait event"), curl_multi_wait( m_multi_handle, &m_pipcurl_notify_fd, 1, m_milliSecondsPeriod, &numfds));
+				if (m_pipcurl_notify_fd.revents)
 				{
+					//... interrupted by new request in the queue or a terminate is signaled
+					m_pipcurl_notify_fd.revents = 0;
+					consumeSelfPipeWrites();
+					if (forcedTick()) tick();
+				}
+				else if (numfds == 0)
+				{
+					//... interrupted by timeout
 					m_requestCount = 0;
 					tick();
 					continue;
 				}
-				else if (forcedTick())
+				else
 				{
-					tick();
+					//... interrupted by event on a request processed
+					if (forcedTick()) tick();
 				}
 				if (m_terminate.test()) break;
-				LOG( _TXT("perform event"), curl_multi_perform( m_multi_handle, &still_running));
-	
+
 				CURLMsg* msg = NULL;
 				int msgs_left = 1;
 				while (msgs_left && NULL != (msg = curl_multi_info_read( m_multi_handle, &msgs_left)))
 				{
-					if (msg->easy_handle == m_pip_handle)
-					{
-						consumeSelfPipeWrites();
-						++tickEvent;
-						tick();
-					}
-					else if (msg->msg == CURLMSG_DONE)
+					if (msg->msg == CURLMSG_DONE)
 					{
 						WebRequestDelegateJobRef job = fetchJob( msg->easy_handle);
 						if (!job.get())
@@ -766,8 +751,7 @@ private:
 	int m_numberOfRequestsBeforeTick;			//< number of times a wait on a request or a timeout is interrupted by a request before a tick is inserted that normally occurrs on a timeout
 	AtomicFlag m_terminate;					//< flag that determines the termination of the eventloop
 	int m_pipfd[2];						//< pipe to listen for queue events in select: "self pipe trick"
-	curl_socket_t m_pipcurlfd;				//< copy of read end of m_pipfd
-	CURL* m_pip_handle;					//< CURL handle for listener on the pipe used for notifying new incoming requests
+	curl_waitfd m_pipcurl_notify_fd;			//< curl additional handle to wait for listening on the read part of the "self pipe trick" pipe
 };
 
 
@@ -822,17 +806,17 @@ void WebRequestDelegateJob::resume( CURLcode ec)
 	catch (const std::runtime_error& err)
 	{
 		m_eventloopdata->handleException( err.what());
-		m_conn->dropAllPendingRequests( err.what());
+		m_conn->dropAllPendingRequests( ErrorCodeRuntimeError, err.what());
 	}
 	catch (const std::bad_alloc& )
 	{
 		m_eventloopdata->handleException( _TXT("memory allocation error"));
-		m_conn->dropAllPendingRequests( _TXT("memory allocation error"));
+		m_conn->dropAllPendingRequests( ErrorCodeOutOfMem, strus::errorCodeToString( ErrorCodeOutOfMem));
 	}
 	catch (...)
 	{
 		m_eventloopdata->handleException( _TXT("unexpected exception"));
-		m_conn->dropAllPendingRequests( _TXT("unexpected exception"));
+		m_conn->dropAllPendingRequests( ErrorCodeUncaughtException, strus::errorCodeToString( ErrorCodeUncaughtException));
 	}
 }
 
@@ -861,7 +845,7 @@ CurlEventLoop::~CurlEventLoop()
 void CurlEventLoop::run()
 {
 	m_data->run();
-	m_data->dropAllPendingRequests( _TXT("service terminated"));
+	m_data->dropAllPendingRequests( ErrorCodeServiceShutdown, strus::errorCodeToString( ErrorCodeServiceShutdown));
 }
 
 bool CurlEventLoop::start()
