@@ -8,6 +8,7 @@ Table of Contents
 	boost
 	fmt
 	Zend framework (PHP)
+	lunajson
 
 textwolf
 ----------
@@ -30,3 +31,9 @@ fmt
 Zend framework (PHP)
 ----------------
        New BSD License
+
+lunajson
+--------
+	MIT/X11 (https://github.com/grafi-tt/lunajson)
+	
+

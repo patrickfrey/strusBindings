@@ -43,10 +43,13 @@ each of these flags toggled to YES another section.
 ## Required packages with -DWITH_STRUS_VECTOR=YES
 	atlas-dev lapack-dev blas-dev libarmadillo-dev
 
-## Required packages with -DWITH_STRUS_PYTHON=YES
+## Required packages with -DWITH_LUA=YES
+	lua5.2
+
+## Required packages with -DWITH_PYTHON=YES
 	python3-dev
 
-## Required packages with -DWITH_STRUS_PHP=YES
+## Required packages with -DWITH_PHP=YES
 	php7.0-dev zlib1g-dev libxml2-dev
 
 ## Required packages with -DWITH_WEBREQUEST=YES
@@ -90,23 +93,24 @@ each of these flags toggled to YES another section.
 	git clone https://github.com/patrickfrey/$strusprj $strusprj
 	cd $strusprj
 	cmake -DCMAKE_BUILD_TYPE=Release \
-		-DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" .
+		-DCMAKE_C_COMPILER="clang" -DCMAKE_CXX_COMPILER="clang++" -DWITH_LUA=YES .
 	make
 	make install
 	cd ..
 	done
 
 # Configure with GNU C/C++
-	With PHP and Python bindings and strusVector and strusPattern enabled:
+	With Lua, Php and Python bindings and strusVector and strusPattern enabled:
 	cmake -DCMAKE_BUILD_TYPE=Release \
 		-DWITH_PYTHON=YES \
 		-DWITH_PHP=YES \
+		-DWITH_LUA=YES \
 		-DWITH_STRUS_VECTOR=YES \
 		-DWITH_STRUS_PATTERN=YES \
 		-DLIB_INSTALL_DIR=lib .
 
 # Configure with Clang C/C++
-	Minimal build, only Lua bindings without Vector and Pattern and
+	Minimal build without Vector and Pattern and
 	a reasonable default for library installation directory:
 
 	cmake -DCMAKE_BUILD_TYPE=Release \

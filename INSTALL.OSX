@@ -35,7 +35,10 @@ brew install php70
 
 brew install python3
 
-# 4) If support for pattern matching is build (-DWITH_STRUS_PATTERN=YES), build and install hyperscan (tag v4.7.0, build with shared libs) from source.
+# 4.3) Install Lua 5.2 or greater when building the Lua bindings (-DWITH_LUA=YES):
+brew install lua5.2
+
+# 4.4) If support for pattern matching is build (-DWITH_STRUS_PATTERN=YES), build and install hyperscan (tag v4.7.0, build with shared libs) from source.
 
 # 5) Build dependent strus packages
 # See installation of projects strusBase,strusAnalyzer,strusPattern (-DWITH_STRUS_PATTERN=YES), strusVector (-DWITH_STRUS_VECTOR=YES),strusRpc,strusTrace,strusModule

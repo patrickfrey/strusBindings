@@ -604,7 +604,9 @@ bool strus::mapStringToAnswer(
 		WebRequestContent::Type doctype,
 		const std::string& input)
 {
-	return mapResult( answer, allocator, html_head, html_href_base, 0, name, encoding, doctype, input);
+	papuga_ValueVariant value;
+	papuga_init_ValueVariant_string( &value, input.c_str(), input.size());
+	return strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, 0, name, encoding, doctype, value);
 }
 
 bool strus::mapStringArrayToAnswer(

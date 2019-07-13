@@ -382,7 +382,10 @@ strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Con
 std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::string& method, const std::string& path, const strus::WebRequestContent& content)
 {
 	std::pair<strus::WebRequestAnswer,std::string> rt;
-	std::string html_base_href = strus::string_format( "http://%s/", m_hostname.c_str());
+	std::string html_base_href =
+		path.empty()
+			? strus::string_format( "http://%s/", m_hostname.c_str())
+			: strus::string_format( "http://%s/%s/", m_hostname.c_str(), path.c_str());
 
 	strus::Reference<strus::WebRequestContextInterface> ctx( m_handler->createContext( 
 				g_charset, g_doctype, html_base_href.c_str(), rt.first));
@@ -618,7 +621,7 @@ static int l_set_time( lua_State *L)
 	}
 	catch (const std::exception& err)
 	{
-		luaL_error( L, err.what());
+		luaL_error( L, "%s", err.what());
 	}
 	return 0;
 }
@@ -638,7 +641,7 @@ static int l_def_server( lua_State *L)
 	}
 	catch (const std::exception& err)
 	{
-		luaL_error( L, err.what());
+		luaL_error( L, "%s", err.what());
 	}
 	return 0;
 }
@@ -653,7 +656,7 @@ static int l_call_server( lua_State *L)
 		const char* method = lua_tostring( L, 1);
 		const char* url = lua_tostring( L, 2);
 		std::size_t arglen = 0;
-		const char* arg = nofArgs < 3 ? "" : lua_tolstring( L, 3, &arglen);
+		const char* arg = nofArgs < 3 || lua_isnil( L, 3) ? "" : lua_tolstring( L, 3, &arglen);
 		std::pair<strus::WebRequestAnswer,std::string> result;
 		if (arg[0] == '@')
 		{
@@ -663,7 +666,7 @@ static int l_call_server( lua_State *L)
 			if (ec)
 			{
 				std::string msg = strus::string_format( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
-				return luaL_error(L, msg.c_str());
+				return luaL_error(L, "%s", msg.c_str());
 			}
 			result = g_globalContext.call( method, url, content.c_str());
 		}
@@ -673,19 +676,18 @@ static int l_call_server( lua_State *L)
 		}
 		if (result.second.empty())
 		{
-			lua_pushinteger(L, result.first.httpstatus()); /* first return value */
-			return 1;
+			lua_pushnil(L);
 		}
 		else
 		{
-			lua_pushinteger(L, result.first.httpstatus()); /* first return value */
 			lua_pushlstring(L, result.second.c_str(), result.second.size()); 
-			return 2;
 		}
+		lua_pushinteger(L, result.first.httpstatus()); /* second return value */
+		return 2;
 	}
 	catch (const std::exception& err)
 	{
-		luaL_error( L, err.what());
+		luaL_error( L, "%s", err.what());
 		return 0;
 	}
 }
