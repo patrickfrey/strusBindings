@@ -19,3 +19,4 @@ for k,path in pairs(documents) do
 	call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
 end
 
+io.stderr:write( string.format("- Inspect document analysis:\n%s\n", call_server_checked( "GET", TRANSACTION )))
