@@ -141,6 +141,7 @@ private:
 	std::string m_procname;
 };
 
+static bool g_verbose = false;
 static Logger g_logger;
 static const char* g_charset = "UTF-8";
 static const char* g_doctype = "application/json";
@@ -621,6 +622,26 @@ static std::string convertConfigToJson( lua_State *L, int luaddr)
 	return rt;
 }
 
+static std::string getContentArgumentValue( const char* arg)
+{
+	if (!arg)
+	{
+		return std::string();
+	}
+	else if (arg[0] == '@')
+	{
+		std::string content;
+		std::string fullpath = strus::joinFilePath( g_scriptDir, arg+1);
+		int ec = strus::readFile( fullpath, content);
+		if (ec) throw strus::runtime_error( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
+		return content;
+	}
+	else
+	{
+		return arg;
+	}
+}
+
 static int l_set_time( lua_State *L)
 {
 	try
@@ -668,24 +689,10 @@ static int l_call_server( lua_State *L)
 		const char* method = lua_tostring( L, 1);
 		const char* url = lua_tostring( L, 2);
 		std::size_t arglen = 0;
-		const char* arg = nofArgs < 3 || lua_isnil( L, 3) ? "" : lua_tolstring( L, 3, &arglen);
-		std::pair<strus::WebRequestAnswer,std::string> result;
-		if (arg[0] == '@')
-		{
-			std::string content;
-			std::string fullpath = strus::joinFilePath( g_scriptDir, arg+1);
-			int ec = strus::readFile( fullpath, content);
-			if (ec)
-			{
-				std::string msg = strus::string_format( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
-				return luaL_error(L, "%s", msg.c_str());
-			}
-			result = g_globalContext.call( method, url, content.c_str());
-		}
-		else
-		{
-			result = g_globalContext.call( method, url, arg);
-		}
+		const char* arg = nofArgs < 3 || lua_isnil( L, 3) ? 0 : lua_tolstring( L, 3, &arglen);
+
+		std::string content = getContentArgumentValue( arg);
+		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, content.c_str());
 		if (result.second.empty())
 		{
 			lua_pushnil(L);
@@ -707,55 +714,68 @@ static int l_call_server( lua_State *L)
 static void push_linestring( lua_State *L, char const* ln)
 {
 	char const* end = std::strchr( ln, '\n');
-	if (!ln) end = std::strchr( ln, '\0');
+	if (!end) end = std::strchr( ln, '\0');
 	lua_pushlstring( L, ln, end-ln);
 }
 
 static int l_cmp_content( lua_State *L)
 {
-	int linecnt = 1;
-	int nofArgs = lua_gettop(L);
-	if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'cmp_content': expected <result> <expected>"));
-	if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'cmp_content': expected <result> <expected>"));
-	char const* ai = lua_tostring( L, 1);
-	char const* bi = lua_tostring( L, 2);
-	const char* a_ln = ai;
-	const char* b_ln = bi;
-	while (*ai && *bi)
+	try
 	{
-		if (*ai == *bi) {++ai; ++bi; continue;}
-		if ((*ai == '\r' || *ai == '\n') && (*bi == '\r' || *bi == '\n'))
+		int linecnt = 1;
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'cmp_content': expected <result> <expected>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'cmp_content': expected <result> <expected>"));
+		const char* arg_1 = lua_tostring( L, 1);
+		const char* arg_2 = lua_tostring( L, 2);
+		std::string content_a = getContentArgumentValue( arg_1);
+		std::string content_b = getContentArgumentValue( arg_2);
+		char const* ai = content_a.c_str();
+		char const* bi = content_b.c_str();
+		const char* a_ln = ai;
+		const char* b_ln = bi;
+	
+		while (*ai && *bi)
 		{
-			++linecnt;
-			if (*ai == '\r') ++ai;
-			if (*bi == '\r') ++bi;
-			if (*ai == '\n' && *bi == '\n')
+			if (*ai == *bi) {++ai; ++bi; continue;}
+			if ((*ai == '\r' || *ai == '\n') && (*bi == '\r' || *bi == '\n'))
 			{
-				++ai; a_ln = ai;
-				++bi; b_ln = bi;
-				continue;
+				++linecnt;
+				if (*ai == '\r') ++ai;
+				if (*bi == '\r') ++bi;
+				if (*ai == '\n' && *bi == '\n')
+				{
+					++ai; a_ln = ai;
+					++bi; b_ln = bi;
+					continue;
+				}
 			}
+			lua_pushboolean( L, false);
+			lua_pushinteger( L, linecnt);
+			push_linestring( L, a_ln);
+			push_linestring( L, b_ln);
+			return 4;
 		}
-		lua_pushboolean( L, false);
-		lua_pushinteger( L, linecnt);
-		push_linestring( L, a_ln);
-		push_linestring( L, b_ln);
-		return 4;
+		while (*ai == '\r' || *ai == '\n') ++ai;
+		while (*bi == '\r' || *bi == '\n') ++bi;
+		if (!*ai && !*bi)
+		{
+			lua_pushboolean( L, true);
+			return 1;
+		}
+		else
+		{
+			lua_pushboolean( L, false);
+			lua_pushinteger( L, linecnt);
+			push_linestring( L, a_ln);
+			push_linestring( L, b_ln);
+			return 4;
+		}
 	}
-	while (*ai == '\r' || *ai == '\n') ++ai;
-	while (*bi == '\r' || *bi == '\n') ++bi;
-	if (!*ai && !*bi)
+	catch (const std::exception& err)
 	{
-		lua_pushboolean( L, true);
-		return 1;
-	}
-	else
-	{
-		lua_pushboolean( L, false);
-		lua_pushinteger( L, linecnt);
-		push_linestring( L, a_ln);
-		push_linestring( L, b_ln);
-		return 4;
+		luaL_error( L, "%s", err.what());
+		return 0;
 	}
 }
 
@@ -767,6 +787,9 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( def_server );
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
+
+	lua_pushboolean( L, g_verbose);
+	lua_setglobal( L, "verbose");
 }
 
 static void printUsage()
@@ -865,12 +888,15 @@ static void printDebugTraceMessages()
 	{
 		std::vector<strus::DebugTraceMessage> messages = g_debugTrace->fetchMessages();
 		std::vector<strus::DebugTraceMessage>::const_iterator mi = messages.begin(), me = messages.end();
-		fprintf( stderr, "DEBUG:\n");
-		for (; mi != me; ++mi)
+		if (mi != me)
 		{
-			fprintf( stderr, "%s %s %s: %s\n", mi->typeName(), mi->component(), mi->id(), mi->content().c_str());
+			fprintf( stderr, "DEBUG:\n");
+			for (; mi != me; ++mi)
+			{
+				fprintf( stderr, "%s %s %s: %s\n", mi->typeName(), mi->component(), mi->id(), mi->content().c_str());
+			}
+			fprintf( stderr, "\n");
 		}
-		fprintf( stderr, "\n");
 	}
 }
 
@@ -911,6 +937,7 @@ int main( int argc, const char* argv[])
 			else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV"))
 			{
 				verbosity += std::strlen(argv[argi])-1;
+				g_verbose = true;
 			}
 			else if (0==strcmp( argv[argi], "--debug") || 0==strcmp( argv[argi], "-G"))
 			{

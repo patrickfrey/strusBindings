@@ -1,6 +1,7 @@
 require "config"
 require "testUtils"
 require "io"
+require "os"
 local json = require 'lunajson'
 
 SCRIPTPATH = script_path()
@@ -10,13 +11,16 @@ call_server_checked( "PUT", CSERVER1 .. "/contentstats/stats", "@contentstats.js
 set_time( 1)
 
 TRANSACTION = json.decode( call_server_checked( "POST", CSERVER1 .. "/contentstats/stats/transaction" )).link
-io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION))
+if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
 
 documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
 for k,path in pairs(documents) do
 	fullpath = "doc/xml/" .. path
-	io.stderr:write( string.format("- Insert document %s\n", fullpath))
+	if verbose then io.stderr:write( string.format("- Insert document %s\n", fullpath)) end
 	call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
 end
 
-io.stderr:write( string.format("- Inspect document analysis:\n%s\n", call_server_checked( "GET", TRANSACTION )))
+OUTPUT = call_server_checked( "GET", TRANSACTION )
+if verbose then io.stderr:write( string.format("- Inspect document analysis:\n%s\n", OUTPUT)) end
+
+checkExpected( OUTPUT, "@documentStructureAnalysis.exp" )

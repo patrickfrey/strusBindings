@@ -28,13 +28,21 @@ end
 function getDirectoryFiles( dir, extension)
 	rt = {}
 	for filename in io.popen("ls " .. dir):lines() do
-		print( dir)
 		if string.find( filename, string.format("%%%s$", extension)) then
-			print( filename)
 			table.insert( rt, filename)
 		end
 	end
 	return rt
 end
+
+function checkExpected( output, expected)
+	res,lineno,line_a,line_b = cmp_content( output, expected )
+	if not res then
+		io.stderr:write( string.format("ERROR result not as expected, difference on line %d, result: '%s', expected '%s'\n", lineno, line_a, line_b))
+		os.exit( 1)
+	end
+end
+
+
 
 
