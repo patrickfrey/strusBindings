@@ -10,9 +10,9 @@ config = {
 	},
 	extensions = {
 		directory = "@STRUS_MODULE_PATH@",
-		modules = [
+		modules = { 
 			@STRUS_MODULES_LOADED@
-		]
+		}	
 	}
 }
 
