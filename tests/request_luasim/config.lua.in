@@ -1,8 +1,8 @@
 config = {
 	data = {
-		workdir     = "/srv/strus",
-		configdir   = "/srv/strus/config",
-		resources   = "/usr/share/strus"
+		workdir     = "@TEST_REQUEST_LUASIM_RUN_DIR@",
+		configdir   = "@TEST_REQUEST_LUASIM_RUN_DIR@/config",
+		resources   = "@TEST_REQUEST_LUASIM_RUN_DIR@/strus"
 	},
 	transactions = {
 		max_idle_time  = 600,

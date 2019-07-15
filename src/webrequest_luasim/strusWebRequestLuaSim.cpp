@@ -515,18 +515,19 @@ static void convertConfig_( lua_State *L, int luaddr, Configuration& config, con
 	lua_pop( L, 1); // Get luaddr-value from stack
 }
 
-static bool isArray( lua_State *L, int luaddr)
+enum TableType {TableTypeEmpty,TableTypeArray,TableTypeDictionary};
+static TableType getTableType( lua_State *L, int luaddr)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
 	if (lua_next( L, -2) != 0)
 	{
-		bool rt = (lua_isnumber( L, -2) && lua_tointeger( L, -2) == 1);
+		TableType rt = (lua_isnumber( L, -2) && lua_tointeger( L, -2) == 1) ? TableTypeArray : TableTypeDictionary;
 		lua_pop( L, 3 );
 		return rt;
 	}
 	lua_pop( L, 1 );
-	return false;
+	return TableTypeEmpty;
 }
 
 static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configstr, bool array)
@@ -552,17 +553,23 @@ static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configs
 		else {
 			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
 		}
-		if (key)
-		{
-			configstr.append( itercnt ? ", \"" : "\"");
-			configstr.append( key);
-			configstr.append( "\": ");
-		}
-		else if (itercnt)
+		std::size_t elementStartPos = configstr.size();
+		if (itercnt)
 		{
 			configstr.append( ", ");
 		}
-		if (lua_isstring( L, -1))
+		if (key)
+		{
+			configstr.append( "\"");
+			configstr.append( key);
+			configstr.append( "\": ");
+		}
+		if (lua_isnil( L, -1))
+		{
+			configstr.resize( elementStartPos);
+			--itercnt;
+		}
+		else if (lua_isstring( L, -1))
 		{
 			configstr.push_back( '"');
 			configstr.append( lua_tostring( L, -1));
@@ -570,17 +577,22 @@ static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configs
 		}
 		else if (lua_istable( L, -1))
 		{
-			if (isArray( L, -1))
+			switch (getTableType( L, -1))
 			{
-				configstr.append( "[ ");
-				convertConfigToJson_( L, -1, configstr, true/*array*/);
-				configstr.append( " ]");
-			}
-			else
-			{
-				configstr.append( "{ ");
-				convertConfigToJson_( L, -1, configstr, false/*!array*/);
-				configstr.append( " }");
+				case TableTypeEmpty:
+					configstr.resize( elementStartPos);
+					--itercnt;
+					break;
+				case TableTypeArray:
+					configstr.append( "[ ");
+					convertConfigToJson_( L, -1, configstr, true/*array*/);
+					configstr.append( " ]");
+					break;
+				case TableTypeDictionary:
+					configstr.append( "{ ");
+					convertConfigToJson_( L, -1, configstr, false/*!array*/);
+					configstr.append( " }");
+					break;
 			}
 		}
 		else
@@ -958,7 +970,6 @@ int main( int argc, const char* argv[])
 		{
 			setLuaPath( ls, modpath[ mi]);
 		}
-	
 		/* Define program arguments for lua script: */
 		lua_newtable( ls);
 		for (ai=0,ae=argc-argi; ai != ae; ++ai)

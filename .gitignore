@@ -65,7 +65,6 @@ doc/luaBindingsDoc.css
 doc/luaBindingsDoc.js
 src/lang/lua/dist.info
 src/lang/lua/strus.lua
-tests/request_luasim/config.lua
 
 # Compiled programs
 src/parser/strusBindingsInterfaceGen
