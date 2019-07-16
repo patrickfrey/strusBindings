@@ -60,7 +60,7 @@
 			{
 				"select": "/doc/citation/attr/E@id",
 				"type": "title",
-				"example": "David Bowie",
+				"example": "Brit Awards",
 				"df": 1,
 				"tf": 3},
 			{
@@ -114,7 +114,7 @@
 			{
 				"select": "/doc/citation/attr/entity/pagelink/text()",
 				"type": "title",
-				"example": "Showgirls",
+				"example": "Earthling",
 				"df": 1,
 				"tf": 2},
 			{
@@ -246,7 +246,7 @@
 			{
 				"select": "/doc/citation/attr/pagelink/text/N()",
 				"type": "title",
-				"example": "school",
+				"example": "houses",
 				"df": 1,
 				"tf": 2},
 			{
@@ -432,7 +432,7 @@
 			{
 				"select": "/doc/citation/attr/text/V()",
 				"type": "title",
-				"example": "flourished",
+				"example": "encouraged",
 				"df": 1,
 				"tf": 210},
 			{
@@ -450,7 +450,7 @@
 			{
 				"select": "/doc/citation/list/attr()",
 				"type": "",
-				"example": ", ",
+				"example": ") ",
 				"df": 1,
 				"tf": 8},
 			{
@@ -570,7 +570,7 @@
 			{
 				"select": "/doc/citation/table/cell/entity/text()",
 				"type": "title",
-				"example": "Fahrenheit 9/11",
+				"example": " 1. Outside and",
 				"df": 1,
 				"tf": 3},
 			{
@@ -612,7 +612,7 @@
 			{
 				"select": "/doc/citation/table/cell/pagelink/mark()",
 				"type": "",
-				"example": "-'",
+				"example": "'-",
 				"df": 1,
 				"tf": 3},
 			{
@@ -756,7 +756,7 @@
 			{
 				"select": "/doc/citation/table/cell/quot/text/R()",
 				"type": "title",
-				"example": "It",
+				"example": "He",
 				"df": 1,
 				"tf": 4},
 			{
@@ -834,7 +834,7 @@
 			{
 				"select": "/doc/citation/table/cell/text/M()",
 				"type": "title",
-				"example": "will",
+				"example": "such",
 				"df": 1,
 				"tf": 5},
 			{
@@ -870,7 +870,7 @@
 			{
 				"select": "/doc/citation/table/cell/text/W()",
 				"type": "title",
-				"example": "where",
+				"example": "Where",
 				"df": 1,
 				"tf": 35},
 			{
@@ -1224,7 +1224,7 @@
 			{
 				"select": "/doc/entity/text()",
 				"type": "",
-				"example": ", ",
+				"example": "' ",
 				"df": 1,
 				"tf": 40},
 			{
@@ -1284,7 +1284,7 @@
 			{
 				"select": "/doc/entity/text/V()",
 				"type": "title",
-				"example": "symbolised",
+				"example": "considered",
 				"df": 1,
 				"tf": 49},
 			{
@@ -1296,7 +1296,7 @@
 			{
 				"select": "/doc/entity@lv",
 				"type": "title",
-				"example": "5",
+				"example": "2",
 				"df": 1,
 				"tf": 442},
 			{
@@ -1500,7 +1500,7 @@
 			{
 				"select": "/doc/list/citlink@id",
 				"type": "title",
-				"example": "cit264",
+				"example": "cit116",
 				"df": 1,
 				"tf": 56},
 			{
@@ -1614,7 +1614,7 @@
 			{
 				"select": "/doc/list/entity@lv",
 				"type": "title",
-				"example": "3",
+				"example": "2",
 				"df": 1,
 				"tf": 120},
 			{
@@ -1788,7 +1788,7 @@
 			{
 				"select": "/doc/list/quot/text/C()",
 				"type": "title",
-				"example": "1979",
+				"example": "1974",
 				"df": 1,
 				"tf": 5},
 			{
@@ -1842,7 +1842,7 @@
 			{
 				"select": "/doc/list/text/A()",
 				"type": "title",
-				"example": "previously",
+				"example": "additional",
 				"df": 1,
 				"tf": 44},
 			{
@@ -1866,7 +1866,7 @@
 			{
 				"select": "/doc/list/text/N()",
 				"type": "title",
-				"example": "picture disc sets",
+				"example": "background vocals",
 				"df": 1,
 				"tf": 73},
 			{
@@ -1878,13 +1878,13 @@
 			{
 				"select": "/doc/list/text/R()",
 				"type": "title",
-				"example": "their",
+				"example": "Their",
 				"df": 1,
 				"tf": 9},
 			{
 				"select": "/doc/list/text/V()",
 				"type": "title",
-				"example": "unreleased",
+				"example": "Uncredited",
 				"df": 1,
 				"tf": 83},
 			{
@@ -2010,13 +2010,13 @@
 			{
 				"select": "/doc/pagelink/text/A()",
 				"type": "title",
-				"example": "androgynous",
+				"example": "alternative",
 				"df": 1,
 				"tf": 47},
 			{
 				"select": "/doc/pagelink/text/C()",
 				"type": "title",
-				"example": "eleven",
+				"example": "342843",
 				"df": 1,
 				"tf": 15},
 			{
@@ -2190,7 +2190,7 @@
 			{
 				"select": "/doc/quot/mark()",
 				"type": "",
-				"example": "-\"",
+				"example": "'\"",
 				"df": 1,
 				"tf": 2},
 			{
@@ -2316,7 +2316,7 @@
 			{
 				"select": "/doc/quot/text()",
 				"type": "title",
-				"example": "The Voyeur of Utter Destruction (as Beauty)",
+				"example": "The Voyeur Of Utter Destruction (As Beauty)",
 				"df": 1,
 				"tf": 1525},
 			{
@@ -2388,7 +2388,7 @@
 			{
 				"select": "/doc/quot/text/W()",
 				"type": "title",
-				"example": "which",
+				"example": "where",
 				"df": 1,
 				"tf": 82},
 			{
@@ -2400,7 +2400,7 @@
 			{
 				"select": "/doc/ref/citlink@id",
 				"type": "title",
-				"example": "cit239",
+				"example": "cit110",
 				"df": 1,
 				"tf": 24},
 			{
@@ -2448,7 +2448,7 @@
 			{
 				"select": "/doc/ref/entity/text/N()",
 				"type": "title",
-				"example": "user",
+				"example": "down",
 				"df": 1,
 				"tf": 6},
 			{
@@ -2484,7 +2484,7 @@
 			{
 				"select": "/doc/ref/quot/text()",
 				"type": "",
-				"example": "] ",
+				"example": ", ",
 				"df": 1,
 				"tf": 17},
 			{
@@ -2502,7 +2502,7 @@
 			{
 				"select": "/doc/ref/quot/text/C()",
 				"type": "title",
-				"example": "1913",
+				"example": "1912",
 				"df": 1,
 				"tf": 2},
 			{
@@ -2610,7 +2610,7 @@
 			{
 				"select": "/doc/ref/text/C()",
 				"type": "title",
-				"example": "2015",
+				"example": "1983",
 				"df": 1,
 				"tf": 166},
 			{
@@ -2628,7 +2628,7 @@
 			{
 				"select": "/doc/ref/text/N()",
 				"type": "title",
-				"example": "magazine",
+				"example": "category",
 				"df": 1,
 				"tf": 14},
 			{
@@ -2796,7 +2796,7 @@
 			{
 				"select": "/doc/table/cell/citlink@id",
 				"type": "title",
-				"example": "cit147",
+				"example": "cit100",
 				"df": 1,
 				"tf": 203},
 			{
@@ -2940,7 +2940,7 @@
 			{
 				"select": "/doc/table/cell/mark()",
 				"type": "title",
-				"example": "nom",
+				"example": "end",
 				"df": 1,
 				"tf": 124},
 			{
@@ -3120,7 +3120,7 @@
 			{
 				"select": "/doc/table/head/citlink@id",
 				"type": "title",
-				"example": "cit146",
+				"example": "cit101",
 				"df": 1,
 				"tf": 62},
 			{
@@ -3156,7 +3156,7 @@
 			{
 				"select": "/doc/table/head/quot/pagelink/text()",
 				"type": "",
-				"example": ", ",
+				"example": " (",
 				"df": 1,
 				"tf": 21},
 			{
@@ -3306,7 +3306,7 @@
 			{
 				"select": "/doc/table/head/text/C()",
 				"type": "title",
-				"example": "1977",
+				"example": "1972",
 				"df": 1,
 				"tf": 16},
 			{
@@ -3372,19 +3372,19 @@
 			{
 				"select": "/doc/table@id",
 				"type": "title",
-				"example": "table41",
+				"example": "table12",
 				"df": 1,
 				"tf": 51},
 			{
 				"select": "/doc/tablink@id",
 				"type": "title",
-				"example": "table41",
+				"example": "table12",
 				"df": 1,
 				"tf": 51},
 			{
 				"select": "/doc/text()",
 				"type": "",
-				"example": ". ... ",
+				"example": ") – ",
 				"df": 1,
 				"tf": 2290},
 			{
@@ -3456,7 +3456,7 @@
 			{
 				"select": "/doc/text/R()",
 				"type": "title",
-				"example": "their",
+				"example": "Their",
 				"df": 1,
 				"tf": 729},
 			{
@@ -3474,7 +3474,7 @@
 			{
 				"select": "/doc/text/V()",
 				"type": "title",
-				"example": "characterised",
+				"example": "Characterised",
 				"df": 1,
 				"tf": 2821},
 			{
@@ -3486,7 +3486,7 @@
 			{
 				"select": "/doc/text/X()",
 				"type": "title",
-				"example": "there",
+				"example": "There",
 				"df": 1,
 				"tf": 3},
 			{
@@ -3496,4 +3496,3 @@
 				"df": 1,
 				"tf": 18}]}}
 }
-
