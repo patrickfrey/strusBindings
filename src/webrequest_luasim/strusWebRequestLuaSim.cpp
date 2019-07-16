@@ -278,6 +278,7 @@ private:
 static EventLoop g_eventLoop;
 static GlobalContext g_globalContext;
 static std::string g_scriptDir;
+static std::string g_outputDir;
 static strus::DebugTraceInterface* g_debugTrace = 0;
 static strus::ErrorBufferInterface* g_errorhnd = 0;
 
@@ -814,7 +815,7 @@ static int l_write_textfile( lua_State *L)
 		const char* filename = lua_tostring( L, 1);
 		const char* content = lua_tostring( L, 2);
 
-		std::string fullpath = strus::joinFilePath( g_scriptDir, filename);
+		std::string fullpath = strus::joinFilePath( g_outputDir, filename);
 		std::string normcontent;
 		char const* ci = content;
 		while (*ci)
@@ -861,7 +862,7 @@ static void declareFunctions( lua_State *L)
 static void printUsage()
 {
 	fprintf( stderr, "%s",
-		 "strusWebRequestLuaSim [<options>] <luascript>\n"
+		 "strusWebRequestLuaSim [<options>] <luascript> [<outputdir>]\n"
 		"<options>:\n" 
 		 "   -h,--help          :Print this usage\n"
 		 "   -m,--mod <PATH>    :Set <PATH> as addidional module path\n"
@@ -975,7 +976,6 @@ int main( int argc, const char* argv[])
 	int errcode = 0;
 	int modi = 0;
 	int mi,me;
-	int ai,ae;
 	int verbosity = 0;
 	const char* modpath[ MaxModPaths];
 
@@ -1040,15 +1040,28 @@ int main( int argc, const char* argv[])
 			fprintf( stderr, _TXT("too few arguments (less than one)\n"));
 			return -1;
 		}
-		inputfile = argv[ argi];
+		inputfile = argv[ argi++];
 		int ec = strus::getParentPath( inputfile, g_scriptDir);
 		if (ec)
 		{
 			fprintf( stderr, _TXT("failed to get directory of the script to execute\n"));
 			return -1;
 		}
+		if (argi == argc)
+		{
+			g_outputDir = ".";
+		}
+		else
+		{
+			g_outputDir = argv[ argi++];
+		}
+		if (argi != argc)
+		{
+			fprintf( stderr, _TXT("too many arguments\n"));
+			return -1;
+		}
 		g_logger.init( verbosity);
-	
+
 #ifdef STRUS_LOWLEVEL_DEBUG
 		fprintf( stderr, "create lua state\n");
 #endif
@@ -1063,15 +1076,7 @@ int main( int argc, const char* argv[])
 		{
 			setLuaPath( ls, modpath[ mi]);
 		}
-		/* Define program arguments for lua script: */
-		lua_newtable( ls);
-		for (ai=0,ae=argc-argi; ai != ae; ++ai)
-		{
-			lua_pushinteger( ls, ai);
-			lua_pushstring( ls, argv[argi+ai]);
-			lua_rawset( ls, -3);
-		}
-		lua_setglobal( ls, "arg");
+		setLuaPath( ls, g_outputDir.c_str());
 		declareFunctions( ls);
 	
 		/* Load the script: */

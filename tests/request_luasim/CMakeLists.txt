@@ -13,5 +13,5 @@ ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
 configure_file( "${CMAKE_CURRENT_LIST_DIR}/config.lua.in"   "${CMAKE_CURRENT_BINARY_DIR}/config.lua"   @ONLY )
 
-add_test( DocumentStructureAnalysis  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim --mod '${CMAKE_CURRENT_BINARY_DIR}'   ${CMAKE_CURRENT_LIST_DIR}/documentStructureAnalysis.lua )
+add_test( DocumentStructureAnalysis  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim ${CMAKE_CURRENT_LIST_DIR}/documentStructureAnalysis.lua '${CMAKE_CURRENT_BINARY_DIR}' )
 
