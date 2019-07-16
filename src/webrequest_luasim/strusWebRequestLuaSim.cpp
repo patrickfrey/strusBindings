@@ -804,6 +804,46 @@ static int l_cmp_content( lua_State *L)
 	}
 }
 
+static int l_write_textfile( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'write_textfile': expected <result> <expected>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'write_textfile': expected <result> <expected>"));
+		const char* filename = lua_tostring( L, 1);
+		const char* content = lua_tostring( L, 2);
+
+		std::string fullpath = strus::joinFilePath( g_scriptDir, filename);
+		std::string normcontent;
+		char const* ci = content;
+		while (*ci)
+		{
+			if (*ci == '\n' || *ci == '\r')
+			{
+				normcontent.push_back( '\n');
+				ci = skipEoln( ci);
+			}
+			else
+			{
+				normcontent.push_back( '\n');
+				++ci;
+			}
+		}
+		int ec = strus::writeFile( fullpath, normcontent);
+		if (ec)
+		{
+			luaL_error( L, _TXT("failed to write text file (errno %d): %s"), ec, ::strerror(ec));
+		}
+		return 0;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
 static void declareFunctions( lua_State *L)
 {
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
@@ -812,6 +852,7 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( def_server );
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
+	DEFINE_FUNCTION( write_textfile );
 
 	lua_pushboolean( L, g_verbose);
 	lua_setglobal( L, "verbose");
