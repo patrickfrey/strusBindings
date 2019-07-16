@@ -718,6 +718,22 @@ static void push_linestring( lua_State *L, char const* ln)
 	lua_pushlstring( L, ln, end-ln);
 }
 
+static const char* skipEoln( const char* si)
+{
+	if (si[0] == '\r')
+	{
+		return (si[1] == '\n') ? (si + 2) /*CRLF - Windows*/: (si + 1) /*CR - older Mac OS*/;
+	}
+	else if (si[0] == '\n')
+	{
+		return si+1;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 static int l_cmp_content( lua_State *L)
 {
 	try
@@ -737,18 +753,27 @@ static int l_cmp_content( lua_State *L)
 	
 		while (*ai && *bi)
 		{
-			if (*ai == *bi) {++ai; ++bi; continue;}
 			if ((*ai == '\r' || *ai == '\n') && (*bi == '\r' || *bi == '\n'))
 			{
 				++linecnt;
-				if (*ai == '\r') ++ai;
-				if (*bi == '\r') ++bi;
-				if (*ai == '\n' && *bi == '\n')
+				ai = skipEoln( ai);
+				bi = skipEoln( bi);
+				if (ai && bi)
 				{
-					++ai; a_ln = ai;
-					++bi; b_ln = bi;
+					a_ln = ai;
+					b_ln = bi;
 					continue;
 				}
+				else
+				{
+					return luaL_error(L, _TXT("bad state in 'cmp_content'"));
+				}
+			}
+			else if (*ai == *bi)
+			{
+				++ai;
+				++bi;
+				continue;
 			}
 			lua_pushboolean( L, false);
 			lua_pushinteger( L, linecnt);
@@ -756,8 +781,8 @@ static int l_cmp_content( lua_State *L)
 			push_linestring( L, b_ln);
 			return 4;
 		}
-		while (*ai == '\r' || *ai == '\n') ++ai;
-		while (*bi == '\r' || *bi == '\n') ++bi;
+		while (*ai == '\r' || *ai == '\n') ai = skipEoln( ai);
+		while (*bi == '\r' || *bi == '\n') bi = skipEoln( bi);
 		if (!*ai && !*bi)
 		{
 			lua_pushboolean( L, true);
