@@ -826,7 +826,7 @@ static int l_write_textfile( lua_State *L)
 			}
 			else
 			{
-				normcontent.push_back( '\n');
+				normcontent.push_back( *ci);
 				++ci;
 			}
 		}
