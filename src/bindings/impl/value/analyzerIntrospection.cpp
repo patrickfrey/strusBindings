@@ -108,9 +108,9 @@ public:
 		{
 			return new IntrospectionAtomic<std::string>( m_errorhnd, m_doctype.mimeType());
 		}
-		else if (name == "scheme")
+		else if (name == "schema")
 		{
-			return new IntrospectionAtomic<std::string>( m_errorhnd, m_doctype.scheme());
+			return new IntrospectionAtomic<std::string>( m_errorhnd, m_doctype.schema());
 		}
 		else
 		{
@@ -120,7 +120,7 @@ public:
 
 	virtual std::vector<IntrospectionLink> list()
 	{
-		static const char* ar[] = {"encoding","mimetype","scheme",NULL};
+		static const char* ar[] = {"encoding","mimetype","schema",NULL};
 		return getList( ar);
 	}
 

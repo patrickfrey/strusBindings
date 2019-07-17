@@ -60,6 +60,7 @@ public:
 					{"arg", NormalizerArg, '*'}
 				}
 			},
+			{"feature/{search,forward,metadata,attribute,lexem}/priority", "()", FeaturePriority, papuga_TypeInt, "0:1:2:3"},
 			{"feature/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ:pred:content:unique"},
 			{"feature/{search,forward}/option", FeatureOptionDef, {
 					{"position", FeatureOptionPosition, '?'},

@@ -85,7 +85,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	{
 		rt &= serializeArrayElement( result, val.mimeType(), errcode, deep);
 		rt &= serializeArrayElement( result, val.encoding(), errcode, deep);
-		rt &= serializeArrayElement( result, val.scheme(), errcode, deep);
+		rt &= serializeArrayElement( result, val.schema(), errcode, deep);
 	}
 	else
 	{

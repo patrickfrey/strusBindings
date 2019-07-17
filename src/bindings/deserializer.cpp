@@ -1040,7 +1040,7 @@ class DocumentClassParser
 public:
 	static void setNamedValue( analyzer::DocumentClass& ths, const char* name, const papuga_ValueVariant* value)
 	{
-		static const StructureNameMap namemap( "mimetype,encoding,scheme", ',');
+		static const StructureNameMap namemap( "mimetype,encoding,schema", ',');
 
 		int idx = namemap.index( name);
 		switch (idx)
@@ -1049,7 +1049,7 @@ public:
 				break;
 			case 1: ths.setEncoding( ValueVariantWrap::tostring( *value));
 				break;
-			case 2: ths.setScheme( ValueVariantWrap::tostring( *value));
+			case 2: ths.setSchema( ValueVariantWrap::tostring( *value));
 				break;
 			default: throw strus::runtime_error(_TXT("unknown tag name '%s'"), name);
 		}
@@ -1066,7 +1066,7 @@ public:
 				break;
 			case 1: ths.setEncoding( ValueVariantWrap::tostring( *value));
 				break;
-			case 2: ths.setScheme( ValueVariantWrap::tostring( *value));
+			case 2: ths.setSchema( ValueVariantWrap::tostring( *value));
 				break;
 			default: throw strus::runtime_error(_TXT("to many positional values defined in structure"));
 		}
