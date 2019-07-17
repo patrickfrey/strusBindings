@@ -95,8 +95,8 @@ enum _Document {doctype,attribute,metadata,forwardindex,searchindex,access};
 /// \brief Document class structure
 /// \member mimetype MIME type
 /// \member encoding Character set encoding (default UTF-8)
-/// \member scheme Document type id
-enum _DocumentClass {mimetype,encoding,scheme};
+/// \member schema Name for document structure
+enum _DocumentClass {mimetype,encoding,schema};
 
 /// \struct VectorQueryResult
 /// \brief Result of a similar vector query

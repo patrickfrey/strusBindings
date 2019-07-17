@@ -845,6 +845,30 @@ static int l_write_textfile( lua_State *L)
 	}
 }
 
+static int l_mkdirp( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'mkdirp': expected <dirname>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'mkdirp': expected <dirname>"));
+		const char* nam = lua_tostring( L, 1);
+
+		std::string fullpath = strus::joinFilePath( g_outputDir, nam);
+		int ec = strus::mkdirp( fullpath);
+		if (ec)
+		{
+			luaL_error( L, _TXT("failed to create directory (errno %d): %s"), ec, ::strerror(ec));
+		}
+		return 0;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
 static void declareFunctions( lua_State *L)
 {
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
@@ -854,6 +878,7 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
 	DEFINE_FUNCTION( write_textfile );
+	DEFINE_FUNCTION( mkdirp );
 
 	lua_pushboolean( L, g_verbose);
 	lua_setglobal( L, "verbose");

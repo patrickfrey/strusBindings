@@ -43,7 +43,7 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 			$doc->attribute['docclass'] =
 				"mimetype=" . $docclass->mimetype
 				. ", encoding=" . $docclass->encoding
-				. ", scheme=" . $docclass->scheme;
+				. ", schema=" . $docclass->schema;
 			if ($aclmap && isset($aclmap[ $fnam])) {
 				$doc->access = $aclmap[ $fnam];
 			}

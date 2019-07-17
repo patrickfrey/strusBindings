@@ -46,7 +46,7 @@ str docids:
 str docs:
   str A.xml:
     str ACL: "a"
-    str docclass: "mimetype='application/xml', encoding='utf-8', scheme=''"
+    str docclass: "mimetype='application/xml', encoding='utf-8', schema=''"
     str docid: "A.xml"
     str doclen: 20
     str endtitle: ""
@@ -57,7 +57,7 @@ str docs:
     str word: "one day in tokyo is a citi that complet differ than what you would expect as european citizen"
   str B.xml:
     str ACL: "b"
-    str docclass: "mimetype='application/xml', encoding='utf-8', scheme=''"
+    str docclass: "mimetype='application/xml', encoding='utf-8', schema=''"
     str docid: "B.xml"
     str doclen: 16
     str endtitle: ""
@@ -68,7 +68,7 @@ str docs:
     str word: "in is a citi you visit new york with dimens can t imagin"
   str C.xml:
     str ACL: "c"
-    str docclass: "mimetype='application/xml', encoding='utf-8', scheme=''"
+    str docclass: "mimetype='application/xml', encoding='utf-8', schema=''"
     str docid: "C.xml"
     str doclen: 16
     str endtitle: ""

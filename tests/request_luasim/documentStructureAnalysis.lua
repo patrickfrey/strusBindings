@@ -8,7 +8,6 @@ SCRIPTPATH = script_path()
 
 def_server( CSERVER1, config )
 call_server_checked( "PUT", CSERVER1 .. "/contentstats/stats", "@contentstats.json" )
-set_time( 1)
 
 TRANSACTION = json.decode( call_server_checked( "POST", CSERVER1 .. "/contentstats/stats/transaction" )).link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end

@@ -46,7 +46,7 @@ str docids:
 str docs:
   str A.xml:
     str ACL: "a"
-    str docclass: "mimetype='application/xml', encoding='utf-8', scheme=''"
+    str docclass: "mimetype='application/xml', encoding='utf-8', schema=''"
     str docid: "A.xml"
     str doclen: 14
     str endtitle: ""
@@ -57,7 +57,7 @@ str docs:
     str word: "march und aehnlich es versammeln sich die low wenn vogel uber all flieg"
   str B.xml:
     str ACL: "b"
-    str docclass: "mimetype='application/xml', encoding='utf-8', scheme=''"
+    str docclass: "mimetype='application/xml', encoding='utf-8', schema=''"
     str docid: "B.xml"
     str doclen: 14
     str endtitle: ""
@@ -68,7 +68,7 @@ str docs:
     str word: "sich die low uber all hub wie drub ueber konnt man aufreg aber besond"
   str C.xml:
     str ACL: "c"
-    str docclass: "mimetype='application/xml', encoding='utf-8', scheme=''"
+    str docclass: "mimetype='application/xml', encoding='utf-8', schema=''"
     str docid: "C.xml"
     str doclen: 7
     str endtitle: ""

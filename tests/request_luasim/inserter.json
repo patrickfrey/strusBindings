@@ -1,0 +1,7 @@
+{
+    "inserter" : {
+        "docanalyzer" : "test",
+        "storage"     : "test"
+    }
+}
+
