@@ -8,15 +8,14 @@ SCRIPTPATH = script_path()
 
 storageConfig = {
 	storage = {
-		path = undef,
 		database = "leveldb",
 		cache_size = "500M",
 		max_open_files = 512,
 		write_buffer_size = "8K",
 		block_size = "4K",
-		metadata = [
+		metadata = {
 			{ name = "doclen", type = "UInt16" }
-		]
+		}
 	}
 }
 
@@ -24,7 +23,7 @@ def_server( ISERVER1, config )
 call_server_checked( "PUT", ISERVER1 .. "/docanalyzer/test", "@docanalyzer.json" )
 
 storageConfig.storage.path = "storage/test"
-call_server_checked( "PUT", ISERVER1 .. "/storage/test", storageConfig )
+call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
 
 call_server_checked( "PUT", ISERVER1 .. "/inserter/test", "@inserter.json" )
 if verbose then io.stderr:write( string.format("- Created, storage, analyzer and inserter\n")) end

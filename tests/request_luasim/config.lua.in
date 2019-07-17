@@ -2,7 +2,7 @@ config = {
 	data = {
 		workdir     = "@TEST_REQUEST_LUASIM_RUN_DIR@",
 		configdir   = "@TEST_REQUEST_LUASIM_RUN_DIR@/config",
-		resources   = "@TEST_REQUEST_LUASIM_RUN_DIR@/strus"
+		resources   = "@TEST_REQUEST_LUASIM_SRC_DIR@/strus"
 	},
 	transactions = {
 		max_idle_time  = 600,
@@ -24,5 +24,5 @@ ISERVER3="http://127.0.0.1:7186"
 ISERVER4="http://127.0.0.1:7187"
 VSERVER1="http://127.0.0.1:7191"
 
-mkdirp( "strus/storage")
-mkdirp( "config")
+createDir( "storage")
+createDir( "config")

@@ -689,11 +689,27 @@ static int l_call_server( lua_State *L)
 		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'call_server': expected <method> <addr> [<arg>]"));
 		const char* method = lua_tostring( L, 1);
 		const char* url = lua_tostring( L, 2);
-		std::size_t arglen = 0;
-		const char* arg = nofArgs < 3 || lua_isnil( L, 3) ? 0 : lua_tolstring( L, 3, &arglen);
-
-		std::string content = getContentArgumentValue( arg);
-		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, content.c_str());
+		const char* arg = "";
+		std::string content;
+		if (nofArgs == 3 && !lua_isnil( L, 3))
+		{
+			if (lua_isstring( L, 3))
+			{
+				arg = lua_tostring( L, 3);
+				content = getContentArgumentValue( arg);
+				arg = content.c_str();
+			}
+			else if (lua_istable( L, 3))
+			{
+				content = convertConfigToJson( L, 3);
+				arg = content.c_str();
+			}
+			else
+			{
+				luaL_error(L, _TXT("table or string expected as 3rd argument 'call_server'"));
+			}
+		}
+		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, arg);
 		if (result.second.empty())
 		{
 			lua_pushnil(L);
@@ -845,7 +861,7 @@ static int l_write_textfile( lua_State *L)
 	}
 }
 
-static int l_mkdirp( lua_State *L)
+static int l_createDir( lua_State *L)
 {
 	try
 	{
@@ -855,7 +871,12 @@ static int l_mkdirp( lua_State *L)
 		const char* nam = lua_tostring( L, 1);
 
 		std::string fullpath = strus::joinFilePath( g_outputDir, nam);
-		int ec = strus::mkdirp( fullpath);
+		int ec = strus::removeDirRecursive( fullpath, false/*fail_ifnofexist*/);
+		if (ec)
+		{
+			luaL_error( L, _TXT("failed to remove directory (errno %d): %s"), ec, ::strerror(ec));
+		}
+		ec = strus::mkdirp( fullpath);
 		if (ec)
 		{
 			luaL_error( L, _TXT("failed to create directory (errno %d): %s"), ec, ::strerror(ec));
@@ -878,7 +899,7 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
 	DEFINE_FUNCTION( write_textfile );
-	DEFINE_FUNCTION( mkdirp );
+	DEFINE_FUNCTION( createDir );
 
 	lua_pushboolean( L, g_verbose);
 	lua_setglobal( L, "verbose");

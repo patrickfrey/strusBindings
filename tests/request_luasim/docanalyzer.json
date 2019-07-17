@@ -1,6 +1,9 @@
 {
 "analyzer": {
 	"doc": {
+		"class": {
+			"mimetype": "application/xml"
+			},
 		"forward": [{
 				"type": "url",
 				"tokenizer": {

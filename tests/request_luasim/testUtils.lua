@@ -11,9 +11,9 @@ function call_server_checked( method, server, arg)
 	result,status = call_server( method, server, arg)
 	if (status < 200 or status >= 300) then
 		if arg then
-			print( string.format("Request with method %s on server %s and argument %s failed with HTTP status %d", method, server, arg, httpStatus))
+			print( string.format("Request with method %s on server %s and argument %s failed with HTTP status %d", method, server, arg, status))
 		else
-			print( string.format("Request with method %s on server %s failed with HTTP status %d", method, server, httpStatus))
+			print( string.format("Request with method %s on server %s failed with HTTP status %d", method, server, status))
 		end
 		os.exit()
 	end
