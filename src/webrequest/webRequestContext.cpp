@@ -355,6 +355,10 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 		int apperr = 0;
 		if (errmsg)
 		{
+			if (0!=(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+			{
+				m_logger->logError( errmsg);
+			}
 			// Exract last error code and remove error codes from app error message:
 			char const* errmsgitr = errmsg;
 			apperr = strus::errorCodeFromMessage( errmsgitr);

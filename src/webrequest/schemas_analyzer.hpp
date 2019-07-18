@@ -72,7 +72,7 @@ public:
 					{TokenizerDef},
 					{NormalizerDef,'+'},
 					{FeaturePriority,'?'},
-					{FeatureOptionDef,'*'}
+					{FeatureOptionDef,'?'}
 				}
 			},
 			{"feature/forward", 0, "docanalyzer", A::addForwardIndexFeature(), {
@@ -81,7 +81,7 @@ public:
 					{TokenizerDef},
 					{NormalizerDef,'+'},
 					{FeaturePriority,'?'},
-					{FeatureOptionDef,'*'}
+					{FeatureOptionDef,'?'}
 				}
 			},
 			{"feature/lexem", 0, "docanalyzer", A::addPatternLexem(), {
@@ -106,15 +106,15 @@ public:
 					{NormalizerDef,'+'}
 				}
 			},
-			{"feature/aggregate/type", "()", FeatureTypeName, papuga_TypeString, "nofdocs"},
-			{"feature/aggregate/function/name", "()", AggregatorName, papuga_TypeString, "count"},
-			{"feature/aggregate/function/arg", "()", AggregatorArg, papuga_TypeString, "word"},
-			{"feature/aggregate/function", AggregatorDef, {
+			{"feature/aggregator/type", "()", FeatureTypeName, papuga_TypeString, "nofdocs"},
+			{"feature/aggregator/function/name", "()", AggregatorName, papuga_TypeString, "count"},
+			{"feature/aggregator/function/arg", "()", AggregatorArg, papuga_TypeString, "word"},
+			{"feature/aggregator/function", AggregatorDef, {
 					{"name", AggregatorName, '!'},
 					{"arg", AggregatorArg, '*'}
 				}
 			},
-			{"feature/aggregate", 0, "docanalyzer", A::defineAggregatedMetaData(), {
+			{"feature/aggregator", 0, "docanalyzer", A::defineAggregatedMetaData(), {
 					{FeatureTypeName},
 					{AggregatorDef}
 				}
@@ -138,7 +138,7 @@ public:
 					{PatternTypeName},
 					{NormalizerDef,'+'},
 					{FeaturePriority,'?'},
-					{FeatureOptionDef,'*'}
+					{FeatureOptionDef,'?'}
 				}
 			},
 			{"feature/pattern/forward", 0, "docanalyzer", A::addForwardIndexFeatureFromPatternMatch(), {
@@ -146,7 +146,7 @@ public:
 					{PatternTypeName},
 					{NormalizerDef,'+'},
 					{FeaturePriority,'?'},
-					{FeatureOptionDef,'*'}
+					{FeatureOptionDef,'?'}
 				}
 			},
 			{"feature/pattern/metadata", 0, "docanalyzer", A::defineMetaDataFromPatternMatch(), {
@@ -181,25 +181,25 @@ public:
 					{PatternMatcherPatternDef, '*'}
 				}
 			},
-			{"subdoc/name", "()", SubDocumentName, papuga_TypeString, "annotation"},
-			{"subdoc/select", "()", SubDocumentSelect, papuga_TypeString, "/doc/annotation"},
-			{"subdoc", 0, "docanalyzer", A::defineSubDocument(), {
+			{"document/name", "()", SubDocumentName, papuga_TypeString, "annotation"},
+			{"document/select", "()", SubDocumentSelect, papuga_TypeString, "/doc/annotation"},
+			{"document", 0, "docanalyzer", A::defineSubDocument(), {
 					{SubDocumentName, '!'},
 					{SubDocumentSelect, '!'}
 				}
 			},
-			{"subcontent/select", "()", SubContentSelect, papuga_TypeString, "/doc/list/customer()"},
-			{"subcontent/class/segmenter", "()", Segmenter, papuga_TypeString, "cjson"},
-			{"subcontent/class/mime", "()", MimeType, papuga_TypeString, "application/json"},
-			{"subcontent/class/encoding", "()", Charset, papuga_TypeString, "isolatin-1"},
-			{"subcontent/class", SubContentClassDef, {
+			{"content/select", "()", SubContentSelect, papuga_TypeString, "/doc/list/customer()"},
+			{"content/class/segmenter", "()", Segmenter, papuga_TypeString, "cjson"},
+			{"content/class/mime", "()", MimeType, papuga_TypeString, "application/json"},
+			{"content/class/encoding", "()", Charset, papuga_TypeString, "isolatin-1"},
+			{"content/class", SubContentClassDef, {
 					{"segmenter", Segmenter, '?'},
 					{"mime", MimeType, '?'},
 					{"encoding", Charset, '?'},
 					{"schema", Schema, '?'}
 				}
 			},
-			{"subcontent", 0, "docanalyzer", A::defineSubContent(), {
+			{"content", 0, "docanalyzer", A::defineSubContent(), {
 					{SubContentSelect, '!'},
 					{SubContentClassDef, '!'}
 				}
