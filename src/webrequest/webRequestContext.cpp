@@ -334,6 +334,8 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		if (!reqstr)
 		{
 			m_logger->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
+			setAnswer( answer, papugaErrorToErrorCode( papuga_NoMemError));
+			return false;
 		}
 		else
 		{

@@ -15,6 +15,9 @@
 #include "strus/base/stdint.h"
 #include "introspectionBase.hpp"
 #include "serializer.hpp"
+#include <set>
+#include <vector>
+#include <map>
 
 namespace strus {
 namespace bindings {
@@ -104,18 +107,39 @@ public:
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
-		std::vector<std::string> rt;
+		std::vector<typename TypeName::value_type::second_type> elements;
 		typename TypeName::const_iterator li = m_value.begin(), le = m_value.end();
-		for (; li != le && name != li->first; ++li){}
-		return (li == le) ? NULL : new IntrospectionAtomic<typename TypeName::value_type::second_type>( m_errorhnd, li->second);
+		for (; li != le; ++li)
+		{
+			if (name == li->first)
+			{
+				elements.push_back( li->second);
+			}
+		}
+		if (elements.empty())
+		{
+			return NULL;
+		}
+		else if (elements.size() == 1)
+		{
+			return new IntrospectionAtomic<typename TypeName::value_type::second_type>( m_errorhnd, elements[0]);
+		}
+		else
+		{
+			return new IntrospectionAtomic<std::vector<typename TypeName::value_type::second_type> >( m_errorhnd, elements);
+		}
 	}
 	virtual std::vector<IntrospectionLink> list()
 	{
+		std::set<std::string> dupset;
 		std::vector<IntrospectionLink> rt;
 		typename TypeName::const_iterator vi = m_value.begin(), ve = m_value.end();
 		for (; vi != ve; ++vi)
 		{
-			rt.push_back( IntrospectionLink( true/*autoexpand*/, vi->first));
+			if (dupset.insert( vi->first).second == true)
+			{
+				rt.push_back( IntrospectionLink( true/*autoexpand*/, vi->first));
+			}
 		}
 		return rt;
 	}

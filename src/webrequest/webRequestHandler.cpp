@@ -154,7 +154,7 @@ public:
 	DefineConfigSchema() :DefineSchema<SCHEMA>( ROOT_CONTEXT_NAME){}
 };
 
-static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","queryanalyzer","inserter",0};
+static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","inserter",0};
 
 static void tickerFunction( void* THIS)
 {

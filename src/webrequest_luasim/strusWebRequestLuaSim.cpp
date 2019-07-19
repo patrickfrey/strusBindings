@@ -713,13 +713,16 @@ static int l_call_server( lua_State *L)
 		if (result.second.empty())
 		{
 			lua_pushnil(L);
+			lua_pushinteger(L, result.first.httpstatus()); /* second return value */
+			lua_pushstring(L, result.first.errorstr()); 
 		}
 		else
 		{
 			lua_pushlstring(L, result.second.c_str(), result.second.size()); 
+			lua_pushinteger(L, result.first.httpstatus()); /* second return value */
+			lua_pushnil(L);
 		}
-		lua_pushinteger(L, result.first.httpstatus()); /* second return value */
-		return 2;
+		return 3;
 	}
 	catch (const std::exception& err)
 	{

@@ -22,4 +22,4 @@ end
 OUTPUT = call_server_checked( "GET", TRANSACTION )
 if verbose then io.stderr:write( string.format("- Inspect document analysis:\n%s\n", OUTPUT)) end
 
-checkExpected( OUTPUT, "@documentStructureAnalysis.exp" )
+checkExpected( OUTPUT, "@documentStructureAnalysis.exp", "documentStructureAnalysis.res" )

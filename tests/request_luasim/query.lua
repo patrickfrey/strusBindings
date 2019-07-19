@@ -22,6 +22,8 @@ storageConfig = {
 def_server( ISERVER1, config )
 call_server_checked( "PUT", ISERVER1 .. "/docanalyzer/test", "@docanalyzer.json" )
 
+call_server_checked( "PUT", ISERVER1 .. "/qryanalyzer/test", "@qryanalyzer.json" )
+
 storageConfig.storage.path = "storage/test"
 call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
 
@@ -39,4 +41,11 @@ for k,path in pairs(documents) do
 end
 call_server_checked( "PUT", TRANSACTION)
 if verbose then io.stderr:write( string.format("- All documents inserted\n")) end
+
+qryanacfg = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test" )
+if verbose then io.stderr:write( string.format("- Query analyzer configuration:\n%s\n", qryanacfg)) end
+docanacfg = call_server_checked( "GET", ISERVER1 .. "/docanalyzer/test" )
+if verbose then io.stderr:write( string.format("- Document analyzer configuration:\n%s\n", docanacfg)) end
+
+checkExpected( qryanacfg .. docanacfg, "@query.exp", "query.res" )
 

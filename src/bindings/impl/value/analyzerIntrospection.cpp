@@ -375,7 +375,7 @@ IntrospectionBase* DocumentAnalyzerIntrospection::open( const std::string& name)
 
 std::vector<IntrospectionLink> DocumentAnalyzerIntrospection::list()
 {
-	static const char* ar[] = {".segmenter",".attributes",".metadata",".searchindex",".forwardindex",".aggregator",".subdoc",".subcontent",".patternmatcher",".patternlexer",NULL};
+	static const char* ar[] = {"segmenter","attributes","metadata","searchindex","forwardindex","aggregator","subdoc","subcontent","patternmatcher","patternlexer",NULL};
 	return getList( ar);
 }
 
