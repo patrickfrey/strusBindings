@@ -75,6 +75,7 @@ WebRequestContext::WebRequestContext(
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
+	,m_results(0),m_nofResults(0)
 	,m_errbuf(),m_answer()
 	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_)
 	,m_html_base_href(html_base_href_)
@@ -102,7 +103,7 @@ WebRequestContext::WebRequestContext(
 
 WebRequestContext::~WebRequestContext()
 {
-	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
+	if (m_context_ownership && m_context) {papuga_destroy_RequestContext( m_context); m_context=0;}
 	if (m_request) papuga_destroy_Request( m_request);
 	papuga_destroy_Allocator( &m_allocator);
 }
@@ -349,7 +350,7 @@ bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const W
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	int errpos = -1;
-	if (!papuga_RequestContext_execute_request( m_context, m_request, &m_callLogger, &m_errbuf, &errpos))
+	if (!papuga_RequestContext_execute_request( m_context, m_request, &m_allocator, &m_callLogger, &m_results, &m_nofResults, &m_errbuf, &errpos))
 	{
 		errcode = papuga_HostObjectError;
 		char* errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
@@ -446,10 +447,10 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 
-	int ri = 0, re = papuga_RequestContext_nof_results( m_context);
+	int ri = 0, re = m_nofResults;
 	for (; ri != re; ++ri)
 	{
-		papuga_RequestResult* result = papuga_RequestContext_get_result( m_context, ri);
+		papuga_RequestResult* result = m_results + ri;
 		if (!result->schema) continue;
 
 		std::size_t resultlen = 0;
@@ -514,10 +515,10 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 	papuga_ErrorCode errcode = papuga_Ok;
 
 	if (!m_context) return true;
-	int ri = 0, re = papuga_RequestContext_nof_results( m_context);
+	int ri = 0, re = m_nofResults;
 	for (; ri != re; ++ri)
 	{
-		papuga_RequestResult* result = papuga_RequestContext_get_result( m_context, ri);
+		papuga_RequestResult* result = m_results + ri;
 		if (result->schema) continue;
 
 		std::size_t resultlen = 0;
@@ -1467,6 +1468,7 @@ bool WebRequestContext::executeRequest(
 		std::vector<WebRequestDelegateRequest>& delegateRequests)
 {
 	TransactionRef transactionRef;
+	ObjectDescr selector;
 	bool rt = true;
 	try
 	{
@@ -1477,7 +1479,6 @@ bool WebRequestContext::executeRequest(
 		}
 		if (!setResultContentType( m_answer, papuga_UTF8, WebRequestContent::HTML)) return false;
 
-		ObjectDescr selector;
 		if (path.startsWith( "transaction", 11/*"transaction"*/))
 		{
 			const char* typenam = path.getNext();

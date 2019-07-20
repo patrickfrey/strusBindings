@@ -112,6 +112,8 @@ private:
 	const papuga_RequestAutomaton* m_atm;
 	papuga_StringEncoding m_result_encoding;
 	WebRequestContent::Type m_result_doctype;
+	papuga_RequestResult* m_results;
+	int m_nofResults;
 	papuga_ErrorBuffer m_errbuf;
 	WebRequestAnswer m_answer;
 	const char* m_accepted_charset;

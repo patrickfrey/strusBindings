@@ -47,5 +47,21 @@ if verbose then io.stderr:write( string.format("- Query analyzer configuration:\
 docanacfg = call_server_checked( "GET", ISERVER1 .. "/docanalyzer/test" )
 if verbose then io.stderr:write( string.format("- Document analyzer configuration:\n%s\n", docanacfg)) end
 
-checkExpected( qryanacfg .. docanacfg, "@query.exp", "query.res" )
+query1 = {
+	query = {
+		feature = {
+		{	set = "search", 
+			content = {
+				term = {
+					type = "text",
+					value = "David Bowie"
+				}
+			}
+		}}
+	}
+}
+qryana1 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1)
+
+
+checkExpected( qryanacfg .. docanacfg .. qryana1, "@query.exp", "query.res" )
 
