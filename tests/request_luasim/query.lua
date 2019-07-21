@@ -60,8 +60,39 @@ query1 = {
 		}}
 	}
 }
+query_with_analyzer = {
+	query = {
+		analyzer = {
+			element = {
+				{
+					type = "word",
+					field = "text",
+					tokenizer = {
+						name = "word"
+					},
+					normalizer = {{
+						name = "uc"
+					}}
+				}
+			}
+		},
+		feature = {
+		{	set = "search", 
+			content = {
+				term = {
+					type = "text",
+					value = "David Bowie"
+				}
+			}
+		}}
+	}
+}
+
 qryana1 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1)
+if verbose then io.stderr:write( string.format("- Analyzed query with analyzer defined by server:\n%s\n", qryana1)) end
+qryana2 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query_with_analyzer)
+if verbose then io.stderr:write( string.format("- Analyzed query with analyzer passed as content:\n%s\n", qryana2)) end
 
 
-checkExpected( qryanacfg .. docanacfg .. qryana1, "@query.exp", "query.res" )
+checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2, "@query.exp", "query.res" )
 

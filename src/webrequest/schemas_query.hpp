@@ -64,7 +64,7 @@ public:
 		},
 		{},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval()},
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
 			{SchemaQueryPart::buildQueryOriginal()},
@@ -84,7 +84,7 @@ public:
 		},
 		{},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval()},
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
 			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
 			{SchemaQueryPart::buildQueryAnalyzed()},
 			{SchemaQueryDeclPart::defineStatistics()},

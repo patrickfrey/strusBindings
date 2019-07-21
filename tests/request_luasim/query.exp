@@ -1132,3 +1132,34 @@
 	"subdoc": {},
 	"subcontent": {}}
 }
+{
+"query": {
+	"feature": [
+		{
+			"content": {
+				"list": {
+					"term": {
+						"type": "word",
+						"value": "david"},
+					"term": {
+						"type": "word",
+						"value": "bowie"},
+					"term": {
+						"type": "entity",
+						"value": "david_bowie"}}},
+			"set": "search"}]}
+}
+{
+"query": {
+	"feature": [
+		{
+			"content": {
+				"list": {
+					"term": {
+						"type": "word",
+						"value": "DAVID"},
+					"term": {
+						"type": "word",
+						"value": "BOWIE"}}},
+			"set": "search"}]}
+}

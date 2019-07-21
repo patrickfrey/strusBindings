@@ -22,82 +22,83 @@ namespace webrequest {
 class SchemaQueryEvalDeclPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList defineQueryEval()
+	static papuga::RequestAutomaton_NodeList defineQueryEval( const char* rootexpr)
 	{
 		typedef bindings::method::QueryEval E;
 		typedef bindings::method::Context C;
-		return {
-			{"/query/eval", "queryeval", "context", C::createQueryEval(), {} },
-			{"/query/eval/cterm/set", "()", FeatureSet, papuga_TypeString, "weighted"},
-			{"/query/eval/cterm/type", "()", TermType, papuga_TypeString, "word"},
-			{"/query/eval/cterm/name", "()", TermValue, papuga_TypeString, "town"},
-			{"/query/eval/cterm", 0, "queryeval", E::addTerm(), {{FeatureSet},{TermType},{TermValue}} },
-			{"/query/eval/restriction", "()", FeatureSetRestrictionDef, papuga_TypeString, "restrict"},
-			{"/query/eval/restriction", 0, "queryeval", E::addRestrictionFeature(), {{FeatureSetRestrictionDef}} },
-			{"/query/eval/selection", "()", FeatureSetSelectionDef, papuga_TypeString, "select"},
-			{"/query/eval/selection", 0, "queryeval", E::addSelectionFeature(), {{FeatureSetSelectionDef}} },
-			{"/query/eval/exclusion", "()", FeatureSetExclusionDef, papuga_TypeString, "exclude"},
-			{"/query/eval/exclusion", 0, "queryeval", E::addExclusionFeature(), {{FeatureSetExclusionDef}} },
+		return { rootexpr,
+		{
+			{"", "queryeval", "context", C::createQueryEval(), {} },
+			{"cterm/set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"cterm/type", "()", TermType, papuga_TypeString, "word"},
+			{"cterm/name", "()", TermValue, papuga_TypeString, "town"},
+			{"cterm", 0, "queryeval", E::addTerm(), {{FeatureSet},{TermType},{TermValue}} },
+			{"restriction", "()", FeatureSetRestrictionDef, papuga_TypeString, "restrict"},
+			{"restriction", 0, "queryeval", E::addRestrictionFeature(), {{FeatureSetRestrictionDef}} },
+			{"selection", "()", FeatureSetSelectionDef, papuga_TypeString, "select"},
+			{"selection", 0, "queryeval", E::addSelectionFeature(), {{FeatureSetSelectionDef}} },
+			{"exclusion", "()", FeatureSetExclusionDef, papuga_TypeString, "exclude"},
+			{"exclusion", 0, "queryeval", E::addExclusionFeature(), {{FeatureSetExclusionDef}} },
 
-			{"/query/eval//result/name", "()", QueryEvalFunctionResultName, papuga_TypeString, NULL},
-			{"/query/eval//result/value", "()", QueryEvalFunctionResultValue, papuga_TypeString, NULL},
-			{"/query/eval//result", QueryEvalFunctionResult, {
+			{"//result/name", "()", QueryEvalFunctionResultName, papuga_TypeString, NULL},
+			{"//result/value", "()", QueryEvalFunctionResultValue, papuga_TypeString, NULL},
+			{"//result", QueryEvalFunctionResult, {
 					{"name", QueryEvalFunctionResultName},
 					{"value", QueryEvalFunctionResultValue}
 				}
 			},
-			{"/query/eval//param/name", "()", QueryEvalFunctionParameterName, papuga_TypeString, NULL},
-			{"/query/eval//param/value", "()", QueryEvalFunctionParameterValue, papuga_TypeString, NULL},
-			{"/query/eval//param", QueryEvalFunctionParameter, {
+			{"//param/name", "()", QueryEvalFunctionParameterName, papuga_TypeString, NULL},
+			{"//param/value", "()", QueryEvalFunctionParameterValue, papuga_TypeString, NULL},
+			{"//param", QueryEvalFunctionParameter, {
 					{"name", QueryEvalFunctionParameterName},
 					{"value", QueryEvalFunctionParameterValue}
 				}
 			},
-			{"/query/eval//feature/name", "()", QueryEvalFunctionFeatureName, papuga_TypeString, NULL},
-			{"/query/eval//feature/value", "()", QueryEvalFunctionFeatureValue, papuga_TypeString, NULL},
-			{"/query/eval//feature", QueryEvalFunctionParameter, {
+			{"//feature/name", "()", QueryEvalFunctionFeatureName, papuga_TypeString, NULL},
+			{"//feature/value", "()", QueryEvalFunctionFeatureValue, papuga_TypeString, NULL},
+			{"//feature", QueryEvalFunctionParameter, {
 					{"name", QueryEvalFunctionFeatureName},
 					{"feature", QueryEvalFunctionFeatureValue}
 				}
 			},
-			{"/query/eval/summarizer/name", "()", QueryEvalFunctionName, papuga_TypeString, "matchphrase"},
-			{"/query/eval/summarizer/arg", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
-			{"/query/eval/summarizer/result", "()", QueryEvalFunctionResult, papuga_TypeVoid, NULL},
-			{"/query/eval/summarizer", QueryEvalSummarizer, {
+			{"summarizer/name", "()", QueryEvalFunctionName, papuga_TypeString, "matchphrase"},
+			{"summarizer/arg", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
+			{"summarizer/result", "()", QueryEvalFunctionResult, papuga_TypeVoid, NULL},
+			{"summarizer", QueryEvalSummarizer, {
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*', 2/*tag diff*/},
 					{"result", QueryEvalFunctionResult, '*'}
 				}
 			},
-			{"/query/eval/summarizer", 0, "queryeval", E::addSummarizer(), {
+			{"summarizer", 0, "queryeval", E::addSummarizer(), {
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*', 2/*tag diff*/},
 					{QueryEvalFunctionResult, '*'}}
 			},
-			{"/query/eval/weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
-			{"/query/eval/weighting/arg", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
-			{"/query/eval/weighting", QueryEvalWeighting, {
+			{"weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
+			{"weighting/arg", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
+			{"weighting", QueryEvalWeighting, {
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*', 2/*tag diff*/},
 				}
 			},
-			{"/query/eval/weighting", 0, "queryeval", E::addWeightingFunction(), {
+			{"weighting", 0, "queryeval", E::addWeightingFunction(), {
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*', 2/*tag diff*/}}
 			},
-			{"/query/eval/formula/source", "()", QueryEvalFormulaSource, papuga_TypeString, "_0 * factor * log(_2)"},
-			{"/query/eval/formula/param/name", "()", QueryEvalFormulaParameterName, papuga_TypeString, "factor"},
-			{"/query/eval/formula/param/value", "()", QueryEvalFormulaParameterValue, papuga_TypeString, "3.2"},
-			{"/query/eval/formula/param", QueryEvalFormulaParameter, {
+			{"formula/source", "()", QueryEvalFormulaSource, papuga_TypeString, "_0 * factor * log(_2)"},
+			{"formula/param/name", "()", QueryEvalFormulaParameterName, papuga_TypeString, "factor"},
+			{"formula/param/value", "()", QueryEvalFormulaParameterValue, papuga_TypeString, "3.2"},
+			{"formula/param", QueryEvalFormulaParameter, {
 					{"name", QueryEvalFormulaParameterName},
 					{"value", QueryEvalFormulaParameterValue}
 				}
 			},
-			{"/query/eval/formula", 0, "queryeval", E::defineWeightingFormula(), {
+			{"formula", 0, "queryeval", E::defineWeightingFormula(), {
 					{QueryEvalFormulaSource},
 					{QueryEvalFormulaParameter, '*'}}
 			}
-		};
+		}};
 	}
 };
 

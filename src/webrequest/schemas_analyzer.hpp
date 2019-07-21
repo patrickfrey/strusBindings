@@ -212,9 +212,9 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		typedef bindings::method::Context C;
 		typedef bindings::method::VectorStorageClient V;
-		return papuga::RequestAutomaton_NodeList( rootexpr,
+		return { rootexpr,
 		{
-			{"/", "qryanalyzer", "context", C::createQueryAnalyzer(), {} },
+			{"", "qryanalyzer", "context", C::createQueryAnalyzer(), {} },
 			{"element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
 			{"element/field", "()", FieldTypeName, papuga_TypeString, "text"},
 
@@ -323,7 +323,7 @@ public:
 					{JoinOperatorRange,'?'},
 					{JoinOperatorCardinality,'?'}}
 			}
-		});
+		}};
 	}
 
 	static papuga::RequestAutomaton_NodeList analyzeFeature()

@@ -41,6 +41,16 @@ extern "C" {
 
 #undef STRUS_LOWLEVEL_DEBUG
 
+struct CString
+{
+	const char* value;
+
+	CString( const char* value_) :value(value_){}
+	CString( const CString& o) :value(o.value){}
+
+	bool operator<( const CString& o) const {return std::strcmp(value,o.value) < 0;}
+};
+
 /// \brief Interface for executing XML/JSON requests based on the strus bindings API
 class Logger
 	:public strus::WebRequestLoggerInterface
@@ -532,7 +542,47 @@ static TableType getTableType( lua_State *L, int luaddr)
 	return TableTypeEmpty;
 }
 
-static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configstr, bool array)
+static void convertLuaArrayToJson_( lua_State *L, int luaddr, std::string& configstr);
+static void convertLuaDictionaryToJson_( lua_State *L, int luaddr, std::string& configstr);
+
+static bool convertLuaValueToJson_( lua_State *L, int luaddr, std::string& configstr)
+{
+	if (lua_isnil( L, luaddr))
+	{
+		return false;
+	}
+	else if (lua_isstring( L, luaddr))
+	{
+		configstr.push_back( '"');
+		configstr.append( lua_tostring( L, luaddr));
+		configstr.push_back( '"');
+	}
+	else if (lua_istable( L, luaddr))
+	{
+		switch (getTableType( L, luaddr))
+		{
+			case TableTypeEmpty:
+				return false;
+			case TableTypeArray:
+				configstr.append( "[ ");
+				convertLuaArrayToJson_( L, luaddr, configstr);
+				configstr.append( " ]");
+				break;
+			case TableTypeDictionary:
+				configstr.append( "{ ");
+				convertLuaDictionaryToJson_( L, luaddr, configstr);
+				configstr.append( " }");
+				break;
+		}
+	}
+	else
+	{
+		configstr.append( lua_tostring( L, luaddr));
+	}
+	return true;
+}
+
+static void convertLuaArrayToJson_( lua_State *L, int luaddr, std::string& configstr)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -540,72 +590,72 @@ static void convertConfigToJson_( lua_State *L, int luaddr, std::string& configs
 
 	while (lua_next( L, -2) != 0)
 	{
-		const char* key = 0;
 		++itercnt;
 
 		if (lua_isnumber( L, -2))
 		{
-			if (!array) luaL_error( L, _TXT("mixing array and table"));
-		}
-		else if (lua_isstring( L, -2))
-		{
-			if (array) luaL_error( L, _TXT("mixing array and table"));
-			key = lua_tostring( L, -2);
-		}
-		else {
-			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
-		}
-		std::size_t elementStartPos = configstr.size();
-		if (itercnt)
-		{
-			configstr.append( ", ");
-		}
-		if (key)
-		{
-			configstr.append( "\"");
-			configstr.append( key);
-			configstr.append( "\": ");
-		}
-		if (lua_isnil( L, -1))
-		{
-			configstr.resize( elementStartPos);
-			--itercnt;
-		}
-		else if (lua_isstring( L, -1))
-		{
-			configstr.push_back( '"');
-			configstr.append( lua_tostring( L, -1));
-			configstr.push_back( '"');
-		}
-		else if (lua_istable( L, -1))
-		{
-			switch (getTableType( L, -1))
+			if (lua_tointeger( L, -2) != itercnt+1)
 			{
-				case TableTypeEmpty:
-					configstr.resize( elementStartPos);
-					--itercnt;
-					break;
-				case TableTypeArray:
-					configstr.append( "[ ");
-					convertConfigToJson_( L, -1, configstr, true/*array*/);
-					configstr.append( " ]");
-					break;
-				case TableTypeDictionary:
-					configstr.append( "{ ");
-					convertConfigToJson_( L, -1, configstr, false/*!array*/);
-					configstr.append( " }");
-					break;
+				luaL_error( L, _TXT("array with non strict ascending indices or not starting with 1"));
 			}
 		}
 		else
 		{
-			lua_pushvalue( L, -1);
-			configstr.append( lua_tostring( L, -1));
-			lua_pop( L, 1);
+			luaL_error( L, _TXT("mixing array and table"));
+		}
+		if (itercnt)
+		{
+			configstr.append( ", ");
+		}
+		if (!convertLuaValueToJson_( L, -1, configstr))
+		{
+			configstr.append( "null");
 		}
 		lua_pop( L, 1 );
 	}
 	lua_pop( L, 1); // Get luaddr-value from stack
+}
+
+static void convertLuaDictionaryToJson_( lua_State *L, int luaddr, std::string& configstr)
+{
+	std::map<CString,std::string> dictmap;
+	lua_pushvalue( L, luaddr);
+	lua_pushnil( L );
+
+	while (lua_next( L, -2) != 0)
+	{
+		const char* key = 0;
+
+		if (lua_isnumber( L, -2))
+		{
+			luaL_error( L, _TXT("mixing array and table"));
+		}
+		else if (lua_isstring( L, -2))
+		{
+			key = lua_tostring( L, -2);
+		}
+		else {
+			luaL_error( L, _TXT("non string type keys are not supported in table conversion to JSON"));
+		}
+		std::string value;
+		if (convertLuaValueToJson_( L, -1, value))
+		{
+			dictmap[ key] = value;
+		}
+		lua_pop( L, 1 );
+	}
+	lua_pop( L, 1); // Get luaddr-value from stack
+
+	std::map<CString,std::string>::const_iterator di = dictmap.begin(), de = dictmap.end();
+	for (int didx=0; di != de; ++di,++didx)
+	{
+		if (didx) configstr.append( ", ");
+
+		configstr.append( "\"");
+		configstr.append( di->first.value);
+		configstr.append( "\": ");
+		configstr.append( di->second);
+	}
 }
 
 static Configuration convertConfig( lua_State *L, int luaddr)
@@ -615,11 +665,10 @@ static Configuration convertConfig( lua_State *L, int luaddr)
 	return rt;
 }
 
-static std::string convertConfigToJson( lua_State *L, int luaddr)
+static std::string convertLuaTableToJson( lua_State *L, int luaddr)
 {
-	std::string rt( "{");
-	convertConfigToJson_( L, luaddr, rt, false/*!array*/);
-	rt.append( "}");
+	std::string rt;
+	convertLuaValueToJson_( L, luaddr, rt);
 	return rt;
 }
 
@@ -669,7 +718,7 @@ static int l_def_server( lua_State *L)
 		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'def_server': expected <host> <config>"));
 		const char* hostname = lua_tostring( L, 1);
 		Configuration configmap = convertConfig( L, 2);
-		std::string configjson = convertConfigToJson( L, 2);
+		std::string configjson = convertLuaTableToJson( L, 2);
 
 		g_globalContext.defineServer( hostname, configmap, configjson);
 	}
@@ -701,7 +750,7 @@ static int l_call_server( lua_State *L)
 			}
 			else if (lua_istable( L, 3))
 			{
-				content = convertConfigToJson( L, 3);
+				content = convertLuaTableToJson( L, 3);
 				arg = content.c_str();
 			}
 			else
