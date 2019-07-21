@@ -154,7 +154,7 @@ public:
 	DefineConfigSchema() :DefineSchema<SCHEMA>( ROOT_CONTEXT_NAME){}
 };
 
-static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","inserter",0};
+static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","qryeval","inserter",0};
 
 static void tickerFunction( void* THIS)
 {
@@ -218,6 +218,11 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_INIT_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
 		schema_Context_PUT_QueryAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
+
+		static const DefineConfigSchema<Schema_Context_INIT_QueryEval> schema_Context_INIT_QueryEval;
+		schema_Context_INIT_QueryEval.addToHandler( m_impl, "POST/qryeval");
+		static const DefineConfigSchema<Schema_Context_PUT_QueryEval> schema_Context_PUT_QueryEval;
+		schema_Context_PUT_QueryEval.addToHandler( m_impl, "PUT/qryeval");
 
 		static const DefineConfigSchema<Schema_Context_PUT_StatisticsServer> Schema_Context_PUT_StatisticsServer;
 		Schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");

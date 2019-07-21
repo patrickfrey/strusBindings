@@ -54,6 +54,29 @@ public:
 	}
 };
 
+class Schema_Context_INIT_QueryEval :public papuga::RequestAutomaton
+{
+public:
+	Schema_Context_INIT_QueryEval() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		{},
+		{
+			{"storage","/qryeval/storage/name()",false/*not required*/},
+			{"qryanalyzer","/qryeval/analyzer/name()",false/*not required*/}
+		},
+		{
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/qryeval/eval")}
+		}
+	) {}
+};
+
+class Schema_Context_PUT_QueryEval :public Schema_Context_INIT_QueryEval
+{
+public:
+	Schema_Context_PUT_QueryEval() :Schema_Context_INIT_QueryEval(){}
+};
+
+
 class Schema_Storage_QRYORG :public papuga::RequestAutomaton
 {
 public:

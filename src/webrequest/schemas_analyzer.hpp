@@ -395,20 +395,12 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton
+class Schema_Context_PUT_QueryAnalyzer :public Schema_Context_INIT_QueryAnalyzer
 {
 public:
-	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		{},
-		{
-			{"vstorage","/analyzer/query/vstorage/name()",false/*not required*/}
-		},
-		{
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")},
-		}
-	) {}
+	Schema_Context_PUT_QueryAnalyzer() :Schema_Context_INIT_QueryAnalyzer(){}
 };
+
 
 class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
