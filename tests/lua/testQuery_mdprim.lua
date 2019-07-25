@@ -102,7 +102,7 @@ query:setDebugMode( false )
 query:addAccess( {"tiny","huge","small"} )
 
 -- Dump query to output
-output[ "QueryDump"] = query:tostring()
+output[ "QueryDump"] = query:introspection( nil)
 
 -- Now we evaluate the query and iterate on the result to display them:
 local results = query:evaluate()

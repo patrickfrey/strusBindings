@@ -95,7 +95,7 @@ query:addFeature( "titlefield", {from="title_start", to="title_end"} )
 query:setDebugMode( false )
 
 -- Dump query to output
-output[ "QueryDump"] = query:tostring()
+output[ "QueryDump"] = query:introspection()
 
 -- Now we evaluate the query and iterate on the result to display them:
 local results = query:evaluate()

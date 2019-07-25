@@ -236,11 +236,28 @@ QueryResult* QueryImpl::evaluate() const
 	return result.release();
 }
 
-std::string QueryImpl::tostring() const
+Struct QueryImpl::introspection( const ValueVariant& arg) const
 {
-	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
-	return THIS->tostring();
+	Struct rt;
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const QueryInterface* query = m_query_impl.getObject<QueryInterface>();
+
+	/*[-]*/std::cerr << "++++ Serialization " << query->view().tostring() << std::endl;
+	strus::local_ptr<IntrospectionBase> ictx( new StructViewIntrospection( errorhnd, query->view()));
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
 }
+
 
 
 

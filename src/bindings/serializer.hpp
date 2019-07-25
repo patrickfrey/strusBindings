@@ -26,6 +26,7 @@
 #include "strus/timeStamp.hpp"
 #include "strus/statisticsMessage.hpp"
 #include "strus/functionDescription.hpp"
+#include "strus/structView.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
 #include "strus/documentTermIteratorInterface.hpp"
@@ -239,6 +240,7 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const strus::DebugTraceMessage& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::DebugTraceMessage>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const strus::StructView& val, papuga_ErrorCode& errcode, bool deep);
 
 	struct atomictype_ {};
 	struct structtype_ {};

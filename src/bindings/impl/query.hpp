@@ -216,9 +216,10 @@ public:
 	/// \return the result (strus::QueryResult)
 	QueryResult* evaluate() const;
 
-	/// \brief Map the contents of the query to a readable string
-	/// \return the string
-	std::string tostring() const;
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path=ValueVariant()) const;
 
 private:
 	friend class QueryEvalImpl;

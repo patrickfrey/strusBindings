@@ -112,7 +112,7 @@ try
 	$query->addAccess( ["tiny","huge","small"] );
 	
 	// Dump query to output
-	$output[ "QueryDump"] = $query->tostring();
+	$output[ "QueryDump"] = $query->introspection( NULL);
 	
 	// Now we evaluate the query and iterate on the result to display them:
 	$results = $query->evaluate();
