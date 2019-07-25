@@ -326,31 +326,31 @@ public:
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList analyzeFeature()
+	static papuga::RequestAutomaton_NodeList analyzeFeature( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
-		return {
-			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
-		};
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareFeature( "")},
+			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
+		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList analyzeSentence()
+	static papuga::RequestAutomaton_NodeList analyzeSentence( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
-		return {
-			{SchemaQueryDeclPart::declareSentence()},
-			{"/query/sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
-		};
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareSentence( "")},
+			{"sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList analyzeMetaData()
+	static papuga::RequestAutomaton_NodeList analyzeMetaData( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
-		return {
-			{SchemaQueryDeclPart::declareMetaData()},
-			{"/query/restriction/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeSchemaMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
-		};
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareMetaData( "")},
+			{"restriction/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeSchemaMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
+		}};
 	}
 };
 
@@ -429,9 +429,9 @@ public:
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
 			{"/query/analyzer", '?'},
 
-			{SchemaAnalyzerPart::analyzeFeature()},
-			{SchemaAnalyzerPart::analyzeMetaData()},
-			{SchemaAnalyzerPart::analyzeSentence()}
+			{SchemaAnalyzerPart::analyzeFeature( "/query")},
+			{SchemaAnalyzerPart::analyzeMetaData( "/query")},
+			{SchemaAnalyzerPart::analyzeSentence( "/query")}
 		}
 	) {}
 };

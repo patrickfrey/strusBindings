@@ -26,31 +26,31 @@ namespace webrequest {
 class SchemaQueryPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList buildQueryOriginal()
+	static papuga::RequestAutomaton_NodeList buildQueryOriginal( const char* rootexpr)
 	{
 		typedef bindings::method::Query Q;
 		typedef bindings::method::QueryAnalyzer A;
-		return {
-			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression, '!', 2/*tag diff*/}} },
-			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
+		return { rootexpr, {
+			{SchemaQueryDeclPart::declareFeature( "")},
+			{"feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression, '!', 2/*tag diff*/}} },
+			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
 
-			{SchemaQueryDeclPart::declareMetaData()},
-			{"/query/restriction", "_condition", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
-			{"/query/restriction", 0, "query", Q::addMetaDataRestriction(),  {"_condition"} }
-		};
+			{SchemaQueryDeclPart::declareMetaData( "")},
+			{"restriction", "_condition", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
+			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_condition"} }
+		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList buildQueryAnalyzed()
+	static papuga::RequestAutomaton_NodeList buildQueryAnalyzed( const char* rootexpr)
 	{
 		typedef bindings::method::Query Q;
-		return {
-			{SchemaQueryDeclPart::declareFeature()},
-			{"/query/feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '!', 2/*tag diff*/}, {FeatureWeight, '?'}} },
+		return { rootexpr, {
+			{SchemaQueryDeclPart::declareFeature( "")},
+			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '!', 2/*tag diff*/}, {FeatureWeight, '?'}} },
 
-			{SchemaQueryDeclPart::declareMetaData()},
-			{"/query/restriction", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
-		};
+			{SchemaQueryDeclPart::declareMetaData( "")},
+			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
+		}};
 	}
 };
 
@@ -61,11 +61,11 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{},
 		{
-			{"storage","/qryeval/storage/name()",false/*not required*/},
-			{"qryanalyzer","/qryeval/analyzer/name()",false/*not required*/}
+			{"storage","/query/storage/name()",false/*not required*/},
+			{"qryanalyzer","/query/analyzer/name()",false/*not required*/}
 		},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval( "/qryeval/eval")}
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")}
 		}
 	) {}
 };
@@ -89,9 +89,9 @@ public:
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
-			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
-			{SchemaQueryPart::buildQueryOriginal()},
-			{SchemaQueryDeclPart::defineRankingParameter()},
+			{"/query", "query", "qryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
+			{SchemaQueryPart::buildQueryOriginal( "/query")},
+			{SchemaQueryDeclPart::defineRankingParameter( "/query")},
 			{"/query", "ranklist", "query", bindings::method::Query::evaluate(), {} }
 		}
 	) {}
@@ -108,10 +108,10 @@ public:
 		{},
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
-			{"/query", "query", "queryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
-			{SchemaQueryPart::buildQueryAnalyzed()},
-			{SchemaQueryDeclPart::defineStatistics()},
-			{SchemaQueryDeclPart::defineRankingParameter()},
+			{"/query", "query", "qryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
+			{SchemaQueryPart::buildQueryAnalyzed( "/query")},
+			{SchemaQueryDeclPart::defineStatistics( "/query")},
+			{SchemaQueryDeclPart::defineRankingParameter( "/query")},
 			{"/query", "ranklist", "query", bindings::method::Query::evaluate(), {} }
 		}
 	) {}

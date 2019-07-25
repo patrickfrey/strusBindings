@@ -129,14 +129,14 @@ expected = """query evaluation:
 str QueryDump: "query evaluation program:
 SELECT select;
 EVAL  tf( match= %seek);
-EVAL  metadata( name=doclen, weight=1);
-EVAL  metadata( name=docidx, weight=1);
-SUMMARIZE attribute( metaname='docid', resultname='docid');
-SUMMARIZE metadata( metaname='cross', resultname='cross');
-SUMMARIZE metadata( metaname='factors', resultname='factors');
-SUMMARIZE metadata( metaname='lo', resultname='lo');
-SUMMARIZE metadata( metaname='hi', resultname='hi');
-SUMMARIZE forwardindex( type='word' resultname='word' N=100);
+EVAL  metadata( {name:"doclen",weight:1});
+EVAL  metadata( {name:"docidx",weight:1});
+SUMMARIZE attribute( {attribute:"docid",resultname:"docid"});
+SUMMARIZE metadata( {metaname:"cross",resultname:"cross"});
+SUMMARIZE metadata( {metaname:"factors",resultname:"factors"});
+SUMMARIZE metadata( {metaname:"lo",resultname:"lo"});
+SUMMARIZE metadata( {metaname:"hi",resultname:"hi"});
+SUMMARIZE forwardindex( {N:100,resultname:"word",type:"word"});
 feature 'seek' 1.00000: 
   sequence_imm range=0 cardinality=0:
     sequence_imm range=0 cardinality=0:

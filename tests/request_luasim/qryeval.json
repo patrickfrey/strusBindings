@@ -1,0 +1,27 @@
+{
+    "query": {
+        "storage": {
+            "name": "test"
+        },
+        "analyzer": {
+            "name": "test"
+        },
+        "eval": {
+            "weighting": {
+                "name": "BM25",
+                "param": [{
+                    "name": "k1",
+                    "value": "1.2"
+                },{
+                    "name": "b",
+                    "value": "0.75"
+                },{
+                    "name": "avgdoclen",
+                    "value": "100"
+                }
+                ]
+            },
+            "selection": "search"
+        }
+    }
+}

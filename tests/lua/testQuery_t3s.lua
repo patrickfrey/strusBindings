@@ -114,10 +114,10 @@ local expected = [[
 query evaluation:
 string QueryDump: "query evaluation program:
 SELECT select;
-EVAL  BM25( b=2.1, k1=0.75, avgdoclen=1000, metadata_doclen=, match= %seek);
-SUMMARIZE attribute( metaname='title', resultname='title');
-SUMMARIZE attribute( metaname='docid', resultname='docid');
-SUMMARIZE matchphrase( type='orig', matchmark=(,), floatingmark=(... , ...), name para=para, name phrase=phrase, name docstart=docstart, paragraphsize=300, sentencesize=40, windowsize=30, cardinality='0', maxdf='0.1', match= %seek, title= %titlefield);
+EVAL  BM25( {avgdoclen:1000,b:2.1,k1:0.75,metadata_doclen:""}, match= %seek);
+SUMMARIZE attribute( {attribute:"title",resultname:"title"});
+SUMMARIZE attribute( {attribute:"docid",resultname:"docid"});
+SUMMARIZE matchphrase( {cardinality:0,features:{docstart:"docstart",para:"para",phrase:"phrase"},floatingmark:{end:" ...",start:"... "},matchmark:{end:"",start:""},maxdf:0.1,paragraphsize:300,sentencesize:40,type:"orig",windowsize:30}, match= %seek, title= %titlefield);
 feature 'seek' 1.00000: 
   term word 'citi'
 

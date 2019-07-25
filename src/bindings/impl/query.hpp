@@ -12,6 +12,7 @@
 #include "strus/numericVariant.hpp"
 #include "strus/queryResult.hpp"
 #include "impl/value/objectref.hpp"
+#include "impl/value/struct.hpp"
 #include <vector>
 #include <string>
 
@@ -99,6 +100,11 @@ public:
 	/// \param[in] storage storage to execute the query on
 	/// \return the query instance
 	QueryImpl* createQuery( StorageClientImpl* storage) const;
+
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path) const;
 
 private:
 	/// \brief Constructor used by Context

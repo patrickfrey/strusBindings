@@ -254,6 +254,8 @@ WebRequestHandler::WebRequestHandler(
 
 		static const IntrospectionMethodDescription mt_QueryAnalyzer_GET( mt::QueryAnalyzer::introspection(), "analyzer");
 		mt_QueryAnalyzer_GET.addToHandler( m_impl);
+		static const IntrospectionMethodDescription mt_QueryEval_GET( mt::QueryEval::introspection(), "qryeval");
+		mt_QueryEval_GET.addToHandler( m_impl);
 
 		static const IntrospectionMethodDescription mt_StatisticsServer_GET( mt::StatisticsMap::introspection(), "statserver");
 		mt_StatisticsServer_GET.addToHandler( m_impl);

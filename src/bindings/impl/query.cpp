@@ -7,11 +7,13 @@
  */
 #include "impl/query.hpp"
 #include "impl/storage.hpp"
+#include "impl/value/structViewIntrospection.hpp"
 #include "papuga/serialization.h"
 #include "strus/queryEvalInterface.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "private/internationalization.hpp"
 #include "valueVariantWrap.hpp"
 #include "callResultUtils.hpp"
@@ -113,6 +115,27 @@ QueryImpl* QueryEvalImpl::createQuery( StorageClientImpl* storage) const
 	if (!query.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	return new QueryImpl( m_trace_impl, m_objbuilder_impl, m_errorhnd_impl, storage->m_storage_impl, m_queryeval_impl, query, m_queryproc);
+}
+
+Struct QueryEvalImpl::introspection( const ValueVariant& arg) const
+{
+	Struct rt;
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	const QueryEvalInterface* queryeval = m_queryeval_impl.getObject<QueryEvalInterface>();
+
+	strus::local_ptr<IntrospectionBase> ictx( new StructViewIntrospection( errorhnd, queryeval->view()));
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
 }
 
 void QueryImpl::addFeature( const std::string& set_, const ValueVariant& expr_, double weight_)

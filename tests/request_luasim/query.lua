@@ -93,6 +93,12 @@ if verbose then io.stderr:write( string.format("- Analyzed query with analyzer d
 qryana2 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query_with_analyzer)
 if verbose then io.stderr:write( string.format("- Analyzed query with analyzer passed as content:\n%s\n", qryana2)) end
 
+call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
+qryeval = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
+if verbose then io.stderr:write( string.format("- Query evaluation configuration from the server:\n%s\n", qryeval)) end
+
+qryres = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1)
+if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
 checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2, "@query.exp", "query.res" )
 
