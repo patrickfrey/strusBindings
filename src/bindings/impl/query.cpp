@@ -247,7 +247,6 @@ Struct QueryImpl::introspection( const ValueVariant& arg) const
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryInterface* query = m_query_impl.getObject<QueryInterface>();
 
-	/*[-]*/std::cerr << "++++ Serialization " << query->view().tostring() << std::endl;
 	strus::local_ptr<IntrospectionBase> ictx( new StructViewIntrospection( errorhnd, query->view()));
 	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())

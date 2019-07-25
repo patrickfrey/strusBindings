@@ -119,46 +119,200 @@ output[ "ResultList"] = output_list
 local result = "query evaluation:" .. dumpTreeWithFilter( output, {'docno'}) .. "\n"
 local expected = [[
 query evaluation:
-string QueryDump: "query evaluation program:
-SELECT select;
-EVAL  tf( match= %seek);
-EVAL  metadata( {name:"doclen",weight:1});
-EVAL  metadata( {name:"docidx",weight:1});
-SUMMARIZE attribute( {attribute:"docid",resultname:"docid"});
-SUMMARIZE metadata( {metaname:"cross",resultname:"cross"});
-SUMMARIZE metadata( {metaname:"factors",resultname:"factors"});
-SUMMARIZE metadata( {metaname:"lo",resultname:"lo"});
-SUMMARIZE metadata( {metaname:"hi",resultname:"hi"});
-SUMMARIZE forwardindex( {N:100,resultname:"word",type:"word"});
-feature 'seek' 1.00000: 
-  sequence_imm range=0 cardinality=0:
-    sequence_imm range=0 cardinality=0:
-      term word '2'
-      term word '3'
-    union range=0 cardinality=0:
-      sequence_imm range=0 cardinality=0:
-        term word '3'
-        term word '5'
-      term word '5'
-      term word '7'
-      term word '11'
-
-feature 'seek' 1.00000: 
-  sequence_imm range=0 cardinality=0:
-    term word '2'
-    term word '2'
-    term word '2'
-    term word '2'
-
-feature 'select' 1.00000: 
-  contains range=0 cardinality=2:
-    term word '2'
-    term word '3'
-
-maxNofRanks = 20
-minRank = 0
-user access one of : tiny, huge, small
-"
+string QueryDump:
+  string debug: "false"
+  string eval:
+    string formula:
+      number 1:
+        string arg: 0
+        string ip: 0
+        string opcode: "Arg"
+      number 2:
+        string arg: 1
+        string ip: 1
+        string opcode: "Arg"
+      number 3:
+        string ip: 2
+        string opcode: "Div"
+      number 4:
+        string arg: 1000
+        string ip: 3
+        string opcode: "Push"
+      number 5:
+        string arg: 2
+        string ip: 4
+        string opcode: "Arg"
+      number 6:
+        string ip: 5
+        string opcode: "Sub"
+      number 7:
+        string arg: 1000000
+        string ip: 6
+        string opcode: "Push"
+      number 8:
+        string ip: 7
+        string opcode: "Div"
+      number 9:
+        string ip: 8
+        string opcode: "Add"
+    string selection_sets:
+      number 1: "select"
+    string summarizers:
+      number 1:
+        string debugattr: "debug_attribute"
+        string def:
+          string attribute: "docid"
+          string resultname: "docid"
+        string function: "attribute"
+      number 2:
+        string debugattr: "debug_metadata"
+        string def:
+          string metaname: "cross"
+          string resultname: "cross"
+        string function: "metadata"
+      number 3:
+        string debugattr: "debug_metadata"
+        string def:
+          string metaname: "factors"
+          string resultname: "factors"
+        string function: "metadata"
+      number 4:
+        string debugattr: "debug_metadata"
+        string def:
+          string metaname: "lo"
+          string resultname: "lo"
+        string function: "metadata"
+      number 5:
+        string debugattr: "debug_metadata"
+        string def:
+          string metaname: "hi"
+          string resultname: "hi"
+        string function: "metadata"
+      number 6:
+        string debugattr: "debug_forwardindex"
+        string def:
+          string N: 100
+          string resultname: "word"
+          string type: "word"
+        string function: "forwardindex"
+    string weighting:
+      number 1:
+        string debugattr: "debug_weighting"
+        string function: "tf"
+        string parameter:
+          string match: "seek"
+      number 2:
+        string debugattr: "debug"
+        string def:
+          string name: "doclen"
+          string weight: 1
+        string function: "metadata"
+      number 3:
+        string debugattr: "debug"
+        string def:
+          string name: "docidx"
+          string weight: 1
+        string function: "metadata"
+    string weighting_sets:
+      number 1: "seek"
+  string feature:
+    number 1:
+      string set: "seek"
+      string struct:
+        string arg:
+          number 1:
+            string arg:
+              number 1:
+                string node: "term"
+                string type: "word"
+                string value: "2"
+              number 2:
+                string node: "term"
+                string type: "word"
+                string value: "3"
+            string cardinality: 0
+            string node: "expression"
+            string op: "sequence_imm"
+            string range: 0
+          number 2:
+            string arg:
+              number 1:
+                string arg:
+                  number 1: {...}
+                  number 2: {...}
+                string cardinality: 0
+                string node: "expression"
+                string op: "sequence_imm"
+                string range: 0
+              number 2:
+                string node: "term"
+                string type: "word"
+                string value: "5"
+              number 3:
+                string node: "term"
+                string type: "word"
+                string value: "7"
+              number 4:
+                string node: "term"
+                string type: "word"
+                string value: "11"
+            string cardinality: 0
+            string node: "expression"
+            string op: "union"
+            string range: 0
+        string cardinality: 0
+        string node: "expression"
+        string op: "sequence_imm"
+        string range: 0
+      string weight: 1
+    number 2:
+      string set: "seek"
+      string struct:
+        string arg:
+          number 1:
+            string node: "term"
+            string type: "word"
+            string value: "2"
+          number 2:
+            string node: "term"
+            string type: "word"
+            string value: "2"
+          number 3:
+            string node: "term"
+            string type: "word"
+            string value: "2"
+          number 4:
+            string node: "term"
+            string type: "word"
+            string value: "2"
+        string cardinality: 0
+        string node: "expression"
+        string op: "sequence_imm"
+        string range: 0
+      string weight: 1
+    number 3:
+      string set: "select"
+      string struct:
+        string arg:
+          number 1:
+            string node: "term"
+            string type: "word"
+            string value: "2"
+          number 2:
+            string node: "term"
+            string type: "word"
+            string value: "3"
+        string cardinality: 2
+        string node: "expression"
+        string op: "contains"
+        string range: 0
+      string weight: 1
+  string maxNofRanks: 20
+  string minRank: 0
+  string user:
+    number 1: "tiny"
+    number 2: "huge"
+    number 3: "small"
 string QueryExpr:
   number 1:
     string arg:

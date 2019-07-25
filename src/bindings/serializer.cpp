@@ -743,19 +743,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::S
 			rt &= serialize_nothrow( result, val.asstring(), errcode, deep);
 			break;
 		case strus::StructView::Numeric:
-			switch (val.asnumeric().type)
-			{
-				case strus::NumericVariant::Null:
-					rt &= papuga_Serialization_pushValue_void( result);
-					break;
-				case strus::NumericVariant::Int:
-				case strus::NumericVariant::UInt:
-					rt &= papuga_Serialization_pushValue_int( result, val.asnumeric().toint());
-					break;
-				case strus::NumericVariant::Float:
-					rt &= papuga_Serialization_pushValue_double( result, val.asnumeric().tofloat());
-					break;
-			}
+			rt &= serialize_nothrow( result, val.asnumeric(), errcode, deep);
 			break;
 		case strus::StructView::Structure:
 			if (val.isArray())
@@ -781,15 +769,15 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::S
 				StructView::dict_iterator di = val.dict_begin(), de = val.dict_end();
 				for (; di != de; ++di)
 				{
-					const char* valstr = deep
+					const char* keystr = deep
 						? papuga_Allocator_copy_string( result->allocator, di->first.c_str(), di->first.size())
 						: di->first.c_str();
-					if (!valstr)
+					if (!keystr)
 					{
 						errcode = papuga_NoMemError;
 						return false;
 					}
-					rt &= papuga_Serialization_pushName_string( result, valstr, di->first.size());
+					rt &= papuga_Serialization_pushName_string( result, keystr, di->first.size());
 					if (di->second.type() == strus::StructView::Structure)
 					{
 						rt &= papuga_Serialization_pushOpen( result);

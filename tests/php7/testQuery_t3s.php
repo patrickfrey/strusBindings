@@ -122,33 +122,122 @@ $output[ "ResultList"] = $output_list;
 $result = "query evaluation:" . dumpTreeWithFilter( $output, ['docno']);
 $expected = <<<END_expected
 query evaluation:
-string QueryDump: "query evaluation program:
-SELECT select;
-EVAL  BM25( {avgdoclen:1000,b:2.1,k1:0.75,metadata_doclen:""}, match= %seek);
-SUMMARIZE attribute( {attribute:"title",resultname:"title"});
-SUMMARIZE attribute( {attribute:"docid",resultname:"docid"});
-SUMMARIZE matchphrase( {cardinality:0,features:{docstart:"docstart",para:"para",phrase:"phrase"},floatingmark:{end:" ...",start:"... "},matchmark:{end:"",start:""},maxdf:0.1,paragraphsize:300,sentencesize:40,type:"orig",windowsize:30}, match= %seek, title= %titlefield);
-feature 'seek' 1.00000: 
-  term word 'citi'
-
-feature 'seek' 1.00000: 
-  term word 'visit'
-
-feature 'seek' 1.00000: 
-  term word 'tokyo'
-
-feature 'select' 1.00000: 
-  contains range=0 cardinality=1:
-    term word 'citi'
-    term word 'visit'
-    term word 'tokyo'
-
-feature 'titlefield' 1.00000: 
-  docfield title_start : title_end
-
-maxNofRanks = 20
-minRank = 0
-"
+string QueryDump: 
+  string debug: "false"
+  string docs: 
+  string eval: 
+    string selection_sets: 
+      integer 0: "select"
+    string summarizers: 
+      integer 0: 
+        string debugattr: "debug_attribute"
+        string def: 
+          string attribute: "title"
+          string resultname: "title"
+        string function: "attribute"
+      integer 1: 
+        string debugattr: "debug_attribute"
+        string def: 
+          string attribute: "docid"
+          string resultname: "docid"
+        string function: "attribute"
+      integer 2: 
+        string debugattr: "debug_matchphrase"
+        string def: 
+          string cardinality: 0
+          string features: 
+            string docstart: "docstart"
+            string para: "para"
+            string phrase: "phrase"
+          string floatingmark: 
+            string end: " ..."
+            string start: "... "
+          string matchmark: 
+            string end: ""
+            string start: ""
+          string maxdf: 0.1
+          string paragraphsize: 300
+          string sentencesize: 40
+          string type: "orig"
+          string windowsize: 30
+        string function: "matchphrase"
+        string parameter: 
+          string match: "seek"
+          string title: "titlefield"
+    string weighting: 
+      integer 0: 
+        string debugattr: "debug_weighting"
+        string def: 
+          string avgdoclen: 1000
+          string b: 2.1
+          string k1: 0.75
+          string metadata_doclen: ""
+        string function: "BM25"
+        string parameter: 
+          string match: "seek"
+    string weighting_sets: 
+      integer 0: "seek"
+  string feature: 
+    integer 0: 
+      string set: "seek"
+      string struct: 
+        string node: "term"
+        string type: "word"
+        string value: "citi"
+        string var: 
+      string weight: 1
+    integer 1: 
+      string set: "seek"
+      string struct: 
+        string node: "term"
+        string type: "word"
+        string value: "visit"
+        string var: 
+      string weight: 1
+    integer 2: 
+      string set: "seek"
+      string struct: 
+        string node: "term"
+        string type: "word"
+        string value: "tokyo"
+        string var: 
+      string weight: 1
+    integer 3: 
+      string set: "select"
+      string struct: 
+        string arg: 
+          integer 0: 
+            string node: "term"
+            string type: "word"
+            string value: "citi"
+            string var: 
+          integer 1: 
+            string node: "term"
+            string type: "word"
+            string value: "visit"
+            string var: 
+          integer 2: 
+            string node: "term"
+            string type: "word"
+            string value: "tokyo"
+            string var: 
+        string cardinality: 1
+        string node: "expression"
+        string op: "contains"
+        string range: 0
+        string var: 
+      string weight: 1
+    integer 4: 
+      string set: "titlefield"
+      string struct: 
+        string end: "title_end"
+        string node: "docfield"
+        string start: "title_start"
+        string var: 
+      string weight: 1
+  string maxNofRanks: 20
+  string minRank: 0
+  string user: 
 string QueryExpression: 
   integer 0: 
     string arg: 

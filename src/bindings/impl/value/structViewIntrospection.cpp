@@ -9,46 +9,14 @@
 #include "structViewIntrospection.hpp"
 #include "strus/structView.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "serializer.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
 
 void StructViewIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 {
-	switch (m_impl.type())
-	{
-		case StructView::Null:
-			if (!papuga_Serialization_pushValue_void( &serialization)) throw std::bad_alloc();
-			break;
-		case StructView::Numeric:
-		{
-			NumericVariant::String strval = m_impl.asnumeric().tostring();
-			if (!papuga_Serialization_pushValue_charp( &serialization, strval.c_str())) throw std::bad_alloc();
-			break;
-		}
-		case StructView::String:
-			papuga_Serialization_pushValue_string( &serialization, m_impl.asstring().c_str(), m_impl.asstring().size());
-			break;
-		case StructView::Structure:
-			if (m_impl.isArray())
-			{
-				bool rt = true;
-				if (substructure) rt &= papuga_Serialization_pushOpen( &serialization);
-				std::size_t ai = 0, ae = m_impl.arraySize();
-				for (; ai != ae; ++ai)
-				{
-					StructViewIntrospection elem( m_errorhnd, *m_impl.get( ai));
-					elem.serialize( serialization, path, true/*substructure*/);
-				}
-				if (substructure) rt &= papuga_Serialization_pushClose( &serialization);
-				if (!rt) throw std::bad_alloc();
-			}
-			else
-			{
-				serializeMembers( serialization, path, substructure);
-			}
-			break;
-	}
+	Serializer::serialize( &serialization, m_impl, true/*deep*/);
 }
 
 IntrospectionBase* StructViewIntrospection::open( const std::string& name)

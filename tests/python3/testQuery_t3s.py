@@ -117,33 +117,122 @@ output[ "ResultList"] = output_list
 
 result = "query evaluation:" + dumpTreeWithFilter( output, {'docno'}) + "\n"
 expected = """query evaluation:
-str QueryDump: "query evaluation program:
-SELECT select;
-EVAL  BM25( {avgdoclen:1000,b:2.1,k1:0.75,metadata_doclen:""}, match= %seek);
-SUMMARIZE attribute( {attribute:"title",resultname:"title"});
-SUMMARIZE attribute( {attribute:"docid",resultname:"docid"});
-SUMMARIZE matchphrase( {cardinality:0,features:{docstart:"docstart",para:"para",phrase:"phrase"},floatingmark:{end:" ...",start:"... "},matchmark:{end:"",start:""},maxdf:0.1,paragraphsize:300,sentencesize:40,type:"orig",windowsize:30}, match= %seek, title= %titlefield);
-feature 'seek' 1.00000: 
-  term word 'citi'
-
-feature 'seek' 1.00000: 
-  term word 'visit'
-
-feature 'seek' 1.00000: 
-  term word 'tokyo'
-
-feature 'select' 1.00000: 
-  contains range=0 cardinality=1:
-    term word 'citi'
-    term word 'visit'
-    term word 'tokyo'
-
-feature 'titlefield' 1.00000: 
-  docfield title_start : title_end
-
-maxNofRanks = 20
-minRank = 0
-"
+str QueryDump:
+  str debug: "false"
+  str docs: None
+  str eval:
+    str selection_sets:
+      number 1: "select"
+    str summarizers:
+      number 1:
+        str debugattr: "debug_attribute"
+        str def:
+          str attribute: "title"
+          str resultname: "title"
+        str function: "attribute"
+      number 2:
+        str debugattr: "debug_attribute"
+        str def:
+          str attribute: "docid"
+          str resultname: "docid"
+        str function: "attribute"
+      number 3:
+        str debugattr: "debug_matchphrase"
+        str def:
+          str cardinality: 0
+          str features:
+            str docstart: "docstart"
+            str para: "para"
+            str phrase: "phrase"
+          str floatingmark:
+            str end: " ..."
+            str start: "... "
+          str matchmark:
+            str end: ""
+            str start: ""
+          str maxdf: 0.10000
+          str paragraphsize: 300
+          str sentencesize: 40
+          str type: "orig"
+          str windowsize: 30
+        str function: "matchphrase"
+        str parameter:
+          str match: "seek"
+          str title: "titlefield"
+    str weighting:
+      number 1:
+        str debugattr: "debug_weighting"
+        str def:
+          str avgdoclen: 1000
+          str b: 2.10000
+          str k1: 0.75000
+          str metadata_doclen: ""
+        str function: "BM25"
+        str parameter:
+          str match: "seek"
+    str weighting_sets:
+      number 1: "seek"
+  str feature:
+    number 1:
+      str set: "seek"
+      str struct:
+        str node: "term"
+        str type: "word"
+        str value: "citi"
+        str var: None
+      str weight: 1
+    number 2:
+      str set: "seek"
+      str struct:
+        str node: "term"
+        str type: "word"
+        str value: "visit"
+        str var: None
+      str weight: 1
+    number 3:
+      str set: "seek"
+      str struct:
+        str node: "term"
+        str type: "word"
+        str value: "tokyo"
+        str var: None
+      str weight: 1
+    number 4:
+      str set: "select"
+      str struct:
+        str arg:
+          number 1:
+            str node: "term"
+            str type: "word"
+            str value: "citi"
+            str var: None
+          number 2:
+            str node: "term"
+            str type: "word"
+            str value: "visit"
+            str var: None
+          number 3:
+            str node: "term"
+            str type: "word"
+            str value: "tokyo"
+            str var: None
+        str cardinality: 1
+        str node: "expression"
+        str op: "contains"
+        str range: 0
+        str var: None
+      str weight: 1
+    number 5:
+      str set: "titlefield"
+      str struct:
+        str end: "title_end"
+        str node: "docfield"
+        str start: "title_start"
+        str var: None
+      str weight: 1
+  str maxNofRanks: 20
+  str minRank: 0
+  str user: 
 str QueryExpression:
   number 1:
     str arg:
