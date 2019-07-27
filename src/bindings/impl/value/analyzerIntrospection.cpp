@@ -48,9 +48,9 @@ public:
 		{}
 	virtual ~FunctionViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -93,9 +93,9 @@ public:
 		{}
 	virtual ~DocumentClassIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -141,9 +141,9 @@ public:
 		{}
 	virtual ~FeatureViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -199,9 +199,9 @@ public:
 		{}
 	virtual ~AggregatorViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -243,9 +243,9 @@ public:
 		{}
 	virtual ~SubDocumentDefinitionViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -288,9 +288,9 @@ public:
 		{}
 	virtual ~SubContentDefinitionViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -321,9 +321,9 @@ private:
 };
 
 
-void DocumentAnalyzerIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void DocumentAnalyzerIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 
 static IntrospectionBase* createFeatureViewIntrospectionList( ErrorBufferInterface* errorhnd_, const std::vector<analyzer::FeatureView>& view_)
@@ -391,9 +391,9 @@ public:
 		{}
 	virtual ~QueryElementViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -445,9 +445,9 @@ public:
 		{}
 	virtual ~ContentStatisticsElementViewIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -499,9 +499,9 @@ private:
 	analyzer::ContentStatisticsElementView m_view;
 };
 
-void QueryAnalyzerIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void QueryAnalyzerIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 
 IntrospectionBase* QueryAnalyzerIntrospection::open( const std::string& name)
@@ -528,9 +528,9 @@ std::vector<IntrospectionLink> QueryAnalyzerIntrospection::list()
 }
 
 
-void ContentStatisticsIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void ContentStatisticsIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 
 IntrospectionBase* ContentStatisticsIntrospection::open( const std::string& name)

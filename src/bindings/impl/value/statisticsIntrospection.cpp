@@ -14,7 +14,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-void StatisticsMapIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void StatisticsMapIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
 	if (m_level == 0)
 	{

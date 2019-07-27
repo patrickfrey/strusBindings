@@ -45,7 +45,7 @@ public:\
 			const ClassName* impl_)\
 		:m_errorhnd(errorhnd_),m_impl(impl_){}\
 	virtual ~IntrospectionClassName(){}\
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure);\
+	virtual void serialize( papuga_Serialization& serialization, bool substructure);\
 	virtual IntrospectionBase* open( const std::string& name);\
 	virtual std::vector<IntrospectionLink> list();\
 private:\
@@ -81,7 +81,7 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionFunctionDescription(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure)
 		{
@@ -233,9 +233,9 @@ public:
 		:m_errorhnd(errorhnd_),m_impl(impl_){}
 	virtual ~IntrospectionFunctionList(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{
@@ -250,9 +250,9 @@ private:
 	const InterfaceClassName* m_impl;
 };
 
-void ContextIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void ContextIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 IntrospectionBase* ContextIntrospection::open( const std::string& name)
 {
@@ -271,9 +271,9 @@ std::vector<IntrospectionLink> ContextIntrospection::list()
 }
 
 
-void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void IntrospectionModuleLoader::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 IntrospectionBase* IntrospectionModuleLoader::open( const std::string& name)
 {
@@ -296,9 +296,9 @@ typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::PatternLexer> IntrospectionPatternLexerList;
 typedef IntrospectionFunctionList<TextProcessorInterface, TextProcessorInterface::PatternMatcher> IntrospectionPatternMatcherList;
 
-void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void IntrospectionTextProcessor::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 IntrospectionBase* IntrospectionTextProcessor::open( const std::string& name)
 {
@@ -321,9 +321,9 @@ typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterfa
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::SummarizerFunction> IntrospectionSummarizerFunctionList;
 typedef IntrospectionFunctionList<QueryProcessorInterface, QueryProcessorInterface::ScalarFunctionParser> IntrospectionScalarFunctionParserList;
 
-void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void IntrospectionQueryProcessor::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 IntrospectionBase* IntrospectionQueryProcessor::open( const std::string& name)
 {

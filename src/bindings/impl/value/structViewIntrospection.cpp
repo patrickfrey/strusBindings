@@ -14,7 +14,7 @@
 using namespace strus;
 using namespace strus::bindings;
 
-void StructViewIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void StructViewIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
 	Serializer::serialize( &serialization, m_impl, true/*deep*/);
 }

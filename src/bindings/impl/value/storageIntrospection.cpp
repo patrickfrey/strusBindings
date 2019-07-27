@@ -108,9 +108,9 @@ public:
 	{}
 	virtual ~AttibuteIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -173,9 +173,9 @@ public:
 	{}
 	virtual ~MetaDataIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -240,7 +240,7 @@ public:
 		{}
 	virtual ~ForwardIndexListIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
 		strus::local_ptr<ForwardIteratorInterface> itr( m_impl->createForwardIterator( m_type));
@@ -303,7 +303,7 @@ public:
 
 	enum {PartialDumpSize=1024};
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
 
@@ -314,7 +314,7 @@ public:
 			for (; ti != te; ++ti)
 			{
 				ForwardIndexIntrospection part( m_errorhnd, m_impl, m_docno, *ti);
-				part.serializeStructureAs( serialization, ti->c_str(), path);
+				part.serializeStructureAs( serialization, ti->c_str());
 			}
 		}
 		else if (m_pos == 0)
@@ -446,7 +446,7 @@ public:
 		{}
 	virtual ~DocumentPostingsIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
 
@@ -526,7 +526,7 @@ public:
 	}
 	virtual ~TermPostingsIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
 
@@ -675,7 +675,7 @@ public:
 		{}
 	virtual ~SearchIndexIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
 
@@ -686,7 +686,7 @@ public:
 			for (; ti != te; ++ti)
 			{
 				SearchIndexIntrospection part( m_errorhnd, m_impl, m_docno, *ti);
-				part.serializeStructureAs( serialization, ti->c_str(), path);
+				part.serializeStructureAs( serialization, ti->c_str());
 			}
 		}
 		else
@@ -783,9 +783,9 @@ public:
 		{}
 	virtual ~TermIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -871,9 +871,9 @@ public:
 		{}
 	virtual ~DocumentIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -935,9 +935,9 @@ public:
 		{}
 	virtual ~DocidIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -1032,9 +1032,9 @@ public:
 	}
 	virtual ~StatisticsIncrementIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -1092,9 +1092,9 @@ public:
 		{}
 	virtual ~StatisticsIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -1121,9 +1121,9 @@ private:
 	const StorageClientInterface* m_impl;
 };
 
-void StorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void StorageIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 
 IntrospectionBase* StorageIntrospection::open( const std::string& name)

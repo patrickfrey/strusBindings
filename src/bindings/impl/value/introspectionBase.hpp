@@ -54,15 +54,15 @@ class IntrospectionBase
 public:
 	virtual ~IntrospectionBase(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)=0;
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)=0;
 	virtual IntrospectionBase* open( const std::string& name)=0;
 	virtual std::vector<IntrospectionLink> list()=0;
 
-	void serializeStructureAs( papuga_Serialization& serialization, const char* name, const std::string& path);
+	void serializeStructureAs( papuga_Serialization& serialization, const char* name);
 	void getPathContent( papuga_Serialization& serialization, const std::vector<std::string>& path, bool substructure);
 
 protected:
-	void serializeMembers( papuga_Serialization& serialization, const std::string& path, bool substructure);
+	void serializeMembers( papuga_Serialization& serialization, bool substructure);
 	static std::vector<IntrospectionLink> getList( const char** ar);
 	static std::vector<std::string> getKeyList( const std::vector<std::pair<std::string,std::string> >& ar);
 	static std::runtime_error unresolvable_exception();
@@ -77,7 +77,7 @@ public:
 
 	virtual ~IntrospectionValueIterator(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure);
+	virtual void serialize( papuga_Serialization& serialization, bool substructure);
 	virtual IntrospectionBase* open( const std::string& name);
 	virtual std::vector<IntrospectionLink> list();
 
@@ -96,7 +96,7 @@ public:
 
 	virtual ~IntrospectionDirectoryIterator(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure);
+	virtual void serialize( papuga_Serialization& serialization, bool substructure);
 	virtual IntrospectionBase* open( const std::string& name);
 	virtual std::vector<IntrospectionLink> list();
 
@@ -123,7 +123,7 @@ public:
 	}
 	virtual ~LinkIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure);
+	virtual void serialize( papuga_Serialization& serialization, bool substructure);
 	virtual IntrospectionBase* open( const std::string& )	{return NULL;}
 	virtual std::vector<IntrospectionLink> list()		{return m_links;}
 

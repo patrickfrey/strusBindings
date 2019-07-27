@@ -68,9 +68,9 @@ public:
 		{}
 	virtual ~FeatureTypeListIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual std::vector<IntrospectionLink> list()
@@ -114,9 +114,9 @@ public:
 		{}
 	virtual ~FeatureValueIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		serializeMembers( serialization, substructure);
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)
@@ -180,9 +180,9 @@ private:
 }//anonymous namespace
 
 
-void VectorStorageIntrospection::serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
+void VectorStorageIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
-	serializeMembers( serialization, path, substructure);
+	serializeMembers( serialization, substructure);
 }
 
 IntrospectionBase* VectorStorageIntrospection::open( const std::string& name)

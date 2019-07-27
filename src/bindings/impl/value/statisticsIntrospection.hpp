@@ -55,7 +55,7 @@ public:
 		{}
 	virtual ~StatisticsMapIntrospection(){}
 
-	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure);
+	virtual void serialize( papuga_Serialization& serialization, bool substructure);
 	virtual IntrospectionBase* open( const std::string& name);
 	virtual std::vector<IntrospectionLink> list();
 
