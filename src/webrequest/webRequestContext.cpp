@@ -457,7 +457,7 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 		const char* resultstr = getDelegateRequestString( result, resultlen, errcode);
 		if (resultstr)
 		{
-			const papuga_ValueVariant* addressval = papuga_RequestContext_get_variable( m_context, result->addressvar, 0);
+			const papuga_ValueVariant* addressval = papuga_RequestContext_get_variable( m_context, result->addressvar);
 			if (!addressval)
 			{
 				setAnswer_fmt( answer, ErrorCodeNotFound, _TXT("undefined variable '%s'"), result->addressvar);
@@ -834,7 +834,7 @@ bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMet
 		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
 		return false;
 	}
-	else if (!papuga_RequestContext_add_variable( context, resultname, &retval.valuear[0]))
+	else if (!papuga_RequestContext_define_variable( context, resultname, &retval.valuear[0]))
 	{
 		return false;
 	}
@@ -941,7 +941,7 @@ struct ObjectDescr
 		typenam = typenam_;
 		classnam = classnam_;
 		contextnam = contextnam_;
-		obj = papuga_RequestContext_get_variable( context, typenam, NULL/*param[out] isArray*/);
+		obj = papuga_RequestContext_get_variable( context, typenam);
 		varnam = 0;
 		context_ownership = false;
 	}
@@ -950,7 +950,7 @@ struct ObjectDescr
 	{
 		papuga_ValueVariant pathvalue;
 		papuga_init_ValueVariant_charp( &pathvalue, path);
-		return papuga_RequestContext_add_variable( context, "_path", &pathvalue);
+		return papuga_RequestContext_define_variable( context, "_path", &pathvalue);
 	}
 
 	bool init( const papuga_RequestHandler* handler, PathBuf& path, WebRequestAnswer& answer)
@@ -994,11 +994,11 @@ struct ObjectDescr
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 		if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
 		{
-			obj = papuga_RequestContext_get_variable( context, typenam, NULL/*param[out] isArray*/);
+			obj = papuga_RequestContext_get_variable( context, typenam);
 			return true;
 		}
 		if (!(varnam = path.getNext())) return true;
-		obj = papuga_RequestContext_get_variable( context, varnam, NULL/*param[out] isArray*/);
+		obj = papuga_RequestContext_get_variable( context, varnam);
 		if (!obj)
 		{
 			reset();
