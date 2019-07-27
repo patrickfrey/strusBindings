@@ -26,8 +26,8 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{},
 		{
-			{"docanalyzer","/inserter/docanalyzer()",true/*required*/},
-			{"storage","/inserter/storage()",true/*required*/}},
+			{"docanalyzer","/inserter/include/analyzer()",true/*required*/},
+			{"storage","/inserter/include/storage()",true/*required*/}},
 		{
 			{"/inserter", "inserter", "context", bindings::method::Context::createInserter(), {{"storage"},{"docanalyzer"}} }
 		}

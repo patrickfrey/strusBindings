@@ -59,7 +59,7 @@ public:
 		{
 			return new IntrospectionAtomic<std::string>( m_errorhnd, m_view.name());
 		}
-		else if (name == "arg")
+		else if (name == "arg" && !m_view.parameter().empty())
 		{
 			return new IntrospectionKeyValueList<ParameterList>( m_errorhnd, m_view.parameter());
 		}

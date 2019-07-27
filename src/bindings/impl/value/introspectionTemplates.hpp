@@ -12,6 +12,7 @@
 #include "strus/base/configParser.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/numstring.hpp"
+#include "strus/base/local_ptr.hpp"
 #include "strus/base/stdint.h"
 #include "introspectionBase.hpp"
 #include "serializer.hpp"
@@ -166,7 +167,14 @@ public:
 
 	virtual void serialize( papuga_Serialization& serialization, const std::string& path, bool substructure)
 	{
-		serializeMembers( serialization, path, substructure);
+		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+		int ii=0, ie=m_value.size();
+		for (; ii != ie; ++ii)
+		{
+			strus::local_ptr<IntrospectionBase> chld( (*m_elementConstructor)( m_errorhnd, m_value[ ii]));
+			chld->serialize( serialization, path, true/*substructure*/);
+		}
+		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
 	}
 	virtual IntrospectionBase* open( const std::string& name)
 	{

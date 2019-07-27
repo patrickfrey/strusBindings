@@ -171,7 +171,7 @@ string QueryDump:
           string avgdoclen: 1000
           string b: 2.1
           string k1: 0.75
-          string metadata_doclen: ""
+          string metadata_doclen: "doclen"
         string function: "BM25"
         string parameter: 
           string match: "seek"

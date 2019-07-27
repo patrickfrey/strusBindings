@@ -166,7 +166,7 @@ str QueryDump:
           str avgdoclen: 1000
           str b: 2.10000
           str k1: 0.75000
-          str metadata_doclen: ""
+          str metadata_doclen: "doclen"
         str function: "BM25"
         str parameter:
           str match: "seek"

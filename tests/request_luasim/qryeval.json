@@ -1,10 +1,8 @@
 {
     "query": {
-        "storage": {
-            "name": "test"
-        },
-        "analyzer": {
-            "name": "test"
+        "include": {
+            "storage": "test",
+            "analyzer": "test"
         },
         "eval": {
             "weighting": {

@@ -236,12 +236,15 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "PUT/contentstats");
 		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "POST/contentstats");
 
-		static const DefineSchema<Schema_Storage_QRYORG> schema_Storage_QRYORG("storage");
-		schema_Storage_QRYORG.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_Storage_GET> schema_Storage_GET("storage");
+		schema_Storage_GET.addToHandler( m_impl, "GET");
 
 		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
 		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
-				
+
+		static const DefineSchema<Schema_QueryEval_GET> schema_QueryEval_GET("qryeval");
+		schema_QueryEval_GET.addToHandler( m_impl, "GET");
+
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
 		mt_Context_GET.addToHandler( m_impl);
@@ -254,6 +257,7 @@ WebRequestHandler::WebRequestHandler(
 
 		static const IntrospectionMethodDescription mt_QueryAnalyzer_GET( mt::QueryAnalyzer::introspection(), "analyzer");
 		mt_QueryAnalyzer_GET.addToHandler( m_impl);
+
 		static const IntrospectionMethodDescription mt_QueryEval_GET( mt::QueryEval::introspection(), "qryeval");
 		mt_QueryEval_GET.addToHandler( m_impl);
 

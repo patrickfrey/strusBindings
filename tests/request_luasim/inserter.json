@@ -1,7 +1,9 @@
 {
     "inserter" : {
-        "docanalyzer" : "test",
-        "storage"     : "test"
+        "include": {
+            "analyzer" : "test",
+            "storage" : "test"
+        }
     }
 }
 

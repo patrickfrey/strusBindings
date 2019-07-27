@@ -204,7 +204,11 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 	
 					rt &= papuga_Serialization_pushName_charp( ser, "arg");
 					rt &= papuga_Serialization_pushOpen( ser);
-					if ((std::size_t)ii->nofOperands() > stk.size()) throw std::runtime_error( _TXT("number of query analyzer expression operands out of range"));
+					if ((std::size_t)ii->nofOperands() > stk.size())
+					{
+						errcode = papuga_SyntaxError;
+						return false;
+					}
 					std::size_t si = stk.size() - ii->nofOperands(), se = stk.size();
 					for (; si != se; ++si)
 					{
@@ -243,13 +247,15 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 			if (stk.size() == 1)
 			{
 				papuga_Serialization* ser = *stk.begin();
+				papuga_Serialization_flatten( ser);
 				papuga_SerializationIter seriter;
 				papuga_init_SerializationIter( &seriter, ser);
 				if (ser->structid)
 				{
 					if (result->head.size > 0)
 					{
-						throw std::runtime_error( _TXT("appending structure with id to single unique result"));
+						errcode = papuga_MixedConstruction;
+						return false;
 					}
 					papuga_Serialization_set_structid( result, ser->structid);
 				}
@@ -260,11 +266,13 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 			}
 			else if (stk.empty())
 			{
-				throw std::runtime_error( _TXT("no result returned by term expression analysis"));
+				errcode = papuga_ValueUndefined;
+				return false;
 			}
 			else
 			{
-				throw std::runtime_error( _TXT("result returned by term expression analysis is not unique"));
+				errcode = papuga_DuplicateDefinition;
+				return false;
 			}
 		}
 		else
@@ -275,11 +283,13 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 			{
 				rt &= papuga_Serialization_pushValue_serialization( result, *si);
 			}
+			rt &= papuga_Serialization_flatten( result);
 		}
 		return rt;
 	}
 	catch (const std::bad_alloc&)
 	{
+		errcode = papuga_NoMemError;
 		return false;
 	}
 }
@@ -794,4 +804,5 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::S
 	}
 	return rt;
 }
+
 

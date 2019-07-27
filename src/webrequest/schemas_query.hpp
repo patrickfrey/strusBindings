@@ -26,18 +26,13 @@ namespace webrequest {
 class SchemaQueryPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList buildQueryOriginal( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList buildQueryOriginalAnalyzed( const char* rootexpr)
 	{
 		typedef bindings::method::Query Q;
-		typedef bindings::method::QueryAnalyzer A;
 		return { rootexpr, {
-			{SchemaQueryDeclPart::declareFeature( "")},
-			{"feature", "_feature", "qryanalyzer", A::analyzeSingleTermExpression(), {{TermExpression, '!', 2/*tag diff*/}} },
-			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_feature"}, {FeatureWeight, '?'}} },
-
-			{SchemaQueryDeclPart::declareMetaData( "")},
-			{"restriction", "_condition", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '*'}} },
-			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_condition"} }
+			{SchemaAnalyzerPart::analyzeQuery("")},
+			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} },
+			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} }
 		}};
 	}
 
@@ -52,6 +47,26 @@ public:
 			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
 		}};
 	}
+
+	static papuga::RequestAutomaton_NodeList createQuery( const char* rootexpr)
+	{
+		typedef bindings::method::QueryEval QE;
+		return { rootexpr, {
+			{SchemaQueryEvalDeclPart::defineQueryEval( "eval")},
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "analyzer")},
+			{"", "query", "qryeval", QE::createQuery(), {{"storage"}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList evaluateQuery( const char* rootexpr)
+	{
+		typedef bindings::method::Query Q;
+		return { rootexpr, {
+			{SchemaQueryDeclPart::defineStatistics( "")},
+			{SchemaQueryDeclPart::defineRankingParameter( "")},
+			{"", "ranklist", "query", Q::evaluate(), {} }
+		}};
+	}
 };
 
 class Schema_Context_INIT_QueryEval :public papuga::RequestAutomaton
@@ -61,8 +76,8 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{},
 		{
-			{"storage","/query/storage/name()",false/*not required*/},
-			{"qryanalyzer","/query/analyzer/name()",false/*not required*/}
+			{"storage","/query/include/storage()",false/*not required*/},
+			{"qryanalyzer","/query/include/analyzer()",false/*not required*/}
 		},
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")}
@@ -76,43 +91,36 @@ public:
 	Schema_Context_PUT_QueryEval() :Schema_Context_INIT_QueryEval(){}
 };
 
-
-class Schema_Storage_QRYORG :public papuga::RequestAutomaton
+class Schema_QueryEval_GET :public papuga::RequestAutomaton
 {
 public:
-	Schema_Storage_QRYORG() :papuga::RequestAutomaton(
+	Schema_QueryEval_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{
 			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
 		{},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
-			{"/query", "query", "qryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
-			{SchemaQueryPart::buildQueryOriginal( "/query")},
-			{SchemaQueryDeclPart::defineRankingParameter( "/query")},
-			{"/query", "ranklist", "query", bindings::method::Query::evaluate(), {} }
+			{SchemaQueryPart::createQuery( "/query")},
+			{SchemaQueryPart::buildQueryOriginalAnalyzed( "/query")},
+			{SchemaQueryPart::evaluateQuery( "/query")}
 		}
 	) {}
 };
 
-class Schema_Storage_QRYANA :public papuga::RequestAutomaton, public SchemaQueryPart
+class Schema_Storage_GET :public papuga::RequestAutomaton, public SchemaQueryPart
 {
 public:
-	Schema_Storage_QRYANA() :papuga::RequestAutomaton(
+	Schema_Storage_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{
 			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
 		{},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
-			{"/query", "query", "qryeval", bindings::method::QueryEval::createQuery(), {{"storage"}} },
+			{SchemaQueryPart::createQuery( "/query")},
 			{SchemaQueryPart::buildQueryAnalyzed( "/query")},
-			{SchemaQueryDeclPart::defineStatistics( "/query")},
-			{SchemaQueryDeclPart::defineRankingParameter( "/query")},
-			{"/query", "ranklist", "query", bindings::method::Query::evaluate(), {} }
+			{SchemaQueryPart::evaluateQuery( "/query")}
 		}
 	) {}
 };
