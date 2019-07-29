@@ -695,40 +695,9 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 	return serializeArray( result, val, errcode, deep);
 }
 
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::FunctionDescription::Parameter>& val, papuga_ErrorCode& errcode, bool deep)
-{
-	return serializeArray( result, val, errcode, deep);
-}
-
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::DebugTraceMessage>& val, papuga_ErrorCode& errcode, bool deep)
 {
 	return serializeArray( result, val, errcode, deep);
-}
-
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode, bool deep)
-{
-	bool rt = true;
-	rt &= Serializer::serializeStructMemberConstName( result, "type", val.typeName(), errcode, deep);
-	rt &= Serializer::serializeStructMemberConstName( result, "name", val.name(), errcode, deep);
-	rt &= Serializer::serializeStructMemberConstName( result, "domain", val.domain(), errcode, deep);
-	rt &= Serializer::serializeStructMemberConstName( result, "text", val.text(), errcode, deep);
-	return rt;
-}
-
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode, bool deep)
-{
-	bool rt = true;
-	rt &= Serializer::serializeStructMemberConstName( result, "text", val.text(), errcode, deep);
-	rt &= Serializer::serializeStructMemberConstName( result, "parameter", val.parameter(), errcode, deep);
-	return rt;
-}
-
-bool Serializer::serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode, bool deep)
-{
-	bool rt = true;
-	rt &= Serializer::serializeStructMemberConstName( result, "name", val.name(), errcode, deep);
-	rt &= Serializer::serializeStructMemberConstName( result, "text", val.text(), errcode, deep);
-	return rt;
 }
 
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const DebugTraceMessage& val, papuga_ErrorCode& errcode, bool deep)

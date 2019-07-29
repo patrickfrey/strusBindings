@@ -218,7 +218,6 @@ string QueryDump:
       string weight: 1
   string maxNofRanks: 20
   string minRank: 0
-  string user: 
 string QueryExpression:
   number 1:
     string arg:

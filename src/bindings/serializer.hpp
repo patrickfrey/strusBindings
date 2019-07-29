@@ -25,7 +25,6 @@
 #include "strus/sentenceGuess.hpp"
 #include "strus/timeStamp.hpp"
 #include "strus/statisticsMessage.hpp"
-#include "strus/functionDescription.hpp"
 #include "strus/structView.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
@@ -234,10 +233,6 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, StatisticsViewerInterface& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<ResultDocument>& val, papuga_ErrorCode& errcode, bool deep);
-	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription& val, papuga_ErrorCode& errcode, bool deep);
-	static bool serialize_nothrow( papuga_Serialization* result, const strus::FunctionDescription::Parameter& val, papuga_ErrorCode& errcode, bool deep);
-	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::FunctionDescription::Parameter>& val, papuga_ErrorCode& errcode, bool deep);
-	static bool serialize_nothrow( papuga_Serialization* result, const strus::PostingJoinOperatorInterface::Description& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const strus::DebugTraceMessage& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<strus::DebugTraceMessage>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const strus::StructView& val, papuga_ErrorCode& errcode, bool deep);

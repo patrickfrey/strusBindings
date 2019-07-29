@@ -87,13 +87,13 @@ public:
 		{
 			bool sc = true;
 			sc &= papuga_Serialization_pushOpen( &serialization);
-			Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
+			Serializer::serialize( &serialization, m_impl->view(), true/*deep*/);
 			sc &= papuga_Serialization_pushClose( &serialization);
 			if (!sc) throw std::bad_alloc();
 		}
 		else
 		{
-			Serializer::serialize( &serialization, m_impl->getDescription(), true/*deep*/);
+			Serializer::serialize( &serialization, m_impl->view(), true/*deep*/);
 		}
 	}
 	virtual IntrospectionBase* open( const std::string& name)

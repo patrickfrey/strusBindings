@@ -19,7 +19,6 @@ set( source_files
 	impl/value/statisticsIntrospection.cpp
 	impl/value/storageIntrospection.cpp
 	impl/value/vectorStorageIntrospection.cpp
-	impl/value/analyzerIntrospection.cpp
 	impl/value/structViewIntrospection.cpp
 	impl/value/termExpression.cpp
 	impl/value/metadataExpression.cpp

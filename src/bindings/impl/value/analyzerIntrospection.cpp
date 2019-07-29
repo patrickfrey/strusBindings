@@ -24,6 +24,7 @@
 #include <utility>
 #include <limits>
 
+#error DEPRECATED 
 using namespace strus;
 using namespace strus::bindings;
 

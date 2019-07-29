@@ -144,7 +144,6 @@ $expected = <<<END_expected
 query evaluation:
 string QueryDump: 
   string debug: "false"
-  string docs: 
   string eval: 
     string formula: 
       integer 0: 

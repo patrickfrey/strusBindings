@@ -124,7 +124,6 @@ $expected = <<<END_expected
 query evaluation:
 string QueryDump: 
   string debug: "false"
-  string docs: 
   string eval: 
     string selection_sets: 
       integer 0: "select"
@@ -237,7 +236,6 @@ string QueryDump:
       string weight: 1
   string maxNofRanks: 20
   string minRank: 0
-  string user: 
 string QueryExpression: 
   integer 0: 
     string arg: 

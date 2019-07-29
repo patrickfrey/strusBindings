@@ -128,7 +128,6 @@ result = "query evaluation:" + dumpTreeWithFilter( output, {'docno'}) + "\n"
 expected = """query evaluation:
 str QueryDump:
   str debug: "false"
-  str docs: None
   str eval:
     str formula:
       number 1:
