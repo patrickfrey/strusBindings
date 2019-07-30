@@ -30,8 +30,8 @@ extern "C" {
 #include "lualib.h"
 }
 #include "strus/lib/lua.h"
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <limits>
@@ -692,6 +692,57 @@ static std::string getContentArgumentValue( const char* arg)
 	}
 }
 
+static std::string convertSourceReformatFloat( const char* src, unsigned int precision)
+{
+	std::string rt;
+	enum {MaxFloatStringSize=48};
+	if (precision >= MaxFloatStringSize-3) return src;
+	char const* si = src;
+	while (*si)
+	{
+		if (*si == '-' || (*si >= '0' && *si <= '9'))
+		{
+			bool isFloat = false;
+			char const* se = si;
+			if (*se == '-') ++se;
+			for (; *se >= '0' && *se <= '9'; ++se){}
+			if (*se == '.')
+			{
+				++se;
+				for (; *se >= '0' && *se <= '9'; ++se){}
+				isFloat = true;
+			}
+			if (*se == 'e' || *se == 'E')
+			{
+				++se;
+				if (*se == '-') ++se;
+				for (; *se >= '0' && *se <= '9'; ++se){}
+				isFloat = true;
+			}
+			if (isFloat && se - si < MaxFloatStringSize)
+			{
+				char numbuf[ MaxFloatStringSize+1];
+				std::memcpy( numbuf, si, se-si);
+				numbuf[ se-si] = 0;
+				double number;
+				if (1==std::sscanf( numbuf, "%lf", &number))
+				{
+					char formatstr[ 16];
+					std::snprintf( formatstr, sizeof(formatstr), "%%.%uf", precision);
+					std::snprintf( numbuf, sizeof(numbuf), formatstr, number);
+					rt.append( numbuf);
+					si = se;
+					continue;
+				}
+				
+			}
+		}
+		rt.push_back( *si);
+		++si;
+	}
+	return rt;
+}
+
 static int l_set_time( lua_State *L)
 {
 	try
@@ -913,13 +964,13 @@ static int l_write_textfile( lua_State *L)
 	}
 }
 
-static int l_createDir( lua_State *L)
+static int l_create_dir( lua_State *L)
 {
 	try
 	{
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'mkdirp': expected <dirname>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'mkdirp': expected <dirname>"));
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'create_dir': expected <dirname>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'create_dir': expected <dirname>"));
 		const char* nam = lua_tostring( L, 1);
 
 		std::string fullpath = strus::joinFilePath( g_outputDir, nam);
@@ -942,6 +993,28 @@ static int l_createDir( lua_State *L)
 	}
 }
 
+static int l_reformat_float( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'reformat_float': expected <content> <precision>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'reformat_float': expected <content> <precision>"));
+		const char* content = lua_tostring( L, 1);
+		int precision = lua_tointeger( L, 2);
+		if (precision <= 0) return luaL_error(L, _TXT("expected positive number for precision argument of 'reformat_float'"));
+
+		std::string result = convertSourceReformatFloat( content, precision);
+		lua_pushlstring( L, result.c_str(), result.size()); 
+		return 1;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
 static void declareFunctions( lua_State *L)
 {
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
@@ -951,8 +1024,8 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
 	DEFINE_FUNCTION( write_textfile );
-	DEFINE_FUNCTION( createDir );
-
+	DEFINE_FUNCTION( create_dir );
+	DEFINE_FUNCTION( reformat_float );
 	lua_pushboolean( L, g_verbose);
 	lua_setglobal( L, "verbose");
 }

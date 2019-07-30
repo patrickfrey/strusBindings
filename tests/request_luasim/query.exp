@@ -845,13 +845,13 @@
 			"content": [
 				{
 					"type": "word",
-					"value": "david"},
+					"value": "iggy"},
 				{
 					"type": "word",
-					"value": "bowie"},
+					"value": "pop"},
 				{
 					"type": "entity",
-					"value": "david_bowie"}],
+					"value": "iggy_pop"}],
 			"set": "search"}]}
 }
 {
@@ -861,9 +861,57 @@
 			"content": [
 				{
 					"type": "word",
-					"value": "DAVID"},
+					"value": "IGGY"},
 				{
 					"type": "word",
-					"value": "BOWIE"}],
+					"value": "POP"}],
 			"set": "search"}]}
+}
+{
+"result": {
+	"ranklist": {
+		"evalpass": 0,
+		"nofranked": 10,
+		"nofvisited": 10,
+		"ranks": [
+			{
+				"docno": 11,
+				"weight": 1.1861035,
+				"summary": {}},
+			{
+				"docno": 1,
+				"weight": 0.9680647,
+				"summary": {}},
+			{
+				"docno": 6,
+				"weight": 0.9081836,
+				"summary": {}},
+			{
+				"docno": 12,
+				"weight": 0.4634619,
+				"summary": {}},
+			{
+				"docno": 10,
+				"weight": 0.4124582,
+				"summary": {}},
+			{
+				"docno": 15,
+				"weight": 0.0000159,
+				"summary": {}},
+			{
+				"docno": 9,
+				"weight": 0.0000101,
+				"summary": {}},
+			{
+				"docno": 14,
+				"weight": 0.0000064,
+				"summary": {}},
+			{
+				"docno": 2,
+				"weight": 0.0000059,
+				"summary": {}},
+			{
+				"docno": 4,
+				"weight": 0.0000032,
+				"summary": {}}]}}
 }

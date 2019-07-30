@@ -54,7 +54,7 @@ query1 = {
 			content = {
 				term = {
 					type = "text",
-					value = "David Bowie"
+					value = "Iggy Pop"
 				}
 			}
 		}}
@@ -81,7 +81,7 @@ query_with_analyzer = {
 			content = {
 				term = {
 					type = "text",
-					value = "David Bowie"
+					value = "Iggy Pop"
 				}
 			}
 		}}
@@ -99,8 +99,8 @@ if verbose then io.stderr:write( string.format("- Query evaluation configuration
 qryanaconf = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test")
 if verbose then io.stderr:write( string.format("- Query analyzer configuration from the server:\n%s\n", qryanaconf)) end
 
-qryres = call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query1)
+qryres = reformat_float( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query1), 7)
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
-checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2, "@query.exp", "query.res" )
+checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2 .. qryres, "@query.exp", "query.res" )
 

@@ -43,7 +43,7 @@ public:
 			{"{weighting,summarizer}/param/name", "()", QueryEvalFunctionParameterName, papuga_TypeString, NULL},
 			{"{weighting,summarizer}/param/value", "()", QueryEvalFunctionParameterValue, papuga_TypeString, NULL},
 			{"{weighting,summarizer}/param/feature", "()", QueryEvalFunctionFeatureValue, papuga_TypeString, NULL},
-			{"//param", QueryEvalFunctionParameter, {
+			{"{weighting,summarizer}/param", QueryEvalFunctionParameter, {
 					{"name", QueryEvalFunctionParameterName},
 					{"value", QueryEvalFunctionParameterValue, '?'},
 					{"feature", QueryEvalFunctionFeatureValue, '?'}
@@ -61,25 +61,25 @@ public:
 			{"summarizer/result", "()", QueryEvalFunctionResult, papuga_TypeVoid, NULL},
 			{"summarizer", QueryEvalSummarizer, {
 					{"name", QueryEvalFunctionName, '!'},
-					{"param", QueryEvalFunctionParameter, '*', 2/*tag diff*/},
+					{"param", QueryEvalFunctionParameter, '*'},
 					{"result", QueryEvalFunctionResult, '*'}
 				}
 			},
 			{"summarizer", 0, "qryeval", E::addSummarizer(), {
 					{QueryEvalFunctionName},
-					{QueryEvalFunctionParameter, '*', 2/*tag diff*/},
+					{QueryEvalFunctionParameter, '*'},
 					{QueryEvalFunctionResult, '*'}}
 			},
 			{"weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
 			{"weighting/param", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
 			{"weighting", QueryEvalWeighting, {
 					{"name", QueryEvalFunctionName, '!'},
-					{"param", QueryEvalFunctionParameter, '*', 2/*tag diff*/},
+					{"param", QueryEvalFunctionParameter, '*'},
 				}
 			},
 			{"weighting", 0, "qryeval", E::addWeightingFunction(), {
 					{QueryEvalFunctionName},
-					{QueryEvalFunctionParameter, '*', 2/*tag diff*/}}
+					{QueryEvalFunctionParameter, '*'}}
 			},
 			{"formula/source", "()", QueryEvalFormulaSource, papuga_TypeString, "_0 * factor * log(_2)"},
 			{"formula/param/name", "()", QueryEvalFormulaParameterName, papuga_TypeString, "factor"},

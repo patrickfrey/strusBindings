@@ -15,7 +15,10 @@
                     "value": "0.75"
                 },{
                     "name": "avgdoclen",
-                    "value": "100"
+                    "value": "1000"
+                },{
+                    "name":"match",
+                    "feature":"search"
                 }
                 ]
             },
