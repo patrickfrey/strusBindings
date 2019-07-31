@@ -875,7 +875,7 @@
 		"nofvisited": 10,
 		"ranks": [
 			{
-				"docno": 11,
+				"docno": 14,
 				"weight": 1.1861035,
 				"summary": {}},
 			{
@@ -887,23 +887,23 @@
 				"weight": 0.9081836,
 				"summary": {}},
 			{
-				"docno": 12,
+				"docno": 15,
 				"weight": 0.4634619,
 				"summary": {}},
 			{
-				"docno": 10,
+				"docno": 13,
 				"weight": 0.4124582,
 				"summary": {}},
 			{
-				"docno": 15,
+				"docno": 12,
 				"weight": 0.0000159,
 				"summary": {}},
 			{
-				"docno": 9,
+				"docno": 7,
 				"weight": 0.0000101,
 				"summary": {}},
 			{
-				"docno": 14,
+				"docno": 11,
 				"weight": 0.0000064,
 				"summary": {}},
 			{

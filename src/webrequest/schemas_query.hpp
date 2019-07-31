@@ -118,6 +118,7 @@ public:
 		},
 		{},
 		{
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
 			{SchemaQueryPart::createQuery( "/query")},
 			{SchemaQueryPart::buildQueryAnalyzed( "/query")},
 			{SchemaQueryPart::evaluateQuery( "/query")}
