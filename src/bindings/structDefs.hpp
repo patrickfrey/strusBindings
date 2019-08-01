@@ -70,8 +70,10 @@ struct KeyValueList
 	typedef std::pair< std::string, const papuga_ValueVariant*> Item;
 	std::vector<Item> items;
 
-	KeyValueList( const papuga_ValueVariant& def);
-	KeyValueList( papuga_SerializationIter& seriter);
+	/// \param[in] namemapdef string with comma separated key value name pair
+	KeyValueList( const papuga_ValueVariant& def, const char* namemapdef);
+	/// \param[in] namemapdef string with comma separated key value name pair
+	KeyValueList( papuga_SerializationIter& seriter, const char* namemapdef);
 	KeyValueList( const KeyValueList& o)
 		:items(o.items){}
 
@@ -80,7 +82,7 @@ struct KeyValueList
 	const_iterator end() const	{return items.end();}
 
 private:
-	void init( papuga_SerializationIter& seriter);
+	void init( papuga_SerializationIter& seriter, const char* namemapdef);
 	void parseMetaKeyValueList( papuga_SerializationIter& seriter);
 	void parseDictionary( papuga_SerializationIter& seriter);
 	void parseValueTupleList( papuga_SerializationIter& seriter);

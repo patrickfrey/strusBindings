@@ -1319,76 +1319,13 @@ static void instantiateQueryEvalFunctionParameter(
 }
 
 template <class FUNCTYPE>
-static void deserializeQueryEvalFunctionParameterValue(
-		const char* functionclass,
-		FUNCTYPE* function,
-		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
-		const std::string& paramname,
-		papuga_SerializationIter& seriter)
-{
-	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
-	if (papuga_SerializationIter_tag(&seriter) == papuga_TagClose)
-	{
-		throw strus::runtime_error(_TXT("unexpected end of %s parameter definition"), functionclass);
-	}
-	else if (papuga_SerializationIter_tag(&seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip(&seriter);
-
-		if (papuga_SerializationIter_tag(&seriter) == papuga_TagName)
-		{
-			char buf[ 128];
-			const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
-
-			if (id && 0==std::strcmp( id, "feature"))
-			{
-				papuga_SerializationIter_skip(&seriter);
-				if (papuga_SerializationIter_tag(&seriter) == papuga_TagOpen)
-				{
-					papuga_SerializationIter_skip(&seriter);
-					while (papuga_SerializationIter_tag(&seriter) == papuga_TagValue)
-					{
-						featureParameters.push_back( FeatureParameter( paramname, Deserializer::getString( seriter)));
-					}
-					Deserializer::consumeClose( seriter);
-				}
-				else if (papuga_SerializationIter_tag(&seriter) == papuga_TagValue)
-				{
-					featureParameters.push_back( FeatureParameter( paramname, Deserializer::getString( seriter)));
-				}
-			}
-			else
-			{
-				throw strus::runtime_error(_TXT("unexpected tag name in %s parameter definition"), functionclass);
-			}
-		}
-		else
-		{
-			while (papuga_SerializationIter_tag(&seriter) != papuga_TagClose)
-			{
-				const papuga_ValueVariant* value = getValue( seriter);
-				instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
-			}
-		}
-		Deserializer::consumeClose( seriter);
-	}
-	else
-	{
-		const papuga_ValueVariant* value = getValue( seriter);
-		instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
-	}
-}
-
-template <class FUNCTYPE>
 static void deserializeQueryEvalFunctionParameter(
 		const char* functionclass,
 		FUNCTYPE* function,
 		std::string& debuginfoAttribute,
-		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
 		papuga_SerializationIter& seriter)
 {
-	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
-	static const StructureNameMap namemap( "name,value,feature", ',');
+	static const StructureNameMap namemap( "name,value", ',');
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
@@ -1403,8 +1340,8 @@ static void deserializeQueryEvalFunctionParameter(
 			}
 			else
 			{
-				deserializeQueryEvalFunctionParameterValue(
-					functionclass, function, featureParameters, paramname, seriter);
+				const papuga_ValueVariant* value = getValue( seriter);
+				instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
 			}
 			Deserializer::consumeClose( seriter);
 		}
@@ -1412,7 +1349,6 @@ static void deserializeQueryEvalFunctionParameter(
 		{
 			std::string name;
 			unsigned char name_defined = 0;
-			bool is_feature = false;
 			const papuga_ValueVariant* value = 0;
 			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 			{
@@ -1426,9 +1362,6 @@ static void deserializeQueryEvalFunctionParameter(
 					case 1: if (value) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
 						value = getValue( seriter);
 						break;
-					case 2:	if (value) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
-						is_feature=true; value = getValue( seriter);
-						break;
 					default: throw strus::runtime_error(_TXT("unknown name in %s parameter list"), functionclass);
 				}
 			}
@@ -1437,20 +1370,13 @@ static void deserializeQueryEvalFunctionParameter(
 			{
 				throw strus::runtime_error( _TXT( "incomplete definition of %s"), functionclass);
 			}
-			if (is_feature)
+			if (name == "debug")
 			{
-				featureParameters.push_back( FeatureParameter( name, ValueVariantWrap::tostring( *value)));
+				debuginfoAttribute = ValueVariantWrap::tostring( *value);
 			}
 			else
 			{
-				if (name == "debug")
-				{
-					debuginfoAttribute = ValueVariantWrap::tostring( *value);
-				}
-				else
-				{
-					instantiateQueryEvalFunctionParameter( functionclass, function, name, value);
-				}
+				instantiateQueryEvalFunctionParameter( functionclass, function, name, value);
 			}
 		}
 		else
@@ -1468,7 +1394,8 @@ static void deserializeQueryEvalFunctionParameter(
 		}
 		else
 		{
-			deserializeQueryEvalFunctionParameterValue( functionclass, function, featureParameters, paramname, seriter);
+			const papuga_ValueVariant* value = getValue( seriter);
+			instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
 		}
 	}
 	else
@@ -1477,12 +1404,106 @@ static void deserializeQueryEvalFunctionParameter(
 	}
 }
 
+static std::vector<QueryEvalInterface::FeatureParameter> getFeatureParameters(
+		const papuga_ValueVariant& featureParameters)
+{
+	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
+	std::vector<FeatureParameter> rt;
+	static const char* context = "feature parameter";
+	static const StructureNameMap namemap( "role,set", ',');
+
+	if (!papuga_ValueVariant_defined( &featureParameters))
+	{
+		return rt;
+	}
+	else if (featureParameters.valuetype != papuga_TypeSerialization)
+	{
+		throw strus::runtime_error( _TXT( "structure expected for %s"), context);
+	}
+	else
+	{
+		papuga_SerializationIter seriter;
+		papuga_init_SerializationIter( &seriter, featureParameters.value.serialization);
+		while (!papuga_SerializationIter_eof( &seriter))
+		{
+			if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+			{
+				papuga_SerializationIter_skip( &seriter);
+
+				if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+				{
+					// ... 2 tuple (pair) of values interpreted as key/value pair
+					std::string feature = Deserializer::getString( seriter);
+					std::vector<std::string> sets = Deserializer::getStringListAsValue( seriter);
+					std::vector<std::string>::const_iterator si = sets.begin(), se = sets.end();
+					for (; si != se; ++si)
+					{
+						rt.push_back( FeatureParameter( feature, *si));
+					}
+					Deserializer::consumeClose( seriter);
+				}
+				else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+				{
+					std::string feature;
+					std::vector<std::string> sets;
+
+					unsigned char defined[2] = {false,false};
+					while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+					{
+						int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+						papuga_SerializationIter_skip( &seriter);
+						switch (idx)
+						{
+							case 0: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+								feature = Deserializer::getString( seriter);
+								break;
+							case 1: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "set", context);
+								sets = Deserializer::getStringListAsValue( seriter);
+								break;
+							default: throw strus::runtime_error(_TXT("unknown name in %s definition"), context);
+						}
+					}
+					Deserializer::consumeClose( seriter);
+					if (!defined[0] || !defined[1])
+					{
+						throw strus::runtime_error( _TXT( "incomplete definition of %s"), context);
+					}
+					std::vector<std::string>::const_iterator si = sets.begin(), se = sets.end();
+					for (; si != se; ++si)
+					{
+						rt.push_back( FeatureParameter( feature, *si));
+					}
+				}
+				else
+				{
+					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+				}
+			}
+			else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+			{
+				std::string feature = ValueVariantWrap::tostring( *papuga_SerializationIter_value( &seriter));
+				papuga_SerializationIter_skip( &seriter);
+				std::vector<std::string> sets = Deserializer::getStringListAsValue( seriter);
+				std::vector<std::string>::const_iterator si = sets.begin(), se = sets.end();
+				for (; si != se; ++si)
+				{
+					rt.push_back( FeatureParameter( feature, *si));
+				}
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("format error in %s list"), context);
+			}
+		}
+	}
+	return rt;
+}
+
 template <class FUNCTYPE>
 static void deserializeQueryEvalFunctionParameters(
 		const char* functionclass,
 		FUNCTYPE* function,
 		std::string& debuginfoAttribute,
-		std::vector<QueryEvalInterface::FeatureParameter>& featureParameters,
 		const papuga_ValueVariant& parameters,
 		ErrorBufferInterface* errorhnd)
 {
@@ -1498,8 +1519,7 @@ static void deserializeQueryEvalFunctionParameters(
 	{
 		while (papuga_SerializationIter_tag(&seriter) != papuga_TagClose)
 		{
-			deserializeQueryEvalFunctionParameter(
-					functionclass, function, debuginfoAttribute, featureParameters, seriter);
+			deserializeQueryEvalFunctionParameter( functionclass, function, debuginfoAttribute, seriter);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -1516,6 +1536,7 @@ static void deserializeQueryEvalFunctionResultNames(
 		const papuga_ValueVariant& resultnames,
 		ErrorBufferInterface* errorhnd)
 {
+	static const char* namemapdef = "name,value";
 	if (papuga_ValueVariant_defined( &resultnames))
 	{
 		if (resultnames.valuetype != papuga_TypeSerialization)
@@ -1531,7 +1552,7 @@ static void deserializeQueryEvalFunctionResultNames(
 		}
 		try
 		{
-			KeyValueList kvlist( seriter);
+			KeyValueList kvlist( seriter, namemapdef);
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s result name definitions"), functionclass);
 
 			KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
@@ -1551,13 +1572,13 @@ void Deserializer::buildSummarizerFunction(
 		QueryEvalInterface* queryeval,
 		const std::string& functionName,
 		const papuga_ValueVariant& parameters,
+		const papuga_ValueVariant& features,
 		const papuga_ValueVariant& resultnames,
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("summarizer function");
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
-	std::vector<FeatureParameter> featureParameters;
 
 	const SummarizerFunctionInterface* sf = queryproc->getSummarizerFunction( functionName);
 	if (!sf) throw strus::runtime_error( _TXT("%s not defined: '%s'"), context, functionName.c_str());
@@ -1567,11 +1588,11 @@ void Deserializer::buildSummarizerFunction(
 
 	std::string debuginfoAttribute("debug");
 
-	deserializeQueryEvalFunctionParameters(
-		context, function.get(), debuginfoAttribute, featureParameters, parameters, errorhnd);
+	deserializeQueryEvalFunctionParameters( context, function.get(), debuginfoAttribute, parameters, errorhnd);
 
-	deserializeQueryEvalFunctionResultNames(
-		context, function.get(), resultnames, errorhnd);
+	std::vector<FeatureParameter> featureParameters = getFeatureParameters( features);
+
+	deserializeQueryEvalFunctionResultNames( context, function.get(), resultnames, errorhnd);
 
 	queryeval->addSummarizerFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
 	function.release();
@@ -1586,12 +1607,12 @@ void Deserializer::buildWeightingFunction(
 		QueryEvalInterface* queryeval,
 		const std::string& functionName,
 		const papuga_ValueVariant& parameters,
+		const papuga_ValueVariant& features,
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("weighting function");
 	typedef QueryEvalInterface::FeatureParameter FeatureParameter;
-	std::vector<FeatureParameter> featureParameters;
 
 	const WeightingFunctionInterface* sf = queryproc->getWeightingFunction( functionName);
 	if (!sf) throw strus::runtime_error( _TXT("%s not defined: '%s'"), context, functionName.c_str());
@@ -1600,9 +1621,10 @@ void Deserializer::buildWeightingFunction(
 	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 
 	std::string debuginfoAttribute("debug");
-	deserializeQueryEvalFunctionParameters(
-		context, function.get(), debuginfoAttribute, featureParameters, parameters, errorhnd);
+	deserializeQueryEvalFunctionParameters( context, function.get(), debuginfoAttribute, parameters, errorhnd);
 
+	std::vector<FeatureParameter> featureParameters = getFeatureParameters( features);
+	
 	queryeval->addWeightingFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
 	function.release();
 
@@ -1620,12 +1642,13 @@ void Deserializer::buildWeightingFormula(
 		ErrorBufferInterface* errorhnd)
 {
 	static const char* context = _TXT("scalar function");
+	static const char* namemapdef = "name,value";
 	std::string parsername;
 	typedef std::pair<std::string,double> ParamDef;
 	std::vector<ParamDef> paramlist;
 	if (papuga_ValueVariant_defined( &parameter))
 	{
-		KeyValueList kvlist( parameter);
+		KeyValueList kvlist( parameter, namemapdef);
 		KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
 		for (; ki != ke; ++ki)
 		{

@@ -32,9 +32,7 @@ def createQueryEval_t3s( strusctx):
 
 	# Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
 	queryEval.addWeightingFunction(
-		"BM25", {
-				'k1':0.75, 'b':2.1, 'avgdoclen':1000, 'match':{'feature':"seek"}, 'debug':"debug_weighting"
-			})
+		"BM25", {'k1':0.75, 'b':2.1, 'avgdoclen':1000, 'debug':"debug_weighting"}, {'match':"seek"})
 
 	# Now we define what attributes of the documents are returned and how they are build.
 	# The functions that extract stuff from documents for presentation are called summarizers.
@@ -45,10 +43,8 @@ def createQueryEval_t3s( strusctx):
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
 	queryEval.addSummarizer(
-		"matchphrase", [
-				["type","orig"], ["sentencesize",40], ["windowsize",30],
-				["match",{'feature':"seek"}],["title",{'feature':"titlefield"}],
-				["debug","debug_matchphrase"]
-			])
+		"matchphrase",
+		[ ["type","orig"], ["sentencesize",40], ["windowsize",30], ["debug","debug_matchphrase"] ],
+		{"match":"seek","title":"titlefield"} )
 	return queryEval
 

@@ -124,21 +124,25 @@ str QueryDump:
       number 1: "select"
     str summarizers:
       number 1:
-        str debugattr: "debug_attribute"
-        str def:
+        str function: "attribute"
+        str param:
           str attribute: "title"
-          str resultname: "title"
-        str function: "attribute"
+          str debug: "debug_attribute"
+          str result: "title"
       number 2:
-        str debugattr: "debug_attribute"
-        str def:
-          str attribute: "docid"
-          str resultname: "docid"
         str function: "attribute"
+        str param:
+          str attribute: "docid"
+          str debug: "debug_attribute"
+          str result: "docid"
       number 3:
-        str debugattr: "debug_matchphrase"
-        str def:
+        str feature:
+          str match: "seek"
+          str title: "titlefield"
+        str function: "matchphrase"
+        str param:
           str cardinality: 0
+          str debug: "debug_matchphrase"
           str features:
             str docstart: "docstart"
             str para: "para"
@@ -154,21 +158,17 @@ str QueryDump:
           str sentencesize: 40
           str type: "orig"
           str windowsize: 30
-        str function: "matchphrase"
-        str parameter:
-          str match: "seek"
-          str title: "titlefield"
     str weighting:
       number 1:
-        str debugattr: "debug_weighting"
-        str def:
+        str feature:
+          str match: "seek"
+        str function: "BM25"
+        str param:
           str avgdoclen: 1000
           str b: 2.10000
+          str debug: "debug_weighting"
           str k1: 0.75000
           str metadata_doclen: "doclen"
-        str function: "BM25"
-        str parameter:
-          str match: "seek"
     str weighting_sets:
       number 1: "seek"
   str feature:

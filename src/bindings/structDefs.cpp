@@ -180,7 +180,7 @@ MetaDataRangeDef::MetaDataRangeDef( papuga_SerializationIter& seriter)
 	}
 }
 
-KeyValueList::KeyValueList( const papuga_ValueVariant& def)
+KeyValueList::KeyValueList( const papuga_ValueVariant& def, const char* namemapdef)
 	:items()
 {
 	static const char* context = _TXT("named key value pair list");
@@ -194,18 +194,18 @@ KeyValueList::KeyValueList( const papuga_ValueVariant& def)
 	{
 		return;
 	}
-	init( seriter);
+	init( seriter, namemapdef);
 	if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error(_TXT("unexpected tokens at end of serialization of %s"), context);
 }
 
-KeyValueList::KeyValueList( papuga_SerializationIter& seriter)
+KeyValueList::KeyValueList( papuga_SerializationIter& seriter, const char* namemapdef)
 	:items()
 {
 	static const char* context = _TXT("named key value pair list");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
-		init( seriter);
+		init( seriter, namemapdef);
 		Deserializer::consumeClose( seriter);
 	}
 	else
@@ -219,10 +219,10 @@ static void KeyValueList_appendKeyValueDefinition( std::vector<KeyValueList::Ite
 	res.push_back( KeyValueList::Item( name, value));
 }
 
-void KeyValueList::init( papuga_SerializationIter& seriter)
+void KeyValueList::init( papuga_SerializationIter& seriter, const char* namemapdef)
 {
 	static const char* context = _TXT("key value pair list");
-	static const StructureNameMap namemap( "name,value", ',');
+	static const StructureNameMap namemap( namemapdef, ',');
 
 	while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 	{

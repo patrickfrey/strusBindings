@@ -71,10 +71,16 @@ public:
 	/// \example "attribute"
 	/// \param[in] parameter the parameters of the summarizer to add (parameter name 'debug' reserved for declaring the debug info attribute)
 	/// \example [ sentencesize: 40 windowsize: 100 cardinality: 5 ]
-	/// \param[in] resultnames the mapping of result names
+	/// \param[in] featuresets the mapping of used feature sets, list of key value pairs assigning feature roles to feature sets, key "role", value(s) "set" (optional)
+	/// \example [ "weight", "word" ]
+	/// \example [ ["struct", "punct"], [ "weight", "word" ] ]
+	/// \example [ [ role: "weight", set: "word" ] ]
+	/// \example [ [ role: "weight", set: "word" ], [ role: "struct", set: "punct"]]
+	/// \param[in] resultnames the mapping of result names (optional)
 	void addSummarizer(
 			const std::string& name,
 			const ValueVariant& parameter,
+			const ValueVariant& featuresets=ValueVariant(),
 			const ValueVariant& resultnames=ValueVariant());
 
 	/// \brief Add a weighting function to use as summand of the total document weight
@@ -83,9 +89,15 @@ public:
 	/// \example "BM25"
 	/// \param[in] parameter the parameters of the weighting function to add
 	/// \example [ b:0.75 k:1.2 avgdoclen:1000 match:[feature:"seek"] debug:"debug_weighting" ]
+	/// \param[in] featuresets the mapping of used feature sets, list of key value pairs assigning feature roles to feature sets, key "role", value(s) "set" (optional)
+	/// \example [ "weight", "word" ]
+	/// \example [ ["struct", "punct"], [ "weight", "word" ] ]
+	/// \example [ [ role: "weight", set: "word" ] ]
+	/// \example [ [ role: "weight", set: "word" ], [ role: "struct", set: "punct"]]
 	void addWeightingFunction(
 			const std::string& name,
-			const ValueVariant& parameter);
+			const ValueVariant& parameter,
+			const ValueVariant& featuresets=ValueVariant());
 
 	/// \brief Define the weighting formula to use for calculating the total weight from the weighting function results (sum of the weighting function results is the default)
 	/// \example defineWeightingFormula( "_0 / _1" )

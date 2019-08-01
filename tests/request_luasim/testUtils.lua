@@ -31,7 +31,7 @@ function getDirectoryFiles( dir, extension)
 	for filename in io.popen("ls " .. dir):lines() do
 		table.insert( filenames, filename)
 	end
-	table.sort( filenames)
+	table.sort( filenames, function (left, right) return left < right end)
 	for i,filename in ipairs(filenames) do
 		if string.find( filename, string.format("%%%s$", extension)) then
 			table.insert( rt, filename)

@@ -102,5 +102,5 @@ if verbose then io.stderr:write( string.format("- Query analyzer configuration f
 qryres = reformat_float( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query1), 7)
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
-checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2 .. qryres, "@query.exp", "query.res" )
+checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2 .. qryevalconf .. qryres, "@query.exp", "query.res" )
 

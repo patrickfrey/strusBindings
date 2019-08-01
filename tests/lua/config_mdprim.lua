@@ -53,18 +53,9 @@ function createQueryEval_mdprim( strusctx)
 	queryEval:addSelectionFeature( "select")
 	
 	-- Here we define how we rank a document selected:
-	queryEval:addWeightingFunction(
-		"tf", {
-				match={feature="seek"}, debug="debug_weighting"
-			})
-	queryEval:addWeightingFunction(
-		"metadata", {
-				name="doclen"
-			})
-	queryEval:addWeightingFunction(
-		"metadata", {
-				name="docidx"
-			})
+	queryEval:addWeightingFunction( "tf", {debug="debug_weighting"}, {match="seek"})
+	queryEval:addWeightingFunction( "metadata", {name="doclen"})
+	queryEval:addWeightingFunction( "metadata", {name="docidx"})
 	queryEval:defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
 
 	-- Now we define what attributes of the documents are returned and how they are build:

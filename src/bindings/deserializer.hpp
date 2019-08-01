@@ -140,6 +140,7 @@ struct Deserializer
 			QueryEvalInterface* queryeval,
 			const std::string& functionName,
 			const papuga_ValueVariant& parameter,
+			const papuga_ValueVariant& features,
 			const papuga_ValueVariant& resultnames,
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
@@ -148,6 +149,7 @@ struct Deserializer
 			QueryEvalInterface* queryeval,
 			const std::string& functionName,
 			const papuga_ValueVariant& parameter,
+			const papuga_ValueVariant& features,
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 

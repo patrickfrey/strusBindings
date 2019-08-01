@@ -166,61 +166,61 @@ str QueryDump:
       number 1: "select"
     str summarizers:
       number 1:
-        str debugattr: "debug_attribute"
-        str def:
-          str attribute: "docid"
-          str resultname: "docid"
         str function: "attribute"
+        str param:
+          str attribute: "docid"
+          str debug: "debug_attribute"
+          str result: "docid"
       number 2:
-        str debugattr: "debug_metadata"
-        str def:
+        str function: "metadata"
+        str param:
+          str debug: "debug_metadata"
           str metaname: "cross"
-          str resultname: "cross"
-        str function: "metadata"
+          str result: "cross"
       number 3:
-        str debugattr: "debug_metadata"
-        str def:
+        str function: "metadata"
+        str param:
+          str debug: "debug_metadata"
           str metaname: "factors"
-          str resultname: "factors"
-        str function: "metadata"
+          str result: "factors"
       number 4:
-        str debugattr: "debug_metadata"
-        str def:
+        str function: "metadata"
+        str param:
+          str debug: "debug_metadata"
           str metaname: "lo"
-          str resultname: "lo"
-        str function: "metadata"
+          str result: "lo"
       number 5:
-        str debugattr: "debug_metadata"
-        str def:
-          str metaname: "hi"
-          str resultname: "hi"
         str function: "metadata"
+        str param:
+          str debug: "debug_metadata"
+          str metaname: "hi"
+          str result: "hi"
       number 6:
-        str debugattr: "debug_forwardindex"
-        str def:
-          str N: 100
-          str resultname: "word"
-          str type: "word"
         str function: "forwardindex"
+        str param:
+          str N: 100
+          str debug: "debug_forwardindex"
+          str result: "word"
+          str type: "word"
     str weighting:
       number 1:
-        str debugattr: "debug_weighting"
-        str def: None
-        str function: "tf"
-        str parameter:
+        str feature:
           str match: "seek"
+        str function: "tf"
+        str param:
+          str debug: "debug_weighting"
       number 2:
-        str debugattr: "debug"
-        str def:
+        str function: "metadata"
+        str param:
+          str debug: "debug"
           str name: "doclen"
           str weight: 1
-        str function: "metadata"
       number 3:
-        str debugattr: "debug"
-        str def:
+        str function: "metadata"
+        str param:
+          str debug: "debug"
           str name: "docidx"
           str weight: 1
-        str function: "metadata"
     str weighting_sets:
       number 1: "seek"
   str feature:

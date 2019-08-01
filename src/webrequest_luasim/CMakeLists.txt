@@ -4,6 +4,9 @@ include_directories(
         ${LUA_INCLUDE_DIRS}
 	${Intl_INCLUDE_DIRS}
 	${PAPUGA_INCLUDE_DIRS}
+	${strusbase_INCLUDE_DIRS}
+	${strustrace_INCLUDE_DIRS}
+	${strusrpc_INCLUDE_DIRS}
 	${BINDINGS_INCLUDE_DIRS}
 )
 

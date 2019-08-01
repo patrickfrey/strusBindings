@@ -182,61 +182,61 @@ string QueryDump:
       integer 0: "select"
     string summarizers: 
       integer 0: 
-        string debugattr: "debug_attribute"
-        string def: 
-          string attribute: "docid"
-          string resultname: "docid"
         string function: "attribute"
+        string param: 
+          string attribute: "docid"
+          string debug: "debug_attribute"
+          string result: "docid"
       integer 1: 
-        string debugattr: "debug_metadata"
-        string def: 
+        string function: "metadata"
+        string param: 
+          string debug: "debug_metadata"
           string metaname: "cross"
-          string resultname: "cross"
-        string function: "metadata"
+          string result: "cross"
       integer 2: 
-        string debugattr: "debug_metadata"
-        string def: 
+        string function: "metadata"
+        string param: 
+          string debug: "debug_metadata"
           string metaname: "factors"
-          string resultname: "factors"
-        string function: "metadata"
+          string result: "factors"
       integer 3: 
-        string debugattr: "debug_metadata"
-        string def: 
+        string function: "metadata"
+        string param: 
+          string debug: "debug_metadata"
           string metaname: "lo"
-          string resultname: "lo"
-        string function: "metadata"
+          string result: "lo"
       integer 4: 
-        string debugattr: "debug_metadata"
-        string def: 
-          string metaname: "hi"
-          string resultname: "hi"
         string function: "metadata"
+        string param: 
+          string debug: "debug_metadata"
+          string metaname: "hi"
+          string result: "hi"
       integer 5: 
-        string debugattr: "debug_forwardindex"
-        string def: 
-          string N: 100
-          string resultname: "word"
-          string type: "word"
         string function: "forwardindex"
+        string param: 
+          string N: 100
+          string debug: "debug_forwardindex"
+          string result: "word"
+          string type: "word"
     string weighting: 
       integer 0: 
-        string debugattr: "debug_weighting"
-        string def: 
-        string function: "tf"
-        string parameter: 
+        string feature: 
           string match: "seek"
+        string function: "tf"
+        string param: 
+          string debug: "debug_weighting"
       integer 1: 
-        string debugattr: "debug"
-        string def: 
+        string function: "metadata"
+        string param: 
+          string debug: "debug"
           string name: "doclen"
           string weight: 1
-        string function: "metadata"
       integer 2: 
-        string debugattr: "debug"
-        string def: 
+        string function: "metadata"
+        string param: 
+          string debug: "debug"
           string name: "docidx"
           string weight: 1
-        string function: "metadata"
     string weighting_sets: 
       integer 0: "seek"
   string feature: 

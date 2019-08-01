@@ -75,24 +75,26 @@ void QueryEvalImpl::addExclusionFeature( const std::string& set_)
 void QueryEvalImpl::addSummarizer(
 		const std::string& name,
 		const ValueVariant& parameters,
+		const ValueVariant& featuresets,
 		const ValueVariant& resultnames)
 {
 	QueryEvalInterface* queryeval = m_queryeval_impl.getObject<QueryEvalInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
 	Deserializer::buildSummarizerFunction(
-		queryeval, name, parameters, resultnames, m_queryproc, errorhnd);
+		queryeval, name, parameters, featuresets, resultnames, m_queryproc, errorhnd);
 }
 
 void QueryEvalImpl::addWeightingFunction(
 		const std::string& name,
-		const ValueVariant& parameter)
+		const ValueVariant& parameters,
+		const ValueVariant& featuresets)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	QueryEvalInterface* queryeval = m_queryeval_impl.getObject<QueryEvalInterface>();
 
 	Deserializer::buildWeightingFunction(
-		queryeval, name, parameter, m_queryproc, errorhnd);
+		queryeval, name, parameters, featuresets, m_queryproc, errorhnd);
 }
 
 void QueryEvalImpl::defineWeightingFormula(
@@ -210,7 +212,7 @@ void QueryImpl::setWeightingVariables(
 {
 	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
 
-	KeyValueList kvlist( parameter);
+	KeyValueList kvlist( parameter, "name,value");
 	KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
 	for (; ki != ke; ++ki)
 	{
