@@ -40,13 +40,18 @@ public:
 			{"exclusion", "()", FeatureSetExclusionDef, papuga_TypeString, "exclude"},
 			{"exclusion", 0, "qryeval", E::addExclusionFeature(), {{FeatureSetExclusionDef}} },
 
+			{"{weighting,summarizer}/feature/role", "()", QueryEvalFunctionFeatureRole, papuga_TypeString, NULL},
+			{"{weighting,summarizer}/feature/set", "()", QueryEvalFunctionFeatureSet, papuga_TypeString, NULL},
+			{"{weighting,summarizer}/feature", QueryEvalFunctionParameter, {
+					{"role", QueryEvalFunctionFeatureRole},
+					{"set", QueryEvalFunctionFeatureSet}
+				}
+			},
 			{"{weighting,summarizer}/param/name", "()", QueryEvalFunctionParameterName, papuga_TypeString, NULL},
 			{"{weighting,summarizer}/param/value", "()", QueryEvalFunctionParameterValue, papuga_TypeString, NULL},
-			{"{weighting,summarizer}/param/feature", "()", QueryEvalFunctionFeatureValue, papuga_TypeString, NULL},
 			{"{weighting,summarizer}/param", QueryEvalFunctionParameter, {
 					{"name", QueryEvalFunctionParameterName},
-					{"value", QueryEvalFunctionParameterValue, '?'},
-					{"feature", QueryEvalFunctionFeatureValue, '?'}
+					{"value", QueryEvalFunctionParameterValue},
 				}
 			},
 			{"summarizer/result/name", "()", QueryEvalFunctionResultName, papuga_TypeString, NULL},
@@ -57,24 +62,24 @@ public:
 				}
 			},
 			{"summarizer/name", "()", QueryEvalFunctionName, papuga_TypeString, "matchphrase"},
-			{"summarizer/param", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
-			{"summarizer/result", "()", QueryEvalFunctionResult, papuga_TypeVoid, NULL},
 			{"summarizer", QueryEvalSummarizer, {
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*'},
+					{"feature", QueryEvalFunctionFeature, '*'},
 					{"result", QueryEvalFunctionResult, '*'}
 				}
 			},
 			{"summarizer", 0, "qryeval", E::addSummarizer(), {
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*'},
+					{QueryEvalFunctionFeature, '*'},
 					{QueryEvalFunctionResult, '*'}}
 			},
 			{"weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
-			{"weighting/param", "()", QueryEvalFunctionParameter, papuga_TypeVoid, NULL},
 			{"weighting", QueryEvalWeighting, {
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*'},
+					{"feature", QueryEvalFunctionFeature, '*'}
 				}
 			},
 			{"weighting", 0, "qryeval", E::addWeightingFunction(), {

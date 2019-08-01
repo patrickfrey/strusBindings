@@ -16,11 +16,12 @@
                 },{
                     "name": "avgdoclen",
                     "value": "1000"
-                },{
-                    "name":"match",
-                    "feature":"search"
                 }
-                ]
+                ],
+                "feature": [{
+                    "role":"match",
+                    "set": "search"
+                }]
             },
             "summarizer": {
                 "name": "attribute",
