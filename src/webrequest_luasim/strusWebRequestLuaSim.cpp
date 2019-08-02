@@ -750,6 +750,10 @@ static std::string convertLuaTableToJson( lua_State* L, int luaddr)
 
 static void pushConvertedJsonAsLuaTable( lua_State* L, int luaddr)
 {
+	if (!lua_isstring( L, luaddr))
+	{
+		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), _TXT("argument is not a string"));
+	}
 	std::size_t srclen;
 	const char* src = lua_tolstring( L, luaddr, &srclen);
 	papuga_ErrorCode errcode = papuga_Ok;

@@ -47,7 +47,7 @@ if verbose then io.stderr:write( string.format("- Query analyzer configuration:\
 docanacfg = call_server_checked( "GET", ISERVER1 .. "/docanalyzer/test" )
 if verbose then io.stderr:write( string.format("- Document analyzer configuration:\n%s\n", docanacfg)) end
 
-query1 = {
+query = {
 	query = {
 		feature = {
 		{	set = "search", 
@@ -58,37 +58,27 @@ query1 = {
 				}
 			}
 		}}
+	}
+}
+qryanacfg2 = {
+	element = {
+		{
+			type = "word",
+			field = "text",
+			tokenizer = {
+				name = "word"
+			},
+			normalizer = {{
+				name = "uc"
+			}}
+		}
 	}
 }
 query_with_analyzer = {
-	query = {
-		analyzer = {
-			element = {
-				{
-					type = "word",
-					field = "text",
-					tokenizer = {
-						name = "word"
-					},
-					normalizer = {{
-						name = "uc"
-					}}
-				}
-			}
-		},
-		feature = {
-		{	set = "search", 
-			content = {
-				term = {
-					type = "text",
-					value = "Iggy Pop"
-				}
-			}
-		}}
-	}
+	query = mergeValues( query, {query = {analyzer = qryanacfg2}} )
 }
 
-qryana1 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1)
+qryana1 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query)
 if verbose then io.stderr:write( string.format("- Analyzed query with analyzer defined by server:\n%s\n", qryana1)) end
 qryana2 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query_with_analyzer)
 if verbose then io.stderr:write( string.format("- Analyzed query with analyzer passed as content:\n%s\n", qryana2)) end
@@ -99,7 +89,7 @@ if verbose then io.stderr:write( string.format("- Query evaluation configuration
 qryanaconf = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test")
 if verbose then io.stderr:write( string.format("- Query analyzer configuration from the server:\n%s\n", qryanaconf)) end
 
-qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query1))
+qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
 checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2 .. qryevalconf .. qryres, "@query.exp", "query.res" )

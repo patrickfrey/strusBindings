@@ -59,6 +59,55 @@ function checkExpected( output, expected, outputfile)
 	end
 end
 
+function isArray( val)
+	if type(val) ~= 'table' then
+		return false
+		end
+	-- objects always return empty size
+	if #val > 0 then
+		return true
+	end
+	-- only object can have empty length with elements inside
+	for k, v in pairs(val) do
+		return false
+	end
+	-- if no elements it can be array and not at same time
+	return true
+end
 
+function concatArrays( t1, t2)
+	res = t1
+	for i=1,#t2 do
+		res[#res+1] = t2[i]
+	end
+	return res
+end
+
+function mergeValues( t1, t2)
+	if isArray( t1) and isArray( t2) then
+		return concatArrays( t1, t2)
+	elseif (type(t1) == "table" and type(t2) == "table") then
+		res = {}
+		for key,value in pairs(t1) do
+			if t2[key] then
+				res[ key] = mergeValues( value, t2[key])
+			else
+				res[ key] = value
+			end
+		end
+		for key,value in pairs(t2) do
+			if not res[key] then
+				if t1[key] then
+					res[ key] = mergeValues( value, t1[key])
+				else
+					res[ key] = value
+				end
+			end
+		end
+		return res
+	else
+		return {t1,t2}
+	end
+end
 
 
