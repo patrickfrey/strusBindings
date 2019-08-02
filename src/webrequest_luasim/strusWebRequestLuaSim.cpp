@@ -24,6 +24,11 @@
 #include "strus/base/fileio.hpp"
 #include "strus/base/stdint.h"
 #include "private/internationalization.hpp"
+#include "papuga/lib/lua_dev.h"
+#include "papuga/serialization.h"
+#include "papuga/valueVariant.h"
+#include "papuga/errors.h"
+#include "papuga/typedefs.h"
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -672,6 +677,27 @@ static std::string convertLuaTableToJson( lua_State *L, int luaddr)
 	return rt;
 }
 
+static void pushConvertedJsonAsLuaTable( lua_State *L, int luaddr)
+{
+	std::size_t srclen;
+	const char* src = lua_tolstring( L, luaddr, &srclen);
+	papuga_ErrorCode errcode = papuga_Ok;
+	papuga_Serialization jsonser;
+	int allocatormem[ 1024];
+	papuga_Allocator allocator;
+	papuga_init_Allocator( &allocator, allocatormem, sizeof(allocatormem));
+	papuga_init_Serialization( &jsonser, &allocator);
+	if (!papuga_Serialization_append_json( &jsonser, src, srclen, papuga_UTF8, true/*withRoot*/, &errcode))
+	{
+		papuga_destroy_Allocator( &allocator);
+		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), papuga_ErrorCode_tostring( errcode));
+	}
+	papuga_ValueVariant jsonval;
+	papuga_init_ValueVariant_serialization( &jsonval, &jsonser);
+	papuga_lua_push_value_plain( L, &jsonval);
+	papuga_destroy_Allocator( &allocator);
+}
+
 static std::string getContentArgumentValue( const char* arg)
 {
 	if (!arg)
@@ -1015,6 +1041,41 @@ static int l_reformat_float( lua_State *L)
 	}
 }
 
+static int l_to_json( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'tojson': expected <table>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'tojson': expected <table>"));
+		std::string result = convertLuaTableToJson( L, 1);
+		lua_pushlstring( L, result.c_str(), result.size()); 
+		return 1;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
+static int l_from_json( lua_State *L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'tojson': expected <table>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'tojson': expected <table>"));
+		pushConvertedJsonAsLuaTable( L, 1);
+		return 1;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
 static void declareFunctions( lua_State *L)
 {
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
@@ -1026,6 +1087,8 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( write_textfile );
 	DEFINE_FUNCTION( create_dir );
 	DEFINE_FUNCTION( reformat_float );
+	DEFINE_FUNCTION( to_json );
+	DEFINE_FUNCTION( from_json );
 	lua_pushboolean( L, g_verbose);
 	lua_setglobal( L, "verbose");
 }

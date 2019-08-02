@@ -28,7 +28,7 @@ link_directories(
 # PROGRAMS
 # ------------------------------
 add_executable( strusWebRequestLuaSim strusWebRequestLuaSim.cpp )
-target_link_libraries( strusWebRequestLuaSim strus_webrequest strus_base strus_error strus_bindings_lua papuga_devel papuga_lua m ${Intl_LIBRARIES} )
+target_link_libraries( strusWebRequestLuaSim papuga_lua strus_webrequest strus_base strus_error strus_bindings_lua papuga_devel m ${Intl_LIBRARIES} )
 
 # FreeBSD needs kernel data access library for libuv (-libkvm)
 find_library( LIBKVM_LIBRARIES kvm )
