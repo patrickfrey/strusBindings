@@ -23,6 +23,7 @@
 #include "strus/base/numstring.hpp"
 #include "strus/base/fileio.hpp"
 #include "strus/base/stdint.h"
+#include "strus/base/regex.hpp"
 #include "private/internationalization.hpp"
 #include "papuga/lib/lua_dev.h"
 #include "papuga/serialization.h"
@@ -161,14 +162,143 @@ static Logger g_logger;
 static const char* g_charset = "UTF-8";
 static const char* g_doctype = "application/json";
 
-typedef std::map<std::string,std::string> Configuration;
+namespace {
+template <typename ValueType>
+ValueType castLuaValue( lua_State* ls, int luaddr)
+{
+	throw std::runtime_error(_TXT("lua value cast error"));
+}
+template <>
+int castLuaValue<int>( lua_State* ls, int luaddr)
+{
+	return lua_tointeger( ls, luaddr);
+}
+template <>
+double castLuaValue<double>( lua_State* ls, int luaddr)
+{
+	return lua_tonumber( ls, luaddr);
+}
+template <>
+std::string castLuaValue<std::string>( lua_State* ls, int luaddr)
+{
+	std::size_t valsize;
+	lua_pushvalue( ls, luaddr);
+	const char* val = lua_tolstring( ls, -1, &valsize);
+	std::string rt( val, valsize);
+	lua_pop( ls, 1);
+	return rt;
+}
+}// anonymous namespace
+
+#if 0
+static void logValue( lua_State* ls, int luaddr, const char* title)
+{
+	lua_pushvalue( ls, luaddr);
+	const char* val = 0;
+	const char* typestr = "UNKNOWN";
+
+	switch (lua_type( ls, -1))
+	{
+		case LUA_TNIL: typestr = "NIL"; break;
+		case LUA_TNUMBER: typestr = "NUMBER"; val = lua_tostring( ls, -1); break;
+		case LUA_TBOOLEAN: typestr = "BOOLEAN"; val = lua_tostring( ls, -1); break;
+		case LUA_TSTRING: typestr = "STRING"; val = lua_tostring( ls, -1); break;
+		case LUA_TTABLE: typestr = "TABLE"; break;
+		case LUA_TFUNCTION: typestr = "FUNCTION"; break;
+		case LUA_TUSERDATA: typestr = "USERDATA"; break;
+		case LUA_TTHREAD: typestr = "THREAD"; break;
+		case LUA_TLIGHTUSERDATA: typestr = "LIGHTUSERDATA"; break;
+	}
+	if (val)
+	{
+		fprintf( stderr, "LOG [%d] %s type %s value '%s'\n", luaddr, title, typestr, val);
+	}
+	else
+	{
+		fprintf( stderr, "LOG [%d] %s type %s\n", luaddr, title, typestr);
+	}
+	lua_pop( ls, 1);
+}
+#endif
+
+class Configuration
+{
+public:
+	Configuration( lua_State* ls_, int luaddr_)
+		:m_ls(ls_),m_luaddr(luaddr_){}
+	Configuration( const Configuration& o)
+		:m_ls(o.m_ls),m_luaddr(o.m_luaddr){}
+
+	template <typename ValueType>
+	bool getValue( ValueType& val, const char* id) const
+	{
+		lua_pushvalue( m_ls, m_luaddr);				// STACK: TABLE
+
+		char const* keyitr = id;
+		while (hasFollowKey( keyitr))
+		{
+			if (!lua_istable( m_ls, -1))
+			{
+				throw strus::runtime_error(_TXT("try to access non table structure with key '%s'"), keyitr);
+			}
+			std::string key = nextKey( keyitr);
+			lua_pushlstring( m_ls, key.c_str(), key.size()); //STACK: KEY TABLE
+			if (lua_gettable( m_ls, -2))
+			{						//STACK: SUBTABLE TABLE 
+				lua_remove( m_ls, -2);			//STACK: SUBTABLE
+			}
+			else
+			{						//STACK: SUBTABLE
+				lua_pop( m_ls, 1);			//STACK:
+				return false;
+			}
+		}
+		lua_pushstring( m_ls, keyitr);				// STACK: RESTKEY TABLE
+		if (lua_gettable( m_ls, -2))
+		{							//STACK: VALUE TABLE
+			val = castLuaValue<ValueType>( m_ls, -1);
+			lua_pop( m_ls, 2);				//STACK:
+			return true;
+		}
+		else
+		{							//STACK: TABLE
+			lua_pop( m_ls, 1);				//STACK:
+			return false;
+		}
+	}
+
+private:
+	static bool hasFollowKey( char const* id)
+	{
+		return 0!=std::strchr( id, '.');
+	}
+
+	static std::string nextKey( char const*& id)
+	{
+		char const* end = std::strchr( id, '.');
+		const char* start = id;
+		if (end)
+		{
+			id = end+1;
+		}
+		else
+		{
+			id = end = std::strchr( id, '\0');
+		}
+		return std::string( start, end-start);
+	}
+
+private:
+	lua_State* m_ls;
+	int m_luaddr;
+};
 
 
 class Processor
 {
 public:
-	Processor( const std::string& hostname_, const Configuration& config_, const std::string& configjson_)
-		:m_hostname(hostname_),m_config(config_),m_handler(createWebRequestHandler(config_,configjson_)){}
+	Processor( const std::string& hostname_, const Configuration& config, const std::string& configjson_)
+		:m_hostname(hostname_),m_handler(createWebRequestHandler(config,configjson_)){}
 	Processor( const Processor& o)
 		:m_hostname(o.m_hostname),m_handler(o.m_handler){}
 
@@ -179,7 +309,6 @@ private:
 
 private:
 	std::string m_hostname;
-	Configuration m_config;
 	strus::shared_ptr<strus::WebRequestHandlerInterface> m_handler;
 };
 
@@ -310,24 +439,10 @@ static std::pair<std::string,std::string> splitUrl( const std::string& url)
 	return rt;
 }
 
-static int64_t getConfigurationValue( const Configuration& config, const std::string& key, const int& defaultValue)
-{
-	Configuration::const_iterator ci = config.find( key);
-	if (ci == config.end()) return defaultValue;
-	return strus::numstring_conv::toint( ci->second, std::numeric_limits<int64_t>::max());
-}
-
-static std::string getConfigurationValue( const Configuration& config, const std::string& key, const char* defaultValue)
-{
-	Configuration::const_iterator ci = config.find( key);
-	if (ci == config.end()) return defaultValue;
-	return ci->second;
-}
-
-
 void EventLoop::initConfiguration( const Configuration& config)
 {
-	int max_idle_time = getConfigurationValue( config, "transactions.max_idle_time", 600);
+	int max_idle_time = 600;
+	(void)config.getValue( max_idle_time, "transactions.max_idle_time");
 	m_timerEventSecondsPeriod = std::max( 10, max_idle_time/20);
 }
 		
@@ -382,15 +497,20 @@ void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status
 	m_requestContext.reset();
 }
 
-strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Configuration& config_, const std::string& configjson_)
+strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Configuration& config, const std::string& configjson_)
 {
+	std::string configdir = "./";
+	int transaction_max_idle_time = 600;
+	int transaction_nof_per_sec = 60;
+
+	(void)config.getValue( configdir, "data.configdir");
+	(void)config.getValue( transaction_max_idle_time, "transactions.max_idle_time");
+	(void)config.getValue( transaction_nof_per_sec, "transactions.nof_per_sec");
+
 	strus::WebRequestHandlerInterface* rt =
 		strus::createWebRequestHandler(
 			&g_eventLoop, &g_logger, ""/*html head*/,
-			getConfigurationValue( config_, "data.configdir", "./"),
-			configjson_,
-			getConfigurationValue( config_, "transactions.max_idle_time", 600),
-			getConfigurationValue( config_, "transactions.nof_per_sec", 60),
+			configdir, configjson_, transaction_max_idle_time, transaction_nof_per_sec,
 			g_errorhnd);
 	if (!rt) throw strus::runtime_error( _TXT("error creating web request handler: %s"), g_errorhnd->fetchError());
 	return rt;
@@ -490,50 +610,8 @@ void GlobalContext::reportError( const char* fmt, ...)
 	std::cerr << "ERROR " << msg << std::endl;
 }
 
-static void convertConfig_( lua_State *L, int luaddr, Configuration& config, const std::string& prefix)
-{
-	lua_pushvalue( L, luaddr);
-	lua_pushnil( L );
-
-	while (lua_next( L, -2) != 0)
-	{
-		std::string key;
-		if (lua_isnumber( L, -2))
-		{
-			lua_pushvalue( L, -2);
-			key = lua_tostring( L, -1);
-			lua_pop( L, 1);
-		}
-		else if (lua_isstring( L, -2))
-		{
-			key = lua_tostring( L, -2);
-		}
-		else {
-			luaL_error( L, _TXT("non string type keys are not supported in configuration definition"));
-		}
-		std::string fullkey = prefix.empty() ? key : (prefix + "." + key);
-
-		if (lua_isstring( L, -1))
-		{
-			config[ fullkey] = lua_tostring( L, -1);
-		}
-		else if (lua_istable( L, -1))
-		{
-			convertConfig_( L, -1, config, fullkey);
-		}
-		else
-		{
-			lua_pushvalue( L, -1);
-			config[ fullkey] = lua_tostring( L, -1);
-			lua_pop( L, 1);
-		}
-		lua_pop( L, 1 );
-	}
-	lua_pop( L, 1); // Get luaddr-value from stack
-}
-
 enum TableType {TableTypeEmpty,TableTypeArray,TableTypeDictionary};
-static TableType getTableType( lua_State *L, int luaddr)
+static TableType getTableType( lua_State* L, int luaddr)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -547,10 +625,10 @@ static TableType getTableType( lua_State *L, int luaddr)
 	return TableTypeEmpty;
 }
 
-static void convertLuaArrayToJson_( lua_State *L, int luaddr, std::string& configstr);
-static void convertLuaDictionaryToJson_( lua_State *L, int luaddr, std::string& configstr);
+static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr);
+static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr);
 
-static bool convertLuaValueToJson_( lua_State *L, int luaddr, std::string& configstr)
+static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& configstr)
 {
 	if (lua_isnil( L, luaddr))
 	{
@@ -587,7 +665,7 @@ static bool convertLuaValueToJson_( lua_State *L, int luaddr, std::string& confi
 	return true;
 }
 
-static void convertLuaArrayToJson_( lua_State *L, int luaddr, std::string& configstr)
+static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -621,7 +699,7 @@ static void convertLuaArrayToJson_( lua_State *L, int luaddr, std::string& confi
 	lua_pop( L, 1); // Get luaddr-value from stack
 }
 
-static void convertLuaDictionaryToJson_( lua_State *L, int luaddr, std::string& configstr)
+static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr)
 {
 	std::map<CString,std::string> dictmap;
 	lua_pushvalue( L, luaddr);
@@ -663,21 +741,14 @@ static void convertLuaDictionaryToJson_( lua_State *L, int luaddr, std::string& 
 	}
 }
 
-static Configuration convertConfig( lua_State *L, int luaddr)
-{
-	Configuration rt;
-	convertConfig_( L, luaddr, rt, std::string());
-	return rt;
-}
-
-static std::string convertLuaTableToJson( lua_State *L, int luaddr)
+static std::string convertLuaTableToJson( lua_State* L, int luaddr)
 {
 	std::string rt;
 	convertLuaValueToJson_( L, luaddr, rt);
 	return rt;
 }
 
-static void pushConvertedJsonAsLuaTable( lua_State *L, int luaddr)
+static void pushConvertedJsonAsLuaTable( lua_State* L, int luaddr)
 {
 	std::size_t srclen;
 	const char* src = lua_tolstring( L, luaddr, &srclen);
@@ -769,7 +840,28 @@ static std::string convertSourceReformatFloat( const char* src, unsigned int pre
 	return rt;
 }
 
-static int l_set_time( lua_State *L)
+static std::string convertSourceRegexReplace( const char* src, const char* expr, const char* substfmt)
+{
+	std::string rt;
+	std::size_t srcsize = std::strlen(src);
+	strus::RegexSearch regex( expr, 0, g_errorhnd);
+	strus::RegexSubst subst( expr, substfmt, g_errorhnd);
+	if (g_errorhnd->hasError()) throw strus::runtime_error( _TXT("error in init replace regex: %s"), g_errorhnd->fetchError());
+	std::vector<strus::RegexSearch::Match> matches = regex.find_all( src, srcsize);
+	std::size_t ofs = 0;
+	std::vector<strus::RegexSearch::Match>::const_iterator mi = matches.begin(), me = matches.end();
+	for (; mi != me; ++mi)
+	{
+		rt.append( src + ofs, mi->pos - ofs);
+		subst.exec( rt, src + ofs + mi->pos, mi->len);
+		ofs = mi->pos + mi->len;
+	}
+	rt.append( src + ofs, srcsize - ofs);
+	if (g_errorhnd->hasError()) throw strus::runtime_error( _TXT("error in run replace regex: %s"), g_errorhnd->fetchError());
+	return rt;
+}
+
+static int l_set_time( lua_State* L)
 {
 	try
 	{
@@ -786,7 +878,7 @@ static int l_set_time( lua_State *L)
 	return 0;
 }
 
-static int l_def_server( lua_State *L)
+static int l_def_server( lua_State* L)
 {
 	try
 	{
@@ -794,7 +886,7 @@ static int l_def_server( lua_State *L)
 		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'def_server': expected <host> <config>"));
 		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'def_server': expected <host> <config>"));
 		const char* hostname = lua_tostring( L, 1);
-		Configuration configmap = convertConfig( L, 2);
+		Configuration configmap( L, 2);
 		std::string configjson = convertLuaTableToJson( L, 2);
 
 		g_globalContext.defineServer( hostname, configmap, configjson);
@@ -806,7 +898,7 @@ static int l_def_server( lua_State *L)
 	return 0;
 }
 
-static int l_call_server( lua_State *L)
+static int l_call_server( lua_State* L)
 {
 	try
 	{
@@ -857,7 +949,7 @@ static int l_call_server( lua_State *L)
 	}
 }
 
-static void push_linestring( lua_State *L, char const* ln)
+static void push_linestring( lua_State* L, char const* ln)
 {
 	char const* end = std::strchr( ln, '\n');
 	if (!end) end = std::strchr( ln, '\0');
@@ -880,7 +972,7 @@ static const char* skipEoln( const char* si)
 	}
 }
 
-static int l_cmp_content( lua_State *L)
+static int l_cmp_content( lua_State* L)
 {
 	try
 	{
@@ -950,7 +1042,7 @@ static int l_cmp_content( lua_State *L)
 	}
 }
 
-static int l_write_textfile( lua_State *L)
+static int l_write_textfile( lua_State* L)
 {
 	try
 	{
@@ -990,7 +1082,7 @@ static int l_write_textfile( lua_State *L)
 	}
 }
 
-static int l_create_dir( lua_State *L)
+static int l_create_dir( lua_State* L)
 {
 	try
 	{
@@ -1019,7 +1111,7 @@ static int l_create_dir( lua_State *L)
 	}
 }
 
-static int l_reformat_float( lua_State *L)
+static int l_reformat_float( lua_State* L)
 {
 	try
 	{
@@ -1041,7 +1133,29 @@ static int l_reformat_float( lua_State *L)
 	}
 }
 
-static int l_to_json( lua_State *L)
+static int l_reformat_regex( lua_State* L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'reformat_regex': expected <content> <regex> [<subst>]"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'reformat_regex': expected <content> <regex> [<subst>]"));
+		const char* content = lua_tostring( L, 1);
+		const char* expr = lua_tostring( L, 2);
+		const char* substfmt = (nofArgs > 2) ? lua_tostring( L, 3) : "";
+
+		std::string result = convertSourceRegexReplace( content, expr, substfmt);
+		lua_pushlstring( L, result.c_str(), result.size()); 
+		return 1;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
+static int l_to_json( lua_State* L)
 {
 	try
 	{
@@ -1059,7 +1173,7 @@ static int l_to_json( lua_State *L)
 	}
 }
 
-static int l_from_json( lua_State *L)
+static int l_from_json( lua_State* L)
 {
 	try
 	{
@@ -1076,7 +1190,7 @@ static int l_from_json( lua_State *L)
 	}
 }
 
-static void declareFunctions( lua_State *L)
+static void declareFunctions( lua_State* L)
 {
 #define DEFINE_FUNCTION( NAME)	lua_pushcfunction( L, l_ ##NAME); lua_setglobal( L, #NAME);
 
@@ -1087,6 +1201,7 @@ static void declareFunctions( lua_State *L)
 	DEFINE_FUNCTION( write_textfile );
 	DEFINE_FUNCTION( create_dir );
 	DEFINE_FUNCTION( reformat_float );
+	DEFINE_FUNCTION( reformat_regex );
 	DEFINE_FUNCTION( to_json );
 	DEFINE_FUNCTION( from_json );
 	lua_pushboolean( L, g_verbose);

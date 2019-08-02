@@ -1,5 +1,6 @@
 require "os"
 
+-- Function checking a HTTP status code that exits if the code is not in the OK range
 function exitOnBadHttpStatus( httpStatus)
 	if (httpStatus < 200 or httpStatus >= 300) then
 		print( "Request failed with HTTP status " .. httpStatus )
@@ -7,6 +8,7 @@ function exitOnBadHttpStatus( httpStatus)
 	end
 end
 
+-- Function calling a server in the emulation context (not a real server) and handling possible errors, expecting the call to succeed
 function call_server_checked( method, server, arg)
 	result,status,errmsg = call_server( method, server, arg)
 	if (status < 200 or status >= 300) then
@@ -20,11 +22,18 @@ function call_server_checked( method, server, arg)
 	return result
 end
 
+-- Function to make result of query evaluation comparable between different platforms
+function det_qeval_result( content)
+	return reformat_regex( reformat_float( content, 7), "[\\n][ \\t]*[\"]docno[\"][:][ ]*[0-9]+[,][ \\t]*")
+end
+
+-- Function to evaluate the path of the executing script (for locating resources or input files in the same directory)
 function script_path()
 	local str = debug.getinfo(2, "S").source:sub(2)
 	return str:match("(.*/)")
 end
 
+-- Function to get all files in lexicographically sorted order in a directory matching a defined extension
 function getDirectoryFiles( dir, extension)
 	rt = {}
 	filenames = {}
@@ -40,6 +49,7 @@ function getDirectoryFiles( dir, extension)
 	return rt
 end
 
+-- Function to check if to files (result and expected of a test) are equal (accepting different line endings to make the comparison independent of the platform)
 function checkExpected( output, expected, outputfile)
 	res,lineno,line_a,line_b = cmp_content( output, expected )
 	if not res then

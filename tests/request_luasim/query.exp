@@ -868,6 +868,28 @@
 			"set": "search"}]}
 }
 {
+"qryeval": {
+	"selection_sets": ["search"],
+	"summarizers": [
+		{
+			"function": "attribute",
+			"param": {
+				"attribute": "title",
+				"debug": "debug"}}],
+	"weighting": [
+		{
+			"feature": {
+				"match": "search"},
+			"function": "BM25",
+			"param": {
+				"avgdoclen": 1000,
+				"b": 0.75,
+				"debug": "debug",
+				"k1": 1.2,
+				"metadata_doclen": "doclen"}}],
+	"weighting_sets": ["search"]}
+}
+{
 "result": {
 	"ranklist": {
 		"evalpass": 0,
@@ -875,43 +897,83 @@
 		"nofvisited": 10,
 		"ranks": [
 			{
-				"docno": 14,
 				"weight": 1.1861035,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "Tonight (David Bowie album)",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 1,
 				"weight": 0.9680647,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "VH1 Storytellers (David Bowie album)",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 6,
 				"weight": 0.9081836,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "List of songs recorded by David Bowie",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 15,
 				"weight": 0.4634619,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "Let's Dance (David Bowie album)",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 13,
 				"weight": 0.4124582,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "David Bowie",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 12,
 				"weight": 0.0000159,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "Liza Jane (David Bowie song)",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 7,
 				"weight": 0.0000101,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "List of awards and nominations received by David Bowie",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 11,
 				"weight": 0.0000064,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "David Bowie (1967 album)",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 2,
 				"weight": 0.0000059,
-				"summary": {}},
+				"summary": [
+					{
+						"name": "title",
+						"value": "Stage (David Bowie album)",
+						"weight": 1,
+						"index": -1}]},
 			{
-				"docno": 4,
 				"weight": 0.0000032,
-				"summary": {}}]}}
+				"summary": [
+					{
+						"name": "title",
+						"value": "Outside (David Bowie album)",
+						"weight": 1,
+						"index": -1}]}]}}
 }

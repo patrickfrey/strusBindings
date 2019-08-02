@@ -6,7 +6,7 @@ config = {
 	},
 	transactions = {
 		max_idle_time  = 600,
-		nof_per_second = 60
+		nof_per_sec = 60
 	},
 	extensions = {
 		directory = "@STRUS_MODULE_PATH@",

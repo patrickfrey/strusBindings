@@ -16,8 +16,7 @@
                 },{
                     "name": "avgdoclen",
                     "value": "1000"
-                }
-                ],
+                }],
                 "feature": [{
                     "role":"match",
                     "set": "search"

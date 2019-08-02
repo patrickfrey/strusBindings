@@ -42,7 +42,7 @@ public:
 
 			{"{weighting,summarizer}/feature/role", "()", QueryEvalFunctionFeatureRole, papuga_TypeString, NULL},
 			{"{weighting,summarizer}/feature/set", "()", QueryEvalFunctionFeatureSet, papuga_TypeString, NULL},
-			{"{weighting,summarizer}/feature", QueryEvalFunctionParameter, {
+			{"{weighting,summarizer}/feature", QueryEvalFunctionFeature, {
 					{"role", QueryEvalFunctionFeatureRole},
 					{"set", QueryEvalFunctionFeatureSet}
 				}
@@ -84,7 +84,8 @@ public:
 			},
 			{"weighting", 0, "qryeval", E::addWeightingFunction(), {
 					{QueryEvalFunctionName},
-					{QueryEvalFunctionParameter, '*'}}
+					{QueryEvalFunctionParameter, '*'},
+					{QueryEvalFunctionFeature, '*'}}
 			},
 			{"formula/source", "()", QueryEvalFormulaSource, papuga_TypeString, "_0 * factor * log(_2)"},
 			{"formula/param/name", "()", QueryEvalFormulaParameterName, papuga_TypeString, "factor"},
