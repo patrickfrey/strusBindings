@@ -330,7 +330,7 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {rootexpr,{
-			{SchemaQueryDeclPart::declareFeature( "")},
+			{SchemaQueryDeclPart::declareOrigFeature( "feature")},
 			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeTermExpression(), {{TermExpression}} },
 		}};
 	}
@@ -339,7 +339,7 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {rootexpr,{
-			{SchemaQueryDeclPart::declareSentence( "")},
+			{SchemaQueryDeclPart::declareSentence( "sentence")},
 			{"sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
 		}};
 	}
@@ -348,8 +348,8 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {rootexpr,{
-			{SchemaQueryDeclPart::declareMetaData( "")},
-			{"restriction/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
+			{SchemaQueryDeclPart::declareMetaDataCondition( "restriction/content")},
+			{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
 		}};
 	}
 
@@ -420,16 +420,19 @@ public:
 			{"/query/feature", "feature", true},
 			{"/query/feature/set", "set", FeatureSet},
 			{"/query/feature/weight", "weight", FeatureWeight, '?'},
-			{"/query/feature/content", "content", "_analyzed", '!'},
+			{"/query/feature/content", "content", TermExpression, '*'},
+			{"/query/feature/content", "analyzed", "_analyzed", '!'},
 
 			{"/query/sentence", "sentence", true},
 			{"/query/sentence/field", "field", FieldTypeName},
 			{"/query/sentence/results", "results", NumberOfResults},
 			{"/query/sentence/minweight", "minweight", MinWeight},
-			{"/query/sentence/content", "content", "_analyzed", '!'},
+			{"/query/sentence/content", "content", FieldValue},
+			{"/query/sentence/content", "analyzed", "_analyzed", '!'},
 
 			{"/query/restriction", "restriction", true},
-			{"/query/restriction/{union,condition}", 0, "_analyzed", '!'}
+			{"/query/restriction/content", "restriction", MetaDataCondition},
+			{"/query/restriction/content", "analyzed", "_analyzed", '!'}
 		}}},
 		{
 			{"vstorage","/query/analyzer/vstorage/name()",false/*not required*/}

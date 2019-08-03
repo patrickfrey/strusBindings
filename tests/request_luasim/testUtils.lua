@@ -84,7 +84,11 @@ function concatArrays( t1, t2)
 end
 
 function mergeValues( t1, t2)
-	if isArray( t1) and isArray( t2) then
+	if not t1 then
+		return t2
+	elseif not t2 then
+		return t1
+	elseif isArray( t1) and isArray( t2) then
 		return concatArrays( t1, t2)
 	elseif (type(t1) == "table" and type(t2) == "table") then
 		res = {}

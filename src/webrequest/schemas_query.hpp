@@ -40,11 +40,11 @@ public:
 	{
 		typedef bindings::method::Query Q;
 		return { rootexpr, {
-			{SchemaQueryDeclPart::declareFeature( "")},
+			{SchemaQueryDeclPart::declareAnalyzedFeature( "feature")},
 			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '!', 2/*tag diff*/}, {FeatureWeight, '?'}} },
 
-			{SchemaQueryDeclPart::declareMetaData( "")},
-			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
+			{SchemaQueryDeclPart::declareMetaDataCondition( "restriction/analyzed")},
+			{"restriction/analyzed", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
 		}};
 	}
 

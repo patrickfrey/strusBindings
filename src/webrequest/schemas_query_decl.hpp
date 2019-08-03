@@ -23,45 +23,61 @@ namespace webrequest {
 class SchemaQueryDeclPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList declareMetaData( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList declareMetaDataCondition( const char* rootexpr)
 	{
 		return { rootexpr, {
-			{"restriction/condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
-			{"restriction/condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
-			{"restriction/condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
-			{"restriction/condition", MetaDataCondition, {
+			{"condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
+			{"condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
+			{"condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
+			{"condition", MetaDataCondition, {
 					{MetaDataConditionOp},
 					{MetaDataConditionName},
 					{MetaDataConditionValue}
 				}
 			},
-			{"restriction/union/condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
-			{"restriction/union/condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
-			{"restriction/union/condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
-			{"restriction/union/condition", MetaDataUnionCondition, {
+			{"union/condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
+			{"union/condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
+			{"union/condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
+			{"union/condition", MetaDataUnionCondition, {
 					{MetaDataConditionOp},
 					{MetaDataConditionName},
 					{MetaDataConditionValue}
 				}
 			},
-			{"restriction/union", MetaDataCondition, {
+			{"union", MetaDataCondition, {
 					{MetaDataUnionCondition, '*', 2/*tag diff*/}
 				}
 			},
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList declareFeature( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList declareOrigFeature( const char* rootexpr)
 	{
 		return {rootexpr, {
-			{SchemaExpressionPart::declarePostingsExpression( "feature/content")},
-			{"feature/set", "()", FeatureSet, papuga_TypeString, "weighted"},
-			{"feature/weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
-			{"feature/content", "()", TermExpression, papuga_TypeVoid, NULL},
-			{"feature", FeatureDef, {
+			{SchemaExpressionPart::declarePostingsExpression( "content")},
+			{"set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
+			{"content", "()", TermExpression, papuga_TypeVoid, NULL},
+			{"", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
-					{"expression", TermExpression, '!', 2/*tag diff*/},
+					{"content", TermExpression, '!', 2/*tag diff*/},
+				}
+			},
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList declareAnalyzedFeature( const char* rootexpr)
+	{
+		return {rootexpr, {
+			{SchemaExpressionPart::declarePostingsExpression( "content")},
+			{"set", "()", FeatureSet, papuga_TypeString, "weighted"},
+			{"weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
+			{"content", "()", TermExpression, papuga_TypeVoid, NULL},
+			{"", FeatureDef, {
+					{"set", FeatureSet},
+					{"weight", FeatureWeight, '?'},
+					{"content", TermExpression, '!', 2/*tag diff*/},
 				}
 			},
 		}};
@@ -70,10 +86,10 @@ public:
 	static papuga::RequestAutomaton_NodeList declareSentence( const char* rootexpr)
 	{
 		return {rootexpr, {
-			{"sentence/field", "()", FieldTypeName, papuga_TypeString, "sent"},
-			{"sentence/content", "()", FieldValue, papuga_TypeString, "bla bla"},
-			{"sentence/results", "()", NumberOfResults, papuga_TypeDouble, "1;2"},
-			{"sentence/minweight", "()", MinWeight, papuga_TypeDouble, "0.75;1.0"},
+			{"field", "()", FieldTypeName, papuga_TypeString, "sent"},
+			{"content", "()", FieldValue, papuga_TypeString, "bla bla"},
+			{"results", "()", NumberOfResults, papuga_TypeDouble, "1;2"},
+			{"minweight", "()", MinWeight, papuga_TypeDouble, "0.75;1.0"},
 		}};
 	}
 

@@ -42,9 +42,9 @@ call_server_checked( "PUT", TRANSACTION)
 if verbose then io.stderr:write( string.format("- All documents inserted\n")) end
 
 qryanacfg = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test" )
-if verbose then io.stderr:write( string.format("- Query analyzer configuration:\n%s\n", qryanacfg)) end
+if verbose then io.stderr:write( string.format("- Query analyzer configuration from the server:\n%s\n", qryanacfg)) end
 docanacfg = call_server_checked( "GET", ISERVER1 .. "/docanalyzer/test" )
-if verbose then io.stderr:write( string.format("- Document analyzer configuration:\n%s\n", docanacfg)) end
+if verbose then io.stderr:write( string.format("- Document analyzer configuration from the server:\n%s\n", docanacfg)) end
 
 query = {
 	query = {
@@ -85,8 +85,6 @@ if verbose then io.stderr:write( string.format("- Analyzed query with analyzer p
 call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
 qryevalconf = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
 if verbose then io.stderr:write( string.format("- Query evaluation configuration from the server:\n%s\n", qryevalconf)) end
-qryanaconf = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test")
-if verbose then io.stderr:write( string.format("- Query analyzer configuration from the server:\n%s\n", qryanaconf)) end
 
 qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end

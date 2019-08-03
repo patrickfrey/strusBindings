@@ -1,5 +1,5 @@
 {
-"analyzer": {
+"qryanalyzer": {
 	"element": [
 		{
 			"field": "text",
@@ -21,7 +21,7 @@
 			"type": "entity"}]}
 }
 {
-"analyzer": {
+"docanalyzer": {
 	"aggregator": [
 		{
 			"function": {
@@ -52,7 +52,7 @@
 					"name": "lc"}],
 			"select": "//weblink@id",
 			"tokenizer": {
-				"expression": "^[a-z]{3,6}[:][/][/]([^ ?]*)",
+				"expression": "^[a-z]{3,6}[:][/][/]([^ ?/]*)",
 				"index": 0,
 				"name": "regex"},
 			"type": "url"},
@@ -62,7 +62,7 @@
 					"name": "lc"}],
 			"select": "//weblink@id",
 			"tokenizer": {
-				"expression": "^([a-z]{1,32}[.][^ ?]*)",
+				"expression": "^([a-z]{1,32}[.][^ ?/]*)",
 				"index": 0,
 				"name": "regex"},
 			"type": "url"},
@@ -583,6 +583,8 @@
 					"name": "lc"},
 				{
 					"name": "entityid"}],
+			"options": {
+				"position": "succ"},
 			"select": "//E()",
 			"tokenizer": {
 				"name": "content"},
@@ -844,6 +846,10 @@
 		{
 			"content": [
 				{
+					"type": "text",
+					"value": "Iggy Pop"}],
+			"analyzed": [
+				{
 					"type": "word",
 					"value": "iggy"},
 				{
@@ -859,6 +865,10 @@
 	"feature": [
 		{
 			"content": [
+				{
+					"type": "text",
+					"value": "Iggy Pop"}],
+			"analyzed": [
 				{
 					"type": "word",
 					"value": "IGGY"},
