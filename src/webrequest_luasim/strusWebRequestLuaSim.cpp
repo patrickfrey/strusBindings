@@ -625,10 +625,10 @@ static TableType getTableType( lua_State* L, int luaddr)
 	return TableTypeEmpty;
 }
 
-static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr);
-static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr);
+static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr, int indent);
+static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr, int indent);
 
-static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& configstr)
+static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& configstr, int indent=0)
 {
 	if (lua_isnil( L, luaddr))
 	{
@@ -648,12 +648,12 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& confi
 				return false;
 			case TableTypeArray:
 				configstr.append( "[ ");
-				convertLuaArrayToJson_( L, luaddr, configstr);
+				convertLuaArrayToJson_( L, luaddr, configstr, indent);
 				configstr.append( " ]");
 				break;
 			case TableTypeDictionary:
 				configstr.append( "{ ");
-				convertLuaDictionaryToJson_( L, luaddr, configstr);
+				convertLuaDictionaryToJson_( L, luaddr, configstr, indent);
 				configstr.append( " }");
 				break;
 		}
@@ -665,7 +665,7 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& confi
 	return true;
 }
 
-static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr)
+static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr, int indent)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -688,9 +688,12 @@ static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& confi
 		}
 		if (itercnt)
 		{
-			configstr.append( ", ");
+			configstr.append( ",");
 		}
-		if (!convertLuaValueToJson_( L, -1, configstr))
+		configstr.append( "\n");
+		configstr.resize( configstr.size()+(indent*2), ' ');
+
+		if (!convertLuaValueToJson_( L, -1, configstr, indent+1))
 		{
 			configstr.append( "null");
 		}
@@ -699,7 +702,7 @@ static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& confi
 	lua_pop( L, 1); // Get luaddr-value from stack
 }
 
-static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr)
+static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr, int indent)
 {
 	std::map<CString,std::string> dictmap;
 	lua_pushvalue( L, luaddr);
@@ -721,7 +724,7 @@ static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& 
 			luaL_error( L, _TXT("non string type keys are not supported in table conversion to JSON"));
 		}
 		std::string value;
-		if (convertLuaValueToJson_( L, -1, value))
+		if (convertLuaValueToJson_( L, -1, value, indent+1))
 		{
 			dictmap[ key] = value;
 		}
@@ -732,8 +735,9 @@ static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& 
 	std::map<CString,std::string>::const_iterator di = dictmap.begin(), de = dictmap.end();
 	for (int didx=0; di != de; ++di,++didx)
 	{
-		if (didx) configstr.append( ", ");
-
+		if (didx) configstr.append( ",");
+		configstr.append( "\n");
+		configstr.resize( configstr.size()+(indent*2), ' ');
 		configstr.append( "\"");
 		configstr.append( di->first.value);
 		configstr.append( "\": ");
@@ -741,7 +745,7 @@ static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& 
 	}
 }
 
-static std::string convertLuaTableToJson( lua_State* L, int luaddr)
+static std::string convertLuaValueToJson( lua_State* L, int luaddr)
 {
 	std::string rt;
 	convertLuaValueToJson_( L, luaddr, rt);
@@ -891,7 +895,7 @@ static int l_def_server( lua_State* L)
 		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'def_server': expected <host> <config>"));
 		const char* hostname = lua_tostring( L, 1);
 		Configuration configmap( L, 2);
-		std::string configjson = convertLuaTableToJson( L, 2);
+		std::string configjson = convertLuaValueToJson( L, 2);
 
 		g_globalContext.defineServer( hostname, configmap, configjson);
 	}
@@ -923,7 +927,7 @@ static int l_call_server( lua_State* L)
 			}
 			else if (lua_istable( L, 3))
 			{
-				content = convertLuaTableToJson( L, 3);
+				content = convertLuaValueToJson( L, 3);
 				arg = content.c_str();
 			}
 			else
@@ -1046,13 +1050,35 @@ static int l_cmp_content( lua_State* L)
 	}
 }
 
-static int l_write_textfile( lua_State* L)
+static int l_load_file( lua_State* L)
 {
 	try
 	{
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'write_textfile': expected <result> <expected>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'write_textfile': expected <result> <expected>"));
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'load_file': expected <filename>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'load_file': expected <filename>"));
+		const char* filename = lua_tostring( L, 1);
+		std::string content;
+		std::string fullpath = strus::joinFilePath( g_scriptDir, filename);
+		int ec = strus::readFile( fullpath, content);
+		if (ec) throw strus::runtime_error( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
+		lua_pushlstring(L, content.c_str(), content.size());
+		return 1;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
+static int l_write_file( lua_State* L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'write_file': expected <result> <expected>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'write_file': expected <result> <expected>"));
 		const char* filename = lua_tostring( L, 1);
 		const char* content = lua_tostring( L, 2);
 
@@ -1166,7 +1192,7 @@ static int l_to_json( lua_State* L)
 		int nofArgs = lua_gettop(L);
 		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'tojson': expected <table>"));
 		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'tojson': expected <table>"));
-		std::string result = convertLuaTableToJson( L, 1);
+		std::string result = convertLuaValueToJson( L, 1);
 		lua_pushlstring( L, result.c_str(), result.size()); 
 		return 1;
 	}
@@ -1202,7 +1228,8 @@ static void declareFunctions( lua_State* L)
 	DEFINE_FUNCTION( def_server );
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
-	DEFINE_FUNCTION( write_textfile );
+	DEFINE_FUNCTION( write_file );
+	DEFINE_FUNCTION( load_file );
 	DEFINE_FUNCTION( create_dir );
 	DEFINE_FUNCTION( reformat_float );
 	DEFINE_FUNCTION( reformat_regex );

@@ -53,7 +53,7 @@ end
 function checkExpected( output, expected, outputfile)
 	res,lineno,line_a,line_b = cmp_content( output, expected )
 	if not res then
-		write_textfile( outputfile, output)
+		write_file( outputfile, output)
 		io.stderr:write( string.format("ERROR result not as expected, difference on line %d, result: '%s', expected '%s'\n", lineno, line_a, line_b))
 		os.exit( 1)
 	end

@@ -2,14 +2,13 @@ require "config"
 require "testUtils"
 require "io"
 require "os"
-local json = require 'lunajson'
 
 SCRIPTPATH = script_path()
 
 def_server( CSERVER1, config )
 call_server_checked( "PUT", CSERVER1 .. "/contentstats/stats", "@contentstats.json" )
 
-TRANSACTION = json.decode( call_server_checked( "POST", CSERVER1 .. "/contentstats/stats/transaction" )).link
+TRANSACTION = from_json( call_server_checked( "POST", CSERVER1 .. "/contentstats/stats/transaction" )).link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
 
 documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")

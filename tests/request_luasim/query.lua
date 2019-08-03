@@ -2,7 +2,6 @@ require "config"
 require "testUtils"
 require "io"
 require "os"
-local json = require 'lunajson'
 
 SCRIPTPATH = script_path()
 
@@ -30,7 +29,7 @@ call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
 call_server_checked( "PUT", ISERVER1 .. "/inserter/test", "@inserter.json" )
 if verbose then io.stderr:write( string.format("- Created, storage, analyzer and inserter\n")) end
 
-TRANSACTION = json.decode( call_server_checked( "POST", ISERVER1 .. "/inserter/test/transaction" )).link
+TRANSACTION = from_json( call_server_checked( "POST", ISERVER1 .. "/inserter/test/transaction" )).link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
 
 documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
@@ -93,4 +92,17 @@ qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/tes
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
 checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2 .. qryevalconf .. qryres, "@query.exp", "query.res" )
+
+query_with_eval = {
+	query = mergeValues(
+			query,
+			{query = {eval = from_json( load_file( "qryeval.json"))["query"]["eval"]}}
+		)
+}
+
+-- if verbose then io.stderr:write( string.format("- Query with eval:\n%s\n", to_json(query_with_eval))) end
+-- qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/storage/test", query_with_eval))
+-- if verbose then io.stderr:write( string.format("- Query evaluation result from storage with query evaluation config passed:\n%s\n", qryres2)) end
+-- checkExpected( qryres2, qryres, "query2.res" )
+
 
