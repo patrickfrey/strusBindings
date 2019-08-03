@@ -20,14 +20,13 @@ storageConfig = {
 
 def_server( ISERVER1, config )
 call_server_checked( "PUT", ISERVER1 .. "/docanalyzer/test", "@docanalyzer.json" )
-
 call_server_checked( "PUT", ISERVER1 .. "/qryanalyzer/test", "@qryanalyzer.json" )
+if verbose then io.stderr:write( string.format("- Created document and query analyzer\n")) end
 
 storageConfig.storage.path = "storage/test"
 call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
-
 call_server_checked( "PUT", ISERVER1 .. "/inserter/test", "@inserter.json" )
-if verbose then io.stderr:write( string.format("- Created, storage, analyzer and inserter\n")) end
+if verbose then io.stderr:write( string.format("- Created storage and inserter\n")) end
 
 TRANSACTION = from_json( call_server_checked( "POST", ISERVER1 .. "/inserter/test/transaction" )).link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
@@ -39,12 +38,7 @@ for k,path in pairs(documents) do
 	call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
 end
 call_server_checked( "PUT", TRANSACTION)
-if verbose then io.stderr:write( string.format("- All documents inserted\n")) end
-
-qryanacfg = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test" )
-if verbose then io.stderr:write( string.format("- Query analyzer configuration from the server:\n%s\n", qryanacfg)) end
-docanacfg = call_server_checked( "GET", ISERVER1 .. "/docanalyzer/test" )
-if verbose then io.stderr:write( string.format("- Document analyzer configuration from the server:\n%s\n", docanacfg)) end
+if verbose then io.stderr:write( string.format("- Inserted all documents\n")) end
 
 query = {
 	query = {
@@ -59,28 +53,6 @@ query = {
 		}}
 	}
 }
-qryanacfg2 = {
-	element = {
-		{
-			type = "word",
-			field = "text",
-			tokenizer = {
-				name = "word"
-			},
-			normalizer = {{
-				name = "uc"
-			}}
-		}
-	}
-}
-query_with_analyzer = {
-	query = mergeValues( query, {query = {analyzer = qryanacfg2}} )
-}
-
-qryana1 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query)
-if verbose then io.stderr:write( string.format("- Analyzed query with analyzer defined by server:\n%s\n", qryana1)) end
-qryana2 = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query_with_analyzer)
-if verbose then io.stderr:write( string.format("- Analyzed query with analyzer passed as content:\n%s\n", qryana2)) end
 
 call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
 qryevalconf = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
@@ -89,12 +61,12 @@ if verbose then io.stderr:write( string.format("- Query evaluation configuration
 qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
-checkExpected( qryanacfg .. docanacfg .. qryana1 .. qryana2 .. qryevalconf .. qryres, "@query.exp", "query.res" )
+checkExpected( qryevalconf .. qryres, "@query.exp", "query.res" )
 
 query_with_eval = {
 	query = mergeValues(
 			query,
-			{query = {eval = from_json( load_file( "qryeval.json"))["query"]["eval"]}}
+			{query = {eval = from_json( load_file( "qryeval.json"))["qryeval"]}}
 		)
 }
 
