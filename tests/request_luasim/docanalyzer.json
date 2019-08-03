@@ -1,1029 +1,1030 @@
 {
-"analyzer": {
-	"doc": {
-		"class": {
-			"mimetype": "application/xml"
-		},
-		"feature": {
-			"forward": [{
-					"type": "url",
-					"tokenizer": {
-						"name": "regex",
-						"arg": ["^[a-z]{3,6}[:][/][/]([^ ?]*)"
-						]
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//weblink@id"
-				},{
-					"type": "url",
-					"tokenizer": {
-						"name": "regex",
-						"arg": ["^([a-z]{1,32}[.][^ ?]*)"
-						]
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//weblink@id"
-				},{
-					"type": "pageref",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//pagelink@id"
-				},{
-					"type": "bibref",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//bibref()"
-				},{
-					"type": "time",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//time()"
-				},{
-					"type": "categoryid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//category@cid"
-				},{
-					"type": "headingid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//title@id"
-				},{
-					"type": "headingid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//heading@id"
-				},{
-					"type": "entityref",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//N@id"
-				},{
-					"type": "entityref",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//E@id"
-				},{
-					"type": "entityref",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//R@id"
-				},{
-					"type": "punct",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//T()"
-				},{
-					"type": "comma",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//P()"
-				},{
-					"type": "cardinal",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//C()"
-				},{
-					"type": "exist",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//X()"
-				},{
-					"type": "adjv",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//A()"
-				},{
-					"type": "verb",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//V()"
-				},{
-					"type": "modal",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//M()"
-				},{
-					"type": "noun",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//N()"
-				},{
-					"type": "entity",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//E()"
-				},{
-					"type": "url",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//U()"
-				},{
-					"type": "pron",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//R()"
-				},{
-					"type": "wdet",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//W()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//T()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//P()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//C()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//X()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//A()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//V()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//M()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//N()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//E()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//U()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//R()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//W()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//heading()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//tabtitle()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//head()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//cell()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//citation()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//ref()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//list()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//text()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//attr()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//pagelink()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//weblink()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//entity()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//quot()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//math()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//char()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//code()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//bibref()"
-				},{
-					"type": "orig",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "//time()"
-				}
-			],
-			"search": [{
-					"type": "word",
-					"tokenizer": {
-						"name": "regex",
-						"arg": ["^[a-z]{3,5}[:][/][/]([^ ?/]{1,32})"
-						]
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"select": "//weblink@id"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "regex",
-						"arg": ["^([a-z\\.]{6,24}[^ ?/]{1,20})"
-						]
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"select": "//weblink@id"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"select": "//bibref()"
-				},{
-					"type": "categoryid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//category@cid"
-				},{
-					"type": "headid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//title@id"
-				},{
-					"type": "headid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//heading@id"
-				},{
-					"type": "title",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "/doc/title()"
-				},{
-					"type": "entity",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"option": {
-						"position": "succ"
-					},
-					"select": "//N@id"
-				},{
-					"type": "entity",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"option": {
-						"position": "succ"
-					},
-					"select": "//E@id"
-				},{
-					"type": "entity",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"option": {
-						"position": "succ"
-					},
-					"select": "//R@id"
-				},{
-					"type": "entity",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"select": "//E()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "empty"
-						}
-					],
-					"select": "//T"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "empty"
-						}
-					],
-					"select": "//P"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//C()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//X()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//A()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//V()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//M()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"option": {
-						"position": "succ"
-					},
-					"select": "//N()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "lc"
-						},{
-							"name": "entityid"
-						}
-					],
-					"option": {
-						"position": "succ"
-					},
-					"select": "//E()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//N()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//E()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//U()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//R()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//W()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//heading()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//tabtitle()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//head()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//cell()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//citation()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//ref()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//list()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//text()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//attr()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//pagelink()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//weblink()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//entity()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//quot()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//math()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//char()"
-				},{
-					"type": "word",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-							"name": "lc"
-						}
-					],
-					"select": "//code()"
-				}
-			],
-			"attribute": [{
-					"type": "title",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "/doc/title()"
-				},{
-					"type": "docid",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-							"name": "orig"
-						}
-					],
-					"select": "/doc/docid()"
-				}
-			],
-			"aggregator": [{
-					"type": "doclen",
-					"function": {
-						"name": "count",
-						"arg": ["word"
-						]
+"docanalyzer": {
+	"class": {
+		"mimetype": "application/xml"
+	},
+	"feature": {
+		"forward": [{
+				"type": "url",
+				"tokenizer": {
+					"name": "regex",
+					"arg": ["^[a-z]{3,6}[:][/][/]([^ ?/]*)"
+					]
+				},
+				"normalizer": [{
+						"name": "lc"
 					}
+				],
+				"select": "//weblink@id"
+			},{
+				"type": "url",
+				"tokenizer": {
+					"name": "regex",
+					"arg": ["^([a-z]{1,32}[.][^ ?/]*)"
+					]
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//weblink@id"
+			},{
+				"type": "pageref",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//pagelink@id"
+			},{
+				"type": "bibref",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//bibref()"
+			},{
+				"type": "time",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//time()"
+			},{
+				"type": "categoryid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//category@cid"
+			},{
+				"type": "headingid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//title@id"
+			},{
+				"type": "headingid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//heading@id"
+			},{
+				"type": "entityref",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//N@id"
+			},{
+				"type": "entityref",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//E@id"
+			},{
+				"type": "entityref",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//R@id"
+			},{
+				"type": "punct",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//T()"
+			},{
+				"type": "comma",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//P()"
+			},{
+				"type": "cardinal",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//C()"
+			},{
+				"type": "exist",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//X()"
+			},{
+				"type": "adjv",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//A()"
+			},{
+				"type": "verb",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//V()"
+			},{
+				"type": "modal",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//M()"
+			},{
+				"type": "noun",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//N()"
+			},{
+				"type": "entity",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//E()"
+			},{
+				"type": "url",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//U()"
+			},{
+				"type": "pron",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//R()"
+			},{
+				"type": "wdet",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//W()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//T()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//P()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//C()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//X()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//A()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//V()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//M()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//N()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//E()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//U()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//R()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//W()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//heading()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//tabtitle()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//head()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//cell()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//citation()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//ref()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//list()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//text()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//attr()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//pagelink()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//weblink()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//entity()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//quot()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//math()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//char()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//code()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//bibref()"
+			},{
+				"type": "orig",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "//time()"
+			}
+		],
+		"search": [{
+				"type": "word",
+				"tokenizer": {
+					"name": "regex",
+					"arg": ["^[a-z]{3,5}[:][/][/]([^ ?/]{1,32})"
+					]
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"select": "//weblink@id"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "regex",
+					"arg": ["^([a-z\\.]{6,24}[^ ?/]{1,20})"
+					]
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"select": "//weblink@id"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"select": "//bibref()"
+			},{
+				"type": "categoryid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//category@cid"
+			},{
+				"type": "headid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//title@id"
+			},{
+				"type": "headid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//heading@id"
+			},{
+				"type": "title",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "/doc/title()"
+			},{
+				"type": "entity",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"option": {
+					"position": "succ"
+				},
+				"select": "//N@id"
+			},{
+				"type": "entity",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"option": {
+					"position": "succ"
+				},
+				"select": "//E@id"
+			},{
+				"type": "entity",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"option": {
+					"position": "succ"
+				},
+				"select": "//R@id"
+			},{
+				"type": "entity",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"option": {
+					"position": "succ"
+				},
+				"select": "//E()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "empty"
+					}
+				],
+				"select": "//T"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "empty"
+					}
+				],
+				"select": "//P"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//C()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//X()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//A()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//V()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//M()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"option": {
+					"position": "succ"
+				},
+				"select": "//N()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "lc"
+					},{
+						"name": "entityid"
+					}
+				],
+				"option": {
+					"position": "succ"
+				},
+				"select": "//E()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//N()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//E()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//U()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//R()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//W()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//heading()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//tabtitle()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//head()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//cell()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//citation()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//ref()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//list()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//text()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//attr()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//pagelink()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//weblink()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//entity()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//quot()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//math()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//char()"
+			},{
+				"type": "word",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "//code()"
+			}
+		],
+		"attribute": [{
+				"type": "title",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "/doc/title()"
+			},{
+				"type": "docid",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+						"name": "orig"
+					}
+				],
+				"select": "/doc/docid()"
+			}
+		],
+		"aggregator": [{
+				"type": "doclen",
+				"function": {
+					"name": "count",
+					"arg": ["word"
+					]
 				}
-			],
-			"metadata": [
-			]
-		}
+			}
+		],
+		"metadata": [
+		]
 	}
 }
 }

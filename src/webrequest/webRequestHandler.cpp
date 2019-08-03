@@ -249,13 +249,13 @@ WebRequestHandler::WebRequestHandler(
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
 		mt_Context_GET.addToHandler( m_impl);
 
-		static const IntrospectionMethodDescription mt_DocumentAnalyzer_GET( mt::DocumentAnalyzer::introspection(), "analyzer");
+		static const IntrospectionMethodDescription mt_DocumentAnalyzer_GET( mt::DocumentAnalyzer::introspection(), "docanalyzer");
 		mt_DocumentAnalyzer_GET.addToHandler( m_impl);
 
 		static const TransformationMethodDescription mt_DocumentAnalyzer_GET_content( mt::DocumentAnalyzer::analyzeMultiPart(), "doc");
 		mt_DocumentAnalyzer_GET_content.addToHandler( m_impl);
 
-		static const IntrospectionMethodDescription mt_QueryAnalyzer_GET( mt::QueryAnalyzer::introspection(), "analyzer");
+		static const IntrospectionMethodDescription mt_QueryAnalyzer_GET( mt::QueryAnalyzer::introspection(), "qryanalyzer");
 		mt_QueryAnalyzer_GET.addToHandler( m_impl);
 
 		static const IntrospectionMethodDescription mt_QueryEval_GET( mt::QueryEval::introspection(), "qryeval");

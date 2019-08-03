@@ -1,29 +1,27 @@
 {
-	"analyzer": {
-		"query": {
-			 "element": [
-				{
-					"type": "word",
-					"field": "text",
-					"tokenizer": {
-						"name": "word"
-					},
-					"normalizer": [{
-						"name":"lc"
-					}]
+	"qryanalyzer": {
+		 "element": [
+			{
+				"type": "word",
+				"field": "text",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+					"name":"lc"
+				}]
+			},{
+				"type": "entity",
+				"field": "text",
+				"tokenizer": {
+					"name": "content"
+				},
+				"normalizer": [{
+					"name":"entityid"
 				},{
-					"type": "entity",
-					"field": "text",
-					"tokenizer": {
-						"name": "content"
-					},
-					"normalizer": [{
-						"name":"entityid"
-					},{
-						"name":"lc"
-					}]
-			}]
-		}
+					"name":"lc"
+				}]
+		}]
 	}
 }
 

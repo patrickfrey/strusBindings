@@ -76,11 +76,11 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{},
 		{
-			{"storage","/query/include/storage()",false/*not required*/},
-			{"qryanalyzer","/query/include/analyzer()",false/*not required*/}
+			{"storage","/qryeval/include/storage()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
 		},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")}
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/qryeval")}
 		}
 	) {}
 };

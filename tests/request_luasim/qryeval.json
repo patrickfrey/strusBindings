@@ -1,35 +1,35 @@
 {
-    "query": {
-        "include": {
-            "storage": "test",
-            "analyzer": "test"
-        },
-        "eval": {
-            "weighting": {
-                "name": "BM25",
-                "param": [{
-                    "name": "k1",
-                    "value": "1.2"
-                },{
-                    "name": "b",
-                    "value": "0.75"
-                },{
-                    "name": "avgdoclen",
-                    "value": "1000"
-                }],
-                "feature": [{
-                    "role":"match",
-                    "set": "search"
-                }]
-            },
-            "summarizer": {
-                "name": "attribute",
-                "param": [{
-                     "name":"attribute",
-                     "value": "title"
-                }]
-            },
-            "selection": "search"
-        }
-    }
+	"query": {
+		"include": {
+			"storage": "test",
+			"analyzer": "test"
+		},
+		"eval": {
+			"weighting": {
+				"name": "BM25",
+				"param": [{
+					"name": "k1",
+					"value": "1.2"
+				},{
+					"name": "b",
+					"value": "0.75"
+				},{
+					"name": "avgdoclen",
+					"value": "1000"
+				}],
+				"feature": [{
+					"role":"match",
+					"set": "search"
+				}]
+			},
+			"summarizer": {
+				"name": "attribute",
+				"param": [{
+					 "name":"attribute",
+					 "value": "title"
+				}]
+			},
+			"selection": "search"
+		}
+	}
 }

@@ -371,7 +371,7 @@ public:
 		{},
 		{},
 		{
-			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/analyzer/doc")}
+			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/docanalyzer")}
 		}
 	) {}
 };
@@ -384,7 +384,7 @@ public:
 		{},
 		{},
 		{
-			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/analyzer/doc")}
+			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/docanalyzer")}
 		}
 	) {}
 };
@@ -396,10 +396,10 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{},
 		{
-			{"vstorage","/analyzer/query/vstorage/name()",false/*not required*/}
+			{"vstorage","/qryanalyzer/vstorage/name()",false/*not required*/}
 		},
 		{
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "/analyzer/query")}
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/qryanalyzer")}
 		}
 	) {}
 };
