@@ -61,18 +61,23 @@ if verbose then io.stderr:write( string.format("- Query evaluation configuration
 qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
 
-checkExpected( qryevalconf .. qryres, "@query.exp", "query.res" )
+qryana = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query )
+if verbose then io.stderr:write( string.format("- Query analysis:\n%s\n", qryana)) end
 
-query_with_eval = {
+qryana_with_eval = {
 	query = mergeValues(
-			query,
-			{query = {eval = from_json( load_file( "qryeval.json"))["qryeval"]}}
+			from_json( qryana)["query"],
+			{eval = from_json( load_file( "qryeval.json"))["qryeval"]}
 		)
 }
+if verbose then io.stderr:write( string.format("- Analyzed query with eval:\n%s\n", to_json(qryana_with_eval))) end
+write_file( "test.json", to_json(qryana_with_eval))
 
--- if verbose then io.stderr:write( string.format("- Query with eval:\n%s\n", to_json(query_with_eval))) end
--- qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/storage/test", query_with_eval))
--- if verbose then io.stderr:write( string.format("- Query evaluation result from storage with query evaluation config passed:\n%s\n", qryres2)) end
--- checkExpected( qryres2, qryres, "query2.res" )
+qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/storage/test", to_json(qryana_with_eval)))
+if verbose then io.stderr:write( string.format("- Query evaluation result from storage with query evaluation config passed:\n%s\n", qryres2)) end
+
+checkExpected( qryevalconf .. qryres .. qryres2, "@query.exp", "query.res" )
+
+
 
 

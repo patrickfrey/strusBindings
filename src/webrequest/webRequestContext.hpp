@@ -95,6 +95,7 @@ private:
 	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	void releaseContext();
 	bool executeSchemaDescriptionRequest( const char* method, const char* path, WebRequestAnswer& answer);
+	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
 
 private:
 	WebRequestHandler* m_handler;

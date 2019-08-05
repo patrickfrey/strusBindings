@@ -10,6 +10,7 @@
 #include "webRequestContext.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
+#include "schemas_base.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/versionStorage.hpp"
@@ -322,7 +323,14 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	{
 		char buf[ 2048];
 		int pos = papuga_RequestParser_get_position( parser, buf, sizeof(buf));
-		papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error at position %d: %s, feeding request, location: %s"), pos, papuga_ErrorCode_tostring( errcode), buf);
+		if (pos > 0)
+		{
+			papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request at position %d: %s, location: %s"), pos, papuga_ErrorCode_tostring( errcode), buf);
+		}
+		else
+		{
+			papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request: %s, location: %s"), papuga_ErrorCode_tostring( errcode), buf);
+		}
 		papuga_destroy_RequestParser( parser);
 
 		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorBuffer_lastError( &m_errbuf), true);
@@ -346,44 +354,91 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	return true;
 }
 
-bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
+void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct, const WebRequestContent& content)
 {
-	papuga_ErrorCode errcode = papuga_Ok;
-	int errpos = -1;
-	if (!papuga_RequestContext_execute_request( m_context, m_request, &m_allocator, &m_callLogger, &m_results, &m_nofResults, &m_errbuf, &errpos))
+	if (errstruct.classname)
 	{
-		errcode = papuga_HostObjectError;
-		char* errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
-
-		int apperr = 0;
-		if (errmsg)
+		if (errstruct.methodname)
 		{
-			if (0!=(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+			if (errstruct.argcnt >= 0)
 			{
-				m_logger->logError( errmsg);
+				papuga_ErrorBuffer_reportError( &m_errbuf, "%s in method %s::%s argument %d", papuga_ErrorCode_tostring( errstruct.errcode), errstruct.classname, errstruct.methodname, errstruct.argcnt);
 			}
-			// Exract last error code and remove error codes from app error message:
-			char const* errmsgitr = errmsg;
-			apperr = strus::errorCodeFromMessage( errmsgitr);
-
-			// Add position info (scope of error in input) to error message, if available:
-			if (errpos >= 0)
+			else
 			{
-				// Evaluate more info about the location of the error, we append the scope of the document to the error message:
-				const char* locinfo = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), errpos, 4/*maxdepth*/, &errcode);
-				if (locinfo)
-				{
-					papuga_ErrorBuffer_appendMessage( &m_errbuf, " (error scope: %s)", locinfo);
-					errmsg = papuga_ErrorBuffer_lastError(&m_errbuf);
-				}
+				papuga_ErrorBuffer_reportError( &m_errbuf, "%s in method %s::%s", papuga_ErrorCode_tostring( errstruct.errcode), errstruct.classname, errstruct.methodname);
 			}
-			if (apperr) removeErrorCodesFromMessage( errmsg);
-			setAnswer( answer, apperr, errmsg, true);
 		}
 		else
 		{
-			setAnswer( answer, papugaErrorToErrorCode( errcode));
+			if (errstruct.argcnt >= 0)
+			{
+				papuga_ErrorBuffer_reportError( &m_errbuf, "%s in constructor of %s", papuga_ErrorCode_tostring( errstruct.errcode), errstruct.classname);
+			}
+			else
+			{
+				papuga_ErrorBuffer_reportError( &m_errbuf, "%s in constructor of %s", papuga_ErrorCode_tostring( errstruct.errcode), errstruct.classname, errstruct.argcnt);
+			}
 		}
+	}
+	else
+	{
+		papuga_ErrorBuffer_reportError( &m_errbuf, "%s", papuga_ErrorCode_tostring( errstruct.errcode));
+	}
+	if (errstruct.variable)
+	{
+		papuga_ErrorBuffer_appendMessage( &m_errbuf, " accessing variable '%s'", errstruct.variable);
+	}
+	if (errstruct.itemid)
+	{
+		const char* itemname = webrequest::AutomatonNameSpace::itemName( (webrequest::AutomatonNameSpace::Item)errstruct.itemid);
+		if (errstruct.structpath[0])
+		{
+			papuga_ErrorBuffer_appendMessage( &m_errbuf, " resolving %s in %s", itemname, errstruct.structpath);
+		}
+		else
+		{
+			papuga_ErrorBuffer_appendMessage( &m_errbuf, " resolving %s", itemname);
+		}
+	}
+	if (errstruct.errormsg[0])
+	{
+		papuga_ErrorBuffer_appendMessage( &m_errbuf, " message: %s", errstruct.errormsg);
+	}
+	if (errstruct.scopestart > 0)
+	{
+		papuga_Allocator allocator;
+		char allocator_mem[ 4096];
+		papuga_init_Allocator( &allocator, allocator_mem, sizeof(allocator_mem));
+
+		papuga_ErrorCode errcode;
+		const char* locinfo = papuga_request_content_tostring( &allocator, m_doctype, m_encoding, content.str(), content.len(), errstruct.scopestart, 3/*max depth*/, &errcode);
+		if (locinfo)
+		{
+			papuga_ErrorBuffer_appendMessage( &m_errbuf, " error scope: %s", locinfo);
+		}
+	}
+	if (0!=(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+	{
+		m_logger->logError( m_errbuf.ptr);
+	}
+}
+
+bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
+{
+	papuga_RequestError reqerr;
+	if (!papuga_RequestContext_execute_request( m_context, m_request, &m_allocator, &m_callLogger, &m_results, &m_nofResults, &reqerr))
+	{
+		int apperr = 0;
+		if (reqerr.errormsg[0])
+		{
+			char const* errmsgitr = reqerr.errormsg;
+			apperr = strus::errorCodeFromMessage( errmsgitr);
+			if (apperr) removeErrorCodesFromMessage( reqerr.errormsg);
+		}
+		if (!apperr) apperr = papugaErrorToErrorCode( reqerr.errcode);
+		reportRequestError( reqerr, content);
+		setAnswer( answer, apperr, m_errbuf.ptr, true);
 		return false;
 	}
 	return true;
@@ -774,15 +829,25 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	enum {MaxNofArgs=32};
 	papuga_ValueVariant argv[MaxNofArgs];
 	int argc = 0;
-	strus::ErrorCode errcode = ErrorCodeUnknown;
 	bool path_argument_used = false;
+
 	for (; argc < MaxNofArgs && methoddescr->paramtypes[argc]; ++argc)
 	{
 		WebRequestHandler::MethodParamType paramtype = (WebRequestHandler::MethodParamType)methoddescr->paramtypes[argc];
 		path_argument_used |= (paramtype == WebRequestHandler::ParamPathArray || WebRequestHandler::ParamPathString);
+		strus::ErrorCode errcode;
 		if (!initHostObjMethodParam( argv[ argc], paramtype, path, content, &m_allocator, errcode))
 		{
-			setAnswer( answer, errcode);
+			papuga_RequestError errstruct;
+			papuga_init_RequestError( &errstruct);
+
+			errstruct.classname = cdef->name;
+			errstruct.methodname = cdef->methodnames[ methoddescr->id.functionid-1];
+			errstruct.argcnt = argc;
+			errstruct.errcode = papuga_HostObjectError;
+
+			reportRequestError( errstruct, content);
+			setAnswer( answer, errcode, papuga_ErrorBuffer_lastError(&m_errbuf), true/*do copy*/);
 			return false;
 		}
 	}
@@ -800,12 +865,23 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	// Call the method:
 	if (!(*method)( self, &retval, argc, argv))
 	{
+		papuga_RequestError errstruct;
+		papuga_init_RequestError( &errstruct);
+
+		errstruct.classname = cdef->name;
+		errstruct.methodname = cdef->methodnames[ methoddescr->id.functionid-1];
+
 		char* errstr = papuga_CallResult_lastError( &retval);
 		char const* msgitr = errstr;
 		int apperr = strus::errorCodeFromMessage( msgitr);
 		if (apperr) strus::removeErrorCodesFromMessage( errstr);
+		std::size_t errlen = std::strlen( errstr);
+		if (errlen >= sizeof(errstruct.errormsg)) errlen = sizeof(errstruct.errormsg)-1;
+		std::memcpy( errstruct.errormsg, errstr, errlen);
+		errstruct.errormsg[ errlen] = 0;
 
-		setAnswer( answer, apperr, errstr, true);
+		reportRequestError( errstruct, content);
+		setAnswer( answer, apperr, errstr, true/*do copy*/);
 		return false;
 	}
 	answer.setStatus( methoddescr->httpstatus_success);

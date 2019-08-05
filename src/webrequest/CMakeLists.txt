@@ -12,6 +12,7 @@ set( source_files
 	configurationUpdateRequest.cpp
 	transaction.cpp
 	curlEventLoop.cpp
+	schemas_base.cpp
 	webRequestUtils.cpp
 	webRequestHandler.cpp
 	webRequestContext.cpp

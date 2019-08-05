@@ -268,7 +268,7 @@ static ConfigurationDescription createSubConfig( const std::string& name, papuga
 					if (taglevel == 1)
 					{
 						char nambuf[ 128];
-						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &itr));
+						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &itr), 0/*non ascii subst*/);
 						if (nam && 0==std::strcmp( nam, "id"))
 						{
 							papuga_SerializationIter_skip( &itr);
@@ -342,7 +342,7 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getSubConfigurations
 					if (taglevel == 0)
 					{
 						char nambuf[ 128];
-						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &seriter));
+						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &seriter), 0/*non ascii subst*/);
 						if (nam && m_context_typenames.find( nam) != m_context_typenames.end())
 						{
 							papuga_SerializationIter_skip( &seriter);

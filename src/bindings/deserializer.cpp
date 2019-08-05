@@ -292,7 +292,7 @@ MetaDataRestrictionInterface::CompareOperator Deserializer::getMetaDataCmpOp( pa
 {
 	MetaDataRestrictionInterface::CompareOperator rt;
 	char buf[ 32];
-	const char* cmpopstr = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
+	const char* cmpopstr = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter), 0/*nonAsciiSubstChar*/);
 	if (!cmpopstr || !getCompareOperator( rt, cmpopstr))
 	{
 		buf[ sizeof(buf)-1] = 0;
@@ -349,7 +349,7 @@ bool Deserializer::compareName( const papuga_SerializationIter& seriter, const c
 		else
 		{
 			char buf[ 256];
-			const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), val);
+			const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), val, 0/*nonAsciiSubstChar*/);
 			return (id && namelen < sizeof(buf) && std::strlen(id) == namelen && 0==std::memcmp( name, buf, namelen));
 		}
 	}
@@ -359,7 +359,7 @@ bool Deserializer::compareName( const papuga_SerializationIter& seriter, const c
 const char* Deserializer::getCharpAscii( char* buf, std::size_t bufsize, papuga_SerializationIter& seriter)
 {
 	const papuga_ValueVariant* vp = getValue( seriter);
-	const char* rt = papuga_ValueVariant_toascii( buf, bufsize, vp);
+	const char* rt = papuga_ValueVariant_toascii( buf, bufsize, vp, 0/*nonAsciiSubstChar*/);
 	if (!rt) throw strus::runtime_error(_TXT("ascii string with maximum size %u expected"), (unsigned int)bufsize);
 	return rt;
 }
@@ -583,7 +583,7 @@ std::vector<Index> Deserializer::getIndexList( const papuga_ValueVariant& val)
 static void setFeatureOption_position( analyzer::FeatureOptions& res, const papuga_ValueVariant* val)
 {
 	char buf[ 128];
-	const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), val);
+	const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), val, 0/*nonAsciiSubstChar*/);
 	if (!id) throw strus::runtime_error(_TXT("cannot convert value to feature position option"));
 
 	if (0==std::strcmp( id, "content"))
@@ -665,7 +665,7 @@ public:
 					for(;;)
 					{
 						char buf[ 128];
-						const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
+						const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter), 0/*nonAsciiSubstChar*/);
 						papuga_SerializationIter_skip( &seriter);
 						SimpleStructureParser::setNamedValue( rt, id, getValue( seriter));
 						Deserializer::consumeClose( seriter);
@@ -684,7 +684,7 @@ public:
 				do
 				{
 					char buf[ 128];
-					const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
+					const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter), 0/*nonAsciiSubstChar*/);
 					if (!id) throw strus::runtime_error(_TXT("unknown identifier"));
 					papuga_SerializationIter_skip( &seriter);
 					SimpleStructureParser::setNamedValue( rt, id, getValue( seriter));
@@ -1015,7 +1015,7 @@ const papuga_ValueVariant* Deserializer::getOptionalDefinition( papuga_Serializa
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
 		char buf[ 128];
-		const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
+		const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter), 0/*nonAsciiSubstChar*/);
 
 		if (id && 0==std::strcmp( id, name))
 		{
@@ -1760,7 +1760,7 @@ static ExpressionType getExpressionType( const papuga_SerializationIter& seriter
 			if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 			{
 				char buf[ 128];
-				const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter));
+				const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), papuga_SerializationIter_value( &seriter), 0/*nonAsciiSubstChar*/);
 
 				if (id && 0==std::strcmp( id, "variable"))
 				{
@@ -2084,7 +2084,7 @@ void Deserializer::buildPattern( ExpressionBuilder& builder, papuga_Serializatio
 				if (visibility)
 				{
 					char buf[ 128];
-					const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), visibility);
+					const char* id = papuga_ValueVariant_toascii( buf, sizeof(buf), visibility, 0/*nonAsciiSubstChar*/);
 	
 					if (id && 0==std::strcmp( id, "public"))
 					{

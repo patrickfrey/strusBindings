@@ -58,7 +58,7 @@ int StructureNameMap::index( const papuga_ValueVariant& id) const
 		{
 			enum {MaxIdSize=128};
 			char buf[ MaxIdSize];
-			if (!papuga_ValueVariant_toascii( buf, sizeof(buf), &id)) return Undefined;
+			if (!papuga_ValueVariant_toascii( buf, sizeof(buf), &id, '_'/*nonAsciiSubstChar*/)) return Undefined;
 			return index( buf, id.length);
 		}
 	}
