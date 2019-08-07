@@ -229,25 +229,13 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 				}
 			}
 		}
-		if (val.schemaTypedOutput() && stk.size() > 1)
-		{
-			rt &= papuga_Serialization_pushName_charp( result, "list");
-			rt &= papuga_Serialization_pushOpen( result);
-			// Collect list of results from the stack:
-			std::vector<papuga_Serialization*>::const_iterator si = stk.begin(), se = stk.end();
-			for (; si != se; ++si)
-			{
-				rt &= papuga_Serialization_pushValue_serialization( result, *si);
-			}
-			rt &= papuga_Serialization_pushClose( result);
-		}
-		else if (val.singleUniqueResult())
+		if (val.singleUniqueResult())
 		{
 			// Copy serialization of unique result from the stack:
 			if (stk.size() == 1)
 			{
 				papuga_Serialization* ser = *stk.begin();
-				papuga_Serialization_flatten( ser);
+				rt &= papuga_Serialization_flatten( ser);
 				papuga_SerializationIter seriter;
 				papuga_init_SerializationIter( &seriter, ser);
 				if (ser->structid)

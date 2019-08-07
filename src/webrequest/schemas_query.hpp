@@ -41,7 +41,7 @@ public:
 		typedef bindings::method::Query Q;
 		return { rootexpr, {
 			{SchemaQueryDeclPart::declareAnalyzedFeature( "feature")},
-			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '!', 2/*tag diff*/}, {FeatureWeight, '?'}} },
+			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '+', 2/*tag diff*/}, {FeatureWeight, '?'}} },
 
 			{SchemaQueryDeclPart::declareMetaDataCondition( "restriction/analyzed")},
 			{"restriction/analyzed", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
@@ -108,7 +108,7 @@ public:
 	) {}
 };
 
-class Schema_Storage_GET :public papuga::RequestAutomaton, public SchemaQueryPart
+class Schema_Storage_GET :public papuga::RequestAutomaton
 {
 public:
 	Schema_Storage_GET() :papuga::RequestAutomaton(
@@ -118,7 +118,6 @@ public:
 		},
 		{},
 		{
-			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},
 			{SchemaQueryPart::createQuery( "/query")},
 			{SchemaQueryPart::buildQueryAnalyzed( "/query")},
 			{SchemaQueryPart::evaluateQuery( "/query")}

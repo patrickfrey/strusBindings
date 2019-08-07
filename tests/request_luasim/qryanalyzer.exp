@@ -30,14 +30,17 @@
 					"value": "Iggy Pop"}],
 			"analyzed": [
 				{
-					"type": "word",
-					"value": "iggy"},
+					"term": {
+						"type": "word",
+						"value": "iggy"}},
 				{
-					"type": "word",
-					"value": "pop"},
+					"term": {
+						"type": "word",
+						"value": "pop"}},
 				{
-					"type": "entity",
-					"value": "iggy_pop"}],
+					"term": {
+						"type": "entity",
+						"value": "iggy_pop"}}],
 			"set": "search"}]}
 }
 {
@@ -50,10 +53,12 @@
 					"value": "Iggy Pop"}],
 			"analyzed": [
 				{
-					"type": "word",
-					"value": "IGGY"},
+					"term": {
+						"type": "word",
+						"value": "IGGY"}},
 				{
-					"type": "word",
-					"value": "POP"}],
+					"term": {
+						"type": "word",
+						"value": "POP"}}],
 			"set": "search"}]}
 }

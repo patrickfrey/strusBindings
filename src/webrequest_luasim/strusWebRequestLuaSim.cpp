@@ -70,6 +70,7 @@ public:
 		m_loglevel = loglevel_;
 		switch (m_loglevel)
 		{
+			case 4: m_logmask |= (LogContentEvents);
 			case 3: m_logmask |= (LogMethodCalls|LogAction);
 			case 2: m_logmask |= (LogRequests|LogConfiguration);
 			case 1: m_logmask |= (LogError|LogWarning);
@@ -108,13 +109,39 @@ public:
 		std::cerr << header() << strus::string_format( "ACTION %s '%s' %s", type, name, action) << std::endl;
 	}
 
-	virtual void logMethodCall(
-			const std::string& classname,
-			const std::string& methodname,
-			const std::string& arguments,
-			const std::string& result)
+	virtual void logContentEvent( const char* title, const char* item, const char* value)
 	{
-		std::cerr << header() << strus::string_format( "CALL %s %s (%s) -> %s", classname.c_str(), methodname.c_str(), arguments.c_str(), result.c_str()) << std::endl;
+		if (item && item[0])
+		{
+			if (value && value[0])
+			{
+				std::cerr << header() << strus::string_format( "PARSE %s %s '%s'", title, item, value) << std::endl;
+			}
+			else
+			{
+				std::cerr << header() << strus::string_format( "PARSE %s %s", title, item) << std::endl;
+			}
+		}
+		else
+		{
+			if (value && value[0])
+			{
+				std::cerr << header() << strus::string_format( "PARSE %s '%s'", title, value) << std::endl;
+			}
+			else
+			{
+				std::cerr << header() << strus::string_format( "PARSE %s", title) << std::endl;
+			}
+		}
+	}
+
+	virtual void logMethodCall(
+			const char* classname,
+			const char* methodname,
+			const char* arguments,
+			const char* result)
+	{
+		std::cerr << header() << strus::string_format( "CALL %s %s (%s) -> %s", classname?classname:"", methodname?methodname:"", arguments?arguments:"", result?result:"") << std::endl;
 	}
 
 	virtual void logWarning( const char* warnmsg)
@@ -1077,8 +1104,8 @@ static int l_write_file( lua_State* L)
 	try
 	{
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'write_file': expected <result> <expected>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'write_file': expected <result> <expected>"));
+		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'write_file': expected <filename> <content>"));
+		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'write_file': expected <filename> <content>"));
 		const char* filename = lua_tostring( L, 1);
 		const char* content = lua_tostring( L, 2);
 
@@ -1102,6 +1129,30 @@ static int l_write_file( lua_State* L)
 		if (ec)
 		{
 			luaL_error( L, _TXT("failed to write text file (errno %d): %s"), ec, ::strerror(ec));
+		}
+		return 0;
+	}
+	catch (const std::exception& err)
+	{
+		luaL_error( L, "%s", err.what());
+		return 0;
+	}
+}
+
+static int l_remove_file( lua_State* L)
+{
+	try
+	{
+		int nofArgs = lua_gettop(L);
+		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'remove_file': expected <filename>"));
+		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'remove_file': expected <filename>"));
+		const char* filename = lua_tostring( L, 1);
+
+		std::string fullpath = strus::joinFilePath( g_outputDir, filename);
+		int ec = strus::removeFile( fullpath, false/*fail_ifnofexist*/);
+		if (ec)
+		{
+			luaL_error( L, _TXT("failed to remove file (errno %d): %s"), ec, ::strerror(ec));
 		}
 		return 0;
 	}
@@ -1229,6 +1280,7 @@ static void declareFunctions( lua_State* L)
 	DEFINE_FUNCTION( call_server );
 	DEFINE_FUNCTION( cmp_content );
 	DEFINE_FUNCTION( write_file );
+	DEFINE_FUNCTION( remove_file );
 	DEFINE_FUNCTION( load_file );
 	DEFINE_FUNCTION( create_dir );
 	DEFINE_FUNCTION( reformat_float );
@@ -1380,7 +1432,7 @@ int main( int argc, const char* argv[])
 				printUsage();
 				return 0;
 			}
-			else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV"))
+			else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV") || 0==strcmp( argv[argi], "-VVVVV"))
 			{
 				verbosity += std::strlen(argv[argi])-1;
 				g_verbose = true;

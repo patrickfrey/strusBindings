@@ -48,7 +48,8 @@
 #undef STRUS_LOWLEVEL_DEBUG
 using namespace strus;
 
-static void logMethodCall( void* self_, int nofItems, ...);
+static void logMethodCall( void* self, int nofItems, ...);
+static void logContentEvent( void* self, const char* title, int itemid, const papuga_ValueVariant* value);
 
 static std::string parentPath( const std::string& url)
 {
@@ -97,6 +98,7 @@ WebRequestContext::WebRequestContext(
 	m_callLogger.self = logger_;
 	int mask = logger_->logMask();
 	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_callLogger.logMethodCall = &logMethodCall;
+	if (!!(mask & (int)WebRequestLoggerInterface::LogContentEvents)) m_callLogger.logContentEvent = &logContentEvent;
 
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
@@ -230,7 +232,7 @@ static void logMethodCall( void* self_, int nofItems, ...)
 		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes, errcode);
 		if (errcode == papuga_Ok)
 		{
-			self->logMethodCall( args[0], args[1], args[2], args[3]);
+			self->logMethodCall( args[0].c_str(), args[1].c_str(), args[2].c_str(), args[3].c_str());
 		}
 		else
 		{
@@ -250,6 +252,38 @@ static void logMethodCall( void* self_, int nofItems, ...)
 		self->logError( papuga_ErrorCode_tostring( papuga_UncaughtException));
 	}
 	va_end( arguments);
+}
+
+void logContentEvent( void* self_, const char* title, int itemid, const papuga_ValueVariant* value)
+{
+	WebRequestLoggerInterface* self = (WebRequestLoggerInterface*)self_;
+	try
+	{
+		papuga_ErrorCode errcode = papuga_Ok;
+		std::string valuestr;
+		if (value) valuestr = papuga::ValueVariant_tostring( *value, errcode);
+		if (valuestr.empty() && errcode != papuga_Ok)
+		{
+			self->logError( papuga_ErrorCode_tostring( errcode));
+		}
+		else
+		{
+			const char* item =  itemid >= 0 ? strus::webrequest::AutomatonNameSpace::itemName( (strus::webrequest::AutomatonNameSpace::Item)itemid) : 0;
+			self->logContentEvent( title, item, valuestr.c_str());
+		}
+	}
+	catch (const std::bad_alloc&)
+	{
+		self->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
+	}
+	catch (const std::runtime_error& err)
+	{
+		self->logError( err.what());
+	}
+	catch (...)
+	{
+		self->logError( papuga_ErrorCode_tostring( papuga_UncaughtException));
+	}
 }
 
 static void setAnswer( WebRequestAnswer& answer, int errcode, const char* errstr=0, bool doCopy=false)
@@ -321,15 +355,35 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	}
 	if (!papuga_RequestParser_feed_request( parser, m_request, &errcode))
 	{
+		int itemid = papuga_Request_last_error_itemid( m_request);
+		const char* itemname = 0;
+		if (itemid >= 0)
+		{
+			itemname = webrequest::AutomatonNameSpace::itemName( (webrequest::AutomatonNameSpace::Item)itemid);
+		}
 		char buf[ 2048];
 		int pos = papuga_RequestParser_get_position( parser, buf, sizeof(buf));
 		if (pos > 0)
 		{
-			papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request at position %d: %s, location: %s"), pos, papuga_ErrorCode_tostring( errcode), buf);
+			if (itemname)
+			{
+				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request item %s at position %d: %s, location: %s"), itemname, pos, papuga_ErrorCode_tostring( errcode), buf);
+			}
+			else
+			{
+				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request at position %d: %s, location: %s"), pos, papuga_ErrorCode_tostring( errcode), buf);
+			}
 		}
 		else
 		{
-			papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request: %s, location: %s"), papuga_ErrorCode_tostring( errcode), buf);
+			if (itemname)
+			{
+				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request item %s: %s, location: %s"), itemname, papuga_ErrorCode_tostring( errcode), buf);
+			}
+			else
+			{
+				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request: %s, location: %s"), papuga_ErrorCode_tostring( errcode), buf);
+			}
 		}
 		papuga_destroy_RequestParser( parser);
 
@@ -389,7 +443,7 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 	{
 		papuga_ErrorBuffer_appendMessage( &m_errbuf, " accessing variable '%s'", errstruct.variable);
 	}
-	if (errstruct.itemid)
+	if (errstruct.itemid >= 0)
 	{
 		const char* itemname = webrequest::AutomatonNameSpace::itemName( (webrequest::AutomatonNameSpace::Item)errstruct.itemid);
 		if (errstruct.structpath[0])
@@ -685,7 +739,7 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 		return false;
 	}
 	if (m_request) papuga_destroy_Request( m_request);
-	m_request = papuga_create_Request( m_atm);
+	m_request = papuga_create_Request( m_atm, &m_callLogger);
 	if (!m_request)
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);

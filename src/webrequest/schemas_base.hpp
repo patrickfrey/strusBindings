@@ -66,7 +66,7 @@ public:
 		SentenceAnalyzerSentenceWeight,SentenceAnalyzerConfig,
 
 		QueryDef, FeatureDef, FeatureSet, FeatureWeight,
-		FeatureSetRestrictionDef, FeatureSetSelectionDef, FeatureSetExclusionDef,
+		FeatureRestrictionDef, FeatureSelectionDef, FeatureExclusionDef,
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,
 		QueryEvalFunctionFeatureRole, QueryEvalFunctionFeatureSet, QueryEvalFunctionFeature,

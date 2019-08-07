@@ -29,6 +29,7 @@ public:
 		LogRequests=0x8,
 		LogConfiguration=0x10,
 		LogAction=0x20,
+		LogContentEvents=0x40,
 		LogAll=0xFF
 	};
 
@@ -59,6 +60,13 @@ public:
 	/// \remark expected to be thread safe
 	virtual void logAction( const char* type, const char* name, const char* action)=0;
 
+	/// \brief Log an event parsing content
+	/// \param[in] title name of the event
+	/// \param[in] item type name of the item
+	/// \param[in] value value of the event
+	/// \remark expected to be thread safe
+	virtual void logContentEvent( const char* title, const char* item, const char* value)=0;
+
 	/// \brief Log a method call
 	/// \param[in] classname name identifier of the class called
 	/// \param[in] methodname name identifier of the method called
@@ -66,10 +74,10 @@ public:
 	/// \param[in] result serialized result of the method called
 	/// \remark expected to be thread safe
 	virtual void logMethodCall(
-			const std::string& classname,
-			const std::string& methodname,
-			const std::string& arguments,
-			const std::string& result)=0;
+			const char* classname,
+			const char* methodname,
+			const char* arguments,
+			const char* result)=0;
 
 	/// \brief Log a warning message
 	/// \param[in] warnmsg warning message to log

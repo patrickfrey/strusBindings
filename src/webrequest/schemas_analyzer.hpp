@@ -335,6 +335,15 @@ public:
 		}};
 	}
 
+	static papuga::RequestAutomaton_NodeList analyzeQueryFeatureSchemaOutput( const char* rootexpr)
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareOrigFeature( "feature")},
+			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
+		}};
+	}
+
 	static papuga::RequestAutomaton_NodeList analyzeQuerySentence( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
@@ -357,6 +366,15 @@ public:
 	{
 		return {rootexpr,{
 			{analyzeQueryFeature( "")},
+			{analyzeQuerySentence( "")},
+			{analyzeQueryMetaData( "")},
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQuerySchemaOutput( const char* rootexpr)
+	{
+		return {rootexpr,{
+			{analyzeQueryFeatureSchemaOutput( "")},
 			{analyzeQuerySentence( "")},
 			{analyzeQueryMetaData( "")},
 		}};
@@ -441,7 +459,7 @@ public:
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
 			{"/query/analyzer", '?'},
 
-			{SchemaAnalyzerPart::analyzeQuery( "/query")},
+			{SchemaAnalyzerPart::analyzeQuerySchemaOutput( "/query")},
 		}
 	) {}
 };

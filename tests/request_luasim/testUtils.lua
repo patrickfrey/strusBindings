@@ -13,11 +13,10 @@ function call_server_checked( method, server, arg)
 	result,status,errmsg = call_server( method, server, arg)
 	if (status < 200 or status >= 300) then
 		if arg then
-			print( string.format("Request with method %s on server %s and argument %s failed with HTTP status %d: %s", method, server, arg, status, errmsg))
+			error( string.format("Request with method %s on server %s and argument %s failed with HTTP status %d: %s", method, server, arg, status, errmsg))
 		else
-			print( string.format("Request with method %s on server %s failed with HTTP status %d: %s", method, server, status, errmsg))
+			error( string.format("Request with method %s on server %s failed with HTTP status %d: %s", method, server, status, errmsg))
 		end
-		os.exit()
 	end
 	return result
 end
@@ -56,6 +55,8 @@ function checkExpected( output, expected, outputfile)
 		write_file( outputfile, output)
 		io.stderr:write( string.format("ERROR result not as expected, difference on line %d, result: '%s', expected '%s'\n", lineno, line_a, line_b))
 		os.exit( 1)
+	else
+		remove_file( outputfile)
 	end
 end
 
