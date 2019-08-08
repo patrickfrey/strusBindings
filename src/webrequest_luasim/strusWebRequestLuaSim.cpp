@@ -139,9 +139,45 @@ public:
 			const char* classname,
 			const char* methodname,
 			const char* arguments,
-			const char* result)
+			const char* result,
+			const char* resultvar)
 	{
-		std::cerr << header() << strus::string_format( "CALL %s %s (%s) -> %s", classname?classname:"", methodname?methodname:"", arguments?arguments:"", result?result:"") << std::endl;
+		std::string assignment;
+		const char* resultStatement = result;
+		if (resultvar && resultvar[0])
+		{
+			assignment = strus::string_format( "%s := %s", resultvar, result?result:"NULL");
+			resultStatement = assignment.c_str();
+		}
+		if (!classname || !classname[0])
+		{
+			// Variable assignment
+			std::cerr << header() << strus::string_format( "ASSIGN %s", resultStatement) << std::endl;
+		}
+		else if (!methodname || !methodname[0])
+		{
+			// Constructor call
+			if (!resultStatement || !resultStatement[0])
+			{
+				std::cerr << header() << strus::string_format( "NEW %s (%s)", classname, arguments?arguments:"") << std::endl;
+			}
+			else
+			{
+				std::cerr << header() << strus::string_format( "NEW %s (%s) -> %s", classname, arguments?arguments:"", resultStatement) << std::endl;
+			}
+		}
+		else
+		{
+			// Method call
+			if (!resultStatement || !resultStatement[0])
+			{
+				std::cerr << header() << strus::string_format( "CALL %s::%s (%s)", classname, methodname, arguments?arguments:"") << std::endl;
+			}
+			else
+			{
+				std::cerr << header() << strus::string_format( "CALL %s::%s (%s) -> %s", classname, methodname, arguments?arguments:"", resultStatement) << std::endl;
+			}
+		}
 	}
 
 	virtual void logWarning( const char* warnmsg)

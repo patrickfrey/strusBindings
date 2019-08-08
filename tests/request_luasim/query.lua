@@ -19,14 +19,16 @@ storageConfig = {
 }
 
 def_server( ISERVER1, config )
-call_server_checked( "PUT", ISERVER1 .. "/docanalyzer/test", "@docanalyzer.json" )
-call_server_checked( "PUT", ISERVER1 .. "/qryanalyzer/test", "@qryanalyzer.json" )
+call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@docanalyzer.json" )
+call_server_checked( "PUT", ISERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 if verbose then io.stderr:write( string.format("- Created document and query analyzer\n")) end
 
 storageConfig.storage.path = "storage/test"
 call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
-call_server_checked( "PUT", ISERVER1 .. "/inserter/test", "@inserter.json" )
-if verbose then io.stderr:write( string.format("- Created storage and inserter\n")) end
+call_server_checked( "PUT",  ISERVER1 .. "/inserter/test", "@inserter.json" )
+call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
+
+if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval\n")) end
 
 TRANSACTION = from_json( call_server_checked( "POST", ISERVER1 .. "/inserter/test/transaction" )).link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
@@ -54,7 +56,26 @@ query = {
 	}
 }
 
-call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
+query2 = {
+	query = {
+		feature = {
+		{	set = "search", 
+			content = {
+				term = {
+					type = "text",
+					value = "XXXXXX"
+				}
+			},
+			analyzed = {
+				term = {
+					type = "word",
+					value = "songwriter"
+				}
+			}
+		}}
+	}
+}
+
 qryevalconf = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
 if verbose then io.stderr:write( string.format("- Query evaluation configuration from the server:\n%s\n", qryevalconf)) end
 

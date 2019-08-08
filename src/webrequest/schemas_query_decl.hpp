@@ -55,13 +55,16 @@ public:
 	{
 		return {rootexpr, {
 			{SchemaExpressionPart::declarePostingsExpression( "content")},
+			{SchemaExpressionPart::declarePostingsExpression( "analyzed")},
 			{"set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
 			{"content", "()", TermExpression, papuga_TypeVoid, NULL},
+			{"analyzed", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
-					{"content", TermExpression, '!', 2/*tag diff*/},
+					{"content", TermExpression, '*', 2/*tag diff*/},
+					{"analyzed", TermExpression, '*', 2/*tag diff*/},
 				}
 			},
 		}};

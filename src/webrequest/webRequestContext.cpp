@@ -134,6 +134,7 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 			case papuga_LogItemClassName:
 			case papuga_LogItemMethodName:
 			case papuga_LogItemMessage:
+			case papuga_LogItemResultVariable:
 				if (ei < ee) rt[ei] = va_arg( arguments,charp);
 				break;
 			case papuga_LogItemResult:
@@ -224,7 +225,8 @@ static void logMethodCall( void* self_, int nofItems, ...)
 		papuga_LogItemClassName,
 		papuga_LogItemMethodName,
 		papuga_LogItemArgv,
-		papuga_LogItemResult
+		papuga_LogItemResult,
+		papuga_LogItemResultVariable
 	};
 	try
 	{
@@ -232,7 +234,7 @@ static void logMethodCall( void* self_, int nofItems, ...)
 		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes, errcode);
 		if (errcode == papuga_Ok)
 		{
-			self->logMethodCall( args[0].c_str(), args[1].c_str(), args[2].c_str(), args[3].c_str());
+			self->logMethodCall( args[0].c_str(), args[1].c_str(), args[2].c_str(), args[3].c_str(), args[4].c_str());
 		}
 		else
 		{

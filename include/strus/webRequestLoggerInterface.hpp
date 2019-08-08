@@ -72,12 +72,14 @@ public:
 	/// \param[in] methodname name identifier of the method called
 	/// \param[in] arguments serialized arguments of the method called
 	/// \param[in] result serialized result of the method called
+	/// \param[in] resultvar name of the variable the result is assigned to
 	/// \remark expected to be thread safe
 	virtual void logMethodCall(
 			const char* classname,
 			const char* methodname,
 			const char* arguments,
-			const char* result)=0;
+			const char* result,
+			const char* resultvar)=0;
 
 	/// \brief Log a warning message
 	/// \param[in] warnmsg warning message to log
