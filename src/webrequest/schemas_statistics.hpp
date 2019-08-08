@@ -28,7 +28,7 @@ public:
 		{},
 		{
 			{"/statserver/storage", "()", StatisticsStorageServer, papuga_TypeString, "example.com:7184"},
-			{"/statserver", "storage", StatisticsStorageServer, '*'},
+			{"/statserver", "", "storage", StatisticsStorageServer, '*'},
 			{"/statserver/blocks", "()", StatisticsMapBlocks, papuga_TypeString, "100K"},
 			{"/statserver/proc", "()", StatisticsProc, papuga_TypeString, "std"},
 			{"/statserver", StatisticsMapConfig, {

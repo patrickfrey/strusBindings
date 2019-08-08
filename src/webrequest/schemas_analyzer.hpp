@@ -331,7 +331,7 @@ public:
 		typedef bindings::method::QueryAnalyzer A;
 		return {rootexpr,{
 			{SchemaQueryDeclPart::declareOrigFeature( "feature")},
-			{"feature/analyzed", "_analyzed", TermExpression, '*', 2/*max tag diff*/},
+			{"feature", "analyzed", "_analyzed", TermExpression, '*', 2/*max tag diff*/},
 			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeTermExpression(), {{TermExpression}} },
 		}};
 	}
