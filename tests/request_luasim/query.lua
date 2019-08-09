@@ -63,7 +63,7 @@ query2 = {
 			content = {
 				term = {
 					type = "text",
-					value = "XXXXXX"
+					value = "Iggy Pop"
 				}
 			},
 			analyzed = {
@@ -79,8 +79,11 @@ query2 = {
 qryevalconf = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
 if verbose then io.stderr:write( string.format("- Query evaluation configuration from the server:\n%s\n", qryevalconf)) end
 
-qryres = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
-if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres)) end
+qryres1 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
+if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres1)) end
+
+qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query2))
+if verbose then io.stderr:write( string.format("- Query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
 qryana = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query )
 if verbose then io.stderr:write( string.format("- Query analysis:\n%s\n", qryana)) end
@@ -94,10 +97,10 @@ qryana_with_eval = {
 if verbose then io.stderr:write( string.format("- Analyzed query with eval:\n%s\n", to_json(qryana_with_eval))) end
 write_file( "test.json", to_json(qryana_with_eval))
 
-qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/storage/test", to_json(qryana_with_eval)))
-if verbose then io.stderr:write( string.format("- Query evaluation result from storage with query evaluation config passed:\n%s\n", qryres2)) end
+qryres3 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/storage/test", to_json(qryana_with_eval)))
+if verbose then io.stderr:write( string.format("- Query evaluation result from storage with query evaluation config passed:\n%s\n", qryres3)) end
 
-checkExpected( qryevalconf .. qryres .. qryres2, "@query.exp", "query.res" )
+checkExpected( qryevalconf .. qryres1 .. qryres2 .. qryres3, "@query.exp", "query.res" )
 
 
 

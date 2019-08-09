@@ -112,6 +112,54 @@
 "result": {
 	"ranklist": {
 		"evalpass": 0,
+		"nofranked": 5,
+		"nofvisited": 5,
+		"ranks": [
+			{
+				"weight": 0.3984471,
+				"summary": [
+					{
+						"name": "title",
+						"value": "Liza Jane (David Bowie song)",
+						"weight": 1,
+						"index": -1}]},
+			{
+				"weight": 0.2511597,
+				"summary": [
+					{
+						"name": "title",
+						"value": "Never Let Me Down (David Bowie song)",
+						"weight": 1,
+						"index": -1}]},
+			{
+				"weight": 0.2480876,
+				"summary": [
+					{
+						"name": "title",
+						"value": "David Bowie (1967 album)",
+						"weight": 1,
+						"index": -1}]},
+			{
+				"weight": 0.1187357,
+				"summary": [
+					{
+						"name": "title",
+						"value": "List of songs recorded by David Bowie",
+						"weight": 1,
+						"index": -1}]},
+			{
+				"weight": 0.1060572,
+				"summary": [
+					{
+						"name": "title",
+						"value": "David Bowie",
+						"weight": 1,
+						"index": -1}]}]}}
+}
+{
+"result": {
+	"ranklist": {
+		"evalpass": 0,
 		"nofranked": 10,
 		"nofvisited": 10,
 		"ranks": [
