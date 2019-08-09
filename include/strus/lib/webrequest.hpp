@@ -54,6 +54,7 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		WebRequestLoggerInterface* logger,
 		const std::string& html_head,
 		const std::string& config_store_dir,
+		const std::string& service_name_,
 		const std::string& config,
 		int maxIdleTime,
 		int nofTransactionsPerSeconds,

@@ -115,4 +115,20 @@ function mergeValues( t1, t2)
 	end
 end
 
+function hashString( str, md, start)
+	local rt = 1013
+	for i = 1, #str do
+		local c = string.byte( str, i)
+		rt = rt * 103 + c
+		if md then
+			rt = math.fmod( rt, md)
+		end
+	end
+	if md then
+		return math.fmod( rt, md) + start
+	else
+		return rt + start
+	end
+end
+
 

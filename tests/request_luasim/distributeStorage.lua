@@ -1,0 +1,60 @@
+require "config"
+require "testUtils"
+require "io"
+require "os"
+
+SCRIPTPATH = script_path()
+nofStorages = 3
+
+storageConfig = {
+	storage = {
+		database = "leveldb",
+		cache_size = "500M",
+		max_open_files = 512,
+		write_buffer_size = "8K",
+		block_size = "4K",
+		metadata = {
+			{ name = "doclen", type = "UInt16" }
+		}
+	}
+}
+
+function buildStorageServer( serveridx, serveraddr)
+	if verbose then io.stderr:write( string.format("- Build storage server %d listening on %s\n", serveridx, serveraddr)) end
+	config.service.name = string.format("isrv%d", serveridx)
+
+	def_server( serveraddr, config )
+	call_server_checked( "PUT", serveraddr  .. "/docanalyzer/test", "@docanalyzer.json" )
+	call_server_checked( "PUT", serveraddr  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+	if verbose then io.stderr:write( string.format("- Created document and query analyzer for server %d\n", serveridx)) end
+
+	storageConfig.storage.path = string.format("storage/test%d", serveridx)
+	call_server_checked( "POST", serveraddr .. "/storage/test",  storageConfig )
+	call_server_checked( "PUT",  serveraddr .. "/inserter/test", "@inserter.json" )
+	call_server_checked( "POST", serveraddr .. "/qryeval/test",  "@qryeval.json" )
+
+	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %d\n", serveridx)) end
+
+	TRANSACTION = from_json( call_server_checked( "POST", serveraddr .. "/inserter/test/transaction" )).link
+	if verbose then io.stderr:write( string.format("- Create transaction %s for server %d\n", TRANSACTION, serveridx)) end
+	local cntdoc = 0
+
+	documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
+	for k,path in pairs(documents) do
+		fullpath = "doc/xml/" .. path
+		hs = hashString( fullpath, nofStorages, 1)
+		if hs == serveridx then
+			cntdoc = cntdoc + 1
+			if verbose then io.stderr:write( string.format("- Insert document %s to server %d\n", fullpath, serveridx)) end
+			call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
+		end
+	end
+	call_server_checked( "PUT", TRANSACTION)
+	if verbose then io.stderr:write( string.format("- Inserted %d documents to server %d\n", cntdoc, serveridx)) end
+end
+
+buildStorageServer( 1, ISERVER1)
+buildStorageServer( 2, ISERVER2)
+buildStorageServer( 3, ISERVER3)
+
+

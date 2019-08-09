@@ -13,6 +13,9 @@ config = {
 		modules = { 
 			@STRUS_MODULES_LOADED@
 		}	
+	},
+	service = {
+		name = "test"
 	}
 }
 

@@ -563,17 +563,19 @@ void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status
 strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Configuration& config, const std::string& configjson_)
 {
 	std::string configdir = "./";
+	std::string servicename = "test";
 	int transaction_max_idle_time = 600;
 	int transaction_nof_per_sec = 60;
 
 	(void)config.getValue( configdir, "data.configdir");
+	(void)config.getValue( servicename, "service.name");
 	(void)config.getValue( transaction_max_idle_time, "transactions.max_idle_time");
 	(void)config.getValue( transaction_nof_per_sec, "transactions.nof_per_sec");
 
 	strus::WebRequestHandlerInterface* rt =
 		strus::createWebRequestHandler(
 			&g_eventLoop, &g_logger, ""/*html head*/,
-			configdir, configjson_, transaction_max_idle_time, transaction_nof_per_sec,
+			configdir, servicename, configjson_, transaction_max_idle_time, transaction_nof_per_sec,
 			g_errorhnd);
 	if (!rt) throw strus::runtime_error( _TXT("error creating web request handler: %s"), g_errorhnd->fetchError());
 	return rt;

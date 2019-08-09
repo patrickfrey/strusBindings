@@ -41,6 +41,7 @@ public:
 			WebRequestLoggerInterface* logger_,
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
+			const std::string& service_name_,
 			const std::string& configstr_,
 			int maxIdleTime_,
 			int nofTransactionsPerSeconds);

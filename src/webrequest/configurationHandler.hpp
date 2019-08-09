@@ -63,6 +63,7 @@ public:
 	ConfigurationHandler(
 			WebRequestLoggerInterface* logger_,
 			const std::string& config_store_dir_,
+			const std::string& service_name_,
 			const char** context_typenames);
 
 	virtual ~ConfigurationHandler(){}
@@ -95,6 +96,7 @@ public:
 	std::vector<std::string> contextTypes() const;
 
 private:
+	std::string configurationStoreDirectory() const;
 	std::vector<ConfigurationDescription> getStoredConfigurations( bool doDeleteObsolete);
 	typedef std::pair<std::string,std::string> ContextNameDef;
 
@@ -102,6 +104,7 @@ private:
 	mutable strus::mutex m_mutex;
 	WebRequestLoggerInterface* m_logger;
 	std::string m_config_store_dir;
+	std::string m_service_name;
 	enum {MaxConfigCounter=999};
 	int m_config_counter;
 	std::set<std::string> m_context_typenames;	//< defined context types

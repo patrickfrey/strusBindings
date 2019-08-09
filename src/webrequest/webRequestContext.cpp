@@ -443,23 +443,23 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 	}
 	if (errstruct.variable)
 	{
-		papuga_ErrorBuffer_appendMessage( &m_errbuf, " accessing variable '%s'", errstruct.variable);
+		papuga_ErrorBuffer_appendMessage( &m_errbuf, ", accessing variable '%s'", errstruct.variable);
 	}
-	if (errstruct.itemid >= 0)
+	if (errstruct.itemid > 0)
 	{
 		const char* itemname = webrequest::AutomatonNameSpace::itemName( (webrequest::AutomatonNameSpace::Item)errstruct.itemid);
 		if (errstruct.structpath[0])
 		{
-			papuga_ErrorBuffer_appendMessage( &m_errbuf, " resolving %s in %s", itemname, errstruct.structpath);
+			papuga_ErrorBuffer_appendMessage( &m_errbuf, ", resolving '%s' in %s", itemname, errstruct.structpath);
 		}
 		else
 		{
-			papuga_ErrorBuffer_appendMessage( &m_errbuf, " resolving %s", itemname);
+			papuga_ErrorBuffer_appendMessage( &m_errbuf, " resolving '%s'", itemname);
 		}
 	}
 	if (errstruct.errormsg[0])
 	{
-		papuga_ErrorBuffer_appendMessage( &m_errbuf, " message: %s", errstruct.errormsg);
+		papuga_ErrorBuffer_appendMessage( &m_errbuf, ", message: %s", errstruct.errormsg);
 	}
 	if (errstruct.scopestart > 0)
 	{

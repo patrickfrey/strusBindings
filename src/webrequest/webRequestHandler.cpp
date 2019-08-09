@@ -167,13 +167,14 @@ WebRequestHandler::WebRequestHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
+		const std::string& service_name_,
 		const std::string& configstr_,
 		int maxIdleTime_,
 		int nofTransactionsPerSeconds)
 	:m_debug_maxdepth(logger_?logger_->structDepth():0)
 	,m_logger(logger_)
 	,m_impl(0)
-	,m_configHandler(logger_,config_store_dir_,g_context_typenames)
+	,m_configHandler(logger_,config_store_dir_,service_name_,g_context_typenames)
 	,m_html_head(html_head_)
 	,m_transactionPool( eventLoop_->time(), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
