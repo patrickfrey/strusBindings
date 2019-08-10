@@ -198,8 +198,8 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
 		static const DefineConfigSchema<Schema_Context_INIT_Storage> schema_Context_INIT_Storage;
 		schema_Context_INIT_Storage.addToHandler( m_impl, "PUT/storage");
-		static const DefineSchema<Schema_Context_PUT_StorageTransaction> schema_Context_PUT_StorageTransaction("transaction/storage");
-		schema_Context_PUT_StorageTransaction.addToHandler( m_impl, "PUT");
+		static const DefineSchema<Schema_StorageTransaction_PUT> schema_StorageTransaction_PUT("transaction/storage");
+		schema_StorageTransaction_PUT.addToHandler( m_impl, "PUT");
 
 		static const DefineConfigSchema<Schema_Context_CREATE_VectorStorage> schema_Context_CREATE_VectorStorage;
 		schema_Context_CREATE_VectorStorage.addToHandler( m_impl, "POST/vstorage");

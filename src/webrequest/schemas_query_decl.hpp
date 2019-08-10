@@ -12,6 +12,8 @@
 #define _STRUS_WEBREQUEST_SCHEMAS_QUERY_DECL_HPP_INCLUDED
 #include "schemas_base.hpp"
 #include "schemas_expression.hpp"
+#include "schemas_queryeval_decl.hpp"
+#include "schemas_analyzer_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -133,6 +135,103 @@ public:
 
 			{"debug", 0, "query", Q::setDebugMode(), {{DebugModeFlag, '?'}} },
 			{"", 0, "query", Q::setWeightingVariables(), {{VariableDef, '*'}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList buildQueryOriginalAnalyzed( const char* rootexpr)
+	{
+		typedef bindings::method::Query Q;
+		return { rootexpr, {
+			{SchemaQueryDeclPart::analyzeQuery("")},
+			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} },
+			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList buildQueryAnalyzed( const char* rootexpr)
+	{
+		typedef bindings::method::Query Q;
+		return { rootexpr, {
+			{SchemaQueryDeclPart::declareAnalyzedFeature( "feature")},
+			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '+', 2/*tag diff*/}, {FeatureWeight, '?'}} },
+
+			{SchemaQueryDeclPart::declareMetaDataCondition( "restriction/analyzed")},
+			{"restriction/analyzed", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList createQuery( const char* rootexpr)
+	{
+		typedef bindings::method::QueryEval QE;
+		return { rootexpr, {
+			{SchemaQueryEvalDeclPart::defineQueryEval( "eval")},
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "analyzer")},
+			{"", "query", "qryeval", QE::createQuery(), {{"storage"}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList evaluateQuery( const char* rootexpr)
+	{
+		typedef bindings::method::Query Q;
+		return { rootexpr, {
+			{SchemaQueryDeclPart::defineStatistics( "")},
+			{SchemaQueryDeclPart::defineRankingParameter( "")},
+			{"", "ranklist", "query", Q::evaluate(), {} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQueryFeature( const char* rootexpr)
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareOrigFeature( "feature")},
+			{"feature", "analyzed", "_analyzed", TermExpression, '*', 2/*max tag diff*/},
+			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeTermExpression(), {{TermExpression}} },
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQueryFeatureSchemaOutput( const char* rootexpr)
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareOrigFeature( "feature")},
+			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQuerySentence( const char* rootexpr)
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareSentence( "sentence")},
+			{"sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQueryMetaData( const char* rootexpr)
+	{
+		typedef bindings::method::QueryAnalyzer A;
+		return {rootexpr,{
+			{SchemaQueryDeclPart::declareMetaDataCondition( "restriction/content")},
+			{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!', 1/*tag diff*/}} },
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQuery( const char* rootexpr)
+	{
+		return {rootexpr,{
+			{analyzeQueryFeature( "")},
+			{analyzeQuerySentence( "")},
+			{analyzeQueryMetaData( "")},
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList analyzeQuerySchemaOutput( const char* rootexpr)
+	{
+		return {rootexpr,{
+			{analyzeQueryFeatureSchemaOutput( "")},
+			{analyzeQuerySentence( "")},
+			{analyzeQueryMetaData( "")},
 		}};
 	}
 };

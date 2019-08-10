@@ -23,52 +23,6 @@
 namespace strus {
 namespace webrequest {
 
-class SchemaQueryPart :public AutomatonNameSpace
-{
-public:
-	static papuga::RequestAutomaton_NodeList buildQueryOriginalAnalyzed( const char* rootexpr)
-	{
-		typedef bindings::method::Query Q;
-		return { rootexpr, {
-			{SchemaAnalyzerPart::analyzeQuery("")},
-			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} },
-			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} }
-		}};
-	}
-
-	static papuga::RequestAutomaton_NodeList buildQueryAnalyzed( const char* rootexpr)
-	{
-		typedef bindings::method::Query Q;
-		return { rootexpr, {
-			{SchemaQueryDeclPart::declareAnalyzedFeature( "feature")},
-			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {TermExpression, '+', 2/*tag diff*/}, {FeatureWeight, '?'}} },
-
-			{SchemaQueryDeclPart::declareMetaDataCondition( "restriction/analyzed")},
-			{"restriction/analyzed", 0, "query", Q::addMetaDataRestriction(),  {MetaDataCondition} }
-		}};
-	}
-
-	static papuga::RequestAutomaton_NodeList createQuery( const char* rootexpr)
-	{
-		typedef bindings::method::QueryEval QE;
-		return { rootexpr, {
-			{SchemaQueryEvalDeclPart::defineQueryEval( "eval")},
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "analyzer")},
-			{"", "query", "qryeval", QE::createQuery(), {{"storage"}} }
-		}};
-	}
-
-	static papuga::RequestAutomaton_NodeList evaluateQuery( const char* rootexpr)
-	{
-		typedef bindings::method::Query Q;
-		return { rootexpr, {
-			{SchemaQueryDeclPart::defineStatistics( "")},
-			{SchemaQueryDeclPart::defineRankingParameter( "")},
-			{"", "ranklist", "query", Q::evaluate(), {} }
-		}};
-	}
-};
-
 class Schema_Context_INIT_QueryEval :public papuga::RequestAutomaton
 {
 public:
@@ -101,26 +55,9 @@ public:
 		},
 		{},
 		{
-			{SchemaQueryPart::createQuery( "/query")},
-			{SchemaQueryPart::buildQueryOriginalAnalyzed( "/query")},
-			{SchemaQueryPart::evaluateQuery( "/query")}
-		}
-	) {}
-};
-
-class Schema_Storage_GET :public papuga::RequestAutomaton
-{
-public:
-	Schema_Storage_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		{
-			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
-		},
-		{},
-		{
-			{SchemaQueryPart::createQuery( "/query")},
-			{SchemaQueryPart::buildQueryAnalyzed( "/query")},
-			{SchemaQueryPart::evaluateQuery( "/query")}
+			{SchemaQueryDeclPart::createQuery( "/query")},
+			{SchemaQueryDeclPart::buildQueryOriginalAnalyzed( "/query")},
+			{SchemaQueryDeclPart::evaluateQuery( "/query")}
 		}
 	) {}
 };

@@ -11,6 +11,9 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_STORAGE_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_STORAGE_HPP_INCLUDED
 #include "schemas_base.hpp"
+#include "schemas_query_decl.hpp"
+#include "schemas_queryeval_decl.hpp"
+#include "schemas_analyzer_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -101,10 +104,27 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_StorageTransaction :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Storage_GET :public papuga::RequestAutomaton
 {
 public:
-	Schema_Context_PUT_StorageTransaction() :papuga::RequestAutomaton(
+	Schema_Storage_GET() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		{
+			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
+		},
+		{},
+		{
+			{SchemaQueryDeclPart::createQuery( "/query")},
+			{SchemaQueryDeclPart::buildQueryAnalyzed( "/query")},
+			{SchemaQueryDeclPart::evaluateQuery( "/query")}
+		}
+	) {}
+};
+
+class Schema_StorageTransaction_PUT :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_StorageTransaction_PUT() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{},
 		{},
