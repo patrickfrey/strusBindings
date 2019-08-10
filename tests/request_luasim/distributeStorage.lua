@@ -57,4 +57,22 @@ buildStorageServer( 1, ISERVER1)
 buildStorageServer( 2, ISERVER2)
 buildStorageServer( 3, ISERVER3)
 
+statserverConfig = {
+	statserver = {
+		proc = "std",
+		blocks = "100K",
+		storage = {ISERVER1,ISERVER2,ISERVER3}
+	}
+}
+
+config.service.name = "ssrv"
+def_server( SSERVER1, config)
+
+call_server_checked( "PUT", SSERVER1  .. "/statserver/test", statserverConfig )
+
+statserverDef = call_server_checked( "GET", SSERVER1 .. "/statserver/test")
+if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
+
+checkExpected( statserverDef, "@distributeStorage.exp", "distributeStorage.res" )
+
 

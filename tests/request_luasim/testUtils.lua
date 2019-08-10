@@ -57,6 +57,7 @@ function checkExpected( output, expected, outputfile)
 		os.exit( 1)
 	else
 		remove_file( outputfile)
+		io.stderr:write( "OK\n");
 	end
 end
 

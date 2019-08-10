@@ -242,7 +242,8 @@ public:
 
 	virtual void serialize( papuga_Serialization& serialization, bool substructure)
 	{
-		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
+		bool sc = true;
+		if (substructure) sc &= papuga_Serialization_pushOpen( &serialization);
 		strus::local_ptr<ForwardIteratorInterface> itr( m_impl->createForwardIterator( m_type));
 		if (!itr.get()) throw std::runtime_error( m_errorhnd->fetchError());
 		itr->skipDoc( m_docno);
@@ -253,14 +254,15 @@ public:
 			char* valuestr_copy = papuga_Allocator_copy_string( serialization.allocator, value.c_str(), value.size());
 			if (!valuestr_copy) throw std::bad_alloc();
 
-			papuga_Serialization_pushOpen( &serialization);
-			papuga_Serialization_pushName_charp( &serialization, "value");
-			papuga_Serialization_pushValue_string( &serialization, valuestr_copy, value.size());
-			papuga_Serialization_pushName_charp( &serialization, "pos");
-			papuga_Serialization_pushValue_int( &serialization, pos);
-			papuga_Serialization_pushClose( &serialization);
+			sc &= papuga_Serialization_pushOpen( &serialization);
+			sc &= papuga_Serialization_pushName_charp( &serialization, "value");
+			sc &= papuga_Serialization_pushValue_string( &serialization, valuestr_copy, value.size());
+			sc &= papuga_Serialization_pushName_charp( &serialization, "pos");
+			sc &= papuga_Serialization_pushValue_int( &serialization, pos);
+			sc &= papuga_Serialization_pushClose( &serialization);
 		}
-		if (substructure && !papuga_Serialization_pushClose( &serialization)) throw std::bad_alloc();
+		if (substructure) sc &= papuga_Serialization_pushClose( &serialization);
+		if (!sc) throw std::bad_alloc();
 	}
 
 	virtual IntrospectionBase* open( const std::string& name)

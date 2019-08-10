@@ -1051,11 +1051,10 @@ struct ObjectDescr
 	const char* typenam;
 	const char* classnam;
 	const char* contextnam;
-	const char* varnam;
 	bool context_ownership;
 
 	ObjectDescr()
-		:context(0),obj(0),typenam(0),classnam(0),contextnam(0),varnam(0),context_ownership(false){}
+		:context(0),obj(0),typenam(0),classnam(0),contextnam(0),context_ownership(false){}
 	~ObjectDescr()
 	{
 		if (context_ownership) papuga_destroy_RequestContext( context);
@@ -1074,7 +1073,6 @@ struct ObjectDescr
 		classnam = classnam_;
 		contextnam = contextnam_;
 		obj = papuga_RequestContext_get_variable( context, typenam);
-		varnam = 0;
 		context_ownership = false;
 	}
 
@@ -1117,21 +1115,35 @@ struct ObjectDescr
 			}
 			else
 			{
-				reset();
 				setAnswer( answer, papugaErrorToErrorCode( errcode));
 				return false;
 			}
 		}
 		char const** varlist = papuga_RequestContext_list_variables( context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
 		if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
-		if (varlist[0] && !varlist[1] && isEqual( *varlist, typenam))
+		if (path.hasMore() && !path.startsWith( typenam, std::strlen(typenam)))
 		{
-			obj = papuga_RequestContext_get_variable( context, typenam);
-			return true;
+			char const** vi = varlist;
+			for (; *vi; ++vi)
+			{
+				if (path.startsWith( *vi, std::strlen(*vi)))
+				{
+					const char* varnam = path.getNext();
+					if (!varnam)
+					{
+						reset();
+						setAnswer( answer, papugaErrorToErrorCode( papuga_LogicError));
+						return false;
+					}
+					obj = papuga_RequestContext_get_variable( context, varnam);
+					return true;
+				}
+			}
 		}
-		if (!(varnam = path.getNext())) return true;
-		obj = papuga_RequestContext_get_variable( context, varnam);
-		if (!obj)
+		obj = papuga_RequestContext_get_variable( context, typenam);
+		if (obj) return true;
+
+		if (path.hasMore())
 		{
 			reset();
 			setAnswer( answer, ErrorCodeRequestResolveError);

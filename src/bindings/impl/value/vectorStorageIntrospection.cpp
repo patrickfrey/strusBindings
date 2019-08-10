@@ -35,11 +35,6 @@ static IntrospectionBase* createIntrospectionAtomic( ErrorBufferInterface* error
 {
 	return new IntrospectionAtomic<TypeName>( errorhnd, val);
 }
-template <class TypeName>
-static IntrospectionBase* createIntrospectionStructure( ErrorBufferInterface* errorhnd, const TypeName& val)
-{
-	return new IntrospectionStructure<TypeName>( errorhnd, val);
-}
 
 static bool isValidFeatureValuePrefix( const VectorStorageClientInterface* vstorage, const std::string& prefix, ErrorBufferInterface* errorhnd)
 {

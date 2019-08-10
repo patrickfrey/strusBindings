@@ -19,6 +19,41 @@
 namespace strus {
 namespace webrequest {
 
+class SchemaStoragePart :public AutomatonNameSpace
+{
+public:
+	static papuga::RequestAutomaton_NodeList defineStorage( const char* rootexpr)
+	{
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
+			{"path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
+			{"metadata/name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
+			{"metadata/type", "()", StorageMetadataType, papuga_TypeString, "INT32"},
+			{"metadata", StorageMetadata, {{"name", StorageMetadataName}, {"type", StorageMetadataType}} },
+			{"autocompact", "()", DatabaseEnableAutoCompact, papuga_TypeBool, "true"},
+			{"acl", "()", StorageEnableAcl, papuga_TypeBool, "true"},
+			{"cachedterms", "()", StorageCachedTerms, papuga_TypeString, "/srv/strus/termlist.txt"},
+			{"cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
+			{"compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
+			{"max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
+			{"write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
+			{"block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
+			{"", StorageConfig, {
+				{"path", DatabasePath},
+				{"cache", DatabaseLruCacheSize, '?'},
+				{"compression", DatabaseEnableCompression, '?'},
+				{"autocompact", DatabaseEnableAutoCompact, '?'},
+				{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
+				{"write_buffer_size", DatabaseWriteBufferSize, '?'},
+				{"block_size", DatabaseBlockSize, '?'},
+				{"cachedterms", StorageCachedTerms, '?'},
+				{"metadata", StorageMetadata, '*'},
+				{"acl", StorageEnableAcl, '?'}
+			}}
+		});
+	}
+};
+
 class Schema_Context_CREATE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
@@ -27,31 +62,23 @@ public:
 		{},
 		{},
 		{
-			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
-			{"/storage/metadata/name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
-			{"/storage/metadata/type", "()", StorageMetadataType, papuga_TypeString, "INT32"},
-			{"/storage/metadata", StorageMetadata, {{"name", StorageMetadataName}, {"type", StorageMetadataType}} },
-			{"/storage/acl", "()", StorageEnableAcl, papuga_TypeBool, "true"},
-			{"/storage/cachedterms", "()", StorageCachedTerms, papuga_TypeString, "/srv/strus/termlist.txt"},
-			{"/storage/cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
-			{"/storage/compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
-			{"/storage/max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
-			{"/storage/write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
-			{"/storage/block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
-			{"/storage", StorageConfig, {
-					{"path", DatabasePath},
-					{"cache", DatabaseLruCacheSize, '?'},
-					{"compression", DatabaseEnableCompression, '?'},
-					{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
-					{"write_buffer_size", DatabaseWriteBufferSize, '?'},
-					{"block_size", DatabaseBlockSize, '?'},
-					{"cachedterms", StorageCachedTerms, '?'},
-					{"metadata", StorageMetadata, '*'},
-					{"acl", StorageEnableAcl, '?'}
-				}
-			},
+			{SchemaStoragePart::defineStorage("/storage")},
 			{"/storage", "_success", "context", bindings::method::Context::createStorage(), {{StorageConfig}} },
 			{"/storage", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
+		}
+	) {}
+};
+
+class Schema_Context_INIT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_Context_INIT_Storage() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		{},
+		{},
+		{
+			{SchemaStoragePart::defineStorage("/storage")},
+			{"/", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
 		}
 	) {}
 };
@@ -70,38 +97,6 @@ public:
 				}
 			},
 			{"/storage", "success", "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
-		}
-	) {}
-};
-
-class Schema_Context_INIT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
-{
-public:
-	Schema_Context_INIT_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		{},
-		{},
-		{
-			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
-			{"/storage/cachedterms", "()", StorageCachedTerms, papuga_TypeString, "/srv/strus/termlist.txt"},
-			{"/storage/cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
-			{"/storage/autocompact", "()", DatabaseEnableAutoCompact, papuga_TypeBool, "true"},
-			{"/storage/compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
-			{"/storage/max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
-			{"/storage/write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
-			{"/storage/block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
-			{"/storage", StorageConfig, {
-					{"path", DatabasePath},
-					{"cachedterms", StorageCachedTerms, '?'},
-					{"cache", DatabaseLruCacheSize, '?'},
-					{"autocompact", DatabaseEnableAutoCompact, '?'},
-					{"compression", DatabaseEnableCompression, '?'},
-					{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
-					{"write_buffer_size", DatabaseWriteBufferSize, '?'},
-					{"block_size", DatabaseBlockSize, '?'}
-				}
-			},
-			{"/", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
 		}
 	) {}
 };
