@@ -926,7 +926,8 @@ static std::string convertSourceRegexReplace( const char* src, const char* expr,
 	for (; mi != me; ++mi)
 	{
 		rt.append( src + ofs, mi->pos - ofs);
-		subst.exec( rt, src + ofs + mi->pos, mi->len);
+		if (mi->pos + mi->len > (int)srcsize) throw strus::runtime_error(_TXT("array bound read in %s"), "convertSourceRegexReplace");
+		subst.exec( rt, src + mi->pos, mi->len);
 		ofs = mi->pos + mi->len;
 	}
 	rt.append( src + ofs, srcsize - ofs);

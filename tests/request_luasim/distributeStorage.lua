@@ -57,11 +57,19 @@ buildStorageServer( 1, ISERVER1)
 buildStorageServer( 2, ISERVER2)
 buildStorageServer( 3, ISERVER3)
 
+function storageAddress( serverurl)
+	return serverurl .. "/storage/test"
+end
+
 statserverConfig = {
 	statserver = {
 		proc = "std",
 		blocks = "100K",
-		storage = {ISERVER1,ISERVER2,ISERVER3}
+		storage = {
+			storageAddress(ISERVER1),
+			storageAddress(ISERVER2),
+			storageAddress(ISERVER3)
+		}
 	}
 }
 

@@ -578,9 +578,9 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 			{
 				papuga_SerializationIter si;
 				papuga_init_SerializationIter( &si, addressval->value.serialization);
-				while (!papuga_SerializationIter_eof(&si))
+				for (; !papuga_SerializationIter_eof( &si); papuga_SerializationIter_skip( &si))
 				{
-					if (papuga_SerializationIter_tag(&si) == papuga_TagValue)
+					if (papuga_SerializationIter_tag( &si) == papuga_TagValue)
 					{
 						const papuga_ValueVariant* eval = papuga_SerializationIter_value(&si);
 						size_t urllen = 0;
@@ -644,7 +644,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 			}
 			else
 			{
-				setAnswer_fmt( answer, ErrorCodeSyntax, _TXT("duplicate definition of result"));
+				setAnswer( answer, ErrorCodeSyntax, _TXT("duplicate definition of result"));
 				return false;
 			}
 			return true;
@@ -737,7 +737,14 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 	m_atm = papuga_RequestHandler_get_automaton( m_handler->impl(), contextType, schema);
 	if (!m_atm)
 	{
-		setAnswer( answer, ErrorCodeRequestResolveError, _TXT("unknown schema"));
+		if (0==std::strcmp( contextType, ROOT_CONTEXT_NAME))
+		{
+			setAnswer_fmt( answer, ErrorCodeRequestResolveError, _TXT("unknown schema '%s' in root context"), schema);
+		}
+		else
+		{
+			setAnswer_fmt( answer, ErrorCodeRequestResolveError, _TXT("unknown schema '%s' for '%s'"), schema, ROOT_CONTEXT_NAME);
+		}
 		return false;
 	}
 	if (m_request) papuga_destroy_Request( m_request);
@@ -1762,7 +1769,7 @@ bool WebRequestContext::executeRequest(
 				if (!content.empty())
 				{
 					if (!objectDescr.finish( m_answer)) return false;
-					setAnswer( m_answer, ErrorCodeInvalidArgument);
+					setAnswer( m_answer, ErrorCodeRequestResolveError);
 					return false;
 				}
 				if (isEqual( method, "GET"))

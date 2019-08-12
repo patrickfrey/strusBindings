@@ -25,13 +25,13 @@ public:
 	Schema_Context_PUT_StatisticsServer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{
-			//[+]{"query", "PUT/stats", "GET", "storage", {
-			//[+]	{"/statserver", "stats", true},
-			//[+]}}
+			{"statquery", "PUT/stats", "GET", "storage", {
+				{"/statserver", "all"}
+			}}
 		},
 		{},
 		{
-			{"/statserver/storage", "()", StatisticsStorageServer, papuga_TypeString, "example.com:7184"},
+			{"/statserver/storage", "()", StatisticsStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
 			{"/statserver", "", "storage", StatisticsStorageServer, '*'},
 			{"/statserver/blocks", "()", StatisticsMapBlocks, papuga_TypeString, "100K"},
 			{"/statserver/proc", "()", StatisticsProc, papuga_TypeString, "std"},
