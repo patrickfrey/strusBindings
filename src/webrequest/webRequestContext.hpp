@@ -68,6 +68,7 @@ public:
 			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
+
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);

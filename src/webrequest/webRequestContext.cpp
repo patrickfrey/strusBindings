@@ -737,7 +737,7 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 	m_atm = papuga_RequestHandler_get_automaton( m_handler->impl(), contextType, schema);
 	if (!m_atm)
 	{
-		if (0==std::strcmp( contextType, ROOT_CONTEXT_NAME))
+		if (!contextType || 0==std::strcmp( contextType, ROOT_CONTEXT_NAME))
 		{
 			setAnswer_fmt( answer, ErrorCodeRequestResolveError, _TXT("unknown schema '%s' in root context"), schema);
 		}

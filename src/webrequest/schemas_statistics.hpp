@@ -25,9 +25,9 @@ public:
 	Schema_Context_PUT_StatisticsServer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
 		{
-			{"statquery", "PUT/stats", "GET", "storage", {
-				{"/statserver", "all"}
-			}}
+			//[+]{"statquery", "PUT/statistics", "GET", "storage", {
+			//[+]	{"/statserver", "all"}
+			//[+]}}
 		},
 		{},
 		{
