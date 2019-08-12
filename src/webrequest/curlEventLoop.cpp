@@ -210,6 +210,10 @@ struct WebRequestDelegateConnectionGlobals
 		valid &= set_http_header( headers, "Accept", "application/json");
 		valid &= set_http_header( headers, "Accept-Charset", "UTF-8");
 	}
+	~WebRequestDelegateConnectionGlobals()
+	{
+		if (headers) curl_slist_free_all( headers);
+	}
 };
 static WebRequestDelegateConnectionGlobals g_delegateRequestGlobals;
 
