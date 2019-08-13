@@ -115,7 +115,7 @@ int TransactionPool::transactionRefIndexCandidate( int maxIdleTime)
 	return (((m_lasttick % (m_arsize-1)) + maxIdleTime) * m_nofTransactionPerSlot) % (m_arsize-1);
 }
 
-TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, int maxIdleTime)
+TransactionRef TransactionPool::newTransaction( const std::string& contextType, papuga_RequestContext* context, int maxIdleTime)
 {
 	try
 	{
@@ -151,7 +151,7 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 					TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
 					if (!tref.get())
 					{
-						Transaction* tr = new Transaction( context, tidx, tidxref, maxIdleTime);
+						Transaction* tr = new Transaction( contextType, context, tidx, tidxref, maxIdleTime);
 						context = 0;
 						TransactionRef rt( tr);
 						*tidxref = eidx & (m_arsize-1);
@@ -182,9 +182,9 @@ TransactionRef TransactionPool::newTransaction( papuga_RequestContext* context, 
 	}
 }
 
-std::string TransactionPool::createTransaction( papuga_RequestContext* context, int maxIdleTime)
+std::string TransactionPool::createTransaction( const std::string& contextType, papuga_RequestContext* context, int maxIdleTime)
 {
-	TransactionRef tr = newTransaction( context, maxIdleTime);
+	TransactionRef tr = newTransaction( contextType, context, maxIdleTime);
 	return transactionId( tr->idx());
 }
 

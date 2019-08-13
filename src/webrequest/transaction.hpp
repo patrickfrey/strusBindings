@@ -25,8 +25,8 @@ class WebRequestLoggerInterface;
 class Transaction
 {
 public:
-	Transaction( papuga_RequestContext* context_, int64_t tidx_, int* ref_, int maxIdleTime_)
-		:m_context(context_),m_ref(ref_),m_maxIdleTime(maxIdleTime_),m_tidx(tidx_){}
+	Transaction( const std::string& contextType_, papuga_RequestContext* context_, int64_t tidx_, int* ref_, int maxIdleTime_)
+		:m_contextType(contextType_),m_context(context_),m_ref(ref_),m_maxIdleTime(maxIdleTime_),m_tidx(tidx_){}
 	~Transaction()
 	{
 		if (m_context) papuga_destroy_RequestContext( m_context);
@@ -44,6 +44,10 @@ public:
 	{
 		*m_ref = refidx;
 	}
+	const char* contextType() const
+	{
+		return m_contextType.c_str();
+	}
 	papuga_RequestContext* context() const
 	{
 		return m_context;
@@ -51,6 +55,7 @@ public:
 	std::string id() const;
 
 private:
+	std::string m_contextType;
 	papuga_RequestContext* m_context;
 	int* m_ref;
 	int m_maxIdleTime;
@@ -80,10 +85,11 @@ public:
 	void collectGarbage( int64_t timecount);
 
 	/// \brief Create a transaction holding the context object passed
+	/// \param[in] contextType type name used to address schemas and methods of this transaction object
 	/// \param[in] context transaction context (passed with ownership)
 	/// \param[in] maxIdleTime maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
 	/// \return transaction identifier of the transaction created
-	std::string createTransaction( papuga_RequestContext* context, int maxIdleTime);
+	std::string createTransaction( const std::string& contextType, papuga_RequestContext* context, int maxIdleTime);
 
 	/// \brief Get a transaction object addressed by its identifier
 	/// \param[in] tid transaction identifier
@@ -103,7 +109,7 @@ private:
 	/// \brief Create a new transaction
 	/// \param[in] context transaction context (passed with ownership)
 	/// \param[in] maxIdleTime maximum time intervall a transaction lives without beeing touched by the client, timeout counter is renewed with every touch
-	TransactionRef newTransaction( papuga_RequestContext* context, int maxIdleTime);
+	TransactionRef newTransaction( const std::string& contextType, papuga_RequestContext* context, int maxIdleTime);
 
 	/// \brief Get a transaction identifier as string
 	/// \param[in] tidx internal transaction index

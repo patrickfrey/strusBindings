@@ -690,7 +690,7 @@ ERROR:
 
 bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName)
 {
-	if (!createEmptyRequestContext( answer, 0/*classname*/)) return false;
+	if (!createEmptyRequestContext( answer)) return false;
 	if (contextName)
 	{
 		if (!inheritRequestContext( answer, contextType, contextName)) return false;
@@ -698,10 +698,10 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 	return true;
 }
 
-bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer, const char* className)
+bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer)
 {
 	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-	m_context = papuga_create_RequestContext( className);
+	m_context = papuga_create_RequestContext();
 	m_context_ownership = true;
 	if (!m_context)
 	{
@@ -1057,14 +1057,13 @@ struct ObjectDescr
 	papuga_RequestContext* context;
 	const papuga_ValueVariant* obj;
 	const char* typenam;
-	const char* classnam;
 	const char* contextnam;
 	bool context_ownership;
 	TransactionRef transactionRef;
 	TransactionPool* transactionPool;
 
 	explicit ObjectDescr( TransactionPool* transactionPool_)
-		:context(0),obj(0),typenam(0),classnam(0),contextnam(0),context_ownership(false),transactionRef(),transactionPool(transactionPool_){}
+		:context(0),obj(0),typenam(0),contextnam(0),context_ownership(false),transactionRef(),transactionPool(transactionPool_){}
 	~ObjectDescr()
 	{
 		if (context_ownership) papuga_destroy_RequestContext( context);
@@ -1085,9 +1084,9 @@ struct ObjectDescr
 
 		if (path.startsWith( "transaction", 11/*"transaction"*/))
 		{
-			typenam = path.getNext();
+			(void)path.getNext();
 			contextnam = path.getNext();
-			if (!typenam || !contextnam)
+			if (!contextnam)
 			{
 				setAnswer( answer, ErrorCodeIncompleteRequest);
 				return false;
@@ -1098,9 +1097,9 @@ struct ObjectDescr
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
-			classnam = papuga_RequestContext_classname( transactionRef->context());
+			typenam = transactionRef->contextType();
 			context = transactionRef->context();
-			obj = papuga_RequestContext_get_variable( context, typenam);
+			obj = papuga_RequestContext_get_variable( context, "transaction");
 			if (!obj)
 			{
 				setAnswer( answer, ErrorCodeRequestResolveError);
@@ -1120,7 +1119,7 @@ struct ObjectDescr
 			{
 				if (!(contextnam = path.getNext())) return true;
 			}
-			context = papuga_create_RequestContext( 0/*className*/);
+			context = papuga_create_RequestContext();
 			if (!context)
 			{
 				setAnswer( answer, ErrorCodeOutOfMem);
@@ -1297,15 +1296,13 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 {
 	const char* method = "POST/transaction";
 	const char* resultname = "transaction";
-	const papuga_RequestMethodDescription* methoddescr
-		= papuga_RequestHandler_get_method( m_handler->impl(), classid, method, false);
+	const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, false);
 	if (!methoddescr)
 	{
 		setAnswer( answer, ErrorCodeRequestResolveError);
 		return false;
 	}
-	std::string className = strus::string_format( "transaction/%s", typenam);
-	if (!createEmptyRequestContext( answer, className.c_str()))
+	if (!createEmptyRequestContext( answer))
 	{
 		return false;
 	}
@@ -1318,7 +1315,8 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 	{
 		return false;
 	}
-	std::string tid = m_transactionPool->createTransaction( m_context, m_handler->maxIdleTime());
+	std::string transaction_typenam = strus::string_format( "transaction/%s", typenam);
+	std::string tid = m_transactionPool->createTransaction( transaction_typenam, m_context, m_handler->maxIdleTime());
 	releaseContext();
 	std::string linkbase;
 	int ec = strus::getAncestorPath( m_html_base_href, 3, linkbase);
@@ -1622,7 +1620,7 @@ bool WebRequestContext::returnConfigurationDelegateRequestAnswer(
 	try
 	{
 		if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-		m_context = papuga_create_RequestContext( 0/*className*/);
+		m_context = papuga_create_RequestContext();
 		m_context_ownership = true;
 		if (!m_context)
 		{
@@ -1853,8 +1851,7 @@ bool WebRequestContext::executeRequest(
 					schema = schemabuf;
 				}
 				// schema execution else:
-				const char* classnam = objectDescr.classnam ? objectDescr.classnam : objectDescr.typenam;
-				if (!executeContextSchema( objectDescr.context, classnam, schema, content, m_answer, delegateRequests))
+				if (!executeContextSchema( objectDescr.context, objectDescr.typenam, schema, content, m_answer, delegateRequests))
 				{
 					return false;
 				}
