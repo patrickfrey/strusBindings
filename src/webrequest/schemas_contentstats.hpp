@@ -22,42 +22,42 @@ namespace webrequest {
 class SchemaContentStatisticsPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList defineContentStatistics()
+	static papuga::RequestAutomaton_NodeList defineContentStatistics( const char* rootexpr)
 	{
 		typedef bindings::method::ContentStatistics S;
 		typedef bindings::method::Context C;
-		return {
-			{"library", "contentstats", "context", C::createContentStatistics(), {} },
-			{"library/attribute", "()", ContentAttribute, papuga_TypeString, "id"},
-			{"library/select", "()", SelectExpression, papuga_TypeString, "/doc/text()"},
-			{"library/element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
-			{"library/element/regex", "()", ContentRegexExpression, papuga_TypeString, "[A-Za-z0-9 ]+"},
-			{"library/element/priority", "()", ContentPriorityExpression, papuga_TypeInt, "0;1;2"},
-			{"library/element/minlen", "()", ContentMinLength, papuga_TypeInt, "10"},
-			{"library/element/maxlen", "()", ContentMaxLength, papuga_TypeInt, "160"},
-			{"library/element/tokenizer/name", "()", TokenizerName, papuga_TypeString, "text"},
-			{"library/element/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "de"},
-			{"library/element/tokenizer", TokenizerDef, {
+		return { rootexpr, {
+			{"", "contentstats", "context", C::createContentStatistics(), {} },
+			{"attribute", "()", ContentAttribute, papuga_TypeString, "id"},
+			{"select", "()", SelectExpression, papuga_TypeString, "/doc/text()"},
+			{"element/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"element/regex", "()", ContentRegexExpression, papuga_TypeString, "[A-Za-z0-9 ]+"},
+			{"element/priority", "()", ContentPriorityExpression, papuga_TypeInt, "0;1;2"},
+			{"element/minlen", "()", ContentMinLength, papuga_TypeInt, "10"},
+			{"element/maxlen", "()", ContentMaxLength, papuga_TypeInt, "160"},
+			{"element/tokenizer/name", "()", TokenizerName, papuga_TypeString, "text"},
+			{"element/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "de"},
+			{"element/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"library/element/normalizer/name", "()", NormalizerName, papuga_TypeString, "regex"},
-			{"library/element/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "[A-Za-z0-9 ]+"},
-			{"library/element/normalizer", NormalizerDef, {
+			{"element/normalizer/name", "()", NormalizerName, papuga_TypeString, "regex"},
+			{"element/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "[A-Za-z0-9 ]+"},
+			{"element/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"library/attribute", 0, "contentstats", S::addVisibleAttribute(), {
+			{"attribute", 0, "contentstats", S::addVisibleAttribute(), {
 					{ContentAttribute}
 				}
 			},
-			{"library/select", 0, "contentstats", S::addSelectorExpression(), {
+			{"select", 0, "contentstats", S::addSelectorExpression(), {
 					{SelectExpression}
 				}
 			},
-			{"library/element", 0, "contentstats", S::addLibraryElement(), {
+			{"element", 0, "contentstats", S::addLibraryElement(), {
 					{FeatureTypeName},
 					{ContentRegexExpression},
 					{ContentPriorityExpression,'?'},
@@ -67,7 +67,7 @@ public:
 					{NormalizerDef,'+'}
 				}
 			}
-		};
+		}};
 	}
 };
 
@@ -75,27 +75,21 @@ class Schema_Context_INIT_ContentStatistics :public papuga::RequestAutomaton, pu
 {
 public:
 	Schema_Context_INIT_ContentStatistics() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
-			{defineContentStatistics()}
+			{defineContentStatistics("/library")}
 		}
 	) {}
 };
 
-class Schema_Context_PUT_ContentStatistics :public papuga::RequestAutomaton, public SchemaContentStatisticsPart
+class Schema_Context_PUT_ContentStatistics :public Schema_Context_INIT_ContentStatistics
 {
 public:
-	Schema_Context_PUT_ContentStatistics() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		{},
-		{},
-		{
-			{defineContentStatistics()}
-		}
-	) {}
+	Schema_Context_PUT_ContentStatistics() :Schema_Context_INIT_ContentStatistics(){}
 };
+
 
 }}//namespace
 #endif

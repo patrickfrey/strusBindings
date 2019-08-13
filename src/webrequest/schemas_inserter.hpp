@@ -23,7 +23,7 @@ class Schema_Context_PUT_Inserter :public papuga::RequestAutomaton, public Autom
 {
 public:
 	Schema_Context_PUT_Inserter() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
 			{"docanalyzer","/inserter/include/analyzer()",true/*required*/},

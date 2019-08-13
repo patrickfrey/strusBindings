@@ -380,11 +380,11 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		{
 			if (itemname)
 			{
-				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request item %s: %s, location: %s"), itemname, papuga_ErrorCode_tostring( errcode), buf);
+				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request item %s"), itemname, papuga_ErrorCode_tostring( errcode));
 			}
 			else
 			{
-				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request: %s, location: %s"), papuga_ErrorCode_tostring( errcode), buf);
+				papuga_ErrorBuffer_reportError( &m_errbuf, _TXT( "error feeding request: %s"), papuga_ErrorCode_tostring( errcode));
 			}
 		}
 		papuga_destroy_RequestParser( parser);

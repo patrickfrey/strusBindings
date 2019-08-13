@@ -60,6 +60,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_AmbiguousReference:		return ErrorCodeBindingLanguageError;
 		case papuga_MaxRecursionDepthReached:	return ErrorCodeMaxRecursionDepht;
 		case papuga_ComplexityOfProblem:	return ErrorCodeRefusedDueToComplexity;
+		case papuga_InvalidRequest:		return ErrorCodeInvalidRequest;
 	}
 	return ErrorCodeUnknown;
 }
@@ -90,6 +91,7 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 		case ErrorCodeInvalidRegex: return 500 /*Internal Server Error*/;
 		case ErrorCodeInvalidOperation: return 500 /*Internal Server Error*/;
 		case ErrorCodeInvalidFilePath: return 500 /*Internal Server Error*/;
+		case ErrorCodeInvalidRequest: return 400 /*Bad Request*/;
 		case ErrorCodeLoadModuleFailed: return 500 /*Internal Server Error*/;
 		case ErrorCodeNotImplemented: return 500 /*Internal Server Error*/;
 		case ErrorCodeIncompleteInitialization: return 500 /*Internal Server Error*/;

@@ -27,7 +27,7 @@ class Schema_Context_INIT_QueryEval :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_INIT_QueryEval() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
 			{"storage","/qryeval/include/storage()",false/*not required*/},
@@ -49,7 +49,7 @@ class Schema_QueryEval_GET :public papuga::RequestAutomaton
 {
 public:
 	Schema_QueryEval_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{
 			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
 		},

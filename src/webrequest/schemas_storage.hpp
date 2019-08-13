@@ -61,7 +61,7 @@ class Schema_Context_CREATE_Storage :public papuga::RequestAutomaton, public Aut
 {
 public:
 	Schema_Context_CREATE_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
@@ -76,7 +76,7 @@ class Schema_Context_INIT_Storage :public papuga::RequestAutomaton, public Autom
 {
 public:
 	Schema_Context_INIT_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
@@ -90,7 +90,7 @@ class Schema_Context_DELETE_Storage :public papuga::RequestAutomaton, public Aut
 {
 public:
 	Schema_Context_DELETE_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
@@ -108,7 +108,7 @@ class Schema_Storage_GET :public papuga::RequestAutomaton
 {
 public:
 	Schema_Storage_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{
 			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
@@ -125,7 +125,7 @@ class Schema_StorageTransaction_PUT :public papuga::RequestAutomaton, public Aut
 {
 public:
 	Schema_StorageTransaction_PUT() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{

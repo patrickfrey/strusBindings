@@ -26,7 +26,7 @@ class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
@@ -35,24 +35,17 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton
+class Schema_Context_PUT_DocumentAnalyzer :public Schema_Context_INIT_DocumentAnalyzer
 {
 public:
-	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
-		{},
-		{},
-		{
-			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/docanalyzer")}
-		}
-	) {}
+	Schema_Context_PUT_DocumentAnalyzer() :Schema_Context_INIT_DocumentAnalyzer(){}
 };
 
 class Schema_Context_INIT_QueryAnalyzer :public papuga::RequestAutomaton
 {
 public:
 	Schema_Context_INIT_QueryAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
 			{"vstorage","/qryanalyzer/vstorage/name()",false/*not required*/}
@@ -74,7 +67,7 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 {
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{{"query", {
 			{"/query/feature", "feature", true},
 			{"/query/feature/set", "set", FeatureSet},
