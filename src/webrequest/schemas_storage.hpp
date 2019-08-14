@@ -55,19 +55,29 @@ public:
 			}}
 		});
 	}
+
+	static papuga::RequestAutomaton_NodeList defineStatisticsQuery( const char* rootexpr)
+	{
+		typedef bindings::method::StorageClient S;
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
+			{"snapshot", "_blob", "storage", S::getAllStatistics(), {}}
+		});
+	}
 };
 
 class Schema_Context_CREATE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
+	typedef bindings::method::Context C;
 	Schema_Context_CREATE_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
 			{SchemaStoragePart::defineStorage("/storage")},
-			{"/storage", "_success", "context", bindings::method::Context::createStorage(), {{StorageConfig}} },
-			{"/storage", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
+			{"/storage", "_success", "context", C::createStorage(), {{StorageConfig}} },
+			{"/storage", "storage", "context", C::createStorageClient(), {{StorageConfig}} }
 		}
 	) {}
 };
@@ -110,13 +120,16 @@ public:
 	Schema_Storage_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{
-			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
+			{"result", { {"/query", "ranklist", "ranklist", '!'} }},
+			{"statistics", { {"/statistics", "_blob", "statistics", '!'} }}
 		},
 		{},
 		{
 			{SchemaQueryDeclPart::createQuery( "/query")},
 			{SchemaQueryDeclPart::buildQueryAnalyzed( "/query")},
-			{SchemaQueryDeclPart::evaluateQuery( "/query")}
+			{SchemaQueryDeclPart::evaluateQuery( "/query")},
+
+			{SchemaStoragePart::defineStatisticsQuery( "/statistics")}
 		}
 	) {}
 };
