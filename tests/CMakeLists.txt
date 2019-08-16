@@ -4,6 +4,7 @@ cmake_minimum_required( VERSION 2.8 FATAL_ERROR )
 if( WITH_WEBREQUEST STREQUAL "YES" )
 add_subdirectory( request_transactionmap )
 add_subdirectory( request_parse )
+add_subdirectory( schemaid )
 endif( WITH_WEBREQUEST STREQUAL "YES" )
 
 IF (WITH_LUA STREQUAL "YES")

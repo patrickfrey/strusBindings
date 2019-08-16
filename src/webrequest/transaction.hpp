@@ -16,6 +16,7 @@
 #include "strus/base/atomic.hpp"
 #include "strus/base/stdint.h"
 #include "strus/errorCodes.hpp"
+#include <string>
 
 namespace strus {
 

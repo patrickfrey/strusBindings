@@ -30,7 +30,7 @@ public:
 
 		StatisticsMapConfig,StatisticsProc,StatisticsMapBlocks,StatisticsStorageServer,
 
-		StorageConfig, DatabasePath, StorageCachedTerms,
+		StorageConfig, DatabaseEngine, DatabasePath, StorageCachedTerms,
 		StorageMetadata, StorageMetadataName, StorageMetadataType,
 		StorageEnableAcl, DatabaseEnableCompression, DatabaseEnableAutoCompact,
 		DatabaseLruCacheSize, DatabaseMaxNofOpenFiles, DatabaseWriteBufferSize, DatabaseBlockSize,

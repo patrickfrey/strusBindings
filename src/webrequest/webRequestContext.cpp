@@ -548,10 +548,64 @@ const char* WebRequestContext::getResultString( papuga_RequestResult* result, st
 const char* WebRequestContext::getDelegateRequestString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode)
 {
 	papuga_ValueVariant resultval;
-	papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
-	const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
+	if (papuga_Serialization_empty( &result->serialization))
+	{
+		resultlen = 0;
+		return "";
+	}
+	else
+	{
+		papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
+		const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
 
-	return (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
+		return (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
+
+	}
+}
+
+static const char* getDelegateRequestUrl( papuga_Allocator* allocator, const papuga_ValueVariant* adressval, char const* path, papuga_ErrorCode* errcode)
+{
+	if (papuga_ValueVariant_isstring( adressval))
+	{
+		while (*path == '/') {++path;}
+		std::size_t pathlen = path ? std::strlen( path) : 0;
+		std::size_t urlbuflen = adressval->length * 4 + pathlen + 16;
+		char* urlbuf = (char*)papuga_Allocator_alloc( allocator, urlbuflen, 1/*align*/);
+		if (!urlbuf)
+		{
+			*errcode = papuga_NoMemError;
+			return NULL;
+		}
+		std::size_t urllen;
+		if (!papuga_ValueVariant_tostring_enc( adressval, papuga_UTF8, urlbuf, urlbuflen, &urllen, errcode))
+		{
+			return NULL;
+		}
+		while (urllen > 0 && urlbuf[ urllen-1] == '/') {--urllen;}
+		if (urllen == 0)
+		{
+			*errcode = papuga_TypeError;
+			return NULL;
+		}
+		if (urllen + pathlen + 2 > urlbuflen)
+		{
+			*errcode = papuga_BufferOverflowError;
+			return NULL;
+		}
+		urlbuf[ urllen] = '/';
+		std::memcpy( urlbuf + urllen + 1, path, pathlen + 1);
+		if (!papuga_Allocator_shrink_last_alloc( allocator, urlbuf, urlbuflen, urllen + pathlen + 2))
+		{
+			*errcode = papuga_LogicError;
+			return NULL;
+		}
+		return urlbuf;
+	}
+	else
+	{
+		*errcode = papuga_TypeError;
+		return NULL;
+	}
 }
 
 bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
@@ -582,30 +636,28 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 				{
 					if (papuga_SerializationIter_tag( &si) == papuga_TagValue)
 					{
-						const papuga_ValueVariant* eval = papuga_SerializationIter_value(&si);
-						size_t urllen = 0;
-						const char* url = papuga_ValueVariant_tostring( eval, &m_allocator, &urllen, &errcode);
+						const papuga_ValueVariant* addressvalelem = papuga_SerializationIter_value(&si);
+						const char* url = getDelegateRequestUrl( &m_allocator, addressvalelem, result->path, &errcode);
 						if (!url)
 						{
-							setAnswer_fmt( answer, papugaErrorToErrorCode( errcode), _TXT("error resolving variable '%s'"), result->addressvar);
+							setAnswer_fmt( answer, papugaErrorToErrorCode( errcode), _TXT("error resolving url of delegate request from variable '%s'"), result->addressvar);
 							return false;
 						}
 						delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
 					}
 					else
 					{
-						setAnswer_fmt( answer, ErrorCodeSyntax, _TXT("list of URLs expected for variable '%s'"), result->addressvar);
+						setAnswer_fmt( answer, ErrorCodeSyntax, _TXT("list of delegate request service URLs expected for variable '%s'"), result->addressvar);
 						return false;
 					}
 				}
 			}
 			else
 			{
-				size_t urllen = 0;
-				const char* url = papuga_ValueVariant_tostring( addressval, &m_allocator, &urllen, &errcode);
+				const char* url = getDelegateRequestUrl( &m_allocator, addressval, result->path, &errcode);
 				if (!url)
 				{
-					setAnswer_fmt( answer, papugaErrorToErrorCode( errcode), _TXT("error resolving variable '%s'"), result->addressvar);
+					setAnswer_fmt( answer, papugaErrorToErrorCode( errcode), _TXT("error resolving url of delegate request from variable '%s'"), result->addressvar);
 					return false;
 				}
 				delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
@@ -732,7 +784,7 @@ bool WebRequestContext::initRequestContext( WebRequestAnswer& answer)
 	return true;
 }
 
-bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema)
+bool WebRequestContext::initAutomaton( WebRequestAnswer& answer, const char* contextType, const char* schema)
 {
 	m_atm = papuga_RequestHandler_get_automaton( m_handler->impl(), contextType, schema);
 	if (!m_atm)
@@ -747,6 +799,11 @@ bool WebRequestContext::initContentRequest( WebRequestAnswer& answer, const char
 		}
 		return false;
 	}
+	return true;
+}
+
+bool WebRequestContext::initContentRequest( WebRequestAnswer& answer)
+{
 	if (m_request) papuga_destroy_Request( m_request);
 	m_request = papuga_create_Request( m_atm, &m_callLogger);
 	if (!m_request)
@@ -1204,10 +1261,20 @@ bool WebRequestContext::executeMainSchema( const char* schema, const WebRequestC
 	return executeContextSchema( (const char*)0, (const char*)0, schema, content, answer, delegateRequests);
 }
 
+bool WebRequestContext::executeCurrentSchema( const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
+{
+	return initContentRequest( answer)
+	&&	feedContentRequest( answer, content)
+	&&	initRequestContext( answer)
+	&&	executeContentRequest( answer, content)
+	&&	getContentRequestDelegateRequests( answer, delegateRequests);
+}
+
 bool WebRequestContext::executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
 {
 	return	createRequestContext( answer, contextType, contextName)
-	&&	initContentRequest( answer, contextType, schema)
+	&&	initAutomaton( answer, contextType, schema)
+	&&	initContentRequest( answer)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
 	&&	executeContentRequest( answer, content)
@@ -1219,7 +1286,8 @@ bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, co
 	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
 	m_context = context;
 	m_context_ownership = false;
-	return	initContentRequest( answer, contextType, schema)
+	return	initAutomaton( answer, contextType, schema)
+	&&	initContentRequest( answer)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
 	&&	executeContentRequest( answer, content)
@@ -1577,15 +1645,14 @@ WebRequestAnswer WebRequestContext::buildSimpleRequestAnswer(
 	return rt;
 }
 
-bool WebRequestContext::returnDelegateRequestAnswer(
-		const char* schema,
+bool WebRequestContext::pushDelegateRequestAnswer(
 		const WebRequestContent& content,
 		WebRequestAnswer& answer)
 {
 	try
 	{
 		std::vector<WebRequestDelegateRequest> delegateRequests;
-		bool rt = executeContextSchema( m_context, 0, schema, content, answer, delegateRequests);
+		bool rt = executeCurrentSchema( content, answer, delegateRequests);
 		if (rt && !delegateRequests.empty())
 		{
 			setAnswer( answer, ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in partial requests"));
@@ -1633,7 +1700,7 @@ bool WebRequestContext::returnConfigurationDelegateRequestAnswer(
 			setAnswer( answer, papugaErrorToErrorCode( errcode));
 			return false;
 		}
-		if (!returnDelegateRequestAnswer( schema, content, answer))
+		if (!pushDelegateRequestAnswer( content, answer))
 		{
 			return false;
 		}

@@ -1147,8 +1147,9 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 	{
 		return new DocidIntrospection( m_errorhnd, m_impl);
 	}
-	else if (name == "statistics" && m_impl->getStatisticsProcessor())
+	else if (name == "statistics")
 	{
+		if (!m_impl->getStatisticsProcessor()) throw std::runtime_error( _TXT("no statistics processor defined (e.g. statsproc=\"std\" in storage configuration)"));
 		return new StatisticsIntrospection( m_errorhnd, m_impl);
 	}
 	return NULL;

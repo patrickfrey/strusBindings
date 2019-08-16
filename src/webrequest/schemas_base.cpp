@@ -36,6 +36,7 @@ const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
 		{StatisticsMapBlocks, "statistics map blocks"},
 		{StatisticsStorageServer, "statistics storage server"},
 		{StorageConfig, "storage config"},
+		{DatabaseEngine, "database engine implementation"},
 		{DatabasePath, "database path"},
 		{StorageCachedTerms, "storage cached terms"},
 		{StorageMetadata, "storage metadata"},

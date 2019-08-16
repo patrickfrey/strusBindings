@@ -30,6 +30,8 @@ public:
 		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
 			{"path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
+			{"database", "()", DatabaseEngine, papuga_TypeString, "std"},
+			{"statsproc", "()", StatisticsProc, papuga_TypeString, "std"},
 			{"metadata/name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
 			{"metadata/type", "()", StorageMetadataType, papuga_TypeString, "INT32"},
 			{"metadata", StorageMetadata, {{"name", StorageMetadataName}, {"type", StorageMetadataType}} },
@@ -42,16 +44,18 @@ public:
 			{"write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
 			{"block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
 			{"", StorageConfig, {
-				{"path", DatabasePath},
+				{"path", DatabasePath, '!'},
+				{"database", DatabaseEngine, '?'},
+				{"statsproc", StatisticsProc, '?'},
+				{"metadata", StorageMetadata, '*'},
+				{"autocompact", DatabaseEnableAutoCompact, '?'},
+				{"acl", StorageEnableAcl, '?'},
+				{"cachedterms", StorageCachedTerms, '?'},
 				{"cache", DatabaseLruCacheSize, '?'},
 				{"compression", DatabaseEnableCompression, '?'},
-				{"autocompact", DatabaseEnableAutoCompact, '?'},
 				{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
 				{"write_buffer_size", DatabaseWriteBufferSize, '?'},
-				{"block_size", DatabaseBlockSize, '?'},
-				{"cachedterms", StorageCachedTerms, '?'},
-				{"metadata", StorageMetadata, '*'},
-				{"acl", StorageEnableAcl, '?'}
+				{"block_size", DatabaseBlockSize, '?'}
 			}}
 		});
 	}

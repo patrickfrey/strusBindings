@@ -48,8 +48,7 @@ public:
 			const WebRequestContent& content,
 			std::vector<WebRequestDelegateRequest>& delegateRequests);
 
-	virtual bool returnDelegateRequestAnswer(
-			const char* schema,
+	virtual bool pushDelegateRequestAnswer(
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
@@ -76,13 +75,15 @@ private:
 	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
-	bool initContentRequest( WebRequestAnswer& answer, const char* contextType, const char* schema);
+	bool initAutomaton( WebRequestAnswer& answer, const char* contextType, const char* schema);
+	bool initContentRequest( WebRequestAnswer& answer);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
 	bool createEmptyRequestContext( WebRequestAnswer& answer);
 	bool createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool initRequestContext( WebRequestAnswer& answer);
 	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
+	bool executeCurrentSchema( const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
 	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
 	const char* getDelegateRequestString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);

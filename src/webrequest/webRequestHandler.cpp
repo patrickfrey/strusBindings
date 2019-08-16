@@ -225,9 +225,11 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineConfigSchema<Schema_Context_PUT_QueryEval> schema_Context_PUT_QueryEval;
 		schema_Context_PUT_QueryEval.addToHandler( m_impl, "PUT/qryeval");
 
-		static const DefineConfigSchema<Schema_Context_PUT_StatisticsServer> Schema_Context_PUT_StatisticsServer;
-		Schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");
-		Schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "POST/statserver");
+		static const DefineConfigSchema<Schema_Context_PUT_StatisticsServer> schema_Context_PUT_StatisticsServer;
+		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");
+		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "POST/statserver");
+		static const DefineSchema<Schema_StatisticsServer_PUT_statistics> schema_StatisticsServer_PUT_statistics_statistics("statistics");
+		schema_StatisticsServer_PUT_statistics_statistics.addToHandler( m_impl, "PUT~statistics");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");

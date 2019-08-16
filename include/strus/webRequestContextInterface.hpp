@@ -37,13 +37,11 @@ public:
 			const WebRequestContent& content,
 			std::vector<WebRequestDelegateRequest>& delegateRequests)=0;
 
-	/// \brief Return the result of a delegate request with the name of a schema to execute to process the answer in the current context created with exewcuteRequest()
-	/// \param[in] schema schema to execute
+	/// \brief Return the result of a delegate request to process the answer in the current context created with executeRequest()
 	/// \param[in] content content of the result put
 	/// \param[out] answer result status and the data of the answer of the operation
 	/// \return bool true if succeeded, false else
-	virtual bool returnDelegateRequestAnswer(
-			const char* schema,
+	virtual bool pushDelegateRequestAnswer(
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
@@ -81,7 +79,7 @@ public:
 			WebRequestAnswer& answer,
 			std::vector<WebRequestDelegateRequest>& delegateRequests)=0;
 
-	/// \brief Return the result of a delegate request issued by the loading of a configuration with the name of a schema to execute to process the answer in the current context created with exewcuteRequest()
+	/// \brief Return the result of a delegate request issued by the loading of a configuration with the name of a schema to execute to process the answer in the current context created with executeRequest()
 	/// \param[in] typenam type name of the configured object
 	/// \param[in] contextnam name of the configured object
 	/// \param[in] schema schema to execute

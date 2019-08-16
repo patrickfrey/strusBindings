@@ -25,9 +25,7 @@ public:
 	Schema_Context_PUT_StatisticsServer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{
-			//[+]{"statquery", "PUT/statistics", "GET", "storage", "statistics/snapshot", {
-			//[+]	{"/statserver", "all"}
-			//[+]}}
+			{"statquery", "PUT~statistics", "GET", "storage", "statistics/snapshot", {}}
 		},
 		{},
 		{
@@ -42,6 +40,17 @@ public:
 			},
 			{"/", "statserver", "context", bindings::method::Context::createStatisticsMap(), {{StatisticsMapConfig}} }
 		}
+	) {}
+};
+
+class Schema_StatisticsServer_PUT_statistics :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_StatisticsServer_PUT_statistics() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		{},
+		{},
+		{}
 	) {}
 };
 
