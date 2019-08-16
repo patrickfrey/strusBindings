@@ -50,7 +50,10 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
-		{}
+		{
+			{"/storage/value", "()", StatisticsBlob, papuga_TypeString, "AAAABwAKZ9h..."},
+			{"/storage/value", 0/*result*/, "statserver", bindings::method::StatisticsMap::processStatisticsMessage(), {{StatisticsBlob}} }
+		}
 	) {}
 };
 

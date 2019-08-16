@@ -24,6 +24,7 @@
 #include "strus/base/fileio.hpp"
 #include "strus/base/stdint.h"
 #include "strus/base/regex.hpp"
+#include "strus/base/utf8.hpp"
 #include "private/internationalization.hpp"
 #include "papuga/lib/lua_dev.h"
 #include "papuga/serialization.h"
@@ -72,7 +73,7 @@ public:
 		{
 			case 4: m_logmask |= (LogContentEvents);
 			case 3: m_logmask |= (LogMethodCalls|LogAction);
-			case 2: m_logmask |= (LogRequests|LogConfiguration);
+			case 2: m_logmask |= (LogRequests|LogDelegateRequests|LogConfiguration);
 			case 1: m_logmask |= (LogError|LogWarning);
 			case 0: m_logmask |= (LogNothing); break;
 			default: m_logmask = LogAll;
@@ -97,6 +98,27 @@ public:
 	virtual void logRequest( const char* reqstr)
 	{
 		std::cerr << header() << strus::string_format( "REQUEST %s", reqstr) << std::endl;
+	}
+
+	virtual void logDelegateRequest( const char* address, const char* method, const char* content)
+	{
+		std::size_t contentsize = std::strlen( content);
+		if (contentsize == 0)
+		{
+			std::cerr << header() << strus::string_format( "DELEGATE %s '%s'", method, address) << std::endl;
+		}
+		else if (contentsize <= 100)
+		{
+			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s'", method, address, content) << std::endl;
+		}
+		else
+		{
+			const char* contentend = strus::utf8prev( content + 100);
+			if (contentend < content) contentend = content;
+			std::string contentstr( content, contentend - content);
+	
+			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s...'", method, address, contentstr.c_str()) << std::endl;
+		}
 	}
 
 	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr)
@@ -534,7 +556,7 @@ void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status
 
 	if (status.ok() && status.httpstatus() >= 200 && status.httpstatus() < 300)
 	{
-		if (!m_requestContext->returnDelegateRequestAnswer( m_schema.c_str(), status.content(), *m_answer))
+		if (!m_requestContext->pushDelegateRequestAnswer( m_schema.c_str(), status.content(), *m_answer))
 		{
 			success = false;
 		}

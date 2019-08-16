@@ -42,6 +42,7 @@ public:
 	/// \param[out] answer result status and the data of the answer of the operation
 	/// \return bool true if succeeded, false else
 	virtual bool pushDelegateRequestAnswer(
+			const char* schema,
 			const WebRequestContent& content,
 			WebRequestAnswer& answer)=0;
 
@@ -86,7 +87,7 @@ public:
 	/// \param[in] content content of the result put
 	/// \param[out] answer result status and the data of the answer of the operation
 	/// \return bool true if succeeded, false else
-	virtual bool returnConfigurationDelegateRequestAnswer(
+	virtual bool pushConfigurationDelegateRequestAnswer(
 			const char* typenam,
 			const char* contextnam,
 			const char* schema,

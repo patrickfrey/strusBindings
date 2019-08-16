@@ -228,7 +228,7 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineConfigSchema<Schema_Context_PUT_StatisticsServer> schema_Context_PUT_StatisticsServer;
 		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");
 		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "POST/statserver");
-		static const DefineSchema<Schema_StatisticsServer_PUT_statistics> schema_StatisticsServer_PUT_statistics_statistics("statistics");
+		static const DefineSchema<Schema_StatisticsServer_PUT_statistics> schema_StatisticsServer_PUT_statistics_statistics("statserver");
 		schema_StatisticsServer_PUT_statistics_statistics.addToHandler( m_impl, "PUT~statistics");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
@@ -484,6 +484,10 @@ bool WebRequestHandler::delegateRequest(
 		const std::string& content,
 		WebRequestDelegateContextInterface* context)
 {
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogDelegateRequests))
+	{
+		m_logger->logDelegateRequest( address.c_str(), method.c_str(), content.c_str());
+	}
 	return m_eventLoop->send( address, method, content, context);
 }
 

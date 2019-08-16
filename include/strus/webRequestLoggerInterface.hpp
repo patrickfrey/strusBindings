@@ -27,9 +27,10 @@ public:
 		LogWarning=0x2,
 		LogMethodCalls=0x4,
 		LogRequests=0x8,
-		LogConfiguration=0x10,
-		LogAction=0x20,
-		LogContentEvents=0x40,
+		LogDelegateRequests=0x10,
+		LogConfiguration=0x20,
+		LogAction=0x40,
+		LogContentEvents=0x80,
 		LogAll=0xFF
 	};
 
@@ -45,6 +46,10 @@ public:
 	/// \brief Log a request
 	/// \remark expected to be thread safe
 	virtual void logRequest( const char* reqstr)=0;
+
+	/// \brief Log a delegate request
+	/// \remark expected to be thread safe
+	virtual void logDelegateRequest( const char* address, const char* method, const char* content)=0;
 
 	/// \brief Log a loaded configuration
 	/// \param[in] type type of the configuration

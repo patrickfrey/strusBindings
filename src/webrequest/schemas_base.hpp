@@ -28,7 +28,7 @@ public:
 	
 		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
 
-		StatisticsMapConfig,StatisticsProc,StatisticsMapBlocks,StatisticsStorageServer,
+		StatisticsMapConfig,StatisticsProc,StatisticsMapBlocks,StatisticsStorageServer,StatisticsBlob,
 
 		StorageConfig, DatabaseEngine, DatabasePath, StorageCachedTerms,
 		StorageMetadata, StorageMetadataName, StorageMetadataType,

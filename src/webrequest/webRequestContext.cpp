@@ -71,6 +71,7 @@ WebRequestContext::WebRequestContext(
 	,m_logger(logger_)
 	,m_confighandler(confighandler_)
 	,m_transactionPool(transactionPool_)
+	,m_contextType(0)
 	,m_context(0)
 	,m_context_ownership(false)
 	,m_request(0)
@@ -347,8 +348,23 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	{
 		return false;
 	}
-	// Parse the request:
+	// Log the request:
 	papuga_ErrorCode errcode = papuga_Ok;
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogRequests))
+	{
+		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &errcode);
+		if (!reqstr)
+		{
+			m_logger->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
+			setAnswer( answer, papugaErrorToErrorCode( papuga_NoMemError));
+			return false;
+		}
+		else
+		{
+			m_logger->logRequest( reqstr);
+		}
+	}
+	// Parse the request:
 	papuga_RequestParser* parser = papuga_create_RequestParser( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), &errcode);
 	if (!parser)
 	{
@@ -393,20 +409,6 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		return false;
 	}
 	papuga_destroy_RequestParser( parser);
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogRequests))
-	{
-		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &errcode);
-		if (!reqstr)
-		{
-			m_logger->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
-			setAnswer( answer, papugaErrorToErrorCode( papuga_NoMemError));
-			return false;
-		}
-		else
-		{
-			m_logger->logRequest( reqstr);
-		}
-	}
 	return true;
 }
 
@@ -743,9 +745,9 @@ ERROR:
 bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName)
 {
 	if (!createEmptyRequestContext( answer)) return false;
-	if (contextName)
+	if (contextType)
 	{
-		if (!inheritRequestContext( answer, contextType, contextName)) return false;
+		if (!initContextType( answer, contextType) || !inheritRequestContext( answer, contextType, contextName)) return false;
 	}
 	return true;
 }
@@ -780,6 +782,17 @@ bool WebRequestContext::initRequestContext( WebRequestAnswer& answer)
 	for (; di->type && di->name; ++di)
 	{
 		if (!inheritRequestContext( answer, di->type, di->name)) return false;
+	}
+	return true;
+}
+
+bool WebRequestContext::initContextType( WebRequestAnswer& answer, const char* contextType_)
+{
+	m_contextType = papuga_Allocator_copy_charp( &m_allocator, contextType_);
+	if (!m_contextType)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
 	}
 	return true;
 }
@@ -1261,15 +1274,6 @@ bool WebRequestContext::executeMainSchema( const char* schema, const WebRequestC
 	return executeContextSchema( (const char*)0, (const char*)0, schema, content, answer, delegateRequests);
 }
 
-bool WebRequestContext::executeCurrentSchema( const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
-{
-	return initContentRequest( answer)
-	&&	feedContentRequest( answer, content)
-	&&	initRequestContext( answer)
-	&&	executeContentRequest( answer, content)
-	&&	getContentRequestDelegateRequests( answer, delegateRequests);
-}
-
 bool WebRequestContext::executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
 {
 	return	createRequestContext( answer, contextType, contextName)
@@ -1283,9 +1287,12 @@ bool WebRequestContext::executeContextSchema( const char* contextType, const cha
 
 bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
 {
-	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-	m_context = context;
-	m_context_ownership = false;
+	if (m_context != context)
+	{
+		if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
+		m_context = context;
+		m_context_ownership = false;
+	}
 	return	initAutomaton( answer, contextType, schema)
 	&&	initContentRequest( answer)
 	&&	feedContentRequest( answer, content)
@@ -1452,6 +1459,11 @@ bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const 
 		return false;
 	}
 	releaseContext();
+	if (!initContextType( answer, typenam))
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
+	}
 	if (!init)
 	{
 		m_confighandler->commitStoreConfiguration( cfgtransaction);
@@ -1646,13 +1658,14 @@ WebRequestAnswer WebRequestContext::buildSimpleRequestAnswer(
 }
 
 bool WebRequestContext::pushDelegateRequestAnswer(
+		const char* schema,
 		const WebRequestContent& content,
 		WebRequestAnswer& answer)
 {
 	try
 	{
 		std::vector<WebRequestDelegateRequest> delegateRequests;
-		bool rt = executeCurrentSchema( content, answer, delegateRequests);
+		bool rt = executeContextSchema( m_context, m_contextType, schema, content, answer, delegateRequests);
 		if (rt && !delegateRequests.empty())
 		{
 			setAnswer( answer, ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in partial requests"));
@@ -1677,7 +1690,7 @@ bool WebRequestContext::pushDelegateRequestAnswer(
 	}
 }
 
-bool WebRequestContext::returnConfigurationDelegateRequestAnswer(
+bool WebRequestContext::pushConfigurationDelegateRequestAnswer(
 		const char* typenam,
 		const char* contextnam,
 		const char* schema,
@@ -1686,21 +1699,8 @@ bool WebRequestContext::returnConfigurationDelegateRequestAnswer(
 {
 	try
 	{
-		if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-		m_context = papuga_create_RequestContext();
-		m_context_ownership = true;
-		if (!m_context)
-		{
-			setAnswer( answer, ErrorCodeOutOfMem);
-			return false;
-		}
-		if (!papuga_RequestContext_inherit( m_context, m_handler->impl(), typenam, contextnam))
-		{
-			papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context, true);
-			setAnswer( answer, papugaErrorToErrorCode( errcode));
-			return false;
-		}
-		if (!pushDelegateRequestAnswer( content, answer))
+		if (!createRequestContext( answer, typenam, contextnam)) return false;
+		if (!pushDelegateRequestAnswer( schema, content, answer))
 		{
 			return false;
 		}

@@ -60,7 +60,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 			}
 			strus::WebRequestContent subcontent( accepted_charset, accepted_doctype, status.content().str(), status.content().len());
 
-			if (!ctx->returnConfigurationDelegateRequestAnswer( m_type.c_str(), m_name.c_str(), m_schema.c_str(), subcontent, ctxstatus))
+			if (!ctx->pushConfigurationDelegateRequestAnswer( m_type.c_str(), m_name.c_str(), m_schema.c_str(), subcontent, ctxstatus))
 			{
 				std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), ctxstatus.errorstr());
 				errbuf[ sizeof(errbuf)-1] = 0;

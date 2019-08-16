@@ -7,6 +7,7 @@ include_directories(
 	"${PROJECT_SOURCE_DIR}/include"
 	"${strusbase_INCLUDE_DIRS}"
 	${REQUEST_SOURCE_DIRS}
+	${BINDINGS_INCLUDE_DIRS}
 )
 
 link_directories(

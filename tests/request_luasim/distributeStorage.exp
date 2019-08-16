@@ -1,5 +1,5 @@
 {
 "statserver": {
-	"types": {},
-	"nofdocs": 0}
+	"types": ["entity","title","word"],
+	"nofdocs": 18}
 }
