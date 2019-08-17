@@ -13,6 +13,7 @@
 #include "strus/base/string_format.hpp"
 #include "strus/errorCodes.hpp"
 #include "papuga/valueVariant.h"
+#include "papuga/valueVariant.hpp"
 #include "papuga/allocator.h"
 #include "papuga/serialization.h"
 #include "papuga/errors.hpp"
@@ -281,31 +282,21 @@ static ConfigurationDescription createSubConfig( const std::string& name, papuga
 					--taglevel;
 					break;
 				case papuga_TagName:
+					if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 					if (taglevel == 1)
 					{
 						char nambuf[ 128];
 						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &itr), 0/*non ascii subst*/);
-						if (nam && 0==std::strcmp( nam, "id"))
+						if (nam && 0==std::strcmp( nam, "id") && papuga_TagValue == papuga_SerializationIter_follow_tag( &itr))
 						{
 							papuga_SerializationIter_skip( &itr);
 							if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
-	
-							if (papuga_SerializationIter_tag( &itr) == papuga_TagValue)
+							if (papuga_ValueVariant_isatomic( papuga_SerializationIter_value( &itr)))
 							{
-								std::size_t idlen;
-								const char* idval = papuga_ValueVariant_tostring( papuga_SerializationIter_value( &itr), &allocator, &idlen, &errcode);
-								if (!idval) throw std::bad_alloc();
-								subconfidid = std::string( idval, idlen);
+								subconfidid = papuga::ValueVariant_tostring( *papuga_SerializationIter_value( &itr), errcode);
+								if (errcode != papuga_Ok) throw std::bad_alloc();
 							}
 						}
-						else
-						{
-							if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
-						}
-					}
-					else
-					{
-						if (!papuga_Serialization_push( &ser, papuga_SerializationIter_tag( &itr), papuga_SerializationIter_value( &itr))) throw std::bad_alloc();
 					}
 			}
 		}

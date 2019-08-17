@@ -87,8 +87,9 @@ config_SSERVER2 = mergeValues(
 			config
 		)
 config_SSERVER2.service.name = "ssrv2"
-config_SSERVER2.statserver.id = "test",
+config_SSERVER2.statserver.id = "test"
 
+if verbose then io.stderr:write( string.format("- Merged statistics server configuration:\n%s\n", to_json(config_SSERVER2))) end
 def_server( SSERVER2, config_SSERVER2)
 
 statserverDef_configured = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
