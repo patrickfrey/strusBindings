@@ -36,6 +36,7 @@ each of these flags toggled to YES another section.
 	git clone https://github.com/intel/hyperscan.git
 	mkdir hyperscan/build
 	cd hyperscan/build
+	git checkout v5.1.1
 	cmake ..
 	make
 	make install
