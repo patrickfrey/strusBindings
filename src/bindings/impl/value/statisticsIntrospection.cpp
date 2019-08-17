@@ -32,7 +32,7 @@ void StatisticsMapIntrospection::serialize( papuga_Serialization& serialization,
 		{
 			GlobalCounter df = m_impl->df( m_type, m_value);
 			if (!papuga_Serialization_pushValue_int( &serialization, df)) throw std::bad_alloc();
-			if (!df && m_errorhnd->hasError()) throw strus::runtime_error(m_errorhnd->fetchError());
+			if (!df && m_errorhnd->hasError()) throw std::runtime_error(m_errorhnd->fetchError());
 			break;
 		}
 	}

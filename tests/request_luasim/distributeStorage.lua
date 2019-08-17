@@ -76,12 +76,24 @@ statserverConfig = {
 
 config.service.name = "ssrv"
 def_server( SSERVER1, config)
-
 call_server_checked( "PUT", SSERVER1  .. "/statserver/test", statserverConfig )
 
 statserverDef = call_server_checked( "GET", SSERVER1 .. "/statserver/test")
 if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
 
-checkExpected( statserverDef, "@distributeStorage.exp", "distributeStorage.res" )
+SSERVER2=ISERVER4
+config_SSERVER2 = mergeValues(
+			statserverConfig,
+			config
+		)
+config_SSERVER2.service.name = "ssrv2"
+config_SSERVER2.statserver.id = "test",
+
+def_server( SSERVER2, config_SSERVER2)
+
+statserverDef_configured = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
+if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
+
+checkExpected( statserverDef .. statserverDef_configured, "@distributeStorage.exp", "distributeStorage.res" )
 
 

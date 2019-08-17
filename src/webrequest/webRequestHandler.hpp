@@ -88,6 +88,7 @@ public:/*CurlEventLoopTicker*/
 
 private:/*Constructor/Destructor*/
 	void loadConfiguration( const std::string& configstr);
+	void loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& configdescr);
 	void clear();
 
 private:

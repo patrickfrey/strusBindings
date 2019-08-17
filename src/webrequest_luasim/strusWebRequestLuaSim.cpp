@@ -631,7 +631,7 @@ std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::strin
 		for (; di != de; ++di)
 		{
 			strus::Reference<strus::WebRequestDelegateContextInterface> receiver(
-				new WebRequestDelegateContext( &rt.first, ctx, di->url(), di->schema()));
+				new WebRequestDelegateContext( &rt.first, ctx, di->url(), di->receiverSchema()));
 			receivers.push_back( receiver);
 		}
 		di = delegateRequests.begin();

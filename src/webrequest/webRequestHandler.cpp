@@ -38,6 +38,11 @@
 
 using namespace strus;
 
+static const char* g_config_doctype = "json";
+static const char* g_config_charset = "utf-8";
+static const char* g_config_accepted_charset = "UTF-8";
+static const char* g_config_accepted_doctype = "application/json";
+
 struct MethodDescription
 {
 	enum {MaxNofArgs=8};
@@ -496,24 +501,43 @@ void WebRequestHandler::tick()
 	m_transactionPool.collectGarbage( m_eventLoop->time());
 }
 
+void WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& cfg)
+{
+	WebRequestAnswer status;
+
+	std::vector<WebRequestDelegateRequest> delegates;
+	strus::WebRequestContent subcontent( g_config_charset, cfg.doctype.c_str(), cfg.contentbuf.c_str(), cfg.contentbuf.size());
+	if (!ctxi->executeLoadSubConfiguration( cfg.type.c_str(), cfg.name.c_str(), subcontent, status, delegates))
+	{
+		throw strus::runtime_error(
+			_TXT("error loading sub configuration %s '%s': %s"),
+			cfg.type.c_str(), cfg.name.c_str(), status.errorstr());
+	}
+	std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
+	for (; di != de; ++di)
+	{
+		std::string contentstr( di->contentstr(), di->contentlen());
+		m_eventLoop->send(
+			di->url(), di->method(), contentstr,
+			new ConfigurationUpdateRequestContext( this, m_logger, cfg.type, cfg.name, di->receiverSchema()));
+	}
+	m_configHandler.declareSubConfiguration( cfg.type.c_str(), cfg.name.c_str());
+}
+
 void WebRequestHandler::loadConfiguration( const std::string& configstr)
 {
-	const char* config_doctype = "json";
-	const char* config_charset = "utf-8";
-	const char* accepted_charset = "UTF-8";
-	const char* accepted_doctype = "application/json";
 	WebRequestAnswer status;
 
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
 	{
 		m_logger->logPutConfiguration( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, configstr);
 	}
-	strus::local_ptr<WebRequestContextInterface> ctx( createContext( accepted_charset, accepted_doctype, ""/*html_base_href*/, status));
+	strus::local_ptr<WebRequestContextInterface> ctx( createContext( g_config_accepted_charset, g_config_accepted_doctype, ""/*html_base_href*/, status));
 	WebRequestContextInterface* ctxi = ctx.get();
 	if (!ctxi) throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
 
 	// Load main configuration:
-	strus::WebRequestContent content( config_charset, config_doctype, configstr.c_str(), configstr.size());
+	strus::WebRequestContent content( g_config_charset, g_config_doctype, configstr.c_str(), configstr.size());
 	if (!ctxi->executeLoadMainConfiguration( content, status))
 	{
 		throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
@@ -523,44 +547,14 @@ void WebRequestHandler::loadConfiguration( const std::string& configstr)
 	std::vector<ConfigurationDescription>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-		std::vector<WebRequestDelegateRequest> delegates;
-		strus::WebRequestContent subcontent( config_charset, ci->doctype.c_str(), ci->contentbuf.c_str(), ci->contentbuf.size());
-		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status, delegates))
-		{
-			throw strus::runtime_error(
-				_TXT("error loading sub configuration %s '%s': %s"),
-				ci->type.c_str(), ci->name.c_str(), status.errorstr());
-		}
-		std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
-		for (; di != de; ++di)
-		{
-			std::string contentstr( di->contentstr(), di->contentlen());
-			m_eventLoop->send(
-				di->url(), di->method(), contentstr,
-				new ConfigurationUpdateRequestContext( this, m_logger, di->receiverType(), di->receiverName(), di->schema()));
-		}
-		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
+		loadSubConfiguration( ctxi, *ci);
 	}
 	// Load put configurations:
 	cfglist = m_configHandler.getStoredConfigurations();
 	ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-		strus::WebRequestContent subcontent( config_charset, ci->doctype.c_str(), ci->contentbuf.c_str(), ci->contentbuf.size());
-		std::vector<WebRequestDelegateRequest> delegates;
-		if (!ctxi->executeLoadSubConfiguration( ci->type.c_str(), ci->name.c_str(), subcontent, status, delegates))
-		{
-			throw strus::runtime_error(
-				_TXT("error loading stored sub configuration %s '%s': %s"),
-				ci->type.c_str(), ci->name.c_str(), status.errorstr());
-		}
-		if (!delegates.empty())
-		{
-			throw strus::runtime_error(
-				_TXT("error loading sub configuration %s '%s': %s"),
-				ci->type.c_str(), ci->name.c_str(), _TXT("delegate requests in configuration not implemented yet"));
-		}
-		m_configHandler.declareSubConfiguration( ci->type.c_str(), ci->name.c_str());
+		loadSubConfiguration( ctxi, *ci);
 	}
 }
 

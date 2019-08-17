@@ -71,7 +71,8 @@ WebRequestContext::WebRequestContext(
 	,m_logger(logger_)
 	,m_confighandler(confighandler_)
 	,m_transactionPool(transactionPool_)
-	,m_contextType(0)
+	,m_contextType(ROOT_CONTEXT_NAME)
+	,m_contextName(ROOT_CONTEXT_NAME)
 	,m_context(0)
 	,m_context_ownership(false)
 	,m_request(0)
@@ -747,7 +748,8 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 	if (!createEmptyRequestContext( answer)) return false;
 	if (contextType)
 	{
-		if (!initContextType( answer, contextType) || !inheritRequestContext( answer, contextType, contextName)) return false;
+		if (!initContextType( answer, contextType, contextName)
+		||  !inheritRequestContext( answer, contextType, contextName)) return false;
 	}
 	return true;
 }
@@ -786,10 +788,11 @@ bool WebRequestContext::initRequestContext( WebRequestAnswer& answer)
 	return true;
 }
 
-bool WebRequestContext::initContextType( WebRequestAnswer& answer, const char* contextType_)
+bool WebRequestContext::initContextType( WebRequestAnswer& answer, const char* contextType_, const char* contextName_)
 {
 	m_contextType = papuga_Allocator_copy_charp( &m_allocator, contextType_);
-	if (!m_contextType)
+	m_contextName = papuga_Allocator_copy_charp( &m_allocator, contextName_);
+	if (!m_contextType || !m_contextName)
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
@@ -1459,7 +1462,7 @@ bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const 
 		return false;
 	}
 	releaseContext();
-	if (!initContextType( answer, typenam))
+	if (!initContextType( answer, typenam, contextnam))
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;

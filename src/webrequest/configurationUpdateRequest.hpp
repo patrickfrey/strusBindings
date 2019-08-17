@@ -24,8 +24,12 @@ class ConfigurationUpdateRequestContext
 	:public WebRequestDelegateContextInterface
 {
 public:
-	ConfigurationUpdateRequestContext( WebRequestHandlerInterface* handler_, WebRequestLoggerInterface* logger_, const std::string& type_, const std::string& name_, const std::string& schema_)
-		:m_handler(handler_),m_logger(logger_),m_type(type_),m_name(name_),m_schema(schema_){}
+	ConfigurationUpdateRequestContext( WebRequestHandlerInterface* handler_, WebRequestLoggerInterface* logger_, const std::string& receiverType_, const std::string& receiverName_, const char* receiverSchema_)
+		:m_handler(handler_)
+		,m_logger(logger_)
+		,m_type(receiverType_)
+		,m_name(receiverName_)
+		,m_schema(receiverSchema_){}
 
 	virtual void putAnswer( const WebRequestAnswer& status);
 

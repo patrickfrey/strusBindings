@@ -76,7 +76,7 @@ private:
 	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
-	bool initContextType( WebRequestAnswer& answer, const char* contextType);
+	bool initContextType( WebRequestAnswer& answer, const char* contextType, const char* contextName);
 	bool initAutomaton( WebRequestAnswer& answer, const char* contextType, const char* schema);
 	bool initContentRequest( WebRequestAnswer& answer);
 	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
@@ -109,6 +109,7 @@ private:
 	TransactionPool* m_transactionPool;	//< transaction pool
 	papuga_Allocator m_allocator;
 	const char* m_contextType;		//< context type
+	const char* m_contextName;		//< context name
 	papuga_RequestContext* m_context;
 	bool m_context_ownership;
 	papuga_Request* m_request;

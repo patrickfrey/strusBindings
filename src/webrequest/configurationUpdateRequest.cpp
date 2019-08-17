@@ -45,7 +45,8 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 		}
 		else if (!status.content().empty())
 		{
-			if (0!=std::strcmp( status.content().charset(), accepted_charset) || 0!=std::strcmp( status.content().charset(), accepted_doctype))
+			if (0!=std::strcmp( status.content().charset(), accepted_charset)
+			||  0!=std::strcmp( status.content().doctype(), accepted_doctype))
 			{
 				throw strus::runtime_error( _TXT("expected delegate request to be JSON/UTF-8"));
 			}
@@ -53,18 +54,24 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 			strus::local_ptr<WebRequestContextInterface> ctx( m_handler->createContext( accepted_charset, accepted_doctype, ""/*html_base_href*/, ctxstatus));
 			if (!ctx.get())
 			{
-				std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), ctxstatus.errorstr());
-				errbuf[ sizeof(errbuf)-1] = 0;
-				m_logger->logError( errbuf);
+				if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+				{
+					std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), ctxstatus.errorstr());
+					errbuf[ sizeof(errbuf)-1] = 0;
+					m_logger->logError( errbuf);
+				}
 				return;
 			}
 			strus::WebRequestContent subcontent( accepted_charset, accepted_doctype, status.content().str(), status.content().len());
 
 			if (!ctx->pushConfigurationDelegateRequestAnswer( m_type.c_str(), m_name.c_str(), m_schema.c_str(), subcontent, ctxstatus))
 			{
-				std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), ctxstatus.errorstr());
-				errbuf[ sizeof(errbuf)-1] = 0;
-				m_logger->logError( errbuf);
+				if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+				{
+					std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), ctxstatus.errorstr());
+					errbuf[ sizeof(errbuf)-1] = 0;
+					m_logger->logError( errbuf);
+				}
 				return;
 			}
 		}
