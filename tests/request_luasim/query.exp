@@ -20,6 +20,7 @@
 				"metadata_doclen": "doclen"}}],
 	"weighting_sets": ["search"]}
 }
+
 {
 "result": {
 	"ranklist": {
@@ -108,6 +109,7 @@
 						"weight": 1,
 						"index": -1}]}]}}
 }
+
 {
 "result": {
 	"ranklist": {
@@ -156,6 +158,7 @@
 						"weight": 1,
 						"index": -1}]}]}}
 }
+
 {
 "result": {
 	"ranklist": {
@@ -244,3 +247,4 @@
 						"weight": 1,
 						"index": -1}]}]}}
 }
+

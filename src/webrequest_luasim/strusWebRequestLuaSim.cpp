@@ -26,6 +26,7 @@
 #include "strus/base/regex.hpp"
 #include "strus/base/utf8.hpp"
 #include "private/internationalization.hpp"
+#include "blockingCurlClient.hpp"
 #include "papuga/lib/lua_dev.h"
 #include "papuga/serialization.h"
 #include "papuga/valueVariant.h"
@@ -42,11 +43,10 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <limits>
+#include <unistd.h> 
 #include <map>
 #include <cstdbool>
 #include <iostream>
-
-#undef STRUS_LOWLEVEL_DEBUG
 
 struct CString
 {
@@ -242,10 +242,10 @@ private:
 	std::string m_procname;
 };
 
-static bool g_verbose = false;
 static Logger g_logger;
 static const char* g_charset = "UTF-8";
 static const char* g_doctype = "application/json";
+static strus::BlockingCurlClient* g_blockingCurlClient = 0;
 
 namespace {
 template <typename ValueType>
@@ -403,6 +403,7 @@ public:
 	GlobalContext(){}
 
 	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson);
+	void startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep);
 	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& url, const std::string& content);
 	void reportError( const char* fmt, ...);
 
@@ -508,6 +509,9 @@ static EventLoop g_eventLoop;
 static GlobalContext g_globalContext;
 static std::string g_scriptDir;
 static std::string g_outputDir;
+static std::string g_serviceProgramCmdLine;
+static std::vector<pid_t> g_serviceProgramPids;
+static int g_verbosity = 0;
 static strus::DebugTraceInterface* g_debugTrace = 0;
 static strus::ErrorBufferInterface* g_errorhnd = 0;
 
@@ -521,6 +525,72 @@ static std::pair<std::string,std::string> splitUrl( const std::string& url)
 	rt.first.append( server_start, pi-server_start);
 	for (; *pi == '/'; ++pi){}
 	rt.second.append( pi);
+	return rt;
+}
+
+static std::string substStringVariable( const std::string& src, const char* name, const std::string& value)
+{
+	std::size_t namelen = std::strlen(name);
+	char const* si = std::strchr( src.c_str(), '{');
+	for (; si; si = std::strchr( si+1, '{'))
+	{
+		char const* ni = si+1;
+		for (; (unsigned char)*ni <= 32; ++ni){}
+		if (0!=std::memcmp( ni, name, namelen)) continue;
+		ni += namelen;
+		for (; (unsigned char)*ni <= 32; ++ni){}
+		if (*ni == '}')
+		{
+			std::string rt;
+			rt.append( src.c_str(), si-src.c_str());
+			rt.append( value);
+			rt.append( ni+1);
+			return rt;
+		}
+	}
+	return src;
+}
+
+static std::vector<std::string> splitCmdLine( const std::string& cmdline)
+{
+	std::vector<std::string> rt;
+	char const* ci = cmdline.c_str();
+	while (*ci)
+	{
+		if (*ci == '{')
+		{
+			char const* start = ci;
+			int brkcnt = 1;
+			for (++ci; *ci && brkcnt > 0; ++ci)
+			{
+				if (*ci == '{') ++brkcnt;
+				if (*ci == '}') --brkcnt;
+			}
+			if (brkcnt) throw std::runtime_error(_TXT("syntax error, brackets not balanced in JSON passed by command line"));
+			rt.push_back( std::string( start, ci-start));
+		}
+		else if (*ci == ' ')
+		{
+			++ci;
+		}
+		else if (*ci == '"' || *ci == '\'')
+		{
+			char const* start = ci+1;
+			char eb = *ci;
+			for (++ci; *ci && *ci != eb; ++ci){}
+			if (*ci != eb) throw std::runtime_error(_TXT("syntax error, string passed by command line not terminated"));
+			rt.push_back( std::string( start, ci-start));
+			++ci;
+		}
+		else
+		{
+			char const* start = ci;
+			char eb = ' ';
+			for (++ci; *ci && *ci != eb; ++ci){}
+			rt.push_back( std::string( start, ci-start));
+			if (*ci == eb) ++ci;
+		}
+	}
 	return rt;
 }
 
@@ -650,6 +720,7 @@ std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::strin
 	if (!rt.first.content().empty())
 	{
 		rt.second.append( rt.first.content().str(), rt.first.content().len());
+		rt.second.push_back( '\n');
 		rt.first.content().setContent( rt.second.c_str(), rt.second.size());
 	}
 	return rt;
@@ -668,23 +739,86 @@ void GlobalContext::defineServer( const std::string& hostname, const Configurati
 	}
 }
 
-std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
+void GlobalContext::startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep)
 {
-	std::pair<std::string,std::string> serverPathPair = splitUrl( url);
-	const std::string& proc = serverPathPair.first;
-	const std::string& path = serverPathPair.second;
-	strus::WebRequestContent content( g_charset, g_doctype, contentstr.c_str(), contentstr.size());
-
-	ProcMap::iterator pi = m_procMap.find( proc);
-	if (pi == m_procMap.end())
+	char const* hptr = hostname.c_str();
+	if (strus::caseInsensitiveStartsWith( hostname, "http:") || strus::caseInsensitiveStartsWith( hostname, "https:"))
 	{
-		const char* errmsg = strus::errorCodeToString( strus::ErrorCodeNotFound);
-		strus::WebRequestAnswer answer( errmsg, 404, strus::ErrorCodeNotFound, strus::WebRequestContent());
-		return std::pair<strus::WebRequestAnswer,std::string>( answer, std::string());
+		hptr = std::strchr( hptr, ':')+1;
+	}
+	char const* portstr = std::strchr( hptr, ':');
+	char const* configfile = "tmp.startServerProcess.config.js";
+	std::string configpath = strus::joinFilePath( g_outputDir, configfile);
+	int ec = strus::writeFile( configpath, configjson);
+	if (ec) throw strus::runtime_error( _TXT("failed to write configuration for server to start into text file %s (errno %d): %s"), configpath.c_str(), ec, ::strerror(ec));
+
+	std::string cmdline = substStringVariable(
+					substStringVariable( g_serviceProgramCmdLine, "port", portstr ? (portstr+1):"80"),
+					"config", configpath);
+	std::vector<std::string> cmd = splitCmdLine( cmdline);
+	enum {MaxArgNum=64};
+	const char* argv[ MaxArgNum+2];
+	int argc = 0;
+	if (cmd.size() >= MaxArgNum) throw std::runtime_error(_TXT("too many arguments for starting server"));
+	std::vector<std::string>::const_iterator ci = cmd.begin(), ce = cmd.end();
+	for (; ci != ce; ++ci,++argc)
+	{
+		argv[ argc] = ci->c_str();
+	}
+	argv[ argc] = 0;
+
+	pid_t pid = ::fork();
+	if ( pid == 0 )
+	{
+		pid_t pid_chld = getpid();
+		fprintf( stderr, "FORK child %d\n", (int)pid_chld);
+		ec = ::execvp( argv[0], (char* const*)(argv));
+		if (ec)
+		{
+			std::fprintf( stderr, _TXT("failed to run server %s: return %d"), hostname.c_str(), ec);
+		}
+		else
+		{
+			g_serviceProgramPids.push_back( pid_chld);
+		}
+		exit( ec);
 	}
 	else
 	{
-		return pi->second.call( method, path, content);
+		fprintf( stderr, "FORK parent %d, sleeping %d seconds\n", (int)getpid(), serverParentSleep);
+		::sleep( serverParentSleep);
+	}
+}
+
+std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
+{
+	if (g_blockingCurlClient)
+	{
+		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, contentstr);
+		std::pair<strus::WebRequestAnswer,std::string> rt;
+		rt.second = response.content;
+		strus::WebRequestContent content( g_charset, g_doctype, rt.second.c_str(), rt.second.size());
+		rt.first = strus::WebRequestAnswer( response.httpstatus, content);
+		return rt;
+	}
+	else
+	{
+		std::pair<std::string,std::string> serverPathPair = splitUrl( url);
+		const std::string& proc = serverPathPair.first;
+		const std::string& path = serverPathPair.second;
+		strus::WebRequestContent content( g_charset, g_doctype, contentstr.c_str(), contentstr.size());
+		
+		ProcMap::iterator pi = m_procMap.find( proc);
+		if (pi == m_procMap.end())
+		{
+			const char* errmsg = strus::errorCodeToString( strus::ErrorCodeNotFound);
+			strus::WebRequestAnswer answer( errmsg, 404, strus::ErrorCodeNotFound, strus::WebRequestContent());
+			return std::pair<strus::WebRequestAnswer,std::string>( answer, std::string());
+		}
+		else
+		{
+			return pi->second.call( method, path, content);
+		}
 	}
 }
 
@@ -747,7 +881,9 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& confi
 	}
 	else
 	{
-		configstr.append( lua_tostring( L, luaddr));
+		const char* str = lua_tostring( L, luaddr);
+		if (!str) return false;
+		configstr.append( str);
 	}
 	return true;
 }
@@ -985,7 +1121,16 @@ static int l_def_server( lua_State* L)
 		Configuration configmap( L, 2);
 		std::string configjson = convertLuaValueToJson( L, 2);
 
-		g_globalContext.defineServer( hostname, configmap, configjson);
+		if (g_serviceProgramCmdLine.empty())
+		{
+			g_globalContext.defineServer( hostname, configmap, configjson);
+		}
+		else
+		{
+			lua_getglobal( L, "serverwait");
+			int serverParentSleep = lua_isnumber( L, -1) ? lua_tointeger( L, -1) : 3;
+			g_globalContext.startServerProcess( hostname, configjson, serverParentSleep);
+		}
 	}
 	catch (const std::exception& err)
 	{
@@ -1348,7 +1493,7 @@ static void declareFunctions( lua_State* L)
 	DEFINE_FUNCTION( reformat_regex );
 	DEFINE_FUNCTION( to_json );
 	DEFINE_FUNCTION( from_json );
-	lua_pushboolean( L, g_verbose);
+	lua_pushboolean( L, g_verbosity > 0);
 	lua_setglobal( L, "verbose");
 }
 
@@ -1366,9 +1511,7 @@ static void printUsage()
 static void setLuaPath( lua_State* ls, const char* path)
 {
 	const char* cur_path;
-#ifdef STRUS_LOWLEVEL_DEBUG
-	fprintf( stderr, "set lua module path to: '%s'\n", path);
-#endif
+	if (g_verbosity) fprintf( stderr, "set lua module path to: '%s'\n", path);
 	char pathbuf[ 2048];
 	lua_getglobal( ls, "package");
 	lua_getfield( ls, -1, "path");
@@ -1387,9 +1530,7 @@ static void setLuaPath( lua_State* ls, const char* path)
 			luaL_error( ls, _TXT("internal buffer is too small for path"));
 		}
 	}
-#ifdef STRUS_LOWLEVEL_DEBUG
-	fprintf( stderr, "set lua module pattern to: '%s'\n", pathbuf);
-#endif
+	if (g_verbosity) fprintf( stderr, "set lua module pattern to: '%s'\n", pathbuf);
 	lua_pop( ls, 1); 
 	lua_pushstring( ls, pathbuf);
 	lua_setfield( ls, -2, "path");
@@ -1463,13 +1604,13 @@ static void printDebugTraceMessages()
 #define MaxModPaths 64
 int main( int argc, const char* argv[])
 {
+	int rt = 0;
 	const char* inputfile = 0;
 	lua_State* ls = 0;
 	int argi = 1;
 	int errcode = 0;
 	int modi = 0;
 	int mi,me;
-	int verbosity = 0;
 	const char* modpath[ MaxModPaths];
 
 	try
@@ -1478,8 +1619,7 @@ int main( int argc, const char* argv[])
 		g_errorhnd = strus::createErrorBuffer_standard( NULL, 2, g_debugTrace);
 		if (!g_debugTrace || !g_errorhnd)
 		{
-			fprintf( stderr, _TXT( "out of memory creating error handler\n"));
-			return -1;
+			throw std::runtime_error( _TXT( "out of memory creating error handler"));
 		}
 		/* Parse command line arguments: */
 		for (; argi < argc; ++argi)
@@ -1491,20 +1631,19 @@ int main( int argc, const char* argv[])
 			else if (0==strcmp( argv[argi], "--help") || 0==strcmp( argv[argi], "-h"))
 			{
 				printUsage();
-				return 0;
+				rt = 0;
+				goto EXIT;
 			}
 			else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV") || 0==strcmp( argv[argi], "-VVVVV"))
 			{
-				verbosity += std::strlen(argv[argi])-1;
-				g_verbose = true;
+				g_verbosity += std::strlen(argv[argi])-1;
 			}
 			else if (0==strcmp( argv[argi], "--debug") || 0==strcmp( argv[argi], "-G"))
 			{
 				++argi;
 				if (argi == argc || argv[argi][0] == '-')
 				{
-					fprintf( stderr, _TXT("option -G (--debug) needs argument\n"));
-					return 1;
+					throw std::runtime_error( _TXT("option -G (--debug) needs argument"));
 				}
 				g_debugTrace->enable( argv[argi]);
 			}
@@ -1513,14 +1652,26 @@ int main( int argc, const char* argv[])
 				++argi;
 				if (argi == argc || argv[argi][0] == '-')
 				{
-					fprintf( stderr, _TXT("option -m (--mod) needs argument\n"));
-					return 1;
+					throw std::runtime_error( _TXT("option -m (--mod) needs argument"));
 				}
 				if (modi >= MaxModPaths)
 				{
-					fprintf( stderr, _TXT("too many options -m (--mod) specified in argument list\n"));
+					throw std::runtime_error( _TXT("too many options -m (--mod) specified in argument list"));
 				}
 				modpath[ modi++] = argv[argi];
+			}
+			else if (0==strcmp( argv[argi], "--program") || 0==strcmp( argv[argi], "-p"))
+			{
+				++argi;
+				if (argi == argc || argv[argi][0] == '-')
+				{
+					throw std::runtime_error( _TXT("option -p (--program) needs argument"));
+				}
+				if (!g_serviceProgramCmdLine.empty())
+				{
+					throw std::runtime_error( _TXT("option -p(--program) specified twice"));
+				}
+				g_serviceProgramCmdLine = argv[argi];
 			}
 			else if (0==strcmp( argv[argi], "--"))
 			{
@@ -1530,16 +1681,22 @@ int main( int argc, const char* argv[])
 		}
 		if (argi == argc)
 		{
-			fprintf( stderr, _TXT("too few arguments (less than one)\n"));
-			return -1;
+			throw std::runtime_error( _TXT("too few arguments (less than one)"));
+		}
+		if (!g_serviceProgramCmdLine.empty())
+		{
+			mi = 0, me = modi;
+			for (; mi < me; ++mi)
+			{
+				g_serviceProgramCmdLine.append( " -m \"");
+				g_serviceProgramCmdLine.append( modpath[ mi]);
+				g_serviceProgramCmdLine.append( "\"");
+			}
 		}
 		inputfile = argv[ argi++];
 		int ec = strus::getParentPath( inputfile, g_scriptDir);
-		if (ec)
-		{
-			fprintf( stderr, _TXT("failed to get directory of the script to execute\n"));
-			return -1;
-		}
+		if (ec) throw std::runtime_error( _TXT("failed to get directory of the script to execute"));
+
 		if (argi == argc)
 		{
 			g_outputDir = ".";
@@ -1550,14 +1707,15 @@ int main( int argc, const char* argv[])
 		}
 		if (argi != argc)
 		{
-			fprintf( stderr, _TXT("too many arguments\n"));
-			return -1;
+			throw std::runtime_error( _TXT("too many arguments"));
 		}
-		g_logger.init( verbosity);
+		g_logger.init( g_verbosity);
 
-#ifdef STRUS_LOWLEVEL_DEBUG
-		fprintf( stderr, "create lua state\n");
-#endif
+		if (g_verbosity) fprintf( stderr, "create lua state\n");
+		if (!g_serviceProgramCmdLine.empty())
+		{
+			g_blockingCurlClient = new strus::BlockingCurlClient();
+		}
 		/* Define the lua state: */
 		ls = luaL_newstate();
 		luaL_openlibs( ls);
@@ -1573,28 +1731,26 @@ int main( int argc, const char* argv[])
 		declareFunctions( ls);
 	
 		/* Load the script: */
-#ifdef STRUS_LOWLEVEL_DEBUG
-		fprintf( stderr, "load script file: '%s'\n", inputfile);
-#endif
+		if (g_verbosity) fprintf( stderr, "load script file: '%s'\n", inputfile);
+
 		errcode = luaL_loadfile( ls, inputfile);
 		if (errcode != LUA_OK)
 		{
 			handleLuaScriptError( ls, errcode, inputfile, _TXT("loading script"));
 			lua_close( ls);
-			if (g_errorhnd) delete g_errorhnd;
-			return -2;
+			rt = -2;
+			goto EXIT;
 		}
-#ifdef STRUS_LOWLEVEL_DEBUG
-		fprintf( stderr, "starting ...\n");
-#endif
+		if (g_verbosity) fprintf( stderr, "starting ...\n");
+
 		/* Run the script: */
 		errcode = lua_pcall( ls, 0, LUA_MULTRET, 0);
 		if (errcode != LUA_OK)
 		{
 			handleLuaScriptError( ls, errcode, inputfile, _TXT("executing script"));
 			lua_close( ls);
-			if (g_errorhnd) delete g_errorhnd;
-			return -3;
+			rt = -3;
+			goto EXIT;
 		}
 		lua_close( ls);
 		printDebugTraceMessages();
@@ -1603,30 +1759,32 @@ int main( int argc, const char* argv[])
 		{
 			if (g_errorhnd->hasError())
 			{
-				fprintf( stderr, _TXT("error in strus context: %s\n"), g_errorhnd->fetchError());
-				return -4;
+				throw strus::runtime_error( _TXT("error in strus context: %s"), g_errorhnd->fetchError());
 			}
-			delete g_errorhnd;
 		}
-		return 0;
+		goto EXIT;
 	}
 	catch (const std::bad_alloc&)
 	{
-		if (g_errorhnd) delete g_errorhnd;
 		fprintf( stderr, _TXT( "out of memory\n"));
-		return -1;
+		rt = -1;
+		goto EXIT;
 	}
 	catch (const std::runtime_error& err)
 	{
-		if (g_errorhnd) delete g_errorhnd;
 		fprintf( stderr, _TXT( "runtime error: %s\n"), err.what());
-		return -1;
+		rt = -1;
+		goto EXIT;
 	}
 	catch (const std::exception& err)
 	{
-		if (g_errorhnd) delete g_errorhnd;
 		fprintf( stderr, _TXT( "uncaught exception: %s\n"), err.what());
-		return -1;
+		rt = -1;
+		goto EXIT;
 	}
+EXIT:
+	if (g_blockingCurlClient) delete g_blockingCurlClient;
+	if (g_errorhnd) delete g_errorhnd;
+	return rt;
 }
 

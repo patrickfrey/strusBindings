@@ -32,6 +32,9 @@ public:
 	WebRequestAnswer( const WebRequestContent& content_)
 		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
 	/// \brief Constructor
+	WebRequestAnswer( int httpstatus_, const WebRequestContent& content_)
+		:m_errorstr(0),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
+	/// \brief Constructor
 	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_)
 		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(){m_errorbuf[0]=0;}
 	/// \brief Copy constructor

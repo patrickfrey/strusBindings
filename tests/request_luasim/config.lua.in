@@ -14,8 +14,31 @@ config = {
 			@STRUS_MODULES_LOADED@
 		}	
 	},
+	http = {
+		script = "/strus"
+	},
 	service = {
-		name = "test"
+		name = "test",
+		api = "http",
+		ip = "0.0.0.0",
+		port = 8080,
+	},
+	logging = {
+		level = "debug",
+		file = {
+			name = "./strusWebService.{service.name}.log",
+			append = true
+		}
+	},
+	debug = {
+		log_requests = true,
+		struct_depth = 4,
+		request_file = "./requests.{service.name}.log",
+		protocol = {
+			pretty_print = true,
+			quit_enabled = true,
+			debug_enabled = true
+		}
 	}
 }
 
