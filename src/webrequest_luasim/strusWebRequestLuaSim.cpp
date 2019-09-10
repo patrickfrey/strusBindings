@@ -746,15 +746,14 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	{
 		hptr = std::strchr( hptr, ':')+1;
 	}
-	char const* portstr = std::strchr( hptr, ':');
-	char const* configfile = "tmp.startServerProcess.config.js";
+	char const* portsep = std::strchr( hptr, ':');
+	char const* portstr = portsep ? (portsep+1) : "80";
+	std::string configfile = strus::string_format( "tmp.startServerProcess.config.%s.js", portstr);
 	std::string configpath = strus::joinFilePath( g_outputDir, configfile);
 	int ec = strus::writeFile( configpath, configjson);
 	if (ec) throw strus::runtime_error( _TXT("failed to write configuration for server to start into text file %s (errno %d): %s"), configpath.c_str(), ec, ::strerror(ec));
 
-	std::string cmdline = substStringVariable(
-					substStringVariable( g_serviceProgramCmdLine, "port", portstr ? (portstr+1):"80"),
-					"config", configpath);
+	std::string cmdline = substStringVariable( substStringVariable( g_serviceProgramCmdLine, "port", portstr), "config", configpath);
 	std::vector<std::string> cmd = splitCmdLine( cmdline);
 	enum {MaxArgNum=64};
 	const char* argv[ MaxArgNum+2];
@@ -771,7 +770,7 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	if ( pid == 0 )
 	{
 		pid_t pid_chld = getpid();
-		fprintf( stderr, "FORK child %d\n", (int)pid_chld);
+		fprintf( stderr, "FORK child %d EXEC %s\n", (int)pid_chld, cmdline.c_str());
 		ec = ::execvp( argv[0], (char* const*)(argv));
 		if (ec)
 		{

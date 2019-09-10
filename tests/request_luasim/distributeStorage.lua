@@ -32,7 +32,7 @@ function buildStorageServer( serveridx, serveraddr)
 	storageConfig.storage.path = string.format("storage/test%d", serveridx)
 	call_server_checked( "POST", serveraddr .. "/storage/test",  storageConfig )
 	call_server_checked( "PUT",  serveraddr .. "/inserter/test", "@inserter.json" )
-	call_server_checked( "POST", serveraddr .. "/qryeval/test",  "@qryeval.json" )
+	call_server_checked( "PUT", serveraddr .. "/qryeval/test",  "@qryeval.json" )
 
 	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %d\n", serveridx)) end
 

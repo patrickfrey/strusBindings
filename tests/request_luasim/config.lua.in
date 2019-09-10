@@ -18,6 +18,7 @@ config = {
 		script = "/strus"
 	},
 	service = {
+		worker_threads = 1,
 		name = "test",
 		api = "http",
 		ip = "0.0.0.0",
