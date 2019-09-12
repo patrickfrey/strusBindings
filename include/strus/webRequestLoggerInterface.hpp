@@ -31,7 +31,8 @@ public:
 		LogConfiguration=0x20,
 		LogAction=0x40,
 		LogContentEvents=0x80,
-		LogAll=0xFF
+		LogConnectionEvents=0x100,
+		LogAll=0xFFFF
 	};
 
 	/// \brief Destructor
@@ -85,6 +86,11 @@ public:
 			const char* arguments,
 			const char* result,
 			const char* resultvar)=0;
+
+	/// \brief Log a verbose event from the network client library (cURL)
+	/// \param[in] content content to log
+	/// \remark expected to be thread safe
+	virtual void logConnectionEvent( const char* content)=0;
 
 	/// \brief Log a warning message
 	/// \param[in] warnmsg warning message to log

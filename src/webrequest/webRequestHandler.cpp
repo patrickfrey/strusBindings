@@ -489,6 +489,7 @@ bool WebRequestHandler::delegateRequest(
 		const std::string& content,
 		WebRequestDelegateContextInterface* context)
 {
+	/*[-]*/std::cerr << "+++ send " << method << " " << address << " {" << content << "}" << std::endl;
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogDelegateRequests))
 	{
 		m_logger->logDelegateRequest( address.c_str(), method.c_str(), content.c_str());

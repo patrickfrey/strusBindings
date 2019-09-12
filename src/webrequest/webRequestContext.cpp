@@ -1004,6 +1004,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 		papuga_RequestError errstruct;
 		papuga_init_RequestError( &errstruct);
 
+		errstruct.errcode = papuga_HostObjectError;
 		errstruct.classname = cdef->name;
 		errstruct.methodname = cdef->methodnames[ methoddescr->id.functionid-1];
 
@@ -1815,8 +1816,12 @@ bool WebRequestContext::executeRequest(
 					}
 					else
 					{
-						objectDescr.reset();
-						return executeDeleteConfiguration( objectDescr.typenam, objectDescr.contextnam, m_answer);
+						if (content.empty())
+						{
+							objectDescr.reset();
+							return executeDeleteConfiguration( objectDescr.typenam, objectDescr.contextnam, m_answer);
+						}
+						//... else fallback
 					}
 				}
 				else if (!objectDescr.obj && objectDescr.context && content.empty() && isEqual( method, "GET"))

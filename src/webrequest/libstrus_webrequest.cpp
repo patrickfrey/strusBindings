@@ -44,6 +44,7 @@ public:
 			const char* arguments,
 			const char* result,
 			const char* resultvar){}
+	virtual void logConnectionEvent( const char* content){}
 	virtual void logWarning( const char* warnmsg){}
 	virtual void logError( const char* errmsg){}
 };

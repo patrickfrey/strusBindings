@@ -71,7 +71,7 @@ public:
 		m_loglevel = loglevel_;
 		switch (m_loglevel)
 		{
-			case 4: m_logmask |= (LogContentEvents);
+			case 4: m_logmask |= (LogContentEvents|LogConnectionEvents);
 			case 3: m_logmask |= (LogMethodCalls|LogAction);
 			case 2: m_logmask |= (LogRequests|LogDelegateRequests|LogConfiguration);
 			case 1: m_logmask |= (LogError|LogWarning);
@@ -155,6 +155,11 @@ public:
 				std::cerr << header() << strus::string_format( "PARSE %s", title) << std::endl;
 			}
 		}
+	}
+
+	virtual void logConnectionEvent( const char* content)
+	{
+		std::cerr << header() << strus::string_format( "CURL\n%s", content) << std::endl;
 	}
 
 	virtual void logMethodCall(

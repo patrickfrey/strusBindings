@@ -17,6 +17,7 @@
 #include "strus/base/atomic.hpp"
 #include "strus/base/bitset.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/base/filehandle.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/reference.hpp"
 #include "private/internationalization.hpp"
@@ -69,7 +70,7 @@ static size_t std_string_append_callback(char *ptr, size_t size, size_t nmemb, v
 
 class Logger {
 public:
-	enum LogType {LogFatal,LogError,LogWarning};
+	enum LogType {LogFatal,LogError,LogWarning,LogInfo};
 
 	explicit Logger( WebRequestLoggerInterface* logger_)
 		:m_logger(logger_),m_loglevel(evalLogLevel( logger_)){}
@@ -94,6 +95,9 @@ public:
 			case LogWarning:
 				m_logger->logWarning( msgbuf);
 				break;
+			case LogInfo:
+				m_logger->logConnectionEvent( msgbuf);
+				break;
 		}
 	}
 
@@ -102,7 +106,11 @@ public:
 private:
 	static LogType evalLogLevel( WebRequestLoggerInterface* logger_)
 	{
-		if ((logger_->logMask() & WebRequestLoggerInterface::LogWarning) != 0)
+		if ((logger_->logMask() & WebRequestLoggerInterface::LogConnectionEvents) != 0)
+		{
+			return LogInfo;
+		}
+		else if ((logger_->logMask() & WebRequestLoggerInterface::LogWarning) != 0)
 		{
 			return LogWarning;
 		}
@@ -147,8 +155,10 @@ public:
 	void reconnect();
 	void done();
 	void dropAllPendingRequests( const strus::ErrorCode& errcode, const char* errmsg);
+	void flushLogs();
 
 	CURL* handle() const {return m_curl;}
+	Logger& logger();
 
 private:
 	enum State {Init,Connected,Process};
@@ -161,6 +171,7 @@ private:
 	strus::mutex m_mutex;
 	std::queue<WebRequestDelegateDataRef> m_requestQueue;
 	CurlEventLoop::Data* m_eventloopdata;
+	strus::Reference<strus::WriteBufferHandle> m_curlLogBuf;
 
 private:
 	void connect();
@@ -182,6 +193,7 @@ public:
 
 public:
 	CURL* handle() const {return m_handle;}
+	void flushLogs();
 
 private:
 	CURL* m_handle;
@@ -254,12 +266,44 @@ void WebRequestDelegateConnection::connect()
 	set_curl_opt( m_curl, CURLOPT_TCP_KEEPIDLE, 120L);
 	set_curl_opt( m_curl, CURLOPT_TCP_KEEPINTVL, 60L);
 	set_curl_opt( m_curl, CURLOPT_CONNECT_ONLY, 1L);
+	if (Logger::LogInfo <= logger().loglevel())
+	{
+		m_curlLogBuf.reset( new strus::WriteBufferHandle());
+		if (m_curlLogBuf->error() == 0)
+		{
+			set_curl_opt( m_curl, CURLOPT_STDERR, m_curlLogBuf->getCStreamHandle());
+			set_curl_opt( m_curl, CURLOPT_VERBOSE, 1);
+		}
+	}
 	CURLcode res = curl_easy_perform( m_curl);
 	if (res != CURLE_OK)
 	{
 		throw strus::runtime_error( _TXT("failed to connect to '%s:%d': %s"), m_url.c_str(), m_port, curl_easy_strerror(res));
 	}
 	m_state = Connected;
+	if (m_curlLogBuf.get())
+	{
+		std::string conninfo = m_curlLogBuf->fetchContent();
+		if (!conninfo.empty())
+		{
+			logger().print( Logger::LogInfo, _TXT("libcurl verbose output:\n%s"), conninfo.c_str());
+		}
+	}
+	/*[-]*/char curlid[ 32];
+	/*[-]*/std::snprintf( curlid, sizeof(curlid), "%lx", (uintptr_t)m_curl);
+	/*[-]*/std::cerr << "+++ connect " << curlid << " " << m_url << " " << m_port << std::endl;
+}
+
+void WebRequestDelegateConnection::flushLogs()
+{
+	if (m_curlLogBuf.get())
+	{
+		std::string conninfo = m_curlLogBuf->fetchContent();
+		if (!conninfo.empty())
+		{
+			logger().print( Logger::LogInfo, _TXT("libcurl log:\n%s"), conninfo.c_str());
+		}
+	}
 }
 
 WebRequestDelegateConnection::WebRequestDelegateConnection( const std::string& address, CurlEventLoop::Data* eventloopdata_)
@@ -312,6 +356,7 @@ void WebRequestDelegateConnection::done()
 	{
 		connect();
 	}
+	flushLogs();
 }
 
 void WebRequestDelegateConnection::dropAllPendingRequests( const strus::ErrorCode& errcode, const char* errmsg)
@@ -718,6 +763,10 @@ struct CurlEventLoop::Data
 						else
 						{
 							curl_multi_remove_handle( m_multi_handle, msg->easy_handle);
+							if (Logger::LogInfo <= m_logger.loglevel())
+							{
+								job->flushLogs();
+							}
 							job->resume( msg->data.result);
 						}
 					}
@@ -740,6 +789,11 @@ struct CurlEventLoop::Data
 		}
 	}
 
+	Logger& logger()
+	{
+		return m_logger;
+	}
+
 private:
 	CURLM* m_multi_handle;					//< handle to listen for multiple connections simultaneously
 	strus::thread* m_thread;				//< background thread of the eventloop 
@@ -758,6 +812,10 @@ private:
 	curl_waitfd m_pipcurl_notify_fd;			//< curl additional handle to wait for listening on the read part of the "self pipe trick" pipe
 };
 
+Logger& WebRequestDelegateConnection::logger()
+{
+	return m_eventloopdata->logger();
+}
 
 WebRequestDelegateJob::WebRequestDelegateJob( const WebRequestDelegateConnectionRef& conn_, const WebRequestDelegateDataRef& data_, CurlEventLoop::Data* eventloopdata_)
 	:m_handle(conn_->handle())
@@ -774,12 +832,21 @@ WebRequestDelegateJob::WebRequestDelegateJob( const WebRequestDelegateConnection
 	set_curl_opt( curl, CURLOPT_FAILONERROR, 0);
 	set_curl_opt( curl, CURLOPT_ERRORBUFFER, m_response_errbuf);
 	set_curl_opt( curl, CURLOPT_CUSTOMREQUEST, m_data->method.c_str());
+
+	/*[-]*/char curlid[ 32];
+	/*[-]*/std::snprintf( curlid, sizeof(curlid), "%lx", (uintptr_t)curl);
+	/*[-]*/std::cerr << "+++ delegateJob " << curlid << " " << m_data->method << " {" << m_data->content << "}" << std::endl;
 }
 
 void WebRequestDelegateJob::dropRequest( const char* errmsg)
 {
 	WebRequestAnswer answer( errmsg, 500, ErrorCodeDelegateRequestFailed);
 	m_data->receiver->putAnswer( answer);
+}
+
+void WebRequestDelegateJob::flushLogs()
+{
+	m_conn->flushLogs();
 }
 
 void WebRequestDelegateJob::resume( CURLcode ec)
