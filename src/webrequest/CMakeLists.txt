@@ -11,6 +11,8 @@ set( source_files
 	configurationHandler.cpp
 	configurationUpdateRequest.cpp
 	transaction.cpp
+	curlLogger.cpp
+	curlMessage.cpp
 	curlEventLoop.cpp
 	schemas_base.cpp
 	webRequestUtils.cpp

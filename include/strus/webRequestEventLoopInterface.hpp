@@ -48,10 +48,6 @@ public:
 	/// \return true on success, false on memory allocation error
 	virtual bool addTickerEvent( void* obj, TickerFunction func)=0;
 
-	/// \brief Handle an exception
-	/// \param[in] message of the exception
-	virtual void handleException( const char* msg)=0;
-
 	/// \brief Get the current time
 	/// \return Get the current time in seconds (unixtime)
 	/// \note Wrapper to empower tests to create their own emulation of time

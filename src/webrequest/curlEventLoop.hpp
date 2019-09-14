@@ -47,8 +47,6 @@ public:
 
 	virtual bool addTickerEvent( void* obj, TickerFunction func);
 
-	void handleException( const char* msg);
-
 public:
 	struct Data;					//... private as PIMPL
 
