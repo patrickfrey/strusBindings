@@ -33,16 +33,17 @@ public:
 
 	virtual int logMask() const {return 0;}
 	virtual int structDepth() const {return 0;}
-	virtual void logRequest( const char* reqstr) {}
+	virtual void logRequest( const char* content, std::size_t contentsize) {}
 	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr) {}
-	virtual void logDelegateRequest( const char* address, const char* method, const char* content) {}
+	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize) {}
 	virtual void logAction( const char* type, const char* name, const char* action) {}
-	virtual void logContentEvent( const char* title, const char* item, const char* value) {}
+	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize) {}
 	virtual void logMethodCall(
 			const char* classname,
 			const char* methodname,
 			const char* arguments,
 			const char* result,
+			std::size_t resultsize,
 			const char* resultvar){}
 	virtual void logConnectionEvent( const char* content){}
 	virtual void logWarning( const char* warnmsg){}

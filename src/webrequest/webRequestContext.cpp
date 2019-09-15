@@ -25,6 +25,7 @@
 #include "strus/base/string_format.hpp"
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/base/fileio.hpp"
+#include "strus/base/utf8.hpp"
 #include "strus/base/string_conv.hpp"
 #include "strus/base/string_format.hpp"
 #include "papuga/errors.h"
@@ -236,7 +237,7 @@ static void logMethodCall( void* self_, int nofItems, ...)
 		std::vector<std::string> args = getLogArgument( self->structDepth(), nofItems, arguments, nof_itypes, itypes, errcode);
 		if (errcode == papuga_Ok)
 		{
-			self->logMethodCall( args[0].c_str(), args[1].c_str(), args[2].c_str(), args[3].c_str(), args[4].c_str());
+			self->logMethodCall( args[0].c_str(), args[1].c_str(), args[2].c_str(), args[3].c_str(), args[3].size(), args[4].c_str());
 		}
 		else
 		{
@@ -263,17 +264,25 @@ void logContentEvent( void* self_, const char* title, int itemid, const papuga_V
 	WebRequestLoggerInterface* self = (WebRequestLoggerInterface*)self_;
 	try
 	{
-		papuga_ErrorCode errcode = papuga_Ok;
-		std::string valuestr;
-		if (value) valuestr = papuga::ValueVariant_tostring( *value, errcode);
-		if (valuestr.empty() && errcode != papuga_Ok)
+		const char* item =  itemid >= 0 ? strus::webrequest::AutomatonNameSpace::itemName( (strus::webrequest::AutomatonNameSpace::Item)itemid) : 0;
+
+		if (value && papuga_ValueVariant_defined( value))
 		{
-			self->logError( papuga_ErrorCode_tostring( errcode));
+			papuga_ErrorCode errcode = papuga_Ok;
+			std::string valuestr = papuga::ValueVariant_tostring( *value, errcode);
+
+			if (valuestr.empty() && errcode != papuga_Ok)
+			{
+				self->logError( papuga_ErrorCode_tostring( errcode));
+			}
+			else
+			{
+				self->logContentEvent( title, item, valuestr.c_str(), valuestr.size());
+			}
 		}
 		else
 		{
-			const char* item =  itemid >= 0 ? strus::webrequest::AutomatonNameSpace::itemName( (strus::webrequest::AutomatonNameSpace::Item)itemid) : 0;
-			self->logContentEvent( title, item, valuestr.c_str());
+			self->logContentEvent( title, item, 0, 0);
 		}
 	}
 	catch (const std::bad_alloc&)
@@ -353,7 +362,8 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	papuga_ErrorCode errcode = papuga_Ok;
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogRequests))
 	{
-		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &errcode);
+		int reqstrlen;
+		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &reqstrlen, &errcode);
 		if (!reqstr)
 		{
 			m_logger->logError( papuga_ErrorCode_tostring( papuga_NoMemError));
@@ -362,7 +372,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 		}
 		else
 		{
-			m_logger->logRequest( reqstr);
+			m_logger->logRequest( reqstr, reqstrlen);
 		}
 	}
 	// Parse the request:
@@ -471,9 +481,19 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 		papuga_init_Allocator( &allocator, allocator_mem, sizeof(allocator_mem));
 
 		papuga_ErrorCode errcode;
-		const char* locinfo = papuga_request_content_tostring( &allocator, m_doctype, m_encoding, content.str(), content.len(), errstruct.scopestart, 3/*max depth*/, &errcode);
+		int locinfolen;
+		const char* locinfo = papuga_request_content_tostring( &allocator, m_doctype, m_encoding, content.str(), content.len(), errstruct.scopestart, 3/*max depth*/, &locinfolen, &errcode);
 		if (locinfo)
 		{
+			std::string locinfobuf;
+			if (locinfolen > MaxLogContentSize)
+			{
+				std::size_t endidx = MaxLogContentSize;
+				for (;endidx > 0 && strus::utf8midchr( locinfo[ endidx-1]); --endidx){}
+				locinfobuf.append( locinfo, endidx);
+				locinfobuf.append( " ...");
+				locinfo = locinfobuf.c_str();
+			}
 			papuga_ErrorBuffer_appendMessage( &m_errbuf, " error scope: %s", locinfo);
 		}
 	}

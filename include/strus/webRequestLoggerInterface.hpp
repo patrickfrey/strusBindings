@@ -45,12 +45,18 @@ public:
 	virtual int structDepth() const=0;
 
 	/// \brief Log a request
+	/// \param[in] content pointer to content string of the request
+	/// \param[in] contentsize size of the content sent in bytes
 	/// \remark expected to be thread safe
-	virtual void logRequest( const char* reqstr)=0;
+	virtual void logRequest( const char* content, std::size_t contentsize)=0;
 
-	/// \brief Log a delegate request
+	/// \brief Log a delegate http request
+	/// \param[in] address address of the request URL with port and path
+	/// \param[in] method http request method of the request
+	/// \param[in] content pointer to content string of the request
+	/// \param[in] contentsize size of the content sent in bytes
 	/// \remark expected to be thread safe
-	virtual void logDelegateRequest( const char* address, const char* method, const char* content)=0;
+	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize)=0;
 
 	/// \brief Log a loaded configuration
 	/// \param[in] type type of the configuration
@@ -69,15 +75,17 @@ public:
 	/// \brief Log an event parsing content
 	/// \param[in] title name of the event
 	/// \param[in] item type name of the item
-	/// \param[in] value value of the event
+	/// \param[in] content pointer to content string of the event
+	/// \param[in] contentsize size of bytes of the content string
 	/// \remark expected to be thread safe
-	virtual void logContentEvent( const char* title, const char* item, const char* value)=0;
+	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize)=0;
 
 	/// \brief Log a method call
 	/// \param[in] classname name identifier of the class called
 	/// \param[in] methodname name identifier of the method called
 	/// \param[in] arguments serialized arguments of the method called
 	/// \param[in] result serialized result of the method called
+	/// \param[in] resultsize size of bytes of the result string
 	/// \param[in] resultvar name of the variable the result is assigned to
 	/// \remark expected to be thread safe
 	virtual void logMethodCall(
@@ -85,6 +93,7 @@ public:
 			const char* methodname,
 			const char* arguments,
 			const char* result,
+			std::size_t resultsize,
 			const char* resultvar)=0;
 
 	/// \brief Log a verbose event from the network client library (cURL)

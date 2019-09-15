@@ -69,6 +69,8 @@ public:
 			const WebRequestContent& content,
 			WebRequestAnswer& answer);
 
+	enum {MaxLogContentSize=2048 /*2K*/};
+
 private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);

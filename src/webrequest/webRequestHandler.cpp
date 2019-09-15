@@ -491,7 +491,7 @@ bool WebRequestHandler::delegateRequest(
 {
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogDelegateRequests))
 	{
-		m_logger->logDelegateRequest( address.c_str(), method.c_str(), content.c_str());
+		m_logger->logDelegateRequest( address.c_str(), method.c_str(), content.c_str(), content.size());
 	}
 	return m_eventLoop->send( address, method, content, context);
 }
