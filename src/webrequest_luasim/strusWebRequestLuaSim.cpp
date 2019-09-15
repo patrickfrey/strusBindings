@@ -95,29 +95,25 @@ public:
 	{
 		return 100;
 	}
-	virtual void logRequest( const char* reqstr)
+	virtual void logRequest( const char* reqstr, std::size_t reqstrlen)
 	{
+		std::string reqstrbuf;
+		reqstr = reduceContentSize( reqstrbuf, reqstr, reqstrlen);
 		std::cerr << header() << strus::string_format( "REQUEST %s", reqstr) << std::endl;
 	}
 
-	virtual void logDelegateRequest( const char* address, const char* method, const char* content)
+	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize)
 	{
-		std::size_t contentsize = std::strlen( content);
 		if (contentsize == 0)
 		{
 			std::cerr << header() << strus::string_format( "DELEGATE %s '%s'", method, address) << std::endl;
 		}
-		else if (contentsize <= 100)
-		{
-			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s'", method, address, content) << std::endl;
-		}
 		else
 		{
-			const char* contentend = strus::utf8prev( content + 100);
-			if (contentend < content) contentend = content;
-			std::string contentstr( content, contentend - content);
-	
-			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s...'", method, address, contentstr.c_str()) << std::endl;
+			std::string contentbuf;
+			content = reduceContentSize( contentbuf, content, contentsize);
+
+			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s...'", method, address, content) << std::endl;
 		}
 	}
 
@@ -131,13 +127,16 @@ public:
 		std::cerr << header() << strus::string_format( "ACTION %s '%s' %s", type, name, action) << std::endl;
 	}
 
-	virtual void logContentEvent( const char* title, const char* item, const char* value)
+	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize)
 	{
 		if (item && item[0])
 		{
-			if (value && value[0])
+			if (content && content[0])
 			{
-				std::cerr << header() << strus::string_format( "PARSE %s %s '%s'", title, item, value) << std::endl;
+				std::string contentbuf;
+				content = reduceContentSize( contentbuf, content, contentsize);
+
+				std::cerr << header() << strus::string_format( "PARSE %s %s '%s'", title, item, content) << std::endl;
 			}
 			else
 			{
@@ -146,9 +145,12 @@ public:
 		}
 		else
 		{
-			if (value && value[0])
+			if (contentsize)
 			{
-				std::cerr << header() << strus::string_format( "PARSE %s '%s'", title, value) << std::endl;
+				std::string contentbuf;
+				content = reduceContentSize( contentbuf, content, contentsize);
+
+				std::cerr << header() << strus::string_format( "PARSE %s '%s'", title, content) << std::endl;
 			}
 			else
 			{
@@ -167,13 +169,23 @@ public:
 			const char* methodname,
 			const char* arguments,
 			const char* result,
+			std::size_t resultsize,
 			const char* resultvar)
 	{
 		std::string assignment;
 		const char* resultStatement = result;
 		if (resultvar && resultvar[0])
 		{
-			assignment = strus::string_format( "%s := %s", resultvar, result?result:"NULL");
+			std::string resultbuf;
+			if (result)
+			{
+				result = reduceContentSize( resultbuf, result, resultsize);
+			}
+			else
+			{
+				result = "NULL";
+			}
+			assignment = strus::string_format( "%s := %s", resultvar, result);
 			resultStatement = assignment.c_str();
 		}
 		if (!classname || !classname[0])
@@ -217,7 +229,8 @@ public:
 		std::cerr << header() << strus::string_format( "ERROR %s", errmsg) << std::endl;
 	}
 
-	
+	enum {MaxLogContentSize=2048};
+
 private:
 	std::string header() const
 	{
@@ -239,6 +252,22 @@ private:
 			}
 		}
 		return rt;
+	}
+
+	static const char* reduceContentSize( std::string& contentbuf, const char* content, std::size_t contentsize)
+	{
+		if (contentsize > MaxLogContentSize)
+		{
+			std::size_t endidx = MaxLogContentSize;
+			for (;endidx > 0 && strus::utf8midchr( content[ endidx-1]); --endidx){}
+			contentbuf.append( content, endidx);
+			contentbuf.append( " ...");
+			return contentbuf.c_str();
+		}
+		else
+		{
+			return content;
+		}
 	}
 
 private:
