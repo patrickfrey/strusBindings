@@ -64,13 +64,16 @@ void WebRequestDelegateJob::dropRequest( ErrorCode errcode, const char* errmsg)
 	int httpStatus = errorCodeToHttpStatus( errcode);
 	WebRequestAnswer answer( errmsg ? errmsg : strus::errorCodeToString(errcode), httpStatus, errcode);
 	m_receiver->putAnswer( answer);
-	if (errmsg)
+	if (CurlLogger::LogError <= m_logger->loglevel())
 	{
-		m_logger->print( CurlLogger::LogFatal, _TXT("connection exception: %s, %s"), strus::errorCodeToString(errcode), errmsg);
-	}
-	else
-	{
-		m_logger->print( CurlLogger::LogFatal, _TXT("connection exception: %s"), strus::errorCodeToString(errcode));
+		if (errmsg)
+		{
+			m_logger->print( CurlLogger::LogError, _TXT("connection exception: %s, %s"), strus::errorCodeToString(errcode), errmsg);
+		}
+		else
+		{
+			m_logger->print( CurlLogger::LogError, _TXT("connection exception: %s"), strus::errorCodeToString(errcode));
+		}
 	}
 }
 
@@ -78,7 +81,11 @@ void WebRequestDelegateJob::resume( CURLcode ec)
 {
 	try
 	{
-		if (CurlLogger::LogInfo <= m_logger->loglevel()) flushLogs();
+		if (CurlLogger::LogInfo <= m_logger->loglevel())
+		{
+			flushLogs();
+			m_logger->logState( "resume", m_message.handle(), ec);
+		}
 		CURL* curl = handle();
 		if (ec == CURLE_OK)
 		{
@@ -378,6 +385,7 @@ struct CurlEventLoop::Data
 
 				// Blocking listen for events (results available or new jobs in the queue) or a timeout:
 				LOG( _TXT("perform event"), curl_multi_perform( m_multi_handle, &runningHandles));
+				if (CurlLogger::LogInfo <= m_logger.loglevel() && !m_activatedMap.empty()) m_logger.logState( "listen", 0/*conn*/, 0/*ecode*/);
 				LOG( _TXT("wait event"), curl_multi_wait( m_multi_handle, &m_pipcurl_notify_fd, 1, m_milliSecondsPeriod, &numfds));
 				if (m_pipcurl_notify_fd.revents)
 				{

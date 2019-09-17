@@ -16,7 +16,7 @@ using namespace strus;
 
 void CurlLogger::print( LogType logtype, const char* fmt, ...)
 {
-	char msgbuf[ 1024];
+	char msgbuf[ 4096];
 	va_list ap;
 	va_start( ap, fmt);
 	if ((int)sizeof(msgbuf) <= std::vsnprintf( msgbuf, sizeof(msgbuf), fmt, ap)) msgbuf[ sizeof(msgbuf)-1] = 0;
@@ -37,6 +37,11 @@ void CurlLogger::print( LogType logtype, const char* fmt, ...)
 			m_logger->logConnectionEvent( msgbuf);
 			break;
 	}
+}
+
+void CurlLogger::logState( const char* state, void* hnd, int ecode)
+{
+	m_logger->logConnectionState( state, hnd, ecode);
 }
 
 CurlLogger::LogType CurlLogger::evalLogLevel( WebRequestLoggerInterface* logger_)

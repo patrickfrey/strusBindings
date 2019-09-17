@@ -47,6 +47,7 @@ extern "C" {
 #include <map>
 #include <cstdbool>
 #include <iostream>
+#include <inttypes.h>
 
 struct CString
 {
@@ -98,7 +99,7 @@ public:
 	virtual void logRequest( const char* reqstr, std::size_t reqstrlen)
 	{
 		std::string reqstrbuf;
-		reqstr = reduceContentSize( reqstrbuf, reqstr, reqstrlen);
+		reqstr = reduceContentSize( reqstrbuf, reqstr, reqstrlen, MaxLogContentSize);
 		std::cerr << header() << strus::string_format( "REQUEST %s", reqstr) << std::endl;
 	}
 
@@ -111,7 +112,7 @@ public:
 		else
 		{
 			std::string contentbuf;
-			content = reduceContentSize( contentbuf, content, contentsize);
+			content = reduceContentSize( contentbuf, content, contentsize, MaxLogContentSize);
 
 			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s...'", method, address, content) << std::endl;
 		}
@@ -134,7 +135,8 @@ public:
 			if (content && content[0])
 			{
 				std::string contentbuf;
-				content = reduceContentSize( contentbuf, content, contentsize);
+				std::size_t maxsize = isReadableText( content, 64) ? MaxLogReadableItemSize : MaxLogBinaryItemSize;
+				content = reduceContentSize( contentbuf, content, contentsize, maxsize);
 
 				std::cerr << header() << strus::string_format( "PARSE %s %s '%s'", title, item, content) << std::endl;
 			}
@@ -148,7 +150,8 @@ public:
 			if (contentsize)
 			{
 				std::string contentbuf;
-				content = reduceContentSize( contentbuf, content, contentsize);
+				std::size_t maxsize = isReadableText( content, 64) ? MaxLogReadableItemSize : MaxLogBinaryItemSize;
+				content = reduceContentSize( contentbuf, content, contentsize, maxsize);
 
 				std::cerr << header() << strus::string_format( "PARSE %s '%s'", title, content) << std::endl;
 			}
@@ -162,6 +165,13 @@ public:
 	virtual void logConnectionEvent( const char* content)
 	{
 		std::cerr << header() << strus::string_format( "CURL\n%s", content) << std::endl;
+	}
+
+	virtual void logConnectionState( const char* state, void* conn, int ecode)
+	{
+		char connid[ 64];
+		std::snprintf( connid, sizeof(connid), "%" PRIxPTR, (uintptr_t)conn);
+		std::cerr << header() << strus::string_format( "CURL connection %s state %s [%d]", connid, state, ecode) << std::endl;
 	}
 
 	virtual void logMethodCall(
@@ -179,7 +189,7 @@ public:
 			std::string resultbuf;
 			if (result)
 			{
-				result = reduceContentSize( resultbuf, result, resultsize);
+				result = reduceContentSize( resultbuf, result, resultsize, MaxLogContentSize);
 			}
 			else
 			{
@@ -229,8 +239,11 @@ public:
 		std::cerr << header() << strus::string_format( "ERROR %s", errmsg) << std::endl;
 	}
 
-	enum {MaxLogContentSize=2048};
-
+	enum {
+		MaxLogContentSize=2048/*2K*/,
+		MaxLogBinaryItemSize=32,
+		MaxLogReadableItemSize=256
+	};
 private:
 	std::string header() const
 	{
@@ -254,11 +267,21 @@ private:
 		return rt;
 	}
 
-	static const char* reduceContentSize( std::string& contentbuf, const char* content, std::size_t contentsize)
+	static bool isReadableText( const char* sample, std::size_t samplesize)
 	{
-		if (contentsize > MaxLogContentSize)
+		int si = 0, se = samplesize;
+		for (; si != se; ++si)
 		{
-			std::size_t endidx = MaxLogContentSize;
+			if ((unsigned char)sample[si] <= 32) return true;
+		}
+		return false;
+	}
+
+	static const char* reduceContentSize( std::string& contentbuf, const char* content, std::size_t contentsize, std::size_t maxsize)
+	{
+		if (contentsize > maxsize)
+		{
+			std::size_t endidx = maxsize;
 			for (;endidx > 0 && strus::utf8midchr( content[ endidx-1]); --endidx){}
 			contentbuf.append( content, endidx);
 			contentbuf.append( " ...");

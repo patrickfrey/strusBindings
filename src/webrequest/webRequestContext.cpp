@@ -119,6 +119,113 @@ static inline bool isEqual( const char* name, const char* oth)
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
 
+static bool initValueVariant_length_cut( papuga_ValueVariant& newval, const papuga_ValueVariant& val, std::size_t maxlen)
+{
+	papuga_init_ValueVariant_value( &newval, &val);
+	if (papuga_ValueVariant_isstring( &newval) && newval.length > maxlen)
+	{
+		newval.length = maxlen;
+		if (newval.encoding == papuga_UTF8)
+		{
+			while (newval.length > 0 && utf8midchr( newval.value.string[ newval.length-1]))
+			{
+				--newval.length;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+static void ValueVariant_appendString_maxsize( std::string& out, const papuga_ValueVariant& val, std::size_t maxItemSize, std::size_t maxContentSize, int maxStructDepth)
+{
+	papuga_ErrorCode errcode = papuga_Ok;
+	if (papuga_ValueVariant_isstring( &val))
+	{
+		papuga_ValueVariant newval;
+		if (initValueVariant_length_cut( newval, val, maxItemSize))
+		{
+			out.push_back( '\"');
+			if (!papuga::ValueVariant_append_string( out, newval, errcode)) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+			out.append( " ...\"");
+		}
+		else
+		{
+			out.push_back( '\"');
+			if (!papuga::ValueVariant_append_string( out, newval, errcode)) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+			out.push_back( '\"');
+		}
+	}
+	else if (papuga_ValueVariant_isatomic( &val))
+	{
+		if (!papuga::ValueVariant_append_string( out, val, errcode)) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+	}
+	else if (val.valuetype == papuga_TypeSerialization)
+	{
+		if (maxStructDepth > 0)
+		{
+			papuga_SerializationIter itr;
+			papuga_init_SerializationIter( &itr, val.value.serialization);
+			out.push_back( '{');
+			for (; !papuga_SerializationIter_eof( &itr); papuga_SerializationIter_skip( &itr))
+			{
+				if (out.size() > maxContentSize) break;
+
+				switch (papuga_SerializationIter_tag( &itr))
+				{
+					case papuga_TagValue:
+						if (maxStructDepth > 0)
+						{
+							ValueVariant_appendString_maxsize( out, *papuga_SerializationIter_value( &itr), maxItemSize, maxContentSize, maxStructDepth-1);
+						}
+						break;
+					case papuga_TagOpen:
+						--maxStructDepth;
+						if (maxStructDepth > 0)
+						{
+							out.push_back( '{');
+						}
+						break;
+					case papuga_TagClose:
+						if (maxStructDepth > 0)
+						{
+							out.push_back( '}');
+						}
+						++maxStructDepth;
+						break;
+					case papuga_TagName:
+						if (maxStructDepth > 0)
+						{
+							if (!papuga::ValueVariant_append_string( out, *papuga_SerializationIter_value( &itr), errcode)) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
+							out.append( ": ");
+						}
+						break;
+				}
+			}
+			out.push_back( '}');
+		}
+		else
+		{
+			out.append( "{}");
+		}
+	}
+	else
+	{
+		out.push_back( '<');
+		out.append( papuga_Type_name( val.valuetype));
+		out.push_back( '>');
+	}
+	if (out.size() > maxContentSize)
+	{
+		std::size_t newSize = maxContentSize;
+		while (newSize > 0 && utf8midchr( out[ newSize-1]))
+		{
+			--newSize;
+		}
+		out.resize( newSize);
+	}
+}
+
 static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof_arguments, va_list arguments, std::size_t nof_itypes, const papuga_RequestLogItem* itype, papuga_ErrorCode& errcode)
 {
 	std::vector<std::string> rt( nof_itypes);
@@ -145,24 +252,13 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 				if (ei < ee)
 				{
 					papuga_ValueVariant* val = va_arg( arguments, papuga_ValueVariant*);
-					if (val->valuetype == papuga_TypeSerialization)
+					if (val)
 					{
-						if (structDepth > 0)
-						{
-							rt[ei] = std::string("{") + papuga::Serialization_tostring( *val->value.serialization, false, structDepth, errcode) + "}";
-						}
-						else
-						{
-							rt[ei] = "{}";
-						}
-					}
-					else if (papuga_ValueVariant_isatomic( val))
-					{
-						rt[ei] = papuga::ValueVariant_tostring( *val, errcode);
+						ValueVariant_appendString_maxsize( rt[ei], *val, WebRequestContext::MaxLogItemSize, WebRequestContext::MaxLogContentSize, WebRequestContext::MaxLogStructDepth);
 					}
 					else
 					{
-						rt[ei] = std::string("<") + papuga_Type_name( val->valuetype) + ">";
+						rt[ei] = "<NULL>";
 					}
 				}
 				break;
@@ -182,33 +278,15 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 			{
 				if (ei < ee)
 				{
-					std::ostringstream argstr;
 					papuga_ValueVariant* ar = va_arg( arguments, papuga_ValueVariant*);
 					std::size_t ii=0, ie=nofargs;
 					for (; ii!=ie; ++ii)
 					{
-						if (ii) argstr << ", ";
-						if (papuga_ValueVariant_isatomic( ar+ii))
-						{
-							argstr << '\"' << papuga::ValueVariant_tostring( ar[ii], errcode) << '\"';
-						}
-						else if (ar[ii].valuetype == papuga_TypeSerialization)
-						{
-							if (structDepth > 0)
-							{
-								argstr << "{" << papuga::Serialization_tostring( *ar[ii].value.serialization, false, structDepth, errcode) << "}";
-							}
-							else
-							{
-								argstr << "{}";
-							}
-						}
-						else
-						{
-							argstr << "<" << papuga_Type_name( ar[ii].valuetype) << ">";
-						}
+						if (ii) rt[ ei].append( ", ");
+						std::string argstr;
+						ValueVariant_appendString_maxsize( argstr, ar[ ii], WebRequestContext::MaxLogItemSize, WebRequestContext::MaxLogContentSize, WebRequestContext::MaxLogStructDepth);
+						rt[ ei].append( argstr);
 					}
-					rt[ei] = argstr.str();
 				}
 				break;
 			}
