@@ -46,7 +46,7 @@ public:
 			std::size_t resultsize,
 			const char* resultvar){}
 	virtual void logConnectionEvent( const char* content){}
-	virtual void logConnectionState( const char* state, void* conn, int ecode){}
+	virtual void logConnectionState( const char* state, int arg){}
 
 	virtual void logWarning( const char* warnmsg){}
 	virtual void logError( const char* errmsg){}

@@ -107,6 +107,12 @@ CurlMessage::CurlMessage()
 	,m_curlLogBuf(),m_content(),m_response_content()
 {}
 
+void CurlMessageErrorHandler( void* logger_, int errno_)
+{
+	CurlLogger* logger = (CurlLogger*)logger_;
+	logger->print( CurlLogger::LogError, _TXT("libcurl logging failed: %s"), ::strerror(errno_));
+}
+
 CurlMessage::CurlMessage( const std::string& address, const std::string& method_, const std::string& content_, CurlLogger* logger_)
 	:m_curl(curl_easy_init()),m_logger(logger_)
 	,m_method(method_),m_url(getUrl(address.c_str())),m_port(getPort(address.c_str()))
@@ -143,7 +149,7 @@ CurlMessage::CurlMessage( const std::string& address, const std::string& method_
 
 	if (m_logger && CurlLogger::LogInfo <= m_logger->loglevel())
 	{
-		m_curlLogBuf.reset( new strus::WriteBufferHandle());
+		m_curlLogBuf.reset( new strus::WriteBufferHandle( CurlMessageErrorHandler, m_logger));
 		if (m_curlLogBuf->error() == 0)
 		{
 			set_curl_opt( m_curl, CURLOPT_STDERR, m_curlLogBuf->getCStreamHandle());

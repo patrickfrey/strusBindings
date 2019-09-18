@@ -39,9 +39,9 @@ void CurlLogger::print( LogType logtype, const char* fmt, ...)
 	}
 }
 
-void CurlLogger::logState( const char* state, void* hnd, int ecode)
+void CurlLogger::logState( const char* state, int arg)
 {
-	m_logger->logConnectionState( state, hnd, ecode);
+	m_logger->logConnectionState( state, arg);
 }
 
 CurlLogger::LogType CurlLogger::evalLogLevel( WebRequestLoggerInterface* logger_)

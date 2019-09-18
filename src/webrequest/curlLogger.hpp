@@ -27,7 +27,7 @@ public:
 	void print( LogType logtype, const char* fmt, ...);
 	LogType loglevel() const	{return m_loglevel;}
 
-	void logState( const char* state, void* hnd, int ecode);
+	void logState( const char* state, int arg);
 
 private:
 	static LogType evalLogLevel( WebRequestLoggerInterface* logger_);

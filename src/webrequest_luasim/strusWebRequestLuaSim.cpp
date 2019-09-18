@@ -164,14 +164,19 @@ public:
 
 	virtual void logConnectionEvent( const char* content)
 	{
-		std::cerr << header() << strus::string_format( "CURL\n%s", content) << std::endl;
+		std::cerr << header() << strus::string_format( "delegate connection events %s", content) << std::endl;
 	}
 
-	virtual void logConnectionState( const char* state, void* conn, int ecode)
+	virtual void logConnectionState( const char* state, int arg)
 	{
-		char connid[ 64];
-		std::snprintf( connid, sizeof(connid), "%" PRIxPTR, (uintptr_t)conn);
-		std::cerr << header() << strus::string_format( "CURL connection %s state %s [%d]", connid, state, ecode) << std::endl;
+		if (arg)
+		{
+			std::cerr << header() << strus::string_format( "delegate connection state %s [%d]", state, arg) << std::endl;
+		}
+		else
+		{
+			std::cerr << header() << strus::string_format( "delegate connection state %s", state) << std::endl;
+		}
 	}
 
 	virtual void logMethodCall(

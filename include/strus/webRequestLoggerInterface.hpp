@@ -103,10 +103,9 @@ public:
 
 	/// \brief Log a state of a delegate request connection handled by the network client library (cURL)
 	/// \param[in] state name of the state to log
-	/// \param[in] conn pointer to connection handle
-	/// \param[in] ecode status code, depending on the network client library
+	/// \param[in] arg some state argument or 0 if undefined
 	/// \remark expected to be thread safe
-	virtual void logConnectionState( const char* state, void* conn, int ecode)=0;
+	virtual void logConnectionState( const char* state, int arg)=0;
 
 	/// \brief Log a warning message
 	/// \param[in] warnmsg warning message to log

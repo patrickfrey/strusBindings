@@ -84,7 +84,7 @@ void WebRequestDelegateJob::resume( CURLcode ec)
 		if (CurlLogger::LogInfo <= m_logger->loglevel())
 		{
 			flushLogs();
-			m_logger->logState( "resume", m_message.handle(), ec);
+			m_logger->logState( "resume", ec);
 		}
 		CURL* curl = handle();
 		if (ec == CURLE_OK)
@@ -129,6 +129,7 @@ struct CurlEventLoop::Data
 		,m_activatedMap()
 		,m_tickerar()
 		,m_logger(logger_)
+		,m_logState(LogStateInit)
 		,m_milliSecondsPeriod(secondsPeriod_*1000)
 		,m_requestCount(0)
 		,m_numberOfRequestsBeforeTick(secondsPeriod_*NumberOfRequestsBeforeTick)
@@ -273,10 +274,21 @@ struct CurlEventLoop::Data
 		{
 			ti->first( ti->second);
 		}
+		m_requestCount = 0;
+	}
+
+	void checkTick()
+	{
+		if (++m_requestCount == m_numberOfRequestsBeforeTick)
+		{
+			m_requestCount = 0;
+			tick();
+		}
 	}
 
 	void activateIdleJobs()
 	{
+		int nofRequests = 0;
 		strus::unique_lock lock( m_waitingList_mutex);
 		std::vector<WebRequestDelegateJobRef>::iterator wi = m_waitingList.begin(), we = m_waitingList.end();
 		for (; wi != we; ++wi)
@@ -289,7 +301,12 @@ struct CurlEventLoop::Data
 			else
 			{
 				m_activatedMap[ (*wi)->handle()] = *wi;
+				++nofRequests;
 			}
+		}
+		if (CurlLogger::LogInfo <= m_logger.loglevel() && nofRequests > 0)
+		{
+			m_logger.logState( "new requests", nofRequests);
 		}
 		m_waitingList.clear();
 	}
@@ -319,19 +336,6 @@ struct CurlEventLoop::Data
 		for (; ai != ae; ++ai)
 		{
 			ai->second->flushLogs();
-		}
-	}
-
-	bool forcedTick()
-	{
-		if (++m_requestCount == m_numberOfRequestsBeforeTick)
-		{
-			m_requestCount = 0;
-			return true;
-		}
-		else
-		{
-			return false;
 		}
 	}
 
@@ -371,80 +375,119 @@ struct CurlEventLoop::Data
 		}
 	}
 
-	void run()
+	void processEvents()
 	{
-		while (!m_terminate.test())
+		// Handle message results:
+		CURLMsg* msg = NULL;
+		int msgLeft = 1;
+		int msgCount = 0;
+		int runningHandles = 0;
+
+		do
 		{
-			try
+			msgCount = 0;
+			LOG( _TXT("complete event"), curl_multi_perform( m_multi_handle, &runningHandles));
+			if (CurlLogger::LogInfo <= m_logger.loglevel() && m_logState != LogStateConnections && runningHandles)
 			{
-				int numfds = 0;
-				int runningHandles = 1;
-
-				// Get new messages jobs from the queue into the listener context:
-				activateIdleJobs();
-
-				// Blocking listen for events (results available or new jobs in the queue) or a timeout:
-				LOG( _TXT("perform event"), curl_multi_perform( m_multi_handle, &runningHandles));
-				if (CurlLogger::LogInfo <= m_logger.loglevel() && !m_activatedMap.empty()) m_logger.logState( "listen", 0/*conn*/, 0/*ecode*/);
-				LOG( _TXT("wait event"), curl_multi_wait( m_multi_handle, &m_pipcurl_notify_fd, 1, m_milliSecondsPeriod, &numfds));
-				if (m_pipcurl_notify_fd.revents)
+				m_logger.logState( "connections", runningHandles);
+				m_logState = LogStateConnections;
+			}
+			while (msgLeft && NULL != (msg = curl_multi_info_read( m_multi_handle, &msgLeft)))
+			{
+				++msgCount;
+				if (CurlLogger::LogInfo <= m_logger.loglevel())
 				{
-					//... interrupted by new request in the queue or a terminate is signaled
-					m_pipcurl_notify_fd.revents = 0;
-					consumeSelfPipeWrites();
-					if (forcedTick()) tick();
+					m_logger.logState( "connection event", 0/*arg*/);
+					m_logState = LogStateConnEvent;
 				}
-				else if (numfds == 0)
+				if (msg->msg == CURLMSG_DONE)
 				{
-					//... interrupted by timeout
-					m_requestCount = 0;
-					tick();
-					continue;
-				}
-				if (m_terminate.test()) break;
-
-				// Handle message results:
-				CURLMsg* msg = NULL;
-				int msgsLeft = 1;
-				int msgsCount = 0;
-
-				LOG( _TXT("complete event"), curl_multi_perform( m_multi_handle, &runningHandles));
-				while (msgsLeft && NULL != (msg = curl_multi_info_read( m_multi_handle, &msgsLeft)))
-				{
-					++msgsCount;
-
-					if (msg->msg == CURLMSG_DONE)
+					WebRequestDelegateJobRef job = fetchJob( msg->easy_handle);
+					if (!job.get())
 					{
-						WebRequestDelegateJobRef job = fetchJob( msg->easy_handle);
-						if (!job.get())
+						if (CurlLogger::LogError <= m_logger.loglevel())
 						{
-							if (CurlLogger::LogError <= m_logger.loglevel())
-							{
-								m_logger.print( CurlLogger::LogError, _TXT("logic error: lost handle"));
-							}
-						}
-						else
-						{
-							curl_multi_remove_handle( m_multi_handle, msg->easy_handle);
-							job->resume( msg->data.result);
+							m_logger.print( CurlLogger::LogError, _TXT("logic error: lost handle"));
 						}
 					}
 					else
 					{
-						m_logger.print( CurlLogger::LogError, _TXT("unknown curl message type"));
+						curl_multi_remove_handle( m_multi_handle, msg->easy_handle);
+						job->resume( msg->data.result);
 					}
 				}
-				// Do a tick after a defined amount of subsequent interruptions by an event and not by a timeout:
-				if (msgsCount)
+				else
 				{
-					//... interrupted by event on a request processed (not by timeout)
-					if (forcedTick()) tick();
+					m_logger.print( CurlLogger::LogError, _TXT("unknown curl message type"));
 				}
-				// Log the status of the connections if required:
-				if (CurlLogger::LogInfo <= m_logger.loglevel())
+			}
+			// Log the status of the connections if required:
+			if (CurlLogger::LogInfo <= m_logger.loglevel())
+			{
+				flushLogsOfPendingRequests();
+			}
+		}
+		while (msgCount);
+	}
+
+	bool listen()
+	{
+		int numfds = 0;
+
+		// Blocking listen for events (results available or new jobs in the queue) or a timeout:
+		if (CurlLogger::LogInfo <= m_logger.loglevel() && !m_activatedMap.empty() && (m_logState != LogStateListen && m_logState != LogStateConnections))
+		{
+			m_logger.logState( "listen", 0);
+			m_logState = LogStateListen;
+		}
+		LOG( _TXT("wait event"), curl_multi_wait( m_multi_handle, &m_pipcurl_notify_fd, 1, m_milliSecondsPeriod, &numfds));
+		if (m_pipcurl_notify_fd.revents)
+		{
+			//... interrupted by new request in the queue or a terminate is signaled
+			m_pipcurl_notify_fd.revents = 0;
+			consumeSelfPipeWrites();
+			if (CurlLogger::LogInfo <= m_logger.loglevel())
+			{
+				m_logger.logState( "queue event", 0/*arg*/);
+				m_logState = LogStateQueueEvent;
+			}
+			return true;
+		}
+		else if (numfds == 0)
+		{
+			//... interrupted by timeout
+			return false;
+		}
+		else
+		{
+			// ... interrupted by connection event
+			return true;
+		}
+	}
+
+	void run()
+	{
+		m_logState = LogStateInit;
+
+		while (!m_terminate.test())
+		{
+			try
+			{
+				// Get new messages jobs from the queue into the listener context:
+				activateIdleJobs();
+				processEvents();
+
+				if (listen())
 				{
-					flushLogsOfPendingRequests();
+					// ... have events, do a tick after a defined amount of subsequent interruptions by an event and not by a timeout
+					checkTick();
 				}
+				else
+				{
+					//... interrupted by timeout
+					tick();
+				}
+				if (m_terminate.test()) break;
 			}
 			catch (const std::runtime_error& err)
 			{
@@ -465,6 +508,9 @@ struct CurlEventLoop::Data
 	}
 
 private:
+	enum LogState {LogStateInit,LogStateListen,LogStateQueueEvent,LogStateConnEvent,LogStateConnections};
+
+private:
 	CURLM* m_multi_handle;					//< handle to listen for multiple connections simultaneously
 	strus::thread* m_thread;				//< background thread of the eventloop 
 	std::vector<WebRequestDelegateJobRef> m_waitingList;	//< list of jobs in the queue to process
@@ -473,6 +519,7 @@ private:
 	std::vector<TickerFunctionDef> m_tickerar;		//< tickers to call after timeout or a number of requests
 	strus::mutex m_tickerar_mutex;				//< mutex for tickers monitor
 	CurlLogger m_logger;					//< logger for logging
+	LogState m_logState;					//< state for logging, suppressing repetitive log messages
 	int m_milliSecondsPeriod;				//< milliseconds to wait for a request until a timeout is signalled
 	int m_requestCount;					//< counter of subsequent requests signalled without timeout
 	int m_numberOfRequestsBeforeTick;			//< number of times a wait on a request or a timeout is interrupted by a request before a tick is inserted that normally occurrs on a timeout

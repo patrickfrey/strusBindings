@@ -513,13 +513,18 @@ void WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, 
 			_TXT("error loading sub configuration %s '%s': %s"),
 			cfg.type.c_str(), cfg.name.c_str(), status.errorstr());
 	}
-	std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
-	for (; di != de; ++di)
+	if (!delegates.empty())
 	{
-		std::string contentstr( di->contentstr(), di->contentlen());
-		m_eventLoop->send(
-			di->url(), di->method(), contentstr,
-			new ConfigurationUpdateRequestContext( this, m_logger, cfg.type, cfg.name, di->receiverSchema()));
+		strus::shared_ptr<int> count = strus::make_shared<int>();
+		*count = delegates.size();
+		std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
+		for (; di != de; ++di)
+		{
+			std::string contentstr( di->contentstr(), di->contentlen());
+			m_eventLoop->send(
+				di->url(), di->method(), contentstr,
+				new ConfigurationUpdateRequestContext( this, m_logger, cfg.type, cfg.name, di->receiverSchema(), count));
+		}
 	}
 	m_configHandler.declareSubConfiguration( cfg.type.c_str(), cfg.name.c_str());
 }

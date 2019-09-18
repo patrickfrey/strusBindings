@@ -74,6 +74,11 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 				}
 				return;
 			}
+			*m_counter -= 1;
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConnectionEvents) && *m_counter == 0)
+			{
+				m_logger->logConnectionState( "completed delegate requests", m_requestCount);
+			}
 		}
 	}
 	catch (const std::bad_alloc&)
