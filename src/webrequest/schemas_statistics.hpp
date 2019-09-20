@@ -20,6 +20,26 @@
 namespace strus {
 namespace webrequest {
 
+class SchemaStatisticsPart :public AutomatonNameSpace
+{
+public:
+	static papuga::RequestAutomaton_NodeList evaluateTermStatistics( const char* rootexpr)
+	{
+		typedef bindings::method::StatisticsMap S;
+		return papuga::RequestAutomaton_NodeList( rootexpr,{
+			{"//term", "_termstats", "statserver", S::df(), {{TermType}, {TermValue}}},
+		});
+	}
+
+	static papuga::RequestAutomaton_NodeList evaluateGlobalStatistics( const char* rootexpr)
+	{
+		typedef bindings::method::StatisticsMap S;
+		return papuga::RequestAutomaton_NodeList( rootexpr,{
+			{"", "_globstats", "statserver", S::nofDocuments(), {}}
+		});
+	}
+};
+
 class Schema_Context_PUT_StatisticsServer :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
@@ -64,18 +84,18 @@ public:
 	Schema_StatisticsServer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{{"statistics", {
-			{"/query", "termstats", false},
+			{"/query/feature/analyzed//term", "termstats", true},
 			{"/query", "nofdocs", "_globstats", '!'},
-			{"/query", "term", true},
-			{"/query/feature/analyzed//term", "type", TermType},
-			{"/query/feature/analyzed//term", "value", TermValue},
+			{"/query/feature/analyzed//term/type", "type", TermType},
+			{"/query/feature/analyzed//term/value", "value", TermValue},
 			{"/query/feature/analyzed//term", "df", "_termstats", '!'}
 		}}},
 		{},
 		{
-			//{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed")},
-			//{"/query/feature/analyzed//term", "_termstats", "statserver", bindings::method::StatisticsMap::df(), {{TermType}, {TermValue}}},
-			{"/query", "_globstats", "statserver", bindings::method::StatisticsMap::nofDocuments(), {}}
+			{"/query/feature/analyzed", "()", TermExpression, papuga_TypeVoid, NULL},
+			{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed")},
+			{SchemaStatisticsPart::evaluateTermStatistics( "/query/feature/analyzed")},
+			{SchemaStatisticsPart::evaluateGlobalStatistics( "/query")}
 		}
 	) {}
 };

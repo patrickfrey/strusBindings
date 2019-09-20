@@ -95,6 +95,29 @@ def_server( SSERVER2, config_SSERVER2)
 statserverDef_configured = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
 if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
 
-checkExpected( statserverDef .. statserverDef_configured, "@distributeStorage.exp", "distributeStorage.res" )
+query_analyzed = {
+query = {
+	feature = {
+		{
+			content = {
+				{type = "text", value = "Iggy Pop"}
+			},
+			analyzed = {
+				{
+					term = { type = "word", value = "iggy"}
+				},{
+					term = { type = "word", value = "pop"}
+				},{
+					term = { type = "entity", value = "iggy_pop"}
+				}
+			},
+			set = "search"
+		}
+	}
+}}
 
+statserverStats = call_server_checked( "GET", SSERVER1 .. "/statserver/test", query_analyzed)
+if verbose then io.stderr:write( string.format("- Statistics server query result:\n%s\n", statserverStats)) end
+
+checkExpected( statserverDef .. statserverDef_configured, "@distributeStorage.exp", "distributeStorage.res" )
 
