@@ -35,7 +35,7 @@ public:
 	{
 		typedef bindings::method::StatisticsMap S;
 		return papuga::RequestAutomaton_NodeList( rootexpr,{
-			{"", "_globstats", "statserver", S::nofDocuments(), {}}
+			{"", "_nofdocs", "statserver", S::nofDocuments(), {}}
 		});
 	}
 };
@@ -85,7 +85,8 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{{"statistics", {
 			{"/query/feature/analyzed//term", "termstats", true},
-			{"/query", "nofdocs", "_globstats", '!'},
+			{"/query", "globalstats", false},
+			{"/query", "nofdocs", "_nofdocs", '!'},
 			{"/query/feature/analyzed//term/type", "type", TermType},
 			{"/query/feature/analyzed//term/value", "value", TermValue},
 			{"/query/feature/analyzed//term", "df", "_termstats", '!'}

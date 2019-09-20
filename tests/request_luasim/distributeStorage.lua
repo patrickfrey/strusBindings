@@ -119,5 +119,5 @@ query = {
 statserverStats = call_server_checked( "GET", SSERVER1 .. "/statserver/test", query_analyzed)
 if verbose then io.stderr:write( string.format("- Statistics server query result:\n%s\n", statserverStats)) end
 
-checkExpected( statserverDef .. statserverDef_configured, "@distributeStorage.exp", "distributeStorage.res" )
+checkExpected( statserverDef .. statserverDef_configured .. statserverStats, "@distributeStorage.exp", "distributeStorage.res" )
 

@@ -10,3 +10,21 @@
 	"nofdocs": 18}
 }
 
+{
+"statistics": {
+	"termstats": [
+		{
+			"type": "word",
+			"value": "iggy",
+			"df": 5},
+		{
+			"type": "word",
+			"value": "pop",
+			"df": 10},
+		{
+			"type": "entity",
+			"value": "iggy_pop",
+			"df": 5}],
+	"nofdocs": 18}
+}
+
