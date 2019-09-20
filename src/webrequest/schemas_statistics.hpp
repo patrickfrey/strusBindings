@@ -11,6 +11,7 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_STATISTICS_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_STATISTICS_HPP_INCLUDED
 #include "schemas_base.hpp"
+#include "schemas_expression_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -53,6 +54,28 @@ public:
 		{
 			{"/storage/value", "()", StatisticsBlob, papuga_TypeString, "AAAABwAKZ9h..."},
 			{"/storage/value", 0/*result*/, "statserver", bindings::method::StatisticsMap::processStatisticsMessage(), {{StatisticsBlob}} }
+		}
+	) {}
+};
+
+class Schema_StatisticsServer_GET :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_StatisticsServer_GET() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		{{"statistics", {
+			{"/query", "termstats", false},
+			{"/query", "nofdocs", "_globstats", '!'},
+			{"/query", "term", true},
+			{"/query/feature/analyzed//term", "type", TermType},
+			{"/query/feature/analyzed//term", "value", TermValue},
+			{"/query/feature/analyzed//term", "df", "_termstats", '!'}
+		}}},
+		{},
+		{
+			//{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed")},
+			//{"/query/feature/analyzed//term", "_termstats", "statserver", bindings::method::StatisticsMap::df(), {{TermType}, {TermValue}}},
+			{"/query", "_globstats", "statserver", bindings::method::StatisticsMap::nofDocuments(), {}}
 		}
 	) {}
 };

@@ -11,7 +11,7 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_ANALYZER_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_ANALYZER_HPP_INCLUDED
 #include "schemas_base.hpp"
-#include "schemas_expression.hpp"
+#include "schemas_expression_decl.hpp"
 #include "schemas_query_decl.hpp"
 #include "schemas_analyzer_decl.hpp"
 
@@ -48,7 +48,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
-			{"vstorage","/qryanalyzer/vstorage/name()",false/*not required*/}
+			{"vstorage","/qryanalyzer/include/vstorage()",false/*not required*/}
 		},
 		{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/qryanalyzer")}
@@ -87,7 +87,7 @@ public:
 			{"/query/restriction/content", "analyzed", "_analyzed", '!'}
 		}}},
 		{
-			{"vstorage","/query/analyzer/vstorage/name()",false/*not required*/}
+			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},

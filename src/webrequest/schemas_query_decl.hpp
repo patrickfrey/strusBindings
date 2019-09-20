@@ -11,7 +11,7 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_QUERY_DECL_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_QUERY_DECL_HPP_INCLUDED
 #include "schemas_base.hpp"
-#include "schemas_expression.hpp"
+#include "schemas_expression_decl.hpp"
 #include "schemas_queryeval_decl.hpp"
 #include "schemas_analyzer_decl.hpp"
 
@@ -82,7 +82,7 @@ public:
 			{"", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
-					{"content", TermExpression, '!', 2/*tag diff*/},
+					{"analyzed", TermExpression, '!', 2/*tag diff*/},
 				}
 			},
 		}};

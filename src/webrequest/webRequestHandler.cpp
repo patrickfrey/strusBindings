@@ -235,6 +235,8 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "POST/statserver");
 		static const DefineSchema<Schema_StatisticsServer_PUT_statistics> schema_StatisticsServer_PUT_statistics_statistics("statserver");
 		schema_StatisticsServer_PUT_statistics_statistics.addToHandler( m_impl, "PUT~statistics");
+		static const DefineSchema<Schema_StatisticsServer_GET> schema_StatisticsServer_GET("statserver");
+		schema_StatisticsServer_GET.addToHandler( m_impl, "GET");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");

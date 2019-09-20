@@ -11,7 +11,7 @@
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_ANALYZER_DECL_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_SCHEMAS_ANALYZER_DECL_HPP_INCLUDED
 #include "schemas_base.hpp"
-#include "schemas_expression.hpp"
+#include "schemas_expression_decl.hpp"
 #include "schemas_query_decl.hpp"
 
 #if __cplusplus < 201103L

@@ -6,10 +6,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 /* \brief Partial schema definition to include for parsing expressions
- * @file schemas_expression.hpp
+ * @file schemas_expression_decl.hpp
  */
-#ifndef _STRUS_WEBREQUEST_SCHEMAS_EXPRESSION_HPP_INCLUDED
-#define _STRUS_WEBREQUEST_SCHEMAS_EXPRESSION_HPP_INCLUDED
+#ifndef _STRUS_WEBREQUEST_SCHEMAS_EXPRESSION_DECL_HPP_INCLUDED
+#define _STRUS_WEBREQUEST_SCHEMAS_EXPRESSION_DECL_HPP_INCLUDED
 #include "schemas_base.hpp"
 
 #if __cplusplus < 201103L
