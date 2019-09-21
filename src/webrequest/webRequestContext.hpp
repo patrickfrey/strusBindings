@@ -45,8 +45,9 @@ public:
 	virtual bool executeRequest(
 			const char* method,
 			const char* path,
-			const WebRequestContent& content,
-			std::vector<WebRequestDelegateRequest>& delegateRequests);
+			const WebRequestContent& content);
+
+	virtual std::vector<WebRequestDelegateRequest> getFollowDelegateRequests();
 
 	virtual bool pushDelegateRequestAnswer(
 			const char* schema,
@@ -60,7 +61,7 @@ public:
 			const std::string& message);
 
 	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
-	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
+	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer);
 
 	virtual bool pushConfigurationDelegateRequestAnswer(
 			const char* typenam,
@@ -79,7 +80,7 @@ private:
 	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
-	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
+	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
 	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
 	bool initContextType( WebRequestAnswer& answer, const char* contextType, const char* contextName);
@@ -99,9 +100,9 @@ private:
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
-	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
-	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
-	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
+	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeListVariables( papuga_RequestContext* context, WebRequestAnswer& answer);
 	void releaseContext();
 	bool executeSchemaDescriptionRequest( const char* method, const char* path, WebRequestAnswer& answer);
@@ -127,6 +128,7 @@ private:
 	WebRequestContent::Type m_result_doctype;
 	papuga_RequestResult* m_results;
 	int m_nofResults;
+	int m_resultIdx;
 	papuga_ErrorBuffer m_errbuf;
 	WebRequestAnswer m_answer;
 	const char* m_accepted_charset;

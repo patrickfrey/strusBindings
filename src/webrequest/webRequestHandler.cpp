@@ -507,14 +507,16 @@ void WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, 
 {
 	WebRequestAnswer status;
 
-	std::vector<WebRequestDelegateRequest> delegates;
 	strus::WebRequestContent subcontent( g_config_charset, cfg.doctype.c_str(), cfg.contentbuf.c_str(), cfg.contentbuf.size());
-	if (!ctxi->executeLoadSubConfiguration( cfg.type.c_str(), cfg.name.c_str(), subcontent, status, delegates))
+	if (!ctxi->executeLoadSubConfiguration( cfg.type.c_str(), cfg.name.c_str(), subcontent, status))
 	{
 		throw strus::runtime_error(
 			_TXT("error loading sub configuration %s '%s': %s"),
 			cfg.type.c_str(), cfg.name.c_str(), status.errorstr());
 	}
+	m_configHandler.declareSubConfiguration( cfg.type.c_str(), cfg.name.c_str());
+
+	std::vector<WebRequestDelegateRequest> delegates = ctxi->getFollowDelegateRequests();
 	if (!delegates.empty())
 	{
 		strus::shared_ptr<int> count = strus::make_shared<int>();
@@ -527,8 +529,14 @@ void WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, 
 				di->url(), di->method(), contentstr,
 				new ConfigurationUpdateRequestContext( this, m_logger, cfg.type, cfg.name, di->receiverSchema(), count));
 		}
+		delegates = ctxi->getFollowDelegateRequests();
+		if (!delegates.empty())
+		{
+			throw strus::runtime_error(
+				_TXT("error loading sub configuration %s '%s': %s"),
+				cfg.type.c_str(), cfg.name.c_str(), _TXT("cascaded delegate requests not allowed for configurations"));
+		}
 	}
-	m_configHandler.declareSubConfiguration( cfg.type.c_str(), cfg.name.c_str());
 }
 
 void WebRequestHandler::loadConfiguration( const std::string& configstr)

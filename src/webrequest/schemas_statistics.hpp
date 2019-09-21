@@ -90,8 +90,6 @@ public:
 			{"/query/feature/analyzed//term", "df", "_termstats", '!'},
 			{"/query~", "globalstats", false},
 			{"/query~", "nofdocs", "_nofdocs", '!'}
-
-			// QUERIES WITH DIFFERENT TARGET VARIABLE ("storage") ARE EXECUTED SEQUENTIALLY
 		}}},
 		{},
 		{

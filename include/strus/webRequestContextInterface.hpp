@@ -29,13 +29,18 @@ public:
 	/// \param[in] method request method in uppercase
 	/// \param[in] path path of the request
 	/// \param[in] content content of the request
-	/// \param[out] delegateRequests delegate requests to perform for the completion of the request
+	/// \note The methods executeRequest,getFollowDelegateRequests,pushDelegateRequestAnswer,getRequestAnswer are executed in a context of a state machine with getFollowDelegateRequests and pushDelegateRequestAnswer executed in a loop until no following delegate request defined. 'executeRequest' is called at the start and getRequestAnswer at the end.
 	/// \return bool true if succeeded, false else
 	virtual bool executeRequest(
 			const char* method,
 			const char* path,
-			const WebRequestContent& content,
-			std::vector<WebRequestDelegateRequest>& delegateRequests)=0;
+			const WebRequestContent& content)=0;
+
+	/// \brief Get a list of delegate requests
+	/// \note Called after runnig the request or pushing the results of the last delegate requests
+	/// \return delegate requests to perform for the completion of the request or an empty list in case of an error or no further delegate requests defined
+	/// \note A possible error is indicated in the answer retrieved with 'getRequestAnswer();'
+	virtual std::vector<WebRequestDelegateRequest> getFollowDelegateRequests()=0;
 
 	/// \brief Return the result of a delegate request to process the answer in the current context created with executeRequest()
 	/// \param[in] content content of the result put
@@ -77,8 +82,7 @@ public:
 			const char* typenam,
 			const char* contextnam,
 			const WebRequestContent& content,
-			WebRequestAnswer& answer,
-			std::vector<WebRequestDelegateRequest>& delegateRequests)=0;
+			WebRequestAnswer& answer)=0;
 
 	/// \brief Return the result of a delegate request issued by the loading of a configuration with the name of a schema to execute to process the answer in the current context created with executeRequest()
 	/// \param[in] typenam type name of the configured object

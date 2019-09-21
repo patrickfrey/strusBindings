@@ -80,7 +80,7 @@ WebRequestContext::WebRequestContext(
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
-	,m_results(0),m_nofResults(0)
+	,m_results(0),m_nofResults(0),m_resultIdx(0)
 	,m_errbuf(),m_answer()
 	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_)
 	,m_html_base_href(html_base_href_)
@@ -713,10 +713,9 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 
-	int ri = 0, re = m_nofResults;
-	for (; ri != re; ++ri)
+	for (; m_resultIdx < m_nofResults; ++m_resultIdx)
 	{
-		papuga_RequestResult* result = m_results + ri;
+		papuga_RequestResult* result = m_results + m_resultIdx;
 		if (!result->schema) continue;
 
 		std::size_t resultlen = 0;
@@ -763,6 +762,7 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 				}
 				delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
 			}
+			++m_resultIdx;
 			return true;
 		}
 		else
@@ -1371,23 +1371,22 @@ void WebRequestContext::releaseContext()
 	m_context_ownership = false;
 }
 
-bool WebRequestContext::executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
+bool WebRequestContext::executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return executeContextSchema( (const char*)0, (const char*)0, schema, content, answer, delegateRequests);
+	return executeContextSchema( (const char*)0, (const char*)0, schema, content, answer);
 }
 
-bool WebRequestContext::executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
+bool WebRequestContext::executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	return	createRequestContext( answer, contextType, contextName)
 	&&	initAutomaton( answer, contextType, schema)
 	&&	initContentRequest( answer)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
-	&&	executeContentRequest( answer, content)
-	&&	getContentRequestDelegateRequests( answer, delegateRequests);
+	&&	executeContentRequest( answer, content);
 }
 
-bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
+bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	if (m_context != context)
 	{
@@ -1399,8 +1398,7 @@ bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, co
 	&&	initContentRequest( answer)
 	&&	feedContentRequest( answer, content)
 	&&	initRequestContext( answer)
-	&&	executeContentRequest( answer, content)
-	&&	getContentRequestDelegateRequests( answer, delegateRequests);
+	&&	executeContentRequest( answer, content);
 }
 
 bool WebRequestContext::executeOPTIONS(
@@ -1540,7 +1538,7 @@ bool WebRequestContext::executeCommitTransaction( const papuga_ValueVariant* obj
 	}
 }
 
-bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
+bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	ConfigurationTransaction cfgtransaction;
 	std::string configstr = webRequestContent_tostring( content, 0);
@@ -1555,7 +1553,7 @@ bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const 
 	{
 		m_confighandler->storeConfiguration( cfgtransaction, cfgdescr);
 	}
-	if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer, delegateRequests)
+	if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer)
 	||  !m_handler->transferContext( typenam, contextnam, m_context, answer))
 	{
 		return false;
@@ -1580,13 +1578,14 @@ bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const 
 
 bool WebRequestContext::executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	std::vector<WebRequestDelegateRequest> delegates;
-	if (!executeMainSchema( ROOT_CONTEXT_NAME, content, answer, delegates)
+	if (!executeMainSchema( ROOT_CONTEXT_NAME, content, answer)
 	||  !m_handler->transferContext( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, m_context, answer))
 	{
 		return false;
 	}
 	releaseContext();
+
+	std::vector<WebRequestDelegateRequest> delegates = getFollowDelegateRequests();
 	if (!delegates.empty())
 	{
 		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
@@ -1601,9 +1600,9 @@ bool WebRequestContext::executeLoadMainConfiguration( const WebRequestContent& c
 	return true;
 }
 
-bool WebRequestContext::executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
+bool WebRequestContext::executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return executeDeclareConfiguration( typenam, contextnam, "PUT", true/*init*/, content, answer, delegateRequests);
+	return executeDeclareConfiguration( typenam, contextnam, "PUT", true/*init*/, content, answer);
 }
 
 bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer)
@@ -1630,11 +1629,11 @@ bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const c
 		else
 		{
 			WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
-			std::vector<WebRequestDelegateRequest> delegateRequests;
-			if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer, delegateRequests))
+			if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer))
 			{
 				return false;
 			}
+			std::vector<WebRequestDelegateRequest> delegateRequests = getFollowDelegateRequests();
 			if (!delegateRequests.empty())
 			{
 				m_logger->logWarning( _TXT("delete configuration schema with delegate requests that are ignored"));
@@ -1740,6 +1739,16 @@ bool WebRequestContext::executeSchemaDescriptionRequest(
 	}
 }
 
+std::vector<WebRequestDelegateRequest> WebRequestContext::getFollowDelegateRequests()
+{
+	std::vector<WebRequestDelegateRequest> rt;
+	if (!getContentRequestDelegateRequests( m_answer, rt))
+	{
+		return std::vector<WebRequestDelegateRequest>();
+	}
+	return rt;
+}
+
 WebRequestAnswer WebRequestContext::getRequestAnswer()
 {
 	if (m_answer.ok())
@@ -1766,12 +1775,15 @@ bool WebRequestContext::pushDelegateRequestAnswer(
 {
 	try
 	{
-		std::vector<WebRequestDelegateRequest> delegateRequests;
-		bool rt = executeContextSchema( m_context, m_contextType, schema, content, answer, delegateRequests);
-		if (rt && !delegateRequests.empty())
+		bool rt = executeContextSchema( m_context, m_contextType, schema, content, answer);
+		if (rt)
 		{
-			setAnswer( answer, ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in partial requests"));
-			return false;
+			std::vector<WebRequestDelegateRequest> delegateRequests = getFollowDelegateRequests();
+			if (!delegateRequests.empty())
+			{
+				setAnswer( answer, ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in partial requests"));
+				return false;
+			}
 		}
 		return rt;
 	}
@@ -1833,8 +1845,7 @@ bool WebRequestContext::pushConfigurationDelegateRequestAnswer(
 bool WebRequestContext::executeRequest(
 		const char* method,
 		const char* path_,
-		const WebRequestContent& content,
-		std::vector<WebRequestDelegateRequest>& delegateRequests)
+		const WebRequestContent& content)
 {
 	ObjectDescr objectDescr( m_transactionPool);
 	try
@@ -1895,7 +1906,7 @@ bool WebRequestContext::executeRequest(
 						else
 						{
 							objectDescr.reset();
-							return executeDeclareConfiguration( objectDescr.typenam, objectDescr.contextnam, method, false/*init*/, content, m_answer, delegateRequests);
+							return executeDeclareConfiguration( objectDescr.typenam, objectDescr.contextnam, method, false/*init*/, content, m_answer);
 						}
 					}
 				}
@@ -2024,7 +2035,7 @@ bool WebRequestContext::executeRequest(
 					schema = schemabuf;
 				}
 				// schema execution else:
-				if (!executeContextSchema( objectDescr.context, objectDescr.typenam, schema, content, m_answer, delegateRequests))
+				if (!executeContextSchema( objectDescr.context, objectDescr.typenam, schema, content, m_answer))
 				{
 					return false;
 				}
