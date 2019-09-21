@@ -25,6 +25,7 @@
 			"type": "entity",
 			"value": "iggy_pop",
 			"df": 5}],
-	"nofdocs": 18}
+	"globalstats": {
+		"nofdocs": 18}}
 }
 
