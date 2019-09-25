@@ -158,6 +158,7 @@ const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
 		{QueryEvalFormulaParameterName, "query evaluation formula parameter name"},
 		{QueryEvalFormulaParameterValue, "query evaluation formula parameter value"},
 		{QueryEvalFormulaParameter, "query evaluation formula parameter"},
+		{QueryResult, "query result"},
 		{QueryEvalPass, "query evaluation pass"},
 		{QueryNofRanked, "query number of ranked"},
 		{QueryNofVisited, "query number of visited"},
@@ -194,7 +195,7 @@ const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
 		{VariableValue, "variable value"},
 		{VariableDef, "variable definition"},
 		{DebugModeFlag, "debug mode flag"},
-		{NofItemDefinitions, "number of item definitions"}
+		{NofItemDefinitions, "number of item definitions"},
 	};
 	const ItemDef& idef = ar[ item];
 	if (idef.id != item) throw strus::runtime_error( _TXT("internal: badly defined table of automaton items"));
