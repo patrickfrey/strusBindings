@@ -69,23 +69,8 @@ public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{{"query", {
-			{"/query/feature", "feature", true},
-			{"/query/feature/set", "set", FeatureSet},
-			{"/query/feature/weight", "weight", FeatureWeight, '?'},
-			{"/query/feature/content", "content", TermExpression, '*'},
-			{"/query/feature/content", "analyzed", "_analyzed", '!'},
-
-			{"/query/sentence", "sentence", true},
-			{"/query/sentence/field", "field", FieldTypeName},
-			{"/query/sentence/results", "results", NumberOfResults},
-			{"/query/sentence/minweight", "minweight", MinWeight},
-			{"/query/sentence/content", "content", FieldValue},
-			{"/query/sentence/content", "analyzed", "_analyzed", '!'},
-
-			{"/query/restriction", "restriction", true},
-			{"/query/restriction/content", "restriction", MetaDataCondition},
-			{"/query/restriction/content", "analyzed", "_analyzed", '!'}
-		}}},
+			{SchemaQueryDeclPart::resultElementsQueryAnalyzer( "/query")}}
+		}},
 		{
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},

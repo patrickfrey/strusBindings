@@ -16,6 +16,7 @@
 #include "schemas_storage.hpp"
 #include "schemas_vector.hpp"
 #include "schemas_query.hpp"
+#include "schemas_distquery.hpp"
 #include "schemas_analyzer.hpp"
 #include "schemas_inserter.hpp"
 #include "schemas_contentstats.hpp"

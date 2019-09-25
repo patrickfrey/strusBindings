@@ -457,7 +457,7 @@ bool WebRequestContext::feedContentRequest( WebRequestAnswer& answer, const WebR
 	papuga_RequestParser* parser = papuga_create_RequestParser( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), &errcode);
 	if (!parser)
 	{
-		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode));
 		return false;
 	}
 	if (!papuga_RequestParser_feed_request( parser, m_request, &errcode))
@@ -709,6 +709,26 @@ static const char* getDelegateRequestUrl( papuga_Allocator* allocator, const pap
 	}
 }
 
+bool WebRequestContext::resultAppendContentVariableValues( papuga_RequestResult* result, papuga_ErrorCode& errcode)
+{
+	bool rt = true;
+
+	char const* const* vi = result->contentvar;
+	for (; *vi; ++vi)
+	{
+		const papuga_ValueVariant* contentvalue = papuga_RequestContext_get_variable( m_context, *vi);
+		if (contentvalue)
+		{
+			char const* vnam = *vi;
+			for (; vnam[0] == '_'; ++vnam){}
+			papuga_Serialization_pushName_charp( &result->serialization, vnam);
+			papuga_Serialization_pushValue( &result->serialization, contentvalue);
+		}
+	}
+	if (!rt && errcode == papuga_Ok) errcode = papuga_NoMemError;
+	return rt;
+}
+
 bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
@@ -718,6 +738,11 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 		papuga_RequestResult* result = m_results + m_resultIdx;
 		if (!result->schema) continue;
 
+		if (!resultAppendContentVariableValues( result, errcode))
+		{
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
+			return false;
+		}
 		std::size_t resultlen = 0;
 		const char* resultstr = getDelegateRequestString( result, resultlen, errcode);
 		if (resultstr)
@@ -767,7 +792,7 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 		}
 		else
 		{
-			setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
 			return false;
 		}
 	}
@@ -785,6 +810,11 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		papuga_RequestResult* result = m_results + ri;
 		if (result->schema) continue;
 
+		if (!resultAppendContentVariableValues( result, errcode))
+		{
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
+			return false;
+		}
 		std::size_t resultlen = 0;
 		const char* resultstr = getResultString( result, resultlen, errcode);
 		if (resultstr)
@@ -804,7 +834,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 		}
 		else
 		{
-			setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
 			return false;
 		}
 	}
@@ -876,7 +906,7 @@ bool WebRequestContext::initRequestContext( WebRequestAnswer& answer)
 	papuga_RequestInheritedContextDef const* di = papuga_Request_get_inherited_contextdefs( m_request, &errcode);
 	if (!di)
 	{
-		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode));
 		return false;
 	}
 	for (; di->type && di->name; ++di)
@@ -1733,7 +1763,7 @@ bool WebRequestContext::executeSchemaDescriptionRequest(
 		else
 		{
 			papuga_ErrorCode errcode = papuga_SchemaDescription_last_error( descr);
-			setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+			setAnswer( answer, papugaErrorToErrorCode( errcode));
 			return false;
 		}
 	}

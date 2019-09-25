@@ -106,6 +106,8 @@ public:
 			{"termstats/value", "()", TermValue, papuga_TypeString, "country"},
 			{"termstats/df", "()", TermDocumentFrequency, papuga_TypeInt, "312367"},
 			{"termstats", TermStats, {
+					{"type", TermType},
+					{"value", TermValue},
 					{"df", TermDocumentFrequency}
 				}
 			},
@@ -232,6 +234,59 @@ public:
 			{analyzeQueryFeatureSchemaOutput( "")},
 			{analyzeQuerySentence( "")},
 			{analyzeQueryMetaData( "")},
+		}};
+	}
+
+	static papuga::RequestAutomaton_ResultElementDefList resultElementsQueryAnalyzer( const char* rootexpr)
+	{
+		return papuga::RequestAutomaton_ResultElementDefList( rootexpr, {
+			{"feature", "feature", true},
+			{"feature/set", "set", FeatureSet},
+			{"feature/weight", "weight", FeatureWeight, '?'},
+			{"feature/content", "content", TermExpression, '*'},
+			{"feature/content", "analyzed", "_analyzed", '!'},
+			
+			{"sentence", "sentence", true},
+			{"sentence/field", "field", FieldTypeName},
+			{"sentence/results", "results", NumberOfResults},
+			{"sentence/minweight", "minweight", MinWeight},
+			{"sentence/content", "content", FieldValue},
+			{"sentence/content", "analyzed", "_analyzed", '!'},
+			
+			{"restriction", "restriction", true},
+			{"restriction/content", "restriction", MetaDataCondition},
+			{"restriction/content", "analyzed", "_analyzed", '!'}
+		});
+	}
+
+	static papuga::RequestAutomaton_NodeList defineRanklist( const char* rootexpr)
+	{
+		return {rootexpr, {
+			{"evalpass", "()", QueryEvalPass, papuga_TypeInt, "0;1;2"},
+			{"nofranked", "()", QueryNofRanked, papuga_TypeInt, "0;2;12;20"},
+			{"nofvisited", "()", QueryNofVisited, papuga_TypeInt, "312367"},
+			{"ranks/weight", "()", QueryRankWeight, papuga_TypeDouble, "0.7875834;1.234235;120.1241"},
+			{"ranks/summary/name", "()", QueryRankSummaryName, papuga_TypeString, "title"},
+			{"ranks/summary/value", "()", QueryRankSummaryValue, papuga_TypeString, "Tonight (David Bowie album)"},
+			{"ranks/summary/weight", "()", QueryRankSummaryWeight, papuga_TypeDouble, "0.14841834;3.634931;101.98547"},
+			{"ranks/summary/index", "()", QueryRankSummaryIndex, papuga_TypeInt, "-1;0;1;2"},
+			{"ranks/summary", QueryRankSummary, {
+				{"name", QueryRankSummaryName},
+				{"value", QueryRankSummaryValue},
+				{"weight", QueryRankSummaryWeight, '?'},
+				{"index", QueryRankSummaryIndex, '?'},
+				{"name", QueryRankSummaryName},
+			}},
+			{"ranks", QueryRank, {
+				{"weight", QueryRankWeight},
+				{"summary", QueryRankSummary, '*'},
+			}},
+			{"", QueryResult, {
+				{"evalpass", QueryEvalPass, '?'},
+				{"nofranked", QueryNofRanked},
+				{"nofvisited", QueryNofVisited},
+				{"ranks", QueryRank, '*'}
+			}},
 		}};
 	}
 };

@@ -106,6 +106,17 @@ struct Deserializer
 	static StatisticsMessage getStatisticsMessage( papuga_SerializationIter& seriter);
 	static StatisticsMessage getStatisticsMessage( const papuga_ValueVariant& msg);
 
+	static SummaryElement getSummaryElement( papuga_SerializationIter& seriter);
+	static std::vector<SummaryElement> getSummaryElementList( papuga_SerializationIter& seriter);
+	static std::vector<SummaryElement> getSummaryElementListValue( papuga_SerializationIter& seriter);
+	static ResultDocument getResultDocument( papuga_SerializationIter& seriter);
+	static std::vector<ResultDocument> getResultDocumentList( papuga_SerializationIter& seriter);
+	static std::vector<ResultDocument> getResultDocumentListValue( papuga_SerializationIter& seriter);
+	static QueryResult getQueryResult( papuga_SerializationIter& seriter);
+	static QueryResult getQueryResult( const papuga_ValueVariant& res);
+	static std::vector<QueryResult> getQueryResultList( papuga_SerializationIter& seriter);
+	static std::vector<QueryResult> getQueryResultList( const papuga_ValueVariant& res);
+
 	static std::vector<Reference<NormalizerFunctionInstanceInterface> > getNormalizers(
 			papuga_SerializationIter& seriter,
 			const TextProcessorInterface* textproc,

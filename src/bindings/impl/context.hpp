@@ -9,6 +9,7 @@
 #define _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
 #include "papuga/valueVariant.h"
 #include "strus/textProcessorInterface.hpp"
+#include "strus/queryResult.hpp"
 #include "strus/base/thread.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
@@ -188,6 +189,11 @@ public:
 	/// \param[in] analyzer document analyzer to use for preparing the documents to insert
 	/// \return inserter interface (class Inserter)
 	InserterImpl* createInserter( StorageClientImpl* storage, DocumentAnalyzerImpl* analyzer);
+
+	/// \brief Take a list of query results as input and return a merged query result
+	/// \param[in] queryResults list of query results to merge
+	/// \return the result (strus::QueryResult)
+	QueryResult* mergeQueryResults( const ValueVariant& queryResults) const;
 
 	/// \brief Unpack a statistics blob retrieved from a storage
 	/// \param[in] blob binary blob with statistics to decode (created by StorageClient:getAllStatistics or StorageClient:getChangeStatistics)

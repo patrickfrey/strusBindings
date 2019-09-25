@@ -333,6 +333,11 @@ InserterImpl* ContextImpl::createInserter( StorageClientImpl* storage, DocumentA
 	return new InserterImpl( storage, analyzer);
 }
 
+QueryResult* ContextImpl::mergeQueryResults( const ValueVariant& queryResults) const
+{
+	return NULL;
+}
+
 void ContextImpl::createStorage( const ValueVariant& config_)
 {
 	std::string dbname;

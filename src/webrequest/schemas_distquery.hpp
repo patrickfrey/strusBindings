@@ -12,6 +12,7 @@
 #define _STRUS_WEBREQUEST_SCHEMAS_DIST_QUERYEVAL_HPP_INCLUDED
 #include "schemas_base.hpp"
 #include "schemas_expression_decl.hpp"
+#include "schemas_query_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -20,18 +21,22 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_INIT_DistQueryEval :public papuga::RequestAutomaton
+class Schema_Context_INIT_DistQueryEval :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_Context_INIT_DistQueryEval() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
-			{"storage","/distqryeval/include/storage()",false/*not required*/},
 			{"analyzer","/distqryeval/include/analyzer()",false/*not required*/},
-			{"statserver","/distqryeval/include/statserver()",false/*not required*/}
+			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
 		},
-		{}
+		{
+			{"/distqryeval/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
+			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
+			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
+			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
+		}
 	) {}
 };
 
@@ -41,19 +46,63 @@ public:
 	Schema_Context_PUT_DistQueryEval() :Schema_Context_INIT_DistQueryEval(){}
 };
 
-class Schema_DistQueryEval_GET :public papuga::RequestAutomaton
+class Schema_DistQueryEval_GET :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_DistQueryEval_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{
-			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
+			{"query", "SET~querystats", "GET", "statserver", "", {
+				{"/query/feature", "feature", true},
+				{"/query/{feature,sentence}/analyzed", "analyzed", TermExpression, '*'}
+			}},
+			{"query", "SET~ranklist", "GET", "qryeval", "", {"termstats","globalstats"}, {
+				{SchemaQueryDeclPart::resultElementsQueryAnalyzer( "/query")}
+			}},
+			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
+		{
+			{"analyzer","/query/include/analyzer()",false/*not required*/},
+			{"vstorage","/query/include/vstorage()",false/*not required*/}
+		},
+		{
+			{"/query/server/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
+			{"/query/server", "", "storage", DistQueryEvalStorageServer, '*'},
+			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
+			{"/query/server", "", "statserver", DistQueryEvalStatisticsServer, '!'},
+
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
+			{"/query/analyzer", '?'},
+		
+			{SchemaQueryDeclPart::analyzeQuerySchemaOutput( "/query")},
+		}
+	) {}
+};
+
+class Schema_DistQueryEval_SET_querystats :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_DistQueryEval_SET_querystats() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		{},
 		{},
 		{
-			{SchemaQueryDeclPart::createQuery( "/query")},
-			{SchemaQueryDeclPart::buildQueryOriginalAnalyzed( "/query")},
-			{SchemaQueryDeclPart::evaluateQuery( "/query")}
+			{SchemaQueryDeclPart::defineStatistics("/statitics")},
+			{"/statitics", "", "termstats", TermStats, '!'},
+			{"/statitics", "", "globalstats", GlobalStats, '!'}
+		}
+	) {}
+};
+
+class Schema_DistQueryEval_SET_ranklist :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_DistQueryEval_SET_ranklist() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		{},
+		{},
+		{
+			{SchemaQueryDeclPart::defineRanklist( "/queryresult/ranklist")},
 		}
 	) {}
 };

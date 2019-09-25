@@ -74,6 +74,11 @@ public:
 		QueryEvalSummarizer, QueryEvalWeighting, 
 		QueryEvalFormulaParameterName, QueryEvalFormulaParameterValue, QueryEvalFormulaParameter,
 
+		QueryResult,QueryEvalPass,QueryNofRanked,QueryNofVisited,QueryRank,QueryRankWeight,QueryRankSummary,
+		QueryRankSummaryName,QueryRankSummaryValue,QueryRankSummaryWeight,QueryRankSummaryIndex,
+
+		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, 
+
 		TermExpression, ExpressionVariableName, TermType, TermValue, TermLen,
 		MetaDataCondition, MetaDataUnionCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue,
 		MetaDataRangeFrom, MetaDataRangeTo, 

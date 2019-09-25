@@ -51,7 +51,7 @@ public:
 	Schema_QueryEval_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{
-			{"result", { {"/query", "ranklist", "ranklist", '!'} }}
+			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
 		{},
 		{
