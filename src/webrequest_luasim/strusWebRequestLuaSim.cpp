@@ -590,6 +590,19 @@ static std::pair<std::string,std::string> splitUrl( const std::string& url)
 	return rt;
 }
 
+static std::string getPostString( const std::string& hostaddr)
+{
+	char const* hptr = hostaddr.c_str();
+	if (strus::caseInsensitiveStartsWith( hostaddr, "http:") || strus::caseInsensitiveStartsWith( hostaddr, "https:"))
+	{
+		hptr = std::strchr( hptr, ':')+1;
+	}
+	char const* portsep = std::strchr( hptr, ':');
+	char const* portstr = portsep ? (portsep+1) : "80";
+	char const* portend = std::strchr( portstr, '/');
+	return portend ? std::string( portstr, portend-portstr) : std::string( portstr);
+}
+
 static std::string substStringVariable( const std::string& src, const char* name, const std::string& value)
 {
 	std::size_t namelen = std::strlen(name);
@@ -806,19 +819,13 @@ void GlobalContext::defineServer( const std::string& hostname, const Configurati
 
 void GlobalContext::startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep)
 {
-	char const* hptr = hostname.c_str();
-	if (strus::caseInsensitiveStartsWith( hostname, "http:") || strus::caseInsensitiveStartsWith( hostname, "https:"))
-	{
-		hptr = std::strchr( hptr, ':')+1;
-	}
-	char const* portsep = std::strchr( hptr, ':');
-	char const* portstr = portsep ? (portsep+1) : "80";
-	std::string configfile = strus::string_format( "tmp.startServerProcess.config.%s.js", portstr);
+	std::string portstr = getPostString( hostname);
+	std::string configfile = strus::string_format( "tmp.startServerProcess.config.%s.js", portstr.c_str());
 	std::string configpath = strus::joinFilePath( g_outputDir, configfile);
 	int ec = strus::writeFile( configpath, configjson);
 	if (ec) throw strus::runtime_error( _TXT("failed to write configuration for server to start into text file %s (errno %d): %s"), configpath.c_str(), ec, ::strerror(ec));
 
-	std::string cmdline = substStringVariable( substStringVariable( g_serviceProgramCmdLine, "port", portstr), "config", configpath);
+	std::string cmdline = substStringVariable( substStringVariable( g_serviceProgramCmdLine, "port", portstr.c_str()), "config", configpath);
 	std::vector<std::string> cmd = splitCmdLine( cmdline);
 	enum {MaxArgNum=64};
 	const char* argv[ MaxArgNum+2];

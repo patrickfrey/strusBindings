@@ -29,3 +29,16 @@
 		"nofdocs": 18}}
 }
 
+{
+"list": {
+	"link": ["storage","statserver"]}
+}
+
+{ 
+"distqryeval": { 
+  "statserver": "http://127.0.0.1:7183/statserver/test",
+  "storage": [ 
+    "http://127.0.0.1:7184/storage/test",
+    "http://127.0.0.1:7185/storage/test",
+    "http://127.0.0.1:7186/storage/test" ] } }
+

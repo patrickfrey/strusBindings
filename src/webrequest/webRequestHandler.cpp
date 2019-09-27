@@ -159,7 +159,7 @@ public:
 	DefineConfigSchema() :DefineSchema<SCHEMA>( ROOT_CONTEXT_NAME){}
 };
 
-static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","qryeval","inserter",0};
+static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","qryeval","distqryeval","inserter",0};
 
 static void tickerFunction( void* THIS)
 {
@@ -224,11 +224,15 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_INIT_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
 		schema_Context_PUT_QueryAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
+		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
+		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
 
 		static const DefineConfigSchema<Schema_Context_INIT_QueryEval> schema_Context_INIT_QueryEval;
 		schema_Context_INIT_QueryEval.addToHandler( m_impl, "POST/qryeval");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryEval> schema_Context_PUT_QueryEval;
 		schema_Context_PUT_QueryEval.addToHandler( m_impl, "PUT/qryeval");
+		static const DefineSchema<Schema_QueryEval_GET> schema_QueryEval_GET("qryeval");
+		schema_QueryEval_GET.addToHandler( m_impl, "GET");
 
 		static const DefineConfigSchema<Schema_Context_PUT_StatisticsServer> schema_Context_PUT_StatisticsServer;
 		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");
@@ -249,11 +253,16 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineSchema<Schema_Storage_GET> schema_Storage_GET("storage");
 		schema_Storage_GET.addToHandler( m_impl, "GET");
 
-		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
-		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
-
-		static const DefineSchema<Schema_QueryEval_GET> schema_QueryEval_GET("qryeval");
-		schema_QueryEval_GET.addToHandler( m_impl, "GET");
+		static const DefineConfigSchema<Schema_Context_INIT_DistQueryEval> schema_Context_INIT_DistQueryEval;
+		schema_Context_INIT_DistQueryEval.addToHandler( m_impl, "POST/distqryeval");
+		static const DefineConfigSchema<Schema_Context_PUT_DistQueryEval> schema_Context_PUT_DistQueryEval;
+		schema_Context_PUT_DistQueryEval.addToHandler( m_impl, "PUT/distqryeval");
+		static const DefineSchema<Schema_DistQueryEval_GET> schema_DistQueryEval_GET("distqryeval");
+		schema_DistQueryEval_GET.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_DistQueryEval_SET_querystats> schema_DistQueryEval_SET_querystats("distqryeval");
+		schema_DistQueryEval_GET.addToHandler( m_impl, "SET~querystats");
+		static const DefineSchema<Schema_DistQueryEval_SET_ranklist> schema_DistQueryEval_SET_ranklist("distqryeval");
+		schema_DistQueryEval_GET.addToHandler( m_impl, "SET~ranklist");
 
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
@@ -583,6 +592,7 @@ bool WebRequestHandler::transferContext(
 	strus::unique_lock lock( m_mutex_context_transfer);
 	if (!papuga_RequestHandler_transfer_context( m_impl, contextType, contextName, context, &errcode))
 	{
+		papuga_destroy_RequestContext( context);
 		setStatus( status, papugaErrorToErrorCode( errcode));
 		return false;
 	}

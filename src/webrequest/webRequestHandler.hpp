@@ -68,6 +68,11 @@ public:/*WebRequestContext*/
 	const char* html_head() const					{return m_html_head.c_str();}
 	int debug_maxdepth() const					{return m_debug_maxdepth;}
 	int maxIdleTime() const						{return m_maxIdleTime;}
+
+	/// \param[in] contextType type name of context
+	/// \param[in] contextName object name of context
+	/// \param[in] context context transferred (with ownership, destroyed in case of failure)
+	/// \param[out] status describes the error in case failure
 	bool transferContext(
 			const char* contextType,
 			const char* contextName,

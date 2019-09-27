@@ -61,7 +61,11 @@ buildStorageServer( 3, ISERVER3)
 function storageAddress( serverurl)
 	return serverurl .. "/storage/test"
 end
+function statserverAddress( serverurl)
+	return serverurl .. "/statserver/test"
+end
 
+-- Define a statistics server for the 3 storage servers defined:
 statserverConfig = {
 	statserver = {
 		proc = "std",
@@ -74,13 +78,14 @@ statserverConfig = {
 	}
 }
 
-config.service.name = "ssrv"
+config.service.name = "ssrv1"
 def_server( SSERVER1, config)
 call_server_checked( "PUT", SSERVER1  .. "/statserver/test", statserverConfig )
 
 statserverDef = call_server_checked( "GET", SSERVER1 .. "/statserver/test")
 if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
 
+-- Define a 2nd variant of the statistics server for testing delegate calls issued by embedded sub configuration:
 SSERVER2=ISERVER4
 config_SSERVER2 = mergeValues(
 			statserverConfig,
@@ -95,6 +100,7 @@ def_server( SSERVER2, config_SSERVER2)
 statserverDef_configured = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
 if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
 
+-- Call the statistics server for statistics of an analyzed query:
 query_analyzed = {
 query = {
 	feature = {
@@ -119,5 +125,79 @@ query = {
 statserverStats = call_server_checked( "GET", SSERVER1 .. "/statserver/test", query_analyzed)
 if verbose then io.stderr:write( string.format("- Statistics server query result:\n%s\n", statserverStats)) end
 
-checkExpected( statserverDef .. statserverDef_configured .. statserverStats, "@distributeStorage.exp", "distributeStorage.res" )
+-- Define queryeval server for distributed query:
+distqryevalConfig = {
+	distqryeval = {
+		include = {
+			analyzer = "test"
+		},
+		statserver = {
+			statserverAddress(SSERVER1)
+		},
+		storage = {
+			storageAddress(ISERVER1),
+			storageAddress(ISERVER2),
+			storageAddress(ISERVER3)
+		}
+	}
+}
+
+config.service.name = "qsrv1"
+def_server( QSERVER1, config)
+call_server_checked( "PUT", QSERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+call_server_checked( "PUT", QSERVER1  .. "/distqryeval/test", distqryevalConfig )
+
+distqryevalObj = {}
+distqryevalObj.statserver = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/statserver")).list.value
+distqryevalObj.storage = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/storage")).list.value
+distqryevalDef = to_json( {distqryeval = distqryevalObj} )
+distqryevalVar = call_server_checked( "GET", QSERVER1 .. "/distqryeval/test")
+if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end
+if verbose then io.stderr:write( string.format("- Distributed query evaluation server configuration from server:\n%s\n", distqryevalDef)) end
+
+-- Evaluate the same queries as in the 'query.lua' test with the distributed query evaluation:
+query = {
+	query = {
+		feature = {
+		{	set = "search", 
+			content = {
+				term = {
+					type = "text",
+					value = "Iggy Pop"
+				}
+			}
+		}}
+	}
+}
+
+query2 = {
+	query = {
+		feature = {
+		{	set = "search", 
+			content = {
+				term = {
+					type = "text",
+					value = "Iggy Pop"
+				}
+			},
+			analyzed = {
+				term = {
+					type = "word",
+					value = "songwriter"
+				}
+			}
+		}}
+	}
+}
+
+qryres1 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query))
+if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres1)) end
+-- qryres2 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query2))
+-- if verbose then io.stderr:write( string.format("- Query evaluation result with analysis passed:\n%s\n", qryres2)) end
+
+if verbose then io.stderr:write( string.format("- Distributed query evaluation:\n%s\n", qryres1)) end
+-- if verbose then io.stderr:write( string.format("- Distributed query evaluation with analysis passed:\n%s\n", qryres2)) end
+
+
+checkExpected( statserverDef .. statserverDef_configured .. statserverStats .. distqryevalVar .. distqryevalDef, "@distributeStorage.exp", "distributeStorage.res" )
 

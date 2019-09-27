@@ -6,7 +6,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 /* \brief Structure to build and map the Result of an XML/JSON request
- * @file requestResult.h
+ * @file transaction.cpp
  */
 #include "transaction.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
@@ -115,74 +115,60 @@ int TransactionPool::transactionRefIndexCandidate( int maxIdleTime)
 	return (((m_lasttick % (m_arsize-1)) + maxIdleTime) * m_nofTransactionPerSlot) % (m_arsize-1);
 }
 
-TransactionRef TransactionPool::newTransaction( const std::string& contextType, papuga_RequestContext* context, int maxIdleTime)
+TransactionRef TransactionPool::newTransaction( const std::string& contextType, const PapugaContextRef& context, int maxIdleTime)
 {
-	try
+	if (maxIdleTime <= 0 || maxIdleTime > m_maxIdleTime)
 	{
-		if (maxIdleTime <= 0 || maxIdleTime > m_maxIdleTime)
+		maxIdleTime = m_maxIdleTime;
+	}
+	int64_t tidx;
+	int* tidxref = 0;
+	{
+		int cnt = m_allocNofTries;
+		do
 		{
-			maxIdleTime = m_maxIdleTime;
-		}
-		int64_t tidx;
-		int* tidxref = 0;
-		{
-			int cnt = m_allocNofTries;
-			do
+			tidx = nextRand();
+			strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
+			tidxref = &m_refar[ tidx & (m_arsize-1)];
+			if (*tidxref == -1)
 			{
-				tidx = nextRand();
-				strus::scoped_lock lock( m_mutex_refar[ tidx % NofMutex]);
-				tidxref = &m_refar[ tidx & (m_arsize-1)];
-				if (*tidxref == -1)
-				{
-					*tidxref = std::numeric_limits<int>::max(); 
-					break;
-				}
-				--cnt;
-			} while (cnt >= 0);
-			if (cnt==0) throw std::runtime_error(_TXT("failed to allocate transaction"));
-		}{
-			int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
-			int cnt = m_allocNofTries;
-			while (cnt >= 0)
-			{
-				try
-				{
-					strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
-					TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
-					if (!tref.get())
-					{
-						Transaction* tr = new Transaction( contextType, context, tidx, tidxref, maxIdleTime);
-						context = 0;
-						TransactionRef rt( tr);
-						*tidxref = eidx & (m_arsize-1);
-						return m_ar[ eidx & (m_arsize-1)] = rt;
-					}
-				}
-				catch (...)
-				{
-					*tidxref = -1; //... roll back
-					throw std::bad_alloc();
-				}
-				--cnt;
-				++eidx;
+				*tidxref = std::numeric_limits<int>::max(); 
+				break;
 			}
-			*tidxref = -1; //... roll back
-			throw std::runtime_error(_TXT("failed to allocate transaction slot"));
+			--cnt;
+		} while (cnt >= 0);
+		if (cnt==0) throw std::runtime_error(_TXT("failed to allocate transaction"));
+	}{
+		int64_t eidx = transactionRefIndexCandidate( maxIdleTime) + (tidx % m_nofTransactionPerSlot);
+		int cnt = m_allocNofTries;
+		while (cnt >= 0)
+		{
+			try
+			{
+				strus::scoped_lock lock( m_mutex_ar[ eidx % NofMutex]);
+				TransactionRef& tref = m_ar[ eidx & (m_arsize-1)];
+				if (!tref.get())
+				{
+					Transaction* tr = new Transaction( contextType, context, tidx, tidxref, maxIdleTime);
+					TransactionRef rt( tr);
+					*tidxref = eidx & (m_arsize-1);
+					return m_ar[ eidx & (m_arsize-1)] = rt;
+				}
+			}
+			catch (...)
+			{
+				*tidxref = -1; //... roll back
+				throw std::bad_alloc();
+			}
+			--cnt;
+			++eidx;
 		}
-	}
-	catch (const std::bad_alloc&)
-	{
-		if (context) papuga_destroy_RequestContext( context);
-		throw std::bad_alloc();
-	}
-	catch (const std::runtime_error& err)
-	{
-		if (context) papuga_destroy_RequestContext( context);
-		throw std::runtime_error( err.what());
+		*tidxref = -1; //... roll back
+		throw std::runtime_error(_TXT("failed to allocate transaction slot"));
 	}
 }
 
-std::string TransactionPool::createTransaction( const std::string& contextType, papuga_RequestContext* context, int maxIdleTime)
+std::string TransactionPool::createTransaction( const std::string& contextType, const PapugaContextRef& context, int maxIdleTime)
 {
 	TransactionRef tr = newTransaction( contextType, context, maxIdleTime);
 	return transactionId( tr->idx());

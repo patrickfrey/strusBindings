@@ -18,6 +18,7 @@
 #include "papuga/requestResult.h"
 #include "papuga/request.h"
 #include "papuga/typedefs.h"
+#include "papugaContextRef.hpp"
 #include <stdexcept>
 
 namespace strus
@@ -96,16 +97,16 @@ private:
 	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
 	const char* getDelegateRequestString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
 	bool resultAppendContentVariableValues( papuga_RequestResult* result, papuga_ErrorCode& errcode);
+	bool hasContentRequestDelegateRequests() const;
 	bool getContentRequestDelegateRequests( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
 	bool getContentRequestResult( WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
 	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer);
+	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname, WebRequestAnswer& answer);
 	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
 	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeListVariables( papuga_RequestContext* context, WebRequestAnswer& answer);
-	void releaseContext();
+	bool executeContextSchema( const PapugaContextRef& context_, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool executeListVariables( const PapugaContextRef& context, WebRequestAnswer& answer);
 	bool executeSchemaDescriptionRequest( const char* method, const char* path, WebRequestAnswer& answer);
 	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
 
@@ -118,8 +119,7 @@ private:
 	papuga_Allocator m_allocator;
 	const char* m_contextType;		//< context type
 	const char* m_contextName;		//< context name
-	papuga_RequestContext* m_context;
-	bool m_context_ownership;
+	PapugaContextRef m_context;
 	papuga_Request* m_request;
 	papuga_StringEncoding m_encoding;
 	papuga_ContentType m_doctype;

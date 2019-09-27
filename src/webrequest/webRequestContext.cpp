@@ -46,7 +46,8 @@
 #include <iostream>
 #include <sstream>
 
-#undef STRUS_LOWLEVEL_DEBUG
+#define STRUS_LIST_ROOT_ELEMENT "list"
+
 using namespace strus;
 
 static void logMethodCall( void* self, int nofItems, ...);
@@ -74,8 +75,7 @@ WebRequestContext::WebRequestContext(
 	,m_transactionPool(transactionPool_)
 	,m_contextType(ROOT_CONTEXT_NAME)
 	,m_contextName(ROOT_CONTEXT_NAME)
-	,m_context(0)
-	,m_context_ownership(false)
+	,m_context()
 	,m_request(0)
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
@@ -109,7 +109,7 @@ WebRequestContext::WebRequestContext(
 
 WebRequestContext::~WebRequestContext()
 {
-	if (m_context_ownership && m_context) {papuga_destroy_RequestContext( m_context); m_context=0;}
+	m_context.reset();
 	if (m_request) papuga_destroy_Request( m_request);
 	papuga_destroy_Allocator( &m_allocator);
 }
@@ -167,6 +167,7 @@ static void ValueVariant_appendString_maxsize( std::string& out, const papuga_Va
 			papuga_SerializationIter itr;
 			papuga_init_SerializationIter( &itr, val.value.serialization);
 			out.push_back( '{');
+			bool separator = false;
 			for (; !papuga_SerializationIter_eof( &itr); papuga_SerializationIter_skip( &itr))
 			{
 				if (out.size() > maxContentSize) break;
@@ -176,15 +177,19 @@ static void ValueVariant_appendString_maxsize( std::string& out, const papuga_Va
 					case papuga_TagValue:
 						if (maxStructDepth > 0)
 						{
+							if (separator) out.push_back(',');
 							ValueVariant_appendString_maxsize( out, *papuga_SerializationIter_value( &itr), maxItemSize, maxContentSize, maxStructDepth-1);
 						}
+						separator = true;
 						break;
 					case papuga_TagOpen:
 						--maxStructDepth;
 						if (maxStructDepth > 0)
 						{
+							if (separator) out.push_back(',');
 							out.push_back( '{');
 						}
+						separator = false;
 						break;
 					case papuga_TagClose:
 						if (maxStructDepth > 0)
@@ -192,13 +197,16 @@ static void ValueVariant_appendString_maxsize( std::string& out, const papuga_Va
 							out.push_back( '}');
 						}
 						++maxStructDepth;
+						separator = true;
 						break;
 					case papuga_TagName:
 						if (maxStructDepth > 0)
 						{
+							if (separator) out.push_back(',');
 							if (!papuga::ValueVariant_append_string( out, *papuga_SerializationIter_value( &itr), errcode)) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
-							out.append( ": ");
+							out.push_back( ':');
 						}
+						separator = false;
 						break;
 				}
 			}
@@ -223,6 +231,7 @@ static void ValueVariant_appendString_maxsize( std::string& out, const papuga_Va
 			--newSize;
 		}
 		out.resize( newSize);
+		out.append( " ...");
 	}
 }
 
@@ -584,7 +593,7 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 bool WebRequestContext::executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content)
 {
 	papuga_RequestError reqerr;
-	if (!papuga_RequestContext_execute_request( m_context, m_request, &m_allocator, &m_callLogger, &m_results, &m_nofResults, &reqerr))
+	if (!papuga_RequestContext_execute_request( m_context.get(), m_request, &m_allocator, &m_callLogger, &m_results, &m_nofResults, &reqerr))
 	{
 		int apperr = 0;
 		if (reqerr.errormsg[0])
@@ -660,7 +669,6 @@ const char* WebRequestContext::getDelegateRequestString( papuga_RequestResult* r
 		const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
 
 		return (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
-
 	}
 }
 
@@ -716,7 +724,7 @@ bool WebRequestContext::resultAppendContentVariableValues( papuga_RequestResult*
 	char const* const* vi = result->contentvar;
 	for (; *vi; ++vi)
 	{
-		const papuga_ValueVariant* contentvalue = papuga_RequestContext_get_variable( m_context, *vi);
+		const papuga_ValueVariant* contentvalue = papuga_RequestContext_get_variable( m_context.get(), *vi);
 		if (contentvalue)
 		{
 			char const* vnam = *vi;
@@ -747,7 +755,7 @@ bool WebRequestContext::getContentRequestDelegateRequests( WebRequestAnswer& ans
 		const char* resultstr = getDelegateRequestString( result, resultlen, errcode);
 		if (resultstr)
 		{
-			const papuga_ValueVariant* addressval = papuga_RequestContext_get_variable( m_context, result->addressvar);
+			const papuga_ValueVariant* addressval = papuga_RequestContext_get_variable( m_context.get(), result->addressvar);
 			if (!addressval)
 			{
 				setAnswer_fmt( answer, ErrorCodeNotFound, _TXT("undefined variable '%s'"), result->addressvar);
@@ -803,7 +811,7 @@ bool WebRequestContext::getContentRequestResult( WebRequestAnswer& answer)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 
-	if (!m_context) return true;
+	if (!m_context.get()) return true;
 	int ri = 0, re = m_nofResults;
 	for (; ri != re; ++ri)
 	{
@@ -845,14 +853,14 @@ bool WebRequestContext::inheritRequestContext( WebRequestAnswer& answer, const c
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	char buf[ 1024];
-	if (!m_context)
+	if (!m_context.get())
 	{
 		errcode = papuga_ExecutionOrder;
 		goto ERROR;
 	}
-	if (!papuga_RequestContext_inherit( m_context, m_handler->impl(), contextType, contextName))
+	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->impl(), contextType, contextName))
 	{
-		errcode = papuga_RequestContext_last_error( m_context, true);
+		errcode = papuga_RequestContext_last_error( m_context.get(), true);
 		goto ERROR;
 	}
 	return true;
@@ -884,10 +892,8 @@ bool WebRequestContext::createRequestContext( WebRequestAnswer& answer, const ch
 
 bool WebRequestContext::createEmptyRequestContext( WebRequestAnswer& answer)
 {
-	if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-	m_context = papuga_create_RequestContext();
-	m_context_ownership = true;
-	if (!m_context)
+	m_context.create();
+	if (!m_context.get())
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
@@ -971,6 +977,7 @@ public:
 	bool startsWith( const char* prefix, int prefixlen)
 	{
 		char* itrnext = std::strchr( itr, '/');
+		if (!itrnext) itrnext = std::strchr( itr, '\0');
 		return (prefixlen == itrnext-itr && prefix[0] == itr[0] && 0==std::memcmp( prefix, itr, prefixlen));
 	}
 	bool hasMore()
@@ -1153,7 +1160,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	return true;
 }
 
-bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, papuga_RequestContext* context, const char* resultname, WebRequestAnswer& answer)
+bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname, WebRequestAnswer& answer)
 {
 	papuga_CallResult retval;
 	char membuf_err[ 4096];
@@ -1175,7 +1182,7 @@ bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMet
 		setAnswer( answer, ErrorCodeRuntimeError, _TXT( "only one result expected"));
 		return false;
 	}
-	else if (!papuga_RequestContext_define_variable( context, resultname, &retval.valuear[0]))
+	else if (!papuga_RequestContext_define_variable( context_.get(), resultname, &retval.valuear[0]))
 	{
 		return false;
 	}
@@ -1256,25 +1263,21 @@ static bool checkPapugaListBufferOverflow( const char** ci, WebRequestAnswer& an
 /// \brief Object addressed by the request with all its context data
 struct ObjectDescr
 {
-	papuga_RequestContext* context;
+	PapugaContextRef context;
 	const papuga_ValueVariant* obj;
 	const char* typenam;
 	const char* contextnam;
-	bool context_ownership;
 	TransactionRef transactionRef;
 	TransactionPool* transactionPool;
 
 	explicit ObjectDescr( TransactionPool* transactionPool_)
-		:context(0),obj(0),typenam(0),contextnam(0),context_ownership(false),transactionRef(),transactionPool(transactionPool_){}
-	~ObjectDescr()
-	{
-		if (context_ownership) papuga_destroy_RequestContext( context);
-	}
+		:context(),obj(0),typenam(0),contextnam(0),transactionRef(),transactionPool(transactionPool_){}
+	~ObjectDescr(){}
+
 	void reset()
 	{
-		if (context_ownership) papuga_destroy_RequestContext( context);
 		transactionRef.reset();
-		context = 0;
+		context.reset();
 		obj = 0;
 	}
 
@@ -1301,13 +1304,12 @@ struct ObjectDescr
 			}
 			typenam = transactionRef->contextType();
 			context = transactionRef->context();
-			obj = papuga_RequestContext_get_variable( context, "transaction");
+			obj = papuga_RequestContext_get_variable( context.get(), "transaction");
 			if (!obj)
 			{
 				setAnswer( answer, ErrorCodeRequestResolveError);
 				return false;
 			}
-			context_ownership = false;
 			return true;
 		}
 		else
@@ -1321,16 +1323,15 @@ struct ObjectDescr
 			{
 				if (!(contextnam = path.getNext())) return true;
 			}
-			context = papuga_create_RequestContext();
-			if (!context)
+			context.create();
+			if (!context.get())
 			{
 				setAnswer( answer, ErrorCodeOutOfMem);
 				return false;
 			}
-			context_ownership = true;
-			if (!papuga_RequestContext_inherit( context, handler, typenam, contextnam))
+			if (!papuga_RequestContext_inherit( context.get(), handler, typenam, contextnam))
 			{
-				errcode = papuga_RequestContext_last_error( context, true);
+				errcode = papuga_RequestContext_last_error( context.get(), true);
 				reset();
 				if (errcode == papuga_AddressedItemNotFound)
 				{
@@ -1342,7 +1343,7 @@ struct ObjectDescr
 					return false;
 				}
 			}
-			char const** varlist = papuga_RequestContext_list_variables( context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
+			char const** varlist = papuga_RequestContext_list_variables( context.get(), 1/*max inheritcnt*/, lstbuf, lstbufsize);
 			if (!checkPapugaListBufferOverflow( varlist, answer)) return false;
 			if (path.hasMore() && !path.startsWith( typenam, std::strlen(typenam)))
 			{
@@ -1358,12 +1359,12 @@ struct ObjectDescr
 							setAnswer( answer, papugaErrorToErrorCode( papuga_LogicError));
 							return false;
 						}
-						obj = papuga_RequestContext_get_variable( context, varnam);
+						obj = papuga_RequestContext_get_variable( context.get(), varnam);
 						return true;
 					}
 				}
 			}
-			obj = papuga_RequestContext_get_variable( context, typenam);
+			obj = papuga_RequestContext_get_variable( context.get(), typenam);
 			return true;
 		}
 	}
@@ -1396,11 +1397,6 @@ struct ObjectDescr
 	}
 };
 
-void WebRequestContext::releaseContext()
-{
-	m_context_ownership = false;
-}
-
 bool WebRequestContext::executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
 	return executeContextSchema( (const char*)0, (const char*)0, schema, content, answer);
@@ -1416,14 +1412,9 @@ bool WebRequestContext::executeContextSchema( const char* contextType, const cha
 	&&	executeContentRequest( answer, content);
 }
 
-bool WebRequestContext::executeContextSchema( papuga_RequestContext* context, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
+bool WebRequestContext::executeContextSchema( const PapugaContextRef& context_, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	if (m_context != context)
-	{
-		if (m_context_ownership && m_context) papuga_destroy_RequestContext( m_context);
-		m_context = context;
-		m_context_ownership = false;
-	}
+	m_context = context_;
 	return	initAutomaton( answer, contextType, schema)
 	&&	initContentRequest( answer)
 	&&	feedContentRequest( answer, content)
@@ -1469,7 +1460,7 @@ bool WebRequestContext::executeOPTIONS(
 	}
 	else if (objectDescr.contextnam)
 	{
-		if (objectDescr.context)
+		if (objectDescr.context.get())
 		{
 			std::string http_allow("OPTIONS,");
 			char const** sl = papuga_RequestHandler_list_schema_names( m_handler->impl(), objectDescr.typenam, lstbuf, lstbufsize);
@@ -1511,9 +1502,9 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 	{
 		return false;
 	}
-	if (!papuga_RequestContext_inherit( m_context, m_handler->impl(), typenam, contextnam))
+	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->impl(), typenam, contextnam))
 	{
-		setAnswer( answer, papugaErrorToErrorCode( papuga_RequestContext_last_error( m_context, true)));
+		setAnswer( answer, papugaErrorToErrorCode( papuga_RequestContext_last_error( m_context.get(), true)));
 		return false;
 	}
 	if (!callExtensionMethod( self, methoddescr, m_context, resultname, answer))
@@ -1522,7 +1513,6 @@ bool WebRequestContext::executePostTransaction( void* self, int classid, const c
 	}
 	std::string transaction_typenam = strus::string_format( "transaction/%s", typenam);
 	std::string tid = m_transactionPool->createTransaction( transaction_typenam, m_context, m_handler->maxIdleTime());
-	releaseContext();
 	std::string linkbase;
 	int ec = strus::getAncestorPath( m_html_base_href, 3, linkbase);
 	std::string tlinkparent = strus::joinFilePath( linkbase, "transaction");
@@ -1583,12 +1573,16 @@ bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const 
 	{
 		m_confighandler->storeConfiguration( cfgtransaction, cfgdescr);
 	}
-	if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer)
-	||  !m_handler->transferContext( typenam, contextnam, m_context, answer))
+	if (!executeContextSchema( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, schema, content, answer)) return false;
+	if (m_context.refcnt() != 1)
+	{
+		setAnswer( answer, ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
+		return false;
+	}
+	if (!m_handler->transferContext( typenam, contextnam, m_context.release(), answer))
 	{
 		return false;
 	}
-	releaseContext();
 	if (!initContextType( answer, typenam, contextnam))
 	{
 		setAnswer( answer, ErrorCodeOutOfMem);
@@ -1608,31 +1602,60 @@ bool WebRequestContext::executeDeclareConfiguration( const char* typenam, const 
 
 bool WebRequestContext::executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	if (!executeMainSchema( ROOT_CONTEXT_NAME, content, answer)
-	||  !m_handler->transferContext( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, m_context, answer))
+	try
 	{
+		if (!executeMainSchema( ROOT_CONTEXT_NAME, content, answer)) return false;
+		if (m_context.refcnt() != 1)
+		{
+			setAnswer( answer, ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
+			return false;
+		}
+		if (!m_handler->transferContext( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, m_context.release(), answer))
+		{
+			return false;
+		}	
+		std::vector<WebRequestDelegateRequest> delegates = getFollowDelegateRequests();
+		if (hasContentRequestDelegateRequests())
+		{
+			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+			{
+				m_logger->logError( "delegate requests in main configuration are not allowed and ignored");
+			}
+		}
+		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+		{
+			m_logger->logAction( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, "load configuration");
+		}
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
 		return false;
 	}
-	releaseContext();
-
-	std::vector<WebRequestDelegateRequest> delegates = getFollowDelegateRequests();
-	if (!delegates.empty())
+	catch (const std::runtime_error& err)
 	{
-		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
-		{
-			m_logger->logError( "delegate requests in main configuration are not allowed and ignored");
-		}
+		setAnswer( answer, ErrorCodeRuntimeError, err.what(), true);
+		return false;
 	}
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
-	{
-		m_logger->logAction( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, "load configuration");
-	}
-	return true;
 }
 
 bool WebRequestContext::executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	return executeDeclareConfiguration( typenam, contextnam, "PUT", true/*init*/, content, answer);
+	try
+	{
+		return executeDeclareConfiguration( typenam, contextnam, "PUT", true/*init*/, content, answer);
+	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+		return false;
+	}
+	catch (const std::runtime_error& err)
+	{
+		setAnswer( answer, ErrorCodeRuntimeError, err.what(), true);
+		return false;
+	}
 }
 
 bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer)
@@ -1663,8 +1686,7 @@ bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const c
 			{
 				return false;
 			}
-			std::vector<WebRequestDelegateRequest> delegateRequests = getFollowDelegateRequests();
-			if (!delegateRequests.empty())
+			if (hasContentRequestDelegateRequests())
 			{
 				m_logger->logWarning( _TXT("delete configuration schema with delegate requests that are ignored"));
 			}
@@ -1684,16 +1706,16 @@ bool WebRequestContext::executeDeleteConfiguration( const char* typenam, const c
 	return true;
 }
 
-bool WebRequestContext::executeListVariables( papuga_RequestContext* context, WebRequestAnswer& answer)
+bool WebRequestContext::executeListVariables( const PapugaContextRef& context_, WebRequestAnswer& answer)
 {
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
-	char const** varlist = papuga_RequestContext_list_variables( context, 1/*max inheritcnt*/, lstbuf, lstbufsize);
+	char const** varlist = papuga_RequestContext_list_variables( context_.get(), 1/*max inheritcnt*/, lstbuf, lstbufsize);
 	if (!checkPapugaListBufferOverflow( varlist, answer))
 	{
 		return false;
 	}
-	else if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist))
+	else if (!strus::mapStringArrayToAnswer( answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist))
 	{
 		return false;
 	}
@@ -1769,6 +1791,14 @@ bool WebRequestContext::executeSchemaDescriptionRequest(
 	}
 }
 
+bool WebRequestContext::hasContentRequestDelegateRequests() const
+{
+	int ri = 0, re = m_nofResults;
+	for (; ri != re && !m_results[ri].schema; ++ri)
+	{}
+	return ri == re;
+}
+
 std::vector<WebRequestDelegateRequest> WebRequestContext::getFollowDelegateRequests()
 {
 	std::vector<WebRequestDelegateRequest> rt;
@@ -1793,8 +1823,19 @@ WebRequestAnswer WebRequestContext::buildSimpleRequestAnswer(
 		const std::string& message)
 {
 	WebRequestAnswer rt;
-	if (!setResultContentType( rt, papuga_UTF8, WebRequestContent::HTML)) return rt;
-	(void)strus::mapStringToAnswer( rt, &m_allocator, m_handler->html_head(), ""/*html href base*/, name.c_str(), m_result_encoding, m_result_doctype, message);
+	try
+	{
+		if (!setResultContentType( rt, papuga_UTF8, WebRequestContent::HTML)) return rt;
+		(void)strus::mapStringToAnswer( rt, &m_allocator, m_handler->html_head(), ""/*html href base*/, name.c_str(), m_result_encoding, m_result_doctype, message);
+	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( rt, ErrorCodeOutOfMem);
+	}
+	catch (const std::runtime_error& err)
+	{
+		setAnswer( rt, ErrorCodeRuntimeError, err.what(), true);
+	}
 	return rt;
 }
 
@@ -1808,10 +1849,9 @@ bool WebRequestContext::pushDelegateRequestAnswer(
 		bool rt = executeContextSchema( m_context, m_contextType, schema, content, answer);
 		if (rt)
 		{
-			std::vector<WebRequestDelegateRequest> delegateRequests = getFollowDelegateRequests();
-			if (!delegateRequests.empty())
+			if (hasContentRequestDelegateRequests())
 			{
-				setAnswer( answer, ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in partial requests"));
+				setAnswer( answer, ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in request result handlers"));
 				return false;
 			}
 		}
@@ -1848,11 +1888,15 @@ bool WebRequestContext::pushConfigurationDelegateRequestAnswer(
 		{
 			return false;
 		}
-		if (!m_handler->transferContext( typenam, contextnam, m_context, answer))
+		if (m_context.refcnt() != 1)
+		{
+			setAnswer( answer, ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
+			return false;
+		}
+		if (!m_handler->transferContext( typenam, contextnam, m_context.release(), answer))
 		{
 			return false;
 		}
-		releaseContext();
 		return true;
 	}
 	catch (const std::bad_alloc&)
@@ -1911,6 +1955,7 @@ bool WebRequestContext::executeRequest(
 		{
 			return false;
 		}
+		m_context = objectDescr.context;
 		if (!path.hasMore())
 		{
 			if (objectDescr.contextnam)
@@ -1963,7 +2008,7 @@ bool WebRequestContext::executeRequest(
 						//... else fallback
 					}
 				}
-				else if (!objectDescr.obj && objectDescr.context && content.empty() && isEqual( method, "GET"))
+				else if (!objectDescr.obj && objectDescr.context.get() && content.empty() && isEqual( method, "GET"))
 				{
 					// List variables if no main object defined
 					if (!executeListVariables( objectDescr.context, m_answer))
@@ -1991,7 +2036,7 @@ bool WebRequestContext::executeRequest(
 						std::vector<std::string> contextTypes = m_confighandler->contextTypes();
 						contextTypes.push_back( ROOT_CONTEXT_NAME);
 						if (!objectDescr.finish( m_answer)) return false;
-						return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes);
+						return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes);
 					}
 					else
 					{
@@ -2005,7 +2050,7 @@ bool WebRequestContext::executeRequest(
 						else
 						{
 							if (!objectDescr.finish( m_answer)) return false;
-							return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
+							return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
 						}
 					}
 				}
@@ -2041,12 +2086,12 @@ bool WebRequestContext::executeRequest(
 					//... fallback
 				}
 			}
-			else
+			else if (isEqual( method,"GET"))
 			{
-				return mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), "list", "value", m_result_encoding, m_result_doctype, *objectDescr.obj);
+				return mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, "value", m_result_encoding, m_result_doctype, *objectDescr.obj);
 			}
 		}
-		if (objectDescr.context)
+		if (objectDescr.context.get())
 		{
 			// Execute schema on object selected:
 			if (!content.empty())

@@ -1,4 +1,5 @@
 #include "transaction.hpp"
+#include "papugaContextRef.hpp"
 #include "strus/base/pseudoRandom.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/base/thread.hpp"
@@ -43,15 +44,14 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
-			papuga_RequestContext* ctx = papuga_create_RequestContext();
+			strus::PapugaContextRef ctx( papuga_create_RequestContext());
 			papuga_ValueVariant val;
 			papuga_init_ValueVariant_int( &val, idx);
-			if (!papuga_RequestContext_define_variable( ctx, "index", &val)) throw std::bad_alloc();
+			if (!papuga_RequestContext_define_variable( ctx.get(), "index", &val)) throw std::bad_alloc();
 			int timeout = odd(idx) ? random.get( 7, 10) : random.get( 1, 3);
 			std::string tid = g_tpool->createTransaction( "test", ctx, timeout);
 			if (tid.empty())
 			{
-				papuga_destroy_RequestContext( ctx);
 				throw std::bad_alloc();
 			}
 			tidlist.push_back( tid);
@@ -63,8 +63,8 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 			int idx = ii+1;
 			strus::TransactionRef tref = g_tpool->fetchTransaction( tidlist[ ii]);
 			if (!tref.get()) throw std::runtime_error("lost transaction");
-			papuga_RequestContext* ctx = tref->context();
-			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index");
+			strus::PapugaContextRef ctx = tref->context();
+			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx.get(), "index");
 			if (!var) throw std::runtime_error("index variable of context undefined");
 			int value = papuga_ValueVariant_toint( var, &errcode);
 			if (errcode != papuga_Ok) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
@@ -87,8 +87,8 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 				if (tref.get()) throw std::runtime_error("transaction not collected");
 				continue;
 			}
-			papuga_RequestContext* ctx = tref->context();
-			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx, "index");
+			strus::PapugaContextRef ctx = tref->context();
+			const papuga_ValueVariant* var = papuga_RequestContext_get_variable( ctx.get(), "index");
 			if (!var) throw std::runtime_error("index variable of context undefined");
 			int value = papuga_ValueVariant_toint( var, &errcode);
 			if (errcode != papuga_Ok) throw std::runtime_error( papuga_ErrorCode_tostring( errcode));

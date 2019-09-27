@@ -50,6 +50,7 @@ ISERVER2="http://127.0.0.1:7185"
 ISERVER3="http://127.0.0.1:7186"
 ISERVER4="http://127.0.0.1:7187"
 VSERVER1="http://127.0.0.1:7191"
+QSERVER1="http://127.0.0.1:7192"
 
 create_dir( "storage")
 create_dir( "config")

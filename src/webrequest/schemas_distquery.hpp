@@ -28,7 +28,7 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
-			{"analyzer","/distqryeval/include/analyzer()",false/*not required*/},
+			{"qryanalyzer","/distqryeval/include/analyzer()",false/*not required*/},
 			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
 		},
 		{
@@ -36,6 +36,9 @@ public:
 			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
+
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
+			{"/query/analyzer", '?'}
 		}
 	) {}
 };
@@ -54,15 +57,15 @@ public:
 		{
 			{"query", "SET~querystats", "GET", "statserver", "", {
 				{"/query/feature", "feature", true},
-				{"/query/{feature,sentence}/analyzed", "analyzed", TermExpression, '*'}
+				{"/query/{feature,sentence}/content", "analyzed", "_analyzed", '*'}
 			}},
 			{"query", "SET~ranklist", "GET", "qryeval", "", {"termstats","globalstats"}, {
 				{SchemaQueryDeclPart::resultElementsQueryAnalyzer( "/query")}
 			}},
-			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}
+			{"queryresult", {"ranklist"}, {}}
 		},
 		{
-			{"analyzer","/query/include/analyzer()",false/*not required*/},
+			{"qryanalyzer","/query/include/analyzer()",false/*not required*/},
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{
