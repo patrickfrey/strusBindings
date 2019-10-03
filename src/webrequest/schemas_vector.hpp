@@ -19,45 +19,63 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_CREATE_VectorStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class SchemaVectorStoragePart :public AutomatonNameSpace
 {
 public:
-	Schema_Context_CREATE_VectorStorage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
-		{},
-		{},
+	static papuga::RequestAutomaton_NodeList defineVectorStorage( const char* rootexpr)
+	{
+		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
-			{"/vstorage/path", "()", DatabasePath, papuga_TypeString, "strus/vstorage"},
-			{"/vstorage/vecdim", "()", VectorDim, papuga_TypeInt, "256;300;500"},
-			{"/vstorage/bits", "()", VectorBits, papuga_TypeInt, "64"},
-			{"/vstorage/variations", "()", VectorVariations, papuga_TypeInt, "32"},
-			{"/vstorage/compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
-			{"/vstorage/cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
-			{"/vstorage/max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
-			{"/vstorage/write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
-			{"/vstorage/block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
-			{"/vstorage", StorageConfig, {
+			{"path", "()", DatabasePath, papuga_TypeString, "strus/vstorage"},
+			{"memtypes", "()", VectorMemType, papuga_TypeString, "V;A"},
+			{"lexprun", "()", VectorLexemPrunning, papuga_TypeBool, "1;2;4;5"},
+			{"vecdim", "()", VectorDim, papuga_TypeInt, "256;300;500"},
+			{"bits", "()", VectorBits, papuga_TypeInt, "64"},
+			{"variations", "()", VectorVariations, papuga_TypeInt, "32"},
+			{"cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
+			{"autocompact", "()", DatabaseEnableAutoCompact, papuga_TypeBool, "true"},
+			{"compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
+			{"max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
+			{"write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
+			{"block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
+			{"", StorageConfig, {
 					{"path", DatabasePath},
-					{"vecdim", VectorDim, '!'},
+					{"memtypes", VectorMemType, '*'},
+					{"lexprun", VectorLexemPrunning, '?'},
+					{"vecdim", VectorDim, '?'},
 					{"bits", VectorBits, '?'},
 					{"variations", VectorVariations, '?'},
-					{"compression", DatabaseEnableCompression, '?'},
 					{"cache", DatabaseLruCacheSize, '?'},
+					{"autocompact", DatabaseEnableAutoCompact, '?'},
+					{"compression", DatabaseEnableCompression, '?'},
 					{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
 					{"write_buffer_size", DatabaseWriteBufferSize, '?'},
 					{"block_size", DatabaseBlockSize, '?'},
 				}
 			},
+		});
+	}
+};
+
+class Schema_Context_POST_VectorStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_Context_POST_VectorStorage() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		{},
+		{},
+		{
+			{SchemaVectorStoragePart::defineVectorStorage( "/vstorage")},
 			{"/vstorage", "_success", "context", bindings::method::Context::createVectorStorage(), {{StorageConfig}} },
 			{"/vstorage", "storage", "context", bindings::method::Context::createVectorStorageClient(), {{StorageConfig}} }
 		}
 	) {}
 };
 
-class Schema_Context_DELETE_VectorStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_DELETE_POST_VectorStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Schema_Context_DELETE_VectorStorage() :papuga::RequestAutomaton(
+	Schema_Context_DELETE_POST_VectorStorage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
@@ -72,35 +90,15 @@ public:
 	) {}
 };
 
-class Schema_Context_INIT_VectorStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_PUT_VectorStorage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Schema_Context_INIT_VectorStorage() :papuga::RequestAutomaton(
+	Schema_Context_PUT_VectorStorage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
 		{
-			{"/vstorage/path", "()", DatabasePath, papuga_TypeString, "strus/vstorage"},
-			{"/vstorage/memtypes", "()", VectorMemType, papuga_TypeString, "V;A"},
-			{"/vstorage/lexprun", "()", VectorLexemPrunning, papuga_TypeBool, "1;2;4;5"},
-			{"/vstorage/cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
-			{"/vstorage/autocompact", "()", DatabaseEnableAutoCompact, papuga_TypeBool, "true"},
-			{"/vstorage/compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
-			{"/vstorage/max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
-			{"/vstorage/write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
-			{"/vstorage/block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
-			{"/vstorage", StorageConfig, {
-					{"path", DatabasePath},
-					{"memtypes", VectorMemType, '*'},
-					{"lexprun", VectorLexemPrunning, '?'},
-					{"cache", DatabaseLruCacheSize, '?'},
-					{"autocompact", DatabaseEnableAutoCompact, '?'},
-					{"compression", DatabaseEnableCompression, '?'},
-					{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
-					{"write_buffer_size", DatabaseWriteBufferSize, '?'},
-					{"block_size", DatabaseBlockSize, '?'}
-				}
-			},
+			{SchemaVectorStoragePart::defineVectorStorage( "/vstorage")},
 			{"/", "vstorage", "context", bindings::method::Context::createVectorStorageClient(), {{StorageConfig}} }
 		}
 	) {}

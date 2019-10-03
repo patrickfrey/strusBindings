@@ -23,6 +23,7 @@
 #include "strus/base/string_conv.hpp"
 #include "strus/base/shared_ptr.hpp"
 #include "strus/base/fileio.hpp"
+#include "strus/base/sleep.hpp"
 #include "papuga/request.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
@@ -40,8 +41,6 @@ using namespace strus;
 
 static const char* g_config_doctype = "json";
 static const char* g_config_charset = "utf-8";
-static const char* g_config_accepted_charset = "UTF-8";
-static const char* g_config_accepted_doctype = "application/json";
 
 struct MethodDescription
 {
@@ -173,7 +172,6 @@ WebRequestHandler::WebRequestHandler(
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
 		const std::string& service_name_,
-		const std::string& configstr_,
 		int maxIdleTime_,
 		int nofTransactionsPerSeconds)
 	:m_debug_maxdepth(logger_?logger_->structDepth():0)
@@ -197,38 +195,38 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineMainSchema<Schema_INIT_Context> schema_INIT_Context;
 		schema_INIT_Context.addToHandler( m_impl, ROOT_CONTEXT_NAME/*schema name*/);
 
-		static const DefineConfigSchema<Schema_Context_CREATE_Storage> schema_Context_CREATE_Storage;
-		schema_Context_CREATE_Storage.addToHandler( m_impl, "POST/storage");
-		static const DefineConfigSchema<Schema_Context_DELETE_Storage> schema_Context_DELETE_Storage;
-		schema_Context_DELETE_Storage.addToHandler( m_impl, "DELETE/storage");
-		static const DefineConfigSchema<Schema_Context_INIT_Storage> schema_Context_INIT_Storage;
-		schema_Context_INIT_Storage.addToHandler( m_impl, "PUT/storage");
+		static const DefineConfigSchema<Schema_Context_POST_Storage> schema_Context_POST_Storage;
+		schema_Context_POST_Storage.addToHandler( m_impl, "POST/storage");
+		static const DefineConfigSchema<Schema_Context_DELETE_POST_Storage> schema_Context_DELETE_POST_Storage;
+		schema_Context_DELETE_POST_Storage.addToHandler( m_impl, "DELETE_POST/storage");
+		static const DefineConfigSchema<Schema_Context_PUT_Storage> schema_Context_PUT_Storage;
+		schema_Context_PUT_Storage.addToHandler( m_impl, "PUT/storage");
 		static const DefineSchema<Schema_StorageTransaction_PUT> schema_StorageTransaction_PUT("transaction/storage");
 		schema_StorageTransaction_PUT.addToHandler( m_impl, "PUT");
 
-		static const DefineConfigSchema<Schema_Context_CREATE_VectorStorage> schema_Context_CREATE_VectorStorage;
-		schema_Context_CREATE_VectorStorage.addToHandler( m_impl, "POST/vstorage");
-		static const DefineConfigSchema<Schema_Context_DELETE_VectorStorage> schema_Context_DELETE_VectorStorage;
-		schema_Context_DELETE_VectorStorage.addToHandler( m_impl, "DELETE/vstorage");
-		static const DefineConfigSchema<Schema_Context_INIT_VectorStorage> schema_Context_INIT_VectorStorage;
-		schema_Context_INIT_VectorStorage.addToHandler( m_impl, "PUT/vstorage");
+		static const DefineConfigSchema<Schema_Context_POST_VectorStorage> schema_Context_POST_VectorStorage;
+		schema_Context_POST_VectorStorage.addToHandler( m_impl, "POST/vstorage");
+		static const DefineConfigSchema<Schema_Context_DELETE_POST_VectorStorage> schema_Context_DELETE_POST_VectorStorage;
+		schema_Context_DELETE_POST_VectorStorage.addToHandler( m_impl, "DELETE_POST/vstorage");
+		static const DefineConfigSchema<Schema_Context_PUT_VectorStorage> schema_Context_PUT_VectorStorage;
+		schema_Context_PUT_VectorStorage.addToHandler( m_impl, "PUT/vstorage");
 		static const DefineSchema<Schema_Context_PUT_VectorStorageTransaction> schema_Context_PUT_VectorStorageTransaction("transaction/vstorage");
 		schema_Context_PUT_VectorStorageTransaction.addToHandler( m_impl, "PUT");
 
-		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_INIT_DocumentAnalyzer;
-		schema_Context_INIT_DocumentAnalyzer.addToHandler( m_impl, "POST/docanalyzer");
+		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_POST_DocumentAnalyzer;
+		schema_Context_POST_DocumentAnalyzer.addToHandler( m_impl, "POST/docanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_DocumentAnalyzer> schema_Context_PUT_DocumentAnalyzer;
 		schema_Context_PUT_DocumentAnalyzer.addToHandler( m_impl, "PUT/docanalyzer");
 
-		static const DefineConfigSchema<Schema_Context_INIT_QueryAnalyzer> schema_Context_INIT_QueryAnalyzer;
-		schema_Context_INIT_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
+		static const DefineConfigSchema<Schema_Context_POST_QueryAnalyzer> schema_Context_POST_QueryAnalyzer;
+		schema_Context_POST_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
 		schema_Context_PUT_QueryAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
 		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
 		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
 
-		static const DefineConfigSchema<Schema_Context_INIT_QueryEval> schema_Context_INIT_QueryEval;
-		schema_Context_INIT_QueryEval.addToHandler( m_impl, "POST/qryeval");
+		static const DefineConfigSchema<Schema_Context_POST_QueryEval> schema_Context_POST_QueryEval;
+		schema_Context_POST_QueryEval.addToHandler( m_impl, "POST/qryeval");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryEval> schema_Context_PUT_QueryEval;
 		schema_Context_PUT_QueryEval.addToHandler( m_impl, "PUT/qryeval");
 		static const DefineSchema<Schema_QueryEval_GET> schema_QueryEval_GET("qryeval");
@@ -253,8 +251,8 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineSchema<Schema_Storage_GET> schema_Storage_GET("storage");
 		schema_Storage_GET.addToHandler( m_impl, "GET");
 
-		static const DefineConfigSchema<Schema_Context_INIT_DistQueryEval> schema_Context_INIT_DistQueryEval;
-		schema_Context_INIT_DistQueryEval.addToHandler( m_impl, "POST/distqryeval");
+		static const DefineConfigSchema<Schema_Context_POST_DistQueryEval> schema_Context_POST_DistQueryEval;
+		schema_Context_POST_DistQueryEval.addToHandler( m_impl, "POST/distqryeval");
 		static const DefineConfigSchema<Schema_Context_PUT_DistQueryEval> schema_Context_PUT_DistQueryEval;
 		schema_Context_PUT_DistQueryEval.addToHandler( m_impl, "PUT/distqryeval");
 		static const DefineSchema<Schema_DistQueryEval_GET> schema_DistQueryEval_GET("distqryeval");
@@ -314,8 +312,6 @@ WebRequestHandler::WebRequestHandler(
 		mt_ContentStatisticsTransaction_PUT.addToHandler( m_impl);
 		static const DumpMethodDescription mt_ContentStatisticsTransaction_GET( mt::ContentStatisticsCollector::statistics(), "statistics");
 		mt_ContentStatisticsTransaction_GET.addToHandler( m_impl);
-
-		loadConfiguration( configstr_);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -329,10 +325,53 @@ WebRequestHandler::WebRequestHandler(
 	}
 }
 
-void WebRequestHandler::init()
+WebRequestHandler::~WebRequestHandler()
 {
-	m_configHandler.clearUnfinishedTransactions();
-	m_configHandler.deleteObsoleteConfigurations();
+	clear();
+}
+
+static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, const char* errstr=0, bool doCopy=false)
+{
+	int httpstatus = errorCodeToHttpStatus( errcode);
+	if (errstr)
+	{
+		answer.setError( httpstatus, errcode, errstr, doCopy);
+	}
+	else
+	{
+		answer.setError( httpstatus, errcode, strus::errorCodeToString(errcode));
+	}
+}
+
+#define WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, errorReturnValue) \
+	catch (const std::bad_alloc&) \
+	{\
+		setAnswer( answer, ErrorCodeOutOfMem);\
+		return errorReturnValue;\
+	}\
+	catch (const std::runtime_error& err)\
+	{\
+		setAnswer( answer, ErrorCodeRuntimeError, err.what(), true/*do copy*/);\
+		return errorReturnValue;\
+	}\
+	catch (...)\
+	{\
+		setAnswer( answer, ErrorCodeUncaughtException);\
+		return errorReturnValue;\
+	}
+
+bool WebRequestHandler::init( 
+		const std::string& configsrc,
+		WebRequestAnswer& answer)
+{
+	try
+	{
+		m_configHandler.clearUnfinishedTransactions();
+		m_configHandler.deleteObsoleteConfigurations();
+
+		return loadConfiguration( configsrc, answer);
+	}
+	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, false);
 }
 
 static std::string getSchemaFileName( const std::string& dir, const std::string& doctype, const std::string& schematype, const std::string& schemaname)
@@ -449,49 +488,31 @@ void WebRequestHandler::clear()
 	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
 }
 
-WebRequestHandler::~WebRequestHandler()
-{
-	clear();
-}
-
-static void setStatus( WebRequestAnswer& status, ErrorCode errcode, const char* errmsg=0)
-{
-	const char* errstr = errorCodeToString( errcode);
-	int httpstatus = errorCodeToHttpStatus( errcode);
-	if (errmsg)
-	{
-		char errbuf[ 1024];
-		if ((int)sizeof(errbuf)-1 >= std::snprintf( errbuf, sizeof(errbuf), "%s, %s", errmsg, errstr))
-		{
-			errbuf[ sizeof(errbuf)-1] = 0;
-		}
-		status.setError( httpstatus, errcode, errbuf, true);
-	}
-	else
-	{
-		status.setError( httpstatus, errcode, errstr);
-	}
-}
-
-WebRequestContextInterface* WebRequestHandler::createContext(
-		const char* accepted_charset,
-		const char* accepted_doctype,
-		const char* html_base_href,
-		WebRequestAnswer& status)
+WebRequestContextInterface* WebRequestHandler::createConfigurationContext(
+		const char* contextType,
+		const char* contextName,
+		WebRequestAnswer& answer)
 {
 	try
 	{
-		return new WebRequestContext( this, m_logger, &m_configHandler, &m_transactionPool, accepted_charset, accepted_doctype, html_base_href);
+		return new WebRequestContext( this, m_logger, &m_configHandler, &m_transactionPool, contextType, contextName);
 	}
-	catch (const std::bad_alloc&)
+	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, NULL);
+}
+
+WebRequestContextInterface* WebRequestHandler::createRequestContext(
+		const char* accepted_charset,
+		const char* accepted_doctype,
+		const char* html_base_href,
+		const char* method,
+		const char* path,
+		WebRequestAnswer& answer)
+{
+	try
 	{
-		setStatus( status, ErrorCodeOutOfMem);
+		return new WebRequestContext( this, m_logger, &m_configHandler, &m_transactionPool, accepted_charset, accepted_doctype, html_base_href, method, path);
 	}
-	catch (...)
-	{
-		setStatus( status, ErrorCodeUncaughtException);
-	}
-	return NULL;
+	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, NULL);
 }
 
 bool WebRequestHandler::delegateRequest(
@@ -507,93 +528,158 @@ bool WebRequestHandler::delegateRequest(
 	return m_eventLoop->send( address, method, content, context);
 }
 
+WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
+		const char* accepted_charset,
+		const char* accepted_doctype,
+		const char* html_base_href,
+		const std::string& name,
+		const std::string& message)
+{
+	WebRequestAnswer rt;
+	try
+	{
+		papuga_StringEncoding result_encoding = strus::getResultStringEncoding( accepted_charset, WebRequestContext::defaultEncoding());
+		WebRequestContent::Type result_doctype = strus::getResultContentType( accepted_doctype, WebRequestContext::defaultDocType());
+		if (result_encoding == papuga_Binary)
+		{
+			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented: %s"), accepted_charset);
+			return rt;
+		}
+		if (result_doctype == WebRequestContent::Unknown)
+		{
+			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), accepted_doctype);
+			return rt;
+		}
+		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, name.c_str(), result_encoding, result_doctype, message);
+	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( rt, ErrorCodeOutOfMem);
+	}
+	catch (const std::runtime_error& err)
+	{
+		setAnswer( rt, ErrorCodeRuntimeError, err.what(), true);
+	}
+	return rt;
+}
+
 void WebRequestHandler::tick()
 {
 	m_transactionPool.collectGarbage( m_eventLoop->time());
 }
 
-void WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& cfg)
+
+bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, const WebRequestContent& content, WebRequestAnswer& answer)
 {
-	WebRequestAnswer status;
-
-	strus::WebRequestContent subcontent( g_config_charset, cfg.doctype.c_str(), cfg.contentbuf.c_str(), cfg.contentbuf.size());
-	if (!ctxi->executeLoadSubConfiguration( cfg.type.c_str(), cfg.name.c_str(), subcontent, status))
+	bool rt = true;
+	if (!ctx->execute( content))
 	{
-		throw strus::runtime_error(
-			_TXT("error loading sub configuration %s '%s': %s"),
-			cfg.type.c_str(), cfg.name.c_str(), status.errorstr());
+		answer = ctx->getAnswer();
+		return false;
 	}
-	m_configHandler.declareSubConfiguration( cfg.type.c_str(), cfg.name.c_str());
-
-	std::vector<WebRequestDelegateRequest> delegates = ctxi->getFollowDelegateRequests();
-	if (!delegates.empty())
+	std::vector<WebRequestDelegateRequest> delegates = ctx->getDelegateRequests();
+	while (rt && !delegates.empty())
 	{
-		strus::shared_ptr<int> count = strus::make_shared<int>();
-		*count = delegates.size();
+		strus::AtomicCounter<int> count( delegates.size());
 		std::vector<WebRequestDelegateRequest>::const_iterator di = delegates.begin(), de = delegates.end();
-		for (; di != de; ++di)
+		for (int didx=0; di != de; ++di,++didx)
 		{
-			std::string contentstr( di->contentstr(), di->contentlen());
-			m_eventLoop->send(
-				di->url(), di->method(), contentstr,
-				new ConfigurationUpdateRequestContext( this, m_logger, cfg.type, cfg.name, di->receiverSchema(), count));
+			try
+			{
+				ConfigurationUpdateRequestContext* update = new ConfigurationUpdateRequestContext( this, m_logger, ctx, di->receiverSchema(), &count);
+				std::string contentstr( di->contentstr(), di->contentlen());
+				m_eventLoop->send( di->url(), di->method(), contentstr, update);
+			}
+			catch (const std::bad_alloc&)
+			{
+				setAnswer( answer, ErrorCodeOutOfMem);
+				count.decrement( delegates.size() - didx);
+				rt = false;
+				break;
+			}
 		}
-		delegates = ctxi->getFollowDelegateRequests();
-		if (!delegates.empty())
+		while (count.value())
 		{
-			throw strus::runtime_error(
-				_TXT("error loading sub configuration %s '%s': %s"),
-				cfg.type.c_str(), cfg.name.c_str(), _TXT("cascaded delegate requests not allowed for configurations"));
+			strus::usleep( 50);
+			// ... we poll with a sleep of 20ms as it is not time critical to do this in the initialization phase
 		}
+		if (rt) delegates = ctx->getDelegateRequests();
 	}
+	if (rt) rt = ctx->complete();
+	answer = ctx->getAnswer();
+	return rt;
 }
 
-void WebRequestHandler::loadConfiguration( const std::string& configstr)
+bool WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& cfg, const char* configurationClass, WebRequestAnswer& answer)
 {
-	WebRequestAnswer status;
+	m_configHandler.declareSubConfiguration( cfg.type, cfg.name);
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+	{
+		m_logger->logAction( cfg.type.c_str(), cfg.name.c_str(), _TXT("loading embedded configuration"));
+	}
+	strus::WebRequestContent subcontent( g_config_charset, cfg.doctype.c_str(), cfg.contentbuf.c_str(), cfg.contentbuf.size());
+	if (!runConfigurationLoad( ctxi, subcontent, answer))
+	{
+		char buf[ 256];
+		std::size_t buflen = std::snprintf( buf, sizeof(buf), _TXT("error loading %s %s '%s'"), configurationClass, cfg.type.c_str(), cfg.name.c_str());
+		if (sizeof(buf) <= buflen) buf[ sizeof(buf)-1] = 0;
+		answer.explain( buf);
+		return false;
+	}
+	return true;
+}
 
+bool WebRequestHandler::loadConfiguration( const std::string& configstr, WebRequestAnswer& answer)
+{
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
 	{
 		m_logger->logPutConfiguration( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, configstr);
 	}
-	strus::local_ptr<WebRequestContextInterface> ctx( createContext( g_config_accepted_charset, g_config_accepted_doctype, ""/*html_base_href*/, status));
-	WebRequestContextInterface* ctxi = ctx.get();
-	if (!ctxi) throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
+	strus::local_ptr<WebRequestContextInterface> ctx( createConfigurationContext( 0, 0, answer));
 
+	WebRequestContextInterface* ctxi = ctx.get();
+	if (!ctxi)
+	{
+		answer.explain( _TXT("error creating context for loading main configuration"));
+		return false;
+	}
 	// Load main configuration:
 	strus::WebRequestContent content( g_config_charset, g_config_doctype, configstr.c_str(), configstr.size());
-	if (!ctxi->executeLoadMainConfiguration( content, status))
+	if (!runConfigurationLoad( ctxi, content, answer))
 	{
-		throw std::runtime_error( status.errorstr() ? status.errorstr() : _TXT("unknown error"));
+		answer.explain( _TXT("error loading main configuration"));
+		return false;
 	}
+
 	// Load sub configurations:
 	std::vector<ConfigurationDescription> cfglist = m_configHandler.getSubConfigurations( configstr);
 	std::vector<ConfigurationDescription>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-		loadSubConfiguration( ctxi, *ci);
+		if (!loadSubConfiguration( ctxi, *ci, "embedded configuration", answer)) return false;
 	}
 	// Load put configurations:
 	cfglist = m_configHandler.getStoredConfigurations();
 	ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-		loadSubConfiguration( ctxi, *ci);
+		if (!loadSubConfiguration( ctxi, *ci, ci->method.c_str(), answer)) return false;
 	}
+	return true;
 }
 
 bool WebRequestHandler::transferContext(
 		const char* contextType,
 		const char* contextName,
 		papuga_RequestContext* context,
-		WebRequestAnswer& status)
+		WebRequestAnswer& answer)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	strus::unique_lock lock( m_mutex_context_transfer);
 	if (!papuga_RequestHandler_transfer_context( m_impl, contextType, contextName, context, &errcode))
 	{
 		papuga_destroy_RequestContext( context);
-		setStatus( status, papugaErrorToErrorCode( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode));
 		return false;
 	}
 	return true;
@@ -602,17 +688,16 @@ bool WebRequestHandler::transferContext(
 bool WebRequestHandler::removeContext(
 		const char* contextType,
 		const char* contextName,
-		WebRequestAnswer& status)
+		WebRequestAnswer& answer)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	strus::unique_lock lock( m_mutex_context_transfer);
 	if (!papuga_RequestHandler_remove_context( m_impl, contextType, contextName, &errcode))
 	{
-		setStatus( status, papugaErrorToErrorCode( errcode));
+		setAnswer( answer, papugaErrorToErrorCode( errcode));
 		return false;
 	}
 	return true;
 }
-
 
 

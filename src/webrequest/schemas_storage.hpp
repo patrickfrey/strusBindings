@@ -70,11 +70,11 @@ public:
 	}
 };
 
-class Schema_Context_CREATE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_POST_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	typedef bindings::method::Context C;
-	Schema_Context_CREATE_Storage() :papuga::RequestAutomaton(
+	Schema_Context_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
@@ -86,10 +86,10 @@ public:
 	) {}
 };
 
-class Schema_Context_INIT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Schema_Context_INIT_Storage() :papuga::RequestAutomaton(
+	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
@@ -100,10 +100,10 @@ public:
 	) {}
 };
 
-class Schema_Context_DELETE_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Schema_Context_DELETE_Storage() :papuga::RequestAutomaton(
+	Schema_Context_DELETE_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},

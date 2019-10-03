@@ -44,7 +44,6 @@ WebRequestEventLoopInterface* createCurlEventLoop(
 /// \param[in] request logger interface (no ownership)
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
-/// \param[in] config main configuration
 /// \param[in] maxIdleTime maximum time of keepalive for untouched transactions in seconds
 /// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxIdleTime
 /// \param[in] errorhnd error buffer interface to use
@@ -55,7 +54,6 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& service_name_,
-		const std::string& config,
 		int maxIdleTime,
 		int nofTransactionsPerSeconds,
 		ErrorBufferInterface* errorhnd);

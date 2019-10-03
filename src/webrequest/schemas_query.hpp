@@ -23,10 +23,10 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_INIT_QueryEval :public papuga::RequestAutomaton
+class Schema_Context_POST_QueryEval :public papuga::RequestAutomaton
 {
 public:
-	Schema_Context_INIT_QueryEval() :papuga::RequestAutomaton(
+	Schema_Context_POST_QueryEval() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
@@ -39,10 +39,10 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_QueryEval :public Schema_Context_INIT_QueryEval
+class Schema_Context_PUT_QueryEval :public Schema_Context_POST_QueryEval
 {
 public:
-	Schema_Context_PUT_QueryEval() :Schema_Context_INIT_QueryEval(){}
+	Schema_Context_PUT_QueryEval() :Schema_Context_POST_QueryEval(){}
 };
 
 class Schema_QueryEval_GET :public papuga::RequestAutomaton

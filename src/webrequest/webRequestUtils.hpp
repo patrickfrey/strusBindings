@@ -35,7 +35,7 @@ int errorCodeToHttpStatus( ErrorCode errcode);
 // \param[in] content web request content
 // \param[in] maxsize maximum size to print or 0 for printing all
 // \return content as UTF-8 string
-std::string webRequestContent_tostring( const WebRequestContent& content, int maxsize);
+std::string webRequestContent_tostring( const WebRequestContent& content, int maxsize=0);
 
 // \brief Parse a content type from a string
 // \param[in] name content type as string
@@ -79,7 +79,7 @@ WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype)
 
 // \brief Map a string as content to an answer
 // \param[out] answer initialized answer object
-// \param[in] allocator allocator to use
+// \param[in] allocator allocator to use or NULL if the result string ownership should be attached to the result string
 // \param[in] html_head additional head elements in case of HTML
 // \param[in] html_href_base link base in case of HTML
 // \param[in] rootname name of the document root element
@@ -99,7 +99,7 @@ bool mapStringToAnswer(
 
 // \brief Map a string vector as content to an answer
 // \param[out] answer initialized answer object
-// \param[in] allocator allocator to use
+// \param[in] allocator allocator to use or NULL if the result string ownership should be attached to the result string
 // \param[in] html_head additional head elements in case of HTML
 // \param[in] html_href_base link base in case of HTML
 // \param[in] rootname name of the document root element
@@ -120,7 +120,7 @@ bool mapStringArrayToAnswer(
 
 // \brief Map a NULL terminated C string array as content to an answer
 // \param[out] answer initialized answer object
-// \param[in] allocator allocator to use
+// \param[in] allocator allocator to use or NULL if the result string ownership should be attached to the result string
 // \param[in] html_head additional head elements in case of HTML
 // \param[in] html_href_base link base in case of HTML
 // \param[in] rootname name of the document root element
@@ -141,7 +141,7 @@ bool mapStringArrayToAnswer(
 
 // \brief Map a string to string map as content to an answer
 // \param[out] answer initialized answer object
-// \param[in] allocator allocator to use
+// \param[in] allocator allocator to use or NULL if the result string ownership should be attached to the result string
 // \param[in] html_head additional head elements in case of HTML
 // \param[in] html_href_base link base in case of HTML
 // \param[in] rootname name of the document root element
@@ -160,7 +160,7 @@ bool mapStringMapToAnswer(
 
 // \brief Map a value variant to an answer
 // \param[out] answer initialized answer object
-// \param[in] allocator allocator to use
+// \param[in] allocator allocator to use or NULL if the result string ownership should be attached to the result string
 // \param[in] html_head additional head elements in case of HTML
 // \param[in] html_href_base link base in case of HTML
 // \param[in] rootname name of the document root element

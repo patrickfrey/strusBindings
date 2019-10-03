@@ -64,7 +64,6 @@ private:
 };
 typedef strus::shared_ptr<Transaction> TransactionRef;
 
-
 /// \brief Pool for managing transaction objects
 class TransactionPool
 {
@@ -97,10 +96,6 @@ public:
 	/// \return Transaction reference
 	/// \note A transaction is processed by fetching it and returning it after processing. If the time between the last return and the succeding fetch exceeds the timeout set on create transaction, then the transaction is destroyed
 	TransactionRef fetchTransaction( const std::string& tid);
-
-	/// \brief Release a transaction object addressed by its identifier
-	/// \param[in] tid transaction identifier
-	void releaseTransaction( const std::string& tid);
 
 	/// \brief Return a transaction object after operation
 	/// \param[in] tr transaction reference
@@ -156,7 +151,6 @@ private:
 	strus::mutex m_mutex_ar[ NofMutex];		///< mutex array for accessing ar
 	strus::AtomicFlag m_tickflag;			///< flag controlling mutual exclusion of ticker calls
 };
-
 
 }//namespace
 #endif

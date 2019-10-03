@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <utility>
 
 #define ROOT_CONTEXT_NAME "context"
 
@@ -27,15 +28,24 @@ struct ConfigurationDescription
 {
 	std::string type;
 	std::string name;
+	std::string method;
 	std::string doctype;
 	std::string contentbuf;
 
 	ConfigurationDescription()
 		:type(),name(),doctype(),contentbuf(){}
-	ConfigurationDescription( const std::string& type_, const std::string& name_, const std::string& doctype_, const std::string& contentbuf_)
-		:type(type_),name(name_),doctype(doctype_),contentbuf(contentbuf_){}
+	ConfigurationDescription( const std::string& type_, const std::string& name_, const std::string& method_, const std::string& doctype_, const std::string& contentbuf_)
+		:type(type_),name(name_),method(method_),doctype(doctype_),contentbuf(contentbuf_){}
 	ConfigurationDescription( const ConfigurationDescription& o)
-		:type(o.type),name(o.name),doctype(o.doctype),contentbuf(o.contentbuf){}
+		:type(o.type),name(o.name),method(o.method),doctype(o.doctype),contentbuf(o.contentbuf){}
+	ConfigurationDescription& operator=( const ConfigurationDescription& o)
+		{type=o.type;name=o.name;method=o.method,doctype=o.doctype;contentbuf=o.contentbuf; return *this;}
+#if __cplusplus >= 201103L
+	ConfigurationDescription( ConfigurationDescription&& o)
+		:type(std::move(o.type)),name(std::move(o.name)),method(std::move(o.method)),doctype(std::move(o.doctype)),contentbuf(std::move(o.contentbuf)){}
+	ConfigurationDescription& operator=( ConfigurationDescription&& o)
+		{type=std::move(o.type);name=std::move(o.name);method=std::move(o.method);doctype=std::move(o.doctype);contentbuf=std::move(o.contentbuf); return *this;}
+#endif
 
 	bool valid() const	{return !type.empty();}
 };
@@ -53,6 +63,18 @@ struct ConfigurationTransaction
 		:type(type_),name(name_),failed_filename(failed_filename_),filename(filename_){}
 	ConfigurationTransaction( const ConfigurationTransaction& o)
 		:type(o.type),name(o.name),failed_filename(o.failed_filename),filename(o.filename){}
+	ConfigurationTransaction& operator=( const ConfigurationTransaction& o)
+		{type=o.type;name=o.name;failed_filename=o.failed_filename;filename=o.filename; return *this;}
+#if __cplusplus >= 201103L
+	ConfigurationTransaction( ConfigurationTransaction&& o)
+		:type(std::move(o.type)),name(std::move(o.name)),failed_filename(std::move(o.failed_filename)),filename(std::move(o.filename)){}
+	ConfigurationTransaction& operator=( ConfigurationTransaction&& o)
+		{type=std::move(o.type);name=std::move(o.name);failed_filename=std::move(o.failed_filename);filename=std::move(o.filename); return *this;}
+#endif
+	bool defined() const
+	{
+		return !filename.empty();
+	}
 };
 
 
@@ -90,10 +112,9 @@ public:
 
 	std::vector<ConfigurationDescription> getSubConfigurations( const std::string& configstr);
 
-	void declareSubConfiguration( const char* contextType, const char* contextName);
-
 	std::vector<std::string> contextNames( const std::string& name) const;
 	std::vector<std::string> contextTypes() const;
+	void declareSubConfiguration( const std::string& contextType, const std::string& contextName);
 
 private:
 	std::string configurationStoreDirectory() const;

@@ -22,10 +22,10 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_INIT_DocumentAnalyzer :public papuga::RequestAutomaton
+class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton
 {
 public:
-	Schema_Context_INIT_DocumentAnalyzer() :papuga::RequestAutomaton(
+	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{},
@@ -35,16 +35,16 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_DocumentAnalyzer :public Schema_Context_INIT_DocumentAnalyzer
+class Schema_Context_POST_DocumentAnalyzer :public Schema_Context_PUT_DocumentAnalyzer
 {
 public:
-	Schema_Context_PUT_DocumentAnalyzer() :Schema_Context_INIT_DocumentAnalyzer(){}
+	Schema_Context_POST_DocumentAnalyzer() :Schema_Context_PUT_DocumentAnalyzer(){}
 };
 
-class Schema_Context_INIT_QueryAnalyzer :public papuga::RequestAutomaton
+class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton
 {
 public:
-	Schema_Context_INIT_QueryAnalyzer() :papuga::RequestAutomaton(
+	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
@@ -56,10 +56,10 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_QueryAnalyzer :public Schema_Context_INIT_QueryAnalyzer
+class Schema_Context_POST_QueryAnalyzer :public Schema_Context_PUT_QueryAnalyzer
 {
 public:
-	Schema_Context_PUT_QueryAnalyzer() :Schema_Context_INIT_QueryAnalyzer(){}
+	Schema_Context_POST_QueryAnalyzer() :Schema_Context_PUT_QueryAnalyzer(){}
 };
 
 

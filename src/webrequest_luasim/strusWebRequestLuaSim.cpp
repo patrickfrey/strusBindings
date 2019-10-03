@@ -449,7 +449,7 @@ public:
 	Processor( const Processor& o)
 		:m_hostname(o.m_hostname),m_handler(o.m_handler){}
 
-	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& path, const strus::WebRequestContent& content);
+	strus::WebRequestAnswer call( const std::string& method, const std::string& path, const strus::WebRequestContent& content);
 
 private:
 	static strus::WebRequestHandlerInterface* createWebRequestHandler( const Configuration& config_, const std::string& configjson_);
@@ -466,7 +466,7 @@ public:
 
 	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson);
 	void startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep);
-	std::pair<strus::WebRequestAnswer,std::string> call( const std::string& method, const std::string& url, const std::string& content);
+	strus::WebRequestAnswer call( const std::string& method, const std::string& url, const std::string& content);
 	void reportError( const char* fmt, ...);
 
 private:
@@ -683,8 +683,8 @@ bool EventLoop::send( const std::string& address,
 {
 	try
 	{
-		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, address, contentstr);
-		receiver->putAnswer( result.first);
+		strus::WebRequestAnswer result = g_globalContext.call( method, address, contentstr);
+		receiver->putAnswer( result);
 		return true;
 	}
 	catch (const std::bad_alloc&)
@@ -693,33 +693,55 @@ bool EventLoop::send( const std::string& address,
 	}
 }
 
+static void forwardDelegateRequests( strus::WebRequestHandlerInterface* handler, strus::Reference<strus::WebRequestContextInterface> ctx, const std::vector<strus::WebRequestDelegateRequest>& delegateRequests, strus::WebRequestAnswer& answer)
+{
+	std::vector<strus::Reference<strus::WebRequestDelegateContextInterface> > receivers;
+	std::vector<strus::WebRequestDelegateRequest>::const_iterator di = delegateRequests.begin(), de = delegateRequests.end();
+	for (; di != de; ++di)
+	{
+		strus::Reference<strus::WebRequestDelegateContextInterface> receiver(
+			new WebRequestDelegateContext( &answer, ctx, di->url(), di->receiverSchema()));
+		receivers.push_back( receiver);
+	}
+
+	std::size_t didx = 0;
+	for (; didx != delegateRequests.size(); ++didx)
+	{
+		const strus::WebRequestDelegateRequest& request = delegateRequests[didx];
+		strus::Reference<strus::WebRequestDelegateContextInterface>& receiver = receivers[ didx];
+
+		try
+		{
+			std::string delegateContent( request.contentstr(), request.contentlen());
+			if (!handler->delegateRequest( request.url(), request.method(), delegateContent, receiver.release()))
+			{
+				g_globalContext.reportError( _TXT("delegate request failed, out of memory"));
+			}
+		}
+		catch (const std::bad_alloc&)
+		{
+			g_globalContext.reportError( _TXT("delegate request failed, out of memory"));
+			answer.setError( 500, strus::ErrorCodeOutOfMem);
+			receiver->putAnswer( answer);
+		}
+	}
+}
+
 void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status)
 {
-	unsigned int rc = m_requestContext.refcnt();
 	bool success = true;
 	if (!m_answer->ok()) return;
 
 	if (status.ok() && status.httpstatus() >= 200 && status.httpstatus() < 300)
 	{
-		if (!m_requestContext->pushDelegateRequestAnswer( m_schema.c_str(), status.content(), *m_answer))
-		{
-			success = false;
-		}
+		success &= m_requestContext->putDelegateRequestAnswer( m_schema.c_str(), status.content());
 	}
 	else
 	{
 		*m_answer = status;
 		success = false;
 	}
-	if (success)
-	{
-		if (rc <= 1)
-		{
-			//... last delegate request reply
-			*m_answer = m_requestContext->getRequestAnswer();
-		}
-	}
-	else
+	if (!success)
 	{
 		std::string msg( strus::string_format( _TXT( "delegate request to %s failed"), m_url.c_str()));
 		m_answer->explain( msg.c_str());
@@ -742,64 +764,51 @@ strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Con
 	strus::WebRequestHandlerInterface* rt =
 		strus::createWebRequestHandler(
 			&g_eventLoop, &g_logger, ""/*html head*/,
-			configdir, servicename, configjson_, transaction_max_idle_time, transaction_nof_per_sec,
+			configdir, servicename, transaction_max_idle_time, transaction_nof_per_sec,
 			g_errorhnd);
-	if (!rt) throw strus::runtime_error( _TXT("error creating web request handler: %s"), g_errorhnd->fetchError());
+	if (!rt) throw strus::runtime_error( _TXT("error creating request handler: %s"), g_errorhnd->fetchError());
+	strus::WebRequestAnswer answer;
+	if (!rt->init( configjson_, answer))
+	{
+		const char* msg = answer.errorstr() ? answer.errorstr() : strus::errorCodeToString( answer.apperror());
+		throw strus::runtime_error( _TXT("failed to initialize request handler: %s"), msg);
+	}
 	return rt;
 }
 
-std::pair<strus::WebRequestAnswer,std::string> Processor::call( const std::string& method, const std::string& path, const strus::WebRequestContent& content)
+strus::WebRequestAnswer Processor::call( const std::string& method, const std::string& path, const strus::WebRequestContent& content)
 {
-	std::pair<strus::WebRequestAnswer,std::string> rt;
+	strus::WebRequestAnswer rt;
 	std::string html_base_href =
 		path.empty()
 			? strus::string_format( "http://%s/", m_hostname.c_str())
 			: strus::string_format( "http://%s/%s/", m_hostname.c_str(), path.c_str());
 
-	strus::Reference<strus::WebRequestContextInterface> ctx( m_handler->createContext( 
-				g_charset, g_doctype, html_base_href.c_str(), rt.first));
+	strus::Reference<strus::WebRequestContextInterface>
+		ctx( m_handler->createRequestContext( g_charset, g_doctype, html_base_href.c_str(), method.c_str(), path.c_str(), rt));
 	if (!ctx.get()) return rt;
-
-	if (!ctx->executeRequest( method.c_str(), path.c_str(), content))
+	if (!ctx->execute( content))
 	{
-		rt.first = ctx->getRequestAnswer();
+		rt = ctx->getAnswer();
 	}
 	else
 	{
-		std::vector<strus::WebRequestDelegateRequest> delegateRequests = ctx->getFollowDelegateRequests();
-		if (delegateRequests.empty())
+		std::vector<strus::WebRequestDelegateRequest> delegateRequests = ctx->getDelegateRequests();
+		for (;!delegateRequests.empty(); delegateRequests = ctx->getDelegateRequests())
 		{
-			rt.first = ctx->getRequestAnswer();
-		}
-		else
-		{
-			std::vector<strus::Reference<strus::WebRequestDelegateContextInterface> > receivers;
-			std::vector<strus::WebRequestDelegateRequest>::const_iterator di = delegateRequests.begin(), de = delegateRequests.end();
-			for (; di != de; ++di)
-			{
-				strus::Reference<strus::WebRequestDelegateContextInterface> receiver(
-					new WebRequestDelegateContext( &rt.first, ctx, di->url(), di->receiverSchema()));
-				receivers.push_back( receiver);
-			}
-			di = delegateRequests.begin();
-			for (int didx=0; di != de; ++di,++didx)
-			{
-				std::string delegateContent( di->contentstr(), di->contentlen());
-	
-				strus::Reference<strus::WebRequestDelegateContextInterface>& receiver = receivers[ didx];
-				if (!m_handler->delegateRequest( di->url(), di->method(), delegateContent, receiver.release()))
-				{
-					g_globalContext.reportError( _TXT("delegate request failed, out of memory"));
-					break;
-				}
-			}
+			forwardDelegateRequests( m_handler.get(), ctx, delegateRequests, rt);
+			if (!rt.ok()) break;
 		}
 	}
-	if (!rt.first.content().empty())
+	if (rt.ok())
 	{
-		rt.second.append( rt.first.content().str(), rt.first.content().len());
-		rt.second.push_back( '\n');
-		rt.first.content().setContent( rt.second.c_str(), rt.second.size());
+		(void)ctx->complete();
+	}
+	rt = ctx->getAnswer();
+
+	if (!rt.content().empty())
+	{
+		rt.copyContent();
 	}
 	return rt;
 }
@@ -861,15 +870,14 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	}
 }
 
-std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
+strus::WebRequestAnswer GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
 {
 	if (g_blockingCurlClient)
 	{
 		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, contentstr);
-		std::pair<strus::WebRequestAnswer,std::string> rt;
-		rt.second = response.content;
-		strus::WebRequestContent content( g_charset, g_doctype, rt.second.c_str(), rt.second.size());
-		rt.first = strus::WebRequestAnswer( response.httpstatus, content);
+		strus::WebRequestContent content( g_charset, g_doctype, response.content.c_str(), response.content.size());
+		strus::WebRequestAnswer rt( response.httpstatus, content);
+		rt.copyContent();
 		return rt;
 	}
 	else
@@ -883,8 +891,7 @@ std::pair<strus::WebRequestAnswer,std::string> GlobalContext::call( const std::s
 		if (pi == m_procMap.end())
 		{
 			const char* errmsg = strus::errorCodeToString( strus::ErrorCodeNotFound);
-			strus::WebRequestAnswer answer( errmsg, 404, strus::ErrorCodeNotFound, strus::WebRequestContent());
-			return std::pair<strus::WebRequestAnswer,std::string>( answer, std::string());
+			return strus::WebRequestAnswer( errmsg, 404, strus::ErrorCodeNotFound);
 		}
 		else
 		{
@@ -1239,17 +1246,17 @@ static int l_call_server( lua_State* L)
 				luaL_error(L, _TXT("table or string expected as 3rd argument 'call_server'"));
 			}
 		}
-		std::pair<strus::WebRequestAnswer,std::string> result = g_globalContext.call( method, url, arg);
-		if (result.second.empty())
+		strus::WebRequestAnswer result = g_globalContext.call( method, url, arg);
+		if (result.content().empty())
 		{
 			lua_pushnil(L);
-			lua_pushinteger(L, result.first.httpstatus()); /* second return value */
-			lua_pushstring(L, result.first.errorstr()); 
+			lua_pushinteger(L, result.httpstatus()); /* second return value */
+			lua_pushstring(L, result.errorstr()); 
 		}
 		else
 		{
-			lua_pushlstring(L, result.second.c_str(), result.second.size()); 
-			lua_pushinteger(L, result.first.httpstatus()); /* second return value */
+			lua_pushlstring(L, result.content().str(), result.content().len()); 
+			lua_pushinteger(L, result.httpstatus()); /* second return value */
 			lua_pushnil(L);
 		}
 		return 3;

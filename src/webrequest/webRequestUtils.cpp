@@ -27,8 +27,12 @@
 #include <cctype>
 #include <iostream>
 
-#undef STRUS_LOWLEVEL_DEBUG
 using namespace strus;
+
+static inline bool isEqual( const char* name, const char* oth)
+{
+	return name[0] == oth[0] && 0==std::strcmp(name,oth);
+}
 
 ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 {
@@ -297,7 +301,7 @@ static const AcceptElem* parseAccept( const char* acceptsrc, char* strbuf, std::
 				char valbuf[ 64];
 				while (parseAssigment( ai, keybuf, sizeof(keybuf), valbuf, sizeof(valbuf)))
 				{
-					if (0==std::strcmp( keybuf, "q"))
+					if (isEqual( keybuf, "q"))
 					{
 						NumParseError numerr = strus::NumParseOk;
 						double weight = strus::doubleFromString( valbuf, std::strlen(valbuf), numerr);
@@ -329,7 +333,7 @@ static bool findAccept( const AcceptElem* http_accept_list, const char* suggesti
 	AcceptElem const* ai = http_accept_list;
 	for (; ai->type; ++ai)
 	{
-		if (0==std::strcmp( suggestion, ai->type)) return true;
+		if (isEqual( suggestion, ai->type)) return true;
 	}
 	return false;
 }
@@ -440,48 +444,48 @@ WebRequestContent::Type strus::webRequestContentFromTypeName( const char* name)
 	else if (*si == '/')
 	{
 		++si;
-		if (0==std::strcmp( namebuf, "application"))
+		if (isEqual( namebuf, "application"))
 		{
 			if (parseIdent( si, namebuf, sizeof(namebuf)))
 			{
-				if (0==std::strcmp( namebuf, "xml"))
+				if (isEqual( namebuf, "xml"))
 				{
 					return WebRequestContent::XML;
 				}
-				else if (0==std::strcmp( namebuf, "json"))
+				else if (isEqual( namebuf, "json"))
 				{
 					return WebRequestContent::JSON;
 				}
 			}
 		}
-		else if (0==std::strcmp( namebuf, "text"))
+		else if (isEqual( namebuf, "text"))
 		{
 			if (parseIdent( si, namebuf, sizeof(namebuf)))
 			{
-				if (0==std::strcmp( namebuf, "html"))
+				if (isEqual( namebuf, "html"))
 				{
 					return WebRequestContent::HTML;
 				}
-				else if (0==std::strcmp( namebuf, "plain"))
+				else if (isEqual( namebuf, "plain"))
 				{
 					return WebRequestContent::TEXT;
 				}
 			}
 		}
 	}
-	else if (0==std::strcmp( namebuf, "xml"))
+	else if (isEqual( namebuf, "xml"))
 	{
 		return WebRequestContent::XML;
 	}
-	else if (0==std::strcmp( namebuf, "json"))
+	else if (isEqual( namebuf, "json"))
 	{
 		return WebRequestContent::JSON;
 	}
-	else if (0==std::strcmp( namebuf, "html"))
+	else if (isEqual( namebuf, "html"))
 	{
 		return WebRequestContent::HTML;
 	}
-	else if (0==std::strcmp( namebuf, "text"))
+	else if (isEqual( namebuf, "text"))
 	{
 		return WebRequestContent::TEXT;
 	}
@@ -583,16 +587,36 @@ static bool mapResult(
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	papuga_ValueVariant value;
-	papuga_Serialization* ser = papuga_Allocator_alloc_Serialization( allocator);
+	papuga_Allocator serallocator;
+	int serallocator_mem[ 1024];
+	papuga_Serialization* ser;
+	if (allocator)
+	{
+		ser = papuga_Allocator_alloc_Serialization( allocator);
+	}
+	else
+	{
+		papuga_init_Allocator( &serallocator, &serallocator_mem, sizeof( serallocator_mem));
+		ser = papuga_Allocator_alloc_Serialization( &serallocator);
+	}
 	if (!ser)
 	{
 		errcode = papuga_NoMemError;
 		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+		if (!allocator) papuga_destroy_Allocator( &serallocator);
 		return false;
 	}
-	serialize( ser, true, input);
+	if (!serialize( ser, true, input))
+	{
+		errcode = papuga_NoMemError;
+		setAnswer( answer, papugaErrorToErrorCode( errcode), papuga_ErrorCode_tostring( errcode));
+		if (!allocator) papuga_destroy_Allocator( &serallocator);
+		return false;
+	}
 	papuga_init_ValueVariant_serialization( &value, ser);
-	return strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, value);
+	bool rt = strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, value);
+	if (!allocator) papuga_destroy_Allocator( &serallocator);
+	return rt;
 }
 }//namespace
 
@@ -664,21 +688,6 @@ bool strus::mapValueVariantToAnswer(
 		const papuga_ValueVariant& value)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
-#ifdef STRUS_LOWLEVEL_DEBUG
-	std::cerr << "CALL strus::mapValueVariantToAnswer" << std::endl;
-	if (papuga_ValueVariant_isatomic( &value))
-	{
-		std::cerr << "  " << papuga::ValueVariant_tostring( value, errcode) << std::endl;
-	}
-	else if (value.valuetype == papuga_TypeSerialization)
-	{
-		std::cerr << papuga::Serialization_tostring( *value.value.serialization, "- ", errcode) << std::endl << "--" << std::endl;
-	}
-	else
-	{
-		std::cerr << "<" << papuga_Type_name( value.valuetype) << ">" << std::endl;
-	}
-#endif
 	char* resultstr = 0;
 	std::size_t resultlen = 0;
 	const papuga_StructInterfaceDescription* structdefs = strus::getBindingsInterfaceDescription()->structs;
@@ -698,6 +707,7 @@ bool strus::mapValueVariantToAnswer(
 	}
 	if (resultstr)
 	{
+		if (!allocator) answer.defineMemBlock( resultstr);
 		WebRequestContent content( papuga_stringEncodingName( encoding), WebRequestContent::typeMime(doctype), resultstr, resultlen);
 		answer.setContent( content);
 		return true;

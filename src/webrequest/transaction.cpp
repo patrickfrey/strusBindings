@@ -189,11 +189,6 @@ TransactionRef TransactionPool::fetchTransaction( const std::string& tid)
 	return TransactionRef();
 }
 
-void TransactionPool::releaseTransaction( const std::string& tid)
-{
-	(void)fetchTransaction( tid);
-}
-
 void TransactionPool::returnTransaction( const TransactionRef& tr)
 {
 	int64_t eidx = transactionRefIndexCandidate( tr->maxIdleTime()) + (tr->idx() % m_nofTransactionPerSlot);
@@ -211,7 +206,7 @@ void TransactionPool::returnTransaction( const TransactionRef& tr)
 		--cnt;
 		++eidx;
 	}
-	throw std::runtime_error(_TXT("failed to refresh transaction"));
+	throw std::runtime_error(_TXT("failed to return transaction to pool"));
 }
 
 std::string TransactionPool::transactionId( int64_t tidx)

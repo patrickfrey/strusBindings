@@ -21,10 +21,10 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_INIT_DistQueryEval :public papuga::RequestAutomaton, public AutomatonNameSpace
+class Schema_Context_POST_DistQueryEval :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
-	Schema_Context_INIT_DistQueryEval() :papuga::RequestAutomaton(
+	Schema_Context_POST_DistQueryEval() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
 		{},
 		{
@@ -43,10 +43,10 @@ public:
 	) {}
 };
 
-class Schema_Context_PUT_DistQueryEval :public Schema_Context_INIT_DistQueryEval
+class Schema_Context_PUT_DistQueryEval :public Schema_Context_POST_DistQueryEval
 {
 public:
-	Schema_Context_PUT_DistQueryEval() :Schema_Context_INIT_DistQueryEval(){}
+	Schema_Context_PUT_DistQueryEval() :Schema_Context_POST_DistQueryEval(){}
 };
 
 class Schema_DistQueryEval_GET :public papuga::RequestAutomaton, public AutomatonNameSpace

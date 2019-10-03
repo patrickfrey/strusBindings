@@ -20,7 +20,6 @@
 				"name": "content"},
 			"type": "entity"}]}
 }
-
 {
 "query": {
 	"feature": [
@@ -44,7 +43,6 @@
 						"value": "iggy_pop"}}],
 			"set": "search"}]}
 }
-
 {
 "query": {
 	"feature": [
@@ -64,4 +62,3 @@
 						"value": "POP"}}],
 			"set": "search"}]}
 }
-

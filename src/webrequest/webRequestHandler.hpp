@@ -42,24 +42,39 @@ public:
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
 			const std::string& service_name_,
-			const std::string& configstr_,
 			int maxIdleTime_,
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
 
-	virtual void init();
+	virtual bool init( 
+			const std::string& configsrc,
+			WebRequestAnswer& answer);
 
-	virtual WebRequestContextInterface* createContext(
+	virtual WebRequestContextInterface* createConfigurationContext(
+			const char* contextType,
+			const char* contextName,
+			WebRequestAnswer& answer);
+
+	virtual WebRequestContextInterface* createRequestContext(
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			const char* html_base_href,
-			WebRequestAnswer& status);
+			const char* method,
+			const char* path,
+			WebRequestAnswer& answer);
 
 	virtual bool delegateRequest(
 			const std::string& address,
 			const std::string& method,
 			const std::string& content,
 			WebRequestDelegateContextInterface* context);
+
+	virtual WebRequestAnswer getSimpleRequestAnswer(
+			const char* accepted_charset,
+			const char* accepted_doctype,
+			const char* html_base_href,
+			const std::string& name,
+			const std::string& message);
 
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
@@ -69,19 +84,24 @@ public:/*WebRequestContext*/
 	int debug_maxdepth() const					{return m_debug_maxdepth;}
 	int maxIdleTime() const						{return m_maxIdleTime;}
 
+	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
 	/// \param[in] contextName object name of context
 	/// \param[in] context context transferred (with ownership, destroyed in case of failure)
-	/// \param[out] status describes the error in case failure
+	/// \param[out] answer describes the error in case failure
 	bool transferContext(
 			const char* contextType,
 			const char* contextName,
 			papuga_RequestContext* context,
-			WebRequestAnswer& status);
+			WebRequestAnswer& answer);
+	/// \brief Remove a context addressed by type and name
+	/// \param[in] contextType type name of context
+	/// \param[in] contextName object name of context
+	/// \param[out] answer describes the error in case failure
 	bool removeContext(
 			const char* contextType,
 			const char* contextName,
-			WebRequestAnswer& status);
+			WebRequestAnswer& answer);
 
 public:/*libstrus_webrequest*/
 	/// \brief Store all request schemas in a tree with a given directory as root
@@ -92,8 +112,9 @@ public:/*CurlEventLoopTicker*/
 	void tick();
 
 private:/*Constructor/Destructor*/
-	void loadConfiguration( const std::string& configstr);
-	void loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& configdescr);
+	bool runConfigurationLoad( WebRequestContextInterface* ctx, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool loadConfiguration( const std::string& configstr, WebRequestAnswer& answer);
+	bool loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& configdescr, const char* configurationClass, WebRequestAnswer& answer);
 	void clear();
 
 private:

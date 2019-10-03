@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2018 Patrick P. Frey
+ * Copyright (c) 2019 Patrick P. Frey
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Structure to build and map the Result of an XML/JSON request
+/* @brief RAII Container for papuga request context
  * @file papugaContextRef.hpp
  */
 #ifndef _STRUS_WEBREQUEST_PAPUGA_CONTEXTREF_HPP_INCLUDED

@@ -232,6 +232,7 @@ struct CurlEventLoop::Data
 			WebRequestAnswer answer( err.what(), 500, ErrorCodeDelegateRequestFailed);
 			receiver->putAnswer( answer);
 			m_logger.print( CurlLogger::LogFatal, err.what());
+			delete receiver;
 			return false;
 		}
 		catch (const std::bad_alloc& )
@@ -239,6 +240,7 @@ struct CurlEventLoop::Data
 			WebRequestAnswer answer( _TXT("memory allocation error"), 500, ErrorCodeOutOfMem);
 			receiver->putAnswer( answer);
 			m_logger.print( CurlLogger::LogFatal, _TXT("memory allocation error"));
+			delete receiver;
 			return false;
 		}
 		catch (...)
@@ -246,6 +248,7 @@ struct CurlEventLoop::Data
 			WebRequestAnswer answer( _TXT("unexpected exception"), 500, ErrorCodeDelegateRequestFailed);
 			receiver->putAnswer( answer);
 			m_logger.print( CurlLogger::LogFatal, _TXT("unexpected exception"));
+			delete receiver;
 			return false;
 		}
 	}

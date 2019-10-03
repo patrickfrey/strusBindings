@@ -42,8 +42,7 @@ static std::string getConfigFilenamePart( const std::string& filename, int pi)
 		++si;
 	}
 	const char* se = std::strchr( si, '.');
-	if (!se) se = std::strchr( si, '\0');
-	return std::string( si, se-si);
+	return se ? std::string( si, se-si) : std::string();
 }
 
 ConfigurationHandler::ConfigurationHandler(
@@ -88,7 +87,7 @@ void ConfigurationHandler::storeConfiguration(
 	std::snprintf( idxbuf, sizeof(idxbuf), "%03d", m_config_counter++);
 	if (m_config_counter == MaxConfigCounter) m_config_counter = 0;
 
-	std::string filename = strus::string_format( "%s_%s.%s.%s.%s.conf", timebuf, idxbuf, doctypeName, config.type.c_str(), config.name.c_str());
+	std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, doctypeName, config.method.c_str(), config.type.c_str(), config.name.c_str());
 	std::string cfgdir = configurationStoreDirectory();
 	transaction.type = config.type;
 	transaction.name = config.name;
@@ -180,16 +179,17 @@ ConfigurationDescription ConfigurationHandler::getStoredConfiguration(
 	{
 		std::string doctype = getConfigFilenamePart( *ci, 1);
 		if (doctype.empty()) continue;
-		std::string candidateContextType = getConfigFilenamePart( *ci, 2);
-		std::string candidateContextName = getConfigFilenamePart( *ci, 3);
+		std::string candidateContextType = getConfigFilenamePart( *ci, 3);
+		std::string candidateContextName = getConfigFilenamePart( *ci, 4);
 		if (candidateContextType != contextType || candidateContextName != contextName) continue;
 		std::string date = getConfigFilenamePart( *ci, 0);
+		std::string method = getConfigFilenamePart( *ci, 2);
 		std::string filepath = strus::joinFilePath( cfgdir, *ci);
 		std::string contentbuf;
 		ec = strus::readFile( filepath, contentbuf);
 		if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
 
-		return ConfigurationDescription( contextType, contextName, doctype, contentbuf);
+		return ConfigurationDescription( contextType, contextName, method, doctype, contentbuf);
 	}
 	return ConfigurationDescription();
 }
@@ -216,8 +216,9 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 		{
 			std::string doctype = getConfigFilenamePart( *ci, 1);
 			if (doctype.empty()) continue;
-			std::string contextType = getConfigFilenamePart( *ci, 2);
-			std::string contextName = getConfigFilenamePart( *ci, 3);
+			std::string method = getConfigFilenamePart( *ci, 2);
+			std::string contextType = getConfigFilenamePart( *ci, 3);
+			std::string contextName = getConfigFilenamePart( *ci, 4);
 			std::string date = getConfigFilenamePart( *ci, 0);
 			std::string filepath = strus::joinFilePath( cfgdir, *ci);
 	
@@ -234,7 +235,7 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 			ec = strus::readFile( filepath, contentbuf);
 			if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
 	
-			rt.push_back( ConfigurationDescription( contextType, contextName, doctype, contentbuf));
+			rt.push_back( ConfigurationDescription( contextType, contextName, method, doctype, contentbuf));
 		}
 		std::reverse( rt.begin(), rt.end());
 	}
@@ -248,7 +249,7 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 
 void ConfigurationHandler::deleteObsoleteConfigurations()
 {
-	ConfigurationHandler::getStoredConfigurations( true);
+	(void)ConfigurationHandler::getStoredConfigurations( true);
 }
 
 static ConfigurationDescription createSubConfig( const std::string& name, papuga_Allocator& allocator, papuga_SerializationIter& itr)
@@ -313,7 +314,7 @@ static ConfigurationDescription createSubConfig( const std::string& name, papuga
 					papuga_UTF8, NULL/*rootname*/, NULL/*elemname*/, &subcfglen, &errcode);
 	if (!subcfgstr) throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to load sub configuration"));
 	const char* doctype = WebRequestContent::typeName( WebRequestContent::JSON);
-	return ConfigurationDescription( name, subconfidid.empty() ? name : subconfidid, doctype, std::string(subcfgstr, subcfglen));
+	return ConfigurationDescription( name, subconfidid.empty() ? name : subconfidid, std::string()/*method*/, doctype, std::string(subcfgstr, subcfglen));
 }
 
 std::vector<ConfigurationDescription> ConfigurationHandler::getSubConfigurations( const std::string& configstr)
@@ -399,7 +400,7 @@ std::vector<std::string> ConfigurationHandler::contextTypes() const
 	return std::vector<std::string>( res.begin(), res.end());
 }
 
-void ConfigurationHandler::declareSubConfiguration( const char* contextType, const char* contextName)
+void ConfigurationHandler::declareSubConfiguration( const std::string& contextType, const std::string& contextName)
 {
 	strus::unique_lock lock( m_mutex);
 	ContextNameDef namedef( contextType, contextName);

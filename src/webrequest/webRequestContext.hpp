@@ -12,6 +12,7 @@
 #include "strus/webRequestContextInterface.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "configurationHandler.hpp"
+#include "pathBuf.hpp"
 #include "transaction.hpp"
 #include "papuga/requestHandler.h"
 #include "papuga/requestParser.h"
@@ -20,6 +21,8 @@
 #include "papuga/typedefs.h"
 #include "papugaContextRef.hpp"
 #include <stdexcept>
+
+#define STRUS_LIST_ROOT_ELEMENT "list"
 
 namespace strus
 {
@@ -32,44 +35,40 @@ class WebRequestContext
 	:public WebRequestContextInterface
 {
 public:
+	/// \brief Constructor for web request
 	WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
-		ConfigurationHandler* confighandler_,
+		ConfigurationHandler* configHandler_,
 		TransactionPool* transactionPool_,
-		const char* accepted_charset,
-		const char* accepted_doctype,
-		const char* html_base_href);
+		const char* accepted_charset_,
+		const char* accepted_doctype_,
+		const char* html_base_href_,
+		const char* method_,
+		const char* path_);
+
+	/// \brief Constructor for configuration request
+	WebRequestContext(
+		WebRequestHandler* handler_,
+		WebRequestLoggerInterface* logger_,
+		ConfigurationHandler* configHandler_,
+		TransactionPool* transactionPool_,
+		const char* contextType_,
+		const char* contextName_);
 
 	virtual ~WebRequestContext();
 
-	virtual bool executeRequest(
-			const char* method,
-			const char* path,
+	virtual bool execute(
 			const WebRequestContent& content);
 
-	virtual std::vector<WebRequestDelegateRequest> getFollowDelegateRequests();
+	virtual std::vector<WebRequestDelegateRequest> getDelegateRequests();
 
-	virtual bool pushDelegateRequestAnswer(
+	virtual bool putDelegateRequestAnswer(
 			const char* schema,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
+			const WebRequestContent& content);
 
-	virtual WebRequestAnswer getRequestAnswer();
-
-	virtual WebRequestAnswer buildSimpleRequestAnswer(
-			const std::string& name,
-			const std::string& message);
-
-	virtual bool executeLoadMainConfiguration( const WebRequestContent& content, WebRequestAnswer& answer);
-	virtual bool executeLoadSubConfiguration( const char* typenam, const char* contextnam, const WebRequestContent& content, WebRequestAnswer& answer);
-
-	virtual bool pushConfigurationDelegateRequestAnswer(
-			const char* typenam,
-			const char* contextnam,
-			const char* schema,
-			const WebRequestContent& content,
-			WebRequestAnswer& answer);
+	virtual bool complete();
+	virtual WebRequestAnswer getAnswer() const;
 
 	enum {
 		MaxLogContentSize=2048 /*2K*/,
@@ -78,65 +77,133 @@ public:
 	};
 
 private:
-	bool executeOPTIONS( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeSCHEMA( const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executePostTransaction( void* self, int classid, const char* typenam, const char* contextnam, WebRequestAnswer& answer);
-	bool executeDeclareConfiguration( const char* typenam, const char* contextnam, const char* request_method, bool init, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeDeleteConfiguration( const char* typenam, const char* contextnam, WebRequestAnswer& answer);
-	bool executeCommitTransaction( const papuga_ValueVariant* obj, WebRequestAnswer& answer);
-	bool initContextType( WebRequestAnswer& answer, const char* contextType, const char* contextName);
-	bool initAutomaton( WebRequestAnswer& answer, const char* contextType, const char* schema);
-	bool initContentRequest( WebRequestAnswer& answer);
-	bool feedContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
-	bool createEmptyRequestContext( WebRequestAnswer& answer);
-	bool createRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
-	bool initRequestContext( WebRequestAnswer& answer);
-	bool inheritRequestContext( WebRequestAnswer& answer, const char* contextType, const char* contextName);
-	bool executeContentRequest( WebRequestAnswer& answer, const WebRequestContent& content);
-	bool setResultContentType( WebRequestAnswer& answer, papuga_StringEncoding default_encoding, WebRequestContent::Type default_doctype);
-	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
-	const char* getDelegateRequestString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
-	bool resultAppendContentVariableValues( papuga_RequestResult* result, papuga_ErrorCode& errcode);
-	bool hasContentRequestDelegateRequests() const;
-	bool getContentRequestDelegateRequests( WebRequestAnswer& answer, std::vector<WebRequestDelegateRequest>& delegateRequests);
-	bool getContentRequestResult( WebRequestAnswer& answer);
-	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, papuga_CallResult& retval, WebRequestAnswer& answer);
-	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname, WebRequestAnswer& answer);
-	bool executeMainSchema( const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextSchema( const char* contextType, const char* contextName, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeContextSchema( const PapugaContextRef& context_, const char* contextType, const char* schema, const WebRequestContent& content, WebRequestAnswer& answer);
-	bool executeListVariables( const PapugaContextRef& context, WebRequestAnswer& answer);
-	bool executeSchemaDescriptionRequest( const char* method, const char* path, WebRequestAnswer& answer);
-	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
+	enum RequestType {
+		UndefinedRequest,
+		SchemaDescriptionRequest,
+		MethodOptionsRequest,
+		LoadMainConfiguration,
+		LoadEmbeddedConfiguration,
+		ObjectRequest
+	};
+	struct SchemaId
+	{
+		const char* contextType;
+		const char* schemaName;
+
+		SchemaId()
+			:contextType(""),schemaName(ROOT_CONTEXT_NAME){}
+		SchemaId( const char* contextType_, const char* schemaName_)
+			:contextType(contextType_),schemaName(schemaName_){}
+		SchemaId( const SchemaId& o)
+			:contextType(o.contextType),schemaName(o.schemaName){}
+	};
+
+public:/*WebRequestContext*/
+	static papuga_StringEncoding defaultEncoding() {return papuga_UTF8;}
+	static WebRequestContent::Type defaultDocType() {return WebRequestContent::HTML;}
+	static RequestType configRequestType( const char* contextType);
 
 private:
-	WebRequestHandler* m_handler;
-	WebRequestLoggerInterface* m_logger;
-	ConfigurationHandler* m_confighandler;
+	/// \brief Clone constructor
+	WebRequestContext(
+		WebRequestHandler* handler_,
+		WebRequestLoggerInterface* logger_,
+		ConfigurationHandler* configHandler_,
+		TransactionPool* transactionPool_,
+		const char* contextType_,
+		const char* contextName_,
+		const PapugaContextRef& context_,
+		const RequestType& requestType_);
+
+	/// \brief Constructor of a clone with a reset state for the execution of schemas to process the delegate request results
+	WebRequestContext* createClone( const RequestType& requestType_) const;
+
+private:
+	// Implemented in webRequestContext:
+	bool executeObjectRequest( const WebRequestContent& content);
+
+	// Implemented in webRequestContext_obj:
+	void initCallLogger();
+	bool initEmptyObject();
+	bool initRootObject();
+	bool initSchemaDescriptionObject();
+	bool initRequestObject();
+	void resetRequestObject();
+	bool inheritRequestContext( const char* contextType_, const char* contextName_);
+	bool initContentType( const WebRequestContent& content);
+	bool executePostTransaction();
+	bool executeCommitTransaction();
+
+	// Implemented in webRequestContext_method:
+	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content);
+	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname);
+
+	// Implemented in webRequestContext_schema:
+	SchemaId getSchemaId();
+	SchemaId getSchemaId( const char* contextType_, const char* method_);
+	bool executeContentSchemaRequest( const SchemaId& schemaid, const WebRequestContent& content);
+		bool initContentSchemaAutomaton( const SchemaId& schemaid);
+		bool initContentSchemaRequest();
+		bool feedContentSchemaRequest( const WebRequestContent& content);
+		bool inheritContentSchemaRequestContext();
+		bool executeContentSchema( const WebRequestContent& content);
+	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
+
+	// Implemented in webRequestContext_error:
+	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
+
+	// Implemented in webRequestContext_result:
+	bool getContentRequestResult();
+	bool getContentRequestDelegateRequests( std::vector<WebRequestDelegateRequest>& delegateRequests);
+	bool hasContentRequestDelegateRequests() const;
+	bool hasContentRequestResult() const;
+	bool transferContext();
+	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
+
+	// Implemented in webRequestContext_meta:
+	bool executeListVariables();
+	bool executeSchemaDescription();
+	bool executeOPTIONS();
+
+	// Implemented in webRequestContext_config:
+	bool loadMainConfiguration( const WebRequestContent& content);
+	bool loadEmbeddedConfiguration( const WebRequestContent& content);
+	bool loadConfigurationRequest( const WebRequestContent& content);
+	bool deleteConfigurationRequest();
+
+private:
+	WebRequestHandler* m_handler;		//< request handler creating this request
+	WebRequestLoggerInterface* m_logger;	//< logger for logging this request
+	ConfigurationHandler* m_configHandler;	//< handler to manage configuration transactions
+	ConfigurationTransaction m_configTransaction; //< current configuration transaction in case of a configuration request
 	papuga_RequestLogger m_callLogger;	//< request call logger (for papuga)
 	TransactionPool* m_transactionPool;	//< transaction pool
-	papuga_Allocator m_allocator;
+	TransactionRef m_transactionRef;	//< transaction reference
+	papuga_Allocator m_allocator;		//< papuga allocator used for this request context
+	RequestType m_requestType;		//< classification of this request
 	const char* m_contextType;		//< context type
 	const char* m_contextName;		//< context name
-	PapugaContextRef m_context;
-	papuga_Request* m_request;
-	papuga_StringEncoding m_encoding;
-	papuga_ContentType m_doctype;
-	const char* m_doctypestr;
-	const papuga_RequestAutomaton* m_atm;
-	papuga_StringEncoding m_result_encoding;
-	WebRequestContent::Type m_result_doctype;
-	papuga_RequestResult* m_results;
-	int m_nofResults;
-	int m_resultIdx;
-	papuga_ErrorBuffer m_errbuf;
-	WebRequestAnswer m_answer;
-	const char* m_accepted_charset;
-	const char* m_accepted_doctype;
-	std::string m_html_base_href;
-	char m_errbuf_mem[ 4096];
-	char m_allocator_mem[ 1<<14];
+	PapugaContextRef m_context;		//< context reference
+	const papuga_ValueVariant* m_obj;	//< pointer to object in context selected
+	papuga_Request* m_request;		//< request data for papuga
+	const char* m_method;			//< request method
+	PathBuf m_path;				//< iterator on path of the request
+	papuga_StringEncoding m_encoding;	//< character set encoding of the request
+	papuga_ContentType m_doctype;		//< document class of the request
+	const char* m_doctypestr;		//< document class of the request as string
+	const papuga_RequestAutomaton* m_atm;	//< automaton of the schema to execute
+	papuga_StringEncoding m_result_encoding;//< character set encoding of the result
+	WebRequestContent::Type m_result_doctype;//< document class of the result
+	papuga_RequestResult* m_results;	//< list of results or delegate request templates
+	int m_nofResults;			//< list of result templates
+	int m_resultIdx;			//< index of current result template
+	papuga_ErrorBuffer m_errbuf;		//< error buffer for papuga
+	WebRequestAnswer m_answer;		//< answer of the request
+	const char* m_accepted_charset;		//< accepted character set HTTP field
+	const char* m_accepted_doctype;		//< accepted doctype HTTP field
+	std::string m_html_base_href;		//< link address base for HTML
+	char m_errbuf_mem[ 4096];		//< memory used by error buffer for papuga
+	char m_allocator_mem[ 1<<14];		//< memory used by papuga allocator used for this request context
 };
 
 }//namespace

@@ -10,10 +10,13 @@
 #ifndef _STRUS_WEB_REQUEST_ANSWER_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_ANSWER_HPP_INCLUDED
 #include "webRequestContent.hpp"
+#include "strus/reference.hpp"
 #include <cstddef>
 #include <string>
 #include <cstdio>
 #include <cstring>
+#include <cstdarg>
+#include <cstdlib>
 
 namespace strus
 {
@@ -24,22 +27,32 @@ class WebRequestAnswer
 public:
 	/// \brief Default constructor
 	WebRequestAnswer()
-		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(){m_errorbuf[0]=0;}
+		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Constructor
+	/// \param[in] errorstr_ error message string
+	/// \param[in] httpstatus_ http status code
+	/// \param[in] apperrorcode_ strus application error code
+	/// \param[in] content_ content of the answer
 	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_, const WebRequestContent& content_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
+		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Constructor
+	/// \param[in] content_ content of the answer
 	WebRequestAnswer( const WebRequestContent& content_)
-		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
+		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Constructor
+	/// \param[in] httpstatus_ http status code
+	/// \param[in] content_ content of the answer
 	WebRequestAnswer( int httpstatus_, const WebRequestContent& content_)
-		:m_errorstr(0),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_){m_errorbuf[0]=0;}
+		:m_errorstr(0),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Constructor
+	/// \param[in] errorstr_ error message string
+	/// \param[in] httpstatus_ http status code
+	/// \param[in] apperrorcode_ strus application error code
 	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(){m_errorbuf[0]=0;}
+		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Copy constructor
 	WebRequestAnswer( const WebRequestAnswer& o)
-		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_apperrorcode(o.m_apperrorcode),m_messagetype(o.m_messagetype),m_messagestr(o.m_messagestr),m_content(o.m_content)
+		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_apperrorcode(o.m_apperrorcode),m_messagetype(o.m_messagetype),m_messagestr(o.m_messagestr),m_content(o.m_content),m_memblock(o.m_memblock)
 	{
 		if (o.m_errorstr == o.m_errorbuf)
 		{
@@ -51,6 +64,7 @@ public:
 			m_errorbuf[0] = 0;
 		}
 	}
+	/// \brief Assignment operator
 	WebRequestAnswer& operator=( const WebRequestAnswer& o)
 	{
 		m_errorstr = o.m_errorstr;
@@ -59,6 +73,7 @@ public:
 		m_messagetype = o.m_messagetype;
 		m_messagestr = o.m_messagestr;
 		m_content = o.m_content;
+		m_memblock = o.m_memblock;
 		if (o.m_errorstr == o.m_errorbuf)
 		{
 			std::memcpy( m_errorbuf, o.m_errorbuf, sizeof(m_errorbuf));
@@ -98,12 +113,13 @@ public:
 		m_httpstatus = httpstatus_;
 		m_apperrorcode = 0;
 	}
+
 	/// \brief Set http status with error
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] apperrorcode_ application error code
 	/// \param[in] errorstr_ pointer to the error message
 	/// \param[in] doCopy is the message should be copied
-	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_, bool doCopy=false)
+	void setError( int httpstatus_, int apperrorcode_, const char* errorstr_=0, bool doCopy=false)
 	{
 		if (doCopy)
 		{
@@ -118,6 +134,28 @@ public:
 		m_httpstatus = httpstatus_;
 		m_apperrorcode = apperrorcode_;
 	}
+
+	/// \brief Set http status with formatted error message
+	/// \param[in] httpstatus_ http status code
+	/// \param[in] apperrorcode_ application error code
+	/// \param[in] format format string of the error message
+	/// \param[in] doCopy is the message should be copied
+	void setError_fmt( int httpstatus_, int apperrorcode_, const char* format, ...)
+#ifdef __GNUC__
+		__attribute__ ((format (printf, 4, 5)))
+#endif
+	{
+		char buf[ 2048];
+		va_list ap;
+		va_start( ap, format);
+
+		std::size_t len = ::vsnprintf( buf, sizeof(buf), format, ap);
+		if (len >= sizeof(buf)) buf[ sizeof(buf)-1] = 0;
+
+		setError( httpstatus_, apperrorcode_, buf, true/*doCopy*/);
+		va_end( ap);
+	}
+
 	/// \brief Set http status with a message (no error)
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] type type of the message
@@ -145,6 +183,29 @@ public:
 	void setContent( const WebRequestContent& content_)
 	{
 		m_content = content_;
+	}
+
+	/// \brief Define memory block under control of this answer with allocations used for construction
+	/// \param[in] mem memory block (with ownership)
+	/// \note only one memory block can be attached to an answer
+	void defineMemBlock( char* mem)
+	{
+		if (m_memblock.get()) {delete mem; throw std::bad_alloc();}
+		m_memblock.reset( mem);
+	}
+
+	/// \brief Allocate an own copy the content
+	/// \return false on memory allocation error or if content already defined
+	bool copyContent()
+	{
+		if (m_memblock.get()) return false;
+		char* strptr = (char*)std::malloc( m_content.len()+1);
+		if (!strptr) return false;
+		std::memcpy( strptr, m_content.str(), m_content.len());
+		strptr[ m_content.len()] = 0;
+		m_memblock.reset( strptr);
+		m_content.setContent( strptr, m_content.len());
+		return true;
 	}
 
 	/// \brief Add some explanation to error message
@@ -183,6 +244,14 @@ public:
 	}
 
 private:
+	class StandardMallocDeleter
+	{
+	public:
+		void operator()( char* ptr) {std::free(ptr);}
+	};
+	typedef strus::Reference<char,StandardMallocDeleter> MemBlock;
+
+private:
 	enum {errorbufsize=4096};
 	char m_errorbuf[ errorbufsize];	///< local buffer for error messages
 	const char* m_errorstr;		///< error message in case of failure or NULL
@@ -191,6 +260,7 @@ private:
 	const char* m_messagetype;	///< type of the answer for answers returned in the HTTP header
 	const char* m_messagestr;	///< string of message
 	WebRequestContent m_content;	///< content of the answer
+	MemBlock m_memblock;		///< memory block used for alloctions of memory for this answer
 };
 
 }//namespace
