@@ -21,8 +21,6 @@
 #include "private/internationalization.hpp"
 #include <vector>
 #include <cstdarg>
-#include <iostream>
-#include <sstream>
 
 using namespace strus;
 
@@ -184,9 +182,9 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 				nofargs = va_arg( arguments,size_t);
 				if (ei < ee)
 				{
-					std::ostringstream num;
-					num << nofargs;
-					rt[ei] = num.str();
+					char numbuf[ 64];
+					std::snprintf( numbuf, sizeof(numbuf), "%d", (int)nofargs);
+					rt[ei] = numbuf;
 				}
 				break;
 			}
