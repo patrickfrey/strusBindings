@@ -113,8 +113,9 @@ public:/*CurlEventLoopTicker*/
 
 private:/*Constructor/Destructor*/
 	bool runConfigurationLoad( WebRequestContextInterface* ctx, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool loadSubConfiguration( const ConfigurationDescription& configdescr, bool initload, WebRequestAnswer& answer);
+	bool loadMainConfiguration( const std::string& configstr, WebRequestAnswer& answer);
 	bool loadConfiguration( const std::string& configstr, WebRequestAnswer& answer);
-	bool loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& configdescr, const char* configurationClass, WebRequestAnswer& answer);
 	void clear();
 
 private:

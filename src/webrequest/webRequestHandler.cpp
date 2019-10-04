@@ -610,20 +610,46 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 	return rt;
 }
 
-bool WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, const ConfigurationDescription& cfg, const char* configurationClass, WebRequestAnswer& answer)
+bool WebRequestHandler::loadSubConfiguration( const ConfigurationDescription& cfg, bool initload, WebRequestAnswer& answer)
 {
 	m_configHandler.declareSubConfiguration( cfg.type, cfg.name);
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
+	strus::local_ptr<WebRequestContextInterface> ctx( createConfigurationContext( cfg.type.c_str(), cfg.name.c_str(), answer));
+	WebRequestContextInterface* ctxi = ctx.get();
+	if (!ctxi)
 	{
-		m_logger->logAction( cfg.type.c_str(), cfg.name.c_str(), _TXT("loading embedded configuration"));
+		answer.explain( initload
+			? _TXT("error creating context for loading embedded sub configuration")
+			: _TXT("error creating context for restoring context"));
+		return false;
 	}
 	strus::WebRequestContent subcontent( g_config_charset, cfg.doctype.c_str(), cfg.contentbuf.c_str(), cfg.contentbuf.size());
 	if (!runConfigurationLoad( ctxi, subcontent, answer))
 	{
-		char buf[ 256];
-		std::size_t buflen = std::snprintf( buf, sizeof(buf), _TXT("error loading %s %s '%s'"), configurationClass, cfg.type.c_str(), cfg.name.c_str());
-		if (sizeof(buf) <= buflen) buf[ sizeof(buf)-1] = 0;
-		answer.explain( buf);
+		answer.explain( initload
+			? _TXT("error loading embedded sub configuration")
+			: _TXT("error restoring context"));
+		return false;
+	}
+	return true;
+}
+
+bool WebRequestHandler::loadMainConfiguration( const std::string& configstr, WebRequestAnswer& answer)
+{
+	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
+	{
+		m_logger->logPutConfiguration( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, configstr);
+	}
+	strus::local_ptr<WebRequestContextInterface> ctx( createConfigurationContext( 0, 0, answer));
+	WebRequestContextInterface* ctxi = ctx.get();
+	if (!ctxi)
+	{
+		answer.explain( _TXT("error creating context for loading main configuration"));
+		return false;
+	}
+	strus::WebRequestContent content( g_config_charset, g_config_doctype, configstr.c_str(), configstr.size());
+	if (!runConfigurationLoad( ctxi, content, answer))
+	{
+		answer.explain( _TXT("error loading main configuration"));
 		return false;
 	}
 	return true;
@@ -631,39 +657,22 @@ bool WebRequestHandler::loadSubConfiguration( WebRequestContextInterface* ctxi, 
 
 bool WebRequestHandler::loadConfiguration( const std::string& configstr, WebRequestAnswer& answer)
 {
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
-	{
-		m_logger->logPutConfiguration( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, configstr);
-	}
-	strus::local_ptr<WebRequestContextInterface> ctx( createConfigurationContext( 0, 0, answer));
-
-	WebRequestContextInterface* ctxi = ctx.get();
-	if (!ctxi)
-	{
-		answer.explain( _TXT("error creating context for loading main configuration"));
-		return false;
-	}
 	// Load main configuration:
-	strus::WebRequestContent content( g_config_charset, g_config_doctype, configstr.c_str(), configstr.size());
-	if (!runConfigurationLoad( ctxi, content, answer))
-	{
-		answer.explain( _TXT("error loading main configuration"));
-		return false;
-	}
+	if (!loadMainConfiguration( configstr, answer)) return false;
 
-	// Load sub configurations:
+	// Load embedded sub configurations:
 	std::vector<ConfigurationDescription> cfglist = m_configHandler.getSubConfigurations( configstr);
 	std::vector<ConfigurationDescription>::const_iterator ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-		if (!loadSubConfiguration( ctxi, *ci, "embedded configuration", answer)) return false;
+		if (!loadSubConfiguration( *ci, true, answer)) return false;
 	}
 	// Load put configurations:
 	cfglist = m_configHandler.getStoredConfigurations();
 	ci = cfglist.begin(), ce = cfglist.end();
 	for (; ci != ce; ++ci)
 	{
-		if (!loadSubConfiguration( ctxi, *ci, ci->method.c_str(), answer)) return false;
+		if (!loadSubConfiguration( *ci, false, answer)) return false;
 	}
 	return true;
 }

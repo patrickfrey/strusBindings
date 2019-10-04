@@ -43,7 +43,7 @@ bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& cont
 	{
 		m_logger->logAction( m_contextType, m_contextName, _TXT("load embedded configuration"));
 	}
-	return executeContentSchemaRequest( SchemaId( m_contextType, m_contextName), content);
+	return executeContentSchemaRequest( getSchemaId( m_contextType, "PUT"), content);
 }
 
 bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& content)

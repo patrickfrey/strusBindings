@@ -264,10 +264,6 @@ bool WebRequestContext::transferContext()
 		m_configHandler->commitStoreConfiguration( m_configTransaction);
 		m_answer.setStatus( 204/*no content*/);
 	}
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
-	{
-		m_logger->logAction( m_contextType, m_contextName, m_configTransaction.defined()?_TXT("put configuration"):_TXT("loaded embedded configuration"));
-	}
 	return true;
 }
 
