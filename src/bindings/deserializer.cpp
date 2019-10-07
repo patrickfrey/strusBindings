@@ -2044,6 +2044,7 @@ bool Deserializer::skipStructure( papuga_SerializationIter& seriter)
 
 enum ExpressionType {
 	ExpressionUnknown,
+	ExpressionEmpty,
 	ExpressionTerm,
 	ExpressionVariableAssignment,
 	ExpressionMetaDataRange,
@@ -2106,7 +2107,7 @@ static ExpressionType getExpressionType( const papuga_SerializationIter& seriter
 		for (; argc < 3 && papuga_SerializationIter_tag( &seriter) == papuga_TagValue; papuga_SerializationIter_skip( &seriter),++argc){}
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagClose)
 		{
-			return ExpressionTerm;
+			return argc ? ExpressionTerm : ExpressionEmpty;
 		}
 		else
 		{
@@ -2277,9 +2278,9 @@ static void buildExpressionTyped( ExpressionBuilder& builder, ExpressionType ety
 	switch (etype)
 	{
 		case ExpressionUnknown:
-		{
 			throw strus::runtime_error(_TXT("unable to interpret %s"), context);
-		}
+		case ExpressionEmpty:
+			throw strus::runtime_error(_TXT("empty structure as %s"), context);
 		case ExpressionTerm:
 		{
 			builderPushTerm( builder, QueryTermDef( seriter));

@@ -333,9 +333,10 @@ InserterImpl* ContextImpl::createInserter( StorageClientImpl* storage, DocumentA
 	return new InserterImpl( storage, analyzer);
 }
 
-QueryResult* ContextImpl::mergeQueryResults( const ValueVariant& queryResults) const
+QueryResult* ContextImpl::mergeQueryResults( const ValueVariant& queryResults, int minRank, int maxNofResults) const
 {
-	return NULL;
+	std::vector<QueryResult> queryResultList = Deserializer::getQueryResultList( queryResults);
+	return new QueryResult( QueryResult::merge( queryResultList, minRank, maxNofResults));
 }
 
 void ContextImpl::createStorage( const ValueVariant& config_)

@@ -13,7 +13,7 @@
 using namespace strus;
 using namespace strus::webrequest;
 
-const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
+const char* AutomatonNameSpace::itemName( int itemid)
 {
 	struct ItemDef {Item id; const char* name;};
 	static ItemDef ar[ NofItemDefinitions+1] = {
@@ -139,6 +139,7 @@ const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
 		{FeatureDef, "feature definition"},
 		{FeatureSet, "feature set"},
 		{FeatureWeight, "feature weight"},
+		{RestrictionDef, "restriction definition"},
 		{FeatureRestrictionDef, "feature restriction definition"},
 		{FeatureSelectionDef, "feature selection definition"},
 		{FeatureExclusionDef, "feature exclusion definition"},
@@ -190,6 +191,7 @@ const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
 		{Docno, "internal document number"},
 		{NumberOfResults, "number of results"},
 		{FirstResult, "first result"},
+		{MergeResult, "merge result"},
 		{AccessRight, "access right"},
 		{VariableName, "variable name"},
 		{VariableValue, "variable value"},
@@ -197,8 +199,8 @@ const char* AutomatonNameSpace::itemName( AutomatonNameSpace::Item item)
 		{DebugModeFlag, "debug mode flag"},
 		{NofItemDefinitions, "number of item definitions"},
 	};
-	const ItemDef& idef = ar[ item];
-	if (idef.id != item) throw strus::runtime_error( _TXT("internal: badly defined table of automaton items"));
+	const ItemDef& idef = ar[ (AutomatonNameSpace::Item)itemid];
+	if (idef.id != (AutomatonNameSpace::Item)itemid) throw strus::runtime_error( _TXT("internal: badly defined table of automaton items"));
 	return idef.name;
 }
 

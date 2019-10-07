@@ -24,7 +24,11 @@ end
 
 -- Function to make result of query evaluation comparable between different platforms
 function det_qeval_result( content)
-	return reformat_regex( reformat_float( content, 7), "[\\n][ \\t]*[\"]docno[\"][:][ ]*[0-9]+[,][ \\t]*")
+	if content then
+		return reformat_regex( reformat_float( content, 7), "[\\n][ \\t]*[\"]docno[\"][:][ ]*[0-9]+[,][ \\t]*")
+	else
+		return nil
+	end
 end
 
 -- Function to evaluate the path of the executing script (for locating resources or input files in the same directory)

@@ -70,6 +70,9 @@ sub mapNamePart {
 	elsif ($arg eq "max") {
 		return "maximum";
 	}
+	elsif ($arg eq "res") {
+		return "result";
+	}
 	else
 	{
 		return $arg;

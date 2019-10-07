@@ -52,24 +52,32 @@ public:
 		});
 	}
 
-	static papuga::RequestAutomaton_NodeList declarePostingsExpression( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList declareMetaDataExpression( const char* rootexpr)
 	{
-		return papuga::RequestAutomaton_NodeList( rootexpr,
-		{
-			{declareTermExpression("")},
-			{"//meta/from", "()", MetaDataRangeFrom, papuga_TypeString, "title_start"},
-			{"//meta/to", "()", MetaDataRangeTo, papuga_TypeString, "title_end"},
-			{"//meta", TermExpression, {
-					{"from", MetaDataRangeFrom, '?'},
-					{"to", MetaDataRangeTo, '?'}
+		return { rootexpr, {
+			{"condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
+			{"condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
+			{"condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
+			{"condition", MetaDataCondition, {
+					{MetaDataConditionOp},
+					{MetaDataConditionName},
+					{MetaDataConditionValue}
 				}
-			}
-		});
-	}
-
-	static papuga::RequestAutomaton_NodeList declarePatternExpression( const char* rootexpr)
-	{
-		return declareTermExpression( rootexpr);
+			},
+			{"union/condition/op", "()", MetaDataConditionOp, papuga_TypeString, ">:gt:ne"},
+			{"union/condition/name", "()", MetaDataConditionName, papuga_TypeString, "date"},
+			{"union/condition/value", "()", MetaDataConditionValue, papuga_TypeString, "879236"},
+			{"union/condition", MetaDataUnionCondition, {
+					{MetaDataConditionOp},
+					{MetaDataConditionName},
+					{MetaDataConditionValue}
+				}
+			},
+			{"union", MetaDataCondition, {
+					{MetaDataUnionCondition, '*', 2/*tag diff*/}
+				}
+			},
+		}};
 	}
 };
 

@@ -283,7 +283,7 @@ bool WebRequestContext::executePostTransaction()
 		setAnswer( ErrorCodeRequestResolveError);
 		return false;
 	}
-	if (!callExtensionMethod( self, methoddescr, m_context, resultname))
+	if (!callHostObjMethodToVariable( self, methoddescr, m_context, resultname))
 	{
 		return false;
 	}
@@ -319,7 +319,7 @@ bool WebRequestContext::executeCommitTransaction()
 		if (methoddescr)
 		{
 			WebRequestContent content;
-			if (!callHostObjMethod( self, methoddescr, ""/*path*/, content))
+			if (!callHostObjMethodToAnswer( self, methoddescr, ""/*path*/, content))
 			{
 				m_transactionRef.reset();
 				return false;

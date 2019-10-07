@@ -26,7 +26,7 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 	{
 		if (errstruct.methodname)
 		{
-			if (errstruct.argcnt >= 0)
+			if (errstruct.argcnt > 0)
 			{
 				papuga_ErrorBuffer_reportError( &m_errbuf, "%s in method %s::%s argument %d", papuga_ErrorCode_tostring( errstruct.errcode), errstruct.classname, errstruct.methodname, errstruct.argcnt);
 			}
@@ -37,7 +37,7 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 		}
 		else
 		{
-			if (errstruct.argcnt >= 0)
+			if (errstruct.argcnt > 0)
 			{
 				papuga_ErrorBuffer_reportError( &m_errbuf, "%s in constructor of %s", papuga_ErrorCode_tostring( errstruct.errcode), errstruct.classname);
 			}

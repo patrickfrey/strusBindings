@@ -22,11 +22,11 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton
+class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
@@ -41,11 +41,11 @@ public:
 	Schema_Context_POST_DocumentAnalyzer() :Schema_Context_PUT_DocumentAnalyzer(){}
 };
 
-class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton
+class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{
 			{"vstorage","/qryanalyzer/include/vstorage()",false/*not required*/}
@@ -67,18 +67,19 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 {
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{{"query", {
-			{SchemaQueryDeclPart::resultElementsQueryAnalyzer( "/query")}}
+			{SchemaQueryDeclPart::resultQuery( "/query")}}
 		}},
 		{
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 			{"/query/analyzer", '?'},
 
-			{SchemaQueryDeclPart::analyzeQuerySchemaOutput( "/query")},
+			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
+			{SchemaQueryDeclPart::analyzeQuery( "/query")}
 		}
 	) {}
 };

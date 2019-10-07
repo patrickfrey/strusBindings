@@ -200,16 +200,16 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 	{
 		if (m_contextName)
 		{
-			if (isEqual( m_method,"PUT") || isEqual( m_method,"POST"))
+			if (isEqual( m_method,"PUT"))
 			{
-				// PUT or POST of configuration/transaction or fallback to next:
 				if (m_transactionRef.get())
 				{
 					if (content.empty())
 					{
+						// [1.A] PUT transaction:
 						return executeCommitTransaction();
 					}
-					//... else fallback
+					//... else fallback to [3] or [4]
 				}
 				else
 				{
@@ -220,44 +220,55 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					}
 					else
 					{
+						// [1.B] PUT of configuration:
 						return loadConfigurationRequest( content);
 					}
 				}
 			}
-			else if (isEqual( m_method,"DELETE") && content.empty())
+			else if (isEqual( m_method,"POST"))
 			{
-				// DELETE of configuration/transaction or fallback to next:
-				if (m_transactionRef.get())
+				if (content.empty())
 				{
-					m_answer.setStatus( 204/*no content*/);
-					return true;//... transaction automatically released when not returned
+					setAnswer( ErrorCodeIncompleteRequest);
+					return false;
 				}
 				else
 				{
-					return deleteConfigurationRequest();
+					// [1.C] POST of configuration:
+					return loadConfigurationRequest( content);
 				}
 			}
-			else if (isEqual( m_method, "GET") && !m_obj && m_context.get())
+			else if (isEqual( m_method,"DELETE"))
 			{
-				// List variables if no main object defined but context exists
-				if (!content.empty())
+				if (content.empty())
 				{
-					setAnswer( ErrorCodeInvalidArgument);
+					if (m_transactionRef.get())
+					{
+						// [1.D] DELETE of a transaction object:
+						m_transactionRef.reset();
+						m_answer.setStatus( 204/*no content*/);
+						return true;//... transaction automatically released when not returned
+					}
+					else
+					{
+						// [1.E] DELETE of a configuration object:
+						return deleteConfigurationRequest();
+					}
+				}
+				else
+				{
+					setAnswer( ErrorCodeInvalidRequest);
+					//... DELETE with content invalid
 					return false;
 				}
-				if (!executeListVariables())
-				{
-					return false;
-				}
-				return false;
 			}
-			// else fallback
+			// else fallback to [3] or [4]
 		}
 		else if (content.empty())
 		{
-			// Top level introspection without context defined:
 			if (isEqual( m_method, "GET"))
 			{
+				// [2] Top level introspection without context defined:
 				if (m_contextType)
 				{
 					std::vector<std::string> contextlist = m_configHandler->contextNames( m_contextType);
@@ -287,41 +298,48 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 	}
 	if (m_obj)
 	{
-		// Call object method or POST transaction (also a method), fallback to next if not method defined:
 		if (m_obj->valuetype == papuga_TypeHostObject)
 		{
 			if (isEqual( m_method,"POST") && isEqual( m_path.rest(),"transaction"))
 			{
+				// [3.A] Call POST transaction (a method), e.g. create a new transaction
 				return executePostTransaction();
 			}
 			else
 			{
+				// [3.B] Call object method if defined or fallback to next:
 				int classid = m_obj->value.hostObject->classid;
 				void* self = m_obj->value.hostObject->data;
 
 				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, m_method, !content.empty());
 				if (methoddescr)
 				{
-					return callHostObjMethod( self, methoddescr, m_path.rest(), content);
+					return callHostObjMethodToAnswer( self, methoddescr, m_path.getRest(), content);
 				}
-				//... fallback
+				//... fallback to [4]
 			}
 		}
 		else if (isEqual( m_method,"GET"))
 		{
+			// [3.C] Map the addressed structure that is not a host object:
 			return mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, "value", m_result_encoding, m_result_doctype, *m_obj);
 		}
 	}
 	if (m_context.get())
 	{
-		// Execute schema in context with content:
 		if (!content.empty())
 		{
+			// [4.A] Execute schema in context with content:
 			return executeContentSchemaRequest( getSchemaId(), content);
+		}
+		else if (isEqual( m_method, "GET"))
+		{
+			// [4.B] List variables when no main object with introspection method defined (section [3.B]):
+			return executeListVariables();
 		}
 		else
 		{
-			setAnswer( ErrorCodeIncompleteRequest);
+			setAnswer( ErrorCodeRequestResolveError);
 			return false;
 		}
 	}

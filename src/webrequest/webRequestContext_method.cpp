@@ -159,7 +159,7 @@ static bool hostObj_callMethod( void* self, const papuga_RequestMethodDescriptio
 	return true;
 }
 
-bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname)
+bool WebRequestContext::callHostObjMethodToVariable( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname)
 {
 	papuga_CallResult retval;
 	char membuf_err[ 4096];
@@ -192,7 +192,7 @@ bool WebRequestContext::callExtensionMethod( void* self, const papuga_RequestMet
 	return true;
 }
 
-bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content)
+bool WebRequestContext::callHostObjMethodToAnswer( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content)
 {
 	papuga_CallResult retval;
 	char membuf_err[ 4096];
@@ -200,7 +200,7 @@ bool WebRequestContext::callHostObjMethod( void* self, const papuga_RequestMetho
 	int httpStatus;
 
 	papuga_init_CallResult( &retval, &m_allocator, false/*allocator ownerwhip*/, membuf_err, sizeof(membuf_err));
-	if (!hostObj_callMethod( self, methoddescr, ""/*path*/, content, &m_allocator, retval, errstruct, httpStatus))
+	if (!hostObj_callMethod( self, methoddescr, path, content, &m_allocator, retval, errstruct, httpStatus))
 	{
 		setAnswer( errstruct.errcode, errstruct.errormsg, true/*do copy*/);
 		return false;

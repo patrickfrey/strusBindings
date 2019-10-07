@@ -186,14 +186,17 @@ void QueryImpl::addDocumentEvaluationSet( const ValueVariant& docnolist_)
 
 void QueryImpl::setMaxNofRanks( unsigned int maxNofRanks_)
 {
-	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	THIS->setMaxNofRanks( maxNofRanks_);
+	m_maxNofRanks = maxNofRanks_;
 }
 
 void QueryImpl::setMinRank( unsigned int minRank_)
 {
-	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	THIS->setMinRank( minRank_);
+	m_minRank = minRank_;
+}
+
+void QueryImpl::useMergeResult( bool yes)
+{
+	m_useMergeResult = yes;
 }
 
 void QueryImpl::addAccess( const ValueVariant& userlist_)
@@ -229,7 +232,15 @@ void QueryImpl::setDebugMode( bool debug)
 QueryResult* QueryImpl::evaluate() const
 {
 	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
-	Reference<QueryResult> result( new QueryResult( THIS->evaluate()));
+	Reference<QueryResult> result;
+	if (m_useMergeResult)
+	{
+		result.reset( new QueryResult( THIS->evaluate( 0, m_minRank + m_maxNofRanks)));
+	}
+	else
+	{
+		result.reset( new QueryResult( THIS->evaluate( m_minRank, m_maxNofRanks)));
+	}
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
@@ -249,7 +260,12 @@ Struct QueryImpl::introspection( const ValueVariant& arg) const
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryInterface* query = m_query_impl.getObject<QueryInterface>();
 
-	strus::local_ptr<IntrospectionBase> ictx( new StructViewIntrospection( errorhnd, query->view()));
+	StructView view = query->view();
+	view
+		( "minrank", m_minRank)
+		( "nofranks", m_maxNofRanks)
+		( "merge", m_useMergeResult);
+	strus::local_ptr<IntrospectionBase> ictx( new StructViewIntrospection( errorhnd, view));
 	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
 	if (errorhnd->hasError())
 	{

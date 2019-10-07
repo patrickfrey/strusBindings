@@ -192,8 +192,10 @@ public:
 
 	/// \brief Take a list of query results as input and return a merged query result
 	/// \param[in] queryResults list of query results to merge
+	/// \param[in] minRank minimum rank number counted starting from 0
+	/// \param[in] maxNofRanks maximum number of ranks
 	/// \return the result (strus::QueryResult)
-	QueryResult* mergeQueryResults( const ValueVariant& queryResults) const;
+	QueryResult* mergeQueryResults( const ValueVariant& queryResults, int minRank, int maxNofRanks) const;
 
 	/// \brief Unpack a statistics blob retrieved from a storage
 	/// \param[in] blob binary blob with statistics to decode (created by StorageClient:getAllStatistics or StorageClient:getChangeStatistics)

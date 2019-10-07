@@ -258,9 +258,9 @@ WebRequestHandler::WebRequestHandler(
 		static const DefineSchema<Schema_DistQueryEval_GET> schema_DistQueryEval_GET("distqryeval");
 		schema_DistQueryEval_GET.addToHandler( m_impl, "GET");
 		static const DefineSchema<Schema_DistQueryEval_SET_querystats> schema_DistQueryEval_SET_querystats("distqryeval");
-		schema_DistQueryEval_GET.addToHandler( m_impl, "SET~querystats");
+		schema_DistQueryEval_SET_querystats.addToHandler( m_impl, "SET~querystats");
 		static const DefineSchema<Schema_DistQueryEval_SET_ranklist> schema_DistQueryEval_SET_ranklist("distqryeval");
-		schema_DistQueryEval_GET.addToHandler( m_impl, "SET~ranklist");
+		schema_DistQueryEval_SET_ranklist.addToHandler( m_impl, "SET~ranklist");
 
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");

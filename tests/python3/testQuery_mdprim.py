@@ -340,8 +340,9 @@ str QueryDump:
         str range: 0
         str var: None
       str weight: 1
-  str maxNofRanks: 20
-  str minRank: 0
+  str merge: 0
+  str minrank: 0
+  str nofranks: 20
   str user:
     number 1: "tiny"
     number 2: "huge"

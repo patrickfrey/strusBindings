@@ -44,7 +44,7 @@ class Schema_Context_PUT_StatisticsServer :public papuga::RequestAutomaton, publ
 {
 public:
 	Schema_Context_PUT_StatisticsServer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{
 			{"statquery", "PUT~statistics", "GET", "storage", "statistics/snapshot", {}}
 		},
@@ -68,7 +68,7 @@ class Schema_StatisticsServer_PUT_statistics :public papuga::RequestAutomaton, p
 {
 public:
 	Schema_StatisticsServer_PUT_statistics() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
@@ -82,7 +82,7 @@ class Schema_StatisticsServer_GET :public papuga::RequestAutomaton, public Autom
 {
 public:
 	Schema_StatisticsServer_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{{"statistics", {
 			{"/query/feature/analyzed//term", "termstats", true},
 			{"/query/feature/analyzed//term/type", "type", TermType},

@@ -234,8 +234,9 @@ string QueryDump:
         string start: "title_start"
         string var: 
       string weight: 1
-  string maxNofRanks: 20
-  string minRank: 0
+  string merge: 0
+  string minrank: 0
+  string nofranks: 20
 string QueryExpression: 
   integer 0: 
     string arg: 

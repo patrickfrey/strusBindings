@@ -308,8 +308,9 @@ string QueryDump:
         string op: "contains"
         string range: 0
       string weight: 1
-  string maxNofRanks: 20
-  string minRank: 0
+  string merge: 0
+  string minrank: 0
+  string nofranks: 20
   string user:
     number 1: "tiny"
     number 2: "huge"

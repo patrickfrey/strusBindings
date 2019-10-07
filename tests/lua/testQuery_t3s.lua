@@ -216,8 +216,9 @@ string QueryDump:
         string node: "docfield"
         string start: "title_start"
       string weight: 1
-  string maxNofRanks: 20
-  string minRank: 0
+  string merge: 0
+  string minrank: 0
+  string nofranks: 20
 string QueryExpression:
   number 1:
     string arg:

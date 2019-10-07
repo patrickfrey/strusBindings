@@ -65,7 +65,7 @@ public:
 		SentenceAnalyzerSentencePattern,SentenceAnalyzerSentenceConfig,SentenceAnalyzerSentenceName,
 		SentenceAnalyzerSentenceWeight,SentenceAnalyzerConfig,
 
-		QueryDef, FeatureDef, FeatureSet, FeatureWeight,
+		QueryDef, FeatureDef, FeatureSet, FeatureWeight, RestrictionDef,
 		FeatureRestrictionDef, FeatureSelectionDef, FeatureExclusionDef,
 		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,
@@ -84,13 +84,13 @@ public:
 		MetaDataRangeFrom, MetaDataRangeTo, 
 
 		TermStats, TermDocumentFrequency, CollectionNofDocs, GlobalStats,
-		Docno,NumberOfResults,FirstResult,AccessRight,
+		Docno,NumberOfResults,FirstResult,MergeResult,AccessRight,
 		VariableName,VariableValue,VariableDef,
 		DebugModeFlag,
 		NofItemDefinitions
 	};
 
-	static const char* itemName( Item item);
+	static const char* itemName( int itemid);
 };
 
 }}//namespace

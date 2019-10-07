@@ -135,8 +135,8 @@ private:
 	bool executeCommitTransaction();
 
 	// Implemented in webRequestContext_method:
-	bool callHostObjMethod( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content);
-	bool callExtensionMethod( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname);
+	bool callHostObjMethodToAnswer( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content);
+	bool callHostObjMethodToVariable( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname);
 
 	// Implemented in webRequestContext_schema:
 	SchemaId getSchemaId();

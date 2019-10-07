@@ -356,8 +356,9 @@ string QueryDump:
         string range: 0
         string var: 
       string weight: 1
-  string maxNofRanks: 20
-  string minRank: 0
+  string merge: 0
+  string minrank: 0
+  string nofranks: 20
   string user: 
     integer 0: "tiny"
     integer 1: "huge"

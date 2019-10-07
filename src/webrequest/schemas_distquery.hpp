@@ -25,15 +25,15 @@ class Schema_Context_POST_DistQueryEval :public papuga::RequestAutomaton, public
 {
 public:
 	Schema_Context_POST_DistQueryEval() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{
 			{"qryanalyzer","/distqryeval/include/analyzer()",false/*not required*/},
 			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
 		},
 		{
-			{"/distqryeval/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
-			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
+			{"/distqryeval/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
+			{"/distqryeval", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
 
@@ -53,16 +53,17 @@ class Schema_DistQueryEval_GET :public papuga::RequestAutomaton, public Automato
 {
 public:
 	Schema_DistQueryEval_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{
 			{"query", "SET~querystats", "GET", "statserver", "", {
 				{"/query/feature", "feature", true},
 				{"/query/{feature,sentence}/content", "analyzed", "_analyzed", '*'}
 			}},
-			{"query", "SET~ranklist", "GET", "qryeval", "", {"termstats","globalstats"}, {
-				{SchemaQueryDeclPart::resultElementsQueryAnalyzer( "/query")}
+			{"query", "SET~ranklist", "GET", "qryeval", "", {"_termstats","_globalstats"}, {
+				{SchemaQueryDeclPart::resultQuery( "/query")},
+				{{"/query","mergeres", "y", '#'}}
 			}},
-			{"queryresult", {"ranklist"}, {}}
+			{"queryresult", {"_ranklist"}, {}}
 		},
 		{
 			{"qryanalyzer","/query/include/analyzer()",false/*not required*/},
@@ -74,10 +75,11 @@ public:
 			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/query/server", "", "statserver", DistQueryEvalStatisticsServer, '!'},
 
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 			{"/query/analyzer", '?'},
-		
-			{SchemaQueryDeclPart::analyzeQuerySchemaOutput( "/query")},
+
+			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
+			{SchemaQueryDeclPart::analyzeQuery( "/query")}
 		}
 	) {}
 };
@@ -86,13 +88,13 @@ class Schema_DistQueryEval_SET_querystats :public papuga::RequestAutomaton, publ
 {
 public:
 	Schema_DistQueryEval_SET_querystats() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
-			{SchemaQueryDeclPart::defineStatistics("/statitics")},
-			{"/statitics", "", "termstats", TermStats, '!'},
-			{"/statitics", "", "globalstats", GlobalStats, '!'}
+			{SchemaQueryDeclPart::declareStatistics("/statitics")},
+			{"/statitics", "", "_termstats", TermStats, '!'},
+			{"/statitics", "", "_globalstats", GlobalStats, '!'}
 		}
 	) {}
 };
@@ -100,12 +102,14 @@ public:
 class Schema_DistQueryEval_SET_ranklist :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
+	typedef bindings::method::Context C;
 	Schema_DistQueryEval_SET_ranklist() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
-			{SchemaQueryDeclPart::defineRanklist( "/queryresult/ranklist")},
+			{SchemaQueryDeclPart::declareRanklist( "/queryresult/ranklist")},
+			{"/queryresult", "_ranklist", "context", C::mergeQueryResults(), {{QueryResult},{"_minrank"},{"_nofranks"}}}
 		}
 	) {}
 };

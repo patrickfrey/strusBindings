@@ -9,6 +9,7 @@
 #define _STRUS_BINDING_IMPL_QUERY_HPP_INCLUDED
 #include "papuga/valueVariant.h"
 #include "strus/queryProcessorInterface.hpp"
+#include "strus/queryInterface.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/queryResult.hpp"
 #include "impl/value/objectref.hpp"
@@ -204,10 +205,18 @@ public:
 	void setMaxNofRanks( unsigned int maxNofRanks);
 
 	/// \brief Set the index of the first rank to be returned
-	/// \param[in] minRank index of the first rank to be returned by this query
+	/// \param[in] minRank index, starting with 0, of the first rank to be returned by this query
+	/// \example 0
 	/// \example 10
 	/// \example 20
 	void setMinRank( unsigned int minRank);
+
+	/// \brief Flag that marks the result of this query to be used as input of a merge of multiple query results ('QueryResult::merge')
+	/// \note In this case minRank and maxNofRanks have to be set to 0 and minRank+maxNofRanks for merge to work correctly
+	/// \note This method is intented for the mappings in the webrequest context, because there we have no possibility for control structures and calculations
+	/// \note default is false
+	/// \param[in] yes true if the result of this query is used as input of a merge of multiple query results, false else
+	void useMergeResult( bool yes=true);
 
 	/// \brief Allow read access to documents having a specific ACL tag
 	/// \note If no ACL tags are specified, then all documents are potential candidates for the result
@@ -236,7 +245,7 @@ public:
 private:
 	friend class QueryEvalImpl;
 	QueryImpl( const ObjectRef& trace_impl_, const ObjectRef& objbuilder_impl_, const ObjectRef& errorhnd_, const ObjectRef& storage_impl_, const ObjectRef& queryeval_impl_, const ObjectRef& query_impl_, const QueryProcessorInterface* queryproc_)
-		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_objbuilder_impl(objbuilder_impl_),m_storage_impl(storage_impl_),m_queryeval_impl(queryeval_impl_),m_query_impl(query_impl_),m_queryproc(queryproc_),m_useMergeResult(false),m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMinNofRanks)
 	{}
 
 	mutable ObjectRef m_errorhnd_impl;
@@ -246,6 +255,9 @@ private:
 	ObjectRef m_queryeval_impl;
 	ObjectRef m_query_impl;
 	const QueryProcessorInterface* m_queryproc;
+	bool m_useMergeResult;
+	int m_minRank;
+	int m_maxNofRanks;
 };
 
 }}//namespace

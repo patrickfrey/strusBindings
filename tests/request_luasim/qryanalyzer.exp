@@ -28,6 +28,7 @@
 				{
 					"type": "text",
 					"value": "Iggy Pop"}],
+			"set": "search",
 			"analyzed": [
 				{
 					"term": {
@@ -40,8 +41,7 @@
 				{
 					"term": {
 						"type": "entity",
-						"value": "iggy_pop"}}],
-			"set": "search"}]}
+						"value": "iggy_pop"}}]}]}
 }
 {
 "query": {
@@ -51,6 +51,7 @@
 				{
 					"type": "text",
 					"value": "Iggy Pop"}],
+			"set": "search",
 			"analyzed": [
 				{
 					"term": {
@@ -59,6 +60,5 @@
 				{
 					"term": {
 						"type": "word",
-						"value": "POP"}}],
-			"set": "search"}]}
+						"value": "POP"}}]}]}
 }

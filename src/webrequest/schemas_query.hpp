@@ -23,11 +23,11 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_POST_QueryEval :public papuga::RequestAutomaton
+class Schema_Context_POST_QueryEval :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_Context_POST_QueryEval() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{
 			{"storage","/qryeval/include/storage()",false/*not required*/},
@@ -45,18 +45,24 @@ public:
 	Schema_Context_PUT_QueryEval() :Schema_Context_POST_QueryEval(){}
 };
 
-class Schema_QueryEval_GET :public papuga::RequestAutomaton
+class Schema_QueryEval_GET :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_QueryEval_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
 		{},
 		{
-			{SchemaQueryDeclPart::createQuery( "/query")},
-			{SchemaQueryDeclPart::buildQueryOriginalAnalyzed( "/query")},
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
+			{"/query/eval", '?'},
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
+			{"/query/analyzer", '?'},
+
+			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
+			{SchemaQueryDeclPart::analyzeQuery( "/query")},
+			{SchemaQueryDeclPart::defineQuery( "/query")},
 			{SchemaQueryDeclPart::evaluateQuery( "/query")}
 		}
 	) {}

@@ -75,7 +75,7 @@ class Schema_Context_POST_Storage :public papuga::RequestAutomaton, public Autom
 public:
 	typedef bindings::method::Context C;
 	Schema_Context_POST_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
@@ -90,7 +90,7 @@ class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public Automa
 {
 public:
 	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
@@ -104,7 +104,7 @@ class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, publi
 {
 public:
 	Schema_Context_DELETE_POST_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
@@ -118,19 +118,23 @@ public:
 	) {}
 };
 
-class Schema_Storage_GET :public papuga::RequestAutomaton
+class Schema_Storage_GET :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	Schema_Storage_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }},
 			{"statistics", { {"/statistics", "_blob", "statistics", '!'} }}
 		},
 		{},
 		{
-			{SchemaQueryDeclPart::createQuery( "/query")},
-			{SchemaQueryDeclPart::buildQueryAnalyzed( "/query")},
+			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
+			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
+
+			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
+			{SchemaQueryDeclPart::analyzeQuery( "/query")},
+			{SchemaQueryDeclPart::defineQuery( "/query")},
 			{SchemaQueryDeclPart::evaluateQuery( "/query")},
 
 			{SchemaStoragePart::defineStatisticsQuery( "/statistics")}
@@ -142,7 +146,7 @@ class Schema_StorageTransaction_PUT :public papuga::RequestAutomaton, public Aut
 {
 public:
 	Schema_StorageTransaction_PUT() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
 		{},
 		{
