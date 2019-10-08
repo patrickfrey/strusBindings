@@ -137,6 +137,7 @@ private:
 	// Implemented in webRequestContext_method:
 	bool callHostObjMethodToAnswer( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content);
 	bool callHostObjMethodToVariable( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname);
+		void logMethodCall( const papuga_RequestMethodDescription* methoddescr);
 
 	// Implemented in webRequestContext_schema:
 	SchemaId getSchemaId();
@@ -174,6 +175,7 @@ private:
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request
 	WebRequestLoggerInterface* m_logger;	//< logger for logging this request
+	int m_logMask;				//< what to log
 	ConfigurationHandler* m_configHandler;	//< handler to manage configuration transactions
 	ConfigurationTransaction m_configTransaction; //< current configuration transaction in case of a configuration request
 	papuga_RequestLogger m_callLogger;	//< request call logger (for papuga)

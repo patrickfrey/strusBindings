@@ -159,6 +159,16 @@ static bool hostObj_callMethod( void* self, const papuga_RequestMethodDescriptio
 	return true;
 }
 
+void WebRequestContext::logMethodCall( const papuga_RequestMethodDescription* methoddescr)
+{
+	const papuga_ClassDef* cdeflist = strus_getBindingsClassDefs();
+	const papuga_ClassDef* cdef = &cdeflist[ methoddescr->id.classid-1];
+	char namebuf[ 256];
+	std::snprintf( namebuf, sizeof(namebuf), "%s::%s", cdef->name, cdef->methodnames[ methoddescr->id.functionid-1]);
+	namebuf[ sizeof( namebuf)-1] = 0;
+	m_logger->logRequestType( "call", namebuf, m_contextType, m_contextName);
+}
+
 bool WebRequestContext::callHostObjMethodToVariable( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname)
 {
 	papuga_CallResult retval;
@@ -168,6 +178,10 @@ bool WebRequestContext::callHostObjMethodToVariable( void* self, const papuga_Re
 	papuga_RequestError errstruct;
 	int httpStatus;
 
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		logMethodCall( methoddescr);
+	}
 	if (!hostObj_callMethod( self, methoddescr, ""/*path*/, content, &m_allocator, retval, errstruct, httpStatus))
 	{
 		setAnswer( errstruct.errcode, errstruct.errormsg, true/*do copy*/);
@@ -199,6 +213,10 @@ bool WebRequestContext::callHostObjMethodToAnswer( void* self, const papuga_Requ
 	papuga_RequestError errstruct;
 	int httpStatus;
 
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		logMethodCall( methoddescr);
+	}
 	papuga_init_CallResult( &retval, &m_allocator, false/*allocator ownerwhip*/, membuf_err, sizeof(membuf_err));
 	if (!hostObj_callMethod( self, methoddescr, path, content, &m_allocator, retval, errstruct, httpStatus))
 	{

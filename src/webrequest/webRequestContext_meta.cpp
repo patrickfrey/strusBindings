@@ -28,6 +28,10 @@ static inline bool isEqual( const char* name, const char* oth)
 
 bool WebRequestContext::executeListVariables()
 {
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "introspection", "variables", m_contextType, m_contextName);
+	}
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
 	char const** varlist = papuga_RequestContext_list_variables( m_context.get(), 1/*max inheritcnt*/, lstbuf, lstbufsize);
@@ -58,6 +62,10 @@ bool WebRequestContext::executeSchemaDescription()
 	{
 		setAnswer( ErrorCodeRequestResolveError);
 		return false;
+	}
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "schema", m_method, m_contextType, m_contextName);
 	}
 	SchemaId schemaId = getSchemaId();
 	const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), schemaId.contextType, schemaId.schemaName);
@@ -105,6 +113,10 @@ bool WebRequestContext::executeOPTIONS()
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
 
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "options", m_method, m_contextType, m_contextName);
+	}
 	if (m_obj && m_obj->valuetype == papuga_TypeHostObject)
 	{
 		std::string http_allow("OPTIONS,");

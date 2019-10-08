@@ -137,7 +137,7 @@ public:
 			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} },
 			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} },
 			/// Statistics:
-			{"termstats", 0, "query", Q::defineTermStatistics(), {{TermType},{TermValue},{TermStats}} },
+			{"termstats", 0, "query", Q::defineTermStatistics(), {{TermType},{TermValue},{TermDocumentFrequency}} },
 			{"globalstats", 0, "query", Q::defineGlobalStatistics(), {{GlobalStats}} },
 			/// Ranking parameter:
 			{"evalset", 0, "query", Q::addDocumentEvaluationSet(), {{Docno, '*'}} },
@@ -147,6 +147,26 @@ public:
 			{"access", 0, "query", Q::addAccess(), {{AccessRight, '*'}} },
 			{"debug", 0, "query", Q::setDebugMode(), {{DebugModeFlag, '?'}} },
 			{"", 0, "query", Q::setWeightingVariables(), {{VariableDef, '*'}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList defineQueryMerger( const char* rootexpr)
+	{
+		typedef bindings::method::QueryResultMerger QM;
+		typedef bindings::method::Context C;
+		return {rootexpr, {
+			{"", "merger", "context", C::createQueryResultMerger(), {}},
+			/// Ranking parameter needed for merging:
+			{"nofranks", 0, "merger", QM::setMaxNofRanks(), {{NumberOfResults}} },
+			{"minrank", 0, "merger", QM::setMinRank(), {{FirstResult}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList mergeResults( const char* rootexpr)
+	{
+		typedef bindings::method::Query Q;
+		return { rootexpr, {
+			{"", "ranklist", "merger", Q::evaluate(), {} }
 		}};
 	}
 

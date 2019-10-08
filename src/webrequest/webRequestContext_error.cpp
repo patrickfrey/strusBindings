@@ -94,7 +94,7 @@ void WebRequestContext::reportRequestError( const papuga_RequestError& errstruct
 			papuga_ErrorBuffer_appendMessage( &m_errbuf, " error scope: %s", locinfo);
 		}
 	}
-	if (0!=(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 	{
 		m_logger->logError( m_errbuf.ptr);
 	}

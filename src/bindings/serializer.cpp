@@ -120,8 +120,8 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const SummaryE
 	bool rt = true;
 	rt &= serializeArrayElement( result, val.name(), errcode, deep);
 	rt &= serializeArrayElement( result, val.value(), errcode, deep);
-	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
-	rt &= serializeArrayElement( result, (papuga_Int)val.index(), errcode, deep);
+	if (val.weight() != 1.0 || val.index() >= 0) rt &= serializeArrayElement( result, val.weight(), errcode, deep);
+	if (val.index() >= 0) rt &= serializeArrayElement( result, (papuga_Int)val.index(), errcode, deep);
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val, papuga_ErrorCode& errcode, bool deep)

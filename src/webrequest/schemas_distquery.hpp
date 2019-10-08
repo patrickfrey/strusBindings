@@ -70,8 +70,8 @@ public:
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{
-			{"/query/server/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
-			{"/query/server", "", "storage", DistQueryEvalStorageServer, '*'},
+			{"/query/server/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
+			{"/query/server", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/query/server", "", "statserver", DistQueryEvalStatisticsServer, '!'},
 
@@ -79,7 +79,7 @@ public:
 			{"/query/analyzer", '?'},
 
 			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
-			{SchemaQueryDeclPart::analyzeQuery( "/query")}
+			{SchemaQueryDeclPart::analyzeQuery( "/query")},
 		}
 	) {}
 };
@@ -92,9 +92,9 @@ public:
 		{},
 		{},
 		{
-			{SchemaQueryDeclPart::declareStatistics("/statitics")},
-			{"/statitics", "", "_termstats", TermStats, '!'},
-			{"/statitics", "", "_globalstats", GlobalStats, '!'}
+			{SchemaQueryDeclPart::declareStatistics("/statistics")},
+			{"/statistics", "termstats", "_termstats", TermStats, '*'},
+			{"/statistics", "globalstats", "_globalstats", GlobalStats, '!'}
 		}
 	) {}
 };

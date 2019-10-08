@@ -252,56 +252,38 @@ string QueryResult:
     number 1:
       string summary:
         number 1:
-          string index: -1
           string name: "title"
           string value: "One day in Tokyo"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "docid"
           string value: "A.xml"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "docstart"
           string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
-          string weight: 1
       string weight: 0.64282
     number 2:
       string summary:
         number 1:
-          string index: -1
           string name: "title"
           string value: "A visit in New York"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "docid"
           string value: "B.xml"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "docstart"
           string value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
-          string weight: 1
       string weight: 0.00017
     number 3:
       string summary:
         number 1:
-          string index: -1
           string name: "title"
           string value: "A journey through Germany"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "docid"
           string value: "C.xml"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "docstart"
           string value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
-          string weight: 1
       string weight: 0.00009
 string QueryString: "City visit tokyo"
 string QueryTerms:

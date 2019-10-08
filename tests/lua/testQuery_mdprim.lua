@@ -386,30 +386,20 @@ string QueryResult:
     number 1:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "384"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "15"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "7"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "3"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -454,30 +444,20 @@ string QueryResult:
     number 2:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "960"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "15"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "7"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -522,30 +502,20 @@ string QueryResult:
     number 3:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "30"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "3"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "2"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -565,30 +535,20 @@ string QueryResult:
     number 4:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "42"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "2"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "7"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -608,30 +568,20 @@ string QueryResult:
     number 5:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "96"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "15"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "5"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "3"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -666,30 +616,20 @@ string QueryResult:
     number 6:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "240"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "5"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -724,30 +664,20 @@ string QueryResult:
     number 7:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "288"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "18"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "6"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "3"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -787,30 +717,20 @@ string QueryResult:
     number 8:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "60"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -835,30 +755,20 @@ string QueryResult:
     number 9:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "90"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "9"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -883,30 +793,20 @@ string QueryResult:
     number 10:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "132"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "11"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -931,30 +831,20 @@ string QueryResult:
     number 11:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "150"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -979,30 +869,20 @@ string QueryResult:
     number 12:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "210"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "3"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "7"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1027,30 +907,20 @@ string QueryResult:
     number 13:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "294"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "15"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "7"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1075,30 +945,20 @@ string QueryResult:
     number 14:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "330"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "11"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1123,30 +983,20 @@ string QueryResult:
     number 15:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "966"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "21"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "3"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "23"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1171,30 +1021,20 @@ string QueryResult:
     number 16:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "120"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "3"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "4"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1224,30 +1064,20 @@ string QueryResult:
     number 17:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "168"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "15"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "4"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "7"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1277,30 +1107,20 @@ string QueryResult:
     number 18:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "180"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "9"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "4"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1330,30 +1150,20 @@ string QueryResult:
     number 19:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "300"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "3"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "4"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "5"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"
@@ -1383,30 +1193,20 @@ string QueryResult:
     number 20:
       string summary:
         number 1:
-          string index: -1
           string name: "docid"
           string value: "420"
-          string weight: 1
         number 2:
-          string index: -1
           string name: "cross"
           string value: "6"
-          string weight: 1
         number 3:
-          string index: -1
           string name: "factors"
           string value: "4"
-          string weight: 1
         number 4:
-          string index: -1
           string name: "lo"
           string value: "2"
-          string weight: 1
         number 5:
-          string index: -1
           string name: "hi"
           string value: "7"
-          string weight: 1
         number 6:
           string index: 1
           string name: "word"

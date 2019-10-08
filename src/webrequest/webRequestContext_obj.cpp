@@ -32,9 +32,8 @@ void WebRequestContext::initCallLogger()
 {
 	std::memset( &m_callLogger, 0, sizeof(m_callLogger));
 	m_callLogger.self = m_logger;
-	int mask = m_logger->logMask();
-	if (!!(mask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_callLogger.logMethodCall = &papugaLogMethodCall;
-	if (!!(mask & (int)WebRequestLoggerInterface::LogContentEvents)) m_callLogger.logContentEvent = &papugaLogContentEvent;
+	if (0!=(m_logMask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_callLogger.logMethodCall = &papugaLogMethodCall;
+	if (0!=(m_logMask & (int)WebRequestLoggerInterface::LogContentEvents)) m_callLogger.logContentEvent = &papugaLogContentEvent;
 }
 
 void WebRequestContext::resetRequestObject()
@@ -267,6 +266,10 @@ bool WebRequestContext::initContentType( const WebRequestContent& content)
 
 bool WebRequestContext::executePostTransaction()
 {
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "transaction", "post", m_contextType, m_contextName);
+	}
 	if (m_obj->valuetype != papuga_TypeHostObject)
 	{
 		setAnswer( ErrorCodeLogicError);
@@ -308,6 +311,10 @@ bool WebRequestContext::executePostTransaction()
 
 bool WebRequestContext::executeCommitTransaction()
 {
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "transaction", "commit", m_contextType, m_contextName);
+	}
 	if (m_obj && m_obj->valuetype == papuga_TypeHostObject)
 	{
 		int classid = m_obj->value.hostObject->classid;
@@ -323,10 +330,6 @@ bool WebRequestContext::executeCommitTransaction()
 			{
 				m_transactionRef.reset();
 				return false;
-			}
-			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogAction))
-			{
-				m_logger->logAction( m_contextType, m_contextName, _TXT("commit transaction"));
 			}
 			m_transactionRef.reset();
 			return true;

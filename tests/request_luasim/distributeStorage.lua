@@ -61,6 +61,9 @@ buildStorageServer( 3, ISERVER3)
 function storageAddress( serverurl)
 	return serverurl .. "/storage/test"
 end
+function qryevalAddress( serverurl)
+	return serverurl .. "/qryeval/test"
+end
 function statserverAddress( serverurl)
 	return serverurl .. "/statserver/test"
 end
@@ -134,10 +137,10 @@ distqryevalConfig = {
 		statserver = {
 			statserverAddress(SSERVER1)
 		},
-		storage = {
-			storageAddress(ISERVER1),
-			storageAddress(ISERVER2),
-			storageAddress(ISERVER3)
+		qryeval = {
+			qryevalAddress(ISERVER1),
+			qryevalAddress(ISERVER2),
+			qryevalAddress(ISERVER3)
 		}
 	}
 }
@@ -149,7 +152,7 @@ call_server_checked( "PUT", QSERVER1  .. "/distqryeval/test", distqryevalConfig 
 
 distqryevalObj = {}
 distqryevalObj.statserver = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/statserver")).list.value
-distqryevalObj.storage = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/storage")).list.value
+distqryevalObj.qryeval = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/qryeval")).list.value
 distqryevalDef = to_json( {distqryeval = distqryevalObj} )
 distqryevalVar = call_server_checked( "GET", QSERVER1 .. "/distqryeval/test")
 if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end

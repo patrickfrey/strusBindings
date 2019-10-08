@@ -339,6 +339,11 @@ QueryResult* ContextImpl::mergeQueryResults( const ValueVariant& queryResults, i
 	return new QueryResult( QueryResult::merge( queryResultList, minRank, maxNofResults));
 }
 
+QueryResultMergerImpl* ContextImpl::createQueryResultMerger() const
+{
+	return new QueryResultMergerImpl( m_trace_impl, m_errorhnd_impl);
+}
+
 void ContextImpl::createStorage( const ValueVariant& config_)
 {
 	std::string dbname;

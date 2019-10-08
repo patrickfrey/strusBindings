@@ -122,7 +122,7 @@ bool WebRequestContext::feedContentSchemaRequest( const WebRequestContent& conte
 	}
 	// Log the request:
 	papuga_ErrorCode errcode = papuga_Ok;
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogRequests))
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
 	{
 		int reqstrlen;
 		const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &reqstrlen, &errcode);
@@ -232,6 +232,10 @@ const char* WebRequestContext::getResultString( papuga_RequestResult* result, st
 
 bool WebRequestContext::executeContentSchemaRequest( const SchemaId& schemaid, const WebRequestContent& content)
 {
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "content schema request", schemaid.schemaName, m_contextType, m_contextName);
+	}
 	if (!initContentSchemaAutomaton( schemaid)) return false;
 	if (!initContentSchemaRequest()) return false;
 	if (!feedContentSchemaRequest( content)) return false;

@@ -37,6 +37,8 @@ class QueryEvalImpl;
 class InserterImpl;
 /// \brief Forward declaration
 class StatisticsMapImpl;
+/// \brief Forward declaration
+class QueryResultMergerImpl;
 
 typedef papuga_ValueVariant ValueVariant;
 
@@ -197,6 +199,11 @@ public:
 	/// \return the result (strus::QueryResult)
 	QueryResult* mergeQueryResults( const ValueVariant& queryResults, int minRank, int maxNofRanks) const;
 
+	/// \brief Create an object to merge multiple query results to one
+	/// \note This method and the returned object are intended to be used in the web request handler case where only mappings and no control structures are available. In a scripting language you might more likely be using the method mergeQueryResults.
+	/// \return query result merger interface (class QueryResultMerger)
+	QueryResultMergerImpl* createQueryResultMerger() const;
+	
 	/// \brief Unpack a statistics blob retrieved from a storage
 	/// \param[in] blob binary blob with statistics to decode (created by StorageClient:getAllStatistics or StorageClient:getChangeStatistics)
 	/// \param[in] procname name of statistics processor to use for decoding the message (use default processor, if not defined)

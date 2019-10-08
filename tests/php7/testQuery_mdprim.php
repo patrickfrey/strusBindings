@@ -434,30 +434,20 @@ string QueryResult:
     integer 0: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 384
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 15
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 7
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 3
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -502,30 +492,20 @@ string QueryResult:
     integer 1: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 960
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 15
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 7
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -570,30 +550,20 @@ string QueryResult:
     integer 2: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 30
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 3
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 2
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -613,30 +583,20 @@ string QueryResult:
     integer 3: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 42
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 2
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 7
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -656,30 +616,20 @@ string QueryResult:
     integer 4: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 96
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 15
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 5
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 3
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -714,30 +664,20 @@ string QueryResult:
     integer 5: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 240
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 5
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -772,30 +712,20 @@ string QueryResult:
     integer 6: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 288
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 18
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 6
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 3
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -835,30 +765,20 @@ string QueryResult:
     integer 7: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 60
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -883,30 +803,20 @@ string QueryResult:
     integer 8: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 90
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 9
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -931,30 +841,20 @@ string QueryResult:
     integer 9: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 132
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 11
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -979,30 +879,20 @@ string QueryResult:
     integer 10: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 150
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1027,30 +917,20 @@ string QueryResult:
     integer 11: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 210
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 3
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 7
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1075,30 +955,20 @@ string QueryResult:
     integer 12: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 294
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 15
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 7
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1123,30 +993,20 @@ string QueryResult:
     integer 13: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 330
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 11
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1171,30 +1031,20 @@ string QueryResult:
     integer 14: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 966
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 21
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 3
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 23
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1219,30 +1069,20 @@ string QueryResult:
     integer 15: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 120
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 3
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 4
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1272,30 +1112,20 @@ string QueryResult:
     integer 16: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 168
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 15
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 4
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 7
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1325,30 +1155,20 @@ string QueryResult:
     integer 17: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 180
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 9
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 4
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1378,30 +1198,20 @@ string QueryResult:
     integer 18: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 300
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 3
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 4
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 5
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"
@@ -1431,30 +1241,20 @@ string QueryResult:
     integer 19: 
       string summary: 
         integer 0: 
-          string index: -1
           string name: "docid"
           string value: 420
-          string weight: 1
         integer 1: 
-          string index: -1
           string name: "cross"
           string value: 6
-          string weight: 1
         integer 2: 
-          string index: -1
           string name: "factors"
           string value: 4
-          string weight: 1
         integer 3: 
-          string index: -1
           string name: "lo"
           string value: 2
-          string weight: 1
         integer 4: 
-          string index: -1
           string name: "hi"
           string value: 7
-          string weight: 1
         integer 5: 
           string index: 1
           string name: "word"

@@ -60,6 +60,7 @@ WebRequestContext::WebRequestContext(
 		const char* contextName_)
 	:m_handler(handler_)
 	,m_logger(logger_)
+	,m_logMask(logger_->logMask())
 	,m_configHandler(configHandler_),m_configTransaction()
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(configRequestType(contextType_))
@@ -93,6 +94,7 @@ WebRequestContext::WebRequestContext(
 		const char* path_)
 	:m_handler(handler_)
 	,m_logger(logger_)
+	,m_logMask(logger_->logMask())
 	,m_configHandler(configHandler_),m_configTransaction()
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(UndefinedRequest)
@@ -154,11 +156,12 @@ WebRequestContext::WebRequestContext(
 		const RequestType& requestType_)
 	:m_handler(handler_)
 	,m_logger(logger_)
+	,m_logMask(logger_->logMask())
 	,m_configHandler(configHandler_),m_configTransaction()
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(requestType_)
 	,m_contextType(contextType_),m_contextName(contextName_)
-	,m_context(),m_obj(0),m_request(0),m_method(0),m_path()
+	,m_context(context_),m_obj(0),m_request(0),m_method(0),m_path()
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
@@ -413,9 +416,13 @@ bool WebRequestContext::putDelegateRequestAnswer(
 {
 	try
 	{
+		if (m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogAction) != 0)
+		{
+			m_logger->logAction( m_contextType, m_contextName, "put delegate answer");
+		}
 		if (!m_answer.ok())
 		{
-			if (0!=(m_logger->logMask() & WebRequestLoggerInterface::LogWarning))
+			if (0!=(m_logMask & WebRequestLoggerInterface::LogWarning))
 			{
 				m_logger->logWarning( _TXT( "ignoring delegate request answer because of previous error"));
 			}
@@ -423,7 +430,7 @@ bool WebRequestContext::putDelegateRequestAnswer(
 		}
 		strus::Reference<WebRequestContext> delegateContext( createClone( ObjectRequest));
 		delegateContext->initContentType( content);
-		bool rt = executeContentSchemaRequest( SchemaId( m_contextType, schema), content);
+		bool rt = delegateContext->executeContentSchemaRequest( SchemaId( m_contextType, schema), content);
 		if (rt)
 		{
 			if (delegateContext->hasContentRequestDelegateRequests())
@@ -477,6 +484,10 @@ bool WebRequestContext::complete()
 						rt &= transferContext();
 					}
 					break;
+			}
+			if (rt && m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogAction) != 0)
+			{
+				m_logger->logAction( m_contextType, m_contextName, "request complete");
 			}
 		}
 		else

@@ -50,6 +50,14 @@ public:
 	/// \remark expected to be thread safe
 	virtual void logRequest( const char* content, std::size_t contentsize)=0;
 
+	/// \brief Log the type of a request
+	/// \param[in] title title that classifies the request
+	/// \param[in] procdescr description of the procedure executed by the request
+	/// \param[in] contextType type of the context active in the request
+	/// \param[in] contextName name of the context active in the request
+	/// \remark expected to be thread safe
+	virtual void logRequestType( const char* title, const char* procdescr, const char* contextType, const char* contextName)=0;
+
 	/// \brief Log a delegate http request
 	/// \param[in] address address of the request URL with port and path
 	/// \param[in] method http request method of the request
@@ -66,8 +74,8 @@ public:
 	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr)=0;
 
 	/// \brief Log an action
-	/// \param[in] type type of the configuration
-	/// \param[in] name name of the configuration
+	/// \param[in] type type of the context
+	/// \param[in] name name of the context
 	/// \param[in] action string describing the action on the object
 	/// \remark expected to be thread safe
 	virtual void logAction( const char* type, const char* name, const char* action)=0;

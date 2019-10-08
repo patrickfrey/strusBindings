@@ -103,6 +103,26 @@ public:
 		std::cerr << header() << strus::string_format( "REQUEST %s", reqstr) << std::endl;
 	}
 
+	void logRequestType( const char* title, const char* procdescr, const char* contextType, const char* contextName)
+	{
+		if (contextName)
+		{
+			std::cerr << header() << strus::string_format( "REQTYPE %s %s %s %s", title, procdescr, contextType, contextName) << std::endl;
+		}
+		else if (contextType)
+		{
+			std::cerr << header() << strus::string_format( "REQTYPE %s %s %s", title, procdescr, contextType) << std::endl;
+		}
+		else if (procdescr)
+		{
+			std::cerr << header() << strus::string_format( "REQTYPE %s %s", title, procdescr) << std::endl;
+		}
+		else
+		{
+			std::cerr << header() << strus::string_format( "REQTYPE %s", title) << std::endl;
+		}
+	}
+
 	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize)
 	{
 		if (contentsize == 0)
@@ -138,7 +158,7 @@ public:
 				std::size_t maxsize = isReadableText( content, 64) ? MaxLogReadableItemSize : MaxLogBinaryItemSize;
 				content = reduceContentSize( contentbuf, content, contentsize, maxsize);
 
-				std::cerr << header() << strus::string_format( "PARSE %s %s '%s'", title, item, content) << std::endl;
+				std::cerr << header() << strus::string_format( "PARSE %s %s: %s", title, item, content) << std::endl;
 			}
 			else
 			{
@@ -153,7 +173,7 @@ public:
 				std::size_t maxsize = isReadableText( content, 64) ? MaxLogReadableItemSize : MaxLogBinaryItemSize;
 				content = reduceContentSize( contentbuf, content, contentsize, maxsize);
 
-				std::cerr << header() << strus::string_format( "PARSE %s '%s'", title, content) << std::endl;
+				std::cerr << header() << strus::string_format( "PARSE %s: %s", title, content) << std::endl;
 			}
 			else
 			{

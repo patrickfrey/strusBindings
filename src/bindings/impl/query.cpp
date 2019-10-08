@@ -184,12 +184,12 @@ void QueryImpl::addDocumentEvaluationSet( const ValueVariant& docnolist_)
 	THIS->addDocumentEvaluationSet( docnolist);
 }
 
-void QueryImpl::setMaxNofRanks( unsigned int maxNofRanks_)
+void QueryImpl::setMaxNofRanks( int maxNofRanks_)
 {
 	m_maxNofRanks = maxNofRanks_;
 }
 
-void QueryImpl::setMinRank( unsigned int minRank_)
+void QueryImpl::setMinRank( int minRank_)
 {
 	m_minRank = minRank_;
 }
@@ -275,6 +275,77 @@ Struct QueryImpl::introspection( const ValueVariant& arg) const
 	return rt;
 }
 
+void QueryResultMergerImpl::setMaxNofRanks( int maxNofRanks_)
+{
+	m_maxNofRanks = maxNofRanks_;
+}
 
+void QueryResultMergerImpl::setMinRank( int minRank_)
+{
+	m_minRank = minRank_;
+}
+
+void QueryResultMergerImpl::addQueryResult( const ValueVariant& res)
+{
+	std::vector<QueryResult> partvec( Deserializer::getQueryResultList( res));
+	m_ar.insert( m_ar.end(), partvec.begin(), partvec.end());
+}
+
+QueryResult* QueryResultMergerImpl::evaluate() const
+{
+	return new QueryResult( QueryResult::merge( m_ar, m_minRank, m_maxNofRanks));
+}
+
+static StructView getView( const SummaryElement& res);
+static StructView getView( const ResultDocument& res);
+static StructView getView( const QueryResult& res);
+
+template <class Element>
+static StructView getView( const std::vector<Element>& ar)
+{
+	StructView rt;
+	typename std::vector<Element>::const_iterator ai = ar.begin(), ae = ar.end();
+	for (; ai != ae; ++ai) rt( getView( *ai));
+	return rt;
+}
+
+static StructView getView( const SummaryElement& res)
+{
+	return StructView()("name",res.name())("value",res.value())("weight",res.weight())("index",res.index());
+}
+
+static StructView getView( const ResultDocument& res)
+{
+	return StructView()("docno",res.docno())("weight",res.weight())("summary",getView(res.summaryElements()));
+}
+
+static StructView getView( const QueryResult& res)
+{
+	return StructView()("evalpass",res.evaluationPass())("nofranked",res.nofRanked())("nofvisited",res.nofVisited())("ranks", getView(res.ranks()));
+}
+
+Struct QueryResultMergerImpl::introspection( const ValueVariant& arg) const
+{
+	Struct rt;
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	std::vector<std::string> path;
+	if (papuga_ValueVariant_defined( &arg))
+	{
+		path = Deserializer::getStringList( arg);
+	}
+	StructView view;
+	view
+		( "minrank", m_minRank)
+		( "nofranks", m_maxNofRanks)
+		( "results", getView(m_ar));
+	strus::local_ptr<IntrospectionBase> ictx( new StructViewIntrospection( errorhnd, view));
+	ictx->getPathContent( rt.serialization, path, false/*substructure*/);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to serialize introspection: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
+}
 
 
