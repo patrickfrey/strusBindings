@@ -39,17 +39,49 @@ void WebRequestContext::setAnswer( int errcode, const char* errstr, bool doCopy)
 static const char* getDelegateRequestString( papuga_Allocator* allocator, papuga_RequestResult* result, std::size_t& resultlen, const papuga_Request* request, papuga_ErrorCode& errcode)
 {
 	papuga_ValueVariant resultval;
-	if (papuga_Serialization_empty( &result->serialization))
-	{
-		resultlen = 0;
-		return "";
-	}
-	else
+	if (result->name)
 	{
 		papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
 		const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( request);
 
 		return (const char*)papuga_ValueVariant_tojson( &resultval, allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
+	}
+	else
+	{
+		resultlen = 0;
+		return "";
+	}
+}
+
+const char* WebRequestContext::getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode)
+{
+	if (result->name)
+	{
+		const char* rt = 0;
+		papuga_ValueVariant resultval;
+		papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
+		const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
+	
+		// Map the result:
+		switch (m_result_doctype)
+		{
+			case WebRequestContent::XML:  rt = (const char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::JSON: rt = (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::HTML: rt = (const char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultlen, &errcode); break;
+			case WebRequestContent::TEXT: rt = (const char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::Unknown:
+			{
+				errcode = papuga_NotImplemented;
+				return NULL;
+			}
+			default: break;
+		}
+		return rt;
+	}
+	else
+	{
+		resultlen = 0;
+		return "";
 	}
 }
 
@@ -59,7 +91,7 @@ static const char* getDelegateRequestUrl( papuga_Allocator* allocator, const pap
 	{
 		while (*path == '/') {++path;}
 		std::size_t pathlen = path ? std::strlen( path) : 0;
-		std::size_t urlbuflen = adressval->length * 4 + pathlen + 16;
+		std::size_t urlbuflen = adressval->length * 6 + pathlen + 16;
 		char* urlbuf = (char*)papuga_Allocator_alloc( allocator, urlbuflen, 1/*align*/);
 		if (!urlbuf)
 		{
@@ -136,47 +168,54 @@ bool WebRequestContext::getContentRequestDelegateRequests( std::vector<WebReques
 		const char* resultstr = getDelegateRequestString( &m_allocator, result, resultlen, m_request, errcode);
 		if (resultstr)
 		{
-			const papuga_ValueVariant* addressval = papuga_RequestContext_get_variable( m_context.get(), result->addressvar);
-			if (!addressval)
+			if (result->addressvar)
 			{
-				m_answer.setError_fmt( errorCodeToHttpStatus( ErrorCodeNotFound), ErrorCodeNotFound, _TXT("undefined variable '%s'"), result->addressvar);
-				return false;
-			}
-			if (addressval->valuetype == papuga_TypeSerialization)
-			{
-				papuga_SerializationIter si;
-				papuga_init_SerializationIter( &si, addressval->value.serialization);
-				for (; !papuga_SerializationIter_eof( &si); papuga_SerializationIter_skip( &si))
+				const papuga_ValueVariant* addressval = papuga_RequestContext_get_variable( m_context.get(), result->addressvar);
+				if (!addressval)
 				{
-					if (papuga_SerializationIter_tag( &si) == papuga_TagValue)
+					m_answer.setError_fmt( errorCodeToHttpStatus( ErrorCodeNotFound), ErrorCodeNotFound, _TXT("undefined variable '%s'"), result->addressvar);
+					return false;
+				}
+				if (addressval->valuetype == papuga_TypeSerialization)
+				{
+					papuga_SerializationIter si;
+					papuga_init_SerializationIter( &si, addressval->value.serialization);
+					for (; !papuga_SerializationIter_eof( &si); papuga_SerializationIter_skip( &si))
 					{
-						const papuga_ValueVariant* addressvalelem = papuga_SerializationIter_value(&si);
-						const char* url = getDelegateRequestUrl( &m_allocator, addressvalelem, result->path, &errcode);
-						if (!url)
+						if (papuga_SerializationIter_tag( &si) == papuga_TagValue)
 						{
-							strus::ErrorCode ec = papugaErrorToErrorCode( errcode);
-							m_answer.setError_fmt( errorCodeToHttpStatus(ec), ec, _TXT("error resolving url of delegate request from variable '%s'"), result->addressvar);
+							const papuga_ValueVariant* addressvalelem = papuga_SerializationIter_value(&si);
+							const char* url = getDelegateRequestUrl( &m_allocator, addressvalelem, result->path, &errcode);
+							if (!url)
+							{
+								strus::ErrorCode ec = papugaErrorToErrorCode( errcode);
+								m_answer.setError_fmt( errorCodeToHttpStatus(ec), ec, _TXT("error resolving url of delegate request from variable '%s'"), result->addressvar);
+								return false;
+							}
+							delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
+						}
+						else
+						{
+							m_answer.setError_fmt( errorCodeToHttpStatus( ErrorCodeSyntax), ErrorCodeSyntax, _TXT("list of delegate request service URLs expected for variable '%s'"), result->addressvar);
 							return false;
 						}
-						delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
 					}
-					else
+				}
+				else
+				{
+					const char* url = getDelegateRequestUrl( &m_allocator, addressval, result->path, &errcode);
+					if (!url)
 					{
-						m_answer.setError_fmt( errorCodeToHttpStatus( ErrorCodeSyntax), ErrorCodeSyntax, _TXT("list of delegate request service URLs expected for variable '%s'"), result->addressvar);
+						strus::ErrorCode ec = papugaErrorToErrorCode( errcode);
+						m_answer.setError_fmt( errorCodeToHttpStatus(ec), ec, _TXT("error resolving url of delegate request from variable '%s'"), result->addressvar);
 						return false;
 					}
+					delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
 				}
 			}
 			else
 			{
-				const char* url = getDelegateRequestUrl( &m_allocator, addressval, result->path, &errcode);
-				if (!url)
-				{
-					strus::ErrorCode ec = papugaErrorToErrorCode( errcode);
-					m_answer.setError_fmt( errorCodeToHttpStatus(ec), ec, _TXT("error resolving url of delegate request from variable '%s'"), result->addressvar);
-					return false;
-				}
-				delegateRequests.push_back( WebRequestDelegateRequest( result->requestmethod, url, result->schema, resultstr, resultlen));
+				delegateRequests.push_back( WebRequestDelegateRequest( 0/*requestmethod*/, 0/*url*/, result->schema, resultstr, resultlen));
 			}
 			++m_resultIdx;
 			return true;
@@ -214,7 +253,10 @@ bool WebRequestContext::getContentRequestResult()
 			WebRequestContent resultContent( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultlen);
 			if (m_answer.content().empty())
 			{
-				m_answer.setContent( resultContent);
+				if (!resultContent.empty())
+				{
+					m_answer.setContent( resultContent);
+				}
 			}
 			else
 			{

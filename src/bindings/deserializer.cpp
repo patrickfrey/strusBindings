@@ -839,7 +839,7 @@ TimeStamp Deserializer::getTimeStamp( papuga_SerializationIter& seriter)
 			StructureNameId idx = (StructureNameId)namemap.index( *papuga_SerializationIter_value( &seriter));
 			if (idx >= 0 && defined[idx])
 			{
-				strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
+				throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
 			}
 			defined[idx] = true;
 
@@ -853,7 +853,7 @@ TimeStamp Deserializer::getTimeStamp( papuga_SerializationIter& seriter)
 					counter = Deserializer::getInt( seriter);
 					break;
 				default:
-					strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, "{unixtime,counter}");
+					throw strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, "{unixtime,counter}");
 					break;
 			}
 		}
@@ -927,7 +927,7 @@ StatisticsMessage Deserializer::getStatisticsMessage( papuga_SerializationIter& 
 			StructureNameId idx = (StructureNameId)namemap.index( *papuga_SerializationIter_value( &seriter));
 			if (idx >= 0 && defined[idx])
 			{
-				strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
+				throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
 			}
 			defined[idx] = true;
 
@@ -948,14 +948,14 @@ StatisticsMessage Deserializer::getStatisticsMessage( papuga_SerializationIter& 
 					}
 					else
 					{
-						strus::runtime_error(_TXT("structure or value expected for %s in %s"), "timestamp", context);
+						throw strus::runtime_error(_TXT("structure or value expected for %s in %s"), "timestamp", context);
 					}
 					break;
 				case I_blob:
 					blob = getBlobBase64Decoded( seriter);
 					break;
 				default:
-					strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, "{unixtime,counter}");
+					throw strus::runtime_error(_TXT("unknown definition in %s expected one of %s"), context, "{unixtime,counter}");
 					break;
 			}
 		}
@@ -1029,7 +1029,7 @@ SummaryElement Deserializer::getSummaryElement( papuga_SerializationIter& serite
 			StructureNameId idx = (StructureNameId)namemap.index( *papuga_SerializationIter_value( &seriter));
 			if (idx >= 0 && defined[idx])
 			{
-				strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
+				throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
 			}
 			defined[idx] = true;
 
@@ -1042,8 +1042,8 @@ SummaryElement Deserializer::getSummaryElement( papuga_SerializationIter& serite
 				case I_index: index_=getIndex( seriter); break;
 			}
 		}
-		if (!defined[ I_name]) strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_name), context);
-		if (!defined[ I_value]) strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_value), context);
+		if (!defined[ I_name]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_name), context);
+		if (!defined[ I_value]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_value), context);
 	}
 	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
@@ -1054,7 +1054,7 @@ SummaryElement Deserializer::getSummaryElement( papuga_SerializationIter& serite
 		}
 		else
 		{
-			strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_value), context);
+			throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_value), context);
 		}
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
@@ -1067,7 +1067,7 @@ SummaryElement Deserializer::getSummaryElement( papuga_SerializationIter& serite
 	}
 	else
 	{
-		strus::runtime_error(_TXT("expected non empty structure for %s"), context);
+		throw strus::runtime_error(_TXT("expected non empty structure for %s"), context);
 	}
 	return SummaryElement( name_, value_, weight_, index_);
 }
@@ -1088,7 +1088,7 @@ std::vector<SummaryElement> Deserializer::getSummaryElementList( papuga_Serializ
 			}
 			else
 			{
-				strus::runtime_error(_TXT("expected structures as elements of %s"), context);
+				throw strus::runtime_error(_TXT("expected structures as elements of %s"), context);
 			}
 		}
 	}
@@ -1105,7 +1105,7 @@ std::vector<SummaryElement> Deserializer::getSummaryElementListValue( papuga_Ser
 	std::vector<SummaryElement> rt;
 	if (papuga_SerializationIter_tag( &seriter) != papuga_TagOpen)
 	{
-		strus::runtime_error(_TXT("expected structure for %s"), context);
+		throw strus::runtime_error(_TXT("expected structure for %s"), context);
 	}
 	papuga_SerializationIter_skip( &seriter);
 	rt = getSummaryElementList( seriter);
@@ -1119,8 +1119,8 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 	enum StructureNameId {I_docno=0,I_weight=1,I_summary=2};
 	static const char* context = _TXT("result document");
 
-	Index docno_;
-	double weight_;
+	Index docno_=0;
+	double weight_=0.0;
 	std::vector<SummaryElement> summary_;
 
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
@@ -1132,7 +1132,7 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 			StructureNameId idx = (StructureNameId)namemap.index( *papuga_SerializationIter_value( &seriter));
 			if (idx >= 0 && defined[idx])
 			{
-				strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
+				throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
 			}
 			defined[idx] = true;
 
@@ -1144,8 +1144,8 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 				case I_summary: summary_=getSummaryElementListValue( seriter); break;
 			}
 		}
-		if (!defined[ I_docno]) strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_docno), context);
-		if (!defined[ I_weight]) strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_weight), context);
+		if (!defined[ I_docno]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_docno), context);
+		if (!defined[ I_weight]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_weight), context);
 	}
 	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
@@ -1156,7 +1156,7 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 		}
 		else
 		{
-			strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_weight), context);
+			throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_weight), context);
 		}
 		if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 		{
@@ -1165,7 +1165,7 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 	}
 	else
 	{
-		strus::runtime_error(_TXT("expected non empty structure for %s"), context);
+		throw strus::runtime_error(_TXT("expected non empty structure for %s"), context);
 	}
 	return ResultDocument( docno_, weight_, summary_);
 }
@@ -1186,7 +1186,7 @@ std::vector<ResultDocument> Deserializer::getResultDocumentList( papuga_Serializ
 			}
 			else
 			{
-				strus::runtime_error(_TXT("expected structures as elements of %s"), context);
+				throw strus::runtime_error(_TXT("expected structures as elements of %s"), context);
 			}
 		}
 	}
@@ -1203,7 +1203,7 @@ std::vector<ResultDocument> Deserializer::getResultDocumentListValue( papuga_Ser
 	std::vector<ResultDocument> rt;
 	if (papuga_SerializationIter_tag( &seriter) != papuga_TagOpen)
 	{
-		strus::runtime_error(_TXT("expected structure for %s"), context);
+		throw strus::runtime_error(_TXT("expected structure for %s"), context);
 	}
 	papuga_SerializationIter_skip( &seriter);
 	rt = getResultDocumentList( seriter);
@@ -1231,7 +1231,7 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 			StructureNameId idx = (StructureNameId)namemap.index( *papuga_SerializationIter_value( &seriter));
 			if (idx >= 0 && defined[idx])
 			{
-				strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
+				throw strus::runtime_error(_TXT("duplicate definition of %s in %s"), namemap.name(idx), context);
 			}
 			defined[idx] = true;
 
@@ -1244,8 +1244,8 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 				case I_ranks: ranks_=getResultDocumentListValue( seriter); break;
 			}
 		}
-		if (!defined[ I_nofranked]) strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofranked), context);
-		if (!defined[ I_nofvisited]) strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofvisited), context);
+		if (!defined[ I_nofranked]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofranked), context);
+		if (!defined[ I_nofvisited]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofvisited), context);
 	}
 	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
@@ -1256,7 +1256,7 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 		}
 		else
 		{
-			strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofranked), context);
+			throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofranked), context);
 		}
 		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
@@ -1264,7 +1264,7 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 		}
 		else
 		{
-			strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofvisited), context);
+			throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofvisited), context);
 		}
 		if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 		{
@@ -1273,7 +1273,7 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 	}
 	else
 	{
-		strus::runtime_error(_TXT("expected non empty structure for %s"), context);
+		throw strus::runtime_error(_TXT("expected non empty structure for %s"), context);
 	}
 	return QueryResult( evaluationPass_, nofRanked_, nofVisited_, ranks_);
 }
@@ -1295,16 +1295,16 @@ QueryResult Deserializer::getQueryResult( const papuga_ValueVariant& res)
 
 std::vector<QueryResult> Deserializer::getQueryResultList( papuga_SerializationIter& seriter)
 {
-	static const char* context = _TXT("query result list");
 	std::vector<QueryResult> rt;
 	while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 	{
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue
+		&&  papuga_SerializationIter_value( &seriter)->valuetype == papuga_TypeSerialization)
 		{
 			rt.push_back( getQueryResult( *papuga_SerializationIter_value( &seriter)));
 			papuga_SerializationIter_skip( &seriter);
 		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 		{
 			papuga_SerializationIter_skip( &seriter);
 			rt.push_back( getQueryResult( seriter));
@@ -1312,7 +1312,8 @@ std::vector<QueryResult> Deserializer::getQueryResultList( papuga_SerializationI
 		}
 		else
 		{
-			throw strus::runtime_error(_TXT("expected structure for element of %s"), context);
+			rt.push_back( getQueryResult( seriter));
+			// ... single result returned as list with one element
 		}
 	}
 	return rt;
@@ -1321,15 +1322,15 @@ std::vector<QueryResult> Deserializer::getQueryResultList( papuga_SerializationI
 std::vector<QueryResult> Deserializer::getQueryResultList( const papuga_ValueVariant& res)
 {
 	static const char* context = _TXT("query result list");
-	if (res.valuetype != papuga_TypeSerialization)
-	{
-		throw strus::runtime_error(_TXT("expected structure for %s"), context);
-	}
-	else
+	if (res.valuetype == papuga_TypeSerialization)
 	{
 		papuga_SerializationIter seriter;
 		papuga_init_SerializationIter( &seriter, res.value.serialization);
 		return getQueryResultList( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected structure for %s"), context);
 	}
 }
 

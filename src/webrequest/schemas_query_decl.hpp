@@ -150,7 +150,7 @@ public:
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList defineQueryMerger( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList defineResultMerger( const char* rootexpr)
 	{
 		typedef bindings::method::QueryResultMerger QM;
 		typedef bindings::method::Context C;
@@ -162,11 +162,19 @@ public:
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList mergeResults( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList addQueryResult( const char* rootexpr)
 	{
-		typedef bindings::method::Query Q;
+		typedef bindings::method::QueryResultMerger QM;
 		return { rootexpr, {
-			{"", "ranklist", "merger", Q::evaluate(), {} }
+			{"", "ranklist", "merger", QM::addQueryResult(), {{QueryResult}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList mergeQueryResults( const char* rootexpr)
+	{
+		typedef bindings::method::QueryResultMerger QM;
+		return { rootexpr, {
+			{"", "ranklist", "merger", QM::evaluate(), {} }
 		}};
 	}
 
@@ -203,17 +211,18 @@ public:
 			{"sentence", "analyzed", "_analyzed", '!'},
 			
 			{"restriction", "restriction", true},
-			{"restriction/content", "restriction", MetaDataCondition, '!'},
+			{"restriction/content", "content", MetaDataCondition, '!'},
 			{"restriction", "analyzed", "_analyzed", '!'}
 		});
 	}
 
-	static papuga::RequestAutomaton_NodeList declareRanklist( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList declareQueryResult( const char* rootexpr)
 	{
 		return {rootexpr, {
 			{"evalpass", "()", QueryEvalPass, papuga_TypeInt, "0;1;2"},
 			{"nofranked", "()", QueryNofRanked, papuga_TypeInt, "0;2;12;20"},
 			{"nofvisited", "()", QueryNofVisited, papuga_TypeInt, "312367"},
+			{"ranks/docno", "()", QueryRankDocno, papuga_TypeInt, "1;133;1812473"},
 			{"ranks/weight", "()", QueryRankWeight, papuga_TypeDouble, "0.7875834;1.234235;120.1241"},
 			{"ranks/summary/name", "()", QueryRankSummaryName, papuga_TypeString, "title"},
 			{"ranks/summary/value", "()", QueryRankSummaryValue, papuga_TypeString, "Tonight (David Bowie album)"},
@@ -223,10 +232,10 @@ public:
 				{"name", QueryRankSummaryName},
 				{"value", QueryRankSummaryValue},
 				{"weight", QueryRankSummaryWeight, '?'},
-				{"index", QueryRankSummaryIndex, '?'},
-				{"name", QueryRankSummaryName},
+				{"index", QueryRankSummaryIndex, '?'}
 			}},
 			{"ranks", QueryRank, {
+				{"docno", QueryRankDocno},
 				{"weight", QueryRankWeight},
 				{"summary", QueryRankSummary, '*'},
 			}},

@@ -3,13 +3,11 @@
 	"types": ["entity","title","word"],
 	"nofdocs": 18}
 }
-
 {
 "statserver": {
 	"types": ["entity","title","word"],
 	"nofdocs": 18}
 }
-
 {
 "statistics": {
 	"termstats": [
@@ -28,17 +26,82 @@
 	"globalstats": {
 		"nofdocs": 18}}
 }
-
 {
 "list": {
-	"link": ["storage","statserver"]}
+	"link": ["qryeval","statserver"]}
 }
-
 { 
 "distqryeval": { 
-  "statserver": "http://127.0.0.1:7183/statserver/test",
-  "storage": [ 
-    "http://127.0.0.1:7184/storage/test",
-    "http://127.0.0.1:7185/storage/test",
-    "http://127.0.0.1:7186/storage/test" ] } }
-
+  "qryeval": [ 
+    "http://127.0.0.1:7184/qryeval/test",
+    "http://127.0.0.1:7185/qryeval/test",
+    "http://127.0.0.1:7186/qryeval/test" ],
+  "statserver": "http://127.0.0.1:7183/statserver/test" } }
+{
+"queryresult": {
+	"ranklist": {
+		"evalpass": 0,
+		"nofranked": 10,
+		"nofvisited": 10,
+		"ranks": [
+			{
+				"weight": "1.186104",
+				"summary": [
+					{
+						"name": "title",
+						"value": "Tonight (David Bowie album)"}]},
+			{
+				"weight": "0.968065",
+				"summary": [
+					{
+						"name": "title",
+						"value": "VH1 Storytellers (David Bowie album)"}]},
+			{
+				"weight": "0.908184",
+				"summary": [
+					{
+						"name": "title",
+						"value": "List of songs recorded by David Bowie"}]},
+			{
+				"weight": "0.463462",
+				"summary": [
+					{
+						"name": "title",
+						"value": "Let's Dance (David Bowie album)"}]},
+			{
+				"weight": "0.412458",
+				"summary": [
+					{
+						"name": "title",
+						"value": "David Bowie"}]},
+			{
+				"weight": "0.000016",
+				"summary": [
+					{
+						"name": "title",
+						"value": "Liza Jane (David Bowie song)"}]},
+			{
+				"weight": "0.000010",
+				"summary": [
+					{
+						"name": "title",
+						"value": "List of awards and nominations received by David Bowie"}]},
+			{
+				"weight": "0.000006",
+				"summary": [
+					{
+						"name": "title",
+						"value": "David Bowie (1967 album)"}]},
+			{
+				"weight": "0.000006",
+				"summary": [
+					{
+						"name": "title",
+						"value": "Stage (David Bowie album)"}]},
+			{
+				"weight": "0.000003",
+				"summary": [
+					{
+						"name": "title",
+						"value": "Outside (David Bowie album)"}]}]}}
+}

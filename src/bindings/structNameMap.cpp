@@ -42,7 +42,7 @@ int StructureNameMap::index( const char* id) const
 
 const char* StructureNameMap::name( int idx) const
 {
-	if (idx < 0 || (int)m_names.size() >= idx) return NULL;
+	if (idx < 0 || (int)m_names.size() <= idx) return NULL;
 	return m_names[ idx].c_str();
 }
 

@@ -206,30 +206,6 @@ bool WebRequestContext::executeContentSchema( const WebRequestContent& content)
 	return true;
 }
 
-const char* WebRequestContext::getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode)
-{
-	const char* rt = 0;
-	papuga_ValueVariant resultval;
-	papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
-	const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
-
-	// Map the result:
-	switch (m_result_doctype)
-	{
-		case WebRequestContent::XML:  rt = (const char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: rt = (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: rt = (const char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultlen, &errcode); break;
-		case WebRequestContent::TEXT: rt = (const char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
-		case WebRequestContent::Unknown:
-		{
-			errcode = papuga_NotImplemented;
-			return NULL;
-		}
-		default: break;
-	}
-	return rt;
-}
-
 bool WebRequestContext::executeContentSchemaRequest( const SchemaId& schemaid, const WebRequestContent& content)
 {
 	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))

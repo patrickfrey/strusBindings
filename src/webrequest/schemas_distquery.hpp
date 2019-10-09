@@ -63,7 +63,8 @@ public:
 				{SchemaQueryDeclPart::resultQuery( "/query")},
 				{{"/query","mergeres", "y", '#'}}
 			}},
-			{"queryresult", {"_ranklist"}, {}}
+			{"query", "END~ranklist", {}},
+			{"queryresult", {"ranklist"}, {}}
 		},
 		{
 			{"qryanalyzer","/query/include/analyzer()",false/*not required*/},
@@ -80,6 +81,8 @@ public:
 
 			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
 			{SchemaQueryDeclPart::analyzeQuery( "/query")},
+
+			{SchemaQueryDeclPart::defineResultMerger( "/query")}
 		}
 	) {}
 };
@@ -108,8 +111,22 @@ public:
 		{},
 		{},
 		{
-			{SchemaQueryDeclPart::declareRanklist( "/queryresult/ranklist")},
-			{"/queryresult", "_ranklist", "context", C::mergeQueryResults(), {{QueryResult},{"_minrank"},{"_nofranks"}}}
+			{SchemaQueryDeclPart::declareQueryResult( "/queryresult/ranklist")},
+			{SchemaQueryDeclPart::addQueryResult( "/queryresult/ranklist")},
+		}
+	) {}
+};
+
+class Schema_DistQueryEval_END_ranklist :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	typedef bindings::method::Context C;
+	Schema_DistQueryEval_END_ranklist() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		{},
+		{},
+		{
+			{SchemaQueryDeclPart::mergeQueryResults( "/query")}
 		}
 	) {}
 };

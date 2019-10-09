@@ -21,9 +21,18 @@
 
 using namespace strus;
 
+void ConfigurationUpdateRequestContext::logErrorFmt( const char* fmt, ...)
+{
+	char buf[ 4096];
+	va_list ap;
+	va_start( ap, fmt);
+	if ((int)sizeof(buf) <= std::vsnprintf( buf, sizeof(buf), fmt, ap)) {buf[ sizeof(buf)-1] = 0;}
+	m_logger->logError( buf);
+	va_end(ap);
+}
+
 void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& status)
 {
-	char errbuf[ 4096];
 	try
 	{
 		if (status.httpstatus() < 200 || status.httpstatus() >= 300)
@@ -32,14 +41,12 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 			{
 				if (status.errorstr())
 				{
-					std::snprintf( errbuf, sizeof(errbuf), _TXT("error in delegate request (http status %d): %s"), status.httpstatus(), status.errorstr());
-					errbuf[ sizeof(errbuf)-1] = 0;
+					logErrorFmt( _TXT("error in delegate request (http status %d): %s"), status.httpstatus(), status.errorstr());
 				}
 				else
 				{
-					std::snprintf( errbuf, sizeof(errbuf), _TXT("error in delegate request (http status %d)"), status.httpstatus());
+					logErrorFmt( _TXT("error in delegate request (http status %d)"), status.httpstatus());
 				}
-				m_logger->logError( errbuf);
 			}
 		}
 		else if (!status.content().empty())
@@ -50,9 +57,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 				{
 					WebRequestAnswer ctxstatus = m_context->getAnswer();
 					const char* msg = ctxstatus.errorstr() ? ctxstatus.errorstr() : strus::errorCodeToString( ctxstatus.apperror());
-					std::snprintf( errbuf, sizeof(errbuf), _TXT("error processing delegate request answer with schema '%s': %s"), m_schema, msg);
-					errbuf[ sizeof(errbuf)-1] = 0;
-					m_logger->logError( errbuf);
+					logErrorFmt( _TXT("error processing delegate request answer with schema '%s': %s"), m_schema, msg);
 				}
 			}
 		}
@@ -61,18 +66,14 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 	{
 		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
 		{
-			std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), _TXT("memory allocation error"));
-			errbuf[ sizeof(errbuf)-1] = 0;
-			m_logger->logError( errbuf);
+			logErrorFmt( _TXT("error returning delegate request answer: %s"), _TXT("memory allocation error"));
 		}
 	}
 	catch (const std::runtime_error& err)
 	{
 		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
 		{
-			std::snprintf( errbuf, sizeof(errbuf), _TXT("error returning delegate request answer: %s"), err.what());
-			errbuf[ sizeof(errbuf)-1] = 0;
-			m_logger->logError( errbuf);
+			logErrorFmt( _TXT("error returning delegate request answer: %s"), err.what());
 		}
 	}
 	m_counter->decrement( 1);

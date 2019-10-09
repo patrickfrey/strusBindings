@@ -25,7 +25,7 @@ end
 -- Function to make result of query evaluation comparable between different platforms
 function det_qeval_result( content)
 	if content then
-		return reformat_regex( reformat_float( content, 7), "[\\n][ \\t]*[\"]docno[\"][:][ ]*[0-9]+[,][ \\t]*")
+		return reformat_regex( reformat_float( content, 6), "[\\n][ \\t]*[\"]docno[\"][:][ ]*[0-9]+[,][ \\t]*")
 	else
 		return nil
 	end

@@ -153,7 +153,7 @@ call_server_checked( "PUT", QSERVER1  .. "/distqryeval/test", distqryevalConfig 
 distqryevalObj = {}
 distqryevalObj.statserver = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/statserver")).list.value
 distqryevalObj.qryeval = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/qryeval")).list.value
-distqryevalDef = to_json( {distqryeval = distqryevalObj} )
+distqryevalDef = to_json( {distqryeval = distqryevalObj} ) .. "\n"
 distqryevalVar = call_server_checked( "GET", QSERVER1 .. "/distqryeval/test")
 if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end
 if verbose then io.stderr:write( string.format("- Distributed query evaluation server configuration from server:\n%s\n", distqryevalDef)) end
@@ -194,13 +194,9 @@ query2 = {
 }
 
 qryres1 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query))
-if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres1)) end
+if verbose then io.stderr:write( string.format("- Distributed query evaluation result:\n%s\n", qryres1)) end
 -- qryres2 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query2))
--- if verbose then io.stderr:write( string.format("- Query evaluation result with analysis passed:\n%s\n", qryres2)) end
+-- if verbose then io.stderr:write( string.format("- Distributed query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-if verbose then io.stderr:write( string.format("- Distributed query evaluation:\n%s\n", qryres1)) end
--- if verbose then io.stderr:write( string.format("- Distributed query evaluation with analysis passed:\n%s\n", qryres2)) end
-
-
-checkExpected( statserverDef .. statserverDef_configured .. statserverStats .. distqryevalVar .. distqryevalDef, "@distributeStorage.exp", "distributeStorage.res" )
+checkExpected( statserverDef .. statserverDef_configured .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1, "@distributeStorage.exp", "distributeStorage.res" )
 

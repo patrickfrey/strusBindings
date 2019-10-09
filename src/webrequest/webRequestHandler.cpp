@@ -261,6 +261,8 @@ WebRequestHandler::WebRequestHandler(
 		schema_DistQueryEval_SET_querystats.addToHandler( m_impl, "SET~querystats");
 		static const DefineSchema<Schema_DistQueryEval_SET_ranklist> schema_DistQueryEval_SET_ranklist("distqryeval");
 		schema_DistQueryEval_SET_ranklist.addToHandler( m_impl, "SET~ranklist");
+		static const DefineSchema<Schema_DistQueryEval_END_ranklist> schema_DistQueryEval_END_ranklist("distqryeval");
+		schema_DistQueryEval_END_ranklist.addToHandler( m_impl, "END~ranklist");
 
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");
@@ -586,9 +588,23 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 		{
 			try
 			{
-				ConfigurationUpdateRequestContext* update = new ConfigurationUpdateRequestContext( this, m_logger, ctx, di->receiverSchema(), &count);
-				std::string contentstr( di->contentstr(), di->contentlen());
-				m_eventLoop->send( di->url(), di->method(), contentstr, update);
+				std::string delegate_contentstr( di->contentstr(), di->contentlen());
+				if (di->url())
+				{
+					ConfigurationUpdateRequestContext* update = new ConfigurationUpdateRequestContext( this, m_logger, ctx, di->receiverSchema(), &count);
+					m_eventLoop->send( di->url(), di->method(), delegate_contentstr, update);
+				}
+				else
+				{
+					// ... without receiver feed to itself with the receiver schema:
+					WebRequestContent delegate_content( g_config_charset, g_config_doctype, delegate_contentstr.c_str(), delegate_contentstr.size());
+					if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegate_content))
+					{
+						count.decrement( delegates.size() - didx);
+						rt = false;
+						break;
+					}
+				}
 			}
 			catch (const std::bad_alloc&)
 			{

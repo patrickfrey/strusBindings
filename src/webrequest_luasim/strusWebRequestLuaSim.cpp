@@ -713,38 +713,48 @@ bool EventLoop::send( const std::string& address,
 	}
 }
 
-static void forwardDelegateRequests( strus::WebRequestHandlerInterface* handler, strus::Reference<strus::WebRequestContextInterface> ctx, const std::vector<strus::WebRequestDelegateRequest>& delegateRequests, strus::WebRequestAnswer& answer)
+static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler, strus::Reference<strus::WebRequestContextInterface> ctx, const std::vector<strus::WebRequestDelegateRequest>& delegateRequests, strus::WebRequestAnswer& answer)
 {
-	std::vector<strus::Reference<strus::WebRequestDelegateContextInterface> > receivers;
 	std::vector<strus::WebRequestDelegateRequest>::const_iterator di = delegateRequests.begin(), de = delegateRequests.end();
-	for (; di != de; ++di)
-	{
-		strus::Reference<strus::WebRequestDelegateContextInterface> receiver(
-			new WebRequestDelegateContext( &answer, ctx, di->url(), di->receiverSchema()));
-		receivers.push_back( receiver);
-	}
-
 	std::size_t didx = 0;
-	for (; didx != delegateRequests.size(); ++didx)
+	for (; di != de; ++di,++didx)
 	{
-		const strus::WebRequestDelegateRequest& request = delegateRequests[didx];
-		strus::Reference<strus::WebRequestDelegateContextInterface>& receiver = receivers[ didx];
-
 		try
 		{
-			std::string delegateContent( request.contentstr(), request.contentlen());
-			if (!handler->delegateRequest( request.url(), request.method(), delegateContent, receiver.release()))
+			std::string delegateContentStr( di->contentstr(), di->contentlen());
+			if (di->url())
 			{
-				g_globalContext.reportError( _TXT("delegate request failed, out of memory"));
+				strus::WebRequestDelegateContextInterface* receiver
+					= new WebRequestDelegateContext( &answer, ctx, di->url(), di->receiverSchema());
+				if (!handler->delegateRequest( di->url(), di->method(), delegateContentStr, receiver))
+				{
+					answer.setError_fmt( 500, strus::ErrorCodeOutOfMem, _TXT("delegate request failed: %s"), strus::errorCodeToString( strus::ErrorCodeOutOfMem));
+					g_globalContext.reportError( answer.errorstr());
+					return false;
+				}
+			}
+			else
+			{
+				// ... without receiver feed to itself with the receiver schema:
+				strus::WebRequestContent delegateContent( g_charset, g_doctype, delegateContentStr.c_str(), delegateContentStr.size());
+				if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegateContent))
+				{
+					answer = ctx->getAnswer();
+					answer.explain( _TXT("delegate request failed"));
+					g_globalContext.reportError( answer.errorstr());
+					return false;
+				}
 			}
 		}
 		catch (const std::bad_alloc&)
 		{
-			g_globalContext.reportError( _TXT("delegate request failed, out of memory"));
 			answer.setError( 500, strus::ErrorCodeOutOfMem);
-			receiver->putAnswer( answer);
+			answer.explain( _TXT("delegate request failed"));
+			g_globalContext.reportError( answer.errorstr());
+			return false;
 		}
 	}
+	return true;
 }
 
 void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status)
@@ -810,20 +820,17 @@ strus::WebRequestAnswer Processor::call( const std::string& method, const std::s
 	if (!ctx->execute( content))
 	{
 		rt = ctx->getAnswer();
+		if (!rt.ok()) return rt;
 	}
 	else
 	{
 		std::vector<strus::WebRequestDelegateRequest> delegateRequests = ctx->getDelegateRequests();
 		for (;!delegateRequests.empty(); delegateRequests = ctx->getDelegateRequests())
 		{
-			forwardDelegateRequests( m_handler.get(), ctx, delegateRequests, rt);
-			if (!rt.ok()) break;
+			if (!forwardDelegateRequests( m_handler.get(), ctx, delegateRequests, rt)) return rt;
 		}
 	}
-	if (rt.ok())
-	{
-		(void)ctx->complete();
-	}
+	(void)ctx->complete();
 	rt = ctx->getAnswer();
 
 	if (!rt.content().empty())

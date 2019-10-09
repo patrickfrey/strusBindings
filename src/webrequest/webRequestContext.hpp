@@ -148,12 +148,12 @@ private:
 		bool feedContentSchemaRequest( const WebRequestContent& content);
 		bool inheritContentSchemaRequestContext();
 		bool executeContentSchema( const WebRequestContent& content);
-	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
 
 	// Implemented in webRequestContext_error:
 	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
 
 	// Implemented in webRequestContext_result:
+	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
 	bool getContentRequestResult();
 	bool getContentRequestDelegateRequests( std::vector<WebRequestDelegateRequest>& delegateRequests);
 	bool hasContentRequestDelegateRequests() const;

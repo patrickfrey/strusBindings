@@ -164,6 +164,7 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{QueryNofRanked, "query number of ranked"},
 		{QueryNofVisited, "query number of visited"},
 		{QueryRank, "query rank"},
+		{QueryRankDocno, "query rank internal document number"},
 		{QueryRankWeight, "query rank weight"},
 		{QueryRankSummary, "query rank summary"},
 		{QueryRankSummaryName, "query rank summary name"},

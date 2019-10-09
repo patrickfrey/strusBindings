@@ -46,6 +46,13 @@ public:
 	virtual void putAnswer( const WebRequestAnswer& status);
 
 private:
+	void logErrorFmt( const char* fmt, ...)
+#ifdef __GNUC__
+	__attribute__ ((format (printf, 2, 3)))
+#endif
+	;
+
+private:
 	WebRequestHandlerInterface* m_handler;
 	WebRequestLoggerInterface* m_logger;
 	WebRequestContextInterface* m_context;
