@@ -26,27 +26,38 @@ public:
 	{
 		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
+			{"", "()", TermExpression, papuga_TypeVoid, NULL},
+			{"", TermExpression, {
+					{"term", NodeTerm, '?'},
+					{"expression", NodeExpression, '?'}
+				}
+			},
 			{"//term/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
 			{"//term/type", "()", TermType, papuga_TypeString, "word"},
 			{"//term/value", "()", TermValue, papuga_TypeString, "city"},
-			{"//term", TermExpression, {
+			{"//term/len", "()", TermLen, papuga_TypeInt, "1;2;3"},
+			{"//term", NodeTerm, {
 					{"variable", ExpressionVariableName, '?'},
-					{"len", TermLen, '?'},
 					{"type", TermType, '!'},
-					{"value", TermValue, '!'}
+					{"value", TermValue, '!'},
+					{"len", TermLen, '?'}
 				}
 			},
 			{"//expression/variable", "()", ExpressionVariableName, papuga_TypeString, "location"},
 			{"//expression/op", "()", JoinOperatorName, papuga_TypeString, "within_struct"},
 			{"//expression/range", "()", JoinOperatorRange, papuga_TypeInt, "12"},
 			{"//expression/cardinality", "()", JoinOperatorCardinality, papuga_TypeInt, "3"},
-			{"//expression/arg", "()", TermExpression, papuga_TypeVoid, NULL},
-			{"//expression", TermExpression, {
+			{"//expression/arg", ExpressionArg, {
+					{"term", NodeTerm, '?'},
+					{"expression", NodeExpression, '?'}
+				}
+			},
+			{"//expression", NodeExpression, {
 					{"variable", ExpressionVariableName, '?'},
 					{"op", JoinOperatorName, '!'},
 					{"range", JoinOperatorRange, '?'},
 					{"cardinality", JoinOperatorCardinality, '?'},
-					{"arg", TermExpression, '*', 2/*tag diff*/}
+					{"arg", ExpressionArg, '*'}
 				}
 			}
 		});

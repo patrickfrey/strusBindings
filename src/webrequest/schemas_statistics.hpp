@@ -93,7 +93,6 @@ public:
 		}}},
 		{},
 		{
-			{"/query/feature/analyzed", "()", TermExpression, papuga_TypeVoid, NULL},
 			{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed")},
 			{SchemaStatisticsPart::evaluateTermStatistics( "/query/feature/analyzed")},
 			{SchemaStatisticsPart::evaluateGlobalStatistics( "/query")}

@@ -164,14 +164,13 @@ public:
 			{"postmatcher/name", "()", PatternTypeName, papuga_TypeString, "bibref"},
 			{"postmatcher/module", "()", PatternMatcherModule, papuga_TypeString, "analyzer_pattern"},
 			{"postmatcher/lexem", "()", PatternMatcherLexemTypes, papuga_TypeString, "lexem"},
-			{SchemaExpressionPart::declareTermExpression( "postmatcher/pattern")},
+			{SchemaExpressionPart::declareTermExpression( "postmatcher/pattern/analyzed")},
 			{"postmatcher/pattern/name", "()", PatternRuleName, papuga_TypeString, "bibref"},
 			{"postmatcher/pattern/visible", "()", PatternRuleVisible, papuga_TypeBool, "true"},
-			{"postmatcher/pattern/content", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"postmatcher/pattern", PatternMatcherPatternDef, {
 					{"name", PatternRuleName, '!'},
 					{"visible", PatternRuleVisible, '?'},
-					{"expression", TermExpression, '!'}
+					{"analyzed", TermExpression, '?'}
 				}
 			},
 			{"postmatcher", 0, "docanalyzer", A::defineTokenPatternMatcher(), {

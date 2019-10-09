@@ -80,7 +80,7 @@ public:
 
 		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, 
 
-		TermExpression, ExpressionVariableName, TermType, TermValue, TermLen,
+		TermExpression, NodeTerm, NodeExpression, ExpressionArg, ExpressionVariableName, TermType, TermValue, TermLen,
 		MetaDataCondition, MetaDataUnionCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue,
 		MetaDataRangeFrom, MetaDataRangeTo, 
 

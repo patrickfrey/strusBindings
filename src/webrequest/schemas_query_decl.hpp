@@ -31,7 +31,6 @@ public:
 			{SchemaExpressionPart::declareTermExpression( contenttag)},
 			{"set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
-			{contenttag, "()", TermExpression, papuga_TypeVoid, NULL},
 			{"", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
@@ -113,15 +112,12 @@ public:
 			{SchemaExpressionPart::declareTermExpression( "sentence/analyzed")},
 			{SchemaExpressionPart::declareMetaDataExpression( "restriction/analyzed")},
 
-			{"feature/analyzed", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"feature", "analyzed", "_analyzed", TermExpression, '*'},
 			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
 
-			{"sentence/analyzed", "()", TermExpression, papuga_TypeVoid, NULL},
 			{"sentence", "analyzed", "_analyzed", TermExpression, '*'},
 			{"sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}},
 
-			{"restriction/analyzed", "()", MetaDataCondition, papuga_TypeVoid, NULL},
 			{"restriction", "analyzed", "_analyzed", MetaDataCondition, '*'},
 			{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!'}} }
 		}};

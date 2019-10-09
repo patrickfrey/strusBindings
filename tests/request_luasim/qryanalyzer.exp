@@ -26,8 +26,9 @@
 		{
 			"content": [
 				{
-					"type": "text",
-					"value": "Iggy Pop"}],
+					"term": {
+						"type": "text",
+						"value": "Iggy Pop"}}],
 			"set": "search",
 			"analyzed": [
 				{
@@ -49,8 +50,9 @@
 		{
 			"content": [
 				{
-					"type": "text",
-					"value": "Iggy Pop"}],
+					"term": {
+						"type": "text",
+						"value": "Iggy Pop"}}],
 			"set": "search",
 			"analyzed": [
 				{

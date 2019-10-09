@@ -57,7 +57,7 @@ public:
 		{
 			{"query", "SET~querystats", "GET", "statserver", "", {
 				{"/query/feature", "feature", true},
-				{"/query/{feature,sentence}/content", "analyzed", "_analyzed", '*'}
+				{"/query/{feature,sentence}", "analyzed", "_analyzed", '*'}
 			}},
 			{"query", "SET~ranklist", "GET", "qryeval", "", {"_termstats","_globalstats"}, {
 				{SchemaQueryDeclPart::resultQuery( "/query")},
