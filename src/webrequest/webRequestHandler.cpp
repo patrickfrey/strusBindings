@@ -98,7 +98,7 @@ struct IntrospectionMethodDescription
 	:public MethodDescription
 {
 	IntrospectionMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
-		:MethodDescription( "GET", id, 200, NULL, rootelem, "value", false/*has content*/, 1, WebRequestHandler::ParamPathArray){}
+		:MethodDescription( "GET", id, 200, NULL, rootelem, 0/*no list*/, false/*has content*/, 1, WebRequestHandler::ParamPathArray){}
 };
 struct TransformationMethodDescription
 	:public MethodDescription
@@ -110,19 +110,19 @@ struct InsertMethodDescription
 	:public MethodDescription
 {
 	InsertMethodDescription( const papuga_RequestMethodId& id)
-		:MethodDescription( "PUT", id, 204/*no content*/, NULL, "insert", "value", true/*has content*/, 2, WebRequestHandler::ParamPathString, WebRequestHandler::ParamContent){}
+		:MethodDescription( "PUT", id, 204/*no content*/, NULL, "insert", 0/*no list*/, true/*has content*/, 2, WebRequestHandler::ParamPathString, WebRequestHandler::ParamContent){}
 };
 struct CommitTransactionMethodDescription
 	:public MethodDescription
 {
 	CommitTransactionMethodDescription( const papuga_RequestMethodId& id)
-		:MethodDescription( "PUT/transaction", id, 204/*no content*/, NULL, "commit", "value", false/*has content*/, 0){}
+		:MethodDescription( "PUT/transaction", id, 204/*no content*/, NULL, "commit", 0/*no list*/, false/*has content*/, 0){}
 };
 struct PostTransactionMethodDescription
 	:public MethodDescription
 {
 	PostTransactionMethodDescription( const papuga_RequestMethodId& id, const char* rootelem)
-		:MethodDescription( "POST/transaction", id, 200, NULL, rootelem, "id", false/*has content*/, 0){}
+		:MethodDescription( "POST/transaction", id, 200, NULL, rootelem, 0/*no list*/, false/*has content*/, 0){}
 };
 
 template <class SCHEMA>
