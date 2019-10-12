@@ -271,6 +271,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 		{
 			if (isEqual( m_method, "GET"))
 			{
+				bool beautified = m_handler->beautifiedOutput();
 				// [2] Top level introspection without context defined:
 				if (m_contextType)
 				{
@@ -282,14 +283,14 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					}
 					else
 					{
-						return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextlist);
+						return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, contextlist);
 					}
 				}
 				else
 				{
 					std::vector<std::string> contextTypes = m_configHandler->contextTypes();
 					contextTypes.push_back( ROOT_CONTEXT_NAME);
-					return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, contextTypes);
+					return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, contextTypes);
 				}
 			}
 			else
@@ -325,7 +326,8 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 		else if (isEqual( m_method,"GET"))
 		{
 			// [3.C] Map the addressed structure that is not a host object:
-			return mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, "value", m_result_encoding, m_result_doctype, *m_obj);
+			bool beautified = m_handler->beautifiedOutput();
+			return mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, "value", m_result_encoding, m_result_doctype, beautified, *m_obj);
 		}
 	}
 	if (m_context.get())

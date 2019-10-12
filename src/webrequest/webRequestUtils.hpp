@@ -86,15 +86,18 @@ WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype)
 // \param[in] elemname optional name of the elements if needed for arrays (XML,HTML)
 // \param[in] encoding encoding of the result
 // \param[in] doctype content type of the result
+// \param[in] beautified true, if output is made human readable, false if output is made compact
 // \param[in] input input to map
 bool mapStringToAnswer(
 		WebRequestAnswer& answer,
 		papuga_Allocator* allocator,
 		const char* html_head,
 		const char* html_href_base,
-		const char* name,
+		const char* rootname,
+		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const std::string& input);
 
 // \brief Map a string vector as content to an answer
@@ -106,6 +109,7 @@ bool mapStringToAnswer(
 // \param[in] elemname optional name of the elements if needed for arrays (XML,HTML)
 // \param[in] encoding encoding of the result
 // \param[in] doctype content type of the result
+// \param[in] beautified true, if output is made human readable, false if output is made compact
 // \param[in] input input to map
 bool mapStringArrayToAnswer(
 		WebRequestAnswer& answer,
@@ -116,6 +120,7 @@ bool mapStringArrayToAnswer(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const std::vector<std::string>& input);
 
 // \brief Map a NULL terminated C string array as content to an answer
@@ -127,6 +132,7 @@ bool mapStringArrayToAnswer(
 // \param[in] elemname optional name of the elements if needed for arrays (XML,HTML)
 // \param[in] encoding encoding of the result
 // \param[in] doctype content type of the result
+// \param[in] beautified true, if output is made human readable, false if output is made compact
 // \param[in] input input to map
 bool mapStringArrayToAnswer(
 		WebRequestAnswer& answer,
@@ -137,6 +143,7 @@ bool mapStringArrayToAnswer(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const char** input);
 
 // \brief Map a string to string map as content to an answer
@@ -147,6 +154,7 @@ bool mapStringArrayToAnswer(
 // \param[in] rootname name of the document root element
 // \param[in] encoding encoding of the result
 // \param[in] doctype content type of the result
+// \param[in] beautified true, if output is made human readable, false if output is made compact
 // \param[in] input input to map
 bool mapStringMapToAnswer(
 		WebRequestAnswer& answer,
@@ -156,6 +164,7 @@ bool mapStringMapToAnswer(
 		const char* rootname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const std::map<std::string,std::string>& input);
 
 // \brief Map a value variant to an answer
@@ -167,6 +176,7 @@ bool mapStringMapToAnswer(
 // \param[in] elemname optional name of the elements if needed for arrays (XML,HTML)
 // \param[in] encoding character set encoding of the result
 // \param[in] doctype content type of the result
+// \param[in] beautified true, if output is made human readable, false if output is made compact
 // \param[in] input input to map
 bool mapValueVariantToAnswer(
 		WebRequestAnswer& answer,
@@ -177,6 +187,7 @@ bool mapValueVariantToAnswer(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const papuga_ValueVariant& input);
 
 }//namespace

@@ -30,7 +30,7 @@ call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
 
 if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval\n")) end
 
-TRANSACTION = from_json( call_server_checked( "POST", ISERVER1 .. "/inserter/test/transaction" )).link
+TRANSACTION = from_json( call_server_checked( "POST", ISERVER1 .. "/inserter/test/transaction" )).transaction.link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
 
 documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")

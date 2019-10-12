@@ -36,7 +36,7 @@ function buildStorageServer( serveridx, serveraddr)
 
 	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %d\n", serveridx)) end
 
-	TRANSACTION = from_json( call_server_checked( "POST", serveraddr .. "/inserter/test/transaction" )).link
+	TRANSACTION = from_json( call_server_checked( "POST", serveraddr .. "/inserter/test/transaction" )).transaction.link
 	if verbose then io.stderr:write( string.format("- Create transaction %s for server %d\n", TRANSACTION, serveridx)) end
 	local cntdoc = 0
 

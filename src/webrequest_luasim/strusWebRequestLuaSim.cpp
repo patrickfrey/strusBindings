@@ -794,7 +794,8 @@ strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Con
 	strus::WebRequestHandlerInterface* rt =
 		strus::createWebRequestHandler(
 			&g_eventLoop, &g_logger, ""/*html head*/,
-			configdir, servicename, transaction_max_idle_time, transaction_nof_per_sec,
+			configdir, servicename, true/*beautifiedOutput*/,
+			transaction_max_idle_time, transaction_nof_per_sec,
 			g_errorhnd);
 	if (!rt) throw strus::runtime_error( _TXT("error creating request handler: %s"), g_errorhnd->fetchError());
 	strus::WebRequestAnswer answer;

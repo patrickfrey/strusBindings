@@ -172,6 +172,7 @@ WebRequestHandler::WebRequestHandler(
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
 		const std::string& service_name_,
+		bool beautifiedOutput_,
 		int maxIdleTime_,
 		int nofTransactionsPerSeconds)
 	:m_debug_maxdepth(logger_?logger_->structDepth():0)
@@ -181,6 +182,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_html_head(html_head_)
 	,m_transactionPool( eventLoop_->time(), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_maxIdleTime(maxIdleTime_)
+	,m_beautifiedOutput(beautifiedOutput_)
 	,m_eventLoop( eventLoop_)
 {
 	m_impl = papuga_create_RequestHandler( strus_getBindingsClassDefs());
@@ -552,7 +554,7 @@ WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
 			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), accepted_doctype);
 			return rt;
 		}
-		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, name.c_str(), result_encoding, result_doctype, message);
+		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, SYSTEM_MESSAGE_HEADER, name.c_str(), result_encoding, result_doctype, m_beautifiedOutput, message);
 	}
 	catch (const std::bad_alloc&)
 	{

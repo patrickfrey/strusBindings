@@ -267,7 +267,8 @@ bool WebRequestContext::callHostObjMethodToAnswer( void* self, const papuga_Requ
 		}
 		else
 		{
-			if (!mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, retval.valuear[0]))
+			bool beautified = m_handler->beautifiedOutput();
+			if (!mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), methoddescr->result_rootelem, methoddescr->result_listelem, m_result_encoding, m_result_doctype, beautified, retval.valuear[0]))
 			{
 				return false;
 			}

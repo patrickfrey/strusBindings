@@ -44,7 +44,7 @@ static const char* getDelegateRequestString( papuga_Allocator* allocator, papuga
 		papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
 		const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( request);
 
-		return (const char*)papuga_ValueVariant_tojson( &resultval, allocator, structdefs, papuga_UTF8, result->name, NULL/*no array possible*/, &resultlen, &errcode);
+		return (const char*)papuga_ValueVariant_tojson( &resultval, allocator, structdefs, papuga_UTF8, false/*not beautified*/, result->name, NULL/*no array possible*/, &resultlen, &errcode);
 	}
 	else
 	{
@@ -61,14 +61,15 @@ const char* WebRequestContext::getResultString( papuga_RequestResult* result, st
 		papuga_ValueVariant resultval;
 		papuga_init_ValueVariant_serialization( &resultval, &result->serialization);
 		const papuga_StructInterfaceDescription* structdefs = papuga_Request_struct_descriptions( m_request);
+		bool beautified = m_handler->beautifiedOutput();
 	
 		// Map the result:
 		switch (m_result_doctype)
 		{
-			case WebRequestContent::XML:  rt = (const char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
-			case WebRequestContent::JSON: rt = (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
-			case WebRequestContent::HTML: rt = (const char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultlen, &errcode); break;
-			case WebRequestContent::TEXT: rt = (const char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::XML:  rt = (const char*)papuga_ValueVariant_toxml( &resultval, &m_allocator, structdefs, m_result_encoding, beautified, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::JSON: rt = (const char*)papuga_ValueVariant_tojson( &resultval, &m_allocator, structdefs, m_result_encoding, beautified, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
+			case WebRequestContent::HTML: rt = (const char*)papuga_ValueVariant_tohtml5( &resultval, &m_allocator, structdefs, m_result_encoding, beautified, result->name, NULL/*no array possible*/, m_handler->html_head(), m_html_base_href.c_str(), &resultlen, &errcode); break;
+			case WebRequestContent::TEXT: rt = (const char*)papuga_ValueVariant_totext( &resultval, &m_allocator, structdefs, m_result_encoding, beautified, result->name, NULL/*no array possible*/, &resultlen, &errcode); break;
 			case WebRequestContent::Unknown:
 			{
 				errcode = papuga_NotImplemented;

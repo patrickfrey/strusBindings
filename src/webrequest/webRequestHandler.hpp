@@ -21,6 +21,7 @@
 #include <set>
 
 #define ROOT_CONTEXT_NAME "context"
+#define SYSTEM_MESSAGE_HEADER "service"
 
 namespace strus
 {
@@ -42,6 +43,7 @@ public:
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
 			const std::string& service_name_,
+			bool beautifiedOutput_,
 			int maxIdleTime_,
 			int nofTransactionsPerSeconds);
 	virtual ~WebRequestHandler();
@@ -83,6 +85,7 @@ public:/*WebRequestContext*/
 	const char* html_head() const					{return m_html_head.c_str();}
 	int debug_maxdepth() const					{return m_debug_maxdepth;}
 	int maxIdleTime() const						{return m_maxIdleTime;}
+	bool beautifiedOutput() const					{return m_beautifiedOutput;}
 
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
@@ -127,6 +130,7 @@ private:
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	TransactionPool m_transactionPool;		//< transaction pool
 	int m_maxIdleTime;				//< maximum idle time transactions
+	bool m_beautifiedOutput;			//< true, if output should be beautyfied for more readability
 	WebRequestEventLoopInterface* m_eventLoop;	//< queue for requests to other servers and periodic timer event to handle timeout of transactions
 };
 

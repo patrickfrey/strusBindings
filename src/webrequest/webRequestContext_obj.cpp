@@ -306,7 +306,8 @@ bool WebRequestContext::executePostTransaction()
 		setAnswer( ErrorCodeOutOfMem);
 		return false;
 	}
-	return strus::mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, tlink);
+	bool beautified = m_handler->beautifiedOutput();
+	return strus::mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, "transaction", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, tlink);
 }
 
 bool WebRequestContext::executeCommitTransaction()

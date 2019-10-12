@@ -583,6 +583,7 @@ static bool mapResult(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const ResultType& input)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
@@ -614,7 +615,7 @@ static bool mapResult(
 		return false;
 	}
 	papuga_init_ValueVariant_serialization( &value, ser);
-	bool rt = strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, value);
+	bool rt = strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, beautified, value);
 	if (!allocator) papuga_destroy_Allocator( &serallocator);
 	return rt;
 }
@@ -625,14 +626,16 @@ bool strus::mapStringToAnswer(
 		papuga_Allocator* allocator,
 		const char* html_head,
 		const char* html_href_base,
-		const char* name,
+		const char* rootname,
+		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const std::string& input)
 {
 	papuga_ValueVariant value;
 	papuga_init_ValueVariant_string( &value, input.c_str(), input.size());
-	return strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, 0, name, encoding, doctype, value);
+	return strus::mapValueVariantToAnswer( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, beautified, value);
 }
 
 bool strus::mapStringArrayToAnswer(
@@ -644,9 +647,10 @@ bool strus::mapStringArrayToAnswer(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const std::vector<std::string>& input)
 {
-	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, beautified, input);
 }
 
 bool strus::mapStringMapToAnswer(
@@ -654,12 +658,13 @@ bool strus::mapStringMapToAnswer(
 		papuga_Allocator* allocator,
 		const char* html_head,
 		const char* html_href_base,
-		const char* name,
+		const char* rootname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const std::map<std::string,std::string>& input)
 {
-	return mapResult( answer, allocator, html_head, html_href_base, 0/*elemname*/, name, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, rootname, 0/*elemname*/, encoding, doctype, beautified, input);
 }
 
 bool strus::mapStringArrayToAnswer(
@@ -671,9 +676,10 @@ bool strus::mapStringArrayToAnswer(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const char** input)
 {
-	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, input);
+	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, beautified, input);
 }
 
 bool strus::mapValueVariantToAnswer(
@@ -685,6 +691,7 @@ bool strus::mapValueVariantToAnswer(
 		const char* elemname,
 		papuga_StringEncoding encoding,
 		WebRequestContent::Type doctype,
+		bool beautified,
 		const papuga_ValueVariant& value)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
@@ -694,10 +701,10 @@ bool strus::mapValueVariantToAnswer(
 	// Map the result:
 	switch (doctype)
 	{
-		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, rootname, elemname, html_head, html_href_base, &resultlen, &errcode); break;
-		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, rootname, elemname, &resultlen, &errcode); break;
+		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
+		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
+		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, beautified, rootname, elemname, html_head, html_href_base, &resultlen, &errcode); break;
+		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
 		case WebRequestContent::Unknown:
 		{
 			setAnswer( answer, ErrorCodeNotImplemented, _TXT("output content type unknown"));

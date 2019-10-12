@@ -40,7 +40,8 @@ bool WebRequestContext::executeListVariables()
 		setAnswer( ErrorCodeBufferOverflow);
 		return false;
 	}
-	else if (!strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, varlist))
+	bool beautified = m_handler->beautifiedOutput();
+	if (!strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, varlist))
 	{
 		return false;
 	}
