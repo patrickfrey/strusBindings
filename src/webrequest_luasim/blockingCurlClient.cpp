@@ -60,6 +60,13 @@ struct ResponseBuf
 		errbuf[0] = '\0';
 		httpstatus = 0;
 	}
+	void cutDuplicateEolnAtEndOfContent()
+	{
+		while (content.size() > 2 && content[ content.size()-1] == '\n' && content[ content.size()-2] == '\n')
+		{
+			content.resize( content.size()-1);
+		}
+	}
 };
 
 static void issueRequest( const std::string& url, int port, const std::string& method_, const std::string& content, ResponseBuf& response)
@@ -160,6 +167,7 @@ BlockingCurlClient::Response BlockingCurlClient::sendJsonUtf8( const std::string
 	ResponseBuf response;
 
 	issueRequest( url, port, requestMethod, content, response);
+	response.cutDuplicateEolnAtEndOfContent();
 	return Response( response.httpstatus, response.content);
 }
 

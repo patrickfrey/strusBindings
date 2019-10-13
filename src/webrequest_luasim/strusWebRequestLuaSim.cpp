@@ -898,7 +898,7 @@ strus::WebRequestAnswer GlobalContext::call( const std::string& method, const st
 		const std::string& proc = serverPathPair.first;
 		const std::string& path = serverPathPair.second;
 		strus::WebRequestContent content( g_charset, g_doctype, contentstr.c_str(), contentstr.size());
-		
+
 		ProcMap::iterator pi = m_procMap.find( proc);
 		if (pi == m_procMap.end())
 		{
