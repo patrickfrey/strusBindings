@@ -31,7 +31,9 @@
 	"nofdocs": 18}}}
 {
 "list":{
-"link": ""}}
+"link":[
+	"qryeval",
+	"statserver"]}}
 { 
 "distqryeval": { 
   "qryeval": [ 

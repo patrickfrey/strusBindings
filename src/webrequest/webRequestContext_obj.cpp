@@ -209,28 +209,30 @@ ERROR:
 
 bool WebRequestContext::initContentType( const WebRequestContent& content)
 {
-	// Set the request character set encoding:
-	if (content.charset()[0] == '\0')
+	// Set the request character set encoding if some content is provided in the request:
+	if (!content.empty())
 	{
-		setAnswer( ErrorCodeNotImplemented, _TXT("charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented"));
-		/// ... according to https://www.w3.org/International/articles/http-charset/index we should use "ISO-8859-1" if not defined, currently not available
-		return false;
+		if (!content.charset() || content.charset()[0] == '\0')
+		{
+			setAnswer( ErrorCodeNotImplemented, _TXT("charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented"));
+			/// ... according to https://www.w3.org/International/articles/http-charset/index we should use "ISO-8859-1" if not defined, currently not available
+			return false;
+		}
+		m_encoding = strus::getStringEncoding( content.charset(), content.str(), content.len());
+		if (m_encoding == papuga_Binary)
+		{
+			setAnswer( ErrorCodeNotImplemented);
+			return false;
+		}
+		// Set the request content type:
+		m_doctype = content.doctype() ? papuga_contentTypeFromName( content.doctype()) : papuga_guess_ContentType( content.str(), content.len());
+		if (m_doctype == papuga_ContentType_Unknown)
+		{
+			setAnswer( ErrorCodeInputFormat);
+			return false;
+		}
+		m_doctypestr = content.doctype();
 	}
-	m_encoding = strus::getStringEncoding( content.charset(), content.str(), content.len());
-	if (m_encoding == papuga_Binary)
-	{
-		setAnswer( ErrorCodeNotImplemented);
-		return false;
-	}
-	// Set the request content type:
-	m_doctype = content.doctype() ? papuga_contentTypeFromName( content.doctype()) : papuga_guess_ContentType( content.str(), content.len());
-	if (m_doctype == papuga_ContentType_Unknown)
-	{
-		setAnswer( ErrorCodeInputFormat);
-		return false;
-	}
-	m_doctypestr = content.doctype();
-
 	// Set the result content encoding:
 	if (m_encoding == papuga_Binary)
 	{

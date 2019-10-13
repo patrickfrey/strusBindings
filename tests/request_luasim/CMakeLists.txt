@@ -15,8 +15,22 @@ ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 
 configure_file( "${CMAKE_CURRENT_LIST_DIR}/config.lua.in"   "${CMAKE_CURRENT_BINARY_DIR}/config.lua"   @ONLY )
 
-add_test( DocumentStructureAnalysis  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim ${CMAKE_CURRENT_LIST_DIR}/documentStructureAnalysis.lua  ${CMAKE_CURRENT_BINARY_DIR} )
-add_test( DocumentAnalysis  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim ${CMAKE_CURRENT_LIST_DIR}/docanalyzer.lua  ${CMAKE_CURRENT_BINARY_DIR} )
-add_test( QueryAnalysis  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim ${CMAKE_CURRENT_LIST_DIR}/qryanalyzer.lua  ${CMAKE_CURRENT_BINARY_DIR} )
-add_test( Query  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim ${CMAKE_CURRENT_LIST_DIR}/query.lua  ${CMAKE_CURRENT_BINARY_DIR} )
-add_test( DistributeStorage  ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim ${CMAKE_CURRENT_LIST_DIR}/distributeStorage.lua  ${CMAKE_CURRENT_BINARY_DIR} )
+set( WS_CMD_BINARY_DIR ${PROJECT_BINARY_DIR}/src  )
+STRING( REGEX REPLACE "strusBindings" "strusWebService" WS_CMD_BINARY_DIR ${WS_CMD_BINARY_DIR})
+set( WS_CMD_PRG "${WS_CMD_BINARY_DIR}/strusWebService --config {config} --port {port}" )
+
+add_custom_target( test_ws )
+function( DeclareTest TestTitle TestScript )
+	set( LuaSim ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim )
+	add_test( ${TestTitle}  ${LuaSim} ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
+	add_custom_command( 
+		TARGET test_ws
+		COMMAND  ${LuaSim} -V --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
+endfunction( DeclareTest )
+
+DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua )
+DeclareTest( DocumentAnalysis docanalyzer.lua )
+DeclareTest( QueryAnalysis qryanalyzer.lua )
+DeclareTest( Query query.lua )
+DeclareTest( DistributeStorage distributeStorage.lua )
+

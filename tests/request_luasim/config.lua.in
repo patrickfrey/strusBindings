@@ -1,3 +1,5 @@
+require "testUtils"
+
 config = {
 	data = {
 		workdir     = "@TEST_REQUEST_LUASIM_RUN_DIR@",
@@ -54,3 +56,19 @@ QSERVER1="http://127.0.0.1:7192"
 
 create_dir( "storage")
 create_dir( "config")
+
+function get_test_server_config( name)
+	cfg = config;
+	cfg.service.name = name
+	return cfg
+end
+
+function def_test_server( name, address, embeddedConfig)
+	if embeddedConfig then
+		def_server( address, mergeValues( embeddedConfig, get_test_server_config( name)))
+	else
+		def_server( address, get_test_server_config( name))
+	end
+	if verbose then io.stderr:write( string.format("- Defined server %s at %s\n", name, address)) end
+end
+

@@ -5,7 +5,7 @@ require "os"
 
 SCRIPTPATH = script_path()
 
-def_server( CSERVER1, config )
+def_test_server( "csrv1", CSERVER1)
 call_server_checked( "PUT", CSERVER1 .. "/contentstats/stats", "@contentstats.json" )
 
 print( "TRANSACTION " .. call_server_checked( "POST", CSERVER1 .. "/contentstats/stats/transaction" ))

@@ -328,6 +328,7 @@ static Logger g_logger;
 static const char* g_charset = "UTF-8";
 static const char* g_doctype = "application/json";
 static strus::BlockingCurlClient* g_blockingCurlClient = 0;
+static int g_defaultServerParentSleep = 3;
 
 namespace {
 template <typename ValueType>
@@ -357,36 +358,6 @@ std::string castLuaValue<std::string>( lua_State* ls, int luaddr)
 }
 }// anonymous namespace
 
-#if 0
-static void logValue( lua_State* ls, int luaddr, const char* title)
-{
-	lua_pushvalue( ls, luaddr);
-	const char* val = 0;
-	const char* typestr = "UNKNOWN";
-
-	switch (lua_type( ls, -1))
-	{
-		case LUA_TNIL: typestr = "NIL"; break;
-		case LUA_TNUMBER: typestr = "NUMBER"; val = lua_tostring( ls, -1); break;
-		case LUA_TBOOLEAN: typestr = "BOOLEAN"; val = lua_tostring( ls, -1); break;
-		case LUA_TSTRING: typestr = "STRING"; val = lua_tostring( ls, -1); break;
-		case LUA_TTABLE: typestr = "TABLE"; break;
-		case LUA_TFUNCTION: typestr = "FUNCTION"; break;
-		case LUA_TUSERDATA: typestr = "USERDATA"; break;
-		case LUA_TTHREAD: typestr = "THREAD"; break;
-		case LUA_TLIGHTUSERDATA: typestr = "LIGHTUSERDATA"; break;
-	}
-	if (val)
-	{
-		fprintf( stderr, "LOG [%d] %s type %s value '%s'\n", luaddr, title, typestr, val);
-	}
-	else
-	{
-		fprintf( stderr, "LOG [%d] %s type %s\n", luaddr, title, typestr);
-	}
-	lua_pop( ls, 1);
-}
-#endif
 
 class Configuration
 {
@@ -857,12 +828,16 @@ void GlobalContext::defineServer( const std::string& hostname, const Configurati
 void GlobalContext::startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep)
 {
 	std::string portstr = getPostString( hostname);
-	std::string configfile = strus::string_format( "tmp.startServerProcess.config.%s.js", portstr.c_str());
+	std::string configfile = strus::string_format( "tmp.config.%s.js", portstr.c_str());
 	std::string configpath = strus::joinFilePath( g_outputDir, configfile);
 	int ec = strus::writeFile( configpath, configjson);
 	if (ec) throw strus::runtime_error( _TXT("failed to write configuration for server to start into text file %s (errno %d): %s"), configpath.c_str(), ec, ::strerror(ec));
 
-	std::string cmdline = substStringVariable( substStringVariable( g_serviceProgramCmdLine, "port", portstr.c_str()), "config", configpath);
+	std::string cmdline = g_serviceProgramCmdLine;
+	cmdline = substStringVariable( cmdline, "port", portstr);
+	cmdline = substStringVariable( cmdline, "config", configpath);
+	cmdline = substStringVariable( cmdline, "verbosity", strus::string_format( "%d", g_verbosity));
+
 	std::vector<std::string> cmd = splitCmdLine( cmdline);
 	enum {MaxArgNum=64};
 	const char* argv[ MaxArgNum+2];
@@ -952,10 +927,24 @@ static TableType getTableType( lua_State* L, int luaddr)
 	return TableTypeEmpty;
 }
 
-static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr, int indent);
-static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr, int indent);
+static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& dest, int indent);
+static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& dest, int indent);
 
-static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& configstr, int indent=0)
+static void appendIndent( std::string& dest, int indent)
+{
+	if (indent >= 0)
+	{
+		dest.append( "\n");
+		dest.resize( dest.size()+(indent*2), ' ');
+	}
+}
+
+static int nextIndent( int indent)
+{
+	return indent >= 0 ? (indent+1) : indent;
+}
+
+static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& dest, int indent)
 {
 	if (lua_isnil( L, luaddr))
 	{
@@ -963,9 +952,9 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& confi
 	}
 	else if (lua_isstring( L, luaddr))
 	{
-		configstr.push_back( '"');
-		configstr.append( lua_tostring( L, luaddr));
-		configstr.push_back( '"');
+		dest.push_back( '"');
+		dest.append( lua_tostring( L, luaddr));
+		dest.push_back( '"');
 	}
 	else if (lua_istable( L, luaddr))
 	{
@@ -974,14 +963,14 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& confi
 			case TableTypeEmpty:
 				return false;
 			case TableTypeArray:
-				configstr.append( "[ ");
-				convertLuaArrayToJson_( L, luaddr, configstr, indent);
-				configstr.append( " ]");
+				dest.append( "[ ");
+				convertLuaArrayToJson_( L, luaddr, dest, indent);
+				dest.append( " ]");
 				break;
 			case TableTypeDictionary:
-				configstr.append( "{ ");
-				convertLuaDictionaryToJson_( L, luaddr, configstr, indent);
-				configstr.append( " }");
+				dest.append( "{ ");
+				convertLuaDictionaryToJson_( L, luaddr, dest, indent);
+				dest.append( " }");
 				break;
 		}
 	}
@@ -989,12 +978,12 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& confi
 	{
 		const char* str = lua_tostring( L, luaddr);
 		if (!str) return false;
-		configstr.append( str);
+		dest.append( str);
 	}
 	return true;
 }
 
-static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& configstr, int indent)
+static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& dest, int indent)
 {
 	lua_pushvalue( L, luaddr);
 	lua_pushnil( L );
@@ -1017,21 +1006,19 @@ static void convertLuaArrayToJson_( lua_State* L, int luaddr, std::string& confi
 		}
 		if (itercnt)
 		{
-			configstr.append( ",");
+			dest.append( ",");
 		}
-		configstr.append( "\n");
-		configstr.resize( configstr.size()+(indent*2), ' ');
-
-		if (!convertLuaValueToJson_( L, -1, configstr, indent+1))
+		appendIndent( dest, indent);
+		if (!convertLuaValueToJson_( L, -1, dest, nextIndent(indent)))
 		{
-			configstr.append( "null");
+			dest.append( "null");
 		}
 		lua_pop( L, 1 );
 	}
 	lua_pop( L, 1); // Get luaddr-value from stack
 }
 
-static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& configstr, int indent)
+static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& dest, int indent)
 {
 	std::map<CString,std::string> dictmap;
 	lua_pushvalue( L, luaddr);
@@ -1053,7 +1040,7 @@ static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& 
 			luaL_error( L, _TXT("non string type keys are not supported in table conversion to JSON"));
 		}
 		std::string value;
-		if (convertLuaValueToJson_( L, -1, value, indent+1))
+		if (convertLuaValueToJson_( L, -1, value, nextIndent(indent)))
 		{
 			dictmap[ key] = value;
 		}
@@ -1064,20 +1051,19 @@ static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& 
 	std::map<CString,std::string>::const_iterator di = dictmap.begin(), de = dictmap.end();
 	for (int didx=0; di != de; ++di,++didx)
 	{
-		if (didx) configstr.append( ",");
-		configstr.append( "\n");
-		configstr.resize( configstr.size()+(indent*2), ' ');
-		configstr.append( "\"");
-		configstr.append( di->first.value);
-		configstr.append( "\": ");
-		configstr.append( di->second);
+		if (didx) dest.append( ",");
+		appendIndent( dest, indent);
+		dest.append( "\"");
+		dest.append( di->first.value);
+		dest.append( "\": ");
+		dest.append( di->second);
 	}
 }
 
-static std::string convertLuaValueToJson( lua_State* L, int luaddr)
+static std::string convertLuaValueToJson( lua_State* L, int luaddr, bool withIndentiation)
 {
 	std::string rt;
-	convertLuaValueToJson_( L, luaddr, rt);
+	convertLuaValueToJson_( L, luaddr, rt, withIndentiation ? 0 : -1);
 	return rt;
 }
 
@@ -1199,13 +1185,33 @@ static std::string convertSourceRegexReplace( const char* src, const char* expr,
 	return rt;
 }
 
+static void logLuaCall( std::ostream& out, lua_State* L, const char* fname, int nofArgs)
+{
+	int ni = 0;
+	std::string cmdline( fname);
+	for (; ni < nofArgs; ++ni)
+	{
+		cmdline.push_back( ' ');
+		cmdline.append( convertLuaValueToJson( L, 1+ni, false/*no indent*/));
+	}
+	out << "LUA " << cmdline << std::endl;
+}
+
+static void LUA_FUNCTION_HEADER( lua_State* L, const char* funcname, int minNofArgs, int maxNofArgs, const char* expectedArgs)
+{
+	int nofArgs = lua_gettop(L);
+	if (g_verbosity >= 2) logLuaCall( std::cerr, L, funcname, nofArgs);
+
+	if (nofArgs > maxNofArgs) luaL_error(L, _TXT("too many (%d, max %d) arguments for '%s', expected %s"), nofArgs, maxNofArgs, funcname, expectedArgs);
+	if (nofArgs < minNofArgs) luaL_error(L, _TXT("too few (%d, min %d) arguments for '%s', expected %s"), nofArgs, minNofArgs, funcname, expectedArgs);
+}
+
 static int l_set_time( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'set_time': expected <seconds>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'set_time': expected <seconds>"));
+		LUA_FUNCTION_HEADER( L, "set_time", 1, 1, "<seconds since baseline as int>");
+
 		long newtime = lua_tointeger( L, 1);
 		g_eventLoop.setTime( newtime);
 	}
@@ -1220,12 +1226,11 @@ static int l_def_server( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'def_server': expected <host> <config>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'def_server': expected <host> <config>"));
+		LUA_FUNCTION_HEADER( L, "def_server", 2, 2, "<hostname> <configuration>");
+
 		const char* hostname = lua_tostring( L, 1);
 		Configuration configmap( L, 2);
-		std::string configjson = convertLuaValueToJson( L, 2);
+		std::string configjson = convertLuaValueToJson( L, 2, true/*indentiation*/);
 
 		if (g_serviceProgramCmdLine.empty())
 		{
@@ -1234,7 +1239,7 @@ static int l_def_server( lua_State* L)
 		else
 		{
 			lua_getglobal( L, "serverwait");
-			int serverParentSleep = lua_isnumber( L, -1) ? lua_tointeger( L, -1) : 3;
+			int serverParentSleep = lua_isnumber( L, -1) ? lua_tointeger( L, -1) : g_defaultServerParentSleep;
 			g_globalContext.startServerProcess( hostname, configjson, serverParentSleep);
 		}
 	}
@@ -1249,9 +1254,9 @@ static int l_call_server( lua_State* L)
 {
 	try
 	{
+		LUA_FUNCTION_HEADER( L, "call_server", 2, 3, "<method> <url> [<content to send>]");
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'call_server': expected <method> <addr> [<arg>]"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'call_server': expected <method> <addr> [<arg>]"));
+
 		const char* method = lua_tostring( L, 1);
 		const char* url = lua_tostring( L, 2);
 		const char* arg = "";
@@ -1266,7 +1271,7 @@ static int l_call_server( lua_State* L)
 			}
 			else if (lua_istable( L, 3))
 			{
-				content = convertLuaValueToJson( L, 3);
+				content = convertLuaValueToJson( L, 3, true/*indentiation*/);
 				arg = content.c_str();
 			}
 			else
@@ -1323,10 +1328,9 @@ static int l_cmp_content( lua_State* L)
 {
 	try
 	{
+		LUA_FUNCTION_HEADER( L, "cmp_content", 2, 2, "<content string> <other>");
+
 		int linecnt = 1;
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'cmp_content': expected <result> <expected>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'cmp_content': expected <result> <expected>"));
 		const char* arg_1 = lua_tostring( L, 1);
 		const char* arg_2 = lua_tostring( L, 2);
 		std::string content_a = getContentArgumentValue( arg_1);
@@ -1393,9 +1397,8 @@ static int l_load_file( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'load_file': expected <filename>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'load_file': expected <filename>"));
+		LUA_FUNCTION_HEADER( L, "load_file", 1, 1, "<filename>");
+
 		const char* filename = lua_tostring( L, 1);
 		std::string content;
 		std::string fullpath = strus::joinFilePath( g_scriptDir, filename);
@@ -1415,9 +1418,8 @@ static int l_write_file( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'write_file': expected <filename> <content>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'write_file': expected <filename> <content>"));
+		LUA_FUNCTION_HEADER( L, "write_file", 2, 2, "<filename> <content>");
+
 		const char* filename = lua_tostring( L, 1);
 		const char* content = lua_tostring( L, 2);
 
@@ -1455,11 +1457,9 @@ static int l_remove_file( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'remove_file': expected <filename>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'remove_file': expected <filename>"));
-		const char* filename = lua_tostring( L, 1);
+		LUA_FUNCTION_HEADER( L, "remove_file", 1, 1, "<filename>");
 
+		const char* filename = lua_tostring( L, 1);
 		std::string fullpath = strus::joinFilePath( g_outputDir, filename);
 		int ec = strus::removeFile( fullpath, false/*fail_ifnofexist*/);
 		if (ec)
@@ -1479,11 +1479,9 @@ static int l_create_dir( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'create_dir': expected <dirname>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'create_dir': expected <dirname>"));
-		const char* nam = lua_tostring( L, 1);
+		LUA_FUNCTION_HEADER( L, "create_dir", 1, 1, "<dirname>");
 
+		const char* nam = lua_tostring( L, 1);
 		std::string fullpath = strus::joinFilePath( g_outputDir, nam);
 		int ec = strus::removeDirRecursive( fullpath, false/*fail_ifnofexist*/);
 		if (ec)
@@ -1508,9 +1506,8 @@ static int l_reformat_float( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 2) return luaL_error(L, _TXT("too many arguments for 'reformat_float': expected <content> <precision>"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'reformat_float': expected <content> <precision>"));
+		LUA_FUNCTION_HEADER( L, "reformat_float", 2, 2, "<string to map> <precision of floats>");
+
 		const char* content = lua_tostring( L, 1);
 		int precision = lua_tointeger( L, 2);
 		if (precision <= 0) return luaL_error(L, _TXT("expected positive number for precision argument of 'reformat_float'"));
@@ -1530,9 +1527,9 @@ static int l_reformat_regex( lua_State* L)
 {
 	try
 	{
+		LUA_FUNCTION_HEADER( L, "reformat_regex", 2, 3, "<string to map> <expression to match> [<format string to replace with>]");
 		int nofArgs = lua_gettop(L);
-		if (nofArgs > 3) return luaL_error(L, _TXT("too many arguments for 'reformat_regex': expected <content> <regex> [<subst>]"));
-		if (nofArgs < 2) return luaL_error(L, _TXT("too few arguments for 'reformat_regex': expected <content> <regex> [<subst>]"));
+
 		const char* content = lua_tostring( L, 1);
 		const char* expr = lua_tostring( L, 2);
 		const char* substfmt = (nofArgs > 2) ? lua_tostring( L, 3) : "";
@@ -1552,10 +1549,9 @@ static int l_to_json( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'tojson': expected <table>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'tojson': expected <table>"));
-		std::string result = convertLuaValueToJson( L, 1);
+		LUA_FUNCTION_HEADER( L, "to_json", 1, 1, "<value to map>");
+
+		std::string result = convertLuaValueToJson( L, 1, true/*indentiation*/);
 		lua_pushlstring( L, result.c_str(), result.size()); 
 		return 1;
 	}
@@ -1570,9 +1566,8 @@ static int l_from_json( lua_State* L)
 {
 	try
 	{
-		int nofArgs = lua_gettop(L);
-		if (nofArgs > 1) return luaL_error(L, _TXT("too many arguments for 'tojson': expected <table>"));
-		if (nofArgs < 1) return luaL_error(L, _TXT("too few arguments for 'tojson': expected <table>"));
+		LUA_FUNCTION_HEADER( L, "from_json", 1, 1, "<json content to parse>");
+
 		pushConvertedJsonAsLuaTable( L, 1);
 		return 1;
 	}
@@ -1607,11 +1602,22 @@ static void printUsage()
 {
 	fprintf( stderr, "%s",
 		 "strusWebRequestLuaSim [<options>] <luascript> [<outputdir>]\n"
-		"<options>:\n" 
+		"Program Options <options>:\n" 
 		 "   -h,--help          :Print this usage\n"
 		 "   -m,--mod <PATH>    :Set <PATH> as addidional module path\n"
+		 "   -G,--debug <ID>    :Enable debug trace of items with id <ID>\n"
 		 "   -V                 :Raise verbosity level (may be repeated\n"
-		"<luascript>            :Lua script to execute\n");
+		 "   -p,--program <PRG> :Use the command line <PRG> for starting a\n"
+		 "                       web service instance instead of running the\n"
+		 "                       commands directly. The strings {port} and {config}\n"
+		 "                       in the command line are substituted by the\n"
+		 "                       corresponding values\n"
+		 "Program arguments:\n"
+		 "<luascript>           :Lua script with the commands to execute\n"
+		 "<outputdir>           :Working directory (default execution dir)\n");
+	fprintf( stderr, "The environment variable STRUS_WS_SLEEP can be set as \n"
+		"the number of seconds the fork parent sleeps while starting the\n"
+		"web service program specified with --program. The default is 3\n");
 }
 
 static void setLuaPath( lua_State* ls, const char* path)
@@ -1723,6 +1729,8 @@ int main( int argc, const char* argv[])
 	{
 		g_debugTrace = strus::createDebugTrace_standard( 2);
 		g_errorhnd = strus::createErrorBuffer_standard( NULL, 2, g_debugTrace);
+		std::string thisCommandLine( "src/webrequest_luasim/strusWebRequestLuaSim");
+
 		if (!g_debugTrace || !g_errorhnd)
 		{
 			throw std::runtime_error( _TXT( "out of memory creating error handler"));
@@ -1743,6 +1751,8 @@ int main( int argc, const char* argv[])
 			else if (0==strcmp( argv[argi], "-V") || 0==strcmp( argv[argi], "-VV") || 0==strcmp( argv[argi], "-VVV") || 0==strcmp( argv[argi], "-VVVV") || 0==strcmp( argv[argi], "-VVVVV"))
 			{
 				g_verbosity += std::strlen(argv[argi])-1;
+				thisCommandLine.append( " -");
+				thisCommandLine.append( std::string( g_verbosity, 'V'));
 			}
 			else if (0==strcmp( argv[argi], "--debug") || 0==strcmp( argv[argi], "-G"))
 			{
@@ -1752,6 +1762,7 @@ int main( int argc, const char* argv[])
 					throw std::runtime_error( _TXT("option -G (--debug) needs argument"));
 				}
 				g_debugTrace->enable( argv[argi]);
+				thisCommandLine.append( " -G");
 			}
 			else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))
 			{
@@ -1765,6 +1776,7 @@ int main( int argc, const char* argv[])
 					throw std::runtime_error( _TXT("too many options -m (--mod) specified in argument list"));
 				}
 				modpath[ modi++] = argv[argi];
+				thisCommandLine.append( strus::string_format( " -m \"%s\"", argv[argi]));
 			}
 			else if (0==strcmp( argv[argi], "--program") || 0==strcmp( argv[argi], "-p"))
 			{
@@ -1778,9 +1790,11 @@ int main( int argc, const char* argv[])
 					throw std::runtime_error( _TXT("option -p(--program) specified twice"));
 				}
 				g_serviceProgramCmdLine = argv[argi];
+				thisCommandLine.append( strus::string_format( " --program \"%s\"", argv[argi]));
 			}
 			else if (0==strcmp( argv[argi], "--"))
 			{
+				thisCommandLine.append( " --");
 				++argi;
 				break;
 			}
@@ -1789,17 +1803,26 @@ int main( int argc, const char* argv[])
 		{
 			throw std::runtime_error( _TXT("too few arguments (less than one)"));
 		}
-		if (!g_serviceProgramCmdLine.empty())
+		char const* serverParentSleepEnv = ::getenv( "STRUS_WS_SLEEP");
+		if (serverParentSleepEnv)
 		{
-			mi = 0, me = modi;
-			for (; mi < me; ++mi)
+			if (g_serviceProgramCmdLine.empty())
 			{
-				g_serviceProgramCmdLine.append( " -m \"");
-				g_serviceProgramCmdLine.append( modpath[ mi]);
-				g_serviceProgramCmdLine.append( "\"");
+				std::cerr << _TXT("ignoring value of environment variable STRUS_WS_SLEEP as the web service command line is not specified by option --program") << std::endl;
+			}
+			int wsleep = ::atoi( serverParentSleepEnv);
+			if (wsleep > 0)
+			{
+				g_defaultServerParentSleep = wsleep;
+			}
+			else
+			{
+				std::cerr << _TXT("ignoring value of environment variable STRUS_WS_SLEEP expected to be an integer greater than 0") << std::endl;
 			}
 		}
 		inputfile = argv[ argi++];
+		thisCommandLine.append( strus::string_format( " \"%s\"", inputfile));
+
 		int ec = strus::getParentPath( inputfile, g_scriptDir);
 		if (ec) throw std::runtime_error( _TXT("failed to get directory of the script to execute"));
 
@@ -1810,10 +1833,26 @@ int main( int argc, const char* argv[])
 		else
 		{
 			g_outputDir = argv[ argi++];
+			thisCommandLine.append( strus::string_format( " \"%s\"", g_outputDir.c_str()));
 		}
 		if (argi != argc)
 		{
 			throw std::runtime_error( _TXT("too many arguments"));
+		}
+		if (!g_serviceProgramCmdLine.empty())
+		{
+			mi = 0, me = modi;
+			for (; mi < me; ++mi)
+			{
+				g_serviceProgramCmdLine.append( " -m \"");
+				g_serviceProgramCmdLine.append( modpath[ mi]);
+				g_serviceProgramCmdLine.append( "\"");
+			}
+			if (g_verbosity > 0)
+			{
+				std::cerr << "START " << thisCommandLine << std::endl;
+				
+			}
 		}
 		g_logger.init( g_verbosity);
 

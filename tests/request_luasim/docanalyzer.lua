@@ -5,7 +5,7 @@ require "os"
 
 SCRIPTPATH = script_path()
 
-def_server( ISERVER1, config )
+def_test_server( "isrv1", ISERVER1)
 
 call_server_checked( "PUT", ISERVER1 .. "/docanalyzer/test", "@docanalyzer.json" )
 docanaconf = call_server_checked( "GET", ISERVER1 .. "/docanalyzer/test" )

@@ -17,14 +17,18 @@ storageConfig = {
 		}
 	}
 }
+function getStorageConfig( serveridx)
+	cfg = storageConfig
+	cfg.storage.path = "storage/test"
+	return cfg
+end
 
-def_server( ISERVER1, config )
+def_test_server( "isrv1", ISERVER1)
 call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@docanalyzer.json" )
 call_server_checked( "PUT", ISERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 if verbose then io.stderr:write( string.format("- Created document and query analyzer\n")) end
 
-storageConfig.storage.path = "storage/test"
-call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
+call_server_checked( "POST", ISERVER1 .. "/storage/test", getStorageConfig())
 call_server_checked( "PUT",  ISERVER1 .. "/inserter/test", "@inserter.json" )
 call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
 

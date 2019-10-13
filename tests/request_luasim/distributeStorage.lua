@@ -19,18 +19,21 @@ storageConfig = {
 		}
 	}
 }
+function getStorageConfig( serveridx)
+	cfg = storageConfig
+	cfg.storage.path = string.format("storage/test%d", serveridx)
+	return cfg
+end
 
 function buildStorageServer( serveridx, serveraddr)
 	if verbose then io.stderr:write( string.format("- Build storage server %d listening on %s\n", serveridx, serveraddr)) end
-	config.service.name = string.format("isrv%d", serveridx)
+	def_test_server( string.format("isrv%d", serveridx), serveraddr)
 
-	def_server( serveraddr, config )
 	call_server_checked( "PUT", serveraddr  .. "/docanalyzer/test", "@docanalyzer.json" )
 	call_server_checked( "PUT", serveraddr  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 	if verbose then io.stderr:write( string.format("- Created document and query analyzer for server %d\n", serveridx)) end
 
-	storageConfig.storage.path = string.format("storage/test%d", serveridx)
-	call_server_checked( "POST", serveraddr .. "/storage/test",  storageConfig )
+	call_server_checked( "POST", serveraddr .. "/storage/test",  getStorageConfig( serveridx))
 	call_server_checked( "PUT",  serveraddr .. "/inserter/test", "@inserter.json" )
 	call_server_checked( "PUT", serveraddr .. "/qryeval/test",  "@qryeval.json" )
 
@@ -71,6 +74,7 @@ end
 -- Define a statistics server for the 3 storage servers defined:
 statserverConfig = {
 	statserver = {
+		id = "test",
 		proc = "std",
 		blocks = "100K",
 		storage = {
@@ -81,8 +85,7 @@ statserverConfig = {
 	}
 }
 
-config.service.name = "ssrv1"
-def_server( SSERVER1, config)
+def_test_server( "ssrv1", SSERVER1)
 call_server_checked( "PUT", SSERVER1  .. "/statserver/test", statserverConfig )
 
 statserverDef = call_server_checked( "GET", SSERVER1 .. "/statserver/test")
@@ -90,17 +93,9 @@ if verbose then io.stderr:write( string.format("- Statistics server configuratio
 
 -- Define a 2nd variant of the statistics server for testing delegate calls issued by embedded sub configuration:
 SSERVER2=ISERVER4
-config_SSERVER2 = mergeValues(
-			statserverConfig,
-			config
-		)
-config_SSERVER2.service.name = "ssrv2"
-config_SSERVER2.statserver.id = "test"
+def_test_server( "ssrv2", SSERVER2, statserverConfig)
 
-if verbose then io.stderr:write( string.format("- Merged statistics server configuration:\n%s\n", to_json(config_SSERVER2))) end
-def_server( SSERVER2, config_SSERVER2)
-
-statserverDef_configured = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
+statserverDef_embedded = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
 if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
 
 -- Call the statistics server for statistics of an analyzed query:
@@ -145,8 +140,7 @@ distqryevalConfig = {
 	}
 }
 
-config.service.name = "qsrv1"
-def_server( QSERVER1, config)
+def_test_server( "qsrv1", QSERVER1)
 call_server_checked( "PUT", QSERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 call_server_checked( "PUT", QSERVER1  .. "/distqryeval/test", distqryevalConfig )
 
@@ -198,5 +192,5 @@ if verbose then io.stderr:write( string.format("- Distributed query evaluation r
 qryres2 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query2))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-checkExpected( statserverDef .. statserverDef_configured .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@distributeStorage.exp", "distributeStorage.res" )
+checkExpected( statserverDef .. statserverDef_embedded .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@distributeStorage.exp", "distributeStorage.res" )
 
