@@ -198,5 +198,5 @@ if verbose then io.stderr:write( string.format("- Distributed query evaluation r
 qryres2 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query2))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-checkExpected( statserverDef .. statserverDef_configured .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1, "@distributeStorage.exp", "distributeStorage.res" )
+checkExpected( statserverDef .. statserverDef_configured .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@distributeStorage.exp", "distributeStorage.res" )
 

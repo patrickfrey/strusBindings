@@ -72,8 +72,8 @@ public:
 		{},
 		{},
 		{
-			{"/storage/value", "()", StatisticsBlob, papuga_TypeString, "AAAABwAKZ9h..."},
-			{"/storage/value", 0/*result*/, "statserver", bindings::method::StatisticsMap::processStatisticsMessage(), {{StatisticsBlob}} }
+			{"/storage", "()", StatisticsBlob, papuga_TypeString, "AAAABwAKZ9h..."},
+			{"/storage", 0/*result*/, "statserver", bindings::method::StatisticsMap::processStatisticsMessage(), {{StatisticsBlob}} }
 		}
 	) {}
 };
