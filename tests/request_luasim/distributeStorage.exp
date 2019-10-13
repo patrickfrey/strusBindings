@@ -34,13 +34,13 @@
 "link":[
 	"qryeval",
 	"statserver"]}}
-{ 
-"distqryeval": { 
-  "qryeval": [ 
+{
+"distqryeval": {
+  "qryeval": [
     "http://127.0.0.1:7184/qryeval/test",
     "http://127.0.0.1:7185/qryeval/test",
-    "http://127.0.0.1:7186/qryeval/test" ],
-  "statserver": "http://127.0.0.1:7183/statserver/test" } }
+    "http://127.0.0.1:7186/qryeval/test"],
+  "statserver": "http://127.0.0.1:7183/statserver/test"}}
 {
 "queryresult":{
 "ranklist":{

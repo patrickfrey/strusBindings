@@ -1,0 +1,34 @@
+{
+"data": {
+  "configdir": "/etc/strus/build/tests/request_luasim/config",
+  "resources": "/usr/share/strus/tests/request_luasim/strus",
+  "workdir": "/srv/strus/build/tests/request_luasim"},
+"debug": {
+  "log_requests": true,
+  "protocol": {
+    "debug_enabled": true,
+    "pretty_print": true,
+    "quit_enabled": true},
+  "request_file": "./requests.{service.name}.log",
+  "struct_depth": 4},
+"extensions": {
+  "directory": "/usr/local/lib/strus/modules",
+  "modules": [
+    "modstrus_analyzer_pattern",
+    "modstrus_storage_vector_std"]},
+"http": {
+  "script": "/strus"},
+"logging": {
+  "file": {
+    "append": true,
+    "name": "./strusWebService.{service.name}.log"},
+  "level": "debug"},
+"service": {
+  "api": "http",
+  "ip": "0.0.0.0",
+  "name": "test",
+  "port": 8080,
+  "worker_threads": 1},
+"transactions": {
+  "max_idle_time": 600,
+  "nof_per_sec": 60}}

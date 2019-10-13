@@ -28,6 +28,7 @@ function( DeclareTest TestTitle TestScript )
 		COMMAND  ${LuaSim} -V --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
 endfunction( DeclareTest )
 
+DeclareTest( MapLuaTableToJson configToJson.lua )
 DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua )
 DeclareTest( DocumentAnalysis docanalyzer.lua )
 DeclareTest( QueryAnalysis qryanalyzer.lua )

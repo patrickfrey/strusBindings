@@ -3,8 +3,7 @@ require "os"
 -- Function checking a HTTP status code that exits if the code is not in the OK range
 function exitOnBadHttpStatus( httpStatus)
 	if (httpStatus < 200 or httpStatus >= 300) then
-		print( "Request failed with HTTP status " .. httpStatus )
-		os.exit()
+		error( "Request failed with HTTP status " .. httpStatus )
 	end
 end
 
@@ -53,16 +52,26 @@ function getDirectoryFiles( dir, extension)
 	return rt
 end
 
+function displayString( str, maxlen)
+	if type(str) ~= "string" then
+		return ""
+	elseif string.len(str) >= maxlen then
+		return string.sub( str, 0, maxlen) .. "..."
+	else
+		return str
+	end
+end
+
 -- Function to check if to files (result and expected of a test) are equal (accepting different line endings to make the comparison independent of the platform)
 function checkExpected( output, expected, outputfile)
 	res,lineno,line_a,line_b = cmp_content( output, expected )
 	if not res then
 		write_file( outputfile, output)
-		io.stderr:write( string.format("ERROR result not as expected, difference on line %d, result: '%s', expected '%s'\n", lineno, line_a, line_b))
-		os.exit( 1)
+		io.stderr:write( string.format("difference on line %d, result: '%s', expected '%s'\n", lineno, displayString( line_a, 30), displayString( line_b, 30)))
+		error( "result not as expected")
 	else
 		remove_file( outputfile)
-		io.stderr:write( "OK\n");
+		io.stderr:write( "OK\n")
 	end
 end
 

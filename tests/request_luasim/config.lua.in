@@ -14,7 +14,7 @@ config = {
 		directory = "@STRUS_MODULE_PATH@",
 		modules = { 
 			@STRUS_MODULES_LOADED@
-		}	
+		}
 	},
 	http = {
 		script = "/strus"

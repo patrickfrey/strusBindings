@@ -147,7 +147,7 @@ call_server_checked( "PUT", QSERVER1  .. "/distqryeval/test", distqryevalConfig 
 distqryevalObj = {}
 distqryevalObj.statserver = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/statserver")).list.value
 distqryevalObj.qryeval = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/qryeval")).list.value
-distqryevalDef = to_json( {distqryeval = distqryevalObj} ) .. "\n"
+distqryevalDef = to_json( {distqryeval = distqryevalObj} )
 distqryevalVar = call_server_checked( "GET", QSERVER1 .. "/distqryeval/test")
 if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end
 if verbose then io.stderr:write( string.format("- Distributed query evaluation server configuration from server:\n%s\n", distqryevalDef)) end

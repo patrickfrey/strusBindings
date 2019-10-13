@@ -15,7 +15,6 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/debugTraceInterface.hpp"
 #include "strus/reference.hpp"
-#include "strus/base/string_format.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "strus/base/shared_ptr.hpp"
 #include "strus/base/string_format.hpp"
@@ -40,6 +39,7 @@ extern "C" {
 #include "strus/lib/lua.h"
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <limits>
@@ -48,6 +48,8 @@ extern "C" {
 #include <cstdbool>
 #include <iostream>
 #include <inttypes.h>
+#include <sys/types.h>
+#include <signal.h>
 
 struct CString
 {
@@ -660,6 +662,16 @@ static std::vector<std::string> splitCmdLine( const std::string& cmdline)
 	return rt;
 }
 
+void killBackGroundProcesses()
+{
+	std::vector<pid_t>::const_iterator pi = g_serviceProgramPids.begin(), pe = g_serviceProgramPids.end();
+	for (; pi != pe; ++pi)
+	{
+		if (0>::kill( *pi, SIGTERM)) ::fprintf( stderr, "failed to kill process with pid %d: %s\n", (int)*pi, ::strerror(errno));
+	}
+	::fflush( stderr);
+}
+
 void EventLoop::initConfiguration( const Configuration& config)
 {
 	int max_idle_time = 600;
@@ -853,22 +865,19 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	pid_t pid = ::fork();
 	if ( pid == 0 )
 	{
-		pid_t pid_chld = getpid();
+		pid_t pid_chld = ::getpid();
 		fprintf( stderr, "FORK child %d EXEC %s\n", (int)pid_chld, cmdline.c_str());
 		ec = ::execvp( argv[0], (char* const*)(argv));
 		if (ec)
 		{
 			std::fprintf( stderr, _TXT("failed to run server %s: return %d"), hostname.c_str(), ec);
 		}
-		else
-		{
-			g_serviceProgramPids.push_back( pid_chld);
-		}
 		exit( ec);
 	}
 	else
 	{
 		fprintf( stderr, "FORK parent %d, sleeping %d seconds\n", (int)getpid(), serverParentSleep);
+		g_serviceProgramPids.push_back( pid);
 		::sleep( serverParentSleep);
 	}
 }
@@ -950,6 +959,26 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& dest,
 	{
 		return false;
 	}
+	else if (lua_isboolean( L, luaddr))
+	{
+		dest.append( lua_toboolean ( L, luaddr) ? "true" : "false");
+	}
+	else if (lua_isnumber( L, luaddr))
+	{
+		double fval = lua_tonumber( L, luaddr);
+		double frac = fval - ::floor( fval);
+		if (fval < 0.0 || frac > std::numeric_limits<double>::epsilon() * 10)
+		{
+			dest.push_back( '"');
+			dest.append( lua_tostring( L, luaddr));
+			dest.push_back( '"');
+		}
+		else
+		{
+			int value = lua_tointeger( L, luaddr);
+			dest.append( strus::string_format( "%d", value));
+		}
+	}
 	else if (lua_isstring( L, luaddr))
 	{
 		dest.push_back( '"');
@@ -963,21 +992,23 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& dest,
 			case TableTypeEmpty:
 				return false;
 			case TableTypeArray:
-				dest.append( "[ ");
+				dest.append( "[");
 				convertLuaArrayToJson_( L, luaddr, dest, indent);
-				dest.append( " ]");
+				dest.append( "]");
 				break;
 			case TableTypeDictionary:
-				dest.append( "{ ");
+				dest.append( "{");
 				convertLuaDictionaryToJson_( L, luaddr, dest, indent);
-				dest.append( " }");
+				dest.append( "}");
 				break;
 		}
 	}
 	else
 	{
 		const char* str = lua_tostring( L, luaddr);
+		dest.push_back( '"');
 		if (!str) return false;
+		dest.push_back( '"');
 		dest.append( str);
 	}
 	return true;
@@ -1064,6 +1095,7 @@ static std::string convertLuaValueToJson( lua_State* L, int luaddr, bool withInd
 {
 	std::string rt;
 	convertLuaValueToJson_( L, luaddr, rt, withIndentiation ? 0 : -1);
+	rt.push_back('\n');
 	return rt;
 }
 
@@ -1928,6 +1960,7 @@ int main( int argc, const char* argv[])
 		goto EXIT;
 	}
 EXIT:
+	killBackGroundProcesses();
 	if (g_blockingCurlClient) delete g_blockingCurlClient;
 	if (g_errorhnd) delete g_errorhnd;
 	return rt;
