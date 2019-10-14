@@ -1,6 +1,6 @@
 require "testUtils"
 
-config = {
+serverConfig = {
 	data = {
 		workdir     = "@TEST_REQUEST_LUASIM_RUN_DIR@",
 		configdir   = "@TEST_REQUEST_LUASIM_RUN_DIR@/config",
@@ -45,6 +45,7 @@ config = {
 	}
 }
 
+SERVER="http://127.0.0.1:7184"
 CSERVER1="http://127.0.0.1:7182"
 SSERVER1="http://127.0.0.1:7183"
 ISERVER1="http://127.0.0.1:7184"
@@ -57,18 +58,38 @@ QSERVER1="http://127.0.0.1:7192"
 create_dir( "storage")
 create_dir( "config")
 
-function get_test_server_config( name)
-	cfg = config;
-	cfg.service.name = name
-	return cfg
+serverAddressMap = {}
+
+function def_test_server( serverName, address, embeddedConfig)
+	if serverAddressMap[ serverName] then
+		error( string.format("server %s defined twice", serverName))
+	end
+	serverAddressMap[ serverName] = address
+
+	config = serverConfig
+	config.service.name = serverName
+	if embeddedConfig then
+		def_server( address, mergeValues( embeddedConfig, config))
+	else
+		def_server( address, config)
+	end
+	if verbose then io.stderr:write( string.format("- Defined server %s at %s\n", serverName, address)) end
 end
 
-function def_test_server( name, address, embeddedConfig)
-	if embeddedConfig then
-		def_server( address, mergeValues( embeddedConfig, get_test_server_config( name)))
-	else
-		def_server( address, get_test_server_config( name))
+function serverAddress( serverName)
+	rt = serverAddressMap[ serverName]
+	if not rt then
+		error( string.format("server %s not defined", serverName))
 	end
-	if verbose then io.stderr:write( string.format("- Defined server %s at %s\n", name, address)) end
+	return rt
 end
+
+function serviceAddress( serverName, type, index)
+	if index then
+		return serverAddress( serverName) .. "/" .. type .. "/" .. string.sub( type, 1, 1) .. index
+	else
+		return serverAddress( serverName) .. "/" .. type .. "/" .. "test"
+	end
+end
+
 

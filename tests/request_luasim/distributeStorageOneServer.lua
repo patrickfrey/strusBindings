@@ -28,30 +28,23 @@ function storageServerName( storageidx)
 	return string.format("isrv%d", storageidx)
 end
 
-nofStorages = 0
-function defStorageServer( storageidx, serveraddr)
-	if storageidx > nofStorages then nofStorages = storageidx end
-	srvname = storageServerName( storageidx)
-	def_test_server( srvname, serveraddr)
-	if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", srvname, serveraddr)) end
-end
-
-function buildStorageServer( storageidx)
+function buildStorageServer( storageidx, nofStorages, serveraddr)
 	srvname = storageServerName( storageidx)
 	srvconfig = getStorageConfig( storageidx)
-	srvaddress = serverAddress( srvname)
+	def_test_server( srvname, serveraddr)
+	if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", srvname, serveraddr)) end
 
-	call_server_checked( "PUT", srvaddress  .. "/docanalyzer/test", "@docanalyzer.json" )
-	call_server_checked( "PUT", srvaddress  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+	call_server_checked( "PUT", serveraddr  .. "/docanalyzer/test", "@docanalyzer.json" )
+	call_server_checked( "PUT", serveraddr  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 	if verbose then io.stderr:write( string.format("- Created document and query analyzer for server %s\n", srvname)) end
 
-	call_server_checked( "POST", srvaddress .. "/storage/test",  srvconfig )
-	call_server_checked( "PUT",  srvaddress .. "/inserter/test", "@inserter.json" )
-	call_server_checked( "PUT", srvaddress .. "/qryeval/test",  "@qryeval.json" )
+	call_server_checked( "POST", serveraddr .. "/storage/test",  srvconfig )
+	call_server_checked( "PUT",  serveraddr .. "/inserter/test", "@inserter.json" )
+	call_server_checked( "PUT", serveraddr .. "/qryeval/test",  "@qryeval.json" )
 
 	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", srvname)) end
 
-	TRANSACTION = from_json( call_server_checked( "POST", srvaddress .. "/inserter/test/transaction" )).transaction.link
+	TRANSACTION = from_json( call_server_checked( "POST", serveraddr .. "/inserter/test/transaction" )).transaction.link
 	if verbose then io.stderr:write( string.format("- Create transaction %s for server %s\n", TRANSACTION, srvname)) end
 	local cntdoc = 0
 
@@ -69,12 +62,9 @@ function buildStorageServer( storageidx)
 	if verbose then io.stderr:write( string.format("- Inserted %d documents to server %s\n", cntdoc, srvname)) end
 end
 
-defStorageServer( 1, ISERVER1 )
-defStorageServer( 2, ISERVER2 )
-defStorageServer( 3, ISERVER3 )
-buildStorageServer( 1)
-buildStorageServer( 2)
-buildStorageServer( 3)
+buildStorageServer( 1, 3, ISERVER1)
+buildStorageServer( 2, 3, ISERVER2)
+buildStorageServer( 3, 3, ISERVER3)
 
 function storageAddress( serverurl)
 	return serverurl .. "/storage/test"
