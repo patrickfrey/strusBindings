@@ -72,8 +72,7 @@ public:
 
 	enum {
 		MaxLogContentSize=2048 /*2K*/,
-		MaxLogItemSize=48,
-		MaxLogStructDepth=4,
+		MaxLogItemSize=48
 	};
 
 private:

@@ -89,7 +89,7 @@ static void ValueVariant_appendString_maxsize( std::string& out, const papuga_Va
 						break;
 					case papuga_TagOpen:
 						--maxStructDepth;
-						if (maxStructDepth > 0)
+						if (maxStructDepth >= 0)
 						{
 							if (separator) out.push_back(',');
 							out.push_back( '{');
@@ -99,6 +99,11 @@ static void ValueVariant_appendString_maxsize( std::string& out, const papuga_Va
 					case papuga_TagClose:
 						if (maxStructDepth > 0)
 						{
+							out.push_back( '}');
+						}
+						else if (maxStructDepth == 0)
+						{
+							if (separator) out.append( "...");
 							out.push_back( '}');
 						}
 						++maxStructDepth;
@@ -168,7 +173,7 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 					papuga_ValueVariant* val = va_arg( arguments, papuga_ValueVariant*);
 					if (val)
 					{
-						ValueVariant_appendString_maxsize( rt[ei], *val, WebRequestContext::MaxLogItemSize, WebRequestContext::MaxLogContentSize, WebRequestContext::MaxLogStructDepth);
+						ValueVariant_appendString_maxsize( rt[ei], *val, WebRequestContext::MaxLogItemSize, WebRequestContext::MaxLogContentSize, structDepth);
 					}
 					else
 					{
@@ -198,7 +203,7 @@ static std::vector<std::string> getLogArgument( int structDepth, std::size_t nof
 					{
 						if (ii) rt[ ei].append( ", ");
 						std::string argstr;
-						ValueVariant_appendString_maxsize( argstr, ar[ ii], WebRequestContext::MaxLogItemSize, WebRequestContext::MaxLogContentSize, WebRequestContext::MaxLogStructDepth);
+						ValueVariant_appendString_maxsize( argstr, ar[ ii], WebRequestContext::MaxLogItemSize, WebRequestContext::MaxLogContentSize, structDepth);
 						rt[ ei].append( argstr);
 					}
 				}

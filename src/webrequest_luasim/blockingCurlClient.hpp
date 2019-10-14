@@ -30,7 +30,7 @@ public:
 			:httpstatus(o.httpstatus),content(o.content){}
 	};
 
-	Response sendJsonUtf8( const std::string& requestMethod, const std::string& url, const std::string& content) const;
+	Response sendJsonUtf8( const std::string& requestMethod, const std::string& url, const std::string& content, int nofConnRetries) const;
 };
 
 }//namespace

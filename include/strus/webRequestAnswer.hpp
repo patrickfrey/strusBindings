@@ -26,15 +26,15 @@ class WebRequestAnswer
 {
 public:
 	/// \brief Default constructor
-	WebRequestAnswer()
-		:m_errorstr(0),m_httpstatus(200),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(),m_memblock(){m_errorbuf[0]=0;}
+	explicit WebRequestAnswer( int httpstatus_=200)
+		:m_errorstr(0),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Constructor
 	/// \param[in] errorstr_ error message string
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] apperrorcode_ strus application error code
 	/// \param[in] content_ content of the answer
-	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_, const WebRequestContent& content_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(content_),m_memblock(){m_errorbuf[0]=0;}
+	WebRequestAnswer( int httpstatus_, int apperrorcode_, const WebRequestContent& content_)
+		:m_errorstr(0),m_httpstatus(httpstatus_),m_apperrorcode(apperrorcode_),m_messagetype(0),m_messagestr(0),m_content(content_),m_memblock(){m_errorbuf[0]=0;}
 	/// \brief Constructor
 	/// \param[in] content_ content of the answer
 	WebRequestAnswer( const WebRequestContent& content_)
@@ -48,8 +48,8 @@ public:
 	/// \param[in] errorstr_ error message string
 	/// \param[in] httpstatus_ http status code
 	/// \param[in] apperrorcode_ strus application error code
-	WebRequestAnswer( const char* errorstr_, int httpstatus_, int apperrorcode_)
-		:m_errorstr(errorstr_),m_httpstatus(httpstatus_),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(),m_memblock(){m_errorbuf[0]=0;}
+	WebRequestAnswer( int httpstatus_, int apperrorcode_, const char* errorstr_, bool doCopy=false)
+		:m_errorstr(0),m_httpstatus(0),m_apperrorcode(0),m_messagetype(0),m_messagestr(0),m_content(),m_memblock(){setError(httpstatus_,apperrorcode_,errorstr_,doCopy);}
 	/// \brief Copy constructor
 	WebRequestAnswer( const WebRequestAnswer& o)
 		:m_errorstr(o.m_errorstr),m_httpstatus(o.m_httpstatus),m_apperrorcode(o.m_apperrorcode),m_messagetype(o.m_messagetype),m_messagestr(o.m_messagestr),m_content(o.m_content),m_memblock(o.m_memblock)
@@ -129,6 +129,7 @@ public:
 		}
 		else
 		{
+			m_errorbuf[ 0] = 0;
 			m_errorstr = errorstr_;
 		}
 		m_httpstatus = httpstatus_;
@@ -173,6 +174,7 @@ public:
 		else
 		{
 			m_messagestr = str;
+			m_errorbuf[ 0] = 0;
 		}
 		m_httpstatus = httpstatus_;
 		m_messagetype = type;

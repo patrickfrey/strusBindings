@@ -594,7 +594,12 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 				if (di->url())
 				{
 					ConfigurationUpdateRequestContext* update = new ConfigurationUpdateRequestContext( this, m_logger, ctx, di->receiverSchema(), &count);
-					m_eventLoop->send( di->url(), di->method(), delegate_contentstr, update);
+					if (!m_eventLoop->send( di->url(), di->method(), delegate_contentstr, update))
+					{
+						count.set( 0);
+						rt = false;
+						break;
+					}
 				}
 				else
 				{
@@ -602,7 +607,7 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 					WebRequestContent delegate_content( g_config_charset, g_config_doctype, delegate_contentstr.c_str(), delegate_contentstr.size());
 					if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegate_content))
 					{
-						count.decrement( delegates.size() - didx);
+						count.set( 0);
 						rt = false;
 						break;
 					}
@@ -611,12 +616,12 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 			catch (const std::bad_alloc&)
 			{
 				setAnswer( answer, ErrorCodeOutOfMem);
-				count.decrement( delegates.size() - didx);
+				count.set( 0);
 				rt = false;
 				break;
 			}
 		}
-		while (count.value())
+		while (count.value() > 0)
 		{
 			strus::usleep( 50);
 			// ... we poll with a sleep of 20ms as it is not time critical to do this in the initialization phase

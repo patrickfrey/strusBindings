@@ -330,7 +330,11 @@ static Logger g_logger;
 static const char* g_charset = "UTF-8";
 static const char* g_doctype = "application/json";
 static strus::BlockingCurlClient* g_blockingCurlClient = 0;
-static int g_defaultServerParentSleep = 3;
+static int g_serverConnSleep = 2;
+static int g_serverConnRetry = 12;
+static bool g_printLuaCalls = false;
+static int g_verbosity = 0;
+static bool g_killChildOnError = true;
 
 namespace {
 template <typename ValueType>
@@ -458,7 +462,7 @@ public:
 	GlobalContext(){}
 
 	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson);
-	void startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep);
+	void startServerProcess( const std::string& hostname, const std::string& configjson);
 	strus::WebRequestAnswer call( const std::string& method, const std::string& url, const std::string& content);
 	void reportError( const char* fmt, ...);
 
@@ -559,14 +563,21 @@ private:
 	strus::WebRequestAnswer* m_answer;
 };
 
+struct ChildProcess
+{
+	std::string address;
+	pid_t pid;
+
+	ChildProcess( const std::string& address_, pid_t pid_)
+		:address(address_),pid(pid_){}
+};
 
 static EventLoop g_eventLoop;
 static GlobalContext g_globalContext;
 static std::string g_scriptDir;
 static std::string g_outputDir;
 static std::string g_serviceProgramCmdLine;
-static std::vector<pid_t> g_serviceProgramPids;
-static int g_verbosity = 0;
+static std::vector<ChildProcess> g_childProcessList;
 static strus::DebugTraceInterface* g_debugTrace = 0;
 static strus::ErrorBufferInterface* g_errorhnd = 0;
 
@@ -664,11 +675,19 @@ static std::vector<std::string> splitCmdLine( const std::string& cmdline)
 
 void killBackGroundProcesses()
 {
-	std::vector<pid_t>::const_iterator pi = g_serviceProgramPids.begin(), pe = g_serviceProgramPids.end();
+	std::vector<ChildProcess>::const_iterator pi = g_childProcessList.begin(), pe = g_childProcessList.end();
 	for (; pi != pe; ++pi)
 	{
-		if (0>::kill( *pi, SIGTERM)) ::fprintf( stderr, "failed to kill process with pid %d: %s\n", (int)*pi, ::strerror(errno));
+		if (0>::kill( pi->pid, SIGTERM))
+		{
+			::fprintf( stderr, _TXT("failed to kill process for %s with pid %d: %s\n"), pi->address.c_str(), (int)pi->pid, ::strerror(errno));
+		}
+		else if (g_verbosity >= 3)
+		{
+			::fprintf( stderr, _TXT("KILL %d (%s)\n"), (int)pi->pid, pi->address.c_str());
+		}
 	}
+	g_childProcessList.clear();
 	::fflush( stderr);
 }
 
@@ -837,7 +856,7 @@ void GlobalContext::defineServer( const std::string& hostname, const Configurati
 	}
 }
 
-void GlobalContext::startServerProcess( const std::string& hostname, const std::string& configjson, int serverParentSleep)
+void GlobalContext::startServerProcess( const std::string& hostname, const std::string& configjson)
 {
 	std::string portstr = getPostString( hostname);
 	std::string configfile = strus::string_format( "tmp.config.%s.js", portstr.c_str());
@@ -866,7 +885,7 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	if ( pid == 0 )
 	{
 		pid_t pid_chld = ::getpid();
-		fprintf( stderr, "FORK child %d EXEC %s\n", (int)pid_chld, cmdline.c_str());
+		if (g_verbosity >= 2) fprintf( stderr, _TXT("FORK child pid %d EXEC %s\n"), (int)pid_chld, cmdline.c_str());
 		ec = ::execvp( argv[0], (char* const*)(argv));
 		if (ec)
 		{
@@ -876,9 +895,9 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	}
 	else
 	{
-		fprintf( stderr, "FORK parent %d, sleeping %d seconds\n", (int)getpid(), serverParentSleep);
-		g_serviceProgramPids.push_back( pid);
-		::sleep( serverParentSleep);
+		if (g_verbosity >= 2) fprintf( stderr, _TXT("FORK parent pid %d, sleeping for %d seconds\n"), (int)getpid(), g_serverConnSleep);
+		g_childProcessList.push_back( ChildProcess( hostname, pid));
+		::sleep( g_serverConnSleep);
 	}
 }
 
@@ -886,7 +905,7 @@ strus::WebRequestAnswer GlobalContext::call( const std::string& method, const st
 {
 	if (g_blockingCurlClient)
 	{
-		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, contentstr);
+		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, contentstr, g_serverConnRetry);
 		strus::WebRequestContent content( g_charset, g_doctype, response.content.c_str(), response.content.size());
 		strus::WebRequestAnswer rt( response.httpstatus, content);
 		rt.copyContent();
@@ -903,7 +922,7 @@ strus::WebRequestAnswer GlobalContext::call( const std::string& method, const st
 		if (pi == m_procMap.end())
 		{
 			const char* errmsg = strus::errorCodeToString( strus::ErrorCodeNotFound);
-			return strus::WebRequestAnswer( errmsg, 404, strus::ErrorCodeNotFound);
+			return strus::WebRequestAnswer( 404, strus::ErrorCodeNotFound, errmsg);
 		}
 		else
 		{
@@ -1094,8 +1113,15 @@ static void convertLuaDictionaryToJson_( lua_State* L, int luaddr, std::string& 
 static std::string convertLuaValueToJson( lua_State* L, int luaddr, bool withIndentiation)
 {
 	std::string rt;
-	convertLuaValueToJson_( L, luaddr, rt, withIndentiation ? 0 : -1);
-	rt.push_back('\n');
+	if (withIndentiation)
+	{
+		convertLuaValueToJson_( L, luaddr, rt, 0);
+		rt.push_back('\n');
+	}
+	else
+	{
+		convertLuaValueToJson_( L, luaddr, rt, -1);
+	}
 	return rt;
 }
 
@@ -1217,25 +1243,46 @@ static std::string convertSourceRegexReplace( const char* src, const char* expr,
 	return rt;
 }
 
+static int g_nofLuaCalls = 0;
 static void logLuaCall( std::ostream& out, lua_State* L, const char* fname, int nofArgs)
 {
 	int ni = 0;
-	std::string cmdline( fname);
+	++g_nofLuaCalls;
+	std::string cmdline;
+	cmdline.append( fname);
 	for (; ni < nofArgs; ++ni)
 	{
 		cmdline.push_back( ' ');
 		cmdline.append( convertLuaValueToJson( L, 1+ni, false/*no indent*/));
 	}
-	out << "LUA " << cmdline << std::endl;
+	out << "LUA " << strus::string_format( "%d: ", g_nofLuaCalls) << cmdline << std::endl;
+}
+
+static void logLuaReturn( std::ostream& out, lua_State* L, const char* fname, int nofRetvals)
+{
+	int ni = nofRetvals;
+	std::string retline( fname);
+	retline.append( strus::string_format( "[%d]", nofRetvals));
+	for (; ni > 0; --ni)
+	{
+		retline.push_back( ' ');
+		retline.append( convertLuaValueToJson( L, -ni, false/*no indent*/));
+	}
+	out << "RET " << strus::string_format( "%d: ", g_nofLuaCalls) << retline << std::endl;
 }
 
 static void LUA_FUNCTION_HEADER( lua_State* L, const char* funcname, int minNofArgs, int maxNofArgs, const char* expectedArgs)
 {
 	int nofArgs = lua_gettop(L);
-	if (g_verbosity >= 2) logLuaCall( std::cerr, L, funcname, nofArgs);
+	if (g_verbosity >= 2 || g_printLuaCalls) logLuaCall( std::cerr, L, funcname, nofArgs);
 
 	if (nofArgs > maxNofArgs) luaL_error(L, _TXT("too many (%d, max %d) arguments for '%s', expected %s"), nofArgs, maxNofArgs, funcname, expectedArgs);
 	if (nofArgs < minNofArgs) luaL_error(L, _TXT("too few (%d, min %d) arguments for '%s', expected %s"), nofArgs, minNofArgs, funcname, expectedArgs);
+}
+
+static void LUA_FUNCTION_TAIL( lua_State* L, const char* funcname, int nofRetvals)
+{
+	if (g_verbosity >= 2 || g_printLuaCalls) logLuaReturn( std::cerr, L, funcname, nofRetvals);
 }
 
 static int l_set_time( lua_State* L)
@@ -1246,6 +1293,8 @@ static int l_set_time( lua_State* L)
 
 		long newtime = lua_tointeger( L, 1);
 		g_eventLoop.setTime( newtime);
+
+		LUA_FUNCTION_TAIL( L, "set_time", 0);
 	}
 	catch (const std::exception& err)
 	{
@@ -1270,10 +1319,9 @@ static int l_def_server( lua_State* L)
 		}
 		else
 		{
-			lua_getglobal( L, "serverwait");
-			int serverParentSleep = lua_isnumber( L, -1) ? lua_tointeger( L, -1) : g_defaultServerParentSleep;
-			g_globalContext.startServerProcess( hostname, configjson, serverParentSleep);
+			g_globalContext.startServerProcess( hostname, configjson);
 		}
+		LUA_FUNCTION_TAIL( L, "def_server", 0);
 	}
 	catch (const std::exception& err)
 	{
@@ -1324,6 +1372,7 @@ static int l_call_server( lua_State* L)
 			lua_pushinteger(L, result.httpstatus()); /* second return value */
 			lua_pushnil(L);
 		}
+		LUA_FUNCTION_TAIL( L, "call_server", 3);
 		return 3;
 	}
 	catch (const std::exception& err)
@@ -1407,6 +1456,7 @@ static int l_cmp_content( lua_State* L)
 		if (!*ai && !*bi)
 		{
 			lua_pushboolean( L, true);
+			LUA_FUNCTION_TAIL( L, "cmp_content", 1);
 			return 1;
 		}
 		else
@@ -1415,6 +1465,7 @@ static int l_cmp_content( lua_State* L)
 			lua_pushinteger( L, linecnt);
 			push_linestring( L, a_ln);
 			push_linestring( L, b_ln);
+			LUA_FUNCTION_TAIL( L, "cmp_content", 4);
 			return 4;
 		}
 	}
@@ -1437,6 +1488,8 @@ static int l_load_file( lua_State* L)
 		int ec = strus::readFile( fullpath, content);
 		if (ec) throw strus::runtime_error( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
 		lua_pushlstring(L, content.c_str(), content.size());
+
+		LUA_FUNCTION_TAIL( L, "load_file", 1);
 		return 1;
 	}
 	catch (const std::exception& err)
@@ -1476,6 +1529,7 @@ static int l_write_file( lua_State* L)
 		{
 			luaL_error( L, _TXT("failed to write text file (errno %d): %s"), ec, ::strerror(ec));
 		}
+		LUA_FUNCTION_TAIL( L, "write_file", 0);
 		return 0;
 	}
 	catch (const std::exception& err)
@@ -1498,6 +1552,7 @@ static int l_remove_file( lua_State* L)
 		{
 			luaL_error( L, _TXT("failed to remove file (errno %d): %s"), ec, ::strerror(ec));
 		}
+		LUA_FUNCTION_TAIL( L, "remove_file", 0);
 		return 0;
 	}
 	catch (const std::exception& err)
@@ -1525,6 +1580,7 @@ static int l_create_dir( lua_State* L)
 		{
 			luaL_error( L, _TXT("failed to create directory (errno %d): %s"), ec, ::strerror(ec));
 		}
+		LUA_FUNCTION_TAIL( L, "create_dir", 0);
 		return 0;
 	}
 	catch (const std::exception& err)
@@ -1546,6 +1602,8 @@ static int l_reformat_float( lua_State* L)
 
 		std::string result = convertSourceReformatFloat( content, precision);
 		lua_pushlstring( L, result.c_str(), result.size()); 
+
+		LUA_FUNCTION_TAIL( L, "reformat_float", 1);
 		return 1;
 	}
 	catch (const std::exception& err)
@@ -1568,6 +1626,8 @@ static int l_reformat_regex( lua_State* L)
 
 		std::string result = convertSourceRegexReplace( content, expr, substfmt);
 		lua_pushlstring( L, result.c_str(), result.size()); 
+
+		LUA_FUNCTION_TAIL( L, "reformat_regex", 1);
 		return 1;
 	}
 	catch (const std::exception& err)
@@ -1585,6 +1645,8 @@ static int l_to_json( lua_State* L)
 
 		std::string result = convertLuaValueToJson( L, 1, true/*indentiation*/);
 		lua_pushlstring( L, result.c_str(), result.size()); 
+
+		LUA_FUNCTION_TAIL( L, "to_json", 1);
 		return 1;
 	}
 	catch (const std::exception& err)
@@ -1601,6 +1663,8 @@ static int l_from_json( lua_State* L)
 		LUA_FUNCTION_HEADER( L, "from_json", 1, 1, "<json content to parse>");
 
 		pushConvertedJsonAsLuaTable( L, 1);
+
+		LUA_FUNCTION_TAIL( L, "from_json", 1);
 		return 1;
 	}
 	catch (const std::exception& err)
@@ -1633,29 +1697,39 @@ static void declareFunctions( lua_State* L)
 static void printUsage()
 {
 	fprintf( stderr, "%s",
-		 "strusWebRequestLuaSim [<options>] <luascript> [<outputdir>]\n"
+		"strusWebRequestLuaSim [<options>] <luascript> [<outputdir>]\n"
 		"Program Options <options>:\n" 
 		 "   -h,--help          :Print this usage\n"
 		 "   -m,--mod <PATH>    :Set <PATH> as addidional module path\n"
 		 "   -G,--debug <ID>    :Enable debug trace of items with id <ID>\n"
-		 "   -V                 :Raise verbosity level (may be repeated\n"
+		 "   -V                 :Raise verbosity level (may be repeated)\n"
+		 "   --calltrace        :Print trace of lua procedures defined here\n"
+		 "                       This option has no effect with a verbosity >= 2,\n"
+		 "                       because then the call trace is printed anyway.\n"
+		 "   -E,--nokill        :Do not kill child processes after exit with error\n"
 		 "   -p,--program <PRG> :Use the command line <PRG> for starting a\n"
 		 "                       web service instance instead of running the\n"
 		 "                       commands directly. The strings {port} and {config}\n"
 		 "                       in the command line are substituted by the\n"
-		 "                       corresponding values\n"
+		 "                       corresponding values\n");
+	fprintf( stderr,
 		 "Program arguments:\n"
 		 "<luascript>           :Lua script with the commands to execute\n"
 		 "<outputdir>           :Working directory (default execution dir)\n");
-	fprintf( stderr, "The environment variable STRUS_WS_SLEEP can be set as \n"
+	fprintf( stderr, "The environment variable STRUS_CONN_SLEEP can be set as \n"
 		"the number of seconds the fork parent sleeps while starting the\n"
-		"web service program specified with --program. The default is 3\n");
+		"web service program specified with --program. The default is %d\n",
+		 g_serverConnSleep);
+	fprintf( stderr, "The environment variable STRUS_CONN_RETRY can be set as \n"
+		"the number of connection retries on client server connections\n"
+		"when running with the option --program. The default is %d\n",
+		 g_serverConnRetry);
 }
 
 static void setLuaPath( lua_State* ls, const char* path)
 {
 	const char* cur_path;
-	if (g_verbosity) fprintf( stderr, "set lua module path to: '%s'\n", path);
+	if (g_verbosity) fprintf( stderr, _TXT("set lua module path to: '%s'\n"), path);
 	char pathbuf[ 2048];
 	lua_getglobal( ls, "package");
 	lua_getfield( ls, -1, "path");
@@ -1674,7 +1748,7 @@ static void setLuaPath( lua_State* ls, const char* path)
 			luaL_error( ls, _TXT("internal buffer is too small for path"));
 		}
 	}
-	if (g_verbosity) fprintf( stderr, "set lua module pattern to: '%s'\n", pathbuf);
+	if (g_verbosity) fprintf( stderr, _TXT("set lua module pattern to: '%s'\n"), pathbuf);
 	lua_pop( ls, 1); 
 	lua_pushstring( ls, pathbuf);
 	lua_setfield( ls, -2, "path");
@@ -1786,6 +1860,14 @@ int main( int argc, const char* argv[])
 				thisCommandLine.append( " -");
 				thisCommandLine.append( std::string( g_verbosity, 'V'));
 			}
+			else if (0==strcmp( argv[argi], "--calltrace"))
+			{
+				g_printLuaCalls = true;
+			}
+			else if (0==strcmp( argv[argi], "-E") || 0==strcmp( argv[argi], "--nokill"))
+			{
+				g_killChildOnError = false;
+			}
 			else if (0==strcmp( argv[argi], "--debug") || 0==strcmp( argv[argi], "-G"))
 			{
 				++argi;
@@ -1835,21 +1917,33 @@ int main( int argc, const char* argv[])
 		{
 			throw std::runtime_error( _TXT("too few arguments (less than one)"));
 		}
-		char const* serverParentSleepEnv = ::getenv( "STRUS_WS_SLEEP");
-		if (serverParentSleepEnv)
+		if (!g_serviceProgramCmdLine.empty())
 		{
-			if (g_serviceProgramCmdLine.empty())
+			char const* serverConnSleepEnv = ::getenv( "STRUS_CONN_SLEEP");
+			if (serverConnSleepEnv)
 			{
-				std::cerr << _TXT("ignoring value of environment variable STRUS_WS_SLEEP as the web service command line is not specified by option --program") << std::endl;
+				int wsleep = ::atoi( serverConnSleepEnv);
+				if (wsleep > 0)
+				{
+					g_serverConnSleep = wsleep;
+				}
+				else
+				{
+					std::cerr << _TXT("ignoring value of environment variable STRUS_WS_SLEEP expected to be an integer greater than 0") << std::endl;
+				}
 			}
-			int wsleep = ::atoi( serverParentSleepEnv);
-			if (wsleep > 0)
+			char const* serverConnRetryEnv = ::getenv( "STRUS_CONN_RETRY");
+			if (serverConnRetryEnv)
 			{
-				g_defaultServerParentSleep = wsleep;
-			}
-			else
-			{
-				std::cerr << _TXT("ignoring value of environment variable STRUS_WS_SLEEP expected to be an integer greater than 0") << std::endl;
+				int wretry = ::atoi( serverConnRetryEnv);
+				if (wretry > 0)
+				{
+					g_serverConnRetry = wretry;
+				}
+				else
+				{
+					std::cerr << _TXT("ignoring value of environment variable STRUS_WS_RETRY expected to be an integer greater than 0") << std::endl;
+				}
 			}
 		}
 		inputfile = argv[ argi++];
@@ -1888,7 +1982,7 @@ int main( int argc, const char* argv[])
 		}
 		g_logger.init( g_verbosity);
 
-		if (g_verbosity) fprintf( stderr, "create lua state\n");
+		if (g_verbosity) fprintf( stderr, _TXT("create lua state\n"));
 		if (!g_serviceProgramCmdLine.empty())
 		{
 			g_blockingCurlClient = new strus::BlockingCurlClient();
@@ -1908,7 +2002,7 @@ int main( int argc, const char* argv[])
 		declareFunctions( ls);
 	
 		/* Load the script: */
-		if (g_verbosity) fprintf( stderr, "load script file: '%s'\n", inputfile);
+		if (g_verbosity) fprintf( stderr, _TXT("load script file: '%s'\n"), inputfile);
 
 		errcode = luaL_loadfile( ls, inputfile);
 		if (errcode != LUA_OK)
@@ -1918,7 +2012,7 @@ int main( int argc, const char* argv[])
 			rt = -2;
 			goto EXIT;
 		}
-		if (g_verbosity) fprintf( stderr, "starting ...\n");
+		if (g_verbosity) fprintf( stderr, _TXT("starting script ...\n"));
 
 		/* Run the script: */
 		errcode = lua_pcall( ls, 0, LUA_MULTRET, 0);
@@ -1939,6 +2033,7 @@ int main( int argc, const char* argv[])
 				throw strus::runtime_error( _TXT("error in strus context: %s"), g_errorhnd->fetchError());
 			}
 		}
+		killBackGroundProcesses();
 		goto EXIT;
 	}
 	catch (const std::bad_alloc&)
@@ -1960,7 +2055,7 @@ int main( int argc, const char* argv[])
 		goto EXIT;
 	}
 EXIT:
-	killBackGroundProcesses();
+	if (g_killChildOnError) killBackGroundProcesses();
 	if (g_blockingCurlClient) delete g_blockingCurlClient;
 	if (g_errorhnd) delete g_errorhnd;
 	return rt;

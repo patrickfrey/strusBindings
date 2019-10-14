@@ -77,7 +77,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 		}
 	}
 	m_counter->decrement( 1);
-	if (m_counter->value() == 0)
+	if (m_counter->value() <= 0)
 	{
 		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConnectionEvents))
 		{

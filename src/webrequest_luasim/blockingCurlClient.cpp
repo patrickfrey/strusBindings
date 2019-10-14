@@ -9,6 +9,8 @@
 /// \file "blockingCurlClient.cpp"
 #include "blockingCurlClient.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/base/sleep.hpp"
+#include "private/internationalization.hpp"
 #include <curl/curl.h>
 #include <stdexcept>
 #include <cstring>
@@ -21,7 +23,7 @@ static void set_curl_opt( CURL *curl, CURLoption opt, const DATA& data)
 	CURLcode res = curl_easy_setopt( curl, opt, data);
 	if (res != CURLE_OK)
 	{
-		throw std::runtime_error( strus::string_format( "failed set socket option: %s", curl_easy_strerror(res)));
+		throw strus::runtime_error( _TXT("failed set socket option: %s"), curl_easy_strerror(res));
 	}
 }
 
@@ -69,7 +71,7 @@ struct ResponseBuf
 	}
 };
 
-static void issueRequest( const std::string& url, int port, const std::string& method_, const std::string& content, ResponseBuf& response)
+static CURLcode issueRequest( const std::string& url, int port, const std::string& method_, const std::string& content, ResponseBuf& response)
 {
 	std::string errout;
 	std::string method = method_;
@@ -122,7 +124,7 @@ static void issueRequest( const std::string& url, int port, const std::string& m
 	}
 	if (headers) curl_slist_free_all( headers);
 	if (curl) curl_easy_cleanup( curl);
-	if (ec != CURLE_OK) throw std::runtime_error( curl_easy_strerror( ec));
+	return ec;
 }
 
 static int getPort( const std::string& url)
@@ -160,15 +162,26 @@ BlockingCurlClient::~BlockingCurlClient()
 	curl_global_cleanup();
 }
 
-BlockingCurlClient::Response BlockingCurlClient::sendJsonUtf8( const std::string& requestMethod, const std::string& address, const std::string& content) const
+BlockingCurlClient::Response BlockingCurlClient::sendJsonUtf8( const std::string& requestMethod, const std::string& address, const std::string& content, int nofConnRetries) const
 {
 	std::string url = getUrl( address);
 	int port = getPort( address);
 	ResponseBuf response;
+	int connectionFailures = 0;
 
-	issueRequest( url, port, requestMethod, content, response);
+	CURLcode ec = issueRequest( url, port, requestMethod, content, response);
+	while (ec == CURLE_COULDNT_CONNECT && --nofConnRetries >= 0)
+	{
+		++connectionFailures;
+		fprintf( stderr, _TXT("Connection to server '%s' port %d failed (%d times)\n"), url.c_str(), port, connectionFailures);
+		strus::sleep( 1);
+		ec = issueRequest( url, port, requestMethod, content, response);
+	}
+	if (ec != CURLE_OK)
+	{
+		throw strus::runtime_error( _TXT("request %s to '%s' failed: %s"), requestMethod.c_str(), address.c_str(), curl_easy_strerror( ec));	
+	}
 	response.cutDuplicateEolnAtEndOfContent();
 	return Response( response.httpstatus, response.content);
 }
-
 

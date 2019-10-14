@@ -62,7 +62,8 @@ private:
 void WebRequestDelegateJob::dropRequest( ErrorCode errcode, const char* errmsg)
 {
 	int httpStatus = errorCodeToHttpStatus( errcode);
-	WebRequestAnswer answer( errmsg ? errmsg : strus::errorCodeToString(errcode), httpStatus, errcode);
+	if (!errmsg) errmsg = strus::errorCodeToString(errcode);
+	WebRequestAnswer answer( httpStatus, errcode, errmsg);
 	m_receiver->putAnswer( answer);
 	if (CurlLogger::LogError <= m_logger->loglevel())
 	{
@@ -99,7 +100,7 @@ void WebRequestDelegateJob::resume( CURLcode ec)
 		{
 			long http_code = 500;
 			curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &http_code);
-			WebRequestAnswer answer( m_message.response_error(), http_code, ErrorCodeDelegateRequestFailed);
+			WebRequestAnswer answer( http_code, ErrorCodeDelegateRequestFailed, m_message.response_error());
 			m_receiver->putAnswer( answer);
 		}
 	}
@@ -218,6 +219,7 @@ struct CurlEventLoop::Data
 	{
 		try
 		{
+			if (!m_thread) throw std::runtime_error( _TXT("send failed because eventloop thread not started yet"));
 			strus::shared_ptr<WebRequestDelegateContextInterface> receiverRef( receiver);
 			WebRequestDelegateJobRef job( new WebRequestDelegateJob( address, method, content, receiverRef, &m_logger, this));
 			{
@@ -229,7 +231,7 @@ struct CurlEventLoop::Data
 		}
 		catch (const std::runtime_error& err)
 		{
-			WebRequestAnswer answer( err.what(), 500, ErrorCodeDelegateRequestFailed);
+			WebRequestAnswer answer( 500, ErrorCodeDelegateRequestFailed, err.what());
 			receiver->putAnswer( answer);
 			m_logger.print( CurlLogger::LogFatal, err.what());
 			delete receiver;
@@ -237,7 +239,7 @@ struct CurlEventLoop::Data
 		}
 		catch (const std::bad_alloc& )
 		{
-			WebRequestAnswer answer( _TXT("memory allocation error"), 500, ErrorCodeOutOfMem);
+			WebRequestAnswer answer( 500, ErrorCodeOutOfMem, _TXT("memory allocation error"));
 			receiver->putAnswer( answer);
 			m_logger.print( CurlLogger::LogFatal, _TXT("memory allocation error"));
 			delete receiver;
@@ -245,7 +247,7 @@ struct CurlEventLoop::Data
 		}
 		catch (...)
 		{
-			WebRequestAnswer answer( _TXT("unexpected exception"), 500, ErrorCodeDelegateRequestFailed);
+			WebRequestAnswer answer( 500, ErrorCodeDelegateRequestFailed, _TXT("unexpected exception"));
 			receiver->putAnswer( answer);
 			m_logger.print( CurlLogger::LogFatal, _TXT("unexpected exception"));
 			delete receiver;
