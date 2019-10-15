@@ -59,21 +59,26 @@ create_dir( "storage")
 create_dir( "config")
 
 serverAddressMap = {}
+serverSet = {}
 
 function def_test_server( serverName, address, embeddedConfig)
-	if serverAddressMap[ serverName] then
-		error( string.format("server %s defined twice", serverName))
-	end
-	serverAddressMap[ serverName] = address
+	serverSetKey = serverName .. ":" .. address
+	if not serverSet[ serverSetKey] then
+		serverSet[ serverSetKey] = true
+		if serverAddressMap[ serverName] then
+			error( string.format("server %s defined twice", serverName))
+		end
+		serverAddressMap[ serverName] = address
 
-	config = serverConfig
-	config.service.name = serverName
-	if embeddedConfig then
-		def_server( address, mergeValues( embeddedConfig, config))
-	else
-		def_server( address, config)
+		config = serverConfig
+		config.service.name = serverName
+		if embeddedConfig then
+			def_server( address, mergeValues( embeddedConfig, config))
+		else
+			def_server( address, config)
+		end
+		if verbose then io.stderr:write( string.format("- Defined server %s at %s\n", serverName, address)) end
 	end
-	if verbose then io.stderr:write( string.format("- Defined server %s at %s\n", serverName, address)) end
 end
 
 function serverAddress( serverName)

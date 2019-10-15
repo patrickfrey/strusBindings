@@ -23,9 +23,12 @@ add_custom_target( test_ws )
 function( DeclareTest TestTitle TestScript )
 	set( LuaSim ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim )
 	add_test( ${TestTitle}  ${LuaSim} ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
+	set( TestWsCommand  ${LuaSim} --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
+
 	add_custom_command( 
 		TARGET test_ws
-		COMMAND  ${LuaSim} -V --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
+		COMMENT "Running test ${TestTitle}:\n${TestWsCommand}"
+		COMMAND  ${LuaSim} --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
 endfunction( DeclareTest )
 
 DeclareTest( MapLuaTableToJson configToJson.lua )

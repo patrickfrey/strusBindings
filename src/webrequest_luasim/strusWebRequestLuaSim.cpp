@@ -1690,6 +1690,20 @@ static void declareFunctions( lua_State* L)
 	DEFINE_FUNCTION( reformat_regex );
 	DEFINE_FUNCTION( to_json );
 	DEFINE_FUNCTION( from_json );
+}
+
+static void declareArguments( lua_State* L, const char** arguments)
+{
+	int ai = 0;
+	lua_newtable( L);
+	while (arguments[ ai])
+	{
+		lua_pushinteger( L, ai+1);
+		lua_pushstring( L, arguments[ ai]);
+		lua_settable( L, -3);
+	}
+	lua_setglobal( L, "argv");
+
 	lua_pushboolean( L, g_verbosity > 0);
 	lua_setglobal( L, "verbose");
 }
@@ -1824,6 +1838,9 @@ int main( int argc, const char* argv[])
 {
 	int rt = 0;
 	const char* inputfile = 0;
+	enum {MaxNofArguments=7};
+	const char* arguments[ MaxNofArguments+1];
+	int nofArguments = 0;
 	lua_State* ls = 0;
 	int argi = 1;
 	int errcode = 0;
@@ -1961,6 +1978,14 @@ int main( int argc, const char* argv[])
 			g_outputDir = argv[ argi++];
 			thisCommandLine.append( strus::string_format( " \"%s\"", g_outputDir.c_str()));
 		}
+		int ai = 0;
+		while (ai != MaxNofArguments && argi != argc)
+		{
+			arguments[ ai++] = argv[ argi++];
+		}
+		arguments[ ai] = NULL;
+		nofArguments = ai;
+
 		if (argi != argc)
 		{
 			throw std::runtime_error( _TXT("too many arguments"));
@@ -2000,7 +2025,8 @@ int main( int argc, const char* argv[])
 		}
 		setLuaPath( ls, g_outputDir.c_str());
 		declareFunctions( ls);
-	
+		declareArguments( ls, arguments);
+
 		/* Load the script: */
 		if (g_verbosity) fprintf( stderr, _TXT("load script file: '%s'\n"), inputfile);
 

@@ -5,6 +5,56 @@ require "os"
 
 SCRIPTPATH = script_path()
 
+function storageServerName( storageidx)
+	return string.format("isrv%d", storageidx)
+end
+
+server = {
+	storage = {
+			{ name = storageServerName( 1), address = ISERVER1 },
+			{ name = storageServerName( 2), address = ISERVER2 },
+			{ name = storageServerName( 3), address = ISERVER3 },
+		},
+	statserver  =	{ name = "ssrv1",               address = SSERVER1 },
+	distqryeval =	{ name = "qsrv1",               address = QSERVER1 }
+}
+
+function serverHaveSameName( srvar)
+	ai = 1
+	while ai < #srvar do
+		if srvar[ ai].name ~= srvar[ ai+1].name then
+			return false
+		end
+	end
+	return true
+end
+
+function storageContextName( index)
+	if serverHaveSameName( server.storage) then
+		return "sto" .. index
+	else
+		return "test"
+	end
+end
+
+function serviceAddress( name, index)
+	if name == "storage" or name == "inserter" or name == "qryeval" then
+		return server.storage[ index].address .. "/" .. name .. "/" .. storageContextName( index) 
+
+	elseif name == "docanalyzer" or name == "qryanalyzer" then
+		return server.storage[ index].address .. "/" .. name .. "/test"
+
+	elseif name == "statserver" then
+		return server.statserver1.address .. "/" .. name .. "/test"
+
+	elseif name == "distqryeval" then
+		return server.distqryeval.address .. "/" .. name .. "/test"
+
+	else
+		error( "unknown service " .. name )
+	end
+end
+
 storageConfig = {
 	storage = {
 		database = "leveldb",
@@ -24,8 +74,15 @@ function getStorageConfig( storageidx)
 	return cfg
 end
 
-function storageServerName( storageidx)
-	return string.format("isrv%d", storageidx)
+function getInserterConfig( storageidx)
+	return {
+		inserter = {
+			include = {
+				analyzer = "test",
+				storage  = storageContextName( storageidx)
+			}
+		}
+	}
 end
 
 nofStorages = 0
@@ -41,17 +98,17 @@ function buildStorageServer( storageidx)
 	srvconfig = getStorageConfig( storageidx)
 	srvaddress = serverAddress( srvname)
 
-	call_server_checked( "PUT", srvaddress  .. "/docanalyzer/test", "@docanalyzer.json" )
-	call_server_checked( "PUT", srvaddress  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+	call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
+	call_server_checked( "PUT", serviceAddress( "qryanalyzer", storageidx), "@qryanalyzer.json" )
 	if verbose then io.stderr:write( string.format("- Created document and query analyzer for server %s\n", srvname)) end
 
-	call_server_checked( "POST", srvaddress .. "/storage/test",  srvconfig )
-	call_server_checked( "PUT",  srvaddress .. "/inserter/test", "@inserter.json" )
-	call_server_checked( "PUT", srvaddress .. "/qryeval/test",  "@qryeval.json" )
+	call_server_checked( "POST", serviceAddress( "storage", storageidx),  srvconfig )
+	call_server_checked( "PUT",  serviceAddress( "inserter", storageidx), getInserterConfig( storageidx) )
+	call_server_checked( "PUT", serviceAddress( "qryeval", storageidx),  "@qryeval.json" )
 
 	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", srvname)) end
 
-	TRANSACTION = from_json( call_server_checked( "POST", srvaddress .. "/inserter/test/transaction" )).transaction.link
+	TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "inserter", storageidx) .. "/transaction" )).transaction.link
 	if verbose then io.stderr:write( string.format("- Create transaction %s for server %s\n", TRANSACTION, srvname)) end
 	local cntdoc = 0
 
@@ -61,7 +118,7 @@ function buildStorageServer( storageidx)
 		hs = hashString( fullpath, nofStorages, 1)
 		if hs == storageidx then
 			cntdoc = cntdoc + 1
-			if verbose then io.stderr:write( string.format("- Insert document %s to server %d\n", fullpath, srvname)) end
+			if verbose then io.stderr:write( string.format("- Insert document %s to server %s\n", fullpath, srvname)) end
 			call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
 		end
 	end
@@ -93,9 +150,9 @@ statserverConfig = {
 		proc = "std",
 		blocks = "100K",
 		storage = {
-			storageAddress(ISERVER1),
-			storageAddress(ISERVER2),
-			storageAddress(ISERVER3)
+			storageAddress( serverAddress( storageServerName( 1))),
+			storageAddress( serverAddress( storageServerName( 2))),
+			storageAddress( serverAddress( storageServerName( 3)))
 		}
 	}
 }
