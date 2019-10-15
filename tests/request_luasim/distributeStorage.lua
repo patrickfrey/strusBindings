@@ -5,41 +5,31 @@ require "os"
 
 SCRIPTPATH = script_path()
 
-function storageServerName( storageidx)
-	return string.format("isrv%d", storageidx)
-end
-
+if argv[ 0] == "1server" then
 server = {
 	storage = {
-			{ name = storageServerName( 1), address = ISERVER1 },
-			{ name = storageServerName( 2), address = ISERVER2 },
-			{ name = storageServerName( 3), address = ISERVER3 },
+			{ name = "srv", address = ISERVER1, context="test1", db= "test1" },
+			{ name = "srv", address = ISERVER1, context="test2", db= "test2" },
+			{ name = "srv", address = ISERVER1, context="test3", db= "test3" },
 		},
-	statserver  =	{ name = "ssrv",                address = SSERVER1 },
-	distqryeval =	{ name = "qsrv",                address = QSERVER1 }
+	statserver  =	{ name = "srv", address = ISERVER1, context="test" },
+	distqryeval =	{ name = "srv", address = ISERVER1, context="test" }
 }
-
-function serverHaveSameName( srvar)
-	ai = 1
-	while ai < #srvar do
-		if srvar[ ai].name ~= srvar[ ai+1].name then
-			return false
-		end
-	end
-	return true
-end
-
-function storageContextName( index)
-	if serverHaveSameName( server.storage) then
-		return "sto" .. index
-	else
-		return "test"
-	end
+else
+server = {
+	storage = {
+			{ name = "isrv1", address = ISERVER1, context="test", db= "test1" },
+			{ name = "isrv2", address = ISERVER2, context="test", db= "test2" },
+			{ name = "isrv3", address = ISERVER3, context="test", db= "test3" },
+		},
+	statserver  =	{ name = "ssrv",  address = SSERVER1, context="test" },
+	distqryeval =	{ name = "qsrv",  address = QSERVER1, context="test" }
+}
 end
 
 function serviceAddress( name, index)
 	if name == "storage" or name == "inserter" or name == "qryeval" then
-		return server.storage[ index].address .. "/" .. name .. "/" .. storageContextName( index) 
+		return server.storage[ index].address .. "/" .. name .. "/" .. server.storage[ index].context 
 
 	elseif name == "docanalyzer" or name == "qryanalyzer" then
 		return server.storage[ index].address .. "/" .. name .. "/test"
@@ -83,7 +73,7 @@ function getInserterConfig( storageidx)
 		inserter = {
 			include = {
 				analyzer = "test",
-				storage  = storageContextName( storageidx)
+				storage  = server.storage[ storageidx].context
 			}
 		}
 	}
@@ -91,7 +81,7 @@ end
 
 function defStorageServer( storageidx)
 	address = server.storage[ storageidx].address
-	srvname = storageServerName( storageidx)
+	srvname = server.storage[ storageidx].name
 	def_test_server( srvname, address)
 	if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", srvname, address)) end
 end
@@ -111,7 +101,7 @@ function buildAnalyzer( storageidx)
 end
 
 function buildStorageServer( storageidx)
-	srvname = storageServerName( storageidx)
+	srvname = server.storage[ storageidx].name
 	srvconfig = getStorageConfig( storageidx)
 
 	call_server_checked( "POST", serviceAddress( "storage", storageidx),  srvconfig )
