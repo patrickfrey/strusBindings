@@ -77,7 +77,10 @@ public:
 	Schema_Context_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
-		{},
+		{//Inherited:
+			{"qryeval","/storage/include/qryeval()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+		},
 		{
 			{SchemaStoragePart::defineStorage("/storage")},
 			{"/storage", "_success", "context", C::createStorage(), {{StorageConfig}} },
@@ -92,7 +95,10 @@ public:
 	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
-		{},
+		{//Inherited:
+			{"qryeval","/storage/include/qryeval()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+		},
 		{
 			{SchemaStoragePart::defineStorage("/storage")},
 			{"/", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
@@ -127,7 +133,10 @@ public:
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }},
 			{"statistics", { {"/statistics", "_blob", "statistics", '!'} }}
 		},
-		{},
+		{//Inherited:
+			{"qryeval","/storage/include/qryeval()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+		},
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
@@ -150,54 +159,7 @@ public:
 		{},
 		{},
 		{
-			{"/storage/document/id", "()", DocumentId, papuga_TypeString, "/company/ACME"},
-			{"/storage/document/doctype", "()", SubDocumentName, papuga_TypeString, "article"},
-			{"/storage/document/attribute/name", "()", DocumentAttributeName, papuga_TypeString, "title"},
-			{"/storage/document/attribute/value", "()", DocumentAttributeValue, papuga_TypeString, "the king is back"},
-			{"/storage/document/attribute", DocumentAttributeDef, {
-					{DocumentAttributeName},
-					{DocumentAttributeValue}
-				}
-			},
-
-			{"/storage/document/metadata/name", "()", DocumentMetaDataName, papuga_TypeString, "title"},
-			{"/storage/document/metadata/value", "()", DocumentMetaDataValue, papuga_TypeString, "12;32443;4324"},
-			{"/storage/document/metadata", DocumentMetaDataDef, {
-					{DocumentMetaDataName},
-					{DocumentMetaDataValue}
-				}
-			},
-
-			{"/storage/document/{forwardindex,searchindex}/type", "()", DocumentFeatureType, papuga_TypeString, "word"},
-			{"/storage/document/{forwardindex,searchindex}/value", "()", DocumentFeatureValue, papuga_TypeString, "hello"},
-			{"/storage/document/{forwardindex,searchindex}/pos", "()", DocumentFeaturePos, papuga_TypeInt, "1;3;13;3452"},
-			{"/storage/document/{forwardindex,searchindex}/len", "()", DocumentFeatureLen, papuga_TypeInt, "1;2;5"},
-
-			{"/storage/document/forwardindex", DocumentForwardIndexFeatureDef, {
-					{DocumentFeatureType},
-					{DocumentFeatureValue},
-					{DocumentFeaturePos},
-					{DocumentFeatureLen,'?'}
-				}
-			},
-			{"/storage/document/searchindex", DocumentSearchIndexFeatureDef, {
-					{DocumentFeatureType},
-					{DocumentFeatureValue},
-					{DocumentFeaturePos},
-					{DocumentFeatureLen,'?'}
-				}
-			},
-			{"/storage/document/access", "()", DocumentAccess, papuga_TypeString, "muller;all;doe"},
-			{"/storage/document", DocumentDef, {
-					{"docid",DocumentId,'!'},
-					{"doctype",SubDocumentName,'?'},
-					{"searchindex",DocumentSearchIndexFeatureDef,'*'},
-					{"forwardindex",DocumentForwardIndexFeatureDef,'*'},
-					{"metadata",DocumentMetaDataDef,'*'},
-					{"attribute",DocumentAttributeDef,'*'},
-					{"access",DocumentAccess,'*'}
-				}
-			},
+			{SchemaAnalyzerPart::defineDocumentAnalyzed( "/storage/document")},
 			{"/storage", DocumentDefList, {
 					{DocumentDef,'*'}
 				}

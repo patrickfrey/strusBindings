@@ -28,7 +28,7 @@ public:
 	{
 		typedef bindings::method::DocumentAnalyzer A;
 		typedef bindings::method::Context C;
-		return papuga::RequestAutomaton_NodeList( rootexpr,
+		return { rootexpr,
 		{
 			{"class/segmenter", "()", Segmenter, papuga_TypeString, "textwolf"},
 			{"class/mimetype", "()", MimeType, papuga_TypeString, "application/xml"},
@@ -203,7 +203,7 @@ public:
 					{SubContentClassDef, '!'}
 				}
 			}
-		});
+		}};
 	}
 
 	static papuga::RequestAutomaton_NodeList defineQueryAnalyzer( const char* rootexpr)
@@ -322,6 +322,60 @@ public:
 					{JoinOperatorRange,'?'},
 					{JoinOperatorCardinality,'?'}}
 			}
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList defineDocumentAnalyzed( const char* rootexpr)
+	{
+		return { rootexpr, {
+			{"id", "()", DocumentId, papuga_TypeString, "/company/ACME"},
+			{"doctype", "()", SubDocumentName, papuga_TypeString, "article"},
+			{"attribute/name", "()", DocumentAttributeName, papuga_TypeString, "title"},
+			{"attribute/value", "()", DocumentAttributeValue, papuga_TypeString, "the king is back"},
+			{"attribute", DocumentAttributeDef, {
+					{DocumentAttributeName},
+					{DocumentAttributeValue}
+				}
+			},
+
+			{"metadata/name", "()", DocumentMetaDataName, papuga_TypeString, "title"},
+			{"metadata/value", "()", DocumentMetaDataValue, papuga_TypeString, "12;32443;4324"},
+			{"metadata", DocumentMetaDataDef, {
+					{DocumentMetaDataName},
+					{DocumentMetaDataValue}
+				}
+			},
+
+			{"{forwardindex,searchindex}/type", "()", DocumentFeatureType, papuga_TypeString, "word"},
+			{"{forwardindex,searchindex}/value", "()", DocumentFeatureValue, papuga_TypeString, "hello"},
+			{"{forwardindex,searchindex}/pos", "()", DocumentFeaturePos, papuga_TypeInt, "1;3;13;3452"},
+			{"{forwardindex,searchindex}/len", "()", DocumentFeatureLen, papuga_TypeInt, "1;2;5"},
+
+			{"forwardindex", DocumentForwardIndexFeatureDef, {
+					{DocumentFeatureType},
+					{DocumentFeatureValue},
+					{DocumentFeaturePos},
+					{DocumentFeatureLen,'?'}
+				}
+			},
+			{"searchindex", DocumentSearchIndexFeatureDef, {
+					{DocumentFeatureType},
+					{DocumentFeatureValue},
+					{DocumentFeaturePos},
+					{DocumentFeatureLen,'?'}
+				}
+			},
+			{"access", "()", DocumentAccess, papuga_TypeString, "muller;all;doe"},
+			{"", DocumentDef, {
+					{"docid",DocumentId,'!'},
+					{"doctype",SubDocumentName,'?'},
+					{"searchindex",DocumentSearchIndexFeatureDef,'*'},
+					{"forwardindex",DocumentForwardIndexFeatureDef,'*'},
+					{"metadata",DocumentMetaDataDef,'*'},
+					{"attribute",DocumentAttributeDef,'*'},
+					{"access",DocumentAccess,'*'}
+				}
+			},
 		}};
 	}
 };

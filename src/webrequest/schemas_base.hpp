@@ -25,8 +25,9 @@ public:
 	enum Item
 	{
 		NullValue,
-	
-		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
+
+		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,
+		ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
 
 		StatisticsMapConfig,StatisticsProc,StatisticsMapBlocks,StatisticsStorageServer,StatisticsBlob,
 
@@ -88,6 +89,9 @@ public:
 		Docno,NumberOfResults,FirstResult,MergeResult,AccessRight,
 		VariableName,VariableValue,VariableDef,
 		DebugModeFlag,
+
+		IncludeContextName,
+
 		NofItemDefinitions
 	};
 

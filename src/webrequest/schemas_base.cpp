@@ -201,6 +201,7 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{VariableValue, "variable value"},
 		{VariableDef, "variable definition"},
 		{DebugModeFlag, "debug mode flag"},
+		{IncludeContextName, "include context name"},
 		{NofItemDefinitions, "number of item definitions"},
 	};
 	const ItemDef& idef = ar[ (AutomatonNameSpace::Item)itemid];

@@ -32,7 +32,7 @@ public:
 			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
 		},
 		{
-			{"/distqryeval/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
+			{"/distqryeval/{storage,qryeval}", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
 			{"/distqryeval", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
@@ -71,7 +71,7 @@ public:
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{
-			{"/query/server/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
+			{"/query/server/{storage,qryeval}", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
 			{"/query/server", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/query/server", "", "statserver", DistQueryEvalStatisticsServer, '!'},

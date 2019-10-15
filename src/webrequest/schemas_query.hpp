@@ -29,7 +29,7 @@ public:
 	Schema_Context_POST_QueryEval() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
 		{},
-		{
+		{//Inherited:
 			{"storage","/qryeval/include/storage()",false/*not required*/},
 			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
 		},
@@ -53,7 +53,10 @@ public:
 		{
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
-		{},
+		{//Inherited:
+			{"storage","/qryeval/include/storage()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+		},
 		{
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
 			{"/query/eval", '?'},

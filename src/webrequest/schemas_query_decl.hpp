@@ -193,6 +193,10 @@ public:
 			{"access", "access", AccessRight, '*'},
 			{"debug", "debug", DebugModeFlag, '?'},
 
+			{"include", "feature", true},
+			{"include/qryeval", "qryeval", IncludeContextName, '?'},
+			{"include/storage", "storage", IncludeContextName, '?'},
+
 			{"feature", "feature", true},
 			{"feature/set", "set", FeatureSet, '!'},
 			{"feature/weight", "weight", FeatureWeight, '?'},
