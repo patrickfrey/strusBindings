@@ -176,7 +176,6 @@ end
 
 -- Setup all servers:
 for storageidx,storage in ipairs( server.storage) do
-	io.stderr:write( string.format("## Define storage server %d\n", storageidx))
 	defStorageServer( storageidx)
 	buildAnalyzer( storageidx)
 	buildStorageServer( storageidx)
