@@ -1,9 +1,5 @@
 {
 	"qryeval": {
-		"include": {
-			"storage": "test",
-			"analyzer": "test"
-		},
 		"weighting": {
 			"name": "BM25",
 			"param": [{

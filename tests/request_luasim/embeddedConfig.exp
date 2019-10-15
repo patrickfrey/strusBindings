@@ -1,0 +1,21 @@
+{
+"qryanalyzer":{
+"element":[
+	{
+		"field": "text",
+		"normalizer":[
+			{
+				"name": "lc"}],
+		"tokenizer":{
+			"name": "word"},
+		"type": "word"},
+	{
+		"field": "text",
+		"normalizer":[
+			{
+				"name": "entityid"},
+			{
+				"name": "lc"}],
+		"tokenizer":{
+			"name": "content"},
+		"type": "entity"}]}}

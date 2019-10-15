@@ -32,8 +32,8 @@ public:
 			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
 		},
 		{
-			{"/distqryeval/{storage,qryeval}", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
-			{"/distqryeval", "", "qryeval", DistQueryEvalStorageServer, '*'},
+			{"/distqryeval/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
+			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
 
@@ -59,7 +59,7 @@ public:
 				{"/query/feature", "feature", true},
 				{"/query/{feature,sentence}", "analyzed", "_analyzed", '*'}
 			}},
-			{"query", "SET~ranklist", "GET", "qryeval", "", {"_termstats","_globalstats"}, {
+			{"query", "SET~ranklist", "GET", "storage", "", {"_termstats","_globalstats"}, {
 				{SchemaQueryDeclPart::resultQuery( "/query")},
 				{{"/query","mergeres", "y", '#'}}
 			}},
@@ -71,8 +71,8 @@ public:
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{
-			{"/query/server/{storage,qryeval}", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
-			{"/query/server", "", "qryeval", DistQueryEvalStorageServer, '*'},
+			{"/query/server/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
+			{"/query/server", "", "storage", DistQueryEvalStorageServer, '*'},
 			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/query/server", "", "statserver", DistQueryEvalStatisticsServer, '!'},
 

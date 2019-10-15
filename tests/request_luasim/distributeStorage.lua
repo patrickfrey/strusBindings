@@ -15,8 +15,8 @@ server = {
 			{ name = storageServerName( 2), address = ISERVER2 },
 			{ name = storageServerName( 3), address = ISERVER3 },
 		},
-	statserver  =	{ name = "ssrv1",               address = SSERVER1 },
-	distqryeval =	{ name = "qsrv1",               address = QSERVER1 }
+	statserver  =	{ name = "ssrv",                address = SSERVER1 },
+	distqryeval =	{ name = "qsrv",                address = QSERVER1 }
 }
 
 function serverHaveSameName( srvar)
@@ -45,7 +45,7 @@ function serviceAddress( name, index)
 		return server.storage[ index].address .. "/" .. name .. "/test"
 
 	elseif name == "statserver" then
-		return server.statserver1.address .. "/" .. name .. "/test"
+		return server.statserver.address .. "/" .. name .. "/test"
 
 	elseif name == "distqryeval" then
 		return server.distqryeval.address .. "/" .. name .. "/test"
@@ -71,6 +71,10 @@ storageConfig = {
 function getStorageConfig( storageidx)
 	cfg = storageConfig
 	cfg.storage.path = string.format("storage/test%d", storageidx)
+	cfg.storage.include = {
+		analyzer = "test",
+		qryeval  = "test"
+	}
 	return cfg
 end
 
@@ -85,26 +89,33 @@ function getInserterConfig( storageidx)
 	}
 end
 
-nofStorages = 0
-function defStorageServer( storageidx, serveraddr)
-	if storageidx > nofStorages then nofStorages = storageidx end
+function defStorageServer( storageidx)
+	address = server.storage[ storageidx].address
 	srvname = storageServerName( storageidx)
-	def_test_server( srvname, serveraddr)
-	if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", srvname, serveraddr)) end
+	def_test_server( srvname, address)
+	if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", srvname, address)) end
+end
+
+function buildAnalyzer( storageidx)
+	servers = {}
+	for _,storage in ipairs(server.storage) do
+		if not servers[ storage.name] then
+			servers[ storage.name] = true
+
+			call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
+			call_server_checked( "PUT", serviceAddress( "qryanalyzer", storageidx), "@qryanalyzer.json" )
+			call_server_checked( "PUT", serviceAddress( "qryeval", storageidx),  "@qryeval.json" )
+			if verbose then io.stderr:write( string.format("- Created document analyzer, query analyzer and query eval for server %s\n", srvname)) end
+		end
+	end
 end
 
 function buildStorageServer( storageidx)
 	srvname = storageServerName( storageidx)
 	srvconfig = getStorageConfig( storageidx)
-	srvaddress = serverAddress( srvname)
-
-	call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
-	call_server_checked( "PUT", serviceAddress( "qryanalyzer", storageidx), "@qryanalyzer.json" )
-	if verbose then io.stderr:write( string.format("- Created document and query analyzer for server %s\n", srvname)) end
 
 	call_server_checked( "POST", serviceAddress( "storage", storageidx),  srvconfig )
 	call_server_checked( "PUT",  serviceAddress( "inserter", storageidx), getInserterConfig( storageidx) )
-	call_server_checked( "PUT", serviceAddress( "qryeval", storageidx),  "@qryeval.json" )
 
 	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", srvname)) end
 
@@ -115,7 +126,7 @@ function buildStorageServer( storageidx)
 	documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
 	for k,path in pairs(documents) do
 		fullpath = "doc/xml/" .. path
-		hs = hashString( fullpath, nofStorages, 1)
+		hs = hashString( fullpath, #server.storage, 1)
 		if hs == storageidx then
 			cntdoc = cntdoc + 1
 			if verbose then io.stderr:write( string.format("- Insert document %s to server %s\n", fullpath, srvname)) end
@@ -126,48 +137,56 @@ function buildStorageServer( storageidx)
 	if verbose then io.stderr:write( string.format("- Inserted %d documents to server %s\n", cntdoc, srvname)) end
 end
 
-defStorageServer( 1, ISERVER1 )
-defStorageServer( 2, ISERVER2 )
-defStorageServer( 3, ISERVER3 )
-buildStorageServer( 1)
-buildStorageServer( 2)
-buildStorageServer( 3)
-
-function storageAddress( serverurl)
-	return serverurl .. "/storage/test"
-end
-function qryevalAddress( serverurl)
-	return serverurl .. "/qryeval/test"
-end
-function statserverAddress( serverurl)
-	return serverurl .. "/statserver/test"
-end
-
--- Define a statistics server for the 3 storage servers defined:
-statserverConfig = {
-	statserver = {
-		id = "test",
-		proc = "std",
-		blocks = "100K",
-		storage = {
-			storageAddress( serverAddress( storageServerName( 1))),
-			storageAddress( serverAddress( storageServerName( 2))),
-			storageAddress( serverAddress( storageServerName( 3)))
+function defStatisticsServer()
+	storages = {}
+	for storageidx,storage in ipairs( server.storage) do
+		table.insert( storages, serviceAddress( "storage", storageidx))
+	end
+	statserverConfig = {
+		statserver = {
+			id = "test",
+			proc = "std",
+			blocks = "100K",
+			storage = storages
 		}
 	}
-}
+	def_test_server( server.statserver.name, server.statserver.address )
+	call_server_checked( "PUT", serviceAddress( "statserver"), statserverConfig )
+	if verbose then io.stderr:write( string.format("- Created statistics server %s\n", srvname)) end
+end
 
-def_test_server( "ssrv1", SSERVER1)
-call_server_checked( "PUT", SSERVER1  .. "/statserver/test", statserverConfig )
+function defDistributedQueryEvalServer()
+	storages = {}
+	for storageidx,storage in ipairs( server.storage) do
+		table.insert( storages, serviceAddress( "storage", storageidx))
+	end
+	distqryevalConfig = {
+		distqryeval = {
+			include = {
+				analyzer = "test"
+			},
+			statserver = { serviceAddress( "statserver") },
+			storage = storages
+		}
+	}
+	def_test_server( server.distqryeval.name, server.distqryeval.address )
+	call_server_checked( "PUT", server.distqryeval.address  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+	call_server_checked( "PUT", serviceAddress( "distqryeval"), distqryevalConfig )
+end
 
-statserverDef = call_server_checked( "GET", SSERVER1 .. "/statserver/test")
-if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
+-- Setup all servers:
+for storageidx,storage in ipairs( server.storage) do
+	io.stderr:write( string.format("## Define storage server %d\n", storageidx))
+	defStorageServer( storageidx)
+	buildAnalyzer( storageidx)
+	buildStorageServer( storageidx)
+end
+defStatisticsServer()
+defDistributedQueryEvalServer()
 
--- Define a 2nd variant of the statistics server for testing delegate calls issued by embedded sub configuration:
-SSERVER2=ISERVER4
-def_test_server( "ssrv2", SSERVER2, statserverConfig)
 
-statserverDef_embedded = call_server_checked( "GET", SSERVER2 .. "/statserver/test")
+-- Get statistics server introspection:
+statserverDef = call_server_checked( "GET", serviceAddress( "statserver"))
 if verbose then io.stderr:write( string.format("- Statistics server configuration from server:\n%s\n", statserverDef)) end
 
 -- Call the statistics server for statistics of an analyzed query:
@@ -191,36 +210,15 @@ query = {
 		}
 	}
 }}
-
-statserverStats = call_server_checked( "GET", SSERVER1 .. "/statserver/test", query_analyzed)
+statserverStats = call_server_checked( "GET", serviceAddress( "statserver"), query_analyzed)
 if verbose then io.stderr:write( string.format("- Statistics server query result:\n%s\n", statserverStats)) end
 
--- Define queryeval server for distributed query:
-distqryevalConfig = {
-	distqryeval = {
-		include = {
-			analyzer = "test"
-		},
-		statserver = {
-			statserverAddress(SSERVER1)
-		},
-		qryeval = {
-			qryevalAddress(ISERVER1),
-			qryevalAddress(ISERVER2),
-			qryevalAddress(ISERVER3)
-		}
-	}
-}
-
-def_test_server( "qsrv1", QSERVER1)
-call_server_checked( "PUT", QSERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
-call_server_checked( "PUT", QSERVER1  .. "/distqryeval/test", distqryevalConfig )
-
+-- Get distributed queryeval server introspection:
 distqryevalObj = {}
-distqryevalObj.statserver = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/statserver")).list.value
-distqryevalObj.qryeval = from_json( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test/qryeval")).list.value
+distqryevalObj.statserver = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/statserver")).list.value
+distqryevalObj.qryeval = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/storage")).list.value
 distqryevalDef = to_json( {distqryeval = distqryevalObj} )
-distqryevalVar = call_server_checked( "GET", QSERVER1 .. "/distqryeval/test")
+distqryevalVar = call_server_checked( "GET", serviceAddress( "distqryeval") )
 if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end
 if verbose then io.stderr:write( string.format("- Distributed query evaluation server configuration from server:\n%s\n", distqryevalDef)) end
 
@@ -259,10 +257,10 @@ query2 = {
 	}
 }
 
-qryres1 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query))
+qryres1 = det_qeval_result( call_server_checked( "GET", serviceAddress( "distqryeval"), query))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result:\n%s\n", qryres1)) end
-qryres2 = det_qeval_result( call_server_checked( "GET", QSERVER1 .. "/distqryeval/test", query2))
+qryres2 = det_qeval_result( call_server_checked( "GET", serviceAddress( "distqryeval"), query2))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-checkExpected( statserverDef .. statserverDef_embedded .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@distributeStorage.exp", "distributeStorage.res" )
+checkExpected( statserverDef .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@distributeStorage.exp", "distributeStorage.res" )
 

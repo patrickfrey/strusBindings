@@ -32,6 +32,7 @@ function( DeclareTest TestTitle TestScript )
 endfunction( DeclareTest )
 
 DeclareTest( MapLuaTableToJson configToJson.lua )
+DeclareTest( EmbeddedConfig  embeddedConfig.lua )
 DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua )
 DeclareTest( DocumentAnalysis docanalyzer.lua )
 DeclareTest( QueryAnalysis qryanalyzer.lua )

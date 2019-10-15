@@ -7,6 +7,7 @@ SCRIPTPATH = script_path()
 
 storageConfig = {
 	storage = {
+		path = "storage/test",
 		database = "leveldb",
 		cache_size = "500M",
 		max_open_files = 512,
@@ -17,20 +18,25 @@ storageConfig = {
 		}
 	}
 }
-function getStorageConfig( serveridx)
-	cfg = storageConfig
-	cfg.storage.path = "storage/test"
-	return cfg
-end
+inserterConfig = {
+	inserter = {
+		include = {
+			analyzer = "test",
+			storage  = "test"
+		}
+	}
+}
+qryevalConfig = from_json( load_file( "qryeval.json") )
+qryevalConfig.qryeval.include = inserterConfig.inserter.include
 
 def_test_server( "isrv1", ISERVER1)
 call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@docanalyzer.json" )
 call_server_checked( "PUT", ISERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 if verbose then io.stderr:write( string.format("- Created document and query analyzer\n")) end
 
-call_server_checked( "POST", ISERVER1 .. "/storage/test", getStorageConfig())
-call_server_checked( "PUT",  ISERVER1 .. "/inserter/test", "@inserter.json" )
-call_server_checked( "POST", ISERVER1 .. "/qryeval/test", "@qryeval.json" )
+call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
+call_server_checked( "PUT",  ISERVER1 .. "/inserter/test", inserterConfig )
+call_server_checked( "POST", ISERVER1 .. "/qryeval/test", qryevalConfig )
 
 if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval\n")) end
 

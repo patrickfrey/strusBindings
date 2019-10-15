@@ -6,13 +6,6 @@
 	"word"],
 "nofdocs": 18}}
 {
-"statserver":{
-"types":[
-	"entity",
-	"title",
-	"word"],
-"nofdocs": 18}}
-{
 "statistics":{
 "termstats":[
 	{
@@ -32,14 +25,14 @@
 {
 "list":{
 "link":[
-	"qryeval",
+	"storage",
 	"statserver"]}}
 {
 "distqryeval": {
   "qryeval": [
-    "http://127.0.0.1:7184/qryeval/test",
-    "http://127.0.0.1:7185/qryeval/test",
-    "http://127.0.0.1:7186/qryeval/test"],
+    "http://127.0.0.1:7184/storage/test",
+    "http://127.0.0.1:7185/storage/test",
+    "http://127.0.0.1:7186/storage/test"],
   "statserver": "http://127.0.0.1:7183/statserver/test"}}
 {
 "queryresult":{

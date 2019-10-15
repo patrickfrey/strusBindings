@@ -126,7 +126,7 @@ function mergeValues( t1, t2)
 		end
 		return res
 	else
-		return {t1,t2}
+		error( "cannot merge " .. type(t1) .. " and " .. type(t2))
 	end
 end
 

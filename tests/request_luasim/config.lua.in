@@ -62,9 +62,8 @@ serverAddressMap = {}
 serverSet = {}
 
 function def_test_server( serverName, address, embeddedConfig)
-	serverSetKey = serverName .. ":" .. address
-	if not serverSet[ serverSetKey] then
-		serverSet[ serverSetKey] = true
+	if not serverSet[ address] then
+		serverSet[ address] = true
 		if serverAddressMap[ serverName] then
 			error( string.format("server %s defined twice", serverName))
 		end
