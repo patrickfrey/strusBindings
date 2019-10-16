@@ -44,7 +44,9 @@ WebRequestEventLoopInterface* createCurlEventLoop(
 /// \param[in] request logger interface (no ownership)
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
-/// \param[in] config_store_dir directory where to store configurations loaded with PUT
+/// \param[in] service_name identifier of the service
+/// \param[in] rootid identifying the web request handler, if defined the first element of the path after hostname and port in the URL. Used to identify loopback calls to itself that have to be handled as direct calls in the configuration phase (because of the hen and egg problem of the service required to exist before its configuration phase is over).
+/// \param[in] port port of this the web request handler, also used for identifying self requests in the configuration phase
 /// \param[in] beautifiedOutput true, if request results are made human readable, false if request results are made compact
 /// \param[in] maxIdleTime maximum time of keepalive for untouched transactions in seconds
 /// \param[in] nofTransactionsPerSeconds 2nd allocation dimension value for the sliding window used internally for open transactions besides maxIdleTime
@@ -56,6 +58,8 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& service_name,
+		const std::string& rootid,
+		int port,
 		bool beautifiedOutput,
 		int maxIdleTime,
 		int nofTransactionsPerSeconds,

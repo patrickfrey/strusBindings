@@ -20,22 +20,26 @@ STRING( REGEX REPLACE "strusBindings" "strusWebService" WS_CMD_BINARY_DIR ${WS_C
 set( WS_CMD_PRG "${WS_CMD_BINARY_DIR}/strusWebService --config {config} --port {port}" )
 
 add_custom_target( test_ws )
-function( DeclareTest TestTitle TestScript )
+function( DeclareTest TestTitle TestScript Argument )
 	set( LuaSim ${REQUEST_LUASIM_BUILD_DIR}/strusWebRequestLuaSim )
-	add_test( ${TestTitle}  ${LuaSim} ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
-	set( TestWsCommand  ${LuaSim} --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
-
+	add_test( ${TestTitle}  ${LuaSim} ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} ${Argument} )
+	IF (Argument STREQUAL "")
+		set( TestWsCommand  "${LuaSim} --program '${WS_CMD_PRG}' ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR}" )
+	ELSE (Argument STREQUAL "")
+		set( TestWsCommand  "${LuaSim} --program '${WS_CMD_PRG}' ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR}  ${Argument}" )
+	ENDIF (Argument STREQUAL "")
 	add_custom_command( 
 		TARGET test_ws
 		COMMENT "Running test ${TestTitle}:\n${TestWsCommand}"
-		COMMAND  ${LuaSim} --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR} )
+		COMMAND  ${LuaSim} --program "${WS_CMD_PRG}" ${CMAKE_CURRENT_LIST_DIR}/${TestScript}  ${CMAKE_CURRENT_BINARY_DIR}  ${Argument} )
 endfunction( DeclareTest )
 
-DeclareTest( MapLuaTableToJson configToJson.lua )
-DeclareTest( EmbeddedConfig  embeddedConfig.lua )
-DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua )
-DeclareTest( DocumentAnalysis docanalyzer.lua )
-DeclareTest( QueryAnalysis qryanalyzer.lua )
-DeclareTest( Query query.lua )
-DeclareTest( DistributeStorage distributeStorage.lua )
+DeclareTest( MapLuaTableToJson configToJson.lua "" )
+DeclareTest( EmbeddedConfig  embeddedConfig.lua "" )
+DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua "" )
+DeclareTest( DocumentAnalysis docanalyzer.lua "" )
+DeclareTest( QueryAnalysis qryanalyzer.lua "" )
+DeclareTest( Query query.lua "" )
+DeclareTest( DistributeStorage distributeStorage.lua "" )
+DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
 

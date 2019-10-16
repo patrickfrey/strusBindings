@@ -5,12 +5,20 @@ require "os"
 
 SCRIPTPATH = script_path()
 
-if argv[ 0] == "1server" then
+if #argv == 0 then
+	resultFile = "distributeStorage.res"
+	expectedFile = "distributeStorage.exp"
+else
+	resultFile = "distributeStorage." .. argv[ 1] .. ".res"
+	expectedFile = "distributeStorage." .. argv[ 1] .. ".exp"
+end
+
+if argv[ 1] == "1server" then
 server = {
 	storage = {
-			{ name = "srv", address = ISERVER1, context="test1", db= "test1" },
-			{ name = "srv", address = ISERVER1, context="test2", db= "test2" },
-			{ name = "srv", address = ISERVER1, context="test3", db= "test3" },
+			{ name = "srv", address = ISERVER1, context="test1" },
+			{ name = "srv", address = ISERVER1, context="test2" },
+			{ name = "srv", address = ISERVER1, context="test3" },
 		},
 	statserver  =	{ name = "srv", address = ISERVER1, context="test" },
 	distqryeval =	{ name = "srv", address = ISERVER1, context="test" }
@@ -18,9 +26,9 @@ server = {
 else
 server = {
 	storage = {
-			{ name = "isrv1", address = ISERVER1, context="test", db= "test1" },
-			{ name = "isrv2", address = ISERVER2, context="test", db= "test2" },
-			{ name = "isrv3", address = ISERVER3, context="test", db= "test3" },
+			{ name = "isrv1", address = ISERVER1, context="test" },
+			{ name = "isrv2", address = ISERVER2, context="test" },
+			{ name = "isrv3", address = ISERVER3, context="test" },
 		},
 	statserver  =	{ name = "ssrv",  address = SSERVER1, context="test" },
 	distqryeval =	{ name = "qsrv",  address = QSERVER1, context="test" }
@@ -28,10 +36,10 @@ server = {
 end
 
 function serviceAddress( name, index)
-	if name == "storage" or name == "inserter" or name == "qryeval" then
+	if name == "storage" or name == "inserter" then
 		return server.storage[ index].address .. "/" .. name .. "/" .. server.storage[ index].context 
 
-	elseif name == "docanalyzer" or name == "qryanalyzer" then
+	elseif name == "docanalyzer" or name == "qryanalyzer" or name == "qryeval" then
 		return server.storage[ index].address .. "/" .. name .. "/test"
 
 	elseif name == "statserver" then
@@ -80,51 +88,50 @@ function getInserterConfig( storageidx)
 end
 
 function defStorageServer( storageidx)
-	address = server.storage[ storageidx].address
-	srvname = server.storage[ storageidx].name
-	def_test_server( srvname, address)
-	if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", srvname, address)) end
+	for storageidx,storage in ipairs( server.storage) do
+		def_test_server( storage.name, storage.address)
+		if verbose then io.stderr:write( string.format("- Build storage server %s listening on %s\n", storage.name, storage.address)) end
+	end
 end
 
-function buildAnalyzer( storageidx)
+function buildAnalyzer()
 	servers = {}
-	for _,storage in ipairs(server.storage) do
+	for storageidx,storage in ipairs(server.storage) do
 		if not servers[ storage.name] then
 			servers[ storage.name] = true
 
 			call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
 			call_server_checked( "PUT", serviceAddress( "qryanalyzer", storageidx), "@qryanalyzer.json" )
 			call_server_checked( "PUT", serviceAddress( "qryeval", storageidx),  "@qryeval.json" )
-			if verbose then io.stderr:write( string.format("- Created document analyzer, query analyzer and query eval for server %s\n", srvname)) end
+			if verbose then io.stderr:write( string.format("- Created document analyzer, query analyzer and query eval for server %s\n", storage.name)) end
 		end
 	end
 end
 
-function buildStorageServer( storageidx)
-	srvname = server.storage[ storageidx].name
-	srvconfig = getStorageConfig( storageidx)
-
-	call_server_checked( "POST", serviceAddress( "storage", storageidx),  srvconfig )
-	call_server_checked( "PUT",  serviceAddress( "inserter", storageidx), getInserterConfig( storageidx) )
-
-	if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", srvname)) end
-
-	TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "inserter", storageidx) .. "/transaction" )).transaction.link
-	if verbose then io.stderr:write( string.format("- Create transaction %s for server %s\n", TRANSACTION, srvname)) end
-	local cntdoc = 0
-
-	documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
-	for k,path in pairs(documents) do
-		fullpath = "doc/xml/" .. path
-		hs = hashString( fullpath, #server.storage, 1)
-		if hs == storageidx then
-			cntdoc = cntdoc + 1
-			if verbose then io.stderr:write( string.format("- Insert document %s to server %s\n", fullpath, srvname)) end
-			call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
+function buildStorageServer()
+	for storageidx,storage in ipairs( server.storage) do
+		call_server_checked( "POST", serviceAddress( "storage", storageidx),  getStorageConfig( storageidx))
+		call_server_checked( "PUT",  serviceAddress( "inserter", storageidx), getInserterConfig( storageidx))
+	
+		if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", storage.name)) end
+	
+		TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "inserter", storageidx) .. "/transaction" )).transaction.link
+		if verbose then io.stderr:write( string.format("- Create transaction %s for server %s\n", TRANSACTION, storage.name)) end
+		local cntdoc = 0
+	
+		documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
+		for k,path in pairs(documents) do
+			fullpath = "doc/xml/" .. path
+			hs = hashString( fullpath, #server.storage, 1)
+			if hs == storageidx then
+				cntdoc = cntdoc + 1
+				if verbose then io.stderr:write( string.format("- Insert document %s to server %s\n", fullpath, storage.name)) end
+				call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
+			end
 		end
+		call_server_checked( "PUT", TRANSACTION)
+		if verbose then io.stderr:write( string.format("- Inserted %d documents to server %s\n", cntdoc, storage.name)) end
 	end
-	call_server_checked( "PUT", TRANSACTION)
-	if verbose then io.stderr:write( string.format("- Inserted %d documents to server %s\n", cntdoc, srvname)) end
 end
 
 function defStatisticsServer()
@@ -142,7 +149,7 @@ function defStatisticsServer()
 	}
 	def_test_server( server.statserver.name, server.statserver.address )
 	call_server_checked( "PUT", serviceAddress( "statserver"), statserverConfig )
-	if verbose then io.stderr:write( string.format("- Created statistics server %s\n", srvname)) end
+	if verbose then io.stderr:write( string.format("- Created statistics server %s\n", server.statserver.name)) end
 end
 
 function defDistributedQueryEvalServer()
@@ -165,11 +172,9 @@ function defDistributedQueryEvalServer()
 end
 
 -- Setup all servers:
-for storageidx,storage in ipairs( server.storage) do
-	defStorageServer( storageidx)
-	buildAnalyzer( storageidx)
-	buildStorageServer( storageidx)
-end
+defStorageServer()
+buildAnalyzer()
+buildStorageServer()
 defStatisticsServer()
 defDistributedQueryEvalServer()
 
@@ -251,5 +256,5 @@ if verbose then io.stderr:write( string.format("- Distributed query evaluation r
 qryres2 = det_qeval_result( call_server_checked( "GET", serviceAddress( "distqryeval"), query2))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-checkExpected( statserverDef .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@distributeStorage.exp", "distributeStorage.res" )
+checkExpected( statserverDef .. statserverStats .. distqryevalVar .. distqryevalDef .. qryres1 .. qryres2, "@" .. expectedFile, resultFile )
 

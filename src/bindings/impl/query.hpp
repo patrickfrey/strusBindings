@@ -289,6 +289,13 @@ public:
 	/// \param[in] res one query result or a list of query results to merge
 	void addQueryResult( const ValueVariant& res);
 
+	/// \brief Flag that marks the result of this query to be used as input of a merge of multiple query results ('QueryResult::merge')
+	/// \note In this case minRank and maxNofRanks have to be set to 0 and minRank+maxNofRanks for merge to work correctly
+	/// \note This method is intented for the mappings in the webrequest context, because there we have no possibility for control structures and calculations
+	/// \note default is false
+	/// \param[in] yes true if the result of this query is used as input of a merge of multiple query results, false else
+	void useMergeResult( bool yes=true);
+
 	/// \brief Merge all added query results to one result
 	/// \return the result (strus::QueryResult)
 	QueryResult* evaluate() const;
@@ -300,14 +307,13 @@ public:
 
 private:
 	friend class ContextImpl;
-	/// \param[in] minRank_ minimum rank number counted starting from 0
-	/// \param[in] maxNofRanks_ maximum number of ranks
 	QueryResultMergerImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_)
-		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks),m_ar()
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_useMergeResult(false),m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks),m_ar()
 	{}
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
+	bool m_useMergeResult;
 	int m_minRank;
 	int m_maxNofRanks;
 	std::vector<QueryResult> m_ar;

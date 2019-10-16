@@ -154,7 +154,8 @@ public:
 			{"", "merger", "context", C::createQueryResultMerger(), {}},
 			/// Ranking parameter needed for merging:
 			{"nofranks", 0, "merger", QM::setMaxNofRanks(), {{NumberOfResults}} },
-			{"minrank", 0, "merger", QM::setMinRank(), {{FirstResult}} }
+			{"minrank", 0, "merger", QM::setMinRank(), {{FirstResult}} },
+			{"mergeres", 0, "query", QM::useMergeResult(), {{MergeResult}} }
 		}};
 	}
 

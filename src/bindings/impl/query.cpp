@@ -291,6 +291,11 @@ void QueryResultMergerImpl::addQueryResult( const ValueVariant& res)
 	m_ar.insert( m_ar.end(), partvec.begin(), partvec.end());
 }
 
+void QueryResultMergerImpl::useMergeResult( bool yes)
+{
+	m_useMergeResult = yes;
+}
+
 QueryResult* QueryResultMergerImpl::evaluate() const
 {
 	return new QueryResult( QueryResult::merge( m_ar, m_minRank, m_maxNofRanks));

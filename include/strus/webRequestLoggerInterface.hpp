@@ -67,18 +67,18 @@ public:
 	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize)=0;
 
 	/// \brief Log a loaded configuration
-	/// \param[in] type type of the configuration
-	/// \param[in] name name of the configuration
+	/// \param[in] contextType context type of the configuration
+	/// \param[in] contextName name of the context of the configuration
 	/// \param[in] configstr content string of the configuration
 	/// \remark expected to be thread safe
-	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr)=0;
+	virtual void logPutConfiguration( const char* contextType, const char* contextName, const std::string& configstr)=0;
 
 	/// \brief Log an action
-	/// \param[in] type type of the context
-	/// \param[in] name name of the context
+	/// \param[in] contextType type of the context
+	/// \param[in] contextName name of the context
 	/// \param[in] action string describing the action on the object
 	/// \remark expected to be thread safe
-	virtual void logAction( const char* type, const char* name, const char* action)=0;
+	virtual void logAction( const char* contextType, const char* contextName, const char* action)=0;
 
 	/// \brief Log an event parsing content
 	/// \param[in] title name of the event

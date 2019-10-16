@@ -334,7 +334,7 @@ static int g_serverConnSleep = 2;
 static int g_serverConnRetry = 12;
 static bool g_printLuaCalls = false;
 static int g_verbosity = 0;
-static bool g_killChildOnError = true;
+static bool g_killChildOnExit = true;
 
 namespace {
 template <typename ValueType>
@@ -567,9 +567,12 @@ struct ChildProcess
 {
 	std::string address;
 	pid_t pid;
+	std::string cmdline;
 
-	ChildProcess( const std::string& address_, pid_t pid_)
-		:address(address_),pid(pid_){}
+	ChildProcess( const std::string& address_, pid_t pid_, const std::string& cmdline_)
+		:address(address_),pid(pid_),cmdline(cmdline_){}
+	ChildProcess( const ChildProcess& o)
+		:address(o.address),pid(o.pid),cmdline(o.cmdline){}
 };
 
 static EventLoop g_eventLoop;
@@ -673,7 +676,7 @@ static std::vector<std::string> splitCmdLine( const std::string& cmdline)
 	return rt;
 }
 
-void killBackGroundProcesses()
+static void killBackGroundProcesses()
 {
 	std::vector<ChildProcess>::const_iterator pi = g_childProcessList.begin(), pe = g_childProcessList.end();
 	for (; pi != pe; ++pi)
@@ -682,12 +685,25 @@ void killBackGroundProcesses()
 		{
 			::fprintf( stderr, _TXT("failed to kill process for %s with pid %d: %s\n"), pi->address.c_str(), (int)pi->pid, ::strerror(errno));
 		}
-		else if (g_verbosity >= 3)
+		else if (g_verbosity >= 2)
 		{
-			::fprintf( stderr, _TXT("KILL %d (%s)\n"), (int)pi->pid, pi->address.c_str());
+			::fprintf( stderr, _TXT("KILL pid %d (%s): %s\n"), (int)pi->pid, pi->address.c_str(), pi->cmdline.c_str());
 		}
 	}
 	g_childProcessList.clear();
+	::fflush( stderr);
+}
+
+static void listBackGroundProcesses()
+{
+	std::vector<ChildProcess>::const_iterator pi = g_childProcessList.begin(), pe = g_childProcessList.end();
+	for (; pi != pe; ++pi)
+	{
+		if (g_verbosity >= 2)
+		{
+			::fprintf( stderr, _TXT("PID %d address %s: %s\n"), (int)pi->pid, pi->address.c_str(), pi->cmdline.c_str());
+		}
+	}
 	::fflush( stderr);
 }
 
@@ -796,7 +812,7 @@ strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Con
 	strus::WebRequestHandlerInterface* rt =
 		strus::createWebRequestHandler(
 			&g_eventLoop, &g_logger, ""/*html head*/,
-			configdir, servicename, true/*beautifiedOutput*/,
+			configdir, servicename, ""/*rootid*/, 0/*port*/, true/*beautifiedOutput*/,
 			transaction_max_idle_time, transaction_nof_per_sec,
 			g_errorhnd);
 	if (!rt) throw strus::runtime_error( _TXT("error creating request handler: %s"), g_errorhnd->fetchError());
@@ -873,6 +889,7 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	enum {MaxArgNum=64};
 	const char* argv[ MaxArgNum+2];
 	int argc = 0;
+	if (cmd.empty()) throw std::runtime_error(_TXT("server program specified with option --program is invalid"));
 	if (cmd.size() >= MaxArgNum) throw std::runtime_error(_TXT("too many arguments for starting server"));
 	std::vector<std::string>::const_iterator ci = cmd.begin(), ce = cmd.end();
 	for (; ci != ce; ++ci,++argc)
@@ -880,6 +897,11 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 		argv[ argc] = ci->c_str();
 	}
 	argv[ argc] = 0;
+
+	std::string show_cmdline;
+	ec = strus::getFileName( argv[0], show_cmdline);
+	if (ec) throw strus::runtime_error(_TXT("failed to get filename of server program specified with option --program: %s"), ::strerror(ec));
+	show_cmdline.append( cmdline.c_str() + cmd[0].size());
 
 	pid_t pid = ::fork();
 	if ( pid == 0 )
@@ -896,7 +918,7 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	else
 	{
 		if (g_verbosity >= 2) fprintf( stderr, _TXT("FORK parent pid %d, sleeping for %d seconds\n"), (int)getpid(), g_serverConnSleep);
-		g_childProcessList.push_back( ChildProcess( hostname, pid));
+		g_childProcessList.push_back( ChildProcess( hostname, pid, show_cmdline));
 		::sleep( g_serverConnSleep);
 	}
 }
@@ -1696,7 +1718,7 @@ static void declareArguments( lua_State* L, const char** arguments)
 {
 	int ai = 0;
 	lua_newtable( L);
-	while (arguments[ ai])
+	for (; arguments[ ai]; ++ai)
 	{
 		lua_pushinteger( L, ai+1);
 		lua_pushstring( L, arguments[ ai]);
@@ -1720,7 +1742,7 @@ static void printUsage()
 		 "   --calltrace        :Print trace of lua procedures defined here\n"
 		 "                       This option has no effect with a verbosity >= 2,\n"
 		 "                       because then the call trace is printed anyway.\n"
-		 "   -E,--nokill        :Do not kill child processes after exit with error\n"
+		 "   --nokill           :Do not kill child processes after exit\n"
 		 "   -p,--program <PRG> :Use the command line <PRG> for starting a\n"
 		 "                       web service instance instead of running the\n"
 		 "                       commands directly. The strings {port} and {config}\n"
@@ -1840,7 +1862,6 @@ int main( int argc, const char* argv[])
 	const char* inputfile = 0;
 	enum {MaxNofArguments=7};
 	const char* arguments[ MaxNofArguments+1];
-	int nofArguments = 0;
 	lua_State* ls = 0;
 	int argi = 1;
 	int errcode = 0;
@@ -1881,9 +1902,9 @@ int main( int argc, const char* argv[])
 			{
 				g_printLuaCalls = true;
 			}
-			else if (0==strcmp( argv[argi], "-E") || 0==strcmp( argv[argi], "--nokill"))
+			else if (0==strcmp( argv[argi], "--nokill"))
 			{
-				g_killChildOnError = false;
+				g_killChildOnExit = false;
 			}
 			else if (0==strcmp( argv[argi], "--debug") || 0==strcmp( argv[argi], "-G"))
 			{
@@ -1984,7 +2005,6 @@ int main( int argc, const char* argv[])
 			arguments[ ai++] = argv[ argi++];
 		}
 		arguments[ ai] = NULL;
-		nofArguments = ai;
 
 		if (argi != argc)
 		{
@@ -2059,7 +2079,6 @@ int main( int argc, const char* argv[])
 				throw strus::runtime_error( _TXT("error in strus context: %s"), g_errorhnd->fetchError());
 			}
 		}
-		killBackGroundProcesses();
 		goto EXIT;
 	}
 	catch (const std::bad_alloc&)
@@ -2081,7 +2100,14 @@ int main( int argc, const char* argv[])
 		goto EXIT;
 	}
 EXIT:
-	if (g_killChildOnError) killBackGroundProcesses();
+	if (g_killChildOnExit)
+	{
+		killBackGroundProcesses();
+	}
+	else
+	{
+		listBackGroundProcesses();
+	}
 	if (g_blockingCurlClient) delete g_blockingCurlClient;
 	if (g_errorhnd) delete g_errorhnd;
 	return rt;

@@ -1114,7 +1114,7 @@ public:
 
 	virtual std::vector<IntrospectionLink> list()
 	{
-		static const char* ar[] = {"increment","snapshot",NULL};
+		static const char* ar[] = {".increment",".snapshot",NULL};
 		return getList( ar);
 	}
 
@@ -1157,7 +1157,7 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 
 std::vector<IntrospectionLink> StorageIntrospection::list()
 {
-	static const char* ar_withStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue","statistics",".term",".doc",NULL};
+	static const char* ar_withStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".statistics",".term",".doc",NULL};
 	static const char* ar_withoutStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".term",".doc",NULL};
 	return getList( (m_impl->getStatisticsProcessor()) ? ar_withStats : ar_withoutStats);
 }

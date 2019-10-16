@@ -172,6 +172,8 @@ WebRequestHandler::WebRequestHandler(
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
 		const std::string& service_name_,
+		const std::string& rootid_,
+		int port_,
 		bool beautifiedOutput_,
 		int maxIdleTime_,
 		int nofTransactionsPerSeconds)
@@ -181,6 +183,8 @@ WebRequestHandler::WebRequestHandler(
 	,m_configHandler(logger_,config_store_dir_,service_name_,g_context_typenames)
 	,m_html_head(html_head_)
 	,m_transactionPool( eventLoop_->time(), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
+	,m_rootid(rootid_)
+	,m_port((port_==80||port_==0) ? std::string() : strus::string_format("%d",port_))
 	,m_maxIdleTime(maxIdleTime_)
 	,m_beautifiedOutput(beautifiedOutput_)
 	,m_eventLoop( eventLoop_)
@@ -319,19 +323,19 @@ WebRequestHandler::WebRequestHandler(
 	}
 	catch (const std::bad_alloc&)
 	{
-		clear();
+		papuga_destroy_RequestHandler( m_impl);
 		throw std::bad_alloc();
 	}
 	catch (const std::runtime_error& err)
 	{
-		clear();
+		papuga_destroy_RequestHandler( m_impl);
 		throw err;
 	}
 }
 
 WebRequestHandler::~WebRequestHandler()
 {
-	clear();
+	papuga_destroy_RequestHandler( m_impl);
 }
 
 static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, const char* errstr=0, bool doCopy=false)
@@ -486,12 +490,6 @@ void WebRequestHandler::storeSchemaDescriptions( const std::string& dir) const
 	storeSchemaDescriptions( dir, "json");
 }
 
-void WebRequestHandler::clear()
-{
-	m_eventLoop->stop();
-	if (m_impl) {papuga_destroy_RequestHandler( m_impl); m_impl=0;}
-}
-
 WebRequestContextInterface* WebRequestHandler::createConfigurationContext(
 		const char* contextType,
 		const char* contextName,
@@ -572,6 +570,120 @@ void WebRequestHandler::tick()
 	m_transactionPool.collectGarbage( m_eventLoop->time());
 }
 
+static const char* parsePathDelim( char const* ai)
+{
+	if (*ai == '/')
+	{
+		for (++ai; *ai == '/'; ++ai){}
+		return ai;
+	}
+	else if (*ai == '\0')
+	{
+		return ai;
+	}
+	return NULL;
+}
+
+static const char* parseLocalHost( char const* ai)
+{
+	if (ai)
+	{
+		if (0==std::memcmp( ai, "http:/", 6))
+		{
+			if (!(ai = parsePathDelim( ai+6))) return NULL;
+		}
+		else if (0==std::memcmp( ai, "https:/", 7))
+		{
+			if (!(ai = parsePathDelim( ai+7))) return NULL;
+		}
+		if (0==std::memcmp( ai, "127.0.0.1", 9))
+		{
+			return ai+9;
+		}
+		else if (0==std::memcmp( ai, "localhost", 9))
+		{
+			return ai+9;
+		}
+	}
+	return NULL;
+}
+
+static const char* parsePort( const char* ai, const std::string& port)
+{
+	if (ai)
+	{
+		if (*ai == '/' || *ai == '\0')
+		{
+			if (port.empty()) return parsePathDelim( ai);
+		}
+		else if (*ai == ':')
+		{
+			++ai;
+			if (port.empty())
+			{
+				if (ai[0] == '8' && ai[1] == '0') return parsePathDelim( ai+2);
+			}
+			else if (0==std::memcmp(ai,port.c_str(),port.size()))
+			{
+				return parsePathDelim( ai+port.size());
+			}
+		}
+	}
+	return NULL;
+}
+
+static const char* parseRootId( const char* address, const std::string& rootid)
+{
+	if (address)
+	{
+		if (rootid.empty())
+		{
+			return address;
+		}
+		else if (0==std::memcmp( address, rootid.c_str(), rootid.size()))
+		{
+			return parsePathDelim( address+rootid.size());
+		}
+	}
+	return NULL;
+}
+
+const char* WebRequestHandler::pathToSelf( const char* address)
+{
+	return parseRootId( parsePort( parseLocalHost( address), m_port), m_rootid);
+}
+
+bool WebRequestHandler::loopbackConfigurationLoadDelegateRequest( WebRequestContextInterface* receiverContext, const char* receiverSchema, const char* method, const char* path, const std::string& contentstr, WebRequestAnswer& answer)
+{
+	WebRequestContent content( g_config_charset, g_config_doctype, contentstr.c_str(), contentstr.size());
+	strus::Reference<WebRequestContextInterface> ctx( createRequestContext( 
+			"UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/,""/*html_base_href*/,
+			method, path, answer));
+	if (ctx.get())
+	{
+		WebRequestAnswer delegateAnswer;
+		if (!runConfigurationLoad( ctx.get(), content, delegateAnswer))
+		{
+			answer = delegateAnswer;
+			answer.explain( _TXT("configuration loopback delegate request failed"));
+			return false;
+		}
+		if (receiverSchema)
+		{
+			if (!receiverContext->putDelegateRequestAnswer( receiverSchema, delegateAnswer.content()))
+			{
+				answer = receiverContext->getAnswer();
+				answer.explain( _TXT("put of configuration loopback delegate request answer failed"));
+				return false;
+			}
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, const WebRequestContent& content, WebRequestAnswer& answer)
 {
@@ -593,24 +705,42 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 				std::string delegate_contentstr( di->contentstr(), di->contentlen());
 				if (di->url())
 				{
-					ConfigurationUpdateRequestContext* update = new ConfigurationUpdateRequestContext( this, m_logger, ctx, di->receiverSchema(), &count);
-					if (!m_eventLoop->send( di->url(), di->method(), delegate_contentstr, update))
+					const char* pt = pathToSelf( di->url());
+					if (pt)
 					{
-						count.set( 0);
-						rt = false;
-						break;
+						if (!loopbackConfigurationLoadDelegateRequest( ctx, di->receiverSchema(), di->method(), pt, delegate_contentstr, answer))
+						{
+							count.set( 0);
+							rt = false;
+							break;
+						}
+						count.decrement();
+					}
+					else
+					{
+						ConfigurationUpdateRequestContext* update = new ConfigurationUpdateRequestContext( this, m_logger, ctx, di->receiverSchema(), &count);
+						if (!m_eventLoop->send( di->url(), di->method(), delegate_contentstr, update))
+						{
+							count.set( 0);
+							rt = false;
+							break;
+						}
 					}
 				}
 				else
 				{
 					// ... without receiver feed to itself with the receiver schema:
 					WebRequestContent delegate_content( g_config_charset, g_config_doctype, delegate_contentstr.c_str(), delegate_contentstr.size());
-					if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegate_content))
+					if (di->receiverSchema())
 					{
-						count.set( 0);
-						rt = false;
-						break;
+						if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegate_content))
+						{
+							count.set( 0);
+							rt = false;
+							break;
+						}
 					}
+					count.decrement();
 				}
 			}
 			catch (const std::bad_alloc&)
@@ -653,6 +783,11 @@ bool WebRequestHandler::loadSubConfiguration( const ConfigurationDescription& cf
 			: _TXT("error restoring context"));
 		return false;
 	}
+	if (!answer.content().empty())
+	{
+		setAnswer( answer, ErrorCodeLogicError, _TXT("load configuration request returned content"));
+		return false;
+	}
 	return true;
 }
 
@@ -673,6 +808,11 @@ bool WebRequestHandler::loadMainConfiguration( const std::string& configstr, Web
 	if (!runConfigurationLoad( ctxi, content, answer))
 	{
 		answer.explain( _TXT("error loading main configuration"));
+		return false;
+	}
+	if (!answer.content().empty())
+	{
+		setAnswer( answer, ErrorCodeLogicError, _TXT("load configuration request returned content"));
 		return false;
 	}
 	return true;
