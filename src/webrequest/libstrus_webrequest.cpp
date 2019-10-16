@@ -98,7 +98,6 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 		const std::string& html_head,
 		const std::string& config_store_dir,
 		const std::string& service_name_,
-		const std::string& rootid,
 		int port,
 		bool beautifiedOutput,
 		int maxIdleTime,
@@ -108,7 +107,7 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 	try
 	{
 		if (!logger) logger = &g_logger_null;
-		return new WebRequestHandler( eventloop, logger, html_head, config_store_dir, service_name_, rootid, port, beautifiedOutput, maxIdleTime, nofTransactionsPerSeconds);
+		return new WebRequestHandler( eventloop, logger, html_head, config_store_dir, service_name_, port, beautifiedOutput, maxIdleTime, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -126,7 +125,7 @@ DLL_PUBLIC bool strus::storeWebRequestSchemaDescriptions( const std::string& con
 {
 	try
 	{
-		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_eventlopp_null, &g_logger_null, ""/*html head*/, "./"/*config_store_dir*/, "./"/*service_name*/, "./"/*rootid*/, 0/*port*/, true/*beautified*/, 30/*maxIdleTime*/, 1/*nofTransactionsPerSeconds*/));
+		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_eventlopp_null, &g_logger_null, ""/*html head*/, "./"/*config_store_dir*/, "./"/*service_name*/, 0/*port*/, true/*beautified*/, 30/*maxIdleTime*/, 1/*nofTransactionsPerSeconds*/));
 		hnd->storeSchemaDescriptions( dir, doctype);
 		return true;
 	}

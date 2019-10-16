@@ -43,7 +43,6 @@ public:
 			const std::string& html_head_,
 			const std::string& config_store_dir_,
 			const std::string& service_name_,
-			const std::string& rootid_,
 			int port_,
 			bool beautifiedOutput_,
 			int maxIdleTime_,
@@ -136,7 +135,6 @@ private:
 	ConfigurationHandler m_configHandler;		//< configuration handler
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	TransactionPool m_transactionPool;		//< transaction pool
-	std::string m_rootid;				//< root of path after localhost that identifies calls to self via loopback
 	std::string m_port;				//< port number of this request handler used to identify calls to self via loopback
 	int m_maxIdleTime;				//< maximum idle time transactions
 	bool m_beautifiedOutput;			//< true, if output should be beautyfied for more readability

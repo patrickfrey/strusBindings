@@ -172,7 +172,6 @@ WebRequestHandler::WebRequestHandler(
 		const std::string& html_head_,
 		const std::string& config_store_dir_,
 		const std::string& service_name_,
-		const std::string& rootid_,
 		int port_,
 		bool beautifiedOutput_,
 		int maxIdleTime_,
@@ -183,7 +182,6 @@ WebRequestHandler::WebRequestHandler(
 	,m_configHandler(logger_,config_store_dir_,service_name_,g_context_typenames)
 	,m_html_head(html_head_)
 	,m_transactionPool( eventLoop_->time(), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
-	,m_rootid(rootid_)
 	,m_port((port_==80||port_==0) ? std::string() : strus::string_format("%d",port_))
 	,m_maxIdleTime(maxIdleTime_)
 	,m_beautifiedOutput(beautifiedOutput_)
@@ -632,25 +630,9 @@ static const char* parsePort( const char* ai, const std::string& port)
 	return NULL;
 }
 
-static const char* parseRootId( const char* address, const std::string& rootid)
-{
-	if (address)
-	{
-		if (rootid.empty())
-		{
-			return address;
-		}
-		else if (0==std::memcmp( address, rootid.c_str(), rootid.size()))
-		{
-			return parsePathDelim( address+rootid.size());
-		}
-	}
-	return NULL;
-}
-
 const char* WebRequestHandler::pathToSelf( const char* address)
 {
-	return parseRootId( parsePort( parseLocalHost( address), m_port), m_rootid);
+	return parsePort( parseLocalHost( address), m_port);
 }
 
 bool WebRequestHandler::loopbackConfigurationLoadDelegateRequest( WebRequestContextInterface* receiverContext, const char* receiverSchema, const char* method, const char* path, const std::string& contentstr, WebRequestAnswer& answer)
