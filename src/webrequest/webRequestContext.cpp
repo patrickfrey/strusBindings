@@ -48,6 +48,23 @@ static inline bool isEqual( const char* name, const char* oth)
 		return errorReturnValue;\
 	}
 
+#define WEBREQUEST_CONTEXT_CATCH_ERROR_SET_BOOL( errflag) \
+	catch (const std::bad_alloc&) \
+	{\
+		setAnswer( ErrorCodeOutOfMem);\
+		errflag = false;\
+	}\
+	catch (const std::runtime_error& err)\
+	{\
+		setAnswer( ErrorCodeRuntimeError, err.what(), true/*do copy*/);\
+		errflag = false;\
+	}\
+	catch (...)\
+	{\
+		setAnswer( ErrorCodeUncaughtException);\
+		errflag = false;\
+	}
+
 
 WebRequestContext* createClone();
 
@@ -235,10 +252,29 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					setAnswer( ErrorCodeIncompleteRequest);
 					return false;
 				}
+				else if (!m_contextName)
+				{
+					// [1.C] POST of configuration without name specified (name allocated by service):
+					bool rt = true;
+					std::string newContextName = m_handler->allocTemporaryContextName( m_contextType, ""/*prefix*/);
+					try
+					{
+						m_contextName = papuga_Allocator_copy_string( &m_allocator, newContextName.c_str(), newContextName.size());
+						rt = loadConfigurationRequest( content);
+						if (rt)
+						{
+							rt = setAnswerLink( m_contextType, newContextName);
+						}
+					}
+					WEBREQUEST_CONTEXT_CATCH_ERROR_SET_BOOL( rt);
+					if (!rt) m_handler->releaseTemporaryContextName( m_contextType, newContextName);
+					return rt;
+				}
 				else
 				{
-					// [1.C] POST of configuration:
-					return loadConfigurationRequest( content);
+					// [1.D] POST of configuration, name defined by client
+					// [NOTE] This is not conforming to REST, the REST interface is defined by [1.C]
+					return (loadConfigurationRequest( content) && setAnswerLink( m_contextType, m_contextName));
 				}
 			}
 			else if (isEqual( m_method,"DELETE"))
@@ -247,14 +283,14 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				{
 					if (m_transactionRef.get())
 					{
-						// [1.D] DELETE of a transaction object:
+						// [1.E] DELETE of a transaction object:
 						m_transactionRef.reset();
 						m_answer.setStatus( 204/*no content*/);
 						return true;//... transaction automatically released when not returned
 					}
 					else
 					{
-						// [1.E] DELETE of a configuration object:
+						// [1.F] DELETE of a configuration object:
 						return deleteConfigurationRequest();
 					}
 				}

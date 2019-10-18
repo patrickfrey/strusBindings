@@ -114,12 +114,32 @@ public:
 
 	std::vector<std::string> contextNames( const std::string& name) const;
 	std::vector<std::string> contextTypes() const;
+	std::string allocTemporaryContextName( const std::string& contextType, const char* prefix);
+	void releaseTemporaryContextName( const std::string& contextType, const std::string& contextName);
+
 	void declareSubConfiguration( const std::string& contextType, const std::string& contextName);
 
 private:
 	std::string configurationStoreDirectory() const;
 	std::vector<ConfigurationDescription> getStoredConfigurations( bool doDeleteObsolete);
-	typedef std::pair<std::string,std::string> ContextNameDef;
+	struct ContextNameDef
+	{
+		std::string contextType;
+		std::string contextName;
+		bool temporary;
+
+		ContextNameDef()
+			:contextType(),contextName(),temporary(true){}
+		ContextNameDef( const std::string& contextType_, const std::string& contextName_, bool temporary_=false)
+			:contextType(contextType_),contextName(contextName_),temporary(temporary_){}
+		ContextNameDef( const ContextNameDef& o)
+			:contextType(o.contextType),contextName(o.contextName),temporary(o.temporary){}
+
+		bool operator<( const ContextNameDef& o) const
+		{
+			return (contextType == o.contextType) ? (contextName < o.contextName) : (contextType < o.contextType);
+		}
+	};
 
 private:
 	mutable strus::mutex m_mutex;

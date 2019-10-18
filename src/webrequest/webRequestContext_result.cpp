@@ -310,5 +310,28 @@ bool WebRequestContext::transferContext()
 	return true;
 }
 
+bool WebRequestContext::setAnswerLink( const char* title, const std::string& lnkid)
+{
+	std::string link;
+	try
+	{
+		std::string linkbase;
+		linkbase.reserve( 256);
+		int ec = strus::getAncestorPath( m_html_base_href, 3, linkbase);
+		if (ec)
+		{
+			setAnswer( ErrorCodeInvalidFilePath, _TXT("failed to get link base"));
+			return false;
+		}
+		link = strus::joinFilePath( strus::joinFilePath( linkbase, title), lnkid);
+		if (link.size() < lnkid.size() + linkbase.size()) throw std::bad_alloc();
+	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( ErrorCodeOutOfMem);
+		return false;
+	}
+	return strus::mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, title, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, m_handler->beautifiedOutput(), link);
+}
 
 

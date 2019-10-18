@@ -108,6 +108,16 @@ public:/*WebRequestContext*/
 			const char* contextName,
 			WebRequestAnswer& answer);
 
+	std::string allocTemporaryContextName( const std::string& contextType, const char* prefix)
+	{
+		return m_configHandler.allocTemporaryContextName( contextType, prefix);
+	}
+
+	void releaseTemporaryContextName( const std::string& contextType, const std::string& contextName)
+	{
+		return m_configHandler.releaseTemporaryContextName( contextType, contextName);
+	}
+
 public:/*libstrus_webrequest*/
 	/// \brief Store all request schemas in a tree with a given directory as root
 	void storeSchemaDescriptions( const std::string& dir) const;

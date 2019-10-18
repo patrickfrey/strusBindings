@@ -106,7 +106,7 @@ void ConfigurationHandler::commitStoreConfiguration(
 {
 	strus::unique_lock lock( m_mutex);
 
-	ContextNameDef namedef( transaction.type, transaction.name);
+	ContextNameDef namedef( transaction.type, transaction.name, false/*temporary*/);
 	m_context_names.insert( namedef);
 
 	int ec = strus::renameFile( transaction.failed_filename, transaction.filename);
@@ -375,18 +375,41 @@ EXIT:
 	return rt;
 }
 
-
-std::vector<std::string> ConfigurationHandler::contextNames( const std::string& name) const
+std::string ConfigurationHandler::allocTemporaryContextName( const std::string& contextType, const char* prefix)
 {
-	std::vector<std::string> rt;
-	ContextNameDef cndef( name, std::string());
+	ContextNameDef cndef( contextType, std::string(), true/*temporary*/);
 	strus::unique_lock lock( m_mutex);
-	std::set<ContextNameDef>::const_iterator ci = m_context_names.upper_bound( cndef);
-	for (; ci != m_context_names.end() && ci->first == name; ++ci)
+	std::set<ContextNameDef>::const_iterator start = m_context_names.upper_bound( cndef);
+	char ibuf[ 64];
+	int idx = 1;
+
+	for (;;++idx)
 	{
-		rt.push_back( ci->second);
+		std::snprintf( ibuf, sizeof(ibuf), "%s%d", prefix, idx);
+		std::set<ContextNameDef>::const_iterator ci = start;
+		bool found = false;
+		for (; !found && ci != m_context_names.end() && ci->contextType == contextType; ++ci)
+		{
+			found = (ci->contextName == ibuf);
+		}
+		if (!found)
+		{
+			cndef.contextName = ibuf;
+			m_context_names.insert( cndef);
+			return cndef.contextName;
+		}
 	}
-	return rt;
+}
+
+void ConfigurationHandler::releaseTemporaryContextName( const std::string& contextType, const std::string& contextName)
+{
+	ContextNameDef cndef( contextType, contextName);
+	strus::unique_lock lock( m_mutex);
+	std::set<ContextNameDef>::const_iterator di = m_context_names.find( cndef);
+	if (di->temporary)
+	{
+		m_context_names.erase( cndef);
+	}
 }
 
 std::vector<std::string> ConfigurationHandler::contextTypes() const
@@ -396,15 +419,34 @@ std::vector<std::string> ConfigurationHandler::contextTypes() const
 	std::set<ContextNameDef>::const_iterator ci = m_context_names.begin();
 	for (; ci != m_context_names.end(); ++ci)
 	{
-		res.insert( ci->first);
+		if (!ci->temporary)
+		{
+			res.insert( ci->contextType);
+		}
 	}
 	return std::vector<std::string>( res.begin(), res.end());
+}
+
+std::vector<std::string> ConfigurationHandler::contextNames( const std::string& contextType) const
+{
+	std::vector<std::string> rt;
+	ContextNameDef cndef( contextType, std::string());
+	strus::unique_lock lock( m_mutex);
+	std::set<ContextNameDef>::const_iterator ci = m_context_names.upper_bound( cndef);
+	for (; ci != m_context_names.end() && ci->contextType == contextType; ++ci)
+	{
+		if (!ci->temporary)
+		{
+			rt.push_back( ci->contextName);
+		}
+	}
+	return rt;
 }
 
 void ConfigurationHandler::declareSubConfiguration( const std::string& contextType, const std::string& contextName)
 {
 	strus::unique_lock lock( m_mutex);
-	ContextNameDef namedef( contextType, contextName);
+	ContextNameDef namedef( contextType, contextName, false/*temporary*/);
 	m_context_names.insert( namedef);
 }
 

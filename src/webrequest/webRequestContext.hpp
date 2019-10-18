@@ -162,6 +162,7 @@ private:
 	bool hasContentRequestResult() const;
 	bool transferContext();
 	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
+	bool setAnswerLink( const char* title, const std::string& lnk);
 
 	// Implemented in webRequestContext_meta:
 	bool executeListVariables();

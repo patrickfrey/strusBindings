@@ -129,7 +129,8 @@ bool WebRequestContext::initRequestObject()
 		}
 		else
 		{
-			if (!(m_contextName = m_path.getNext())) return true;
+			m_contextName = m_path.getNext();
+			if (!m_contextName) return true;
 		}
 		m_context.create();
 		if (!m_context.get())
@@ -298,22 +299,12 @@ bool WebRequestContext::executePostTransaction()
 	}
 	std::string transaction_typenam = strus::string_format( "transaction/%s", m_contextType);
 	std::string tid = m_transactionPool->createTransaction( transaction_typenam, m_context, m_handler->maxIdleTime());
-	std::string linkbase;
-	int ec = strus::getAncestorPath( m_html_base_href, 3, linkbase);
-	std::string tlinkparent = strus::joinFilePath( linkbase, "transaction");
-	std::string tlink = strus::joinFilePath( tlinkparent, tid);
-	if (ec)
-	{
-		setAnswer( ErrorCode( ec), _TXT("failed to get link base"));
-		return false;
-	}
-	if (tid.empty() || tlinkparent.empty() || tlink.empty())
+	if (tid.empty())
 	{
 		setAnswer( ErrorCodeOutOfMem);
 		return false;
 	}
-	bool beautified = m_handler->beautifiedOutput();
-	return strus::mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), ""/*html href base*/, "transaction", PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, tlink);
+	return setAnswerLink( "transaction", tid);
 }
 
 bool WebRequestContext::executeCommitTransaction()
