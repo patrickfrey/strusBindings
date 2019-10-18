@@ -12,6 +12,7 @@
 #include "webRequestUtils.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/base/string_format.hpp"
+#include "strus/lib/error.hpp"
 #include "papugaLoggerFunctions.hpp"
 #include "schemas_base.hpp"
 #include "papuga/allocator.h"
@@ -198,11 +199,14 @@ bool WebRequestContext::inheritRequestContext( const char* contextType_, const c
 ERROR:
 	if (errcode == papuga_AddressedItemNotFound)
 	{
-		m_answer.setError_fmt( errorCodeToHttpStatus( papugaErrorToErrorCode( errcode)), papugaErrorToErrorCode( errcode), _TXT("undefined %s '%s'"), contextType_, contextName_);
+		ErrorCode apperrcode = papugaErrorToErrorCode( errcode);
+		m_answer.setError_fmt( errorCodeToHttpStatus( apperrcode), apperrcode, _TXT("undefined %s '%s'"), contextType_, contextName_);
 	}
 	else
 	{
-		m_answer.setError_fmt( errorCodeToHttpStatus( papugaErrorToErrorCode( errcode)), papugaErrorToErrorCode( errcode), _TXT("failed to inherit from %s '%s'"), contextType_, contextName_);
+		ErrorCode apperrcode = papugaErrorToErrorCode( errcode);
+		const char* apperrstr = strus::errorCodeToString( apperrcode);
+		m_answer.setError_fmt( errorCodeToHttpStatus( apperrcode), apperrcode, _TXT("failed to inherit from %s '%s': %s"), contextType_, contextName_, apperrstr);
 	}
 	return false;
 }

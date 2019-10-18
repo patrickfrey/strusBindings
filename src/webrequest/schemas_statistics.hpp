@@ -45,11 +45,12 @@ class Schema_Context_PUT_StatisticsServer :public papuga::RequestAutomaton, publ
 public:
 	Schema_Context_PUT_StatisticsServer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{
+		{/*env*/},
+		{/*result*/
 			{0, "PUT~statistics", "GET", "storage", "statistics/snapshot", {}}
 		},
-		{},
-		{
+		{/*inherit*/},
+		{/*input*/
 			{"/statserver/storage", "()", StatisticsStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
 			{"/statserver", "", "storage", StatisticsStorageServer, '*'},
 			{"/statserver/blocks", "()", StatisticsMapBlocks, papuga_TypeString, "100K"},
@@ -69,9 +70,10 @@ class Schema_StatisticsServer_PUT_statistics :public papuga::RequestAutomaton, p
 public:
 	Schema_StatisticsServer_PUT_statistics() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{"/storage", "()", StatisticsBlob, papuga_TypeString, "AAAABwAKZ9h..."},
 			{"/storage", 0/*result*/, "statserver", bindings::method::StatisticsMap::processStatisticsMessage(), {{StatisticsBlob}} }
 		}
@@ -83,7 +85,9 @@ class Schema_StatisticsServer_GET :public papuga::RequestAutomaton, public Autom
 public:
 	Schema_StatisticsServer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{{"statistics", {
+		{/*env*/},
+		{/*result*/
+		{"statistics", {
 			{"/query/feature/analyzed//term", "termstats", true},
 			{"/query/feature/analyzed//term/type", "type", TermType},
 			{"/query/feature/analyzed//term/value", "value", TermValue},
@@ -91,8 +95,8 @@ public:
 			{"/query~", "globalstats", false},
 			{"/query~", "nofdocs", "_nofdocs", '!'}
 		}}},
-		{},
-		{
+		{/*inherit*/},
+		{/*input*/
 			{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed")},
 			{SchemaStatisticsPart::evaluateTermStatistics( "/query/feature/analyzed")},
 			{SchemaStatisticsPart::evaluateGlobalStatistics( "/query")}

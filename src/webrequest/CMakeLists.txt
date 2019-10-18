@@ -21,6 +21,7 @@ set( source_files
 	webRequestContext_result.cpp
 	webRequestContext_error.cpp
 	webRequestContext_schema.cpp
+	webRequestContext_env.cpp
 	webRequestContext_meta.cpp
 	webRequestContext_method.cpp
 	webRequestContext_obj.cpp

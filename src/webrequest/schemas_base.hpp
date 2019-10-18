@@ -22,6 +22,11 @@ namespace webrequest {
 class AutomatonNameSpace
 {
 public:
+	enum EnvAssignment
+	{
+		EnvFormat
+	};
+
 	enum Item
 	{
 		NullValue,

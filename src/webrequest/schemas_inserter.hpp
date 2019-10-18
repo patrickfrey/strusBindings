@@ -24,11 +24,12 @@ class Schema_Context_PUT_Inserter :public papuga::RequestAutomaton, public Autom
 public:
 	Schema_Context_PUT_Inserter() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/
 			{"docanalyzer","/inserter/include/analyzer()",true/*required*/},
 			{"storage","/inserter/include/storage()",true/*required*/}},
-		{
+		{/*input*/
 			{"/inserter", "inserter", "context", bindings::method::Context::createInserter(), {{"storage"},{"docanalyzer"}} }
 		}
 	) {}

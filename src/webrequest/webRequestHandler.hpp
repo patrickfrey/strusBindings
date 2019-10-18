@@ -87,6 +87,7 @@ public:/*WebRequestContext*/
 	int debug_maxdepth() const					{return m_debug_maxdepth;}
 	int maxIdleTime() const						{return m_maxIdleTime;}
 	bool beautifiedOutput() const					{return m_beautifiedOutput;}
+	const char* serviceName() const					{return m_serviceName.c_str();}
 
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
@@ -134,6 +135,7 @@ private:
 	papuga_RequestHandler* m_impl;			//< request handler
 	ConfigurationHandler m_configHandler;		//< configuration handler
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
+	std::string m_serviceName;			//< identifier of the webserver
 	TransactionPool m_transactionPool;		//< transaction pool
 	std::string m_port;				//< port number of this request handler used to identify calls to self via loopback
 	int m_maxIdleTime;				//< maximum idle time transactions

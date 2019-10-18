@@ -14,6 +14,7 @@
 #include "schemas_query_decl.hpp"
 #include "schemas_queryeval_decl.hpp"
 #include "schemas_analyzer_decl.hpp"
+#include "schemas_storage_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -22,66 +23,19 @@
 namespace strus {
 namespace webrequest {
 
-class SchemaStoragePart :public AutomatonNameSpace
-{
-public:
-	static papuga::RequestAutomaton_NodeList defineStorage( const char* rootexpr)
-	{
-		return papuga::RequestAutomaton_NodeList( rootexpr,
-		{
-			{"path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
-			{"database", "()", DatabaseEngine, papuga_TypeString, "std"},
-			{"statsproc", "()", StatisticsProc, papuga_TypeString, "std"},
-			{"metadata/name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
-			{"metadata/type", "()", StorageMetadataType, papuga_TypeString, "INT32"},
-			{"metadata", StorageMetadata, {{"name", StorageMetadataName}, {"type", StorageMetadataType}} },
-			{"autocompact", "()", DatabaseEnableAutoCompact, papuga_TypeBool, "true"},
-			{"acl", "()", StorageEnableAcl, papuga_TypeBool, "true"},
-			{"cachedterms", "()", StorageCachedTerms, papuga_TypeString, "/srv/strus/termlist.txt"},
-			{"cache", "()", DatabaseLruCacheSize, papuga_TypeString, "200M"},
-			{"compression", "()", DatabaseEnableCompression, papuga_TypeBool, "true"},
-			{"max_open_files", "()", DatabaseMaxNofOpenFiles, papuga_TypeInt, "128"},
-			{"write_buffer_size", "()", DatabaseWriteBufferSize, papuga_TypeString, "4M"},
-			{"block_size", "()", DatabaseBlockSize, papuga_TypeString, "4K"},
-			{"", StorageConfig, {
-				{"path", DatabasePath, '!'},
-				{"database", DatabaseEngine, '?'},
-				{"statsproc", StatisticsProc, '?'},
-				{"metadata", StorageMetadata, '*'},
-				{"autocompact", DatabaseEnableAutoCompact, '?'},
-				{"acl", StorageEnableAcl, '?'},
-				{"cachedterms", StorageCachedTerms, '?'},
-				{"cache", DatabaseLruCacheSize, '?'},
-				{"compression", DatabaseEnableCompression, '?'},
-				{"max_open_files", DatabaseMaxNofOpenFiles, '?'},
-				{"write_buffer_size", DatabaseWriteBufferSize, '?'},
-				{"block_size", DatabaseBlockSize, '?'}
-			}}
-		});
-	}
-
-	static papuga::RequestAutomaton_NodeList defineStatisticsQuery( const char* rootexpr)
-	{
-		typedef bindings::method::StorageClient S;
-		return papuga::RequestAutomaton_NodeList( rootexpr,
-		{
-			{"snapshot", "_blob", "storage", S::getAllStatistics(), {}}
-		});
-	}
-};
-
 class Schema_Context_POST_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
 	typedef bindings::method::Context C;
 	Schema_Context_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{//Inherited:
+		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
+		{/*result*/},
+		{/*inherit*/
 			{"qryeval","/storage/include/qryeval()",false/*not required*/},
 			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
 			{"/storage", "_success", "context", C::createStorage(), {{StorageConfig}} },
 			{"/storage", "storage", "context", C::createStorageClient(), {{StorageConfig}} }
@@ -94,12 +48,13 @@ class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public Automa
 public:
 	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{//Inherited:
+		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
+		{/*result*/},
+		{/*inherit*/
 			{"qryeval","/storage/include/qryeval()",false/*not required*/},
 			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
 			{"/", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
 		}
@@ -111,9 +66,10 @@ class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, publi
 public:
 	Schema_Context_DELETE_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
 			{"/storage", StorageConfig, {
 					{"path", DatabasePath}
@@ -129,15 +85,16 @@ class Schema_Storage_GET :public papuga::RequestAutomaton, public AutomatonNameS
 public:
 	Schema_Storage_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{
+		{/*env*/},
+		{/*result*/
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }},
 			{"statistics", { {"/statistics", "_blob", "statistics", '!'} }}
 		},
-		{//Inherited:
+		{/*inherit*/
 			{"qryeval","/storage/include/qryeval()",false/*not required*/},
 			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 
@@ -156,9 +113,10 @@ class Schema_StorageTransaction_PUT :public papuga::RequestAutomaton, public Aut
 public:
 	Schema_StorageTransaction_PUT() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{SchemaAnalyzerPart::defineDocumentAnalyzed( "/storage/document")},
 			{"/storage", DocumentDefList, {
 					{DocumentDef,'*'}

@@ -28,7 +28,8 @@ class Schema_Context_POST_QueryEval :public papuga::RequestAutomaton, public Aut
 public:
 	Schema_Context_POST_QueryEval() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
+		{/*env*/},
+		{/*result*/},
 		{//Inherited:
 			{"storage","/qryeval/include/storage()",false/*not required*/},
 			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
@@ -50,14 +51,15 @@ class Schema_QueryEval_GET :public papuga::RequestAutomaton, public AutomatonNam
 public:
 	Schema_QueryEval_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{
+		{/*env*/},
+		{/*result*/
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}
 		},
-		{//Inherited:
+		{/*inherit*/
 			{"storage","/qryeval/include/storage()",false/*not required*/},
 			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
 			{"/query/eval", '?'},
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared

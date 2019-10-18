@@ -26,9 +26,9 @@ server = {
 else
 server = {
 	storage = {
-			{ name = "isrv1", address = ISERVER1, context="test" },
-			{ name = "isrv2", address = ISERVER2, context="test" },
-			{ name = "isrv3", address = ISERVER3, context="test" },
+			{ name = "isrv1", address = ISERVER1, context="test1" },
+			{ name = "isrv2", address = ISERVER2, context="test2" },
+			{ name = "isrv3", address = ISERVER3, context="test3" },
 		},
 	statserver  =	{ name = "ssrv",  address = SSERVER1, context="test" },
 	distqryeval =	{ name = "qsrv",  address = QSERVER1, context="test" }
@@ -68,7 +68,6 @@ storageConfig = {
 }
 function getStorageConfig( storageidx)
 	cfg = storageConfig
-	cfg.storage.path = string.format("storage/test%d", storageidx)
 	cfg.storage.include = {
 		analyzer = "test",
 		qryeval  = "test"

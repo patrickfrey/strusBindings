@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-/* \brief Schema for query analysis and evaluation
+/* \brief Partial schema definition to include for parsing query evaluation definitions
  * @file schemas_query.hpp
  */
 #ifndef _STRUS_WEBREQUEST_SCHEMAS_QUERYEVAL_DECL_HPP_INCLUDED

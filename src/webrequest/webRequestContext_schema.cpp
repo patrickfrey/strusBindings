@@ -213,6 +213,7 @@ bool WebRequestContext::executeContentSchemaRequest( const SchemaId& schemaid, c
 		m_logger->logRequestType( "content schema request", schemaid.schemaName, m_contextType, m_contextName);
 	}
 	if (!initContentSchemaAutomaton( schemaid)) return false;
+	if (!initSchemaEnvAssignments()) return false;
 	if (!initContentSchemaRequest()) return false;
 	if (!feedContentSchemaRequest( content)) return false;
 	if (!inheritContentSchemaRequestContext()) return false;

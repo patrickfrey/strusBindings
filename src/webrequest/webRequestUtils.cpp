@@ -52,7 +52,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_NotImplemented:		return ErrorCodeNotImplemented;
 		case papuga_ValueUndefined:		return ErrorCodeIncompleteDefinition;
 		case papuga_MixedConstruction:		return ErrorCodeBindingLanguageError;
-		case papuga_DuplicateDefinition:	return ErrorCodeBindingLanguageError;
+		case papuga_DuplicateDefinition:	return ErrorCodeDuplicateDefinition;
 		case papuga_SyntaxError:		return ErrorCodeInputFormat;
 		case papuga_UncaughtException:		return ErrorCodeUncaughtException;
 		case papuga_ExecutionOrder:		return ErrorCodeLogicError;
@@ -101,6 +101,7 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 		case ErrorCodeIncompleteInitialization: return 500 /*Internal Server Error*/;
 		case ErrorCodeIncompleteDefinition: return 500 /*Internal Server Error*/;
 		case ErrorCodeIncompleteConfiguration: return 500 /*Internal Server Error*/;
+		case ErrorCodeDuplicateDefinition: return 500 /*Internal Server Error*/;
 		case ErrorCodeBindingLanguageError: return 500 /*Internal Server Error*/;
 		case ErrorCodeUnknownIdentifier: return 400 /*Bad Request*/;
 		case ErrorCodeOperationOrder: return 500 /*Internal Server Error*/;

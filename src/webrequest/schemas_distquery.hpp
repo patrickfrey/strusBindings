@@ -26,12 +26,13 @@ class Schema_Context_POST_DistQueryEval :public papuga::RequestAutomaton, public
 public:
 	Schema_Context_POST_DistQueryEval() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/
 			{"qryanalyzer","/distqryeval/include/analyzer()",false/*not required*/},
 			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{"/distqryeval/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
 			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
@@ -54,7 +55,8 @@ class Schema_DistQueryEval_GET :public papuga::RequestAutomaton, public Automato
 public:
 	Schema_DistQueryEval_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{
+		{/*env*/},
+		{/*result*/
 			{"query", "SET~querystats", "GET", "statserver", "", {
 				{"/query/feature", "feature", true},
 				{"/query/{feature,sentence}", "analyzed", "_analyzed", '*'}
@@ -66,11 +68,11 @@ public:
 			{"query", "END~ranklist", {}},
 			{"queryresult", {"ranklist"}, {}}
 		},
-		{
+		{/*inherit*/
 			{"qryanalyzer","/query/include/analyzer()",false/*not required*/},
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{"/query/server/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
 			{"/query/server", "", "storage", DistQueryEvalStorageServer, '*'},
 			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
@@ -92,9 +94,10 @@ class Schema_DistQueryEval_SET_querystats :public papuga::RequestAutomaton, publ
 public:
 	Schema_DistQueryEval_SET_querystats() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{SchemaQueryDeclPart::declareStatistics("/statistics")},
 			{"/statistics", "termstats", "_termstats", TermStats, '*'},
 			{"/statistics", "globalstats", "_globalstats", GlobalStats, '!'}
@@ -108,9 +111,10 @@ public:
 	typedef bindings::method::Context C;
 	Schema_DistQueryEval_SET_ranklist() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{SchemaQueryDeclPart::declareQueryResult( "/queryresult/ranklist")},
 			{SchemaQueryDeclPart::addQueryResult( "/queryresult/ranklist")},
 		}
@@ -123,9 +127,10 @@ public:
 	typedef bindings::method::Context C;
 	Schema_DistQueryEval_END_ranklist() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{SchemaQueryDeclPart::mergeQueryResults( "/query")}
 		}
 	) {}

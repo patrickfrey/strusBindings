@@ -148,6 +148,9 @@ private:
 		bool inheritContentSchemaRequestContext();
 		bool executeContentSchema( const WebRequestContent& content);
 
+	// Implemented in webRequestContext_env:
+	bool initSchemaEnvAssignments();
+
 	// Implemented in webRequestContext_error:
 	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
 

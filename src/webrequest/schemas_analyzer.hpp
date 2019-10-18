@@ -27,9 +27,10 @@ class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, publ
 public:
 	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
 			{SchemaAnalyzerPart::defineDocumentAnalyzer( "/docanalyzer")}
 		}
 	) {}
@@ -46,11 +47,12 @@ class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton, public 
 public:
 	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{},
-		{
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/
 			{"vstorage","/qryanalyzer/include/vstorage()",false/*not required*/}
 		},
-		{
+		{/*input*/
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/qryanalyzer")}
 		}
 	) {}
@@ -68,10 +70,12 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{{"query", {
-			{SchemaQueryDeclPart::resultQuery( "/query")}}
+		{/*env*/},
+		{/*result*/
+			{"query", {
+				{SchemaQueryDeclPart::resultQuery( "/query")}}
 		}},
-		{
+		{/*inherit*/
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{

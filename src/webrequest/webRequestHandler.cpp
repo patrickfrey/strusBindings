@@ -181,6 +181,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_impl(0)
 	,m_configHandler(logger_,config_store_dir_,service_name_,g_context_typenames)
 	,m_html_head(html_head_)
+	,m_serviceName(service_name_)
 	,m_transactionPool( eventLoop_->time(), maxIdleTime_*2, nofTransactionsPerSeconds, logger_)
 	,m_port((port_==80||port_==0) ? std::string() : strus::string_format("%d",port_))
 	,m_maxIdleTime(maxIdleTime_)

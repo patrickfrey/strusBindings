@@ -30,9 +30,9 @@
 {
 "distqryeval": {
   "qryeval": [
-    "http://127.0.0.1:7184/storage/test",
-    "http://127.0.0.1:7185/storage/test",
-    "http://127.0.0.1:7186/storage/test"],
+    "http://127.0.0.1:7184/storage/test1",
+    "http://127.0.0.1:7185/storage/test2",
+    "http://127.0.0.1:7186/storage/test3"],
   "statserver": "http://127.0.0.1:7183/statserver/test"}}
 {
 "queryresult":{
