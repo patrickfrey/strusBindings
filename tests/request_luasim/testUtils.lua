@@ -9,7 +9,7 @@ end
 
 -- Function calling a server in the emulation context (not a real server) and handling possible errors, expecting the call to succeed
 function call_server_checked( method, server, arg)
-	result,status,errmsg = call_server( method, server, arg)
+	local result,status,errmsg = call_server( method, server, arg)
 	if (status < 200 or status >= 300) then
 		if arg then
 			if (type(arg) == "table") then arg = to_json( arg) end
@@ -38,8 +38,9 @@ end
 
 -- Function to get all files in lexicographically sorted order in a directory matching a defined extension
 function getDirectoryFiles( dir, extension)
-	rt = {}
-	filenames = {}
+	local rt = {}
+	local filenames = {}
+
 	for filename in io.popen("ls " .. dir):lines() do
 		table.insert( filenames, filename)
 	end
@@ -64,7 +65,7 @@ end
 
 -- Function to check if to files (result and expected of a test) are equal (accepting different line endings to make the comparison independent of the platform)
 function checkExpected( output, expected, outputfile)
-	res,lineno,line_a,line_b = cmp_content( output, expected )
+	local res,lineno,line_a,line_b = cmp_content( output, expected )
 	if not res then
 		write_file( outputfile, output)
 		io.stderr:write( string.format("difference on line %d, result: '%s', expected '%s'\n", lineno, displayString( line_a, 30), displayString( line_b, 30)))
@@ -92,7 +93,7 @@ function isArray( val)
 end
 
 function concatArrays( t1, t2)
-	res = t1
+	local res = t1
 	for i=1,#t2 do
 		res[#res+1] = t2[i]
 	end

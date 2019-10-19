@@ -1663,9 +1663,11 @@ static int l_to_json( lua_State* L)
 {
 	try
 	{
-		LUA_FUNCTION_HEADER( L, "to_json", 1, 1, "<value to map>");
+		LUA_FUNCTION_HEADER( L, "to_json", 1, 2, "<value to map>");
+		int nofArgs = lua_gettop(L);
 
-		std::string result = convertLuaValueToJson( L, 1, true/*indentiation*/);
+		bool indentiation = (nofArgs > 1) ? lua_toboolean( L, 2) : true;
+		std::string result = convertLuaValueToJson( L, 1, indentiation);
 		lua_pushlstring( L, result.c_str(), result.size()); 
 
 		LUA_FUNCTION_TAIL( L, "to_json", 1);

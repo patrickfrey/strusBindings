@@ -37,7 +37,7 @@ public:
 		},
 		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
-			{"/storage", "_success", "context", C::createStorage(), {{StorageConfig}} },
+			{"/storage", 0, "context", C::createStorage(), {{StorageConfig}} },
 			{"/storage", "storage", "context", C::createStorageClient(), {{StorageConfig}} }
 		}
 	) {}
@@ -66,16 +66,12 @@ class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, publi
 public:
 	Schema_Context_DELETE_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
-		{/*env*/},
+		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
 		{/*result*/},
 		{/*inherit*/},
 		{/*input*/
-			{"/storage/path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
-			{"/storage", StorageConfig, {
-					{"path", DatabasePath}
-				}
-			},
-			{"/storage", "success", "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
+			{SchemaStoragePart::defineDeleteStorage("/storage")},
+			{"/storage", 0, "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
 		}
 	) {}
 };

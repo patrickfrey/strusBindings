@@ -126,14 +126,13 @@ private:
 	{
 		std::string contextType;
 		std::string contextName;
-		bool temporary;
 
 		ContextNameDef()
-			:contextType(),contextName(),temporary(true){}
-		ContextNameDef( const std::string& contextType_, const std::string& contextName_, bool temporary_=false)
-			:contextType(contextType_),contextName(contextName_),temporary(temporary_){}
+			:contextType(),contextName(){}
+		ContextNameDef( const std::string& contextType_, const std::string& contextName_)
+			:contextType(contextType_),contextName(contextName_){}
 		ContextNameDef( const ContextNameDef& o)
-			:contextType(o.contextType),contextName(o.contextName),temporary(o.temporary){}
+			:contextType(o.contextType),contextName(o.contextName){}
 
 		bool operator<( const ContextNameDef& o) const
 		{
@@ -149,7 +148,8 @@ private:
 	enum {MaxConfigCounter=999};
 	int m_config_counter;
 	std::set<std::string> m_context_typenames;	//< defined context types
-	std::set<ContextNameDef> m_context_names;	//< context definitions type name pairs
+	typedef std::map<ContextNameDef,bool> ContextNameMap;
+	ContextNameMap m_contextNameMap;		//< map context definitions type name pairs to stored flag
 };
 
 }//namespace

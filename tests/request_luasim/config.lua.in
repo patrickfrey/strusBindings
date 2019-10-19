@@ -28,8 +28,9 @@ serverConfig = {
 	},
 	logging = {
 		level = "debug",
+		directory = "{service.data.workdir}/logs",
 		file = {
-			name = "./strusWebService.{service.name}.log",
+			name = "{service.name}.log",
 			append = true
 		}
 	},

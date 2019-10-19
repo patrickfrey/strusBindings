@@ -22,6 +22,20 @@ namespace webrequest {
 class SchemaStoragePart :public AutomatonNameSpace
 {
 public:
+	static papuga::RequestAutomaton_NodeList defineDeleteStorage( const char* rootexpr)
+	{
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
+			{"path", "()", DatabasePath, papuga_TypeString, "strus/storage"},
+			{"path", "", "path", DatabasePath, '?'},
+			{"database", "()", DatabaseEngine, papuga_TypeString, "std"},
+			{"", StorageConfig, {
+				{"path", "path"},
+				{"database", DatabaseEngine, '?'}
+			}}
+		});
+	}
+
 	static papuga::RequestAutomaton_NodeList defineStorage( const char* rootexpr)
 	{
 		return papuga::RequestAutomaton_NodeList( rootexpr,

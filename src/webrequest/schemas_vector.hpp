@@ -30,7 +30,7 @@ public:
 		{/*inherit*/},
 		{/*input*/
 			{SchemaVectorStoragePart::defineVectorStorage( "/vstorage")},
-			{"/vstorage", "_success", "context", bindings::method::Context::createVectorStorage(), {{StorageConfig}} },
+			{"/vstorage", 0, "context", bindings::method::Context::createVectorStorage(), {{StorageConfig}} },
 			{"/vstorage", "storage", "context", bindings::method::Context::createVectorStorageClient(), {{StorageConfig}} }
 		}
 	) {}
@@ -50,7 +50,7 @@ public:
 					{"path", DatabasePath}
 				}
 			},
-			{"/vstorage", "success", "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
+			{"/vstorage", 0, "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
 		}
 	) {}
 };

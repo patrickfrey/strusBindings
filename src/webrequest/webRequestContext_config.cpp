@@ -95,15 +95,13 @@ bool WebRequestContext::deleteConfigurationRequest()
 	if (config.valid())
 	{
 		std::string deleteMethodName = std::string( "DELETE_") + config.method;
-		SchemaId schemaid = getSchemaId( ROOT_CONTEXT_NAME, deleteMethodName.c_str());
+		SchemaId schemaid = getSchemaId( m_contextType, deleteMethodName.c_str());
 		if (!initRootObject()) return false;
 		if (papuga_RequestHandler_get_automaton( m_handler->impl(), schemaid.contextType, schemaid.schemaName))
 		{
 			WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
-			if (!executeContentSchemaRequest( schemaid, content))
-			{
-				return false;
-			}
+			if (!initContentType( content)) return false;
+			if (!executeContentSchemaRequest( schemaid, content)) return false;
 			if (hasContentRequestDelegateRequests())
 			{
 				if (!!(m_logMask & WebRequestLoggerInterface::LogWarning))

@@ -12,13 +12,17 @@
 #define _STRUS_WEBREQUEST_PAPUGA_CONTEXTREF_HPP_INCLUDED
 #include "papuga/requestHandler.h"
 #include "strus/reference.hpp"
+#include <iostream>
 
 namespace strus {
 
 class PapugaRequestContextDeleter
 {
 public:
-	void operator()( papuga_RequestContext* p) {papuga_destroy_RequestContext(p);}
+	void operator()( papuga_RequestContext* p)
+	{
+		papuga_destroy_RequestContext(p);
+	}
 };
 
 class PapugaContextRef

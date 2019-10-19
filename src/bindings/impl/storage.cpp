@@ -57,6 +57,9 @@ StorageClientImpl::StorageClientImpl( const ObjectRef& trace, const ObjectRef& o
 	}
 }
 
+StorageClientImpl::~StorageClientImpl()
+{}
+
 unsigned int StorageClientImpl::nofDocumentsInserted() const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();

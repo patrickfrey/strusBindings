@@ -106,15 +106,16 @@ void ConfigurationHandler::commitStoreConfiguration(
 {
 	strus::unique_lock lock( m_mutex);
 
-	ContextNameDef namedef( transaction.type, transaction.name, false/*temporary*/);
-	m_context_names.insert( namedef);
+	ContextNameDef namedef( transaction.type, transaction.name);
+	m_contextNameMap.insert( ContextNameMap::value_type( namedef, false));
 
 	int ec = strus::renameFile( transaction.failed_filename, transaction.filename);
 	if (ec)
 	{
-		m_context_names.erase( namedef);
+		m_contextNameMap.erase( namedef);
 		throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to commit configuration change '%s'"), transaction.filename.c_str());
 	}
+	m_contextNameMap[ namedef] = true;
 }
 
 void ConfigurationHandler::deleteStoredConfiguration(
@@ -137,7 +138,7 @@ void ConfigurationHandler::deleteStoredConfiguration(
 		if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
 	}
 	ContextNameDef namedef( contextType, contextName);
-	m_context_names.erase( namedef);
+	m_contextNameMap.erase( namedef);
 }
 
 void ConfigurationHandler::clearUnfinishedTransactions()
@@ -377,25 +378,25 @@ EXIT:
 
 std::string ConfigurationHandler::allocTemporaryContextName( const std::string& contextType, const char* prefix)
 {
-	ContextNameDef cndef( contextType, std::string(), true/*temporary*/);
+	ContextNameDef cndef( contextType, std::string());
 	strus::unique_lock lock( m_mutex);
-	std::set<ContextNameDef>::const_iterator start = m_context_names.upper_bound( cndef);
+	ContextNameMap::const_iterator start = m_contextNameMap.upper_bound( cndef);
 	char ibuf[ 64];
 	int idx = 1;
 
 	for (;;++idx)
 	{
 		std::snprintf( ibuf, sizeof(ibuf), "%s%d", prefix, idx);
-		std::set<ContextNameDef>::const_iterator ci = start;
+		ContextNameMap::const_iterator ci = start;
 		bool found = false;
-		for (; !found && ci != m_context_names.end() && ci->contextType == contextType; ++ci)
+		for (; !found && ci != m_contextNameMap.end() && ci->first.contextType == contextType; ++ci)
 		{
-			found = (ci->contextName == ibuf);
+			found = (ci->first.contextName == ibuf);
 		}
 		if (!found)
 		{
 			cndef.contextName = ibuf;
-			m_context_names.insert( cndef);
+			m_contextNameMap.insert( ContextNameMap::value_type( cndef, false));
 			return cndef.contextName;
 		}
 	}
@@ -405,10 +406,10 @@ void ConfigurationHandler::releaseTemporaryContextName( const std::string& conte
 {
 	ContextNameDef cndef( contextType, contextName);
 	strus::unique_lock lock( m_mutex);
-	std::set<ContextNameDef>::const_iterator di = m_context_names.find( cndef);
-	if (di->temporary)
+	ContextNameMap::const_iterator di = m_contextNameMap.find( cndef);
+	if (!di->second)
 	{
-		m_context_names.erase( cndef);
+		m_contextNameMap.erase( cndef);
 	}
 }
 
@@ -416,12 +417,12 @@ std::vector<std::string> ConfigurationHandler::contextTypes() const
 {
 	std::set<std::string> res;
 	strus::unique_lock lock( m_mutex);
-	std::set<ContextNameDef>::const_iterator ci = m_context_names.begin();
-	for (; ci != m_context_names.end(); ++ci)
+	ContextNameMap::const_iterator ci = m_contextNameMap.begin();
+	for (; ci != m_contextNameMap.end(); ++ci)
 	{
-		if (!ci->temporary)
+		if (ci->second)
 		{
-			res.insert( ci->contextType);
+			res.insert( ci->first.contextType);
 		}
 	}
 	return std::vector<std::string>( res.begin(), res.end());
@@ -432,12 +433,12 @@ std::vector<std::string> ConfigurationHandler::contextNames( const std::string& 
 	std::vector<std::string> rt;
 	ContextNameDef cndef( contextType, std::string());
 	strus::unique_lock lock( m_mutex);
-	std::set<ContextNameDef>::const_iterator ci = m_context_names.upper_bound( cndef);
-	for (; ci != m_context_names.end() && ci->contextType == contextType; ++ci)
+	ContextNameMap::const_iterator ci = m_contextNameMap.upper_bound( cndef);
+	for (; ci != m_contextNameMap.end() && ci->first.contextType == contextType; ++ci)
 	{
-		if (!ci->temporary)
+		if (ci->second)
 		{
-			rt.push_back( ci->contextName);
+			rt.push_back( ci->first.contextName);
 		}
 	}
 	return rt;
@@ -446,7 +447,7 @@ std::vector<std::string> ConfigurationHandler::contextNames( const std::string& 
 void ConfigurationHandler::declareSubConfiguration( const std::string& contextType, const std::string& contextName)
 {
 	strus::unique_lock lock( m_mutex);
-	ContextNameDef namedef( contextType, contextName, false/*temporary*/);
-	m_context_names.insert( namedef);
+	ContextNameDef namedef( contextType, contextName);
+	m_contextNameMap.insert( ContextNameMap::value_type( namedef, false));
 }
 

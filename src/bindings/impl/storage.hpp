@@ -19,7 +19,6 @@
 #include <string>
 
 namespace strus {
-
 namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
@@ -34,7 +33,7 @@ class StorageClientImpl
 {
 public:
 	/// \brief Destructor
-	virtual ~StorageClientImpl(){}
+	virtual ~StorageClientImpl();
 
 	/// \brief Get the number of documents inserted into this storage
 	/// \return the total number of documents

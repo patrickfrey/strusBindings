@@ -304,7 +304,7 @@ bool WebRequestContext::executePostTransaction()
 		setAnswer( ErrorCodeOutOfMem);
 		return false;
 	}
-	return setAnswerLink( "transaction", tid);
+	return setAnswerLink( "transaction", tid, 3/*link level*/);
 }
 
 bool WebRequestContext::executeCommitTransaction()

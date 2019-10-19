@@ -7,7 +7,6 @@ SCRIPTPATH = script_path()
 
 storageConfig = {
 	storage = {
-		path = "storage/test",
 		database = "leveldb",
 		cache_size = "500M",
 		max_open_files = 512,

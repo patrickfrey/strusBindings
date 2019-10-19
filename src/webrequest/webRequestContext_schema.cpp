@@ -36,9 +36,14 @@ static inline bool isEqual( const char* name, const char* oth)
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
 
+static inline bool startsWith( const char* name, const char* oth, std::size_t othlen)
+{
+	return name[0] == oth[0] && 0==std::memcmp(name,oth,othlen);
+}
+
 WebRequestContext::SchemaId WebRequestContext::getSchemaId( const char* contextType_, const char* method_)
 {
-	if (isEqual( method_, "POST") || isEqual( method_, "PUT") || isEqual( method_, "DELETE"))
+	if (isEqual( method_, "POST") || isEqual( method_, "PUT") || startsWith( method_, "DELETE_", 7))
 	{
 		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, method_, '/', contextType_));
 	}

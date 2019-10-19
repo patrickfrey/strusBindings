@@ -293,7 +293,7 @@ bool WebRequestContext::hasContentRequestResult() const
 
 bool WebRequestContext::transferContext()
 {
-	if (m_context.refcnt() != 1)
+	if (m_context.use_count() != 1)
 	{
 		setAnswer( ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
 		return false;
@@ -310,14 +310,14 @@ bool WebRequestContext::transferContext()
 	return true;
 }
 
-bool WebRequestContext::setAnswerLink( const char* title, const std::string& lnkid)
+bool WebRequestContext::setAnswerLink( const char* title, const std::string& lnkid, int linklevel)
 {
 	std::string link;
 	try
 	{
 		std::string linkbase;
 		linkbase.reserve( 256);
-		int ec = strus::getAncestorPath( m_html_base_href, 3, linkbase);
+		int ec = strus::getAncestorPath( m_html_base_href, linklevel, linkbase);
 		if (ec)
 		{
 			setAnswer( ErrorCodeInvalidFilePath, _TXT("failed to get link base"));
