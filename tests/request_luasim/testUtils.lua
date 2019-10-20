@@ -13,10 +13,16 @@ function call_server_checked( method, server, arg)
 	if (status < 200 or status >= 300) then
 		if arg then
 			if (type(arg) == "table") then arg = to_json( arg) end
-			error( string.format("Request with method %s on server %s and argument %s failed with HTTP status %d: %s", method, server, arg, status, errmsg))
+			argmsg = " with argument " .. arg
 		else
-			error( string.format("Request with method %s on server %s failed with HTTP status %d: %s", method, server, status, errmsg))
+			argmsg = ""
 		end
+		if errmsg then
+			errmsg = ": " .. errmsg
+		else
+			errmsg = ""
+		end
+		error( string.format("Request with method %s on server %s%s failed with HTTP status %d%s", method, server, argmsg, status, errmsg))
 	end
 	return result
 end

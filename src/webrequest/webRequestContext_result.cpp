@@ -254,7 +254,14 @@ bool WebRequestContext::getContentRequestResult()
 			WebRequestContent resultContent( encname, WebRequestContent::typeMime(m_result_doctype), resultstr, resultlen);
 			if (m_answer.content().empty())
 			{
-				if (!resultContent.empty())
+				if (resultContent.empty())
+				{
+					if (m_answer.httpstatus() == 200)
+					{
+						m_answer.setStatus( 204/*no content*/);
+					}
+				}
+				else
 				{
 					m_answer.setContent( resultContent);
 				}
@@ -305,7 +312,6 @@ bool WebRequestContext::transferContext()
 	if (m_configTransaction.defined())
 	{
 		m_configHandler->commitStoreConfiguration( m_configTransaction);
-		m_answer.setStatus( 204/*no content*/);
 	}
 	return true;
 }

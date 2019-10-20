@@ -454,7 +454,7 @@ bool WebRequestContext::putDelegateRequestAnswer(
 {
 	try
 	{
-		if (m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogAction) != 0)
+		if (m_logger && (m_logMask & WebRequestLoggerInterface::LogAction) != 0)
 		{
 			m_logger->logAction( m_contextType, m_contextName, "put delegate answer");
 		}
@@ -523,9 +523,16 @@ bool WebRequestContext::complete()
 					}
 					break;
 			}
-			if (rt && m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogAction) != 0)
+			if (rt && m_logger)
 			{
-				m_logger->logAction( m_contextType, m_contextName, "request complete");
+				if ((m_logMask & WebRequestLoggerInterface::LogAction) != 0)
+				{
+					m_logger->logAction( m_contextType, m_contextName, "request complete");
+				}
+				if ((m_logMask & WebRequestLoggerInterface::LogRequests) != 0)
+				{
+					m_logger->logRequestAnswer( m_answer.content().str(), m_answer.content().len());
+				}
 			}
 		}
 		else

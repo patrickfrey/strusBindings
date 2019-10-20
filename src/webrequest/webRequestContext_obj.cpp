@@ -237,6 +237,23 @@ bool WebRequestContext::initContentType( const WebRequestContent& content)
 			return false;
 		}
 		m_doctypestr = content.doctype();
+
+		if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+		{
+			int reqstrlen;
+			papuga_ErrorCode errcode;
+			const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &reqstrlen, &errcode);
+			if (!reqstr)
+			{
+				m_logger->logError( papuga_ErrorCode_tostring( errcode));
+				setAnswer( papugaErrorToErrorCode( errcode));
+				return false;
+			}
+			else
+			{
+				m_logger->logRequest( reqstr, reqstrlen);
+			}
+		}
 	}
 	// Set the result content encoding:
 	if (m_encoding == papuga_Binary)

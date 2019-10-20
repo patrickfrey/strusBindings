@@ -28,7 +28,7 @@ serverConfig = {
 	},
 	logging = {
 		level = "debug",
-		directory = "{service.data.workdir}/logs",
+		directory = "{data.workdir}/logs",
 		file = {
 			name = "{service.name}.log",
 			append = true

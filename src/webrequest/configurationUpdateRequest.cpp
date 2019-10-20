@@ -37,7 +37,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 	{
 		if (status.httpstatus() < 200 || status.httpstatus() >= 300)
 		{
-			if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+			if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 			{
 				if (status.errorstr())
 				{
@@ -53,7 +53,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 		{
 			if (!m_context->putDelegateRequestAnswer( m_schema, status.content()))
 			{
-				if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+				if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 				{
 					WebRequestAnswer ctxstatus = m_context->getAnswer();
 					const char* msg = ctxstatus.errorstr() ? ctxstatus.errorstr() : strus::errorCodeToString( ctxstatus.apperror());
@@ -64,14 +64,14 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 	}
 	catch (const std::bad_alloc&)
 	{
-		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+		if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 		{
 			logErrorFmt( _TXT("error returning delegate request answer: %s"), _TXT("memory allocation error"));
 		}
 	}
 	catch (const std::runtime_error& err)
 	{
-		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogError))
+		if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 		{
 			logErrorFmt( _TXT("error returning delegate request answer: %s"), err.what());
 		}
@@ -79,7 +79,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 	m_counter->decrement( 1);
 	if (m_counter->value() <= 0)
 	{
-		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConnectionEvents))
+		if (0!=(m_logMask & WebRequestLoggerInterface::LogConnectionEvents))
 		{
 			m_logger->logConnectionState( "completed delegate requests", m_requestCount);
 		}

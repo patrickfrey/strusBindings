@@ -35,6 +35,7 @@ public:
 	virtual int structDepth() const {return 0;}
 	virtual void logRequest( const char* content, std::size_t contentsize) {}
 	virtual void logRequestType( const char* title, const char* procdescr, const char* contextType, const char* contextName){}
+	virtual void logRequestAnswer( const char* content, std::size_t contentsize){}
 	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr) {}
 	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize) {}
 	virtual void logAction( const char* type, const char* name, const char* action) {}

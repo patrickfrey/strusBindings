@@ -102,12 +102,12 @@ public:
 	{
 		std::string reqstrbuf;
 		reqstr = reduceContentSize( reqstrbuf, reqstr, reqstrlen, MaxLogContentSize);
-		std::cerr << header() << strus::string_format( "REQUEST %s", reqstr) << std::endl;
+		std::cerr << header() << strus::string_format( "REQUEST [%s]", reqstr) << std::endl;
 	}
 
 	void logRequestType( const char* title, const char* procdescr, const char* contextType, const char* contextName)
 	{
-		if (contextName)
+		if (contextName && contextType && contextName != contextType)
 		{
 			std::cerr << header() << strus::string_format( "REQTYPE %s %s %s %s", title, procdescr, contextType, contextName) << std::endl;
 		}
@@ -122,6 +122,20 @@ public:
 		else
 		{
 			std::cerr << header() << strus::string_format( "REQTYPE %s", title) << std::endl;
+		}
+	}
+
+	void logRequestAnswer( const char* content, std::size_t contentsize)
+	{
+		if (contentsize)
+		{
+			std::string contentbuf;
+			content = reduceContentSize( contentbuf, content, contentsize, MaxLogContentSize);
+			std::cerr << header() << strus::string_format( "REQANSWER [%s]", content) << std::endl;
+		}
+		else
+		{
+			std::cerr << header() << strus::string_format( "REQANSWER none") << std::endl;
 		}
 	}
 
@@ -140,14 +154,28 @@ public:
 		}
 	}
 
-	virtual void logPutConfiguration( const char* type, const char* name, const std::string& configstr)
+	virtual void logPutConfiguration( const char* contextType, const char* contextName, const std::string& configstr)
 	{
-		std::cerr << header() << strus::string_format( "CONFIG %s '%s':\n\t", type, name) << indentString( configstr) << std::endl;
+		if (contextName && contextType && contextName != contextType)
+		{
+			std::cerr << header() << strus::string_format( "CONFIG %s '%s':\n\t", contextType, contextName) << indentString( configstr) << std::endl;
+		}
+		else
+		{
+			std::cerr << header() << strus::string_format( "CONFIG %s:\n\t", contextType) << indentString( configstr) << std::endl;
+		}
 	}
 
-	virtual void logAction( const char* type, const char* name, const char* action)
+	virtual void logAction( const char* contextType, const char* contextName, const char* action)
 	{
-		std::cerr << header() << strus::string_format( "ACTION %s '%s' %s", type, name, action) << std::endl;
+		if (contextName && contextType && contextName != contextType)
+		{
+			std::cerr << header() << strus::string_format( "ACTION %s '%s' %s", contextType, contextName, action) << std::endl;
+		}
+		else
+		{
+			std::cerr << header() << strus::string_format( "ACTION %s %s", contextType, action) << std::endl;
+		}
 	}
 
 	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize)
@@ -186,7 +214,7 @@ public:
 
 	virtual void logConnectionEvent( const char* content)
 	{
-		std::cerr << header() << strus::string_format( "delegate connection events %s", content) << std::endl;
+		std::cerr << header() << strus::string_format( "connection event %s", content) << std::endl;
 	}
 
 	virtual void logConnectionState( const char* state, int arg)

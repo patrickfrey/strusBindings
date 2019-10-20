@@ -44,7 +44,7 @@ public:
 	/// \brief Get the depth of structures to log
 	virtual int structDepth() const=0;
 
-	/// \brief Log a request
+	/// \brief Log the content of a request
 	/// \param[in] content pointer to content string of the request
 	/// \param[in] contentsize size of the content sent in bytes
 	/// \remark expected to be thread safe
@@ -57,6 +57,12 @@ public:
 	/// \param[in] contextName name of the context active in the request
 	/// \remark expected to be thread safe
 	virtual void logRequestType( const char* title, const char* procdescr, const char* contextType, const char* contextName)=0;
+
+	/// \brief Log the answer of a request
+	/// \param[in] content pointer to content string of the request answer
+	/// \param[in] contentsize size of the request answer in bytes
+	/// \remark expected to be thread safe
+	virtual void logRequestAnswer( const char* content, std::size_t contentsize)=0;
 
 	/// \brief Log a delegate http request
 	/// \param[in] address address of the request URL with port and path
@@ -109,7 +115,8 @@ public:
 	/// \remark expected to be thread safe
 	virtual void logConnectionEvent( const char* content)=0;
 
-	/// \brief Log a state of a delegate request connection handled by the network client library (cURL)
+	/// \brief Log a state of a delegate request connection
+	/// \note Used to notify completion or failure of a delegate request
 	/// \param[in] state name of the state to log
 	/// \param[in] arg some state argument or 0 if undefined
 	/// \remark expected to be thread safe

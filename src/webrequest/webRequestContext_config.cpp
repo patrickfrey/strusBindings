@@ -29,9 +29,9 @@ static inline bool isEqual( const char* name, const char* oth)
 bool WebRequestContext::loadMainConfiguration( const WebRequestContent& content)
 {
 	if (!initEmptyObject()) return false;
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogAction))
 	{
-		m_logger->logRequestType( "configuration", "load", 0, 0);
+		m_logger->logAction( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, "load main configuration");
 	}
 	return executeContentSchemaRequest( SchemaId( "", ROOT_CONTEXT_NAME), content);
 }
@@ -39,9 +39,9 @@ bool WebRequestContext::loadMainConfiguration( const WebRequestContent& content)
 bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& content)
 {
 	if (!initRootObject()) return false;
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogAction))
 	{
-		m_logger->logRequestType( "configuration", "embedded", m_contextType, m_contextName);
+		m_logger->logAction( m_contextType, m_contextName, "load embedded configuration");
 	}
 	return executeContentSchemaRequest( getSchemaId( m_contextType, "PUT"), content);
 }
@@ -53,10 +53,6 @@ bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& conte
 		setAnswer( ErrorCodeInvalidRequest);
 		return false;
 	}
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-	{
-		m_logger->logRequestType( "configuration", m_method, m_contextType, m_contextName);
-	}
 	std::string configstr = webRequestContent_tostring( content);
 	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, content.doctype(), configstr);
 	m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
@@ -64,7 +60,7 @@ bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& conte
 	if (!initRootObject()) return false;
 	if (executeContentSchemaRequest( schemaid, content))
 	{
-		if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogConfiguration))
+		if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
 		{
 			m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
 		}
@@ -87,9 +83,9 @@ bool WebRequestContext::deleteConfigurationRequest()
 	{
 		return false;
 	}
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogAction))
 	{
-		m_logger->logRequestType( "configuration", m_method, m_contextType, m_contextName);
+		m_logger->logAction( m_contextType, m_contextName, "removed");
 	}
 	ConfigurationDescription config = m_configHandler->getStoredConfiguration( m_contextType, m_contextName);
 	if (config.valid())
@@ -115,8 +111,13 @@ bool WebRequestContext::deleteConfigurationRequest()
 		{
 			m_logger->logAction( config.type.c_str(), config.name.c_str(), _TXT("deleted configurations stored"));
 		}
+		m_answer.setStatus( 204/*no content*/);
+		return true;
 	}
-	m_answer.setStatus( 204/*no content*/);
-	return true;
+	else
+	{
+		setAnswer( ErrorCodeRequestResolveError);
+		return false;
+	}
 }
 

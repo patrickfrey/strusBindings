@@ -10,6 +10,7 @@
 #ifndef _STRUS_WEBREQUEST_CONFIGURATION_UPDATE_REQUEST_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_CONFIGURATION_UPDATE_REQUEST_HPP_INCLUDED
 #include "strus/webRequestDelegateContextInterface.hpp"
+#include "strus/webRequestLoggerInterface.hpp"
 #include "strus/base/atomic.hpp"
 #include <string>
 
@@ -19,8 +20,6 @@ namespace strus {
 class WebRequestHandlerInterface;
 /// \brief Forward declaration
 class WebRequestContextInterface;
-/// \brief Forward declaration
-class WebRequestLoggerInterface;
 
 /// \brief Object to hold the context of an open configuration update delegate request
 class ConfigurationUpdateRequestContext
@@ -36,6 +35,7 @@ public:
 	ConfigurationUpdateRequestContext( WebRequestHandlerInterface* handler_, WebRequestLoggerInterface* logger_, WebRequestContextInterface* receiver_, const char* receiverSchema_, AtomicCounter<int>* counter_)
 		:m_handler(handler_)
 		,m_logger(logger_)
+		,m_logMask(logger_->logMask())
 		,m_context(receiver_)
 		,m_schema(receiverSchema_)
 		,m_counter(counter_)
@@ -55,6 +55,7 @@ private:
 private:
 	WebRequestHandlerInterface* m_handler;
 	WebRequestLoggerInterface* m_logger;
+	int m_logMask;				//< what to log
 	WebRequestContextInterface* m_context;
 	const char* m_schema;
 	AtomicCounter<int>* m_counter;
