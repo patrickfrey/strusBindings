@@ -328,6 +328,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				rt = loadConfigurationRequest( content);
 				if (rt)
 				{
+					m_answer.setStatus( 201/*created*/);
 					rt = setAnswerLink( m_contextType, newContextName, 1/*link level*/);
 				}
 			}

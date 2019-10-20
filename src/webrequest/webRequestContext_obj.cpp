@@ -321,6 +321,7 @@ bool WebRequestContext::executePostTransaction()
 		setAnswer( ErrorCodeOutOfMem);
 		return false;
 	}
+	m_answer.setStatus( 201/*created*/);
 	return setAnswerLink( "transaction", tid, 3/*link level*/);
 }
 
