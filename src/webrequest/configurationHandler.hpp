@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
 #include <utility>
 
 #define ROOT_CONTEXT_NAME "context"
