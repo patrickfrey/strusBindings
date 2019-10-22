@@ -74,56 +74,57 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 	switch (errcode)
 	{
 		case ErrorCodeUnknown: return 200 /*Ok*/;
-		case ErrorCodeErrno: return 500 /*Internal Server Error*/;
-		case ErrorCodeOutOfMem: return 500 /*Internal Server Error*/;
-		case ErrorCodeDataCorruption: return 500 /*Internal Server Error*/;
-		case ErrorCodeMutexLockFailed: return 500 /*Internal Server Error*/;
-		case ErrorCodeLogicError: return 500 /*Internal Server Error*/;
-		case ErrorCodeUncaughtException: return 500 /*Internal Server Error*/;
+		case ErrorCodeErrno: return 500 /*Internal server error*/;
+		case ErrorCodeOutOfMem: return 500 /*Internal server error*/;
+		case ErrorCodeDataCorruption: return 500 /*Internal server error*/;
+		case ErrorCodeMutexLockFailed: return 500 /*Internal server error*/;
+		case ErrorCodeLogicError: return 500 /*Internal server error*/;
+		case ErrorCodeUncaughtException: return 500 /*Internal server error*/;
 
 		case ErrorCodeAvailability: return 503; /*Service not available*/;
-		case ErrorCodeNotAllowed: return 400; /*Bad Request*/
-		case ErrorCodeProtocolError: return 400 /*Bad Request*/;
-		case ErrorCodePlatformIncompatibility: return 500 /*Internal Server Error*/;
-		case ErrorCodePlatformRequirements: return 500 /*Internal Server Error*/;
+		case ErrorCodeNotAllowed: return 400; /*Bad request*/
+		case ErrorCodeProtocolError: return 400 /*Bad request*/;
+		case ErrorCodePlatformIncompatibility: return 500 /*Internal server error*/;
+		case ErrorCodePlatformRequirements: return 500 /*Internal server error*/;
 
-		case ErrorCodeSyntax: return 400 /*Bad Request*/;
-		case ErrorCodeNotFound: return 500 /*Internal Server Error*/;
-		case ErrorCodeIOError: return 500 /*Internal Server Error*/;
-		case ErrorCodeVersionMismatch: return 500 /*Internal Server Error*/;
-		case ErrorCodeInvalidArgument: return 500 /*Internal Server Error*/;
-		case ErrorCodeInvalidRegex: return 500 /*Internal Server Error*/;
-		case ErrorCodeInvalidOperation: return 500 /*Internal Server Error*/;
-		case ErrorCodeInvalidFilePath: return 500 /*Internal Server Error*/;
-		case ErrorCodeInvalidRequest: return 400 /*Bad Request*/;
-		case ErrorCodeLoadModuleFailed: return 500 /*Internal Server Error*/;
-		case ErrorCodeNotImplemented: return 500 /*Internal Server Error*/;
-		case ErrorCodeIncompleteInitialization: return 500 /*Internal Server Error*/;
-		case ErrorCodeIncompleteDefinition: return 500 /*Internal Server Error*/;
-		case ErrorCodeIncompleteConfiguration: return 500 /*Internal Server Error*/;
-		case ErrorCodeDuplicateDefinition: return 500 /*Internal Server Error*/;
-		case ErrorCodeBindingLanguageError: return 500 /*Internal Server Error*/;
-		case ErrorCodeUnknownIdentifier: return 400 /*Bad Request*/;
-		case ErrorCodeOperationOrder: return 500 /*Internal Server Error*/;
-		case ErrorCodeValueOutOfRange: return 500 /*Internal Server Error*/;
-		case ErrorCodeMaxLimitReached: return 500 /*Internal Server Error*/;
-		case ErrorCodeBufferOverflow: return 500 /*Internal Server Error*/;
-		case ErrorCodeMaxNofItemsExceeded: return 500 /*Internal Server Error*/;
-		case ErrorCodeMaxRecursionDepht: return 500 /*Internal Server Error*/;
-		case ErrorCodeRefusedDueToComplexity: return 400 /*Bad Request*/;
-		case ErrorCodeRuntimeError: return 500 /*Internal Server Error*/;
-		case ErrorCodeIncompleteRequest: return 400 /*Bad Request*/;
-		case ErrorCodeIncompleteResult: return 500 /*Internal Server Error*/;
-		case ErrorCodeUnexpectedEof: return 400 /*Bad Request*/;
-		case ErrorCodeHiddenError: return 500 /*Internal Server Error*/;
-		case ErrorCodeInputFormat: return 400 /*Bad Request*/;
-		case ErrorCodeEncoding: return 400 /*Bad Request*/;
+		case ErrorCodeSyntax: return 400 /*Bad request*/;
+		case ErrorCodeNotFound: return 500 /*Internal server error*/;
+		case ErrorCodeIOError: return 500 /*Internal server error*/;
+		case ErrorCodeVersionMismatch: return 500 /*Internal server error*/;
+		case ErrorCodeInvalidArgument: return 500 /*Internal server error*/;
+		case ErrorCodeInvalidRegex: return 500 /*Internal server error*/;
+		case ErrorCodeInvalidOperation: return 500 /*Internal server error*/;
+		case ErrorCodeInvalidFilePath: return 500 /*Internal server error*/;
+		case ErrorCodeInvalidRequest: return 400 /*Bad request*/;
+		case ErrorCodeLoadModuleFailed: return 500 /*Internal server error*/;
+		case ErrorCodeNotImplemented: return 500 /*Internal server error*/;
+		case ErrorCodeIncompleteInitialization: return 500 /*Internal server error*/;
+		case ErrorCodeIncompleteDefinition: return 500 /*Internal server error*/;
+		case ErrorCodeIncompleteConfiguration: return 500 /*Internal server error*/;
+		case ErrorCodeDuplicateDefinition: return 500 /*Internal server error*/;
+		case ErrorCodeBindingLanguageError: return 500 /*Internal server error*/;
+		case ErrorCodeUnknownIdentifier: return 400 /*Bad request*/;
+		case ErrorCodeOperationOrder: return 500 /*Internal server error*/;
+		case ErrorCodeValueOutOfRange: return 500 /*Internal server error*/;
+		case ErrorCodeMaxLimitReached: return 500 /*Internal server error*/;
+		case ErrorCodeBufferOverflow: return 500 /*Internal server error*/;
+		case ErrorCodeMaxNofItemsExceeded: return 500 /*Internal server error*/;
+		case ErrorCodeMaxRecursionDepht: return 500 /*Internal server error*/;
+		case ErrorCodeRefusedDueToComplexity: return 400 /*Bad request*/;
+		case ErrorCodeRuntimeError: return 500 /*Internal server error*/;
+		case ErrorCodeIncompleteRequest: return 400 /*Bad request*/;
+		case ErrorCodeIncompleteResult: return 500 /*Internal server error*/;
+		case ErrorCodeUnexpectedEof: return 400 /*Bad request*/;
+		case ErrorCodeHiddenError: return 500 /*Internal server error*/;
+		case ErrorCodeInputFormat: return 400 /*Bad request*/;
+		case ErrorCodeEncoding: return 400 /*Bad request*/;
 		case ErrorCodeRequestResolveError: return 404 /*Not found*/;
 		case ErrorCodeNotAcceptable: return 406 /*Not acceptable*/;
-		case ErrorCodeDelegateRequestFailed: return 500 /*Internal Server Error*/;
-		case ErrorCodeServiceShutdown: return 503 /*Service Unavailable*/;
+		case ErrorCodeDelegateRequestFailed: return 500 /*Internal server error*/;
+		case ErrorCodeServiceShutdown: return 503 /*Service temporarily unavailable*/;
+		case ErrorCodeServiceTemporarilyUnavailable: return 503 /*Service temporarily unavailable*/;
 	}
-	return 500 /*Internal Server Error*/;
+	return 500 /*Internal server error*/;
 }
 
 std::string strus::webRequestContent_tostring( const WebRequestContent& content, int maxsize)
