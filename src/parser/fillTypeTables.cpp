@@ -92,6 +92,17 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("typename", "integer")
 		("varname", "$val")
 	;
+	typesystem.defineType( "long")
+		("retv_map", "(void)papuga_add_CallResult_int( $name, $value);")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+	;
+	typesystem.defineType( "long $val=0")
+		("argv_default", "0")
+		("argv_map", "ValueVariantWrap::toint( $value)")
+		("typename", "integer")
+		("varname", "$val")
+	;
 	typesystem.defineType( "float")
 		("retv_map", "(void)papuga_add_CallResult_double( $name, $value);")
 		("argv_map", "ValueVariantWrap::tofloat( $value)")

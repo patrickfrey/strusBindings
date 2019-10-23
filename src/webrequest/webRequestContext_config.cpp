@@ -33,7 +33,9 @@ bool WebRequestContext::loadMainConfiguration( const WebRequestContent& content)
 	{
 		m_logger->logAction( ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, "load main configuration");
 	}
-	return executeContentSchemaRequest( SchemaId( "", ROOT_CONTEXT_NAME), content);
+	if (!initContentSchemaAutomaton(SchemaId( "", ROOT_CONTEXT_NAME))) return false;
+	if (!executeContentSchemaAutomaton( content)) return false;
+	return true;
 }
 
 bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& content)
@@ -43,7 +45,9 @@ bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& cont
 	{
 		m_logger->logAction( m_contextType, m_contextName, "load embedded configuration");
 	}
-	return executeContentSchemaRequest( getSchemaId( m_contextType, "PUT"), content);
+	if (!initContentSchemaAutomaton( getSchemaId( m_contextType, "PUT"))) return false;
+	if (!executeContentSchemaAutomaton( content)) return false;
+	return true;
 }
 
 bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& content)
@@ -58,18 +62,57 @@ bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& conte
 	m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
 	SchemaId schemaid = getSchemaId();
 	if (!initRootObject()) return false;
-	if (executeContentSchemaRequest( schemaid, content))
+	if (!initContentSchemaAutomaton( schemaid)) return false;
+	if (!executeContentSchemaAutomaton( content)) return false;
+
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
 	{
-		if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
+		m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
+	}
+	return true;
+}
+
+bool WebRequestContext::updateConfigurationRequest( const WebRequestContent& content)
+{
+	if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
+	{
+		setAnswer( ErrorCodeInvalidRequest);
+		return false;
+	}
+	std::string configstr = webRequestContent_tostring( content);
+	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, content.doctype(), configstr);
+	m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
+	{
+		m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
+	}
+	SchemaId schemaid = getSchemaId();
+	if (!initContentSchemaAutomaton( schemaid)) return false;
+	if (papuga_RequestAutomaton_has_exclusive_access( m_atm))
+	{
+		if (m_requestType == ObjectRequest)
 		{
-			m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
+			m_requestType = InterruptedLoadConfigurationRequest;
+			setAnswer( ErrorCodeServiceNeedExclusiveAccess);
+			return false;
 		}
-		return true;
+		else
+		{
+			setAnswer( ErrorCodeLogicError, _TXT("illegal state in update configuration request"));
+			return false;
+		}
 	}
 	else
 	{
-		return false;
+		if (!executeContentSchemaAutomaton( content)) return false;
 	}
+	return true;
+}
+
+bool WebRequestContext::updateConfigurationRequest_retry( const WebRequestContent& content)
+{
+	if (!executeContentSchemaAutomaton( content)) return false;
+	return true;
 }
 
 bool WebRequestContext::deleteConfigurationRequest()
@@ -97,7 +140,8 @@ bool WebRequestContext::deleteConfigurationRequest()
 		{
 			WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
 			if (!initContentType( content)) return false;
-			if (!executeContentSchemaRequest( schemaid, content)) return false;
+			if (!initContentSchemaAutomaton( schemaid)) return false;
+			if (!executeContentSchemaAutomaton( content)) return false;
 			if (hasContentRequestDelegateRequests())
 			{
 				if (!!(m_logMask & WebRequestLoggerInterface::LogWarning))
@@ -111,7 +155,7 @@ bool WebRequestContext::deleteConfigurationRequest()
 		{
 			m_logger->logAction( config.type.c_str(), config.name.c_str(), _TXT("deleted configurations stored"));
 		}
-		m_answer.setStatus( 204/*no content*/);
+		m_answer.setHttpStatus( 204/*no content*/);
 		return true;
 	}
 	else

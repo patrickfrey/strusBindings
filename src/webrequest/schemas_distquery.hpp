@@ -25,7 +25,7 @@ class Schema_Context_POST_DistQueryEval :public papuga::RequestAutomaton, public
 {
 public:
 	Schema_Context_POST_DistQueryEval() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/
@@ -54,7 +54,7 @@ class Schema_DistQueryEval_GET :public papuga::RequestAutomaton, public Automato
 {
 public:
 	Schema_DistQueryEval_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/
 			{"query", "SET~querystats", "GET", "statserver", "", {
@@ -93,7 +93,7 @@ class Schema_DistQueryEval_SET_querystats :public papuga::RequestAutomaton, publ
 {
 public:
 	Schema_DistQueryEval_SET_querystats() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
@@ -110,7 +110,7 @@ class Schema_DistQueryEval_SET_ranklist :public papuga::RequestAutomaton, public
 public:
 	typedef bindings::method::Context C;
 	Schema_DistQueryEval_SET_ranklist() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
@@ -126,7 +126,7 @@ class Schema_DistQueryEval_END_ranklist :public papuga::RequestAutomaton, public
 public:
 	typedef bindings::method::Context C;
 	Schema_DistQueryEval_END_ranklist() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},

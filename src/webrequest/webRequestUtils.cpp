@@ -123,6 +123,7 @@ int strus::errorCodeToHttpStatus( ErrorCode errcode)
 		case ErrorCodeDelegateRequestFailed: return 500 /*Internal server error*/;
 		case ErrorCodeServiceShutdown: return 503 /*Service temporarily unavailable*/;
 		case ErrorCodeServiceTemporarilyUnavailable: return 503 /*Service temporarily unavailable*/;
+		case ErrorCodeServiceNeedExclusiveAccess: return 503 /*Service temporarily unavailable*/;
 	}
 	return 500 /*Internal server error*/;
 }

@@ -82,7 +82,8 @@ private:
 		MethodOptionsRequest,
 		LoadMainConfiguration,
 		LoadEmbeddedConfiguration,
-		ObjectRequest
+		ObjectRequest,
+		InterruptedLoadConfigurationRequest
 	};
 	struct SchemaId
 	{
@@ -141,12 +142,12 @@ private:
 	// Implemented in webRequestContext_schema:
 	SchemaId getSchemaId();
 	SchemaId getSchemaId( const char* contextType_, const char* method_);
-	bool executeContentSchemaRequest( const SchemaId& schemaid, const WebRequestContent& content);
-		bool initContentSchemaAutomaton( const SchemaId& schemaid);
+	bool initContentSchemaAutomaton( const SchemaId& schemaid);
+	bool executeContentSchemaAutomaton( const WebRequestContent& content);
 		bool initContentSchemaRequest();
 		bool feedContentSchemaRequest( const WebRequestContent& content);
 		bool inheritContentSchemaRequestContext();
-		bool executeContentSchema( const WebRequestContent& content);
+		bool executeContentSchemaCalls( const WebRequestContent& content);
 
 	// Implemented in webRequestContext_env:
 	bool initSchemaEnvAssignments();
@@ -173,6 +174,8 @@ private:
 	bool loadMainConfiguration( const WebRequestContent& content);
 	bool loadEmbeddedConfiguration( const WebRequestContent& content);
 	bool loadConfigurationRequest( const WebRequestContent& content);
+	bool updateConfigurationRequest( const WebRequestContent& content);
+	bool updateConfigurationRequest_retry( const WebRequestContent& content);
 	bool deleteConfigurationRequest();
 
 private:

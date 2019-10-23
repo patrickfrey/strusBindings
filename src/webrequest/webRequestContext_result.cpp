@@ -256,9 +256,9 @@ bool WebRequestContext::getContentRequestResult()
 			{
 				if (resultContent.empty())
 				{
-					if (m_answer.httpstatus() == 200)
+					if (m_answer.httpStatus() == 200)
 					{
-						m_answer.setStatus( 204/*no content*/);
+						m_answer.setHttpStatus( 204/*no content*/);
 					}
 				}
 				else

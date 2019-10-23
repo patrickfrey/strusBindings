@@ -23,7 +23,7 @@ class Schema_INIT_Context :public papuga::RequestAutomaton, public AutomatonName
 {
 public:
 	Schema_INIT_Context() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, false/*not strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, false/*not strict*/, true/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},

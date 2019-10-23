@@ -227,23 +227,17 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_POST_QueryAnalyzer.addToHandler( m_impl, "POST/qryanalyzer");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryAnalyzer> schema_Context_PUT_QueryAnalyzer;
 		schema_Context_PUT_QueryAnalyzer.addToHandler( m_impl, "PUT/qryanalyzer");
-		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
-		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
 
 		static const DefineConfigSchema<Schema_Context_POST_QueryEval> schema_Context_POST_QueryEval;
 		schema_Context_POST_QueryEval.addToHandler( m_impl, "POST/qryeval");
 		static const DefineConfigSchema<Schema_Context_PUT_QueryEval> schema_Context_PUT_QueryEval;
 		schema_Context_PUT_QueryEval.addToHandler( m_impl, "PUT/qryeval");
-		static const DefineSchema<Schema_QueryEval_GET> schema_QueryEval_GET("qryeval");
-		schema_QueryEval_GET.addToHandler( m_impl, "GET");
 
 		static const DefineConfigSchema<Schema_Context_PUT_StatisticsServer> schema_Context_PUT_StatisticsServer;
 		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "PUT/statserver");
 		schema_Context_PUT_StatisticsServer.addToHandler( m_impl, "POST/statserver");
 		static const DefineSchema<Schema_StatisticsServer_PUT_statistics> schema_StatisticsServer_PUT_statistics_statistics("statserver");
 		schema_StatisticsServer_PUT_statistics_statistics.addToHandler( m_impl, "PUT~statistics");
-		static const DefineSchema<Schema_StatisticsServer_GET> schema_StatisticsServer_GET("statserver");
-		schema_StatisticsServer_GET.addToHandler( m_impl, "GET");
 
 		static const DefineConfigSchema<Schema_Context_PUT_Inserter> schema_Context_PUT_Inserter;
 		schema_Context_PUT_Inserter.addToHandler( m_impl, "PUT/inserter");
@@ -253,13 +247,11 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "PUT/contentstats");
 		schema_Context_PUT_ContentStatistics.addToHandler( m_impl, "POST/contentstats");
 
-		static const DefineSchema<Schema_Storage_GET> schema_Storage_GET("storage");
-		schema_Storage_GET.addToHandler( m_impl, "GET");
-
 		static const DefineConfigSchema<Schema_Context_POST_DistQueryEval> schema_Context_POST_DistQueryEval;
 		schema_Context_POST_DistQueryEval.addToHandler( m_impl, "POST/distqryeval");
 		static const DefineConfigSchema<Schema_Context_PUT_DistQueryEval> schema_Context_PUT_DistQueryEval;
 		schema_Context_PUT_DistQueryEval.addToHandler( m_impl, "PUT/distqryeval");
+
 		static const DefineSchema<Schema_DistQueryEval_GET> schema_DistQueryEval_GET("distqryeval");
 		schema_DistQueryEval_GET.addToHandler( m_impl, "GET");
 		static const DefineSchema<Schema_DistQueryEval_SET_querystats> schema_DistQueryEval_SET_querystats("distqryeval");
@@ -268,6 +260,15 @@ WebRequestHandler::WebRequestHandler(
 		schema_DistQueryEval_SET_ranklist.addToHandler( m_impl, "SET~ranklist");
 		static const DefineSchema<Schema_DistQueryEval_END_ranklist> schema_DistQueryEval_END_ranklist("distqryeval");
 		schema_DistQueryEval_END_ranklist.addToHandler( m_impl, "END~ranklist");
+
+		static const DefineSchema<Schema_Storage_GET> schema_Storage_GET("storage");
+		schema_Storage_GET.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_StatisticsServer_GET> schema_StatisticsServer_GET("statserver");
+		schema_StatisticsServer_GET.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_QueryAnalyzer_GET> schema_QueryAnalyzer_GET("qryanalyzer");
+		schema_QueryAnalyzer_GET.addToHandler( m_impl, "GET");
+		static const DefineSchema<Schema_QueryEval_GET> schema_QueryEval_GET("qryeval");
+		schema_QueryEval_GET.addToHandler( m_impl, "GET");
 
 		// [2] Add methods
 		static const IntrospectionMethodDescription mt_Context_GET( mt::Context::introspection(), "config");

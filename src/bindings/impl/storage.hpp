@@ -35,11 +35,15 @@ public:
 	/// \brief Destructor
 	virtual ~StorageClientImpl();
 
+	/// \brief Reload the configuration
+	/// \param[in] config_ new configuration (string or structure with named elements) of the storage client
+	void reload( const ValueVariant& config_);
+
 	/// \brief Get the number of documents inserted into this storage
 	/// \return the total number of documents
 	/// \example 112324
 	/// \example 9873247
-	unsigned int nofDocumentsInserted() const;
+	long nofDocumentsInserted() const;
 
 	/// \brief Get the number of inserted documents where a specific feature occurrs in
 	/// \param[in] type the term type of the feature queried

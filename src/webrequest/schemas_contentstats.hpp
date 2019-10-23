@@ -24,7 +24,7 @@ class Schema_Context_INIT_ContentStatistics :public papuga::RequestAutomaton, pu
 {
 public:
 	Schema_Context_INIT_ContentStatistics() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},

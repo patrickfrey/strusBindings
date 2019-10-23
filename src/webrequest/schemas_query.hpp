@@ -27,7 +27,7 @@ class Schema_Context_POST_QueryEval :public papuga::RequestAutomaton, public Aut
 {
 public:
 	Schema_Context_POST_QueryEval() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{//Inherited:
@@ -50,7 +50,7 @@ class Schema_QueryEval_GET :public papuga::RequestAutomaton, public AutomatonNam
 {
 public:
 	Schema_QueryEval_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }}

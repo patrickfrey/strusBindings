@@ -24,7 +24,7 @@ class Schema_Context_POST_VectorStorage :public papuga::RequestAutomaton, public
 {
 public:
 	Schema_Context_POST_VectorStorage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
@@ -40,7 +40,7 @@ class Schema_Context_DELETE_POST_VectorStorage :public papuga::RequestAutomaton,
 {
 public:
 	Schema_Context_DELETE_POST_VectorStorage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
@@ -59,7 +59,7 @@ class Schema_Context_PUT_VectorStorage :public papuga::RequestAutomaton, public 
 {
 public:
 	Schema_Context_PUT_VectorStorage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
@@ -74,7 +74,7 @@ class Schema_Context_PUT_VectorStorageTransaction :public papuga::RequestAutomat
 {
 public:
 	Schema_Context_PUT_VectorStorageTransaction() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},

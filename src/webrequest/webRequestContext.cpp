@@ -238,9 +238,14 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 						setAnswer( ErrorCodeIncompleteRequest);
 						return false;
 					}
+					else if (m_obj)
+					{
+						// [1.B.1] UPDATE of configuration:
+						return updateConfigurationRequest( content);
+					}
 					else
 					{
-						// [1.B] PUT of configuration:
+						// [1.B.2] PUT of configuration:
 						return loadConfigurationRequest( content);
 					}
 				}
@@ -267,7 +272,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					{
 						// [1.E] DELETE of a transaction object:
 						m_transactionRef.reset();
-						m_answer.setStatus( 204/*no content*/);
+						m_answer.setHttpStatus( 204/*no content*/);
 						return true;//... transaction automatically released when not returned
 					}
 					else
@@ -328,7 +333,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				rt = loadConfigurationRequest( content);
 				if (rt)
 				{
-					m_answer.setStatus( 201/*created*/);
+					m_answer.setHttpStatus( 201/*created*/);
 					rt = setAnswerLink( m_contextType, newContextName, 1/*link level*/);
 				}
 			}
@@ -372,7 +377,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 		if (!content.empty())
 		{
 			// [4.A] Execute schema in context with content:
-			return executeContentSchemaRequest( getSchemaId(), content);
+			return initContentSchemaAutomaton( getSchemaId()) && executeContentSchemaAutomaton( content);
 		}
 		else if (isEqual( m_method, "GET"))
 		{
@@ -428,6 +433,8 @@ bool WebRequestContext::execute(
 				if (!initContentType( content)) return false;
 				if (!initRequestObject()) return false;
 				return executeObjectRequest( content);
+			case InterruptedLoadConfigurationRequest:
+				return updateConfigurationRequest_retry( content);
 		}
 		setAnswer( ErrorCodeInvalidRequest);
 		return false;
@@ -469,7 +476,8 @@ bool WebRequestContext::putDelegateRequestAnswer(
 		}
 		strus::Reference<WebRequestContext> delegateContext( createClone( ObjectRequest));
 		delegateContext->initContentType( content);
-		bool rt = delegateContext->executeContentSchemaRequest( SchemaId( m_contextType, schema), content);
+		bool rt = delegateContext->initContentSchemaAutomaton( SchemaId( m_contextType, schema))
+			&& delegateContext->executeContentSchemaAutomaton( content);
 		if (rt)
 		{
 			if (delegateContext->hasContentRequestDelegateRequests())
@@ -517,6 +525,7 @@ bool WebRequestContext::complete()
 					rt &= transferContext();
 					break;
 				case ObjectRequest:
+				case InterruptedLoadConfigurationRequest:
 					rt &= getContentRequestResult();
 					if (rt && m_configTransaction.defined())
 					{

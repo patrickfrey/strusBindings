@@ -28,7 +28,7 @@ class Schema_Context_POST_Storage :public papuga::RequestAutomaton, public Autom
 public:
 	typedef bindings::method::Context C;
 	Schema_Context_POST_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
 		{/*result*/},
 		{/*inherit*/
@@ -47,7 +47,7 @@ class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public Automa
 {
 public:
 	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
 		{/*result*/},
 		{/*inherit*/
@@ -65,7 +65,7 @@ class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, publi
 {
 public:
 	Schema_Context_DELETE_POST_Storage() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
 		{/*result*/},
 		{/*inherit*/},
@@ -80,7 +80,7 @@ class Schema_Storage_GET :public papuga::RequestAutomaton, public AutomatonNameS
 {
 public:
 	Schema_Storage_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/
 			{"queryresult", { {"/query", "ranklist", "ranklist", '!'} }},
@@ -108,7 +108,7 @@ class Schema_StorageTransaction_PUT :public papuga::RequestAutomaton, public Aut
 {
 public:
 	Schema_StorageTransaction_PUT() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},

@@ -26,7 +26,7 @@ class Schema_Context_PUT_DocumentAnalyzer :public papuga::RequestAutomaton, publ
 {
 public:
 	Schema_Context_PUT_DocumentAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
@@ -46,7 +46,7 @@ class Schema_Context_PUT_QueryAnalyzer :public papuga::RequestAutomaton, public 
 {
 public:
 	Schema_Context_PUT_QueryAnalyzer() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/
@@ -69,7 +69,7 @@ class Schema_QueryAnalyzer_GET :public papuga::RequestAutomaton, public Automato
 {
 public:
 	Schema_QueryAnalyzer_GET() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/,
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/
 			{"query", {

@@ -60,7 +60,19 @@ StorageClientImpl::StorageClientImpl( const ObjectRef& trace, const ObjectRef& o
 StorageClientImpl::~StorageClientImpl()
 {}
 
-unsigned int StorageClientImpl::nofDocumentsInserted() const
+void StorageClientImpl::reload( const ValueVariant& config_)
+{
+	std::string configstr = Deserializer::getConfigString( config_);
+	StorageClientInterface* THIS = m_storage_impl.getObject<StorageClientInterface>();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
+	if (!THIS->reload( configstr))
+	{
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( "error reloading configuration: %s", errorhnd->fetchError());
+	}
+}
+
+long StorageClientImpl::nofDocumentsInserted() const
 {
 	const StorageClientInterface* THIS = m_storage_impl.getObject<const StorageClientInterface>();
 	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));

@@ -35,17 +35,17 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 {
 	try
 	{
-		if (status.httpstatus() < 200 || status.httpstatus() >= 300)
+		if (status.httpStatus() < 200 || status.httpStatus() >= 300)
 		{
 			if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 			{
-				if (status.errorstr())
+				if (status.errorStr())
 				{
-					logErrorFmt( _TXT("error in delegate request (http status %d): %s"), status.httpstatus(), status.errorstr());
+					logErrorFmt( _TXT("error in delegate request (http status %d): %s"), status.httpStatus(), status.errorStr());
 				}
 				else
 				{
-					logErrorFmt( _TXT("error in delegate request (http status %d)"), status.httpstatus());
+					logErrorFmt( _TXT("error in delegate request (http status %d)"), status.httpStatus());
 				}
 			}
 		}
@@ -56,7 +56,7 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 				if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 				{
 					WebRequestAnswer ctxstatus = m_context->getAnswer();
-					const char* msg = ctxstatus.errorstr() ? ctxstatus.errorstr() : strus::errorCodeToString( ctxstatus.apperror());
+					const char* msg = ctxstatus.errorStr() ? ctxstatus.errorStr() : strus::errorCodeToString( ctxstatus.appErrorCode());
 					logErrorFmt( _TXT("error processing delegate request answer with schema '%s': %s"), m_schema, msg);
 				}
 			}

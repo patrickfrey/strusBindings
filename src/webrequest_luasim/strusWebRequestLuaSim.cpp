@@ -775,7 +775,7 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 				if (!handler->delegateRequest( di->url(), di->method(), delegateContentStr, receiver))
 				{
 					answer.setError_fmt( 500, strus::ErrorCodeOutOfMem, _TXT("delegate request failed: %s"), strus::errorCodeToString( strus::ErrorCodeOutOfMem));
-					g_globalContext.reportError( answer.errorstr());
+					g_globalContext.reportError( answer.errorStr());
 					return false;
 				}
 			}
@@ -787,7 +787,7 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 				{
 					answer = ctx->getAnswer();
 					answer.explain( _TXT("delegate request failed"));
-					g_globalContext.reportError( answer.errorstr());
+					g_globalContext.reportError( answer.errorStr());
 					return false;
 				}
 			}
@@ -796,7 +796,7 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 		{
 			answer.setError( 500, strus::ErrorCodeOutOfMem);
 			answer.explain( _TXT("delegate request failed"));
-			g_globalContext.reportError( answer.errorstr());
+			g_globalContext.reportError( answer.errorStr());
 			return false;
 		}
 	}
@@ -808,7 +808,7 @@ void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status
 	bool success = true;
 	if (!m_answer->ok()) return;
 
-	if (status.ok() && status.httpstatus() >= 200 && status.httpstatus() < 300)
+	if (status.ok() && status.httpStatus() >= 200 && status.httpStatus() < 300)
 	{
 		success &= m_requestContext->putDelegateRequestAnswer( m_schema.c_str(), status.content());
 	}
@@ -847,7 +847,7 @@ strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Con
 	strus::WebRequestAnswer answer;
 	if (!rt->init( configjson_, answer))
 	{
-		const char* msg = answer.errorstr() ? answer.errorstr() : strus::errorCodeToString( answer.apperror());
+		const char* msg = answer.errorStr() ? answer.errorStr() : strus::errorCodeToString( answer.appErrorCode());
 		throw strus::runtime_error( _TXT("failed to initialize request handler: %s"), msg);
 	}
 	return rt;
@@ -1413,13 +1413,13 @@ static int l_call_server( lua_State* L)
 		if (result.content().empty())
 		{
 			lua_pushnil(L);
-			lua_pushinteger(L, result.httpstatus()); /* second return value */
-			lua_pushstring(L, result.errorstr()); 
+			lua_pushinteger(L, result.httpStatus()); /* second return value */
+			lua_pushstring(L, result.errorStr()); 
 		}
 		else
 		{
 			lua_pushlstring(L, result.content().str(), result.content().len()); 
-			lua_pushinteger(L, result.httpstatus()); /* second return value */
+			lua_pushinteger(L, result.httpStatus()); /* second return value */
 			lua_pushnil(L);
 		}
 		LUA_FUNCTION_TAIL( L, "call_server", 3);

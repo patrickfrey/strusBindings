@@ -82,6 +82,10 @@ bool WebRequestContext::initContentSchemaAutomaton( const SchemaId& schemaid)
 		}
 		return false;
 	}
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "content schema request", schemaid.schemaName, m_contextType, m_contextName);
+	}
 	return true;
 }
 
@@ -176,7 +180,7 @@ bool WebRequestContext::feedContentSchemaRequest( const WebRequestContent& conte
 }
 
 
-bool WebRequestContext::executeContentSchema( const WebRequestContent& content)
+bool WebRequestContext::executeContentSchemaCalls( const WebRequestContent& content)
 {
 	papuga_RequestError reqerr;
 	if (!papuga_RequestContext_execute_request( m_context.get(), m_request, &m_allocator, &m_callLogger, &m_results, &m_nofResults, &reqerr))
@@ -196,18 +200,13 @@ bool WebRequestContext::executeContentSchema( const WebRequestContent& content)
 	return true;
 }
 
-bool WebRequestContext::executeContentSchemaRequest( const SchemaId& schemaid, const WebRequestContent& content)
+bool WebRequestContext::executeContentSchemaAutomaton( const WebRequestContent& content)
 {
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-	{
-		m_logger->logRequestType( "content schema request", schemaid.schemaName, m_contextType, m_contextName);
-	}
-	if (!initContentSchemaAutomaton( schemaid)) return false;
 	if (!initSchemaEnvAssignments()) return false;
 	if (!initContentSchemaRequest()) return false;
 	if (!feedContentSchemaRequest( content)) return false;
 	if (!inheritContentSchemaRequestContext()) return false;
-	if (!executeContentSchema( content)) return false;
+	if (!executeContentSchemaCalls( content)) return false;
 	return true;
 }
 

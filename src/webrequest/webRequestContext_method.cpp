@@ -202,7 +202,7 @@ bool WebRequestContext::callHostObjMethodToVariable( void* self, const papuga_Re
 	{
 		return false;
 	}
-	m_answer.setStatus( httpStatus);
+	m_answer.setHttpStatus( httpStatus);
 	return true;
 }
 
@@ -257,7 +257,7 @@ bool WebRequestContext::callHostObjMethodToAnswer( void* self, const papuga_Requ
 	{
 		if (retval.nofvalues == 0)
 		{
-			m_answer.setStatus( httpStatus);
+			m_answer.setHttpStatus( httpStatus);
 			return true;
 		}
 		else if (retval.nofvalues > 1)
