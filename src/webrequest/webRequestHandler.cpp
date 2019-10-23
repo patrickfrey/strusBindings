@@ -501,7 +501,7 @@ WebRequestContextInterface* WebRequestHandler::createConfigurationContext(
 	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, NULL);
 }
 
-WebRequestContextInterface* WebRequestHandler::createRequestContext(
+WebRequestContextInterface* WebRequestHandler::createContext(
 		const char* accepted_charset,
 		const char* accepted_doctype,
 		const char* html_base_href,
@@ -639,7 +639,7 @@ const char* WebRequestHandler::pathToSelf( const char* address)
 bool WebRequestHandler::loopbackConfigurationLoadDelegateRequest( WebRequestContextInterface* receiverContext, const char* receiverSchema, const char* method, const char* path, const std::string& contentstr, WebRequestAnswer& answer)
 {
 	WebRequestContent content( g_config_charset, g_config_doctype, contentstr.c_str(), contentstr.size());
-	strus::Reference<WebRequestContextInterface> ctx( createRequestContext( 
+	strus::Reference<WebRequestContextInterface> ctx( createContext( 
 			"UTF-8"/*accepted_charset*/, "application/json"/*accepted_doctype*/,""/*html_base_href*/,
 			method, path, answer));
 	if (ctx.get())

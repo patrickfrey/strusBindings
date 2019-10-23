@@ -862,7 +862,7 @@ strus::WebRequestAnswer Processor::call( const std::string& method, const std::s
 			: strus::string_format( "http://%s/%s/", m_hostname.c_str(), path.c_str());
 
 	strus::Reference<strus::WebRequestContextInterface>
-		ctx( m_handler->createRequestContext( g_charset, g_doctype, html_base_href.c_str(), method.c_str(), path.c_str(), rt));
+		ctx( m_handler->createContext( g_charset, g_doctype, html_base_href.c_str(), method.c_str(), path.c_str(), rt));
 	if (!ctx.get()) return rt;
 	if (!ctx->execute( content))
 	{

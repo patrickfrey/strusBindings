@@ -53,12 +53,7 @@ public:
 			const std::string& configsrc,
 			WebRequestAnswer& answer);
 
-	virtual WebRequestContextInterface* createConfigurationContext(
-			const char* contextType,
-			const char* contextName,
-			WebRequestAnswer& answer);
-
-	virtual WebRequestContextInterface* createRequestContext(
+	virtual WebRequestContextInterface* createContext(
 			const char* accepted_charset,
 			const char* accepted_doctype,
 			const char* html_base_href,
@@ -78,6 +73,20 @@ public:
 			const char* html_base_href,
 			const std::string& name,
 			const std::string& message);
+
+private:
+	/// \brief Create the structure for handling a configuration request
+	/// \note A configuration request is defined as embedded section in the configuration file and it adresses its object not by the path but explicitely addresses the object by type and name.
+	/// \note It does not store any artifacts for recreation on restart because it does not have to remember any objects defined as they are defined in the main configuration file.
+	/// \note It is not recommended to use this context except for creation of the main context. Do not use embedded configurations of other objects, if you want to build bigger systems.
+	/// \param[in] contextType context type
+	/// \param[in] contextName context name
+	/// \param[out] answer the error status
+	/// \return the context structure for handling the configuration request or NULL in case of an error (inspect answer for the error details)
+	WebRequestContextInterface* createConfigurationContext(
+			const char* contextType,
+			const char* contextName,
+			WebRequestAnswer& answer);
 
 public:/*WebRequestContext*/
 	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
