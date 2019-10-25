@@ -27,6 +27,7 @@ class Schema_Context_POST_Storage :public papuga::RequestAutomaton, public Autom
 {
 public:
 	typedef bindings::method::Context C;
+
 	Schema_Context_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
@@ -46,6 +47,8 @@ public:
 class Schema_Context_PUT_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
+	typedef bindings::method::Context C;
+
 	Schema_Context_PUT_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
@@ -56,7 +59,24 @@ public:
 		},
 		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
-			{"/", "storage", "context", bindings::method::Context::createStorageClient(), {{StorageConfig}} }
+			{"/", "storage", "context", C::createStorageClient(), {{StorageConfig}} }
+		}
+	) {}
+};
+
+class Schema_Storage_PUT :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	typedef bindings::method::StorageClient S;
+
+	Schema_Storage_PUT() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, true/*exclusive*/,
+		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
+			{SchemaStoragePart::defineStorage("/storage")},
+			{"/", "storage", "context", S::reload(), {{StorageConfig}} }
 		}
 	) {}
 };
@@ -64,6 +84,8 @@ public:
 class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
+	typedef bindings::method::Context C;
+
 	Schema_Context_DELETE_POST_Storage() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
@@ -71,7 +93,7 @@ public:
 		{/*inherit*/},
 		{/*input*/
 			{SchemaStoragePart::defineDeleteStorage("/storage")},
-			{"/storage", 0, "context", bindings::method::Context::destroyStorage(), {{StorageConfig}} }
+			{"/storage", 0, "context", C::destroyStorage(), {{StorageConfig}} }
 		}
 	) {}
 };
@@ -107,6 +129,8 @@ public:
 class Schema_StorageTransaction_PUT :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
+	typedef bindings::method::StorageTransaction T;
+
 	Schema_StorageTransaction_PUT() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
@@ -118,7 +142,7 @@ public:
 					{DocumentDef,'*'}
 				}
 			},
-			{"/storage/document", "", "transaction", bindings::method::StorageTransaction::insertDocument(), {{DocumentId},{DocumentDef}} },
+			{"/storage/document", "", "transaction", T::insertDocument(), {{DocumentId},{DocumentDef}} },
 		}
 	) {}
 };

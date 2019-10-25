@@ -158,6 +158,14 @@ public:
 	DefineConfigSchema() :DefineSchema<SCHEMA>( ROOT_CONTEXT_NAME){}
 };
 
+template <class SCHEMA>
+class DefineUpdateConfigSchema
+	:public DefineSchema<SCHEMA>
+{
+public:
+	DefineUpdateConfigSchema( const char* contextType) :DefineSchema<SCHEMA>( contextType){}
+};
+
 static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","qryeval","distqryeval","inserter",0};
 
 static void tickerFunction( void* THIS)
@@ -206,6 +214,8 @@ WebRequestHandler::WebRequestHandler(
 		schema_Context_DELETE_POST_Storage.addToHandler( m_impl, "DELETE_POST/storage");
 		static const DefineConfigSchema<Schema_Context_PUT_Storage> schema_Context_PUT_Storage;
 		schema_Context_PUT_Storage.addToHandler( m_impl, "PUT/storage");
+		static const DefineUpdateConfigSchema<Schema_Storage_PUT> schema_Storage_PUT( "storage");
+		schema_Storage_PUT.addToHandler( m_impl, "PUT");
 		static const DefineSchema<Schema_StorageTransaction_PUT> schema_StorageTransaction_PUT("transaction/storage");
 		schema_StorageTransaction_PUT.addToHandler( m_impl, "PUT");
 

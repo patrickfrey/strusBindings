@@ -120,62 +120,109 @@ private:
 
 private:
 	// Implemented in webRequestContext:
+	/// \brief Execute a request of type ObjectRequest
 	bool executeObjectRequest( const WebRequestContent& content);
 
 	// Implemented in webRequestContext_obj:
+	/// \brief Initialize the request logger for papuga
 	void initCallLogger();
-	bool initEmptyObject();
+	/// \brief Create an empty object
+ 	bool initEmptyObject();
+	/// \brief Create an object that inherits all from the root context (object loaded from main configuration)
 	bool initRootObject();
+	/// \brief Init object for schema description requests
 	bool initSchemaDescriptionObject();
+	/// \brief Init object for ordinary requests
 	bool initRequestObject();
+	/// \brief Reset object for requests
 	void resetRequestObject();
+	/// \brief Inherit all objects from a concept identified by type and name
 	bool inheritRequestContext( const char* contextType_, const char* contextName_);
+	/// \brief Inititialize request and result content types and character set encodings
 	bool initContentType( const WebRequestContent& content);
+	/// \brief Execute a request creating a transaction (POST)
 	bool executePostTransaction();
+	/// \brief Execute a request doing the commit (PUT) of a transaction
 	bool executeCommitTransaction();
 
 	// Implemented in webRequestContext_method:
+	/// \brief Call a method and put the result to the answer of the request
 	bool callHostObjMethodToAnswer( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content);
+	/// \brief Call a method and assign the result to a variable of the current context
 	bool callHostObjMethodToVariable( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname);
+		/// \brief Helper to log a method call
 		void logMethodCall( const papuga_RequestMethodDescription* methoddescr);
 
 	// Implemented in webRequestContext_schema:
+	/// \brief Get the schema identifier specified by context
 	SchemaId getSchemaId();
+	/// \brief Get the schema identifier specified by arguments
 	SchemaId getSchemaId( const char* contextType_, const char* method_);
+	/// \brief Get the schema identifier for a configuration update request
+	static SchemaId getSchemaId_updateConfiguration( const char* contextType_);
+	/// \brief Evaluate if a schema exists
+	bool hasContentSchemaAutomaton( const SchemaId& schemaid);
+	/// \brief Initialization of the automaton for a schema request
 	bool initContentSchemaAutomaton( const SchemaId& schemaid);
+	/// \brief Execute the schema request initialized
 	bool executeContentSchemaAutomaton( const WebRequestContent& content);
+		/// \brief Helper of executeContentSchemaAutomaton, initialize the request
 		bool initContentSchemaRequest();
+		/// \brief Helper of executeContentSchemaAutomaton, feed the content to the request
 		bool feedContentSchemaRequest( const WebRequestContent& content);
+		/// \brief Do inherit context operations
 		bool inheritContentSchemaRequestContext();
+		/// \brief Execute calls of the request within the context 
 		bool executeContentSchemaCalls( const WebRequestContent& content);
 
 	// Implemented in webRequestContext_env:
+	/// \brief Execute assignments defined by environment in a schema request
 	bool initSchemaEnvAssignments();
 
 	// Implemented in webRequestContext_error:
+	/// \brief Report an error in a schema request
 	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
 
 	// Implemented in webRequestContext_result:
+	/// \brief Get a pointer to the result string or a delegate request content string of a schema request result
 	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
+	/// \brief Initialize the result of a content request
 	bool getContentRequestResult();
+	/// \brief Initialize the list of delegate requests of a content request
 	bool getContentRequestDelegateRequests( std::vector<WebRequestDelegateRequest>& delegateRequests);
+	/// \brief Evaluate if there are delegate requests in a content request
 	bool hasContentRequestDelegateRequests() const;
+	/// \brief Evaluate if there is a result in a content request
 	bool hasContentRequestResult() const;
+	/// \brief Transfer the current context to the handler as active object
 	bool transferContext();
+	/// \brief Define the current request to have failed
 	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
+	/// \brief Define the answer of the current request to be a link (POST request result)
 	bool setAnswerLink( const char* title, const std::string& lnk, int linklevel);
 
 	// Implemented in webRequestContext_meta:
+	/// \brief List variables of the object loaded
 	bool executeListVariables();
+	/// \brief Get the description of a schema (request with /schema prefix in the URL)
 	bool executeSchemaDescription();
+	/// \brief OPTIONS request
 	bool executeOPTIONS();
 
 	// Implemented in webRequestContext_config:
+	/// \brief Load main configuration in the initialization phase of the service
 	bool loadMainConfiguration( const WebRequestContent& content);
+	/// \brief Load a configuration embedded in the configuration file loaded in the initialization phase of the service
 	bool loadEmbeddedConfiguration( const WebRequestContent& content);
+	/// \brief Helper of loadConfigurationRequest or updateConfigurationRequest, initiate the configuration request
+	bool initConfigurationRequest( const WebRequestContent& content);
+	/// \brief Load configuration request for a not yet existing object
 	bool loadConfigurationRequest( const WebRequestContent& content);
+	/// \brief Update configuration request for an existing object
 	bool updateConfigurationRequest( const WebRequestContent& content);
+	/// \brief Retry of an update configuration request with exclusive access on data, rejected before with ErrorCodeServiceNeedExclusiveAccess due to the exclusive flag set in the automaton definition
 	bool updateConfigurationRequest_retry( const WebRequestContent& content);
+	/// \brief Delete configuration request
 	bool deleteConfigurationRequest();
 
 private:

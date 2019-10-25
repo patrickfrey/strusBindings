@@ -35,9 +35,18 @@ public:
 	/// \brief Destructor
 	virtual ~StorageClientImpl();
 
-	/// \brief Reload the configuration
+	/// \brief Reload the configuration (PUT)
 	/// \param[in] config_ new configuration (string or structure with named elements) of the storage client
 	void reload( const ValueVariant& config_);
+
+	/// \brief Patch the configuration (PATCH)
+	/// \param[in] patchlist list of patch operations according to RFC 6902 (https://tools.ietf.org/html/rfc6902)
+	/// \example [ [ "rename" "metadata/code" "" "cd" ] ]
+	/// \example [ [ "replace" "metadata/code" "INT32" "cd" ] ]
+	/// \example [ [ "replace" "buffer_size" "4K" ], [ "add" "metadata/doclen" "INT32" ] ]
+	/// \example [ [ op: "replace" path: "buffer_size" value: "4K" ], [ op: "add" path: "metadata/doclen" value: "INT32" ] ]
+	/// \example [ [ op: "rename" path: "metadata/code" from: "metadata/cd" ] ]
+	void patch( const ValueVariant& patchlist);
 
 	/// \brief Get the number of documents inserted into this storage
 	/// \return the total number of documents

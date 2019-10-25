@@ -50,7 +50,7 @@ bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& cont
 	return true;
 }
 
-bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& content)
+bool WebRequestContext::initConfigurationRequest( const WebRequestContent& content)
 {
 	if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
 	{
@@ -60,11 +60,6 @@ bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& conte
 	std::string configstr = webRequestContent_tostring( content);
 	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, content.doctype(), configstr);
 	m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
-	SchemaId schemaid = getSchemaId();
-	if (!initRootObject()) return false;
-	if (!initContentSchemaAutomaton( schemaid)) return false;
-	if (!executeContentSchemaAutomaton( content)) return false;
-
 	if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
 	{
 		m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
@@ -72,25 +67,24 @@ bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& conte
 	return true;
 }
 
+bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& content)
+{
+	if (!initConfigurationRequest( content)) return false;
+	SchemaId schemaid = getSchemaId();
+	if (!initRootObject()) return false;
+	if (!initContentSchemaAutomaton( schemaid)) return false;
+	if (!executeContentSchemaAutomaton( content)) return false;
+	return true;
+}
+
 bool WebRequestContext::updateConfigurationRequest( const WebRequestContent& content)
 {
-	if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
+	if (!initConfigurationRequest( content)) return false;
+	SchemaId schemaid = getSchemaId_updateConfiguration( m_contextType);
+	if (hasContentSchemaAutomaton( schemaid))
 	{
-		setAnswer( ErrorCodeInvalidRequest);
-		return false;
-	}
-	std::string configstr = webRequestContent_tostring( content);
-	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, content.doctype(), configstr);
-	m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
-	{
-		m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
-	}
-	SchemaId schemaid = getSchemaId();
-	if (!initContentSchemaAutomaton( schemaid)) return false;
-	if (papuga_RequestAutomaton_has_exclusive_access( m_atm))
-	{
-		if (m_requestType == ObjectRequest)
+		if (!initContentSchemaAutomaton( schemaid)) return false;
+		if (papuga_RequestAutomaton_has_exclusive_access( m_atm))
 		{
 			m_requestType = InterruptedLoadConfigurationRequest;
 			setAnswer( ErrorCodeServiceNeedExclusiveAccess);
@@ -98,12 +92,14 @@ bool WebRequestContext::updateConfigurationRequest( const WebRequestContent& con
 		}
 		else
 		{
-			setAnswer( ErrorCodeLogicError, _TXT("illegal state in update configuration request"));
-			return false;
+			if (!executeContentSchemaAutomaton( content)) return false;
 		}
 	}
 	else
 	{
+		schemaid = getSchemaId();
+		if (!initRootObject()) return false;
+		if (!initContentSchemaAutomaton( schemaid)) return false;
 		if (!executeContentSchemaAutomaton( content)) return false;
 	}
 	return true;

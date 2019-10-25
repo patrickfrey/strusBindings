@@ -66,6 +66,16 @@ WebRequestContext::SchemaId WebRequestContext::getSchemaId()
 	}
 }
 
+WebRequestContext::SchemaId WebRequestContext::getSchemaId_updateConfiguration( const char* contextType_)
+{
+	return SchemaId( contextType_, "PUT");
+}
+
+bool WebRequestContext::hasContentSchemaAutomaton( const SchemaId& schemaid)
+{
+	return !!papuga_RequestHandler_get_automaton( m_handler->impl(), schemaid.contextType, schemaid.schemaName);
+}
+
 bool WebRequestContext::initContentSchemaAutomaton( const SchemaId& schemaid)
 {
 	m_atm = papuga_RequestHandler_get_automaton( m_handler->impl(), schemaid.contextType, schemaid.schemaName);

@@ -18,6 +18,7 @@
 #include "strus/storageTransactionInterface.hpp"
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageClientInterface.hpp"
+#include "strus/storageMetaDataTransactionInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
@@ -29,12 +30,14 @@
 #include "strus/forwardIteratorInterface.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/local_ptr.hpp"
+#include "strus/base/string_format.hpp"
 #include "papuga/serialization.h"
 #include "serializer.hpp"
 #include "valueVariantWrap.hpp"
 #include "private/internationalization.hpp"
 #include "expressionBuilder.hpp"
 #include "deserializer.hpp"
+#include "structDefs.hpp"
 #include "serializer.hpp"
 #include "callResultUtils.hpp"
 
@@ -69,6 +72,236 @@ void StorageClientImpl::reload( const ValueVariant& config_)
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		throw strus::runtime_error( "error reloading configuration: %s", errorhnd->fetchError());
+	}
+}
+
+static bool defineMetaDataTransactionOp( strus::StorageMetaDataTransactionInterface* transaction, ErrorBufferInterface* errorhnd, const PatchDef& patchdef)
+{
+	const char* context = "metadata";
+	if (!patchdef.from.empty())
+	{
+		if (patchdef.path.size() != 2)
+		{
+			errorhnd->report( ErrorCodeNotImplemented, _TXT("element '%s' only allowed to have form '%s/<name>' in patch %s"),
+						"from", context, context);
+			return false;
+		}
+		if (patchdef.from[0] != context)
+		{
+			errorhnd->report( ErrorCodeNotImplemented, _TXT("element '%s' only allowed to have prefix '%s' in patch %s"),
+						"from", context, context);
+			return false;
+		}
+	}
+	if (patchdef.path.size() > 2)
+	{
+		errorhnd->report( ErrorCodeNotFound, _TXT("element '%s' not valid for %s in patch %s"), "path", PatchDef::opName(patchdef.op), context);
+		return false;
+	}
+	else if (patchdef.path[0] != context)
+	{
+		errorhnd->report( ErrorCodeNotImplemented, _TXT("element '%s' only allowed to have prefix '%s' in patch %s"), "path" , context, context);
+		return false;
+	}
+	switch (patchdef.op)
+	{
+		case PatchDef::OpAdd:
+			if (patchdef.value.empty())
+			{
+				errorhnd->report( ErrorCodeNotFound, _TXT("value mandatory for %s in %s"), PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			else if (patchdef.path.size() == 2)
+			{
+				transaction->addElement( patchdef.path[1], patchdef.value);
+			}
+			else
+			{
+				errorhnd->report( ErrorCodeNotFound, _TXT("path not valid for %s in patch %s"), PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			break;
+
+		case PatchDef::OpRemove:
+			if (!patchdef.value.empty())
+			{
+				errorhnd->report( ErrorCodeNotFound, _TXT("value not allowed for %s in %s"), PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			else if (patchdef.path.size() == 1)
+			{
+				transaction->deleteElements();
+			}
+			else if (patchdef.path.size() == 2)
+			{
+				transaction->deleteElement( patchdef.path[1]);
+			}
+			break;
+
+		case PatchDef::OpReplace:
+			if (patchdef.path.size() == 2)
+			{
+				if (patchdef.value.empty())
+				{
+					if (patchdef.from.size() == 2)
+					{
+						transaction->renameElement( patchdef.from[1], patchdef.path[1]);
+					}
+					else
+					{
+						errorhnd->report( ErrorCodeIncompleteDefinition, "element 'from' missing (rename element) or 'value' missing (alter element)"); 
+						return false;
+					}
+				}
+				else if (patchdef.from.size() == 2)
+				{
+					transaction->alterElement( patchdef.from[1], patchdef.path[1], patchdef.value);
+				}
+				else
+				{
+					transaction->alterElement( patchdef.path[1], patchdef.path[1], patchdef.value);
+				}
+			}
+			else
+			{
+				errorhnd->report( ErrorCodeNotFound, "path not valid for %s in patch %s", PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			break;
+
+		case PatchDef::OpCopy:
+			if (patchdef.value != "0" || patchdef.value != "NULL")
+			{
+				errorhnd->report( ErrorCodeNotFound, "only 0 or NULL allowed as value for op '%s' in patch %s (clear content)", PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			else if (patchdef.path.size() == 2)
+			{
+				transaction->clearElement( patchdef.path[1]);
+			}
+			else
+			{
+				errorhnd->report( ErrorCodeNotFound, "path not valid for %s in patch %s", PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			break;
+
+		case PatchDef::OpMove:
+		case PatchDef::OpTest:
+			errorhnd->report( ErrorCodeNotImplemented, "operator '%s' not implemented for patch %s", PatchDef::opName(patchdef.op), context);
+			return false;
+	}
+	return true;
+}
+
+static void setConfigPatchElement( std::string& dest, const std::string& name, const std::string& value)
+{
+	if (dest.empty()) dest.push_back(';');
+	dest.append( strus::string_format("%s='%s'", name.c_str(), value.c_str()));
+}
+
+static void resetConfigPatchElement( std::string& dest, const std::string& name)
+{
+	if (dest.empty()) dest.push_back(';');
+	dest.append( strus::string_format("%s=", name.c_str()));
+}
+
+static bool defineConfigPatchOp( std::string& dest, ErrorBufferInterface* errorhnd, const PatchDef& patchdef)
+{
+	const char* context = "storage configuration";
+	if (!patchdef.from.empty())
+	{
+		errorhnd->report( ErrorCodeNotImplemented, "element 'from' not implemented in patch %s" , context);
+		return false;
+	}
+	if (!patchdef.path.empty())
+	{
+		errorhnd->report( ErrorCodeNotImplemented, "element 'path' required in every element of patch %s" , context);
+		return false;
+	}
+	if (patchdef.path.size() > 1)
+	{
+		errorhnd->report( ErrorCodeNotFound, "path with more than one identifier not allowed in patch %s", context);
+		return false;
+	}
+	switch (patchdef.op)
+	{
+		case PatchDef::OpAdd:
+			if (patchdef.value.empty())
+			{
+				errorhnd->report( ErrorCodeNotFound, _TXT("value required for %s in %s"), PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			setConfigPatchElement( dest, patchdef.path[0], patchdef.value);
+			break;
+		case PatchDef::OpRemove:
+			if (!patchdef.value.empty())
+			{
+				errorhnd->report( ErrorCodeNotFound, _TXT("value not allowed for %s in %s"), PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			resetConfigPatchElement( dest, patchdef.path[0]);
+			break;
+		case PatchDef::OpReplace:
+		case PatchDef::OpCopy:
+		case PatchDef::OpMove:
+		case PatchDef::OpTest:
+			errorhnd->report( ErrorCodeNotImplemented, _TXT("operator '%s' not implemented for %s"), PatchDef::opName(patchdef.op), context);
+			return false;
+	}
+	return true;
+}
+
+static std::set<std::string> getValidConfigSet( StorageClientInterface* cli)
+{
+	std::set<std::string> rt;
+	char const** ai = cli->getConfigParameters();
+	for (; *ai; ++ai)
+	{
+		rt.insert( *ai);
+	}
+	return rt;
+}
+
+void StorageClientImpl::patch( const ValueVariant& patchlist)
+{
+	StorageClientInterface* THIS = m_storage_impl.getObject<StorageClientInterface>();
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+
+	std::vector<PatchDef> patchDefList = PatchDef::parseList( patchlist);
+	std::vector<PatchDef>::iterator pi = patchDefList.begin(), pe = patchDefList.end();
+	strus::Reference<strus::StorageMetaDataTransactionInterface> transaction( THIS->createMetaDataTransaction());
+	std::string storageConfig;
+	std::set<std::string> validConfigSet = getValidConfigSet( THIS);
+
+	for (; pi != pe; ++pi)
+	{
+		if (pi->path.empty())
+		{
+			errorhnd->report( ErrorCodeNotFound, _TXT("path has to be defined always in a %s"), "patch definition list");
+			break;
+		}
+		if (pi->path[0] == "metadata")
+		{
+			if (!defineMetaDataTransactionOp( transaction.get(), errorhnd, *pi)) break;
+		}
+		else if (validConfigSet.find( pi->path[0]) != validConfigSet.end())
+		{
+			if (!defineConfigPatchOp( storageConfig, errorhnd, *pi)) break;
+		}
+		else
+		{
+			errorhnd->report( ErrorCodeNotImplemented, _TXT("unknown configuration variable '%s' (case sensitive)"), pi->path[0].c_str());
+			break;
+		}
+	}
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to patch storage configuration: %s"), errorhnd->fetchError());
+	}
+	if (!transaction->commit())
+	{
+		throw strus::runtime_error(_TXT("meta data transaction failed when patching storage configuration: %s"), errorhnd->fetchError());
 	}
 }
 
