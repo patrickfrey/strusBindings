@@ -194,19 +194,79 @@ static bool defineMetaDataTransactionOp( strus::StorageMetaDataTransactionInterf
 	return true;
 }
 
-static void setConfigPatchElement( std::string& dest, const std::string& name, const std::string& value)
+struct PatchConfigDef
 {
-	if (dest.empty()) dest.push_back(';');
-	dest.append( strus::string_format("%s='%s'", name.c_str(), value.c_str()));
-}
+	StorageClientInterface* m_cli;
+	ErrorBufferInterface* m_errorhnd;
+	std::set<std::string> m_validConfigSet;
+	std::map<std::string,std::string> m_oldConfig;
+	std::map<std::string,std::string> m_newConfig;
 
-static void resetConfigPatchElement( std::string& dest, const std::string& name)
-{
-	if (dest.empty()) dest.push_back(';');
-	dest.append( strus::string_format("%s=", name.c_str()));
-}
+	PatchConfigDef( StorageClientInterface* cli_, ErrorBufferInterface* errorhnd_)
+		:m_cli(cli_),m_errorhnd(errorhnd_),m_validConfigSet( getValidConfigSet(cli_)),m_oldConfig(),m_newConfig()
+	{
+		std::string oldStorageConfig = m_cli->config();
+		std::set<std::string>::const_iterator ci = m_validConfigSet.begin(), ce = m_validConfigSet.end();
+		for (; ci != ce; ++ci)
+		{
+			std::string value;
+			if (strus::extractStringFromConfigString( value, oldStorageConfig, ci->c_str(), m_errorhnd))
+			{
+				m_oldConfig[ *ci] = value;
+			}
+		}
+		if (!oldStorageConfig.empty())
+		{
+			m_errorhnd->report( ErrorCodeLogicError, _TXT("internal: inconsistency in storage config description: %s"), oldStorageConfig.c_str());
+		}
+	}
 
-static bool defineConfigPatchOp( std::string& dest, ErrorBufferInterface* errorhnd, const PatchDef& patchdef)
+	bool isValidKey( std::string& key) const
+	{
+		return m_validConfigSet.find( key) != m_validConfigSet.end();
+	}
+
+	void add( const std::string& key, const std::string& value)
+	{
+		m_oldConfig.erase( key);
+		m_newConfig[ key] = value;
+	}
+
+	void remove( const std::string& key)
+	{
+		m_oldConfig.erase( key);
+		m_newConfig.erase( key);
+	}
+
+	static std::set<std::string> getValidConfigSet( StorageClientInterface* cli_)
+	{
+		std::set<std::string> rt;
+		char const** ai = cli_->getConfigParameters();
+		for (; *ai; ++ai)
+		{
+			rt.insert( *ai);
+		}
+		return rt;
+	}
+
+	std::string tostring()
+	{
+		std::string rt;
+		std::map<std::string,std::string>::const_iterator ci = m_oldConfig.begin(), ce = m_oldConfig.end();
+		for (; ci != ce; ++ci)
+		{
+			if (strus::addConfigStringItem( rt, ci->first, ci->second, m_errorhnd)) return std::string();
+		}
+		ci = m_newConfig.begin(), ce = m_newConfig.end();
+		for (; ci != ce; ++ci)
+		{
+			if (strus::addConfigStringItem( rt, ci->first, ci->second, m_errorhnd)) return std::string();
+		}
+		return rt;
+	}
+};
+
+static bool defineConfigPatchOp( PatchConfigDef& cfg, ErrorBufferInterface* errorhnd, const PatchDef& patchdef)
 {
 	const char* context = "storage configuration";
 	if (!patchdef.from.empty())
@@ -229,10 +289,10 @@ static bool defineConfigPatchOp( std::string& dest, ErrorBufferInterface* errorh
 		case PatchDef::OpAdd:
 			if (patchdef.value.empty())
 			{
-				errorhnd->report( ErrorCodeNotFound, _TXT("value required for %s in %s"), PatchDef::opName(patchdef.op), context);
+				errorhnd->report( ErrorCodeNotFound, _TXT("value mandatory for %s in %s"), PatchDef::opName(patchdef.op), context);
 				return false;
 			}
-			setConfigPatchElement( dest, patchdef.path[0], patchdef.value);
+			cfg.add( patchdef.path[0], patchdef.value);
 			break;
 		case PatchDef::OpRemove:
 			if (!patchdef.value.empty())
@@ -240,7 +300,7 @@ static bool defineConfigPatchOp( std::string& dest, ErrorBufferInterface* errorh
 				errorhnd->report( ErrorCodeNotFound, _TXT("value not allowed for %s in %s"), PatchDef::opName(patchdef.op), context);
 				return false;
 			}
-			resetConfigPatchElement( dest, patchdef.path[0]);
+			cfg.remove( patchdef.path[0]);
 			break;
 		case PatchDef::OpReplace:
 		case PatchDef::OpCopy:
@@ -252,27 +312,16 @@ static bool defineConfigPatchOp( std::string& dest, ErrorBufferInterface* errorh
 	return true;
 }
 
-static std::set<std::string> getValidConfigSet( StorageClientInterface* cli)
-{
-	std::set<std::string> rt;
-	char const** ai = cli->getConfigParameters();
-	for (; *ai; ++ai)
-	{
-		rt.insert( *ai);
-	}
-	return rt;
-}
-
 void StorageClientImpl::patch( const ValueVariant& patchlist)
 {
 	StorageClientInterface* THIS = m_storage_impl.getObject<StorageClientInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	if (!THIS) throw strus::runtime_error( _TXT("calling storage client method after close"));
 
 	std::vector<PatchDef> patchDefList = PatchDef::parseList( patchlist);
 	std::vector<PatchDef>::iterator pi = patchDefList.begin(), pe = patchDefList.end();
 	strus::Reference<strus::StorageMetaDataTransactionInterface> transaction( THIS->createMetaDataTransaction());
-	std::string storageConfig;
-	std::set<std::string> validConfigSet = getValidConfigSet( THIS);
+	PatchConfigDef configDef( THIS, errorhnd);
 
 	for (; pi != pe; ++pi)
 	{
@@ -285,16 +334,17 @@ void StorageClientImpl::patch( const ValueVariant& patchlist)
 		{
 			if (!defineMetaDataTransactionOp( transaction.get(), errorhnd, *pi)) break;
 		}
-		else if (validConfigSet.find( pi->path[0]) != validConfigSet.end())
+		else if (configDef.isValidKey( pi->path[0]))
 		{
-			if (!defineConfigPatchOp( storageConfig, errorhnd, *pi)) break;
+			if (!defineConfigPatchOp( configDef, errorhnd, *pi)) break;
 		}
 		else
 		{
-			errorhnd->report( ErrorCodeNotImplemented, _TXT("unknown configuration variable '%s' (case sensitive)"), pi->path[0].c_str());
+			errorhnd->report( ErrorCodeNotImplemented, _TXT("unknown configuration parameter '%s' (case sensitive)"), pi->path[0].c_str());
 			break;
 		}
 	}
+
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT("failed to patch storage configuration: %s"), errorhnd->fetchError());
@@ -302,6 +352,25 @@ void StorageClientImpl::patch( const ValueVariant& patchlist)
 	if (!transaction->commit())
 	{
 		throw strus::runtime_error(_TXT("meta data transaction failed when patching storage configuration: %s"), errorhnd->fetchError());
+	}
+	strus::Reference<MetaDataReaderInterface> metadataReader( THIS->createMetaDataReader());
+	if (!metadataReader.get())
+	{
+		throw strus::runtime_error(_TXT("failed to create meta data reader: %s"), errorhnd->fetchError());
+	}
+	std::string metadatadef;
+	strus::Index ei = 0, ee = metadataReader->nofElements();
+	for (; ei != ee; ++ei)
+	{
+		if (!metadatadef.empty()) metadatadef.push_back(',');
+		metadatadef.append( strus::string_format("%s %s", metadataReader->getName(ei), metadataReader->getType(ei)));
+	}
+	configDef.add( "metadata", metadatadef);
+
+	std::string configstr = configDef.tostring();
+	if (!THIS->reload( configstr))
+	{
+		throw strus::runtime_error( "error reloading configuration: %s", errorhnd->fetchError());
 	}
 }
 
