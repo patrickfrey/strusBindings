@@ -82,7 +82,7 @@ WebRequestContext::WebRequestContext(
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(configRequestType(contextType_))
 	,m_contextType(0),m_contextName(0)
-	,m_context(),m_obj(0),m_request(0),m_method(0),m_path()
+	,m_context(),m_obj(0),m_request(0),m_methodId(Method_Undefined),m_path()
 	,m_encoding(papuga_UTF8),m_doctype(papuga_ContentType_JSON),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_UTF8),m_result_doctype(WebRequestContent::JSON)
@@ -116,7 +116,7 @@ WebRequestContext::WebRequestContext(
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(UndefinedRequest)
 	,m_contextType(0),m_contextName(0)
-	,m_context(),m_obj(0),m_request(0),m_method(method_),m_path(path_)
+	,m_context(),m_obj(0),m_request(0),m_methodId(method_?methodIdFromName(method_):Method_GET),m_path(path_)
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
@@ -141,12 +141,7 @@ WebRequestContext::WebRequestContext(
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 
-	if (!m_method)
-	{
-		m_method = "GET";
-		m_requestType = ObjectRequest;
-	}
-	else if (isEqual( m_method, "OPTIONS"))
+	if (m_methodId == Method_OPTIONS)
 	{
 		m_requestType = MethodOptionsRequest;
 	}
@@ -178,7 +173,7 @@ WebRequestContext::WebRequestContext(
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(requestType_)
 	,m_contextType(contextType_),m_contextName(contextName_)
-	,m_context(context_),m_obj(0),m_request(0),m_method(0),m_path()
+	,m_context(context_),m_obj(0),m_request(0),m_methodId(Method_Undefined),m_path()
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
@@ -198,6 +193,29 @@ WebRequestContext::~WebRequestContext()
 	m_context.reset();
 	if (m_request) papuga_destroy_Request( m_request);
 	papuga_destroy_Allocator( &m_allocator);
+}
+
+enum MethodId {
+	Method_Undefined,
+	Method_GET,
+	Method_PUT,
+	Method_POST,
+	Method_PATCH,
+	Method_DELETE,
+	Method_OPTIONS,
+	Method_HEAD
+};
+static const char* g_methodNameAr[] = {NULL, "GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS", "HEAD", 0};
+
+const char* WebRequestContext::methodIdName( const MethodId& m)
+{
+	return g_methodNameAr[ m];
+}
+WebRequestContext::MethodId WebRequestContext::methodIdFromName( const char* methodname)
+{
+	int ai = 1;
+	for (; g_methodNameAr[ai] && 0!=std::strcmp( methodname, g_methodNameAr[ai]); ++ai){}
+	return g_methodNameAr[ai] ? (MethodId)(ai) : Method_Undefined;
 }
 
 WebRequestContext* WebRequestContext::createClone( const RequestType& requestType_) const
@@ -220,7 +238,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 	{
 		if (m_contextName)
 		{
-			if (isEqual( m_method,"PUT"))
+			if (m_methodId == Method_PUT)
 			{
 				if (m_transactionRef.get())
 				{
@@ -250,7 +268,10 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					}
 				}
 			}
-			else if (isEqual( m_method,"POST"))
+			else if (m_methodId == Method_PATCH)
+			{
+			}
+			else if (m_methodId == Method_POST)
 			{
 				if (content.empty())
 				{
@@ -264,7 +285,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					return (loadConfigurationRequest( content) && setAnswerLink( m_contextType, m_contextName, 1/*link level*/));
 				}
 			}
-			else if (isEqual( m_method,"DELETE"))
+			else if (m_methodId == Method_DELETE)
 			{
 				if (content.empty())
 				{
@@ -292,7 +313,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 		}
 		else if (content.empty())
 		{
-			if (isEqual( m_method, "GET"))
+			if (m_methodId == Method_GET)
 			{
 				bool beautified = m_handler->beautifiedOutput();
 				// [2] Top level introspection without context defined:
@@ -322,7 +343,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				return false;
 			}
 		}
-		else if (isEqual( m_method, "POST"))
+		else if (m_methodId == Method_POST)
 		{
 			// [1.C] POST of configuration without name specified (name allocated by service):
 			bool rt = true;
@@ -346,7 +367,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 	{
 		if (m_obj->valuetype == papuga_TypeHostObject)
 		{
-			if (isEqual( m_method,"POST") && isEqual( m_path.rest(),"transaction"))
+			if (m_methodId == Method_POST && isEqual( m_path.rest(),"transaction"))
 			{
 				// [3.A] Call POST transaction (a method), e.g. create a new transaction
 				return executePostTransaction();
@@ -357,7 +378,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				int classid = m_obj->value.hostObject->classid;
 				void* self = m_obj->value.hostObject->data;
 
-				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, m_method, !content.empty());
+				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, methodIdName(m_methodId), !content.empty());
 				if (methoddescr)
 				{
 					return callHostObjMethodToAnswer( self, methoddescr, m_path.getRest(), content);
@@ -365,7 +386,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				//... fallback to [4]
 			}
 		}
-		else if (isEqual( m_method,"GET"))
+		else if (m_methodId == Method_GET)
 		{
 			// [3.C] Map the addressed structure that is not a host object:
 			bool beautified = m_handler->beautifiedOutput();
@@ -379,7 +400,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 			// [4.A] Execute schema in context with content:
 			return initContentSchemaAutomaton( getSchemaId()) && executeContentSchemaAutomaton( content);
 		}
-		else if (isEqual( m_method, "GET"))
+		else if (m_methodId == Method_GET)
 		{
 			// [4.B] List variables when no main object with introspection method defined (section [3.B]):
 			return executeListVariables();

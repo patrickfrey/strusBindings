@@ -41,15 +41,15 @@ static inline bool startsWith( const char* name, const char* oth, std::size_t ot
 	return name[0] == oth[0] && 0==std::memcmp(name,oth,othlen);
 }
 
-WebRequestContext::SchemaId WebRequestContext::getSchemaId( const char* contextType_, const char* method_)
+WebRequestContext::SchemaId WebRequestContext::getSchemaId( const char* contextType_, WebRequestContext::MethodId methodId_)
 {
-	if (isEqual( method_, "POST") || isEqual( method_, "PUT") || startsWith( method_, "DELETE_", 7))
+	if (methodId_ == Method_POST || methodId_ == Method_PUT || methodId_ == Method_DELETE)
 	{
-		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, method_, '/', contextType_));
+		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, methodIdName(methodId_), '/', contextType_));
 	}
 	else
 	{
-		return SchemaId( contextType_, method_);
+		return SchemaId( contextType_, methodIdName(methodId_));
 	}
 }
 
@@ -58,17 +58,54 @@ WebRequestContext::SchemaId WebRequestContext::getSchemaId()
 	if (m_path.hasMore())
 	{
 		const char* pt = m_path.getRest();
-		return SchemaId( m_contextType, concatSchemaName( &m_allocator, m_method, '~', pt));
+		return SchemaId( m_contextType, concatSchemaName( &m_allocator, methodIdName(m_methodId), '~', pt));
 	}
 	else
 	{
-		return getSchemaId( m_contextType, m_method);
+		return getSchemaId( m_contextType, m_methodId);
 	}
 }
 
 WebRequestContext::SchemaId WebRequestContext::getSchemaId_updateConfiguration( const char* contextType_)
 {
 	return SchemaId( contextType_, "PUT");
+}
+
+WebRequestContext::SchemaId WebRequestContext::getSchemaId_deleteConfiguration( const char* contextType_, const char* createConfigurationMethod)
+{
+	char mbuf[ 32];
+	std::snprintf( mbuf, sizeof(mbuf), "DELETE_%s", createConfigurationMethod);
+	mbuf[ sizeof( mbuf)-1] = 0;
+	return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, mbuf, '/', contextType_));
+}
+
+WebRequestContext::SchemaId WebRequestContext::getSchemaId_description()
+{
+	const char* mt = m_path.getNext();
+	if (!mt)
+	{
+		setAnswer( ErrorCodeIncompleteRequest, _TXT("method not defined in schema description request"));
+		return WebRequestContext::SchemaId();
+	}
+	const char* ct = m_path.getNext();
+	if (!ct)
+	{
+		setAnswer( ErrorCodeIncompleteRequest, _TXT("context type not defined in schema description request"));
+		return WebRequestContext::SchemaId();
+	}
+	if (m_path.hasMore())
+	{
+		const char* pt = m_path.getRest();
+		return SchemaId( ct, concatSchemaName( &m_allocator, mt, '~', pt));
+	}
+	if (0==std::memcmp(mt,"DELETE_",7) || 0==std::strcmp(mt,"POST") || 0==std::strcmp(mt,"PUT") || 0==std::strcmp(mt,"DELETE"))
+	{
+		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, mt, '/', ct));
+	}
+	else
+	{
+		return SchemaId( ct, mt);
+	}
 }
 
 bool WebRequestContext::hasContentSchemaAutomaton( const SchemaId& schemaid)

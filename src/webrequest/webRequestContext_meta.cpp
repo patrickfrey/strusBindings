@@ -50,62 +50,57 @@ bool WebRequestContext::executeListVariables()
 
 bool WebRequestContext::executeSchemaDescription()
 {
-	if (isEqual( m_method,"GET"))
+	if (m_methodId == Method_GET)
 	{
-		m_method = m_path.getNext();
-		if (!m_method)
+		SchemaId schemaId = getSchemaId_description();
+
+		if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+		{
+			m_logger->logRequestType( "schema", "GET", schemaId.contextType, schemaId.schemaName);
+		}
+		const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), schemaId.contextType, schemaId.schemaName);
+		if (!descr)
 		{
 			setAnswer( ErrorCodeRequestResolveError);
 			return false;
 		}
-	}
-	else
-	{
-		setAnswer( ErrorCodeRequestResolveError);
-		return false;
-	}
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-	{
-		m_logger->logRequestType( "schema", m_method, m_contextType, m_contextName);
-	}
-	SchemaId schemaId = getSchemaId();
-	const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), schemaId.contextType, schemaId.schemaName);
-	if (!descr)
-	{
-		setAnswer( ErrorCodeRequestResolveError);
-		return false;
-	}
-	else
-	{
-		papuga_ContentType schema_doctype = papuga_ContentType_Unknown;
-		switch (m_result_doctype)
-		{
-			case WebRequestContent::Unknown:
-			case WebRequestContent::HTML:
-			case WebRequestContent::TEXT:
-				setAnswer( ErrorCodeNotImplemented);
-				return false;
-			case WebRequestContent::JSON:
-				schema_doctype = papuga_ContentType_JSON;
-				break;
-			case WebRequestContent::XML:
-				schema_doctype = papuga_ContentType_XML;
-				break;
-		}
-		std::size_t txtlen;
-		const char* txt = (const char*)papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding, &txtlen);
-		if (txt)
-		{
-			WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, txtlen);
-			m_answer.setContent( answerContent);
-			return true;
-		}
 		else
 		{
-			papuga_ErrorCode errcode = papuga_SchemaDescription_last_error( descr);
-			setAnswer( papugaErrorToErrorCode( errcode));
-			return false;
+			papuga_ContentType schema_doctype = papuga_ContentType_Unknown;
+			switch (m_result_doctype)
+			{
+				case WebRequestContent::Unknown:
+				case WebRequestContent::HTML:
+				case WebRequestContent::TEXT:
+					setAnswer( ErrorCodeNotImplemented);
+					return false;
+				case WebRequestContent::JSON:
+					schema_doctype = papuga_ContentType_JSON;
+					break;
+				case WebRequestContent::XML:
+					schema_doctype = papuga_ContentType_XML;
+					break;
+			}
+			std::size_t txtlen;
+			const char* txt = (const char*)papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding, &txtlen);
+			if (txt)
+			{
+				WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, txtlen);
+				m_answer.setContent( answerContent);
+				return true;
+			}
+			else
+			{
+				papuga_ErrorCode errcode = papuga_SchemaDescription_last_error( descr);
+				setAnswer( papugaErrorToErrorCode( errcode));
+				return false;
+			}
 		}
+	}
+	else
+	{
+		setAnswer( ErrorCodeRequestResolveError);
+		return false;
 	}
 }
 
@@ -116,7 +111,7 @@ bool WebRequestContext::executeOPTIONS()
 
 	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
 	{
-		m_logger->logRequestType( "options", m_method, m_contextType, m_contextName);
+		m_logger->logRequestType( "options", methodIdName(m_methodId), m_contextType, m_contextName);
 	}
 	if (m_obj && m_obj->valuetype == papuga_TypeHostObject)
 	{

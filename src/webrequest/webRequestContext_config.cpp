@@ -45,7 +45,7 @@ bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& cont
 	{
 		m_logger->logAction( m_contextType, m_contextName, "load embedded configuration");
 	}
-	if (!initContentSchemaAutomaton( getSchemaId( m_contextType, "PUT"))) return false;
+	if (!initContentSchemaAutomaton( getSchemaId( m_contextType, Method_PUT))) return false;
 	if (!executeContentSchemaAutomaton( content)) return false;
 	return true;
 }
@@ -58,7 +58,7 @@ bool WebRequestContext::initConfigurationRequest( const WebRequestContent& conte
 		return false;
 	}
 	std::string configstr = webRequestContent_tostring( content);
-	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, configstr);
+	ConfigurationDescription cfgdescr( m_contextType, m_contextName, methodIdName(m_methodId), configstr);
 	if (update)
 	{
 		m_configHandler->storeConfigurationReplace( m_configTransaction, cfgdescr);
@@ -139,8 +139,7 @@ bool WebRequestContext::deleteConfigurationRequest()
 		ConfigurationDescription config = m_configHandler->getStoredConfigurationFromFile( cfgFileName);
 		if (config.valid())
 		{
-			std::string deleteMethodName = std::string( "DELETE_") + config.method;
-			SchemaId schemaid = getSchemaId( m_contextType, deleteMethodName.c_str());
+			SchemaId schemaid = getSchemaId_deleteConfiguration( m_contextType, config.method.c_str());
 			if (!initRootObject()) return false;
 			if (papuga_RequestHandler_get_automaton( m_handler->impl(), schemaid.contextType, schemaid.schemaName))
 			{

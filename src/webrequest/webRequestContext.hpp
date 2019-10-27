@@ -91,11 +91,15 @@ private:
 		const char* schemaName;
 
 		SchemaId()
-			:contextType(""),schemaName(ROOT_CONTEXT_NAME){}
+			:contextType(0),schemaName(0){}
 		SchemaId( const char* contextType_, const char* schemaName_)
 			:contextType(contextType_),schemaName(schemaName_){}
 		SchemaId( const SchemaId& o)
 			:contextType(o.contextType),schemaName(o.schemaName){}
+		bool defined() const
+		{
+			return contextType && schemaName;
+		}
 	};
 
 public:/*WebRequestContext*/
@@ -117,6 +121,20 @@ private:
 
 	/// \brief Constructor of a clone with a reset state for the execution of schemas to process the delegate request results
 	WebRequestContext* createClone( const RequestType& requestType_) const;
+
+private:
+	enum MethodId {
+		Method_Undefined,
+		Method_GET,
+		Method_PUT,
+		Method_POST,
+		Method_PATCH,
+		Method_DELETE,
+		Method_OPTIONS,
+		Method_HEAD
+	};
+	static const char* methodIdName( const MethodId& m);
+	static MethodId methodIdFromName( const char* methodname);
 
 private:
 	// Implemented in webRequestContext:
@@ -157,9 +175,13 @@ private:
 	/// \brief Get the schema identifier specified by context
 	SchemaId getSchemaId();
 	/// \brief Get the schema identifier specified by arguments
-	SchemaId getSchemaId( const char* contextType_, const char* method_);
+	SchemaId getSchemaId( const char* contextType_, MethodId methodid_);
 	/// \brief Get the schema identifier for a configuration update request
 	static SchemaId getSchemaId_updateConfiguration( const char* contextType_);
+	/// \brief Evaluate if a schema exists
+	SchemaId getSchemaId_deleteConfiguration( const char* contextType_, const char* createConfigurationMethod);
+	/// \brief Evaluate schema for schema description query
+	SchemaId getSchemaId_description();
 	/// \brief Evaluate if a schema exists
 	bool hasContentSchemaAutomaton( const SchemaId& schemaid);
 	/// \brief Initialization of the automaton for a schema request
@@ -255,7 +277,7 @@ private:
 	PapugaContextRef m_context;		//< context reference
 	const papuga_ValueVariant* m_obj;	//< pointer to object in context selected
 	papuga_Request* m_request;		//< request data for papuga
-	const char* m_method;			//< request method
+	MethodId m_methodId;			//< request method enum id
 	PathBuf m_path;				//< iterator on path of the request
 	papuga_StringEncoding m_encoding;	//< character set encoding of the request
 	papuga_ContentType m_doctype;		//< document class of the request

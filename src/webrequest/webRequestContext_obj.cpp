@@ -173,7 +173,7 @@ bool WebRequestContext::initRequestObject()
 						return false;
 					}
 					m_obj = papuga_RequestContext_get_variable( m_context.get(), varnam);
-					if (!isEqual(m_method,"GET"))
+					if (m_methodId != Method_GET)
 					{
 						setAnswer( ErrorCodeRequestResolveError);
 						return false;
