@@ -47,66 +47,89 @@ static std::string getConfigFilenamePart( const std::string& filename, int pi)
 
 ConfigurationHandler::ConfigurationHandler(
 		WebRequestLoggerInterface* logger_,
-		const std::string& config_store_dir_,
-		const std::string& service_name_,
-		const char** context_typenames)
+		const std::string& configStoreDir_,
+		const std::string& serviceName_,
+		const char** contextTypeNames_)
 	:m_mutex()
 	,m_logger(logger_)
-	,m_config_store_dir(config_store_dir_)
-	,m_service_name(service_name_)
-	,m_config_counter(0)
+	,m_configStoreDir(configStoreDir_)
+	,m_serviceName(serviceName_)
+	,m_configCounter(0)
 {
-	char const** ci = context_typenames;
-	for (; *ci; ++ci) m_context_typenames.insert( std::string(*ci));
+	m_lastTimeStmp[0] = 0;
+	char const** ci = contextTypeNames_;
+	for (; *ci; ++ci) m_contextTypeNames.insert( std::string(*ci));
 }
 
 std::string ConfigurationHandler::configurationStoreDirectory() const
 {
-	std::string cfgdir = strus::joinFilePath( m_config_store_dir, m_service_name);
+	std::string cfgdir = strus::joinFilePath( m_configStoreDir, m_serviceName);
 	if (cfgdir.empty()) throw std::bad_alloc();
 	return cfgdir;
+}
+
+std::string ConfigurationHandler::newConfigStorageFilename( const ConfigurationDescription& config)
+{
+	char timebuf[ 16];
+	char idxbuf[ 16];
+	time_t timer;
+	struct tm* tm_info;
+	
+	time( &timer);
+	tm_info = localtime( &timer);
+
+	std::strftime( timebuf, sizeof(timebuf), "%Y%m%d_%H%M%S", tm_info);
+
+	strus::unique_lock lock( m_mutex);
+	if (m_lastTimeStmp != timebuf)
+	{
+		m_configCounter = 0;
+		std::memcpy( m_lastTimeStmp, timebuf, sizeof(m_lastTimeStmp));
+	}
+	std::snprintf( idxbuf, sizeof(idxbuf), "%03d", m_configCounter++);
+	return strus::string_format( "%s_%s.%s.%s.%s.conf", timebuf, idxbuf, config.method.c_str(), config.type.c_str(), config.name.c_str());
+}
+
+ConfigurationTransaction ConfigurationHandler::newConfigurationTransaction( const ConfigurationDescription& config, const std::string& filename)
+{
+	ConfigurationTransaction rt;
+	std::string cfgdir = configurationStoreDirectory();
+	rt.type = config.type;
+	rt.name = config.name;
+	rt.filename = strus::joinFilePath( cfgdir, filename);
+	if (rt.filename.empty()) throw std::bad_alloc();
+	rt.failed_filename = rt.filename + ".failed";
+
+	int ec = strus::writeFile( rt.failed_filename, config.contentbuf);
+	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to store configuration file '%s'"), rt.filename.c_str());
+	return rt;
 }
 
 void ConfigurationHandler::storeConfiguration(
 		ConfigurationTransaction& transaction,
 		const ConfigurationDescription& config)
 {
-	strus::unique_lock lock( m_mutex);
-	char timebuf[ 256];
-	char idxbuf[ 32];
-	time_t timer;
-	struct tm* tm_info;
-	
-	time( &timer);
-	tm_info = localtime( &timer);
-	WebRequestContent::Type doctype = webRequestContentFromTypeName( config.doctype.c_str());
-	if (doctype == WebRequestContent::Unknown) throw strus::runtime_error( _TXT("unknown content type of configuration"));
-	const char* doctypeName = WebRequestContent::typeName( doctype);
-
-	std::strftime( timebuf, sizeof(timebuf), "%Y%m%d_%H%M%S", tm_info);
-	std::snprintf( idxbuf, sizeof(idxbuf), "%03d", m_config_counter++);
-	if (m_config_counter == MaxConfigCounter) m_config_counter = 0;
-
-	std::string filename = strus::string_format( "%s_%s.%s.%s.%s.%s.conf", timebuf, idxbuf, doctypeName, config.method.c_str(), config.type.c_str(), config.name.c_str());
 	std::string cfgdir = configurationStoreDirectory();
-	transaction.type = config.type;
-	transaction.name = config.name;
-	transaction.filename = strus::joinFilePath( cfgdir, filename);
-	if (transaction.filename.empty()) throw std::bad_alloc();
-	transaction.failed_filename = transaction.filename + ".failed";
 	int ec = strus::mkdirp( cfgdir);
-	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to create configuration store directory '%s'"), cfgdir.c_str());
+	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to create configuration store directory '%s': %s"), cfgdir.c_str(), ::strerror(ec));
 
-	ec = strus::writeFile( transaction.failed_filename, config.contentbuf);
-	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to store configuration file '%s'"), transaction.filename.c_str());
+	std::string filename = newConfigStorageFilename( config);
+	transaction = newConfigurationTransaction( config, filename);
+}
+
+void ConfigurationHandler::storeConfigurationReplace(
+		ConfigurationTransaction& transaction,
+		const ConfigurationDescription& config)
+{
+	std::string filename = getStoredConfigurationFile( config.type.c_str(), config.name.c_str());
+	transaction = newConfigurationTransaction( config, filename);
 }
 
 void ConfigurationHandler::commitStoreConfiguration(
 		const ConfigurationTransaction& transaction)
 {
-	strus::unique_lock lock( m_mutex);
-
 	ContextNameDef namedef( transaction.type, transaction.name);
+	strus::unique_lock lock( m_mutex);
 	m_contextNameMap.insert( ContextNameMap::value_type( namedef, false));
 
 	int ec = strus::renameFile( transaction.failed_filename, transaction.filename);
@@ -122,8 +145,6 @@ void ConfigurationHandler::deleteStoredConfiguration(
 		const char* contextType,
 		const char* contextName)
 {
-	strus::unique_lock lock( m_mutex);
-
 	std::string fileext = strus::string_format( ".%s.%s.conf", contextType, contextName);
 	std::vector<std::string> files;
 	std::string cfgdir = configurationStoreDirectory();
@@ -138,6 +159,7 @@ void ConfigurationHandler::deleteStoredConfiguration(
 		if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
 	}
 	ContextNameDef namedef( contextType, contextName);
+	strus::unique_lock lock( m_mutex);
 	m_contextNameMap.erase( namedef);
 }
 
@@ -146,7 +168,6 @@ void ConfigurationHandler::clearUnfinishedTransactions()
 	std::string cfgdir = configurationStoreDirectory();
 	if (strus::isDir( cfgdir))
 	{
-		strus::unique_lock lock( m_mutex);
 		std::string fileext = strus::string_format( ".conf.failed");
 		std::vector<std::string> files;
 		int ec = strus::readDirFiles( cfgdir, fileext, files);
@@ -162,37 +183,52 @@ void ConfigurationHandler::clearUnfinishedTransactions()
 	}
 }
 
-ConfigurationDescription ConfigurationHandler::getStoredConfiguration(
-		const char* contextType,
-		const char* contextName)
+std::string ConfigurationHandler::getStoredConfigurationFile( const char* contextType, const char* contextName)
 {
 	std::string cfgdir = configurationStoreDirectory();
 
 	strus::unique_lock lock( m_mutex);
 	std::vector<std::string> configFileNames;
 
-	int ec = strus::readDirFiles( cfgdir, ".conf", configFileNames);
+	std::string fileext = strus::string_format( ".%s.%s.conf", contextType, contextName);
+
+	int ec = strus::readDirFiles( cfgdir, fileext.c_str(), configFileNames);
 	if (ec) throw strus::runtime_error_ec( ec, _TXT("error loading stored configuration: %s"), std::strerror(ec));
 
 	std::sort( configFileNames.begin(), configFileNames.end(), greater());
-	std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
-	for (; ci != ce; ++ci)
-	{
-		std::string doctype = getConfigFilenamePart( *ci, 1);
-		if (doctype.empty()) continue;
-		std::string candidateContextType = getConfigFilenamePart( *ci, 3);
-		std::string candidateContextName = getConfigFilenamePart( *ci, 4);
-		if (candidateContextType != contextType || candidateContextName != contextName) continue;
-		std::string date = getConfigFilenamePart( *ci, 0);
-		std::string method = getConfigFilenamePart( *ci, 2);
-		std::string filepath = strus::joinFilePath( cfgdir, *ci);
-		std::string contentbuf;
-		ec = strus::readFile( filepath, contentbuf);
-		if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
+	return configFileNames.empty() ? std::string() : *configFileNames.begin();
+}
 
-		return ConfigurationDescription( contextType, contextName, method, doctype, contentbuf);
+static WebRequestContent::Type detectContentType( const std::string& content)
+{
+	char const* ci = content.c_str();
+	while (*ci && (unsigned char)*ci <= 32) ++ci;
+	switch (*ci)
+	{
+		case '<': return WebRequestContent::XML;
+		case '{': return WebRequestContent::JSON;
+		default: return WebRequestContent::Unknown;
 	}
-	return ConfigurationDescription();
+}
+
+WebRequestContent::Type ConfigurationDescription::evalDoctype( const std::string& content)
+{
+	return detectContentType( content);
+}
+
+ConfigurationDescription ConfigurationHandler::getStoredConfigurationFromFile( const std::string& filename)
+{
+	std::string cfgdir = configurationStoreDirectory();
+	std::string method = getConfigFilenamePart( filename, 1);
+	std::string contextType = getConfigFilenamePart( filename, 2);
+	std::string contextName = getConfigFilenamePart( filename, 3);
+	std::string filepath = strus::joinFilePath( cfgdir, filename);
+
+	std::string contentbuf;
+	int ec = strus::readFile( filepath, contentbuf);
+	if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
+
+	return ConfigurationDescription( contextType, contextName, method, contentbuf);
 }
 
 std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurations( bool doDeleteObsolete)
@@ -200,46 +236,40 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getStoredConfigurati
 	std::string cfgdir = configurationStoreDirectory();
 	std::vector<ConfigurationDescription> rt;
 
-	if (strus::isDir( cfgdir))
+	if (!strus::isDir( cfgdir)) return rt;
+
+	typedef std::pair<std::string,std::string> ConfigItem;
+	std::set<ConfigItem> configItemSet;
+	std::vector<std::string> configFileNames;
+
+	int ec = strus::readDirFiles( cfgdir, ".conf", configFileNames);
+	if (ec) throw strus::runtime_error_ec( ec, _TXT("error loading stored configuration in %s"), cfgdir.c_str());
+
+	std::sort( configFileNames.begin(), configFileNames.end(), greater());
+	std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
+	for (; ci != ce; ++ci)
 	{
-		strus::unique_lock lock( m_mutex);
+		std::string method = getConfigFilenamePart( *ci, 1);
+		std::string contextType = getConfigFilenamePart( *ci, 2);
+		std::string contextName = getConfigFilenamePart( *ci, 3);
+		std::string filepath = strus::joinFilePath( cfgdir, *ci);
 
-		typedef std::pair<std::string,std::string> ConfigItem;
-		std::set<ConfigItem> configItemSet;
-		std::vector<std::string> configFileNames;
-
-		int ec = strus::readDirFiles( cfgdir, ".conf", configFileNames);
-		if (ec) throw strus::runtime_error_ec( ec, _TXT("error loading stored configuration in %s"), cfgdir.c_str());
-	
-		std::sort( configFileNames.begin(), configFileNames.end(), greater());
-		std::vector<std::string>::const_iterator ci = configFileNames.begin(), ce = configFileNames.end();
-		for (; ci != ce; ++ci)
+		if (!configItemSet.insert( ConfigItem( contextType, contextName)).second)
 		{
-			std::string doctype = getConfigFilenamePart( *ci, 1);
-			if (doctype.empty()) continue;
-			std::string method = getConfigFilenamePart( *ci, 2);
-			std::string contextType = getConfigFilenamePart( *ci, 3);
-			std::string contextName = getConfigFilenamePart( *ci, 4);
-			std::string date = getConfigFilenamePart( *ci, 0);
-			std::string filepath = strus::joinFilePath( cfgdir, *ci);
-	
-			if (!configItemSet.insert( ConfigItem( contextType, contextName)).second)
+			if (doDeleteObsolete)
 			{
-				if (doDeleteObsolete)
-				{
-					ec = strus::removeFile( filepath, true);
-					if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
-				}
-				continue;
+				ec = strus::removeFile( filepath, true);
+				if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to remove file %s: %s"), filepath.c_str(), std::strerror(ec));
 			}
-			std::string contentbuf;
-			ec = strus::readFile( filepath, contentbuf);
-			if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
-	
-			rt.push_back( ConfigurationDescription( contextType, contextName, method, doctype, contentbuf));
+			continue;
 		}
-		std::reverse( rt.begin(), rt.end());
+		std::string contentbuf;
+		ec = strus::readFile( filepath, contentbuf);
+		if (ec) throw strus::runtime_error_ec( ec, _TXT("error reading stored configuration file %s: %s"), filepath.c_str(), std::strerror(ec));
+
+		rt.push_back( ConfigurationDescription( contextType, contextName, method, contentbuf));
 	}
+	std::reverse( rt.begin(), rt.end());
 	return rt;
 }
 
@@ -315,8 +345,7 @@ static ConfigurationDescription createSubConfig( const std::string& name, papuga
 					papuga_UTF8, true/*beautyfied*/, NULL/*rootname*/, NULL/*elemname*/,
 					&subcfglen, &errcode);
 	if (!subcfgstr) throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to load sub configuration"));
-	const char* doctype = WebRequestContent::typeName( WebRequestContent::JSON);
-	return ConfigurationDescription( name, subconfidid.empty() ? name : subconfidid, std::string()/*method*/, doctype, std::string(subcfgstr, subcfglen));
+	return ConfigurationDescription( name, subconfidid.empty() ? name : subconfidid, std::string()/*method*/, std::string(subcfgstr, subcfglen));
 }
 
 std::vector<ConfigurationDescription> ConfigurationHandler::getSubConfigurations( const std::string& configstr)
@@ -353,7 +382,7 @@ std::vector<ConfigurationDescription> ConfigurationHandler::getSubConfigurations
 					{
 						char nambuf[ 128];
 						const char* nam = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), papuga_SerializationIter_value( &seriter), 0/*non ascii subst*/);
-						if (nam && m_context_typenames.find( nam) != m_context_typenames.end())
+						if (nam && m_contextTypeNames.find( nam) != m_contextTypeNames.end())
 						{
 							papuga_SerializationIter_skip( &seriter);
 							rt.push_back( createSubConfig( nam, allocator, seriter));

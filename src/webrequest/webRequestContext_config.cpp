@@ -50,7 +50,7 @@ bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& cont
 	return true;
 }
 
-bool WebRequestContext::initConfigurationRequest( const WebRequestContent& content)
+bool WebRequestContext::initConfigurationRequest( const WebRequestContent& content, bool update)
 {
 	if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
 	{
@@ -58,8 +58,15 @@ bool WebRequestContext::initConfigurationRequest( const WebRequestContent& conte
 		return false;
 	}
 	std::string configstr = webRequestContent_tostring( content);
-	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, content.doctype(), configstr);
-	m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
+	ConfigurationDescription cfgdescr( m_contextType, m_contextName, m_method, configstr);
+	if (update)
+	{
+		m_configHandler->storeConfigurationReplace( m_configTransaction, cfgdescr);
+	}
+	else
+	{
+		m_configHandler->storeConfiguration( m_configTransaction, cfgdescr);
+	}
 	if (0!=(m_logMask & WebRequestLoggerInterface::LogConfiguration))
 	{
 		m_logger->logPutConfiguration( m_contextType, m_contextName, configstr);
@@ -69,7 +76,7 @@ bool WebRequestContext::initConfigurationRequest( const WebRequestContent& conte
 
 bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& content)
 {
-	if (!initConfigurationRequest( content)) return false;
+	if (!initConfigurationRequest( content, false/*no update, new*/)) return false;
 	SchemaId schemaid = getSchemaId();
 	if (!initRootObject()) return false;
 	if (!initContentSchemaAutomaton( schemaid)) return false;
@@ -79,7 +86,7 @@ bool WebRequestContext::loadConfigurationRequest( const WebRequestContent& conte
 
 bool WebRequestContext::updateConfigurationRequest( const WebRequestContent& content)
 {
-	if (!initConfigurationRequest( content)) return false;
+	if (!initConfigurationRequest( content, true/*update*/)) return false;
 	SchemaId schemaid = getSchemaId_updateConfiguration( m_contextType);
 	if (hasContentSchemaAutomaton( schemaid))
 	{
@@ -126,38 +133,39 @@ bool WebRequestContext::deleteConfigurationRequest()
 	{
 		m_logger->logAction( m_contextType, m_contextName, "removed");
 	}
-	ConfigurationDescription config = m_configHandler->getStoredConfiguration( m_contextType, m_contextName);
-	if (config.valid())
+	std::string cfgFileName = m_configHandler->getStoredConfigurationFile( m_contextType, m_contextName);
+	if (!cfgFileName.empty())
 	{
-		std::string deleteMethodName = std::string( "DELETE_") + config.method;
-		SchemaId schemaid = getSchemaId( m_contextType, deleteMethodName.c_str());
-		if (!initRootObject()) return false;
-		if (papuga_RequestHandler_get_automaton( m_handler->impl(), schemaid.contextType, schemaid.schemaName))
+		ConfigurationDescription config = m_configHandler->getStoredConfigurationFromFile( cfgFileName);
+		if (config.valid())
 		{
-			WebRequestContent content( "UTF-8", config.doctype.c_str(), config.contentbuf.c_str(), config.contentbuf.size());
-			if (!initContentType( content)) return false;
-			if (!initContentSchemaAutomaton( schemaid)) return false;
-			if (!executeContentSchemaAutomaton( content)) return false;
-			if (hasContentRequestDelegateRequests())
+			std::string deleteMethodName = std::string( "DELETE_") + config.method;
+			SchemaId schemaid = getSchemaId( m_contextType, deleteMethodName.c_str());
+			if (!initRootObject()) return false;
+			if (papuga_RequestHandler_get_automaton( m_handler->impl(), schemaid.contextType, schemaid.schemaName))
 			{
-				if (!!(m_logMask & WebRequestLoggerInterface::LogWarning))
+				WebRequestContent content( "UTF-8", WebRequestContent::typeName(config.doctype), config.contentbuf.c_str(), config.contentbuf.size());
+				if (!initContentType( content)) return false;
+				if (!initContentSchemaAutomaton( schemaid)) return false;
+				if (!executeContentSchemaAutomaton( content)) return false;
+				if (hasContentRequestDelegateRequests())
 				{
-					m_logger->logWarning( _TXT("delete configuration schema with delegate requests that are ignored"));
+					if (!!(m_logMask & WebRequestLoggerInterface::LogWarning))
+					{
+						m_logger->logWarning( _TXT("delete configuration schema with delegate requests that are ignored"));
+					}
 				}
 			}
+			m_configHandler->deleteStoredConfiguration( config.type.c_str(), config.name.c_str());
+			if (!!(m_logMask & WebRequestLoggerInterface::LogAction))
+			{
+				m_logger->logAction( config.type.c_str(), config.name.c_str(), _TXT("deleted configurations stored"));
+			}
+			m_answer.setHttpStatus( 204/*no content*/);
+			return true;
 		}
-		m_configHandler->deleteStoredConfiguration( config.type.c_str(), config.name.c_str());
-		if (!!(m_logMask & WebRequestLoggerInterface::LogAction))
-		{
-			m_logger->logAction( config.type.c_str(), config.name.c_str(), _TXT("deleted configurations stored"));
-		}
-		m_answer.setHttpStatus( 204/*no content*/);
-		return true;
 	}
-	else
-	{
-		setAnswer( ErrorCodeRequestResolveError);
-		return false;
-	}
+	setAnswer( ErrorCodeRequestResolveError);
+	return false;
 }
 

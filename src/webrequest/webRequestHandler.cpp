@@ -769,7 +769,8 @@ bool WebRequestHandler::loadSubConfiguration( const ConfigurationDescription& cf
 			: _TXT("error creating context for restoring context"));
 		return false;
 	}
-	strus::WebRequestContent subcontent( g_config_charset, cfg.doctype.c_str(), cfg.contentbuf.c_str(), cfg.contentbuf.size());
+	const char* doctype = WebRequestContent::typeName(cfg.doctype);
+	WebRequestContent subcontent( g_config_charset, doctype, cfg.contentbuf.c_str(), cfg.contentbuf.size());
 	if (!runConfigurationLoad( ctxi, subcontent, answer))
 	{
 		answer.explain( initload

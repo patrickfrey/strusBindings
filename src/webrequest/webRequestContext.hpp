@@ -165,14 +165,17 @@ private:
 	/// \brief Initialization of the automaton for a schema request
 	bool initContentSchemaAutomaton( const SchemaId& schemaid);
 	/// \brief Execute the schema request initialized
+	/// \param[in] content web request content
 	bool executeContentSchemaAutomaton( const WebRequestContent& content);
 		/// \brief Helper of executeContentSchemaAutomaton, initialize the request
 		bool initContentSchemaRequest();
 		/// \brief Helper of executeContentSchemaAutomaton, feed the content to the request
+		/// \param[in] content web request content
 		bool feedContentSchemaRequest( const WebRequestContent& content);
 		/// \brief Do inherit context operations
 		bool inheritContentSchemaRequestContext();
 		/// \brief Execute calls of the request within the context 
+		/// \param[in] content web request content
 		bool executeContentSchemaCalls( const WebRequestContent& content);
 
 	// Implemented in webRequestContext_env:
@@ -181,14 +184,19 @@ private:
 
 	// Implemented in webRequestContext_error:
 	/// \brief Report an error in a schema request
+	/// \param[in] content web request content
 	void reportRequestError( const papuga_RequestError& reqerr, const WebRequestContent& content);
 
 	// Implemented in webRequestContext_result:
 	/// \brief Get a pointer to the result string or a delegate request content string of a schema request result
+	/// \param[in] result structure of the request result or of a delegate request
+	/// \param[out] resultlen length of returned result string in bytes
+	/// \param[out] errcode in case of error, untouched else
 	const char* getResultString( papuga_RequestResult* result, std::size_t& resultlen, papuga_ErrorCode& errcode);
 	/// \brief Initialize the result of a content request
 	bool getContentRequestResult();
 	/// \brief Initialize the list of delegate requests of a content request
+	/// \param[out] delegateRequests list of delegate requests
 	bool getContentRequestDelegateRequests( std::vector<WebRequestDelegateRequest>& delegateRequests);
 	/// \brief Evaluate if there are delegate requests in a content request
 	bool hasContentRequestDelegateRequests() const;
@@ -211,16 +219,22 @@ private:
 
 	// Implemented in webRequestContext_config:
 	/// \brief Load main configuration in the initialization phase of the service
+	/// \param[in] content web request content
 	bool loadMainConfiguration( const WebRequestContent& content);
 	/// \brief Load a configuration embedded in the configuration file loaded in the initialization phase of the service
 	bool loadEmbeddedConfiguration( const WebRequestContent& content);
 	/// \brief Helper of loadConfigurationRequest or updateConfigurationRequest, initiate the configuration request
-	bool initConfigurationRequest( const WebRequestContent& content);
+	/// \param[in] content web request content
+	/// \param[in] update, true if the configuration is written to file as update, e.g. overwriting initial version, keeping its file name, or is written as a new file
+	bool initConfigurationRequest( const WebRequestContent& content, bool update);
 	/// \brief Load configuration request for a not yet existing object
+	/// \param[in] content web request content
 	bool loadConfigurationRequest( const WebRequestContent& content);
 	/// \brief Update configuration request for an existing object
+	/// \param[in] content web request content
 	bool updateConfigurationRequest( const WebRequestContent& content);
 	/// \brief Retry of an update configuration request with exclusive access on data, rejected before with ErrorCodeServiceNeedExclusiveAccess due to the exclusive flag set in the automaton definition
+	/// \param[in] content web request content
 	bool updateConfigurationRequest_retry( const WebRequestContent& content);
 	/// \brief Delete configuration request
 	bool deleteConfigurationRequest();

@@ -11,6 +11,7 @@
 #define _STRUS_CONFIGURATION_HANDLER_IMPL_HPP_INCLUDED
 #include "strus/base/thread.hpp"
 #include "strus/base/fileio.hpp"
+#include "strus/webRequestContent.hpp"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -30,22 +31,24 @@ struct ConfigurationDescription
 	std::string type;
 	std::string name;
 	std::string method;
-	std::string doctype;
+	WebRequestContent::Type doctype;
 	std::string contentbuf;
+
+	static WebRequestContent::Type evalDoctype( const std::string& content);
 
 	ConfigurationDescription()
 		:type(),name(),doctype(),contentbuf(){}
-	ConfigurationDescription( const std::string& type_, const std::string& name_, const std::string& method_, const std::string& doctype_, const std::string& contentbuf_)
-		:type(type_),name(name_),method(method_),doctype(doctype_),contentbuf(contentbuf_){}
+	ConfigurationDescription( const std::string& type_, const std::string& name_, const std::string& method_, const std::string& contentbuf_)
+		:type(type_),name(name_),method(method_),doctype(evalDoctype(contentbuf_)),contentbuf(contentbuf_){}
 	ConfigurationDescription( const ConfigurationDescription& o)
 		:type(o.type),name(o.name),method(o.method),doctype(o.doctype),contentbuf(o.contentbuf){}
 	ConfigurationDescription& operator=( const ConfigurationDescription& o)
 		{type=o.type;name=o.name;method=o.method,doctype=o.doctype;contentbuf=o.contentbuf; return *this;}
 #if __cplusplus >= 201103L
 	ConfigurationDescription( ConfigurationDescription&& o)
-		:type(std::move(o.type)),name(std::move(o.name)),method(std::move(o.method)),doctype(std::move(o.doctype)),contentbuf(std::move(o.contentbuf)){}
+		:type(std::move(o.type)),name(std::move(o.name)),method(std::move(o.method)),doctype(o.doctype),contentbuf(std::move(o.contentbuf)){}
 	ConfigurationDescription& operator=( ConfigurationDescription&& o)
-		{type=std::move(o.type);name=std::move(o.name);method=std::move(o.method);doctype=std::move(o.doctype);contentbuf=std::move(o.contentbuf); return *this;}
+		{type=std::move(o.type);name=std::move(o.name);method=std::move(o.method);doctype=o.doctype;contentbuf=std::move(o.contentbuf); return *this;}
 #endif
 
 	bool valid() const	{return !type.empty();}
@@ -85,13 +88,16 @@ class ConfigurationHandler
 public:
 	ConfigurationHandler(
 			WebRequestLoggerInterface* logger_,
-			const std::string& config_store_dir_,
-			const std::string& service_name_,
-			const char** context_typenames);
+			const std::string& configStoreDir_,
+			const std::string& serviceName_,
+			const char** contextTypeNames_);
 
 	virtual ~ConfigurationHandler(){}
 
 	void storeConfiguration(
+			ConfigurationTransaction& transaction,
+			const ConfigurationDescription& config);
+	void storeConfigurationReplace(
 			ConfigurationTransaction& transaction,
 			const ConfigurationDescription& config);
 
@@ -105,9 +111,8 @@ public:
 	void deleteObsoleteConfigurations();
 	void clearUnfinishedTransactions();
 
-	ConfigurationDescription getStoredConfiguration(
-			const char* contextType,
-			const char* contextName);
+	std::string getStoredConfigurationFile( const char* contextType, const char* contextName);
+	ConfigurationDescription getStoredConfigurationFromFile( const std::string& filename);
 
 	std::vector<ConfigurationDescription> getStoredConfigurations();
 
@@ -121,6 +126,8 @@ public:
 	void declareSubConfiguration( const std::string& contextType, const std::string& contextName);
 
 private:
+	std::string newConfigStorageFilename( const ConfigurationDescription& config);
+	ConfigurationTransaction newConfigurationTransaction( const ConfigurationDescription& config, const std::string& filename);
 	std::string configurationStoreDirectory() const;
 	std::vector<ConfigurationDescription> getStoredConfigurations( bool doDeleteObsolete);
 	struct ContextNameDef
@@ -144,11 +151,11 @@ private:
 private:
 	mutable strus::mutex m_mutex;
 	WebRequestLoggerInterface* m_logger;
-	std::string m_config_store_dir;
-	std::string m_service_name;
-	enum {MaxConfigCounter=999};
-	int m_config_counter;
-	std::set<std::string> m_context_typenames;	//< defined context types
+	std::string m_configStoreDir;
+	std::string m_serviceName;
+	char m_lastTimeStmp[16];
+	int m_configCounter;
+	std::set<std::string> m_contextTypeNames;	//< defined context types
 	typedef std::map<ContextNameDef,bool> ContextNameMap;
 	ContextNameMap m_contextNameMap;		//< map context definitions type name pairs to stored flag
 };

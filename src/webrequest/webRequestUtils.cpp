@@ -143,7 +143,7 @@ std::string strus::webRequestContent_tostring( const WebRequestContent& content,
 	{
 		throw std::runtime_error( papuga_ErrorCode_tostring( errcode));
 	}
-	if (maxsize > 0 && maxsize < (int)rt.size())
+	if (maxsize >= 0 && maxsize < (int)rt.size())
 	{
 		enum {B11000000 = 192, B10000000 = 128};
 		while (maxsize > 0 && (rt[ maxsize-1] & B11000000) == B10000000) --maxsize;
