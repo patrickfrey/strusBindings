@@ -305,13 +305,24 @@ bool WebRequestContext::transferContext()
 		setAnswer( ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
 		return false;
 	}
-	if (!m_handler->transferContext( m_contextType, m_contextName, m_context.release(), m_answer))
-	{
-		return false;
-	}
 	if (m_configTransaction.defined())
 	{
-		m_configHandler->commitStoreConfiguration( m_configTransaction);
+		if (m_configTransaction.type != m_contextType || m_configTransaction.name != m_contextName)
+		{
+			setAnswer( ErrorCodeLogicError, _TXT("context does not match to configuration transaction"));
+			return false;
+		}
+		if (!m_handler->transferConfigurationContext( m_configTransaction, m_context.release(), m_answer))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (!m_handler->transferContext( m_contextType, m_contextName, m_context.release(), m_answer))
+		{
+			return false;
+		}
 	}
 	return true;
 }

@@ -852,6 +852,42 @@ bool WebRequestHandler::transferContext(
 	return true;
 }
 
+bool WebRequestHandler::transferConfigurationContext(
+		const ConfigurationTransaction& configTransaction,
+		papuga_RequestContext* context,
+		WebRequestAnswer& answer)
+{
+	papuga_ErrorCode errcode = papuga_Ok;
+	strus::unique_lock lock( m_mutex_context_transfer);
+	if (!papuga_RequestHandler_transfer_context( m_impl, configTransaction.type.c_str(), configTransaction.name.c_str(), context, &errcode))
+	{
+		papuga_destroy_RequestContext( context);
+		setAnswer( answer, papugaErrorToErrorCode( errcode));
+		return false;
+	}
+	const char* errmsg = 0;
+	char errbuf[ 2048];
+	try
+	{
+		m_configHandler.commitStoreConfiguration( configTransaction);
+		return true;
+	}
+	catch (const std::bad_alloc&)
+	{
+		errmsg = _TXT("fatal: out of memory in a bad moment (commit of the configuration after transfer of the context). The state of the server is now not consistent anymore with the state stored. Retry the operation to archieve consistency.");
+	}
+	catch (const std::runtime_error& err)
+	{
+		std::snprintf( errbuf, sizeof(errbuf), _TXT("fatal: file rename operation failed: %s, commit of the configuration after transfer of the context failed. The state of the server is now not consistent anymore with the state stored. Retry the operation to archieve consistency."), err.what());
+		errbuf[ sizeof(errbuf)-1] = 0;
+		errmsg = errbuf;
+		return false;
+	}
+	m_logger->logError( errmsg);
+	setAnswer( answer, ErrorCodeIOError, _TXT("server in inconsistent state, see logs"));
+	return false;
+}
+
 bool WebRequestHandler::removeContext(
 		const char* contextType,
 		const char* contextName,

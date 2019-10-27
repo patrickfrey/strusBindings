@@ -90,7 +90,7 @@ std::string ConfigurationHandler::newConfigStorageFilename( const ConfigurationD
 	return strus::string_format( "%s_%s.%s.%s.%s.conf", timebuf, idxbuf, config.method.c_str(), config.type.c_str(), config.name.c_str());
 }
 
-ConfigurationTransaction ConfigurationHandler::newConfigurationTransaction( const ConfigurationDescription& config, const std::string& filename)
+ConfigurationTransaction ConfigurationHandler::newConfigurationTransaction( const ConfigurationDescription& config, const std::string& filename, const std::string& failed_filename)
 {
 	ConfigurationTransaction rt;
 	std::string cfgdir = configurationStoreDirectory();
@@ -98,7 +98,7 @@ ConfigurationTransaction ConfigurationHandler::newConfigurationTransaction( cons
 	rt.name = config.name;
 	rt.filename = strus::joinFilePath( cfgdir, filename);
 	if (rt.filename.empty()) throw std::bad_alloc();
-	rt.failed_filename = rt.filename + ".failed";
+	rt.failed_filename = failed_filename;
 
 	int ec = strus::writeFile( rt.failed_filename, config.contentbuf);
 	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to store configuration file '%s'"), rt.filename.c_str());
@@ -114,7 +114,8 @@ void ConfigurationHandler::storeConfiguration(
 	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to create configuration store directory '%s': %s"), cfgdir.c_str(), ::strerror(ec));
 
 	std::string filename = newConfigStorageFilename( config);
-	transaction = newConfigurationTransaction( config, filename);
+	std::string failed_filename = filename + ".failed";
+	transaction = newConfigurationTransaction( config, filename, failed_filename);
 }
 
 void ConfigurationHandler::storeConfigurationReplace(
@@ -122,7 +123,8 @@ void ConfigurationHandler::storeConfigurationReplace(
 		const ConfigurationDescription& config)
 {
 	std::string filename = getStoredConfigurationFile( config.type.c_str(), config.name.c_str());
-	transaction = newConfigurationTransaction( config, filename);
+	std::string failed_filename = newConfigStorageFilename( config) + ".failed";
+	transaction = newConfigurationTransaction( config, filename, failed_filename);
 }
 
 void ConfigurationHandler::commitStoreConfiguration(

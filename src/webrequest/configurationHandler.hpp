@@ -127,7 +127,7 @@ public:
 
 private:
 	std::string newConfigStorageFilename( const ConfigurationDescription& config);
-	ConfigurationTransaction newConfigurationTransaction( const ConfigurationDescription& config, const std::string& filename);
+	ConfigurationTransaction newConfigurationTransaction( const ConfigurationDescription& config, const std::string& filename, const std::string& failed_filename);
 	std::string configurationStoreDirectory() const;
 	std::vector<ConfigurationDescription> getStoredConfigurations( bool doDeleteObsolete);
 	struct ContextNameDef

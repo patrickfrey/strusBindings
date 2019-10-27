@@ -98,6 +98,14 @@ public:/*WebRequestContext*/
 	bool beautifiedOutput() const					{return m_beautifiedOutput;}
 	const char* serviceName() const					{return m_serviceName.c_str();}
 
+	/// \brief Pass ownership of a context for a configuration object to the request handler and commit the configuration transaction
+	/// \param[in] configTransaction configuration transaction object
+	/// \param[in] context context transferred (with ownership, destroyed in case of failure)
+	/// \param[out] answer describes the error in case failure
+	bool transferConfigurationContext(
+			const ConfigurationTransaction& configTransaction,
+			papuga_RequestContext* context,
+			WebRequestAnswer& answer);
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
 	/// \param[in] contextName object name of context
