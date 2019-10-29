@@ -71,6 +71,11 @@ WebRequestContext::SchemaId WebRequestContext::getSchemaId_updateConfiguration( 
 	return SchemaId( contextType_, "PUT");
 }
 
+WebRequestContext::SchemaId WebRequestContext::getSchemaId_patchConfiguration( const char* contextType_)
+{
+	return SchemaId( contextType_, "PATCH");
+}
+
 WebRequestContext::SchemaId WebRequestContext::getSchemaId_deleteConfiguration( const char* contextType_, const char* createConfigurationMethod)
 {
 	char mbuf[ 32];

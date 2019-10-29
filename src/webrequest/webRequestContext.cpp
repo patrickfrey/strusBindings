@@ -195,22 +195,14 @@ WebRequestContext::~WebRequestContext()
 	papuga_destroy_Allocator( &m_allocator);
 }
 
-enum MethodId {
-	Method_Undefined,
-	Method_GET,
-	Method_PUT,
-	Method_POST,
-	Method_PATCH,
-	Method_DELETE,
-	Method_OPTIONS,
-	Method_HEAD
-};
+
 static const char* g_methodNameAr[] = {NULL, "GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS", "HEAD", 0};
 
 const char* WebRequestContext::methodIdName( const MethodId& m)
 {
 	return g_methodNameAr[ m];
 }
+
 WebRequestContext::MethodId WebRequestContext::methodIdFromName( const char* methodname)
 {
 	int ai = 1;
@@ -270,6 +262,8 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 			}
 			else if (m_methodId == Method_PATCH)
 			{
+				setAnswer( ErrorCodeNotImplemented);
+				return false;
 			}
 			else if (m_methodId == Method_POST)
 			{

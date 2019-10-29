@@ -178,6 +178,8 @@ private:
 	SchemaId getSchemaId( const char* contextType_, MethodId methodid_);
 	/// \brief Get the schema identifier for a configuration update request
 	static SchemaId getSchemaId_updateConfiguration( const char* contextType_);
+	/// \brief Get the schema identifier for a configuration patch request
+	static SchemaId getSchemaId_patchConfiguration( const char* contextType_);
 	/// \brief Evaluate if a schema exists
 	SchemaId getSchemaId_deleteConfiguration( const char* contextType_, const char* createConfigurationMethod);
 	/// \brief Evaluate schema for schema description query

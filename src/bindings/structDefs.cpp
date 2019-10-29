@@ -810,4 +810,25 @@ std::vector<PatchDef> PatchDef::parseList( const papuga_ValueVariant& value)
 	return parseList( seriter);
 }
 
+static std::string joinPath( const std::vector<std::string>& pt)
+{
+	std::string rt;
+	std::vector<std::string>::const_iterator pi = pt.begin(), pe = pt.end();
+	for (; pi != pe; ++pi)
+	{
+		if (!rt.empty()) rt.push_back('/');
+		rt.append( *pi);
+	}
+	return rt;
+}
+
+std::string PatchDef::pathAsString() const
+{
+	return joinPath( path);
+}
+
+std::string PatchDef::fromAsString() const
+{
+	return joinPath( from);
+}
 

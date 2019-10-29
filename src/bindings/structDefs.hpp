@@ -187,6 +187,9 @@ struct PatchDef
 	static std::vector<PatchDef> parseList( papuga_SerializationIter& seriter);
 	static std::vector<PatchDef> parseList( const papuga_ValueVariant& value);
 
+	std::string pathAsString() const;
+	std::string fromAsString() const;
+
 	PatchDef()
 		:op(OpAdd),path(),value(),from(){}
 	PatchDef( papuga_SerializationIter& seriter);

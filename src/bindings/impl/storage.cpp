@@ -232,6 +232,12 @@ struct PatchConfigDef
 		m_newConfig[ key] = value;
 	}
 
+	std::string get( const std::string& key)
+	{
+		std::map<std::string,std::string>::const_iterator ci = m_newConfig.find( key);
+		return ci == m_newConfig.end() ? std::string() : ci->second;
+	}
+
 	void remove( const std::string& key)
 	{
 		m_oldConfig.erase( key);
@@ -269,24 +275,29 @@ struct PatchConfigDef
 static bool defineConfigPatchOp( PatchConfigDef& cfg, ErrorBufferInterface* errorhnd, const PatchDef& patchdef)
 {
 	const char* context = "storage configuration";
-	if (!patchdef.from.empty())
-	{
-		errorhnd->report( ErrorCodeNotImplemented, "element 'from' not implemented in patch %s" , context);
-		return false;
-	}
 	if (!patchdef.path.empty())
 	{
-		errorhnd->report( ErrorCodeNotImplemented, "element 'path' required in every element of patch %s" , context);
+		errorhnd->report( ErrorCodeNotImplemented, "element '%s' required in every element of patch %s" , "path", context);
 		return false;
 	}
 	if (patchdef.path.size() > 1)
 	{
-		errorhnd->report( ErrorCodeNotFound, "path with more than one identifier not allowed in patch %s", context);
+		errorhnd->report( ErrorCodeNotFound, "'%s' with more than one identifier not allowed in patch %s", "path", context);
+		return false;
+	}
+	if (patchdef.from.size() > 1)
+	{
+		errorhnd->report( ErrorCodeNotFound, "'%s' with more than one identifier not allowed in patch %s", "from", context);
 		return false;
 	}
 	switch (patchdef.op)
 	{
 		case PatchDef::OpAdd:
+			if (!patchdef.from.empty())
+			{
+				errorhnd->report( ErrorCodeNotImplemented, "element '%s' not implemented in patch %s" , "from", context);
+				return false;
+			}
 			if (patchdef.value.empty())
 			{
 				errorhnd->report( ErrorCodeNotFound, _TXT("value mandatory for %s in %s"), PatchDef::opName(patchdef.op), context);
@@ -295,6 +306,11 @@ static bool defineConfigPatchOp( PatchConfigDef& cfg, ErrorBufferInterface* erro
 			cfg.add( patchdef.path[0], patchdef.value);
 			break;
 		case PatchDef::OpRemove:
+			if (!patchdef.from.empty())
+			{
+				errorhnd->report( ErrorCodeNotImplemented, "element '%s' not implemented in patch %s" , "from", context);
+				return false;
+			}
 			if (!patchdef.value.empty())
 			{
 				errorhnd->report( ErrorCodeNotFound, _TXT("value not allowed for %s in %s"), PatchDef::opName(patchdef.op), context);
@@ -303,6 +319,22 @@ static bool defineConfigPatchOp( PatchConfigDef& cfg, ErrorBufferInterface* erro
 			cfg.remove( patchdef.path[0]);
 			break;
 		case PatchDef::OpReplace:
+			if (patchdef.from.empty())
+			{
+				errorhnd->report( ErrorCodeNotImplemented, "element '%s' missing in for %s patch %s" , "from", PatchDef::opName(patchdef.op), context);
+				return false;
+			}
+			if (patchdef.value.empty())
+			{
+				std::string value = cfg.get( patchdef.from[0]);
+				cfg.add( patchdef.path[0], value);
+			}
+			else
+			{
+				cfg.add( patchdef.path[0], patchdef.value);
+			}
+			cfg.remove( patchdef.path[0]);
+			break;
 		case PatchDef::OpCopy:
 		case PatchDef::OpMove:
 		case PatchDef::OpTest:

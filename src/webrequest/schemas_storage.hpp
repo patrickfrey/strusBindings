@@ -73,7 +73,10 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, true/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
 		{/*result*/},
-		{/*inherit*/},
+		{/*inherit*/
+			{"qryeval","/storage/include/qryeval()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+		},
 		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
 			{"/", "storage", "context", S::reload(), {{StorageConfig}} }
@@ -90,7 +93,10 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, true/*exclusive*/,
 		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
 		{/*result*/},
-		{/*inherit*/},
+		{/*inherit*/
+			{"qryeval","/storage/include/qryeval()",false/*not required*/},
+			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+		},
 		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
 			{"/", "storage", "context", S::patch(), {{StorageConfig}} }
