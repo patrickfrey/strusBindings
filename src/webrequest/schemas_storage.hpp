@@ -84,26 +84,6 @@ public:
 	) {}
 };
 
-class Schema_Storage_PATCH :public papuga::RequestAutomaton, public AutomatonNameSpace
-{
-public:
-	typedef bindings::method::StorageClient S;
-
-	Schema_Storage_PATCH() :papuga::RequestAutomaton(
-		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, true/*exclusive*/,
-		{/*env*/{"path", EnvFormat, "storage/{id}/{name}"}},
-		{/*result*/},
-		{/*inherit*/
-			{"qryeval","/storage/include/qryeval()",false/*not required*/},
-			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
-		},
-		{/*input*/
-			{SchemaStoragePart::defineStorage("/storage")},
-			{"/", "storage", "context", S::patch(), {{StorageConfig}} }
-		}
-	) {}
-};
-
 class Schema_Context_DELETE_POST_Storage :public papuga::RequestAutomaton, public AutomatonNameSpace
 {
 public:
