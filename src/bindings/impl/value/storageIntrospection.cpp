@@ -1082,6 +1082,7 @@ private:
 	std::set<TimeStamp> m_timestamps;
 };
 
+
 class StatisticsIntrospection
 	:public IntrospectionBase
 {
@@ -1123,6 +1124,41 @@ private:
 	const StorageClientInterface* m_impl;
 };
 
+
+class MetaDataTableIntrospection
+	:public IntrospectionBase
+{
+public:
+	MetaDataTableIntrospection(
+			ErrorBufferInterface* errorhnd_,
+			MetaDataReaderInterface* impl_)
+		:m_errorhnd(errorhnd_)
+		,m_impl(impl_)
+	{}
+	virtual ~MetaDataTableIntrospection(){}
+
+	virtual void serialize( papuga_Serialization& serialization, bool substructure)
+	{
+		serializeMembers( serialization, substructure);
+	}
+
+	virtual IntrospectionBase* open( const std::string& name)
+	{
+		Index ehnd = m_impl->elementHandle( name);
+		return (ehnd >= 0) ? createIntrospectionAtomic( m_errorhnd, m_impl->getType( ehnd)) : NULL;
+	}
+
+	virtual std::vector<IntrospectionLink> list()
+	{
+		return IntrospectionLink::getList( true, m_impl->getNames());
+	}
+
+private:
+	ErrorBufferInterface* m_errorhnd;
+	strus::Reference<MetaDataReaderInterface> m_impl;
+};
+
+
 void StorageIntrospection::serialize( papuga_Serialization& serialization, bool substructure)
 {
 	serializeMembers( serialization, substructure);
@@ -1142,6 +1178,12 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 		if (!reader.get()) throw std::runtime_error( m_errorhnd->fetchError());
 		return createIntrospectionStructure( m_errorhnd, reader->getNames());
 	}
+	else if (name == "metadata")
+	{
+		strus::local_ptr<MetaDataReaderInterface> reader( m_impl->createMetaDataReader());
+		if (!reader.get()) throw std::runtime_error(m_errorhnd->fetchError());
+		return new MetaDataTableIntrospection( m_errorhnd, reader.release());
+	}
 	else if (name == "term") return new TermIntrospection( m_errorhnd, m_impl);
 	else if (name == "doc")
 	{
@@ -1157,8 +1199,8 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 
 std::vector<IntrospectionLink> StorageIntrospection::list()
 {
-	static const char* ar_withStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".statistics",".term",".doc",NULL};
-	static const char* ar_withoutStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".term",".doc",NULL};
+	static const char* ar_withStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".attribute",".metadata",".term",".doc",".statistics",NULL};
+	static const char* ar_withoutStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".attribute",".metadata",".term",".doc",NULL};
 	return getList( (m_impl->getStatisticsProcessor()) ? ar_withStats : ar_withoutStats);
 }
 

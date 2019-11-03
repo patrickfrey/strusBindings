@@ -24,16 +24,11 @@ createCollection( $ctx, $storage, metadata_mdprim(), createDocumentAnalyzer_mdpr
 $result = "collection dump:" . dumpTree( dumpCollection( $ctx, $storage));
 $expected = <<<END_expected
 collection dump:
+string attribute: 
+  integer 0: "docid"
 string config: 
   string acl: "true"
   string cache: "524288K"
-  string metadata: 
-    string cross: "UInt8"
-    string docidx: "UInt32"
-    string doclen: "UInt16"
-    string factors: "UInt8"
-    string hi: "UInt16"
-    string lo: "UInt16"
   string path: "storage"
 string docids: 
   integer 0: 1
@@ -147,6 +142,13 @@ string docs:
     string hi: 5
     string lo: 2
     string word: "2 5"
+string metadata: 
+  string cross: "UInt8"
+  string docidx: "UInt32"
+  string doclen: "UInt16"
+  string factors: "UInt8"
+  string hi: "UInt16"
+  string lo: "UInt16"
 string nofdocs: 10
 string stat: 
   string dfchange: 

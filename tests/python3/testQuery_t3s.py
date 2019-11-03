@@ -28,7 +28,7 @@ if ctxconfig and 'rpc' in ctxconfig:
 ctx = strus.Context( ctxconfig)
 storageConfig = None
 if not withrpc:
-	storageConfig = "path='%s';metadata='%s';cache=512M" % (storagedir, metadata_t3s())
+	storageConfig = "path='%s';cache=512M" % storagedir
 output = {}
 
 createCollection( ctx, storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), False, datadir, docfiles, None, withrpc)

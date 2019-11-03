@@ -31,13 +31,13 @@ aclmap = {"A.xml":"a", "B.xml":"b", "C.xml":"c"}
 createCollection( ctx, storage, metadata_umlaut_t3s(), createDocumentAnalyzer_umlaut_t3s( ctx), False, datadir, docfiles, aclmap, withrpc)
 result = "collection dump:" + dumpTree( dumpCollection( ctx, storage)) + "\n"
 expected = """collection dump:
+str attribute:
+  number 1: "docclass"
+  number 2: "docid"
+  number 3: "title"
 str config:
   str acl: "true"
   str cache: "524288K"
-  str metadata:
-    str doclen: "UInt16"
-    str title_end: "UInt8"
-    str title_start: "UInt8"
   str path: "storage"
 str docids:
   number 1: "A.xml"
@@ -77,6 +77,10 @@ str docs:
     str title_end: 4
     str title_start: 0
     str word: "holla hu das ist ein weit text"
+str metadata:
+  str doclen: "UInt16"
+  str title_end: "UInt8"
+  str title_start: "UInt8"
 str nofdocs: 3
 str stat:
   str dfchange:

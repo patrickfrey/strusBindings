@@ -23,9 +23,8 @@ try
 	$storageConfig = NULL;
 	$ctx = new StrusContext( $ctxconfig);
 	if (!$withrpc) {
-		$storageConfig = "path='" . $storagedir . "';metadata='" . metadata_mdprim() . "';cache=512M";
+		$storageConfig = "path='" . $storagedir . "';cache=512M";
 	}
-	
 	$aclmap = [];
 	for ($i = 1; $i < 1000; $i++) {
 		$usr = [];

@@ -30,7 +30,7 @@ if ctxconfig and 'rpc' in ctxconfig:
 ctx = strus.Context( ctxconfig)
 storageConfig = None
 if not withrpc:
-	storageConfig = "path='%s';metadata='%s';cache=512M" % (storagedir, metadata_mdprim())
+	storageConfig = "path='%s';cache=512M" % storagedir
 output = {}
 
 aclmap = {}

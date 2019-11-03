@@ -45,7 +45,7 @@ bool WebRequestContext::loadEmbeddedConfiguration( const WebRequestContent& cont
 	{
 		m_logger->logAction( m_contextType, m_contextName, "load embedded configuration");
 	}
-	if (!initContentSchemaAutomaton( getSchemaId( m_contextType, Method_PUT))) return false;
+	if (!initContentSchemaAutomaton( getSchemaId( m_contextType, Method_PUT, m_contextType/*root element*/))) return false;
 	if (!executeContentSchemaAutomaton( content)) return false;
 	return true;
 }

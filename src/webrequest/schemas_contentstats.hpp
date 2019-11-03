@@ -20,26 +20,19 @@
 namespace strus {
 namespace webrequest {
 
-class Schema_Context_INIT_ContentStatistics :public papuga::RequestAutomaton, public SchemaContentStatisticsPart
+class Schema_Context_PUT_ContentStatistics :public papuga::RequestAutomaton, public SchemaContentStatisticsPart
 {
 public:
-	Schema_Context_INIT_ContentStatistics() :papuga::RequestAutomaton(
+	Schema_Context_PUT_ContentStatistics() :papuga::RequestAutomaton(
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
 		{/*inherit*/},
 		{/*input*/
-			{defineContentStatistics("/library")}
+			{defineContentStatistics("/contentstats")}
 		}
 	) {}
 };
-
-class Schema_Context_PUT_ContentStatistics :public Schema_Context_INIT_ContentStatistics
-{
-public:
-	Schema_Context_PUT_ContentStatistics() :Schema_Context_INIT_ContentStatistics(){}
-};
-
 
 }}//namespace
 #endif

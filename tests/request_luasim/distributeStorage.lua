@@ -60,9 +60,13 @@ storageConfig = {
 		cache_size = "500M",
 		max_open_files = 512,
 		write_buffer_size = "8K",
-		block_size = "4K",
+		block_size = "4K"
+	}
+}
+metadataConfig = {
+	storage = {
 		metadata = {
-			{ name = "doclen", type = "UInt16" }
+			{op="add", name="doclen", type="UINT16"}
 		}
 	}
 }
@@ -111,9 +115,14 @@ function buildStorageServer()
 	for storageidx,storage in ipairs( server.storage) do
 		call_server_checked( "POST", serviceAddress( "storage", storageidx),  getStorageConfig( storageidx))
 		call_server_checked( "PUT",  serviceAddress( "inserter", storageidx), getInserterConfig( storageidx))
-	
 		if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval for server %s\n", storage.name)) end
-	
+
+		TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "storage", storageidx) .. "/transaction" )).transaction.link
+		if verbose then io.stderr:write( string.format("- Create transaction for meta data definitions %s\n", TRANSACTION)) end
+		call_server_checked( "PUT", TRANSACTION, metadataConfig)
+		call_server_checked( "PUT", TRANSACTION)
+		if verbose then io.stderr:write( string.format("- Defined meta data schema\n")) end
+
 		TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "inserter", storageidx) .. "/transaction" )).transaction.link
 		if verbose then io.stderr:write( string.format("- Create transaction %s for server %s\n", TRANSACTION, storage.name)) end
 		local cntdoc = 0

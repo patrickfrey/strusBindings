@@ -75,6 +75,8 @@ function dumpCollection( $strusctx, $storagePath) {
 	}
 	$output[ "docs"] = $output_docs;
 	$output[ "terms"] = $output_terms;
+	$output[ "metadata"] = $storage->introspection( "metadata");
+	$output[ "attribute"] = $storage->introspection( "attribute");
 
 	# Term statistics:
 	$output_stat = [];

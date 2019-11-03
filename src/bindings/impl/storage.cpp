@@ -18,7 +18,7 @@
 #include "strus/storageTransactionInterface.hpp"
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageClientInterface.hpp"
-#include "strus/storageMetaDataTransactionInterface.hpp"
+#include "strus/storageMetaDataTableUpdateInterface.hpp"
 #include "strus/storageObjectBuilderInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
 #include "strus/attributeReaderInterface.hpp"
@@ -324,7 +324,6 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( _TXT("try to insert document in a closed transaction"));
 	Reference<StorageDocumentInterface> document( transaction->createDocument( docid));
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
@@ -336,10 +335,27 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 	}
 }
 
+void StorageTransactionImpl::updateDocument( const std::string& docid, const ValueVariant& content, const ValueVariant& deletes)
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	StorageClientInterface* storage = m_storage_impl.getObject<StorageClientInterface>();
+	strus::Index docno = storage->documentNumber( docid);
+	if (!docno) throw strus::runtime_error( _TXT("failed to update document with undefined id '%s'"), docid.c_str());
+	Reference<StorageDocumentUpdateInterface> document( transaction->createDocumentUpdate( docno));
+	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
+
+	Deserializer::buildUpdateDocument( document.get(), content, deletes, errorhnd);
+	document->done();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error( _TXT("failed to update document: %s"), errorhnd->fetchError());
+	}
+}
+
 void StorageTransactionImpl::deleteDocument( const std::string& docId)
 {
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( _TXT("try to delete document in a closed transaction"));
 	transaction->deleteDocument( docId);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -351,7 +367,6 @@ void StorageTransactionImpl::deleteDocument( const std::string& docId)
 void StorageTransactionImpl::deleteUserAccessRights( const std::string& username)
 {
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction) throw strus::runtime_error( _TXT("try to delete user access rights in a closed transaction"));
 	transaction->deleteUserAccessRights( username);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
@@ -360,24 +375,83 @@ void StorageTransactionImpl::deleteUserAccessRights( const std::string& username
 	}
 }
 
+static void fillUpdateMetaDataTable( StorageMetaDataTableUpdateInterface* update, const std::vector<MetaDataTableCommand>& cmdlist, ErrorBufferInterface* errorhnd)
+{
+	std::vector<MetaDataTableCommand>::const_iterator ci = cmdlist.begin(), ce = cmdlist.end();
+	for (; ci != ce; ++ci)
+	{
+		switch (ci->id)
+		{
+			case MetaDataTableCommand::Add:
+				update->addElement( ci->name, ci->type);
+				break;
+			case MetaDataTableCommand::Replace:
+				if (ci->type.empty())
+				{
+					update->alterElement( ci->oldname, ci->name, ci->type);
+				}
+				else
+				{
+					update->renameElement( ci->oldname, ci->name);
+				}
+				break;
+			case MetaDataTableCommand::Remove:
+				if (ci->name.empty())
+				{
+					update->deleteElements();
+				}
+				else
+				{
+					update->deleteElement( ci->name);
+				}
+				break;
+			case MetaDataTableCommand::Clear:
+				update->clearElement( ci->name);
+				break;
+		}
+	}
+	update->done();
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT("failed to update meta data table: %s"), errorhnd->fetchError());
+	}
+}
+
+void StorageTransactionImpl::updateMetaDataTable( const ValueVariant& commandlist)
+{
+	std::vector<MetaDataTableCommand> cmdlist = MetaDataTableCommand::getList( commandlist);
+	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	strus::Reference<StorageMetaDataTableUpdateInterface> update( transaction->createMetaDataTableUpdate());
+	if (!update.get()) throw strus::runtime_error( _TXT("failed to create meta data table update structure"));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	fillUpdateMetaDataTable( update.get(), cmdlist, errorhnd);
+}
+
+void StorageTransactionImpl::defineMetaDataTable( const ValueVariant& deflist)
+{
+	std::vector<MetaDataTableCommand> cmdlist = MetaDataTableCommand::getListFromNameTypePairs( deflist);
+	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	strus::Reference<StorageMetaDataTableUpdateInterface> update( transaction->createMetaDataTableUpdate());
+	if (!update.get()) throw strus::runtime_error( _TXT("failed to create meta data table update structure"));
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	fillUpdateMetaDataTable( update.get(), cmdlist, errorhnd);
+}
+
 void StorageTransactionImpl::commit()
 {
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (transaction)
+	if (!transaction->commit())
 	{
-		if (!transaction->commit())
-		{
-			m_transaction_impl.reset();
-			ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-			throw strus::runtime_error( _TXT("error flushing storage operations: %s"), errorhnd->fetchError());
-		}
 		m_transaction_impl.reset();
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		throw strus::runtime_error( _TXT("error in commit transaction: %s"), errorhnd->fetchError());
 	}
 }
 
 void StorageTransactionImpl::rollback()
 {
-	m_transaction_impl.reset();
+	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	transaction->rollback();
 }
 
 

@@ -18,13 +18,13 @@ createCollection( ctx, storage, metadata_t3s(), createDocumentAnalyzer_t3s( ctx)
 local result = "collection dump:" .. dumpTree( dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
+string attribute:
+  number 1: "docclass"
+  number 2: "docid"
+  number 3: "title"
 string config:
   string acl: "true"
   string cache: "524288K"
-  string metadata:
-    string doclen: "UInt16"
-    string title_end: "UInt8"
-    string title_start: "UInt8"
   string path: "storage"
 string docids:
   number 1: "A.xml"
@@ -64,6 +64,10 @@ string docs:
     string title_end: 6
     string title_start: 0
     string word: "a visit journey through germani when i first it was still split into two part"
+string metadata:
+  string doclen: "UInt16"
+  string title_end: "UInt8"
+  string title_start: "UInt8"
 string nofdocs: 3
 string stat:
   string dfchange:

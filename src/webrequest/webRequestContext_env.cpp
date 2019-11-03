@@ -93,12 +93,12 @@ bool WebRequestContext::initSchemaEnvAssignments()
 				case webrequest::AutomatonNameSpace::EnvFormat:
 				{
 					const EnvVariable varar[] = {
+						{"path", m_path.rest()},
 						{"name", m_contextName},
 						{"type", m_contextType},
 						{"id", m_handler->serviceName()},
 						{NULL,NULL}
 					};
-
 					if (!parseFormatElement( buf, sizeof(buf), envar[ei].argument, varar, errcode))
 					{
 						setAnswer( errcode);
@@ -107,6 +107,12 @@ bool WebRequestContext::initSchemaEnvAssignments()
 					papuga_init_ValueVariant_charp( &value, buf);
 					break;
 				}
+				case webrequest::AutomatonNameSpace::EnvPath:
+					papuga_init_ValueVariant_charp( &value, m_path.rest());
+					break;
+				case webrequest::AutomatonNameSpace::EnvName:
+					papuga_init_ValueVariant_charp( &value, m_contextName);
+					break;
 				default:
 					setAnswer( ErrorCodeNotImplemented);
 					return false;

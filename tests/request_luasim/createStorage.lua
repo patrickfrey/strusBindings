@@ -11,10 +11,7 @@ storageConfig = {
 		cache_size = "500M",
 		max_open_files = 512,
 		write_buffer_size = "8K",
-		block_size = "4K",
-		metadata = {
-			{ name = "doclen", type = "UInt16" }
-		}
+		block_size = "4K"
 	}
 }
 resultBuffer = ""

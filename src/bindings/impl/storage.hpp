@@ -186,10 +186,9 @@ public:
 
 	/// \brief Introspect the storage structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
-	/// \example ["config"]
-	/// \example ["termtypes"]
-	/// \example ["attributenames"]
-	/// \example ["metadatanames"]
+	/// \example ["doc"]
+	/// \example ["attribute"]
+	/// \example ["metadata"]
 	/// \return the structure to introspect starting from the path
 	Struct introspection( const ValueVariant& path) const;
 
@@ -221,11 +220,18 @@ public:
 	/// \brief Destructor
 	virtual ~StorageTransactionImpl(){}
 
-	/// \brief Prepare the inserting a document into the storage
+	/// \brief Prepare the inserting of a document into the storage
 	/// \note The document is physically inserted with the call of 'commit()'
 	/// \param[in] docid the identifier of the document to insert
 	/// \param[in] doc the structure of the document to insert (analyzer::Document)
 	void insertDocument( const std::string& docid, const ValueVariant& doc);
+
+	/// \brief Prepare the updating of a document into the storage
+	/// \note The document is physically updated with the call of 'commit()'
+	/// \param[in] docid the identifier of the document to insert
+	/// \param[in] content the structure addressing the document contents to update
+	/// \param[in] deletes the structure addressing the document contents to deletes
+	void updateDocument( const std::string& docid, const ValueVariant& content, const ValueVariant& deletes);
 
 	/// \brief Prepare the deletion of a document from the storage
 	/// \note The document is physically deleted with the call of 'commit()'
@@ -236,6 +242,17 @@ public:
 	/// \note The user access rights are changed accordingly with the next implicit or explicit call of 'flush'
 	/// \param[in] username the name of the user to delete all access rights (in the local collection)
 	void deleteUserAccessRights( const std::string& username);
+
+	/// \brief Define a list of operations on the meta data table
+	/// \param[in] commandlist list of commands or a single command to apply on the metadata table.
+	/// \note A metadata table command is a structure with the elements 'op' operation to performs (optional, default 'add', one of {"add","remove","replace","clear","alter"}), 'name' name of metadata element targeted by the operation (mandatory), 'oldname' previous element name in case of "alter" or "replace" (optional), 'type' type of the element (optional)
+	/// \example [["add" "doclen" "UINT16"], ["add" "class" "INT8"]]
+	void updateMetaDataTable( const ValueVariant& commandlist);
+
+	/// \brief Define a list of new meta data table entries (same as updateMetaDataTable with implicit 'add' as operation in the arguments)
+	/// \param[in] deflist list of name/type pairs defining the meta data entries to create in the metadata table.
+	/// \example [["doclen" "UINT16"], ["class" "INT8"]]
+	void defineMetaDataTable( const ValueVariant& deflist);
 
 	/// \brief Commit all insert or delete or user access right change statements of this transaction.
 	/// \remark throws an error on failure

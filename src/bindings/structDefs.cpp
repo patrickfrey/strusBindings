@@ -184,7 +184,11 @@ KeyValueList::KeyValueList( const papuga_ValueVariant& def, const char* namemapd
 	:items()
 {
 	static const char* context = _TXT("named key value pair list");
-	if (def.valuetype != papuga_TypeSerialization)
+	if (!papuga_ValueVariant_defined( &def))
+	{
+		return;
+	}
+	else if (def.valuetype != papuga_TypeSerialization)
 	{
 		throw strus::runtime_error( _TXT("list of key value pairs expected"));
 	}
@@ -691,6 +695,201 @@ MetaDataCompareDef::MetaDataCompareDef( papuga_SerializationIter& seriter)
 		if (!defined[0]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "op", context);
 		if (!defined[1]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "name", context);
 		if (!defined[2]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "value", context);
+	}
+}
+
+static MetaDataTableCommand::Id getMetaDataTableCommandIdFromName( const std::string& name)
+{
+	static const StructureNameMap namemap( "add,replace,remove,clear", ',');
+	int idx = namemap.index( name);
+	if (idx < 0) throw std::runtime_error(_TXT("undefined meta table command op"));
+	return (MetaDataTableCommand::Id)idx;
+}
+
+MetaDataTableCommand::MetaDataTableCommand( papuga_SerializationIter& seriter)
+	:id(Remove),name(),type(),oldname()
+{
+	static const char* context = _TXT("meta data table command");
+	static const StructureNameMap namemap( "op,name,type,oldname", ',');
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		id = getMetaDataTableCommandIdFromName( Deserializer::getString( seriter));
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			name = Deserializer::getString( seriter);
+		}
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			if (papuga_ValueVariant_defined( papuga_SerializationIter_value( &seriter)))
+			{
+				type = Deserializer::getString( seriter);
+			}
+			else
+			{
+				papuga_SerializationIter_skip( &seriter);
+			}
+		}
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			oldname = Deserializer::getString( seriter);
+		}
+	}
+	else
+	{
+		unsigned char defined[4] = {0,0,0,0};
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0: if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "op", context);
+					id = getMetaDataTableCommandIdFromName( Deserializer::getString( seriter));
+					break;
+				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+					name = Deserializer::getString( seriter);
+					break;
+				case 2:	if (defined[2]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "type", context);
+					type = Deserializer::getString( seriter);
+					break;
+				case 3:	if (defined[3]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "oldname", context);
+					oldname = Deserializer::getString( seriter);
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'op' or 'name' or 'type' or 'oldname' expected"), context);
+			}
+		}
+		if (!defined[0]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "op", context);
+	}
+}
+
+static MetaDataTableCommand parseMetaDataTableEntryDef( papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("meta data table entry");
+	static const StructureNameMap namemap( "name,type", ',');
+
+	std::string name;
+	std::string type;
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		name = Deserializer::getString( seriter);
+		type = Deserializer::getString( seriter);
+	}
+	else
+	{
+		unsigned char defined[2] = {0,0};
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0:	if (defined[0]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+					name = Deserializer::getString( seriter);
+					break;
+				case 1:	if (defined[1]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "type", context);
+					type = Deserializer::getString( seriter);
+					break;
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s, 'name' or 'type' expected"), context);
+			}
+		}
+		if (!defined[0]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "name", context);
+		if (!defined[1]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), "type", context);
+	}
+	return MetaDataTableCommand( MetaDataTableCommand::Add, name, type, std::string());
+}
+
+std::vector<MetaDataTableCommand> MetaDataTableCommand::getList( const papuga_ValueVariant& arg)
+{
+	static const char* context = _TXT("meta data table command list");
+	if (!papuga_ValueVariant_defined( &arg))
+	{
+		return std::vector<MetaDataTableCommand>();
+	}
+	else if (arg.valuetype == papuga_TypeSerialization)
+	{
+		std::vector<MetaDataTableCommand> rt;
+		papuga_SerializationIter seriter;
+	
+		papuga_init_SerializationIter( &seriter, arg.value.serialization);
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue
+		||  papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			MetaDataTableCommand cmd( seriter);
+			rt.push_back( cmd);
+			if (!papuga_SerializationIter_eof( &seriter))
+			{
+				throw strus::runtime_error(_TXT("expected eof after definition of '%s'"), context);
+			}
+		}
+		else if (papuga_SerializationIter_eof( &seriter))
+		{}
+		else
+		{
+			while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+			{
+				papuga_SerializationIter_skip( &seriter);
+				MetaDataTableCommand cmd( seriter);
+				rt.push_back( cmd);
+				Deserializer::consumeClose( seriter);
+			}
+			if (!papuga_SerializationIter_eof( &seriter))
+			{
+				throw strus::runtime_error(_TXT("expected eof after definition of '%s'"), context);
+			}
+		}
+		return rt;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected structure for '%s'"), context);
+	}
+}
+
+std::vector<MetaDataTableCommand> MetaDataTableCommand::getListFromNameTypePairs( const papuga_ValueVariant& arg)
+{
+	static const char* context = _TXT("meta data table definiton");
+	if (!papuga_ValueVariant_defined( &arg))
+	{
+		return std::vector<MetaDataTableCommand>();
+	}
+	else if (arg.valuetype == papuga_TypeSerialization)
+	{
+		std::vector<MetaDataTableCommand> rt;
+		papuga_SerializationIter seriter;
+	
+		papuga_init_SerializationIter( &seriter, arg.value.serialization);
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue
+		||  papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			MetaDataTableCommand cmd = parseMetaDataTableEntryDef( seriter);
+			rt.push_back( cmd);
+			if (!papuga_SerializationIter_eof( &seriter))
+			{
+				throw strus::runtime_error(_TXT("expected eof after definition of '%s'"), context);
+			}
+		}
+		else if (papuga_SerializationIter_eof( &seriter))
+		{}
+		else
+		{
+			while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+			{
+				papuga_SerializationIter_skip( &seriter);
+				MetaDataTableCommand cmd = parseMetaDataTableEntryDef( seriter);
+				rt.push_back( cmd);
+				Deserializer::consumeClose( seriter);
+			}
+			if (!papuga_SerializationIter_eof( &seriter))
+			{
+				throw strus::runtime_error(_TXT("expected eof after definition of '%s'"), context);
+			}
+		}
+		return rt;
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected structure for '%s'"), context);
 	}
 }
 

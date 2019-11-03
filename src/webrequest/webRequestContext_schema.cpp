@@ -15,6 +15,7 @@
 #include "papuga/allocator.h"
 #include "papuga/errors.h"
 #include "papuga/request.h"
+#include "papuga/requestParser.h"
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.h"
 #include "private/internationalization.hpp"
@@ -25,7 +26,7 @@ using namespace strus;
 static const char* concatSchemaName( papuga_Allocator* allocator, const char* prefix, char sep, const char* tail)
 {
 	std::size_t len = std::strlen( prefix) + std::strlen( tail) + 1/*sep*/;
-	char* rt = (char*)papuga_Allocator_alloc( allocator, len, 1);
+	char* rt = (char*)papuga_Allocator_alloc( allocator, len+1, 1);
 	if (!rt) throw std::bad_alloc();
 	std::snprintf( rt, len+1, "%s%c%s", prefix, sep, tail);
 	return rt;
@@ -41,9 +42,10 @@ static inline bool startsWith( const char* name, const char* oth, std::size_t ot
 	return name[0] == oth[0] && 0==std::memcmp(name,oth,othlen);
 }
 
-WebRequestContext::SchemaId WebRequestContext::getSchemaId( const char* contextType_, WebRequestContext::MethodId methodId_)
+WebRequestContext::SchemaId WebRequestContext::getSchemaId( const char* contextType_, WebRequestContext::MethodId methodId_, const char* rootElement_)
 {
-	if (methodId_ == Method_POST || methodId_ == Method_PUT || methodId_ == Method_DELETE)
+	if (methodId_ == Method_DELETE
+	|| ((methodId_ == Method_POST || methodId_ == Method_PUT) && isEqual( m_contextType, rootElement_)))
 	{
 		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, methodIdName(methodId_), '/', contextType_));
 	}
@@ -55,15 +57,7 @@ WebRequestContext::SchemaId WebRequestContext::getSchemaId( const char* contextT
 
 WebRequestContext::SchemaId WebRequestContext::getSchemaId()
 {
-	if (m_path.hasMore())
-	{
-		const char* pt = m_path.getRest();
-		return SchemaId( m_contextType, concatSchemaName( &m_allocator, methodIdName(m_methodId), '~', pt));
-	}
-	else
-	{
-		return getSchemaId( m_contextType, m_methodId);
-	}
+	return getSchemaId( m_contextType, m_methodId, m_rootElement);
 }
 
 WebRequestContext::SchemaId WebRequestContext::getSchemaId_updateConfiguration( const char* contextType_)
@@ -98,12 +92,13 @@ WebRequestContext::SchemaId WebRequestContext::getSchemaId_description()
 		setAnswer( ErrorCodeIncompleteRequest, _TXT("context type not defined in schema description request"));
 		return WebRequestContext::SchemaId();
 	}
-	if (m_path.hasMore())
+	const char* root = m_path.getNext();
+
+	if (0==std::memcmp(mt,"DELETE",6))
 	{
-		const char* pt = m_path.getRest();
-		return SchemaId( ct, concatSchemaName( &m_allocator, mt, '~', pt));
+		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, mt, '/', ct));
 	}
-	if (0==std::memcmp(mt,"DELETE_",7) || 0==std::strcmp(mt,"POST") || 0==std::strcmp(mt,"PUT") || 0==std::strcmp(mt,"DELETE"))
+	if ((0==std::strcmp(mt,"POST") || 0==std::strcmp(mt,"PUT")) && (root && 0==std::strcmp(root,ct)))
 	{
 		return SchemaId( ROOT_CONTEXT_NAME, concatSchemaName( &m_allocator, mt, '/', ct));
 	}

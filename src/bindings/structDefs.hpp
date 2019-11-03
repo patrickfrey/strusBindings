@@ -13,6 +13,7 @@
 #include "strus/errorBufferInterface.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
+#include <cstring>
 
 namespace strus {
 namespace bindings {
@@ -143,7 +144,28 @@ struct MetaDataCompareDef
 
 	MetaDataCompareDef( papuga_SerializationIter& seriter);
 	MetaDataCompareDef( const MetaDataCompareDef& o)
-		:cmpop(o.cmpop),name(o.name),value(o.value){}
+		:cmpop(o.cmpop),name(o.name)
+	{
+		std::memcpy( &value, &o.value, sizeof(value));
+	}
+};
+
+struct MetaDataTableCommand
+{
+	enum Id {Add,Replace,Remove,Clear};
+	Id id;
+	std::string name;
+	std::string type;
+	std::string oldname;
+
+	MetaDataTableCommand( Id id_, const std::string& name_, const std::string& type_, const std::string& oldname_)
+		:id(id_),name(name_),type(type_),oldname(oldname_){}
+	MetaDataTableCommand( papuga_SerializationIter& seriter);
+	MetaDataTableCommand( const MetaDataTableCommand& o)
+		:id(o.id),name(o.name),type(o.type),oldname(o.oldname){}
+
+	static std::vector<MetaDataTableCommand> getList( const papuga_ValueVariant& cmd);
+	static std::vector<MetaDataTableCommand> getListFromNameTypePairs( const papuga_ValueVariant& cmd);
 };
 
 }} //namespace

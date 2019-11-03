@@ -19,7 +19,7 @@
 namespace strus {
 namespace bindings {
 
-/// \brief Analyzed term expression structure
+/// \brief Analyzed metadata expression structure
 class MetaDataExpression
 {
 public:

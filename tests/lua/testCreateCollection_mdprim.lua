@@ -18,16 +18,11 @@ createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim
 local result = "collection dump:" .. dumpTree( dumpCollection( ctx, storage)) .. "\n"
 local expected = [[
 collection dump:
+string attribute:
+  number 1: "docid"
 string config:
   string acl: "true"
   string cache: "524288K"
-  string metadata:
-    string cross: "UInt8"
-    string docidx: "UInt32"
-    string doclen: "UInt16"
-    string factors: "UInt8"
-    string hi: "UInt16"
-    string lo: "UInt16"
   string path: "storage"
 string docids:
   number 1: "1"
@@ -140,6 +135,13 @@ string docs:
     string hi: 3
     string lo: 3
     string word: "3 3"
+string metadata:
+  string cross: "UInt8"
+  string docidx: "UInt32"
+  string doclen: "UInt16"
+  string factors: "UInt8"
+  string hi: "UInt16"
+  string lo: "UInt16"
 string nofdocs: 10
 string stat:
   string dfchange:

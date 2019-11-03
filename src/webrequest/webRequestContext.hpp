@@ -158,6 +158,12 @@ private:
 	bool inheritRequestContext( const char* contextType_, const char* contextName_);
 	/// \brief Inititialize request and result content types and character set encodings
 	bool initContentType( const WebRequestContent& content);
+		/// \brief Inititialize root element of the content
+		/// \note Called by init content type
+		bool initContentRootElement( const WebRequestContent& content);
+		/// \brief Inititialize result content type and character set encoding
+		/// \note Called by init content type
+		bool initResultContentType();
 	/// \brief Execute a request creating a transaction (POST)
 	bool executePostTransaction();
 	/// \brief Execute a request doing the commit (PUT) of a transaction
@@ -175,7 +181,7 @@ private:
 	/// \brief Get the schema identifier specified by context
 	SchemaId getSchemaId();
 	/// \brief Get the schema identifier specified by arguments
-	SchemaId getSchemaId( const char* contextType_, MethodId methodid_);
+	SchemaId getSchemaId( const char* contextType_, MethodId methodid_, const char* rootElement_);
 	/// \brief Get the schema identifier for a configuration update request
 	static SchemaId getSchemaId_updateConfiguration( const char* contextType_);
 	/// \brief Get the schema identifier for a configuration patch request
@@ -276,6 +282,7 @@ private:
 	RequestType m_requestType;		//< classification of this request
 	const char* m_contextType;		//< context type
 	const char* m_contextName;		//< context name
+	const char* m_rootElement;		//< root element of the request
 	PapugaContextRef m_context;		//< context reference
 	const papuga_ValueVariant* m_obj;	//< pointer to object in context selected
 	papuga_Request* m_request;		//< request data for papuga

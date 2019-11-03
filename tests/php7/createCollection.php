@@ -6,7 +6,6 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 	if (!$withrpc) {
 		$config = [
 			"path" => $storagePath,
-			"metadata" => $metadata,
 			"cache" => '512M',
 			"statsproc" => 'std'
 		];
@@ -21,8 +20,13 @@ function createCollection( $strusctx, $storagePath, $metadata, $analyzer, $multi
 	# Get a client for the new created storage:
 	$storage = $strusctx->createStorageClient( $config);
 
-	# Read input files, analyze and insert them:
 	$transaction = $storage->createTransaction();
+
+	# Create the meta data table structure:
+	$transaction->defineMetaDataTable( $metadata);
+	$transaction->commit();
+
+	# Read input files, analyze and insert them:
 	$files = [];
 	$idx = 0;
 	foreach ($fnams as $fnam) {

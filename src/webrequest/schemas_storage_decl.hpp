@@ -44,9 +44,6 @@ public:
 			{"path", "", "path", DatabasePath, '?'},
 			{"database", "()", DatabaseEngine, papuga_TypeString, "std"},
 			{"statsproc", "()", StatisticsProc, papuga_TypeString, "std"},
-			{"metadata/name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
-			{"metadata/type", "()", StorageMetadataType, papuga_TypeString, "INT32"},
-			{"metadata", StorageMetadata, {{"name", StorageMetadataName}, {"type", StorageMetadataType}} },
 			{"autocompact", "()", DatabaseEnableAutoCompact, papuga_TypeBool, "true"},
 			{"acl", "()", StorageEnableAcl, papuga_TypeBool, "true"},
 			{"cachedterms", "()", StorageCachedTerms, papuga_TypeString, "/srv/strus/termlist.txt"},
@@ -59,7 +56,6 @@ public:
 				{"path", "path"},
 				{"database", DatabaseEngine, '?'},
 				{"statsproc", StatisticsProc, '?'},
-				{"metadata", StorageMetadata, '*'},
 				{"autocompact", DatabaseEnableAutoCompact, '?'},
 				{"acl", StorageEnableAcl, '?'},
 				{"cachedterms", StorageCachedTerms, '?'},
@@ -78,6 +74,24 @@ public:
 		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
 			{"snapshot", "_blob", "storage", S::getAllStatistics(), {}}
+		});
+	}
+
+	static papuga::RequestAutomaton_NodeList defineMetaDataTableCommand( const char* rootexpr)
+	{
+		return papuga::RequestAutomaton_NodeList( rootexpr,
+		{
+			{"op", "()", StorageMetadataTableOperation, papuga_TypeString, "add;rename;remove;clear;alter"},
+			{"name", "()", StorageMetadataName, papuga_TypeString, "doclen"},
+			{"type", "()", StorageMetadataType, papuga_TypeString, "UINT16;INT32;INT8;FLOAT32"},
+			{"oldname", "()", StorageMetadataOldname, papuga_TypeString, "doclen"},
+			{"", StorageMetadataTableCommand, {
+				{"op", StorageMetadataTableOperation, '!'},
+				{"name", StorageMetadataName, '?'},
+				{"type", StorageMetadataType, '?'},
+				{"oldname", StorageMetadataOldname, '?'}
+			}},
+			
 		});
 	}
 };

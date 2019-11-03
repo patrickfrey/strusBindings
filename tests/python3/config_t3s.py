@@ -21,7 +21,7 @@ def createQueryAnalyzer_t3s( strusctx):
 	return analyzer
 
 def metadata_t3s():
-	return 'doclen UINT16, title_start UINT8, title_end UINT8'
+	return [ ["doclen", "UINT16"], ["title_start", "UINT8"], ["title_end", "UINT8"] ]
 
 def createQueryEval_t3s( strusctx):
 	# Define the query evaluation scheme:

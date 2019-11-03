@@ -71,7 +71,7 @@ struct ResponseBuf
 	}
 };
 
-static CURLcode issueRequest( const std::string& url, int port, const std::string& method_, const std::string& content, ResponseBuf& response)
+static CURLcode issueRequest( const std::string& url, int port, const std::string& method_, const char* charset, const char* doctype, const char* contentstr, std::size_t contentlen, ResponseBuf& response)
 {
 	std::string errout;
 	std::string method = method_;
@@ -79,9 +79,15 @@ static CURLcode issueRequest( const std::string& url, int port, const std::strin
 	for (; mi != me; ++mi) *mi = ::toupper( *mi);
 	const char* accepted_charset = "UTF-8";
 	const char* accepted_doctype = "application/json";
-	std::string content_type = strus::string_format( "%s; charset=%s", accepted_doctype, accepted_charset);
+	std::string accept = strus::string_format( "%s; charset=%s", accepted_doctype, accepted_charset);
+	std::string content_type;
+	if (doctype && charset)
+	{
+		content_type = strus::string_format( "%s; charset=%s", doctype, charset);
+		if (content_type.empty()) throw std::bad_alloc();
+	}
 	std::string user_agent = strus::string_format( "libcurl/%s",curl_version_info(CURLVERSION_NOW)->version);
-	if (content_type.empty() || user_agent.empty()) throw std::bad_alloc();
+	if (accept.empty() || user_agent.empty()) throw std::bad_alloc();
 
 	CURL *curl = 0;
 	CURLcode ec = CURLE_OK;
@@ -94,12 +100,12 @@ static CURLcode issueRequest( const std::string& url, int port, const std::strin
 
 		set_http_header( headers, "Expect", "");
 		set_http_header( headers, "Content-Type", content_type.c_str());
-		set_http_header( headers, "Accept", content_type.c_str());
+		set_http_header( headers, "Accept", accept.c_str());
 		set_http_header( headers, "Accept-Charset", accepted_charset);
 		set_curl_opt( curl, CURLOPT_POST, 1);
 		set_curl_opt( curl, CURLOPT_HTTPHEADER, headers);
-		set_curl_opt( curl, CURLOPT_POSTFIELDSIZE, content.size());
-		set_curl_opt( curl, CURLOPT_POSTFIELDS, content.c_str());
+		set_curl_opt( curl, CURLOPT_POSTFIELDSIZE, contentlen);
+		set_curl_opt( curl, CURLOPT_POSTFIELDS, contentstr);
 		set_curl_opt( curl, CURLOPT_WRITEDATA, &response.content);
 		set_curl_opt( curl, CURLOPT_WRITEFUNCTION, write_callback); 
 		set_curl_opt( curl, CURLOPT_FAILONERROR, 0);
@@ -162,20 +168,20 @@ BlockingCurlClient::~BlockingCurlClient()
 	curl_global_cleanup();
 }
 
-BlockingCurlClient::Response BlockingCurlClient::sendJsonUtf8( const std::string& requestMethod, const std::string& address, const std::string& content, int nofConnRetries) const
+BlockingCurlClient::Response BlockingCurlClient::sendJsonUtf8( const std::string& requestMethod, const std::string& address, const char* charset, const char* doctype, const char* contentstr, std::size_t contentlen, int nofConnRetries) const
 {
 	std::string url = getUrl( address);
 	int port = getPort( address);
 	ResponseBuf response;
 	int connectionFailures = 0;
 
-	CURLcode ec = issueRequest( url, port, requestMethod, content, response);
+	CURLcode ec = issueRequest( url, port, requestMethod, charset, doctype, contentstr, contentlen, response);
 	while (ec == CURLE_COULDNT_CONNECT && --nofConnRetries >= 0)
 	{
 		++connectionFailures;
 		fprintf( stderr, _TXT("Connection to server '%s' port %d failed (%d times)\n"), url.c_str(), port, connectionFailures);
 		strus::sleep( 1);
-		ec = issueRequest( url, port, requestMethod, content, response);
+		ec = issueRequest( url, port, requestMethod, charset, doctype, contentstr, contentlen, response);
 	}
 	if (ec != CURLE_OK)
 	{

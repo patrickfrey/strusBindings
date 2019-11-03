@@ -217,6 +217,72 @@ ERROR:
 	return false;
 }
 
+bool WebRequestContext::initContentRootElement( const WebRequestContent& content)
+{
+	// Extract the root element of the content
+	char rootbuf[ 128];
+	switch (m_doctype)
+	{
+		case papuga_ContentType_Unknown:
+			break;
+		case papuga_ContentType_XML:
+			m_rootElement = papuga_parseRootElement_xml( rootbuf, sizeof(rootbuf), content.str(), content.len());
+			break;
+		case papuga_ContentType_JSON:
+			m_rootElement = papuga_parseRootElement_json( rootbuf, sizeof(rootbuf), content.str(), content.len());
+			break;
+	}
+	if (!m_rootElement)
+	{
+		m_logger->logError( _TXT("failed to extract root element of request"));
+		setAnswer( ErrorCodeInvalidRequest);
+		return false;
+	}
+	m_rootElement = papuga_Allocator_copy_charp( &m_allocator, m_rootElement);
+	if (!m_rootElement)
+	{
+		m_logger->logError( strus::errorCodeToString( ErrorCodeOutOfMem));
+		setAnswer( ErrorCodeOutOfMem);
+		return false;
+	}
+	return true;
+}
+
+bool WebRequestContext::initResultContentType()
+{
+	// Set the result content encoding:
+	if (m_encoding == papuga_Binary)
+	{
+		m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, defaultEncoding());
+	}
+	else
+	{
+		m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, m_encoding);
+	}
+	if (m_result_encoding == papuga_Binary)
+	{
+		int httpstatus = errorCodeToHttpStatus( ErrorCodeNotImplemented);
+		m_answer.setError_fmt( httpstatus, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented: %s"), m_accepted_charset);
+		return false;
+	}
+	// Set the result document type:
+	if (m_doctype == papuga_ContentType_Unknown)
+	{
+		m_result_doctype = strus::getResultContentType( m_accepted_doctype, defaultDocType());
+	}
+	else
+	{
+		m_result_doctype = strus::getResultContentType( m_accepted_doctype, papugaTranslatedContentType(m_doctype));
+	}
+	if (m_result_doctype == WebRequestContent::Unknown)
+	{
+		int httpstatus = errorCodeToHttpStatus( ErrorCodeNotImplemented);
+		m_answer.setError_fmt( httpstatus, ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), m_accepted_doctype);
+		return false;
+	}
+	return true;
+}
+
 bool WebRequestContext::initContentType( const WebRequestContent& content)
 {
 	// Set the request character set encoding if some content is provided in the request:
@@ -259,38 +325,9 @@ bool WebRequestContext::initContentType( const WebRequestContent& content)
 				m_logger->logRequest( reqstr, reqstrlen);
 			}
 		}
+		if (!initContentRootElement( content)) return false;
 	}
-	// Set the result content encoding:
-	if (m_encoding == papuga_Binary)
-	{
-		m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, defaultEncoding());
-	}
-	else
-	{
-		m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, m_encoding);
-	}
-	if (m_result_encoding == papuga_Binary)
-	{
-		int httpstatus = errorCodeToHttpStatus( ErrorCodeNotImplemented);
-		m_answer.setError_fmt( httpstatus, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented: %s"), m_accepted_charset);
-		return false;
-	}
-	// Set the result document type:
-	if (m_doctype == papuga_ContentType_Unknown)
-	{
-		m_result_doctype = strus::getResultContentType( m_accepted_doctype, defaultDocType());
-	}
-	else
-	{
-		m_result_doctype = strus::getResultContentType( m_accepted_doctype, papugaTranslatedContentType(m_doctype));
-	}
-	if (m_result_doctype == WebRequestContent::Unknown)
-	{
-		int httpstatus = errorCodeToHttpStatus( ErrorCodeNotImplemented);
-		m_answer.setError_fmt( httpstatus, ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), m_accepted_doctype);
-		return false;
-	}
-	return true;
+	return initResultContentType();
 }
 
 bool WebRequestContext::executePostTransaction()

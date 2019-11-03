@@ -1,12 +1,12 @@
 require "string"
 require "utils"
+require "math"
 
 function createCollection( strusctx, storagePath, metadata, analyzer, multipart, datadir, fnams, aclmap, withrpc)
 	local config = nil
 	if not withrpc then
 		config = {
 			path = storagePath,
-			metadata = metadata,
 			cache = '512M',
 			statsproc = 'std'
 		}
@@ -21,8 +21,20 @@ function createCollection( strusctx, storagePath, metadata, analyzer, multipart,
 	-- Get a client for the new created storage:
 	local storage = strusctx:createStorageClient( config)
 
-	-- Read input files, analyze and insert them:
 	local transaction = storage:createTransaction()
+	-- Create the meta table structure:
+	if (math.random(10) <= 5) then
+		local metadatacmds = {}
+		for mi,md in ipairs(metadata) do
+			table.insert( metadatacmds, {"add", md[0], md[1]} )
+		end
+		transaction:updateMetaDataTable( metadatacmds)
+	else
+		transaction:defineMetaDataTable( metadata)
+	end
+	transaction:commit()
+
+	-- Read input files, analyze and insert them:
 	local files = {}
 	local idx = 0
 	for _,fnam in ipairs(fnams) do

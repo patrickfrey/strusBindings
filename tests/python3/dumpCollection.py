@@ -18,6 +18,8 @@ def dumpCollection( strusctx, storagePath):
 
 	output[ "config"] = output_config
 	output[ "nofdocs"] = storage.nofDocumentsInserted()
+	output[ "metadata"] = storage.introspection("metadata")
+	output[ "attribute"] = storage.introspection("attribute")
 
 	# Document identifiers:
 	output_docids = []

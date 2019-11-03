@@ -16,7 +16,7 @@ local ctx = strus_Context.new( ctxconfig)
 local storageConfig = nil
 
 if not withrpc then
-	storageConfig = string.format( "path='%s';metadata='%s';cache=512M", storagedir, metadata_t3s())
+	storageConfig = string.format( "path='%s';cache=512M", storagedir)
 end
 
 createCollection( ctx, storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( ctx), false, datadir, docfiles, nil, withrpc)

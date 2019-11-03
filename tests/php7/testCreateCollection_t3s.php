@@ -24,13 +24,13 @@ createCollection( $ctx, $storage, metadata_t3s(), createDocumentAnalyzer_t3s( $c
 $result = "collection dump:" . dumpTree( dumpCollection( $ctx, $storage));
 $expected = <<<END_expected
 collection dump:
+string attribute: 
+  integer 0: "docclass"
+  integer 1: "docid"
+  integer 2: "title"
 string config: 
   string acl: "true"
   string cache: "524288K"
-  string metadata: 
-    string doclen: "UInt16"
-    string title_end: "UInt8"
-    string title_start: "UInt8"
   string path: "storage"
 string docids: 
   integer 0: "A.xml"
@@ -70,6 +70,10 @@ string docs:
     string title_end: 6
     string title_start: 0
     string word: "a visit journey through germani when i first it was still split into two part"
+string metadata: 
+  string doclen: "UInt16"
+  string title_end: "UInt8"
+  string title_start: "UInt8"
 string nofdocs: 3
 string stat: 
   string dfchange: 

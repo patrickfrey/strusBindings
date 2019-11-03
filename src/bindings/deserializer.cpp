@@ -529,7 +529,11 @@ template <typename ATOMICTYPE, ATOMICTYPE CONV( const papuga_ValueVariant& val),
 static std::vector<ATOMICTYPE> getAtomicTypeList( const papuga_ValueVariant& val)
 {
 	std::vector<ATOMICTYPE> rt;
-	if (val.valuetype != papuga_TypeSerialization)
+	if (!papuga_ValueVariant_defined( &val))
+	{
+		return rt;
+	}
+	else if (val.valuetype != papuga_TypeSerialization)
 	{
 		rt.push_back( CONV( val));
 		return rt;
@@ -1283,7 +1287,7 @@ QueryResult Deserializer::getQueryResult( const papuga_ValueVariant& res)
 	static const char* context = _TXT("query result");
 	if (res.valuetype != papuga_TypeSerialization)
 	{
-		throw strus::runtime_error(_TXT("expected structure for %s"), context);
+		throw strus::runtime_error(_TXT("expected non empty structure for %s"), context);
 	}
 	else
 	{

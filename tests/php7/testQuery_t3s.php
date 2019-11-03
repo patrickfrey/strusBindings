@@ -20,7 +20,7 @@ $withrpc = ($ctxconfig != NULL and isset($ctxconfig['rpc']));
 $storageConfig = NULL;
 $ctx = new StrusContext( $ctxconfig);
 if (!$withrpc) {
-	$storageConfig = "path='" . $storagedir . "';metadata='" . metadata_t3s() . "';cache=512M";
+	$storageConfig = "path='" . $storagedir . "';cache=512M";
 }
 
 createCollection( $ctx, $storagedir, metadata_t3s(), createDocumentAnalyzer_t3s( $ctx), False, $datadir, $docfiles, NULL, $withrpc);

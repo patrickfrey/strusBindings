@@ -7,7 +7,6 @@ def createCollection( strusctx, storagePath, metadata, analyzer, multipart, data
 	if not withrpc:
 		config = {
 			'path': storagePath,
-			'metadata': metadata,
 			'cache': '512M',
 			'statsproc': 'std'
 		}
@@ -20,8 +19,13 @@ def createCollection( strusctx, storagePath, metadata, analyzer, multipart, data
 	# Get a client for the new created storage:
 	storage = strusctx.createStorageClient( config)
 
-	# Read input files, analyze and insert them:
 	transaction = storage.createTransaction()
+
+	# Create the meta data table structure:
+	transaction.defineMetaDataTable( metadata)
+	transaction.commit()
+	
+	# Read input files, analyze and insert them:
 	files = {}
 	idx = 0
 	for fnam in fnams:

@@ -146,6 +146,9 @@ public:
 				}
 			},
 			{"/storage/document", "", "transaction", T::insertDocument(), {{DocumentId},{DocumentDef}} },
+
+			{SchemaStoragePart::defineMetaDataTableCommand( "/storage/metadata")},
+			{"/storage/metadata", "", "transaction", T::updateMetaDataTable(), {{StorageMetadataTableCommand}} },
 		}
 	) {}
 };

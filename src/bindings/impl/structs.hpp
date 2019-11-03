@@ -132,6 +132,14 @@ enum _SummaryElement {name,value,weight,index};
 /// \member value query value for the meta data element comparison
 enum _MetaDataComparison {op,name,value};
 
+/// \struct MetaDataTableCommand
+/// \brief Command altering the meta data table structure
+/// \member op operation (one of 'add', 'replace', 'remove', 'clear', 'alter')
+/// \member name name of the meta data element
+/// \member type type name of the meta data element ('UINT32','INT8','FLOAT16',etc.)
+/// \member oldname name of the element before the operation
+enum _MetaDataTableCommand {op,name,type,oldname};
+
 /// \struct ResultDocument
 /// \brief Document result description of a storage query result
 /// \member docno internal (local) document number

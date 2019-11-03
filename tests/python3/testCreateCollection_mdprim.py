@@ -32,16 +32,11 @@ aclmap = {"1":"A","2":"A","3":"A","4":"A","5":"A","6":"B","7":"B","8":"B","9":"B
 createCollection( ctx, storage, metadata_mdprim(), createDocumentAnalyzer_mdprim( ctx), True, datadir, docfiles, aclmap, withrpc)
 result = "collection dump:" + dumpTree( dumpCollection( ctx, storage)) + "\n"
 expected = """collection dump:
+str attribute:
+  number 1: "docid"
 str config:
   str acl: "true"
   str cache: "524288K"
-  str metadata:
-    str cross: "UInt8"
-    str docidx: "UInt32"
-    str doclen: "UInt16"
-    str factors: "UInt8"
-    str hi: "UInt16"
-    str lo: "UInt16"
   str path: "storage"
 str docids:
   number 1: "1"
@@ -155,6 +150,13 @@ str docs:
     str hi: 3
     str lo: 3
     str word: "3 3"
+str metadata:
+  str cross: "UInt8"
+  str docidx: "UInt32"
+  str doclen: "UInt16"
+  str factors: "UInt8"
+  str hi: "UInt16"
+  str lo: "UInt16"
 str nofdocs: 10
 str stat:
   str dfchange:

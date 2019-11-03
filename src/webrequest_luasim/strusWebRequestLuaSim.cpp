@@ -29,6 +29,8 @@
 #include "papuga/lib/lua_dev.h"
 #include "papuga/serialization.h"
 #include "papuga/valueVariant.h"
+#include "papuga/encoding.h"
+#include "papuga/requestParser.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
 extern "C" {
@@ -491,7 +493,7 @@ public:
 
 	void defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson);
 	void startServerProcess( const std::string& hostname, const std::string& configjson);
-	strus::WebRequestAnswer call( const std::string& method, const std::string& url, const std::string& content);
+	strus::WebRequestAnswer call( const std::string& method, const std::string& url, const char* charset, const char* doctype, const char* contentstr, std::size_t contentlen);
 	void reportError( const char* fmt, ...);
 
 private:
@@ -741,7 +743,7 @@ void EventLoop::initConfiguration( const Configuration& config)
 	(void)config.getValue( max_idle_time, "transactions.max_idle_time");
 	m_timerEventSecondsPeriod = std::max( 10, max_idle_time/20);
 }
-		
+
 bool EventLoop::send( const std::string& address,
 		const std::string& method,
 		const std::string& contentstr,
@@ -749,7 +751,7 @@ bool EventLoop::send( const std::string& address,
 {
 	try
 	{
-		strus::WebRequestAnswer result = g_globalContext.call( method, address, contentstr);
+		strus::WebRequestAnswer result = g_globalContext.call( method, address, g_charset, g_doctype, contentstr.c_str(), contentstr.size());
 		receiver->putAnswer( result);
 		return true;
 	}
@@ -951,12 +953,12 @@ void GlobalContext::startServerProcess( const std::string& hostname, const std::
 	}
 }
 
-strus::WebRequestAnswer GlobalContext::call( const std::string& method, const std::string& url, const std::string& contentstr)
+strus::WebRequestAnswer GlobalContext::call( const std::string& method, const std::string& url, const char* charset, const char* doctype, const char* contentstr, std::size_t contentlen)
 {
 	if (g_blockingCurlClient)
 	{
-		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, contentstr, g_serverConnRetry);
-		strus::WebRequestContent content( g_charset, g_doctype, response.content.c_str(), response.content.size());
+		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, charset, doctype, contentstr, contentlen, g_serverConnRetry);
+		strus::WebRequestContent content( charset, doctype, response.content.c_str(), response.content.size());
 		strus::WebRequestAnswer rt( response.httpstatus, content);
 		rt.copyContent();
 		return rt;
@@ -966,7 +968,7 @@ strus::WebRequestAnswer GlobalContext::call( const std::string& method, const st
 		std::pair<std::string,std::string> serverPathPair = splitUrl( url);
 		const std::string& proc = serverPathPair.first;
 		const std::string& path = serverPathPair.second;
-		strus::WebRequestContent content( g_charset, g_doctype, contentstr.c_str(), contentstr.size());
+		strus::WebRequestContent content( charset, doctype, contentstr, contentlen);
 
 		ProcMap::iterator pi = m_procMap.find( proc);
 		if (pi == m_procMap.end())
@@ -1390,6 +1392,7 @@ static int l_call_server( lua_State* L)
 		const char* method = lua_tostring( L, 1);
 		const char* url = lua_tostring( L, 2);
 		const char* arg = "";
+		std::size_t arglen = 0;
 		std::string content;
 		if (nofArgs == 3 && !lua_isnil( L, 3))
 		{
@@ -1398,18 +1401,31 @@ static int l_call_server( lua_State* L)
 				arg = lua_tostring( L, 3);
 				content = getContentArgumentValue( arg);
 				arg = content.c_str();
+				arglen = content.size();
 			}
 			else if (lua_istable( L, 3))
 			{
 				content = convertLuaValueToJson( L, 3, true/*indentiation*/);
 				arg = content.c_str();
+				arglen = content.size();
 			}
 			else
 			{
 				luaL_error(L, _TXT("table or string expected as 3rd argument 'call_server'"));
 			}
 		}
-		strus::WebRequestAnswer result = g_globalContext.call( method, url, arg);
+		const char* doctypestr = 0;
+		const char* encodingstr = 0;
+		if (arglen > 0)
+		{
+			papuga_ContentType doctype = papuga_guess_ContentType( arg, arglen);
+			if (doctype == papuga_ContentType_Unknown) luaL_error(L, _TXT("failed to detect content type of argument of 'call_server'"));
+			doctypestr = papuga_ContentType_mime( doctype);
+			papuga_StringEncoding encoding = papuga_guess_StringEncoding( arg, arglen);
+			if (encoding == papuga_Binary) luaL_error(L, _TXT("failed to detect character set of argument of 'call_server'"));
+			encodingstr = papuga_stringEncodingName( encoding);
+		}
+		strus::WebRequestAnswer result = g_globalContext.call( method, url, encodingstr, doctypestr, arg, arglen);
 		if (result.content().empty())
 		{
 			lua_pushnil(L);

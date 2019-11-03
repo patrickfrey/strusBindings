@@ -24,7 +24,7 @@ class AutomatonNameSpace
 public:
 	enum EnvAssignment
 	{
-		EnvFormat
+		EnvFormat, EnvPath, EnvName
 	};
 
 	enum Item
@@ -38,6 +38,7 @@ public:
 
 		StorageConfig, DatabaseEngine, DatabasePath, StorageCachedTerms,
 		StorageMetadata, StorageMetadataName, StorageMetadataType,
+		StorageMetadataTableCommand, StorageMetadataTableOperation, StorageMetadataOldname, 
 		StorageEnableAcl, DatabaseEnableCompression, DatabaseEnableAutoCompact,
 		DatabaseLruCacheSize, DatabaseMaxNofOpenFiles, DatabaseWriteBufferSize, DatabaseBlockSize,
 

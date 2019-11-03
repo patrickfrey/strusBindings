@@ -41,7 +41,7 @@ function createQueryAnalyzer_mdprim( $strusctx) {
 }
 
 function metadata_mdprim() {
-	return 'cross UINT8, factors UINT8, lo UINT16, hi UINT16, doclen UINT16, docidx UINT32';
+	return [ ["cross", "UINT8"], ["factors", "UINT8"], ["lo", "UINT16"], ["hi", "UINT16"], ["doclen", "UINT16"], ["docidx", "UINT32"] ];
 }
 
 function createQueryEval_mdprim( $strusctx) {

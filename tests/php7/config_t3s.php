@@ -23,7 +23,7 @@ function createQueryAnalyzer_t3s( $strusctx) {
 }
 
 function metadata_t3s() {
-	return 'doclen UINT16, title_start UINT8, title_end UINT8';
+	return [ ["doclen", "UINT16"], ["title_start", "UINT8"], ["title_end", "UINT8"] ];
 }
 
 function createQueryEval_t3s( $strusctx) {
