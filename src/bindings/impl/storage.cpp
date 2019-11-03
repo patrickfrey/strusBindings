@@ -324,6 +324,8 @@ void StorageTransactionImpl::insertDocument( const std::string& docid, const Val
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
+	if (docid.empty()) throw strus::runtime_error( _TXT("empty document id passed to %s"), _TXT("storage transaction insert document"));
+
 	Reference<StorageDocumentInterface> document( transaction->createDocument( docid));
 	if (!document.get()) throw strus::runtime_error( _TXT("failed to create document with id '%s' to insert: %s"), docid.c_str(), errorhnd->fetchError());
 
