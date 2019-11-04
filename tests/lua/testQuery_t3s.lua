@@ -88,9 +88,6 @@ query:setMaxNofRanks( 20)
 -- 20 for the 2nd, 40 for the 3rd page, etc.):
 query:setMinRank( 0)
 
--- Define the title field:
-query:addFeature( "titlefield", {from="title_start", to="title_end"} )
-
 -- Enable debugging
 query:setDebugMode( false )
 
@@ -208,13 +205,6 @@ string QueryDump:
         string node: "expression"
         string op: "contains"
         string range: 0
-      string weight: 1
-    number 5:
-      string set: "titlefield"
-      string struct:
-        string end: "title_end"
-        string node: "docfield"
-        string start: "title_start"
       string weight: 1
   string merge: 0
   string minrank: 0
