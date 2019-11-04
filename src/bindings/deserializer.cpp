@@ -2052,17 +2052,15 @@ enum ExpressionType {
 	ExpressionEmpty,
 	ExpressionTerm,
 	ExpressionVariableAssignment,
-	ExpressionMetaDataRange,
 	ExpressionJoin,
 	ExpressionList
 };
 
 static ExpressionType getExpressionType( const papuga_SerializationIter& seriter_)
 {
-	static const StructureNameMap keywords( "type,value,len,from,to,variable,op,range,cardinality,arg", ',');
+	static const StructureNameMap keywords( "type,value,len,variable,op,range,cardinality,arg", ',');
 	static const ExpressionType keywordTypeMap[10] = {
 		ExpressionTerm, ExpressionTerm, ExpressionTerm,			/*type,value,len*/
-		ExpressionMetaDataRange,ExpressionMetaDataRange,		/*from,to*/
 		ExpressionVariableAssignment,					/*variable*/
 		ExpressionJoin,ExpressionJoin,ExpressionJoin,ExpressionJoin	/*op,range,cardinality,arg*/
 	};
@@ -2295,12 +2293,6 @@ static void buildExpressionTyped( ExpressionBuilder& builder, ExpressionType ety
 		{
 			throw strus::runtime_error(_TXT("isolated variable assignment in %s"), context);
 		}
-		case ExpressionMetaDataRange:
-		{
-			MetaDataRangeDef def( seriter);
-			builder.pushDocField( def.from, def.to);
-			break;
-		}
 		case ExpressionJoin:
 		{
 			buildExpressionJoin( builder, seriter);
@@ -2322,7 +2314,7 @@ static void buildExpressionTyped( ExpressionBuilder& builder, ExpressionType ety
 void Deserializer::buildExpression( ExpressionBuilder& builder, papuga_SerializationIter& seriter, bool allowLists)
 {
 	const char* context = "expression";
-	static const StructureNameMap keywords( "expression,term,meta,list", ',');
+	static const StructureNameMap keywords( "expression,term,list", ',');
 	int ki;
 	ExpressionType etype = ExpressionUnknown;
 
@@ -2338,8 +2330,7 @@ void Deserializer::buildExpression( ExpressionBuilder& builder, papuga_Serializa
 		{
 			case 0: etype = ExpressionJoin; break;
 			case 1: etype = ExpressionTerm; break;
-			case 2: etype = ExpressionMetaDataRange; break;
-			case 3: etype = ExpressionList; break;
+			case 2: etype = ExpressionList; break;
 		}
 		buildExpressionTyped( builder, etype, seriter, allowLists);
 		Deserializer::consumeClose( seriter);

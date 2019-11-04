@@ -42,16 +42,6 @@ struct QueryTermDef
 		:variable(o.variable),type(o.type),value(o.value),length(o.length),value_defined(o.value_defined),length_defined(o.length_defined){}
 };
 
-struct MetaDataRangeDef
-{
-	std::string from;
-	std::string to;
-
-	MetaDataRangeDef( papuga_SerializationIter& seriter);
-	MetaDataRangeDef( const MetaDataRangeDef& o)
-		:from(o.from),to(o.to){}
-};
-
 struct ConfigDef
 {
 	std::string cfgstring;

@@ -146,40 +146,6 @@ QueryTermDef::QueryTermDef( papuga_SerializationIter& seriter)
 	}
 }
 
-MetaDataRangeDef::MetaDataRangeDef( papuga_SerializationIter& seriter)
-	:from(),to()
-{
-	static const char* context = _TXT("metadata range");
-	static const StructureNameMap namemap( "from,to", ',');
-
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-	{
-		do
-		{
-			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-			papuga_SerializationIter_skip( &seriter);
-			switch (idx)
-			{
-				case 0: from = Deserializer::getString( seriter); break;
-				case 1:	to = Deserializer::getString( seriter); break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-			}
-		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-	}
-	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-	{
-		from = Deserializer::getString( seriter);
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			to = Deserializer::getString( seriter);
-		}
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("expected %s structure"), context);
-	}
-}
-
 KeyValueList::KeyValueList( const papuga_ValueVariant& def, const char* namemapdef)
 	:items()
 {

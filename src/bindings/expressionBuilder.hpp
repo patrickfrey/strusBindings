@@ -33,7 +33,6 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length)=0;
 	virtual void pushTerm( const std::string& type, const std::string& value)=0;
 	virtual void pushTerm( const std::string& type)=0;
-	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)=0;
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)=0;
 	virtual void attachVariable( const std::string& name)=0;
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible)=0;
@@ -50,7 +49,6 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
-	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
@@ -80,7 +78,6 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
-	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
@@ -114,7 +111,6 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
-	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
@@ -143,7 +139,6 @@ public:
 	virtual void pushTerm( const std::string& fieldtype, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& fieldtype, const std::string& value);
 	virtual void pushTerm( const std::string& value);
-	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
@@ -169,7 +164,6 @@ public:
 	virtual void pushTerm( const std::string& type, const std::string& value, unsigned int length);
 	virtual void pushTerm( const std::string& type, const std::string& value);
 	virtual void pushTerm( const std::string& type);
-	virtual void pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd);
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);

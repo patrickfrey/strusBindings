@@ -98,11 +98,6 @@ void PostProcPatternExpressionBuilder::pushTerm( const std::string& type)
 	}
 }
 
-void PostProcPatternExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
-{
-	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented in %s"), metadataRangeStart.c_str(), metadataRangeEnd.c_str(), "post proc patterns");
-}
-
 void PostProcPatternExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
 	strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( op);
@@ -170,11 +165,6 @@ void PreProcPatternExpressionBuilder::pushTerm( const std::string& type)
 	}
 }
 
-void PreProcPatternExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
-{
-	throw strus::runtime_error(_TXT("document field ranges ([%s..%s]) not implemented for %s"), metadataRangeStart.c_str(), metadataRangeEnd.c_str(), "pre proc pattern");
-}
-
 void PreProcPatternExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
 	strus::PatternMatcherInstanceInterface::JoinOperation joinop = patternMatcherJoinOp( op);
@@ -225,12 +215,6 @@ void QueryExpressionBuilder::pushTerm( const std::string& type)
 	throw strus::runtime_error(_TXT("push term without value not implemented for %s"), "query");
 }
 
-void QueryExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
-{
-	++m_stackSize;
-	m_query->pushDocField( metadataRangeStart, metadataRangeEnd);
-}
-
 void QueryExpressionBuilder::pushExpression( const std::string& opname, unsigned int argc, int range, unsigned int cardinality)
 {
 	const PostingJoinOperatorInterface* op = m_queryproc->getPostingJoinOperator( opname);
@@ -274,11 +258,6 @@ void QueryAnalyzerTermExpressionBuilder::pushTerm( const std::string& value)
 	pushField( std::string(), value);
 }
 
-void QueryAnalyzerTermExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
-{
-	throw strus::runtime_error(_TXT("document meta data ranges not implemented for %s"), "query");
-}
-
 void QueryAnalyzerTermExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
 	m_expression->pushExpression( op, argc, range, cardinality);
@@ -311,13 +290,6 @@ void PostingsExpressionBuilder::pushTerm( const std::string& type, const std::st
 void PostingsExpressionBuilder::pushTerm( const std::string& type)
 {
 	throw strus::runtime_error(_TXT("push term without value not implemented for %s"), "posting iterator");
-}
-
-void PostingsExpressionBuilder::pushDocField( const std::string& metadataRangeStart, const std::string& metadataRangeEnd)
-{
-	Reference<PostingIteratorInterface> itr( m_storage->createFieldPostingIterator( metadataRangeStart, metadataRangeEnd));
-	if (!itr.get()) throw strus::runtime_error(_TXT("failed to create metadata field posting iterator from '%s' to' '%s': %s"), metadataRangeStart.c_str(), metadataRangeEnd.c_str(), m_errorhnd->fetchError());
-	m_stack.push_back( itr);
 }
 
 void PostingsExpressionBuilder::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
