@@ -81,15 +81,29 @@ enum _DocumentInvTerm {tf,firstpos,value};
 /// \member pos ordinal position of the term (>=1)
 enum _DocumentTerm {type,value,pos};
 
+/// \struct IndexRange
+/// \brief Index range
+/// \member start start position
+/// \member end end position (first position not belonging to the range)
+enum _IndexRange {start,end};
+
+/// \struct DocumentStructure
+/// \brief Document structures
+/// \member name name of the structure
+/// \member source header of the block
+/// \member sink content of the block
+enum _DocumentStructure {name,source,sink};
+
 /// \struct Document
-/// \brief Document structure as returned from the analyzer and accepted by insertDocument
+/// \brief Document as returned from the analyzer and accepted by insertDocument
 /// \member doctype sub document type
 /// \member attribute document attributes (dictionary)
 /// \member metadata document metadata (dictionary)
 /// \member forwardindex forward index features (list)
 /// \member searchindex search index features (list)
+/// \member searchstruct search index structures (list)
 /// \member access access control list, user role or list of user roles allowed to read the document, not provided by the analyzer
-enum _Document {doctype,attribute,metadata,forwardindex,searchindex,access};
+enum _Document {doctype,attribute,metadata,forwardindex,searchindex,searchstruct,access};
 
 /// \struct DocumentClass
 /// \brief Document class structure

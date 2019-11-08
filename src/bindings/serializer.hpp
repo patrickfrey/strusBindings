@@ -30,6 +30,7 @@
 #include "strus/postingJoinOperatorInterface.hpp"
 #include "strus/documentTermIteratorInterface.hpp"
 #include "strus/debugTraceInterface.hpp"
+#include "strus/index.hpp"
 #include "impl/value/termExpression.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/metadataComparison.hpp"
@@ -50,12 +51,15 @@ template <typename Struct> class StructIdTemplate { public:static void structid(
 template <> class StructIdTemplate<StatisticsViewerInterface> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_StatisticsChange;}};
 template <> class StructIdTemplate<TermStatisticsChange> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_TermStatisticsChange;}};
 template <> class StructIdTemplate<TimeStamp> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_TimeStamp;}};
+template <> class StructIdTemplate<IndexRange> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_IndexRange;}};
+template <> class StructIdTemplate<analyzer::DocumentStructure::PositionRange> {public: static int structid() {return STRUS_BINDINGS_STRUCTID_IndexRange;}};
 template <> class StructIdTemplate<StatisticsMessage> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_StatisticsMessage;}};
 template <> class StructIdTemplate<analyzer::QueryTerm> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_QueryTerm;}};
 template <> class StructIdTemplate<analyzer::QueryTermExpression> {public: static int structid(){return STRUS_BINDINGS_STRUCTID_QueryTermExpression;}};
 template <> class StructIdTemplate<DocumentTermIteratorInterface::Term> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentInvTerm;}};
 template <> class StructIdTemplate<analyzer::DocumentTerm> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentTerm;}};
 template <> class StructIdTemplate<analyzer::Document> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_Document;}};
+template <> class StructIdTemplate<analyzer::DocumentStructure> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentStructure;}};
 template <> class StructIdTemplate<analyzer::DocumentClass> {public: static int structid()	{return STRUS_BINDINGS_STRUCTID_DocumentClass;}};
 template <> class StructIdTemplate<VectorQueryResult> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_VectorQueryResult;}};
 template <> class StructIdTemplate<SentenceTerm> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_SentenceTerm;}};
@@ -200,12 +204,16 @@ private:
 
 	static bool serialize_nothrow( papuga_Serialization* result, const TermStatisticsChange& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const TimeStamp& timestamp, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const IndexRange& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentStructure::PositionRange& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const StatisticsMessage& msg, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, DocumentTermIteratorInterface* dtitr, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::QueryTerm& val, const char* variablename, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentTerm& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentAttribute& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentMetaData& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentStructure& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentStructure>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::Document& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentClass& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsItem& val, papuga_ErrorCode& errcode, bool deep);

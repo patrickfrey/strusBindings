@@ -41,7 +41,7 @@ public:
 		}
 		else
 		{
-			throw std::logic_error( "deep copy of Iterator not allowed");
+			throw std::runtime_error( "deep copy of Iterator not allowed");
 		}
 	}
 

@@ -103,6 +103,48 @@ public:
 		const ValueVariant& priority=ValueVariant(),
 		const ValueVariant& options=ValueVariant());
 
+	/// \brief Define field in a document as coherent areas selected by a selection expression
+	/// \note Fields are building blocks of structures int the search index defined as directional binary relations of fields
+	/// \param[in] name name of this field type
+	/// \example "title","text"
+	/// \param[in] scopeexpr expression selecting the scope of the field, the other two expression parameters 'selectexpr' and 'keyexpr' are defined relative to this expression
+	/// \remark The scope of two fields related in a structure has to be the same
+	/// \example "/doc"
+	/// \example "/doc/text"
+	/// \param[in] selectexpr expression selecting the coherent area defining what is in the field
+	/// \param[in] keyexpr (optional) expression selecting the key of the field that has to be the same for fields related in a structure
+	/// \remark selectexpr has to be a prefix of keyexpr
+	void addSearchIndexField(
+			const std::string& name,
+			const std::string& scopeexpr,
+			const std::string& selectexpr,
+			const ValueVariant& keyexpr=ValueVariant());
+
+	/// \brief Define a structure as directional relation of two field types
+	/// \note The field defining the source of the directional relation is called 'header'
+	/// \note The field defining the sink of the directional relation is called 'content'
+	/// \remark The header field areas of a structures of the same structure declaration must not overlap
+	/// \remark The content field areas of a structure of the same structure declaration must not overlap
+	/// \param[in] name name of this structure type
+	/// \example "chapter"
+	/// \param[in] headerFieldName name of the field type that defines the header part of this structure
+	/// \example "title"
+	/// \example "h1"
+	/// \param[in] contentFieldName name of the field type that defines the content part of this structure
+	/// \example "text"
+	/// \example "p"
+	/// \param[in] structureType one of "cover","label","header","footer" defining the building of this structure type in the document analysis
+	/// \note Structure types are unified and treated uniformly after analysis
+	/// \note "cover" is used in case of the header covering the content
+	/// \note "label" is used in case of the header beeing embedded in the content structure
+	/// \note "header" is used in case of the header preceeding the content structure
+	/// \note "footer" is used in case of the header preceeding the content structure
+	void addSearchIndexStructure(
+			const std::string& name,
+			const std::string& headerFieldName,
+			const std::string& contentFieldName,
+			const ValueVariant& structureType);
+
 	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of document analysis
 	/// \param[in] type term type name of the lexem to be feed to the pattern matching
 	/// \example "word"
@@ -129,7 +171,7 @@ public:
 			const ValueVariant& priority=ValueVariant());
 
 	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
-	/// \param[in] fieldname name of the addressed meta data field.
+	/// \param[in] name name of the addressed meta data element.
 	/// \example "date"
 	/// \param[in] selectexpr expression selecting the elements to fetch for producing this feature
 	/// \example "/doc/text//()"
@@ -143,18 +185,18 @@ public:
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
 	void defineMetaData(
-		const std::string& fieldname,
+		const std::string& name,
 		const std::string& selectexpr,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers);
 
 	/// \brief Declare some aggregated value of the document to be put into the meta data table used for restrictions, weighting and summarization.
- 	/// \param[in] fieldname name of the addressed meta data field.
+ 	/// \param[in] name name of the addressed meta data element.
 	/// \example "doclen"
 	/// \param[in] function defining how and from what the value is aggregated
 	/// \example ["count","word"]
 	void defineAggregatedMetaData(
-		const std::string& fieldname,
+		const std::string& name,
 		const ValueVariant& function);
 
 	/// \brief Define a feature to insert as document attribute (for summarization) is selected, tokenized and normalized
@@ -228,7 +270,7 @@ public:
 		const ValueVariant& options=ValueVariant());
 
 	/// \brief Define a result of pattern matching to insert as metadata, normalized
-	/// \param[in] fieldname field name of the meta data element to produce.
+	/// \param[in] name name of the meta data element to produce.
 	/// \example "location"
 	/// \param[in] patternTypeName name of the pattern to select
 	/// \example "word"
@@ -237,7 +279,7 @@ public:
 	/// \example ["lc",["convdia", "en"]]
 	/// \example ["date2int","d","%Y-%m-%d"]
 	void defineMetaDataFromPatternMatch(
-		const std::string& fieldname,
+		const std::string& name,
 		const std::string& patternTypeName,
 		const ValueVariant& normalizers);
 

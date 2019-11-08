@@ -71,6 +71,12 @@ struct Deserializer
 
 	static Index getIndex( papuga_SerializationIter& seriter);
 
+	static IndexRange getIndexRange( papuga_SerializationIter& seriter);
+	static IndexRange getIndexRangeAsValue( papuga_SerializationIter& seriter);
+
+	static analyzer::DocumentStructure::PositionRange getAnalyzerPositionRange( papuga_SerializationIter& seriter);
+	static analyzer::DocumentStructure::PositionRange getAnalyzerPositionRangeAsValue( papuga_SerializationIter& seriter);
+
 	static double getDouble( papuga_SerializationIter& seriter);
 	static float getFloat( papuga_SerializationIter& seriter);
 

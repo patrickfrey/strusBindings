@@ -18,12 +18,14 @@
 #include "papuga/serialization.h"
 #include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
+#include "papuga/valueVariant.h"
 #include "patternMatcherLoader.hpp"
 #include "private/internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
 #include "callResultUtils.hpp"
 #include "structDefs.hpp"
+#include "valueVariantWrap.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -109,6 +111,42 @@ void DocumentAnalyzerImpl::addForwardIndexFeature(
 		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers,
 		priority, Deserializer::getFeatureOptions( options));
 	funcdef.release();
+}
+
+void DocumentAnalyzerImpl::addSearchIndexField(
+		const std::string& name,
+		const std::string& scopeexpr,
+		const std::string& selectexpr,
+		const ValueVariant& keyexprVal)
+{
+	std::string keyexpr;
+	if (papuga_ValueVariant_defined( &keyexprVal))
+	{
+		keyexpr = ValueVariantWrap::tostring( keyexprVal);
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
+	analyzer->addSearchIndexField( name, scopeexpr, selectexpr, keyexpr);
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("error defining search index field: %s"), errorhnd->fetchError());
+}
+
+void DocumentAnalyzerImpl::addSearchIndexStructure(
+		const std::string& name,
+		const std::string& headerFieldName,
+		const std::string& contentFieldName,
+		const ValueVariant& structureTypeVal)
+{
+	DocumentAnalyzerInstanceInterface::StructureType structureType;
+	char nambuf[ 64];
+	const char* structureTypeStr = papuga_ValueVariant_toascii( nambuf, sizeof(nambuf), &structureTypeVal, 0/*nonAsciiSubstChar*/);
+	if (!structureTypeStr || !DocumentAnalyzerInstanceInterface::structureTypeFromName( structureType, structureTypeStr))
+	{
+		throw strus::runtime_error(_TXT("invalid name for structure type, expected one of '%s'"), "cover,label,header,footer");
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
+	analyzer->addSearchIndexStructure( name, headerFieldName, contentFieldName, structureType);
+	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("error defining search index structure: %s"), errorhnd->fetchError());
 }
 
 void DocumentAnalyzerImpl::addPatternLexem(

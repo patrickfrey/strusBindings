@@ -584,6 +584,72 @@ std::vector<Index> Deserializer::getIndexList( const papuga_ValueVariant& val)
 	return getAtomicTypeList<Index,ValueVariantWrap::toint,Deserializer::getIndex>( val);
 }
 
+IndexRange Deserializer::getIndexRange( papuga_SerializationIter& seriter)
+{
+	static const StructureNameMap namemap( "start,end", ',');
+	enum StructureNameId {I_start=0,I_end=1};
+	static const char* context = _TXT("index range");
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		char defined[ 2] = {0,0};
+		int start = 0;
+		int end = 0;
+
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			switch ((StructureNameId)idx)
+			{
+				case I_start:
+					if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s structure"), namemap.name(idx), context);
+					start = getIndex( seriter);
+				break;
+				case I_end:
+					if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s structure"), namemap.name(idx), context);
+					end = getIndex( seriter);
+				break;
+				default:
+					throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+			}
+		}
+		return IndexRange( start, end);
+	}
+	else
+	{
+		Index start = getIndex( seriter);
+		Index end = getIndex( seriter);
+		return IndexRange( start, end);
+	}
+}
+
+IndexRange Deserializer::getIndexRangeAsValue( papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("index range");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		return getIndexRange( seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected structure for %s"), context);
+	}
+}
+
+analyzer::DocumentStructure::PositionRange Deserializer::getAnalyzerPositionRange( papuga_SerializationIter& seriter)
+{
+	IndexRange res = getIndexRange( seriter);
+	return analyzer::DocumentStructure::PositionRange( res.start(), res.end());
+}
+
+analyzer::DocumentStructure::PositionRange Deserializer::getAnalyzerPositionRangeAsValue( papuga_SerializationIter& seriter)
+{
+	IndexRange res = getIndexRangeAsValue( seriter);
+	return analyzer::DocumentStructure::PositionRange( res.start(), res.end());
+}
+
 static void setFeatureOption_position( analyzer::FeatureOptions& res, const papuga_ValueVariant* val)
 {
 	char buf[ 128];
@@ -2708,6 +2774,69 @@ static void buildStorageIndex( StorageDocumentIndexAccess* document, papuga_Seri
 	}
 }
 
+template <class StorageDocumentIndexAccess>
+static void buildStorageStructures( StorageDocumentIndexAccess* document, papuga_SerializationIter& seriter)
+{
+	static const StructureNameMap namemap( "name,source,sink", ',');
+	enum StructureId {_name,_source,_sink};
+	static const char* context = _TXT("search structures");
+
+	while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
+	{
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+			{
+				unsigned char defined[3] = {0,0,0};
+				std::string name;
+				IndexRange source;
+				IndexRange sink;
+				do
+				{
+					int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+					papuga_SerializationIter_skip( &seriter);
+					switch ((StructureId)idx)
+					{
+						case _name: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+							name = Deserializer::getString( seriter);
+							break;
+						case _source: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+							source = Deserializer::getIndexRangeAsValue( seriter);
+							break;
+						case _sink: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+							sink = Deserializer::getIndexRangeAsValue( seriter);
+							break;
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					}
+				}
+				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+				if (!defined[0] || !defined[1] || !defined[2])
+				{
+					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
+				}
+				document->addSearchIndexStructure( name, source, sink);
+			}
+			else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+			{
+				std::string name = Deserializer::getString( seriter);
+				IndexRange source = Deserializer::getIndexRangeAsValue( seriter);
+				IndexRange sink = Deserializer::getIndexRangeAsValue( seriter);
+				document->addSearchIndexStructure( name, source, sink);
+			}
+			else
+			{
+				throw strus::runtime_error(_TXT("array or dictionary expected for %s"), context);
+			}
+			Deserializer::consumeClose( seriter);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("list of structures expected for %s"), context);
+		}
+	}
+}
+
 template <class StorageDocumentAccess>
 static void buildAccessRights( StorageDocumentAccess* document, papuga_SerializationIter& seriter)
 {
@@ -2722,7 +2851,7 @@ static void buildAttributesValue(
 		StorageDocumentAccess* document,
 		papuga_SerializationIter& seriter)
 {
-	static const char* context = _TXT("document");
+	static const char* context = _TXT("document attributes");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
@@ -2740,7 +2869,7 @@ static void buildMetaDataValue(
 		StorageDocumentAccess* document,
 		papuga_SerializationIter& seriter)
 {
-	static const char* context = _TXT("document");
+	static const char* context = _TXT("document metadata");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
@@ -2758,7 +2887,7 @@ static void buildStorageSearchIndexValue(
 		StorageDocumentAccess* document,
 		papuga_SerializationIter& seriter)
 {
-	static const char* context = _TXT("document");
+	static const char* context = _TXT("document search index");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		StorageDocumentSearchIndexAccess<StorageDocumentAccess> da( document);
@@ -2773,11 +2902,29 @@ static void buildStorageSearchIndexValue(
 }
 
 template <class StorageDocumentAccess>
+static void buildStorageSearchStructureValue(
+		StorageDocumentAccess* document,
+		papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("document search structures");
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		papuga_SerializationIter_skip( &seriter);
+		buildStorageStructures( document, seriter);
+		Deserializer::consumeClose( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("structure expected for section %s in %s definition"), "searchindex", context);
+	}
+}
+
+template <class StorageDocumentAccess>
 static void buildStorageForwardIndexValue(
 		StorageDocumentAccess* document,
 		papuga_SerializationIter& seriter)
 {
-	static const char* context = _TXT("document");
+	static const char* context = _TXT("document forward index");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		StorageDocumentForwardIndexAccess<StorageDocumentAccess> da( document);
@@ -2796,7 +2943,7 @@ static void buildAccessRightsValue(
 		StorageDocumentAccess* document,
 		papuga_SerializationIter& seriter)
 {
-	static const char* context = _TXT("document");
+	static const char* context = _TXT("document access");
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
@@ -2826,7 +2973,8 @@ static void buildStorageDocument(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "docid,doctype,attribute,metadata,forwardindex,searchindex,access", ',');
+	static const StructureNameMap namemap( "docid,doctype,attribute,metadata,forwardindex,searchindex,searchstruct,access", ',');
+	enum StructureId {_docid,_doctype,_attribute,_metadata,_forwardindex,_searchindex,_searchstruct,_access};
 	static const char* context = _TXT("document");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -2844,23 +2992,25 @@ static void buildStorageDocument(
 			{
 				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
 				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
+				switch ((StructureId)idx)
 				{
-					case 0: (void)Deserializer::getString( seriter);
+					case _docid: (void)Deserializer::getString( seriter);
 						// ... ignore sub document type (output of analyzer)
 						break;
-					case 1: (void)Deserializer::getString( seriter);
+					case _doctype: (void)Deserializer::getString( seriter);
 						// ... ignore document identifier (part of schema)
 						break;
-					case 2: buildAttributesValue( document, seriter);
+					case _attribute: buildAttributesValue( document, seriter);
 						break;
-					case 3: buildMetaDataValue( document, seriter);
+					case _metadata: buildMetaDataValue( document, seriter);
 						break;
-					case 4: buildStorageForwardIndexValue( document, seriter);
+					case _forwardindex: buildStorageForwardIndexValue( document, seriter);
 						break;
-					case 5: buildStorageSearchIndexValue( document, seriter);
+					case _searchindex: buildStorageSearchIndexValue( document, seriter);
 						break;
-					case 6: buildAccessRightsValue( document, seriter);
+					case _searchstruct: buildStorageSearchStructureValue( document, seriter);
+						break;
+					case _access: buildAccessRightsValue( document, seriter);
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 				}
@@ -2869,11 +3019,12 @@ static void buildStorageDocument(
 		}
 		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 		{
-			(void)Deserializer::getString( seriter);           if (papuga_SerializationIter_eof( &seriter)) return;
-			buildAttributesValue( document, seriter);          if (papuga_SerializationIter_eof( &seriter)) return;
-			buildMetaDataValue( document, seriter);	           if (papuga_SerializationIter_eof( &seriter)) return;
-			buildStorageForwardIndexValue( document, seriter); if (papuga_SerializationIter_eof( &seriter)) return;
-			buildStorageSearchIndexValue( document, seriter);  if (papuga_SerializationIter_eof( &seriter)) return;
+			(void)Deserializer::getString( seriter);		if (papuga_SerializationIter_eof( &seriter)) return;
+			buildAttributesValue( document, seriter);		if (papuga_SerializationIter_eof( &seriter)) return;
+			buildMetaDataValue( document, seriter);			if (papuga_SerializationIter_eof( &seriter)) return;
+			buildStorageForwardIndexValue( document, seriter);	if (papuga_SerializationIter_eof( &seriter)) return;
+			buildStorageSearchIndexValue( document, seriter);	if (papuga_SerializationIter_eof( &seriter)) return;
+			buildStorageSearchStructureValue( document, seriter);	if (papuga_SerializationIter_eof( &seriter)) return;
 			buildAccessRightsValue( document, seriter);
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 		}
@@ -2893,7 +3044,8 @@ static void buildStorageDocumentDeletes(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "attribute,metadata,searchindex,forwardindex,access", ',');
+	static const StructureNameMap namemap( "attribute,metadata,forwardindex,searchindex,searchstruct,access", ',');
+	enum StructureId {_attribute,_metadata,_forwardindex,_searchindex,_searchstruct,_access};
 	static const char* context = _TXT("document update deletes");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -2911,9 +3063,9 @@ static void buildStorageDocumentDeletes(
 			{
 				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
 				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
+				switch ((StructureId)idx)
 				{
-					case 0: {
+					case _attribute: {
 							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
@@ -2923,7 +3075,7 @@ static void buildStorageDocumentDeletes(
 						}
 						break;
 
-					case 1: {
+					case _metadata: {
 							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
@@ -2933,7 +3085,17 @@ static void buildStorageDocumentDeletes(
 						}
 						break;
 
-					case 2: {
+					case _forwardindex: {
+							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
+							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
+							for (; di != de; ++di)
+							{
+								document->clearForwardIndexTerm( *di);
+							}
+						}
+						break;
+
+					case _searchindex: {
 							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
@@ -2943,16 +3105,17 @@ static void buildStorageDocumentDeletes(
 						}
 						break;
 
-					case 3: {
+					case _searchstruct: {
 							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							for (; di != de; ++di)
 							{
-								document->clearForwardIndexTerm( *di);
+								document->clearSearchIndexStructure( *di);
 							}
 						}
 						break;
-					case 4: {
+
+					case _access: {
 							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
 							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
 							if (std::find( di, de, std::string("*")) != deletes.end())
@@ -2965,6 +3128,7 @@ static void buildStorageDocumentDeletes(
 							}
 						}
 						break;
+
 					default: {
 							throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
 					}

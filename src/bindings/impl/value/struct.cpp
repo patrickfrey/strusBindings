@@ -38,7 +38,7 @@ Struct::Struct( const Struct& o)
 	}
 	else
 	{
-		throw std::logic_error( "deep copy of Struct not allowed");
+		throw std::runtime_error( "deep copy of Struct not allowed");
 	}
 }
 

@@ -64,6 +64,14 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= serializeStructMember( result, val.name().c_str(), val.value(), errcode, deep);
 	return rt;
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentStructure& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, val.name(), errcode, deep);
+	rt &= serializeArrayElement( result, val.source(), errcode, deep);
+	rt &= serializeArrayElement( result, val.sink(), errcode, deep);
+	return rt;
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, DocumentTermIteratorInterface* dtitr, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
@@ -132,6 +140,11 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= serializeArrayElement( result, val.metadata(), errcode, deep);
 	rt &= serializeArrayElement( result, val.forwardIndexTerms(), errcode, deep);
 	rt &= serializeArrayElement( result, val.searchIndexTerms(), errcode, deep);
+	rt &= serializeArrayElement( result, val.searchIndexStructures(), errcode, deep);
+	if (!val.accessList().empty())
+	{
+		rt &= serializeArrayElement( result, val.accessList(), errcode, deep);
+	}
 	return rt;
 }
 static const char* getTermExpressionVariableName(
@@ -490,6 +503,24 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TimeStam
 	rt &= serializeArrayElement( result, (papuga_Int)timestamp.unixtime(), errcode, deep);
 	rt &= serializeArrayElement( result, (papuga_Int)timestamp.counter(), errcode, deep);
 	return rt;
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const IndexRange& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, (papuga_Int)val.start(), errcode, deep);
+	rt &= serializeArrayElement( result, (papuga_Int)val.end(), errcode, deep);
+	return rt;
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer::DocumentStructure::PositionRange& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, (papuga_Int)val.start(), errcode, deep);
+	rt &= serializeArrayElement( result, (papuga_Int)val.end(), errcode, deep);
+	return rt;
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::DocumentStructure>& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val, errcode, deep);
 }
 static bool serialize_base64( papuga_Serialization* result, const std::string& val, papuga_ErrorCode& errcode)
 {
