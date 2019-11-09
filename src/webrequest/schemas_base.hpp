@@ -54,6 +54,8 @@ public:
 		AggregatorName,AggregatorArg,AggregatorDef,
 		TokenizerName,TokenizerArg,TokenizerDef,
 		NormalizerName,NormalizerArg,NormalizerDef,
+		SearchFieldName, SearchFieldScope, SearchFieldSelect, SearchFieldKey, SearchFieldDef,
+		SearchStructureName, SearchStructureHeader, SearchStructureContent, SearchStructureClass, SearchStructureDef,
 		JoinOperatorName,JoinOperatorRange,JoinOperatorCardinality,GroupBy,
 		MinWeight,
 

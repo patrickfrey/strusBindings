@@ -60,8 +60,8 @@ public:
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"feature/{search,forward,metadata,attribute,lexem}/priority", "()", FeaturePriority, papuga_TypeInt, "0:1:2:3"},
-			{"feature/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ:pred:content:unique"},
+			{"feature/{search,forward,metadata,attribute,lexem}/priority", "()", FeaturePriority, papuga_TypeInt, "0;1;2;3"},
+			{"feature/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ;pred;content;unique"},
 			{"feature/{search,forward}/option", FeatureOptionDef, {
 					{"position", FeatureOptionPosition, '?'},
 				}
@@ -201,6 +201,42 @@ public:
 			{"content", 0, "docanalyzer", A::defineSubContent(), {
 					{SubContentSelect, '!'},
 					{SubContentClassDef, '!'}
+				}
+			},
+			{"field/name", "()", SearchFieldName, papuga_TypeString, "title;text"},
+			{"field/scope", "()", SearchFieldScope, papuga_TypeString, "title;h1;h2;table/row;table/col"},
+			{"field/select", "()", SearchFieldSelect, papuga_TypeString, "p;li"},
+			{"field/key", "()", SearchFieldKey, papuga_TypeString, "table/row@id;table/col@id"},
+			{"field", SearchFieldDef, {
+					{"name", SearchFieldName, '!'},
+					{"scope", SearchFieldScope, '!'},
+					{"select", SearchFieldSelect, '!'},
+					{"key", SearchFieldKey, '?'}
+				}
+			},
+			{"field", 0, "docanalyzer", A::addSearchIndexField(), {
+					{SearchFieldName},
+					{SearchFieldScope},
+					{SearchFieldSelect},
+					{SearchFieldKey, '?'}
+				}
+			},
+			{"structure/name", "()", SearchStructureName, papuga_TypeString, "chapter;passage;table"},
+			{"structure/header", "()", SearchStructureHeader, papuga_TypeString, "title;rowname;colname"},
+			{"structure/content", "()", SearchStructureContent, papuga_TypeString, "text;coltext;rowtext"},
+			{"structure/class", "()", SearchStructureClass, papuga_TypeString, "cover;label;header;footer"},
+			{"structure", SearchStructureDef, {
+					{"name", SearchStructureName, '!'},
+					{"header", SearchStructureHeader, '!'},
+					{"content", SearchStructureContent, '!'},
+					{"class", SearchStructureClass, '!'}
+				}
+			},
+			{"structure", 0, "docanalyzer", A::addSearchIndexStructure(), {
+					{SearchStructureName},
+					{SearchStructureHeader},
+					{SearchStructureContent},
+					{SearchStructureClass}
 				}
 			}
 		}};
