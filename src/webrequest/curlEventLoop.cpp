@@ -187,9 +187,18 @@ struct CurlEventLoop::Data
 		curl_multi_cleanup( m_multi_handle);
 	}
 
-	void notify()
+	bool notify()
 	{
-		::write( m_pipfd[1], "x", 1);
+		int ww;
+	AGAIN:
+		ww = ::write( m_pipfd[1], "x", 1);
+		if (ww == 0)
+		{
+			int ec = errno;
+			if (ec == EAGAIN || ec == EINTR) goto AGAIN;
+			m_logger.print( CurlLogger::LogFatal, _TXT("internal: delegate request event loop signalling failed: %s"), ::strerror(ec));
+		}
+		return true;
 	}
 
 	void consumeSelfPipeWrites()
