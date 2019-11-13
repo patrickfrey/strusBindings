@@ -54,26 +54,20 @@ public:
 					{"value", QueryEvalFunctionParameterValue},
 				}
 			},
-			{"summarizer/result/name", "()", QueryEvalFunctionResultName, papuga_TypeString, NULL},
-			{"summarizer/result/value", "()", QueryEvalFunctionResultValue, papuga_TypeString, NULL},
-			{"summarizer/result", QueryEvalFunctionResult, {
-					{"name", QueryEvalFunctionResultName},
-					{"value", QueryEvalFunctionResultValue}
-				}
-			},
+			{"summarizer/id", "()", QueryEvalSummaryId, papuga_TypeString, "matches"},
 			{"summarizer/name", "()", QueryEvalFunctionName, papuga_TypeString, "matchphrase"},
 			{"summarizer", QueryEvalSummarizer, {
+					{"id", QueryEvalSummaryId, '?'},
 					{"name", QueryEvalFunctionName, '!'},
 					{"param", QueryEvalFunctionParameter, '*'},
-					{"feature", QueryEvalFunctionFeature, '*'},
-					{"result", QueryEvalFunctionResult, '*'}
+					{"feature", QueryEvalFunctionFeature, '*'}
 				}
 			},
 			{"summarizer", 0, "qryeval", E::addSummarizer(), {
+					{QueryEvalSummaryId,'?'},
 					{QueryEvalFunctionName},
 					{QueryEvalFunctionParameter, '*'},
-					{QueryEvalFunctionFeature, '*'},
-					{QueryEvalFunctionResult, '*'}}
+					{QueryEvalFunctionFeature, '*'}}
 			},
 			{"weighting/name", "()", QueryEvalFunctionName, papuga_TypeString, "bm25"},
 			{"weighting", QueryEvalWeighting, {

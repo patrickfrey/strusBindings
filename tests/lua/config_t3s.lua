@@ -48,13 +48,13 @@ function createQueryEval_t3s( strusctx)
 	-- Now we define what attributes of the documents are returned and how they are build.
 	-- The functions that extract stuff from documents for presentation are called summarizers.
 	-- First we add a summarizer that extracts us the title of the document:
-	queryEval:addSummarizer( "attribute", {{"name", "title"},{"debug","debug_attribute"}})
-	queryEval:addSummarizer( "attribute", {{"name", "docid"},{"debug","debug_attribute"}})
+	queryEval:addSummarizer( "", "attribute", {{"name", "title"},{"debug","debug_attribute"}})
+	queryEval:addSummarizer( "", "attribute", {{"name", "docid"},{"debug","debug_attribute"}})
 	
 	-- Then we add a summarizer that collects the sections that enclose the best matches 
 	-- in a ranked document:
 	queryEval:addSummarizer(
-		"matchphrase", 
+		"summary", "matchphrase", 
 		{{"type","orig"}, {"sentencesize",40}, {"windowsize",30},{"debug","debug_matchphrase"}},
 		{match="seek", title="titlefield"}
 	)

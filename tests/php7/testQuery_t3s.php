@@ -130,13 +130,11 @@ string QueryDump:
         string param: 
           string attribute: "title"
           string debug: "debug_attribute"
-          string result: "title"
       integer 1: 
         string function: "attribute"
         string param: 
           string attribute: "docid"
           string debug: "debug_attribute"
-          string result: "docid"
       integer 2: 
         string feature: 
           string match: "seek"
@@ -145,10 +143,6 @@ string QueryDump:
         string param: 
           string cardinality: 0
           string debug: "debug_matchphrase"
-          string features: 
-            string docstart: "docstart"
-            string para: "para"
-            string phrase: "phrase"
           string floatingmark: 
             string end: " ..."
             string start: "... "
@@ -164,7 +158,7 @@ string QueryDump:
       integer 0: 
         string feature: 
           string match: "seek"
-        string function: "BM25"
+        string function: "bm25"
         string param: 
           string avgdoclen: 1000
           string b: 2.1
@@ -265,7 +259,7 @@ string QueryResult:
           string name: "docid"
           string value: "A.xml"
         integer 2: 
-          string name: "docstart"
+          string name: "summary:start"
           string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
       string weight: 0.64282
     integer 1: 
@@ -277,7 +271,7 @@ string QueryResult:
           string name: "docid"
           string value: "B.xml"
         integer 2: 
-          string name: "docstart"
+          string name: "summary:start"
           string value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
       string weight: 0.00017
     integer 2: 
@@ -289,7 +283,7 @@ string QueryResult:
           string name: "docid"
           string value: "C.xml"
         integer 2: 
-          string name: "docstart"
+          string name: "summary:start"
           string value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
       string weight: 9.0E-5
 string QueryString: "City visit tokyo"
@@ -307,15 +301,15 @@ string ResultList:
   integer 0: "rank 0: 0.64282"
   integer 1: "    title 'One day in Tokyo'"
   integer 2: "    docid 'A.xml'"
-  integer 3: "    docstart 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
+  integer 3: "    summary:start 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
   integer 4: "rank 1: 0.00017"
   integer 5: "    title 'A visit in New York'"
   integer 6: "    docid 'B.xml'"
-  integer 7: "    docstart 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
+  integer 7: "    summary:start 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
   integer 8: "rank 2: 0.00009"
   integer 9: "    title 'A journey through Germany'"
   integer 10: "    docid 'C.xml'"
-  integer 11: "    docstart 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
+  integer 11: "    summary:start 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
 string postings: 
   string expr 0 doc A.xml: 
     integer 0: 12

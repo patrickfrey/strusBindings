@@ -1924,51 +1924,12 @@ static void deserializeQueryEvalFunctionParameters(
 	if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
 }
 
-template <class FUNCTYPE>
-static void deserializeQueryEvalFunctionResultNames(
-		const char* functionclass,
-		FUNCTYPE* function,
-		const papuga_ValueVariant& resultnames,
-		ErrorBufferInterface* errorhnd)
-{
-	static const char* namemapdef = "name,value";
-	if (papuga_ValueVariant_defined( &resultnames))
-	{
-		if (resultnames.valuetype != papuga_TypeSerialization)
-		{
-			throw strus::runtime_error(_TXT("list of named arguments expected as %s result name definitions"), functionclass);
-		}
-		papuga_SerializationIter seriter, serstart;
-		papuga_init_SerializationIter( &seriter, resultnames.value.serialization);
-		papuga_init_SerializationIter( &serstart, resultnames.value.serialization);
-		if (papuga_SerializationIter_eof( &seriter))
-		{
-			return;
-		}
-		try
-		{
-			KeyValueList kvlist( seriter, namemapdef);
-			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s result name definitions"), functionclass);
-
-			KeyValueList::const_iterator ki = kvlist.begin(), ke = kvlist.end();
-			for (; ki != ke; ++ki)
-			{
-				function->defineResultName( ValueVariantWrap::tostring( *ki->second), ki->first);
-			}
-		}
-		catch (const std::runtime_error& err)
-		{
-			throw runtime_error_with_location( err.what(), errorhnd, seriter, serstart);
-		}
-	}
-}
-
 void Deserializer::buildSummarizerFunction(
 		QueryEvalInterface* queryeval,
+		const std::string& summarizerId,
 		const std::string& functionName,
 		const papuga_ValueVariant& parameters,
 		const papuga_ValueVariant& features,
-		const papuga_ValueVariant& resultnames,
 		const QueryProcessorInterface* queryproc,
 		ErrorBufferInterface* errorhnd)
 {
@@ -1987,9 +1948,7 @@ void Deserializer::buildSummarizerFunction(
 
 	std::vector<FeatureParameter> featureParameters = getFeatureParameters( features);
 
-	deserializeQueryEvalFunctionResultNames( context, function.get(), resultnames, errorhnd);
-
-	queryeval->addSummarizerFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
+	queryeval->addSummarizerFunction( summarizerId, function.get(), featureParameters, debuginfoAttribute);
 	function.release();
 
 	if (errorhnd->hasError())
@@ -2019,8 +1978,8 @@ void Deserializer::buildWeightingFunction(
 	deserializeQueryEvalFunctionParameters( context, function.get(), debuginfoAttribute, parameters, errorhnd);
 
 	std::vector<FeatureParameter> featureParameters = getFeatureParameters( features);
-	
-	queryeval->addWeightingFunction( functionName, function.get(), featureParameters, debuginfoAttribute);
+
+	queryeval->addWeightingFunction( function.get(), featureParameters, debuginfoAttribute);
 	function.release();
 
 	if (errorhnd->hasError())

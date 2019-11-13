@@ -20,7 +20,7 @@
 		"summarizer": {
 			"name": "attribute",
 			"param": [{
-				 "name":"attribute",
+				 "name": "name",
 				 "value": "title"
 			}]
 		},

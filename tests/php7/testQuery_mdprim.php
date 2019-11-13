@@ -185,37 +185,31 @@ string QueryDump:
         string param: 
           string attribute: "docid"
           string debug: "debug_attribute"
-          string result: "docid"
       integer 1: 
         string function: "metadata"
         string param: 
           string debug: "debug_metadata"
-          string metaname: "cross"
-          string result: "cross"
+          string name: "cross"
       integer 2: 
         string function: "metadata"
         string param: 
           string debug: "debug_metadata"
-          string metaname: "factors"
-          string result: "factors"
+          string name: "factors"
       integer 3: 
         string function: "metadata"
         string param: 
           string debug: "debug_metadata"
-          string metaname: "lo"
-          string result: "lo"
+          string name: "lo"
       integer 4: 
         string function: "metadata"
         string param: 
           string debug: "debug_metadata"
-          string metaname: "hi"
-          string result: "hi"
+          string name: "hi"
       integer 5: 
         string function: "forwardindex"
         string param: 
           string N: 100
           string debug: "debug_forwardindex"
-          string result: "word"
           string type: "word"
     string weighting: 
       integer 0: 

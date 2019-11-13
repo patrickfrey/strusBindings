@@ -125,13 +125,11 @@ str QueryDump:
         str param:
           str attribute: "title"
           str debug: "debug_attribute"
-          str result: "title"
       number 2:
         str function: "attribute"
         str param:
           str attribute: "docid"
           str debug: "debug_attribute"
-          str result: "docid"
       number 3:
         str feature:
           str match: "seek"
@@ -140,10 +138,6 @@ str QueryDump:
         str param:
           str cardinality: 0
           str debug: "debug_matchphrase"
-          str features:
-            str docstart: "docstart"
-            str para: "para"
-            str phrase: "phrase"
           str floatingmark:
             str end: " ..."
             str start: "... "
@@ -159,7 +153,7 @@ str QueryDump:
       number 1:
         str feature:
           str match: "seek"
-        str function: "BM25"
+        str function: "bm25"
         str param:
           str avgdoclen: 1000
           str b: 2.10000
@@ -260,7 +254,7 @@ str QueryResult:
           str name: "docid"
           str value: "A.xml"
         number 3:
-          str name: "docstart"
+          str name: "summary:start"
           str value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
       str weight: 0.64282
     number 2:
@@ -272,7 +266,7 @@ str QueryResult:
           str name: "docid"
           str value: "B.xml"
         number 3:
-          str name: "docstart"
+          str name: "summary:start"
           str value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
       str weight: 0.00017
     number 3:
@@ -284,7 +278,7 @@ str QueryResult:
           str name: "docid"
           str value: "C.xml"
         number 3:
-          str name: "docstart"
+          str name: "summary:start"
           str value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
       str weight: 0.00009
 str QueryString: "City visit tokyo"
@@ -302,15 +296,15 @@ str ResultList:
   number 1: "rank 1: 0.64282"
   number 2: "    title: 'One day in Tokyo'"
   number 3: "    docid: 'A.xml'"
-  number 4: "    docstart: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
+  number 4: "    summary:start: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
   number 5: "rank 2: 0.00017"
   number 6: "    title: 'A visit in New York'"
   number 7: "    docid: 'B.xml'"
-  number 8: "    docstart: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
+  number 8: "    summary:start: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
   number 9: "rank 3: 0.00009"
   number 10: "    title: 'A journey through Germany'"
   number 11: "    docid: 'C.xml'"
-  number 12: "    docstart: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
+  number 12: "    summary:start: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
 str postings:
   str expr 0 doc A.xml:
     number 1: 12

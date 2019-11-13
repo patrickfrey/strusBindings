@@ -64,9 +64,11 @@ public:
 	void addExclusionFeature( const std::string& set);
 
 	/// \brief Declare a summarizer
-	/// \example addSummarizer( "attribute" [["name" "docid"] ["debug" "debug_attribute"]] )
-	/// \example addSummarizer( "metadata"  [["name" "cross"] ["debug" "debug_metadata" ]] )
-	/// \param[in] name the name of the summarizer to add
+	/// \example addSummarizer( "", "attribute" [["name" "docid"] ["debug" "debug_attribute"]] )
+	/// \example addSummarizer( "meta", "metadata"  [["name" "cross"] ["debug" "debug_metadata" ]] )
+	/// \param[in] summaryid (optional) identifier to use as prefix with ':' in the names of the summary output elements, if not specified or if passed as empty string then no prefix is used
+	/// \example "match"
+	/// \param[in] name the name of the summarizer element
 	/// \example "matchphrase"
 	/// \example "matchpos"
 	/// \example "attribute"
@@ -77,12 +79,11 @@ public:
 	/// \example [ ["struct", "punct"], [ "weight", "word" ] ]
 	/// \example [ [ role: "weight", set: "word" ] ]
 	/// \example [ [ role: "weight", set: "word" ], [ role: "struct", set: "punct"]]
-	/// \param[in] resultnames the mapping of result names (optional)
 	void addSummarizer(
+			const ValueVariant& summaryid,
 			const std::string& name,
 			const ValueVariant& parameter,
-			const ValueVariant& featuresets=ValueVariant(),
-			const ValueVariant& resultnames=ValueVariant());
+			const ValueVariant& featuresets=ValueVariant());
 
 	/// \brief Add a weighting function to use as summand of the total document weight
 	/// \example addWeightingFunction( "tf", [match:[feature:"seek"] debug:"debug_weighting"] )

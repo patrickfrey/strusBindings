@@ -120,13 +120,11 @@ string QueryDump:
         string param:
           string attribute: "title"
           string debug: "debug_attribute"
-          string result: "title"
       number 2:
         string function: "attribute"
         string param:
           string attribute: "docid"
           string debug: "debug_attribute"
-          string result: "docid"
       number 3:
         string feature:
           string match: "seek"
@@ -135,10 +133,6 @@ string QueryDump:
         string param:
           string cardinality: 0
           string debug: "debug_matchphrase"
-          string features:
-            string docstart: "docstart"
-            string para: "para"
-            string phrase: "phrase"
           string floatingmark:
             string end: " ..."
             string start: "... "
@@ -154,7 +148,7 @@ string QueryDump:
       number 1:
         string feature:
           string match: "seek"
-        string function: "BM25"
+        string function: "bm25"
         string param:
           string avgdoclen: 1000
           string b: 2.10000
@@ -248,7 +242,7 @@ string QueryResult:
           string name: "docid"
           string value: "A.xml"
         number 3:
-          string name: "docstart"
+          string name: "summary:start"
           string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
       string weight: 0.64282
     number 2:
@@ -260,7 +254,7 @@ string QueryResult:
           string name: "docid"
           string value: "B.xml"
         number 3:
-          string name: "docstart"
+          string name: "summary:start"
           string value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
       string weight: 0.00017
     number 3:
@@ -272,7 +266,7 @@ string QueryResult:
           string name: "docid"
           string value: "C.xml"
         number 3:
-          string name: "docstart"
+          string name: "summary:start"
           string value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
       string weight: 0.00009
 string QueryString: "City visit tokyo"
@@ -290,15 +284,15 @@ string ResultList:
   number 1: "rank 1: 0.64282"
   number 2: "    title: 'One day in Tokyo'"
   number 3: "    docid: 'A.xml'"
-  number 4: "    docstart: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
+  number 4: "    summary:start: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
   number 5: "rank 2: 0.00017"
   number 6: "    title: 'A visit in New York'"
   number 7: "    docid: 'B.xml'"
-  number 8: "    docstart: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
+  number 8: "    summary:start: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
   number 9: "rank 3: 0.00009"
   number 10: "    title: 'A journey through Germany'"
   number 11: "    docid: 'C.xml'"
-  number 12: "    docstart: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
+  number 12: "    summary:start: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
 string postings:
   string expr 1 doc A.xml:
     number 1: 12

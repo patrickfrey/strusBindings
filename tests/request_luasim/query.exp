@@ -12,7 +12,7 @@
 	{
 		"feature":{
 			"match": "search"},
-		"function": "BM25",
+		"function": "bm25",
 		"param":{
 			"avgdoclen": "1000",
 			"b": "0.75",

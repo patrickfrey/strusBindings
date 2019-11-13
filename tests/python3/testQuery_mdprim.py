@@ -170,37 +170,31 @@ str QueryDump:
         str param:
           str attribute: "docid"
           str debug: "debug_attribute"
-          str result: "docid"
       number 2:
         str function: "metadata"
         str param:
           str debug: "debug_metadata"
-          str metaname: "cross"
-          str result: "cross"
+          str name: "cross"
       number 3:
         str function: "metadata"
         str param:
           str debug: "debug_metadata"
-          str metaname: "factors"
-          str result: "factors"
+          str name: "factors"
       number 4:
         str function: "metadata"
         str param:
           str debug: "debug_metadata"
-          str metaname: "lo"
-          str result: "lo"
+          str name: "lo"
       number 5:
         str function: "metadata"
         str param:
           str debug: "debug_metadata"
-          str metaname: "hi"
-          str result: "hi"
+          str name: "hi"
       number 6:
         str function: "forwardindex"
         str param:
           str N: 100
           str debug: "debug_forwardindex"
-          str result: "word"
           str type: "word"
     str weighting:
       number 1:

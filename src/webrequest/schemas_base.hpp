@@ -76,10 +76,9 @@ public:
 
 		QueryDef, FeatureDef, FeatureSet, FeatureWeight, RestrictionDef,
 		FeatureRestrictionDef, FeatureSelectionDef, FeatureExclusionDef,
-		QueryEvalFunctionResultName, QueryEvalFunctionResultValue, QueryEvalFunctionResult,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,
 		QueryEvalFunctionFeatureRole, QueryEvalFunctionFeatureSet, QueryEvalFunctionFeature,
-		QueryEvalFunctionName, QueryEvalFormulaSource,
+		QueryEvalFunctionName, QueryEvalFormulaSource, QueryEvalSummaryId,
 		QueryEvalSummarizer, QueryEvalWeighting, 
 		QueryEvalFormulaParameterName, QueryEvalFormulaParameterValue, QueryEvalFormulaParameter,
 

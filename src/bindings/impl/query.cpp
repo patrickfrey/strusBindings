@@ -73,16 +73,21 @@ void QueryEvalImpl::addExclusionFeature( const std::string& set_)
 }
 
 void QueryEvalImpl::addSummarizer(
+		const ValueVariant& summaryid,
 		const std::string& name,
 		const ValueVariant& parameters,
-		const ValueVariant& featuresets,
-		const ValueVariant& resultnames)
+		const ValueVariant& featuresets)
 {
 	QueryEvalInterface* queryeval = m_queryeval_impl.getObject<QueryEvalInterface>();
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 
+	std::string summaryidstr;
+	if (papuga_ValueVariant_defined( &summaryid))
+	{
+		summaryidstr = ValueVariantWrap::tostring( summaryid);
+	}
 	Deserializer::buildSummarizerFunction(
-		queryeval, name, parameters, featuresets, resultnames, m_queryproc, errorhnd);
+		queryeval, summaryidstr, name, parameters, featuresets, m_queryproc, errorhnd);
 }
 
 void QueryEvalImpl::addWeightingFunction(

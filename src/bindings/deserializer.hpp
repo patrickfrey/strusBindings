@@ -155,10 +155,10 @@ struct Deserializer
 
 	static void buildSummarizerFunction(
 			QueryEvalInterface* queryeval,
+			const std::string& summarizerId,
 			const std::string& functionName,
 			const papuga_ValueVariant& parameter,
 			const papuga_ValueVariant& features,
-			const papuga_ValueVariant& resultnames,
 			const QueryProcessorInterface* queryproc,
 			ErrorBufferInterface* errorhnd);
 
