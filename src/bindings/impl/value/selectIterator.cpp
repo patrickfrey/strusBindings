@@ -107,11 +107,11 @@ SelectIterator::SelectIterator(
 			}
 			m_items.push_back( ItemDef( *ei, ItemDef::ACL));
 		}
-		else if (0 <= (eh = metadatareader->elementHandle( ei->c_str())))
+		else if (0 <= (eh = metadatareader->elementHandle( *ei)))
 		{
 			m_items.push_back( ItemDef( *ei, ItemDef::MetaData, eh));
 		}
-		else if (1 <= (eh = attributereader->elementHandle( ei->c_str())))
+		else if (1 <= (eh = attributereader->elementHandle( *ei)))
 		{
 			m_items.push_back( ItemDef( *ei, ItemDef::Attribute, eh));
 		}

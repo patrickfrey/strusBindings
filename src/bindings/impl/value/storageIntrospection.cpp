@@ -145,7 +145,7 @@ private:
 	}
 	bool getValue( std::string& result, AttributeReaderInterface* reader, const std::string& name) const
 	{
-		strus::Index elemhandle = reader->elementHandle( name.c_str());
+		strus::Index elemhandle = reader->elementHandle( name);
 		if (!elemhandle) return false;
 		result = reader->getValue( elemhandle);
 		return true;
@@ -1167,6 +1167,7 @@ void StorageIntrospection::serialize( papuga_Serialization& serialization, bool 
 IntrospectionBase* StorageIntrospection::open( const std::string& name)
 {
 	if (name == "config") return new IntrospectionConfig<StorageClientInterface>( m_errorhnd, m_impl);
+	else if (name == "diskusage") return createIntrospectionAtomic( m_errorhnd, strus::string_format( "%ldK", m_impl->diskUsage()));
 	else if (name == "nofdocs") return createIntrospectionAtomic( m_errorhnd, (int64_t) m_impl->nofDocumentsInserted());
 	else if (name == "maxdocno") return createIntrospectionAtomic( m_errorhnd, (int64_t) m_impl->maxDocumentNumber());
 	else if (name == "user") return createIntrospectionValueIterator( m_errorhnd, m_impl->createUserNameIterator(), false/*prefixBound*/);
@@ -1199,8 +1200,8 @@ IntrospectionBase* StorageIntrospection::open( const std::string& name)
 
 std::vector<IntrospectionLink> StorageIntrospection::list()
 {
-	static const char* ar_withStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".attribute",".metadata",".term",".doc",".statistics",NULL};
-	static const char* ar_withoutStats[] = {"config","nofdocs","maxdocno","user","termtype",".termvalue",".attribute",".metadata",".term",".doc",NULL};
+	static const char* ar_withStats[] = {"config",".diskusage","nofdocs","maxdocno","user","termtype",".termvalue",".attribute",".metadata",".term",".doc",".statistics",NULL};
+	static const char* ar_withoutStats[] = {"config",".diskusage","nofdocs","maxdocno","user","termtype",".termvalue",".attribute",".metadata",".term",".doc",NULL};
 	return getList( (m_impl->getStatisticsProcessor()) ? ar_withStats : ar_withoutStats);
 }
 
