@@ -110,6 +110,14 @@ public:
 			const std::string& source,
 			const ValueVariant& defaultParameter=ValueVariant());
 
+	/// \brief Set the flag to indicate wheter to use position information for evaluation or not. If set to yes=false then do not use position information in evaluation, all features that appear in a document get position 1.
+	/// \param[in] yes flag indicating wheter to enable position information or not (default=true)
+	/// \note Forces the query evluation to use a different implementation of posting iterators that are slightly more efficient for some corner cases but useless in general.
+	/// \remark Switching off position information does not make sense in the main query evaluation case. 
+	/// \remark Be aware that you know what you are doing when using this method. Posting join operators work differently when switching position information off for evaluation.
+	/// \note The motivation for this method is to use it in a preliminary evaluation step to get document candidates for query interpretation and expansion.
+	void usePositionInformation( bool yes);
+
 	/// \brief Create a query to instantiate based on this query evaluation scheme
 	/// \param[in] storage storage to execute the query on
 	/// \return the query instance
