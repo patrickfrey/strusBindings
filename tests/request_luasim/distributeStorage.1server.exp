@@ -1,6 +1,7 @@
 {
 "statserver":{
 "types":[
+	"cithead",
 	"entity",
 	"title",
 	"word"],

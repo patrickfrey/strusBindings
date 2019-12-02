@@ -629,8 +629,9 @@ IndexRange Deserializer::getIndexRangeAsValue( papuga_SerializationIter& seriter
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 	{
 		papuga_SerializationIter_skip( &seriter);
-		return getIndexRange( seriter);
+		IndexRange rt = getIndexRange( seriter);
 		Deserializer::consumeClose( seriter);
+		return rt;
 	}
 	else
 	{
@@ -2639,33 +2640,57 @@ template <class StorageDocumentAccess>
 struct StorageDocumentForwardIndexAccess
 {
 	StorageDocumentForwardIndexAccess( StorageDocumentAccess* doc_)
-		:m_doc(doc_){}
+		:m_doc(doc_),m_maxpos(0){}
 	void addTerm( const std::string& type_, const std::string& value_, const Index& position_)
 	{
-		m_doc->addForwardIndexTerm( type_, value_, position_);
+		if ((std::size_t)position_ > (std::size_t)Constants::storage_max_position_info())
+		{
+			// Cut positions away that are out of range. Issue a warning later:
+			if ((std::size_t)position_ > m_maxpos)
+			{
+				m_maxpos = position_;
+			}
+		}
+		else
+		{
+			m_doc->addForwardIndexTerm( type_, value_, position_);
+		}
 	}
+
 private:
 	StorageDocumentAccess* m_doc;
+	std::size_t m_maxpos;
 };
 
 template <class StorageDocumentAccess>
 struct StorageDocumentSearchIndexAccess
 {
 	StorageDocumentSearchIndexAccess( StorageDocumentAccess* doc_)
-		:m_doc(doc_){}
+		:m_doc(doc_),m_maxpos(0){}
 	void addTerm( const std::string& type_, const std::string& value_, const Index& position_)
 	{
-		m_doc->addSearchIndexTerm( type_, value_, position_);
+		if ((std::size_t)position_ > (std::size_t)Constants::storage_max_position_info())
+		{
+			// Cut positions away that are out of range. Issue a warning later:
+			if ((std::size_t)position_ > m_maxpos)
+			{
+				m_maxpos = position_;
+			}
+		}
+		else
+		{
+			m_doc->addSearchIndexTerm( type_, value_, position_);
+		}
 	}
 private:
 	StorageDocumentAccess* m_doc;
+	std::size_t m_maxpos;
 };
 
 template <class StorageDocumentIndexAccess>
-static void buildStorageIndex( StorageDocumentIndexAccess* document, papuga_SerializationIter& seriter)
+static void buildStorageIndex( StorageDocumentIndexAccess* document, papuga_SerializationIter& seriter, const char* context)
 {
 	static const StructureNameMap namemap( "type,value,pos,len", ',');
-	static const char* context = _TXT("search index");
 
 	while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 	{
@@ -2774,7 +2799,11 @@ static void buildStorageStructures( StorageDocumentIndexAccess* document, papuga
 				{
 					throw strus::runtime_error(_TXT("incomplete %s definition"), context);
 				}
-				document->addSearchIndexStructure( name, source, sink);
+				if (source.end() <= (strus::Index)Constants::storage_max_position_info()
+					&& sink.end() <= (strus::Index)Constants::storage_max_position_info())
+				{
+					document->addSearchIndexStructure( name, source, sink);
+				}
 			}
 			else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 			{
@@ -2851,7 +2880,7 @@ static void buildStorageSearchIndexValue(
 	{
 		StorageDocumentSearchIndexAccess<StorageDocumentAccess> da( document);
 		papuga_SerializationIter_skip( &seriter);
-		buildStorageIndex( &da, seriter);
+		buildStorageIndex( &da, seriter, context);
 		Deserializer::consumeClose( seriter);
 	}
 	else
@@ -2888,7 +2917,7 @@ static void buildStorageForwardIndexValue(
 	{
 		StorageDocumentForwardIndexAccess<StorageDocumentAccess> da( document);
 		papuga_SerializationIter_skip( &seriter);
-		buildStorageIndex( &da, seriter);
+		buildStorageIndex( &da, seriter, context);
 		Deserializer::consumeClose( seriter);
 	}
 	else
