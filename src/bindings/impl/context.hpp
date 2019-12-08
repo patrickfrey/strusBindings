@@ -257,6 +257,11 @@ public:
 	/// \note Clears all messages stored for the current thread
 	Struct fetchDebugTrace();
 
+	/// \brief Fetch all info messages of the current thread reported via the internal error buffer info interface
+	/// \return all messages
+	/// \note Clears all messages stored for the current thread
+	Struct infoMessages();
+
 private:
 	void initStorageObjBuilder();
 	void initAnalyzerObjBuilder();

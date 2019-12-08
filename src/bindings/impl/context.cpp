@@ -536,10 +536,23 @@ Struct ContextImpl::fetchDebugTrace()
 	strus::bindings::Serializer::serialize( &rt.serialization, msglist, true);
 	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT( "failed to deserialize statistics blob: %s"), errorhnd->fetchError());
+		throw strus::runtime_error(_TXT( "failed to deserialize debug trace: %s"), errorhnd->fetchError());
 	}
 	rt.release();
 	return rt;
 }
 
+Struct ContextImpl::infoMessages()
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	Struct rt;
+	std::vector<std::string> infomsgs = errorhnd->fetchInfo();
+	strus::bindings::Serializer::serialize( &rt.serialization, infomsgs, true);
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to deserialize info messages: %s"), errorhnd->fetchError());
+	}
+	rt.release();
+	return rt;
+}
 
