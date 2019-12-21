@@ -705,6 +705,20 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const analyzer
 	rt &= serializeArrayElement( result, val.items(), errcode, deep);
 	return rt;
 }
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const BlockStatistics::Element& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= Serializer::serializeStructMemberConstName( result, "type", val.type(), errcode, deep);
+	rt &= Serializer::serializeStructMemberConstName( result, "size", val.size(), errcode, deep);
+	return rt;
+}
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const BlockStatistics& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val.elements(), errcode, deep);
+}
+
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<strus::SummaryElement>& val, papuga_ErrorCode& errcode, bool deep)
 {
 	return serializeArray( result, val, errcode, deep);

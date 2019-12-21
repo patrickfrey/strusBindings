@@ -25,6 +25,7 @@
 #include "strus/sentenceGuess.hpp"
 #include "strus/timeStamp.hpp"
 #include "strus/statisticsMessage.hpp"
+#include "strus/blockStatistics.hpp"
 #include "strus/structView.hpp"
 #include "strus/statisticsViewerInterface.hpp"
 #include "strus/postingJoinOperatorInterface.hpp"
@@ -219,6 +220,8 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsItem& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<analyzer::ContentStatisticsItem>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const analyzer::ContentStatisticsResult& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const BlockStatistics::Element& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const BlockStatistics& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const VectorQueryResult& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SentenceTerm& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SentenceGuess& val, papuga_ErrorCode& errcode, bool deep);
