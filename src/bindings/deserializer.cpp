@@ -3032,8 +3032,8 @@ static void buildStorageDocumentDeletes(
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "attribute,metadata,forwardindex,searchindex,searchstruct,access", ',');
-	enum StructureId {_attribute,_metadata,_forwardindex,_searchindex,_searchstruct,_access};
+	static const StructureNameMap namemap( "attribute,metadata,forwardindex,searchindex,access", ',');
+	enum StructureId {_attribute,_metadata,_forwardindex,_searchindex,_access};
 	static const char* context = _TXT("document update deletes");
 	if (!papuga_ValueVariant_defined( &content)) return;
 	if (content.valuetype != papuga_TypeSerialization)
@@ -3089,16 +3089,6 @@ static void buildStorageDocumentDeletes(
 							for (; di != de; ++di)
 							{
 								document->clearSearchIndexTerm( *di);
-							}
-						}
-						break;
-
-					case _searchstruct: {
-							std::vector<std::string> deletes = Deserializer::getStringListAsValue( seriter);
-							std::vector<std::string>::const_iterator di = deletes.begin(), de = deletes.end();
-							for (; di != de; ++di)
-							{
-								document->clearSearchIndexStructure( *di);
 							}
 						}
 						break;
