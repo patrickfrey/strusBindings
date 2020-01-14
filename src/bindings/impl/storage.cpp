@@ -442,7 +442,8 @@ void StorageTransactionImpl::defineMetaDataTable( const ValueVariant& deflist)
 void StorageTransactionImpl::commit()
 {
 	StorageTransactionInterface* transaction = m_transaction_impl.getObject<StorageTransactionInterface>();
-	if (!transaction->commit())
+	strus::StorageCommitResult cmres = transaction->commit();
+	if (!cmres.success())
 	{
 		m_transaction_impl.reset();
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
