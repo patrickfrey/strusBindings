@@ -43,24 +43,24 @@ public:
 			},
 			{"/", "docanalyzer", "context", C::createDocumentAnalyzer(), {DocumentClassDef} },
 
-			{"feature/{search,forward,metadata,attribute,lexem}/type", "()", FeatureTypeName, papuga_TypeString, "word"},
-			{"feature/{search,forward,metadata,attribute,lexem}/select", "()", SelectExpression, papuga_TypeString, "/doc/employee/name()"},
+			{"feature/{search,forward,metadata,attribute}/type", "()", FeatureTypeName, papuga_TypeString, "word"},
+			{"feature/{search,forward,metadata,attribute}/select", "()", SelectExpression, papuga_TypeString, "/doc/employee/name()"},
 
-			{"feature/{search,forward,metadata,attribute,lexem}/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
-			{"feature/{search,forward,metadata,attribute,lexem}/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[A-Za-z]+"},
-			{"feature/{search,forward,metadata,attribute,lexem}/tokenizer", TokenizerDef, {
+			{"feature/{search,forward,metadata,attribute}/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
+			{"feature/{search,forward,metadata,attribute}/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[A-Za-z]+"},
+			{"feature/{search,forward,metadata,attribute}/tokenizer", TokenizerDef, {
 					{"name", TokenizerName, '!'},
 					{"arg", TokenizerArg, '*'}
 				}
 			},
-			{"feature/{search,forward,metadata,attribute,lexem}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
-			{"feature/{search,forward,metadata,attribute,lexem}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
-			{"feature/{search,forward,metadata,attribute,lexem}/normalizer", NormalizerDef, {
+			{"feature/{search,forward,metadata,attribute}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
+			{"feature/{search,forward,metadata,attribute}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "de"},
+			{"feature/{search,forward,metadata,attribute}/normalizer", NormalizerDef, {
 					{"name", NormalizerName, '!'},
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"feature/{search,forward,metadata,attribute,lexem}/priority", "()", FeaturePriority, papuga_TypeInt, "0;1;2;3"},
+			{"feature/{search,forward,metadata,attribute}/priority", "()", FeaturePriority, papuga_TypeInt, "0;1;2;3"},
 			{"feature/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ;pred;content;unique"},
 			{"feature/{search,forward}/option", FeatureOptionDef, {
 					{"position", FeatureOptionPosition, '?'},
@@ -82,14 +82,6 @@ public:
 					{NormalizerDef,'+'},
 					{FeaturePriority,'?'},
 					{FeatureOptionDef,'?'}
-				}
-			},
-			{"feature/lexem", 0, "docanalyzer", A::addPatternLexem(), {
-					{FeatureTypeName},
-					{SelectExpression},
-					{TokenizerDef},
-					{NormalizerDef,'+'},
-					{FeaturePriority,'?'}
 				}
 			},
 			{"feature/metadata", 0, "docanalyzer", A::defineMetaData(), {
@@ -117,67 +109,6 @@ public:
 			{"feature/aggregator", 0, "docanalyzer", A::defineAggregatedMetaData(), {
 					{FeatureTypeName},
 					{AggregatorDef}
-				}
-			},
-			{"feature/pattern/{search,forward,metadata,attribute}/type", "()", FeatureTypeName, papuga_TypeString, "word"},
-			{"feature/pattern/{search,forward,metadata,attribute}/pattern", "()", PatternTypeName, papuga_TypeString, "bibref"},
-			{"feature/pattern/{search,forward,metadata,attribute}/normalizer/name", "()", NormalizerName, papuga_TypeString, "convdia"},
-			{"feature/pattern/{search,forward,metadata,attribute}/normalizer/arg", "()", NormalizerArg, papuga_TypeString, "en"},
-			{"feature/pattern/{search,forward,metadata,attribute}/normalizer", NormalizerDef, {
-					{"name", NormalizerName, '!'},
-					{"arg", NormalizerArg, '*'}
-				}
-			},
-			{"feature/pattern/{search,forward}/option/position", "()", FeatureOptionPosition, papuga_TypeString, "succ;pred;content;unique"},
-			{"feature/pattern/{search,forward}/option", FeatureOptionDef, {
-					{"position", FeatureOptionPosition, '?'},
-				}
-			},
-			{"feature/pattern/search", 0, "docanalyzer", A::addSearchIndexFeatureFromPatternMatch(), {
-					{FeatureTypeName},
-					{PatternTypeName},
-					{NormalizerDef,'+'},
-					{FeaturePriority,'?'},
-					{FeatureOptionDef,'?'}
-				}
-			},
-			{"feature/pattern/forward", 0, "docanalyzer", A::addForwardIndexFeatureFromPatternMatch(), {
-					{FeatureTypeName},
-					{PatternTypeName},
-					{NormalizerDef,'+'},
-					{FeaturePriority,'?'},
-					{FeatureOptionDef,'?'}
-				}
-			},
-			{"feature/pattern/metadata", 0, "docanalyzer", A::defineMetaDataFromPatternMatch(), {
-					{FeatureTypeName},
-					{PatternTypeName},
-					{NormalizerDef,'+'}
-				}
-			},
-			{"feature/pattern/attribute", 0, "docanalyzer", A::defineAttributeFromPatternMatch(), {
-					{FeatureTypeName},
-					{PatternTypeName},
-					{NormalizerDef,'+'}
-				}
-			},
-			{"postmatcher/name", "()", PatternTypeName, papuga_TypeString, "bibref"},
-			{"postmatcher/module", "()", PatternMatcherModule, papuga_TypeString, "analyzer_pattern"},
-			{"postmatcher/lexem", "()", PatternMatcherLexemTypes, papuga_TypeString, "lexem"},
-			{SchemaExpressionPart::declareTermExpression( "postmatcher/pattern/analyzed")},
-			{"postmatcher/pattern/name", "()", PatternRuleName, papuga_TypeString, "bibref"},
-			{"postmatcher/pattern/visible", "()", PatternRuleVisible, papuga_TypeBool, "true"},
-			{"postmatcher/pattern", PatternMatcherPatternDef, {
-					{"name", PatternRuleName, '!'},
-					{"visible", PatternRuleVisible, '?'},
-					{"analyzed", TermExpression, '?'}
-				}
-			},
-			{"postmatcher", 0, "docanalyzer", A::defineTokenPatternMatcher(), {
-					{PatternTypeName, '!'},
-					{PatternMatcherModule, '!'},
-					{PatternMatcherLexemTypes, '*'},
-					{PatternMatcherPatternDef, '*'}
 				}
 			},
 			{"document/name", "()", SubDocumentName, papuga_TypeString, "annotation"},

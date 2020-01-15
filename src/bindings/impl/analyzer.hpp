@@ -145,31 +145,6 @@ public:
 			const std::string& contentFieldName,
 			const ValueVariant& structureType);
 
-	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of document analysis
-	/// \param[in] type term type name of the lexem to be feed to the pattern matching
-	/// \example "word"
-	/// \param[in] selectexpr an expression that decribes what elements are taken from a document for this feature (tag selection in abbreviated syntax of XPath)
-	/// \example "/doc/text//()"
-	/// \example "/doc/user@id"
-	/// \example "/doc/text[@lang='en']//()"
-	/// \param[in] tokenizer tokenizer (ownership passed to this) to use for this feature
-	/// \example "split"
-	/// \example ["regex", "[0-9]+"]
-	/// \param[in] normalizers list of normalizers (element ownership passed to this) to use for this feature
-	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \example ["date2int","d","%Y-%m-%d"]
-	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
-	/// \example 3
-	/// \example 1
-	/// \example 0
-	void addPatternLexem(
-			const std::string& type,
-			const std::string& selectexpr,
-			const ValueVariant& tokenizer,
-			const ValueVariant& normalizers,
-			const ValueVariant& priority=ValueVariant());
-
 	/// \brief Define a feature to insert as meta data is selected, tokenized and normalized
 	/// \param[in] name name of the addressed meta data element.
 	/// \example "date"
@@ -218,99 +193,6 @@ public:
 		const std::string& selectexpr,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers);
-
-	/// \brief Define a result of pattern matching as feature to insert into the search index, normalized
-	/// \param[in] type type name of the feature to produce.
-	/// \example "concept"
-	/// \param[in] patternTypeName name of the pattern to select
-	/// \example "word"
-	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
-	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \example ["date2int","d","%Y-%m-%d"]
-	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
-	/// \example 3
-	/// \example 1
-	/// \example 0
-	/// \param[in] options a list of option strings, one of {"content" => feature has own position, "unique" => feature gets position but sequences or "unique" features without "content" features in between are mapped to one position, "pred" => the position is bound to the preceeding feature, "succ" => the position is bound to the succeeding feature}
-	/// \example "content"
-	/// \example "unique"
-	/// \example "succ"
-	/// \example "pred"
-	void addSearchIndexFeatureFromPatternMatch(
-		const std::string& type,
-		const std::string& patternTypeName,
-		const ValueVariant& normalizers,
-		const ValueVariant& priority=ValueVariant(),
-		const ValueVariant& options=ValueVariant());
-
-	/// \brief Define a result of pattern matching as feature to insert into the forward index, normalized
-	/// \param[in] type type name of the feature to produce.
-	/// \example "concept"
-	/// \param[in] patternTypeName name of the pattern to select
-	/// \example "word"
-	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
-	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \example ["date2int","d","%Y-%m-%d"]
-	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
-	/// \example 3
-	/// \example 1
-	/// \example 0
-	/// \param[in] options a list of options, elements one of {"BindPosPred" => the position is bound to the preceeding feature, "BindPosSucc" => the position is bound to the succeeding feature}
-	/// \example "content"
-	/// \example "unique"
-	/// \example "succ"
-	/// \example "pred"
-	void addForwardIndexFeatureFromPatternMatch(
-		const std::string& type,
-		const std::string& patternTypeName,
-		const ValueVariant& normalizers,
-		const ValueVariant& priority=ValueVariant(),
-		const ValueVariant& options=ValueVariant());
-
-	/// \brief Define a result of pattern matching to insert as metadata, normalized
-	/// \param[in] name name of the meta data element to produce.
-	/// \example "location"
-	/// \param[in] patternTypeName name of the pattern to select
-	/// \example "word"
-	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
-	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \example ["date2int","d","%Y-%m-%d"]
-	void defineMetaDataFromPatternMatch(
-		const std::string& name,
-		const std::string& patternTypeName,
-		const ValueVariant& normalizers);
-
-	/// \brief Define a result of pattern matching to insert as document attribute, normalized
-	/// \param[in] attribname name of the document attribute to produce.
-	/// \example "annotation"
-	/// \param[in] patternTypeName name of the pattern to select
-	/// \example "word"
-	/// \param[in] normalizers list of normalizer function descriptions to use for this feature in the ascending order of appearance
-	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \example ["date2int","d","%Y-%m-%d"]
-	void defineAttributeFromPatternMatch(
-		const std::string& attribname,
-		const std::string& patternTypeName,
-		const ValueVariant& normalizers);
-
-	/// \brief Declare a pattern matcher on the document features after other query analysis
-	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
-	/// \example "location"
-	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
-	/// \example ""
-	/// \param[in] lexems list of all lexems generated by the feeder (analyzer)
-	/// \example "word"
-	/// \example ["word","number"]
-	/// \param[in] patterns structure with all patterns
-	void defineTokenPatternMatcher(
-			const std::string& patternTypeName,
-			const std::string& patternMatcherModule,
-			const ValueVariant& lexems,
-			const ValueVariant& patterns);
 
 	/// \brief Declare a sub document for the handling of multi part documents in an analyzed content or documents of different types with one configuration
 	/// \note Sub documents are defined as the sections selected by the expression plus some data selected not belonging to any sub document.
@@ -433,63 +315,6 @@ public:
 			const ValueVariant& tokenizer,
 			const ValueVariant& normalizers,
 			SentenceAnalyzerImpl* analyzer);
-
-	/// \brief Defines an element from a pattern matching result.
-	/// \param[in] type element type created from this pattern match result type
-	/// \example "name"
-	/// \param[in] patternTypeName name of the pattern match result item
-	/// \example "entity"
-	/// \param[in] normalizers list of normalizer functions
-	/// \example ["lc",["stem", "en"]]
-	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
-	/// \example 3
-	/// \example 1
-	/// \example 0
-	void addElementFromPatternMatch(
-			const std::string& type,
-			const std::string& patternTypeName,
-			const ValueVariant& normalizers,
-			const ValueVariant& priority=ValueVariant());
-
-	/// \brief Declare an element to be used as lexem by post processing pattern matching but not put into the result of query analysis
-	/// \param[in] termtype term type name of the lexem to be feed to the pattern matching
-	/// \example "titlestem"
-	/// \example "titleword"
-	/// \param[in] fieldtype type of the field of this element in the query
-	/// \example "text"
-	/// \example "word"
-	/// \param[in] tokenizer tokenizer function description to use for the features of this field type
-	/// \example "content"
-	/// \example "word"
-	/// \example ["regex", "[A-Za-z]+"]
-	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type in the ascending order of appearance
-	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \param[in] priority priority element priority analyzer element with lower or undefined priority are ousted if they are completely covered by elements with higher priority
-	/// \example 3
-	/// \example 1
-	/// \example 0
-	void addPatternLexem(
-			const std::string& termtype,
-			const std::string& fieldtype,
-			const ValueVariant& tokenizer,
-			const ValueVariant& normalizers,
-			const ValueVariant& priority=ValueVariant());
-
-	/// \brief Declare a pattern matcher on the query features after other query analysis
-	/// \param[in] patternTypeName name of the type to assign to the pattern matching results
-	/// \example "entity"
-	/// \example "match"
-	/// \param[in] patternMatcherModule module id of pattern matcher to use (empty string for default)
-	/// \param[in] lexems list of all lexems generated by the feeder (analyzer)
-	/// \example ["word" "number" "name"]
-	/// \example "word"
-	/// \param[in] patterns structure with all patterns
-	void defineTokenPatternMatcher(
-			const std::string& patternTypeName,
-			const std::string& patternMatcherModule,
-			const ValueVariant& lexems,
-			const ValueVariant& patterns);
 
 	/// \brief Declare an implicit grouping operation for a query field type. The implicit group operation is always applied when more than one term are resulting from analysis of this field to ensure that you get only one node in the query from it.
 	/// \param[in] fieldtype name of the field type where this grouping operation applies

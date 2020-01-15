@@ -19,7 +19,6 @@
 #include "papuga/errors.hpp"
 #include "papuga/valueVariant.hpp"
 #include "papuga/valueVariant.h"
-#include "patternMatcherLoader.hpp"
 #include "private/internationalization.hpp"
 #include "serializer.hpp"
 #include "deserializer.hpp"
@@ -149,22 +148,6 @@ void DocumentAnalyzerImpl::addSearchIndexStructure(
 	if (errorhnd->hasError()) throw strus::runtime_error(_TXT("error defining search index structure: %s"), errorhnd->fetchError());
 }
 
-void DocumentAnalyzerImpl::addPatternLexem(
-		const std::string& type,
-		const std::string& selectexpr,
-		const ValueVariant& tokenizer,
-		const ValueVariant& normalizers,
-		const ValueVariant& priorityval)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
-	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
-	int priority = Deserializer::getInt( priorityval, 0);
-	analyzer->addPatternLexem(
-		type, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers, priority);
-	funcdef.release();
-}
-
 void DocumentAnalyzerImpl::defineMetaData(
 	const std::string& fieldname,
 	const std::string& selectexpr,
@@ -210,83 +193,6 @@ void DocumentAnalyzerImpl::defineAttribute(
 	analyzer->defineAttribute(
 		attribname, selectexpr, funcdef.tokenizer.get(), funcdef.normalizers);
 	funcdef.release();
-}
-
-void DocumentAnalyzerImpl::addSearchIndexFeatureFromPatternMatch(
-	const std::string& type,
-	const std::string& patternTypeName,
-	const ValueVariant& normalizers,
-	const ValueVariant& priorityval,
-	const ValueVariant& options)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
-	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
-	int priority = Deserializer::getInt( priorityval, 0);
-	analyzer->addSearchIndexFeatureFromPatternMatch(
-		type, patternTypeName, funcdef.normalizers,
-		priority, Deserializer::getFeatureOptions( options));
-	funcdef.release();
-}
-
-void DocumentAnalyzerImpl::addForwardIndexFeatureFromPatternMatch(
-	const std::string& type,
-	const std::string& patternTypeName,
-	const ValueVariant& normalizers,
-	const ValueVariant& priorityval,
-	const ValueVariant& options)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
-	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
-	int priority = Deserializer::getInt( priorityval, 0);
-	analyzer->addForwardIndexFeatureFromPatternMatch(
-		type, patternTypeName, funcdef.normalizers,
-		priority, Deserializer::getFeatureOptions( options));
-	funcdef.release();
-}
-
-void DocumentAnalyzerImpl::defineMetaDataFromPatternMatch(
-	const std::string& fieldname,
-	const std::string& patternTypeName,
-	const ValueVariant& normalizers)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
-	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
-
-	analyzer->defineMetaDataFromPatternMatch(
-		fieldname, patternTypeName, funcdef.normalizers);
-	funcdef.release();
-}
-
-void DocumentAnalyzerImpl::defineAttributeFromPatternMatch(
-	const std::string& attribname,
-	const std::string& patternTypeName,
-	const ValueVariant& normalizers)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
-	DocumentAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
-
-	analyzer->defineAttributeFromPatternMatch(
-		attribname, patternTypeName, funcdef.normalizers);
-	funcdef.release();
-}
-
-void DocumentAnalyzerImpl::defineTokenPatternMatcher(
-		const std::string& patternTypeName,
-		const std::string& patternMatcherModule,
-		const ValueVariant& lexems,
-		const ValueVariant& patterns)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	DocumentAnalyzerInstanceInterface* THIS = m_analyzer_impl.getObject<DocumentAnalyzerInstanceInterface>();
-	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-	PatternMatcherPostProc pt = loadPatternMatcherPostProc( textproc, patternMatcherModule, lexems, patterns, errorhnd);
-	THIS->defineTokenPatternMatcher( patternTypeName, pt.matcher.get(), pt.feeder.get());
-	pt.release();
 }
 
 void DocumentAnalyzerImpl::defineSubDocument(
@@ -480,51 +386,6 @@ void QueryAnalyzerImpl::addElement(
 	int priority = Deserializer::getInt( priorityval, 0);
 	THIS->addElement( featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers, priority);
 	funcdef.release();
-}
-
-void QueryAnalyzerImpl::addElementFromPatternMatch(
-		const std::string& type,
-		const std::string& patternTypeName,
-		const ValueVariant& normalizers,
-		const ValueVariant& priorityval)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInstanceInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-	FeatureFuncDef funcdef( m_textproc, ValueVariant(), normalizers, errorhnd);
-	int priority = Deserializer::getInt( priorityval, 0);
-	THIS->addElementFromPatternMatch( type, patternTypeName, funcdef.normalizers, priority);
-	funcdef.release();
-}
-
-void QueryAnalyzerImpl::addPatternLexem(
-		const std::string& featureType,
-		const std::string& fieldType,
-		const ValueVariant& tokenizer,
-		const ValueVariant& normalizers,
-		const ValueVariant& priorityval)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInstanceInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-	FeatureFuncDef funcdef( m_textproc, tokenizer, normalizers, errorhnd);
-	int priority = Deserializer::getInt( priorityval, 0);
-	THIS->addPatternLexem( featureType, fieldType, funcdef.tokenizer.get(), funcdef.normalizers, priority);
-	funcdef.release();
-}
-
-void QueryAnalyzerImpl::defineTokenPatternMatcher(
-		const std::string& patternTypeName,
-		const std::string& patternMatcherModule,
-		const ValueVariant& lexems,
-		const ValueVariant& patterns)
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	QueryAnalyzerInstanceInterface* THIS = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-	const AnalyzerObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<AnalyzerObjectBuilderInterface>();
-	const TextProcessorInterface* textproc = objBuilder->getTextProcessor();
-
-	PatternMatcherPostProc pt = loadPatternMatcherPostProc( textproc, patternMatcherModule, lexems, patterns, errorhnd);
-	THIS->defineTokenPatternMatcher( patternTypeName, pt.matcher.get(), pt.feeder.get());
-	pt.release();
 }
 
 static QueryAnalyzerContextInterface::GroupBy getImplicitGroupBy( const std::string& name)
