@@ -293,6 +293,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 					else
 					{
 						// [1.F] DELETE of a configuration object:
+						resetRequestObject();
 						return deleteConfigurationRequest();
 					}
 				}
