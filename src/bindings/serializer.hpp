@@ -20,6 +20,8 @@
 #include "strus/analyzer/contentStatisticsResult.hpp"
 #include "strus/vectorQueryResult.hpp"
 #include "strus/summaryElement.hpp"
+#include "strus/weightedField.hpp"
+#include "strus/weightedDocument.hpp"
 #include "strus/resultDocument.hpp"
 #include "strus/queryResult.hpp"
 #include "strus/sentenceGuess.hpp"

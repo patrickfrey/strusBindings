@@ -234,6 +234,9 @@ string QueryResult:
   string nofvisited: 3
   string ranks:
     number 1:
+      string field:
+        string end: 0
+        string start: 0
       string summary:
         number 1:
           string name: "title"
@@ -246,6 +249,9 @@ string QueryResult:
           string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
       string weight: 0.64282
     number 2:
+      string field:
+        string end: 0
+        string start: 0
       string summary:
         number 1:
           string name: "title"
@@ -258,6 +264,9 @@ string QueryResult:
           string value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
       string weight: 0.00017
     number 3:
+      string field:
+        string end: 0
+        string start: 0
       string summary:
         number 1:
           string name: "title"

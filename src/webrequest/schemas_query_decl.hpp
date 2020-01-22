@@ -225,6 +225,12 @@ public:
 			{"nofvisited", "()", QueryNofVisited, papuga_TypeInt, "312367"},
 			{"ranks/docno", "()", QueryRankDocno, papuga_TypeInt, "1;133;1812473"},
 			{"ranks/weight", "()", QueryRankWeight, papuga_TypeDouble, "0.7875834;1.234235;120.1241"},
+			{"ranks/field/start", "()", QueryRankFieldStart, papuga_TypeInt, "0;1;127;1241"},
+			{"ranks/field/end", "()", QueryRankFieldEnd, papuga_TypeInt, "0;2;327;2346;41241"},
+			{"ranks/field", QueryRankField, {
+				{"start", QueryRankFieldStart},
+				{"end", QueryRankFieldEnd}
+			}},
 			{"ranks/summary/name", "()", QueryRankSummaryName, papuga_TypeString, "title"},
 			{"ranks/summary/value", "()", QueryRankSummaryValue, papuga_TypeString, "Tonight (David Bowie album)"},
 			{"ranks/summary/weight", "()", QueryRankSummaryWeight, papuga_TypeDouble, "0.14841834;3.634931;101.98547"},
@@ -238,7 +244,8 @@ public:
 			{"ranks", QueryRank, {
 				{"docno", QueryRankDocno},
 				{"weight", QueryRankWeight},
-				{"summary", QueryRankSummary, '*'},
+				{"field", QueryRankField},
+				{"summary", QueryRankSummary, '*'}
 			}},
 			{"", QueryResult, {
 				{"evalpass", QueryEvalPass, '?'},

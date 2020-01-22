@@ -425,6 +425,9 @@ string QueryResult:
   string nofvisited: 91
   string ranks: 
     integer 0: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -483,6 +486,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.50062
     integer 1: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -541,6 +547,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.50004
     integer 2: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -574,6 +583,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.3343
     integer 3: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -607,6 +619,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.33429
     integer 4: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -655,6 +670,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.33424
     integer 5: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -703,6 +721,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.33409
     integer 6: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -756,6 +777,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.28643
     integer 7: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -794,6 +818,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25094
     integer 8: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -832,6 +859,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25091
     integer 9: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -870,6 +900,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25087
     integer 10: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -908,6 +941,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25085
     integer 11: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -946,6 +982,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25079
     integer 12: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -984,6 +1023,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25071
     integer 13: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -1022,6 +1064,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25067
     integer 14: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -1060,6 +1105,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.25003
     integer 15: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -1103,6 +1151,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.20088
     integer 16: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -1146,6 +1197,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.20083
     integer 17: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -1189,6 +1243,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.20082
     integer 18: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"
@@ -1232,6 +1289,9 @@ string QueryResult:
           string weight: 1
       string weight: 0.2007
     integer 19: 
+      string field: 
+        string end: 0
+        string start: 0
       string summary: 
         integer 0: 
           string name: "docid"

@@ -584,6 +584,7 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const ResultDo
 	bool rt = true;
 	rt &= serializeArrayElement( result, (papuga_Int)val.docno(), errcode, deep);
 	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
+	rt &= serializeArrayElement( result, val.field(), errcode, deep);
 	rt &= serializeArrayElement( result, val.summaryElements(), errcode, deep);
 	return rt;
 }

@@ -158,8 +158,9 @@ enum _MetaDataTableCommand {op,name,type,oldname};
 /// \brief Document result description of a storage query result
 /// \member docno internal (local) document number
 /// \member weight weight of the result document
+/// \member field field (ordinal position range) that was weighted in this result
 /// \member summary list of summary elements for this result document
-enum _ResultDocument {docno,weight,summary};
+enum _ResultDocument {docno,weight,field,summary};
 
 /// \struct QueryResult
 /// \brief Storage query result

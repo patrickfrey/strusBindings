@@ -599,6 +599,7 @@ IndexRange Deserializer::getIndexRange( papuga_SerializationIter& seriter)
 		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 		{
 			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
 			switch ((StructureNameId)idx)
 			{
 				case I_start:
@@ -1186,17 +1187,18 @@ std::vector<SummaryElement> Deserializer::getSummaryElementListValue( papuga_Ser
 
 ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& seriter)
 {
-	static const StructureNameMap namemap( "docno,weight,summary", ',');
-	enum StructureNameId {I_docno=0,I_weight=1,I_summary=2};
+	static const StructureNameMap namemap( "docno,weight,field,summary", ',');
+	enum StructureNameId {I_docno=0,I_weight=1,I_field=2,I_summary=3};
 	static const char* context = _TXT("result document");
 
-	Index docno_=0;
+	strus::Index docno_=0;
 	double weight_=0.0;
+	strus::IndexRange field_;
 	std::vector<SummaryElement> summary_;
 
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
-		bool defined[ 3] = {false,false,false};
+		bool defined[ 4] = {false,false,false,false};
 
 		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 		{
@@ -1212,6 +1214,7 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 			{
 				case I_docno: docno_=getIndex( seriter); break;
 				case I_weight: weight_=getFloat( seriter); break;
+				case I_field: field_=getIndexRangeAsValue( seriter); break;
 				case I_summary: summary_=getSummaryElementListValue( seriter); break;
 			}
 		}
@@ -1231,6 +1234,10 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 		}
 		if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
 		{
+			field_=getIndexRangeAsValue( seriter);
+		}
+		if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
+		{
 			summary_=getSummaryElementListValue( seriter);
 		}
 	}
@@ -1238,7 +1245,7 @@ ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& serite
 	{
 		throw strus::runtime_error(_TXT("expected non empty structure for %s"), context);
 	}
-	return ResultDocument( docno_, weight_, summary_);
+	return ResultDocument( docno_, field_, weight_, summary_);
 }
 
 std::vector<ResultDocument> Deserializer::getResultDocumentList( papuga_SerializationIter& seriter)

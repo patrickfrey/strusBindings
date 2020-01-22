@@ -44,60 +44,90 @@
 	"ranks":[
 		{
 			"weight": "1.207485",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "Tonight (David Bowie album)"}]},
 		{
 			"weight": "0.989159",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "VH1 Storytellers (David Bowie album)"}]},
 		{
 			"weight": "0.921987",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
 			"weight": "0.482522",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "Let's Dance (David Bowie album)"}]},
 		{
 			"weight": "0.436893",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "David Bowie"}]},
 		{
 			"weight": "0.000016",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "Liza Jane (David Bowie song)"}]},
 		{
 			"weight": "0.000010",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "List of awards and nominations received by David Bowie"}]},
 		{
 			"weight": "0.000007",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "David Bowie (1967 album)"}]},
 		{
 			"weight": "0.000006",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "Stage (David Bowie album)"}]},
 		{
 			"weight": "0.000003",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
@@ -111,30 +141,45 @@
 	"ranks":[
 		{
 			"weight": "0.417284",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "Liza Jane (David Bowie song)"}]},
 		{
 			"weight": "0.262864",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "Never Let Me Down (David Bowie song)"}]},
 		{
 			"weight": "0.258166",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "David Bowie (1967 album)"}]},
 		{
 			"weight": "0.122081",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
 			"weight": "0.113390",
+			"field":{
+				"start": 0,
+				"end": 0},
 			"summary":[
 				{
 					"name": "title",

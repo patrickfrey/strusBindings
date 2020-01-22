@@ -83,7 +83,7 @@ public:
 		QueryEvalFormulaParameterName, QueryEvalFormulaParameterValue, QueryEvalFormulaParameter,
 
 		QueryResult,QueryEvalPass,QueryNofRanked,QueryNofVisited,
-		QueryRank,QueryRankDocno,QueryRankWeight,QueryRankSummary,
+		QueryRank,QueryRankDocno,QueryRankWeight,QueryRankField,QueryRankFieldStart,QueryRankFieldEnd,QueryRankSummary,
 		QueryRankSummaryName,QueryRankSummaryValue,QueryRankSummaryWeight,QueryRankSummaryIndex,
 
 		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, 

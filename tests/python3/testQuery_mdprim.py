@@ -410,6 +410,9 @@ str QueryResult:
   str nofvisited: 91
   str ranks:
     number 1:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -468,6 +471,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.50062
     number 2:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -526,6 +532,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.50004
     number 3:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -559,6 +568,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.33430
     number 4:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -592,6 +604,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.33429
     number 5:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -640,6 +655,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.33424
     number 6:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -688,6 +706,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.33409
     number 7:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -741,6 +762,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.28643
     number 8:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -779,6 +803,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25094
     number 9:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -817,6 +844,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25091
     number 10:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -855,6 +885,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25087
     number 11:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -893,6 +926,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25085
     number 12:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -931,6 +967,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25079
     number 13:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -969,6 +1008,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25071
     number 14:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -1007,6 +1049,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25067
     number 15:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -1045,6 +1090,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.25003
     number 16:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -1088,6 +1136,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.20088
     number 17:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -1131,6 +1182,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.20083
     number 18:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -1174,6 +1228,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.20082
     number 19:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
@@ -1217,6 +1274,9 @@ str QueryResult:
           str weight: 1
       str weight: 0.20070
     number 20:
+      str field:
+        str end: 0
+        str start: 0
       str summary:
         number 1:
           str name: "docid"
