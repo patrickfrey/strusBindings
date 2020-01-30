@@ -81,7 +81,7 @@ std::string ConfigurationHandler::newConfigStorageFilename( const ConfigurationD
 	std::strftime( timebuf, sizeof(timebuf), "%Y%m%d_%H%M%S", tm_info);
 
 	strus::unique_lock lock( m_mutex);
-	if (m_lastTimeStmp != timebuf)
+	if (0==std::strcmp( m_lastTimeStmp, timebuf))
 	{
 		m_configCounter = 0;
 		std::memcpy( m_lastTimeStmp, timebuf, sizeof(m_lastTimeStmp));
