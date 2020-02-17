@@ -238,11 +238,6 @@ public:
 	/// \param[in] parameter parameter values (map of variable names to floats)
 	void setWeightingVariables( const ValueVariant& parameter);
 
-	/// \brief Switch on debug mode that creates debug info of query evaluation methods and summarization as attributes of the query result
-	/// \note Debug attributes are specified in the declaration of summarizers and weighting functions (3rd parameter of QueryEval::addSummarizer and QueryEval::addWeightingFunction)
-	/// \param[in] debug true if switched on, false if switched off (default off)
-	void setDebugMode( bool debug);
-
 	/// \brief Evaluate this query and return the result
 	/// \return the result (strus::QueryResult)
 	QueryResult* evaluate() const;

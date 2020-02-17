@@ -214,7 +214,6 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{VariableName, "variable name"},
 		{VariableValue, "variable value"},
 		{VariableDef, "variable definition"},
-		{DebugModeFlag, "debug mode flag"},
 		{IncludeContextName, "include context name"},
 		{NofItemDefinitions, "number of item definitions"},
 	};

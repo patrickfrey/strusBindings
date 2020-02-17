@@ -95,7 +95,6 @@ public:
 		TermStats, TermDocumentFrequency, CollectionNofDocs, GlobalStats,
 		Docno,NumberOfResults,FirstResult,MergeResult,AccessRight,
 		VariableName,VariableValue,VariableDef,
-		DebugModeFlag,
 
 		IncludeContextName,
 

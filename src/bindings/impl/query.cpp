@@ -234,12 +234,6 @@ void QueryImpl::setWeightingVariables(
 	}
 }
 
-void QueryImpl::setDebugMode( bool debug)
-{
-	QueryInterface* THIS = m_query_impl.getObject<QueryInterface>();
-	THIS->setDebugMode( debug);
-}
-
 QueryResult* QueryImpl::evaluate() const
 {
 	const QueryInterface* THIS = m_query_impl.getObject<const QueryInterface>();
@@ -252,10 +246,13 @@ QueryResult* QueryImpl::evaluate() const
 	{
 		result.reset( new QueryResult( THIS->evaluate( m_minRank, m_maxNofRanks)));
 	}
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	if (errorhnd->hasError())
+	if (result->ranks().empty())
 	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
+		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+		if (errorhnd->hasError())
+		{
+			throw strus::runtime_error( "%s", errorhnd->fetchError());
+		}
 	}
 	return result.release();
 }

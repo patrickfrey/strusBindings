@@ -90,7 +90,6 @@ public:
 			{"minrank", "()", FirstResult, papuga_TypeInt, "0;10"},
 			{"mergeres", "()", MergeResult, papuga_TypeBool, "false;True;Y;n;1;0"},
 			{"access", "()", AccessRight, papuga_TypeString, "customer"},
-			{"debug", "()", DebugModeFlag, papuga_TypeBool, "true;false"},
 		}};
 	}
 
@@ -141,7 +140,6 @@ public:
 			{"minrank", 0, "query", Q::setMinRank(), {{FirstResult}} },
 			{"mergeres", 0, "query", Q::useMergeResult(), {{MergeResult}} },
 			{"access", 0, "query", Q::addAccess(), {{AccessRight, '*'}} },
-			{"debug", 0, "query", Q::setDebugMode(), {{DebugModeFlag, '?'}} },
 			{"", 0, "query", Q::setWeightingVariables(), {{VariableDef, '*'}} }
 		}};
 	}
@@ -192,7 +190,6 @@ public:
 			{"minrank", "minrank", FirstResult, '!'},
 			{"mergeres", "mergeres", MergeResult, '?'},
 			{"access", "access", AccessRight, '*'},
-			{"debug", "debug", DebugModeFlag, '?'},
 
 			{"include", "feature", true},
 			{"include/qryeval", "qryeval", IncludeContextName, '?'},
