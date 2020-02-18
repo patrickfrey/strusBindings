@@ -11,7 +11,7 @@
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/queryInterface.hpp"
 #include "strus/numericVariant.hpp"
-#include "strus/queryResult.hpp"
+#include "strus/storage/queryResult.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
 #include <vector>

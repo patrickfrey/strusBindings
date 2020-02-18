@@ -12,7 +12,7 @@
 #include "impl/value/struct.hpp"
 #include "impl/value/iterator.hpp"
 #include "impl/value/introspectionBase.hpp"
-#include "strus/wordVector.hpp"
+#include "strus/storage/wordVector.hpp"
 #include <vector>
 #include <string>
 

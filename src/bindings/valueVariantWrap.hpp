@@ -12,7 +12,7 @@
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.hpp"
 #include "papuga/errors.hpp"
-#include "strus/index.hpp"
+#include "strus/storage/index.hpp"
 #include "strus/base/stdint.h"
 #include "strus/numericVariant.hpp"
 #include "private/internationalization.hpp"

@@ -43,7 +43,7 @@
 #include "strus/debugTraceInterface.hpp"
 #include "strus/constants.hpp"
 #include "strus/numericVariant.hpp"
-#include "strus/statisticsMessage.hpp"
+#include "strus/storage/statisticsMessage.hpp"
 #include "strus/base/configParser.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "private/internationalization.hpp"

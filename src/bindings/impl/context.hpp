@@ -9,7 +9,7 @@
 #define _STRUS_BINDING_IMPL_CONTEXT_HPP_INCLUDED
 #include "papuga/valueVariant.h"
 #include "strus/textProcessorInterface.hpp"
-#include "strus/queryResult.hpp"
+#include "strus/storage/queryResult.hpp"
 #include "strus/base/thread.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"

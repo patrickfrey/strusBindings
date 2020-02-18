@@ -32,7 +32,7 @@
 #include "strus/reference.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
 #include "strus/numericVariant.hpp"
-#include "strus/index.hpp"
+#include "strus/storage/index.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "expressionBuilder.hpp"
 #include "papuga/serialization.h"

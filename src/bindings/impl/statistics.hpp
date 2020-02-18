@@ -8,7 +8,7 @@
 #ifndef _STRUS_BINDING_IMPL_STATISTICS_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STATISTICS_HPP_INCLUDED
 #include "papuga/valueVariant.h"
-#include "strus/index.hpp"
+#include "strus/storage/index.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
 #include <string>

@@ -10,7 +10,7 @@
 #include "papuga/valueVariant.h"
 #include "strus/numericVariant.hpp"
 #include "strus/constants.hpp"
-#include "strus/index.hpp"
+#include "strus/storage/index.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/iterator.hpp"
 #include "impl/value/struct.hpp"

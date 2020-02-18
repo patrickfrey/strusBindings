@@ -8,7 +8,7 @@
 #include "impl/value/valueIterator.hpp"
 #include "papuga/valueVariant.h"
 #include "papuga/callResult.h"
-#include "strus/index.hpp"
+#include "strus/storage/index.hpp"
 #include "strus/reference.hpp"
 #include "strus/valueIteratorInterface.hpp"
 #include "strus/errorBufferInterface.hpp"

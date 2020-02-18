@@ -8,7 +8,7 @@
 #ifndef _STRUS_BINDING_IMPL_STORAGE_SELECT_ITERATOR_HPP_INCLUDED
 #define _STRUS_BINDING_IMPL_STORAGE_SELECT_ITERATOR_HPP_INCLUDED
 #include "papuga/valueVariant.h"
-#include "strus/index.hpp"
+#include "strus/storage/index.hpp"
 #include "strus/reference.hpp"
 #include "strus/storageClientInterface.hpp"
 #include "strus/postingIteratorInterface.hpp"
