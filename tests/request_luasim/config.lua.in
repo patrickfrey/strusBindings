@@ -40,8 +40,7 @@ serverConfig = {
 		request_file = "./requests.{service.name}.log",
 		protocol = {
 			pretty_print = true,
-			quit_enabled = true,
-			debug_enabled = true
+			quit_enabled = true
 		}
 	}
 }

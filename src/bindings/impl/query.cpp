@@ -112,10 +112,10 @@ void QueryEvalImpl::defineWeightingFormula(
 	Deserializer::buildWeightingFormula( queryeval, source, parameter, m_queryproc, errorhnd);
 }
 
-void QueryEvalImpl::usePositionInformation( bool yes)
+void QueryEvalImpl::usePositionInformation( const std::string& featureset, bool yes)
 {
 	QueryEvalInterface* queryeval = m_queryeval_impl.getObject<QueryEvalInterface>();
-	queryeval->usePositionInformation( yes);
+	queryeval->usePositionInformation( featureset, yes);
 }
 
 QueryImpl* QueryEvalImpl::createQuery( StorageClientImpl* storage) const

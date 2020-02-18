@@ -18,6 +18,7 @@
 			}]
 		},
 		"summarizer": {
+			"id": "title",
 			"name": "attribute",
 			"param": [{
 				 "name": "name",

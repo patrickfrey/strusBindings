@@ -13,13 +13,6 @@ function createDocumentAnalyzer_t3s( strusctx)
 	analyzer:defineAttribute( "title", "/doc/title()", "content", "orig")
 	analyzer:defineAggregatedMetaData( "title_end", {"nextpos", "endtitle"})
 	analyzer:defineAggregatedMetaData( "doclen", {"count", "word"})
-
-	-- analyzer:definePatternMatcherPostProc( "coresult", "std", {"word"}, {
-	-- 	{"city_that_is", {"sequence", 3, {"word","citi"},{"word","that"},{"word","is"}} },
-	-- 	{"city_that", {"sequence", 2, {"word","citi"},{"word","that"}}},
-	-- 	{"city_with", {"sequence", 2, {"word","citi"},{"word","with"}}}
-	-- })
-	-- analyzer:addSearchIndexFeatureFromPatternMatch( "word", "coresult", {"lc"})
 	return analyzer
 end
 
@@ -43,21 +36,17 @@ function createQueryEval_t3s( strusctx)
 	queryEval:addSelectionFeature( "select")
 		
 	-- Here we define how we rank a document selected. We use the 'BM25' weighting scheme:
-	queryEval:addWeightingFunction( "BM25", {k1=0.75, b=2.1, avgdoclen=1000, debug="debug_weighting"}, {match="seek"})
-	
+	queryEval:addWeightingFunction( "BM25", {k1=0.75, b=2.1, avgdoclen=1000}, {match="seek"})
+
 	-- Now we define what attributes of the documents are returned and how they are build.
 	-- The functions that extract stuff from documents for presentation are called summarizers.
 	-- First we add a summarizer that extracts us the title of the document:
-	queryEval:addSummarizer( "", "attribute", {{"name", "title"},{"debug","debug_attribute"}})
-	queryEval:addSummarizer( "", "attribute", {{"name", "docid"},{"debug","debug_attribute"}})
+	queryEval:addSummarizer( "title", "attribute", {{"name", "title"}})
+	queryEval:addSummarizer( "docid", "attribute", {{"name", "docid"}})
 	
 	-- Then we add a summarizer that collects the sections that enclose the best matches 
 	-- in a ranked document:
-	queryEval:addSummarizer(
-		"summary", "matchphrase", 
-		{{"type","orig"}, {"sentencesize",40}, {"windowsize",30},{"debug","debug_matchphrase"}},
-		{match="seek", title="titlefield"}
-	)
+	queryEval:addSummarizer( "summary", "matchphrase", {{"text","orig"}, {"cluster",0.1}, {"maxdf", 1.0}}, {match="seek"})
 	return queryEval
 end
 

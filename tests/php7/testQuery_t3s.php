@@ -96,9 +96,6 @@ $query->setMaxNofRanks( 20);
 // 20 for the 2nd, 40 for the 3rd page, etc.):
 $query->setMinRank( 0);
 
-// Enable debugging
-$query->setDebugMode( False );
-
 // Dump query to output
 $output[ "QueryDump"] = $query->introspection();
 
@@ -120,7 +117,6 @@ $result = "query evaluation:" . dumpTreeWithFilter( $output, ['docno']);
 $expected = <<<END_expected
 query evaluation:
 string QueryDump: 
-  string debug: "false"
   string eval: 
     string selection_sets: 
       integer 0: "select"
@@ -129,31 +125,25 @@ string QueryDump:
         string function: "attribute"
         string param: 
           string attribute: "title"
-          string debug: "debug_attribute"
       integer 1: 
         string function: "attribute"
         string param: 
           string attribute: "docid"
-          string debug: "debug_attribute"
       integer 2: 
         string feature: 
           string match: "seek"
-          string title: "titlefield"
         string function: "matchphrase"
         string param: 
-          string cardinality: 0
-          string debug: "debug_matchphrase"
-          string floatingmark: 
-            string end: " ..."
-            string start: "... "
-          string matchmark: 
-            string end: ""
-            string start: ""
-          string maxdf: 0.1
-          string paragraphsize: 300
-          string sentencesize: 40
-          string type: "orig"
-          string windowsize: 30
+          string cluster: 0.1
+          string dist_close: 8
+          string dist_imm: 2
+          string dist_near: 40
+          string dist_sentence: 20
+          string entity: ""
+          string ffbase: 0.1
+          string maxdf: 1
+          string sentences: 2
+          string text: "orig"
     string weighting: 
       integer 0: 
         string feature: 
@@ -162,7 +152,6 @@ string QueryDump:
         string param: 
           string avgdoclen: 1000
           string b: 2.1
-          string debug: "debug_weighting"
           string k1: 0.75
           string metadata_doclen: "doclen"
     string weighting_sets: 
@@ -256,29 +245,31 @@ string QueryResult:
         string start: 0
       string summary: 
         integer 0: 
-          string name: "title"
+          string name: ""
           string value: "One day in Tokyo"
         integer 1: 
-          string name: "docid"
+          string name: ""
           string value: "A.xml"
         integer 2: 
-          string name: "summary:start"
-          string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
-      string weight: 0.64282
+          string name: "summary"
+          string value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as"
+          string weight: 0.11925
+      string weight: 0.64366
     integer 1: 
       string field: 
         string end: 0
         string start: 0
       string summary: 
         integer 0: 
-          string name: "title"
+          string name: ""
           string value: "A visit in New York"
         integer 1: 
-          string name: "docid"
+          string name: ""
           string value: "B.xml"
         integer 2: 
-          string name: "summary:start"
-          string value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
+          string name: "summary"
+          string value: "A visit in New York New York is a city with dimensions you can't imagine."
+          string weight: 0
       string weight: 0.00017
     integer 2: 
       string field: 
@@ -286,14 +277,11 @@ string QueryResult:
         string start: 0
       string summary: 
         integer 0: 
-          string name: "title"
+          string name: ""
           string value: "A journey through Germany"
         integer 1: 
-          string name: "docid"
+          string name: ""
           string value: "C.xml"
-        integer 2: 
-          string name: "summary:start"
-          string value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
       string weight: 9.0E-5
 string QueryString: "City visit tokyo"
 string QueryTerms: 
@@ -307,18 +295,17 @@ string QueryTerms:
     string type: "word"
     string value: "tokyo"
 string ResultList: 
-  integer 0: "rank 0: 0.64282"
-  integer 1: "    title 'One day in Tokyo'"
-  integer 2: "    docid 'A.xml'"
-  integer 3: "    summary:start 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
+  integer 0: "rank 0: 0.64366"
+  integer 1: "     'One day in Tokyo'"
+  integer 2: "     'A.xml'"
+  integer 3: "    summary 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as'"
   integer 4: "rank 1: 0.00017"
-  integer 5: "    title 'A visit in New York'"
-  integer 6: "    docid 'B.xml'"
-  integer 7: "    summary:start 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
+  integer 5: "     'A visit in New York'"
+  integer 6: "     'B.xml'"
+  integer 7: "    summary 'A visit in New York New York is a city with dimensions you can't imagine.'"
   integer 8: "rank 2: 0.00009"
-  integer 9: "    title 'A journey through Germany'"
-  integer 10: "    docid 'C.xml'"
-  integer 11: "    summary:start 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
+  integer 9: "     'A journey through Germany'"
+  integer 10: "     'C.xml'"
 string postings: 
   string expr 0 doc A.xml: 
     integer 0: 12

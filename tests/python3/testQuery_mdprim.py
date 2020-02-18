@@ -105,9 +105,6 @@ query.setMinRank( 0)
 query.addMetaDataRestriction( [ [["<","cross",10],[">","cross",14]], [">","factors",0] ] )
 query.addMetaDataRestriction( mexpr )
 
-# Enable debugging
-query.setDebugMode( False )
-
 # Restrict document access
 query.addAccess( ["tiny","huge","small"] )
 
@@ -127,7 +124,6 @@ output[ "ResultList"] = output_list
 result = "query evaluation:" + dumpTreeWithFilter( output, {'docno'}) + "\n"
 expected = """query evaluation:
 str QueryDump:
-  str debug: "false"
   str eval:
     str formula:
       number 1:
@@ -169,50 +165,41 @@ str QueryDump:
         str function: "attribute"
         str param:
           str attribute: "docid"
-          str debug: "debug_attribute"
       number 2:
         str function: "metadata"
         str param:
-          str debug: "debug_metadata"
           str name: "cross"
       number 3:
         str function: "metadata"
         str param:
-          str debug: "debug_metadata"
           str name: "factors"
       number 4:
         str function: "metadata"
         str param:
-          str debug: "debug_metadata"
           str name: "lo"
       number 5:
         str function: "metadata"
         str param:
-          str debug: "debug_metadata"
           str name: "hi"
       number 6:
-        str function: "forwardindex"
+        str function: "content"
         str param:
-          str N: 100
-          str debug: "debug_forwardindex"
+          str results: 100
           str type: "word"
     str weighting:
       number 1:
         str feature:
           str match: "seek"
-        str function: "tf"
-        str param:
-          str debug: "debug_weighting"
+        str function: "frequency"
+        str param: None
       number 2:
         str function: "metadata"
         str param:
-          str debug: "debug"
           str name: "doclen"
           str weight: 1
       number 3:
         str function: "metadata"
         str param:
-          str debug: "debug"
           str name: "docidx"
           str weight: 1
     str weighting_sets:

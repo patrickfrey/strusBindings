@@ -96,9 +96,6 @@ query.setMaxNofRanks( 20)
 # 20 for the 2nd, 40 for the 3rd page, etc.):
 query.setMinRank( 0)
 
-# Enable debugging
-query.setDebugMode( False )
-
 # Dump query to output
 output[ "QueryDump"] = query.introspection()
 
@@ -115,7 +112,6 @@ output[ "ResultList"] = output_list
 result = "query evaluation:" + dumpTreeWithFilter( output, {'docno'}) + "\n"
 expected = """query evaluation:
 str QueryDump:
-  str debug: "false"
   str eval:
     str selection_sets:
       number 1: "select"
@@ -124,31 +120,25 @@ str QueryDump:
         str function: "attribute"
         str param:
           str attribute: "title"
-          str debug: "debug_attribute"
       number 2:
         str function: "attribute"
         str param:
           str attribute: "docid"
-          str debug: "debug_attribute"
       number 3:
         str feature:
           str match: "seek"
-          str title: "titlefield"
         str function: "matchphrase"
         str param:
-          str cardinality: 0
-          str debug: "debug_matchphrase"
-          str floatingmark:
-            str end: " ..."
-            str start: "... "
-          str matchmark:
-            str end: ""
-            str start: ""
-          str maxdf: 0.10000
-          str paragraphsize: 300
-          str sentencesize: 40
-          str type: "orig"
-          str windowsize: 30
+          str cluster: 0.10000
+          str dist_close: 8
+          str dist_imm: 2
+          str dist_near: 40
+          str dist_sentence: 20
+          str entity: ""
+          str ffbase: 0.10000
+          str maxdf: 1
+          str sentences: 2
+          str text: "orig"
     str weighting:
       number 1:
         str feature:
@@ -157,7 +147,6 @@ str QueryDump:
         str param:
           str avgdoclen: 1000
           str b: 2.10000
-          str debug: "debug_weighting"
           str k1: 0.75000
           str metadata_doclen: "doclen"
     str weighting_sets:
@@ -251,29 +240,31 @@ str QueryResult:
         str start: 0
       str summary:
         number 1:
-          str name: "title"
+          str name: ""
           str value: "One day in Tokyo"
         number 2:
-          str name: "docid"
+          str name: ""
           str value: "A.xml"
         number 3:
-          str name: "summary:start"
-          str value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ..."
-      str weight: 0.64282
+          str name: "summary"
+          str value: "One day in Tokyo Tokyo is a city that is completely different than what you would expect as"
+          str weight: 0.11925
+      str weight: 0.64366
     number 2:
       str field:
         str end: 0
         str start: 0
       str summary:
         number 1:
-          str name: "title"
+          str name: ""
           str value: "A visit in New York"
         number 2:
-          str name: "docid"
+          str name: ""
           str value: "B.xml"
         number 3:
-          str name: "summary:start"
-          str value: "A visit in New York New York is a city with dimensions you can't imagine. ..."
+          str name: "summary"
+          str value: "A visit in New York New York is a city with dimensions you can't imagine."
+          str weight: 0.00000
       str weight: 0.00017
     number 3:
       str field:
@@ -281,14 +272,11 @@ str QueryResult:
         str start: 0
       str summary:
         number 1:
-          str name: "title"
+          str name: ""
           str value: "A journey through Germany"
         number 2:
-          str name: "docid"
+          str name: ""
           str value: "C.xml"
-        number 3:
-          str name: "summary:start"
-          str value: "A journey through Germany When I first visited germany it was still splitted into two parts. ..."
       str weight: 0.00009
 str QueryString: "City visit tokyo"
 str QueryTerms:
@@ -302,18 +290,17 @@ str QueryTerms:
     str type: "word"
     str value: "tokyo"
 str ResultList:
-  number 1: "rank 1: 0.64282"
-  number 2: "    title: 'One day in Tokyo'"
-  number 3: "    docid: 'A.xml'"
-  number 4: "    summary:start: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as European citizen. ...'"
+  number 1: "rank 1: 0.64366"
+  number 2: "    : 'One day in Tokyo'"
+  number 3: "    : 'A.xml'"
+  number 4: "    summary: 'One day in Tokyo Tokyo is a city that is completely different than what you would expect as'"
   number 5: "rank 2: 0.00017"
-  number 6: "    title: 'A visit in New York'"
-  number 7: "    docid: 'B.xml'"
-  number 8: "    summary:start: 'A visit in New York New York is a city with dimensions you can't imagine. ...'"
+  number 6: "    : 'A visit in New York'"
+  number 7: "    : 'B.xml'"
+  number 8: "    summary: 'A visit in New York New York is a city with dimensions you can't imagine.'"
   number 9: "rank 3: 0.00009"
-  number 10: "    title: 'A journey through Germany'"
-  number 11: "    docid: 'C.xml'"
-  number 12: "    summary:start: 'A journey through Germany When I first visited germany it was still splitted into two parts. ...'"
+  number 10: "    : 'A journey through Germany'"
+  number 11: "    : 'C.xml'"
 str postings:
   str expr 0 doc A.xml:
     number 1: 12

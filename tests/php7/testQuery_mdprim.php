@@ -104,9 +104,6 @@ try
 	$query->addMetaDataRestriction( [ [["<","cross",10],[">","cross",14]], [">","factors",0] ] );
 	$query->addMetaDataRestriction( $mexpr );
 	
-	// Enable debugging
-	$query->setDebugMode( False );
-	
 	// Restrict document access
 	$query->addAccess( ["tiny","huge","small"] );
 	
@@ -142,7 +139,6 @@ catch (Exception $e)
 $expected = <<<END_expected
 query evaluation:
 string QueryDump: 
-  string debug: "false"
   string eval: 
     string formula: 
       integer 0: 
@@ -184,50 +180,41 @@ string QueryDump:
         string function: "attribute"
         string param: 
           string attribute: "docid"
-          string debug: "debug_attribute"
       integer 1: 
         string function: "metadata"
         string param: 
-          string debug: "debug_metadata"
           string name: "cross"
       integer 2: 
         string function: "metadata"
         string param: 
-          string debug: "debug_metadata"
           string name: "factors"
       integer 3: 
         string function: "metadata"
         string param: 
-          string debug: "debug_metadata"
           string name: "lo"
       integer 4: 
         string function: "metadata"
         string param: 
-          string debug: "debug_metadata"
           string name: "hi"
       integer 5: 
-        string function: "forwardindex"
+        string function: "content"
         string param: 
-          string N: 100
-          string debug: "debug_forwardindex"
+          string results: 100
           string type: "word"
     string weighting: 
       integer 0: 
         string feature: 
           string match: "seek"
-        string function: "tf"
+        string function: "frequency"
         string param: 
-          string debug: "debug_weighting"
       integer 1: 
         string function: "metadata"
         string param: 
-          string debug: "debug"
           string name: "doclen"
           string weight: 1
       integer 2: 
         string function: "metadata"
         string param: 
-          string debug: "debug"
           string name: "docidx"
           string weight: 1
     string weighting_sets: 

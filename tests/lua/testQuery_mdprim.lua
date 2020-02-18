@@ -95,9 +95,6 @@ query:setMinRank( 0)
 query:addMetaDataRestriction( { {{"<","cross",10},{">","cross",14}}, {">","factors",0} } )
 query:addMetaDataRestriction( mexpr )
 
--- Enable debugging
-query:setDebugMode( false )
-
 -- Restrict document access
 query:addAccess( {"tiny","huge","small"} )
 
@@ -120,7 +117,6 @@ local result = "query evaluation:" .. dumpTreeWithFilter( output, {'docno'}) .. 
 local expected = [[
 query evaluation:
 string QueryDump:
-  string debug: "false"
   string eval:
     string formula:
       number 1:
@@ -162,50 +158,40 @@ string QueryDump:
         string function: "attribute"
         string param:
           string attribute: "docid"
-          string debug: "debug_attribute"
       number 2:
         string function: "metadata"
         string param:
-          string debug: "debug_metadata"
           string name: "cross"
       number 3:
         string function: "metadata"
         string param:
-          string debug: "debug_metadata"
           string name: "factors"
       number 4:
         string function: "metadata"
         string param:
-          string debug: "debug_metadata"
           string name: "lo"
       number 5:
         string function: "metadata"
         string param:
-          string debug: "debug_metadata"
           string name: "hi"
       number 6:
-        string function: "forwardindex"
+        string function: "content"
         string param:
-          string N: 100
-          string debug: "debug_forwardindex"
+          string results: 100
           string type: "word"
     string weighting:
       number 1:
         string feature:
           string match: "seek"
-        string function: "tf"
-        string param:
-          string debug: "debug_weighting"
+        string function: "frequency"
       number 2:
         string function: "metadata"
         string param:
-          string debug: "debug"
           string name: "doclen"
           string weight: 1
       number 3:
         string function: "metadata"
         string param:
-          string debug: "debug"
           string name: "docidx"
           string weight: 1
     string weighting_sets:

@@ -1725,7 +1725,6 @@ template <class FUNCTYPE>
 static void deserializeQueryEvalFunctionParameter(
 		const char* functionclass,
 		FUNCTYPE* function,
-		std::string& debuginfoAttribute,
 		papuga_SerializationIter& seriter)
 {
 	static const StructureNameMap namemap( "name,value", ',');
@@ -1737,15 +1736,8 @@ static void deserializeQueryEvalFunctionParameter(
 		{
 			// ... 2 tuple (pair) of values interpreted as key/value pair
 			std::string paramname = Deserializer::getString( seriter);
-			if (paramname == "debug")
-			{
-				debuginfoAttribute = Deserializer::getString( seriter);
-			}
-			else
-			{
-				const papuga_ValueVariant* value = getValue( seriter);
-				instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
-			}
+			const papuga_ValueVariant* value = getValue( seriter);
+			instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
 			Deserializer::consumeClose( seriter);
 		}
 		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
@@ -1773,14 +1765,7 @@ static void deserializeQueryEvalFunctionParameter(
 			{
 				throw strus::runtime_error( _TXT( "incomplete definition of %s"), functionclass);
 			}
-			if (name == "debug")
-			{
-				debuginfoAttribute = ValueVariantWrap::tostring( *value);
-			}
-			else
-			{
-				instantiateQueryEvalFunctionParameter( functionclass, function, name, value);
-			}
+			instantiateQueryEvalFunctionParameter( functionclass, function, name, value);
 		}
 		else
 		{
@@ -1791,15 +1776,8 @@ static void deserializeQueryEvalFunctionParameter(
 	{
 		std::string paramname = ValueVariantWrap::tostring( *papuga_SerializationIter_value( &seriter));
 		papuga_SerializationIter_skip( &seriter);
-		if (paramname == "debug")
-		{
-			debuginfoAttribute = Deserializer::getString( seriter);
-		}
-		else
-		{
-			const papuga_ValueVariant* value = getValue( seriter);
-			instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
-		}
+		const papuga_ValueVariant* value = getValue( seriter);
+		instantiateQueryEvalFunctionParameter( functionclass, function, paramname, value);
 	}
 	else
 	{
@@ -1906,7 +1884,6 @@ template <class FUNCTYPE>
 static void deserializeQueryEvalFunctionParameters(
 		const char* functionclass,
 		FUNCTYPE* function,
-		std::string& debuginfoAttribute,
 		const papuga_ValueVariant& parameters,
 		ErrorBufferInterface* errorhnd)
 {
@@ -1922,7 +1899,7 @@ static void deserializeQueryEvalFunctionParameters(
 	{
 		while (papuga_SerializationIter_tag(&seriter) != papuga_TagClose)
 		{
-			deserializeQueryEvalFunctionParameter( functionclass, function, debuginfoAttribute, seriter);
+			deserializeQueryEvalFunctionParameter( functionclass, function, seriter);
 		}
 	}
 	catch (const std::runtime_error& err)
@@ -1950,13 +1927,11 @@ void Deserializer::buildSummarizerFunction(
 	Reference<SummarizerFunctionInstanceInterface> function( sf->createInstance( queryproc));
 	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 
-	std::string debuginfoAttribute("debug");
-
-	deserializeQueryEvalFunctionParameters( context, function.get(), debuginfoAttribute, parameters, errorhnd);
+	deserializeQueryEvalFunctionParameters( context, function.get(), parameters, errorhnd);
 
 	std::vector<FeatureParameter> featureParameters = getFeatureParameters( features);
 
-	queryeval->addSummarizerFunction( summarizerId, function.get(), featureParameters, debuginfoAttribute);
+	queryeval->addSummarizerFunction( summarizerId, function.get(), featureParameters);
 	function.release();
 
 	if (errorhnd->hasError())
@@ -1982,12 +1957,11 @@ void Deserializer::buildWeightingFunction(
 	Reference<WeightingFunctionInstanceInterface> function( sf->createInstance( queryproc));
 	if (!function.get()) throw strus::runtime_error( _TXT("error creating %s '%s': %s"), context, functionName.c_str(), errorhnd->fetchError());
 
-	std::string debuginfoAttribute("debug");
-	deserializeQueryEvalFunctionParameters( context, function.get(), debuginfoAttribute, parameters, errorhnd);
+	deserializeQueryEvalFunctionParameters( context, function.get(), parameters, errorhnd);
 
 	std::vector<FeatureParameter> featureParameters = getFeatureParameters( features);
 
-	queryeval->addWeightingFunction( function.get(), featureParameters, debuginfoAttribute);
+	queryeval->addWeightingFunction( function.get(), featureParameters);
 	function.release();
 
 	if (errorhnd->hasError())

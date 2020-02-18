@@ -6,8 +6,7 @@
 	{
 		"function": "attribute",
 		"param":{
-			"attribute": "title",
-			"debug": "debug"}}],
+			"attribute": "title"}}],
 "weighting":[
 	{
 		"feature":{
@@ -16,7 +15,6 @@
 		"param":{
 			"avgdoclen": "1000",
 			"b": "0.75",
-			"debug": "debug",
 			"k1": "1.2",
 			"metadata_doclen": "doclen"}}],
 "weighting_sets":[
@@ -29,7 +27,7 @@
 	"nofvisited": 10,
 	"ranks":[
 		{
-			"weight": "1.207485",
+			"weight": "1.207559",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -38,7 +36,7 @@
 					"name": "title",
 					"value": "Tonight (David Bowie album)"}]},
 		{
-			"weight": "0.989159",
+			"weight": "0.989673",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -47,7 +45,7 @@
 					"name": "title",
 					"value": "VH1 Storytellers (David Bowie album)"}]},
 		{
-			"weight": "0.921987",
+			"weight": "0.922050",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -56,7 +54,7 @@
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
-			"weight": "0.482522",
+			"weight": "0.482583",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -65,7 +63,7 @@
 					"name": "title",
 					"value": "Let's Dance (David Bowie album)"}]},
 		{
-			"weight": "0.436893",
+			"weight": "0.436904",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -126,7 +124,7 @@
 	"nofvisited": 5,
 	"ranks":[
 		{
-			"weight": "0.417284",
+			"weight": "0.417467",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -135,7 +133,7 @@
 					"name": "title",
 					"value": "Liza Jane (David Bowie song)"}]},
 		{
-			"weight": "0.262864",
+			"weight": "0.262937",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -144,7 +142,7 @@
 					"name": "title",
 					"value": "Never Let Me Down (David Bowie song)"}]},
 		{
-			"weight": "0.258166",
+			"weight": "0.258236",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -153,7 +151,7 @@
 					"name": "title",
 					"value": "David Bowie (1967 album)"}]},
 		{
-			"weight": "0.122081",
+			"weight": "0.122097",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -162,7 +160,7 @@
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
-			"weight": "0.113390",
+			"weight": "0.113393",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -178,7 +176,7 @@
 	"nofvisited": 10,
 	"ranks":[
 		{
-			"weight": "1.207485",
+			"weight": "1.207559",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -187,7 +185,7 @@
 					"name": "title",
 					"value": "Tonight (David Bowie album)"}]},
 		{
-			"weight": "0.989159",
+			"weight": "0.989673",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -196,7 +194,7 @@
 					"name": "title",
 					"value": "VH1 Storytellers (David Bowie album)"}]},
 		{
-			"weight": "0.921987",
+			"weight": "0.922050",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -205,7 +203,7 @@
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
-			"weight": "0.482522",
+			"weight": "0.482583",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -214,7 +212,7 @@
 					"name": "title",
 					"value": "Let's Dance (David Bowie album)"}]},
 		{
-			"weight": "0.436893",
+			"weight": "0.436904",
 			"field":{
 				"start": 0,
 				"end": 0},

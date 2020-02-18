@@ -48,21 +48,21 @@ def createQueryEval_mdprim( strusctx):
 	queryEval.addSelectionFeature( "select")
 	
 	# Here we define how we rank a document selected:
-	queryEval.addWeightingFunction( "tf", {'debug':"debug_weighting"},{'match':"seek"})
+	queryEval.addWeightingFunction( "frequency", [], {'match':"seek"})
 	queryEval.addWeightingFunction( "metadata", {'name':"doclen"})
 	queryEval.addWeightingFunction( "metadata", {'name':"docidx"})
 	queryEval.defineWeightingFormula( "(_0 / _1) + ((1000 - _2) / 1000000)" )
 
 	# Now we define what attributes of the documents are returned and how they are build:
-	queryEval.addSummarizer( "", "attribute", [["name", "docid"],["debug","debug_attribute"]])
-	queryEval.addSummarizer( "", "metadata", [["name", "cross"],["debug","debug_metadata"]])
-	queryEval.addSummarizer( "", "metadata", [["name", "factors"],["debug","debug_metadata"]])
-	queryEval.addSummarizer( "", "metadata", [["name", "lo"],["debug","debug_metadata"]])
-	queryEval.addSummarizer( "", "metadata", [["name", "hi"],["debug","debug_metadata"]])
+	queryEval.addSummarizer( "docid", "attribute", [["name", "docid"]])
+	queryEval.addSummarizer( "cross", "metadata", [["name", "cross"]])
+	queryEval.addSummarizer( "factors", "metadata", [["name", "factors"]])
+	queryEval.addSummarizer( "lo", "metadata", [["name", "lo"]])
+	queryEval.addSummarizer( "hi", "metadata", [["name", "hi"]])
 
 	# Then we add a summarizer that collects the sections that enclose the best matches 
 	# in a ranked document:
-	queryEval.addSummarizer( "", "forwardindex", [ ["type","word"], ["debug","debug_forwardindex"] ])
+	queryEval.addSummarizer( "", "content", [ ["type","word"] ])
 
 	return queryEval
 
