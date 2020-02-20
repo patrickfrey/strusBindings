@@ -185,6 +185,12 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{QueryRankSummaryValue, "query rank summary value"},
 		{QueryRankSummaryWeight, "query rank summary weight"},
 		{QueryRankSummaryIndex, "query rank summary index"},
+		{QuerySummary, "query summary"},
+		{QuerySummaryName, "query summary name"},
+		{QuerySummaryValue, "query summary value"},
+		{QuerySummaryWeight, "query summary weight"},
+		{QuerySummaryIndex, "query summary index"},
+
 		{DistQueryEvalStorageServer, "distributed query evaluation storage server"},
 		{DistQueryEvalStatisticsServer, "distributed query evaluation statistics server"},
 		{TermExpression, "term expression"},

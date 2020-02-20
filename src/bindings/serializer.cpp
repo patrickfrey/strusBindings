@@ -118,7 +118,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Sentence
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const SentenceGuess& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	rt &= serializeArrayElement( result, val.classname(), errcode, deep);
 	rt &= serializeArrayElement( result, val.terms(), errcode, deep);
 	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
 	return rt;
@@ -595,6 +594,10 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const QueryRes
 	rt &= serializeArrayElement( result, (papuga_Int)val.nofRanked(), errcode, deep);
 	rt &= serializeArrayElement( result, (papuga_Int)val.nofVisited(), errcode, deep);
 	rt &= serializeArrayElement( result, val.ranks(), errcode, deep);
+	if (!val.summaryElements().empty())
+	{
+		rt &= serializeArrayElement( result, val.summaryElements(), errcode, deep);
+	}
 	return rt;
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const ConfigurationItemList& val, papuga_ErrorCode& errcode, bool deep)

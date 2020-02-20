@@ -244,11 +244,22 @@ public:
 				{"field", QueryRankField},
 				{"summary", QueryRankSummary, '*'}
 			}},
+			{"summary/name", "()", QuerySummaryName, papuga_TypeString, "title"},
+			{"summary/value", "()", QuerySummaryValue, papuga_TypeString, "Tonight (David Bowie album)"},
+			{"summary/weight", "()", QuerySummaryWeight, papuga_TypeDouble, "0.14841834;3.634931;101.98547"},
+			{"summary/index", "()", QuerySummaryIndex, papuga_TypeInt, "-1;0;1;2"},
+			{"summary", QuerySummary, {
+				{"name", QuerySummaryName},
+				{"value", QuerySummaryValue},
+				{"weight", QuerySummaryWeight, '?'},
+				{"index", QuerySummaryIndex, '?'}
+			}},
 			{"", QueryResult, {
 				{"evalpass", QueryEvalPass, '?'},
 				{"nofranked", QueryNofRanked},
 				{"nofvisited", QueryNofVisited},
-				{"ranks", QueryRank, '*'}
+				{"ranks", QueryRank, '*'},
+				{"summary", QuerySummary, '*'}
 			}}
 		}};
 	}

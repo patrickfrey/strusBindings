@@ -1291,15 +1291,16 @@ std::vector<ResultDocument> Deserializer::getResultDocumentListValue( papuga_Ser
 
 QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 {
-	static const StructureNameMap namemap( "evalpass,nofranked,nofvisited,ranks", ',');
-	enum StructureNameId {I_evalpass=0,I_nofranked=1,I_nofvisited=2,I_ranks=3};
+	static const StructureNameMap namemap( "evalpass,nofranked,nofvisited,ranks,summary", ',');
+	enum StructureNameId {I_evalpass=0,I_nofranked=1,I_nofvisited=2,I_ranks=3,I_summary=4};
 	static const char* context = _TXT("query result");
 
 	int evaluationPass_=0;
 	int nofRanked_=0;
 	int nofVisited_=0;
 	std::vector<ResultDocument> ranks_;
-	
+	std::vector<SummaryElement> summary_;
+
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
 		bool defined[ 4] = {false,false,false,false};
@@ -1320,6 +1321,7 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 				case I_nofranked: nofRanked_=getInt( seriter); break;
 				case I_nofvisited: nofVisited_=getInt( seriter); break;
 				case I_ranks: ranks_=getResultDocumentListValue( seriter); break;
+				case I_summary: summary_=getSummaryElementListValue( seriter); break;
 			}
 		}
 		if (!defined[ I_nofranked]) throw strus::runtime_error(_TXT("missing mandatory element %s in %s"), namemap.name(I_nofranked), context);
@@ -1348,12 +1350,16 @@ QueryResult Deserializer::getQueryResult( papuga_SerializationIter& seriter)
 		{
 			ranks_=getResultDocumentListValue( seriter);
 		}
+		if (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
+		{
+			summary_=getSummaryElementListValue( seriter);
+		}
 	}
 	else
 	{
 		throw strus::runtime_error(_TXT("expected non empty structure for %s"), context);
 	}
-	return QueryResult( evaluationPass_, nofRanked_, nofVisited_, ranks_);
+	return QueryResult( evaluationPass_, nofRanked_, nofVisited_, ranks_, summary_);
 }
 
 QueryResult Deserializer::getQueryResult( const papuga_ValueVariant& res)
@@ -3510,241 +3516,7 @@ std::string Deserializer::getConfigString( const papuga_ValueVariant& content)
 	return cfg.cfgstring;
 }
 
-int Deserializer::buildSentencePatternExpressionArguments(
-		SentenceAnalyzerInstanceInterface* analyzer,
-		papuga_SerializationIter& seriter,
-		ErrorBufferInterface* errorhnd)
-{
-	static const char* context = _TXT("sentence expression argument list");
-	int argc = 0;
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-		while (papuga_SerializationIter_tag( &seriter) != papuga_TagClose)
-		{
-			buildSentencePatternExpression( analyzer, seriter, errorhnd);
-			++argc;
-		}
-		consumeClose( seriter);
-		return argc;
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("structure expected for %s"), context);
-	}
-}
-
-void Deserializer::buildSentencePatternExpression(
-		SentenceAnalyzerInstanceInterface* analyzer,
-		papuga_SerializationIter& seriter,
-		ErrorBufferInterface* errorhnd)
-{
-	static const StructureNameMap namemap( "type,value,weight,op,min,max,arg", ',');
-	static const StructureNameMap op_namemap( "seq,alt,repeat", ',');
-	static const char* context = _TXT("sentence expression");
-
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		int repeat_min = 0;
-		int repeat_max = -1;
-		int argc = -1;
-		enum OpType {OpSeq=0,OpAlt,OpRepeat};
-		OpType opType;
-		std::string feat_type;
-		std::string feat_value;
-		double weight = 1.0;
-		enum EType {ETypeNone,ETypeTerm,ETypeSeq,ETypeAlt,ETypeRepeat};
-		EType eType = ETypeNone;
-
-		papuga_SerializationIter_skip( &seriter);
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagClose)
-		{
-			eType = ETypeNone;
-		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-		{
-			do
-			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
-				{
-					case 0/*type*/:
-						if (eType != ETypeNone && eType != ETypeTerm && argc >= 0) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-						eType = ETypeTerm;
-						feat_type = Deserializer::getString( seriter);
-					break;
-					case 1/*value*/:
-						if (eType != ETypeNone && eType != ETypeTerm && argc >= 0) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-						eType = ETypeTerm;
-						feat_value = Deserializer::getString( seriter);
-					break;
-					case 2/*weight*/:
-						if (eType != ETypeNone && eType != ETypeTerm && argc >= 0) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-						eType = ETypeTerm;
-						weight = Deserializer::getFloat( seriter);
-					break;
-					case 3/*op*/:
-						if (papuga_SerializationIter_tag( &seriter) != papuga_TagValue) throw strus::runtime_error(_TXT("value expected as argument of '%s' in '%s'"), namemap.name(idx), context);
-						opType = (OpType)op_namemap.index( *papuga_SerializationIter_value( &seriter));
-						papuga_SerializationIter_skip( &seriter);
-						switch (opType)
-						{
-							case OpSeq:
-								if (eType != ETypeNone && eType != ETypeSeq) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-								eType = ETypeSeq;
-							break;
-							case OpAlt:
-								if (eType != ETypeNone && eType != ETypeAlt) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-								eType = ETypeAlt;
-							break;
-							case OpRepeat:
-								if (eType != ETypeNone && eType != ETypeRepeat) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-								eType = ETypeRepeat;
-							break;
-							default: throw strus::runtime_error(_TXT("unknown operation 'op' in %s structure"), context);
-						}
-						break;
-					break;
-					case 4/*min*/:
-						if (eType != ETypeNone && eType != ETypeRepeat) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-						eType = ETypeRepeat;
-						repeat_min = getUint( seriter);
-					break;
-					case 5/*max*/:
-						if (eType != ETypeNone && eType != ETypeRepeat) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-						eType = ETypeRepeat;
-						repeat_max = getInt( seriter);
-					break;
-					case 6/*arg*/:
-						if (eType == ETypeTerm) throw strus::runtime_error(_TXT("conflicting declarations in '%s'"), context);
-						argc = buildSentencePatternExpressionArguments( analyzer, seriter, errorhnd);
-					break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
-				}
-			} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
-		}
-		else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			const papuga_ValueVariant* op = 0;
-			const papuga_ValueVariant* arg1 = 0;
-			const papuga_ValueVariant* arg2 = 0;
-
-			op = papuga_SerializationIter_value( &seriter);
-			papuga_SerializationIter_skip( &seriter);
-
-			if (papuga_SerializationIter_tag( &seriter) == papuga_TagClose)
-			{
-				if (papuga_ValueVariant_isnumeric( op))
-				{
-					weight = ValueVariantWrap::todouble( *op);
-					eType = ETypeNone;
-				}
-				else
-				{
-					feat_type = ValueVariantWrap::tostring( *op);
-					eType = ETypeTerm;
-				}
-			}
-			else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-			{
-				feat_type = ValueVariantWrap::tostring( *op);
-
-				arg1 = papuga_SerializationIter_value( &seriter);
-				papuga_SerializationIter_skip( &seriter);
-
-				if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-				{
-					arg2 = papuga_SerializationIter_value( &seriter);
-					papuga_SerializationIter_skip( &seriter);
-				}
-				if (papuga_SerializationIter_tag( &seriter) == papuga_TagClose)
-				{
-					if (papuga_ValueVariant_isstring( arg1))
-					{
-						feat_value = ValueVariantWrap::tostring( *arg1);
-						eType = ETypeTerm;
-						arg1 = 0;
-					}
-					else if (!arg2)
-					{
-						weight = ValueVariantWrap::todouble( *arg1);
-						eType = ETypeTerm;
-						arg1 = 0;
-					}
-					else
-					{
-						feat_value = ValueVariantWrap::tostring( *arg1);
-						weight = ValueVariantWrap::todouble( *arg2);
-						eType = ETypeTerm;
-						arg1 = 0;
-						arg2 = 0;
-					}
-				}
-			}
-			if (eType == ETypeNone)
-			{
-				opType = (OpType)op_namemap.index( feat_type);
-				switch (opType)
-				{
-					case OpSeq:
-						if (arg1) throw strus::runtime_error(_TXT("too many arguments for operation '%s' in %s structure"), feat_type.c_str(), context);
-						eType = ETypeSeq;
-						break;
-					case OpAlt:
-						if (arg1) throw strus::runtime_error(_TXT("too many arguments for operation '%s' in %s structure"), feat_type.c_str(), context);
-						eType = ETypeAlt;
-						break;
-					case OpRepeat:
-						eType = ETypeRepeat;
-						if (arg1)
-						{
-							repeat_min = ValueVariantWrap::toint( *arg1);
-							if (arg2)
-							{
-								repeat_max = ValueVariantWrap::toint( *arg2);
-							}
-							arg1 = 0;
-						}
-						break;
-					default: throw strus::runtime_error(_TXT("unknown operation '%s' in %s structure"), feat_type.c_str(), context);
-				}
-				feat_type.clear();
-				argc = buildSentencePatternExpressionArguments( analyzer, seriter, errorhnd);
-			}
-			argc = buildSentencePatternExpressionArguments( analyzer, seriter, errorhnd);
-		}
-		else
-		{
-			throw strus::runtime_error(_TXT("dictionary or list of values expected for '%s'"), context);
-		}
-		switch (eType)
-		{
-			case ETypeNone:
-				analyzer->pushNone( weight);
-			break;
-			case ETypeTerm:
-				analyzer->pushTerm( feat_type, feat_value, weight);
-			break;
-			case ETypeSeq:
-				analyzer->pushSequenceImm( argc);
-			break;
-			case ETypeAlt:
-				analyzer->pushAlt( argc);
-			break;
-			case ETypeRepeat:
-				analyzer->pushRepeat( repeat_min, repeat_max);
-			break;
-		}
-		consumeClose( seriter);
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("structure expected for %s"), context);
-	}
-}
-
-static void buildSentenceAnalyzerLinkDef( SentenceLexerInstanceInterface* lexer, papuga_SerializationIter& seriter)
+static void buildSentenceLexerLinkDef( SentenceLexerInstanceInterface* lexer, papuga_SerializationIter& seriter)
 {
 	static const StructureNameMap namemap( "chr,subst", ',');
 	static const char* context = _TXT("sentence analyzer/lexer link definition");
@@ -3796,38 +3568,32 @@ static void buildSentenceAnalyzerLinkDef( SentenceLexerInstanceInterface* lexer,
 	}
 }
 
-static void buildSentenceAnalyzerSentenceDef(
+static void buildSentenceAnalyzerTypeDef(
 		SentenceAnalyzerInstanceInterface* analyzer,
 		papuga_SerializationIter& seriter,
 		ErrorBufferInterface* errorhnd)
 {
-	static const StructureNameMap namemap( "name,weight,sentpattern", ',');
-	static const char* context = _TXT("sentence analyzer/lexer sentence pattern definition");
-	std::string classname;
-	double weight = 1.0;
-	bool weight_defined = false;
-	bool pattern_defined = false;
+	static const StructureNameMap namemap( "wordtype,priority", ',');
+	static const char* context = _TXT("sentence analyzer word type definition");
+	bool defined[2] = {false,false};
+	std::string wordtype;
+	int priority = -1;
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
 		do
 		{
 			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			if (defined[idx]) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
+			defined[idx] = true;
+
 			papuga_SerializationIter_skip( &seriter);
 			switch (idx)
 			{
-				case 0/*name*/:
-					if (!classname.empty()) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
-					classname = Deserializer::getString( seriter);
+				case 0/*wordtype*/:
+					wordtype = Deserializer::getString( seriter);
 					break;
-				case 1/*weight*/:
-					if (weight_defined) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
-					weight_defined = true;
-					weight = Deserializer::getFloat( seriter);
-					break;
-				case 2/*sentpattern*/:
-					if (pattern_defined) throw strus::runtime_error(_TXT("duplicate defition of '%s' in '%s' structure"), namemap.name(idx), context);
-					pattern_defined = true;
-					Deserializer::buildSentencePatternExpression( analyzer, seriter, errorhnd);
+				case 1/*priority*/:
+					priority = Deserializer::getInt( seriter);
 					break;
 			}
 		}
@@ -3835,19 +3601,18 @@ static void buildSentenceAnalyzerSentenceDef(
 	}
 	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
 	{
-		classname = Deserializer::getString( seriter);
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			weight = Deserializer::getFloat( seriter);
-		}
-		Deserializer::buildSentencePatternExpression( analyzer, seriter, errorhnd);
+		wordtype = Deserializer::getString( seriter);
+		priority = Deserializer::getInt( seriter);
 	}
 	else
 	{
 		throw strus::runtime_error(_TXT("dictionary of list of values expected for %s"), context);
 	}
-	if (!pattern_defined) throw strus::runtime_error(_TXT("missing defition of '%s' in '%s' structure"), "sentpattern", context);
-	analyzer->defineSentence( classname, weight);
+	for (int idx=0; idx<2; ++idx)
+	{
+		if (!defined[idx]) throw strus::runtime_error(_TXT("missing defition of '%s' in '%s' structure"), namemap.name(idx), context);
+	}
+	analyzer->defineWordType( wordtype, priority);
 }
 
 void Deserializer::buildSentenceAnalyzer(
@@ -3907,13 +3672,13 @@ void Deserializer::buildSentenceAnalyzer(
 								while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 								{
 									papuga_SerializationIter_skip( &seriter);
-									buildSentenceAnalyzerLinkDef( lexer, seriter);
+									buildSentenceLexerLinkDef( lexer, seriter);
 									Deserializer::consumeClose( seriter);
 								}
 							}
 							else
 							{
-								buildSentenceAnalyzerLinkDef( lexer, seriter);
+								buildSentenceLexerLinkDef( lexer, seriter);
 							}
 							Deserializer::consumeClose( seriter);
 						}
@@ -3945,13 +3710,13 @@ void Deserializer::buildSentenceAnalyzer(
 								while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
 								{
 									papuga_SerializationIter_skip( &seriter);
-									buildSentenceAnalyzerSentenceDef( analyzer, seriter, errorhnd);
+									buildSentenceAnalyzerTypeDef( analyzer, seriter, errorhnd);
 									Deserializer::consumeClose( seriter);
 								}
 							}
 							else
 							{
-								buildSentenceAnalyzerSentenceDef( analyzer, seriter, errorhnd);
+								buildSentenceAnalyzerTypeDef( analyzer, seriter, errorhnd);
 							}
 							Deserializer::consumeClose( seriter);
 						}

@@ -126,10 +126,9 @@ enum _SentenceTerm {type,value};
 
 /// \struct SentenceGuess
 /// \brief Result of sentence analyzer
-/// \member classname name of the sentence class, eventually used to determine what query evaluation method to use
 /// \member terms list of terms of the sentence
 /// \member weight given to the sentence, used to decide what recognized pattern is the most probably to for the query sentence
-enum _SentenceGuess {classname,terms,weight};
+enum _SentenceGuess {terms,weight};
 
 /// \struct SummaryElement
 /// \brief Summary element in a query result 
@@ -168,7 +167,8 @@ enum _ResultDocument {docno,weight,field,summary};
 /// \member nofranked number of documents ranked for this result
 /// \member nofvisited number of documents visited for this result
 /// \member ranks list of results with a maximum size specified in the query
-enum _QueryResult {evalpass,nofranked,nofvisited,ranks};
+/// \member summary list of summary elements for this result
+enum _QueryResult {evalpass,nofranked,nofvisited,ranks,summary};
 
 /// \struct ContentStatisticsItem
 /// \brief One item of content statistics

@@ -85,6 +85,7 @@ public:
 		QueryResult,QueryEvalPass,QueryNofRanked,QueryNofVisited,
 		QueryRank,QueryRankDocno,QueryRankWeight,QueryRankField,QueryRankFieldStart,QueryRankFieldEnd,QueryRankSummary,
 		QueryRankSummaryName,QueryRankSummaryValue,QueryRankSummaryWeight,QueryRankSummaryIndex,
+		QuerySummary,QuerySummaryName,QuerySummaryValue,QuerySummaryWeight,QuerySummaryIndex,
 
 		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, 
 
