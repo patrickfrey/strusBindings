@@ -377,11 +377,13 @@ int castLuaValue<int>( lua_State* ls, int luaddr)
 {
 	return lua_tointeger( ls, luaddr);
 }
+#if 0 //... not used
 template <>
 double castLuaValue<double>( lua_State* ls, int luaddr)
 {
 	return lua_tonumber( ls, luaddr);
 }
+#endif
 template <>
 std::string castLuaValue<std::string>( lua_State* ls, int luaddr)
 {
