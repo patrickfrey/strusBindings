@@ -478,44 +478,43 @@ MetaDataExpression* QueryAnalyzerImpl::analyzeSchemaMetaDataExpression( const Va
 	return analyzeMetaDataExpression_( expression, true/*schemaTypedOutput*/);
 }
 
-struct SentenceAnalyzerPrivateImpl
+struct SentenceLexerPrivateImpl
 {
 	std::string fieldType;
-	ObjectRef analyzer_impl;
 	ObjectRef lexer_impl;
 	FeatureFuncDef featureFuncDef;
 
-	SentenceAnalyzerPrivateImpl( const std::string& fieldType_, const ObjectRef& analyzer_impl_, const ObjectRef& lexer_impl_, const FeatureFuncDef& featureFuncDef_)
-		:fieldType(fieldType_),analyzer_impl(analyzer_impl_),lexer_impl(lexer_impl_),featureFuncDef(featureFuncDef_){}
-	SentenceAnalyzerPrivateImpl( const SentenceAnalyzerPrivateImpl& o)
-		:fieldType(o.fieldType),analyzer_impl(o.analyzer_impl),lexer_impl(o.lexer_impl),featureFuncDef(o.featureFuncDef){}
+	SentenceLexerPrivateImpl( const std::string& fieldType_, const ObjectRef& lexer_impl_, const FeatureFuncDef& featureFuncDef_)
+		:fieldType(fieldType_),lexer_impl(lexer_impl_),featureFuncDef(featureFuncDef_){}
+	SentenceLexerPrivateImpl( const SentenceLexerPrivateImpl& o)
+		:fieldType(o.fieldType),lexer_impl(o.lexer_impl),featureFuncDef(o.featureFuncDef){}
 };
 
-typedef std::vector<SentenceAnalyzerPrivateImpl> SentenceAnalyzerArrayPrivateImpl;
+typedef std::vector<SentenceLexerPrivateImpl> SentenceLexerArrayPrivateImpl;
 
 void QueryAnalyzerImpl::addSentenceType(
 		const std::string& fieldType,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers,
-		SentenceAnalyzerImpl* analyzer)
+		SentenceLexerImpl* lexer)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	ObjectRef sentence_analyzer_map_impl_copy = m_sentence_analyzer_map_impl;
-	ObjectRef sentence_analyzer_map_impl_new;
-	SentenceAnalyzerArrayPrivateImpl* sar = sentence_analyzer_map_impl_copy.getObject<SentenceAnalyzerArrayPrivateImpl>();
+	ObjectRef sentence_lexer_map_impl_copy = m_sentence_lexer_map_impl;
+	ObjectRef sentence_lexer_map_impl_new;
+	SentenceLexerArrayPrivateImpl* sar = sentence_lexer_map_impl_copy.getObject<SentenceLexerArrayPrivateImpl>();
 	if (sar)
 	{
-		sentence_analyzer_map_impl_new.resetOwnership( sar = new SentenceAnalyzerArrayPrivateImpl( *sar), "array of sentence analyzers");
+		sentence_lexer_map_impl_new.resetOwnership( sar = new SentenceLexerArrayPrivateImpl( *sar), "array of sentence analyzers");
 	}
 	else
 	{
-		if (sentence_analyzer_map_impl_copy.get()) throw strus::runtime_error(_TXT( "logic error: type mismatch accessing '%s'"), "sentence analyzer");
-		sentence_analyzer_map_impl_new.resetOwnership( sar = new SentenceAnalyzerArrayPrivateImpl(), "array of sentence analyzers");
+		if (sentence_lexer_map_impl_copy.get()) throw strus::runtime_error(_TXT( "logic error: type mismatch accessing '%s'"), "sentence analyzer");
+		sentence_lexer_map_impl_new.resetOwnership( sar = new SentenceLexerArrayPrivateImpl(), "array of sentence analyzers");
 	}
-	sar->push_back( SentenceAnalyzerPrivateImpl(
-				fieldType, analyzer->m_analyzer_impl, analyzer->m_lexer_impl,
+	sar->push_back( SentenceLexerPrivateImpl(
+				fieldType, lexer->m_lexer_impl,
 				FeatureFuncDef( m_textproc, tokenizer, normalizers, errorhnd)));
-	m_sentence_analyzer_map_impl = sentence_analyzer_map_impl_new;
+	m_sentence_lexer_map_impl = sentence_lexer_map_impl_new;
 }
 
 static std::string normalize_field(
@@ -593,14 +592,13 @@ Struct QueryAnalyzerImpl::analyzeSentence(
 		int maxNofResults,
 		double minWeight)
 {
-	ObjectRef sentence_analyzer_map_impl_copy = m_sentence_analyzer_map_impl;
-	SentenceAnalyzerArrayPrivateImpl* sar = sentence_analyzer_map_impl_copy.getObject<SentenceAnalyzerArrayPrivateImpl>();
+	ObjectRef sentence_lexer_map_impl_copy = m_sentence_lexer_map_impl;
+	SentenceLexerArrayPrivateImpl* sar = sentence_lexer_map_impl_copy.getObject<SentenceLexerArrayPrivateImpl>();
 	if (!sar) throw strus::runtime_error(_TXT( "unknown '%s' (none defined)"), "sentence analyzer");
-	SentenceAnalyzerArrayPrivateImpl::const_iterator si = sar->begin(), se = sar->end();
+	SentenceLexerArrayPrivateImpl::const_iterator si = sar->begin(), se = sar->end();
 	for (; si != se && !strus::caseInsensitiveEquals( si->fieldType, fieldType); ++si){}
 	if (si == se) throw strus::runtime_error(_TXT( "unknown '%s' (not found)"), "sentence analyzer");
 
-	const SentenceAnalyzerInstanceInterface* analyzer = si->analyzer_impl.getObject<SentenceAnalyzerInstanceInterface>();
 	const SentenceLexerInstanceInterface* lexer = si->lexer_impl.getObject<SentenceLexerInstanceInterface>();
 
 	std::string source;
@@ -626,7 +624,7 @@ Struct QueryAnalyzerImpl::analyzeSentence(
 					si->featureFuncDef.normalizers.begin(), si->featureFuncDef.normalizers.end());
 		appendNormTokenToSentenceString( source, normtok, ' ');
 	}
-	std::vector<SentenceGuess> res = analyzer->analyzeSentence( lexer, source, maxNofResults, minWeight);
+	std::vector<SentenceGuess> res = lexer->call( source, maxNofResults, minWeight);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 

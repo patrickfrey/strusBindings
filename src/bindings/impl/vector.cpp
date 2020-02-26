@@ -237,21 +237,16 @@ Struct VectorStorageClientImpl::introspection( const ValueVariant& arg) const
 	return rt;
 }
 
-SentenceAnalyzerImpl* VectorStorageClientImpl::createSentenceAnalyzer( const ValueVariant& analyzerconfig) const
+SentenceLexerImpl* VectorStorageClientImpl::createSentenceLexer() const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
-	const StorageObjectBuilderInterface* objBuilder = m_objbuilder_impl.getObject<const StorageObjectBuilderInterface>();
-	SentenceAnalyzerInstanceInterface* analyzer = objBuilder->createSentenceAnalyzer( Constants::standard_sentence_analyzer());
-	if (!analyzer) throw strus::runtime_error( _TXT("failed to create sentence analyzer: %s"), errorhnd->fetchError());
-	ObjectRef analyzer_impl;
 	ObjectRef lexer_impl;
-	analyzer_impl.resetOwnership( analyzer, "SentenceAnalyzer");
 	SentenceLexerInstanceInterface* lexer = storage->createSentenceLexer();
 	if (!lexer) throw strus::runtime_error( _TXT("failed to create sentence lexer: %s"), errorhnd->fetchError());
 	lexer_impl.resetOwnership( lexer, "SentenceLexer");
-	return new SentenceAnalyzerImpl( m_trace_impl, m_objbuilder_impl, analyzer_impl, lexer_impl, m_errorhnd_impl, analyzerconfig);
+	return new SentenceLexerImpl( m_trace_impl, m_objbuilder_impl, lexer_impl, m_errorhnd_impl);
 }
 
 VectorStorageClientImpl::VectorStorageClientImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd_, const std::string& config_)

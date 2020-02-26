@@ -26,7 +26,6 @@
 #include "strus/storageDocumentInterface.hpp"
 #include "strus/storageDocumentUpdateInterface.hpp"
 #include "strus/statisticsBuilderInterface.hpp"
-#include "strus/sentenceAnalyzerInstanceInterface.hpp"
 #include "strus/sentenceLexerInstanceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/reference.hpp"
@@ -230,22 +229,6 @@ struct Deserializer
 
 	static std::string getConfigString( papuga_SerializationIter& seriter);
 	static std::string getConfigString( const papuga_ValueVariant& content);
-
-	static int buildSentencePatternExpressionArguments(
-			SentenceAnalyzerInstanceInterface* analyzer,
-			papuga_SerializationIter& seriter,
-			ErrorBufferInterface* errorhnd);
-
-	static void buildSentencePatternExpression(
-			SentenceAnalyzerInstanceInterface* analyzer,
-			papuga_SerializationIter& seriter,
-			ErrorBufferInterface* errorhnd);
-
-	static void buildSentenceAnalyzer(
-			SentenceAnalyzerInstanceInterface* analyzer,
-			SentenceLexerInstanceInterface* lexer,
-			const papuga_ValueVariant& content,
-			ErrorBufferInterface* errorhnd);
 };
 
 }}//namespace

@@ -25,7 +25,7 @@ namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
 ///\brief Forward declaration
-class SentenceAnalyzerImpl;
+class SentenceLexerImpl;
 
 
 /// \class DocumentAnalyzerImpl
@@ -299,7 +299,6 @@ public:
 			const ValueVariant& normalizers,
 			const ValueVariant& priority=ValueVariant());
 
-	
 	/// \brief Define a field containing sentence, meaning that the content of the field is a text string whose content requires syntactical and semantical analysis to determine its class and to decide what to do with it.
 	/// \param[in] fieldType field type name
 	/// \example "querystr"
@@ -309,12 +308,12 @@ public:
 	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type (in the ascending order of appearance) before passing it to analysis.
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
-	/// \param[in] analyzer the sentence analyzer to use
+	/// \param[in] lexer the sentence parser to use
 	void addSentenceType(
 			const std::string& fieldType,
 			const ValueVariant& tokenizer,
 			const ValueVariant& normalizers,
-			SentenceAnalyzerImpl* analyzer);
+			SentenceLexerImpl* lexer);
 
 	/// \brief Declare an implicit grouping operation for a query field type. The implicit group operation is always applied when more than one term are resulting from analysis of this field to ensure that you get only one node in the query from it.
 	/// \param[in] fieldtype name of the field type where this grouping operation applies
@@ -387,7 +386,7 @@ public:
 	/// \param[in] minWeight minimum weight to accept of a result of the sentence analyzer, best result has weight 1.0 and the others are normalized to be smaller or equal to 1.0
 	/// \example 0.99
 	/// \example 0.8
-	/// \return list of named sentence guesses with weight (same as SentenceAnalyzer::analyze(..))
+	/// \return list of named sentence guesses with weight (same as SentenceLexer::call(..))
 	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
 	Struct analyzeSentence(
 			const std::string& fieldType,
@@ -415,7 +414,7 @@ private:
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_analyzer_impl;
-	ObjectRef m_sentence_analyzer_map_impl;
+	ObjectRef m_sentence_lexer_map_impl;
 	QueryAnalyzerStruct m_queryAnalyzerStruct;
 	const TextProcessorInterface* m_textproc;
 };

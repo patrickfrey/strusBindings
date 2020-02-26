@@ -7,9 +7,7 @@
  */
 #include "impl/sentence.hpp"
 #include "strus/lib/storage_objbuild.hpp"
-#include "strus/sentenceAnalyzerInstanceInterface.hpp"
 #include "strus/sentenceLexerInstanceInterface.hpp"
-#include "strus/sentenceLexerContextInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/base/configParser.hpp"
 #include "private/internationalization.hpp"
@@ -20,34 +18,21 @@
 using namespace strus;
 using namespace strus::bindings;
 
-SentenceAnalyzerImpl::~SentenceAnalyzerImpl()
+SentenceLexerImpl::~SentenceLexerImpl()
 {}
 
-SentenceAnalyzerImpl::SentenceAnalyzerImpl( const ObjectRef& trace_impl, const ObjectRef& objbuilder_impl, const ObjectRef& analyzer_impl, const ObjectRef& lexer_impl, const ObjectRef& errorhnd_, const ValueVariant& config)
+SentenceLexerImpl::SentenceLexerImpl( const ObjectRef& trace_impl, const ObjectRef& objbuilder_impl, const ObjectRef& lexer_impl, const ObjectRef& errorhnd_)
 	:m_errorhnd_impl(errorhnd_)
 	,m_trace_impl( trace_impl)
 	,m_objbuilder_impl( objbuilder_impl)
-	,m_analyzer_impl( analyzer_impl)
 	,m_lexer_impl( lexer_impl)
-{
-	SentenceAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<SentenceAnalyzerInstanceInterface>();
-	if (!analyzer) throw strus::runtime_error( _TXT("calling sentence analyzer method after close"));
-	SentenceLexerInstanceInterface* lexer = m_lexer_impl.getObject<SentenceLexerInstanceInterface>();
-	if (!lexer) throw strus::runtime_error( _TXT("calling sentence analyzer method after close"));
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	Deserializer::buildSentenceAnalyzer( analyzer, lexer, config, errorhnd);
-	if (errorhnd->hasError())
-	{
-		throw strus::runtime_error( "%s", errorhnd->fetchError());
-	}
-}
+{}
 
-Struct SentenceAnalyzerImpl::analyze( const std::string& source, int maxNofResults, double minWeight) const
+Struct SentenceLexerImpl::call( const std::string& source, int maxNofResults, double minWeight) const
 {
-	const SentenceAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<SentenceAnalyzerInstanceInterface>();
 	const SentenceLexerInstanceInterface* lexer = m_lexer_impl.getObject<SentenceLexerInstanceInterface>();
 
-	std::vector<SentenceGuess> res = analyzer->analyzeSentence( lexer, source, maxNofResults, minWeight);
+	std::vector<SentenceGuess> res = lexer->call( source, maxNofResults, minWeight);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{

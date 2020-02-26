@@ -19,14 +19,14 @@ namespace bindings {
 
 typedef papuga_ValueVariant ValueVariant;
 
-/// \class SentenceAnalyzerImpl
+/// \class SentenceLexerImpl
 /// \brief Object representing a sentence analyzer for the query
-/// \note Currently the only way to construct a sentence analyzer instance is to call VectorStorageClient::createSentenceAnalyzer( config)
-class SentenceAnalyzerImpl
+/// \note Currently the only way to construct a sentence analyzer instance is to call VectorStorageClient::createSentenceLexer( config)
+class SentenceLexerImpl
 {
 public:
 	/// \brief Destructor
-	virtual ~SentenceAnalyzerImpl();
+	virtual ~SentenceLexerImpl();
 
 	/// \brief Split a sentence into lexems and find the most probable configurations of them and get a weighted ranked list of the best candidates
 	/// \param[in] source source to analyze
@@ -40,18 +40,17 @@ public:
 	/// \example 0.8
 	/// \example 0.9
 	/// \return the list of the most probable query term lists with weights
-	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
-	Struct analyze( const std::string& source, int maxNofResults, double minWeight) const;
+	/// \example [ sentence: weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
+	Struct call( const std::string& source, int maxNofResults, double minWeight) const;
 
 private:
 	friend class VectorStorageClientImpl;
-	SentenceAnalyzerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& analyzer, const ObjectRef& lexer, const ObjectRef& errorhnd_, const ValueVariant& config);
+	SentenceLexerImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& lexer, const ObjectRef& errorhnd_);
 
 	friend class QueryAnalyzerImpl;
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
-	ObjectRef m_analyzer_impl;
 	ObjectRef m_lexer_impl;
 };
 

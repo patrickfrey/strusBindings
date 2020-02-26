@@ -205,46 +205,8 @@ public:
 					{NormalizerDef,'+'},
 				}
 			},
-			{"vstorage/sentanalyzer/separator", "()", SentenceAnalyzerSeparatorChar, papuga_TypeString, "0x22;0x3b;0xa"},
-			{"vstorage/sentanalyzer/space", "()", SentenceAnalyzerSpaceChar, papuga_TypeString, "_;32;44;08;0xA0;0x2008;0x200B"},
-			{"vstorage/sentanalyzer/link/chr", "()", SentenceAnalyzerLinkChar, papuga_TypeString, "0x22;0x2019;0x60;0x27;0x3f;0x21;0x2f;0x3b;0x3a;0x2e;0x2c;0x2d;0x2014;0x20;0x29;0x28;0x5b;0x5d;0x7b;0x7d;0x3c;0x3e;0x5f"},
-			{"vstorage/sentanalyzer/link/subst", "()", SentenceAnalyzerLinkSubst, papuga_TypeString, "-;_"},
-			{"vstorage/sentanalyzer/link", SentenceAnalyzerLinkDef, {
-					{"chr", SentenceAnalyzerLinkChar, '+'},
-					{"subst", SentenceAnalyzerLinkSubst, '!'}
-				}
-			},
-			{"vstorage/sentanalyzer//sentterm/type", "()", SentenceAnalyzerSentenceTermType, papuga_TypeString, "word"},
-			{"vstorage/sentanalyzer//sentterm/value", "()", SentenceAnalyzerSentenceTermValue, papuga_TypeString, "i;where;who"},
-			{"vstorage/sentanalyzer//sentterm/weight", "()", SentenceAnalyzerSentencePatternWeight, papuga_TypeString, "i;where;who"},
-			{"vstorage/sentanalyzer//sentterm", SentenceAnalyzerSentencePattern, {
-					{"weight", SentenceAnalyzerSentencePatternWeight, '?'},
-					{"type", SentenceAnalyzerSentenceTermType, '?'},
-					{"value", SentenceAnalyzerSentenceTermValue, '?'},
-				}
-			},
-			{"vstorage/sentanalyzer//sentpattern/op", "()", SentenceAnalyzerSentencePatternOp, papuga_TypeString, "seq;alt;repeat"},
-			{"vstorage/sentanalyzer//sentpattern/min", "()", SentenceAnalyzerSentencePatternMinOccurrence, papuga_TypeString, "1;2;4"},
-			{"vstorage/sentanalyzer//sentpattern/max", "()", SentenceAnalyzerSentencePatternMaxOccurrence, papuga_TypeString, "1;2;10"},
-			{"vstorage/sentanalyzer//sentpattern/arg", "()", SentenceAnalyzerSentencePattern, papuga_TypeVoid, NULL},
-			{"vstorage/sentanalyzer//sentpattern", SentenceAnalyzerSentencePattern, {
-					{"op", SentenceAnalyzerSentencePatternOp, '?'},
-					{"min", SentenceAnalyzerSentencePatternMinOccurrence, '?'},
-					{"max", SentenceAnalyzerSentencePatternMaxOccurrence, '?'},
-					{"arg", SentenceAnalyzerSentencePattern, '+', 2/*tag diff*/}
-				}
-			},
-			{"vstorage/sentanalyzer/sentence/name", "()", SentenceAnalyzerSentenceName, papuga_TypeString, "question"},
-			{"vstorage/sentanalyzer/sentence/weight", "()", SentenceAnalyzerSentenceWeight, papuga_TypeDouble, "0.3;0.9;1"},
-			{"vstorage/sentanalyzer/sentence/sentpattern", "()", SentenceAnalyzerSentencePattern, papuga_TypeVoid, NULL},
-			{"vstorage/sentanalyzer/sentence", SentenceAnalyzerSentenceConfig, {
-					{"name", SentenceAnalyzerSentenceName},
-					{"weight", SentenceAnalyzerSentenceWeight},
-					{"sentpattern", SentenceAnalyzerSentencePattern}
-				}
-			},
 			{"vstorage/sentanalyzer/field", "()", FieldTypeName, papuga_TypeString, "text"},
-			
+
 			{"vstorage/sentanalyzer/tokenizer/name", "()", TokenizerName, papuga_TypeString, "regex"},
 			{"vstorage/sentanalyzer/tokenizer/arg", "()", TokenizerArg, papuga_TypeString, "[a-zA-Z0-9]+"},
 			{"vstorage/sentanalyzer/tokenizer", TokenizerDef, {
@@ -259,17 +221,7 @@ public:
 					{"arg", NormalizerArg, '*'}
 				}
 			},
-			{"vstorage/sentanalyzer", SentenceAnalyzerConfig, {
-					{"separator", SentenceAnalyzerSeparatorChar, '*'},
-					{"space", SentenceAnalyzerSpaceChar, '*'},
-					{"link", SentenceAnalyzerLinkDef, '*'},
-					{"sentence", SentenceAnalyzerSentenceConfig, '*'}
-				}
-			},
-			{"vstorage", "_sentanalyzer", "vstorage", V::createSentenceAnalyzer(), {
-					{SentenceAnalyzerConfig}
-				}
-			},
+			{"vstorage", "_sentanalyzer", "vstorage", V::createSentenceLexer(), {}},
 			{"vstorage", 0, "qryanalyzer", A::addSentenceType(), {
 					{FieldTypeName, '!', 2/*tag diff*/},
 					{TokenizerDef, '!', 2/*tag diff*/},
