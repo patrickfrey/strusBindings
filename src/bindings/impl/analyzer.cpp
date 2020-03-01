@@ -566,7 +566,7 @@ static std::string normalize_field(
 	return rt;
 }
 
-static void appendNormTokenToSentenceString( std::string& result, const std::string& normtok, char separator)
+static void appendNormTokenToSentenceFields( std::vector<std::string>& result, const std::string& normtok)
 {
 	if (!normtok.empty() && normtok[0] == '\0')
 	{
@@ -574,14 +574,12 @@ static void appendNormTokenToSentenceString( std::string& result, const std::str
 		char const* ve = vi + normtok.size();
 		for (++vi; vi < ve; vi = std::strchr( vi, '\0')+1)
 		{
-			if (!result.empty()) result.push_back( separator);
-			result.append( vi);
+			result.push_back( vi);
 		}
 	}
 	else
 	{
-		if (!result.empty()) result.push_back( separator);
-		result.append( normtok);
+		result.push_back( normtok);
 	}
 	
 }
@@ -601,7 +599,7 @@ Struct QueryAnalyzerImpl::analyzeSentence(
 
 	const SentenceLexerInstanceInterface* lexer = si->lexer_impl.getObject<SentenceLexerInstanceInterface>();
 
-	std::string source;
+	std::vector<std::string> fields;
 	const TokenizerFunctionInstanceInterface* tokenizer = si->featureFuncDef.tokenizer.get();
 	if (tokenizer)
 	{
@@ -613,7 +611,7 @@ Struct QueryAnalyzerImpl::analyzeSentence(
 				= normalize_field(
 					fieldContent.c_str() + ti->origpos().ofs(), ti->origsize(),
 					si->featureFuncDef.normalizers.begin(), si->featureFuncDef.normalizers.end());
-			appendNormTokenToSentenceString( source, normtok, ' ');
+			appendNormTokenToSentenceFields( fields, normtok);
 		}
 	}
 	else
@@ -622,9 +620,9 @@ Struct QueryAnalyzerImpl::analyzeSentence(
 				= normalize_field(
 					fieldContent.c_str(), fieldContent.size(),
 					si->featureFuncDef.normalizers.begin(), si->featureFuncDef.normalizers.end());
-		appendNormTokenToSentenceString( source, normtok, ' ');
+		appendNormTokenToSentenceFields( fields, normtok);
 	}
-	std::vector<SentenceGuess> res = lexer->call( source, maxNofResults, minWeight);
+	std::vector<SentenceGuess> res = lexer->call( fields, maxNofResults, minWeight);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 

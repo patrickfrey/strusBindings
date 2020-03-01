@@ -29,8 +29,8 @@ public:
 	virtual ~SentenceLexerImpl();
 
 	/// \brief Split a sentence into lexems and find the most probable configurations of them and get a weighted ranked list of the best candidates
-	/// \param[in] source source to analyze
-	/// \example "best football manager in the world"
+	/// \param[in] fields list of source fields to analyze
+	/// \example [ "best", "football manager", "in the world" ]
 	/// \example "discography of the rolling stones"
 	/// \param[in] maxNofResults maximum number of results to return or -1 if not specified
 	/// \example 2
@@ -41,7 +41,7 @@ public:
 	/// \example 0.9
 	/// \return the list of the most probable query term lists with weights
 	/// \example [ sentence: weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
-	Struct call( const std::string& source, int maxNofResults, double minWeight) const;
+	Struct call( const ValueVariant& fields, int maxNofResults, double minWeight) const;
 
 private:
 	friend class VectorStorageClientImpl;

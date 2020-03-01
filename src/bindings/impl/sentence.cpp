@@ -28,11 +28,11 @@ SentenceLexerImpl::SentenceLexerImpl( const ObjectRef& trace_impl, const ObjectR
 	,m_lexer_impl( lexer_impl)
 {}
 
-Struct SentenceLexerImpl::call( const std::string& source, int maxNofResults, double minWeight) const
+Struct SentenceLexerImpl::call( const ValueVariant& fields_, int maxNofResults, double minWeight) const
 {
 	const SentenceLexerInstanceInterface* lexer = m_lexer_impl.getObject<SentenceLexerInstanceInterface>();
-
-	std::vector<SentenceGuess> res = lexer->call( source, maxNofResults, minWeight);
+	std::vector<std::string> fields = Deserializer::getStringList( fields_);
+	std::vector<SentenceGuess> res = lexer->call( fields, maxNofResults, minWeight);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError())
 	{
