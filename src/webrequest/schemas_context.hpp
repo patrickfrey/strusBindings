@@ -45,6 +45,7 @@ public:
 					{"count", TraceCount, '?'}
 				}
 			},
+			{"/context/debug", "()", ContextDebug, papuga_TypeString, "sentence,query,analyze"},
 			{"/context/rpc", "()", ContextRpc, papuga_TypeString, "localhost:1313"},
 			{"/context/threads", "()", ContextThreads, papuga_TypeInt, "16"},
 			{"/context", ContextConfig, {
@@ -58,6 +59,7 @@ public:
 			{"/data/resources", "", "context", bindings::method::Context::addResourcePath(), {{(int)ResourceDir}} },
 			{"/extensions/directory", "", "context", bindings::method::Context::addModulePath(), {{(int)ModuleDir}} },
 			{"/extensions/modules", "", "context", bindings::method::Context::loadModule(), {{(int)ModuleName}} },
+			{"/context/debug", "", "context", bindings::method::Context::enableDebugTrace(), {{(int)ContextDebug}} },
 			{"/", "", "context", bindings::method::Context::endConfig(), {} }
 		}
 	) {}

@@ -296,6 +296,11 @@ public:
 		std::cerr << header() << strus::string_format( "ERROR %s", errmsg) << std::endl;
 	}
 
+	virtual void logContextInfoMessages( const char* content)
+	{
+		std::cerr << header() << strus::string_format( "INFO %s", content) << std::endl;
+	}
+
 	enum {
 		MaxLogContentSize=2048/*2K*/,
 		MaxLogBinaryItemSize=32,
@@ -1962,7 +1967,7 @@ int main( int argc, const char* argv[])
 					throw std::runtime_error( _TXT("option -G (--debug) needs argument"));
 				}
 				g_debugTrace->enable( argv[argi]);
-				thisCommandLine.append( " -G");
+				thisCommandLine.append( strus::string_format( " -G \"%s\"", argv[argi]));
 			}
 			else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))
 			{
@@ -2084,7 +2089,7 @@ int main( int argc, const char* argv[])
 		ls = luaL_newstate();
 		luaL_openlibs( ls);
 		luaopen_strus( ls);
-	
+
 		/* Set module directories: */
 		setLuaPathParentDir( ls, inputfile);
 		for (mi=0,me=modi; mi != me; ++mi)
@@ -2118,7 +2123,6 @@ int main( int argc, const char* argv[])
 			goto EXIT;
 		}
 		lua_close( ls);
-		printDebugTraceMessages();
 
 		if (g_errorhnd)
 		{
@@ -2148,6 +2152,7 @@ int main( int argc, const char* argv[])
 		goto EXIT;
 	}
 EXIT:
+	printDebugTraceMessages();
 	if (g_killChildOnExit)
 	{
 		killBackGroundProcesses();

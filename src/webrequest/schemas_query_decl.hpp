@@ -96,6 +96,7 @@ public:
 	static papuga::RequestAutomaton_NodeList declareQuery( const char* rootexpr, const char* contenttag)
 	{
 		return {rootexpr, {
+			{declareSentence("sentence")},
 			{declareFeature("feature",contenttag)},
 			{declareRestriction("restriction",contenttag)},
 			{declareStatistics("")},

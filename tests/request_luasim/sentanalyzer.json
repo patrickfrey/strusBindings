@@ -1,0 +1,21 @@
+{
+	"qryanalyzer": {
+		"include": {
+			"vstorage": "test"
+		},
+		"vstorage": {
+			"sentanalyzer": {
+				"field": "text",
+				"tokenizer": {
+					"name": "queryfield"
+				},
+				"normalizer": [
+					{"name": "entityid"},
+					{"name": "lc"}
+				]
+			}
+		}
+	}
+}
+
+

@@ -1,0 +1,33 @@
+{
+"query":{
+"sentence":[
+	{
+		"field": "text",
+		"content": "David Bowie; Brian Eno; album",
+		"results": "4",
+		"minweight": "0.9",
+		"analyzed":[
+			{
+				"terms":[
+					{
+						"type": "E",
+						"value": "david_bowie"},
+					{
+						"type": "E",
+						"value": "brian_eno"},
+					{
+						"type": "N",
+						"value": "album"}],
+				"weight": "1"},
+			{
+				"terms":[
+					{
+						"type": "E",
+						"value": "david_bowie"},
+					{
+						"type": "E",
+						"value": "brian_eno"},
+					{
+						"type": "V",
+						"value": "album"}],
+				"weight": "1"}]}]}}

@@ -34,7 +34,7 @@ public:
 		{/*result*/},
 		{/*inherit*/
 			{"qryeval","/storage/include/qryeval()",false/*not required*/},
-			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+			{"qryanalyzer","/storage/include/analyzer()",false/*not required*/}
 		},
 		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},
@@ -55,7 +55,7 @@ public:
 		{/*result*/},
 		{/*inherit*/
 			{"qryeval","/storage/include/qryeval()",false/*not required*/},
-			{"qryanalyzer","/qryeval/include/analyzer()",false/*not required*/}
+			{"qryanalyzer","/storage/include/analyzer()",false/*not required*/}
 		},
 		{/*input*/
 			{SchemaStoragePart::defineStorage("/storage")},

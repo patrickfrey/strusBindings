@@ -252,12 +252,7 @@ public:
 	/// \param[in] component name of component to disable debug tracing for
 	void disableDebugTrace( const std::string& component);
 
-	/// \brief Fetch all debug trace messages of the current thread
-	/// \return all messages
-	/// \note Clears all messages stored for the current thread
-	Struct fetchDebugTrace();
-
-	/// \brief Fetch all info messages of the current thread reported via the internal error buffer info interface
+	/// \brief Fetch all info messages and the debug trace of the current thread reported via the internal error buffer info interface
 	/// \return all messages
 	/// \note Clears all messages stored for the current thread
 	Struct infoMessages();

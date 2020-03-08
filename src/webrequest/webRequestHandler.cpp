@@ -166,7 +166,7 @@ public:
 	DefineUpdateConfigSchema( const char* contextType) :DefineSchema<SCHEMA>( contextType){}
 };
 
-static const char* g_context_typenames[] = {"contentstats","statserver","storage","docanalyzer","qryanalyzer","qryeval","distqryeval","inserter",0};
+static const char* g_context_typenames[] = {"contentstats","statserver","storage","vstorage","docanalyzer","qryanalyzer","qryeval","distqryeval","inserter",0};
 
 static void tickerFunction( void* THIS)
 {

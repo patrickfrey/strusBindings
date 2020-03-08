@@ -52,6 +52,7 @@ public:
 
 	virtual void logWarning( const char* warnmsg){}
 	virtual void logError( const char* errmsg){}
+	virtual void logContextInfoMessages( const char* content){}
 };
 
 class WebRequestEventLoop_null

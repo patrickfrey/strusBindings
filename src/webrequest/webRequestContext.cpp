@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2017 Patrick P. Frey
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -276,7 +276,7 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 				{
 					// [1.D] POST of configuration, name defined by client
 					// [NOTE] This is not conforming to REST, the REST interface is defined by [1.C]
-					return (loadConfigurationRequest( content) && setAnswerLink( m_contextType, m_contextName, 1/*link level*/));
+					return (loadConfigurationRequest( content) && setAnswerLink( m_contextType, m_contextName, 2/*link level*/));
 				}
 			}
 			else if (m_methodId == Method_DELETE)
@@ -569,6 +569,11 @@ bool WebRequestContext::complete()
 		{
 			m_transactionPool->returnTransaction( m_transactionRef);
 		}
+		std::string infomsgs = fetchContextInfoMessages();
+		if ((m_logMask & WebRequestLoggerInterface::LogRequests) != 0)
+		{
+			m_logger->logContextInfoMessages( infomsgs.c_str());
+		}
 		return rt;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
@@ -577,5 +582,43 @@ bool WebRequestContext::complete()
 WebRequestAnswer WebRequestContext::getAnswer() const
 {
 	return m_answer;
+}
+
+static int g_call_contextInfoMessages_paramtypes[1] = {0};
+static papuga_RequestMethodDescription g_call_contextInfoMessages =
+{
+	strus::bindings::method::Context::infoMessages(),
+	g_call_contextInfoMessages_paramtypes,
+	false/*has_content*/,
+	200/*http status success*/,
+	0/*result type name*/,
+	0/*result_rootelem*/,0/*result_listelem*/
+};
+
+std::string WebRequestContext::fetchContextInfoMessages()
+{
+	std::string rt;
+	void* self = 0;
+	if (m_obj
+		&& m_obj->valuetype == papuga_TypeHostObject
+		&& m_obj->value.hostObject->classid == g_call_contextInfoMessages.id.classid)
+	{
+		self = m_obj->value.hostObject->data;
+	}
+	else if (m_context.get())
+	{
+		const papuga_ValueVariant* ctxobj = papuga_RequestContext_get_variable( m_context.get(), ROOT_CONTEXT_NAME);
+		if (ctxobj
+			&& ctxobj->valuetype == papuga_TypeHostObject
+			&& ctxobj->value.hostObject->classid == g_call_contextInfoMessages.id.classid)
+		{
+			self = ctxobj->value.hostObject->data;
+		}
+	}
+	if (self)
+	{
+		rt = callHostObjMethodToString( self, &g_call_contextInfoMessages, ""/*path*/, WebRequestContent());
+	}
+	return rt;
 }
 

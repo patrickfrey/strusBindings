@@ -32,6 +32,7 @@ public:
 		LogAction=0x40,
 		LogContentEvents=0x80,
 		LogConnectionEvents=0x100,
+		LogContextInfoMessages=0x200,
 		LogAll=0xFFFF
 	};
 
@@ -131,6 +132,11 @@ public:
 	/// \param[in] errmsg error message to log
 	/// \remark expected to be thread safe
 	virtual void logError( const char* errmsg)=0;
+
+	/// \brief Log warnings and info messages and debug trace from context
+	/// \param[in] content blob to log
+	/// \remark expected to be thread safe
+	virtual void logContextInfoMessages( const char* content)=0;
 };
 
 }//namespace

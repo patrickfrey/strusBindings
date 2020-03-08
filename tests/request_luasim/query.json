@@ -2,8 +2,9 @@
 "query": {
 	"feature": [
 		{
-			"content": 
-				{"type": "text", "value": "Iggy Pop"},
+			"content": {
+				"term": {"type": "text", "value": "Iggy Pop"}
+			},
 			"analyzed": [
 				{
 					"term": { "type": "word", "value": "iggy"}

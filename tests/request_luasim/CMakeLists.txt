@@ -43,4 +43,6 @@ DeclareTest( CreateStorage createStorage.lua "" )
 DeclareTest( Query query.lua "" )
 DeclareTest( DistributeStorage distributeStorage.lua "" )
 DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
+DeclareTest( WikipediaCase wikipedia.lua "" )
+DeclareTest( WikipediaCaseOneServer wikipedia.lua "1server" )
 

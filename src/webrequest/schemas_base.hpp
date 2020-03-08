@@ -31,7 +31,7 @@ public:
 	{
 		NullValue,
 
-		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,
+		ModuleDir,ModuleName,ResourceDir,WorkDir,ContextConfig,ContextThreads,ContextRpc,ContextDebug,
 		ContextTrace,TraceLogType,TraceLogFile,TraceGroupBy,TraceCall,TraceCount,
 
 		StatisticsMapConfig,StatisticsProc,StatisticsMapBlocks,StatisticsStorageServer,StatisticsBlob,

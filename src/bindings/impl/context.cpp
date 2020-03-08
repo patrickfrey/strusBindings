@@ -526,28 +526,32 @@ void ContextImpl::disableDebugTrace( const std::string& component)
 	dbgtrace->disable( component);
 }
 
-Struct ContextImpl::fetchDebugTrace()
+Struct ContextImpl::infoMessages()
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	DebugTraceInterface* dbgtrace = errorhnd->debugTrace();
 	Struct rt;
-	if (!dbgtrace) throw strus::runtime_error(_TXT( "no debug trace interface defined"));
-	std::vector<DebugTraceMessage> msglist = dbgtrace->fetchMessages();
-	strus::bindings::Serializer::serialize( &rt.serialization, msglist, true);
-	if (errorhnd->hasError())
 	{
-		throw strus::runtime_error(_TXT( "failed to deserialize debug trace: %s"), errorhnd->fetchError());
+		std::vector<std::string> infomsgs = errorhnd->fetchInfo();
+		if (!infomsgs.empty())
+		{
+			papuga_Serialization_pushName_charp( &rt.serialization, "info");
+			papuga_Serialization_pushOpen( &rt.serialization);
+			strus::bindings::Serializer::serialize( &rt.serialization, infomsgs, true);
+			papuga_Serialization_pushClose( &rt.serialization);
+		}
 	}
-	rt.release();
-	return rt;
-}
-
-Struct ContextImpl::infoMessages()
-{
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	Struct rt;
-	std::vector<std::string> infomsgs = errorhnd->fetchInfo();
-	strus::bindings::Serializer::serialize( &rt.serialization, infomsgs, true);
+	if (dbgtrace)
+	{
+		std::vector<DebugTraceMessage> tracemsgs = dbgtrace->fetchMessages();
+		if (!tracemsgs.empty())
+		{
+			papuga_Serialization_pushName_charp( &rt.serialization, "debug");
+			papuga_Serialization_pushOpen( &rt.serialization);
+			strus::bindings::Serializer::serialize( &rt.serialization, tracemsgs, true);
+			papuga_Serialization_pushClose( &rt.serialization);
+		}
+	}
 	if (errorhnd->hasError())
 	{
 		throw strus::runtime_error(_TXT( "failed to deserialize info messages: %s"), errorhnd->fetchError());

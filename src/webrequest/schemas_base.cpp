@@ -25,6 +25,7 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{ContextConfig, "context configuration"},
 		{ContextThreads, "context threads"},
 		{ContextRpc, "context rpc"},
+		{ContextDebug, "context debug"},
 		{ContextTrace, "context trace"},
 		{TraceLogType, "trace log type"},
 		{TraceLogFile, "trace log file"},

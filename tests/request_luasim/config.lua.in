@@ -42,6 +42,9 @@ serverConfig = {
 			pretty_print = true,
 			quit_enabled = true
 		}
+	},
+	context = {
+		debug = {"sentence","analyze"}
 	}
 }
 

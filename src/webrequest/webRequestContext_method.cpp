@@ -277,3 +277,38 @@ bool WebRequestContext::callHostObjMethodToAnswer( void* self, const papuga_Requ
 	}
 }
 
+
+std::string WebRequestContext::callHostObjMethodToString( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content)
+{
+	std::string rt;
+	papuga_CallResult retval;
+	char membuf_err[ 4096];
+	papuga_RequestError errstruct;
+	int httpStatus;
+
+	papuga_init_CallResult( &retval, &m_allocator, false/*allocator ownerwhip*/, membuf_err, sizeof(membuf_err));
+	if (!hostObj_callMethod( self, methoddescr, path, content, &m_allocator, retval, errstruct, httpStatus))
+	{
+		rt.append("{\n\"error\": ");
+		rt.append( errstruct.errormsg);
+		rt.append("\n}\n");
+	}
+	else
+	{
+		// Assign the result:
+		int ri = 0, re = retval.nofvalues;
+		for (; ri != re; ++ri)
+		{
+			if (papuga_ValueVariant_defined( &retval.valuear[ri])
+				&& (retval.valuear[ri].valuetype != papuga_TypeSerialization
+					|| !papuga_Serialization_empty( retval.valuear[ri].value.serialization)))
+			{
+				WebRequestAnswer answer;
+				(void)mapValueVariantToAnswer( answer, &m_allocator, ""/*html_head*/, ""/*html_base_href*/, 0/*rootelem*/, 0/*listelem*/, papuga_UTF8, WebRequestContent::JSON, false/*beautified*/, retval.valuear[ri]);
+				rt.append( answer.content().str(), answer.content().len());
+			}
+		}
+	}
+	return rt;
+}
+

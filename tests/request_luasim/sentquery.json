@@ -1,0 +1,11 @@
+{
+"query": {
+	"sentence": [
+		{
+			"field": "text",
+			"content": "David Bowie; Brian Eno; album",
+			"results": "4",
+			"minweight": "0.9"
+		}
+	]
+}}

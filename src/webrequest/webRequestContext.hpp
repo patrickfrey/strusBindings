@@ -58,8 +58,7 @@ public:
 
 	virtual ~WebRequestContext();
 
-	virtual bool execute(
-			const WebRequestContent& content);
+	virtual bool execute( const WebRequestContent& content);
 
 	virtual std::vector<WebRequestDelegateRequest> getDelegateRequests();
 
@@ -140,6 +139,8 @@ private:
 	// Implemented in webRequestContext:
 	/// \brief Execute a request of type ObjectRequest
 	bool executeObjectRequest( const WebRequestContent& content);
+	/// \brief Fetch all info/debug trace messages from current context
+	std::string fetchContextInfoMessages();
 
 	// Implemented in webRequestContext_obj:
 	/// \brief Initialize the request logger for papuga
@@ -176,6 +177,8 @@ private:
 	bool callHostObjMethodToVariable( void* self, const papuga_RequestMethodDescription* methoddescr, PapugaContextRef& context_, const char* resultname);
 		/// \brief Helper to log a method call
 		void logMethodCall( const papuga_RequestMethodDescription* methoddescr);
+	/// \brief Call a method and map the results to a string returned
+	std::string callHostObjMethodToString( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content);
 
 	// Implemented in webRequestContext_schema:
 	/// \brief Get the schema identifier specified by context
