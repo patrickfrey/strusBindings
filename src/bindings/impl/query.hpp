@@ -12,6 +12,7 @@
 #include "strus/queryInterface.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/storage/queryResult.hpp"
+#include "strus/analyzer/queryTerm.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
 #include <vector>
@@ -266,6 +267,7 @@ private:
 	int m_maxNofRanks;
 };
 
+
 /// \class QueryResultMergerImpl
 /// \brief Object used to merge ranklists in the case of a distributed query evaluation.
 /// \remark You might use the method ContextImpl::mergeQueryResults for this if it's easier (e.g. in scripting languages)
@@ -322,6 +324,55 @@ private:
 	int m_minRank;
 	int m_maxNofRanks;
 	std::vector<QueryResult> m_ar;
+};
+
+/// \class QueryBuilderImpl
+/// \brief Object used to build a query in multiple steps
+/// \note This object is intended for web request handling where we have only mappings and no control structures as in scripting languages
+class QueryBuilderImpl
+{
+public:
+	/// \brief Destructor
+	virtual ~QueryBuilderImpl(){}
+
+	/// \brief Set number of ranks to evaluate starting with the first rank (the maximum size of the result rank list)
+	/// \param[in] maxNofRanks maximum number of results to return by this query
+	/// \example 20
+	/// \example 50
+	/// \example 5
+	void setMaxNofRanks( int maxNofRanks);
+
+	/// \brief Set the index of the first rank to be returned
+	/// \param[in] minRank index, starting with 0, of the first rank to be returned by this query
+	/// \example 0
+	/// \example 10
+	/// \example 20
+	void setMinRank( int minRank);
+
+	/// \brief Add expression as join of the arguments
+	/// \param[in] expressionlist list of expressions to add
+	void addExpressionJoin( const ValueVariant& expressionlist) const;
+
+	/// \brief Introspect a structure starting from a root path
+	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
+	/// \return the structure to introspect starting from the path
+	Struct introspection( const ValueVariant& path=ValueVariant()) const;
+
+private:
+	typedef strus::analyzer::QueryTerm QueryTerm;
+	typedef std::vector<QueryTerm> QueryTermList;
+
+private:
+	friend class ContextImpl;
+	QueryBuilderImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_termar(),m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks)
+	{}
+
+	mutable ObjectRef m_errorhnd_impl;
+	ObjectRef m_trace_impl;
+	std::vector<strus::analyzer::QueryTerm> m_termar;
+	int m_minRank;
+	int m_maxNofRanks;
 };
 
 }}//namespace

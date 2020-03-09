@@ -361,4 +361,27 @@ Struct QueryResultMergerImpl::introspection( const ValueVariant& arg) const
 	return rt;
 }
 
+void QueryBuilderImpl::setMaxNofRanks( int maxNofRanks_)
+{
+	m_maxNofRanks = maxNofRanks_;
+}
+
+void QueryBuilderImpl::setMinRank( int minRank_)
+{
+	m_minRank = minRank_;
+}
+
+void QueryBuilderImpl::addExpressionJoin( const ValueVariant& expressionlist) const
+{
+	
+}
+
+Struct QueryBuilderImpl::introspection( const ValueVariant& path) const
+{
+	Struct rt;
+	rt.release();
+	return rt;
+}
+
+
 

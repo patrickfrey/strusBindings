@@ -454,12 +454,38 @@ static void skipBrackets( char const*& si, const char* se)
 	}
 }
 
+static bool trySkipTemplateReference( char const*& si, const char* se)
+{
+	for (++si; si < se && (isAlnum(*si) || *si == ':' || *si == '<' || *si == ' '); ++si)
+	{
+		if (*si == '<')
+		{
+			if (!trySkipTemplateReference( si, se)) return false;
+			--si;
+		}
+	}
+	if (*si == '>')
+	{
+		++si;
+		return true;
+	}
+	return false;
+}
+
 static void skipStructure( char const*& si, const char* se)
 {
 	skipSpacesAndComments( si, se);
 	while (si != se && isAlpha(*si))
 	{
 		parseIdentifier( si, se);
+		if (*si == '<')
+		{
+			char const* next = si;
+			if (trySkipTemplateReference( next, se))
+			{
+				si = next;
+			}
+		}
 		skipSpacesAndComments( si, se);
 		while (*si == ':') ++si;
 		skipSpacesAndComments( si, se);

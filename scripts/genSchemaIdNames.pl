@@ -73,6 +73,12 @@ sub mapNamePart {
 	elsif ($arg eq "res") {
 		return "result";
 	}
+	elsif ($arg eq "prio") {
+		return "priority";
+	}
+	elsif ($arg eq "lsh") {
+		return "LSH";
+	}
 	else
 	{
 		return $arg;

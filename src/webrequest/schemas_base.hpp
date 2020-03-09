@@ -42,7 +42,10 @@ public:
 		StorageEnableAcl, DatabaseEnableCompression, DatabaseEnableAutoCompact,
 		DatabaseLruCacheSize, DatabaseMaxNofOpenFiles, DatabaseWriteBufferSize, DatabaseBlockSize,
 
-		VectorMemType, VectorLexemPrunning, VectorDim, VectorBits, VectorVariations,
+		VectorMemType,
+		VectorLexemTypePriorityMap,VectorLexemSpaceSubst,VectorLexemLinkSubst,VectorLexemCoverSimilarity,VectorLexemLshRecall,
+
+		VectorDim, VectorBits, VectorVariations,
 		VectorFeatureName,VectorFeatureType,VectorFeatureVector,VectorFeature,
 
 		AnalyzerName, Segmenter, MimeType, Charset, Schema, DocumentClassDef,

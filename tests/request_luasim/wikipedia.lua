@@ -79,7 +79,12 @@ vectorStorageConfig = {
 		max_open_files = 512,
 		write_buffer_size = "8K",
 		block_size = "4K",
-		vecdim = "256"
+		vecdim = "256",
+		lextypes = "E,N,V,A,C,W",
+		spacesb = "_",
+		linksb = "-",
+		coversim = 0.8,
+		recall = 0.8
 	}
 }
 
