@@ -12,6 +12,7 @@
 #include "papuga/typedefs.h"
 #include "strus/errorBufferInterface.hpp"
 #include "strus/numericVariant.hpp"
+#include "strus/constants.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
 #include <cstring>
 #include <map>
@@ -161,15 +162,42 @@ struct MetaDataTableCommand
 	static std::vector<MetaDataTableCommand> getListFromNameTypePairs( const papuga_ValueVariant& cmd);
 };
 
+struct QueryFeatureExpansionDef
+{
+	static const double defaultSimilarity()
+	{
+		return strus::Constants::defaultQueryExpansionSimilarityDistance();
+	}
+	static const double defaultMinNormalizedWeight()
+	{
+		return strus::Constants::defaultQueryExpansionMinNormalizedWeight();
+	}
+	static const int defaultMaxNofResults()
+	{
+		return strus::Constants::defaultQueryExpansionMaxNofResults();
+	}
+
+	double similarity;
+	int maxNofResults;
+	double minNormalizedWeight;
+
+	QueryFeatureExpansionDef()
+		:similarity(1.0),maxNofResults(defaultMaxNofResults()),minNormalizedWeight(defaultMinNormalizedWeight()){}
+	QueryFeatureExpansionDef( double similarity_, int maxNofResults_, double minNormalizedWeight_)
+		:similarity(similarity_),maxNofResults(maxNofResults_),minNormalizedWeight(minNormalizedWeight_){}
+	QueryFeatureExpansionDef( const QueryFeatureExpansionDef& o)
+		:similarity(o.similarity),maxNofResults(o.maxNofResults),minNormalizedWeight(o.minNormalizedWeight){}
+};
+
 class QueryFeatureExpansionMap
-	:public std::map<std::string,double>
+	:public std::map<std::string,QueryFeatureExpansionDef>
 {
 public:
 	QueryFeatureExpansionMap( papuga_SerializationIter& seriter)
 		{init(seriter);}
 	QueryFeatureExpansionMap( const papuga_ValueVariant& value);
 	QueryFeatureExpansionMap( const QueryFeatureExpansionMap& o)
-		:std::map<std::string,double>(o){}
+		:std::map<std::string,QueryFeatureExpansionDef>(o){}
 private:
 	void init( papuga_SerializationIter& seriter);
 };

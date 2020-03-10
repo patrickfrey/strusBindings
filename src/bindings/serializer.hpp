@@ -35,6 +35,7 @@
 #include "strus/debugTraceInterface.hpp"
 #include "strus/storage/index.hpp"
 #include "impl/value/termExpression.hpp"
+#include "impl/value/sentenceTermExpression.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/metadataComparison.hpp"
 #include "strus/bindingObjects.h"
@@ -229,6 +230,7 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const SentenceGuess& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const SentenceTermExpression& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataExpression& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const MetaDataComparison& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const ResultDocument& val, papuga_ErrorCode& errcode, bool deep);

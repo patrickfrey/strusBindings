@@ -180,6 +180,10 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 		("typename", "structure")
 	;
+	typesystem.defineType( "SentenceTermExpression*")
+		("retv_map", "initCallResultStructureOwnership( $name, $value);")
+		("typename", "structure")
+	;
 	typesystem.defineType( "MetaDataExpression*")
 		("retv_map", "initCallResultStructureOwnership( $name, $value);")
 		("typename", "structure")

@@ -12,6 +12,7 @@
 #include "strus/analyzer/documentClass.hpp"
 #include "strus/analyzer/document.hpp"
 #include "impl/value/termExpression.hpp"
+#include "impl/value/sentenceTermExpression.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/iterator.hpp"
@@ -391,7 +392,7 @@ public:
 	/// \example 0.8
 	/// \return list of named sentence guesses with weight (same as SentenceLexer::call(..))
 	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
-	Struct analyzeSentence(
+	SentenceTermExpression* analyzeSentence(
 			const std::string& fieldType,
 			const std::string& fieldContent,
 			int maxNofResults,

@@ -21,6 +21,7 @@ set( source_files
 	impl/value/vectorStorageIntrospection.cpp
 	impl/value/structViewIntrospection.cpp
 	impl/value/termExpression.cpp
+	impl/value/sentenceTermExpression.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp
 	impl/value/valueIterator.cpp

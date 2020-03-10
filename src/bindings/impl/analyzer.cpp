@@ -8,6 +8,7 @@
 #include "impl/analyzer.hpp"
 #include "impl/value/analyzerIntrospection.hpp"
 #include "impl/value/featureFuncDef.hpp"
+#include "impl/value/sentenceTermExpression.hpp"
 #include "strus/documentAnalyzerInstanceInterface.hpp"
 #include "strus/documentAnalyzerContextInterface.hpp"
 #include "strus/queryAnalyzerInstanceInterface.hpp"
@@ -588,7 +589,8 @@ static void appendNormTokenToSentenceFields( std::vector<std::string>& result, c
 	
 }
 
-Struct QueryAnalyzerImpl::analyzeSentence(
+
+SentenceTermExpression* QueryAnalyzerImpl::analyzeSentence(
 		const std::string& fieldType,
 		const std::string& fieldContent,
 		int maxNofResults,
@@ -626,15 +628,12 @@ Struct QueryAnalyzerImpl::analyzeSentence(
 					si->featureFuncDef.normalizers.begin(), si->featureFuncDef.normalizers.end());
 		appendNormTokenToSentenceFields( fields, normtok);
 	}
-	std::vector<SentenceGuess> res = lexer->call( fields, maxNofResults, minWeight);
+	std::vector<SentenceGuess> guess = lexer->call( fields, maxNofResults, minWeight);
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
-	Struct rt;
-	strus::bindings::Serializer::serialize( &rt.serialization, res, true/*deep*/);
-	rt.release();
-	return rt;
-	
+	Reference<SentenceTermExpression> termexpr( new SentenceTermExpression( si->expansionMap, lexer, guess));
+	return termexpr.release();
 }
 
 Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg) const
