@@ -483,11 +483,12 @@ struct SentenceLexerPrivateImpl
 	std::string fieldType;
 	ObjectRef lexer_impl;
 	FeatureFuncDef featureFuncDef;
+	QueryFeatureExpansionMap expansionMap;
 
-	SentenceLexerPrivateImpl( const std::string& fieldType_, const ObjectRef& lexer_impl_, const FeatureFuncDef& featureFuncDef_)
-		:fieldType(fieldType_),lexer_impl(lexer_impl_),featureFuncDef(featureFuncDef_){}
+	SentenceLexerPrivateImpl( const std::string& fieldType_, const ObjectRef& lexer_impl_, const FeatureFuncDef& featureFuncDef_, const QueryFeatureExpansionMap& expansionMap_)
+		:fieldType(fieldType_),lexer_impl(lexer_impl_),featureFuncDef(featureFuncDef_),expansionMap(expansionMap_){}
 	SentenceLexerPrivateImpl( const SentenceLexerPrivateImpl& o)
-		:fieldType(o.fieldType),lexer_impl(o.lexer_impl),featureFuncDef(o.featureFuncDef){}
+		:fieldType(o.fieldType),lexer_impl(o.lexer_impl),featureFuncDef(o.featureFuncDef),expansionMap(o.expansionMap){}
 };
 
 typedef std::vector<SentenceLexerPrivateImpl> SentenceLexerArrayPrivateImpl;
@@ -496,6 +497,7 @@ void QueryAnalyzerImpl::addSentenceType(
 		const std::string& fieldType,
 		const ValueVariant& tokenizer,
 		const ValueVariant& normalizers,
+		const ValueVariant& expansion,
 		SentenceLexerImpl* lexer)
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -511,9 +513,11 @@ void QueryAnalyzerImpl::addSentenceType(
 		if (sentence_lexer_map_impl_copy.get()) throw strus::runtime_error(_TXT( "logic error: type mismatch accessing '%s'"), "sentence analyzer");
 		sentence_lexer_map_impl_new.resetOwnership( sar = new SentenceLexerArrayPrivateImpl(), "array of sentence analyzers");
 	}
+	QueryFeatureExpansionMap expansionmap( expansion);
 	sar->push_back( SentenceLexerPrivateImpl(
 				fieldType, lexer->m_lexer_impl,
-				FeatureFuncDef( m_textproc, tokenizer, normalizers, errorhnd)));
+				FeatureFuncDef( m_textproc, tokenizer, normalizers, errorhnd),
+				expansionmap));
 	m_sentence_lexer_map_impl = sentence_lexer_map_impl_new;
 }
 

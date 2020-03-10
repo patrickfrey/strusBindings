@@ -308,11 +308,14 @@ public:
 	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type (in the ascending order of appearance) before passing it to analysis.
 	/// \example "uc"
 	/// \example ["lc",["convdia", "en"]]
+	/// \param[in] expansion the declarations how to expand detectect type with similar values
+	/// \example [[type: "V" similarity: "0.85"],[type: "N" similarity: "0.9"]]
 	/// \param[in] lexer the sentence parser to use
 	void addSentenceType(
 			const std::string& fieldType,
 			const ValueVariant& tokenizer,
 			const ValueVariant& normalizers,
+			const ValueVariant& expansion,
 			SentenceLexerImpl* lexer);
 
 	/// \brief Declare an implicit grouping operation for a query field type. The implicit group operation is always applied when more than one term are resulting from analysis of this field to ensure that you get only one node in the query from it.

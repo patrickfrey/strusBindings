@@ -452,7 +452,7 @@ public:
 	{
 		if (substructure && !papuga_Serialization_pushOpen( &serialization)) throw std::bad_alloc();
 
-		strus::local_ptr<PostingIteratorInterface> pitr( m_impl->createTermPostingIterator( m_type, m_value, 1));
+		strus::local_ptr<PostingIteratorInterface> pitr( m_impl->createTermPostingIterator( m_type, m_value, 1, strus::TermStatistics()));
 		if (!pitr.get()) throw std::runtime_error( m_errorhnd->fetchError());
 		if (m_docno != pitr->skipDoc( m_docno)) return;
 		if (m_pos)
@@ -516,7 +516,7 @@ public:
 		:m_errorhnd(errorhnd_)
 		,m_impl(impl_)
 		,m_areader(impl_->createAttributeReader())
-		,m_postings(impl_->createTermPostingIterator( type_, value_, 1))
+		,m_postings(impl_->createTermPostingIterator( type_, value_, 1, strus::TermStatistics()))
 		,m_docid_handle(0)
 		,m_type(type_)
 		,m_value(value_)

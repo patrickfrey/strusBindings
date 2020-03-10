@@ -221,11 +221,19 @@ public:
 					{"arg", NormalizerArg, '*'}
 				}
 			},
+			{"vstorage/sentanalyzer/expansion/type", "()", FeatureExpansionTypeName, papuga_TypeString, "N;V;word"},
+			{"vstorage/sentanalyzer/expansion/sim", "()", FeatureExpansionSimilarity, papuga_TypeDouble, "0.95;0.86;0.666"},
+			{"vstorage/sentanalyzer/expansion", FeatureExpansionDef, {
+					{"type", FeatureExpansionTypeName, '!'},
+					{"sim", FeatureExpansionSimilarity, '!'}
+				}
+			},
 			{"vstorage", "_sentanalyzer", "vstorage", V::createSentenceLexer(), {}},
 			{"vstorage", 0, "qryanalyzer", A::addSentenceType(), {
 					{FieldTypeName, '!', 2/*tag diff*/},
 					{TokenizerDef, '!', 2/*tag diff*/},
 					{NormalizerDef,'+', 2/*tag diff*/},
+					{FeatureExpansionDef,'*', 2/*tag diff*/},
 					{"_sentanalyzer"}
 				}
 			},

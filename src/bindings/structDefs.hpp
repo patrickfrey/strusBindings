@@ -14,6 +14,9 @@
 #include "strus/numericVariant.hpp"
 #include "strus/metaDataRestrictionInterface.hpp"
 #include <cstring>
+#include <map>
+#include <string>
+#include <vector>
 
 namespace strus {
 namespace bindings {
@@ -156,6 +159,19 @@ struct MetaDataTableCommand
 
 	static std::vector<MetaDataTableCommand> getList( const papuga_ValueVariant& cmd);
 	static std::vector<MetaDataTableCommand> getListFromNameTypePairs( const papuga_ValueVariant& cmd);
+};
+
+class QueryFeatureExpansionMap
+	:public std::map<std::string,double>
+{
+public:
+	QueryFeatureExpansionMap( papuga_SerializationIter& seriter)
+		{init(seriter);}
+	QueryFeatureExpansionMap( const papuga_ValueVariant& value);
+	QueryFeatureExpansionMap( const QueryFeatureExpansionMap& o)
+		:std::map<std::string,double>(o){}
+private:
+	void init( papuga_SerializationIter& seriter);
 };
 
 }} //namespace

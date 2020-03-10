@@ -12,6 +12,15 @@
 				"normalizer": [
 					{"name": "entityid"},
 					{"name": "lc"}
+				],
+				"expansion": [
+					{"type": "E", "sim": "0.95"},
+					{"type": "N", "sim": "0.85"},
+					{"type": "V", "sim": "0.85"},
+					{"type": "A", "sim": "0.85"},
+					{"type": "C", "sim": "0.9"},
+					{"type": "W", "sim": "0.9"},
+					{"type": "X", "sim": "0.9"}
 				]
 			}
 		}

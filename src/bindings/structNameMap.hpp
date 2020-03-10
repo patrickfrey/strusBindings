@@ -30,6 +30,10 @@ public:
 	int index( const char* id) const;
 	int index( const papuga_ValueVariant& id) const;
 	const char* name( int idx) const;
+	const char* names() const
+	{
+		return m_strings;
+	}
 
 private:
 	const char* m_strings;

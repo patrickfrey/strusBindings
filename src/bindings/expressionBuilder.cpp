@@ -275,14 +275,14 @@ void QueryAnalyzerTermExpressionBuilder::definePattern( const std::string& name,
 
 void PostingsExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
-	Reference<PostingIteratorInterface> itr( m_storage->createTermPostingIterator( type, value, length));
+	Reference<PostingIteratorInterface> itr( m_storage->createTermPostingIterator( type, value, length, getTermStatistics(type,value)));
 	if (!itr.get()) throw strus::runtime_error(_TXT("failed to create term posting iterator for %s '%s': %s"), type.c_str(), value.c_str(), m_errorhnd->fetchError());
 	m_stack.push_back( itr);
 }
 
 void PostingsExpressionBuilder::pushTerm( const std::string& type, const std::string& value)
 {
-	Reference<PostingIteratorInterface> itr( m_storage->createTermPostingIterator( type, value, 1));
+	Reference<PostingIteratorInterface> itr( m_storage->createTermPostingIterator( type, value, 1, getTermStatistics(type,value)));
 	if (!itr.get()) throw strus::runtime_error(_TXT("failed to create term posting iterator for %s '%s': %s"), type.c_str(), value.c_str(), m_errorhnd->fetchError());
 	m_stack.push_back( itr);
 }

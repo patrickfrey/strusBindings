@@ -716,7 +716,7 @@ public:
 							{
 								case 0: name = Deserializer::getString( seriter); break;
 								case 1: value = getValue( seriter); break;
-								default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+								default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, metanamemap.names());
 							}
 							papuga_SerializationIter_skip( &seriter);
 						}
@@ -796,6 +796,7 @@ class FeatureOptionsParser
 public:
 	static void setNamedValue( analyzer::FeatureOptions& ths, const char* name, const papuga_ValueVariant* value)
 	{
+		static const char* context = _TXT("feature option");
 		static const StructureNameMap namemap( "position", ',');
 
 		int idx = namemap.index( name);
@@ -803,8 +804,7 @@ public:
 		{
 			case 0: setFeatureOption_position( ths, value);
 				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name '%s'"), name);
-				break;
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 		}
 	}
 	static void setSingleValue( analyzer::FeatureOptions& ths, const papuga_ValueVariant* value)
@@ -834,6 +834,7 @@ class TermStatisticsParser
 public:
 	static void setNamedValue( TermStatistics& ths, const char* name, const papuga_ValueVariant* value)
 	{
+		static const char* context = _TXT("term statistics");
 		static const StructureNameMap namemap( "df", ',');
 
 		int idx = namemap.index( name);
@@ -841,7 +842,7 @@ public:
 		{
 			case 0: ths.setDocumentFrequency( ValueVariantWrap::touint64( *value));
 				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name '%s'"), name);
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 				break;
 		}
 	}
@@ -867,6 +868,7 @@ class GlobalStatisticsParser
 public:
 	static void setNamedValue( GlobalStatistics& ths, const char* name, const papuga_ValueVariant* value)
 	{
+		static const char* context = _TXT("global statistics");
 		static const StructureNameMap namemap( "nofdocs", ',');
 
 		int idx = namemap.index( name);
@@ -874,8 +876,7 @@ public:
 		{
 			case 0: ths.setNofDocumentsInserted( ValueVariantWrap::touint64( *value));
 				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name '%s'"), name);
-				break;
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 		}
 	}
 	static void setSingleValue( GlobalStatistics& ths, const papuga_ValueVariant* value)
@@ -1449,6 +1450,7 @@ class DocumentClassParser
 public:
 	static void setNamedValue( analyzer::DocumentClass& ths, const char* name, const papuga_ValueVariant* value)
 	{
+		static const char* context = _TXT("document class");
 		static const StructureNameMap namemap( "mimetype,encoding,schema", ',');
 
 		int idx = namemap.index( name);
@@ -1460,7 +1462,7 @@ public:
 				break;
 			case 2: ths.setSchema( ValueVariantWrap::tostring( *value));
 				break;
-			default: throw strus::runtime_error(_TXT("unknown tag name '%s'"), name);
+			default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 		}
 	}
 	static void setSingleValue( analyzer::DocumentClass& ths, const papuga_ValueVariant* value)
@@ -1469,6 +1471,7 @@ public:
 	}
 	static void setPositionalValue( analyzer::DocumentClass& ths, int pos, const papuga_ValueVariant* value)
 	{
+		static const char* context = _TXT("document class");
 		switch (pos)
 		{
 			case 0: ths.setMimeType( ValueVariantWrap::tostring( *value));
@@ -1477,7 +1480,7 @@ public:
 				break;
 			case 2: ths.setSchema( ValueVariantWrap::tostring( *value));
 				break;
-			default: throw strus::runtime_error(_TXT("to many positional values defined in structure"));
+			default: throw strus::runtime_error(_TXT("unknown element in %s"), context);
 		}
 	}
 };
@@ -1763,7 +1766,7 @@ static void deserializeQueryEvalFunctionParameter(
 					case 1: if (value) throw strus::runtime_error(_TXT("contradicting definitions in %s parameter: only one allowed of 'value' or 'feature'"), functionclass);
 						value = getValue( seriter);
 						break;
-					default: throw strus::runtime_error(_TXT("unknown name in %s parameter list"), functionclass);
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), functionclass, namemap.names());
 				}
 			}
 			Deserializer::consumeClose( seriter);
@@ -1841,13 +1844,13 @@ static std::vector<QueryEvalInterface::FeatureParameter> getFeatureParameters(
 						papuga_SerializationIter_skip( &seriter);
 						switch (idx)
 						{
-							case 0: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "name", context);
+							case 0: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 								feature = Deserializer::getString( seriter);
 								break;
-							case 1: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), "set", context);
+							case 1: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 								sets = Deserializer::getStringListAsValue( seriter);
 								break;
-							default: throw strus::runtime_error(_TXT("unknown name in %s definition"), context);
+							default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 						}
 					}
 					Deserializer::consumeClose( seriter);
@@ -2219,7 +2222,7 @@ static void buildExpressionJoin( ExpressionBuilder& builder, papuga_Serializatio
 						throw strus::runtime_error( _TXT("structure expected for term argument in %s"), context);
 					}
 					break;
-				default: throw strus::runtime_error(_TXT("unknown tag name in %s"), context);
+				default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, joinop_namemap.names());
 			}
 		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
 	}
@@ -2519,7 +2522,7 @@ static void buildMetaData( StorageDocumentAccess* document, papuga_Serialization
 						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
 							value = ValueVariantWrap::tonumeric( *getValue( seriter));
 							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 					}
 				}
 				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
@@ -2581,13 +2584,13 @@ static void buildAttributes(
 					papuga_SerializationIter_skip( &seriter);
 					switch (idx)
 					{
-						case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+						case 0: if (name_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
 							name = Deserializer::getString( seriter);
 							break;
-						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
 							value = Deserializer::getString( seriter);
 							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 					}
 				}
 				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
@@ -2698,19 +2701,19 @@ static void buildStorageIndex( StorageDocumentIndexAccess* document, papuga_Seri
 					papuga_SerializationIter_skip( &seriter);
 					switch (idx)
 					{
-						case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "name", context);
+						case 0: if (type_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
 							type = Deserializer::getString( seriter);
 							break;
-						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "value", context);
+						case 1: if (value_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
 							value = Deserializer::getString( seriter);
 							break;
-						case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), "pos", context);
+						case 2: if (pos_defined++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
 							pos = Deserializer::getUint( seriter);
 							break;
 						case 3: (void)Deserializer::getUint( seriter);
 							// ... len that is part of analyzer output is ignored
 							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 					}
 				}
 				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
@@ -2778,7 +2781,7 @@ static void buildStorageStructures( StorageDocumentIndexAccess* document, papuga
 						case _sink: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
 							sink = Deserializer::getIndexRangeAsValue( seriter);
 							break;
-						default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+						default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 					}
 				}
 				while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
@@ -2987,7 +2990,7 @@ static void buildStorageDocument(
 						break;
 					case _access: buildAccessRightsValue( document, seriter);
 						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 				}
 			}
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);
@@ -3175,7 +3178,7 @@ void Deserializer::buildStatistics(
 						builder->addNofDocumentsInsertedChange( Deserializer::getInt( seriter));
 						break;
 					}
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s structure"), context);
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
 				}
 			}
 			if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of serialization of %s"), context);

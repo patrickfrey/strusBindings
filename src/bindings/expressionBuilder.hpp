@@ -8,6 +8,7 @@
 #ifndef _STRUS_BINDING_EXPRESSION_BUILDER_HPP_INCLUDED
 #define _STRUS_BINDING_EXPRESSION_BUILDER_HPP_INCLUDED
 #include "strus/queryInterface.hpp"
+#include "strus/storage/termStatistics.hpp"
 #include "strus/patternMatcherInstanceInterface.hpp"
 #include "strus/patternTermFeederInstanceInterface.hpp"
 #include "strus/patternLexerInstanceInterface.hpp"
@@ -169,6 +170,20 @@ public:
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
 
 public:
+	void defineTermStatistics( const std::string& type, const std::string& value, const strus::TermStatistics& stats)
+	{
+		m_termstatmap[ std::pair<std::string,std::string>( type, value)] = stats;
+	}
+
+private:
+	strus::TermStatistics getTermStatistics( const std::string& type, const std::string& value)
+	{
+		std::map<std::pair<std::string,std::string>,strus::TermStatistics>::const_iterator
+			ti = m_termstatmap.find( std::pair<std::string,std::string>( type, value));
+		return (ti == m_termstatmap.end()) ? strus::TermStatistics() : ti->second;
+	}
+
+public:
 	Reference<PostingIteratorInterface> pop();
 
 private:
@@ -180,6 +195,7 @@ private:
 	const StorageClientInterface* m_storage;
 	const QueryProcessorInterface* m_queryproc;
 	std::vector<Reference<PostingIteratorInterface> > m_stack;
+	std::map<std::pair<std::string,std::string>,strus::TermStatistics> m_termstatmap;
 };
 
 }}//namespace
