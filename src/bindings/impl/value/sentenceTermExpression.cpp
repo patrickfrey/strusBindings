@@ -58,27 +58,52 @@ SentenceTermExpression::SentenceTermExpression(
 			}
 		}
 	}
-	// Query expansion step:
+	// Collect co terms:
+	std::vector<double> qtermBaseWeightList;
+	std::vector<strus::WeightedSentenceTerm> qtermList;
 	std::size_t ai = 0, ae = m_ar.size();
 	for (; ai != ae; ++ai)
 	{
 		std::size_t ei = 0, ee = m_ar[ai].size();
 		for (;ei != ee; ++ei)
 		{
+			qtermBaseWeightList.push_back( 1.0 / (double)ee);
+			qtermList.push_back( strus::WeightedSentenceTerm( m_ar[ ai][ ei], 1.0));
+		}
+	}
+	// Query expansion step:
+	std::size_t qtidx = 0;
+	ai = 0, ae = m_ar.size();
+	for (; ai != ae; ++ai)
+	{
+		std::size_t ei = 0, ee = m_ar[ai].size();
+		for (;ei != ee; ++ei,++qtidx)
+		{
 			const strus::SentenceTerm& term = m_ar[ ai][ ei];
 			QueryFeatureExpansionMap::const_iterator xi = expansionMap.find( term.type());
 			if (xi != expansionMap.end())
 			{
-				std::vector<SentenceTerm> termlist;
-				termlist.push_back( term);
-				std::vector<SentenceTerm> simterms =
-					lexer->similarTerms( term.type(), termlist,
+				std::size_t ti = 0, te = qtermList.size();
+				for (; ti != te; ++ti)
+				{
+					if (ti == qtidx)
+					{
+						qtermList[ ti].setWeight( 1.0);
+					}
+					else
+					{
+						qtermList[ ti].setWeight( xi->second.coweight * qtermBaseWeightList[ti]
+										/ (qtermList.size()-1));
+					}
+				}
+				std::vector<WeightedSentenceTerm> simterms =
+					lexer->similarTerms( term.type(), qtermList,
 							xi->second.similarity, xi->second.maxNofResults,
 							xi->second.minNormalizedWeight);
-				std::vector<SentenceTerm>::const_iterator si = simterms.begin(), se = simterms.end();
+				std::vector<WeightedSentenceTerm>::const_iterator si = simterms.begin(), se = simterms.end();
 				for (; si != se; ++si)
 				{
-					if (*si != term)
+					if (si->value() != term.value())
 					{
 						m_ar[ ai].push_back( *si);
 					}

@@ -863,7 +863,7 @@ std::vector<MetaDataTableCommand> MetaDataTableCommand::getListFromNameTypePairs
 static std::pair<std::string,QueryFeatureExpansionDef> parseFeatureExpansionSimilarityDef( papuga_SerializationIter& seriter)
 {
 	static const char* context = _TXT("feature expansion similarity declaration");
-	static const StructureNameMap namemap( "type,sim,results,cut", ',');
+	static const StructureNameMap namemap( "type,sim,coweight,results,cut", ',');
 
 	std::pair<std::string,QueryFeatureExpansionDef> rt;
 	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
@@ -895,9 +895,12 @@ static std::pair<std::string,QueryFeatureExpansionDef> parseFeatureExpansionSimi
 					rt.second.similarity = Deserializer::getDouble( seriter);
 					break;
 				case 2:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-					rt.second.maxNofResults = Deserializer::getInt( seriter);
+					rt.second.coweight = Deserializer::getDouble( seriter);
 					break;
 				case 3:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					rt.second.maxNofResults = Deserializer::getInt( seriter);
+					break;
+				case 4:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 					rt.second.minNormalizedWeight = Deserializer::getDouble( seriter);
 					break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());

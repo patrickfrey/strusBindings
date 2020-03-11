@@ -24,31 +24,28 @@
 							"value": "album"},
 						{
 							"type": "N",
-							"value": "debut_album"},
+							"value": "solo_album"},
 						{
 							"type": "N",
 							"value": "albums"},
 						{
 							"type": "N",
+							"value": "debut_album"},
+						{
+							"type": "N",
+							"value": "recording"},
+						{
+							"type": "N",
+							"value": "title_track"},
+						{
+							"type": "N",
 							"value": "song"},
 						{
 							"type": "N",
-							"value": "songs"},
-						{
-							"type": "N",
-							"value": "single"},
-						{
-							"type": "N",
-							"value": "studio_album"},
-						{
-							"type": "N",
-							"value": "label"},
+							"value": "compilation_album"},
 						{
 							"type": "N",
 							"value": "ep"},
 						{
 							"type": "N",
-							"value": "band"},
-						{
-							"type": "N",
-							"value": "recording"}]}}]}]}}
+							"value": "band"}]}}]}]}}

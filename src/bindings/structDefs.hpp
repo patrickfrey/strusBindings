@@ -164,6 +164,10 @@ struct MetaDataTableCommand
 
 struct QueryFeatureExpansionDef
 {
+	static const double defaultCoWeight()
+	{
+		return strus::Constants::defaultQueryExpansionCoFeatureWeight();
+	}
 	static const double defaultSimilarity()
 	{
 		return strus::Constants::defaultQueryExpansionSimilarityDistance();
@@ -178,15 +182,16 @@ struct QueryFeatureExpansionDef
 	}
 
 	double similarity;
+	double coweight;
 	int maxNofResults;
 	double minNormalizedWeight;
 
 	QueryFeatureExpansionDef()
-		:similarity(1.0),maxNofResults(defaultMaxNofResults()),minNormalizedWeight(defaultMinNormalizedWeight()){}
-	QueryFeatureExpansionDef( double similarity_, int maxNofResults_, double minNormalizedWeight_)
-		:similarity(similarity_),maxNofResults(maxNofResults_),minNormalizedWeight(minNormalizedWeight_){}
+		:similarity(1.0),coweight(defaultCoWeight()),maxNofResults(defaultMaxNofResults()),minNormalizedWeight(defaultMinNormalizedWeight()){}
+	QueryFeatureExpansionDef( double similarity_, double coweight_, int maxNofResults_, double minNormalizedWeight_)
+		:similarity(similarity_),coweight(coweight_),maxNofResults(maxNofResults_),minNormalizedWeight(minNormalizedWeight_){}
 	QueryFeatureExpansionDef( const QueryFeatureExpansionDef& o)
-		:similarity(o.similarity),maxNofResults(o.maxNofResults),minNormalizedWeight(o.minNormalizedWeight){}
+		:similarity(o.similarity),coweight(o.coweight),maxNofResults(o.maxNofResults),minNormalizedWeight(o.minNormalizedWeight){}
 };
 
 class QueryFeatureExpansionMap
