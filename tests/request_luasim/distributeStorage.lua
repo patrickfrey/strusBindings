@@ -21,6 +21,7 @@ server = {
 			{ name = "srv", address = ISERVER1, context="test3" },
 		},
 	statserver  =	{ name = "srv", address = ISERVER1, context="test" },
+	qryanalyzer =	{ name = "srv", address = ISERVER1, context="test" },
 	distqryeval =	{ name = "srv", address = ISERVER1, context="test" }
 }
 else
@@ -31,6 +32,7 @@ server = {
 			{ name = "isrv3", address = ISERVER3, context="test3" },
 		},
 	statserver  =	{ name = "ssrv",  address = SSERVER1, context="test" },
+	qryanalyzer =	{ name = "vsrv",  address = VSERVER1, context="test" },
 	distqryeval =	{ name = "qsrv",  address = QSERVER1, context="test" }
 }
 end
@@ -39,8 +41,11 @@ function serviceAddress( name, index)
 	if name == "storage" or name == "inserter" then
 		return server.storage[ index].address .. "/" .. name .. "/" .. server.storage[ index].context 
 
-	elseif name == "docanalyzer" or name == "qryanalyzer" or name == "qryeval" then
+	elseif name == "docanalyzer" or name == "qryeval" then
 		return server.storage[ index].address .. "/" .. name .. "/test"
+
+	elseif name == "qryanalyzer" then
+		return server.qryanalyzer.address .. "/" .. name .. "/test"
 
 	elseif name == "statserver" then
 		return server.statserver.address .. "/" .. name .. "/test"
@@ -73,7 +78,6 @@ metadataConfig = {
 function getStorageConfig( storageidx)
 	cfg = storageConfig
 	cfg.storage.include = {
-		analyzer = "test",
 		qryeval  = "test"
 	}
 	return cfg
@@ -104,7 +108,6 @@ function buildAnalyzer()
 			servers[ storage.name] = true
 
 			call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
-			call_server_checked( "PUT", serviceAddress( "qryanalyzer", storageidx), "@qryanalyzer.json" )
 			call_server_checked( "PUT", serviceAddress( "qryeval", storageidx),  "@qryeval.json" )
 			if verbose then io.stderr:write( string.format("- Created document analyzer, query analyzer and query eval for server %s\n", storage.name)) end
 		end
@@ -160,6 +163,12 @@ function defStatisticsServer()
 	if verbose then io.stderr:write( string.format("- Created statistics server %s\n", server.statserver.name)) end
 end
 
+function defQueryAnalyzeServer()
+	def_test_server( server.qryanalyzer.name, server.qryanalyzer.address )
+	call_server_checked( "PUT", server.qryanalyzer.address  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+	if verbose then io.stderr:write( string.format("- Created query analyze server %s\n", server.qryanalyzer.name)) end
+end
+
 function defDistributedQueryEvalServer()
 	storages = {}
 	for storageidx,storage in ipairs( server.storage) do
@@ -167,15 +176,12 @@ function defDistributedQueryEvalServer()
 	end
 	distqryevalConfig = {
 		distqryeval = {
-			include = {
-				analyzer = "test"
-			},
+			analyzer = { serviceAddress( "qryanalyzer") },
 			statserver = { serviceAddress( "statserver") },
 			storage = storages
 		}
 	}
 	def_test_server( server.distqryeval.name, server.distqryeval.address )
-	call_server_checked( "PUT", server.distqryeval.address  .. "/qryanalyzer/test", "@qryanalyzer.json" )
 	call_server_checked( "PUT", serviceAddress( "distqryeval"), distqryevalConfig )
 end
 
@@ -184,6 +190,7 @@ defStorageServer()
 buildAnalyzer()
 buildStorageServer()
 defStatisticsServer()
+defQueryAnalyzeServer()
 defDistributedQueryEvalServer()
 
 

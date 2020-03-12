@@ -16,10 +16,13 @@ void strus::initCallResultStruct( papuga_CallResult* retval, const strus::bindin
 	{
 		throw std::runtime_error(_TXT("passing non released object to result"));
 	}
-	if (!papuga_Allocator_add_free_allocator( retval->allocator, &st.allocator))
+	if (!papuga_Allocator_empty(retval->allocator))
 	{
-		papuga_destroy_Allocator( const_cast<papuga_Allocator*>( &st.allocator));
-		throw std::bad_alloc();
+		if (!papuga_Allocator_add_free_allocator( retval->allocator, &st.allocator))
+		{
+			papuga_destroy_Allocator( const_cast<papuga_Allocator*>( &st.allocator));
+			throw std::bad_alloc();
+		}
 	}
 	if (!papuga_add_CallResult_serialization( retval)) throw std::bad_alloc();
 	std::memcpy( retval->valuear[0].value.serialization, &st.serialization, sizeof(papuga_Serialization));

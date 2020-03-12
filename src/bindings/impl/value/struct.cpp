@@ -42,6 +42,13 @@ Struct::Struct( const Struct& o)
 	}
 }
 
+Struct::Struct( const papuga_Serialization* ser)
+	:m_released(true)
+{
+	papuga_init_Allocator( &allocator, 0, 0);
+	std::memcpy( &serialization, ser, sizeof(serialization));
+}
+
 Struct::~Struct()
 {
 	if (!m_released)

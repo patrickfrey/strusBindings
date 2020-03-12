@@ -97,7 +97,7 @@ public:
 		}}},
 		{/*inherit*/},
 		{/*input*/
-			{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed")},
+			{SchemaExpressionPart::declareTermExpression( "/query/feature/analyzed", AnalyzedTermExpression)},
 			{SchemaStatisticsPart::evaluateTermStatistics( "/query/feature/analyzed")},
 			{SchemaStatisticsPart::evaluateGlobalStatistics( "/query")}
 		}

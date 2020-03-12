@@ -71,7 +71,7 @@ public:
 
 		ContentAttribute, ContentRegexExpression, ContentPriorityExpression, ContentMinLength, ContentMaxLength,
 
-		QueryDef, FeatureDef, FeatureSet, FeatureWeight, RestrictionDef,
+		QueryDef, FeatureDef, FeatureSet, FeatureWeight, SentenceDef, RestrictionDef,
 		FeatureRestrictionDef, FeatureSelectionDef, FeatureExclusionDef,
 		QueryEvalFunctionParameterName, QueryEvalFunctionParameterValue, QueryEvalFunctionParameter,
 		QueryEvalFunctionFeatureRole, QueryEvalFunctionFeatureSet, QueryEvalFunctionFeature,
@@ -84,9 +84,10 @@ public:
 		QueryRankSummaryName,QueryRankSummaryValue,QueryRankSummaryWeight,QueryRankSummaryIndex,
 		QuerySummary,QuerySummaryName,QuerySummaryValue,QuerySummaryWeight,QuerySummaryIndex,
 
-		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, 
+		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, DistQueryEvalAnalyzeServer,
 
-		TermExpression, NodeTerm, NodeExpression, ExpressionArg, ExpressionVariableName, TermType, TermValue, TermLen,
+		ContentTermExpression, AnalyzedTermExpression,
+		NodeTerm, NodeExpression, ExpressionArg, ExpressionVariableName, TermType, TermValue, TermLen,
 		MetaDataCondition, MetaDataUnionCondition, MetaDataConditionOp, MetaDataConditionName, MetaDataConditionValue,
 		MetaDataRangeFrom, MetaDataRangeTo, 
 

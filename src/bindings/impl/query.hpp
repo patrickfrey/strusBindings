@@ -15,6 +15,7 @@
 #include "strus/analyzer/queryTerm.hpp"
 #include "impl/value/objectref.hpp"
 #include "impl/value/struct.hpp"
+#include "impl/value/queryExpression.hpp"
 #include <vector>
 #include <string>
 
@@ -349,9 +350,21 @@ public:
 	/// \example 20
 	void setMinRank( int minRank);
 
-	/// \brief Add expression as join of the arguments
-	/// \param[in] expressionlist list of expressions to add
-	void addExpressionJoin( const ValueVariant& expressionlist) const;
+	/// \brief Add a feature to the query
+	/// \param[in] feature feature to add
+	void addFeature( const ValueVariant& feature);
+
+	/// \brief Add a restriction to the query
+	/// \param[in] restriction restriction to add
+	void addRestriction( const ValueVariant& restriction);
+
+	/// \brief Get the list of all features collected with 'addFeature' as serialization
+	/// \return the list of features
+	Struct getFeatures() const;
+
+	/// \brief Get the list of all restrictions collected with 'addRestriction' as serialization
+	/// \return the list of restrictions
+	Struct getRestrictions() const;
 
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
@@ -359,20 +372,14 @@ public:
 	Struct introspection( const ValueVariant& path=ValueVariant()) const;
 
 private:
-	typedef strus::analyzer::QueryTerm QueryTerm;
-	typedef std::vector<QueryTerm> QueryTermList;
-
-private:
 	friend class ContextImpl;
 	QueryBuilderImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_)
-		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_termar(),m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_obj()
 	{}
 
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
-	std::vector<strus::analyzer::QueryTerm> m_termar;
-	int m_minRank;
-	int m_maxNofRanks;
+	QueryExpression m_obj;
 };
 
 }}//namespace

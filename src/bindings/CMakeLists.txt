@@ -20,6 +20,7 @@ set( source_files
 	impl/value/storageIntrospection.cpp
 	impl/value/vectorStorageIntrospection.cpp
 	impl/value/structViewIntrospection.cpp
+	impl/value/queryExpression.cpp
 	impl/value/termExpression.cpp
 	impl/value/sentenceTermExpression.cpp
 	impl/value/metadataExpression.cpp

@@ -71,6 +71,7 @@ struct WebRequestDelegateConnectionGlobals
 	~WebRequestDelegateConnectionGlobals()
 	{
 		if (headers) curl_slist_free_all( headers);
+		curl_global_cleanup();
 	}
 };
 

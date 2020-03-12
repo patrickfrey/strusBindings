@@ -363,17 +363,32 @@ Struct QueryResultMergerImpl::introspection( const ValueVariant& arg) const
 
 void QueryBuilderImpl::setMaxNofRanks( int maxNofRanks_)
 {
-	m_maxNofRanks = maxNofRanks_;
+	m_obj.setMaxNofRanks( maxNofRanks_);
 }
 
 void QueryBuilderImpl::setMinRank( int minRank_)
 {
-	m_minRank = minRank_;
+	m_obj.setMinRank( minRank_);
 }
 
-void QueryBuilderImpl::addExpressionJoin( const ValueVariant& expressionlist) const
+void QueryBuilderImpl::addFeature( const ValueVariant& feature)
 {
-	
+	m_obj.addFeature( feature);
+}
+
+void QueryBuilderImpl::addRestriction( const ValueVariant& restriction)
+{
+	m_obj.addRestriction( restriction);
+}
+
+Struct QueryBuilderImpl::getFeatures() const
+{
+	return Struct( m_obj.getFeatures());
+}
+
+Struct QueryBuilderImpl::getRestrictions() const
+{
+	return Struct( m_obj.getRestrictions());
 }
 
 Struct QueryBuilderImpl::introspection( const ValueVariant& path) const

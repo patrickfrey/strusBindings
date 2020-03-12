@@ -144,6 +144,7 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{FeatureDef, "feature definition"},
 		{FeatureSet, "feature set"},
 		{FeatureWeight, "feature weight"},
+		{SentenceDef, "sentence definition"},
 		{RestrictionDef, "restriction definition"},
 		{FeatureRestrictionDef, "feature restriction definition"},
 		{FeatureSelectionDef, "feature selection definition"},
@@ -185,7 +186,9 @@ const char* AutomatonNameSpace::itemName( int itemid)
 
 		{DistQueryEvalStorageServer, "distributed query evaluation storage server"},
 		{DistQueryEvalStatisticsServer, "distributed query evaluation statistics server"},
-		{TermExpression, "term expression"},
+		{DistQueryEvalAnalyzeServer, "distributed query evaluation analyze server"},
+		{ContentTermExpression, "content term expression"},
+		{AnalyzedTermExpression, "analyzed term expression"},
 		{NodeTerm, "node term"},
 		{NodeExpression, "node expression"},
 		{ExpressionArg, "expression argument"},

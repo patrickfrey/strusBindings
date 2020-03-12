@@ -28,18 +28,14 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/},
-		{/*inherit*/
-			{"qryanalyzer","/distqryeval/include/analyzer()",false/*not required*/},
-			{"vstorage","/distqryeval/include/vstorage()",false/*not required*/}
-		},
+		{/*inherit*/},
 		{/*input*/
+			{"/distqryeval/analyzer", "()", DistQueryEvalAnalyzeServer, papuga_TypeString, "example.com:7191/qryanalyzer/test"},
+			{"/distqryeval", "", "qryanalyzer", DistQueryEvalAnalyzeServer, '!'},
 			{"/distqryeval/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
 			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
-			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
-
-			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},
-			{"/query/analyzer", '?'}
+			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'}
 		}
 	) {}
 };
@@ -57,12 +53,12 @@ public:
 		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
 		{/*env*/},
 		{/*result*/
-			{"query", "SET~querystats", "GET", "statserver", "", {
-				{"/query/feature", "feature", true},
-				{"/query/{feature,sentence}", "analyzed", "_analyzed", '*'}
+			{"query", "SET~analysis", "GET", "qryanalyzer", "", {
+				{SchemaQueryDeclPart::resultQueryOrig("/query")}
 			}},
-			{"query", "SET~ranklist", "GET", "storage", "", {"_termstats","_globalstats"}, {
-				{SchemaQueryDeclPart::resultQuery( "/query")},
+			{"query", "SET~querystats", "GET", "statserver", "", {"_feature"}, {
+			}},
+			{"query", "SET~ranklist", "GET", "storage", "", {"_feature","_restriction","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}
 			}},
 			{"query", "END~ranklist", {}},
@@ -81,10 +77,24 @@ public:
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 			{"/query/analyzer", '?'},
 
-			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
-			{SchemaQueryDeclPart::analyzeQuery( "/query")},
-
+			{SchemaQueryDeclPart::declareQuery( "/query")},
+			{SchemaQueryDeclPart::defineQueryBuilder( "/query")},
 			{SchemaQueryDeclPart::defineResultMerger( "/query")}
+		}
+	) {}
+};
+
+class Schema_DistQueryEval_SET_analysis :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_DistQueryEval_SET_analysis() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
+			{SchemaQueryDeclPart::declareQuery( "/query")},
+			{SchemaQueryDeclPart::buildQuery( "/query")}
 		}
 	) {}
 };

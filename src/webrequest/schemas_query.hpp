@@ -65,7 +65,7 @@ public:
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 			{"/query/analyzer", '?'},
 
-			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
+			{SchemaQueryDeclPart::declareQuery( "/query")},
 			{SchemaQueryDeclPart::analyzeQuery( "/query")},
 			{SchemaQueryDeclPart::defineQuery( "/query")},
 			{SchemaQueryDeclPart::evaluateQuery( "/query")}

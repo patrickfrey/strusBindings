@@ -119,7 +119,7 @@ public:
 			{SchemaQueryEvalDeclPart::defineQueryEval( "/query/eval")},	//... inherited or declared
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 
-			{SchemaQueryDeclPart::declareQuery( "/query", "content")},
+			{SchemaQueryDeclPart::declareQuery( "/query")},
 			{SchemaQueryDeclPart::analyzeQuery( "/query")},
 			{SchemaQueryDeclPart::defineQuery( "/query")},
 			{SchemaQueryDeclPart::evaluateQuery( "/query")},

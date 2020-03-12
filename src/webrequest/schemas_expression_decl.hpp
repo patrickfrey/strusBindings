@@ -22,12 +22,12 @@ namespace webrequest {
 class SchemaExpressionPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList declareTermExpression( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList declareTermExpression( const char* rootexpr, int resultNodeType)
 	{
 		return papuga::RequestAutomaton_NodeList( rootexpr,
 		{
-			{"", "()", TermExpression, papuga_TypeVoid, NULL},
-			{"", TermExpression, {
+			{"", "()", resultNodeType, papuga_TypeVoid, NULL},
+			{"", resultNodeType, {
 					{"term", NodeTerm, '?'},
 					{"expression", NodeExpression, '?'}
 				}

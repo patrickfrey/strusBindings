@@ -28,6 +28,9 @@ public:
 	/// \brief "Move" constructor
 	Struct( const Struct& o);
 
+	/// \brief "Shallow Copy" constructor (ownership remains at the provider of this structure)
+	Struct( const papuga_Serialization* ser);
+
 	/// \brief Destructor
 	~Struct();
 

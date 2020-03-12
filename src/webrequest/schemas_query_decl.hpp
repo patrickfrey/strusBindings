@@ -25,30 +25,37 @@ namespace webrequest {
 class SchemaQueryDeclPart :public AutomatonNameSpace
 {
 public:
-	static papuga::RequestAutomaton_NodeList declareFeature( const char* rootexpr, const  char* contenttag)
+	static papuga::RequestAutomaton_NodeList declareFeature( const char* rootexpr)
 	{
 		return {rootexpr, {
-			{SchemaExpressionPart::declareTermExpression( contenttag)},
+			{declareSentence("sentence")},
+			{SchemaExpressionPart::declareTermExpression( "content", ContentTermExpression)},
+			{SchemaExpressionPart::declareTermExpression( "analyzed", AnalyzedTermExpression)},
 			{"set", "()", FeatureSet, papuga_TypeString, "weighted"},
 			{"weight", "()", FeatureWeight, papuga_TypeDouble, "0.75;1.0"},
 			{"", FeatureDef, {
 					{"set", FeatureSet},
 					{"weight", FeatureWeight, '?'},
-					{contenttag, TermExpression, '+'},
+					{"sentence", SentenceDef, '?'},
+					{"content", ContentTermExpression, '*'},
+					{"analyzed", AnalyzedTermExpression, '*'},
 				}
-			},
+			}
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList declareRestriction( const char* rootexpr, const  char* contenttag)
+	static papuga::RequestAutomaton_NodeList declareRestriction( const char* rootexpr)
 	{
 		return {rootexpr, {
-			{SchemaExpressionPart::declareMetaDataExpression( contenttag)},
-			{contenttag, "()", MetaDataCondition, papuga_TypeVoid, NULL},
+			{SchemaExpressionPart::declareMetaDataExpression( "content")},
+			{SchemaExpressionPart::declareMetaDataExpression( "analyzed")},
+			{"content", "()", MetaDataCondition, papuga_TypeVoid, NULL},
+			{"analyzed", "()", MetaDataCondition, papuga_TypeVoid, NULL},
 			{"", RestrictionDef, {
-					{contenttag, MetaDataCondition, '+'}
+					{"content", MetaDataCondition, '*'},
+					{"analyzed", MetaDataCondition, '*'}
 				}
-			},
+			}
 		}};
 	}
 
@@ -59,6 +66,13 @@ public:
 			{"content", "()", FieldValue, papuga_TypeString, "bla bla"},
 			{"results", "()", NumberOfResults, papuga_TypeDouble, "1;2"},
 			{"minweight", "()", MinWeight, papuga_TypeDouble, "0.75;1.0"},
+			{"", SentenceDef, {
+					{"field", FieldTypeName, '!'},
+					{"content", FieldValue, '!'},
+					{"results", NumberOfResults, '?'},
+					{"minweight", MinWeight, '?'},
+				}
+			}
 		}};
 	}
 
@@ -93,14 +107,24 @@ public:
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList declareQuery( const char* rootexpr, const char* contenttag)
+	static papuga::RequestAutomaton_NodeList declareQuery( const char* rootexpr)
 	{
 		return {rootexpr, {
-			{declareSentence("sentence")},
-			{declareFeature("feature",contenttag)},
-			{declareRestriction("restriction",contenttag)},
+			{declareFeature("feature")},
+			{declareRestriction("restriction")},
 			{declareStatistics("")},
 			{declareRankingParameter("")}
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList buildQuery( const char* rootexpr)
+	{
+		typedef bindings::method::QueryBuilder QB;
+		return {rootexpr, {
+			{"feature", 0, "qrybuilder", QB::addFeature(), {{FeatureDef}} },
+			{"restriction", 0, "qrybuilder", QB::addRestriction(), {{RestrictionDef}} },
+			{"", "_feature", "qrybuilder", QB::getFeatures(), {} },
+			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} }
 		}};
 	}
 
@@ -108,15 +132,9 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {rootexpr, {
-			{SchemaExpressionPart::declareTermExpression( "feature/analyzed")},
-			{SchemaExpressionPart::declareTermExpression( "sentence/analyzed")},
-			{SchemaExpressionPart::declareMetaDataExpression( "restriction/analyzed")},
-
-			{"feature", "analyzed", "_analyzed", TermExpression, '*'},
-			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{TermExpression}} },
-
-			{"sentence", "analyzed", "_analyzed", TermExpression, '*'},
-			{"sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}},
+			{"feature", "analyzed", "_analyzed", AnalyzedTermExpression, '*'},
+			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{ContentTermExpression}} },
+			{"feature/sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}},
 
 			{"restriction", "analyzed", "_analyzed", MetaDataCondition, '*'},
 			{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!'}} }
@@ -155,6 +173,18 @@ public:
 			{"nofranks", 0, "merger", QM::setMaxNofRanks(), {{NumberOfResults}} },
 			{"minrank", 0, "merger", QM::setMinRank(), {{FirstResult}} },
 			{"mergeres", 0, "query", QM::useMergeResult(), {{MergeResult}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList defineQueryBuilder( const char* rootexpr)
+	{
+		typedef bindings::method::QueryBuilder QB;
+		typedef bindings::method::Context C;
+		return {rootexpr, {
+			{"", "qrybuilder", "context", C::createQueryBuilder(), {}},
+			/// Ranking parameter needed for merging:
+			{"nofranks", 0, "qrybuilder", QB::setMaxNofRanks(), {{NumberOfResults}} },
+			{"minrank", 0, "qrybuilder", QB::setMinRank(), {{FirstResult}} }
 		}};
 	}
 
@@ -199,19 +229,50 @@ public:
 			{"feature", "feature", true},
 			{"feature/set", "set", FeatureSet, '!'},
 			{"feature/weight", "weight", FeatureWeight, '?'},
-			{"feature/content", "content", TermExpression, '*'},
+			{"feature/content", "content", ContentTermExpression, '*'},
 			{"feature", "analyzed", "_analyzed", '!'},
-			
-			{"sentence", "sentence", true},
-			{"sentence/field", "field", FieldTypeName, '!'},
-			{"sentence/results", "results", NumberOfResults, '!'},
-			{"sentence/minweight", "minweight", MinWeight, '!'},
-			{"sentence/content", "content", FieldValue, '!'},
-			{"sentence", "analyzed", "_analyzed", '!'},
-			
+
+			{"feature/sentence", "sentence", false},
+			{"feature/sentence/field", "field", FieldTypeName, '!'},
+			{"feature/sentence/results", "results", NumberOfResults, '!'},
+			{"feature/sentence/minweight", "minweight", MinWeight, '!'},
+			{"feature/sentence/content", "content", FieldValue, '!'},
+
 			{"restriction", "restriction", true},
 			{"restriction/content", "content", MetaDataCondition, '!'},
 			{"restriction", "analyzed", "_analyzed", '!'}
+		});
+	}
+
+	static papuga::RequestAutomaton_ResultElementDefList resultQueryOrig( const char* rootexpr)
+	{
+		return papuga::RequestAutomaton_ResultElementDefList( rootexpr, {
+			{"evalset", "evalset", false},
+			{"evalset/docno", "docno", Docno, '*'},
+			{"nofranks", "nofranks", NumberOfResults, '!'},
+			{"minrank", "minrank", FirstResult, '!'},
+			{"mergeres", "mergeres", MergeResult, '?'},
+			{"access", "access", AccessRight, '*'},
+
+			{"include", "feature", true},
+			{"include/qryeval", "qryeval", IncludeContextName, '?'},
+			{"include/storage", "storage", IncludeContextName, '?'},
+
+			{"feature", "feature", true},
+			{"feature/set", "set", FeatureSet, '!'},
+			{"feature/weight", "weight", FeatureWeight, '?'},
+			{"feature/content", "content", ContentTermExpression, '*'},
+			{"feature/analyzed", "analyzed", AnalyzedTermExpression, '*'},
+
+			{"feature/sentence", "sentence", false},
+			{"feature/sentence/field", "field", FieldTypeName, '!'},
+			{"feature/sentence/results", "results", NumberOfResults, '!'},
+			{"feature/sentence/minweight", "minweight", MinWeight, '!'},
+			{"feature/sentence/content", "content", FieldValue, '!'},
+
+			{"restriction", "restriction", true},
+			{"restriction/content", "content", MetaDataCondition, '!'},
+			{"restriction/analyzed", "analyzed", MetaDataCondition, '!'},
 		});
 	}
 

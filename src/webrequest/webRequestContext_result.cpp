@@ -139,7 +139,10 @@ static bool resultAppendContentVariableValues( papuga_RequestResult* result, pap
 	for (; *vi; ++vi)
 	{
 		const papuga_ValueVariant* contentvalue = papuga_RequestContext_get_variable( ctx, *vi);
-		if (contentvalue)
+		if (contentvalue
+			&& papuga_ValueVariant_defined( contentvalue)
+			&& (contentvalue->valuetype != papuga_TypeSerialization
+				|| !papuga_Serialization_empty( contentvalue->value.serialization)))
 		{
 			char const* vnam = *vi;
 			for (; vnam[0] == '_'; ++vnam){}

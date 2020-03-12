@@ -1,11 +1,13 @@
 {
 "query":{
-"sentence":[
+"feature":[
 	{
-		"field": "text",
-		"content": "David Bowie; Brian Eno; album",
-		"results": "4",
-		"minweight": "0.9",
+		"sentence":{
+			"field": "text",
+			"content": "David Bowie; Brian Eno; album",
+			"results": "4",
+			"minweight": "0.9"},
+		"set": "search",
 		"analyzed":[
 			{
 				"term":{
