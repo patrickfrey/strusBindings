@@ -18,8 +18,8 @@
 using namespace strus;
 using namespace strus::bindings;
 
-QueryExpression::QueryExpression()
-	:m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks)
+QueryExpression::QueryExpression( const papuga_ValueVariant& config_)
+	:m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks),m_config(config_)
 {
 	papuga_init_Allocator( &m_allocator, &m_allocatorMem, sizeof(m_allocatorMem));
 	papuga_init_Serialization( &m_featureSerialization, &m_allocator);
@@ -58,5 +58,45 @@ void QueryExpression::addRestriction( const papuga_ValueVariant& restriction)
 	papuga_Serialization_pushValue( &m_restrictionSerialization, &restriction_copy);
 }
 
+void QueryExpression::addCollectSummary( const std::vector<SummaryElement>& summary)
+{
+	std::vector<SummaryElement>::const_iterator si = summary.begin(), se = summary.end();
+	for (; si != se; ++si)
+	{
+		const char* text = si->value().c_str();
+		if (si->name() == m_config.expandSummaryName)
+		{
+			if (m_config.extractFeatureType.empty())
+			{
+				if (m_config.extractFeatureTypeValueSeparator)
+				{
+					char const* zi = std::strchr( text, m_config.extractFeatureTypeValueSeparator);
+					if (zi)
+					{
+						std::string type( text, zi-text);
+						std::string value( zi+1);
+						m_weightedTerms.push_back( WeightedSentenceTerm( type, value, si->weight()));
+					}
+				}
+			}
+			else if (m_config.extractFeatureTypeValueSeparator)
+			{
+				char const* zi = std::strchr( text, m_config.extractFeatureTypeValueSeparator);
+				if (zi)
+				{
+					m_weightedTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, zi+1, si->weight()));
+				}
+			}
+			else
+			{
+				m_weightedTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, text, si->weight()));
+			}
+		}
+		else if (si->name() == m_config.docidSummaryName)
+		{
+			m_nearDocids.push_back( si->value());
+		}
+	}
+}
 
 

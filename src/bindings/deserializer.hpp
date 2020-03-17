@@ -114,6 +114,7 @@ struct Deserializer
 	static SummaryElement getSummaryElement( papuga_SerializationIter& seriter);
 	static std::vector<SummaryElement> getSummaryElementList( papuga_SerializationIter& seriter);
 	static std::vector<SummaryElement> getSummaryElementListValue( papuga_SerializationIter& seriter);
+	static std::vector<SummaryElement> getSummary( const papuga_ValueVariant& val);
 	static ResultDocument getResultDocument( papuga_SerializationIter& seriter);
 	static std::vector<ResultDocument> getResultDocumentList( papuga_SerializationIter& seriter);
 	static std::vector<ResultDocument> getResultDocumentListValue( papuga_SerializationIter& seriter);

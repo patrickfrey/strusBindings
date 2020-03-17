@@ -1,0 +1,58 @@
+{
+	"qryeval": {
+		"weighting": {
+			"name": "BM25",
+			"param": [{
+				"name": "k1",
+				"value": "1.2"
+			},{
+				"name": "b",
+				"value": "0.75"
+			},{
+				"name": "avgdoclen",
+				"value": "1000"
+			}],
+			"feature": [{
+				"role":"match",
+				"set": "search"
+			}]
+		},
+		"summarizer": [{
+			"id": "feature",
+			"name": "accunear",
+			"feature": [{
+				"role": "match",
+				"set": "search"
+			},{
+				"role": "punct",
+				"set": "sent"
+			}],
+			"param": [{
+				"name": "collect",
+				"value": "tag=wordtype;sep='#';type=entity,orig;tags=N,V,E,A,R,C"
+			},{
+				"name": "results",
+				"value": "40"
+			}]
+		},{
+			"id": "docid",
+			"name": "accunear",
+			"feature": [{
+				"role": "match",
+				"set": "search"
+			},{
+				"role": "punct",
+				"set": "sent"
+			}],
+			"param": [{
+				"name": "collect",
+				"value": "type=pageref"
+			},{
+				"name": "results",
+				"value": "20"
+			}]
+		}],
+		"selection": "search"
+	}
+}
+

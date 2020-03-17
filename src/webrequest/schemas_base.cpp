@@ -184,6 +184,14 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{QuerySummaryWeight, "query summary weight"},
 		{QuerySummaryIndex, "query summary index"},
 
+		{QueryBuilderDef, "query builder definition"},
+		{QueryBuilderSeparator, "query builder separator"},
+		{QueryBuilderFeatureType, "query builder feature type"},
+		{QueryBuilderFeatureSet, "query builder feature set"},
+		{QueryBuilderExpandSummary, "query builder expand summary"},
+		{QueryBuilderDocidSummary, "query builder docid summary"},
+
+		{DistQueryEvalCollectServer, "distributed query evaluation collect server"},
 		{DistQueryEvalStorageServer, "distributed query evaluation storage server"},
 		{DistQueryEvalStatisticsServer, "distributed query evaluation statistics server"},
 		{DistQueryEvalAnalyzeServer, "distributed query evaluation analyze server"},

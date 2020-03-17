@@ -381,6 +381,11 @@ void QueryBuilderImpl::addRestriction( const ValueVariant& restriction)
 	m_obj.addRestriction( restriction);
 }
 
+void QueryBuilderImpl::addCollectSummary( const ValueVariant& summary)
+{
+	m_obj.addCollectSummary( Deserializer::getSummary( summary));
+}
+
 Struct QueryBuilderImpl::getFeatures() const
 {
 	return Struct( m_obj.getFeatures());

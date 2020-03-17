@@ -1186,6 +1186,18 @@ std::vector<SummaryElement> Deserializer::getSummaryElementListValue( papuga_Ser
 	return rt;
 }
 
+std::vector<SummaryElement> Deserializer::getSummary( const papuga_ValueVariant& val)
+{
+	static const char* context = _TXT("summary element or list");
+	if (val.valuetype != papuga_TypeSerialization)
+	{
+		throw strus::runtime_error(_TXT("expected structure for %s"), context);
+	}
+	papuga_SerializationIter seriter;
+	papuga_init_SerializationIter( &seriter, val.value.serialization);
+	return Deserializer::getSummaryElementList( seriter);
+}
+
 ResultDocument Deserializer::getResultDocument( papuga_SerializationIter& seriter)
 {
 	static const StructureNameMap namemap( "docno,weight,field,summary", ',');

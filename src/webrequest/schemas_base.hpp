@@ -84,7 +84,11 @@ public:
 		QueryRankSummaryName,QueryRankSummaryValue,QueryRankSummaryWeight,QueryRankSummaryIndex,
 		QuerySummary,QuerySummaryName,QuerySummaryValue,QuerySummaryWeight,QuerySummaryIndex,
 
-		DistQueryEvalStorageServer, DistQueryEvalStatisticsServer, DistQueryEvalAnalyzeServer,
+		QueryBuilderDef, QueryBuilderSeparator, QueryBuilderFeatureType, QueryBuilderFeatureSet,
+		QueryBuilderExpandSummary, QueryBuilderDocidSummary,
+
+		DistQueryEvalCollectServer, DistQueryEvalStorageServer,
+		DistQueryEvalStatisticsServer, DistQueryEvalAnalyzeServer,
 
 		ContentTermExpression, AnalyzedTermExpression,
 		NodeTerm, NodeExpression, ExpressionArg, ExpressionVariableName, TermType, TermValue, TermLen,

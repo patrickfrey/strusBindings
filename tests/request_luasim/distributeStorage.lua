@@ -41,8 +41,17 @@ function serviceAddress( name, index)
 	if name == "storage" or name == "inserter" then
 		return server.storage[ index].address .. "/" .. name .. "/" .. server.storage[ index].context 
 
-	elseif name == "docanalyzer" or name == "qryeval" then
+	elseif name == "docanalyzer" then
 		return server.storage[ index].address .. "/" .. name .. "/test"
+
+	elseif name == "qryeval" then
+		return server.storage[ index].address .. "/qryeval/" .. server.storage[ index].context
+
+	elseif name == "collector" then
+		return server.storage[ index].address .. "/qryeval/collector_" .. server.storage[ index].context
+
+	elseif name == "sentanalyzer" then
+		return server.vstorage.address .. "/qryanalyzer/" .. name
 
 	elseif name == "qryanalyzer" then
 		return server.qryanalyzer.address .. "/" .. name .. "/test"
@@ -75,10 +84,15 @@ metadataConfig = {
 		}
 	}
 }
+
 function getStorageConfig( storageidx)
-	cfg = storageConfig
-	cfg.storage.include = {
-		qryeval  = "test"
+	return storageConfig
+end
+
+function getQueryEvalConfig( storageidx, content)
+	cfg = from_json( content)
+	cfg.qryeval.include = {
+		storage = server.storage[ storageidx].context
 	}
 	return cfg
 end
@@ -101,16 +115,24 @@ function defStorageServer( storageidx)
 	end
 end
 
-function buildAnalyzer()
+function buildDocumentAnalyzer()
 	servers = {}
 	for storageidx,storage in ipairs(server.storage) do
 		if not servers[ storage.name] then
 			servers[ storage.name] = true
 
 			call_server_checked( "PUT", serviceAddress( "docanalyzer", storageidx), "@docanalyzer.json" )
-			call_server_checked( "PUT", serviceAddress( "qryeval", storageidx),  "@qryeval.json" )
-			if verbose then io.stderr:write( string.format("- Created document analyzer, query analyzer and query eval for server %s\n", storage.name)) end
+			if verbose then io.stderr:write( string.format("- Created document analyzer for server %s\n", storage.name)) end
 		end
+	end
+end
+
+function buildQueryEval()
+	servers = {}
+	for storageidx,storage in ipairs(server.storage) do
+		call_server_checked( "PUT", serviceAddress( "collector", storageidx), getQueryEvalConfig( storageidx, "@qryeval_collector.json") )
+		call_server_checked( "PUT", serviceAddress( "qryeval", storageidx), getQueryEvalConfig( storageidx, "@qryeval.json") )
+		if verbose then io.stderr:write( string.format("- Created query evaluations for server %s\n", storage.name)) end
 	end
 end
 
@@ -170,15 +192,19 @@ function defQueryAnalyzeServer()
 end
 
 function defDistributedQueryEvalServer()
-	storages = {}
+	qryevals = {}
+	collectors = {}
 	for storageidx,storage in ipairs( server.storage) do
-		table.insert( storages, serviceAddress( "storage", storageidx))
+		table.insert( qryevals, serviceAddress( "qryeval", storageidx))
+		table.insert( collectors, serviceAddress( "collector", storageidx))
 	end
 	distqryevalConfig = {
 		distqryeval = {
 			analyzer = { serviceAddress( "qryanalyzer") },
 			statserver = { serviceAddress( "statserver") },
-			storage = storages
+			collector = collectors,
+			qryeval = qryevals,
+			config = {separator = "#"}
 		}
 	}
 	def_test_server( server.distqryeval.name, server.distqryeval.address )
@@ -187,8 +213,9 @@ end
 
 -- Setup all servers:
 defStorageServer()
-buildAnalyzer()
+buildDocumentAnalyzer()
 buildStorageServer()
+buildQueryEval()
 defStatisticsServer()
 defQueryAnalyzeServer()
 defDistributedQueryEvalServer()
@@ -225,7 +252,8 @@ if verbose then io.stderr:write( string.format("- Statistics server query result
 -- Get distributed queryeval server introspection:
 distqryevalObj = {}
 distqryevalObj.statserver = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/statserver")).list.value
-distqryevalObj.qryeval = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/storage")).list.value
+distqryevalObj.collector = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/collector")).list.value
+distqryevalObj.qryeval = from_json( call_server_checked( "GET", serviceAddress( "distqryeval") .. "/qryeval")).list.value
 distqryevalDef = to_json( {distqryeval = distqryevalObj} )
 distqryevalVar = call_server_checked( "GET", serviceAddress( "distqryeval") )
 if verbose then io.stderr:write( string.format("- Distributed query evaluation object names from server:\n%s\n", distqryevalVar)) end

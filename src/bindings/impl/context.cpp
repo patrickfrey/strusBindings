@@ -94,7 +94,10 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_mutex()
 {
 	ContextDef contextdef( descr);
-	ErrorBufferInterface* errorhnd = createErrorBuffer_( contextdef.threads+1);
+	ErrorBufferInterface* errorhnd =
+		createErrorBuffer_( contextdef.threads/*configured number of threads*/
+					+1/*main program*/
+					+1/*delegate request thread*/);
 	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
 
 	m_threads = contextdef.threads;
@@ -344,9 +347,9 @@ QueryResultMergerImpl* ContextImpl::createQueryResultMerger() const
 	return new QueryResultMergerImpl( m_trace_impl, m_errorhnd_impl);
 }
 
-QueryBuilderImpl* ContextImpl::createQueryBuilder() const
+QueryBuilderImpl* ContextImpl::createQueryBuilder( const ValueVariant& config) const
 {
-	return new QueryBuilderImpl( m_trace_impl, m_errorhnd_impl);
+	return new QueryBuilderImpl( m_trace_impl, m_errorhnd_impl, config);
 }
 
 void ContextImpl::createStorage( const ValueVariant& config_)

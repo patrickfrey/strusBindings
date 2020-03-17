@@ -10,6 +10,9 @@
 /// \brief Query parts collected in the process of query analysis and preliminary query evaluation steps
 #include "strus/sentenceLexerInstanceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/storage/summaryElement.hpp"
+#include "impl/value/termExpression.hpp"
+#include "structDefs.hpp"
 #include "papuga/typedefs.h"
 #include <vector>
 #include <string>
@@ -21,13 +24,14 @@ namespace bindings {
 class QueryExpression
 {
 public:
-	QueryExpression();
+	explicit QueryExpression( const papuga_ValueVariant& config_);
 
 	void setMaxNofRanks( int maxNofRanks_)				{m_maxNofRanks = maxNofRanks_;}
 	void setMinRank( int minRank_)					{m_minRank = minRank_;}
 
 	void addFeature( const papuga_ValueVariant& feature);
 	void addRestriction( const papuga_ValueVariant& restriction);
+	void addCollectSummary( const std::vector<SummaryElement>& summary);
 
 	const papuga_Serialization* getFeatures() const			{return &m_featureSerialization;}
 	const papuga_Serialization* getRestrictions() const		{return &m_restrictionSerialization;}
@@ -40,10 +44,13 @@ private:
 private:
 	int m_minRank;
 	int m_maxNofRanks;
+	QueryBuilderConfig m_config;
 	papuga_Serialization m_featureSerialization;
 	papuga_Serialization m_restrictionSerialization;
 	papuga_Allocator m_allocator;
 	int m_allocatorMem[ 1024];
+	std::vector<std::string> m_nearDocids;
+	std::vector<WeightedSentenceTerm> m_weightedTerms;
 };
 
 }}//namespace

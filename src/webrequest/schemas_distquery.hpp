@@ -13,6 +13,7 @@
 #include "schemas_base.hpp"
 #include "schemas_expression_decl.hpp"
 #include "schemas_query_decl.hpp"
+#include "schemas_queryeval_decl.hpp"
 
 #if __cplusplus < 201103L
 #error Need C++11 or later to include this
@@ -32,10 +33,14 @@ public:
 		{/*input*/
 			{"/distqryeval/analyzer", "()", DistQueryEvalAnalyzeServer, papuga_TypeString, "example.com:7191/qryanalyzer/test"},
 			{"/distqryeval", "", "qryanalyzer", DistQueryEvalAnalyzeServer, '!'},
-			{"/distqryeval/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
-			{"/distqryeval", "", "storage", DistQueryEvalStorageServer, '*'},
+			{"/distqryeval/collector", "()", DistQueryEvalCollectServer, papuga_TypeString, "example.com:7184/qryeval/bm25"},
+			{"/distqryeval", "", "collector", DistQueryEvalCollectServer, '*'},
+			{"/distqryeval/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
+			{"/distqryeval", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
-			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'}
+			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
+			{SchemaQueryEvalDeclPart::declareQueryBuilderConfig( "/distqryeval/config")},
+			{"/distqryeval", "config", "config", QueryBuilderDef, '?'}
 		}
 	) {}
 };
@@ -58,7 +63,10 @@ public:
 			}},
 			{"query", "SET~querystats", "GET", "statserver", "", {"_feature"}, {
 			}},
-			{"query", "SET~ranklist", "GET", "storage", "", {"_feature","_restriction","_termstats","_globalstats"}, {
+			{"query", "SET~collect", "GET", "collector", "", {"_feature","_termstats","_globalstats"}, {
+				{{"/query","mergeres", "y", '#'}}
+			}},
+			{"query", "SET~ranklist", "GET", "qryeval", "", {"_feature","_restriction","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}
 			}},
 			{"query", "END~ranklist", {}},
@@ -69,16 +77,18 @@ public:
 			{"vstorage","/query/include/vstorage()",false/*not required*/}
 		},
 		{/*input*/
-			{"/query/server/storage", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
-			{"/query/server", "", "storage", DistQueryEvalStorageServer, '*'},
+			{"/query/server/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/storage/test"},
+			{"/query/server", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/query/server/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
 			{"/query/server", "", "statserver", DistQueryEvalStatisticsServer, '!'},
+			{"/query/server/collector", "()", DistQueryEvalCollectServer, papuga_TypeString, "example.com:7184/qryeval/collector"},
+			{"/query/server", "", "collector", DistQueryEvalCollectServer, '!'},
 
 			{SchemaAnalyzerPart::defineQueryAnalyzer( "/query/analyzer")},	//... inherited or declared
 			{"/query/analyzer", '?'},
 
 			{SchemaQueryDeclPart::declareQuery( "/query")},
-			{SchemaQueryDeclPart::defineQueryBuilder( "/query")},
+			{SchemaQueryDeclPart::defineQueryBuilder( "/query", "config")},
 			{SchemaQueryDeclPart::defineResultMerger( "/query")}
 		}
 	) {}
@@ -111,6 +121,21 @@ public:
 			{SchemaQueryDeclPart::declareStatistics("/statistics")},
 			{"/statistics", "termstats", "_termstats", TermStats, '*'},
 			{"/statistics", "globalstats", "_globalstats", GlobalStats, '!'}
+		}
+	) {}
+};
+
+class Schema_DistQueryEval_SET_collect :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_DistQueryEval_SET_collect() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
+			{SchemaQueryDeclPart::declareQueryResult( "/queryresult/ranklist")},
+			{SchemaQueryDeclPart::buildQueryFromResult( "/queryresult/ranklist")}
 		}
 	) {}
 };

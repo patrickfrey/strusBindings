@@ -1184,31 +1184,6 @@ static std::string convertLuaValueToJson( lua_State* L, int luaddr, bool withInd
 	return rt;
 }
 
-static void pushConvertedJsonAsLuaTable( lua_State* L, int luaddr)
-{
-	if (!lua_isstring( L, luaddr))
-	{
-		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), _TXT("argument is not a string"));
-	}
-	std::size_t srclen;
-	const char* src = lua_tolstring( L, luaddr, &srclen);
-	papuga_ErrorCode errcode = papuga_Ok;
-	papuga_Serialization jsonser;
-	int allocatormem[ 1024];
-	papuga_Allocator allocator;
-	papuga_init_Allocator( &allocator, allocatormem, sizeof(allocatormem));
-	papuga_init_Serialization( &jsonser, &allocator);
-	if (!papuga_Serialization_append_json( &jsonser, src, srclen, papuga_UTF8, true/*withRoot*/, &errcode))
-	{
-		papuga_destroy_Allocator( &allocator);
-		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), papuga_ErrorCode_tostring( errcode));
-	}
-	papuga_ValueVariant jsonval;
-	papuga_init_ValueVariant_serialization( &jsonval, &jsonser);
-	papuga_lua_push_value_plain( L, &jsonval);
-	papuga_destroy_Allocator( &allocator);
-}
-
 static std::string getContentArgumentValue( const char* arg)
 {
 	if (!arg)
@@ -1227,6 +1202,38 @@ static std::string getContentArgumentValue( const char* arg)
 	{
 		return arg;
 	}
+}
+
+static void pushConvertedJsonAsLuaTable( lua_State* L, int luaddr)
+{
+	if (!lua_isstring( L, luaddr))
+	{
+		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), _TXT("argument is not a string"));
+	}
+	std::string content;
+	std::size_t srclen;
+	const char* src = lua_tolstring( L, luaddr, &srclen);
+	if (src[0] == '@')
+	{
+		content = getContentArgumentValue( src);
+		src = content.c_str();
+		srclen = content.size();
+	}
+	papuga_ErrorCode errcode = papuga_Ok;
+	papuga_Serialization jsonser;
+	int allocatormem[ 1024];
+	papuga_Allocator allocator;
+	papuga_init_Allocator( &allocator, allocatormem, sizeof(allocatormem));
+	papuga_init_Serialization( &jsonser, &allocator);
+	if (!papuga_Serialization_append_json( &jsonser, src, srclen, papuga_UTF8, true/*withRoot*/, &errcode))
+	{
+		papuga_destroy_Allocator( &allocator);
+		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), papuga_ErrorCode_tostring( errcode));
+	}
+	papuga_ValueVariant jsonval;
+	papuga_init_ValueVariant_serialization( &jsonval, &jsonser);
+	papuga_lua_push_value_plain( L, &jsonval);
+	papuga_destroy_Allocator( &allocator);
 }
 
 static std::string convertSourceReformatFloat( const char* src, unsigned int precision)

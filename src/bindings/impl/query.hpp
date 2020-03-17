@@ -134,9 +134,9 @@ public:
 private:
 	/// \brief Constructor used by Context
 	friend class ContextImpl;
+	friend class QueryImpl;
 	QueryEvalImpl( const ObjectRef& trace, const ObjectRef& objbuilder, const ObjectRef& errorhnd);
 
-	friend class QueryImpl;
 	mutable ObjectRef m_errorhnd_impl;
 	ObjectRef m_trace_impl;
 	ObjectRef m_objbuilder_impl;
@@ -358,6 +358,10 @@ public:
 	/// \param[in] restriction restriction to add
 	void addRestriction( const ValueVariant& restriction);
 
+	/// \brief Create features from summary features if possible
+	/// \param[in] summary summary element to synthesize features from
+	void addCollectSummary( const ValueVariant& summary);
+
 	/// \brief Get the list of all features collected with 'addFeature' as serialization
 	/// \return the list of features
 	Struct getFeatures() const;
@@ -373,8 +377,8 @@ public:
 
 private:
 	friend class ContextImpl;
-	QueryBuilderImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_)
-		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_obj()
+	QueryBuilderImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_, const ValueVariant& queryBuilderConfig_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_obj(queryBuilderConfig_)
 	{}
 
 	mutable ObjectRef m_errorhnd_impl;

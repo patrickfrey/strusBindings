@@ -27,14 +27,20 @@
 "list":{
 "link":[
 	"qryanalyzer",
-	"storage",
-	"statserver"]}}
+	"collector",
+	"qryeval",
+	"statserver",
+	"config"]}}
 {
 "distqryeval": {
+  "collector": [
+    "http://127.0.0.1:7184/qryeval/collector_test1",
+    "http://127.0.0.1:7184/qryeval/collector_test2",
+    "http://127.0.0.1:7184/qryeval/collector_test3"],
   "qryeval": [
-    "http://127.0.0.1:7184/storage/test1",
-    "http://127.0.0.1:7184/storage/test2",
-    "http://127.0.0.1:7184/storage/test3"],
+    "http://127.0.0.1:7184/qryeval/test1",
+    "http://127.0.0.1:7184/qryeval/test2",
+    "http://127.0.0.1:7184/qryeval/test3"],
   "statserver": "http://127.0.0.1:7184/statserver/test"}}
 {
 "queryresult":{

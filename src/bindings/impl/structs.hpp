@@ -130,6 +130,13 @@ enum _SentenceTerm {type,value};
 /// \member weight given to the sentence, used to decide what recognized pattern is the most probably to for the query sentence
 enum _SentenceGuess {terms,weight};
 
+/// \struct WeightedSentenceTerm
+/// \brief NLP tagged term with a weight
+/// \member type type of the term
+/// \member value string value of the term
+/// \member weight weight assigned to the term
+enum _WeightedSentenceTerm {type,value,weight};
+
 /// \struct SummaryElement
 /// \brief Summary element in a query result 
 /// \member name name of the summary element

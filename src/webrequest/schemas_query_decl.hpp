@@ -128,6 +128,14 @@ public:
 		}};
 	}
 
+	static papuga::RequestAutomaton_NodeList buildQueryFromResult( const char* rootexpr)
+	{
+		typedef bindings::method::QueryBuilder QB;
+		return {rootexpr, {
+			{"summary", 0, "qrybuilder", QB::addCollectSummary(), {{QuerySummary}} }
+		}};
+	}
+
 	static papuga::RequestAutomaton_NodeList analyzeQuery( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
@@ -176,12 +184,12 @@ public:
 		}};
 	}
 
-	static papuga::RequestAutomaton_NodeList defineQueryBuilder( const char* rootexpr)
+	static papuga::RequestAutomaton_NodeList defineQueryBuilder( const char* rootexpr, const char* configvar)
 	{
 		typedef bindings::method::QueryBuilder QB;
 		typedef bindings::method::Context C;
 		return {rootexpr, {
-			{"", "qrybuilder", "context", C::createQueryBuilder(), {}},
+			{"", "qrybuilder", "context", C::createQueryBuilder(), {{configvar}}},
 			/// Ranking parameter needed for merging:
 			{"nofranks", 0, "qrybuilder", QB::setMaxNofRanks(), {{NumberOfResults}} },
 			{"minrank", 0, "qrybuilder", QB::setMinRank(), {{FirstResult}} }

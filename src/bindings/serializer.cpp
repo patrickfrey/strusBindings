@@ -122,6 +122,14 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Sentence
 	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
 	return rt;
 }
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const WeightedSentenceTerm& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, val.type(), errcode, deep);
+	rt &= serializeArrayElement( result, val.value(), errcode, deep);
+	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
+	return rt;
+}
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;

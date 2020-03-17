@@ -881,7 +881,7 @@ static std::pair<std::string,QueryFeatureExpansionDef> parseFeatureExpansionSimi
 	}
 	else
 	{
-		unsigned char defined[4] = {0,0,0,0};
+		unsigned char defined[5] = {0,0,0,0,0};
 		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 		{
 			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
@@ -953,9 +953,7 @@ QueryFeatureExpansionMap::QueryFeatureExpansionMap( const papuga_ValueVariant& v
 	{}
 	else if (value.valuetype == papuga_TypeSerialization)
 	{
-		std::vector<MetaDataTableCommand> rt;
-		papuga_SerializationIter seriter;
-	
+		papuga_SerializationIter seriter;	
 		papuga_init_SerializationIter( &seriter, value.value.serialization);
 		init( seriter);
 	}
@@ -964,3 +962,55 @@ QueryFeatureExpansionMap::QueryFeatureExpansionMap( const papuga_ValueVariant& v
 		throw strus::runtime_error(_TXT("expected structure for '%s'"), context);
 	}
 }
+
+void QueryBuilderConfig::init( const papuga_ValueVariant& cfg)
+{
+	static const char* context = _TXT("query builder config");
+	static const StructureNameMap namemap( "separator,type,set,expand,docid", ',');
+
+	if (!papuga_ValueVariant_defined( &cfg))
+	{}
+	else if (cfg.valuetype == papuga_TypeSerialization)
+	{
+		papuga_SerializationIter seriter;
+		papuga_init_SerializationIter( &seriter, cfg.value.serialization);
+
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+		{
+			throw strus::runtime_error(_TXT("explicit structure expected for '%s'"), context);
+		}
+		else
+		{
+			unsigned char defined[5] = {0,0,0,0,0};
+			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+			{
+				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+				papuga_SerializationIter_skip( &seriter);
+				switch (idx)
+				{
+					case 0:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+						extractFeatureTypeValueSeparator = Deserializer::getCharAscii( seriter);
+						break;
+					case 1:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+						extractFeatureType = Deserializer::getString( seriter);
+						break;
+					case 2:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+						extractFeatureSet = Deserializer::getString( seriter);
+						break;
+					case 3:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+						expandSummaryName = Deserializer::getString( seriter);
+						break;
+					case 4:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+						docidSummaryName = Deserializer::getString( seriter);
+						break;
+					default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
+				}
+			}
+		}
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("expected structure for '%s'"), context);
+	}
+}
+
