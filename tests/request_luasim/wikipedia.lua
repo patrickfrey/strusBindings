@@ -50,11 +50,8 @@ function serviceAddress( name, index)
 	elseif name == "collector" then
 		return server.storage[ index].address .. "/qryeval/collector_" .. server.storage[ index].context
 
-	elseif name == "sentanalyzer" then
-		return server.vstorage.address .. "/qryanalyzer/" .. name
-
 	elseif name == "qryanalyzer" then
-		return server.vstorage.address .. "/qryanalyzer/" .. name
+		return server.vstorage.address .. "/" .. name .. "/" .. server.vstorage.context
 
 	elseif name == "statserver" then
 		return server.statserver.address .. "/" .. name .. "/test"
@@ -229,7 +226,7 @@ function buildVectorStorageServer()
 	end
 	call_server_checked( "PUT", TRANSACTION)
 	if verbose then io.stderr:write( string.format("- Inserted vectors in %s\n", vstorage.name)) end
-	call_server_checked( "PUT", serviceAddress( "sentanalyzer"), "@sentanalyzer.json" )
+	call_server_checked( "PUT", serviceAddress( "qryanalyzer"), "@sentanalyzer.json" )
 end
 
 function defDistributedQueryEvalServer()
@@ -263,7 +260,12 @@ buildVectorStorageServer()
 defDistributedQueryEvalServer()
 
 
-sentqryres = call_server_checked( "GET", serviceAddress( "sentanalyzer"), "@sentquery.json")
-if verbose then io.stderr:write( string.format("- Sentence analyzer result:\n%s\n", sentqryres)) end
+-- sentqryAnalyzed = call_server_checked( "GET", serviceAddress( "qryanalyzer"), "@sentquery.json")
+-- if verbose then io.stderr:write( string.format("- Sentence analyzer result:\n%s\n", sentqryAnalyzed)) end
 
-checkExpected( sentqryres, "@" .. expectedFile, resultFile )
+sentqryResult = det_qeval_result( call_server_checked( "GET", serviceAddress( "distqryeval"), "@sentquery.json"))
+if verbose then io.stderr:write( string.format("- Distributed query evaluation result:\n%s\n", sentqryResult)) end
+
+checkExpected( sentqryAnalyzed .. sentqryResult, "@" .. expectedFile, resultFile )
+
+

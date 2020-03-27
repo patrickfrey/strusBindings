@@ -364,11 +364,15 @@ public:
 
 	/// \brief Get the list of all features collected with 'addFeature' as serialization
 	/// \return the list of features
-	Struct getFeatures() const;
+	Struct getFeatures();
+
+	/// \brief Get the list of all weighted terms collected with 'addFeature' and 'addCollectSummary' as serialization
+	/// \return the list of weighted terms
+	Struct getWeightedTerms();
 
 	/// \brief Get the list of all restrictions collected with 'addRestriction' as serialization
 	/// \return the list of restrictions
-	Struct getRestrictions() const;
+	Struct getRestrictions();
 
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect

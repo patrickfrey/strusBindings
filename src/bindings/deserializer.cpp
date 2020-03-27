@@ -1820,7 +1820,7 @@ static std::vector<QueryEvalInterface::FeatureParameter> getFeatureParameters(
 	}
 	else if (featureParameters.valuetype != papuga_TypeSerialization)
 	{
-		throw strus::runtime_error( _TXT( "structure expected for %s"), context);
+		throw strus::runtime_error( _TXT( "serialized structure expected for %s"), context);
 	}
 	else
 	{
@@ -2501,6 +2501,131 @@ void Deserializer::buildPatterns( ExpressionBuilder& builder, const papuga_Value
 	catch (const std::runtime_error& err)
 	{
 		throw runtime_error_with_location( err.what(), errorhnd, seriter, serstart);
+	}
+}
+
+static void buildExpressionListCounted(
+		ExpressionBuilder& builder,
+		papuga_SerializationIter& seriter,
+		ErrorBufferInterface* errorhnd,
+		int& nofExpressions)
+{
+	nofExpressions = 0;
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			Deserializer::buildExpression( builder, seriter, false/*allow list*/);
+			++nofExpressions;
+			Deserializer::consumeClose( seriter);
+		}
+	}
+	else
+	{
+		Deserializer::buildExpression( builder, seriter, false/*allow list*/);
+		++nofExpressions;
+	}
+}
+
+void Deserializer::buildQueryFeature(
+		ExpressionBuilder& builder,
+		papuga_SerializationIter& seriter,
+		ErrorBufferInterface* errorhnd)
+{
+	static const StructureNameMap namemap( "set,weight,analyzed,content,sentence", ',');
+	static const char* context = _TXT("query feature");
+
+	std::string featureSet;
+	double weight = 1.0;
+	int nofExpressions = 0;
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
+	{
+		unsigned char defined[5] = {0,0,0,0,0};
+		do
+		{
+			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
+			papuga_SerializationIter_skip( &seriter);
+			switch (idx)
+			{
+				case 0: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+					featureSet = ValueVariantWrap::tostring( *getValue( seriter));
+					break;
+				case 1: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+					weight = getDouble( seriter);
+					break;
+				case 2: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+					if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+					{
+						papuga_SerializationIter_skip( &seriter);
+						buildExpressionListCounted( builder, seriter, errorhnd, nofExpressions);
+						Deserializer::consumeClose( seriter);
+					}
+					else
+					{
+						throw strus::runtime_error(_TXT("structure expected for %s in %s"), namemap.name(idx), context);
+					}
+					break;
+				case 3:
+				case 4: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s function"), namemap.name(idx), context);
+					skipStructure( seriter);
+					break;
+				default:throw strus::runtime_error(_TXT("unknown element in %s definition, expected one of {%s}"), context,namemap.names());
+			}
+		} while (papuga_SerializationIter_tag( &seriter) == papuga_TagName);
+	}
+	else if (papuga_SerializationIter_tag(&seriter) == papuga_TagValue)
+	{
+		featureSet = getString( seriter);
+		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			buildExpressionListCounted( builder, seriter, errorhnd, nofExpressions);
+			Deserializer::consumeClose( seriter);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT("structure expected for %s in %s"), "feature term expression", context);
+		}
+		weight = getDouble( seriter);
+	}
+	else
+	{
+		throw strus::runtime_error(_TXT("error in %s definition structure"), context);
+	}
+	while (nofExpressions--)
+	{
+		builder.defineFeature( featureSet, weight);
+	}
+}
+
+void Deserializer::buildQueryFeatures(
+		ExpressionBuilder& builder,
+		const papuga_ValueVariant& content,
+		ErrorBufferInterface* errorhnd)
+{
+	static const char* context = _TXT("query feature");
+
+	if (!papuga_ValueVariant_defined( &content)) return;
+	if (content.valuetype != papuga_TypeSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
+	}
+	papuga_SerializationIter seriter;
+	papuga_init_SerializationIter( &seriter, content.value.serialization);
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+	{
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			buildQueryFeature( builder, seriter, errorhnd);
+			Deserializer::consumeClose( seriter);
+		}
+	}
+	else
+	{
+		buildQueryFeature( builder, seriter, errorhnd);
 	}
 }
 

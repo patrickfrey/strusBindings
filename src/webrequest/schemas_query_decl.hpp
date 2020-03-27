@@ -140,10 +140,11 @@ public:
 	{
 		typedef bindings::method::QueryAnalyzer A;
 		return {rootexpr, {
-			{"feature", "analyzed", "_analyzed", AnalyzedTermExpression, '*'},
-			{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{ContentTermExpression}} },
-			{"feature/sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}},
-
+			{ FeatureDef/*groupid*/, {
+				{"feature", "analyzed", "_analyzed", AnalyzedTermExpression, '*'},
+				{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{ContentTermExpression}} },
+				{"feature/sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
+			}},
 			{"restriction", "analyzed", "_analyzed", MetaDataCondition, '*'},
 			{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!'}} }
 		}};
@@ -156,7 +157,9 @@ public:
 		return {rootexpr, {
 			{"", "query", "qryeval", QE::createQuery(), {{"storage"}} },
 			/// Features:
-			{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} },
+			{ FeatureDef/*groupid*/, {
+				{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} }
+			}},
 			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} },
 			/// Statistics:
 			{"termstats", 0, "query", Q::defineTermStatistics(), {{TermType},{TermValue},{TermDocumentFrequency}} },

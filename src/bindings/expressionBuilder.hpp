@@ -37,6 +37,7 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)=0;
 	virtual void attachVariable( const std::string& name)=0;
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible)=0;
+	virtual void defineFeature( const std::string& featureSet, double weight)=0;
 };
 
 class PostProcPatternExpressionBuilder
@@ -53,6 +54,7 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
+	virtual void defineFeature( const std::string& featureSet, double weight);
 
 	void defineLexem( const std::string& name);
 	
@@ -82,6 +84,7 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
+	virtual void defineFeature( const std::string& featureSet, double weight);
 
 	void defineLexem(
 			const std::string& name,
@@ -115,6 +118,7 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
+	virtual void defineFeature( const std::string& featureSet, double weight);
 
 	unsigned int stackSize() const					{return m_stackSize > 0 ? m_stackSize:0;}
 
@@ -143,6 +147,7 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
+	virtual void defineFeature( const std::string& featureSet, double weight);
 
 private:
 	QueryAnalyzerTermExpressionBuilder( const QueryAnalyzerTermExpressionBuilder&){}	//< non copyable
@@ -168,6 +173,7 @@ public:
 	virtual void pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality);
 	virtual void attachVariable( const std::string& name);
 	virtual void definePattern( const std::string& name, const std::string& formatstring, bool visible);
+	virtual void defineFeature( const std::string& featureSet, double weight);
 
 public:
 	void defineTermStatistics( const std::string& type, const std::string& value, const strus::TermStatistics& stats)

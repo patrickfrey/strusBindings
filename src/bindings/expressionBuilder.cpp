@@ -114,6 +114,11 @@ void PostProcPatternExpressionBuilder::definePattern( const std::string& name, c
 	m_matcher->definePattern( name, formatstring, visible);
 }
 
+void PostProcPatternExpressionBuilder::defineFeature( const std::string& featureSet, double weight)
+{
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define feature","post proc pattern");
+}
+
 void PostProcPatternExpressionBuilder::defineLexem( const std::string& name)
 {
 	uint32_t termtypeid = m_termtypetab.getOrCreate( name);
@@ -197,6 +202,11 @@ void PreProcPatternExpressionBuilder::definePattern( const std::string& name, co
 	m_matcher->definePattern( name, formatstring, visible);
 }
 
+void PreProcPatternExpressionBuilder::defineFeature( const std::string& featureSet, double weight)
+{
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define feature","pre proc pattern");
+}
+
 void QueryExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
 {
 	++m_stackSize;
@@ -231,11 +241,12 @@ void QueryExpressionBuilder::attachVariable( const std::string& name)
 
 void QueryExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
-	if (!formatstring.empty())
-	{
-		throw strus::runtime_error(_TXT("format string does not make sense for query variables"));
-	}
-	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query expression");
+}
+
+void QueryExpressionBuilder::defineFeature( const std::string& featureSet, double weight)
+{
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define feature","query expression");
 }
 
 void QueryAnalyzerTermExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
@@ -270,7 +281,12 @@ void QueryAnalyzerTermExpressionBuilder::attachVariable( const std::string& name
 
 void QueryAnalyzerTermExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
-	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query");
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define pattern", "query analyzer term expression");
+}
+
+void QueryAnalyzerTermExpressionBuilder::defineFeature( const std::string& featureSet, double weight)
+{
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define feature","query analyzer term expression");
 }
 
 void PostingsExpressionBuilder::pushTerm( const std::string& type, const std::string& value, unsigned int length)
@@ -324,6 +340,11 @@ void PostingsExpressionBuilder::attachVariable( const std::string& name)
 void PostingsExpressionBuilder::definePattern( const std::string& name, const std::string& formatstring, bool visible)
 {
 	throw strus::runtime_error(_TXT("%s is not implemented for %s"), "define pattern", "postings iterator");
+}
+
+void PostingsExpressionBuilder::defineFeature( const std::string& featureSet, double weight)
+{
+	throw strus::runtime_error(_TXT("%s not implemented for %s"), "define feature","postings iterator");
 }
 
 Reference<PostingIteratorInterface> PostingsExpressionBuilder::pop()

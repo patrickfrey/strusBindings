@@ -61,7 +61,7 @@ public:
 			{"query", "SET~analysis", "GET", "qryanalyzer", "", {
 				{SchemaQueryDeclPart::resultQueryOrig("/query")}
 			}},
-			{"query", "SET~querystats", "GET", "statserver", "", {"_feature"}, {
+			{"query", "SET~querystats", "GET", "statserver", "", {"_feature","_restriction"}, {
 			}},
 			{"query", "SET~collect", "GET", "collector", "", {"_feature","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}

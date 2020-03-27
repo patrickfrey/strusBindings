@@ -229,13 +229,20 @@ struct QueryBuilderConfig
 	{
 		return strus::Constants::attribute_docid();
 	}
+	static std::map<std::string,std::string> defaultQueryFeatureRewriteMap()
+	{
+		std::map<std::string,std::string> rt;
+		rt[ "*"] = strus::Constants::default_feature_type_search();
+		return rt;
+	}
 
 	QueryBuilderConfig()
 		:extractFeatureTypeValueSeparator(defaultExtractFeatureTypeValueSeparator())
 		,extractFeatureType(defaultExtractFeatureType())
 		,extractFeatureSet(defaultExtractFeatureSet())
 		,expandSummaryName(defaultExtractSummaryName())
-		,docidSummaryName(defaultDocidSummaryName()){}
+		,docidSummaryName(defaultDocidSummaryName())
+		,queryFeatureRewriteMap(defaultQueryFeatureRewriteMap()){}
 	QueryBuilderConfig( const papuga_ValueVariant& cfg)
 		:extractFeatureTypeValueSeparator(defaultExtractFeatureTypeValueSeparator())
 		,extractFeatureType(defaultExtractFeatureType())
@@ -248,6 +255,7 @@ struct QueryBuilderConfig
 	std::string extractFeatureSet;
 	std::string expandSummaryName;
 	std::string docidSummaryName;
+	std::map<std::string,std::string> queryFeatureRewriteMap;
 
 private:
 	void init( const papuga_ValueVariant& cfg);

@@ -386,12 +386,23 @@ void QueryBuilderImpl::addCollectSummary( const ValueVariant& summary)
 	m_obj.addCollectSummary( Deserializer::getSummary( summary));
 }
 
-Struct QueryBuilderImpl::getFeatures() const
+Struct QueryBuilderImpl::getFeatures()
 {
-	return Struct( m_obj.getFeatures());
+	Struct rt;
+	m_obj.serializeFeatures( &rt.serialization);
+	rt.release();
+	return rt;
 }
 
-Struct QueryBuilderImpl::getRestrictions() const
+Struct QueryBuilderImpl::getWeightedTerms()
+{
+	Struct rt;
+	m_obj.serializeWeightedTerms( &rt.serialization);
+	rt.release();
+	return rt;
+}
+
+Struct QueryBuilderImpl::getRestrictions()
 {
 	return Struct( m_obj.getRestrictions());
 }
