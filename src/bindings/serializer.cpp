@@ -302,46 +302,52 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 	}
 }
 
+bool Serializer::serializeTermInExpression( papuga_Serialization* result, const SentenceTerm& term, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= papuga_Serialization_pushName_charp( result, "term");
+	rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<analyzer::QueryTerm>::structid());
+	rt &= Serializer::serialize_nothrow( result, term, errcode, deep);
+	rt &= papuga_Serialization_pushClose( result);	//... term
+	return rt;
+}
+
+bool Serializer::serializeTermListInUnion( papuga_Serialization* result, const SentenceTermList& termlist, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	if (termlist.size() == 1)
+	{
+		serializeTermInExpression( result, termlist[0], errcode, deep);
+	}
+	else
+	{
+		rt &= papuga_Serialization_pushName_charp( result, "expression");
+		rt &= papuga_Serialization_pushOpen( result);
+		rt &= Serializer::serializeStructMemberConstName( result, "op", strus::Constants::operator_set_union(), errcode, deep);
+		rt &= papuga_Serialization_pushName_charp( result, "arg");
+		rt &= papuga_Serialization_pushOpen( result);
+		SentenceTermList::const_iterator li = termlist.begin(), le = termlist.end();
+		for (; li != le; ++li)
+		{
+			rt &= papuga_Serialization_pushOpen( result);
+			serializeTermInExpression( result, *li, errcode, deep);
+			rt &= papuga_Serialization_pushClose( result); //... []
+		}
+		rt &= papuga_Serialization_pushClose( result);	//... arg
+		rt &= papuga_Serialization_pushClose( result);	//... expression
+	}
+	return rt;
+}
+
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const SentenceTermExpression& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
-	try
+	SentenceTermExpression::const_iterator vi = val.begin(), ve = val.end();
+	for (; vi != ve; ++vi)
 	{
-		SentenceTermExpression::const_iterator vi = val.begin(), ve = val.end();
-		for (; vi != ve; ++vi)
-		{
-			if (vi->empty())
-			{
-			}
-			else if (vi->size() == 1)
-			{
-				rt &= papuga_Serialization_pushOpen( result);
-				rt &= papuga_Serialization_pushName_charp( result, "term");
-				rt &= papuga_Serialization_pushOpen_struct( result, StructIdTemplate<analyzer::QueryTerm>::structid());
-				rt &= Serializer::serialize_nothrow( result, *vi->begin(), errcode, deep);
-				rt &= papuga_Serialization_pushClose( result);	//... term value
-				rt &= papuga_Serialization_pushClose( result);	//... result list element
-			}
-			else
-			{
-				rt &= papuga_Serialization_pushOpen( result);
-				rt &= papuga_Serialization_pushName_charp( result, "expression");
-				rt &= papuga_Serialization_pushOpen( result);
-				rt &= Serializer::serializeStructMemberConstName( result, "op", strus::Constants::operator_set_union(), errcode, deep);
-				rt &= papuga_Serialization_pushName_charp( result, "arg");
-				rt &= papuga_Serialization_pushOpen( result);
-				rt &= serializeArray( result, *vi, errcode, deep);
-				rt &= papuga_Serialization_pushClose( result);	//... arg
-				rt &= papuga_Serialization_pushClose( result);	//... expression value
-				rt &= papuga_Serialization_pushClose( result);	//... result list element
-			}
-		}
-		return rt;
-	}
-	catch (const std::bad_alloc&)
-	{
-		errcode = papuga_NoMemError;
-		rt = false;
+		rt &= papuga_Serialization_pushOpen( result);
+		rt &= serializeTermListInUnion( result, *vi, errcode, deep);
+		rt &= papuga_Serialization_pushClose( result);	//... []
 	}
 	return rt;
 }

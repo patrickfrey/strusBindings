@@ -367,6 +367,10 @@ private:
 		}
 		return rt;
 	}
+
+private:/*helper functions*/
+	static bool serializeTermInExpression( papuga_Serialization* result, const SentenceTerm& term, papuga_ErrorCode& errcode, bool deep);
+	static bool serializeTermListInUnion( papuga_Serialization* result, const SentenceTermList& termlist, papuga_ErrorCode& errcode, bool deep);
 };
 
 }}//namespace

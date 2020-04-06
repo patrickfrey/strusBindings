@@ -121,8 +121,12 @@ public:
 	{
 		typedef bindings::method::QueryBuilder QB;
 		return {rootexpr, {
-			{"feature", 0, "qrybuilder", QB::addFeature(), {{FeatureDef}} },
-			{"restriction", 0, "qrybuilder", QB::addRestriction(), {{RestrictionDef}} },
+			{ FeatureDef/*groupid*/, {
+				{"feature", 0, "qrybuilder", QB::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} }
+			}},
+			{ RestrictionDef/*groupid*/, {
+				{"restriction", 0, "qrybuilder", QB::addMetaDataRestriction(),  {"_analyzed"} }
+			}},
 			{"", "_feature", "qrybuilder", QB::getFeatures(), {} },
 			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} }
 		}};
@@ -136,6 +140,18 @@ public:
 		}};
 	}
 
+	static papuga::RequestAutomaton_NodeList defineQueryAnalyzed( const char* rootexpr)
+	{
+		return {rootexpr, {
+			{ FeatureDef/*groupid*/, {
+				{"feature", "analyzed", "_analyzed", AnalyzedTermExpression, '*'}
+			}},
+			{ RestrictionDef/*groupid*/, {
+				{"restriction", "analyzed", "_analyzed", MetaDataCondition, '*'}
+			}}
+		}};
+	}
+
 	static papuga::RequestAutomaton_NodeList analyzeQuery( const char* rootexpr)
 	{
 		typedef bindings::method::QueryAnalyzer A;
@@ -145,8 +161,10 @@ public:
 				{"feature/content", "_analyzed", "qryanalyzer", A::analyzeSchemaTermExpression(), {{ContentTermExpression}} },
 				{"feature/sentence", "_analyzed", "qryanalyzer", A::analyzeSentence(), {{FieldTypeName},{FieldValue},{NumberOfResults},{MinWeight}}}
 			}},
-			{"restriction", "analyzed", "_analyzed", MetaDataCondition, '*'},
-			{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!'}} }
+			{ RestrictionDef/*groupid*/, {
+				{"restriction", "analyzed", "_analyzed", MetaDataCondition, '*'},
+				{"restriction/content/{union,condition}", "_analyzed", "qryanalyzer", A::analyzeMetaDataExpression(), {{MetaDataCondition, '!'}} }
+			}}
 		}};
 	}
 
@@ -160,7 +178,9 @@ public:
 			{ FeatureDef/*groupid*/, {
 				{"feature", 0, "query", Q::addFeature(), {{FeatureSet}, {"_analyzed"}, {FeatureWeight, '?'}} }
 			}},
-			{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} },
+			{ RestrictionDef/*groupid*/, {
+				{"restriction", 0, "query", Q::addMetaDataRestriction(),  {"_analyzed"} }
+			}},
 			/// Statistics:
 			{"termstats", 0, "query", Q::defineTermStatistics(), {{TermType},{TermValue},{TermDocumentFrequency}} },
 			{"globalstats", 0, "query", Q::defineGlobalStatistics(), {{GlobalStats}} },

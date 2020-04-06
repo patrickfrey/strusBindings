@@ -351,12 +351,24 @@ public:
 	void setMinRank( int minRank);
 
 	/// \brief Add a feature to the query
-	/// \param[in] feature feature to add
-	void addFeature( const ValueVariant& feature);
+	/// \example addFeature( "select" [ "contains" 0 1 ["word" "hello"] ["word" "world"] ] )
+	/// \example addFeature( "titlefield" [ from:"title_start" to:"title_end"] )
+	/// \param[in] set name of the feature set, this feature is addressed with
+	/// \example "select"
+	/// \example "seek"
+	/// \param[in] expr query term/expression that defines the postings of the feature and the variables attached
+	/// \example [ "contains" 0 1 ["word" "hello"] ["word" "world"] ]
+	/// \example [ from:"title_start" to:"title_end"]
+	/// \remark The query expression passed as parameter is refused if it does not contain exactly one element
+	/// \param[in] weight individual weight of the feature in the query
+	/// \example 0.75
+	/// \example 1.0
+	/// \example 2.5
+	void addFeature( const std::string& set, const ValueVariant& expr, double weight=1);
 
 	/// \brief Add a restriction to the query
-	/// \param[in] restriction restriction to add
-	void addRestriction( const ValueVariant& restriction);
+	/// \param[in] expression restriction term/expression to add
+	void addMetaDataRestriction( const ValueVariant& expression);
 
 	/// \brief Create features from summary features if possible
 	/// \param[in] summary summary element to synthesize features from

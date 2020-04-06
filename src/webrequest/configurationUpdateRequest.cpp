@@ -49,16 +49,13 @@ void ConfigurationUpdateRequestContext::putAnswer( const WebRequestAnswer& statu
 				}
 			}
 		}
-		else if (!status.content().empty())
+		if (!m_context->putDelegateRequestAnswer( m_schema, status))
 		{
-			if (!m_context->putDelegateRequestAnswer( m_schema, status.content()))
+			if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
 			{
-				if (0!=(m_logMask & WebRequestLoggerInterface::LogError))
-				{
-					WebRequestAnswer ctxstatus = m_context->getAnswer();
-					const char* msg = ctxstatus.errorStr() ? ctxstatus.errorStr() : strus::errorCodeToString( ctxstatus.appErrorCode());
-					logErrorFmt( _TXT("error processing delegate request answer with schema '%s': %s"), m_schema, msg);
-				}
+				WebRequestAnswer ctxstatus = m_context->getAnswer();
+				const char* msg = ctxstatus.errorStr() ? ctxstatus.errorStr() : strus::errorCodeToString( ctxstatus.appErrorCode());
+				logErrorFmt( _TXT("error processing delegate request answer with schema '%s': %s"), m_schema, msg);
 			}
 		}
 	}

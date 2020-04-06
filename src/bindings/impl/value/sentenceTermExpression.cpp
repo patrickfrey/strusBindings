@@ -29,31 +29,34 @@ SentenceTermExpression::SentenceTermExpression(
 				m_ar.back().push_back( *ti);
 			}
 		}
-		else if (gi->terms().size() == m_ar.size())
+		else
 		{
-			std::vector<strus::SentenceTerm>::const_iterator ti = gi->terms().begin(), te = gi->terms().end();
-			std::vector<strus::SentenceTermList>::iterator ai = m_ar.begin(), ae = m_ar.end();
-			for (; ti != te; ++ti,++ai)
+			if (gi->terms().size() == m_ar.size())
 			{
-				std::vector<strus::SentenceTerm>::const_iterator ei = ai->begin(), ee = ai->end();
-				for (;ei != ee; ++ei)
+				std::vector<strus::SentenceTerm>::const_iterator ti = gi->terms().begin(), te = gi->terms().end();
+				std::vector<strus::SentenceTermList>::iterator ai = m_ar.begin(), ae = m_ar.end();
+				for (; ti != te; ++ti,++ai)
 				{
-					if (ei->value() == ti->value())
+					std::vector<strus::SentenceTerm>::const_iterator ei = ai->begin(), ee = ai->end();
+					for (;ei != ee; ++ei)
 					{
-						if (ei->type() != ti->type())
+						if (ei->value() == ti->value())
 						{
-							ai->push_back( *ti);
+							if (ei->type() != ti->type())
+							{
+								ai->push_back( *ti);
+							}
+							break;
 						}
+					}
+					if (ei == ee)
+					{
+						guess.erase( guess.begin() + gidx);
+						gidx--;
+						gi = guess.begin() + gidx;
+						ge = guess.end();
 						break;
 					}
-				}
-				if (ei == ee)
-				{
-					guess.erase( guess.begin() + gidx);
-					gidx--;
-					gi = guess.begin() + gidx;
-					ge = guess.end();
-					break;
 				}
 			}
 		}

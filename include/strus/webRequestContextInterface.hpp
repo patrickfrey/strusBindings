@@ -38,12 +38,12 @@ public:
 	virtual std::vector<WebRequestDelegateRequest> getDelegateRequests()=0;
 
 	/// \brief Return the result of a delegate request to process the answer in the current context created with executeRequest()
-	/// \param[in] content content of the result put
-	/// \param[out] answer result status and the data of the answer of the operation
+	/// \param[in] schema to use for processing the answer content if available
+	/// \param[in] answer answer with content of the result put
 	/// \return bool true if succeeded, false else
 	virtual bool putDelegateRequestAnswer(
 			const char* schema,
-			const WebRequestContent& content)=0;
+			const WebRequestAnswer& answer)=0;
 
 	/// \brief Complete the request executed with 'execute(const WebRequestContent&)'
 	/// \return true on success, false on failure

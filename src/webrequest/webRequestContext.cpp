@@ -474,7 +474,7 @@ std::vector<WebRequestDelegateRequest> WebRequestContext::getDelegateRequests()
 
 bool WebRequestContext::putDelegateRequestAnswer(
 		const char* schema,
-		const WebRequestContent& content)
+		const WebRequestAnswer& answer)
 {
 	try
 	{
@@ -490,29 +490,38 @@ bool WebRequestContext::putDelegateRequestAnswer(
 			}
 			return true;
 		}
-		strus::Reference<WebRequestContext> delegateContext( createClone( ObjectRequest));
-		delegateContext->initContentType( content);
-		bool rt = delegateContext->initContentSchemaAutomaton( SchemaId( m_contextType, schema))
-			&& delegateContext->executeContentSchemaAutomaton( content);
-		if (rt)
+		if (!answer.ok())
 		{
-			if (delegateContext->hasContentRequestDelegateRequests())
-			{
-				setAnswer( ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in delegate request result schema definitions"));
-				return false;
-			}
-			if (delegateContext->hasContentRequestResult())
-			{
-				setAnswer( ErrorCodeInvalidOperation, _TXT("results not expected in delegate request result schema definitions"));
-				return false;
-			}
-			rt = delegateContext->complete();
+			m_answer = answer;
+			return false;
 		}
-		if (!rt)
+		if (!answer.content().empty())
 		{
-			m_answer = delegateContext->getAnswer();
+			strus::Reference<WebRequestContext> delegateContext( createClone( ObjectRequest));
+			delegateContext->initContentType( answer.content());
+			bool rt = delegateContext->initContentSchemaAutomaton( SchemaId( m_contextType, schema))
+				&& delegateContext->executeContentSchemaAutomaton( answer.content());
+			if (rt)
+			{
+				if (delegateContext->hasContentRequestDelegateRequests())
+				{
+					setAnswer( ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in delegate request result schema definitions"));
+					return false;
+				}
+				if (delegateContext->hasContentRequestResult())
+				{
+					setAnswer( ErrorCodeInvalidOperation, _TXT("results not expected in delegate request result schema definitions"));
+					return false;
+				}
+				rt = delegateContext->complete();
+			}
+			if (!rt)
+			{
+				m_answer = delegateContext->getAnswer();
+			}
+			return rt;
 		}
-		return rt;
+		return true;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
 }

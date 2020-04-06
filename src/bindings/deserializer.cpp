@@ -2602,6 +2602,34 @@ void Deserializer::buildQueryFeature(
 
 void Deserializer::buildQueryFeatures(
 		ExpressionBuilder& builder,
+		const std::string& featureSet,
+		double weight,
+		const papuga_ValueVariant& listser,
+		ErrorBufferInterface* errorhnd)
+{
+	static const char* context = _TXT("query feature");
+	int nofExpressions = 0;
+
+	if (!papuga_ValueVariant_defined( &listser))
+	{
+		throw strus::runtime_error(_TXT("non empty s expected for %s"), context);
+	}
+	if (listser.valuetype != papuga_TypeSerialization)
+	{
+		throw strus::runtime_error(_TXT("serialized structure expected for %s"), context);
+	}
+	papuga_SerializationIter seriter;
+	papuga_init_SerializationIter( &seriter, listser.value.serialization);
+	buildExpressionListCounted( builder, seriter, errorhnd, nofExpressions);
+
+	while (nofExpressions--)
+	{
+		builder.defineFeature( featureSet, weight);
+	}
+}
+
+void Deserializer::buildQueryFeatures(
+		ExpressionBuilder& builder,
 		const papuga_ValueVariant& content,
 		ErrorBufferInterface* errorhnd)
 {

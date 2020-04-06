@@ -59,7 +59,7 @@ void QueryExpression::pushTerm( const std::string& type)
 
 void QueryExpression::pushExpression( const std::string& op, unsigned int argc, int range, unsigned int cardinality)
 {
-	if (argc < m_freenodear.size()) throw std::runtime_error(_TXT("logic error: push expression number of arguments exceeds number of elements on the stack"));
+	if (argc > m_freenodear.size()) throw std::runtime_error(_TXT("logic error: push expression number of arguments exceeds number of elements on the stack"));
 	int ni = m_freenodear.size() - argc;
 	for (int ai=1,ae=argc; ai < ae; ++ai)
 	{
@@ -68,7 +68,8 @@ void QueryExpression::pushExpression( const std::string& op, unsigned int argc, 
 	int nodeidx = argc == 0 ? -1 : m_freenodear[ ni];
 	m_freenodear.resize( ni);
 	m_freenodear.push_back( m_nodear.size());
-	m_nodear.push_back( Node( Node::ExpressionType, nodeidx, -1/*next*/));
+	m_nodear.push_back( Node( Node::ExpressionType, m_exprar.size(), -1/*next*/));
+	m_exprar.push_back( Expression( op, argc, range, cardinality, nodeidx));
 }
 
 void QueryExpression::attachVariable( const std::string& name)
@@ -105,10 +106,10 @@ void QueryExpression::defineFeature( const std::string& featureSet, double weigh
 	m_featar.push_back( Feature( featureSet, weight, nidx));
 }
 
-void QueryExpression::addFeature( const papuga_ValueVariant& feature)
+void QueryExpression::addFeature( const std::string& set, const papuga_ValueVariant& expr, double weight)
 {
 	LocalErrorBuffer errorhnd;
-	Deserializer::buildQueryFeatures( *this, feature, &errorhnd);
+	Deserializer::buildQueryFeatures( *this, set, weight, expr, &errorhnd);
 	if (errorhnd.hasError()) throw std::runtime_error( errorhnd.fetchError());
 }
 
@@ -228,7 +229,7 @@ void QueryExpression::serializeNode( papuga_Serialization* serialization, const 
 		{
 			rt &= papuga_Serialization_pushName_charp( serialization, "expression");
 			rt &= papuga_Serialization_pushOpen( serialization);
-			
+
 			const Expression& expr = m_exprar[ nd.idx];
 			if (nd.varidx >= 0)
 			{

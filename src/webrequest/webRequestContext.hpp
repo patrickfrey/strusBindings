@@ -64,7 +64,7 @@ public:
 
 	virtual bool putDelegateRequestAnswer(
 			const char* schema,
-			const WebRequestContent& content);
+			const WebRequestAnswer& answer);
 
 	virtual bool complete();
 	virtual WebRequestAnswer getAnswer() const;

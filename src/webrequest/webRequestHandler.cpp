@@ -668,7 +668,7 @@ bool WebRequestHandler::loopbackConfigurationLoadDelegateRequest( WebRequestCont
 		}
 		if (receiverSchema)
 		{
-			if (!receiverContext->putDelegateRequestAnswer( receiverSchema, delegateAnswer.content()))
+			if (!receiverContext->putDelegateRequestAnswer( receiverSchema, delegateAnswer))
 			{
 				answer = receiverContext->getAnswer();
 				answer.explain( _TXT("put of configuration loopback delegate request answer failed"));
@@ -729,9 +729,10 @@ bool WebRequestHandler::runConfigurationLoad( WebRequestContextInterface* ctx, c
 				{
 					// ... without receiver feed to itself with the receiver schema:
 					WebRequestContent delegate_content( g_config_charset, g_config_doctype, delegate_contentstr.c_str(), delegate_contentstr.size());
+					WebRequestAnswer delegate_answer( delegate_content);
 					if (di->receiverSchema())
 					{
-						if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegate_content))
+						if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegate_answer))
 						{
 							count.set( 0);
 							rt = false;

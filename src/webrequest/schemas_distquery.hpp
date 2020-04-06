@@ -104,6 +104,7 @@ public:
 		{/*inherit*/},
 		{/*input*/
 			{SchemaQueryDeclPart::declareQuery( "/query")},
+			{SchemaQueryDeclPart::defineQueryAnalyzed( "/query")},
 			{SchemaQueryDeclPart::buildQuery( "/query")}
 		}
 	) {}

@@ -54,15 +54,7 @@ public:
 	WebRequestAnswer( const WebRequestAnswer& o)
 		:m_errorStr(o.m_errorStr),m_httpStatus(o.m_httpStatus),m_appErrorCode(o.m_appErrorCode),m_messageType(o.m_messageType),m_messageStr(o.m_messageStr),m_content(o.m_content),m_memBlock(o.m_memBlock)
 	{
-		if (o.m_errorStr == o.m_errorBuf)
-		{
-			std::memcpy( m_errorBuf, o.m_errorBuf, sizeof(m_errorBuf));
-			m_errorStr = m_errorBuf;
-		}
-		else
-		{
-			m_errorBuf[0] = 0;
-		}
+		copyErrorBuf( o);
 	}
 	/// \brief Assignment operator
 	WebRequestAnswer& operator=( const WebRequestAnswer& o)
@@ -74,6 +66,12 @@ public:
 		m_messageStr = o.m_messageStr;
 		m_content = o.m_content;
 		m_memBlock = o.m_memBlock;
+		copyErrorBuf( o);
+		return *this;
+	}
+
+	void copyErrorBuf( const WebRequestAnswer& o)
+	{
 		if (o.m_errorStr == o.m_errorBuf)
 		{
 			std::memcpy( m_errorBuf, o.m_errorBuf, sizeof(m_errorBuf));
@@ -83,8 +81,12 @@ public:
 		{
 			m_errorBuf[0] = 0;
 		}
-		return *this;
 	}
+
+#if __cplusplus >= 201103L
+	WebRequestAnswer( WebRequestContent&& o)
+		:m_errorStr(0),m_httpStatus(200),m_appErrorCode(0),m_messageType(0),m_messageStr(0),m_content(std::move(o)),m_memBlock(){m_errorBuf[0]=0;}
+#endif
 
 	/// \brief Test if request succeeded
 	bool ok() const					{return !m_errorStr;}

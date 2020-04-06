@@ -207,6 +207,13 @@ struct Deserializer
 			const papuga_ValueVariant& listser,
 			ErrorBufferInterface* errorhnd);
 
+	static void buildQueryFeatures(
+			ExpressionBuilder& builder,
+			const std::string& featureset,
+			double weight,
+			const papuga_ValueVariant& listser,
+			ErrorBufferInterface* errorhnd);
+
 	static void buildInsertDocument(
 			StorageDocumentInterface* document,
 			const papuga_ValueVariant& content,

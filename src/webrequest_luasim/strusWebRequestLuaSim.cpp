@@ -792,7 +792,8 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 			{
 				// ... without receiver feed to itself with the receiver schema:
 				strus::WebRequestContent delegateContent( g_charset, g_doctype, delegateContentStr.c_str(), delegateContentStr.size());
-				if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegateContent))
+				strus::WebRequestAnswer delegateAnswer( delegateContent);
+				if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegateAnswer))
 				{
 					answer = ctx->getAnswer();
 					answer.explain( _TXT("delegate request failed"));
@@ -819,10 +820,11 @@ void WebRequestDelegateContext::putAnswer( const strus::WebRequestAnswer& status
 
 	if (status.ok() && status.httpStatus() >= 200 && status.httpStatus() < 300)
 	{
-		success &= m_requestContext->putDelegateRequestAnswer( m_schema.c_str(), status.content());
+		success &= m_requestContext->putDelegateRequestAnswer( m_schema.c_str(), status);
 	}
 	else
 	{
+		m_requestContext->putDelegateRequestAnswer( m_schema.c_str(), status);
 		*m_answer = status;
 		success = false;
 	}

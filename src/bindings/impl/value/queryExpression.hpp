@@ -32,7 +32,7 @@ public:
 	void setMaxNofRanks( int maxNofRanks_)				{m_maxNofRanks = maxNofRanks_;}
 	void setMinRank( int minRank_)					{m_minRank = minRank_;}
 
-	void addFeature( const papuga_ValueVariant& feature);
+	void addFeature( const std::string& set, const papuga_ValueVariant& expr, double weight);
 	void addRestriction( const papuga_ValueVariant& restriction);
 	void addCollectSummary( const std::vector<SummaryElement>& summary);
 

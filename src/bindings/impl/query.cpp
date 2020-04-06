@@ -371,14 +371,14 @@ void QueryBuilderImpl::setMinRank( int minRank_)
 	m_obj.setMinRank( minRank_);
 }
 
-void QueryBuilderImpl::addFeature( const ValueVariant& feature)
+void QueryBuilderImpl::addFeature( const std::string& set, const ValueVariant& expr, double weight)
 {
-	m_obj.addFeature( feature);
+	m_obj.addFeature( set, expr, weight);
 }
 
-void QueryBuilderImpl::addRestriction( const ValueVariant& restriction)
+void QueryBuilderImpl::addMetaDataRestriction( const ValueVariant& expression)
 {
-	m_obj.addRestriction( restriction);
+	m_obj.addRestriction( expression);
 }
 
 void QueryBuilderImpl::addCollectSummary( const ValueVariant& summary)
