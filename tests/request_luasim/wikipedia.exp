@@ -22,32 +22,211 @@
 					"op": "union",
 					"arg":[
 						{
-							"type": "N",
-							"value": "album"},
+							"term":{
+								"type": "N",
+								"value": "album"}},
 						{
-							"type": "N",
-							"value": "solo_album"},
+							"term":{
+								"type": "N",
+								"value": "solo_album"}},
 						{
-							"type": "N",
-							"value": "albums"},
+							"term":{
+								"type": "N",
+								"value": "albums"}},
 						{
-							"type": "N",
-							"value": "debut_album"},
+							"term":{
+								"type": "N",
+								"value": "debut_album"}},
 						{
-							"type": "N",
-							"value": "recording"},
+							"term":{
+								"type": "N",
+								"value": "recording"}},
 						{
-							"type": "N",
-							"value": "title_track"},
+							"term":{
+								"type": "N",
+								"value": "title_track"}},
 						{
-							"type": "N",
-							"value": "song"},
+							"term":{
+								"type": "N",
+								"value": "song"}},
 						{
-							"type": "N",
-							"value": "compilation_album"},
+							"term":{
+								"type": "N",
+								"value": "compilation_album"}},
 						{
-							"type": "N",
-							"value": "ep"},
+							"term":{
+								"type": "N",
+								"value": "ep"}},
 						{
-							"type": "N",
-							"value": "band"}]}}]}]}}
+							"term":{
+								"type": "N",
+								"value": "band"}}]}}]}]}}
+{
+"queryresult":{
+"ranklist":{
+	"evalpass": 0,
+	"nofranked": 18,
+	"nofvisited": 18,
+	"ranks":[
+		{
+			"weight": "0.338172",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "List of songs recorded by David Bowie"}]},
+		{
+			"weight": "0.249565",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "\"Heroes\" (David Bowie album)"}]},
+		{
+			"weight": "0.242536",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Beauty and the Beast (David Bowie song)"}]},
+		{
+			"weight": "0.211953",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Outside (David Bowie album)"}]},
+		{
+			"weight": "0.184693",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "David Bowie (box set)"}]},
+		{
+			"weight": "0.113359",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Stage (David Bowie album)"}]},
+		{
+			"weight": "0.028938",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "David Bowie"}]},
+		{
+			"weight": "0.000041",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Let's Dance (David Bowie album)"}]},
+		{
+			"weight": "0.000041",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "David Bowie (1967 album)"}]},
+		{
+			"weight": "0.000040",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Tonight (David Bowie album)"}]},
+		{
+			"weight": "0.000040",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Without You (David Bowie song)"}]},
+		{
+			"weight": "0.000040",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "VH1 Storytellers (David Bowie album)"}]},
+		{
+			"weight": "0.000040",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Soul Love (David Bowie song)"}]},
+		{
+			"weight": "0.000040",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Changes (David Bowie song)"}]},
+		{
+			"weight": "0.000039",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Never Let Me Down (David Bowie song)"}]},
+		{
+			"weight": "0.000039",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "Liza Jane (David Bowie song)"}]},
+		{
+			"weight": "0.000039",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "List of awards and nominations received by David Bowie"}]},
+		{
+			"weight": "0.000029",
+			"field":{
+				"start": 0,
+				"end": 0},
+			"summary":[
+				{
+					"name": "title",
+					"value": "List of David Bowie concert tours"}]}]}}}

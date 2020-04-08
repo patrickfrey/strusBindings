@@ -85,7 +85,8 @@ public:
 		QuerySummary,QuerySummaryName,QuerySummaryValue,QuerySummaryWeight,QuerySummaryIndex,
 
 		QueryBuilderDef, QueryBuilderSeparator, QueryBuilderFeatureType, QueryBuilderFeatureSet,
-		QueryBuilderExpandSummary, QueryBuilderDocidSummary,
+		QueryBuilderExpandSummary, QueryBuilderDocidSummary, QueryBuilderFeatureTypeRewriteDef,
+		QueryBuilderFeatureTypeRewriteDefName, QueryBuilderFeatureTypeRewriteDefValue,
 
 		DistQueryEvalCollectServer, DistQueryEvalStorageServer,
 		DistQueryEvalStatisticsServer, DistQueryEvalAnalyzeServer,

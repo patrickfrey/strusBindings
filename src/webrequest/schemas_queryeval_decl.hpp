@@ -105,12 +105,20 @@ public:
 			{"set", "()", QueryBuilderFeatureSet, papuga_TypeString, "search"},
 			{"expand", "()", QueryBuilderExpandSummary, papuga_TypeString, "expand"},
 			{"docid", "()", QueryBuilderDocidSummary, papuga_TypeString, "docid"},
+			{"rewrite/name", "()", QueryBuilderFeatureTypeRewriteDefName, papuga_TypeString, "N;E;A;V"},
+			{"rewrite/value", "()", QueryBuilderFeatureTypeRewriteDefValue, papuga_TypeString, "word"},
+			{"rewrite", QueryBuilderFeatureTypeRewriteDef, {
+					{"name", QueryBuilderFeatureTypeRewriteDefName},
+					{"value", QueryBuilderFeatureTypeRewriteDefValue}
+				}
+			},
 			{"", QueryBuilderDef, {
 					{"separator", QueryBuilderSeparator, '?'},
 					{"type", QueryBuilderFeatureType, '?'},
 					{"set", QueryBuilderFeatureSet, '?'},
 					{"expand", QueryBuilderExpandSummary, '?'},
-					{"docid", QueryBuilderDocidSummary, '?'}
+					{"docid", QueryBuilderDocidSummary, '?'},
+					{"rewrite", QueryBuilderFeatureTypeRewriteDef, '*'}
 				}
 			}
 		}};

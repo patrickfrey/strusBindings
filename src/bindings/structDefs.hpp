@@ -229,11 +229,18 @@ struct QueryBuilderConfig
 	{
 		return strus::Constants::attribute_docid();
 	}
-	static std::map<std::string,std::string> defaultQueryFeatureRewriteMap()
+	const std::string& queryFeatureRewriteType( const std::string& typenam) const
 	{
-		std::map<std::string,std::string> rt;
-		rt[ "*"] = strus::Constants::default_feature_type_search();
-		return rt;
+		std::map<std::string,std::string>::const_iterator
+			mi = queryFeatureRewriteMap.find( typenam);
+		if (mi == queryFeatureRewriteMap.end())
+		{
+			return typenam;
+		}
+		else
+		{
+			return mi->second;
+		}
 	}
 
 	QueryBuilderConfig()
@@ -242,7 +249,7 @@ struct QueryBuilderConfig
 		,extractFeatureSet(defaultExtractFeatureSet())
 		,expandSummaryName(defaultExtractSummaryName())
 		,docidSummaryName(defaultDocidSummaryName())
-		,queryFeatureRewriteMap(defaultQueryFeatureRewriteMap()){}
+		,queryFeatureRewriteMap(){}
 	QueryBuilderConfig( const papuga_ValueVariant& cfg)
 		:extractFeatureTypeValueSeparator(defaultExtractFeatureTypeValueSeparator())
 		,extractFeatureType(defaultExtractFeatureType())

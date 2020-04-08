@@ -197,7 +197,7 @@ void QueryExpression::fillWeightedQueryTerms( std::vector<WeightedSentenceTerm>&
 	}
 }
 
-void QueryExpression::serializeNode( papuga_Serialization* serialization, const Node& nd) const
+void QueryExpression::serializeNode( papuga_Serialization* serialization, const Node& nd, bool mapTypes) const
 {
 	bool rt = true;
 	rt &= papuga_Serialization_pushOpen( serialization);
@@ -214,7 +214,15 @@ void QueryExpression::serializeNode( papuga_Serialization* serialization, const 
 				Serializer::serialize( serialization, m_variablear[ nd.varidx], true/*deep*/);
 			}
 			rt &= papuga_Serialization_pushName_charp( serialization, "type");
-			Serializer::serialize( serialization, term.type, true/*deep*/);
+			if (mapTypes)
+			{
+				const std::string& type = m_config.queryFeatureRewriteType( term.type);
+				Serializer::serialize( serialization, type, true/*deep*/);
+			}
+			else
+			{
+				Serializer::serialize( serialization, term.type, true/*deep*/);
+			}
 			rt &= papuga_Serialization_pushName_charp( serialization, "value");
 			Serializer::serialize( serialization, term.value, true/*deep*/);
 			if (term.length > 1)
@@ -255,7 +263,7 @@ void QueryExpression::serializeNode( papuga_Serialization* serialization, const 
 			for (; ai != ae; ++ai)
 			{
 				const Node& chld = m_nodear[ ni];
-				serializeNode( serialization, chld);
+				serializeNode( serialization, chld, mapTypes);
 				ni = chld.next;
 			}
 			rt &= papuga_Serialization_pushClose( serialization);
@@ -269,7 +277,7 @@ void QueryExpression::serializeNode( papuga_Serialization* serialization, const 
 	if (!rt) throw std::bad_alloc();
 }
 
-void QueryExpression::serializeFeature( papuga_Serialization* serialization, const Feature& feature) const
+void QueryExpression::serializeFeature( papuga_Serialization* serialization, const Feature& feature, bool mapTypes) const
 {
 	bool rt = true;
 	rt &= papuga_Serialization_pushOpen( serialization);
@@ -278,17 +286,17 @@ void QueryExpression::serializeFeature( papuga_Serialization* serialization, con
 	rt &= papuga_Serialization_pushName_charp( serialization, "weight");
 	rt &= papuga_Serialization_pushValue_double( serialization, feature.weight);
 	rt &= papuga_Serialization_pushName_charp( serialization, "analyzed");
-	serializeNode( serialization, m_nodear[ feature.nodeidx]);
+	serializeNode( serialization, m_nodear[ feature.nodeidx], mapTypes);
 	rt &= papuga_Serialization_pushClose( serialization);
 	if (!rt) throw std::bad_alloc();
 }
 
-void QueryExpression::serializeFeatures( papuga_Serialization* ser) const
+void QueryExpression::serializeFeatures( papuga_Serialization* ser, bool mapTypes) const
 {
 	std::vector<Feature>::const_iterator fi = m_featar.begin(), fe = m_featar.end();
 	for (; fi != fe; ++fi)
 	{
-		serializeFeature( ser, *fi);
+		serializeFeature( ser, *fi, mapTypes);
 	}
 }
 

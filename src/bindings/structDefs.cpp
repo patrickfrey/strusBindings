@@ -1032,6 +1032,7 @@ void QueryBuilderConfig::init( const papuga_ValueVariant& cfg)
 {
 	static const char* context = _TXT("query builder config");
 	static const StructureNameMap namemap( "separator,type,set,expand,docid,rewrite", ',');
+	enum NameMapKey {I_separator,I_type,I_set,I_expand,I_docid,I_rewrite};
 
 	if (!papuga_ValueVariant_defined( &cfg))
 	{}
@@ -1051,24 +1052,24 @@ void QueryBuilderConfig::init( const papuga_ValueVariant& cfg)
 			{
 				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
 				papuga_SerializationIter_skip( &seriter);
-				switch (idx)
+				switch ((NameMapKey)idx)
 				{
-					case 0:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					case I_separator: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 						extractFeatureTypeValueSeparator = Deserializer::getCharAscii( seriter);
 						break;
-					case 1:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					case I_type: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 						extractFeatureType = Deserializer::getString( seriter);
 						break;
-					case 2:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					case I_set: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 						extractFeatureSet = Deserializer::getString( seriter);
 						break;
-					case 3:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					case I_expand: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 						expandSummaryName = Deserializer::getString( seriter);
 						break;
-					case 4:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					case I_docid: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 						docidSummaryName = Deserializer::getString( seriter);
 						break;
-					case 5: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					case I_rewrite: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
 						queryFeatureRewriteMap = parseNameValueMapAsValue( seriter);
 						break;
 					default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());

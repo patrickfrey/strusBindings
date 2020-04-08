@@ -190,6 +190,9 @@ const char* AutomatonNameSpace::itemName( int itemid)
 		{QueryBuilderFeatureSet, "query builder feature set"},
 		{QueryBuilderExpandSummary, "query builder expand summary"},
 		{QueryBuilderDocidSummary, "query builder docid summary"},
+		{QueryBuilderFeatureTypeRewriteDef, "query builder feature type rewrite definition"},
+		{QueryBuilderFeatureTypeRewriteDefName, "query builder feature type rewrite definition name"},
+		{QueryBuilderFeatureTypeRewriteDefValue, "query builder feature type rewrite definition value"},
 
 		{DistQueryEvalCollectServer, "distributed query evaluation collect server"},
 		{DistQueryEvalStorageServer, "distributed query evaluation storage server"},

@@ -389,7 +389,15 @@ void QueryBuilderImpl::addCollectSummary( const ValueVariant& summary)
 Struct QueryBuilderImpl::getFeatures()
 {
 	Struct rt;
-	m_obj.serializeFeatures( &rt.serialization);
+	m_obj.serializeFeatures( &rt.serialization, false);
+	rt.release();
+	return rt;
+}
+
+Struct QueryBuilderImpl::getFeaturesMapped()
+{
+	Struct rt;
+	m_obj.serializeFeatures( &rt.serialization, true);
 	rt.release();
 	return rt;
 }

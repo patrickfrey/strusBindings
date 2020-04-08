@@ -127,7 +127,7 @@ public:
 			{ RestrictionDef/*groupid*/, {
 				{"restriction", 0, "qrybuilder", QB::addMetaDataRestriction(),  {"_analyzed"} }
 			}},
-			{"", "_feature", "qrybuilder", QB::getFeatures(), {} },
+			{"", "_feature", "qrybuilder", QB::getFeaturesMapped(), {} },
 			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} }
 		}};
 	}

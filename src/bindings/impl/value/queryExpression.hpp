@@ -36,7 +36,7 @@ public:
 	void addRestriction( const papuga_ValueVariant& restriction);
 	void addCollectSummary( const std::vector<SummaryElement>& summary);
 
-	void serializeFeatures( papuga_Serialization* ser) const;
+	void serializeFeatures( papuga_Serialization* ser, bool mapTypes) const;
 	void serializeWeightedTerms( papuga_Serialization* ser) const;
 
 	const papuga_Serialization* getRestrictions() const		{return &m_restrictionSerialization;}
@@ -106,8 +106,8 @@ private:
 
 private:
 	void fillWeightedQueryTerms( std::vector<WeightedSentenceTerm>& weightedQueryTerms, const Node& nd, double ww) const;
-	void serializeFeature( papuga_Serialization* serialization, const Feature& feature) const;
-	void serializeNode( papuga_Serialization* serialization, const Node& nd) const;
+	void serializeFeature( papuga_Serialization* serialization, const Feature& feature, bool mapTypes) const;
+	void serializeNode( papuga_Serialization* serialization, const Node& nd, bool mapTypes) const;
 
 private:
 	int m_minRank;

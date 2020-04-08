@@ -242,7 +242,18 @@ function defDistributedQueryEvalServer()
 			statserver = { serviceAddress( "statserver") },
 			collector = collectors,
 			qryeval = qryevals,
-			config = {separator = "#"}
+			config = {separator = "#", type = "word", rewrite = {
+					{name = "N", value = "word"},
+					{name = "C", value = "word"},
+					{name = "A", value = "word"},
+					{name = "V", value = "word"},
+					{name = "M", value = "word"},
+					{name = "N", value = "word"},
+					{name = "E", value = "word"},
+					{name = "U", value = "word"},
+					{name = "R", value = "word"},
+					{name = "W", value = "word"}
+				}}
 		}
 	}
 	def_test_server( server.distqryeval.name, server.distqryeval.address )
@@ -260,8 +271,8 @@ buildVectorStorageServer()
 defDistributedQueryEvalServer()
 
 
--- sentqryAnalyzed = call_server_checked( "GET", serviceAddress( "qryanalyzer"), "@sentquery.json")
--- if verbose then io.stderr:write( string.format("- Sentence analyzer result:\n%s\n", sentqryAnalyzed)) end
+sentqryAnalyzed = call_server_checked( "GET", serviceAddress( "qryanalyzer"), "@sentquery.json")
+if verbose then io.stderr:write( string.format("- Sentence analyzer result:\n%s\n", sentqryAnalyzed)) end
 
 sentqryResult = det_qeval_result( call_server_checked( "GET", serviceAddress( "distqryeval"), "@sentquery.json"))
 if verbose then io.stderr:write( string.format("- Distributed query evaluation result:\n%s\n", sentqryResult)) end

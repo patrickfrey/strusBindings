@@ -378,6 +378,10 @@ public:
 	/// \return the list of features
 	Struct getFeatures();
 
+	/// \brief Get the list of all features with mapped feature type, collected with 'addFeature' as serialization
+	/// \return the list of features
+	Struct getFeaturesMapped();
+
 	/// \brief Get the list of all weighted terms collected with 'addFeature' and 'addCollectSummary' as serialization
 	/// \return the list of weighted terms
 	Struct getWeightedTerms();
