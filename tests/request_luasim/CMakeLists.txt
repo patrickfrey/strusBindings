@@ -46,6 +46,6 @@ DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
 
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
 DeclareTest( WikipediaCase wikipedia.lua "" )
-DeclareTest( WikipediaCaseOneServer wikipedia.lua "1server" )
+# DeclareTest( WikipediaCaseOneServer wikipedia.lua "1server" )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 

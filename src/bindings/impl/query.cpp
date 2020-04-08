@@ -402,10 +402,10 @@ Struct QueryBuilderImpl::getFeaturesMapped()
 	return rt;
 }
 
-Struct QueryBuilderImpl::getWeightedTerms()
+Struct QueryBuilderImpl::getCollectedTerms()
 {
 	Struct rt;
-	m_obj.serializeWeightedTerms( &rt.serialization);
+	m_obj.serializeCollectedTerms( &rt.serialization);
 	rt.release();
 	return rt;
 }

@@ -37,7 +37,7 @@ public:
 	void addCollectSummary( const std::vector<SummaryElement>& summary);
 
 	void serializeFeatures( papuga_Serialization* ser, bool mapTypes) const;
-	void serializeWeightedTerms( papuga_Serialization* ser) const;
+	void serializeCollectedTerms( papuga_Serialization* ser) const;
 
 	const papuga_Serialization* getRestrictions() const		{return &m_restrictionSerialization;}
 
@@ -117,7 +117,7 @@ private:
 	papuga_Allocator m_allocator;
 	int m_allocatorMem[ 1024];
 	std::vector<std::string> m_nearDocids;
-	std::vector<WeightedSentenceTerm> m_weightedTerms;
+	std::vector<WeightedSentenceTerm> m_collectTerms;
 	std::vector<Term> m_termar;
 	std::vector<Expression> m_exprar;
 	std::vector<Node> m_nodear;

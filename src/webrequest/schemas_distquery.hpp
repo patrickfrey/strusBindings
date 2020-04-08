@@ -66,6 +66,8 @@ public:
 			{"query", "SET~collect", "GET", "collector", "", {"_feature","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}
 			}},
+			//[+] {"query", "SET~analysis", "GET", "qryanalyzer", "", {"_collected"}, {
+			//[+] }},
 			{"query", "SET~ranklist", "GET", "qryeval", "", {"_feature","_restriction","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}
 			}},

@@ -128,7 +128,8 @@ public:
 				{"restriction", 0, "qrybuilder", QB::addMetaDataRestriction(),  {"_analyzed"} }
 			}},
 			{"", "_feature", "qrybuilder", QB::getFeaturesMapped(), {} },
-			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} }
+			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} },
+			{"", "_collected", "qrybuilder", QB::getCollectedTerms(), {} }
 		}};
 	}
 

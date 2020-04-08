@@ -374,7 +374,7 @@ public:
 	/// \param[in] summary summary element to synthesize features from
 	void addCollectSummary( const ValueVariant& summary);
 
-	/// \brief Get the list of all features collected with 'addFeature' as serialization
+	/// \brief Get the list of all features defined with 'addFeature' as serialization
 	/// \return the list of features
 	Struct getFeatures();
 
@@ -382,11 +382,11 @@ public:
 	/// \return the list of features
 	Struct getFeaturesMapped();
 
-	/// \brief Get the list of all weighted terms collected with 'addFeature' and 'addCollectSummary' as serialization
+	/// \brief Get the list of all weighted terms collected 'addCollectSummary' as serialization
 	/// \return the list of weighted terms
-	Struct getWeightedTerms();
+	Struct getCollectedTerms();
 
-	/// \brief Get the list of all restrictions collected with 'addRestriction' as serialization
+	/// \brief Get the list of all restrictions defined with 'addRestriction' as serialization
 	/// \return the list of restrictions
 	Struct getRestrictions();
 

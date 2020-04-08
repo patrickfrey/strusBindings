@@ -24,7 +24,7 @@ using namespace strus::bindings;
 
 QueryExpression::QueryExpression( const papuga_ValueVariant& config_)
 	:m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks),m_config(config_)
-	,m_nearDocids(),m_weightedTerms(),m_termar(),m_exprar(),m_nodear()
+	,m_nearDocids(),m_collectTerms(),m_termar(),m_exprar(),m_nodear()
 	,m_freenodear(),m_featar(),m_variablear()
 {
 	papuga_init_Allocator( &m_allocator, &m_allocatorMem, sizeof(m_allocatorMem));
@@ -146,7 +146,7 @@ void QueryExpression::addCollectSummary( const std::vector<SummaryElement>& summ
 					{
 						std::string type( text, zi-text);
 						std::string value( zi+1);
-						m_weightedTerms.push_back( WeightedSentenceTerm( type, value, si->weight()));
+						m_collectTerms.push_back( WeightedSentenceTerm( type, value, si->weight()));
 					}
 				}
 			}
@@ -155,12 +155,12 @@ void QueryExpression::addCollectSummary( const std::vector<SummaryElement>& summ
 				char const* zi = std::strchr( text, m_config.extractFeatureTypeValueSeparator);
 				if (zi)
 				{
-					m_weightedTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, zi+1, si->weight()));
+					m_collectTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, zi+1, si->weight()));
 				}
 			}
 			else
 			{
-				m_weightedTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, text, si->weight()));
+				m_collectTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, text, si->weight()));
 			}
 		}
 		else if (si->name() == m_config.docidSummaryName)
@@ -300,7 +300,7 @@ void QueryExpression::serializeFeatures( papuga_Serialization* ser, bool mapType
 	}
 }
 
-void QueryExpression::serializeWeightedTerms( papuga_Serialization* ser) const
+void QueryExpression::serializeCollectedTerms( papuga_Serialization* ser) const
 {
 	std::vector<WeightedSentenceTerm> weightedQueryTerms;
 	std::vector<Feature>::const_iterator fi = m_featar.begin(), fe = m_featar.end();
@@ -308,7 +308,7 @@ void QueryExpression::serializeWeightedTerms( papuga_Serialization* ser) const
 	{
 		fillWeightedQueryTerms( weightedQueryTerms, m_nodear[ fi->nodeidx], 1.0);
 	}
-	Serializer::serialize( ser, m_weightedTerms, true/*deep*/);
+	Serializer::serialize( ser, m_collectTerms, true/*deep*/);
 	Serializer::serialize( ser, weightedQueryTerms, true/*deep*/);
 }
 
