@@ -61,7 +61,7 @@ end
 call_server_checked( "PUT", TRANSACTION)
 if verbose then io.stderr:write( string.format("- Inserted all documents\n")) end
 
-query = {
+query1 = {
 	query = {
 		feature = {
 		{	set = "search", 
@@ -98,13 +98,13 @@ query2 = {
 qryevalconf = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
 if verbose then io.stderr:write( string.format("- Query evaluation configuration from the server:\n%s\n", qryevalconf)) end
 
-qryres1 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query))
+qryres1 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query1))
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres1)) end
 
 qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query2))
 if verbose then io.stderr:write( string.format("- Query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
-qryana = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query )
+qryana = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1 )
 if verbose then io.stderr:write( string.format("- Query analysis:\n%s\n", qryana)) end
 
 qryana_with_eval = {

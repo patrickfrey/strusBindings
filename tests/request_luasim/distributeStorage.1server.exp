@@ -3,7 +3,10 @@
 "types":[
 	"cithead",
 	"entity",
-	"title",
+	"headid",
+	"headword",
+	"sent",
+	"titleword",
 	"word"],
 "nofdocs": 18}}
 {
@@ -50,7 +53,7 @@
 	"nofvisited": 10,
 	"ranks":[
 		{
-			"weight": "1.207559",
+			"weight": "1.204730",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -59,7 +62,7 @@
 					"name": "title",
 					"value": "Tonight (David Bowie album)"}]},
 		{
-			"weight": "0.989673",
+			"weight": "0.988134",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -68,7 +71,7 @@
 					"name": "title",
 					"value": "VH1 Storytellers (David Bowie album)"}]},
 		{
-			"weight": "0.922050",
+			"weight": "0.920080",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -77,7 +80,7 @@
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
-			"weight": "0.482583",
+			"weight": "0.483256",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -86,7 +89,7 @@
 					"name": "title",
 					"value": "Let's Dance (David Bowie album)"}]},
 		{
-			"weight": "0.436904",
+			"weight": "0.435539",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -147,7 +150,7 @@
 	"nofvisited": 5,
 	"ranks":[
 		{
-			"weight": "0.417467",
+			"weight": "0.418200",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -156,7 +159,7 @@
 					"name": "title",
 					"value": "Liza Jane (David Bowie song)"}]},
 		{
-			"weight": "0.262937",
+			"weight": "0.261638",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -165,7 +168,7 @@
 					"name": "title",
 					"value": "Never Let Me Down (David Bowie song)"}]},
 		{
-			"weight": "0.258236",
+			"weight": "0.258797",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -174,7 +177,7 @@
 					"name": "title",
 					"value": "David Bowie (1967 album)"}]},
 		{
-			"weight": "0.122097",
+			"weight": "0.121614",
 			"field":{
 				"start": 0,
 				"end": 0},
@@ -183,7 +186,7 @@
 					"name": "title",
 					"value": "List of songs recorded by David Bowie"}]},
 		{
-			"weight": "0.113393",
+			"weight": "0.112980",
 			"field":{
 				"start": 0,
 				"end": 0},

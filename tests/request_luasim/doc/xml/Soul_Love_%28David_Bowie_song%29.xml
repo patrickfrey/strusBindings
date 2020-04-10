@@ -1,9 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Soul_Love_%28David_Bowie_song%29</docid>
-<title>Soul Love (David Bowie song)</title>
+<title id="4844_3677">Soul Love (David Bowie song)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <quot><entity lv="3"><text><E>Soul Love</E></text>
     </entity>
@@ -83,59 +85,69 @@
     <quot><pagelink id="Five Years (David Bowie song)"><text><E>Five Years</E></text>
         </pagelink>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><entity lv="3"><text><E>Soul Love</E></text>
         </entity>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><pagelink id="Moonage Daydream"><text><E>Moonage Daydream</E></text>
         </pagelink>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><pagelink id="Starman (song)"><text><E>Starman</E></text>
         </pagelink>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><text><R>It</R> <V>Ai</V><A>n't </A><A>Easy</A></text>
       </quot>
+    
     <br/>
     <text><P/>;Side two
 </text>
     <br/>
-    <text>#</text>
-    <list lv="l"><text> </text>
-      <quot><pagelink id="Lady Stardust"><text><E>Lady Stardust</E></text>
+    <text><N>#</N> </text>
+    <list lv="l"><quot><pagelink id="Lady Stardust"><text><E>Lady Stardust</E></text>
           </pagelink>
         </quot>
       </list>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><text>Star</text>
       </quot>
+    
     <br/>
     <text><N>#</N> </text>
     <quot><pagelink id="Hang On to Yourself"><text><E>Hang On to Yourself</E></text>
         </pagelink>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><pagelink id="Ziggy Stardust (song)"><text><E>Ziggy Stardust</E></text>
         </pagelink>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><pagelink id="Suffragette City"><text><E>Suffragette City</E></text>
         </pagelink>
       </quot>
+    
     <br/>
-    <text># </text>
+    <text><N>#</N> </text>
     <quot><pagelink id="Rock &apos;n&apos; Roll Suicide"><text><E id="Rock n - Roll Suicide">Rock 'n' Roll Suicide</E></text>
         </pagelink>
       </quot>
+    
     <br/>
     </attr>
   </citation>
@@ -180,11 +192,12 @@
     <head id="C8"><text>tracks</text>
       </head>
     <cell id="C8"><citlink id="cit6"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text> Live versions </text>
+<heading lv="h1" id="4844_3691"><text>Live versions</text>
   </heading>
 <text><E id="David Bowie">Bowie</E> <V>played</V> the <N>song</N> in the </text>
 <pagelink id="Ziggy Stardust Tour"><text><E>Ziggy Stardust Tour</E></text>
@@ -196,20 +209,20 @@
 <pagelink id="Serious Moonlight Tour"><text><E>Serious Moonlight Tour</E></text>
   </pagelink>
 <text><T/>.</text>
-<heading lv="h1"><text> <E>Personnel</E> </text>
+<heading lv="h1" id="4844_3705"><text> <E>Personnel</E> </text>
   </heading>
 <list lv="l1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
     </pagelink>
   <text><P/>: </text>
   <pagelink id="Lead vocalist"><text>lead vocals</text>
     </pagelink>
-  <text>, </text>
+  <text>,</text>
   <pagelink id="Acoustic guitar"><text>acoustic guitar</text>
     </pagelink>
-  <text>, </text>
+  <text>,</text>
   <pagelink id="Saxophone"><text>saxophone</text>
     </pagelink>
-  <text>, </text>
+  <text>,</text>
   <pagelink id="Backing vocalist"><text>backing vocals</text>
     </pagelink>
   </list>
@@ -231,7 +244,7 @@
   <pagelink id="Drum kit"><text>drums</text>
     </pagelink>
   </list>
-<heading lv="h1"><text> Other releases </text>
+<heading lv="h1" id="4844_3719"><text>Other releases</text>
   </heading>
 <text><N>Performances</N> from the </text>
 <pagelink id="Isolar II – The 1978 World Tour"><text><C>1978</C> </text>
@@ -248,28 +261,36 @@
     </pagelink>
   </entity>
 <text> <P/>(<C>2018</C><P/>)<T/>.</text>
-<heading lv="h1"><text> <E>Notes</E> </text>
+<heading lv="h1" id="4844_3733"><text> <E>Notes</E> </text>
   </heading>
 <mark>reflist</mark>
+
 <br/>
 <mark>David Bowie singles</mark>
+
 <br/>
 <mark>DEFAULTSORT:Soul Love</mark>
+
 <br/>
 <category id="David Bowie songs">David Bowie songs
   </category>
+
 <br/>
 <category id="1972 songs">1972 songs
   </category>
+
 <br/>
 <category id="Rock ballads">Rock ballads
   </category>
+
 <br/>
 <category id="Songs written by David Bowie">Songs written by David Bowie
   </category>
+
 <br/>
 <category id="Song recordings produced by Ken Scott">Song recordings produced by Ken Scott
   </category>
+
 <br/>
 <category id="Song recordings produced by David Bowie">Song recordings produced by David Bowie
   </category></doc>

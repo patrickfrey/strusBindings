@@ -1,13 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Never_Let_Me_Down_%28David_Bowie_song%29</docid>
-<title>Never Let Me Down (David Bowie song)</title>
+<title id="0784_1561">Never Let Me Down (David Bowie song)</title>
 <mark>good article</mark>
+
 <br/>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <quot><entity lv="3"><text><E>Never Let Me Down</E></text>
     </entity>
@@ -28,15 +32,16 @@
   </pagelink>
 <quot><text> <V>was</V> <V>released</V> in <C>1990</C><P/>)<T/>. <E>Never</E></text>
   </quot>
-<text> Let Me Down</text>
+<text>Let Me Down</text>
 <quot><text> <V>was</V> <V>written</V> by the <N id="Never Let Me Down">singer</N> himself and </text>
   <pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
     </pagelink>
   <text><P/>, while <N>production</N> <V>was</V> <V>handled</V> by <E id="David Bowie">Bowie</E> along with </text>
   <pagelink id="David Richards (record producer)"><text><E>David Richards</E></text>
     </pagelink>
-  <text><T/>.</text>
+  <text><T/>. </text>
   </quot>
+
 <br/>
 <pagelink id="Music journalism"><text><N>Music critics</N></text>
   </pagelink>
@@ -53,7 +58,7 @@
 <entity lv="2"><pagelink id="Billboard (magazine)"><text><E>Billboard</E></text>
     </pagelink>
   </entity>
-<text> </text>
+
 <pagelink id="Billboard Hot 100"><text>Hot 100</text>
   </pagelink>
 <text> and <N>number</N> <C>34</C> on the </text>
@@ -80,7 +85,7 @@
       </head>
     <cell id="C0"><text><E>Never Let Me Down</E></text>
       </cell>
-    <head id="C1"><text>artist</text>
+    <head id="C1"><text><N>artist</N></text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
         </pagelink>
@@ -103,6 +108,7 @@
     <cell id="C5"><text><A>Early</A> <C>1987</C></text>
       <pagelink id="Power Station (recording studio)"><text><E>Power Station</E> <V>studios</V></text>
         </pagelink>
+      
       <br/>
       <text><P/>(<E>New York City</E><P/>)</text>
       </cell>
@@ -132,18 +138,21 @@
     <head id="C11"><text>misc</text>
       </head>
     <cell id="C11"><citlink id="cit7"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Background and development</text>
+<heading lv="h1" id="0784_1575"><text>Background and development</text>
   </heading>
 <quot><text><E>Never Let Me Down</E></text>
   </quot>
 <text> <V>was</V> the <A>last</A> <N>track</N> <V>written</V> and <V>recorded</V> for the <N>album</N><P/>, but despite this<P/>, <E id="David Bowie">Bowie</E> <V>said</V> that the <N>song</N> <V>was</V> </text>
 <quot><text><A>completely</A> <V>finished</V> in <C>twenty</C>-<C>four</C> <N>hours</N> from the <N>beginning</N> of the <N>writing</N> to the <N>end</N> of the <N>arranging</N></text>
   </quot>
-<text><T/>. The <N>name</N> of the <N>track</N> <V>was</V> <A>originally</A> </text>
+<text><T/>. </text>
+<br/>
+<text>The name of the track was originally</text>
 <quot><text><E>Isolation</E></text>
   </quot>
 <text> before <E id="David Bowie">Bowie</E> <V>changed</V> <R id="Never Let Me Down">it</R><T/>.</text>
@@ -169,6 +178,7 @@
 <citlink id="cit11"/>
 <text> The <N>recording</N> <V>is</V> about <E id="David Bowie">Bowie</E>'s <A>long</A>-<N>time</N> <A>personal</A> <N>assistant</N><P/>, <E>Coco Schwab</E><T/>. <E id="David Bowie">Bowie</E> <V>described</V> <R>their</R> <N>relationship</N><P/>, <V>saying</V><P/>:</text>
 <citlink id="cit12"/>
+
 <br/>
 <citlink id="cit13"/>
 <citation id="cit9"><table id="table2"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
@@ -189,11 +199,11 @@
   </citation>
 <citation id="cit10"><table id="table3"><tabtitle><text><V>cite</V> <N>book</N></text>
       </tabtitle>
-    <head id="C0"><text>title</text>
+    <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><quot><text>The <E>Complete</E> <E>David Bowie</E> <E>New Edition</E><P/>: <E>Expanded and Updated</E></text>
         </quot>
-      <text> </text>
+      
       </cell>
     <head id="C1"><text>last</text>
       </head>
@@ -203,7 +213,7 @@
       </head>
     <cell id="C2"><text><E>Nicholas</E></text>
       </cell>
-    <head id="C3"><text>date</text>
+    <head id="C3"><text><N>date</N></text>
       </head>
     <cell id="C3"><text>October 2016</text>
       </cell>
@@ -223,7 +233,7 @@
       </head>
     <cell id="C1"><text><E>Scott</E></text>
       </cell>
-    <head id="C2"><text>title</text>
+    <head id="C2"><text><N>title</N></text>
       </head>
     <cell id="C2"><text><E>David Bowie</E> <E>Opens Up</E> - <E>A Little</E></text>
       </cell>
@@ -235,7 +245,7 @@
       </head>
     <cell id="C4"><text>106</text>
       </cell>
-    <head id="C5"><text>date</text>
+    <head id="C5"><text><N>date</N></text>
       </head>
     <cell id="C5"><text>August 1987</text>
       </cell>
@@ -255,7 +265,7 @@
       </head>
     <cell id="C1"><text><E>Kurt</E></text>
       </cell>
-    <head id="C2"><text>title</text>
+    <head id="C2"><text><N>title</N></text>
       </head>
     <cell id="C2"><text><E>Stardust Memories</E></text>
       </cell>
@@ -269,7 +279,7 @@
       </head>
     <cell id="C4"><text>498</text>
       </cell>
-    <head id="C5"><text>date</text>
+    <head id="C5"><text><N>date</N></text>
       </head>
     <cell id="C5"><text>23 April 1987</text>
       </cell>
@@ -285,7 +295,7 @@
     <text> a <N>romance</N> in <R id="Never Let Me Down">it</R><P/>, I <V>guess</V><P/>, inasmuch as <R id="Never Let Me Down">it</R><V>'s</V> <A>hard</A> for <C>two</C> <N>people</N> to <V>feel</V> <A>totally</A> at <N>ease</N> in each <A>other</A>'s <N>company</N> for that <N>period</N> of <N>time</N> and <A>not</A> <V>expect</V> <A>too</A> <A>much</A> from each <A>other</A><T/>. <A>Always</A> <V>being</V> <A>prepared</A> to <V>be</V> <A>there</A> if the <A>other</A> <N>one</N> <V>needs</V> <N>someone</N><P/>, you <V>know</V><T/>? <X>There</X><V>'s</V> <A>not</A> <A>many</A> <N>people</N> you <V>find</V> in <N>life</N> that you <M>can</M> <V>do</V> that with<P/>, or <V>feel</V> that <N>way</N> with<T/>.</text>
     </attr>
   </citation>
-<heading lv="h1"><text>Release and promotion</text>
+<heading lv="h1" id="0784_1589"><text>Release and promotion</text>
   </heading>
 <quot><text><E>Never Let Me Down</E></text>
   </quot>
@@ -294,10 +304,12 @@
   </pagelink>
 <text> in <C>1987</C> and <V>was</V> the <A>first</A> <E id="David Bowie">Bowie</E> <A>single</A> to <V>be</V> <V>made</V> <A>available</A> on <E>CD</E><P/>, <V>including</V> a <A>newly</A> <V>remixed</V> <N>version</N><T/>.</text>
 <citlink id="cit14"/>
-<text> A <A>digital</A> <N>download version</N> of the <N>tracks</N> <V>was</V> <V>made</V> <A>available</A> <A>online</A> in <C>2007</C><T/>. <E id="David Bowie">Bowie</E> <V>performed</V> the <N>song</N> on </text>
+<text> A <A>digital</A> <N>download version</N> of the <N>tracks</N> <V>was</V> <V>made</V> <A>available</A> <A>online</A> in <C>2007</C><T/>. </text>
+<br/>
+<text><E id="David Bowie">Bowie</E> <V>performed</V> the <N>song</N> on </text>
 <pagelink id="BBC"><text><E>BBC</E></text>
   </pagelink>
-<text>'s </text>
+<text>'s</text>
 <entity lv="2"><pagelink id="Top of the Pops"><text><E>Top of the Pops</E></text>
     </pagelink>
   </entity>
@@ -310,15 +322,17 @@
 <entity lv="2"><pagelink id="Glass Spider"><text><E>Glass Spider</E></text>
     </pagelink>
   </entity>
-<text> <P/>(<C>1988</C><P/>) <N>concert film</N><T/>. The <N>song</N> <V>was</V> <V>added</V> to <A>several</A> <N>compilation albums</N><P/>, <V>including</V> </text>
+<text>(1988) concert film.</text>
+<br/>
+<text>The song was added to several compilation albums, including</text>
 <entity lv="2"><pagelink id="The Singles Collection (David Bowie album)"><text><E id="David Bowie">Bowie</E><P/>: The Singles 1969-1993</text>
     </pagelink>
   </entity>
-<text> (1993) and </text>
+<text>(1993) and</text>
 <entity lv="2"><pagelink id="Best of Bowie"><text><E>Best of Bowie</E></text>
     </pagelink>
   </entity>
-<text> (2002).</text>
+<text>(2002).</text>
 <citlink id="cit16"/>
 <citlink id="cit17"/>
 <text> A <N>re</N>-<V>mastered</V> / <N>re</N>-<V>recorded</V> <N>version</N> of the <N>song</N><P/>, <A>as</A> <A>well</A> as <A>several</A> <A>original</A> <N>remixes</N> of the <N>song</N><P/>, <V>appear</V> on the <N>box</N> <V>set</V> </text>
@@ -326,7 +340,7 @@
     </pagelink>
   </entity>
 <text> (<C>2018</C><P/>)<T/>.</text>
-<citation id="cit14"><table id="table6"><tabtitle><text><V>cite</V> <E>AV media notes</E></text>
+<citation id="cit14"><table id="table6"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
       </tabtitle>
     <head id="C0"><text><N>title</N></text>
       </head>
@@ -334,7 +348,7 @@
       </cell>
     <head id="C1"><text>year</text>
       </head>
-    <cell id="C1"><text>1987</text>
+    <cell id="C1"><text> <C>1987</C></text>
       </cell>
     <head id="C2"><text>type</text>
       </head>
@@ -352,13 +366,14 @@
   </citation>
 <citation id="cit15"><table id="table7"><tabtitle><text>citation</text>
       </tabtitle>
-    <head id="C0"><text>title</text>
+    <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><text><E>Bowie Wonderworld</E></text>
       </cell>
     <head id="C1"><text>url</text>
       </head>
     <cell id="C1"><weblink id="http://www.bowiewonderworld.com/features/topofthepops.htm"/>
+      
       </cell>
     <head id="C2"><text>accessdate</text>
       </head>
@@ -388,7 +403,7 @@
       </head>
     <cell id="C4"><pagelink id="Rykodisc"><text><E>Rykodisc</E></text>
         </pagelink>
-      <text> <P/>(<E>Barcode</E><P/>: </text>
+      <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>014431021824</C></code>
       <text><P/>)</text>
       </cell>
@@ -416,13 +431,13 @@
       </head>
     <cell id="C4"><pagelink id="EMI"><text><E>EMI</E></text>
         </pagelink>
-      <text> <P/>(<E>Barcode</E><P/>: </text>
+      <text> <P/>(<E>Barcode</E><P/>:  </text>
       <code><C>724349010390</C></code>
       <text><P/>)</text>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Music video</text>
+<heading lv="h1" id="0784_1603"><text>Music video</text>
   </heading>
 <text><A>French</A> <N>director</N> </text>
 <pagelink id="Jean-Baptiste Mondino"><text><E>Jean-Baptiste Mondino</E></text>
@@ -437,12 +452,13 @@
 <text> <V>makes</V> <N>appearances</N> throughout the <N>clip</N><P/>, <V>announcing</V> the </text>
 <pagelink id="Dance marathon"><text><N>dance marathon</N></text>
   </pagelink>
-<text><T/>.</text>
+<text><T/>. </text>
 <citlink id="cit19"/>
 <text> A <N>shot</N> from the <N>music video</N> <V>was</V> <V>used</V> to <V>commercialize</V> <C>7</C></text>
 <quot><text> <N>releases</N> of the <A>single</A><T/>.</text>
   </quot>
 <citlink id="cit20"/>
+
 <br/>
 <text>The <N>video</N><P/>, <V>described</V> as a <N>dream</N>-<A>like</A> <N>portrayal</N> of a <C>1950s</C>-<N>style dance marathon</N><P/>, <V>was</V> <V>viewed</V> <A>positively</A> by <C>one</C> </text>
 <pagelink id="Music journalism"><text><N>critic</N></text>
@@ -472,7 +488,7 @@
   </quot>
 <citation id="cit18"><table id="table10"><tabtitle><text>citation</text>
       </tabtitle>
-    <head id="C0"><text>title</text>
+    <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><text><E>Dave In</E><P/>, <E>Dave Out</E></text>
       </cell>
@@ -480,7 +496,7 @@
       </head>
     <cell id="C1"><text>Music &amp; Sound Output magazine</text>
       </cell>
-    <head id="C2"><text>date</text>
+    <head id="C2"><text><N>date</N></text>
       </head>
     <cell id="C2"><text>June 1987</text>
       </cell>
@@ -496,11 +512,11 @@
       </head>
     <cell id="C1"><text><E>Michael</E></text>
       </cell>
-    <head id="C2"><text>title</text>
+    <head id="C2"><text><N>title</N></text>
       </head>
     <cell id="C2"><text><E>Joe Dallesandro</E><P/>: <E>Warhol Superstar</E><P/>, <E>Underground Film Icon</E><P/>, <E>Actor</E></text>
       </cell>
-    <head id="C3"><text>date</text>
+    <head id="C3"><text><N>date</N></text>
       </head>
     <cell id="C3"><text>17 February 2015</text>
       </cell>
@@ -510,7 +526,7 @@
       </cell>
     </table>
   </citation>
-<citation id="cit20"><table id="table12"><tabtitle><text><V>cite</V> <E>AV media notes</E></text>
+<citation id="cit20"><table id="table12"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
       </tabtitle>
     <head id="C0"><text><N>title</N></text>
       </head>
@@ -518,7 +534,7 @@
       </cell>
     <head id="C1"><text>year</text>
       </head>
-    <cell id="C1"><text>1987</text>
+    <cell id="C1"><text> <C>1987</C></text>
       </cell>
     <head id="C2"><text>type</text>
       </head>
@@ -536,8 +552,9 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.dvdmg.com/bestofbowie.shtml"/>
+      
       </cell>
-    <head id="C1"><text>title</text>
+    <head id="C1"><text><N>title</N></text>
       </head>
     <cell id="C1"><text><E>David Bowie</E> <E>Best of Bowie</E> 2002 Video Review</text>
       </cell>
@@ -549,7 +566,7 @@
       </head>
     <cell id="C3"><text><E>Jacobson</E></text>
       </cell>
-    <head id="C4"><text>date</text>
+    <head id="C4"><text><N>date</N></text>
       </head>
     <cell id="C4"><text>2002</text>
       </cell>
@@ -564,12 +581,13 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://articles.latimes.com/1987-08-16/entertainment/ca-1529_1_video-director"/>
+      
       </cell>
-    <head id="C1"><text>title</text>
+    <head id="C1"><text><N>title</N></text>
       </head>
     <cell id="C1"><text><E>Where The Surf Meets The Rap</E></text>
       </cell>
-    <head id="C2"><text>date</text>
+    <head id="C2"><text><N>date</N></text>
       </head>
     <cell id="C2"><text>16 August 1987</text>
       </cell>
@@ -585,7 +603,7 @@
       </head>
     <cell id="C5"><pagelink id="Los Angeles Times"><text><E>Los Angeles Times</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C6"><text>accessdate</text>
       </head>
@@ -598,12 +616,13 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://articles.latimes.com/1987-12-27/entertainment/ca-31668_1_tawny-kitaen-s-legs"/>
+      
       </cell>
-    <head id="C1"><text>title</text>
+    <head id="C1"><text><N>title</N></text>
       </head>
     <cell id="C1"><text>The Year of Tawny's Legs</text>
       </cell>
-    <head id="C2"><text>date</text>
+    <head id="C2"><text><N>date</N></text>
       </head>
     <cell id="C2"><text>27 December 1987</text>
       </cell>
@@ -627,7 +646,7 @@
       </head>
     <cell id="C7"><pagelink id="Los Angeles Times"><text><E>Los Angeles Times</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C8"><text>accessdate</text>
       </head>
@@ -635,11 +654,11 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>Reception</E></text>
+<heading lv="h1" id="0784_1617"><text><E>Reception</E></text>
   </heading>
 <pagelink id="Stephen Thomas Erlewine"><text><E>Stephen Thomas Erlewine</E></text>
   </pagelink>
-<text> of </text>
+<text>of</text>
 <pagelink id="AllMusic"><text><E>AllMusic</E></text>
   </pagelink>
 <text> <V>described</V> the <N>song</N> as a </text>
@@ -650,7 +669,7 @@
 <quot><text> and <C>one</C> of <E id="David Bowie">Bowie</E>'s <A>most</A></text>
   </quot>
 <text> <A>underrated</A> <N>songs</N></text>
-<quot><text><T/>.</text>
+<quot><text><T/>. </text>
   </quot>
 <citlink id="cit24"/>
 <text> <E id="Nicholas Pegg">Pegg</E> <V>called</V> the <N>track</N> </text>
@@ -659,7 +678,9 @@
 <text> from the <N>album</N> due to <R id="Never Let Me Down">its</R> </text>
 <quot><text><A>refreshing</A> <N>spontaneity</N></text>
   </quot>
-<text><P/>, <V>compared</V> to the <N>overproduction</N> of the <N>rest</N> of the <N>album</N><T/>. <A>Commercially</A><P/>, </text>
+<text><P/>, <V>compared</V> to the <N>overproduction</N> of the <N>rest</N> of the <N>album</N><T/>. </text>
+<br/>
+<text><A>Commercially</A><P/>, </text>
 <quot><text><E>Never Let Me Down</E></text>
   </quot>
 <text> <V>was</V> <E id="David Bowie">Bowie</E>'s <A>last</A> <N>single</N> to <V>chart</V> inside the <A>top</A> <C>40</C> of </text>
@@ -667,7 +688,7 @@
     </pagelink>
   </entity>
 <mark>'s</mark>
-<text> </text>
+
 <pagelink id="Billboard Hot 100"><text>Hot 100</text>
   </pagelink>
 <text> until <R>his</R> </text>
@@ -679,14 +700,15 @@
 <text> <A>Additionally</A><P/>, the <N>track</N> <V>peaked</V> at <N>number</N> <C>34</C> on the </text>
 <pagelink id="UK Singles Chart"><text><E>UK Singles Chart</E></text>
   </pagelink>
-<text><T/>.</text>
+<text><T/>. </text>
 <citation id="cit24"><table id="table16"><tabtitle><text><V>cite</V> <N>web</N></text>
       </tabtitle>
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.allmusic.com/album/never-let-me-down-mw0000189321"/>
+      
       </cell>
-    <head id="C1"><text>title</text>
+    <head id="C1"><text><N>title</N></text>
       </head>
     <cell id="C1"><text><E>David Bowie</E> <P/>- <E>Never Let Me Down</E></text>
       </cell>
@@ -714,7 +736,7 @@
       </head>
     <cell id="C0"><weblink id="http://www.billboard.com/articles/columns/chart-beat/6844155/david-bowie-lazarus-top-40-hot-100-single-since-1987"/>
       </cell>
-    <head id="C1"><text>title</text>
+    <head id="C1"><text><N>title</N></text>
       </head>
     <cell id="C1"><text><E>David Bowie</E> <E>Scores First Top 40 Hot 100 Single Since 1987 With 'Lazarus'</E></text>
       </cell>
@@ -722,7 +744,7 @@
       </head>
     <cell id="C2"><text><E>Gary Trust</E></text>
       </cell>
-    <head id="C3"><text>date</text>
+    <head id="C3"><text><N>date</N></text>
       </head>
     <cell id="C3"><text>January 19, 2016</text>
       </cell>
@@ -737,7 +759,7 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Track listing</text>
+<heading lv="h1" id="0784_1631"><text>Track listing</text>
   </heading>
 <quot><text><E>Never Let Me Down</E></text>
   </quot>
@@ -748,146 +770,146 @@
 </text>
 <br/>
 <mark>col-begin</mark>
+
 <br/>
 <mark>col-2</mark>
-<list lv="l1"><text> </text>
-   
+<list lv="l1"> 
   <text>UK 7</text>
-  <quot><text> single</text>
+  <quot><text>single</text>
     <entity lv="3"/>
     </quot>
   </list>
+
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Single Version</E><P/>)</text>
   </quot>
 <text> – <C>3:58</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text>'87 and Cry (Single Version)</text>
   </quot>
-<text> – 3:53</text>
-<list lv="l1"><text> </text>
-   
+<text>– 3:53</text>
+<list lv="l1"> 
   <text>US 12</text>
-  <quot><text> Single #1</text>
+  <quot><text>Single #1</text>
     <entity lv="3"/>
     </quot>
   <citlink id="cit26"/>
   </list>
+
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Extended Dance Mix</E><P/>)</text>
   </quot>
 <text> – <C>7:00</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text>'87 and Cry (Edit)</text>
   </quot>
-<text> - 3:53
-</text>
+<text>- 3:53</text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Dub</E><P/>)</text>
   </quot>
 <text> – <C>3:55</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(A <E>Cappella</E><P/>)</text>
   </quot>
 <text> – <C>2:03</C></text>
-<list lv="l1"><text> </text>
-   
+<list lv="l1"> 
   <text>US 12</text>
-  <quot><text> single #2</text>
+  <quot><text>single #2</text>
     <entity lv="3"/>
     </quot>
   <citlink id="cit27"/>
   </list>
+
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<A>Extended</A> <N>dance mix</N><P/>)</text>
   </quot>
 <text> – <C>7:00</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<C>7</C></text>
   </quot>
 <text> <N>remix edit</N><P/>)</text>
 <quot><text> - <C>3:58</C></text>
   </quot>
+
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Dub</E><P/>)</text>
   </quot>
 <text> - <C>3:55</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(A <E>Capella</E><P/>)</text>
   </quot>
 <text> - <C>2:03</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Instrumental</E><P/>)</text>
   </quot>
 <text> - <C>4:00</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text>'87 and Cry (Edit)</text>
   </quot>
-<text> - 3:53
-</text>
+<text>- 3:53</text>
 <br/>
-<mark>col-2</mark>
-<list lv="l1"><text> </text>
-  <entity lv="3"><text>Japan CD single</text>
+
+<list lv="l1"><entity lv="3"><text>Japan CD single</text>
     </entity>
   <citlink id="cit28"/>
   </list>
+
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<A>Extended</A> <N>dance mix</N><P/>)</text>
   </quot>
 <text> - <C>7:01</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<C>7</C></text>
   </quot>
 <text> <N>remix</N><P/>)</text>
 <quot><text> - <C>3:58</C></text>
   </quot>
+
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Dub</E><P/>)</text>
   </quot>
 <text> - <C>3:55</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(A <E>Cappella</E><P/>)</text>
   </quot>
 <text> - <C>2:03</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text><E>Never Let Me Down</E> <P/>(<E>Instrumental</E><P/>)</text>
   </quot>
 <text> - <C>4:00</C>
 </text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><text>'87 and Cry (Single version)</text>
   </quot>
-<text> - 3:53
-</text>
+<text>- 3:53</text>
 <br/>
 <mark>col end</mark>
 <citation id="cit26"><table id="table18"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
@@ -898,7 +920,7 @@
       </cell>
     <head id="C1"><text>year</text>
       </head>
-    <cell id="C1"><text>1987</text>
+    <cell id="C1"><text> <C>1987</C></text>
       </cell>
     <head id="C2"><text>type</text>
       </head>
@@ -914,7 +936,7 @@
       </cell>
     </table>
   </citation>
-<citation id="cit27"><table id="table19"><tabtitle><text><V>cite</V> <E>AV media notes</E></text>
+<citation id="cit27"><table id="table19"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
       </tabtitle>
     <head id="C0"><text><N>title</N></text>
       </head>
@@ -922,7 +944,7 @@
       </cell>
     <head id="C1"><text>year</text>
       </head>
-    <cell id="C1"><text>1987</text>
+    <cell id="C1"><text> <C>1987</C></text>
       </cell>
     <head id="C2"><text>type</text>
       </head>
@@ -938,7 +960,7 @@
       </cell>
     </table>
   </citation>
-<citation id="cit28"><table id="table20"><tabtitle><text><V>cite</V> <E>AV media notes</E></text>
+<citation id="cit28"><table id="table20"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
       </tabtitle>
     <head id="C0"><text><N>title</N></text>
       </head>
@@ -946,7 +968,7 @@
       </cell>
     <head id="C1"><text>year</text>
       </head>
-    <cell id="C1"><text>1987</text>
+    <cell id="C1"><text> <C>1987</C></text>
       </cell>
     <head id="C2"><text>type</text>
       </head>
@@ -962,32 +984,30 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Credits and personnel</text>
+<heading lv="h1" id="0784_1645"><text>Credits and personnel</text>
   </heading>
 <text><N>Credits</N> <V>adapted</V> from the <N>liner notes</N> of </text>
 <entity lv="2"><text><E>Never Let Me Down</E></text>
   </entity>
-<text><T/>.</text>
+<text><T/>. </text>
 <citlink id="cit29"/>
 <list lv="l1"><text> <E>Carlos Alomar</E> – </text>
   <pagelink id="Composer"><text>composer</text>
     </pagelink>
   <text>, guitar</text>
   </list>
-<list lv="l1"><text> </text>
-  <quot><text>Crusher</text>
+<list lv="l1"><quot><text>Crusher</text>
     </quot>
-  <text> Bennett – </text>
+  <text>Bennett –</text>
   <pagelink id="Percussion instrument"><text>percussion</text>
     </pagelink>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="Spencer Bernard"><text><E>Spencer Bernard</E></text>
+<list lv="l1"><pagelink id="Spencer Bernard"><text><E>Spencer Bernard</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Synthesizer"><text>synthesizers</text>
     </pagelink>
-  <text/>
+  
   <citlink id="cit30"/>
   </list>
 <list lv="l1"><text> <E>David Bowie</E> – composer, </text>
@@ -995,33 +1015,31 @@
     </pagelink>
   <text>, vocals</text>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="David Eiland"><text><E>David Eiland</E></text>
+<list lv="l1"><pagelink id="David Eiland"><text><E>David Eiland</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Alto saxophone"><text>alto saxophone</text>
     </pagelink>
   <citlink id="cit31"/>
   </list>
-<list lv="l1"><text> Steve Hodge – </text>
+<list lv="l1"><text>Steve Hodge –</text>
   <pagelink id="Keyboard instrument"><text>keyboards</text>
     </pagelink>
   <citlink id="cit32"/>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="Erdal Kızılçay"><text>Erdal Kizilcay</text>
+<list lv="l1"><pagelink id="Erdal Kızılçay"><text>Erdal Kizilcay</text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Bass (sound)"><text>bass</text>
     </pagelink>
-  <text>, </text>
+  <text><P/>, </text>
   <pagelink id="Drum kit"><text>drums</text>
     </pagelink>
   <text>, keyboards</text>
   </list>
 <list lv="l1"><text> <E>David Richards</E> – producer</text>
   </list>
-<citation id="cit29"><table id="table21"><tabtitle><text><V>cite</V> <E>AV media notes</E></text>
+<citation id="cit29"><table id="table21"><tabtitle><text><V>cite</V> <N>AV media notes</N></text>
       </tabtitle>
     <head id="C0"><text><N>title</N></text>
       </head>
@@ -1029,7 +1047,7 @@
       </cell>
     <head id="C1"><text>year</text>
       </head>
-    <cell id="C1"><text>1987</text>
+    <cell id="C1"><text> <C>1987</C></text>
       </cell>
     <head id="C2"><text>type</text>
       </head>
@@ -1070,16 +1088,16 @@
   <attr><text>Additional musician the </text>
     <quot><text>single version</text>
       </quot>
-    <text>, </text>
+    <text>,</text>
     <quot><text><E>Extended Dance Mix</E></text>
       </quot>
-    <text>, </text>
+    <text>,</text>
     <quot><text>Dub</text>
       </quot>
-    <text> and </text>
+    <text>and</text>
     <quot><text>A Capella</text>
       </quot>
-    <text> versions.</text>
+    <text>versions.</text>
     </attr>
   </citation>
 <citation id="cit32"><table id="table24"><tabtitle><text>efn</text>
@@ -1095,19 +1113,25 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>Charts</E></text>
+<heading lv="h1" id="0784_1659"><text><E>Charts</E></text>
   </heading>
 <tablink id="table25"/>
+
 <br/>
 <citlink id="cit34"/>
+
 <br/>
 <citlink id="cit35"/>
+
 <br/>
 <citlink id="cit36"/>
+
 <br/>
 <citlink id="cit37"/>
+
 <br/>
 <citlink id="cit38"/>
+
 <br/>
 <citlink id="cit39"/>
 <table id="table25"><head id="C0"><text><E>Chart</E> <P/>(<C>1987</C><P/>)</text>
@@ -1115,7 +1139,7 @@
   <head id="C1"><text><E>Peak</E>
 </text>
     <br/>
-    <text> position</text>
+    <text>position</text>
     </head>
   <head id="R2"><text><E>Australia</E> <P/>(</text>
     <pagelink id="Kent Music Report"><text><E>Kent Music Report</E></text>
@@ -1126,19 +1150,19 @@
   <head id="C0"><text>scope=</text>
     <quot><text>row</text>
       </quot>
-    <text> </text>
+    
     <citlink id="cit40"/>
     </head>
-  <cell id="C1" id="R2"><text>63</text>
+  <cell id="C1,R2"><text>63</text>
     </cell>
   </table>
 <citation id="cit33"><table id="table26"><tabtitle><text><V>Cite</V> <N>book</N></text>
       </tabtitle>
-    <head id="C0"><text>title</text>
+    <head id="C0"><text><N>title</N></text>
       </head>
     <cell id="C0"><pagelink id="Kent Music Report"><text><E>Australian Chart Book 1970–1992</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C1"><text>last</text>
       </head>
@@ -1160,7 +1184,7 @@
       </head>
     <cell id="C5"><pagelink id="St Ives, New South Wales"><text><E>St Ives</E><P/>, <E>NSW</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C6"><text>year</text>
       </head>
@@ -1176,7 +1200,7 @@
       </tabtitle>
     <head id="C0"><text><N>artist</N></text>
       </head>
-    <cell id="C0"><text><E>David Bowie</E></text>
+    <cell id="C0"><text><E>David Bowie</E> </text>
       </cell>
     <head id="C1"><text>accessdate</text>
       </head>
@@ -1196,9 +1220,9 @@
       </tabtitle>
     <head id="C0"><text><N>artist</N></text>
       </head>
-    <cell id="C0"><text><E>David Bowie</E></text>
+    <cell id="C0"><text><E>David Bowie</E> </text>
       </cell>
-    <head id="C1"><text>song</text>
+    <head id="C1"><text><N>song</N></text>
       </head>
     <cell id="C1"><text><E>Never Let Me Down</E></text>
       </cell>
@@ -1261,7 +1285,7 @@
       </tabtitle>
     <head id="C0"><text><N>artist</N></text>
       </head>
-    <cell id="C0"><text><E>David Bowie</E></text>
+    <cell id="C0"><text><E>David Bowie</E> </text>
       </cell>
     <head id="C1"><text>accessdate</text>
       </head>
@@ -1281,7 +1305,7 @@
       </tabtitle>
     <head id="C0"><text><N>artist</N></text>
       </head>
-    <cell id="C0"><text><E>David Bowie</E></text>
+    <cell id="C0"><text><E>David Bowie</E> </text>
       </cell>
     <head id="C1"><text>accessdate</text>
       </head>
@@ -1301,7 +1325,7 @@
       </tabtitle>
     <head id="C0"><text><N>artist</N></text>
       </head>
-    <cell id="C0"><text><E>David Bowie</E></text>
+    <cell id="C0"><text><E>David Bowie</E> </text>
       </cell>
     <head id="C1"><text>accessdate</text>
       </head>
@@ -1313,13 +1337,12 @@
   <list lv="l1"><attr>15</attr>
     </list>
   </citation>
-<heading lv="h1"><text> <E>Notes</E> </text>
+<heading lv="h1" id="0784_1673"><text> <E>Notes</E> </text>
   </heading>
 <mark>notelist-ua</mark>
-<heading lv="h1"><text> <E>Bibliography</E> </text>
+<heading lv="h1" id="0784_1687"><text> <E>Bibliography</E> </text>
   </heading>
-<list lv="l1"><text> </text>
-  <pagelink id="Nicholas Pegg"><text><E>Pegg</E><P/>, <E>Nicholas</E></text>
+<list lv="l1"><pagelink id="Nicholas Pegg"><text><E>Pegg</E><P/>, <E>Nicholas</E></text>
     </pagelink>
   <text><P/>, </text>
   <entity lv="2"><text>The <E>Complete</E> <E>David Bowie</E> <E>New Edition</E><P/>: <E>Expanded and Updated</E></text>
@@ -1329,27 +1352,32 @@
   </list>
 <citation id="cit41" class="ISBN"><attr>978-1-78565-365-0</attr>
   </citation>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="0784_1701"><text><E>References</E></text>
   </heading>
-<heading lv="h1"><text>External links</text>
+<heading lv="h1" id="0784_1715"><text>External links</text>
   </heading>
-<list lv="l1"><text> </text>
-  <citlink id="cit43"/>
+<list lv="l1"><citlink id="cit43"/>
   </list>
+
 <br/>
 <mark>David Bowie singles</mark>
+
 <br/>
 <category id="1987 singles">1987 singles
   </category>
+
 <br/>
 <category id="David Bowie songs">David Bowie songs
   </category>
+
 <br/>
 <category id="Songs written by David Bowie">Songs written by David Bowie
   </category>
+
 <br/>
 <category id="Songs written by Carlos Alomar">Songs written by Carlos Alomar
   </category>
+
 <br/>
 <category id="Music videos directed by Jean-Baptiste Mondino">Music videos directed by Jean-Baptiste Mondino
   </category>

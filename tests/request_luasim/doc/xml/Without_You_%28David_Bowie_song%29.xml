@@ -1,13 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Without_You_%28David_Bowie_song%29</docid>
-<title>Without You (David Bowie song)</title>
+<title id="0904_7570">Without You (David Bowie song)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <citlink id="cit4"/>
+
 <br/>
 <quot><entity lv="3"><text><E id="Without You">Without You</E></text>
     </entity>
@@ -31,7 +35,7 @@
 <text><P/>, <A>back</A> <N>cover photograph</N> <V>is</V> by <A>longtime</A> <E id="David Bowie">Bowie</E> <N>collaborator</N> </text>
 <pagelink id="Denis O&apos;Regan"><text><E>Denis O'Regan</E></text>
   </pagelink>
-<text>.</text>
+<text><T/>. </text>
 <citation id="cit1" class="Use British English" date="January 2014"/>
 <citation id="cit2" class="Use dmy dates" date="January 2014"/>
 <citation id="cit3" class="Refimprove" date="January 2016"/>
@@ -52,12 +56,13 @@
     <head id="C3"><text>url</text>
       </head>
     <cell id="C3"><weblink id="http://thequietus.com/articles/04884-david-bowie-beyond-the-hits"/>
+      
       </cell>
     <head id="C4"><text>work</text>
       </head>
     <cell id="C4"><pagelink id="The Quietus"><text><E>The Quietus</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C5"><text>date</text>
       </head>
@@ -170,55 +175,55 @@
     <head id="C14"><text>misc</text>
       </head>
     <cell id="C14"><citlink id="cit7"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Track listing</text>
+<heading lv="h1" id="0904_7584"><text>Track listing</text>
   </heading>
-<heading lv="h2"><text>7</text>
+<heading lv="h2" id="0904_7598"><text>7</text>
   <quot><text>: <E>EMI America</E> / <E>B 8190</E> <P/>(<E>US</E><P/>)</text>
     </quot>
   </heading>
 <text>#</text>
 <quot><text><E>Without You</E></text>
   </quot>
-<text> </text>
+
 
   <text>(</text>
   <pagelink id="David Bowie"><text><E>David Bowie</E></text>
     </pagelink>
   <text>)</text>
   
-<text>  – 3:08
-</text>
+<text>– 3:08</text>
 <br/>
 <text>#</text>
 <quot><pagelink id="Criminal World"><text><E>Criminal World</E></text>
     </pagelink>
   </quot>
-<text> </text>
+
 
   <text>(</text>
   <pagelink id="Duncan Browne"><text><E>Duncan Browne</E></text>
     </pagelink>
-  <text>, </text>
+  <text><P/>, </text>
   <pagelink id="Peter Godwin (singer)"><text><E>Peter Godwin</E></text>
     </pagelink>
   <text>, Sean Lyons)</text>
   
-<text> – 4:25</text>
-<heading lv="h1"><text><E>Personnel</E></text>
+<text>– 4:25</text>
+<heading lv="h1" id="0904_7612"><text><E>Personnel</E></text>
   </heading>
 <list lv="l1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Singing"><text>vocals</text>
     </pagelink>
   </list>
 <list lv="l1"><pagelink id="Stevie Ray Vaughan"><text><E>Stevie Ray Vaughan</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Guitar"><text><E id="Guitar">guitar</E></text>
     </pagelink>
   </list>
@@ -228,19 +233,19 @@
   </list>
 <list lv="l1"><pagelink id="Bernard Edwards"><text><E>Bernard Edwards</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Bass guitar"><text>bass guitar</text>
     </pagelink>
   </list>
 <list lv="l1"><pagelink id="Tony Thompson (drummer)"><text><E>Tony Thompson</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Drum kit"><text><V>drums</V></text>
     </pagelink>
   </list>
 <list lv="l1"><pagelink id="Stan Harrison"><text><E>Stan Harrison</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Saxophone"><text>saxophone</text>
     </pagelink>
   </list>
@@ -248,12 +253,13 @@
   </list>
 <list lv="l1"><pagelink id="Frank Simms"><text><E>Frank Simms</E></text>
     </pagelink>
-  <text> – </text>
+  <text>–</text>
   <pagelink id="Backing vocalist"><text>backing vocals</text>
     </pagelink>
   </list>
 <list lv="l1"><text>George Simms – backing vocals</text>
   </list>
+
 <br/>
 <text>;Production team</text>
 <list lv="l1"><text><E>David Bowie</E> – </text>
@@ -262,22 +268,24 @@
   </list>
 <list lv="l1"><text><E>Nile Rodgers</E> – producer</text>
   </list>
-<heading lv="h1"><text>Chart performance</text>
+<heading lv="h1" id="0904_7626"><text>Chart performance</text>
   </heading>
 <tablink id="table4"/>
 <table id="table4"><head id="C0"><text><E>Chart</E> <P/>(<C>1984</C><P/>)</text>
     </head>
-  <head id="C1"><text><E>Peakposition</E></text>
+  <head id="C1"><text>Peak</text>
+    <br/>
+    <text>position</text>
     </head>
-  <cell id="C0" id="R1"><text><E>US</E> </text>
+  <cell id="C0,R1"><text><E>US</E> </text>
     <pagelink id="Billboard Hot 100"><entity lv="2"><text><E>Billboard</E></text>
         </entity>
-      <text> Hot 100</text>
+      <text>Hot 100</text>
       </pagelink>
     <citlink id="cit8"/>
-    <text> </text>
+    
     </cell>
-  <cell id="C1" id="R1"><text>73</text>
+  <cell id="C1,R1"><text>73</text>
     </cell>
   </table>
 <citation id="cit9"><table id="table5"><tabtitle><text>BillboardURLbyName</text>
@@ -308,40 +316,49 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>See also</text>
+<heading lv="h1" id="0904_7640"><text>See also</text>
   </heading>
 <list lv="l1"><pagelink id="List of post-disco artists and songs"><text><E>List of post-disco artists and songs</E></text>
     </pagelink>
   </list>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="0904_7654"><text><E>References</E></text>
   </heading>
 <mark>Reflist</mark>
-<heading lv="h1"><text>External links</text>
+<heading lv="h1" id="0904_7668"><text>External links</text>
   </heading>
 <list lv="l1"><citlink id="cit10"/>
   </list>
+
 <br/>
 <mark>David Bowie singles</mark>
+
 <br/>
 <mark>DEFAULTSORT:Without You (David Bowie Song)</mark>
+
 <br/>
 <category id="1983 singles">1983 singles
   </category>
+
 <br/>
 <category id="1983 songs">1983 songs
   </category>
+
 <br/>
 <category id="David Bowie songs">David Bowie songs
   </category>
+
 <br/>
 <category id="Post-disco songs">Post-disco songs
   </category>
+
 <br/>
 <category id="Songs written by David Bowie">Songs written by David Bowie
   </category>
+
 <br/>
 <category id="Song recordings produced by Nile Rodgers">Song recordings produced by Nile Rodgers
   </category>
+
 <br/>
 <category id="EMI America Records singles">EMI America Records singles
   </category>

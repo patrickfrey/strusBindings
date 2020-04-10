@@ -1,15 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Stage_%28David_Bowie_album%29</docid>
-<title>Stage (David Bowie album)</title>
+<title id="0724_4806">Stage (David Bowie album)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <citlink id="cit4"/>
+
 <br/>
 <citlink id="cit9"/>
+
 <br/>
 <entity lv="5"><text><E id="Stage">Stage</E></text>
   </entity>
@@ -26,7 +31,7 @@
 <entity lv="2"><pagelink id="Low (David Bowie album)"><text><E>Low</E></text>
     </pagelink>
   </entity>
-<text> and </text>
+<text>and</text>
 <entity lv="2"><pagelink id="&quot;Heroes&quot; (David Bowie album)"><quot><text><E id="&quot;Heroes&quot;">Heroes</E></text>
       </quot>
     </pagelink>
@@ -40,7 +45,7 @@
 <text><P/>, </text>
 <pagelink id="Providence, Rhode Island"><text><E id="Providence, Rhode Island">Providence</E></text>
   </pagelink>
-<text> and </text>
+<text>and</text>
 <pagelink id="Boston"><text><E>Boston</E></text>
   </pagelink>
 <text><P/>, <E>US</E><P/>, in <A>late</A> <E>April</E> and <A>early</A> <E>May</E> <C>1978</C><T/>. <R id="Stage">It</R> <A>primarily</A> <V>included</V> <N>material</N> from <E id="David Bowie">Bowie</E>'s <A>most</A> <A>recent</A> <N>studio albums</N> to that <N>date</N><P/>, </text>
@@ -50,7 +55,7 @@
 <text><P/>, </text>
 <entity lv="2"><text><E>Low</E></text>
   </entity>
-<text> and </text>
+<text>and</text>
 <entity lv="2"/>
 <quot><text><E id="&quot;Heroes&quot;">Heroes</E></text>
   </quot>
@@ -64,7 +69,7 @@
   <text><P/>, </text>
   <pagelink id="Dennis Davis"><text><E>Dennis Davis</E></text>
     </pagelink>
-  <text> and </text>
+  <text>and</text>
   <pagelink id="George Murray (musician)"><text><E>George Murray</E></text>
     </pagelink>
   <text><P/>, <N>band members</N> <V>included</V> <N>ex-</N></text>
@@ -76,7 +81,7 @@
   <text> on <N>guitar</N><P/>, </text>
   <pagelink id="Simon House"><text><E>Simon House</E></text>
     </pagelink>
-  <text> from </text>
+  <text>from</text>
   <pagelink id="Hawkwind"><text><E>Hawkwind</E></text>
     </pagelink>
   <text> on <A>electric</A> <N>violin</N><P/>, </text>
@@ -95,20 +100,21 @@
   </entity>
 <pagelink id="Lodger (album)"><text><E>Lodger</E></text>
   </pagelink>
-<entity lv="2"><text><T/>.</text>
+<entity lv="2"><text><T/>. </text>
   </entity>
+
 <br/>
 <text><A>Generally</A> <V>considered</V> <A>more</A> <A>relaxed</A> than <E id="David Bowie">Bowie</E>'s <A>previous</A> <A>live</A> <N>album</N><P/>, </text>
 <entity lv="2"><pagelink id="David Live"><text><E>David Live</E></text>
     </pagelink>
   </entity>
 <text><P/>, </text>
-<entity lv="2"><text><E>Stage</E></text>
+<entity lv="2"><text><E id="Stage">Stage</E></text>
   </entity>
 <text> <V>was</V> <V>praised</V> on <R>its</R> <A>initial</A> <N>vinyl release</N> for the <N>fidelity</N> with <W>which</W> the <N>band</N> <V>was</V> <A>able</A> to <V>emulate</V> in <N>concert</N> the <A>electronic</A> and <N>effects</N>-<V>filled</V> <N>numbers</N> from </text>
 <entity lv="2"><text><E>Low</E></text>
   </entity>
-<text> and </text>
+<text>and</text>
 <entity lv="2"/>
 <quot><text><E id="&quot;Heroes&quot;">Heroes</E></text>
   </quot>
@@ -121,11 +127,12 @@
     </quot>
   </entity>
 <reflink id="ref10"/>
+
 <br/>
 <text>As <E id="David Bowie">Bowie</E> <A>rarely</A> <V>tampered</V> with the <N>arrangements</N> <P/>– in <N>contrast</N> to <R>his</R> <N>method</N> on </text>
 <entity lv="2"><text><E>David Live</E></text>
   </entity>
-<text> – </text>
+<text>–</text>
 <entity lv="2"><text><E id="Stage">Stage</E></text>
   </entity>
 <text> <V>added</V> <A>little</A> to <W>what</W> <V>was</V> <A>available</A> on the <A>original</A> <N>albums</N><P/>, and <A>hence</A> <V>was</V> <V>seen</V> by some <N>commentators</N> as <A>simply</A> a <N>marketing exercise</N> <W>that</W> <V>did</V> <A>not</A> <V>do</V> <N>justice</N> to a <A>memorable</A> <N>series</N> of <A>live</A> <N>concerts</N><T/>. <A>Even</A> the <N>cover picture</N> <V>came</V> <A>in</A> for <N>criticism</N><P/>, <A>more</A> <A>so</A> because the <N>rest</N> of the <N>package</N> <V>contained</V> <A>only</A> <N>variations</N> of the <A>same</A> <N>shot</N><T/>.
@@ -138,6 +145,7 @@
   </pagelink>
 <text>.It <A>also</A> <V>reached</V> <N>No</N><T/>. 44 in the US charts. </text>
 <citlink id="cit25"/>
+
 <br/>
 <quot><pagelink id="Breaking Glass (song)"><text><E>Breaking Glass</E></text>
     </pagelink>
@@ -161,9 +169,10 @@
   </pagelink>
 <quot><text> <V>was</V> <V>released</V><P/>, with <E>Blackout</E></text>
   </quot>
-<text/>
+
 <quot><text> on the <N>B</N>-<N>side</N><P/>, but <A>also</A> <V>failed</V> to <V>chart</V><T/>.</text>
   </quot>
+
 <br/>
 <text>A <C>2005</C> <N>reissue</N> <V>saw</V> <A>most</A> of the <N>criticisms</N> of the <A>original</A> <E>LP</E> <V>addressed</V><P/>, and <V>garnered</V> some <A>favourable</A> <N>reviews</N><T/>.
 </text>
@@ -174,7 +183,7 @@
 <text>' <N>list</N> of <R>its</R> <N>writers</N>' </text>
 <quot><text><C>40</C> <E>Favourite Live Albums</E></text>
   </quot>
-<text><T/>.</text>
+<text><T/>. </text>
 <citlink id="cit27"/>
 <ref id="ref2"><citlink id="cit13"/>
   <citlink id="cit14"/>
@@ -215,11 +224,11 @@
       </head>
     <cell id="C2"><pagelink id="Breaking Glass (song)"><text><E>Breaking Glass</E></text>
         </pagelink>
-      <quot><text> b/w </text>
+      <quot><text>b/w</text>
         </quot>
       <pagelink id="Art Decade"><text><E>Art Decade</E></text>
         </pagelink>
-      <quot><text> / </text>
+      <quot><text>/</text>
         </quot>
       <pagelink id="Ziggy Stardust (song)"><text><E>Ziggy Stardust</E></text>
         </pagelink>
@@ -268,7 +277,7 @@
       </cell>
     <head id="C8"><text>length</text>
       </head>
-    <cell id="C8"><text>73:17 (original LP release)  77:17 (1991 CD version)  85:31 (2005 CD reissue)  94:30 (2017 version)</text>
+    <cell id="C8"><text>73:17 (original LP release)   77:17 (1991 CD version)   85:31 (2005 CD reissue)   94:30 (2017 version)</text>
       </cell>
     <head id="C9"><text>label</text>
       </head>
@@ -293,6 +302,7 @@
     <head id="C13"><text>misc</text>
       </head>
     <cell id="C13"><citlink id="cit8"/>
+      
       <br/>
       </cell>
     </table>
@@ -332,12 +342,13 @@
     <head id="C1"><text>url</text>
       </head>
     <cell id="C1"><weblink id="http://www.blender.com/guide/back-catalogue/53910/stage.html"/>
+      
       </cell>
     <head id="C2"><text>work</text>
       </head>
     <cell id="C2"><pagelink id="Blender (magazine)"><text><E>Blender</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C3"><text>accessdate</text>
       </head>
@@ -355,7 +366,7 @@
       </head>
     <cell id="C1"><text>Inter</text>
       <code>netArchiveBot</code>
-      <text> </text>
+      
       </cell>
     <head id="C2"><text><N>fix</N>-<V>attempted</V></text>
       </head>
@@ -374,13 +385,13 @@
       </head>
     <cell id="C0"><pagelink id="Encyclopedia of Popular Music"><text>The <E>Encyclopedia of Popular Music</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C1"><text>publisher</text>
       </head>
     <cell id="C1"><pagelink id="Omnibus Press"><text><E>Omnibus Press</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C2"><text>edition</text>
       </head>
@@ -409,6 +420,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.nme.com/reviews/david-bowie/7647"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -418,7 +430,7 @@
       </head>
     <cell id="C2"><text><E>Nme</E><T/>.<E>Com</E></text>
       </cell>
-    <head id="C3"><text>date</text>
+    <head id="C3"><text><N>date</N></text>
       </head>
     <cell id="C3"><text>7 April 2005</text>
       </cell>
@@ -477,6 +489,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.pitchforkmedia.com/article/record_review/15619/David_Bowie_David_Live_Stage"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -505,6 +518,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.robertchristgau.com/get_artist.php?name=david+bowie"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -530,6 +544,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="https://www.rollingstone.com/music/artists/david-bowie/albumguide"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -539,7 +554,7 @@
       </head>
     <cell id="C2"><pagelink id="Rolling Stone"><text>rollingstone.com</text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C3"><text>archiveurl</text>
       </head>
@@ -580,12 +595,13 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://selectmagazinescans.monkeon.co.uk/showpage.php?file=wp-content/uploads/2014/10/reissues.jpg"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><text><E>David Bowie</E><P/>: <E>Stage</E></text>
       </cell>
-    <head id="C2"><text>date</text>
+    <head id="C2"><text><N>date</N></text>
       </head>
     <cell id="C2"><text>March 1992</text>
       </cell>
@@ -597,7 +613,7 @@
       </head>
     <cell id="C4"><pagelink id="Select (magazine)"><text><E>Select</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C5"><text>last</text>
       </head>
@@ -713,13 +729,14 @@
       </head>
     <cell id="C17"><citlink id="cit23"/>
       <citlink id="cit24"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
 <citation id="cit25"><table id="table16"><tabtitle><text>Cite web</text>
       </tabtitle>
-    <head id="C0"><text>date</text>
+    <head id="C0"><text><N>date</N></text>
       </head>
     <cell id="C0"><text>2018-02-06</text>
       </cell>
@@ -730,6 +747,7 @@
     <head id="C2"><text>url</text>
       </head>
     <cell id="C2"><weblink id="https://en.wikipedia.org/w/index.php?title=David_Bowie_discography&amp;oldid=824329083"/>
+      
       </cell>
     <head id="C3"><text>website</text>
       </head>
@@ -743,7 +761,7 @@
   </citation>
 <citation id="cit26"><table id="table17"><tabtitle><text>Cite web</text>
       </tabtitle>
-    <head id="C0"><text>date</text>
+    <head id="C0"><text><N>date</N></text>
       </head>
     <cell id="C0"><text>2017-09-30</text>
       </cell>
@@ -775,13 +793,13 @@
       </head>
     <cell id="C1"><text><E>John Doran</E></text>
       </cell>
-    <head id="C2"><text>date</text>
+    <head id="C2"><text><N>date</N></text>
       </head>
     <cell id="C2"><text>5 February 2013</text>
       </cell>
     <head id="C3"><text>website</text>
       </head>
-    <cell id="C3"><text><E>The Quietus</E></text>
+    <cell id="C3"><text><E>The Quietus</E> </text>
       </cell>
     <head id="C4"><text>url</text>
       </head>
@@ -789,21 +807,25 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Track listings</text>
+<heading lv="h1" id="0724_4820"><text>Track listings</text>
   </heading>
 <text>All <N>tracks</N> <V>written</V> by </text>
 <pagelink id="David Bowie"><text><E>David Bowie</E></text>
   </pagelink>
 <text><P/>, except <W>where</W> <V>noted</V><T/>.</text>
-<heading lv="h2"><text><E>Original 1978 LP</E></text>
+<heading lv="h2" id="0724_4834"><text><E>Original 1978 LP</E></text>
   </heading>
 <citlink id="cit28"/>
+
 <br/>
 <citlink id="cit29"/>
+
 <br/>
 <citlink id="cit30"/>
+
 <br/>
 <citlink id="cit31"/>
+
 <br/>
 <text>The <N>cassette release</N> <V>places</V> </text>
 <quot><pagelink id="Speed of Life (David Bowie song)"><text><E>Speed of Life</E></text>
@@ -811,10 +833,10 @@
   </quot>
 <quot><text> between <E>Fame</E></text>
   </quot>
-<text/>
+
 <quot><text> and <E>TVC</E></text>
   </quot>
-<text> 15</text>
+<text>15</text>
 <quot><text><T/>.</text>
   </quot>
 <citation id="cit28"><table id="table19"><tabtitle><text>tracklist</text>
@@ -863,7 +885,7 @@
       </cell>
     <head id="C3"><text>note7</text>
       </head>
-    <cell id="C3"><text><E>Bowie</E><P/>,</text>
+    <cell id="C3"><text><E>Bowie</E><P/>, </text>
       <pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
         </pagelink>
       <text><P/>, </text>
@@ -890,7 +912,7 @@
       </cell>
     <head id="C2"><text>note9</text>
       </head>
-    <cell id="C2"><text><E>Bowie</E><P/>,</text>
+    <cell id="C2"><text><E>Bowie</E><P/>, </text>
       <pagelink id="Brian Eno"><text><E>Brian Eno</E></text>
         </pagelink>
       </cell>
@@ -915,7 +937,7 @@
       </cell>
     <head id="C7"><text>note13</text>
       </head>
-    <cell id="C7"><text><E>Bowie</E><P/>,</text>
+    <cell id="C7"><text><E>Bowie</E><P/>, </text>
       <pagelink id="Dennis Davis"><text><E>Dennis Davis</E></text>
         </pagelink>
       <text><P/>, </text>
@@ -961,9 +983,9 @@
       </cell>
     </table>
   </citation>
-<heading lv="h2"><text><E>Rereleases</E></text>
+<heading lv="h2" id="0724_4848"><text><E>Rereleases</E></text>
   </heading>
-<entity lv="2"><text><E>Stage</E></text>
+<entity lv="2"><text><E id="Stage">Stage</E></text>
   </entity>
 <text> <V>has</V> <V>been</V> <V>rereleased</V> on <N>CD</N> <C>four</C> <N>times</N> to <N>date</N><P/>, the <A>first</A> <N>being</N> in <C>1984</C> by </text>
 <pagelink id="RCA Records"><text><E>RCA Records</E></text>
@@ -986,14 +1008,14 @@
 <text> <N>release</N> of this <N>album</N> <V>was</V> </text>
 <pagelink id="Copy protection"><text><N>copy</N> <V>protected</V></text>
   </pagelink>
-<text> with </text>
+<text>with</text>
 <pagelink id="Cactus Data Shield"><text><E>CDS</E> <C>200</C></text>
   </pagelink>
 <text> in the <E>EU</E><T/>.</text>
-<heading lv="h3"><text>1984 rerelease</text>
+<heading lv="h3" id="0724_4862"><text>1984 rerelease</text>
   </heading>
 <text>The <C>1984</C> <N>rerelease</N> on <E>CD</E> <P/>(<N>catalogue number PD89002</N><P/>) <V>contains</V> the <A>same</A> <N>running order</N> as the <A>original</A> <E>LP</E><P/>, and <V>comes</V> on <C>two</C> <N>discs</N><T/>. Some of the <E>European</E>-<V>distributed</V> <N>CDs</N> <V>were</V> <V>manufactured</V> in <E>Japan</E><P/>, but <V>cover</V> and <V>assembling</V> <V>were</V> <V>made</V> in <E>Europe</E><T/>. <A>Most</A> of the <E>CDs</E> <V>were</V> <V>made</V> in <E>Germany</E><T/>.</text>
-<heading lv="h3"><text>1991 rerelease track listing</text>
+<heading lv="h3" id="0724_4876"><text>1991 rerelease track listing</text>
   </heading>
 <text>In <C>1991</C><P/>, <E id="Stage">Stage</E> <V>was</V> <V>rereleased</V> on <E>CD</E><P/>, with the <A>same</A> <N>running order</N> as the <A>original</A> <E>LP</E><P/>, with </text>
 <quot><pagelink id="Alabama Song" anchor="David Bowie version"><text><E>Alabama Song</E></text>
@@ -1003,6 +1025,7 @@
 </text>
 <br/>
 <citlink id="cit32"/>
+
 <br/>
 <citlink id="cit33"/>
 <citation id="cit32"><table id="table23"><tabtitle><text>tracklist</text>
@@ -1106,12 +1129,13 @@
       </cell>
     </table>
   </citation>
-<heading lv="h3"><text>2005 rerelease track listing</text>
+<heading lv="h3" id="0724_4890"><text>2005 rerelease track listing</text>
   </heading>
 <text>The <C>2005</C> <E>CD</E> <N>reissue</N> <V>features</V> a <A>new</A> <N>running order</N><P/>, <V>reflecting</V> the <A>original</A> <N>setlist</N> of the <N>concerts</N> as <V>performed</V><T/>. <C>Two</C> <A>previously</A> <A>unreleased</A> <N>performances</N> <V>were</V> <V>included</V> on the <N>album</N> as <N>bonus tracks</N><T/>.
 </text>
 <br/>
 <citlink id="cit34"/>
+
 <br/>
 <citlink id="cit35"/>
 <citation id="cit34"><table id="table25"><tabtitle><text>tracklist</text>
@@ -1139,7 +1163,7 @@
       </cell>
     <head id="C5"><text>note4</text>
       </head>
-    <cell id="C5"><text>Previously unreleased</text>
+    <cell id="C5"><text><E>Previouslyunreleased</E></text>
       </cell>
     <head id="C6"><text>title6</text>
       </head>
@@ -1216,7 +1240,7 @@
       </cell>
     <head id="C11"><text>note9</text>
       </head>
-    <cell id="C11"><text>Previously unreleased</text>
+    <cell id="C11"><text><E>Previouslyunreleased</E></text>
       </cell>
     <head id="C12"><text>title10</text>
       </head>
@@ -1224,32 +1248,39 @@
       </cell>
     </table>
   </citation>
-<heading lv="h3"><text>2017 rerelease track listing</text>
+<heading lv="h3" id="0724_4904"><text>2017 rerelease track listing</text>
   </heading>
 <text>In <C>2017</C><P/>, the <N>album</N> <V>was</V> <V>included</V><P/>, in <C>two</C> <N>versions</N><P/>, in the </text>
 <entity lv="2"><pagelink id="A New Career in a New Town (1977–1982)"><text><E>A New Career in a New Town</E> <P/>(<C>1977–1982</C><P/>)</text>
     </pagelink>
   </entity>
-<text> </text>
+
 <pagelink id="Box set"><text><N>box set</N></text>
   </pagelink>
 <text> <V>released</V> by <E>Parlophone</E><T/>.  <C>One</C> <N>version</N> <V>contained</V> the <A>same</A> <N>list</N> and <N>ordering</N> of <N>tracks</N> <W>that</W> <V>had</V> <V>appeared</V> on the <A>original</A> <N>vinyl album</N><P/>; the <N>other</N> <V>was</V> a <A>new</A> <N>version</N> of the <N>album</N><P/>, <V>based</V> on the <C>2005</C> <N>edition</N> but <V>including</V> <C>two</C> <A>previously</A> <A>unreleased</A> <N>songs</N> from the <N>concerts</N><T/>.</text>
 <citlink id="cit36"/>
 <text> The <N>latter</N> <V>was</V> <A>also</A> <V>released</V> <A>separately</A><P/>, in <C>2-CD </C>and <C>3-LP </C><N>formats</N><P/>, in <C>2018</C><T/>.</text>
 <citlink id="cit37"/>
+
 <br/>
 <citlink id="cit38"/>
 <citlink id="cit39"/>
+
 <br/>
 <citlink id="cit40"/>
+
 <br/>
 <citlink id="cit41"/>
+
 <br/>
 <citlink id="cit42"/>
+
 <br/>
 <citlink id="cit43"/>
+
 <br/>
 <citlink id="cit44"/>
+
 <br/>
 <citlink id="cit45"/>
 <citation id="cit36"><table id="table27"><tabtitle><text><V>cite</V> <N>web</N></text>
@@ -1257,6 +1288,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.com/news/new-career-new-town-1977-1982-57146"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -1266,7 +1298,7 @@
       </head>
     <cell id="C2"><text><E>David Bowie</E></text>
       </cell>
-    <head id="C3"><text>date</text>
+    <head id="C3"><text><N>date</N></text>
       </head>
     <cell id="C3"><text>2016-07-12</text>
       </cell>
@@ -1294,13 +1326,14 @@
       </head>
     <cell id="C0"><text><E>Paul Sinclair</E></text>
       </cell>
-    <head id="C1"><text>date</text>
+    <head id="C1"><text><N>date</N></text>
       </head>
     <cell id="C1"><text>19 January 2018</text>
       </cell>
     <head id="C2"><text>url</text>
       </head>
     <cell id="C2"><weblink id="http://www.superdeluxeedition.com/news/david-bowie-remastered-berlin-albums-available-separately-next-month"/>
+      
       </cell>
     <head id="C3"><text>title</text>
       </head>
@@ -1357,7 +1390,7 @@
       </cell>
     <head id="C4"><text>note5</text>
       </head>
-    <cell id="C4"><text>Previously unreleased</text>
+    <cell id="C4"><text><E>Previouslyunreleased</E></text>
       </cell>
     </table>
   </citation>
@@ -1422,7 +1455,7 @@
       </cell>
     <head id="C7"><text>note17</text>
       </head>
-    <cell id="C7"><text>Previously unreleased</text>
+    <cell id="C7"><text><E>Previouslyunreleased</E></text>
       </cell>
     </table>
   </citation>
@@ -1510,7 +1543,7 @@
       </cell>
     <head id="C10"><text>note5</text>
       </head>
-    <cell id="C10"><text>Previously unreleased</text>
+    <cell id="C10"><text><E>Previouslyunreleased</E></text>
       </cell>
     <head id="C11"><text>writer9</text>
       </head>
@@ -1578,19 +1611,19 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>Personnel</E></text>
+<heading lv="h1" id="0724_4918"><text><E>Personnel</E></text>
   </heading>
 <list lv="l1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
     </pagelink>
-  <text> – vocals, keyboards</text>
+  <text>– vocals, keyboards</text>
   </list>
 <list lv="l1"><pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
     </pagelink>
-  <text> – rhythm guitar, backing vocals</text>
+  <text>– rhythm guitar, backing vocals</text>
   </list>
 <list lv="l1"><pagelink id="George Murray (musician)"><text><E>George Murray</E></text>
     </pagelink>
-  <text> – bass, backing vocals</text>
+  <text>– bass, backing vocals</text>
   </list>
 <list lv="l1"><pagelink id="Dennis Davis"><text><E>Dennis Davis</E></text>
     </pagelink>
@@ -1598,30 +1631,30 @@
   </list>
 <list lv="l1"><pagelink id="Adrian Belew"><text><E>Adrian Belew</E></text>
     </pagelink>
-  <text> – lead guitar, backing vocals</text>
+  <text>– lead guitar, backing vocals</text>
   </list>
-<heading lv="h2"><text>Additional musicians</text>
+<heading lv="h2" id="0724_4932"><text>Additional musicians</text>
   </heading>
 <list lv="l1"><pagelink id="Simon House"><text><E>Simon House</E></text>
     </pagelink>
-  <text> – violin</text>
+  <text>– violin</text>
   </list>
 <list lv="l1"><pagelink id="Sean Mayes"><text><E>Sean Mayes</E></text>
     </pagelink>
-  <text> – piano, string ensemble, backing vocals</text>
+  <text>– piano, string ensemble, backing vocals</text>
   </list>
 <list lv="l1"><pagelink id="Roger Powell (musician)"><text><E>Roger Powell</E></text>
     </pagelink>
-  <text> – synthesizer, keyboards, backing vocals</text>
+  <text>– synthesizer, keyboards, backing vocals</text>
   </list>
-<heading lv="h2"><text>Additional personnel</text>
+<heading lv="h2" id="0724_4946"><text>Additional personnel</text>
   </heading>
 <list lv="l1"><text>Jan Michael Alejandro – band tech</text>
   </list>
-<list lv="l1"><text>Vern </text>
+<list lv="l1"><text>Vern</text>
   <quot><text>Moose</text>
     </quot>
-  <text> Constan – band tech</text>
+  <text>Constan – band tech</text>
   </list>
 <list lv="l1"><text>Rob Joyce – stage manager</text>
   </list>
@@ -1629,15 +1662,18 @@
   </list>
 <list lv="l1"><text>Edd Kolakowski – piano and keyboard tech (Australia, New Zealand and Japan dates)</text>
   </list>
-<heading lv="h1"><text><E>Charts</E></text>
+<heading lv="h1" id="0724_4960"><text><E>Charts</E></text>
   </heading>
 <entity lv="3"><text><E>Album</E></text>
   </entity>
+
 <br/>
 <tablink id="table37"/>
+
 <br/>
 <entity lv="3"><text><E>Single</E></text>
   </entity>
+
 <br/>
 <tablink id="table39"/>
 <table id="table37"><head id="C0"><text><E>Year</E></text>
@@ -1646,29 +1682,29 @@
     </head>
   <head id="C2"><text><E>Position</E></text>
     </head>
-  <cell id="C0" id="R2"><text>1978</text>
+  <cell id="C0,R2"><text>1978</text>
     </cell>
-  <cell id="C1" id="R2"><text><E>UK Albums Chart</E></text>
+  <cell id="C1,R2"><text><E>UK Albums Chart</E></text>
     </cell>
-  <cell id="C2" id="R2"><text>5</text>
+  <cell id="C2,R2"><text>5</text>
     </cell>
-  <cell id="C0" id="R3"><text>1978</text>
+  <cell id="C0,R3"><text>1978</text>
     </cell>
-  <cell id="C1" id="R3"><text><E>Billboard Pop Albums</E></text>
+  <cell id="C1,R3"><text><E>Billboard Pop Albums</E></text>
     </cell>
-  <cell id="C2" id="R3"><text>44</text>
+  <cell id="C2,R3"><text>44</text>
     </cell>
-  <cell id="C0" id="R4"><text>1978</text>
+  <cell id="C0,R4"><text>1978</text>
     </cell>
-  <cell id="C1" id="R4"><text><E>Norway</E></text>
+  <cell id="C1,R4"><text><E>Norway</E></text>
     </cell>
-  <cell id="C2" id="R4"><text>18</text>
+  <cell id="C2,R4"><text>18</text>
     </cell>
-  <cell id="C0" id="R5"><text>2018</text>
+  <cell id="C0,R5"><text>2018</text>
     </cell>
-  <cell id="C1" id="R5"><text><E>Greek Album Chart</E></text>
+  <cell id="C1,R5"><text><E>Greek Album Chart</E></text>
     </cell>
-  <cell id="C2" id="R5"><text>68</text>
+  <cell id="C2,R5"><text>68</text>
     <citlink id="cit46"/>
     </cell>
   </table>
@@ -1680,14 +1716,14 @@
     </head>
   <head id="C3"><text><E>Position</E></text>
     </head>
-  <cell id="C0" id="R2"><text>1978</text>
+  <cell id="C0,R2"><text>1978</text>
     </cell>
-  <cell id="C1" id="R2"><quot><text><E>Breaking Glass</E></text>
+  <cell id="C1,R2"><quot><text><E>Breaking Glass</E></text>
       </quot>
     </cell>
-  <cell id="C2" id="R2"><text><E>UK Singles Chart</E></text>
+  <cell id="C2,R2"><text><E>UK Singles Chart</E></text>
     </cell>
-  <cell id="C3" id="R2"><text>54</text>
+  <cell id="C3,R2"><text>54</text>
     </cell>
   </table>
 <citation id="cit46"><table id="table38"><tabtitle><text>Cite web</text>
@@ -1702,7 +1738,7 @@
       </cell>
     <head id="C2"><text>website</text>
       </head>
-    <cell id="C2"><text>www.ifpi.gr</text>
+    <cell id="C2"><weblink id="www.ifpi.gr"/>
       </cell>
     <head id="C3"><text>access-date</text>
       </head>
@@ -1710,7 +1746,7 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>Certifications</E></text>
+<heading lv="h1" id="0724_4974"><text><E>Certifications</E></text>
   </heading>
 <tablink id="table40"/>
 <table id="table40"><head id="C0"><text><E>Organization</E></text>
@@ -1719,20 +1755,23 @@
     </head>
   <head id="C2"><text><E>Date</E></text>
     </head>
-  <cell id="C0" id="R2"><text><E>BPI</E> – <E>UK</E></text>
+  <cell id="C0,R2"><text><E>BPI</E> – <E>UK</E></text>
     </cell>
-  <cell id="C1" id="R2"><text><E>Gold</E></text>
+  <cell id="C1,R2"><text><E>Gold</E></text>
     </cell>
-  <cell id="C2" id="R2"><text>1978</text>
+  <cell id="C2,R2"><text>1978</text>
     </cell>
   </table>
-<heading lv="h2"><text>Certifications and sales</text>
+<heading lv="h2" id="0724_4988"><text>Certifications and sales</text>
   </heading>
 <mark>certification Table Top</mark>
+
 <br/>
 <citlink id="cit47"/>
+
 <br/>
 <citlink id="cit50"/>
+
 <br/>
 <mark>certification Table Bottom</mark>
 <citation id="cit48" class="n/a"><attr>none</attr>
@@ -1744,7 +1783,7 @@
     <cell id="C0"><text><E>Les</E> <V>Meilleures</V> <E>Ventes</E> de <E>CD</E> / <E>Albums</E></text>
       <quot><text>Tout Temps</text>
         </quot>
-      <text> </text>
+      
       </cell>
     <head id="C1"><text>language</text>
       </head>
@@ -1755,11 +1794,12 @@
     <cell id="C2"><text>Bestsellers of CDs / Albums</text>
       <quot><text>All Time</text>
         </quot>
-      <text> </text>
+      
       </cell>
     <head id="C3"><text>url</text>
       </head>
     <cell id="C3"><weblink id="http://www.infodisc.fr/Ventes_Albums_Tout_Temps.php?debut=3251"/>
+      
       </cell>
     <head id="C4"><text>website</text>
       </head>
@@ -1792,7 +1832,7 @@
     <head id="C5"><text>award</text>
       </head>
     <cell id="C5"><citlink id="cit48"/>
-      <text> </text>
+      
       </cell>
     <head id="C6"><text>salesamount</text>
       </head>
@@ -1840,15 +1880,16 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="0724_5002"><text><E>References</E></text>
   </heading>
 <mark>Reflist</mark>
+
 <br/>
 <entity lv="3"><text><E>Works</E> <V>cited</V></text>
   </entity>
 <list lv="l1"><pagelink id="Roy Carr"><text><E>Roy Carr</E></text>
     </pagelink>
-  <text> and </text>
+  <text>and</text>
   <pagelink id="Charles Shaar Murray"><text><E>Charles Shaar Murray</E></text>
     </pagelink>
   <text> <P/>(<C>1981</C><P/>)<T/>. </text>
@@ -1863,28 +1904,37 @@
   <entity lv="2"><text>The <E>Complete</E> <E>David Bowie</E></text>
     </entity>
   </list>
+
 <br/>
 <mark>David Bowie</mark>
+
 <br/>
 <mark>DEFAULTSORT:Stage (Album)</mark>
+
 <br/>
 <category id="Albums produced by Tony Visconti">Albums produced by Tony Visconti
   </category>
+
 <br/>
 <category id="David Bowie live albums">David Bowie live albums
   </category>
+
 <br/>
 <category id="1978 live albums">1978 live albums
   </category>
+
 <br/>
 <category id="RCA Records live albums">RCA Records live albums
   </category>
+
 <br/>
 <category id="Rykodisc live albums">Rykodisc live albums
   </category>
+
 <br/>
 <category id="Virgin Records live albums">Virgin Records live albums
   </category>
+
 <br/>
 <category id="EMI Records live albums">EMI Records live albums
   </category></doc>

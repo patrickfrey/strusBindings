@@ -66,8 +66,9 @@ public:
 			{"query", "SET~collect", "GET", "collector", "", {"_feature","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}
 			}},
-			//[+] {"query", "SET~analysis", "GET", "qryanalyzer", "", {"_collected"}, {
-			//[+] }},
+			{"query", "CLOSE~collect", {}, {}},
+			{"query", "SET~analysis", "GET", "qryanalyzer", "", {"_collected"}, {
+			}},
 			{"query", "SET~ranklist", "GET", "qryeval", "", {"_feature","_restriction","_termstats","_globalstats"}, {
 				{{"/query","mergeres", "y", '#'}}
 			}},
@@ -139,6 +140,20 @@ public:
 		{/*input*/
 			{SchemaQueryDeclPart::declareQueryResult( "/queryresult/ranklist")},
 			{SchemaQueryDeclPart::buildQueryFromResult( "/queryresult/ranklist")}
+		}
+	) {}
+};
+
+class Schema_DistQueryEval_CLOSE_collect :public papuga::RequestAutomaton, public AutomatonNameSpace
+{
+public:
+	Schema_DistQueryEval_CLOSE_collect() :papuga::RequestAutomaton(
+		strus_getBindingsClassDefs(), getBindingsInterfaceDescription()->structs, itemName, true/*strict*/, false/*exclusive*/,
+		{/*env*/},
+		{/*result*/},
+		{/*inherit*/},
+		{/*input*/
+			{SchemaQueryDeclPart::closeQueryFromResult( "/query")}
 		}
 	) {}
 };

@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Liza_Jane_%28David_Bowie_song%29</docid>
-<title>Liza Jane (David Bowie song)</title>
+<title id="0920_13138">Liza Jane (David Bowie song)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <quot><entity lv="3"><text><E>Liza Jane</E></text>
     </entity>
@@ -26,8 +29,9 @@
 <text> in <E>Broadhurst Gardens</E><P/>, </text>
 <pagelink id="West Hampstead"><text><E>West Hampstead</E></text>
   </pagelink>
-<text><T/>.</text>
+<text><T/>. </text>
 <reflink id="ref1"/>
+
 <br/>
 <text><E id="David Bowie">Bowie</E> <V>came</V> in <N>touch</N> with </text>
 <pagelink id="Leslie Conn"><E>Leslie Conn</E>
@@ -49,7 +53,9 @@
 <text> <N>label</N> </text>
 <pagelink id="Vocalion Records"><text><E id="Vocalion Records">Vocalion Pop</E></text>
   </pagelink>
-<text><T/>. Despite <V>promoting</V> the <N>single</N> on the <N>television</N> <V>shows</V> </text>
+<text><T/>. </text>
+<br/>
+<text>Despite promoting the single on the television shows</text>
 <entity lv="2"><pagelink id="Juke Box Jury"><text><E>Juke Box Jury</E></text>
     </pagelink>
   </entity>
@@ -57,15 +63,16 @@
 <entity lv="2"><pagelink id="Ready Steady Go!"><text><E>Ready Steady Go!</E></text>
     </pagelink>
   </entity>
-<text> and </text>
+<text>and</text>
 <entity lv="2"><pagelink id="The Beat Room"><text><E>The Beat Room</E></text>
     </pagelink>
   </entity>
-<text><P/>,</text>
+<text><P/>, </text>
 <reflink id="ref3"/>
 <reflink id="ref4"/>
-<text> and <V>receiving</V> <A>good</A> <N>radio coverage</N><P/>, the <A>single</A> <V>sold</V> <A>poorly</A> and the <N>band</N> <V>was</V> <A>subsequently</A> <V>dropped</V> from the <N>label</N><T/>.
-</text>
+<text>and receiving good radio coverage,</text>
+<br/>
+<text>the single sold poorly and the band was subsequently dropped from the label.</text>
 <br/>
 <text>The <N id="Leslie Conn">song</N> <V>was</V> an <N>arrangement</N> of the <A>old</A> <A>standard</A> </text>
 <quot><pagelink id="Li&apos;l Liza Jane"><text><E>Li'l Liza Jane</E></text>
@@ -93,7 +100,7 @@
     </entity>
   <text><T/>. <E>London</E><P/>: Reynolds &amp; Hearn. p.130. </text>
   <citlink id="cit5"/>
-  <text>.</text>
+  <text><T/>. </text>
   </ref>
 <ref id="ref2"><text><E>Willey</E><P/>, <E>Brian</E> <P/>(<C>16</C> <E>March</E> <C>2009</C><P/>)<T/>. </text>
   <quot><weblink id="https://www.independent.co.uk/news/obituaries/les-conn-pop-manager-and-promoter-who-handled-the-early-careers-of-david-bowie-and-marc-bolan-1645849.html"><text> <E>Les Conn</E><P/>: <N>Pop manager</N> and <N>promoter</N> <W>who</W> <V>handled</V> the <A>early</A> <N>careers</N> of <E>David Bowie</E> and <E>Marc Bolan</E></text>
@@ -108,7 +115,7 @@
 <ref id="ref3"><text><E>Thompson</E><P/>, <E>Dave</E> <P/>(<C>2006</C><P/>)<T/>. </text>
   <entity lv="2"><text><E>Hallo Spaceboy</E><P/>: The Rebirth of <E>David Bowie</E></text>
     </entity>
-  <text>. </text>
+  <text><T/>. </text>
   <pagelink id="ECW Press"><text><E>ECW Press</E></text>
     </pagelink>
   <text><T/>. p.304. </text>
@@ -154,7 +161,7 @@
     <head id="C6"><text>format</text>
       </head>
     <cell id="C6"><pagelink id="Single (music)"><text>7</text>
-        <quot><text> single</text>
+        <quot><text>single</text>
           </quot>
         </pagelink>
       </cell>
@@ -163,7 +170,7 @@
     <cell id="C7"><text><E>May</E> <C>1964</C><P/>,</text>
       <pagelink id="Decca Studios"><text><E>Decca Studios</E></text>
         </pagelink>
-      <text><P/>, </text>
+      <text><P/>,</text>
       <pagelink id="West Hampstead"><text><E>West Hampstead</E></text>
         </pagelink>
       <text><P/>, <E>London</E></text>
@@ -203,45 +210,41 @@
   </citation>
 <citation id="cit7" class="ISBN"><attr>978-0-7535-1002-5</attr>
   </citation>
-<heading lv="h1"><text>Track listing</text>
+<heading lv="h1" id="0920_13152"><text>Track listing</text>
   </heading>
-<text># </text>
+<text>#</text>
 <quot><text><E>Liza Jane</E></text>
   </quot>
-<text> (Conn) - 2:32
-</text>
+<text>(Conn) - 2:32</text>
 <br/>
-<text># </text>
-<quot><pagelink id="Louie, Go Home"><text>Louie, <E>Louie Go Home</E></text>
+<text>#</text>
+<quot><pagelink id="Louie, Go Home"><text><E>Louie</E><P/>, <E>Louie Go Home</E></text>
     </pagelink>
   </quot>
-<text> (</text>
-<pagelink id="Paul Revere &amp; the Raiders"><text><E>Paul Revere</E></text>
+<text>(</text>
+<pagelink id="Paul Revere &amp; the Raiders"><text><E id="Paul Revere &amp; the Raiders">Paul Revere</E></text>
   </pagelink>
-<text>, </text>
+<text><P/>, </text>
 <pagelink id="Mark Lindsay"><text><E>Mark Lindsay</E></text>
   </pagelink>
 <text>) – 2:14</text>
-<heading lv="h1"><text>Production credits</text>
+<heading lv="h1" id="0920_13166"><text>Production credits</text>
   </heading>
-<list lv="l1"><text> </text>
-  <entity lv="3"><text><E>Producers</E></text>
+<list lv="l1"><entity lv="3"><text><E>Producers</E></text>
     </entity>
   <text><P/>:</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Leslie Conn"><E>Leslie Conn</E>
+<list lv="l2"><pagelink id="Leslie Conn"><E>Leslie Conn</E>
     </pagelink>
   </list>
-<list lv="l1"><text> </text>
-  <entity lv="3"><text><E>Musicians</E></text>
+<list lv="l1"><entity lv="3"><text><E>Musicians</E></text>
     </entity>
   <text><P/>:</text>
   </list>
 <list lv="l2"><text> <E>David Jones</E><P/>: <E>Vocals</E><P/>, </text>
   <pagelink id="Alto"><text><E>Alto</E></text>
     </pagelink>
-  <text> </text>
+  
   <pagelink id="Saxophone"><text>Sax</text>
     </pagelink>
   </list>
@@ -256,7 +259,7 @@
   </list>
 <list lv="l2"><text> <E>Bob Allen</E><P/>: <E>Drums</E> <P/>(<V>born</V> <E>Robert Allen</E><P/>, <C>8</C> <E>December</E> <C>1941</C><P/>)</text>
   </list>
-<heading lv="h1"><text>Live versions</text>
+<heading lv="h1" id="0920_13180"><text>Live versions</text>
   </heading>
 <list lv="l1"><text> On the <A>40th</A> <N>anniversary</N> of <R>its</R> <N>release</N><P/>, <E id="David Bowie">Bowie</E> <V>played</V> the <A>first</A> <N>verse</N> and <N>chorus</N> of </text>
   <quot><text><E>Liza Jane</E></text>
@@ -277,7 +280,7 @@
     </entity>
   <text><T/>. <E>Retrieved 24 August 2010</E><T/>.</text>
   </ref>
-<heading lv="h1"><text>Other releases</text>
+<heading lv="h1" id="0920_13194"><text>Other releases</text>
   </heading>
 <list lv="l1"><text> The <N>single</N> <V>was</V> <N>re</N>-<V>released</V> by </text>
   <pagelink id="Decca Records"><text><E id="Decca Records">Decca</E></text>
@@ -292,28 +295,33 @@
     </entity>
   <text><T/>.</text>
   </list>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="0920_13208"><text><E>References</E></text>
   </heading>
 <mark>reflist</mark>
-<heading lv="h1"><text>External links</text>
+<heading lv="h1" id="0920_13222"><text>External links</text>
   </heading>
-<list lv="l1"><text> </text>
-  <citlink id="cit8"/>
+<list lv="l1"><citlink id="cit8"/>
   </list>
+
 <br/>
 <mark>David Bowie singles</mark>
+
 <br/>
 <category id="1964 singles">1964 singles
   </category>
+
 <br/>
 <category id="David Bowie songs">David Bowie songs
   </category>
+
 <br/>
 <category id="1964 songs">1964 songs
   </category>
+
 <br/>
 <category id="Vocalion Records singles">Vocalion Records singles
   </category>
+
 <br/>
 <category id="Debut singles">Debut singles
   </category>

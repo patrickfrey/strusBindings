@@ -1,13 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>VH1_Storytellers_%28David_Bowie_album%29</docid>
-<title>VH1 Storytellers (David Bowie album)</title>
+<title id="2740_3608">VH1 Storytellers (David Bowie album)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <citlink id="cit7"/>
+
 <br/>
 <entity lv="5"><text><E>VH1 Storytellers</E></text>
   </entity>
@@ -112,6 +116,7 @@
     <head id="C10"><text>misc</text>
       </head>
     <cell id="C10"><citlink id="cit6"/>
+      
       <br/>
       </cell>
     </table>
@@ -135,10 +140,11 @@
     <head id="C2"><text>url</text>
       </head>
     <cell id="C2"><weblink id="http://www.avclub.com/articles/david-bowie,30285/"/>
+      
       </cell>
     <head id="C3"><text>title</text>
       </head>
-    <cell id="C3"><text><E>David Bowie</E><P/>: <E>VH1 Storytellers</E> (2009) &amp;#124; Music &amp;#124; <E>Music Review</E></text>
+    <cell id="C3"><text>David Bowie: VH1 Storytellers (2009) | Music | Music Review</text>
       </cell>
     <head id="C4"><text>publisher</text>
       </head>
@@ -159,10 +165,11 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://pitchfork.com/reviews/albums/13202-vh1-storytellers/"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
-    <cell id="C1"><text><E>David Bowie</E><P/>: <E>VH1 Storytellers</E> &amp;#124; <E>Album Reviews</E></text>
+    <cell id="C1"><text>David Bowie: VH1 Storytellers | Album Reviews</text>
       </cell>
     <head id="C2"><text>publisher</text>
       </head>
@@ -191,6 +198,7 @@
     <head id="C2"><text>url</text>
       </head>
     <cell id="C2"><weblink id="http://www.popmatters.com/pm/review/107382-david-bowie-vh1-storytellers/"/>
+      
       </cell>
     <head id="C3"><text>title</text>
       </head>
@@ -248,6 +256,7 @@
       </head>
     <cell id="C7"><text><P/>(<C>4/10</C><P/>)</text>
       <citlink id="cit12"/>
+      
       <br/>
       </cell>
     </table>
@@ -268,12 +277,12 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Track listing</text>
+<heading lv="h1" id="2740_3622"><text>Track listing</text>
   </heading>
 <text>All <N>tracks</N> <V>written</V> by <E>David Bowie</E> except <W>where</W> <V>noted</V><T/>.</text>
-<heading lv="h2"><text>CD &amp; DVD</text>
+<heading lv="h2" id="2740_3636"><text>CD &amp; DVD</text>
   </heading>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Life on Mars (song)"><text><E>Life on Mars</E><T/>?</text>
     </pagelink>
   </quot>
@@ -287,79 +296,77 @@
 <text> <P/>(<V>truncated</V><P/>) – <C>3:15</C>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Thursday&apos;s Child (David Bowie song)"><text>Thursday's Child</text>
     </pagelink>
   </quot>
-<text> (Bowie, </text>
+<text> <P/>(<E id="David Bowie">Bowie</E><P/>, </text>
 <pagelink id="Reeves Gabrels"><text><E>Reeves Gabrels</E></text>
   </pagelink>
-<text>) – 6:43
-</text>
+<text>) – 6:43</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Can&apos;t Help Thinking About Me"><text><M>Ca</M><A>n't </A><V>Help</V> <V>Thinking</V> About Me</text>
     </pagelink>
   </quot>
 <text> – <C>6:31</C>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="China Girl (song)"><text><E>China Girl</E></text>
     </pagelink>
   </quot>
-<text> (Bowie, </text>
+<text> <P/>(<E id="David Bowie">Bowie</E><P/>, </text>
 <pagelink id="Iggy Pop"><text><E>Iggy Pop</E></text>
   </pagelink>
-<text>) – 6:48
-</text>
+<text>) – 6:48</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Seven (David Bowie song)"><text>Seven</text>
     </pagelink>
   </quot>
-<text> (Bowie, Gabrels) – 5:01
-</text>
+<text>(Bowie, Gabrels) – 5:01</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Drive-In Saturday"><text><E>Drive-In Saturday</E></text>
     </pagelink>
   </quot>
-<text> – 5:22
-</text>
+<text>– 5:22</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Word on a Wing"><text><E>Word on a Wing</E></text>
     </pagelink>
   </quot>
-<text> – 6:35</text>
-<heading lv="h3"><text>iTunes and DVD bonus performances</text>
+<text>– 6:35</text>
+<heading lv="h3" id="2740_3650"><text>iTunes and DVD bonus performances</text>
   </heading>
-<text><N>#</N> </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text><V>Survive</V></text>
     </pagelink>
   </quot>
 <text> <P/>(<E id="David Bowie">Bowie</E><P/>, <E>Gabrels</E><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="I Can&apos;t Read"><text>I <M>Ca</M><A>n't </A><V>Read</V></text>
     </pagelink>
   </quot>
 <text> <P/>(<E id="David Bowie">Bowie</E><P/>, <E>Gabrels</E><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Always Crashing in the Same Car"><text><E>Always Crashing in the Same Car</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text>If I<V>'m</V> <V>Dreaming</V> My <N>Life</N></text>
     </pagelink>
   </quot>
-<text> <P/>(<E id="David Bowie">Bowie</E><P/>, <E>Gabrels</E><P/>)</text>
-<heading lv="h1"><text><E>Personnel</E></text>
+<text> <P/>(<E id="David Bowie">Bowie</E><P/>, <E>Gabrels</E><P/>)
+</text>
+<heading lv="h1" id="2740_3664"><text><E>Personnel</E></text>
   </heading>
 <list lv="l1"><text><E>David Bowie</E><P/>: vocals, guitar</text>
   </list>
@@ -391,36 +398,45 @@
   </list>
 <list lv="l1"><text>Audio mixer: <E>Thom Cadley</E></text>
   </list>
-<heading lv="h1"><text><E>Charts</E></text>
+<heading lv="h1" id="2740_3678"><text><E>Charts</E></text>
   </heading>
 <tablink id="table8"/>
 <table id="table8"><head id="C0"><text><E>Chart</E> <P/>(<C>2009</C><P/>)</text>
     </head>
-  <head id="C1"><text><E>Peakposition</E></text>
+  <head id="C1"><text>Peak</text>
+    <br/>
+    <text>position</text>
     </head>
-  <cell id="C0" id="R2"><text><E>UK Albums Chart</E></text>
+  <cell id="C0,R2"><text><E>UK Albums Chart</E></text>
     </cell>
-  <cell id="C1" id="R2"><text>114</text>
+  <cell id="C1,R2"><text>114</text>
     </cell>
   </table>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="2740_3692"><text><E>References</E></text>
   </heading>
 <mark>Reflist</mark>
+
 <br/>
 <mark>David Bowie</mark>
+
 <br/>
 <mark>DEFAULTSORT:VH1 Storytellers</mark>
+
 <br/>
 <category id="David Bowie live albums">David Bowie live albums
   </category>
+
 <br/>
 <category id="2009 live albums">2009 live albums
   </category>
+
 <br/>
 <category id="Live video albums">Live video albums
   </category>
+
 <br/>
 <category id="2009 video albums">2009 video albums
   </category>
+
 <br/>
 <mark>2000s-rock-album-stub</mark></doc>

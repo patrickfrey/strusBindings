@@ -56,7 +56,7 @@
 			"type": "title",
 			"example": "Recorded November 22–23",
 			"df": 1,
-			"tf": 146},
+			"tf": 137},
 		{
 			"select": "/doc/citation/attr/E@id",
 			"type": "title",
@@ -68,7 +68,7 @@
 			"type": "title",
 			"example": "partisanship",
 			"df": 1,
-			"tf": 15},
+			"tf": 24},
 		{
 			"select": "/doc/citation/attr/R()",
 			"type": "title",
@@ -368,7 +368,7 @@
 			"type": "",
 			"example": ". ... ",
 			"df": 1,
-			"tf": 109},
+			"tf": 100},
 		{
 			"select": "/doc/citation/attr/text()",
 			"type": "title",
@@ -396,9 +396,9 @@
 		{
 			"select": "/doc/citation/attr/text/E@id",
 			"type": "title",
-			"example": "Recorded October",
+			"example": "Owen Frampton",
 			"df": 1,
-			"tf": 14},
+			"tf": 13},
 		{
 			"select": "/doc/citation/attr/text/M()",
 			"type": "title",
@@ -410,7 +410,7 @@
 			"type": "",
 			"example": "#",
 			"df": 1,
-			"tf": 1},
+			"tf": 10},
 		{
 			"select": "/doc/citation/attr/text/N()",
 			"type": "title",
@@ -570,7 +570,7 @@
 		{
 			"select": "/doc/citation/table/cell/entity/text()",
 			"type": "title",
-			"example": " 1. Outside and",
+			"example": "Fahrenheit 9/11",
 			"df": 1,
 			"tf": 3},
 		{
@@ -618,7 +618,7 @@
 		{
 			"select": "/doc/citation/table/cell/pagelink/quot/text()",
 			"type": "title",
-			"example": " single",
+			"example": "single",
 			"df": 1,
 			"tf": 4},
 		{
@@ -644,7 +644,7 @@
 			"type": "title",
 			"example": "glam",
 			"df": 1,
-			"tf": 2},
+			"tf": 3},
 		{
 			"select": "/doc/citation/table/cell/pagelink/text/E()",
 			"type": "text",
@@ -674,7 +674,7 @@
 			"type": "title",
 			"example": "Putting",
 			"df": 1,
-			"tf": 2},
+			"tf": 3},
 		{
 			"select": "/doc/citation/table/cell/pagelink@anchor",
 			"type": "title",
@@ -714,15 +714,15 @@
 		{
 			"select": "/doc/citation/table/cell/quot/text()",
 			"type": "",
-			"example": " / ",
+			"example": ", ",
 			"df": 1,
 			"tf": 10},
 		{
 			"select": "/doc/citation/table/cell/quot/text()",
 			"type": "title",
-			"example": " extended version)",
+			"example": "60 Years of Bowie",
 			"df": 1,
-			"tf": 42},
+			"tf": 41},
 		{
 			"select": "/doc/citation/table/cell/quot/text/A()",
 			"type": "title",
@@ -734,13 +734,13 @@
 			"type": "title",
 			"example": "Expanded and Updated",
 			"df": 1,
-			"tf": 21},
+			"tf": 22},
 		{
 			"select": "/doc/citation/table/cell/quot/text/E@id",
 			"type": "title",
 			"example": "\"Heroes\"",
 			"df": 1,
-			"tf": 2},
+			"tf": 1},
 		{
 			"select": "/doc/citation/table/cell/quot/text/M()",
 			"type": "title",
@@ -788,11 +788,11 @@
 			"type": "",
 			"example": ") – ",
 			"df": 1,
-			"tf": 584},
+			"tf": 581},
 		{
 			"select": "/doc/citation/table/cell/text()",
 			"type": "text",
-			"example": " Concert Setlist at The Grand Ballroom at Manhattan Center, New York on August 23, 1999 - setlist.fm",
+			"example": "73:17 (original LP release)   77:17 (1991 CD version)   85:31 (2005 CD reissue)   94:30 (2017 version)",
 			"df": 1,
 			"tf": 7},
 		{
@@ -800,19 +800,19 @@
 			"type": "title",
 			"example": "ja:年間アルバムヒットチャート 1983年（昭和58年）",
 			"df": 1,
-			"tf": 2021},
+			"tf": 1956},
 		{
 			"select": "/doc/citation/table/cell/text/A()",
 			"type": "title",
 			"example": "retrospective",
 			"df": 1,
-			"tf": 136},
+			"tf": 138},
 		{
 			"select": "/doc/citation/table/cell/text/C()",
 			"type": "title",
 			"example": "1.Outside ",
 			"df": 1,
-			"tf": 112},
+			"tf": 162},
 		{
 			"select": "/doc/citation/table/cell/text/E()",
 			"type": "text",
@@ -824,13 +824,13 @@
 			"type": "title",
 			"example": "'s Art Collection Is As Beautiful As You Imagined",
 			"df": 1,
-			"tf": 2473},
+			"tf": 2468},
 		{
 			"select": "/doc/citation/table/cell/text/E@id",
 			"type": "title",
 			"example": "William Pitt, 1st Earl of Chatham",
 			"df": 1,
-			"tf": 41},
+			"tf": 40},
 		{
 			"select": "/doc/citation/table/cell/text/M()",
 			"type": "title",
@@ -848,7 +848,7 @@
 			"type": "title",
 			"example": "rock’n’roll mainstream",
 			"df": 1,
-			"tf": 247},
+			"tf": 254},
 		{
 			"select": "/doc/citation/table/cell/text/R()",
 			"type": "title",
@@ -890,7 +890,7 @@
 			"type": "title",
 			"example": "https://www.wsj.com/public/article/SB112476043457720240-Tvpthd07S8mCqCxLFNKIPnWWY9g_20060823.html",
 			"df": 1,
-			"tf": 170},
+			"tf": 177},
 		{
 			"select": "/doc/citation/table/cell@id",
 			"type": "title",
@@ -908,25 +908,25 @@
 			"type": "title",
 			"example": "publication-place",
 			"df": 1,
-			"tf": 4125},
+			"tf": 3451},
 		{
 			"select": "/doc/citation/table/head/text/A()",
 			"type": "title",
 			"example": "first",
 			"df": 1,
-			"tf": 149},
+			"tf": 406},
 		{
 			"select": "/doc/citation/table/head/text/M()",
 			"type": "title",
 			"example": "d",
 			"df": 1,
-			"tf": 1},
+			"tf": 2},
 		{
 			"select": "/doc/citation/table/head/text/N()",
 			"type": "title",
 			"example": "accessdate",
 			"df": 1,
-			"tf": 50},
+			"tf": 468},
 		{
 			"select": "/doc/citation/table/head/text/V()",
 			"type": "title",
@@ -950,7 +950,7 @@
 			"type": "title",
 			"example": "Certification Table Entry",
 			"df": 1,
-			"tf": 187},
+			"tf": 166},
 		{
 			"select": "/doc/citation/table/tabtitle/text/A()",
 			"type": "title",
@@ -962,19 +962,19 @@
 			"type": "title",
 			"example": "Certification Table Bottom",
 			"df": 1,
-			"tf": 13},
+			"tf": 8},
 		{
 			"select": "/doc/citation/table/tabtitle/text/N()",
 			"type": "title",
 			"example": "AV media notes",
 			"df": 1,
-			"tf": 463},
+			"tf": 483},
 		{
 			"select": "/doc/citation/table/tabtitle/text/V()",
 			"type": "title",
 			"example": "singlechart",
 			"df": 1,
-			"tf": 482},
+			"tf": 503},
 		{
 			"select": "/doc/citation/table@id",
 			"type": "title",
@@ -1038,27 +1038,27 @@
 		{
 			"select": "/doc/entity/pagelink/quot/text()",
 			"type": "title",
-			"example": "Heroes",
+			"example": "Low",
 			"df": 1,
-			"tf": 2},
+			"tf": 1},
 		{
 			"select": "/doc/entity/pagelink/quot/text/E()",
 			"type": "title",
 			"example": "Heroes",
 			"df": 1,
-			"tf": 4},
+			"tf": 3},
 		{
 			"select": "/doc/entity/pagelink/quot/text/E@id",
 			"type": "title",
 			"example": "Symphony No. 4",
 			"df": 1,
-			"tf": 4},
+			"tf": 3},
 		{
 			"select": "/doc/entity/pagelink/quot/text/N()",
 			"type": "title",
 			"example": "Heroes",
 			"df": 1,
-			"tf": 1},
+			"tf": 3},
 		{
 			"select": "/doc/entity/pagelink/text()",
 			"type": "",
@@ -1070,7 +1070,7 @@
 			"type": "title",
 			"example": ": The Singles 1969-1993",
 			"df": 1,
-			"tf": 25},
+			"tf": 23},
 		{
 			"select": "/doc/entity/pagelink/text/A()",
 			"type": "title",
@@ -1094,7 +1094,7 @@
 			"type": "title",
 			"example": "Christiane F. – We Children from Bahnhof Zoo",
 			"df": 1,
-			"tf": 270},
+			"tf": 273},
 		{
 			"select": "/doc/entity/pagelink/text/E@id",
 			"type": "title",
@@ -1110,9 +1110,9 @@
 		{
 			"select": "/doc/entity/pagelink/text/V()",
 			"type": "title",
-			"example": "Earthling",
+			"example": "Stage",
 			"df": 1,
-			"tf": 5},
+			"tf": 4},
 		{
 			"select": "/doc/entity/pagelink@id",
 			"type": "text",
@@ -1226,13 +1226,13 @@
 			"type": "",
 			"example": "' ",
 			"df": 1,
-			"tf": 40},
+			"tf": 38},
 		{
 			"select": "/doc/entity/text()",
 			"type": "title",
 			"example": ": The Last Five Years",
 			"df": 1,
-			"tf": 119},
+			"tf": 121},
 		{
 			"select": "/doc/entity/text/A()",
 			"type": "title",
@@ -1244,19 +1244,19 @@
 			"type": "title",
 			"example": "24-bit ",
 			"df": 1,
-			"tf": 19},
+			"tf": 17},
 		{
 			"select": "/doc/entity/text/E()",
 			"type": "title",
 			"example": "The Man Who Sold the World",
 			"df": 1,
-			"tf": 179},
+			"tf": 177},
 		{
 			"select": "/doc/entity/text/E@id",
 			"type": "title",
 			"example": "Station to Station",
 			"df": 1,
-			"tf": 12},
+			"tf": 18},
 		{
 			"select": "/doc/entity/text/M()",
 			"type": "title",
@@ -1286,7 +1286,7 @@
 			"type": "title",
 			"example": "considered",
 			"df": 1,
-			"tf": 49},
+			"tf": 51},
 		{
 			"select": "/doc/entity/text/W()",
 			"type": "title",
@@ -1362,7 +1362,7 @@
 		{
 			"select": "/doc/filelink/text()",
 			"type": "title",
-			"example": " at the premiere of Jones's directorial debut ",
+			"example": "at the premiere of Jones's directorial debut",
 			"df": 1,
 			"tf": 55},
 		{
@@ -1376,13 +1376,13 @@
 			"type": "title",
 			"example": "Hauptstraße 155",
 			"df": 1,
-			"tf": 16},
+			"tf": 17},
 		{
 			"select": "/doc/filelink/text/E@id",
 			"type": "title",
 			"example": "Art Gallery of Ontario",
 			"df": 1,
-			"tf": 4},
+			"tf": 5},
 		{
 			"select": "/doc/filelink/text/N()",
 			"type": "title",
@@ -1446,7 +1446,7 @@
 		{
 			"select": "/doc/heading/quot/text()",
 			"type": "title",
-			"example": " single",
+			"example": "single",
 			"df": 1,
 			"tf": 2},
 		{
@@ -1491,6 +1491,12 @@
 			"example": "Selected",
 			"df": 1,
 			"tf": 3},
+		{
+			"select": "/doc/heading@id",
+			"type": "title",
+			"example": "0004_16927",
+			"df": 1,
+			"tf": 213},
 		{
 			"select": "/doc/heading@lv",
 			"type": "title",
@@ -1826,7 +1832,7 @@
 			"type": "",
 			"example": " – ",
 			"df": 1,
-			"tf": 255},
+			"tf": 257},
 		{
 			"select": "/doc/list/text()",
 			"type": "text",
@@ -1836,7 +1842,7 @@
 		{
 			"select": "/doc/list/text()",
 			"type": "title",
-			"example": " (television series) (1991) as Sir Roland Moorecock",
+			"example": "(television series) (1991) as Sir Roland Moorecock",
 			"df": 1,
 			"tf": 272},
 		{
@@ -1844,7 +1850,7 @@
 			"type": "title",
 			"example": "additional",
 			"df": 1,
-			"tf": 44},
+			"tf": 45},
 		{
 			"select": "/doc/list/text/C()",
 			"type": "title",
@@ -1868,7 +1874,7 @@
 			"type": "title",
 			"example": "background vocals",
 			"df": 1,
-			"tf": 73},
+			"tf": 74},
 		{
 			"select": "/doc/list/text/N@id",
 			"type": "title",
@@ -1886,7 +1892,7 @@
 			"type": "title",
 			"example": "Uncredited",
 			"df": 1,
-			"tf": 83},
+			"tf": 84},
 		{
 			"select": "/doc/list/text/W()",
 			"type": "title",
@@ -1914,7 +1920,7 @@
 		{
 			"select": "/doc/list/weblink/text()",
 			"type": "title",
-			"example": " all releases of ",
+			"example": "all releases of",
 			"df": 1,
 			"tf": 2},
 		{
@@ -1952,7 +1958,7 @@
 			"type": "title",
 			"example": "DEFAULTSORT:Without You (David Bowie Song)",
 			"df": 1,
-			"tf": 91},
+			"tf": 89},
 		{
 			"select": "/doc/pagelink()",
 			"type": "",
@@ -2006,13 +2012,13 @@
 			"type": "title",
 			"example": "Best Overall Performance in a Video",
 			"df": 1,
-			"tf": 96},
+			"tf": 94},
 		{
 			"select": "/doc/pagelink/text/A()",
 			"type": "title",
 			"example": "alternative",
 			"df": 1,
-			"tf": 47},
+			"tf": 48},
 		{
 			"select": "/doc/pagelink/text/C()",
 			"type": "title",
@@ -2036,13 +2042,13 @@
 			"type": "title",
 			"example": "Nat Tate: An American Artist 1928–1960",
 			"df": 1,
-			"tf": 77},
+			"tf": 78},
 		{
 			"select": "/doc/pagelink/text/N()",
 			"type": "title",
 			"example": "independence referendum",
 			"df": 1,
-			"tf": 157},
+			"tf": 158},
 		{
 			"select": "/doc/pagelink/text/R()",
 			"type": "title",
@@ -2156,25 +2162,13 @@
 			"type": "title",
 			"example": "Beauty and the Beast",
 			"df": 1,
-			"tf": 25},
+			"tf": 26},
 		{
 			"select": "/doc/quot/entity/text/E@id",
 			"type": "title",
 			"example": "Beauty and the Beast",
 			"df": 1,
-			"tf": 4},
-		{
-			"select": "/doc/quot/entity/text/N()",
-			"type": "title",
-			"example": "Tonight",
-			"df": 1,
-			"tf": 1},
-		{
-			"select": "/doc/quot/entity/text/N@id",
-			"type": "title",
-			"example": "Tonight",
-			"df": 1,
-			"tf": 1},
+			"tf": 3},
 		{
 			"select": "/doc/quot/entity/text/V()",
 			"type": "title",
@@ -2198,7 +2192,7 @@
 			"type": "title",
 			"example": "nbsp",
 			"df": 1,
-			"tf": 4},
+			"tf": 1},
 		{
 			"select": "/doc/quot/pagelink()",
 			"type": "title",
@@ -2228,13 +2222,13 @@
 			"type": "",
 			"example": "—",
 			"df": 1,
-			"tf": 11},
+			"tf": 12},
 		{
 			"select": "/doc/quot/pagelink/text()",
 			"type": "title",
 			"example": "Battle for Britain (The Letter)",
 			"df": 1,
-			"tf": 41},
+			"tf": 40},
 		{
 			"select": "/doc/quot/pagelink/text/A()",
 			"type": "title",
@@ -2252,7 +2246,7 @@
 			"type": "title",
 			"example": "The Pretty Things Are Going to Hell",
 			"df": 1,
-			"tf": 200},
+			"tf": 201},
 		{
 			"select": "/doc/quot/pagelink/text/E@id",
 			"type": "text",
@@ -2312,25 +2306,31 @@
 			"type": "",
 			"example": ". ... ",
 			"df": 1,
-			"tf": 552},
+			"tf": 556},
+		{
+			"select": "/doc/quot/text()",
+			"type": "text",
+			"example": "I was naming the children the night we met ... it was absolutely immediate.",
+			"df": 1,
+			"tf": 2},
 		{
 			"select": "/doc/quot/text()",
 			"type": "title",
-			"example": "The Voyeur Of Utter Destruction (As Beauty)",
+			"example": "mesmerizing ... like someone from another planet",
 			"df": 1,
-			"tf": 1525},
+			"tf": 1511},
 		{
 			"select": "/doc/quot/text/A()",
 			"type": "title",
 			"example": "institutionalized",
 			"df": 1,
-			"tf": 834},
+			"tf": 837},
 		{
 			"select": "/doc/quot/text/C()",
 			"type": "title",
 			"example": "1999—to ",
 			"df": 1,
-			"tf": 81},
+			"tf": 80},
 		{
 			"select": "/doc/quot/text/E()",
 			"type": "",
@@ -2342,13 +2342,13 @@
 			"type": "title",
 			"example": "The Pretty Things Are Going to Hell",
 			"df": 1,
-			"tf": 446},
+			"tf": 448},
 		{
 			"select": "/doc/quot/text/E@id",
 			"type": "title",
 			"example": "Musicologist James Perone",
 			"df": 1,
-			"tf": 110},
+			"tf": 112},
 		{
 			"select": "/doc/quot/text/M()",
 			"type": "title",
@@ -2360,7 +2360,7 @@
 			"type": "title",
 			"example": "overelaborate characterizations",
 			"df": 1,
-			"tf": 866},
+			"tf": 862},
 		{
 			"select": "/doc/quot/text/N@id",
 			"type": "title",
@@ -2372,7 +2372,7 @@
 			"type": "title",
 			"example": "their",
 			"df": 1,
-			"tf": 201},
+			"tf": 200},
 		{
 			"select": "/doc/quot/text/R@id",
 			"type": "title",
@@ -2384,7 +2384,7 @@
 			"type": "title",
 			"example": "distinguishing",
 			"df": 1,
-			"tf": 962},
+			"tf": 953},
 		{
 			"select": "/doc/quot/text/W()",
 			"type": "title",
@@ -2550,7 +2550,7 @@
 		{
 			"select": "/doc/ref/quot/weblink/text()",
 			"type": "title",
-			"example": " Cincinnati Zoo names newest penguin Bowie after late singer",
+			"example": "Cincinnati Zoo names newest penguin Bowie after late singer",
 			"df": 1,
 			"tf": 8},
 		{
@@ -2592,7 +2592,7 @@
 		{
 			"select": "/doc/ref/text()",
 			"type": "",
-			"example": " & ",
+			"example": "), ",
 			"df": 1,
 			"tf": 246},
 		{
@@ -2600,7 +2600,7 @@
 			"type": "title",
 			"example": "Mary Campbell for the Associated Press, 6 August 1993",
 			"df": 1,
-			"tf": 179},
+			"tf": 178},
 		{
 			"select": "/doc/ref/text/A()",
 			"type": "title",
@@ -2612,13 +2612,13 @@
 			"type": "title",
 			"example": "1983",
 			"df": 1,
-			"tf": 166},
+			"tf": 164},
 		{
 			"select": "/doc/ref/text/E()",
 			"type": "title",
 			"example": "Amsterdam Glass Spider Press Conference",
 			"df": 1,
-			"tf": 199},
+			"tf": 192},
 		{
 			"select": "/doc/ref/text/M()",
 			"type": "title",
@@ -2630,7 +2630,7 @@
 			"type": "title",
 			"example": "category",
 			"df": 1,
-			"tf": 14},
+			"tf": 19},
 		{
 			"select": "/doc/ref/text/R()",
 			"type": "title",
@@ -2744,13 +2744,13 @@
 			"type": "",
 			"example": " – ",
 			"df": 1,
-			"tf": 18},
+			"tf": 17},
 		{
 			"select": "/doc/ref/weblink/text()",
 			"type": "title",
 			"example": " - 1962 vinyl_LP; ",
 			"df": 1,
-			"tf": 3},
+			"tf": 4},
 		{
 			"select": "/doc/ref/weblink/text/C()",
 			"type": "title",
@@ -2762,7 +2762,7 @@
 			"type": "title",
 			"example": "Mountain Studios",
 			"df": 1,
-			"tf": 14},
+			"tf": 13},
 		{
 			"select": "/doc/ref/weblink/text/N()",
 			"type": "title",
@@ -2780,7 +2780,7 @@
 			"type": "title",
 			"example": "https://www.discogs.com/label/283321-Mountain-Studios",
 			"df": 1,
-			"tf": 7},
+			"tf": 9},
 		{
 			"select": "/doc/ref@id",
 			"type": "title",
@@ -2810,7 +2810,7 @@
 			"type": "title",
 			"example": "Rarest One Bowie",
 			"df": 1,
-			"tf": 1},
+			"tf": 2},
 		{
 			"select": "/doc/table/cell/entity/pagelink/quot/text/E()",
 			"type": "title",
@@ -2828,13 +2828,13 @@
 			"type": "",
 			"example": "(",
 			"df": 1,
-			"tf": 31},
+			"tf": 32},
 		{
 			"select": "/doc/table/cell/entity/pagelink/text()",
 			"type": "title",
 			"example": "Moulin Rouge! Music from Baz Luhrmann's Film",
 			"df": 1,
-			"tf": 22},
+			"tf": 10},
 		{
 			"select": "/doc/table/cell/entity/pagelink/text/C()",
 			"type": "title",
@@ -2852,25 +2852,13 @@
 			"type": "title",
 			"example": "The Man Who Sold the World",
 			"df": 1,
-			"tf": 298},
+			"tf": 309},
 		{
 			"select": "/doc/table/cell/entity/pagelink/text/E@id",
 			"type": "title",
 			"example": "Live Santa Monica 72",
 			"df": 1,
 			"tf": 3},
-		{
-			"select": "/doc/table/cell/entity/pagelink/text/N()",
-			"type": "title",
-			"example": "Reality",
-			"df": 1,
-			"tf": 1},
-		{
-			"select": "/doc/table/cell/entity/pagelink/text/V()",
-			"type": "title",
-			"example": "Let",
-			"df": 1,
-			"tf": 2},
 		{
 			"select": "/doc/table/cell/entity/pagelink@anchor",
 			"type": "title",
@@ -2936,13 +2924,13 @@
 			"type": "",
 			"example": "‡",
 			"df": 1,
-			"tf": 59},
+			"tf": 1},
 		{
 			"select": "/doc/table/cell/mark()",
 			"type": "title",
 			"example": "end",
 			"df": 1,
-			"tf": 124},
+			"tf": 61},
 		{
 			"select": "/doc/table/cell/pagelink/entity/text/E()",
 			"type": "title",
@@ -3062,19 +3050,19 @@
 			"type": "",
 			"example": " – ",
 			"df": 1,
-			"tf": 61},
+			"tf": 82},
 		{
 			"select": "/doc/table/cell/text()",
 			"type": "title",
 			"example": "Outstanding Contribution to British Music",
 			"df": 1,
-			"tf": 688},
+			"tf": 642},
 		{
 			"select": "/doc/table/cell/text/A()",
 			"type": "title",
 			"example": "original",
 			"df": 1,
-			"tf": 14},
+			"tf": 42},
 		{
 			"select": "/doc/table/cell/text/C()",
 			"type": "title",
@@ -3092,31 +3080,25 @@
 			"type": "title",
 			"example": "album version",
 			"df": 1,
-			"tf": 9},
+			"tf": 30},
 		{
 			"select": "/doc/table/cell/text/V()",
 			"type": "title",
 			"example": "Indicates",
 			"df": 1,
-			"tf": 8},
-		{
-			"select": "/doc/table/cell/weblink/text()",
-			"type": "title",
-			"example": " www.davidbowie.com",
-			"df": 1,
-			"tf": 1},
+			"tf": 10},
 		{
 			"select": "/doc/table/cell/weblink@id",
 			"type": "title",
 			"example": "http://www.davidbowie.com/",
 			"df": 1,
-			"tf": 1},
+			"tf": 2},
 		{
 			"select": "/doc/table/cell@id",
 			"type": "title",
-			"example": "R100",
+			"example": "C0,R5,R6,R7,R8,R9,R10",
 			"df": 1,
-			"tf": 4565},
+			"tf": 2247},
 		{
 			"select": "/doc/table/head/citlink@id",
 			"type": "title",
@@ -3302,7 +3284,7 @@
 			"type": "title",
 			"example": " with The Lower Third)",
 			"df": 1,
-			"tf": 23},
+			"tf": 36},
 		{
 			"select": "/doc/table/head/text/C()",
 			"type": "title",
@@ -3314,7 +3296,7 @@
 			"type": "title",
 			"example": "Australian Albums Chart",
 			"df": 1,
-			"tf": 141},
+			"tf": 135},
 		{
 			"select": "/doc/table/head/text/N()",
 			"type": "title",
@@ -3386,67 +3368,67 @@
 			"type": "",
 			"example": ") – ",
 			"df": 1,
-			"tf": 2290},
+			"tf": 2117},
 		{
 			"select": "/doc/text()",
 			"type": "text",
-			"example": ". As well as songs from the new album, the tour featured material from Bowie's ",
+			"example": "became one of Bowie's best-known songs. The lyrics are often seen as a manifesto for his chameleonic personality, the frequent change of the world today, and frequent reinventions of his musical style throughout the 1970s.",
 			"df": 1,
-			"tf": 2},
+			"tf": 15},
 		{
 			"select": "/doc/text()",
 			"type": "title",
-			"example": ", taking a detailed look at Bowie's last albums, ",
+			"example": "The shortcoming was underlined by his artistic rivalry with",
 			"df": 1,
-			"tf": 4950},
+			"tf": 4836},
 		{
 			"select": "/doc/text/A()",
 			"type": "title",
 			"example": "indistinguishable",
 			"df": 1,
-			"tf": 1744},
+			"tf": 1716},
 		{
 			"select": "/doc/text/C()",
 			"type": "title",
-			"example": "1972&ndash;73",
+			"example": "-influenced",
 			"df": 1,
-			"tf": 861},
+			"tf": 839},
 		{
 			"select": "/doc/text/E()",
 			"type": "",
 			"example": "#",
 			"df": 1,
-			"tf": 13},
+			"tf": 187},
 		{
 			"select": "/doc/text/E()",
 			"type": "title",
 			"example": "Malta International Song Festival",
 			"df": 1,
-			"tf": 1317},
+			"tf": 1294},
 		{
 			"select": "/doc/text/E@id",
 			"type": "title",
 			"example": "William Pitt, 1st Earl of Chatham",
 			"df": 1,
-			"tf": 573},
+			"tf": 565},
 		{
 			"select": "/doc/text/M()",
 			"type": "title",
 			"example": "Would",
 			"df": 1,
-			"tf": 39},
+			"tf": 38},
 		{
 			"select": "/doc/text/N()",
 			"type": "",
-			"example": "#",
+			"example": "%",
 			"df": 1,
-			"tf": 8},
+			"tf": 2},
 		{
 			"select": "/doc/text/N()",
 			"type": "title",
 			"example": "platinum album certifications",
 			"df": 1,
-			"tf": 3147},
+			"tf": 3072},
 		{
 			"select": "/doc/text/N@id",
 			"type": "title",
@@ -3458,13 +3440,13 @@
 			"type": "title",
 			"example": "Their",
 			"df": 1,
-			"tf": 729},
+			"tf": 713},
 		{
 			"select": "/doc/text/R@id",
 			"type": "title",
 			"example": "David Bowie , Hermione Farthingale",
 			"df": 1,
-			"tf": 362},
+			"tf": 355},
 		{
 			"select": "/doc/text/U()",
 			"type": "title",
@@ -3476,13 +3458,13 @@
 			"type": "title",
 			"example": "Characterised",
 			"df": 1,
-			"tf": 2821},
+			"tf": 2765},
 		{
 			"select": "/doc/text/W()",
 			"type": "title",
 			"example": "soul—",
 			"df": 1,
-			"tf": 208},
+			"tf": 205},
 		{
 			"select": "/doc/text/X()",
 			"type": "title",
@@ -3493,5 +3475,11 @@
 			"select": "/doc/title()",
 			"type": "title",
 			"example": "List of awards and nominations received by David Bowie",
+			"df": 1,
+			"tf": 18},
+		{
+			"select": "/doc/title@id",
+			"type": "title",
+			"example": "0004_16913",
 			"df": 1,
 			"tf": 18}]}}}

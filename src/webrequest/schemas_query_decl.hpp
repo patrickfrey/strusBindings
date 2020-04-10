@@ -128,8 +128,7 @@ public:
 				{"restriction", 0, "qrybuilder", QB::addMetaDataRestriction(),  {"_analyzed"} }
 			}},
 			{"", "_feature", "qrybuilder", QB::getFeaturesMapped(), {} },
-			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} },
-			{"", "_collected", "qrybuilder", QB::getCollectedTerms(), {} }
+			{"", "_restriction", "qrybuilder", QB::getRestrictions(), {} }
 		}};
 	}
 
@@ -138,6 +137,14 @@ public:
 		typedef bindings::method::QueryBuilder QB;
 		return {rootexpr, {
 			{"summary", 0, "qrybuilder", QB::addCollectSummary(), {{QuerySummary}} }
+		}};
+	}
+
+	static papuga::RequestAutomaton_NodeList closeQueryFromResult( const char* rootexpr)
+	{
+		typedef bindings::method::QueryBuilder QB;
+		return {rootexpr, {
+			{"", "_collected", "qrybuilder", QB::getCollectedTerms(), {} }
 		}};
 	}
 

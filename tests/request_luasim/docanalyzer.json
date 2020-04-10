@@ -41,6 +41,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
@@ -54,6 +56,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
@@ -93,6 +97,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
@@ -106,6 +112,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
@@ -119,6 +127,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
@@ -136,7 +146,10 @@
 						]
 					}
 				],
-				"select": "//T()"
+				"option": {
+					"position": "succ"
+				},
+				"select": "//T"
 			},{
 				"type": "wordtype",
 				"tokenizer": {
@@ -148,7 +161,10 @@
 						]
 					}
 				],
-				"select": "//P()"
+				"option": {
+					"position": "succ"
+				},
+				"select": "//P"
 			},{
 				"type": "wordtype",
 				"tokenizer": {
@@ -276,6 +292,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{T,P,C,X,A,V,M,N,E,U,R,W}()"
@@ -286,6 +304,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{heading,tabtitle,head,cell}()"
@@ -296,6 +316,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{citation,ref,list,text,attr}()"
@@ -306,6 +328,8 @@
 				},
 				"normalizer": [{
 						"name": "orig"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{pagelink,weblink,entity,quot}()"
@@ -402,7 +426,7 @@
 				],
 				"select": "//citlink@id"
 			},{
-				"type": "punct",
+				"type": "sent",
 				"tokenizer": {
 					"name": "content"
 				},
@@ -410,9 +434,12 @@
 						"name": "empty"
 					}
 				],
-				"select": "//T()"
+				"option": {
+					"position": "succ"
+				},
+				"select": "//T"
 			},{
-				"type": "title",
+				"type": "titleword",
 				"tokenizer": {
 					"name": "word"
 				},
@@ -420,7 +447,17 @@
 						"name": "lc"
 					}
 				],
-				"select": "/doc/title()"
+				"select": "/doc/title//()"
+			},{
+				"type": "headword",
+				"tokenizer": {
+					"name": "word"
+				},
+				"normalizer": [{
+						"name": "lc"
+					}
+				],
+				"select": "/doc/heading//()"
 			},{
 				"type": "entity",
 				"tokenizer": {
@@ -430,6 +467,8 @@
 						"name": "lc"
 					},{
 						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
@@ -445,8 +484,11 @@
 						"name": "lc"
 					},{
 						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
+				"priority": 1,
 				"option": {
 					"position": "succ"
 				},
@@ -460,12 +502,11 @@
 						"name": "lc"
 					},{
 						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
-				"option": {
-					"position": "succ"
-				},
-				"select": "//R@id"
+				"select": "//E()"
 			},{
 				"type": "entity",
 				"tokenizer": {
@@ -475,12 +516,14 @@
 						"name": "lc"
 					},{
 						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"option": {
 					"position": "succ"
 				},
-				"select": "//E()"
+				"select": "//R@id"
 			},{
 				"type": "word",
 				"tokenizer": {
@@ -488,6 +531,10 @@
 				},
 				"normalizer": [{
 						"name": "lc"
+					},{
+						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{C,X,A,V,M,N,E,U,R,W}()"
@@ -500,11 +547,10 @@
 						"name": "lc"
 					},{
 						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
-				"option": {
-					"position": "succ"
-				},
 				"select": "//N()"
 			},{
 				"type": "word",
@@ -515,11 +561,10 @@
 						"name": "lc"
 					},{
 						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
-				"option": {
-					"position": "succ"
-				},
 				"select": "//E()"
 			},{
 				"type": "word",
@@ -528,6 +573,10 @@
 				},
 				"normalizer": [{
 						"name": "lc"
+					},{
+						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{heading,tabtitle,head,cell}()"
@@ -538,6 +587,10 @@
 				},
 				"normalizer": [{
 						"name": "lc"
+					},{
+						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{citation,ref,list,text,attr}()"
@@ -548,6 +601,10 @@
 				},
 				"normalizer": [{
 						"name": "lc"
+					},{
+						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{pagelink,weblink,entity,quot}()"
@@ -558,6 +615,10 @@
 				},
 				"normalizer": [{
 						"name": "lc"
+					},{
+						"name": "entityid"
+					},{
+						"name": "decode_xmlent"
 					}
 				],
 				"select": "//{math,char,code}()"
@@ -690,20 +751,10 @@
 		}
 	],
 	"structure": [{
-			"name": "tabrel",
+			"name": "section",
 			"header": "tabtitle",
 			"content": "table",
 			"class": "label"
-		},{
-			"name": "relation",
-			"header": "tabhead",
-			"content": "tabcell",
-			"class": "associative"
-		},{
-			"name": "citrel",
-			"header": "cithead",
-			"content": "citbody",
-			"class": "associative"
 		},{
 			"name": "doc",
 			"header": "title",

@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Changes_%28David_Bowie_song%29</docid>
-<title>Changes (David Bowie song)</title>
+<title id="0692_7661">Changes (David Bowie song)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <quot><entity lv="3"><text><E id="Changes">Changes</E></text>
     </entity>
@@ -23,7 +26,9 @@
 <text> <N>top</N> <C>40</C><P/>, </text>
 <quot><text><E id="Changes">Changes</E></text>
   </quot>
-<text> <V>became</V> <C>one</C> of <E id="David Bowie">Bowie</E>'s <A>best</A>-<V>known</V> <N>songs</N><T/>. The <N>lyrics</N> <V>are</V> <A>often</A> <V>seen</V> as a <N>manifesto</N> for <R>his</R> <A>chameleonic</A> <N>personality</N><P/>, the <A>frequent</A> <N>change</N> of the <N>world today</N><P/>, and <A>frequent</A> <N>reinventions</N> of <R>his</R> <A>musical</A> <N>style</N> throughout the <N>1970s</N><T/>. This <N>single</N> <V>is</V> <V>cited</V> as <E>David Bowie</E>'s <A>official</A> <A>North</A> <A>American</A> <N>debut</N><P/>, despite the <N>fact</N> that the <N id="Changes">song</N> </text>
+<text>became one of Bowie's best-known songs. The lyrics are often seen as a manifesto for his chameleonic personality, the frequent change of the world today, and frequent reinventions of his musical style throughout the 1970s.</text>
+<br/>
+<text>This single is cited as David Bowie's official North American debut, despite the fact that the song</text>
 <quot><pagelink id="The Man Who Sold the World"><text><E>The Man Who Sold the World</E></text>
     </pagelink>
   </quot>
@@ -31,6 +36,7 @@
 <reflink id="ref1"/>
 <text> This <V>was</V> the <A>last</A> <N>song</N> <E id="David Bowie">Bowie</E> <V>performed</V> <A>live</A> on <N>stage</N> before <R>his</R> <N>retirement</N> from <A>live</A> <N>performances</N> at the <N>end</N> of <C>2006</C><T/>.</text>
 <citlink id="cit8"/>
+
 <br/>
 <text>The <N id="Changes">song</N> <V>ranked</V> <N>number</N> <C>128</C> on the </text>
 <entity lv="2"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E></text>
@@ -49,6 +55,7 @@
   </pagelink>
 <text> <V>announced</V> <R>its</R> <N>induction</N><P/>, along with that of another <C>24</C> <N>songs</N><T/>.</text>
 <reflink id="ref4"/>
+
 <br/>
 <text><R>It</R> <V>charted</V> for the <A>first</A> <N>time</N> on the </text>
 <pagelink id="UK Singles Chart"><text><E>UK Singles Chart</E></text>
@@ -73,6 +80,7 @@
       </head>
     <cell id="C1"><category id="Errors reported by Module String">Errors reported by Module String
         </category>
+      
       <br/>
       <text><E>String Module Error</E><P/>: <N>Target string</N> <V>is</V> <A>empty</A>
 </text>
@@ -82,6 +90,7 @@
       </head>
     <cell id="C2"><pagelink id="Oh! You Pretty Things"><text><E>Oh! You Pretty Things</E></text>
         </pagelink>
+      
       <br/>
       </cell>
     </table>
@@ -103,7 +112,7 @@
       </head>
     <cell id="C0"><text><E>Changes</E></text>
       </cell>
-    <head id="C1"><text>artist</text>
+    <head id="C1"><text><N>artist</N></text>
       </head>
     <cell id="C1"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
         </pagelink>
@@ -125,7 +134,7 @@
     <head id="C5"><text>format</text>
       </head>
     <cell id="C5"><pagelink id="Single (music)"><text>7</text>
-        <quot><text> single</text>
+        <quot><text>single</text>
           </quot>
         </pagelink>
       </cell>
@@ -139,8 +148,9 @@
       </head>
     <cell id="C7"><pagelink id="RCA Records"><text><E>RCA Records</E></text>
         </pagelink>
+      
       <br/>
-      <text> </text>
+      
       
         <text>2160</text>
         
@@ -171,21 +181,24 @@
     <head id="C12"><text>misc</text>
       </head>
     <cell id="C12"><citlink id="cit4"/>
+      
       <br/>
       <citlink id="cit5"/>
+      
       <br/>
       <citlink id="cit6"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
 <citation id="cit8"><table id="table4"><tabtitle><text>Citation</text>
       </tabtitle>
-    <head id="C0"><text>last</text>
+    <head id="C0"><text><A>last</A></text>
       </head>
     <cell id="C0"><text><E>Gilmore</E></text>
       </cell>
-    <head id="C1"><text>first</text>
+    <head id="C1"><text><A>first</A></text>
       </head>
     <cell id="C1"><text><E>Mikal</E></text>
       </cell>
@@ -197,7 +210,7 @@
       </head>
     <cell id="C3"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E> magazine</text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C4"><text>issue</text>
       </head>
@@ -218,6 +231,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://rockhall.com/exhibits/500-songs-that-shaped-rock-and/"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -241,7 +255,7 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Music and lyrics</text>
+<heading lv="h1" id="0692_7675"><text>Music and lyrics</text>
   </heading>
 <text><E id="David Bowie">Bowie</E> <V>has</V> <V>said</V> that the <N>track</N> </text>
 <quot><text><V>started</V> <A>out</A> as a <N>parody</N> of a </text>
@@ -261,7 +275,7 @@
 <text>'s <N>piano</N> and </text>
 <pagelink id="Mick Ronson"><text><E>Mick Ronson</E></text>
   </pagelink>
-<text>'s </text>
+<text>'s</text>
 <pagelink id="String instrument"><text><N>strings</N></text>
   </pagelink>
 <text><P/>, while the <N>stuttering chorus</N> <V>has</V> <V>been</V> <V>compared</V> to </text>
@@ -271,6 +285,7 @@
 <citlink id="cit12"/>
 <reflink id="ref8"/>
 <citlink id="cit13"/>
+
 <br/>
 <text>The <N>lyrics</N> <V>focused</V> on the <A>compulsive</A> <N>nature</N> of <A>artistic</A> <N>reinvention</N> <P/>(</text>
 <quot><text><A>Strange</A> <N>fascination</N><P/>, <V>fascinating</V> me / <E>Changes</E> <V>are</V> <V>taking</V> the <N>pace</N> I<V>'m</V> <V>going</V> <A>through</A></text>
@@ -283,11 +298,13 @@
 <text> The <N id="Changes">song</N> <V>has</V> <A>also</A> <V>been</V> <V>interpreted</V> as <V>touting</V> </text>
 <quot><text><E>Modern Kids</E> as a <E>New Race</E></text>
   </quot>
-<text><P/>, a <N>theme</N> <V>echoed</V> on the <V>following</V> <N>album track</N><P/>, </text>
+<text><P/>, </text>
+<br/>
+<text>a theme echoed on the following album track,</text>
 <quot><pagelink id="Oh! You Pretty Things"><text><E>Oh! You Pretty Things</E></text>
     </pagelink>
   </quot>
-<text><T/>. </text>
+<text><T/>.</text>
 <entity lv="2"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E></text>
     </pagelink>
   </entity>
@@ -308,13 +325,13 @@
     </entity>
   <text>: CD liner notes</text>
   </ref>
-<ref id="ref8"><text>Blake, Mark (ed.) (2007). </text>
+<ref id="ref8"><text>Blake, Mark (ed.) (2007).</text>
   <quot><text>Future Legend</text>
     </quot>
-  <text>, </text>
+  <text><P/>, </text>
   <entity lv="2"><pagelink id="Mojo (magazine)"><text><E id="Mojo">MOJO</E></text>
       </pagelink>
-    <text> 60 Years of Bowie</text>
+    <text>60 Years of Bowie</text>
     </entity>
   <text>: pp.74-75</text>
   </ref>
@@ -335,7 +352,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><citlink id="cit11"/>
-      <text> </text>
+      
       </cell>
     <head id="C1"><text>work</text>
       </head>
@@ -345,11 +362,11 @@
       </head>
     <cell id="C2"><text>Review of <E>Changes</E></text>
       </cell>
-    <head id="C3"><text>first</text>
+    <head id="C3"><text><A>first</A></text>
       </head>
     <cell id="C3"><text><E>Ned</E></text>
       </cell>
-    <head id="C4"><text>last</text>
+    <head id="C4"><text><A>last</A></text>
       </head>
     <cell id="C4"><text><E>Raggett</E></text>
       </cell>
@@ -361,7 +378,7 @@
       </head>
     <cell id="C0"><text><E>Carr</E></text>
       </cell>
-    <head id="C1"><text>first</text>
+    <head id="C1"><text><A>first</A></text>
       </head>
     <cell id="C1"><text><E>Roy</E></text>
       </cell>
@@ -427,7 +444,7 @@
       </head>
     <cell id="C0"><text><E>David</E></text>
       </cell>
-    <head id="C1"><text>last</text>
+    <head id="C1"><text><A>last</A></text>
       </head>
     <cell id="C1"><text><E>Buckley</E></text>
       </cell>
@@ -451,7 +468,7 @@
       </head>
     <cell id="C0"><text><E>John</E></text>
       </cell>
-    <head id="C1"><text>last</text>
+    <head id="C1"><text><A>last</A></text>
       </head>
     <cell id="C1"><text><E>Mendelsohn</E></text>
       </cell>
@@ -463,7 +480,7 @@
       </head>
     <cell id="C3"><pagelink id="Rolling Stone"><text><E>Rolling Stone</E></text>
         </pagelink>
-      <text> </text>
+      
       </cell>
     <head id="C4"><text>date</text>
       </head>
@@ -472,11 +489,11 @@
     <head id="C5"><text>url</text>
       </head>
     <cell id="C5"><weblink id="https://www.rollingstone.com/music/albumreviews/hunky-dory-19720106"/>
-      <text> </text>
+      
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Release and aftermath</text>
+<heading lv="h1" id="0692_7689"><text>Release and aftermath</text>
   </heading>
 <text>The <N>composer</N> <V>having</V> <V>agreed</V> to </text>
 <pagelink id="Peter Noone"><text><E>Peter Noone</E></text>
@@ -488,6 +505,8 @@
 <entity lv="2"><text><E>Hunky Dory</E></text>
   </entity>
 <text><P/>, </text>
+<br/>
+
 <quot><text><E id="Changes">Changes</E></text>
   </quot>
 <text> <V>was</V> <V>chosen</V> for a <C>45</C> <N>release</N> in <E>January</E> <C>1972</C><T/>. Like the <N>album</N><P/>, <R>it</R> <V>generated</V> <A>good</A> <N>reviews</N> but <A>negligible</A> <N>chart action</N><P/>, <V>peaking</V> <A>just</A> outside the <E>US</E> </text>
@@ -499,7 +518,7 @@
 <text>The <N id="Changes">song</N> <V>was</V> a <A>regular</A> <N>feature</N> of <E id="David Bowie">Bowie</E>'s <A>live</A> <N>performances</N> on the </text>
 <pagelink id="Ziggy Stardust Tour"><text><E>Ziggy Stardust Tour</E></text>
   </pagelink>
-<text> in <C>1972&amp;ndash;73</C><P/>, <V>appearing</V> <A>again</A> on the </text>
+<text>in 1972-73, appearing again on the</text>
 <pagelink id="Diamond Dogs Tour"><text><E>Diamond Dogs Tour</E></text>
   </pagelink>
 <text> in <C>1974</C> and the </text>
@@ -521,8 +540,7 @@
 <text> <N>magazine</N>'s <C>2004</C> <N>list</N> of </text>
 <pagelink id="the 500 Greatest Songs of All Time"><E>the 500 Greatest Songs of All Time</E>
   </pagelink>
-<text><T/>.
-</text>
+<text><T/>.</text>
 <br/>
 <text>In <C>2016</C><P/>, the <N id="Changes">song</N> <V>was</V> <V>ranked</V> at <N>number</N> <C>74</C> by </text>
 <pagelink id="Internet radio"><text><N>internet radio</N></text>
@@ -534,6 +552,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.wddfradio.com/"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -549,29 +568,26 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Track listing</text>
+<heading lv="h1" id="0692_7703"><text>Track listing</text>
   </heading>
-<text># </text>
-<quot><text><E>Changes</E></text>
+<text>#</text>
+<quot><text><E id="Changes">Changes</E></text>
   </quot>
-<text> (Bowie) – 3:33
-</text>
+<text>(Bowie) – 3:33</text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><pagelink id="Andy Warhol (song)"><text><E>Andy Warhol</E></text>
     </pagelink>
   </quot>
-<text> (Bowie) – 3:58</text>
-<heading lv="h1"><text>Production credits</text>
+<text>(Bowie) – 3:58</text>
+<heading lv="h1" id="0692_7717"><text>Production credits</text>
   </heading>
 <list lv="l1"><text> <E>Producer</E><P/>:</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Ken Scott"><text><E>Ken Scott</E></text>
+<list lv="l2"><pagelink id="Ken Scott"><text><E>Ken Scott</E></text>
     </pagelink>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="David Bowie"><text><E>David Bowie</E></text>
+<list lv="l2"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
     </pagelink>
   </list>
 <list lv="l1"><text> <E>Musicians</E><P/>:</text>
@@ -580,100 +596,103 @@
   <pagelink id="Saxophone"><text>saxophone</text>
     </pagelink>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Mick Ronson"><text><E>Mick Ronson</E></text>
+<list lv="l2"><pagelink id="Mick Ronson"><text><E>Mick Ronson</E></text>
     </pagelink>
-  <text><P/>: </text>
+  <text><P/>:</text>
   <pagelink id="String instrument"><text>string arrangement</text>
     </pagelink>
-  <text>, </text>
+  <text><P/>, </text>
   <pagelink id="Mellotron"><text><E>Mellotron</E></text>
     </pagelink>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Trevor Bolder"><text><E>Trevor Bolder</E></text>
+<list lv="l2"><pagelink id="Trevor Bolder"><text><E>Trevor Bolder</E></text>
     </pagelink>
   <text><P/>: bass guitar</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Mick Woodmansey"><text><E>Mick Woodmansey</E></text>
+<list lv="l2"><pagelink id="Mick Woodmansey"><text><E>Mick Woodmansey</E></text>
     </pagelink>
   <text><P/>: drums</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Rick Wakeman"><text><E>Rick Wakeman</E></text>
+<list lv="l2"><pagelink id="Rick Wakeman"><text><E>Rick Wakeman</E></text>
     </pagelink>
   <text><P/>: piano</text>
   </list>
-<heading lv="h1"><text><E>Charts</E></text>
+<heading lv="h1" id="0692_7731"><text><E>Charts</E></text>
   </heading>
 <tablink id="table13"/>
+
 <br/>
 <citlink id="cit19"/>
 <table id="table13"><head id="C0"><text><E>Chart</E> <P/>(<C>1972</C><P/>)</text>
     </head>
-  <head id="C1"><text><E>Peakposition</E></text>
+  <head id="C1"><text>Peak</text>
+    <br/>
+    <text>position</text>
     </head>
   <head id="C0"><text><E>Chart</E> <P/>(<C>1975</C><P/>)</text>
     </head>
-  <head id="C1"><text><E>Peakposition</E></text>
+  <head id="C1"><text>Peak</text>
+    <br/>
+    <text>position</text>
     </head>
   <head id="C0"><text><E>Chart</E> <P/>(<C>2016</C><P/>)</text>
     </head>
-  <head id="C1"><text><E>Peakposition</E></text>
+  <head id="C1"><text>Peak</text>
+    <br/>
+    <text>position</text>
     </head>
-  <cell id="C0" id="R2"><text><E>US</E> </text>
+  <cell id="C0,R2"><text><E>US</E> </text>
     <pagelink id="Billboard Hot 100"><entity lv="2"><text><E>Billboard</E></text>
         </entity>
-      <text> Hot 100</text>
+      <text>Hot 100</text>
       </pagelink>
     <citlink id="cit17"/>
     </cell>
-  <cell id="C1" id="R2"><text>66</text>
+  <cell id="C1,R2"><text>66</text>
     </cell>
-  <cell id="C0" id="R3"><text><E>US</E> </text>
+  <cell id="C0,R3"><text><E>US</E> </text>
     <entity lv="2"><text>Cash Box</text>
       </entity>
-    <text> Top 100</text>
+    <text>Top 100</text>
     </cell>
-  <cell id="C1" id="R3"><text>59</text>
+  <cell id="C1,R3"><text>59</text>
     </cell>
-  <cell id="C0" id="R5"><text><E>US</E> </text>
+  <cell id="C0,R5"><text><E>US</E> </text>
     <pagelink id="Billboard Hot 100"><entity lv="2"><text><E>Billboard</E></text>
         </entity>
-      <text> Hot 100</text>
+      <text>Hot 100</text>
       </pagelink>
     </cell>
-  <cell id="C1" id="R5"><text>41</text>
+  <cell id="C1,R5"><text>41</text>
     </cell>
-  <cell id="C0" id="R6"><text><E>US</E> </text>
+  <cell id="C0,R6"><text><E>US</E> </text>
     <entity lv="2"><text>Cash Box</text>
       </entity>
-    <text> Top 100</text>
+    <text>Top 100</text>
     </cell>
-  <cell id="C1" id="R6"><text>38</text>
+  <cell id="C1,R6"><text>38</text>
     </cell>
-  <cell id="C0" id="R7"><text><E>Canada</E> </text>
+  <cell id="C0,R7"><text><E>Canada</E> </text>
     <entity lv="2"><pagelink id="RPM (magazine)"><text>RPM</text>
         </pagelink>
       </entity>
-    <text> Top Singles</text>
+    <text>Top Singles</text>
     <citlink id="cit18"/>
     </cell>
-  <cell id="C1" id="R7"><text>32</text>
+  <cell id="C1,R7"><text>32</text>
     </cell>
-  <cell id="C0" id="R10"><text><E>UK Singles Chart</E></text>
+  <cell id="C0,R10"><text><E>UK Singles Chart</E></text>
     </cell>
-  <cell id="C1" id="R10"><text>49</text>
+  <cell id="C1,R10"><text>49</text>
     </cell>
-  <cell id="C0" id="R11"><text><E>US</E> </text>
+  <cell id="C0,R11"><text><E>US</E> </text>
     <entity lv="2"><text>Billboard</text>
       </entity>
-    <text> </text>
+    
     <pagelink id="List of number-one Billboard Rock Songs"><text>Rock Songs</text>
       </pagelink>
     </cell>
-  <cell id="C1" id="R11"><text>10</text>
+  <cell id="C1,R11"><text>10</text>
     </cell>
   </table>
 <citation id="cit17"><table id="table14"><tabtitle><text><V>cite</V> <N>book</N></text>
@@ -682,7 +701,7 @@
       </head>
     <cell id="C0"><text><E>Whitburn</E></text>
       </cell>
-    <head id="C1"><text>first</text>
+    <head id="C1"><text><A>first</A></text>
       </head>
     <cell id="C1"><text><E>Joel</E></text>
       </cell>
@@ -752,13 +771,13 @@
   <list lv="l1"><attr>84</attr>
     </list>
   </citation>
-<heading lv="h1"><text>Live versions</text>
+<heading lv="h1" id="0692_7745"><text>Live versions</text>
   </heading>
 <citlink id="cit20"/>
 <list lv="l1"><text> <E id="David Bowie">Bowie</E> <V>played</V> the <N>song</N> for the </text>
   <pagelink id="BBC"><text><E>BBC</E></text>
     </pagelink>
-  <text>'s </text>
+  <text>'s</text>
   <entity lv="2"><text><E>Johnny Walker Lunchtime Show</E></text>
     </entity>
   <text> on <C>22</C> <E>May</E> <C>1972</C><T/>. This <V>was</V> <V>broadcast</V> in <A>early</A> <E>June</E> <C>1972</C> and <A>eventually</A> <V>released</V> on </text>
@@ -774,7 +793,7 @@
   <entity lv="2"><pagelink id="Santa Monica &apos;72"><text><E>Santa Monica</E> '<C>72</C></text>
       </pagelink>
     </entity>
-  <text> and </text>
+  <text>and</text>
   <entity lv="2"><pagelink id="Live Santa Monica &apos;72"><text><E id="Live Santa Monica 72">Live Santa Monica '72</E></text>
       </pagelink>
     </entity>
@@ -865,10 +884,10 @@
   </list>
 <citation id="cit20" class="sources" date="August 2017"><attr>section</attr>
   </citation>
-<heading lv="h1"><text>Other releases</text>
+<heading lv="h1" id="0692_7759"><text>Other releases</text>
   </heading>
 <text><E id="David Bowie">Bowie</E> <V>hit</V> <N>compilations</N> <A>rarely</A> <V>omit</V> </text>
-<quot><text><E>Changes</E></text>
+<quot><text><E id="Changes">Changes</E></text>
   </quot>
 <text> despite <R>its</R> <N>lack</N> of <N>chart success</N> <P/>– <A>indeed</A><P/>, the <N>retrospectives</N> </text>
 <entity lv="2"><pagelink id="Changesonebowie"><text><E>Changesonebowie</E></text>
@@ -885,65 +904,54 @@
 <text> <P/>(<C>1990</C><P/>) <V>have</V> <V>taken</V> <R>their</R> <N>titles</N> from the <N id="Changes">song</N><T/>.</text>
 <list lv="l1"><text> <R>It</R> <V>has</V> <V>appeared</V> on the <A>following</A> <E id="David Bowie">Bowie</E> <N>compilations</N><P/>:</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><text>The Best of <E>David Bowie</E></text>
+<list lv="l2"><entity lv="2"><text>The Best of <E>David Bowie</E></text>
     </entity>
-  <text> (Japan 1974)</text>
+  <text>(Japan 1974)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><text><E>Changesonebowie</E></text>
+<list lv="l2"><entity lv="2"><text><E>Changesonebowie</E></text>
     </entity>
   <text> <P/>(<C>1976</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="Fame and Fashion"><text><E>Fame and Fashion</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="Fame and Fashion"><text><E>Fame and Fashion</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>1984</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="Sound + Vision (box set)"><text><E>Sound + Vision</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="Sound + Vision (box set)"><text><E>Sound + Vision</E></text>
       </pagelink>
     </entity>
-  <text> (1989)</text>
+  <text>(1989)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><text><E>Changesbowie</E></text>
+<list lv="l2"><entity lv="2"><text><E>Changesbowie</E></text>
     </entity>
   <text> <P/>(<C>1990</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Singles Collection (David Bowie album)"><text><E>The Singles Collection</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Singles Collection (David Bowie album)"><text><E>The Singles Collection</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>1993</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Best of David Bowie 1969/1974"><text><E>The Best of David Bowie 1969/1974</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Best of David Bowie 1969/1974"><text><E>The Best of David Bowie 1969/1974</E></text>
       </pagelink>
     </entity>
-  <text> (1997)</text>
+  <text>(1997)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="Best of Bowie"><text><E>Best of Bowie</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="Best of Bowie"><text><E>Best of Bowie</E></text>
       </pagelink>
     </entity>
   <text> (UK, <E>US</E>, <E>Australia</E> 2002)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Platinum Collection (David Bowie album)"><text><E>The Platinum Collection</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Platinum Collection (David Bowie album)"><text><E>The Platinum Collection</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>2006</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="Nothing Has Changed"><text><E>Nothing Has Changed</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="Nothing Has Changed"><text><E>Nothing Has Changed</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>2014</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="Legacy (The Very Best of David Bowie)"><text><E>Bowie Legacy</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="Legacy (The Very Best of David Bowie)"><text><E>Bowie Legacy</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>2016</C><P/>)</text>
@@ -957,19 +965,18 @@
 <list lv="l1"><text> <R>It</R> <V>appeared</V> on <C>two</C> <N>picture disc sets</N><P/>, </text>
   <entity lv="2"><text><E>Fashion</E></text>
     </entity>
-  <text> and the </text>
+  <text>and the</text>
   <pagelink id="RCA Records"><text><E>RCA</E></text>
     </pagelink>
-  <text> </text>
+  
   <entity lv="2"><text>Life Time Disc Set</text>
     </entity>
   <text><T/>.</text>
   </list>
-<heading lv="h1"><text>Cover versions</text>
+<heading lv="h1" id="0692_7773"><text>Cover versions</text>
   </heading>
 <citlink id="cit21"/>
-<list lv="l1"><text> </text>
-  <pagelink id="Butterfly Boucher"><text><E>Butterfly Boucher</E></text>
+<list lv="l1"><pagelink id="Butterfly Boucher"><text><E>Butterfly Boucher</E></text>
     </pagelink>
   <text> – <V>recorded</V> for the </text>
   <entity lv="2"><pagelink id="Shrek 2"><text><E>Shrek 2</E></text>
@@ -977,17 +984,15 @@
     </entity>
   <text> <N>soundtrack</N> <P/>(<C>2004</C><P/>), <V>featuring</V> <E id="David Bowie">Bowie</E> on <A>additional</A> <N>vocals</N><T/>.</text>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="Seu Jorge"><text><E>Seu Jorge</E></text>
+<list lv="l1"><pagelink id="Seu Jorge"><text><E>Seu Jorge</E></text>
     </pagelink>
-  <text> – a Portuguese version for the film </text>
+  <text>– a Portuguese version for the film</text>
   <entity lv="2"><pagelink id="The Life Aquatic with Steve Zissou"><text><E>The Life Aquatic with Steve Zissou</E></text>
       </pagelink>
     </entity>
-  <text> in 2004.</text>
+  <text>in 2004.</text>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="Lindsay Lohan"><text><E>Lindsay Lohan</E></text>
+<list lv="l1"><pagelink id="Lindsay Lohan"><text><E>Lindsay Lohan</E></text>
     </pagelink>
   <text> <V>has</V> <V>covered</V> the <N>song</N> for the <C>2004</C> <N>film</N> </text>
   <entity lv="2"><pagelink id="Confessions of a Teenage Drama Queen"><text><E>Confessions of a Teenage Drama Queen</E></text>
@@ -995,8 +1000,7 @@
     </entity>
   <text><T/>.</text>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="Shawn Mullins"><text><E>Shawn Mullins</E></text>
+<list lv="l1"><pagelink id="Shawn Mullins"><text><E>Shawn Mullins</E></text>
     </pagelink>
   <text> – <V>released</V> on </text>
   <entity lv="2"><pagelink id="The Faculty"><text><E>The Faculty</E></text>
@@ -1013,20 +1017,18 @@
   <text> <V>has</V> <V>performed</V> the <N id="Changes">song</N> <A>live</A><T/>.</text>
   <reflink id="ref14"/>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="Bananarama"><text><E>Bananarama</E></text>
+<list lv="l1"><pagelink id="Bananarama"><text><E>Bananarama</E></text>
     </pagelink>
   <text> <V>recorded</V> this <N>song</N> in <C>1993</C> with <N>producers</N> </text>
   <pagelink id="Mike Stock (musician)"><text><E>Mike Stock</E></text>
     </pagelink>
-  <text> and </text>
+  <text>and</text>
   <pagelink id="Pete Waterman"><text><E>Pete Waterman</E></text>
     </pagelink>
   <text> but <A>never</A> <A>officially</A> <V>released</V> <R>it</R><T/>.</text>
   <citlink id="cit22"/>
   </list>
-<list lv="l1"><text> </text>
-  <pagelink id="The Puppini Sisters"><text><E>The Puppini Sisters</E></text>
+<list lv="l1"><pagelink id="The Puppini Sisters"><text><E>The Puppini Sisters</E></text>
     </pagelink>
   <text> <V>released</V> this <N>song</N> on <R>their</R> <C>2016</C> <N>album</N> </text>
   <entity lv="2"><text>The <A>High</A> <E>Life</E></text>
@@ -1034,7 +1036,8 @@
   <text> <R>Their</R> <N>version</N> <V>was</V> <A>also</A> <V>remixed</V> <A>twice</A> by <E>Fill</E>-<E>Y</E> and <E>Martin Kolarides</E><T/>.</text>
   <reflink id="ref16"/>
   </list>
-<ref id="ref14"><text><R>It</R> <M>can</M> <V>be</V> <V>found</V> at <E>www.jacksmannequin.org</E></text>
+<ref id="ref14"><text><R>It</R> <M>can</M> <V>be</V> <V>found</V> at </text>
+  <weblink id="www.jacksmannequin.org"/>
   </ref>
 <ref id="ref16"><weblink id="https://www.musicglue.com/the-puppini-sisters/products/the-high-life-deluxe-edition-signed-cd/"/>
   </ref>
@@ -1049,15 +1052,15 @@
     <head id="C1"><text>title</text>
       </head>
     <cell id="C1"><text><E>Bananarama</E>’s <E>Unreleased</E> <C>1993</C> <E>Cover</E> Of <E>David Bowie</E><E>’s</E></text>
-      <quot><text>Changes</text>
+      <quot><text><E>Changes</E></text>
         </quot>
       <text> Has Leaked<P/>, <E>And It’s Guilty</E>-<E>Pleasure Gold</E> </text>
       </cell>
-    <head id="C2"><text>first</text>
+    <head id="C2"><text><A>first</A></text>
       </head>
     <cell id="C2"><text><E>Robbie</E></text>
       </cell>
-    <head id="C3"><text>last</text>
+    <head id="C3"><text><A>last</A></text>
       </head>
     <cell id="C3"><text><E>Daw</E></text>
       </cell>
@@ -1071,11 +1074,11 @@
       </cell>
     <head id="C6"><text>website</text>
       </head>
-    <cell id="C6"><text>www.idolator.com</text>
+    <cell id="C6"><weblink id="www.idolator.com"/>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>Notes</E></text>
+<heading lv="h1" id="0692_7787"><text><E>Notes</E></text>
   </heading>
 <citation id="cit24"><table id="table18"><tabtitle><text><V>cite</V> <N>web</N></text>
       </tabtitle>
@@ -1105,52 +1108,62 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="0692_7801"><text><E>References</E></text>
   </heading>
 <list lv="l1"><pagelink id="Nicholas Pegg"><text>Pegg, <E>Nicholas</E></text>
     </pagelink>
-  <text>, </text>
+  <text><P/>, </text>
   <entity lv="2"><text>The Complete <E>David Bowie</E></text>
     </entity>
-  <text>, Reynolds &amp; Hearn Ltd, 2000, </text>
+  <text>, Reynolds &amp; Hearn Ltd, 2000,</text>
   <citlink id="cit25"/>
   </list>
 <citation id="cit25" class="ISBN"><attr>1-903111-14-5</attr>
   </citation>
-<heading lv="h1"><text>External links</text>
+<heading lv="h1" id="0692_7815"><text>External links</text>
   </heading>
-<list lv="l1"><text> </text>
-  <citlink id="cit26"/>
+<list lv="l1"><citlink id="cit26"/>
   </list>
+
 <br/>
 <mark>David Bowie singles</mark>
+
 <br/>
 <category id="1972 singles">1972 singles
   </category>
+
 <br/>
 <category id="David Bowie songs">David Bowie songs
   </category>
+
 <br/>
 <category id="Songs written by David Bowie">Songs written by David Bowie
   </category>
+
 <br/>
 <category id="Song recordings produced by Ken Scott">Song recordings produced by Ken Scott
   </category>
+
 <br/>
 <category id="Song recordings produced by David Bowie">Song recordings produced by David Bowie
   </category>
+
 <br/>
 <category id="Art pop songs">Art pop songs
   </category>
+
 <br/>
 <category id="RCA Records singles">RCA Records singles
   </category>
+
 <br/>
 <category id="1970s ballads">1970s ballads
   </category>
+
 <br/>
 <category id="Songs from animated films">Songs from animated films
   </category>
+
 <br/>
 <category id="1972 songs">1972 songs
   </category>

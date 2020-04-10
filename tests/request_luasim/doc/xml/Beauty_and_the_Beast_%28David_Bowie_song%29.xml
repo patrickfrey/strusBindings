@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>Beauty_and_the_Beast_%28David_Bowie_song%29</docid>
-<title>Beauty and the Beast (David Bowie song)</title>
+<title id="0776_422">Beauty and the Beast (David Bowie song)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <quot><entity lv="3"><text><E id="Beauty and the Beast">Beauty and the Beast</E></text>
     </entity>
@@ -21,7 +24,7 @@
 <text><T/>. <R>It</R> <V>was</V> <V>issued</V> as the <A>second</A> <A>single</A> from the <N>album</N> in <E>January</E> <C>1978</C><P/>, <V>becoming</V> a <A>minor</A> <E>UK</E> <V>hit</V><P/>, <V>peaking</V> at <N>No</N><T/>. 39 on the </text>
 <pagelink id="UK Singles Chart"><text><E>UK Singles Chart</E></text>
   </pagelink>
-<text>.</text>
+<text><T/>. </text>
 <citation id="cit1" class="Use British English" date="January 2014"/>
 <citation id="cit2" class="Use dmy dates" date="January 2014"/>
 <citation id="cit4" class="flatlist"/>
@@ -37,6 +40,7 @@
       </head>
     <cell id="C1"><category id="Errors reported by Module String">Errors reported by Module String
         </category>
+      
       <br/>
       <text><E>String Module Error</E><P/>: <N>Target string</N> <V>is</V> <A>empty</A>
 </text>
@@ -50,6 +54,7 @@
       </head>
     <cell id="C3"><pagelink id="Joe the Lion"><text><E>Joe the Lion</E></text>
         </pagelink>
+      
       <br/>
       </cell>
     </table>
@@ -83,15 +88,16 @@
     <head id="C5"><text>format</text>
       </head>
     <cell id="C5"><pagelink id="Single (music)"><text>7</text>
-        <quot><text> single</text>
+        <quot><text>single</text>
           </quot>
         </pagelink>
+      
       <br/>
       <pagelink id="Twelve-inch single"><text>12</text>
-        <quot><text> single</text>
+        <quot><text>single</text>
           </quot>
         </pagelink>
-      <text> </text>
+      
       
         <text>(US promo, <E>Spain</E>)</text>
         
@@ -100,9 +106,10 @@
       </head>
     <cell id="C6"><pagelink id="Hansa Tonstudio"><text>Hansa Studio by the Wall</text>
         </pagelink>
-      <text>, </text>
+      <text>,</text>
       <pagelink id="West Berlin"><text><E>West Berlin</E></text>
         </pagelink>
+      
       <br/>
       <text><E>July</E>–<E>August</E> <C>1977</C></text>
       </cell>
@@ -110,16 +117,16 @@
       </head>
     <cell id="C7"><pagelink id="Art rock"><text><E>Art rock</E></text>
         </pagelink>
-      <text>, </text>
+      <text>,</text>
       <pagelink id="Krautrock"><text>krautrock</text>
         </pagelink>
       </cell>
     <head id="C8"><text>length</text>
       </head>
-    <cell id="C8"><text>3:325:18</text>
+    <cell id="C8"><text>3:32 5:18</text>
       
-        <text>(12</text>
-        <quot><text> extended version)</text>
+        <text> <P/>(<E>12</E></text>
+        <quot><text>extended version)</text>
           </quot>
         
       </cell>
@@ -127,23 +134,26 @@
       </head>
     <cell id="C9"><pagelink id="RCA Records"><text><E>RCA Records</E></text>
         </pagelink>
+      
       <br/>
-      <text> </text>
+      
       
         <text><E>PB 1190</E></text>
         
+      
       <br/>
-      <text> </text>
+      
       
         <text><E>PC 1204</E> <P/>(<E>12</E></text>
         <quot><text> Spain<P/>)</text>
           </quot>
         
+      
       <br/>
-      <text> </text>
+      
       
         <text>JD 11204 (12</text>
-        <quot><text> US promo)</text>
+        <quot><text>US promo)</text>
           </quot>
         
       </cell>
@@ -170,11 +180,12 @@
     <head id="C14"><text>misc</text>
       </head>
     <cell id="C14"><citlink id="cit5"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Music and lyrics</text>
+<heading lv="h1" id="0776_436"><text>Music and lyrics</text>
   </heading>
 <text>The <N>opening music</N><P/>, a <A>disjointed</A> <N>combination</N> of <N>piano</N><P/>, <N>guitar</N><P/>, <N>electronics</N> and <N>voice</N> <V>rising</V> <A>steadily</A> to a <N>crescendo</N><P/>, <V>has</V> <V>been</V> <V>described</V> as <V>sounding</V> like </text>
 <quot><text><E id="David Bowie">Bowie</E> <V>is</V> <A>about</A> to <V>turn</V> into </text>
@@ -182,7 +193,7 @@
     </pagelink>
   <text> before your <A>very</A> <N>ears</N></text>
   </quot>
-<text><T/>.</text>
+<text><T/>. </text>
 <reflink id="ref1"/>
 <text> The <N id="Beauty and the Beast">song</N> <A>proper</A> <V>features</V> </text>
 <pagelink id="Robert Fripp"><text><E>Robert Fripp</E></text>
@@ -192,6 +203,7 @@
   </pagelink>
 <text><T/>. <E id="Robert Fripp">Fripp</E> <V>has</V> <V>stated</V> that <R>his</R> <N>guitar work</N> on the <N>track</N> <V>is</V> a <A>first</A> <N>take</N> <V>made</V> <A>straight</A> upon <N>arrival</N> at the <N>studio</N><T/>.</text>
 <citlink id="cit6"/>
+
 <br/>
 <text>The <N>lyrics</N> <V>have</V> <V>been</V> <V>interpreted</V> as a <N>look</N> <A>back</A> at <E id="David Bowie">Bowie</E>'s <A>severe</A> <N>mood swings</N> during <R>his</R> </text>
 <pagelink id="Cocaine"><text><N>cocaine</N></text>
@@ -218,8 +230,7 @@
   </entity>
 <quot><text><N>someone</N> <V>fuck</V> a <N>priest</N></text>
   </quot>
-<text><T/>.
-</text>
+<text><T/>. </text>
 <br/>
 <text>In another <N>interpretation</N><P/>, </text>
 <pagelink id="James E. Perone"><E>James E. Perone</E>
@@ -231,17 +242,17 @@
   <quot><text><E id="Beauty and the Beast">Beauty and the Beast</E></text>
     </quot>
   <text> <V>is</V> <C>one</C> of those <E>David Bowie</E> <N>songs</N> with <N>lyrics</N> <W>that</W> <M>can</M> <V>leave</V> the <N id="David Bowie">listener</N> <V>scratching</V> <R id="Robert Fripp">his</R> or <R>her</R> <N>head</N> and <V>wondering</V> <A>just</A> <W>what</W> <R>they</R> <V>mean</V><T/>. <E id="David Bowie">Bowie</E> <V>establishes</V> a <N>basic</N> of <N>feeling</N> of <N>evil</N> in the <N>air</N> through <R>his</R> <A>impressionistic</A> and <A>non</A>-<A>linear</A> <N>lyrics</N><T/>. <E id="David Bowie">Bowie</E>'s <N>references</N> <V>allow</V> the <N id="David Bowie">listener</N> to <V>read</V> the <E>Beauty and the Beast</E> <V>characters</V> <C>two</C> <A>possible</A> <N>ways</N><T/>. Either <R>they</R> <V>are</V> <C>two</C> <N>entities</N><P/>, or <A>perhaps</A><P/>, <C>two</C> <N>sides</N> of a <A>single</A> <N>entity</N><T/>. In either <N>case</N><P/>, the <N>fact</N> <V>remains</V> that the <A>dark</A> <N>side</N><P/>—<W>which</W> <E id="David Bowie">Bowie</E> <V>paints</V> as <A>unavoidable</A><P/>—<V>rules</V> the <N id="David Bowie">situation</N> <R id="Robert Fripp">he</R> <V>constructs</V><T/>. The <N id="David Bowie">listener</N> <M>must</M> <V>keep</V> in <N>mind</N> that <E id="David Bowie">Bowie</E> <V>has</V> <V>created</V> <N>images</N> <V>based</V> on the <A>good</A>-<A>evil</A> <N>dialectic</N> throughout <R>his</R> <N>career</N><P/>: <R>it</R> <V>is</V> <A>not</A> <A>unique</A> to </text>
-  <quot><text><E>Beauty and the Beast</E></text>
+  <quot><text><E id="Beauty and the Beast">Beauty and the Beast</E></text>
     </quot>
   <text><T/>. <A>However</A><P/>, <R>it</R> <V>is</V> <A>interesting</A> to <V>consider</V> the <A>possible</A> <N>influence</N> of <E>Berlin</E> on <E id="David Bowie">Bowie</E> at this <N>point</N> in <R>his</R> <N>career</N><T/>. <A>Certainly</A><P/>, the <E>East Berlin</E>–<E>West Berlin</E><P/>, <E>Communism</E>–<N>Democracy dialectics</N> <V>fit</V> <A>conveniently</A> in the <N id="David Bowie">listener</N>'s <A>possible</A> <N>understanding</N> of the <N id="Beauty and the Beast">song</N><T/>.</text>
   <reflink id="ref4"/>
   
 <ref id="ref1"><pagelink id="Roy Carr"><text><E>Roy Carr</E></text>
     </pagelink>
-  <text> &amp; </text>
+  <text>&amp;</text>
   <pagelink id="Charles Shaar Murray"><text><E>Charles Shaar Murray</E></text>
     </pagelink>
-  <text> (1981). </text>
+  <text>(1981).</text>
   <entity lv="2"><text><E>Bowie</E><P/>: <E>An Illustrated Record</E></text>
     </entity>
   <text><P/>: pp.91-93</text>
@@ -293,7 +304,7 @@
   </citation>
 <citation id="cit7" class="ISBN"><attr>0-275-99245-4</attr>
   </citation>
-<heading lv="h1"><text>Release and aftermath</text>
+<heading lv="h1" id="0776_450"><text>Release and aftermath</text>
   </heading>
 <text>The <N>follow</N>-<N>up</N> <A>single</A> to </text>
  
@@ -302,21 +313,25 @@
   </pagelink>
 <quot><text><P/>, <E>Beauty</E></text>
   </quot>
-<text> and the Beast</text>
-<quot><text> <V>was</V> <V>considered</V> an <A>unconventional</A> <N>choice</N> for <N>release</N><P/>, <V>reflected</V> in <R>it</R> <A>just</A> <V>scraping</V> into the <E>UK Top</E> <C>40</C><T/>. </text>
+<text>and the Beast</text>
+<quot><text> <V>was</V> <V>considered</V> an <A>unconventional</A> <N>choice</N> for <N>release</N><P/>, </text>
+  <br/>
+  <text><V>reflected</V> in <R>it</R> <A>just</A> <V>scraping</V> into the <E>UK Top</E> <C>40</C><T/>. </text>
   <entity lv="2"><pagelink id="NME"><text><E>NME</E></text>
       </pagelink>
     </entity>
   <text> <N>editors</N> </text>
   <pagelink id="Roy Carr"><text><E>Roy Carr</E></text>
     </pagelink>
-  <text> and </text>
+  <text>and</text>
   <pagelink id="Charles Shaar Murray"><text><E>Charles Shaar Murray</E></text>
     </pagelink>
   <text> <V>remarked</V> that <R>its</R> <V>jarring</V></text>
   </quot>
 <text><P/>, <V>threatening</V> <N>edge</N> <P/>(and <R>it</R> <V>was</V> <C>one</C> of the <A>most</A> <A>menacing</A> <N>singles</N> of a <A>menacing</A> <N>year</N><P/>) <A>obviously</A> <V>put</V> <A>off</A> a <A>great</A> <A>many</A> of the <V>floating</V> <N>singles buyers</N> <V>attracted</V> by the <A>intoxicating</A> <N>romanticism</N> of <R>its</R> <A>immediate</A> <N>predecessor</N></text>
-<quot><text><T/>. The <E>US</E> <N>release</N> <V>failed</V> to <V>chart</V><P/>, despite <V>being</V> <V>augmented</V> by a <N>promo</N> <C>12</C></text>
+<quot><text><T/>. </text>
+  <br/>
+  <text>The US release failed to chart, despite being augmented by a promo 12</text>
   </quot>
 <quot><text> <A>single</A> <V>featuring</V> <E id="David Bowie">Bowie</E>'s <A>earlier</A> <E>US</E> <N>No</N><T/>. <C>1</C> <V>hit</V> </text>
   </quot>
@@ -324,6 +339,7 @@
   </pagelink>
 <quot><text> on the <E>B</E>-<N>side</N><T/>.</text>
   </quot>
+
 <br/>
 <text><E id="David Bowie">Bowie</E> <A>only</A> <V>performed</V> the <N id="Beauty and the Beast">song</N> <A>live</A> on <R>his</R> </text>
 <pagelink id="Isolar II – The 1978 World Tour"><text><E id="Isolar II – The 1978 World Tour">Isolar II Tour</E></text>
@@ -332,45 +348,43 @@
 <entity lv="2"><pagelink id="Stage (David Bowie album)"><text><E>Stage</E></text>
     </pagelink>
   </entity>
-<text><T/>.</text>
-<heading lv="h1"><text>Track listing</text>
+<text><T/>. </text>
+<heading lv="h1" id="0776_464"><text>Track listing</text>
   </heading>
-<heading lv="h2"><text>7</text>
-  <quot><text> single</text>
+<heading lv="h2" id="0776_478"><text>7</text>
+  <quot><text>single</text>
     </quot>
   </heading>
-<text># </text>
-<quot><text><E>Beauty and the Beast</E></text>
+<text>#</text>
+<quot><text><E id="Beauty and the Beast">Beauty and the Beast</E></text>
   </quot>
-<text> (</text>
+<text>(</text>
 <pagelink id="David Bowie"><text><E>David Bowie</E></text>
   </pagelink>
-<text>) – 3:32
-</text>
+<text>) – 3:32</text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><pagelink id="Sense of Doubt"><text><E>Sense of Doubt</E></text>
     </pagelink>
   </quot>
-<text> (Bowie) – 3:57</text>
-<heading lv="h2"><text>12</text>
-  <quot><text> single</text>
+<text>(Bowie) – 3:57</text>
+<heading lv="h2" id="0776_492"><text>12</text>
+  <quot><text>single</text>
     </quot>
   </heading>
-<text># </text>
+<text>#</text>
 <quot><text><E>Beauty and the Beast</E> (<E>Special Extended Version</E>)</text>
   </quot>
-<text> (Bowie) – 5:18
-</text>
+<text>(Bowie) – 5:18</text>
 <br/>
-<text># </text>
+<text>#</text>
 <quot><pagelink id="Fame (David Bowie song)"><text><E>Fame</E></text>
     </pagelink>
   </quot>
-<text> (Bowie, </text>
+<text>(Bowie,</text>
 <pagelink id="John Lennon"><text><E>John Lennon</E></text>
   </pagelink>
-<text>, </text>
+<text><P/>, </text>
 <pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
   </pagelink>
 <text>) – 3:30</text>
@@ -379,56 +393,47 @@
     </quot>
   <text> <E>Promo</E><P/>) and <E>Spain</E><T/>.</text>
   </list>
-<heading lv="h1"><text>Production credits</text>
+<heading lv="h1" id="0776_506"><text>Production credits</text>
   </heading>
-<list lv="l1"><text> </text>
-  <entity lv="3"><text><E>Producers</E></text>
+<list lv="l1"><entity lv="3"><text><E>Producers</E></text>
     </entity>
   <text><P/>:</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Tony Visconti"><text><E>Tony Visconti</E></text>
+<list lv="l2"><pagelink id="Tony Visconti"><text><E>Tony Visconti</E></text>
     </pagelink>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="David Bowie"><text><E>David Bowie</E></text>
+<list lv="l2"><pagelink id="David Bowie"><text><E>David Bowie</E></text>
     </pagelink>
   </list>
-<list lv="l1"><text> </text>
-  <entity lv="3"><text><E>Musicians</E></text>
+<list lv="l1"><entity lv="3"><text><E>Musicians</E></text>
     </entity>
   <text><P/>:</text>
   </list>
 <list lv="l2"><text> <E>David Bowie</E><P/>: vocals, piano</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Robert Fripp"><text><E>Robert Fripp</E></text>
+<list lv="l2"><pagelink id="Robert Fripp"><text><E>Robert Fripp</E></text>
     </pagelink>
   <text><P/>: lead guitar</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
+<list lv="l2"><pagelink id="Carlos Alomar"><text><E>Carlos Alomar</E></text>
     </pagelink>
   <text><P/>: rhythm guitar</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="George Murray (musician)"><text><E>George Murray</E></text>
+<list lv="l2"><pagelink id="George Murray (musician)"><text><E>George Murray</E></text>
     </pagelink>
   <text><P/>: bass guitar</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Dennis Davis"><text><E>Dennis Davis</E></text>
+<list lv="l2"><pagelink id="Dennis Davis"><text><E>Dennis Davis</E></text>
     </pagelink>
   <text><P/>: drums</text>
   </list>
-<list lv="l2"><text> </text>
-  <pagelink id="Brian Eno"><text><E>Brian Eno</E></text>
+<list lv="l2"><pagelink id="Brian Eno"><text><E>Brian Eno</E></text>
     </pagelink>
   <text><P/>: synthesizer, guitar treatments</text>
   </list>
 <list lv="l2"><text> <E>Antonia Maass</E><P/>: backing vocals</text>
   </list>
-<heading lv="h1"><text>Live versions</text>
+<heading lv="h1" id="0776_520"><text>Live versions</text>
   </heading>
 <list lv="l1"><text> <N>Performances</N> from the </text>
   <pagelink id="Isolar II – The 1978 World Tour"><text><E id="Isolar II – The 1978 World Tour">Isolar II Tour</E></text>
@@ -443,12 +448,12 @@
     </entity>
   <text> <P/>(<C>2018</C><P/>)<T/>.</text>
   </list>
-<heading lv="h1"><text>Cover versions</text>
+<heading lv="h1" id="0776_534"><text>Cover versions</text>
   </heading>
 <list lv="l1"><text>The <N id="Beauty and the Beast">song</N> <V>was</V> <V>covered</V> by the <A>now</A>-<A>defunct</A> </text>
   <pagelink id="Christian metal"><text><A>Christian</A> <A>heavy</A> <N>metal</N></text>
     </pagelink>
-  <text> band </text>
+  <text>band</text>
   <pagelink id="Deliverance (metal band)"><text><E>Deliverance</E></text>
     </pagelink>
   <text> on the <N>album</N> </text>
@@ -456,35 +461,30 @@
     </entity>
   <text> <P/>(<C>1995</C><P/>)<T/>.</text>
   </list>
-<heading lv="h1"><text>Other releases</text>
+<heading lv="h1" id="0776_548"><text>Other releases</text>
   </heading>
 <list lv="l1"><text> The <N id="Beauty and the Beast">song</N> <V>appeared</V> on the <V>following</V> <N>compilations</N><P/>:</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><text><E>Chameleon</E></text>
+<list lv="l2"><entity lv="2"><text><E>Chameleon</E></text>
     </entity>
   <text> <P/>(<E>Australia and New Zealand 1979</E><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Singles Collection (David Bowie album)"><text><E>The Singles Collection</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Singles Collection (David Bowie album)"><text><E>The Singles Collection</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>1993</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Best of David Bowie 1974/1979"><text><E>The Best of David Bowie 1974/1979</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Best of David Bowie 1974/1979"><text><E>The Best of David Bowie 1974/1979</E></text>
       </pagelink>
     </entity>
-  <text> (1998)</text>
+  <text>(1998)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Collection (David Bowie album)"><text><E>The Collection</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Collection (David Bowie album)"><text><E>The Collection</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>2005</C><P/>)</text>
   </list>
-<list lv="l2"><text> </text>
-  <entity lv="2"><pagelink id="The Platinum Collection (David Bowie album)"><text><E>The Platinum Collection</E></text>
+<list lv="l2"><entity lv="2"><pagelink id="The Platinum Collection (David Bowie album)"><text><E>The Platinum Collection</E></text>
       </pagelink>
     </entity>
   <text> <P/>(<C>2005/2006</C><P/>)</text>
@@ -492,7 +492,7 @@
 <list lv="l1"><text> <R>It</R> <V>was</V> <V>released</V> as a <N>picture disc</N> in the </text>
   <pagelink id="RCA Records"><text><E>RCA</E></text>
     </pagelink>
-  <text> </text>
+  
   <entity lv="2"><text>Life Time</text>
     </entity>
   <text> <N>picture disc set</N><T/>.</text>
@@ -504,14 +504,14 @@
   <entity lv="2"><pagelink id="A_New_Career_in_a_New_Town_(1977–1982)" anchor="Re:Call_3_(remastered_tracks)"><text><E>Re</E><P/>:Call 3</text>
       </pagelink>
     </entity>
-  <text>, part of the </text>
+  <text>, part of the</text>
   <entity lv="2"><pagelink id="A New Career in a New Town (1977–1982)"><text><E>A New Career in a New Town</E> (1977–1982)</text>
       </pagelink>
     </entity>
-  <text> </text>
+  
   <pagelink id="Box set"><text>box set</text>
     </pagelink>
-  <text> (2017).</text>
+  <text>(2017).</text>
   <citlink id="cit8"/>
   </list>
 <citation id="cit8"><table id="table4"><tabtitle><text><V>cite</V> <N>web</N></text>
@@ -519,6 +519,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://www.davidbowie.com/news/new-career-new-town-1977-1982-57146"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -538,41 +539,49 @@
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text><E>Notes</E></text>
+<heading lv="h1" id="0776_562"><text><E>Notes</E></text>
   </heading>
 <mark>Reflist</mark>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="0776_576"><text><E>References</E></text>
   </heading>
 <list lv="l1"><weblink id="http://www.illustrated-db-discography.nl/SongB.htm#B"><text> <E>Beauty and the Beast</E></text>
     </weblink>
-  <text> at the Illustrated db Discography</text>
+  <text>at the Illustrated db Discography</text>
   </list>
 <list lv="l1"><text>Pegg, <E>Nicholas</E>, </text>
   <entity lv="2"><text>The Complete <E>David Bowie</E></text>
     </entity>
-  <text>, Reynolds &amp; Hearn Ltd, 2000, </text>
+  <text>, Reynolds &amp; Hearn Ltd, 2000,</text>
   <citlink id="cit9"/>
   </list>
+
 <br/>
 <mark>David Bowie singles</mark>
+
 <br/>
 <category id="1978 singles">1978 singles
   </category>
+
 <br/>
 <category id="David Bowie songs">David Bowie songs
   </category>
+
 <br/>
 <category id="Songs written by David Bowie">Songs written by David Bowie
   </category>
+
 <br/>
 <category id="Song recordings produced by David Bowie">Song recordings produced by David Bowie
   </category>
+
 <br/>
 <category id="Song recordings produced by Tony Visconti">Song recordings produced by Tony Visconti
   </category>
+
 <br/>
 <category id="RCA Records singles">RCA Records singles
   </category>
+
 <br/>
 <category id="1977 songs">1977 songs
   </category>

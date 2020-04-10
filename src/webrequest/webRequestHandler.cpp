@@ -270,6 +270,8 @@ WebRequestHandler::WebRequestHandler(
 		schema_DistQueryEval_SET_querystats.addToHandler( m_impl, "SET~querystats");
 		static const DefineSchema<Schema_DistQueryEval_SET_collect> schema_DistQueryEval_SET_collect("distqryeval");
 		schema_DistQueryEval_SET_collect.addToHandler( m_impl, "SET~collect");
+		static const DefineSchema<Schema_DistQueryEval_CLOSE_collect> schema_DistQueryEval_CLOSE_collect("distqryeval");
+		schema_DistQueryEval_CLOSE_collect.addToHandler( m_impl, "CLOSE~collect");
 		static const DefineSchema<Schema_DistQueryEval_SET_ranklist> schema_DistQueryEval_SET_ranklist("distqryeval");
 		schema_DistQueryEval_SET_ranklist.addToHandler( m_impl, "SET~ranklist");
 		static const DefineSchema<Schema_DistQueryEval_END_ranklist> schema_DistQueryEval_END_ranklist("distqryeval");

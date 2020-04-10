@@ -137,25 +137,18 @@ void QueryExpression::addCollectSummary( const std::vector<SummaryElement>& summ
 		const char* text = si->value().c_str();
 		if (si->name() == m_config.expandSummaryName)
 		{
-			if (m_config.extractFeatureType.empty())
-			{
-				if (m_config.extractFeatureTypeValueSeparator)
-				{
-					char const* zi = std::strchr( text, m_config.extractFeatureTypeValueSeparator);
-					if (zi)
-					{
-						std::string type( text, zi-text);
-						std::string value( zi+1);
-						m_collectTerms.push_back( WeightedSentenceTerm( type, value, si->weight()));
-					}
-				}
-			}
-			else if (m_config.extractFeatureTypeValueSeparator)
+			if (m_config.extractFeatureTypeValueSeparator)
 			{
 				char const* zi = std::strchr( text, m_config.extractFeatureTypeValueSeparator);
 				if (zi)
 				{
-					m_collectTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, zi+1, si->weight()));
+					std::string type( text, zi-text);
+					std::string value( zi+1);
+					m_collectTerms.push_back( WeightedSentenceTerm( type, value, si->weight()));
+				}
+				else
+				{
+					m_collectTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, text, si->weight()));
 				}
 			}
 			else
@@ -302,15 +295,29 @@ void QueryExpression::serializeFeatures( papuga_Serialization* ser, bool mapType
 
 void QueryExpression::serializeCollectedTerms( papuga_Serialization* ser) const
 {
-	std::vector<WeightedSentenceTerm> weightedQueryTerms;
-	std::vector<Feature>::const_iterator fi = m_featar.begin(), fe = m_featar.end();
-	for (; fi != fe; ++fi)
+	std::map<SentenceTerm,double> termWeightMap;
+	double maxWeight = 0.0;
+	std::vector<WeightedSentenceTerm>::const_iterator
+		ti = m_collectTerms.begin(), te = m_collectTerms.end();
+	for (; ti != te; ++ti)
 	{
-		fillWeightedQueryTerms( weightedQueryTerms, m_nodear[ fi->nodeidx], 1.0);
+		double ww = (termWeightMap[ *ti] += ti->weight());
+		if (ww > maxWeight) maxWeight = ww;
 	}
-	Serializer::serialize( ser, m_collectTerms, true/*deep*/);
-	Serializer::serialize( ser, weightedQueryTerms, true/*deep*/);
+	if (maxWeight > 0.0)
+	{
+		std::vector<WeightedSentenceTerm> termlist;
+		std::map<SentenceTerm,double>::iterator mi = termWeightMap.begin(), me = termWeightMap.end();
+		for (; mi != me; ++mi)
+		{
+			mi->second /= maxWeight;
+			termlist.push_back( WeightedSentenceTerm( mi->first, mi->second));
+		}
+		Serializer::serialize( ser, termlist, true/*deep*/);
+	}
+	else
+	{
+		Serializer::serialize( ser, m_collectTerms, true/*deep*/);
+	}
 }
-
-
 

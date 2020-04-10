@@ -1,26 +1,30 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <doc><docid>David_Bowie_%28box_set%29</docid>
-<title>David Bowie (box set)</title>
+<title id="1968_3128">David Bowie (box set)</title>
 <citlink id="cit1"/>
+
 <br/>
 <citlink id="cit2"/>
+
 <br/>
 <citlink id="cit3"/>
+
 <br/>
 <citlink id="cit4"/>
+
 <br/>
 <entity lv="5"><text><E>David Bowie</E></text>
   </entity>
 <text> <P/>(<A>often</A> <V>referred</V> to as </text>
 <entity lv="5"><text><E>David Bowie</E> <E>Box</E></text>
   </entity>
-<text> or </text>
+<text>or</text>
 <entity lv="5"><text><E>Bowie Box Set</E></text>
   </entity>
 <text><P/>) <V>is</V> a <N>box set</N> <V>released</V> by </text>
 <pagelink id="Sony Music"><text><E>Sony Music</E> <E>Entertainment</E></text>
   </pagelink>
-<text> and </text>
+<text>and</text>
 <pagelink id="Columbia Records"><text><E>Columbia Records</E></text>
   </pagelink>
 <text><T/>. The <N>box set</N> <V>includes</V> <V>expanded</V> <N>versions</N> of all <E id="Sony Music">Sony</E>-<V>owned</V> <N>albums</N> by </text>
@@ -42,7 +46,7 @@
 <entity lv="2"><pagelink id="Heathen (David Bowie album)"><text><E>Heathen</E></text>
     </pagelink>
   </entity>
-<text> and </text>
+<text>and</text>
 <entity lv="2"><pagelink id="Reality (David Bowie album)"><text><E>Reality</E></text>
     </pagelink>
   </entity>
@@ -84,7 +88,7 @@
       </cell>
     <head id="C5"><text>recorded</text>
       </head>
-    <cell id="C5"><text>1995–2003Except</text>
+    <cell id="C5"><text>1995–2003 Except</text>
       <entity lv="2"><pagelink id="Panic in Detroit"><text><E>Panic in Detroit</E></text>
           </pagelink>
         </entity>
@@ -152,6 +156,7 @@
     <head id="C0"><text>url</text>
       </head>
     <cell id="C0"><weblink id="http://pitchfork.com/reviews/albums/10938-david-bowie-box/"/>
+      
       </cell>
     <head id="C1"><text>title</text>
       </head>
@@ -192,13 +197,14 @@
       </head>
     <cell id="C3"><text><P/>(<C>4.6/10</C><P/>)</text>
       <citlink id="cit7"/>
+      
       <br/>
       </cell>
     </table>
   </citation>
-<heading lv="h1"><text>Track listing</text>
+<heading lv="h1" id="1968_3142"><text>Track listing</text>
   </heading>
-<heading lv="h2"><entity lv="2"><text><E>Outside</E></text>
+<heading lv="h2" id="1968_3156"><entity lv="2"><text><E>Outside</E></text>
     </entity>
   </heading>
 <text><P/>;<E>Disc 1</E>
@@ -207,155 +213,185 @@
 <text><E>#</E> </text>
 <quot><text>Leon <V>Takes</V> Us <A>Outside</A></text>
   </quot>
+
 <br/>
-<text># </text>
-<quot><text>Outside</text>
+<text><E>#</E> </text>
+<quot><text><A>Outside</A></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="The Hearts Filthy Lesson"><text><E>The Hearts Filthy Lesson</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Small Plot of Land</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Segue – Baby Grace (A Horrid Cassette)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hallo Spaceboy"><text><E>Hallo Spaceboy</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>The Motel</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I <V>Have</V> <A>Not</A> <V>Been</V> to <E>Oxford Town</E></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>No Control</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Segue – Algeria Touchshriek</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Voyeur of Utter Destruction (As Beauty)</text>
   </quot>
+
 <br/>
 <text><E>#</E> </text>
 <quot><text>Segue – <E>Ramona A. Stone</E>/I <V>Am</V> with <N>Name</N></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Wishful Beginnings</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>We <V>Prick</V> You</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Segue – Nathan Adler</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="I&apos;m Deranged"><text>I<V>'m</V> <A>Deranged</A></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Thru' These Architects Eyes</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Segue – Nathan Adler</text>
   </quot>
+
 <br/>
-<text><E id="# Segue">#</E> </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Strangers When We Meet (David Bowie song)"><text><E>Strangers When We Meet</E></text>
     </pagelink>
   </quot>
+
 <br/>
 <text><P/>;<E>Disc 2</E> <P/>– <E>Bonus</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Hearts Filthy Lesson</E> (</text>
   <pagelink id="Trent Reznor"><text><E>Trent Reznor</E></text>
     </pagelink>
-  <text> alternative </text>
+  <text>alternative</text>
   <pagelink id="Audio mixing (recorded music)"><text>mix</text>
     </pagelink>
-  <text>)</text>
+  <text><P/>)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Hearts Filthy Lesson</E> (Rubber mix)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Hearts Filthy Lesson</E> (Simple Test mix)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Hearts Filthy Lesson</E> (Filthy mix)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Hearts Filthy Lesson</E> (Good Karma mix by </text>
   <pagelink id="Tim Simenon"><text><E>Tim Simenon</E></text>
     </pagelink>
-  <text>)</text>
+  <text><P/>)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Small Plot of Land</text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <entity lv="2"><pagelink id="Basquiat (film)"><text><E>Basquiat</E></text>
     </pagelink>
   </entity>
 <text> <E id="Soundtrack album">OST</E> version)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Hallo Spaceboy</E> (12</text>
   </quot>
-<text> remix)</text>
+<text>remix)</text>
 <quot/>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Hallo Spaceboy</E> (Double Click mix)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Hallo Spaceboy</E> (</text>
   <pagelink id="Instrumental"><text><E>Instrumental</E></text>
     </pagelink>
-  <text>)</text>
+  <text><P/>)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Hallo Spaceboy</E> <P/>(<V>Lost</V> in <E>Space</E> <N>mix</N><P/>)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I <V>Am</V> with <E>Name</E></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I<V>'m</V> <A>Deranged</A> <P/>(<E>Jungle</E> <N>mix</N><P/>)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><V>Get</V> <A>Real</A></text>
   </quot>
 <text> <P/>(</text>
@@ -364,280 +400,288 @@
 <text> <E>UK CD</E> <A>single</A><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><N>Nothing</N> to <V>Be</V> <V>Desired</V></text>
   </quot>
-<heading lv="h2"><entity lv="2"><text><E>Earthling</E></text>
+<heading lv="h2" id="1968_3170"><entity lv="2"><text><E>Earthling</E></text>
     </entity>
   </heading>
 <text><P/>;<E>Disc 1</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Little Wonder (song)"><text><E>Little Wonder</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Looking for Satellites</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Earthling (album)"><text>Battle for Britain (The Letter)</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Seven</E> Years in Tibet</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Dead Man Walking (song)"><text><E>Dead Man Walking</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Telling Lies"><text><E>Telling Lies</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>The <A>Last</A> <N>Thing</N> You <M>Should</M> <V>Do</V></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="I&apos;m Afraid of Americans"><text>I<V>'m</V> <E id="Heathen">Afraid</E> of <E>Americans</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Law (Earthlings on Fire)</text>
   </quot>
+
 <br/>
-<text>;<E>Disc 2</E> <P/>– <E>Bonus</E>
+<text><P/>;<E>Disc 2</E> <P/>– <E>Bonus</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Little Wonder</E></text>
   </quot>
-<text> (Censored video edit)
-</text>
+<text>(Censored video edit)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Little Wonder</E></text>
   </quot>
-<text> (Junior Vasquez club mix)
-</text>
+<text>(Junior Vasquez club mix)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Little Wonder</E></text>
   </quot>
-<text> (Danny Saber dance mix)
-</text>
+<text>(Danny Saber dance mix)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Seven</E> Years in Tibet</text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <pagelink id="Mandarin Chinese"><text><E id="Mandarin Chinese">Mandarin</E></text>
   </pagelink>
-<text> version)
+<text> <N>version</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Dead Man Walking</E></text>
   </quot>
 <text> (<E>Moby</E> Mix 1)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Dead Man Walking</E></text>
   </quot>
 <text> (<E>Moby</E> Mix 2 US 12</text>
-<quot><text> promo)</text>
+<quot><text>promo)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Telling Lies</E></text>
   </quot>
-<text> (Feelgood mix)
-</text>
+<text>(Feelgood mix)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Telling Lies</E></text>
   </quot>
-<text> (Paradox mix)
-</text>
+<text>(Paradox mix)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I<V>'m</V> <E id="Heathen">Afraid</E> of <E>Americans</E></text>
   </quot>
 <text> <P/>(</text>
 <entity lv="2"><pagelink id="Showgirls"><text><E>Showgirls</E></text>
     </pagelink>
   </entity>
-<text> </text>
+
 <pagelink id="Soundtrack album"><text>OST</text>
   </pagelink>
 <text> <N>version</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I<V>'m</V> <E id="Heathen">Afraid</E> of <E>Americans</E></text>
   </quot>
 <text> <P/>(<C>Nine</C> <E>Inch Nails V1</E> <N>mix</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I<V>'m</V> <E id="Heathen">Afraid</E> of <E>Americans</E></text>
   </quot>
 <text> <P/>(<C>Nine</C> <E>Inch Nails V1</E> <A>clean</A> <N>edit</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="V-2 Schneider"><text><E>V-2 Schneider</E></text>
     </pagelink>
   </quot>
 <text> (<E>Tao Jones Index</E>) (Live at the </text>
 <pagelink id="Paradiso (Amsterdam)"><text><E>Paradiso</E></text>
   </pagelink>
-<text>, </text>
+<text><P/>, </text>
 <pagelink id="Amsterdam"><text><E>Amsterdam</E></text>
   </pagelink>
-<text>, June 1997)
-</text>
+<text>, June 1997)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Pallas Athena (song)"><text><E>Pallas Athena</E></text>
     </pagelink>
   </quot>
 <text> (<E>Tao Jones Index</E>) (Live at the <E>Paradiso</E>, <E>Amsterdam</E>, June 1997)</text>
-<heading lv="h2"><entity lv="2"><text><E>Hours</E></text>
+<heading lv="h2" id="1968_3184"><entity lv="2"><text><E>Hours</E></text>
     </entity>
   </heading>
 <text><P/>;<E>Disc 1</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Thursday&apos;s Child (David Bowie song)"><text>Thursday's Child</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text>Something in the Air</text>
     </pagelink>
   </quot>
+
 <br/>
-<text><N>#</N> </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Survive (David Bowie song)"><text><V>Survive</V></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>If I<V>'m</V> <V>Dreaming</V> My <N>Life</N></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Seven (David Bowie song)"><text>Seven</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text><W>What</W><V>'s</V> <A>Really</A> <V>Happening</V><T/>?</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="The Pretty Things Are Going to Hell"><text><E>The Pretty Things Are Going to Hell</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text>New Angels of Promise</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text>Brilliant Adventure</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Hours (David Bowie album)"><text>The Dreamers</text>
     </pagelink>
   </quot>
+
 <br/>
-<text>;<E>Disc 2</E> <P/>– <E>Bonus</E>
+<text><P/>;<E>Disc 2</E> <P/>– <E>Bonus</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Thursday's Child</text>
   </quot>
 <text> (<E id="Rock and roll">Rock</E> mix)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Thursday's Child</text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <entity lv="2"><pagelink id="The Nomad Soul"><text>Omikron: <E>The Nomad Soul</E></text>
     </pagelink>
   </entity>
-<text> slower version)
-</text>
+<text>slower version)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Something in the Air</text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <pagelink id="American Psycho (film)"><text><E>American Psycho</E></text>
   </pagelink>
-<text> </text>
+
 <pagelink id="Remix"><text>remix</text>
   </pagelink>
-<text>)
-</text>
+<text><P/>) </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><V>Survive</V></text>
   </quot>
 <text> <P/>(<E>Marius de Vries</E> <N>mix</N><P/>) (<E>UK CD</E> <A>single</A><P/>)
 </text>
 <br/>
-<text># </text>
-<quot><text>Seven</text>
+<text><E>#</E> </text>
+<quot><text><E>Seven</E></text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <pagelink id="Demo (music)"><text><E>Demo</E></text>
   </pagelink>
-<text>)
-</text>
+<text><P/>) </text>
 <br/>
-<text># </text>
-<quot><text>Seven</text>
-  </quot>
-<text> (Marius De Vries mix)
-</text>
-<br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Seven</E></text>
   </quot>
-<text> (Beck Mix #1)
-</text>
+<text>(Marius De Vries mix)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Seven</E></text>
   </quot>
-<text> (Beck Mix #2)
-</text>
+<text>(Beck Mix #1)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
+<quot><text><E>Seven</E></text>
+  </quot>
+<text>(Beck Mix #2)</text>
+<br/>
+<text><E>#</E> </text>
 <quot><text><E>The Pretty Things Are Going to Hell</E></text>
   </quot>
 <text> <P/>(<E>Edit</E><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Pretty Things Are Going to Hell</E></text>
   </quot>
 <text> <P/>(</text>
@@ -647,7 +691,7 @@
 <text> <N>film version</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>The Pretty Things Are Going to Hell</E></text>
   </quot>
 <text> <P/>(</text>
@@ -656,274 +700,313 @@
 <text> <N>film</N>-<A>only</A> <N>version</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>New Angels of Promise</text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <entity lv="2"><text>Omikron: <E>The Nomad Soul</E></text>
   </entity>
-<text> version)
+<text> <N>version</N><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>The Dreamers</text>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <entity lv="2"><text>Omikron: <E>The Nomad Soul</E></text>
   </entity>
-<text> longer version)
-</text>
+<text>longer version)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>1917</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>We <M>Shall</M> <V>Go</V> to <E>Town</E></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>We All <V>Go</V> <A>Through</A></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>No <E>One</E> <V>Calls</V></text>
   </quot>
-<heading lv="h2"><entity lv="2"><text><E>Heathen</E></text>
+<heading lv="h2" id="1968_3198"><entity lv="2"><text><E>Heathen</E></text>
     </entity>
   </heading>
 <text><P/>;<E>Disc 1</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Heathen (David Bowie album)"><text><E id="Heathen">Sunday</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Cactus (Pixies song)"><text><E>Cactus</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Heathen (David Bowie album)"><text>Slip Away</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Slow Burn (David Bowie song)"><text><E>Slow Burn</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
-<quot><pagelink id="Heathen (David Bowie album)"><text><E id="Heathen">Afraid</E></text>
+<text><E>#</E> </text>
+<quot><pagelink id="Heathen (David Bowie album)"><text> <E id="Heathen">Afraid</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="I&apos;ve Been Waiting for You (Neil Young song)"><text>I<V>'ve</V> <V>Been</V> <V>Waiting</V> for You</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>I <M>Would</M> <V>Be</V> Your <N>Slave</N></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Heathen (David Bowie album)"><text>I <V>Took</V> a <N>Trip</N> on a <E>Gemini Spaceship</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Heathen (David Bowie album)"><text><C>5:15 </C>The <E>Angels</E> <V>Have</V> <V>Gone</V></text>
     </pagelink>
   </quot>
+
 <br/>
 <text><E>#</E> </text>
 <quot><pagelink id="Everyone Says &apos;Hi&apos;"><text><N>Everyone</N> <V>Says</V> 'Hi'</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Heathen (David Bowie album)"><text>A Better Future</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Heathen (David Bowie album)"><text><E>Heathen</E> (The Rays)</text>
     </pagelink>
   </quot>
+
 <br/>
-<text>;<E>Disc 2</E> <P/>– <E>Bonus</E>
+<text><P/>;<E>Disc 2</E> <P/>– <E>Bonus</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E id="Heathen">Sunday</E> (</text>
   <pagelink id="Moby"><text><E>Moby</E></text>
     </pagelink>
-  <text> remix)</text>
+  <text>remix)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Better Future</text>
   </quot>
-<text> (Remix by Air)
-</text>
+<text>(Remix by Air)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><E>Conversation Piece</E></text>
   </quot>
 <text> <P/>(<V>Written</V> in <C>1969</C><P/>, <V>recorded</V> in <C>1970</C><P/>, and <N>re</N>-<V>recorded</V> in <C>2002</C><P/>)
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Panic in Detroit"><text><E>Panic in Detroit</E></text>
     </pagelink>
   </quot>
-<text> (</text>
+<text> <P/>(</text>
 <pagelink id="Outtake"><text><E>Outtake</E></text>
   </pagelink>
-<text> from a 1979 recording)
-</text>
+<text>from a 1979 recording)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Wood Jackson</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text><W>When</W> the <E>Boys</E> <V>Come</V> <E>Marching</E> <A>Home</A></text>
   </quot>
+
 <br/>
-<text><N>#</N> </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Baby Loves That Way"><text><E>Baby Loves That Way</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="You&apos;ve Got a Habit of Leaving"><text>You<V>'ve</V> <V>Got</V> a <E>Habit</E> of <V>Leaving</V></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Safe</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Shadow Man (song)"><text><E>Shadow Man</E></text>
     </pagelink>
   </quot>
-<heading lv="h2"><entity lv="2"><text><E>Reality</E></text>
+<heading lv="h2" id="1968_3212"><entity lv="2"><text><E>Reality</E></text>
     </entity>
   </heading>
 <text><P/>;<E>Disc 1</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="New Killer Star"><text><E>New Killer Star</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Pablo Picasso (song)"><text><E>Pablo Picasso</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Reality (David Bowie album)"><text>Never Get Old</text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>The Loneliest Guy</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Looking for Water</text>
   </quot>
+
 <br/>
 <text><E>#</E> </text>
 <quot><text><R>She</R><M>'ll</M> <V>Drive</V> the <E>Big</E> <N>Car</N></text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Days</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Fall Dog Bombs the Moon"><text><E>Fall Dog Bombs the Moon</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text><N>#</N> </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Try Some, Buy Some"><text><E>Try Some, Buy Some</E></text>
     </pagelink>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Reality</text>
   </quot>
+
 <br/>
-<text><N>#</N> </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Bring Me the Disco King"><text><E>Bring Me the Disco King</E></text>
     </pagelink>
   </quot>
+
 <br/>
 <text><P/>;<E>Disc 2</E> <P/>– <E>Bonus</E>
 </text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Waterloo Sunset"><text><E>Waterloo Sunset</E></text>
     </pagelink>
   </quot>
-<text> (Non-album track)
-</text>
+<text>(Non-album track)</text>
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Fly</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><text>Queen of All the Tarts (Overture)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Rebel Rebel"><text><E>Rebel Rebel</E></text>
     </pagelink>
-  <text> (2003)</text>
+  <text>(2003)</text>
   </quot>
+
 <br/>
-<text># </text>
+<text><E>#</E> </text>
 <quot><pagelink id="Love Missile F1-11"><text><E>Love Missile F1-11</E></text>
     </pagelink>
-  <text> (Non-album track)</text>
+  <text>(Non-album track)</text>
   </quot>
+
 <br/>
 <text><E>#</E> </text>
 <quot><pagelink id="Rebel Never Gets Old"><text><E>Rebel Never Gets Old</E></text>
     </pagelink>
   <text> <P/>(<N>Radio mix</N><P/>)</text>
   </quot>
+
 <br/>
 <text><E>#</E> </text>
 <quot><text>Rebel Never Gets Old <P/>(<A>7th</A> <E>Heaven</E> <N>edit</N><P/>)</text>
   </quot>
+
 <br/>
 <text><E>#</E> </text>
 <quot><text>Rebel Never Gets Old <P/>(<A>7th</A> <E>Heaven</E> <N>mix</N><P/>)</text>
   </quot>
-<heading lv="h1"><text><E>References</E></text>
+<heading lv="h1" id="1968_3226"><text><E>References</E></text>
   </heading>
 <mark>Reflist</mark>
+
 <br/>
 <mark>David Bowie</mark>
+
 <br/>
 <mark>DEFAULTSORT:David Bowie (box set)</mark>
+
 <br/>
 <category id="Albums produced by Brian Eno">Albums produced by Brian Eno
   </category>
+
 <br/>
 <category id="David Bowie compilation albums">David Bowie compilation albums
   </category>
+
 <br/>
 <category id="2007 compilation albums">2007 compilation albums
   </category></doc>
