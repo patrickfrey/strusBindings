@@ -522,6 +522,16 @@ void QueryAnalyzerImpl::addSentenceType(
 	m_sentence_lexer_map_impl = sentence_lexer_map_impl_new;
 }
 
+void QueryAnalyzerImpl::declareSimilarTermSearch( 
+		const std::string& simtype,
+		const ValueVariant& tokenizer,
+		const ValueVariant& normalizers,
+		double minSimilarity,
+		int maxNofResults,
+		double minNormalizedWeight,
+		SentenceLexerImpl* lexer)
+{/*TO BE IMPLEMENTED*/}
+
 static std::string normalize_field(
 	const char* tok, std::size_t toksize, 
 	std::vector<NormalizerFunctionInstanceInterface*>::const_iterator ci,

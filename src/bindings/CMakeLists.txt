@@ -23,6 +23,7 @@ set( source_files
 	impl/value/queryExpression.cpp
 	impl/value/termExpression.cpp
 	impl/value/sentenceTermExpression.cpp
+	impl/value/similarTermSearch.cpp
 	impl/value/metadataExpression.cpp
 	impl/value/postingIterator.cpp
 	impl/value/valueIterator.cpp
