@@ -56,22 +56,6 @@
 using namespace strus;
 using namespace strus::bindings;
 
-static ErrorBufferInterface* createErrorBuffer_( unsigned int maxNofThreads)
-{
-	DebugTraceInterface* dbgtrace = createDebugTrace_standard( maxNofThreads);
-	if (!dbgtrace)
-	{
-		throw strus::runtime_error( _TXT("failed to create debug trace object"));
-	}
-	ErrorBufferInterface* errorhnd = createErrorBuffer_standard( 0, maxNofThreads, dbgtrace);
-	if (!errorhnd)
-	{
-		delete dbgtrace;
-		throw strus::runtime_error( _TXT("failed to create error buffer object"));
-	}
-	return errorhnd;
-}
-
 static ModuleLoaderInterface* createModuleLoader_( ErrorBufferInterface* errorhnd)
 {
 	ModuleLoaderInterface* rt = createModuleLoader( errorhnd);
@@ -94,11 +78,30 @@ ContextImpl::ContextImpl( const ValueVariant& descr)
 	,m_mutex()
 {
 	ContextDef contextdef( descr);
-	ErrorBufferInterface* errorhnd =
-		createErrorBuffer_( contextdef.threads/*configured number of threads*/
-					+1/*main program*/
-					+1/*delegate request thread*/);
-	m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
+
+	ErrorBufferInterface* errorhnd = strus::borrowErrorBuffer_singleton();
+	if (errorhnd)
+	{
+		m_errorhnd_impl.resetBorrowed( errorhnd, "ErrorBuffer");
+	}
+	else
+	{
+		int maxNofThreads =
+				contextdef.threads/*configured number of threads*/
+				+1/*main program*/
+				+1/*delegate request thread*/;
+
+		DebugTraceInterface* dbgtrace = createDebugTrace_standard( maxNofThreads);
+		if (!dbgtrace) throw strus::runtime_error( _TXT("failed to create debug trace object"));
+
+		errorhnd = strus::createErrorBuffer_standard( 0, maxNofThreads, dbgtrace);
+		if (!errorhnd)
+		{
+			delete dbgtrace;
+			throw strus::runtime_error( _TXT("failed to create error buffer object"));
+		}
+		m_errorhnd_impl.resetOwnership( errorhnd, "ErrorBuffer");
+	}
 
 	m_threads = contextdef.threads;
 	if (contextdef.rpc.empty())

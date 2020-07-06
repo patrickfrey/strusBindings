@@ -122,6 +122,20 @@ public:
 		}
 	}
 
+	/// \brief Define pointer as borrowed reference (no deleter) with ownership and reference counting
+	template <class OBJECTTYPE>
+#ifdef STRUS_LOWLEVEL_DEBUG
+	void resetBorrowed( OBJECTTYPE* obj, const char* name_)
+#else
+	void resetBorrowed( OBJECTTYPE* obj, const char*)
+#endif
+	{
+		m_ptr.reset( obj, no_deleter);
+#ifdef STRUS_LOWLEVEL_DEBUG
+		m_name = name_;
+#endif
+	}
+
 	/// \brief Define pointer as constant reference
 	template <class OBJECTTYPE>
 #ifdef STRUS_LOWLEVEL_DEBUG

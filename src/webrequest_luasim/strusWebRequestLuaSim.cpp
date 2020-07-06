@@ -612,14 +612,14 @@ struct ChildProcess
 		:address(o.address),pid(o.pid),cmdline(o.cmdline){}
 };
 
-static EventLoop g_eventLoop;
-static GlobalContext g_globalContext;
 static std::string g_scriptDir;
 static std::string g_outputDir;
 static std::string g_serviceProgramCmdLine;
 static std::vector<ChildProcess> g_childProcessList;
 static strus::DebugTraceInterface* g_debugTrace = 0;
 static strus::ErrorBufferInterface* g_errorhnd = 0;
+static EventLoop g_eventLoop;
+static GlobalContext* g_globalContext = 0;
 
 static std::pair<std::string,std::string> splitUrl( const std::string& url)
 {
@@ -758,7 +758,7 @@ bool EventLoop::send( const std::string& address,
 {
 	try
 	{
-		strus::WebRequestAnswer result = g_globalContext.call( method, address, g_charset, g_doctype, contentstr.c_str(), contentstr.size());
+		strus::WebRequestAnswer result = g_globalContext->call( method, address, g_charset, g_doctype, contentstr.c_str(), contentstr.size());
 		receiver->putAnswer( result);
 		return true;
 	}
@@ -784,7 +784,7 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 				if (!handler->delegateRequest( di->url(), di->method(), delegateContentStr, receiver))
 				{
 					answer.setError_fmt( 500, strus::ErrorCodeOutOfMem, _TXT("delegate request failed: %s"), strus::errorCodeToString( strus::ErrorCodeOutOfMem));
-					g_globalContext.reportError( answer.errorStr());
+					g_globalContext->reportError( answer.errorStr());
 					return false;
 				}
 			}
@@ -797,7 +797,7 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 				{
 					answer = ctx->getAnswer();
 					answer.explain( _TXT("delegate request failed"));
-					g_globalContext.reportError( answer.errorStr());
+					g_globalContext->reportError( answer.errorStr());
 					return false;
 				}
 			}
@@ -806,7 +806,7 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 		{
 			answer.setError( 500, strus::ErrorCodeOutOfMem);
 			answer.explain( _TXT("delegate request failed"));
-			g_globalContext.reportError( answer.errorStr());
+			g_globalContext->reportError( answer.errorStr());
 			return false;
 		}
 	}
@@ -1383,11 +1383,11 @@ static int l_def_server( lua_State* L)
 
 		if (g_serviceProgramCmdLine.empty())
 		{
-			g_globalContext.defineServer( hostname, configmap, configjson);
+			g_globalContext->defineServer( hostname, configmap, configjson);
 		}
 		else
 		{
-			g_globalContext.startServerProcess( hostname, configjson);
+			g_globalContext->startServerProcess( hostname, configjson);
 		}
 		LUA_FUNCTION_TAIL( L, "def_server", 0);
 	}
@@ -1441,7 +1441,7 @@ static int l_call_server( lua_State* L)
 			if (encoding == papuga_Binary) luaL_error(L, _TXT("failed to detect character set of argument of 'call_server'"));
 			encodingstr = papuga_stringEncodingName( encoding);
 		}
-		strus::WebRequestAnswer result = g_globalContext.call( method, url, encodingstr, doctypestr, arg, arglen);
+		strus::WebRequestAnswer result = g_globalContext->call( method, url, encodingstr, doctypestr, arg, arglen);
 		if (result.content().empty())
 		{
 			lua_pushnil(L);
@@ -1941,6 +1941,9 @@ int main( int argc, const char* argv[])
 		{
 			throw std::runtime_error( _TXT( "out of memory creating error handler"));
 		}
+		strus::declareErrorBuffer_singleton( g_errorhnd);
+		g_globalContext = new GlobalContext();
+
 		/* Parse command line arguments: */
 		for (; argi < argc; ++argi)
 		{
@@ -2171,6 +2174,7 @@ EXIT:
 		listBackGroundProcesses();
 	}
 	if (g_blockingCurlClient) delete g_blockingCurlClient;
+	if (g_globalContext) delete g_globalContext;
 	if (g_errorhnd) delete g_errorhnd;
 	return rt;
 }
