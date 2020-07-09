@@ -266,6 +266,11 @@ public:
 	/// \note Clears all messages stored for the current thread
 	Struct infoMessages();
 
+	/// \brief Fetch all info messages and the debug trace of the current thread reported via the internal error buffer info interface
+	/// \return all messages as readable string
+	/// \note Clears all messages stored for the current thread
+	std::string infoMessagesDump();
+
 private:
 	void initStorageObjBuilder();
 	void initAnalyzerObjBuilder();

@@ -537,6 +537,60 @@ void ContextImpl::disableDebugTrace( const std::string& component)
 	dbgtrace->disable( component);
 }
 
+static void appendTraceMessageHeader( std::string& res, const std::string& indentstr, const char* componentstr, const DebugTraceMessage& msg)
+{
+	res.append( "\n");
+	res.append( indentstr);
+	if (componentstr)
+	{
+		res.push_back('[');
+		res.append( componentstr);
+		res.append("] ");
+	}
+	res.append( msg.id());
+}
+
+static std::string traceMessagesToSourceString( const std::vector<DebugTraceMessage>& tracemsgs)
+{
+	const char* indenttab = "  ";
+	int indenttablen = 2;
+	std::string rt;
+	std::string indentstr;
+	std::vector<const char*> componentstk;
+	std::vector<DebugTraceMessage>::const_iterator
+		ti = tracemsgs.begin(), te = tracemsgs.end();
+	for (; ti != te; ++ti)
+	{
+		const char* componentstr = ti->component();
+		if (componentstr && !componentstk.empty() && 0==std::strcmp( componentstk.back(), componentstr))
+		{
+			componentstr = 0;
+		}
+		switch (ti->type())
+		{
+			case DebugTraceMessage::Open:
+				appendTraceMessageHeader( rt, indentstr, componentstr, *ti);
+				rt.append( ":");
+				indentstr.append( indenttab);
+				componentstk.push_back( ti->component());
+				break;
+			case DebugTraceMessage::Close:
+				if (!componentstk.empty())
+				{
+					indentstr.resize( indentstr.size()-indenttablen);
+					componentstk.pop_back();
+				}
+				break;
+			case DebugTraceMessage::Event:
+				appendTraceMessageHeader( rt, indentstr, componentstr, *ti);
+				rt.append( " = ");
+				rt.append( ti->content());
+				break;
+		}
+	}
+	return rt;
+}
+
 Struct ContextImpl::infoMessages()
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -568,6 +622,41 @@ Struct ContextImpl::infoMessages()
 		throw strus::runtime_error(_TXT( "failed to deserialize info messages: %s"), errorhnd->fetchError());
 	}
 	rt.release();
+	return rt;
+}
+
+std::string ContextImpl::infoMessagesDump()
+{
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	DebugTraceInterface* dbgtrace = errorhnd->debugTrace();
+	std::string rt;
+	{
+		std::vector<std::string> infomsgs = errorhnd->fetchInfo();
+		if (!infomsgs.empty())
+		{
+			std::vector<std::string>::const_iterator mi = infomsgs.begin(), me = infomsgs.end();
+			for (; mi != me; ++mi)
+			{
+				rt.append( *mi);
+				rt.append( "\n");
+			}
+		}
+	}
+	if (dbgtrace)
+	{
+		std::vector<DebugTraceMessage> tracemsgs = dbgtrace->fetchMessages();
+		if (!tracemsgs.empty())
+		{
+			rt.append( "debug:");
+			std::string debugtrace_src = traceMessagesToSourceString( tracemsgs);
+			rt.append( debugtrace_src);
+			rt.append( "\n");
+		}
+	}
+	if (errorhnd->hasError())
+	{
+		throw strus::runtime_error(_TXT( "failed to deserialize info messages: %s"), errorhnd->fetchError());
+	}
 	return rt;
 }
 

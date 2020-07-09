@@ -18,6 +18,7 @@
 #include "papuga/request.h"
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.h"
+#include "papuga/valueVariant.hpp"
 #include "papuga/encoding.h"
 #include "private/internationalization.hpp"
 #include <string>
@@ -277,7 +278,6 @@ bool WebRequestContext::callHostObjMethodToAnswer( void* self, const papuga_Requ
 	}
 }
 
-
 std::string WebRequestContext::callHostObjMethodToString( void* self, const papuga_RequestMethodDescription* methoddescr, const char* path, const WebRequestContent& content)
 {
 	std::string rt;
@@ -293,12 +293,23 @@ std::string WebRequestContext::callHostObjMethodToString( void* self, const papu
 		rt.append( errstruct.errormsg);
 		rt.append("\n}\n");
 	}
+	else if (retval.nofvalues == 1 && papuga_ValueVariant_isatomic( &retval.valuear[0]))
+	{
+		papuga_ErrorCode errcode = papuga_Ok;
+		if (!papuga::ValueVariant_append_string( rt, retval.valuear[0], errcode))
+		{
+			rt.append("{\n\"error\": ");
+			rt.append( papuga_ErrorCode_tostring( errcode));
+			rt.append("\n}\n");
+		}
+	}
 	else
 	{
 		// Assign the result:
 		int ri = 0, re = retval.nofvalues;
 		for (; ri != re; ++ri)
 		{
+			if (ri) rt.push_back( ' ');
 			if (papuga_ValueVariant_defined( &retval.valuear[ri])
 				&& (retval.valuear[ri].valuetype != papuga_TypeSerialization
 					|| !papuga_Serialization_empty( retval.valuear[ri].value.serialization)))

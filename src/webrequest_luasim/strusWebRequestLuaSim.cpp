@@ -79,11 +79,17 @@ public:
 			case 4: m_logmask |= (LogContentEvents|LogConnectionEvents);
 			case 3: m_logmask |= (LogMethodCalls|LogAction);
 			case 2: m_logmask |= (LogRequests|LogDelegateRequests|LogConfiguration);
-			case 1: m_logmask |= (LogError|LogWarning);
+			case 1: m_logmask |= (LogError|LogWarning|LogContextInfoMessages);
 			case 0: m_logmask |= (LogNothing); break;
 			default: m_logmask = LogAll;
 		}
 	}
+
+	void initLogContextInfoMessages()
+	{
+		m_logmask |= LogContextInfoMessages;
+	}
+
 	void setCurrentProc( const char* name)
 	{
 		m_procname = name ? name : "";
@@ -1979,6 +1985,7 @@ int main( int argc, const char* argv[])
 					throw std::runtime_error( _TXT("option -G (--debug) needs argument"));
 				}
 				g_debugTrace->enable( argv[argi]);
+				g_logger.initLogContextInfoMessages();
 				thisCommandLine.append( strus::string_format( " -G \"%s\"", argv[argi]));
 			}
 			else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))

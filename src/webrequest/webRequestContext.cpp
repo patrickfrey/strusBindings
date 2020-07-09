@@ -579,7 +579,7 @@ bool WebRequestContext::complete()
 			m_transactionPool->returnTransaction( m_transactionRef);
 		}
 		std::string infomsgs = fetchContextInfoMessages();
-		if ((m_logMask & WebRequestLoggerInterface::LogRequests) != 0)
+		if (!infomsgs.empty() && (m_logMask & WebRequestLoggerInterface::LogContextInfoMessages) != 0)
 		{
 			m_logger->logContextInfoMessages( infomsgs.c_str());
 		}
@@ -596,7 +596,7 @@ WebRequestAnswer WebRequestContext::getAnswer() const
 static int g_call_contextInfoMessages_paramtypes[1] = {0};
 static papuga_RequestMethodDescription g_call_contextInfoMessages =
 {
-	strus::bindings::method::Context::infoMessages(),
+	strus::bindings::method::Context::infoMessagesDump(),
 	g_call_contextInfoMessages_paramtypes,
 	false/*has_content*/,
 	200/*http status success*/,
