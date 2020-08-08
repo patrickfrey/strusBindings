@@ -153,21 +153,18 @@ string QueryDump:
         string node: "term"
         string type: "word"
         string value: "citi"
-      string weight: 1
     number 2:
       string set: "seek"
       string struct:
         string node: "term"
         string type: "word"
         string value: "visit"
-      string weight: 1
     number 3:
       string set: "seek"
       string struct:
         string node: "term"
         string type: "word"
         string value: "tokyo"
-      string weight: 1
     number 4:
       string set: "select"
       string struct:
@@ -187,8 +184,6 @@ string QueryDump:
         string cardinality: 1
         string node: "expression"
         string op: "contains"
-        string range: 0
-      string weight: 1
   string merge: 0
   string minrank: 0
   string nofranks: 20

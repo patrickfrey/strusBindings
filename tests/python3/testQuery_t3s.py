@@ -158,24 +158,18 @@ str QueryDump:
         str node: "term"
         str type: "word"
         str value: "citi"
-        str var: None
-      str weight: 1
     number 2:
       str set: "seek"
       str struct:
         str node: "term"
         str type: "word"
         str value: "visit"
-        str var: None
-      str weight: 1
     number 3:
       str set: "seek"
       str struct:
         str node: "term"
         str type: "word"
         str value: "tokyo"
-        str var: None
-      str weight: 1
     number 4:
       str set: "select"
       str struct:
@@ -184,23 +178,17 @@ str QueryDump:
             str node: "term"
             str type: "word"
             str value: "citi"
-            str var: None
           number 2:
             str node: "term"
             str type: "word"
             str value: "visit"
-            str var: None
           number 3:
             str node: "term"
             str type: "word"
             str value: "tokyo"
-            str var: None
         str cardinality: 1
         str node: "expression"
         str op: "contains"
-        str range: 0
-        str var: None
-      str weight: 1
   str merge: 0
   str minrank: 0
   str nofranks: 20

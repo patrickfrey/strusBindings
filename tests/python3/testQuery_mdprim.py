@@ -215,17 +215,12 @@ str QueryDump:
                 str node: "term"
                 str type: "word"
                 str value: "2"
-                str var: None
               number 2:
                 str node: "term"
                 str type: "word"
                 str value: "3"
-                str var: None
-            str cardinality: 0
             str node: "expression"
             str op: "sequence_imm"
-            str range: 0
-            str var: None
           number 2:
             str arg:
               number 1:
@@ -234,43 +229,28 @@ str QueryDump:
                     str node: "term"
                     str type: "word"
                     str value: "3"
-                    str var: None
                   number 2:
                     str node: "term"
                     str type: "word"
                     str value: "5"
-                    str var: None
-                str cardinality: 0
                 str node: "expression"
                 str op: "sequence_imm"
-                str range: 0
-                str var: None
               number 2:
                 str node: "term"
                 str type: "word"
                 str value: "5"
-                str var: None
               number 3:
                 str node: "term"
                 str type: "word"
                 str value: "7"
-                str var: None
               number 4:
                 str node: "term"
                 str type: "word"
                 str value: "11"
-                str var: None
-            str cardinality: 0
             str node: "expression"
             str op: "union"
-            str range: 0
-            str var: None
-        str cardinality: 0
         str node: "expression"
         str op: "sequence_imm"
-        str range: 0
-        str var: None
-      str weight: 1
     number 2:
       str set: "seek"
       str struct:
@@ -279,28 +259,20 @@ str QueryDump:
             str node: "term"
             str type: "word"
             str value: "2"
-            str var: None
           number 2:
             str node: "term"
             str type: "word"
             str value: "2"
-            str var: None
           number 3:
             str node: "term"
             str type: "word"
             str value: "2"
-            str var: None
           number 4:
             str node: "term"
             str type: "word"
             str value: "2"
-            str var: None
-        str cardinality: 0
         str node: "expression"
         str op: "sequence_imm"
-        str range: 0
-        str var: None
-      str weight: 1
     number 3:
       str set: "select"
       str struct:
@@ -309,18 +281,13 @@ str QueryDump:
             str node: "term"
             str type: "word"
             str value: "2"
-            str var: None
           number 2:
             str node: "term"
             str type: "word"
             str value: "3"
-            str var: None
         str cardinality: 2
         str node: "expression"
         str op: "contains"
-        str range: 0
-        str var: None
-      str weight: 1
   str merge: 0
   str minrank: 0
   str nofranks: 20

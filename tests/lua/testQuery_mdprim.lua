@@ -211,20 +211,16 @@ string QueryDump:
                 string node: "term"
                 string type: "word"
                 string value: "3"
-            string cardinality: 0
             string node: "expression"
             string op: "sequence_imm"
-            string range: 0
           number 2:
             string arg:
               number 1:
                 string arg:
                   number 1: {...}
                   number 2: {...}
-                string cardinality: 0
                 string node: "expression"
                 string op: "sequence_imm"
-                string range: 0
               number 2:
                 string node: "term"
                 string type: "word"
@@ -237,15 +233,10 @@ string QueryDump:
                 string node: "term"
                 string type: "word"
                 string value: "11"
-            string cardinality: 0
             string node: "expression"
             string op: "union"
-            string range: 0
-        string cardinality: 0
         string node: "expression"
         string op: "sequence_imm"
-        string range: 0
-      string weight: 1
     number 2:
       string set: "seek"
       string struct:
@@ -266,11 +257,8 @@ string QueryDump:
             string node: "term"
             string type: "word"
             string value: "2"
-        string cardinality: 0
         string node: "expression"
         string op: "sequence_imm"
-        string range: 0
-      string weight: 1
     number 3:
       string set: "select"
       string struct:
@@ -286,8 +274,6 @@ string QueryDump:
         string cardinality: 2
         string node: "expression"
         string op: "contains"
-        string range: 0
-      string weight: 1
   string merge: 0
   string minrank: 0
   string nofranks: 20

@@ -230,17 +230,12 @@ string QueryDump:
                 string node: "term"
                 string type: "word"
                 string value: 2
-                string var: 
               integer 1: 
                 string node: "term"
                 string type: "word"
                 string value: 3
-                string var: 
-            string cardinality: 0
             string node: "expression"
             string op: "sequence_imm"
-            string range: 0
-            string var: 
           integer 1: 
             string arg: 
               integer 0: 
@@ -249,43 +244,28 @@ string QueryDump:
                     string node: "term"
                     string type: "word"
                     string value: 3
-                    string var: 
                   integer 1: 
                     string node: "term"
                     string type: "word"
                     string value: 5
-                    string var: 
-                string cardinality: 0
                 string node: "expression"
                 string op: "sequence_imm"
-                string range: 0
-                string var: 
               integer 1: 
                 string node: "term"
                 string type: "word"
                 string value: 5
-                string var: 
               integer 2: 
                 string node: "term"
                 string type: "word"
                 string value: 7
-                string var: 
               integer 3: 
                 string node: "term"
                 string type: "word"
                 string value: 11
-                string var: 
-            string cardinality: 0
             string node: "expression"
             string op: "union"
-            string range: 0
-            string var: 
-        string cardinality: 0
         string node: "expression"
         string op: "sequence_imm"
-        string range: 0
-        string var: 
-      string weight: 1
     integer 1: 
       string set: "seek"
       string struct: 
@@ -294,28 +274,20 @@ string QueryDump:
             string node: "term"
             string type: "word"
             string value: 2
-            string var: 
           integer 1: 
             string node: "term"
             string type: "word"
             string value: 2
-            string var: 
           integer 2: 
             string node: "term"
             string type: "word"
             string value: 2
-            string var: 
           integer 3: 
             string node: "term"
             string type: "word"
             string value: 2
-            string var: 
-        string cardinality: 0
         string node: "expression"
         string op: "sequence_imm"
-        string range: 0
-        string var: 
-      string weight: 1
     integer 2: 
       string set: "select"
       string struct: 
@@ -324,18 +296,13 @@ string QueryDump:
             string node: "term"
             string type: "word"
             string value: 2
-            string var: 
           integer 1: 
             string node: "term"
             string type: "word"
             string value: 3
-            string var: 
         string cardinality: 2
         string node: "expression"
         string op: "contains"
-        string range: 0
-        string var: 
-      string weight: 1
   string merge: 0
   string minrank: 0
   string nofranks: 20
