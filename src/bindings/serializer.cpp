@@ -130,6 +130,15 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const Weighted
 	rt &= serializeArrayElement( result, val.weight(), errcode, deep);
 	return rt;
 }
+
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const WeightedString& val, papuga_ErrorCode& errcode, bool deep)
+{
+	bool rt = true;
+	rt &= serializeArrayElement( result, val.value, errcode, deep);
+	rt &= serializeArrayElement( result, val.weight, errcode, deep);
+	return rt;
+}
+
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep)
 {
 	bool rt = true;
@@ -703,6 +712,10 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vec
 	return serializeArray( result, val, errcode, deep);
 }
 bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<WeightedSentenceTerm>& val, papuga_ErrorCode& errcode, bool deep)
+{
+	return serializeArray( result, val, errcode, deep);
+}
+bool Serializer::serialize_nothrow( papuga_Serialization* result, const std::vector<WeightedString>& val, papuga_ErrorCode& errcode, bool deep)
 {
 	return serializeArray( result, val, errcode, deep);
 }

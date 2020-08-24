@@ -963,117 +963,55 @@ QueryFeatureExpansionMap::QueryFeatureExpansionMap( const papuga_ValueVariant& v
 	}
 }
 
-static std::pair<std::string,std::string> parseNameValuePair( papuga_SerializationIter& seriter)
+WeightedString::WeightedString( const papuga_ValueVariant& val)
 {
-	static const char* context = _TXT("name value declaration");
-	static const StructureNameMap namemap( "name,value", ',');
+	static const char* context = _TXT("weighted string");
 
-	std::pair<std::string,std::string> rt;
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	if (!papuga_ValueVariant_defined( &val))
+	{}
+	else if (val.valuetype == papuga_TypeSerialization)
 	{
-		rt.first = Deserializer::getString( seriter);
-		rt.second = Deserializer::getString( seriter);
+		papuga_SerializationIter seriter;
+		papuga_init_SerializationIter( &seriter, val.value.serialization);
+		init( seriter);
+		if (!papuga_SerializationIter_eof( &seriter))
+		{
+			throw strus::runtime_error(_TXT("expected eof after '%s'"), context);
+		}
 	}
 	else
+	{
+		throw strus::runtime_error(_TXT("expected structure for '%s'"), context);
+	}
+}
+
+void WeightedString::init( papuga_SerializationIter& seriter)
+{
+	static const char* context = _TXT("weighted string");
+	static const StructureNameMap namemap( "value,weight", ',');
+	enum NameMapKey {I_value,I_weight};
+
+	if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
+	{
+		value = Deserializer::getString( seriter);
+		weight = Deserializer::getDouble( seriter);
+	}
+	else if (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 	{
 		unsigned char defined[2] = {0,0};
 		while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
 		{
 			int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
 			papuga_SerializationIter_skip( &seriter);
-			switch (idx)
+			switch ((NameMapKey)idx)
 			{
-				case 0:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-					rt.first = Deserializer::getString( seriter);
+				case I_value: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					value = Deserializer::getString( seriter);
 					break;
-				case 1:	if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-					rt.second = Deserializer::getString( seriter);
+				case I_weight: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
+					weight = Deserializer::getDouble( seriter);
 					break;
 				default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
-			}
-		}
-		if (!defined[0]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), namemap.name(0), context);
-		if (!defined[1]) throw strus::runtime_error(_TXT("undefined '%s' in %s"), namemap.name(1), context);
-	}
-	return rt;
-}
-
-static std::map<std::string,std::string> parseNameValueMapAsValue( papuga_SerializationIter& seriter)
-{
-	static const char* context = _TXT("name value map declaration");
-	std::map<std::string,std::string> rt;
-
-	if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-	{
-		papuga_SerializationIter_skip( &seriter);
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-		{
-			while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
-			{
-				papuga_SerializationIter_skip( &seriter);
-				rt.insert( parseNameValuePair( seriter));
-				Deserializer::consumeClose( seriter);
-			}
-		}
-		else
-		{
-			rt.insert( parseNameValuePair( seriter));
-		}
-		Deserializer::consumeClose( seriter);
-	}
-	else
-	{
-		throw strus::runtime_error(_TXT("structure expected for %s"), context);
-	}
-	return rt;
-}
-
-void QueryBuilderConfig::init( const papuga_ValueVariant& cfg)
-{
-	static const char* context = _TXT("query builder config");
-	static const StructureNameMap namemap( "separator,type,set,expand,docid,rewrite", ',');
-	enum NameMapKey {I_separator,I_type,I_set,I_expand,I_docid,I_rewrite};
-
-	if (!papuga_ValueVariant_defined( &cfg))
-	{}
-	else if (cfg.valuetype == papuga_TypeSerialization)
-	{
-		papuga_SerializationIter seriter;
-		papuga_init_SerializationIter( &seriter, cfg.value.serialization);
-
-		if (papuga_SerializationIter_tag( &seriter) == papuga_TagValue)
-		{
-			throw strus::runtime_error(_TXT("explicit structure expected for '%s'"), context);
-		}
-		else
-		{
-			unsigned char defined[6] = {0,0,0,0,0,0};
-			while (papuga_SerializationIter_tag( &seriter) == papuga_TagName)
-			{
-				int idx = namemap.index( *papuga_SerializationIter_value( &seriter));
-				papuga_SerializationIter_skip( &seriter);
-				switch ((NameMapKey)idx)
-				{
-					case I_separator: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-						extractFeatureTypeValueSeparator = Deserializer::getCharAscii( seriter);
-						break;
-					case I_type: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-						extractFeatureType = Deserializer::getString( seriter);
-						break;
-					case I_set: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-						extractFeatureSet = Deserializer::getString( seriter);
-						break;
-					case I_expand: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-						expandSummaryName = Deserializer::getString( seriter);
-						break;
-					case I_docid: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-						docidSummaryName = Deserializer::getString( seriter);
-						break;
-					case I_rewrite: if (defined[idx]++) throw strus::runtime_error(_TXT("duplicate definition of '%s' in %s"), namemap.name(idx), context);
-						queryFeatureRewriteMap = parseNameValueMapAsValue( seriter);
-						break;
-					default: throw strus::runtime_error(_TXT("unknown tag name in %s, one of {%s} expected"), context, namemap.names());
-				}
 			}
 		}
 	}
@@ -1082,4 +1020,5 @@ void QueryBuilderConfig::init( const papuga_ValueVariant& cfg)
 		throw strus::runtime_error(_TXT("expected structure for '%s'"), context);
 	}
 }
+
 

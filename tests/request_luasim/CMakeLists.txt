@@ -41,11 +41,12 @@ DeclareTest( DocumentAnalysis docanalyzer.lua "" )
 DeclareTest( QueryAnalysis qryanalyzer.lua "" )
 DeclareTest( CreateStorage createStorage.lua "" )
 DeclareTest( Query query.lua "" )
-DeclareTest( DistributeStorage distributeStorage.lua "" )
-DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
+# TEMPORARILY DEPRECATED TESTS
+# DeclareTest( DistributeStorage distributeStorage.lua "" )
+# DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )
 
 IF (WITH_STRUS_VECTOR STREQUAL "YES")
-DeclareTest( WikipediaCase wikipedia.lua "" )
+# DeclareTest( WikipediaCase wikipedia.lua "" )
 # DeclareTest( WikipediaCaseOneServer wikipedia.lua "1server" )
 ENDIF (WITH_STRUS_VECTOR STREQUAL "YES")
 

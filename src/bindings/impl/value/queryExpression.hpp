@@ -27,7 +27,7 @@ class QueryExpression
 {
 public:
 	virtual ~QueryExpression();
-	explicit QueryExpression( const papuga_ValueVariant& config_);
+	QueryExpression();
 
 	void setMaxNofRanks( int maxNofRanks_)				{m_maxNofRanks = maxNofRanks_;}
 	void setMinRank( int minRank_)					{m_minRank = minRank_;}
@@ -109,15 +109,17 @@ private:
 	void serializeFeature( papuga_Serialization* serialization, const Feature& feature, bool mapTypes) const;
 	void serializeNode( papuga_Serialization* serialization, const Node& nd, bool mapTypes) const;
 
+	typedef std::map<std::string,double> CollectedSummaryMap;
+	typedef std::map<std::string,CollectedSummaryMap> NameCollectedSummaryMapMap;
+
 private:
 	int m_minRank;
 	int m_maxNofRanks;
-	QueryBuilderConfig m_config;
 	papuga_Serialization m_restrictionSerialization;
 	papuga_Allocator m_allocator;
 	int m_allocatorMem[ 1024];
-	std::vector<std::string> m_nearDocids;
-	std::vector<WeightedSentenceTerm> m_collectTerms;
+	NameCollectedSummaryMapMap m_nameCollectedSummaryMapMap;
+	CollectedSummaryMap m_collectedSummaryMaxWeightMap;
 	std::vector<Term> m_termar;
 	std::vector<Expression> m_exprar;
 	std::vector<Node> m_nodear;

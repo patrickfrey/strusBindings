@@ -10,6 +10,7 @@
 #include "private/internationalization.hpp"
 #include "strus/constants.hpp"
 #include "strus/queryInterface.hpp"
+#include "strus/storage/sentenceTerm.hpp"
 #include "strus/base/localErrorBuffer.hpp"
 #include "deserializer.hpp"
 #include "serializer.hpp"
@@ -22,9 +23,9 @@
 using namespace strus;
 using namespace strus::bindings;
 
-QueryExpression::QueryExpression( const papuga_ValueVariant& config_)
-	:m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks),m_config(config_)
-	,m_nearDocids(),m_collectTerms(),m_termar(),m_exprar(),m_nodear()
+QueryExpression::QueryExpression()
+	:m_minRank(0),m_maxNofRanks(QueryInterface::DefaultMaxNofRanks)
+	,m_nameCollectedSummaryMapMap(),m_collectedSummaryMaxWeightMap(),m_termar(),m_exprar(),m_nodear()
 	,m_freenodear(),m_featar(),m_variablear()
 {
 	papuga_init_Allocator( &m_allocator, &m_allocatorMem, sizeof(m_allocatorMem));
@@ -134,31 +135,19 @@ void QueryExpression::addCollectSummary( const std::vector<SummaryElement>& summ
 	std::vector<SummaryElement>::const_iterator si = summary.begin(), se = summary.end();
 	for (; si != se; ++si)
 	{
-		const char* text = si->value().c_str();
-		if (si->name() == m_config.expandSummaryName)
+		std::pair<CollectedSummaryMap::iterator,bool>
+			ires = m_nameCollectedSummaryMapMap[ si->name()].insert( 
+				std::pair<std::string,double>( si->value(), si->weight()));
+		if (!ires.second/*not new insert*/)
 		{
-			if (m_config.extractFeatureTypeValueSeparator)
-			{
-				char const* zi = std::strchr( text, m_config.extractFeatureTypeValueSeparator);
-				if (zi)
-				{
-					std::string type( text, zi-text);
-					std::string value( zi+1);
-					m_collectTerms.push_back( WeightedSentenceTerm( type, value, si->weight()));
-				}
-				else
-				{
-					m_collectTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, text, si->weight()));
-				}
-			}
-			else
-			{
-				m_collectTerms.push_back( WeightedSentenceTerm( m_config.extractFeatureType, text, si->weight()));
-			}
+			ires.first->second += si->weight(); /*... increment stored value by element weight*/
 		}
-		else if (si->name() == m_config.docidSummaryName)
+		std::pair<CollectedSummaryMap::iterator,bool>
+			mres = m_collectedSummaryMaxWeightMap.insert( 
+				std::pair<std::string,double>( si->name(), si->weight()));
+		if (!mres.second/*not new insert*/ && ires.first->second > mres.first->second/*new maximum*/)
 		{
-			m_nearDocids.push_back( si->value());
+			mres.first->second = ires.first->second;
 		}
 	}
 }
@@ -209,8 +198,7 @@ void QueryExpression::serializeNode( papuga_Serialization* serialization, const 
 			rt &= papuga_Serialization_pushName_charp( serialization, "type");
 			if (mapTypes)
 			{
-				const std::string& type = m_config.queryFeatureRewriteType( term.type);
-				Serializer::serialize( serialization, type, true/*deep*/);
+				Serializer::serialize( serialization, term.type, true/*deep*/);
 			}
 			else
 			{
@@ -295,29 +283,34 @@ void QueryExpression::serializeFeatures( papuga_Serialization* ser, bool mapType
 
 void QueryExpression::serializeCollectedTerms( papuga_Serialization* ser) const
 {
-	std::map<SentenceTerm,double> termWeightMap;
-	double maxWeight = 0.0;
-	std::vector<WeightedSentenceTerm>::const_iterator
-		ti = m_collectTerms.begin(), te = m_collectTerms.end();
-	for (; ti != te; ++ti)
+	bool rt = true;
+	NameCollectedSummaryMapMap::const_iterator
+		mi = m_nameCollectedSummaryMapMap.begin(),
+		me = m_nameCollectedSummaryMapMap.end();
+	for (; mi != me; ++mi)
 	{
-		double ww = (termWeightMap[ *ti] += ti->weight());
-		if (ww > maxWeight) maxWeight = ww;
-	}
-	if (maxWeight > 0.0)
-	{
-		std::vector<WeightedSentenceTerm> termlist;
-		std::map<SentenceTerm,double>::iterator mi = termWeightMap.begin(), me = termWeightMap.end();
-		for (; mi != me; ++mi)
+		rt &= papuga_Serialization_pushOpen( ser);
+		const char* typenam = papuga_Allocator_copy_string( ser->allocator, mi->first.c_str(), mi->first.size());
+		if (!typenam) {rt = false; break;}
+		rt &= papuga_Serialization_pushName_charp( ser, "type");
+		rt &= papuga_Serialization_pushValue_string( ser, typenam, mi->first.size());
+		rt &= papuga_Serialization_pushName_charp( ser, "collect");
+		rt &= papuga_Serialization_pushOpen( ser);
+		CollectedSummaryMap::const_iterator vi = mi->second.begin(), ve = mi->second.end();
+		for (; vi != ve; ++vi)
 		{
-			mi->second /= maxWeight;
-			termlist.push_back( WeightedSentenceTerm( mi->first, mi->second));
+			rt &= papuga_Serialization_pushOpen( ser);
+			rt &= papuga_Serialization_pushName_charp( ser, "value");
+			const char* valstr = papuga_Allocator_copy_string( ser->allocator, vi->first.c_str(), vi->first.size());
+			if (!valstr) {rt = false; break;}
+			rt &= papuga_Serialization_pushValue_string( ser, valstr, vi->first.size());
+			rt &= papuga_Serialization_pushName_charp( ser, "weight");
+			rt &= papuga_Serialization_pushValue_double( ser, vi->second);
+			rt &= papuga_Serialization_pushClose( ser);
 		}
-		Serializer::serialize( ser, termlist, true/*deep*/);
+		rt &= papuga_Serialization_pushClose( ser);
+		rt &= papuga_Serialization_pushClose( ser);
 	}
-	else
-	{
-		Serializer::serialize( ser, m_collectTerms, true/*deep*/);
-	}
+	if (!rt) throw std::bad_alloc();
 }
 

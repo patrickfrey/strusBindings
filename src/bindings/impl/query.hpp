@@ -397,8 +397,8 @@ public:
 
 private:
 	friend class ContextImpl;
-	QueryBuilderImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_, const ValueVariant& queryBuilderConfig_)
-		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_obj(queryBuilderConfig_)
+	QueryBuilderImpl( const ObjectRef& trace_impl_, const ObjectRef& errorhnd_)
+		:m_errorhnd_impl(errorhnd_),m_trace_impl(trace_impl_),m_obj()
 	{}
 
 	mutable ObjectRef m_errorhnd_impl;

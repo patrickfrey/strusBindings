@@ -14,6 +14,7 @@
 #include "strus/queryAnalyzerInstanceInterface.hpp"
 #include "strus/analyzerObjectBuilderInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
+#include "strus/constants.hpp"
 #include "strus/base/string_conv.hpp"
 #include "strus/base/local_ptr.hpp"
 #include "papuga/serialization.h"
@@ -362,6 +363,8 @@ QueryAnalyzerImpl::QueryAnalyzerImpl( const ObjectRef& trace, const ObjectRef& o
 	,m_trace_impl(trace)
 	,m_objbuilder_impl(objbuilder)
 	,m_analyzer_impl()
+	,m_sentence_lexer_map_impl()
+	,m_neighbour_collector_map_impl()
 	,m_queryAnalyzerStruct()
 	,m_textproc(textproc_)
 {
@@ -494,6 +497,27 @@ struct SentenceLexerPrivateImpl
 
 typedef std::vector<SentenceLexerPrivateImpl> SentenceLexerArrayPrivateImpl;
 
+template <typename ELEMTYPE>
+void ObjectRef_addToArray( ObjectRef& objref, const ELEMTYPE& elem)
+{
+	typedef std::vector<ELEMTYPE> ELEMARRAY;
+
+	ObjectRef objref_copy = objref;
+	ObjectRef objref_new;
+	ELEMARRAY* ar = objref_copy.getObject<ELEMARRAY>();
+	if (ar)
+	{
+		objref_new.resetOwnership( ar = new ELEMARRAY( *ar), objref_copy.name());
+	}
+	else
+	{
+		if (objref_copy.get()) throw strus::runtime_error(_TXT( "logic error: type mismatch accessing '%s'"), objref_copy.name());
+		objref_new.resetOwnership( ar = new ELEMARRAY(), objref_copy.name());
+	}
+	ar->push_back( elem);
+	objref = objref_new;
+}
+
 void QueryAnalyzerImpl::addSentenceType(
 		const std::string& fieldType,
 		const ValueVariant& tokenizer,
@@ -501,36 +525,48 @@ void QueryAnalyzerImpl::addSentenceType(
 		const ValueVariant& expansion,
 		SentenceLexerImpl* lexer)
 {
-	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
-	ObjectRef sentence_lexer_map_impl_copy = m_sentence_lexer_map_impl;
-	ObjectRef sentence_lexer_map_impl_new;
-	SentenceLexerArrayPrivateImpl* sar = sentence_lexer_map_impl_copy.getObject<SentenceLexerArrayPrivateImpl>();
-	if (sar)
-	{
-		sentence_lexer_map_impl_new.resetOwnership( sar = new SentenceLexerArrayPrivateImpl( *sar), "array of sentence analyzers");
-	}
-	else
-	{
-		if (sentence_lexer_map_impl_copy.get()) throw strus::runtime_error(_TXT( "logic error: type mismatch accessing '%s'"), "sentence analyzer");
-		sentence_lexer_map_impl_new.resetOwnership( sar = new SentenceLexerArrayPrivateImpl(), "array of sentence analyzers");
-	}
 	QueryFeatureExpansionMap expansionmap( expansion);
-	sar->push_back( SentenceLexerPrivateImpl(
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ObjectRef_addToArray( m_sentence_lexer_map_impl,
+			SentenceLexerPrivateImpl(
 				fieldType, lexer->m_lexer_impl,
 				FeatureFuncDef( m_textproc, tokenizer, normalizers, errorhnd),
 				expansionmap));
-	m_sentence_lexer_map_impl = sentence_lexer_map_impl_new;
 }
 
-void QueryAnalyzerImpl::declareSimilarTermSearch( 
-		const std::string& simtype,
-		const ValueVariant& tokenizer,
+struct CollectorPrivateImpl
+{
+	std::string fieldType;
+	char prefixSeparator;
+	ObjectRef lexer_impl;
+	FeatureFuncDef featureFuncDef;
+
+	CollectorPrivateImpl( const std::string& fieldType_, char prefixSeparator_, const ObjectRef& lexer_impl_, const FeatureFuncDef& featureFuncDef_)
+		:fieldType(fieldType_),prefixSeparator(prefixSeparator_),lexer_impl(lexer_impl_),featureFuncDef(featureFuncDef_){}
+	CollectorPrivateImpl( const CollectorPrivateImpl& o)
+		:fieldType(o.fieldType),prefixSeparator(o.prefixSeparator),lexer_impl(o.lexer_impl),featureFuncDef(o.featureFuncDef){}
+};
+
+typedef std::vector<CollectorPrivateImpl> CollectorArrayPrivateImpl;
+
+void QueryAnalyzerImpl::addCollectorType(
+		const std::string& fieldType,
+		const std::string& prefixSeparator,
 		const ValueVariant& normalizers,
-		double minSimilarity,
-		int maxNofResults,
-		double minNormalizedWeight,
 		SentenceLexerImpl* lexer)
-{/*TO BE IMPLEMENTED*/}
+{
+	char prefixSeparatorChar = strus::Constants::standard_word2vec_type_feature_separator();
+	if (!prefixSeparator.empty())
+	{
+		if (prefixSeparator.size() != 1) throw std::runtime_error(_TXT( "single ASCII character expected as word type prefix separator"));
+		prefixSeparatorChar = prefixSeparator[0];
+	}
+	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
+	ObjectRef_addToArray( m_neighbour_collector_map_impl,
+			CollectorPrivateImpl(
+				fieldType, prefixSeparatorChar, lexer->m_lexer_impl,
+				FeatureFuncDef( m_textproc, normalizers, errorhnd)));
+}
 
 static std::string normalize_field(
 	const char* tok, std::size_t toksize, 
@@ -599,7 +635,6 @@ static void appendNormTokenToSentenceFields( std::vector<std::string>& result, c
 	
 }
 
-
 SentenceTermExpression* QueryAnalyzerImpl::analyzeSentence(
 		const std::string& fieldType,
 		const std::string& fieldContent,
@@ -644,6 +679,63 @@ SentenceTermExpression* QueryAnalyzerImpl::analyzeSentence(
 
 	Reference<SentenceTermExpression> termexpr( new SentenceTermExpression( si->expansionMap, lexer, guess));
 	return termexpr.release();
+}
+
+Struct QueryAnalyzerImpl::getCollectedNeighbours(
+		const std::string& fieldType,
+		const ValueVariant& fields_,
+		const std::string& searchType,
+		int maxNofResults,
+		double minSimilarity,
+		double minNormalizedWeight)
+{
+	Struct rt;
+	ObjectRef m_neighbour_collector_map_impl_copy = m_neighbour_collector_map_impl;
+	CollectorArrayPrivateImpl* car = m_neighbour_collector_map_impl_copy.getObject<CollectorArrayPrivateImpl>();
+	if (!car) throw strus::runtime_error(_TXT( "unknown '%s' (none defined)"), "sentence analyzer");
+	CollectorArrayPrivateImpl::const_iterator ci = car->begin(), ce = car->end();
+	for (; ci != ce && !strus::caseInsensitiveEquals( ci->fieldType, fieldType); ++ci){}
+	if (ci == ce) throw strus::runtime_error(_TXT( "unknown '%s' (not found)"), "sentence analyzer");
+
+	std::vector<WeightedString> fields = Deserializer::getWeightedStringList( fields_);
+	const SentenceLexerInstanceInterface* lexer = ci->lexer_impl.getObject<SentenceLexerInstanceInterface>();
+
+	std::vector<WeightedSentenceTerm> termlist;
+	std::vector<WeightedString>::const_iterator fi = fields.begin(), fe = fields.end();
+	for (; fi != fe; ++fi)
+	{
+		char const* fstr = std::strchr( fi->value.c_str(), ci->prefixSeparator);
+		std::size_t flen = 0;
+		char const* tstr = fi->value.c_str();
+		std::size_t tlen = 0;
+		if (fstr && ci->prefixSeparator)
+		{
+			tlen = fstr - tstr;
+			fstr += 1;
+			flen = std::strlen( fstr);
+		}
+		else
+		{
+			throw strus::runtime_error(_TXT( "missing separator in token '%s'"), fi->value.c_str());
+		}
+		std::string normtok
+			= normalize_field(
+				fstr+1, flen-1,
+				ci->featureFuncDef.normalizers.begin(), ci->featureFuncDef.normalizers.end());
+		termlist.push_back( WeightedSentenceTerm( std::string( tstr, tlen), std::string( fstr, flen), fi->weight));
+	}
+	std::vector<WeightedString> similarValues;
+	std::vector<WeightedSentenceTerm> similarTerms
+		= lexer->similarTerms( searchType, termlist, minSimilarity, maxNofResults, minNormalizedWeight);
+	std::vector<WeightedSentenceTerm>::const_iterator si = similarTerms.begin(), se = similarTerms.end();
+	for (; si != se; ++si)
+	{
+		similarValues.push_back( WeightedString( si->value(), si->weight()));
+	}
+	Serializer::serialize( &rt.serialization, similarValues, false);
+	rt.release();
+	return rt;
+	
 }
 
 Struct QueryAnalyzerImpl::introspection( const ValueVariant& arg) const

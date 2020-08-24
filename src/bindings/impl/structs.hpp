@@ -137,6 +137,12 @@ enum _SentenceGuess {terms,weight};
 /// \member weight weight assigned to the term
 enum _WeightedSentenceTerm {type,value,weight};
 
+/// \struct WeightedString
+/// \brief string with a weight
+/// \member value string value of the string
+/// \member weight weight assigned to the string
+enum _WeightedString {value,weight};
+
 /// \struct SummaryElement
 /// \brief Summary element in a query result 
 /// \member name name of the summary element

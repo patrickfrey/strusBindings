@@ -177,6 +177,13 @@ public:
 	/// \brief Object access as function
 	void* get()					{return m_ptr.get();}
 
+	/// \brief Object name
+#ifdef STRUS_LOWLEVEL_DEBUG
+	const char* name() const			{return m_name;}
+#else
+	const char* name() const			{return 0;}
+#endif
+
 	/// \brief Get const pointer to object
 	template <class OBJECTTYPE>
 	const OBJECTTYPE* getObject() const

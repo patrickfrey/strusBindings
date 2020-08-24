@@ -220,7 +220,7 @@ public:
 		typedef bindings::method::QueryBuilder QB;
 		typedef bindings::method::Context C;
 		return {rootexpr, {
-			{"", "qrybuilder", "context", C::createQueryBuilder(), {{configvar}}},
+			{"", "qrybuilder", "context", C::createQueryBuilder(), {}},
 			/// Ranking parameter needed for merging:
 			{"nofranks", 0, "qrybuilder", QB::setMaxNofRanks(), {{NumberOfResults}} },
 			{"minrank", 0, "qrybuilder", QB::setMinRank(), {{FirstResult}} }

@@ -43,6 +43,18 @@ struct FeatureFuncDef
 		}
 	}
 
+	FeatureFuncDef( const TextProcessorInterface* textproc,
+			const ValueVariant& normalizers_,
+			ErrorBufferInterface* errorhnd)
+	{
+		normalizers_ref = Deserializer::getNormalizers( normalizers_, textproc, errorhnd);
+		std::vector<Reference<NormalizerFunctionInstanceInterface> >::iterator ni = normalizers_ref.begin(), ne = normalizers_ref.end();
+		for (; ni != ne; ++ni)
+		{
+			normalizers.push_back( ni->get());
+		}
+	}
+
 	void release()
 	{
 		(void)tokenizer.release();

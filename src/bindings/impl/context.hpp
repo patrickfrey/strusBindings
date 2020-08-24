@@ -209,9 +209,8 @@ public:
 
 	/// \brief Create an object to build a query in several steps
 	/// \note This method and the returned object are intended to be used in the web request handler case where only mappings and no control structures are available.
-	/// \param[in] config query builder configuration
 	/// \return query builder interface (class QueryBuilder)
-	QueryBuilderImpl* createQueryBuilder( const ValueVariant& config) const;
+	QueryBuilderImpl* createQueryBuilder() const;
 
 	/// \brief Unpack a statistics blob retrieved from a storage
 	/// \param[in] blob binary blob with statistics to decode (created by StorageClient:getAllStatistics or StorageClient:getChangeStatistics)

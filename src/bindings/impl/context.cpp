@@ -350,9 +350,9 @@ QueryResultMergerImpl* ContextImpl::createQueryResultMerger() const
 	return new QueryResultMergerImpl( m_trace_impl, m_errorhnd_impl);
 }
 
-QueryBuilderImpl* ContextImpl::createQueryBuilder( const ValueVariant& config) const
+QueryBuilderImpl* ContextImpl::createQueryBuilder() const
 {
-	return new QueryBuilderImpl( m_trace_impl, m_errorhnd_impl, config);
+	return new QueryBuilderImpl( m_trace_impl, m_errorhnd_impl);
 }
 
 void ContextImpl::createStorage( const ValueVariant& config_)

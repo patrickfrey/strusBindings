@@ -34,6 +34,7 @@
 #include "strus/storage/index.hpp"
 #include "impl/value/metadataExpression.hpp"
 #include "expressionBuilder.hpp"
+#include "structDefs.hpp"
 #include "papuga/serialization.h"
 #include "papuga/valueVariant.h"
 #include <string>
@@ -92,6 +93,8 @@ struct Deserializer
 	static std::vector<double> getDoubleList( const papuga_ValueVariant& val);
 
 	static std::vector<float> getFloatList( const papuga_ValueVariant& val);
+
+	static std::vector<WeightedString> getWeightedStringList( const papuga_ValueVariant& val);
 
 	static const papuga_ValueVariant* getOptionalDefinition( papuga_SerializationIter& seriter, const char* name);
 

@@ -584,6 +584,29 @@ std::vector<Index> Deserializer::getIndexList( const papuga_ValueVariant& val)
 	return getAtomicTypeList<Index,ValueVariantWrap::toint,Deserializer::getIndex>( val);
 }
 
+std::vector<WeightedString> Deserializer::getWeightedStringList( const papuga_ValueVariant& val)
+{
+	std::vector<WeightedString> rt;
+	static const char* context = _TXT("weighted string list");
+	if (val.valuetype == papuga_TypeSerialization)
+	{
+		papuga_SerializationIter seriter;
+		papuga_init_SerializationIter( &seriter, val.value.serialization);
+		while (papuga_SerializationIter_tag( &seriter) == papuga_TagOpen)
+		{
+			papuga_SerializationIter_skip( &seriter);
+			rt.push_back( WeightedString( seriter));
+			consumeClose( seriter);
+		}
+		if (!papuga_SerializationIter_eof( &seriter)) throw strus::runtime_error( _TXT("unexpected tokens at end of %s"), context);
+	}
+	else
+	{
+		throw strus::runtime_error( _TXT("expected array structure for %s"), context);
+	}
+	return rt;
+}
+
 IndexRange Deserializer::getIndexRange( papuga_SerializationIter& seriter)
 {
 	static const StructureNameMap namemap( "start,end", ',');

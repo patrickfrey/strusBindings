@@ -69,6 +69,7 @@ template <> class StructIdTemplate<VectorQueryResult> {public: static int struct
 template <> class StructIdTemplate<SentenceTerm> {public: static int structid()			{return STRUS_BINDINGS_STRUCTID_SentenceTerm;}};
 template <> class StructIdTemplate<SentenceGuess> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_SentenceGuess;}};
 template <> class StructIdTemplate<WeightedSentenceTerm> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_WeightedSentenceTerm;}};
+template <> class StructIdTemplate<WeightedString> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_WeightedString;}};
 template <> class StructIdTemplate<SummaryElement> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_SummaryElement;}};
 template <> class StructIdTemplate<MetaDataComparison> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_MetaDataComparison;}};
 template <> class StructIdTemplate<ResultDocument> {public: static int structid()		{return STRUS_BINDINGS_STRUCTID_ResultDocument;}};
@@ -230,6 +231,7 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const SentenceTerm& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SentenceGuess& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const WeightedSentenceTerm& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const WeightedString& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SummaryElement& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const TermExpression& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const SentenceTermExpression& val, papuga_ErrorCode& errcode, bool deep);
@@ -241,6 +243,7 @@ private:
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<SentenceTerm>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<SentenceGuess>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<WeightedSentenceTerm>& val, papuga_ErrorCode& errcode, bool deep);
+	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<WeightedString>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<std::string>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<int>& val, papuga_ErrorCode& errcode, bool deep);
 	static bool serialize_nothrow( papuga_Serialization* result, const std::vector<double>& val, papuga_ErrorCode& errcode, bool deep);

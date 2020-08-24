@@ -207,65 +207,22 @@ private:
 	void init( papuga_SerializationIter& seriter);
 };
 
-struct QueryBuilderConfig
+struct WeightedString
 {
-	static const char defaultExtractFeatureTypeValueSeparator()
-	{
-		return strus::Constants::standard_word2vec_type_feature_separator();
-	}
-	static const char* defaultExtractFeatureType()
-	{
-		return strus::Constants::default_feature_type_search();
-	}
-	static const char* defaultExtractFeatureSet()
-	{
-		return strus::Constants::default_feature_set_search();
-	}
-	static const char* defaultExtractSummaryName()
-	{
-		return "feature";
-	}
-	static const char* defaultDocidSummaryName()
-	{
-		return strus::Constants::attribute_docid();
-	}
-	const std::string& queryFeatureRewriteType( const std::string& typenam) const
-	{
-		std::map<std::string,std::string>::const_iterator
-			mi = queryFeatureRewriteMap.find( typenam);
-		if (mi == queryFeatureRewriteMap.end())
-		{
-			return typenam;
-		}
-		else
-		{
-			return mi->second;
-		}
-	}
+public:
+	std::string value;
+	double weight;
 
-	QueryBuilderConfig()
-		:extractFeatureTypeValueSeparator(defaultExtractFeatureTypeValueSeparator())
-		,extractFeatureType(defaultExtractFeatureType())
-		,extractFeatureSet(defaultExtractFeatureSet())
-		,expandSummaryName(defaultExtractSummaryName())
-		,docidSummaryName(defaultDocidSummaryName())
-		,queryFeatureRewriteMap(){}
-	QueryBuilderConfig( const papuga_ValueVariant& cfg)
-		:extractFeatureTypeValueSeparator(defaultExtractFeatureTypeValueSeparator())
-		,extractFeatureType(defaultExtractFeatureType())
-		,extractFeatureSet(defaultExtractFeatureSet())
-		,expandSummaryName(defaultExtractSummaryName())
-		,docidSummaryName(defaultDocidSummaryName()){init(cfg);}
-
-	char extractFeatureTypeValueSeparator;
-	std::string extractFeatureType;
-	std::string extractFeatureSet;
-	std::string expandSummaryName;
-	std::string docidSummaryName;
-	std::map<std::string,std::string> queryFeatureRewriteMap;
-
+public:
+	WeightedString( const std::string& value_, double weight_)
+		:value(value_),weight(weight_){}
+	WeightedString( papuga_SerializationIter& seriter)
+		{init(seriter);}
+	WeightedString( const papuga_ValueVariant& value);
+	WeightedString( const WeightedString& o)
+		:value(o.value),weight(o.weight){}
 private:
-	void init( const papuga_ValueVariant& cfg);
+	void init( papuga_SerializationIter& seriter);
 };
 
 }} //namespace

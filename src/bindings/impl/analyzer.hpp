@@ -319,26 +319,19 @@ public:
 			const ValueVariant& expansion,
 			SentenceLexerImpl* lexer);
 
-	/// \brief Declare the configuration for the similar term search
-	/// \param[in] simtype type name of the searched similar terms
-	/// \example "H"
-	/// \param[in] tokenizer tokenizer function description to use for the features of this field type before normalizing it
-	/// \example "content"
-	/// \example "word"
+	/// \brief Define a field with contents to collect and return the closest features (vector similarity) of a specific type
+	/// \param[in] fieldType field type name
+	/// \example "feature"
+	/// \param[in] prefixSeparator separator used to separate word type info from word value, the second part is normalized
+	/// \example "#"
 	/// \param[in] normalizers list of normalizer function descriptions to use for the features of this field type (in the ascending order of appearance) before passing it to analysis.
 	/// \example "uc"
-	/// \example ["lc",["convdia", "en"]]
-	/// \param[in] minSimilarity minimum similarity factor, value between 0.0 and 1.0
-	/// \param[in] maxNofResults maximum number of results
-	/// \param[in] minNormalizedWeight minimum normalized weight (best rank has 1.0), value between 0.0 and 1.0
-	/// \param[in] lexer the sentence lexer to use (with the method for searching similar terms)
-	void declareSimilarTermSearch( 
-			const std::string& simtype,
-			const ValueVariant& tokenizer,
+	/// \example ["lc","entityid"]
+	/// \param[in] lexer the sentence lexer to use
+	void addCollectorType(
+			const std::string& fieldType,
+			const std::string& prefixSeparator,
 			const ValueVariant& normalizers,
-			double minSimilarity,
-			int maxNofResults,
-			double minNormalizedWeight,
 			SentenceLexerImpl* lexer);
 
 	/// \brief Declare an implicit grouping operation for a query field type. The implicit group operation is always applied when more than one term are resulting from analysis of this field to ensure that you get only one node in the query from it.
@@ -413,12 +406,37 @@ public:
 	/// \example 0.99
 	/// \example 0.8
 	/// \return list of named sentence guesses with weight (same as SentenceLexer::call(..))
-	/// \example [ sentence: "norm", weight: 1.0, terms: [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]] ]
+	/// \example [[type: "M", value: "best"],[type: "N", value: "football_manager"],[type: "T", value: "in"],[type: "T", value: "the"],[type: "N", value: "world"]]
 	SentenceTermExpression* analyzeSentence(
 			const std::string& fieldType,
 			const std::string& fieldContent,
 			int maxNofResults,
 			double minWeight);
+
+	/// \brief Find closest neighbours of a list of words typed by a prefix
+	/// \param[in] fieldType field type name that selects the method defined with addCollectorType
+	/// \example "collected"
+ 	/// \param[in] fields list of elements collected
+	/// \example ["V#run", "N#manager", "N#football"]
+	/// \param[in] searchType word type to seek for
+	/// \example "G"
+	/// \param[in] maxNofResults maximum number of results to return
+	/// \example 4
+	/// \param[in] minSimilarity minimum similarity
+	/// \example 0.99
+	/// \example 0.8
+	/// \param[in] minNormalizedWeight minimum normalized weight for cut off
+	/// \example 0.75
+	/// \example 0.8
+	/// \return list of results
+	/// \example [[type: "G", value: "2384798", weight: "0.92121324"],[type: "G", value: "870349244", weight: "0.912923"],[type: "G", value: "131235", weight: "0.813423"],[type: "G", value: "214546546", weight: "0.787834"]]
+	Struct getCollectedNeighbours(
+			const std::string& fieldType,
+			const ValueVariant& fields,
+			const std::string& searchType,
+			int maxNofResults,
+			double minSimilarity,
+			double minNormalizedWeight);
 
 	/// \brief Introspect a structure starting from a root path
 	/// \param[in] path list of idenfifiers describing the access path to the element to introspect
@@ -441,6 +459,7 @@ private:
 	ObjectRef m_objbuilder_impl;
 	ObjectRef m_analyzer_impl;
 	ObjectRef m_sentence_lexer_map_impl;
+	ObjectRef m_neighbour_collector_map_impl;
 	QueryAnalyzerStruct m_queryAnalyzerStruct;
 	const TextProcessorInterface* m_textproc;
 };

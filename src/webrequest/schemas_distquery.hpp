@@ -38,9 +38,7 @@ public:
 			{"/distqryeval/qryeval", "()", DistQueryEvalStorageServer, papuga_TypeString, "example.com:7184/qryeval/test"},
 			{"/distqryeval", "", "qryeval", DistQueryEvalStorageServer, '*'},
 			{"/distqryeval/statserver", "()", DistQueryEvalStatisticsServer, papuga_TypeString, "example.com:7184/statserver/test"},
-			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'},
-			{SchemaQueryEvalDeclPart::declareQueryBuilderConfig( "/distqryeval/config")},
-			{"/distqryeval", "config", "config", QueryBuilderDef, '?'}
+			{"/distqryeval", "", "statserver", DistQueryEvalStatisticsServer, '!'}
 		}
 	) {}
 };

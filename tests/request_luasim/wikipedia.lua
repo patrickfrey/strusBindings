@@ -241,19 +241,7 @@ function defDistributedQueryEvalServer()
 			analyzer = { serviceAddress( "qryanalyzer") },
 			statserver = { serviceAddress( "statserver") },
 			collector = collectors,
-			qryeval = qryevals,
-			config = {separator = "#", type = "word", rewrite = {
-					{name = "N", value = "word"},
-					{name = "C", value = "word"},
-					{name = "A", value = "word"},
-					{name = "V", value = "word"},
-					{name = "M", value = "word"},
-					{name = "N", value = "word"},
-					{name = "E", value = "word"},
-					{name = "U", value = "word"},
-					{name = "R", value = "word"},
-					{name = "W", value = "word"}
-				}}
+			qryeval = qryevals
 		}
 	}
 	def_test_server( server.distqryeval.name, server.distqryeval.address )
