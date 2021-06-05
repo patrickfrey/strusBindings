@@ -1,13 +1,6 @@
 language: cpp
 matrix:
   include:
-# Fri Jan 11: PHP7 is currently disabled for OSX, because of linking problems: No clue how to get -lcrypto installed. Installing openssl does not solve the problem
-    - os: osx
-      compiler: clang
-      env: STRUS_WITH_WEBREQUEST=YES STRUS_WITH_PYTHON=YES STRUS_WITH_PHP=NO STRUS_WITH_LUA=NO STRUS_WITH_VECTOR=NO STRUS_WITH_PATTERN=NO
-    - os: osx
-      compiler: clang
-      env: STRUS_WITH_WEBREQUEST=YES STRUS_WITH_PYTHON=NO STRUS_WITH_PHP=NO STRUS_WITH_LUA=YES STRUS_WITH_VECTOR=NO STRUS_WITH_PATTERN=NO
     - os: linux
       dist: xenial
       compiler: clang
@@ -32,13 +25,6 @@ matrix:
       dist: xenial
       compiler: gcc
       env: STRUS_WITH_WEBREQUEST=YES STRUS_WITH_PYTHON=NO STRUS_WITH_PHP=NO STRUS_WITH_LUA=YES STRUS_WITH_VECTOR=NO STRUS_WITH_PATTERN=NO
-# Thu Jan 10: strusVector is currently disabled for OSX, we still have building problems with armadillo there:
-    - os: osx
-      compiler: clang
-      env: STRUS_WITH_WEBREQUEST=YES STRUS_WITH_PYTHON=YES STRUS_WITH_PHP=NO STRUS_WITH_LUA=NO STRUS_WITH_VECTOR=NO STRUS_WITH_PATTERN=YES
-    - os: osx
-      compiler: clang
-      env: STRUS_WITH_WEBREQUEST=YES STRUS_WITH_PYTHON=NO STRUS_WITH_PHP=NO STRUS_WITH_LUA=YES STRUS_WITH_VECTOR=NO STRUS_WITH_PATTERN=YES
     - os: linux
       dist: xenial
       compiler: clang
