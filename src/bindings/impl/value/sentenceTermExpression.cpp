@@ -34,7 +34,7 @@ SentenceTermExpression::SentenceTermExpression(
 			if (gi->terms().size() == m_ar.size())
 			{
 				std::vector<strus::SentenceTerm>::const_iterator ti = gi->terms().begin(), te = gi->terms().end();
-				std::vector<strus::SentenceTermList>::iterator ai = m_ar.begin(), ae = m_ar.end();
+				std::vector<strus::SentenceTermList>::iterator ai = m_ar.begin();
 				for (; ti != te; ++ti,++ai)
 				{
 					std::vector<strus::SentenceTerm>::const_iterator ei = ai->begin(), ee = ai->end();
