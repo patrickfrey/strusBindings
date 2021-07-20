@@ -2,8 +2,8 @@ Ubuntu 16.04 on x86_64, i686
 ----------------------------
 
 # Build system
-Cmake with gcc or clang. Here in this description we build with 
-gcc >= 4.9 (has C++11 support). Build with C++98 is possible but not with WITH_WEBREQUEST=YES
+Cmake with gcc or clang. Here in this description we build with
+gcc >= 4.9 (has C++11 support).
 
 # Prerequisites
 Install packages with 'apt-get'/aptitude.
@@ -31,7 +31,7 @@ each of these flags toggled to YES another section.
 
 ## Required packages with -DWITH_STRUS_PATTERN=YES
 	ragel libtre-dev boost-all >= 1.57 hyperscan >= 4.7
-	
+
 ### Install hyperscan from sources
 	git clone https://github.com/intel/hyperscan.git
 	mkdir hyperscan/build
@@ -57,7 +57,7 @@ each of these flags toggled to YES another section.
 	libcurl4-openssl-dev
 
 # Strus prerequisite packages to install before
-	strusBase strus strusAnalyzer strusTrace strusModule strusRpc  
+	strusBase strus strusAnalyzer strusTrace strusModule strusRpc
 
 # Strus prerequisite packages to install before with -DWITH_STRUS_VECTOR=YES
 	strusVector
