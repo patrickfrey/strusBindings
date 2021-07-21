@@ -81,3 +81,7 @@ __pycache__
 strusbindings-*.tar.gz
 
 
+# KDevelop project
+.kdev4/
+strusBindings.kdev4
+
