@@ -57,6 +57,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_UncaughtException:		return ErrorCodeUncaughtException;
 		case papuga_ExecutionOrder:		return ErrorCodeLogicError;
 		case papuga_AtomicValueExpected:	return ErrorCodeBindingLanguageError;
+		case papuga_StructureExpected:		return ErrorCodeBindingLanguageError;
 		case papuga_NotAllowed:			return ErrorCodeNotAllowed;
 		case papuga_IteratorFailed:		return ErrorCodeHiddenError;
 		case papuga_AddressedItemNotFound:	return ErrorCodeRequestResolveError;
@@ -65,6 +66,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_MaxRecursionDepthReached:	return ErrorCodeMaxRecursionDepht;
 		case papuga_ComplexityOfProblem:	return ErrorCodeRefusedDueToComplexity;
 		case papuga_InvalidRequest:		return ErrorCodeInvalidRequest;
+		case papuga_AttributeNotAtomic:		return ErrorCodeInvalidRequest;
 	}
 	return ErrorCodeUnknown;
 }
