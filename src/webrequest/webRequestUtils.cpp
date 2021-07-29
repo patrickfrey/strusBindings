@@ -67,6 +67,9 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_ComplexityOfProblem:	return ErrorCodeRefusedDueToComplexity;
 		case papuga_InvalidRequest:		return ErrorCodeInvalidRequest;
 		case papuga_AttributeNotAtomic:		return ErrorCodeInvalidRequest;
+		case papuga_UnknownContentType:		return ErrorCodeInvalidRequest;
+		case papuga_UnknownSchema:		return ErrorCodeInvalidRequest;
+		case papuga_MissingStructureDescription:return ErrorCodeLogicError;
 	}
 	return ErrorCodeUnknown;
 }

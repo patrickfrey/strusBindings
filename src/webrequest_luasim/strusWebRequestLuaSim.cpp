@@ -45,7 +45,7 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <limits>
-#include <unistd.h> 
+#include <unistd.h>
 #include <map>
 #include <cstdbool>
 #include <iostream>
@@ -431,7 +431,7 @@ public:
 			std::string key = nextKey( keyitr);
 			lua_pushlstring( m_ls, key.c_str(), key.size()); //STACK: KEY TABLE
 			if (lua_gettable( m_ls, -2))
-			{						//STACK: SUBTABLE TABLE 
+			{						//STACK: SUBTABLE TABLE
 				lua_remove( m_ls, -2);			//STACK: SUBTABLE
 			}
 			else
@@ -1240,7 +1240,11 @@ static void pushConvertedJsonAsLuaTable( lua_State* L, int luaddr)
 	}
 	papuga_ValueVariant jsonval;
 	papuga_init_ValueVariant_serialization( &jsonval, &jsonser);
-	papuga_lua_push_value_plain( L, &jsonval);
+	if (!papuga_lua_push_value_plain( L, &jsonval, &errcode))
+	{
+		papuga_destroy_Allocator( &allocator);
+		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), papuga_ErrorCode_tostring( errcode));
+	}
 	papuga_destroy_Allocator( &allocator);
 }
 
@@ -1286,7 +1290,7 @@ static std::string convertSourceReformatFloat( const char* src, unsigned int pre
 					si = se;
 					continue;
 				}
-				
+
 			}
 		}
 		rt.push_back( *si);
@@ -1452,11 +1456,11 @@ static int l_call_server( lua_State* L)
 		{
 			lua_pushnil(L);
 			lua_pushinteger(L, result.httpStatus()); /* second return value */
-			lua_pushstring(L, result.errorStr()); 
+			lua_pushstring(L, result.errorStr());
 		}
 		else
 		{
-			lua_pushlstring(L, result.content().str(), result.content().len()); 
+			lua_pushlstring(L, result.content().str(), result.content().len());
 			lua_pushinteger(L, result.httpStatus()); /* second return value */
 			lua_pushnil(L);
 		}
@@ -1508,7 +1512,7 @@ static int l_cmp_content( lua_State* L)
 		char const* bi = content_b.c_str();
 		const char* a_ln = ai;
 		const char* b_ln = bi;
-	
+
 		while (*ai && *bi)
 		{
 			if ((*ai == '\r' || *ai == '\n') && (*bi == '\r' || *bi == '\n'))
@@ -1689,7 +1693,7 @@ static int l_reformat_float( lua_State* L)
 		if (precision <= 0) return luaL_error(L, _TXT("expected positive number for precision argument of 'reformat_float'"));
 
 		std::string result = convertSourceReformatFloat( content, precision);
-		lua_pushlstring( L, result.c_str(), result.size()); 
+		lua_pushlstring( L, result.c_str(), result.size());
 
 		LUA_FUNCTION_TAIL( L, "reformat_float", 1);
 		return 1;
@@ -1713,7 +1717,7 @@ static int l_reformat_regex( lua_State* L)
 		const char* substfmt = (nofArgs > 2) ? lua_tostring( L, 3) : "";
 
 		std::string result = convertSourceRegexReplace( content, expr, substfmt);
-		lua_pushlstring( L, result.c_str(), result.size()); 
+		lua_pushlstring( L, result.c_str(), result.size());
 
 		LUA_FUNCTION_TAIL( L, "reformat_regex", 1);
 		return 1;
@@ -1734,7 +1738,7 @@ static int l_to_json( lua_State* L)
 
 		bool indentiation = (nofArgs > 1) ? lua_toboolean( L, 2) : true;
 		std::string result = convertLuaValueToJson( L, 1, indentiation);
-		lua_pushlstring( L, result.c_str(), result.size()); 
+		lua_pushlstring( L, result.c_str(), result.size());
 
 		LUA_FUNCTION_TAIL( L, "to_json", 1);
 		return 1;
@@ -1802,7 +1806,7 @@ static void printUsage()
 {
 	fprintf( stderr, "%s",
 		"strusWebRequestLuaSim [<options>] <luascript> [<outputdir>]\n"
-		"Program Options <options>:\n" 
+		"Program Options <options>:\n"
 		 "   -h,--help          :Print this usage\n"
 		 "   -m,--mod <PATH>    :Set <PATH> as addidional module path\n"
 		 "   -G,--debug <ID>    :Enable debug trace of items with id <ID>\n"
@@ -1837,7 +1841,7 @@ static void setLuaPath( lua_State* ls, const char* path)
 	char pathbuf[ 2048];
 	lua_getglobal( ls, "package");
 	lua_getfield( ls, -1, "path");
-	cur_path = lua_tostring( ls, -1); 
+	cur_path = lua_tostring( ls, -1);
 	if (cur_path[0])
 	{
 		if ((int)sizeof(pathbuf) <= std::snprintf( pathbuf, sizeof(pathbuf), "%s;%s/?.lua", cur_path, path))
@@ -1853,7 +1857,7 @@ static void setLuaPath( lua_State* ls, const char* path)
 		}
 	}
 	if (g_verbosity) fprintf( stderr, _TXT("set lua module pattern to: '%s'\n"), pathbuf);
-	lua_pop( ls, 1); 
+	lua_pop( ls, 1);
 	lua_pushstring( ls, pathbuf);
 	lua_setfield( ls, -2, "path");
 	lua_pop( ls, 1);
@@ -2094,7 +2098,7 @@ int main( int argc, const char* argv[])
 			if (g_verbosity > 0)
 			{
 				std::cerr << "START " << thisCommandLine << std::endl;
-				
+
 			}
 		}
 		g_logger.init( g_verbosity);
