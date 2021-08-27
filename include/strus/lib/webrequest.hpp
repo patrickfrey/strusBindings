@@ -44,6 +44,8 @@ WebRequestEventLoopInterface* createCurlEventLoop(
 /// \param[in] request logger interface (no ownership)
 /// \param[in] html_head content included in HTML <head> section when returning HTML
 /// \param[in] config_store_dir directory where to store configurations loaded with PUT
+/// \param[in] script_dir directory with the scripts to load
+/// \param[in] schema_dir directory with the schema to load
 /// \param[in] service_name identifier of the service
 /// \param[in] port port of this the web request handler, also used for identifying self requests in the configuration phase
 /// \param[in] beautifiedOutput true, if request results are made human readable, false if request results are made compact
@@ -56,23 +58,13 @@ WebRequestHandlerInterface* createWebRequestHandler(
 		WebRequestLoggerInterface* logger,
 		const std::string& html_head,
 		const std::string& config_store_dir,
+		const std::string& script_dir,
+		const std::string& schema_dir,
 		const std::string& service_name,
 		int port,
 		bool beautifiedOutput,
 		int maxIdleTime,
 		int nofTransactionsPerSeconds,
-		ErrorBufferInterface* errorhnd);
-
-/// \brief Store all request schemas of a given type of the web request handler provided here to a directory
-/// \param[in] config main configuration
-/// \param[in] dir absolute path where to write the descriptions to (created if it does not exist)
-/// \param[in] doctype type of the schema ("xml"/"xsd" for XML Schema and "json" for JSON Schema)
-/// \param[in] errorhnd error buffer interface to use
-/// \return true in case of success, false else
-bool storeWebRequestSchemaDescriptions(
-		const std::string& config,
-		const std::string& dir,
-		const std::string& doctype,
 		ErrorBufferInterface* errorhnd);
 
 /// \brief Convert string from UTF-8 to a given charset encoding

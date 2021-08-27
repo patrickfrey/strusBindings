@@ -10,7 +10,6 @@
 #include "webRequestContext.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
-#include "schemas_base.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/base/fileio.hpp"
@@ -71,38 +70,6 @@ WebRequestContext* createClone();
 WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
-		ConfigurationHandler* configHandler_,
-		TransactionPool* transactionPool_,
-		const char* contextType_,
-		const char* contextName_)
-	:m_handler(handler_)
-	,m_logger(logger_)
-	,m_logMask(logger_->logMask())
-	,m_configHandler(configHandler_),m_configTransaction()
-	,m_transactionPool(transactionPool_),m_transactionRef()
-	,m_requestType(configRequestType(contextType_))
-	,m_contextType(0),m_contextName(0),m_rootElement(0)
-	,m_context(),m_obj(0),m_request(0),m_methodId(Method_Undefined),m_path()
-	,m_encoding(papuga_UTF8),m_doctype(papuga_ContentType_JSON),m_doctypestr(0)
-	,m_atm(0)
-	,m_result_encoding(papuga_UTF8),m_result_doctype(WebRequestContent::JSON)
-	,m_results(0),m_nofResults(0),m_resultIdx(0)
-	,m_errbuf(),m_answer()
-	,m_accepted_charset(0),m_accepted_doctype(0),m_html_base_href()
-{
-	initCallLogger();
-	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
-	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
-
-	m_contextType = contextType_ ? papuga_Allocator_copy_charp( &m_allocator, contextType_) : ROOT_CONTEXT_NAME;
-	m_contextName = contextName_ ? papuga_Allocator_copy_charp( &m_allocator, contextName_) : ROOT_CONTEXT_NAME;
-	if (!m_contextType || !m_contextName) throw std::bad_alloc();
-}
-
-WebRequestContext::WebRequestContext(
-		WebRequestHandler* handler_,
-		WebRequestLoggerInterface* logger_,
-		ConfigurationHandler* configHandler_,
 		TransactionPool* transactionPool_,
 		const char* accepted_charset_,
 		const char* accepted_doctype_,
@@ -112,15 +79,12 @@ WebRequestContext::WebRequestContext(
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logMask(logger_->logMask())
-	,m_configHandler(configHandler_),m_configTransaction()
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(UndefinedRequest)
 	,m_contextType(0),m_contextName(0),m_rootElement(0)
-	,m_context(),m_obj(0),m_request(0),m_methodId(method_?methodIdFromName(method_):Method_GET),m_path(path_)
+	,m_context(),m_obj(0),m_path(path_)
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
-	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
-	,m_results(0),m_nofResults(0),m_resultIdx(0)
 	,m_errbuf(),m_answer()
 	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_)
 	,m_html_base_href(html_base_href_)
@@ -160,7 +124,6 @@ WebRequestContext::WebRequestContext(
 WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
-		ConfigurationHandler* configHandler_,
 		TransactionPool* transactionPool_,
 		const char* contextType_,
 		const char* contextName_,
@@ -175,9 +138,7 @@ WebRequestContext::WebRequestContext(
 	,m_contextType(contextType_),m_contextName(contextName_),m_rootElement(0)
 	,m_context(context_),m_obj(0),m_request(0),m_methodId(Method_Undefined),m_path()
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
-	,m_atm(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
-	,m_results(0),m_nofResults(0),m_resultIdx(0)
 	,m_errbuf(),m_answer()
 	,m_accepted_charset(""),m_accepted_doctype("")
 	,m_html_base_href("")

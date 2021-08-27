@@ -10,7 +10,7 @@
  */
 #ifndef _STRUS_WEBREQUEST_PAPUGA_CONTEXTREF_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_PAPUGA_CONTEXTREF_HPP_INCLUDED
-#include "papuga/requestHandler.h"
+#include "papuga/requestContext.h"
 #include "strus/reference.hpp"
 #include <iostream>
 

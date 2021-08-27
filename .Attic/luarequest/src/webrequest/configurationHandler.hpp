@@ -89,8 +89,7 @@ public:
 	ConfigurationHandler(
 			WebRequestLoggerInterface* logger_,
 			const std::string& configStoreDir_,
-			const std::string& serviceName_,
-			const char** contextTypeNames_);
+			const std::string& serviceName_);
 
 	virtual ~ConfigurationHandler(){}
 
@@ -155,7 +154,6 @@ private:
 	std::string m_serviceName;
 	char m_lastTimeStmp[16];
 	int m_configCounter;
-	std::set<std::string> m_contextTypeNames;	//< defined context types
 	typedef std::map<ContextNameDef,bool> ContextNameMap;
 	ContextNameMap m_contextNameMap;		//< map context definitions type name pairs to stored flag
 };

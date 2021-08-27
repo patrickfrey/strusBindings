@@ -41,7 +41,6 @@ set( source_files
 	impl/context.cpp
 	impl/statistics.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp
-	${CMAKE_CURRENT_BINARY_DIR}/bindingClasses.cpp
 )
 set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingObjects.cpp PROPERTIES GENERATED TRUE ) 
 set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/bindingClasses.cpp PROPERTIES GENERATED TRUE ) 

@@ -10,10 +10,9 @@
 #ifndef _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #define _STRUS_WEB_REQUEST_HANDLER_IMPL_HPP_INCLUDED
 #include "strus/webRequestHandlerInterface.hpp"
+#include "configurationHandler.hpp"
 #include "strus/base/thread.hpp"
 #include "papuga/requestContext.h"
-#include "papuga/schema.h"
-#include "papuga/luaRequestHandler.h"
 #include "transaction.hpp"
 #include "curlEventLoop.hpp"
 #include <cstddef>
@@ -41,9 +40,7 @@ public:
 			WebRequestEventLoopInterface* eventloop_,
 			WebRequestLoggerInterface* logger_,
 			const std::string& html_head_,
-			const std::string& config_dir_,
-			const std::string& script_dir_,
-			const std::string& schema_dir_,
+			const std::string& config_store_dir_,
 			const std::string& service_name_,
 			int port_,
 			bool beautifiedOutput_,
@@ -91,16 +88,23 @@ private:
 			WebRequestAnswer& answer);
 
 public:/*WebRequestContext*/
-	papuga_SchemaList const* schemaList() const noexcept		{return m_schemaList;}
-	papuga_SchemaMap* schemaMap() const noexcept			{return m_schemaMap;}
-	const std::vector<papuga_LuaRequestHandlerScript*>& scripts() const noexcept	{return m_scripts;}
-	const papuga_RequestContextPool* contextPool() const noexcept	{return m_contextPool;}
-	const char* html_head() const noexcept				{return m_html_head.c_str();}
-	int debug_maxdepth() const noexcept				{return m_debug_maxdepth;}
-	int maxIdleTime() const noexcept				{return m_maxIdleTime;}
-	bool beautifiedOutput() const noexcept				{return m_beautifiedOutput;}
-	const char* serviceName() const noexcept			{return m_serviceName.c_str();}
+	enum MethodParamType {ParamEnd=0,ParamPathString,ParamPathArray,ParamDocumentClass,ParamContent};
 
+	const papuga_RequestContextPool* contextPool()			{return m_contextPool;}
+	const char* html_head() const					{return m_html_head.c_str();}
+	int debug_maxdepth() const					{return m_debug_maxdepth;}
+	int maxIdleTime() const						{return m_maxIdleTime;}
+	bool beautifiedOutput() const					{return m_beautifiedOutput;}
+	const char* serviceName() const					{return m_serviceName.c_str();}
+
+	/// \brief Pass ownership of a context for a configuration object to the request handler and commit the configuration transaction
+	/// \param[in] configTransaction configuration transaction object
+	/// \param[in] context context transferred (with ownership, destroyed in case of failure)
+	/// \param[out] answer describes the error in case failure
+	bool transferConfigurationContext(
+			const ConfigurationTransaction& configTransaction,
+			papuga_RequestContext* context,
+			WebRequestAnswer& answer);
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
 	/// \param[in] contextName object name of context
@@ -120,28 +124,44 @@ public:/*WebRequestContext*/
 			const char* contextName,
 			WebRequestAnswer& answer);
 
+	std::string allocTemporaryContextName( const std::string& contextType, const char* prefix)
+	{
+		return m_configHandler.allocTemporaryContextName( contextType, prefix);
+	}
+
+	void releaseTemporaryContextName( const std::string& contextType, const std::string& contextName)
+	{
+		return m_configHandler.releaseTemporaryContextName( contextType, contextName);
+	}
+
 public:/*CurlEventLoopTicker*/
 	void tick();
+
+private:/*init*/
+	bool runConfigurationLoad( WebRequestContextInterface* ctx, const WebRequestContent& content, WebRequestAnswer& answer);
+	bool loadSubConfiguration( const ConfigurationDescription& configdescr, bool initload, WebRequestAnswer& answer);
+	bool loadMainConfiguration( const std::string& configstr, WebRequestAnswer& answer);
+	bool loadConfiguration( const std::string& configstr, WebRequestAnswer& answer);
+	/// \brief Try to evaluate if a request is to itself
+	/// \return the start of the path if yes, else return NULL
+	const char* pathToSelf( const char* address);
+	/// \brief Loopback request to itself
+	/// \brief Needed during configuration phase are executed directly because otherwise we get into a hen and egg problem as the service needed to answer the request is not yet up
+	bool loopbackConfigurationLoadDelegateRequest( WebRequestContextInterface* receiverContext, const char* receiverSchema, const char* method, const char* path, const std::string& content, WebRequestAnswer& answer);
 
 private:
 	strus::mutex m_mutex_context_transfer;		//< mutual exclusion of request context access
 	int m_debug_maxdepth;				//< maximum depth for debug structures
 	WebRequestLoggerInterface* m_logger;		//< request logger
 	papuga_RequestContextPool* m_contextPool;	//< request context pool
-	papuga_SchemaList* m_schemaList;		//< list of schemas
-	papuga_SchemaMap* m_schemaMap;			//< map of schemas
-	std::vector<papuga_LuaRequestHandlerScript*> m_scripts; //< list of scripts
+	ConfigurationHandler m_configHandler;		//< configuration handler
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
-	std::string m_config_dir;			//< directory where configuration is stored
-	std::string m_script_dir;			//< directory where scripts are stored
-	std::string m_schema_dir;			//< directory where schemas are stored
 	std::string m_serviceName;			//< identifier of the webserver
 	TransactionPool m_transactionPool;		//< transaction pool
 	std::string m_port;				//< port number of this request handler used to identify calls to self via loopback
 	int m_maxIdleTime;				//< maximum idle time transactions
 	bool m_beautifiedOutput;			//< true, if output should be beautyfied for more readability
 	WebRequestEventLoopInterface* m_eventLoop;	//< queue for requests to other servers and periodic timer event to handle timeout of transactions
-	papuga_Allocator m_allocator;			//< allocator used for schemas and scripts
 };
 
 }//namespace

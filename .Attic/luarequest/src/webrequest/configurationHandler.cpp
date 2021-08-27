@@ -48,8 +48,7 @@ static std::string getConfigFilenamePart( const std::string& filename, int pi)
 ConfigurationHandler::ConfigurationHandler(
 		WebRequestLoggerInterface* logger_,
 		const std::string& configStoreDir_,
-		const std::string& serviceName_,
-		const char** contextTypeNames_)
+		const std::string& serviceName_)
 	:m_mutex()
 	,m_logger(logger_)
 	,m_configStoreDir(configStoreDir_)
@@ -57,8 +56,6 @@ ConfigurationHandler::ConfigurationHandler(
 	,m_configCounter(0)
 {
 	m_lastTimeStmp[0] = 0;
-	char const** ci = contextTypeNames_;
-	for (; *ci; ++ci) m_contextTypeNames.insert( std::string(*ci));
 }
 
 std::string ConfigurationHandler::configurationStoreDirectory() const

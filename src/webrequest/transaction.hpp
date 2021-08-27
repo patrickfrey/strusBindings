@@ -10,7 +10,7 @@
  */
 #ifndef _STRUS_WEBREQUEST_TRANSACTION_HPP_INCLUDED
 #define _STRUS_WEBREQUEST_TRANSACTION_HPP_INCLUDED
-#include "papuga/requestHandler.h"
+#include "papuga/requestContext.h"
 #include "strus/base/shared_ptr.hpp"
 #include "strus/base/thread.hpp"
 #include "strus/base/atomic.hpp"

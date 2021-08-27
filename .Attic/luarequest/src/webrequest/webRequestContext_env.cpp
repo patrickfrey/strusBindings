@@ -13,11 +13,8 @@
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/errorCodes.hpp"
-#include "papugaLoggerFunctions.hpp"
-#include "schemas_base.hpp"
 #include "papuga/allocator.h"
 #include "papuga/errors.h"
-#include "papuga/requestAutomaton.hpp"
 #include "papuga/typedefs.h"
 #include "private/internationalization.hpp"
 #include <string>

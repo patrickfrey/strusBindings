@@ -99,7 +99,9 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 		WebRequestLoggerInterface* logger,
 		const std::string& html_head,
 		const std::string& config_store_dir,
-		const std::string& service_name_,
+		const std::string& script_dir,
+		const std::string& schema_dir,
+		const std::string& service_name,
 		int port,
 		bool beautifiedOutput,
 		int maxIdleTime,
@@ -109,7 +111,7 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 	try
 	{
 		if (!logger) logger = &g_logger_null;
-		return new WebRequestHandler( eventloop, logger, html_head, config_store_dir, service_name_, port, beautifiedOutput, maxIdleTime, nofTransactionsPerSeconds);
+		return new WebRequestHandler( eventloop, logger, html_head, config_store_dir, script_dir, schema_dir, service_name, port, beautifiedOutput, maxIdleTime, nofTransactionsPerSeconds);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -120,26 +122,6 @@ DLL_PUBLIC WebRequestHandlerInterface* strus::createWebRequestHandler(
 	{
 		errorhnd->report( ErrorCodeRuntimeError, _TXT("error creating web request handler: %s"), err.what());
 		return NULL;
-	}
-}
-
-DLL_PUBLIC bool strus::storeWebRequestSchemaDescriptions( const std::string& config, const std::string& dir, const std::string& doctype, ErrorBufferInterface* errorhnd)
-{
-	try
-	{
-		strus::local_ptr<WebRequestHandler> hnd( new WebRequestHandler( &g_eventlopp_null, &g_logger_null, ""/*html head*/, "./"/*config_store_dir*/, "./"/*service_name*/, 0/*port*/, true/*beautified*/, 30/*maxIdleTime*/, 1/*nofTransactionsPerSeconds*/));
-		hnd->storeSchemaDescriptions( dir, doctype);
-		return true;
-	}
-	catch (const std::bad_alloc&)
-	{
-		errorhnd->report( ErrorCodeOutOfMem, _TXT("out of memory"));
-		return false;
-	}
-	catch (const std::runtime_error& err)
-	{
-		errorhnd->report( ErrorCodeRuntimeError, _TXT("error creating web request handler: %s"), err.what());
-		return false;
 	}
 }
 

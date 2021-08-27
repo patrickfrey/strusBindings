@@ -236,7 +236,7 @@ static std::string variableValueDeclaration( const std::string& indent, const st
 static std::string methodParameterDeclaration( const std::string& clname, const std::string& mtname, const std::vector<strus::VariableValue>& parameters)
 {
 	std::ostringstream out;
-	
+
 	std::vector<strus::VariableValue>::const_iterator
 		pi = parameters.begin(), pe = parameters.end();
 	for (unsigned int pidx=0; pi != pe; ++pi,++pidx)
@@ -260,7 +260,7 @@ static std::string methodParameterDeclaration( const std::string& clname, const 
 static std::string constructorParameterDeclaration( const std::string& clname, const std::vector<strus::VariableValue>& parameters)
 {
 	std::ostringstream out;
-	
+
 	std::vector<strus::VariableValue>::const_iterator
 		pi = parameters.begin(), pe = parameters.end();
 	for (unsigned int pidx=0; pi != pe; ++pi,++pidx)
@@ -526,7 +526,7 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 			ke = ci->constructorDefs().end();
 		for (; ki != ke; ++ki)
 		{
-			out 
+			out
 			<< "void* " << constructorFunctionName( ci->name())
 			<< "( papuga_ErrorBuffer* errbuf, size_t argc, const papuga_ValueVariant* argv);" << std::endl;
 		}
@@ -536,7 +536,7 @@ static void print_BindingObjectsH( std::ostream& out, const strus::InterfacesDef
 			me = ci->methodDefs().end();
 		for (; mi != me; ++mi)
 		{
-			out 
+			out
 			<< "bool " << methodFunctionName( ci->name(), mi->name())
 			<< "( void* self, papuga_CallResult* retval, "
 			<< "size_t argc, const papuga_ValueVariant* argv);" << std::endl;
@@ -756,7 +756,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 			ke = ci->constructorDefs().end();
 		for (; ki != ke; ++ki)
 		{
-			out 
+			out
 			<< "extern \"C\" DLL_PUBLIC void* " << constructorFunctionName( ci->name())
 			<< "( papuga_ErrorBuffer* errbuf, size_t argc, const papuga_ValueVariant* argv)" << std::endl
 			<< "{" << std::endl;
@@ -819,88 +819,6 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 	}
 }
 
-static void print_BindingClassesH( std::ostream& out, const strus::InterfacesDef& interfaceDef)
-{
-	strus::printHFrameHeader( out, "bindingClasses", "Provides binding classes as structures");
-	out << "#include \"papuga/classdef.h\"" << std::endl;
-
-	out << "#ifdef __cplusplus" << std::endl;
-	out << "extern \"C\" {" << std::endl;
-	out << "#endif" << std::endl << std::endl;
-
-	out << "const papuga_ClassDef* strus_getBindingsClassDefs();" << std::endl << std::endl;
-
-	out << "#ifdef __cplusplus" << std::endl;
-	out << "}" << std::endl;
-	out << "#endif" << std::endl << std::endl;
-	strus::printHFrameTail( out);
-}
-
-static void print_BindingClassesCpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
-{
-	strus::printCppFrameHeader( out, "bindingClasses", "Provides binding classes as structures");
-	out << "#include \"strus/bindingClasses.h\"" << std::endl;
-	out << "#include \"strus/bindingObjects.h\"" << std::endl;
-	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out << "#include \"impl/strus.hpp\"" << std::endl;
-	out << "#include \"papuga.h\"" << std::endl;
-	out << std::endl
-		<< "using namespace strus;" << std::endl
-		<< "using namespace strus::bindings;" << std::endl
-		<< std::endl;
-	
-	std::vector<strus::ClassDef>::const_iterator
-		ci = interfaceDef.classDefs().begin(),
-		ce = interfaceDef.classDefs().end();
-
-	for (; ci != ce; ++ci)
-	{
-		out << "static const char* g_methodnames_" << ci->name() << "[" << (ci->methodDefs().size() + 1) << "] = {";
-		std::vector<strus::MethodDef>::const_iterator
-			mi = ci->methodDefs().begin(),
-			me = ci->methodDefs().end();
-		for (; mi != me; ++mi)
-		{
-			out << "\"" << mi->name() << "\",";
-		}
-		out << "NULL};" << std::endl;
-
-		out << "static papuga_ClassMethod g_methodtable_" << ci->name() << "[" << (ci->methodDefs().size() + 1) << "] = {";
-		mi = ci->methodDefs().begin();
-		for (; mi != me; ++mi)
-		{
-			out << "&" << methodFunctionName( ci->name(), mi->name()) << ",";
-		}
-		out << "NULL};" << std::endl;
-	}
-	out << std::endl;
-	out << "static const papuga_ClassDef g_classdefs[" << (interfaceDef.classDefs().size() + 1) << "] = {" << std::endl;
-	ci = interfaceDef.classDefs().begin();
-	for (; ci != ce; ++ci)
-	{
-		out << "\t" << "{\"" << ci->name() << "\", ";
-		if (ci->constructorDefs().empty())
-		{
-			out << "NULL,";
-		}
-		else
-		{
-			out << "&" << constructorFunctionName( ci->name()) << ", ";
-		}
-		out << "&" << destructorFunctionName( ci->name()) << ", "
-			<< "g_methodtable_" << ci->name() << ", "
-			<< "g_methodnames_" << ci->name() << ","
-			<< ci->methodDefs().size() << "}," << std::endl;
-	}
-	out << "\t" << "{NULL,NULL,NULL,NULL,NULL,0}" << std::endl;
-	out << "};" << std::endl;
-	out << "extern \"C\" DLL_PUBLIC const papuga_ClassDef* strus_getBindingsClassDefs()" << std::endl;
-	out << "{" << std::endl;
-	out << "\t" << "return g_classdefs;" << std::endl;
-	out << "}" << std::endl;
-	out << std::endl;
-}
-
 static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
 {
 	strus::printHppFrameHeader( out, "bindingClassTemplate", "Template to map interface to some properties");
@@ -937,43 +855,6 @@ static void print_BindingClassTemplatesHpp( std::ostream& out, const strus::Inte
 			<< "};" << std::endl << std::endl;
 	}
 	out << "}}//namespace" << std::endl;
-	strus::printHppFrameTail( out);
-}
-
-static void print_bindingMethodIdsHpp( std::ostream& out, const strus::InterfacesDef& interfaceDef)
-{
-	strus::printHppFrameHeader( out, "bindingMethodIds", "Provides identifiers for methods to address in request definitions");
-	out << "#include \"strus/bindingObjects.h\"" << std::endl;
-	out << "#include \"strus/base/dll_tags.hpp\"" << std::endl;
-	out << "#include \"papuga.h\"" << std::endl;
-	out << std::endl
-		<< "namespace strus {" << std::endl
-		<< "namespace bindings {" << std::endl
-		<< std::endl << std::endl;
-
-	out << "namespace method {" << std::endl << std::endl;
-
-	std::vector<strus::ClassDef>::const_iterator
-		ci = interfaceDef.classDefs().begin(),
-		ce = interfaceDef.classDefs().end();
-	for (int cidx=1; ci != ce; ++ci,++cidx)
-	{
-		out << "struct " << ci->name() << std::endl;
-		out << "{" << std::endl;
-		if (!ci->constructorDefs().empty())
-		{
-			out << "\t" << "static papuga_RequestMethodId constructor() {papuga_RequestMethodId rt = {" << cidx << "," << 0 << "}; return rt;}" << std::endl;
-		}
-		std::vector<strus::MethodDef>::const_iterator
-			mi = ci->methodDefs().begin(),
-			me = ci->methodDefs().end();
-		for (int midx=1; mi != me; ++mi,++midx)
-		{
-			out << "\t" << "static papuga_RequestMethodId " << mi->name() << "() {papuga_RequestMethodId rt = {" << cidx << "," << midx << "}; return rt;}" << std::endl;
-		}
-		out << "};" << std::endl;
-	}
-	out << "}}}//namespace" << std::endl << std::endl;
 	strus::printHppFrameTail( out);
 }
 
@@ -1067,10 +948,7 @@ int main( int argc, const char* argv[])
 		}
 		printOutput( outputdir + "/include/strus/bindingObjects.h", &print_BindingObjectsH, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingObjects.cpp", &print_BindingObjectsCpp, interfaceDef);
-		printOutput( outputdir + "/include/strus/bindingClasses.h", &print_BindingClassesH, interfaceDef);
-		printOutput( outputdir + "/src/bindings/bindingClasses.cpp", &print_BindingClassesCpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/bindingClassTemplate.hpp", &print_BindingClassTemplatesHpp, interfaceDef);
-		printOutput( outputdir + "/include/strus/bindingMethodIds.hpp", &print_bindingMethodIdsHpp, interfaceDef);
 		printOutput( outputdir + "/include/strus/lib/bindings_description.hpp", &print_BindingInterfaceDescriptionHpp, interfaceDef);
 		printOutput( outputdir + "/src/bindings/libstrus_bindings_description.cpp", &print_BindingInterfaceDescriptionCpp, interfaceDef);
 

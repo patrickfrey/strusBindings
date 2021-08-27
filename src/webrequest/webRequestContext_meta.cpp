@@ -11,20 +11,17 @@
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
-#include "schemas_base.hpp"
 #include "papuga/allocator.h"
 #include "papuga/errors.h"
-#include "papuga/request.h"
 #include "papuga/typedefs.h"
+#include "papuga/encoding.h"
+#include "papuga/constants.h"
+#include "papuga/schema.h"
+#include "papuga/luaRequestHandler.h"
 #include "private/internationalization.hpp"
 #include <string>
 
 using namespace strus;
-
-static inline bool isEqual( const char* name, const char* oth)
-{
-	return name[0] == oth[0] && 0==std::strcmp(name,oth);
-}
 
 bool WebRequestContext::executeListVariables()
 {
@@ -48,124 +45,68 @@ bool WebRequestContext::executeListVariables()
 	return true;
 }
 
-bool WebRequestContext::executeSchemaDescription()
+bool WebRequestContext::executeListSchemas()
 {
-	if (m_methodId == Method_GET)
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
 	{
-		SchemaId schemaId = getSchemaId_description();
-
-		if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-		{
-			m_logger->logRequestType( "schema", "GET", schemaId.contextType, schemaId.schemaName);
-		}
-		const papuga_SchemaDescription* descr = papuga_RequestHandler_get_description( m_handler->impl(), schemaId.contextType, schemaId.schemaName);
-		if (!descr)
-		{
-			setAnswer( ErrorCodeRequestResolveError);
-			return false;
-		}
-		else
-		{
-			papuga_ContentType schema_doctype = papuga_ContentType_Unknown;
-			switch (m_result_doctype)
-			{
-				case WebRequestContent::Unknown:
-				case WebRequestContent::HTML:
-				case WebRequestContent::TEXT:
-					setAnswer( ErrorCodeNotImplemented);
-					return false;
-				case WebRequestContent::JSON:
-					schema_doctype = papuga_ContentType_JSON;
-					break;
-				case WebRequestContent::XML:
-					schema_doctype = papuga_ContentType_XML;
-					break;
-			}
-			std::size_t txtlen;
-			const char* txt = (const char*)papuga_SchemaDescription_get_text( descr, &m_allocator, schema_doctype, m_result_encoding, &txtlen);
-			if (txt)
-			{
-				WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), txt, txtlen);
-				m_answer.setContent( answerContent);
-				return true;
-			}
-			else
-			{
-				papuga_ErrorCode errcode = papuga_SchemaDescription_last_error( descr);
-				setAnswer( papugaErrorToErrorCode( errcode));
-				return false;
-			}
-		}
+		m_logger->logRequestType( "schema", "GET", "schema", 0);
 	}
-	else
+	enum {MaxNofSchemas=128};
+	char const* buf[ MaxNofSchemas];
+	const char** schemaNames = papuga_SchemaList_get_names( m_handler->schemaList(), buf, MaxNofSchemas);
+	if (!schemaNames)
+	{
+		setAnswer( ErrorCodeBufferOverflow);
+		return false;
+	}
+	bool beautified = m_handler->beautifiedOutput();
+	if (!strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, schemaNames))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool WebRequestContext::executeSchemaDescription( const char* schemaName)
+{
+	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
+	{
+		m_logger->logRequestType( "schema", "GET", "schema", schemaName);
+	}
+	papuga_SchemaSource const* schema = papuga_SchemaList_get( m_handler->schemaList(), schemaName);
+	if (!schema)
 	{
 		setAnswer( ErrorCodeRequestResolveError);
 		return false;
+	}
+	else
+	{
+		WebRequestContent answerContent( papuga_stringEncodingName( m_result_encoding), WebRequestContent::typeMime(m_result_doctype), schema->source, std::strlen(schema->source));
+		m_answer.setContent( answerContent);
+		return true;
 	}
 }
 
 bool WebRequestContext::executeOPTIONS()
 {
-	enum {lstbufsize=256};
-	char const* lstbuf[ lstbufsize];
-
 	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
 	{
-		m_logger->logRequestType( "options", methodIdName(m_methodId), m_contextType, m_contextName);
+		m_logger->logRequestType( "options", "OPTIONS", m_contextType, m_contextName);
 	}
-	if (m_obj && m_obj->valuetype == papuga_TypeHostObject)
+	if (m_contextType)
 	{
-		std::string http_allow("OPTIONS,");
-		char const** sl = papuga_RequestHandler_list_schema_names( m_handler->impl(), m_contextType, lstbuf, lstbufsize);
-		if (!sl)
+		for (auto script : m_handler->scripts())
 		{
-			setAnswer( ErrorCodeBufferOverflow);
-			return false;
-		}
-		for (; *sl; ++sl) http_allow.append( *sl);
-		int classid = m_obj->value.hostObject->classid;
-		char const** ml = papuga_RequestHandler_list_methods( m_handler->impl(), classid, lstbuf, lstbufsize);
-		if (!ml)
-		{
-			setAnswer( ErrorCodeBufferOverflow);
-			return false;
-		}
-		for (; *ml; ++ml) http_allow.append( *ml);
-		const char* msgstr = papuga_Allocator_copy_string( &m_allocator, http_allow.c_str(), http_allow.size());
-		if (!msgstr)
-		{
-			setAnswer( ErrorCodeOutOfMem);
-			return false;
-		}
-		m_answer.setMessage( 200/*OK*/, "Allow", msgstr);
-		return true;
-	}
-	else if (m_contextName)
-	{
-		if (m_context.get())
-		{
-			std::string http_allow("OPTIONS,");
-			char const** sl = papuga_RequestHandler_list_schema_names( m_handler->impl(), m_contextType, lstbuf, lstbufsize);
-			if (!sl)
+			if (0==std::strcmp( papuga_LuaRequestHandlerScript_name( script), m_contextType))
 			{
-				setAnswer( ErrorCodeBufferOverflow);
-				return false;
+				std::string options("OPTIONS,");
+				options.append( papuga_LuaRequestHandlerScript_options( script));
+				m_answer.setMessage( 200/*OK*/, "Allow", options.c_str(), true);
+				return true;
 			}
-			for (; *sl; ++sl) http_allow.append( *sl);
-			const char* msgstr = papuga_Allocator_copy_string( &m_allocator, http_allow.c_str(), http_allow.size());
-			if (!msgstr)
-			{
-				setAnswer( ErrorCodeOutOfMem);
-				return false;
-			}
-			m_answer.setMessage( 200/*OK*/, "Allow", msgstr);
-			return true;
 		}
-		else
-		{
-			m_answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,PUT");
-			return true;
-		}
+		setAnswer( ErrorCodeRequestResolveError);
+		return false;
 	}
 	else
 	{
@@ -173,5 +114,3 @@ bool WebRequestContext::executeOPTIONS()
 		return true;
 	}
 }
-
-

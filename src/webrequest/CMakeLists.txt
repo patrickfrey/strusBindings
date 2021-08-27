@@ -8,22 +8,14 @@ endif( NOT STRUS_CXX_STD_11 )
 # SOURCES AND INCLUDES
 # --------------------------------------
 set( source_files
-	configurationHandler.cpp
-	configurationUpdateRequest.cpp
 	transaction.cpp
 	curlLogger.cpp
 	curlMessage.cpp
 	curlEventLoop.cpp
-	schemas_base.cpp
-	papugaLoggerFunctions.cpp
 	webRequestUtils.cpp
 	webRequestHandler.cpp
 	webRequestContext_result.cpp
-	webRequestContext_error.cpp
-	webRequestContext_schema.cpp
-	webRequestContext_env.cpp
 	webRequestContext_meta.cpp
-	webRequestContext_method.cpp
 	webRequestContext_obj.cpp
 	webRequestContext_config.cpp
 	webRequestContext.cpp

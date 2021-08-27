@@ -8,7 +8,7 @@
 #include "strus/base/unique_ptr.hpp"
 #include "strus/base/platform.hpp"
 #include "papuga/typedefs.h"
-#include "papuga/requestHandler.h"
+#include "papuga/requestContext.h"
 #include "papuga/valueVariant.h"
 #include "papuga/errors.h"
 #include <iostream>
@@ -40,7 +40,7 @@ static void runThread( int treadidx, int nofIterations, int randomSeed)
 		std::map<std::string,int> refmap;
 		std::vector<std::string> tidlist;
 		papuga_ErrorCode errcode = papuga_Ok;
-	
+
 		for (ii=0; ii<nofIterations; ++ii)
 		{
 			int idx = ii+1;
