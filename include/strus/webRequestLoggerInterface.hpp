@@ -95,22 +95,6 @@ public:
 	/// \remark expected to be thread safe
 	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize)=0;
 
-	/// \brief Log a method call
-	/// \param[in] classname name identifier of the class called
-	/// \param[in] methodname name identifier of the method called
-	/// \param[in] arguments serialized arguments of the method called
-	/// \param[in] result serialized result of the method called
-	/// \param[in] resultsize size of bytes of the result string
-	/// \param[in] resultvar name of the variable the result is assigned to
-	/// \remark expected to be thread safe
-	virtual void logMethodCall(
-			const char* classname,
-			const char* methodname,
-			const char* arguments,
-			const char* result,
-			std::size_t resultsize,
-			const char* resultvar)=0;
-
 	/// \brief Log a verbose event from the network client library (cURL)
 	/// \param[in] content content to log
 	/// \remark expected to be thread safe

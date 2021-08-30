@@ -77,7 +77,7 @@ public:
 		switch (m_loglevel)
 		{
 			case 4: m_logmask |= (LogContentEvents|LogConnectionEvents);
-			case 3: m_logmask |= (LogMethodCalls|LogAction);
+			case 3: m_logmask |= (LogAction);
 			case 2: m_logmask |= (LogRequests|LogDelegateRequests|LogConfiguration);
 			case 1: m_logmask |= (LogError|LogWarning|LogContextInfoMessages);
 			case 0: m_logmask |= (LogNothing); break;
@@ -234,61 +234,6 @@ public:
 		else
 		{
 			std::cerr << header() << strus::string_format( "delegate connection state %s", state) << std::endl;
-		}
-	}
-
-	virtual void logMethodCall(
-			const char* classname,
-			const char* methodname,
-			const char* arguments,
-			const char* result,
-			std::size_t resultsize,
-			const char* resultvar)
-	{
-		std::string assignment;
-		const char* resultStatement = result;
-		if (resultvar && resultvar[0])
-		{
-			std::string resultbuf;
-			if (result)
-			{
-				result = reduceContentSize( resultbuf, result, resultsize, MaxLogContentSize);
-			}
-			else
-			{
-				result = "NULL";
-			}
-			assignment = strus::string_format( "%s := %s", resultvar, result);
-			resultStatement = assignment.c_str();
-		}
-		if (!classname || !classname[0])
-		{
-			// Variable assignment
-			std::cerr << header() << strus::string_format( "ASSIGN %s", resultStatement) << std::endl;
-		}
-		else if (!methodname || !methodname[0])
-		{
-			// Constructor call
-			if (!resultStatement || !resultStatement[0])
-			{
-				std::cerr << header() << strus::string_format( "NEW %s (%s)", classname, arguments?arguments:"") << std::endl;
-			}
-			else
-			{
-				std::cerr << header() << strus::string_format( "NEW %s (%s) -> %s", classname, arguments?arguments:"", resultStatement) << std::endl;
-			}
-		}
-		else
-		{
-			// Method call
-			if (!resultStatement || !resultStatement[0])
-			{
-				std::cerr << header() << strus::string_format( "CALL %s::%s (%s)", classname, methodname, arguments?arguments:"") << std::endl;
-			}
-			else
-			{
-				std::cerr << header() << strus::string_format( "CALL %s::%s (%s) -> %s", classname, methodname, arguments?arguments:"", resultStatement) << std::endl;
-			}
 		}
 	}
 

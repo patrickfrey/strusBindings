@@ -13,11 +13,8 @@
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/lib/error.hpp"
-#include "papugaLoggerFunctions.hpp"
-#include "schemas_base.hpp"
 #include "papuga/allocator.h"
 #include "papuga/errors.h"
-#include "papuga/request.h"
 #include "papuga/typedefs.h"
 #include "private/internationalization.hpp"
 #include <string>
@@ -27,14 +24,6 @@ using namespace strus;
 static inline bool isEqual( const char* name, const char* oth)
 {
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
-}
-
-void WebRequestContext::initCallLogger()
-{
-	std::memset( &m_callLogger, 0, sizeof(m_callLogger));
-	m_callLogger.self = m_logger;
-	if (0!=(m_logMask & (int)WebRequestLoggerInterface::LogMethodCalls)) m_callLogger.logMethodCall = &papugaLogMethodCall;
-	if (0!=(m_logMask & (int)WebRequestLoggerInterface::LogContentEvents)) m_callLogger.logContentEvent = &papugaLogContentEvent;
 }
 
 void WebRequestContext::resetRequestObject()
@@ -63,27 +52,13 @@ bool WebRequestContext::initRootObject()
 	{
 		return false;
 	}
-	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->impl(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
+	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
 	{
 		papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
 		setAnswer( papugaErrorToErrorCode( errcode));
 		return false;
 	}
 	return true;
-}
-
-bool WebRequestContext::initSchemaDescriptionObject()
-{
-	if (!(m_contextType = m_path.getNext())) return true;
-	if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
-	{
-		m_contextName = ROOT_CONTEXT_NAME;
-		return false;
-	}
-	else
-	{
-		return !!(m_contextName = m_path.getNext());
-	}
 }
 
 bool WebRequestContext::initRequestObject()
@@ -138,7 +113,7 @@ bool WebRequestContext::initRequestObject()
 			setAnswer( ErrorCodeOutOfMem);
 			return false;
 		}
-		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->impl(), m_contextType, m_contextName))
+		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
 		{
 			errcode = papuga_RequestContext_last_error( m_context.get(), true);
 			resetRequestObject();
@@ -173,7 +148,7 @@ bool WebRequestContext::initRequestObject()
 						return false;
 					}
 					m_obj = papuga_RequestContext_get_variable( m_context.get(), varnam);
-					if (m_methodId != Method_GET)
+					if (0!=std::strcmp( m_requestMethod, "GET"))
 					{
 						setAnswer( ErrorCodeRequestResolveError);
 						return false;
@@ -186,35 +161,6 @@ bool WebRequestContext::initRequestObject()
 		return true;
 	}
 	return true;
-}
-
-bool WebRequestContext::inheritRequestContext( const char* contextType_, const char* contextName_)
-{
-	papuga_ErrorCode errcode = papuga_Ok;
-	if (!m_context.get())
-	{
-		errcode = papuga_ExecutionOrder;
-		goto ERROR;
-	}
-	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->impl(), contextType_, contextName_))
-	{
-		errcode = papuga_RequestContext_last_error( m_context.get(), true);
-		goto ERROR;
-	}
-	return true;
-ERROR:
-	if (errcode == papuga_AddressedItemNotFound)
-	{
-		ErrorCode apperrcode = papugaErrorToErrorCode( errcode);
-		m_answer.setError_fmt( errorCodeToHttpStatus( apperrcode), apperrcode, _TXT("undefined %s '%s'"), contextType_, contextName_);
-	}
-	else
-	{
-		ErrorCode apperrcode = papugaErrorToErrorCode( errcode);
-		const char* apperrstr = strus::errorCodeToString( apperrcode);
-		m_answer.setError_fmt( errorCodeToHttpStatus( apperrcode), apperrcode, _TXT("failed to inherit from %s '%s': %s"), contextType_, contextName_, apperrstr);
-	}
-	return false;
 }
 
 bool WebRequestContext::initContentRootElement( const WebRequestContent& content)
@@ -328,81 +274,6 @@ bool WebRequestContext::initContentType( const WebRequestContent& content)
 		if (!initContentRootElement( content)) return false;
 	}
 	return initResultContentType();
-}
-
-bool WebRequestContext::executePostTransaction()
-{
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-	{
-		m_logger->logRequestType( "transaction", "post", m_contextType, m_contextName);
-	}
-	if (m_obj->valuetype != papuga_TypeHostObject)
-	{
-		setAnswer( ErrorCodeLogicError);
-		return false;
-	}
-	int classid = m_obj->value.hostObject->classid;
-	void* self = m_obj->value.hostObject->data;
-
-	const char* method = "POST/transaction";
-	const char* resultname = "transaction";
-	const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, method, false);
-	if (!methoddescr)
-	{
-		setAnswer( ErrorCodeRequestResolveError);
-		return false;
-	}
-	if (!callHostObjMethodToVariable( self, methoddescr, m_context, resultname))
-	{
-		return false;
-	}
-	std::string transaction_typenam = strus::string_format( "transaction/%s", m_contextType);
-	std::string tid = m_transactionPool->createTransaction( transaction_typenam, m_context, m_handler->maxIdleTime());
-	if (tid.empty())
-	{
-		setAnswer( ErrorCodeOutOfMem);
-		return false;
-	}
-	m_answer.setHttpStatus( 201/*created*/);
-	return setAnswerLink( "transaction", tid, 3/*link level*/);
-}
-
-bool WebRequestContext::executeCommitTransaction()
-{
-	if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-	{
-		m_logger->logRequestType( "transaction", "commit", m_contextType, m_contextName);
-	}
-	if (m_obj && m_obj->valuetype == papuga_TypeHostObject)
-	{
-		int classid = m_obj->value.hostObject->classid;
-		void* self = m_obj->value.hostObject->data;
-
-		const papuga_RequestMethodDescription* methoddescr
-			= papuga_RequestHandler_get_method(
-				m_handler->impl(), classid, "PUT/transaction"/*method*/, false/*has content*/);
-		if (methoddescr)
-		{
-			WebRequestContent content;
-			if (!callHostObjMethodToAnswer( self, methoddescr, ""/*path*/, content))
-			{
-				m_transactionRef.reset();
-				return false;
-			}
-			m_transactionRef.reset();
-			return true;
-		}
-		else
-		{
-			setAnswer( ErrorCodeRequestResolveError);
-			return false;
-		}
-	}
-	else
-	{
-		setAnswer( ErrorCodeRequestResolveError);
-		return false;
-	}
 }
 
 

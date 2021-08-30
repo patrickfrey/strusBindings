@@ -22,6 +22,7 @@
 #include "strus/base/fileio.hpp"
 #include "strus/base/sleep.hpp"
 #include "papuga/requestContext.h"
+#include "papuga/luaRequestHandler.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
 #include "papuga/valueVariant.hpp"
@@ -245,12 +246,73 @@ static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, const char* 
 		return errorReturnValue;\
 	}
 
+static papuga_RequestAttributes g_configRequestAttributes = {
+	nullptr/*accepted_charset*/,
+	nullptr/*accepted_doctype*/,
+	nullptr/*html_base_href*/,
+	true/*beautifiedOutput*/,
+	true/*deterministicOutput*/};
+
 bool WebRequestHandler::init( 
 		const std::string& configsrc,
 		WebRequestAnswer& answer)
 {
 	try
 	{
+		for (auto script : m_scripts)
+		{
+			if (0==std::strcmp( papuga_LuaRequestHandlerScript_name( script), ROOT_CONTEXT_NAME))
+			{
+				papuga_ErrorCode errcode = papuga_Ok;
+				papuga_RequestContext* context = papuga_create_RequestContext();
+				papuga_LuaRequestHandler* reqhnd
+					= papuga_create_LuaRequestHandler(
+						script, m_schemaMap, m_contextPool, context,
+						nullptr/*transaction handler*/, &g_configRequestAttributes,
+						"PUT", ROOT_CONTEXT_NAME, "", configsrc.c_str(), configsrc.size(),
+						&errcode);
+				if (!reqhnd)
+				{
+					setAnswer( answer, papugaErrorToErrorCode( errcode));
+					papuga_destroy_RequestContext( context);
+					return false;
+				}
+				papuga_ErrorBuffer errbuf;
+				char errbufmem[ 2048];
+				papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
+				if (!papuga_run_LuaRequestHandler( reqhnd, &errbuf))
+				{
+					if (papuga_ErrorBuffer_hasError( &errbuf))
+					{
+						const char* msg = papuga_ErrorBuffer_lastError( &errbuf);
+						setAnswer( answer, ErrorCodeRuntimeError, msg, true);
+					}
+					else
+					{
+						setAnswer( answer, ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), true);
+					}
+					papuga_destroy_RequestContext( context);
+					papuga_destroy_LuaRequestHandler( reqhnd);
+					return false;
+				}
+				if (0<papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
+				{
+					setAnswer( answer, ErrorCodeRuntimeError, _TXT("no delegate requests allowed in configuration"), true);
+					papuga_destroy_RequestContext( context);
+					papuga_destroy_LuaRequestHandler( reqhnd);
+					return false;
+				}
+				if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
+				{
+					setAnswer( answer, papugaErrorToErrorCode( errcode));
+					papuga_destroy_RequestContext( context);
+					papuga_destroy_LuaRequestHandler( reqhnd);
+					return false;
+				}
+				papuga_destroy_LuaRequestHandler( reqhnd);
+				return true;
+			}
+		}
 		return true;
 	}
 	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, false);

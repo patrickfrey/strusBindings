@@ -40,13 +40,6 @@ public:
 	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize) {}
 	virtual void logAction( const char* type, const char* name, const char* action) {}
 	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize) {}
-	virtual void logMethodCall(
-			const char* classname,
-			const char* methodname,
-			const char* arguments,
-			const char* result,
-			std::size_t resultsize,
-			const char* resultvar){}
 	virtual void logConnectionEvent( const char* content){}
 	virtual void logConnectionState( const char* state, int arg){}
 

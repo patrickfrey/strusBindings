@@ -67,8 +67,6 @@ private:
 		UndefinedRequest,
 		SchemaDescriptionRequest,
 		MethodOptionsRequest,
-		LoadMainConfiguration,
-		LoadEmbeddedConfiguration,
 		ObjectRequest,
 		InterruptedLoadConfigurationRequest
 	};
@@ -92,7 +90,6 @@ private:
 public:/*WebRequestContext*/
 	static papuga_StringEncoding defaultEncoding() {return papuga_UTF8;}
 	static WebRequestContent::Type defaultDocType() {return WebRequestContent::HTML;}
-	static RequestType configRequestType( const char* contextType);
 
 private:
 	/// \brief Clone constructor
@@ -100,6 +97,7 @@ private:
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		TransactionPool* transactionPool_,
+		const char* method_,
 		const char* contextType_,
 		const char* contextName_,
 		const PapugaContextRef& context_,
@@ -116,20 +114,14 @@ private:
 	std::string fetchContextInfoMessages();
 
 	// Implemented in webRequestContext_obj:
-	/// \brief Initialize the request logger for papuga
-	void initCallLogger();
 	/// \brief Create an empty object
  	bool initEmptyObject();
 	/// \brief Create an object that inherits all from the root context (object loaded from main configuration)
 	bool initRootObject();
-	/// \brief Init object for schema description requests
-	bool initSchemaDescriptionObject();
 	/// \brief Init object for ordinary requests
 	bool initRequestObject();
 	/// \brief Reset object for requests
 	void resetRequestObject();
-	/// \brief Inherit all objects from a concept identified by type and name
-	bool inheritRequestContext( const char* contextType_, const char* contextName_);
 	/// \brief Inititialize request and result content types and character set encodings
 	bool initContentType( const WebRequestContent& content);
 		/// \brief Inititialize root element of the content
@@ -138,10 +130,6 @@ private:
 		/// \brief Inititialize result content type and character set encoding
 		/// \note Called by init content type
 		bool initResultContentType();
-	/// \brief Execute a request creating a transaction (POST)
-	bool executePostTransaction();
-	/// \brief Execute a request doing the commit (PUT) of a transaction
-	bool executeCommitTransaction();
 
 	// Implemented in webRequestContext_result:
 	/// \brief Transfer the current context to the handler as active object
@@ -161,28 +149,6 @@ private:
 	/// \brief OPTIONS request
 	bool executeOPTIONS();
 
-	// Implemented in webRequestContext_config:
-	/// \brief Load main configuration in the initialization phase of the service
-	/// \param[in] content web request content
-	bool loadMainConfiguration( const WebRequestContent& content);
-	/// \brief Load a configuration embedded in the configuration file loaded in the initialization phase of the service
-	bool loadEmbeddedConfiguration( const WebRequestContent& content);
-	/// \brief Helper of loadConfigurationRequest or updateConfigurationRequest, initiate the configuration request
-	/// \param[in] content web request content
-	/// \param[in] update, true if the configuration is written to file as update, e.g. overwriting initial version, keeping its file name, or is written as a new file
-	bool initConfigurationRequest( const WebRequestContent& content, bool update);
-	/// \brief Load configuration request for a not yet existing object
-	/// \param[in] content web request content
-	bool loadConfigurationRequest( const WebRequestContent& content);
-	/// \brief Update configuration request for an existing object
-	/// \param[in] content web request content
-	bool updateConfigurationRequest( const WebRequestContent& content);
-	/// \brief Retry of an update configuration request with exclusive access on data, rejected before with ErrorCodeServiceNeedExclusiveAccess due to the exclusive flag set in the automaton definition
-	/// \param[in] content web request content
-	bool updateConfigurationRequest_retry( const WebRequestContent& content);
-	/// \brief Delete configuration request
-	bool deleteConfigurationRequest();
-
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request
 	WebRequestLoggerInterface* m_logger;	//< logger for logging this request
@@ -191,6 +157,7 @@ private:
 	TransactionRef m_transactionRef;	//< transaction reference
 	papuga_Allocator m_allocator;		//< papuga allocator used for this request context
 	RequestType m_requestType;		//< classification of this request
+	char m_requestMethod[8];		//< request method
 	const char* m_contextType;		//< context type
 	const char* m_contextName;		//< context name
 	const char* m_rootElement;		//< root element of the request

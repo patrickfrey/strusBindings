@@ -25,7 +25,15 @@ static std::string parentPath( const std::string& url)
 	return rt;
 }
 
-static inline bool isEqual( const char* name, const char* oth)
+static void assignRequestMethod( char* destbuf, size_t destbufsize, char const* ri) noexcept
+{
+	size_t di = 0;
+	destbufsize -= 1;
+	for (; di != destbufsize && *ri; ++di) {destbuf[ di] = *ri++ & ~32;}
+	destbuf[ di] = 0;
+}
+
+static bool isEqual( const char* name, const char* oth)
 {
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
@@ -81,8 +89,8 @@ WebRequestContext::WebRequestContext(
 	,m_logMask(logger_->logMask())
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(UndefinedRequest)
-	,m_contextType(0),m_contextName(0),m_rootElement(0)
-	,m_context(),m_obj(0),m_path(path_)
+	,m_contextType(nullptr),m_contextName(nullptr),m_rootElement(nullptr)
+	,m_context(),m_obj(nullptr),m_path(path_)
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
 	,m_errbuf(),m_answer()
@@ -101,11 +109,11 @@ WebRequestContext::WebRequestContext(
 			m_html_base_href = parentPath( m_html_base_href);
 		}
 	}
-	initCallLogger();
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 
-	if (m_methodId == Method_OPTIONS)
+	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
+	if (0==std::strcmp( m_requestMethod, "OPTIONS"))
 	{
 		m_requestType = MethodOptionsRequest;
 	}
@@ -125,6 +133,7 @@ WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		TransactionPool* transactionPool_,
+		const char* method_,
 		const char* contextType_,
 		const char* contextName_,
 		const PapugaContextRef& context_,
@@ -132,18 +141,17 @@ WebRequestContext::WebRequestContext(
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logMask(logger_->logMask())
-	,m_configHandler(configHandler_),m_configTransaction()
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_requestType(requestType_)
 	,m_contextType(contextType_),m_contextName(contextName_),m_rootElement(0)
-	,m_context(context_),m_obj(0),m_request(0),m_methodId(Method_Undefined),m_path()
+	,m_context(context_),m_obj(0),m_path()
 	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
 	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
 	,m_errbuf(),m_answer()
 	,m_accepted_charset(""),m_accepted_doctype("")
 	,m_html_base_href("")
 {
-	initCallLogger();
+	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 }
@@ -152,37 +160,15 @@ WebRequestContext::~WebRequestContext()
 {
 	m_transactionRef.reset();
 	m_context.reset();
-	if (m_request) papuga_destroy_Request( m_request);
 	papuga_destroy_Allocator( &m_allocator);
-}
-
-
-static const char* g_methodNameAr[] = {NULL, "GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS", "HEAD", 0};
-
-const char* WebRequestContext::methodIdName( const MethodId& m)
-{
-	return g_methodNameAr[ m];
-}
-
-WebRequestContext::MethodId WebRequestContext::methodIdFromName( const char* methodname)
-{
-	int ai = 1;
-	for (; g_methodNameAr[ai] && 0!=std::strcmp( methodname, g_methodNameAr[ai]); ++ai){}
-	return g_methodNameAr[ai] ? (MethodId)(ai) : Method_Undefined;
 }
 
 WebRequestContext* WebRequestContext::createClone( const RequestType& requestType_) const
 {
 	return new WebRequestContext(
-			m_handler, m_logger, m_configHandler, m_transactionPool, m_contextType, m_contextName,
+			m_handler, m_logger, m_transactionPool,
+			m_requestMethod, m_contextType, m_contextName,
 			m_context, requestType_);
-}
-
-WebRequestContext::RequestType WebRequestContext::configRequestType( const char* contextType)
-{
-	return contextType == 0 || isEqual( contextType, ROOT_CONTEXT_NAME)
-		? WebRequestContext::LoadMainConfiguration
-		: WebRequestContext::LoadEmbeddedConfiguration;
 }
 
 bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
