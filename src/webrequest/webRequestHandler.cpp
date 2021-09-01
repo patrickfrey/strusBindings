@@ -247,8 +247,9 @@ static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, const char* 
 	}
 
 static papuga_RequestAttributes g_configRequestAttributes = {
-	nullptr/*accepted_charset*/,
-	nullptr/*accepted_doctype*/,
+	0xffFF/*accepted_encoding_set*/,
+	0xffFF/*accepted_doctype_set*/,
+	nullptr/*html_head*/,
 	nullptr/*html_base_href*/,
 	true/*beautifiedOutput*/,
 	true/*deterministicOutput*/};
@@ -319,8 +320,7 @@ bool WebRequestHandler::init(
 }
 
 WebRequestContextInterface* WebRequestHandler::createContext(
-		const char* accepted_charset,
-		const char* accepted_doctype,
+		const char* http_accept,
 		const char* html_base_href,
 		const char* method,
 		const char* path,
@@ -328,7 +328,7 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 {
 	try
 	{
-		return new WebRequestContext( this, m_logger, &m_transactionPool, accepted_charset, accepted_doctype, html_base_href, method, path);
+		return new WebRequestContext( this, m_logger, &m_transactionPool, http_accept, html_base_href, method, path);
 	}
 	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, NULL);
 }
@@ -347,8 +347,7 @@ bool WebRequestHandler::delegateRequest(
 }
 
 WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
-		const char* accepted_charset,
-		const char* accepted_doctype,
+		const char* http_accept,
 		const char* html_base_href,
 		const std::string& name,
 		const std::string& message)
@@ -356,16 +355,17 @@ WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
 	WebRequestAnswer rt;
 	try
 	{
-		papuga_StringEncoding result_encoding = strus::getResultStringEncoding( accepted_charset, WebRequestContext::defaultEncoding());
-		WebRequestContent::Type result_doctype = strus::getResultContentType( accepted_doctype, WebRequestContext::defaultDocType());
-		if (result_encoding == papuga_Binary)
+		papuga_RequestAttributes attributes;
+		papuga_init_RequestAttributes(
+			&attributes, http_accept, html_head(), html_base_href,
+			m_beautifiedOutput, false/*deterministicOutput*/);
+
+		papuga_StringEncoding result_encoding = papuga_UTF8;
+		papuga_ContentType result_doctype = papuga_http_default_doctype( &attributes);
+
+		if (result_doctype == papuga_ContentType_Unknown)
 		{
-			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented: %s"), accepted_charset);
-			return rt;
-		}
-		if (result_doctype == WebRequestContent::Unknown)
-		{
-			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), accepted_doctype);
+			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), http_accept);
 			return rt;
 		}
 		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, SYSTEM_MESSAGE_HEADER, name.c_str(), result_encoding, result_doctype, m_beautifiedOutput, message);

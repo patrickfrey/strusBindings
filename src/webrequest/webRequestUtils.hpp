@@ -40,7 +40,7 @@ std::string webRequestContent_tostring( const WebRequestContent& content, int ma
 // \brief Parse a content type from a string
 // \param[in] name content type as string
 // \return type id or WebRequestContent::Unknown
-WebRequestContent::Type webRequestContentFromTypeName( const char* name);
+papuga_ContentType webRequestContentFromTypeName( const char* name);
 
 // \brief Evaluate the string encoding from name or content
 // \param[in] name encoding as string
@@ -48,34 +48,6 @@ WebRequestContent::Type webRequestContentFromTypeName( const char* name);
 // \param[in] contentlen size of content in bytes
 // \return string encoding enum
 papuga_StringEncoding getStringEncoding( const char* encoding, const char* content, std::size_t contentlen);
-
-// \brief Get the best choice for the character encoding type of a request result
-// \param[in] http_accept_charset value of HTTP header "Accept-Charset"
-// \return chosen charset
-papuga_StringEncoding getResultStringEncoding( const char* http_accept_charset, papuga_StringEncoding inputenc);
-
-// \brief Get the best choice for the content type of a request result
-// \param[in] http_accept value of HTTP header "Accept"
-// \note does not handle '*' for any in the HTTP header "Accept" (e.g. "application/*" or "*/*" etc. not respected)
-// \return chosen content type
-WebRequestContent::Type getResultContentType( const char* http_accept, WebRequestContent::Type inputdoctype);
-
-// \brief Get the best choice for the content type of a request result
-// \param[in] http_accept value of HTTP header "Accept"
-// \note does not handle '*' for any in the HTTP header "Accept" (e.g. "application/*" or "*/*" etc. not respected)
-// \return chosen content type
-papuga_ContentType getPapugaResultContentType( const char* http_accept, papuga_ContentType inputdoctype);
-
-// \brief Get the papuga request content type from a web content type
-// \param[in] doctype web content type
-// \return the correspoding papuga request content type or papuga_ContentType_Unknown if mapping failed
-papuga_ContentType papugaContentType( WebRequestContent::Type doctype);
-
-// \brief Map a papuga request content type to its correspoding web content type
-// \param[in] type papuga request content type
-// \return the correspoding web content type
-WebRequestContent::Type papugaTranslatedContentType( papuga_ContentType doctype);
-
 
 // \brief Map a string as content to an answer
 // \param[out] answer initialized answer object
@@ -96,7 +68,7 @@ bool mapStringToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const std::string& input);
 
@@ -119,7 +91,7 @@ bool mapStringArrayToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const std::vector<std::string>& input);
 
@@ -142,7 +114,7 @@ bool mapStringArrayToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const char** input);
 
@@ -163,7 +135,7 @@ bool mapStringMapToAnswer(
 		const char* html_href_base,
 		const char* rootname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const std::map<std::string,std::string>& input);
 
@@ -186,7 +158,7 @@ bool mapValueVariantToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const papuga_ValueVariant& input);
 

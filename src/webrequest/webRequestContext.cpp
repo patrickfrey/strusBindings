@@ -79,8 +79,7 @@ WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
 		TransactionPool* transactionPool_,
-		const char* accepted_charset_,
-		const char* accepted_doctype_,
+		const char* http_accept_,
 		const char* html_base_href_,
 		const char* method_,
 		const char* path_)
@@ -88,44 +87,17 @@ WebRequestContext::WebRequestContext(
 	,m_logger(logger_)
 	,m_logMask(logger_->logMask())
 	,m_transactionPool(transactionPool_),m_transactionRef()
-	,m_requestType(UndefinedRequest)
-	,m_contextType(nullptr),m_contextName(nullptr),m_rootElement(nullptr)
-	,m_context(),m_obj(nullptr),m_path(path_)
-	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
-	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
+	,m_contextType(nullptr),m_contextName(nullptr)
+	,m_context(),m_path(path_)
 	,m_errbuf(),m_answer()
-	,m_accepted_charset(accepted_charset_),m_accepted_doctype(accepted_doctype_)
-	,m_html_base_href(html_base_href_)
 {
-	if (!m_html_base_href.empty())
-	{
-		if (m_html_base_href[m_html_base_href.size()-1] == '/' && m_html_base_href[ m_html_base_href.size()-2] == '*')
-		{
-			m_html_base_href.resize( m_html_base_href.size()-1);
-			m_html_base_href = parentPath( m_html_base_href) + "/";
-		}
-		else if (m_html_base_href[ m_html_base_href.size()-1] == '*')
-		{
-			m_html_base_href = parentPath( m_html_base_href);
-		}
-	}
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 
+	papuga_init_RequestAttributes(
+		&m_attributes, http_accept_, html_base_href_,
+		m_handler->beautifiedOutput(), false/*deterministicOutput*/);
 	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
-	if (0==std::strcmp( m_requestMethod, "OPTIONS"))
-	{
-		m_requestType = MethodOptionsRequest;
-	}
-	else if (m_path.startsWith( "schema", 6/*"schema"*/))
-	{
-		(void)m_path.getNext();//... skip "schema"
-		m_requestType = SchemaDescriptionRequest;
-	}
-	else
-	{
-		m_requestType = ObjectRequest;
-	}
 }
 
 /// \brief Clone constructor
@@ -136,24 +108,22 @@ WebRequestContext::WebRequestContext(
 		const char* method_,
 		const char* contextType_,
 		const char* contextName_,
-		const PapugaContextRef& context_,
-		const RequestType& requestType_)
+		const papuga_RequestAttributes& attributes_,
+		const PapugaContextRef& context_)
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logMask(logger_->logMask())
 	,m_transactionPool(transactionPool_),m_transactionRef()
-	,m_requestType(requestType_)
-	,m_contextType(contextType_),m_contextName(contextName_),m_rootElement(0)
-	,m_context(context_),m_obj(0),m_path()
-	,m_encoding(papuga_Binary),m_doctype(papuga_ContentType_Unknown),m_doctypestr(0)
-	,m_result_encoding(papuga_Binary),m_result_doctype(WebRequestContent::Unknown)
+	,m_contextType(contextType_),m_contextName(contextName_)
+	,m_context(context_),m_path()
 	,m_errbuf(),m_answer()
-	,m_accepted_charset(""),m_accepted_doctype("")
-	,m_html_base_href("")
 {
 	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
+	m_contextType = papuga_Allocator_copy_charp( &m_allocator, contextType_);
+	m_contextName = papuga_Allocator_copy_charp( &m_allocator, contextName_);
+	papuga_copy_RequestAttributes( &m_allocator, &m_attributes, &attributes_);
 }
 
 WebRequestContext::~WebRequestContext()
@@ -163,12 +133,12 @@ WebRequestContext::~WebRequestContext()
 	papuga_destroy_Allocator( &m_allocator);
 }
 
-WebRequestContext* WebRequestContext::createClone( const RequestType& requestType_) const
+WebRequestContext* WebRequestContext::createClone() const
 {
 	return new WebRequestContext(
 			m_handler, m_logger, m_transactionPool,
 			m_requestMethod, m_contextType, m_contextName,
-			m_context, requestType_);
+			m_attributes, m_context);
 }
 
 bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
@@ -363,44 +333,90 @@ bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
 bool WebRequestContext::execute(
 		const WebRequestContent& content)
 {
+	bool rt = true;
+	papuga_ErrorCode errcode = papuga_Ok;
+	enum {lstbufsize=256};
+	char const* lstbuf[ lstbufsize];
+
 	try
 	{
-		switch (m_requestType)
+		initRequestContext();
+		if (isEqual( m_requestMethod,"OPTIONS"))
 		{
-			case UndefinedRequest:
-				setAnswer( ErrorCodeIncompleteRequest);
-				return false;
-			case SchemaDescriptionRequest:
-				if (!initContentType( content)) return false;
-				if (!initSchemaDescriptionObject()) return false;
-				if (!content.empty())
+			if (!m_contextType)
+			{
+				m_answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,GET", true);
+				return true;
+			}
+			else if (0==std::strcmp( m_contextType, "schema"))
+			{
+				m_answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,GET", true);
+				return true;
+			}
+			else
+			{
+				if (m_contextName)
 				{
-					setAnswer( ErrorCodeInvalidArgument);
+					for (auto script : m_handler->scripts())
+					{
+						if (0==std::strcmp( papuga_LuaRequestHandlerScript_name( script), m_contextName))
+						{
+							std::string options("OPTIONS,");
+							options.append( papuga_LuaRequestHandlerScript_options( script));
+							m_answer.setMessage( 200/*OK*/, "Allow", options.c_str(), true);
+							return true;
+						}
+					}
+					setAnswer( ErrorCodeRequestResolveError);
 					return false;
 				}
-				return executeSchemaDescription();
-			case MethodOptionsRequest:
-				if (!initContentType( content)) return false;
-				if (!initRequestObject()) return false;
-				if (!content.empty())
+				else
 				{
-					setAnswer( ErrorCodeInvalidArgument);
-					return false;
+					m_answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,GET", true);
+					return true;
 				}
-				return executeOPTIONS();
-			case LoadMainConfiguration:
-				return loadMainConfiguration( content);
-			case LoadEmbeddedConfiguration:
-				return loadEmbeddedConfiguration( content);
-			case ObjectRequest:
-				if (!initContentType( content)) return false;
-				if (!initRequestObject()) return false;
-				return executeObjectRequest( content);
-			case InterruptedLoadConfigurationRequest:
-				return updateConfigurationRequest_retry( content);
+			}
 		}
-		setAnswer( ErrorCodeInvalidRequest);
-		return false;
+		else if (isEqual( m_requestMethod,"GET"))
+		{
+			if (0==std::strcmp( m_contextType, "schema"))
+			{
+				if (m_contextName)
+				{
+					papuga_Schema const* schema = papuga_SchemaMap_get( m_handler->schemaMap(), m_contextName);
+					if (schema)
+					{
+						return mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_href_base,
+									"schema"/*rootname*/, schema->name,
+									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
+									m_attributes.beautifiedOutput, schema->source);
+					}
+					else
+					{
+						setAnswer( ErrorCodeRequestResolveError);
+						return false;
+					}
+				}
+				else
+				{
+					char const** lst = papuga_SchemaList_get_names( m_handler->schemaList(), lstbuf, lstbufsize);
+					if (!lst)
+					{
+						setAnswer( ErrorCodeBufferOverflow);
+						return false;
+					}
+					return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_href_base,
+									"schema"/*rootname*/, "name"/*itemname*/, 
+									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
+									m_attributes.beautifiedOutput, lstbuf));
+				}
+			}
+			else
+			{
+				!!!! execute script
+			}
+		}
+		return rt;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
 }
@@ -480,31 +496,6 @@ bool WebRequestContext::complete()
 		bool rt = true;
 		if (m_answer.ok())
 		{
-			switch (m_requestType)
-			{
-				case UndefinedRequest:
-					setAnswer( ErrorCodeIncompleteRequest);
-					rt = false;
-					break;
-				case SchemaDescriptionRequest:
-					rt &= getContentRequestResult();
-					break;
-				case MethodOptionsRequest:
-					rt &= getContentRequestResult();
-					break;
-				case LoadMainConfiguration:
-				case LoadEmbeddedConfiguration:
-					rt &= transferContext();
-					break;
-				case ObjectRequest:
-				case InterruptedLoadConfigurationRequest:
-					rt &= getContentRequestResult();
-					if (rt && m_configTransaction.defined())
-					{
-						rt &= transferContext();
-					}
-					break;
-			}
 			if (rt && m_logger)
 			{
 				if ((m_logMask & WebRequestLoggerInterface::LogAction) != 0)

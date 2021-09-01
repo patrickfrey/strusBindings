@@ -58,7 +58,10 @@ bool WebRequestContext::setAnswerLink( const char* title, const std::string& lnk
 	{
 		std::string linkbase;
 		linkbase.reserve( 256);
-		int ec = strus::getAncestorPath( m_html_base_href, linklevel, linkbase);
+		std::size_t len = std::strlen( m_attributes.html_base_href);
+		while (len > 0 && (m_attributes.html_base_href[len-1] == '*' || m_attributes.html_base_href[len-1] == '/')) --len;
+		std::string path( m_attributes.html_base_href, len);
+		int ec = strus::getAncestorPath( path, linklevel, linkbase);
 		if (ec)
 		{
 			setAnswer( ErrorCodeInvalidFilePath, _TXT("failed to get link base"));

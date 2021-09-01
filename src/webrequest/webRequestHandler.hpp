@@ -56,8 +56,7 @@ public:
 			WebRequestAnswer& answer);
 
 	virtual WebRequestContextInterface* createContext(
-			const char* accepted_charset,
-			const char* accepted_doctype,
+			const char* http_accept,
 			const char* html_base_href,
 			const char* method,
 			const char* path,
@@ -70,8 +69,7 @@ public:
 			WebRequestDelegateContextInterface* context);
 
 	virtual WebRequestAnswer getSimpleRequestAnswer(
-			const char* accepted_charset,
-			const char* accepted_doctype,
+			const char* http_accept,
 			const char* html_base_href,
 			const std::string& name,
 			const std::string& message);

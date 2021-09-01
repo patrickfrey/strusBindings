@@ -13,6 +13,7 @@
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/base/string_format.hpp"
 #include "strus/lib/error.hpp"
+#include "papuga/schema.h"
 #include "papuga/allocator.h"
 #include "papuga/errors.h"
 #include "papuga/typedefs.h"
@@ -26,33 +27,22 @@ static inline bool isEqual( const char* name, const char* oth)
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
 
-void WebRequestContext::resetRequestObject()
+void WebRequestContext::resetContext()
 {
 	m_transactionRef.reset();
 	m_context.reset();
-	m_obj = 0;
 }
 
-bool WebRequestContext::initEmptyObject()
+bool WebRequestContext::initContext()
 {
 	m_transactionRef.reset();
 	m_context.create();
-	m_obj = 0;
 	if (!m_context.get())
 	{
 		setAnswer( ErrorCodeOutOfMem);
 		return false;
 	}
-	return true;
-}
-
-bool WebRequestContext::initRootObject()
-{
-	if (!initEmptyObject())
-	{
-		return false;
-	}
-	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
+	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
 	{
 		papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
 		setAnswer( papugaErrorToErrorCode( errcode));
@@ -61,13 +51,9 @@ bool WebRequestContext::initRootObject()
 	return true;
 }
 
-bool WebRequestContext::initRequestObject()
+bool WebRequestContext::initRequestContext()
 {
-	resetRequestObject();
-	papuga_ErrorCode errcode = papuga_Ok;
-	enum {lstbufsize=256};
-	char const* lstbuf[ lstbufsize];
-
+	resetContext();
 	if (m_path.startsWith( "transaction", 11/*"transaction"*/))
 	{
 		// Fetch transaction object from pool with exclusive ownership:
@@ -86,17 +72,14 @@ bool WebRequestContext::initRequestObject()
 		}
 		m_contextType = m_transactionRef->contextType();
 		m_context = m_transactionRef->context();
-		m_obj = papuga_RequestContext_get_variable( m_context.get(), "transaction");
-		if (!m_obj)
-		{
-			setAnswer( ErrorCodeRequestResolveError);
-			return false;
-		}
-		return true;
+	}
+	else if (m_path.startsWith( "schema", 6/*"schema"*/))
+	{
+		m_contextType = m_path.getNext();
+		m_contextName = m_path.getNext();
 	}
 	else
 	{
-		// Find addressed object and create clone of it:
 		if (!(m_contextType = m_path.getNext())) return true;
 		if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
 		{
@@ -107,173 +90,8 @@ bool WebRequestContext::initRequestObject()
 			m_contextName = m_path.getNext();
 			if (!m_contextName) return true;
 		}
-		m_context.create();
-		if (!m_context.get())
-		{
-			setAnswer( ErrorCodeOutOfMem);
-			return false;
-		}
-		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
-		{
-			errcode = papuga_RequestContext_last_error( m_context.get(), true);
-			resetRequestObject();
-			if (errcode == papuga_AddressedItemNotFound)
-			{
-				return true;
-			}
-			else
-			{
-				setAnswer( papugaErrorToErrorCode( errcode));
-				return false;
-			}
-		}
-		char const** varlist = papuga_RequestContext_list_variables( m_context.get(), 1/*max inheritcnt*/, lstbuf, lstbufsize);
-		if (!varlist)
-		{
-			setAnswer( ErrorCodeBufferOverflow);
-			return false;
-		}
-		if (m_path.hasMore() && !m_path.startsWith( m_contextType, std::strlen(m_contextType)))
-		{
-			char const** vi = varlist;
-			for (; *vi; ++vi)
-			{
-				if (m_path.startsWith( *vi, std::strlen(*vi)))
-				{
-					const char* varnam = m_path.getNext();
-					if (!varnam)
-					{
-						resetRequestObject();
-						setAnswer( papugaErrorToErrorCode( papuga_LogicError));
-						return false;
-					}
-					m_obj = papuga_RequestContext_get_variable( m_context.get(), varnam);
-					if (0!=std::strcmp( m_requestMethod, "GET"))
-					{
-						setAnswer( ErrorCodeRequestResolveError);
-						return false;
-					}
-					return true;
-				}
-			}
-		}
-		m_obj = papuga_RequestContext_get_variable( m_context.get(), m_contextType);
-		return true;
+		initContext();
 	}
 	return true;
 }
-
-bool WebRequestContext::initContentRootElement( const WebRequestContent& content)
-{
-	// Extract the root element of the content
-	char rootbuf[ 128];
-	switch (m_doctype)
-	{
-		case papuga_ContentType_Unknown:
-			break;
-		case papuga_ContentType_XML:
-			m_rootElement = papuga_parseRootElement_xml( rootbuf, sizeof(rootbuf), content.str(), content.len());
-			break;
-		case papuga_ContentType_JSON:
-			m_rootElement = papuga_parseRootElement_json( rootbuf, sizeof(rootbuf), content.str(), content.len());
-			break;
-	}
-	if (!m_rootElement)
-	{
-		m_logger->logError( _TXT("failed to extract root element of request"));
-		setAnswer( ErrorCodeInvalidRequest);
-		return false;
-	}
-	m_rootElement = papuga_Allocator_copy_charp( &m_allocator, m_rootElement);
-	if (!m_rootElement)
-	{
-		m_logger->logError( strus::errorCodeToString( ErrorCodeOutOfMem));
-		setAnswer( ErrorCodeOutOfMem);
-		return false;
-	}
-	return true;
-}
-
-bool WebRequestContext::initResultContentType()
-{
-	// Set the result content encoding:
-	if (m_encoding == papuga_Binary)
-	{
-		m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, defaultEncoding());
-	}
-	else
-	{
-		m_result_encoding = strus::getResultStringEncoding( m_accepted_charset, m_encoding);
-	}
-	if (m_result_encoding == papuga_Binary)
-	{
-		int httpstatus = errorCodeToHttpStatus( ErrorCodeNotImplemented);
-		m_answer.setError_fmt( httpstatus, ErrorCodeNotImplemented, _TXT("none of the accept charsets implemented: %s"), m_accepted_charset);
-		return false;
-	}
-	// Set the result document type:
-	if (m_doctype == papuga_ContentType_Unknown)
-	{
-		m_result_doctype = strus::getResultContentType( m_accepted_doctype, defaultDocType());
-	}
-	else
-	{
-		m_result_doctype = strus::getResultContentType( m_accepted_doctype, papugaTranslatedContentType(m_doctype));
-	}
-	if (m_result_doctype == WebRequestContent::Unknown)
-	{
-		int httpstatus = errorCodeToHttpStatus( ErrorCodeNotImplemented);
-		m_answer.setError_fmt( httpstatus, ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), m_accepted_doctype);
-		return false;
-	}
-	return true;
-}
-
-bool WebRequestContext::initContentType( const WebRequestContent& content)
-{
-	// Set the request character set encoding if some content is provided in the request:
-	if (!content.empty())
-	{
-		if (!content.charset() || content.charset()[0] == '\0')
-		{
-			setAnswer( ErrorCodeNotImplemented, _TXT("charset field in content type is empty. HTTP 1.1 standard character set ISO-8859-1 not implemented"));
-			/// ... according to https://www.w3.org/International/articles/http-charset/index we should use "ISO-8859-1" if not defined, currently not available
-			return false;
-		}
-		m_encoding = strus::getStringEncoding( content.charset(), content.str(), content.len());
-		if (m_encoding == papuga_Binary)
-		{
-			setAnswer( ErrorCodeNotImplemented);
-			return false;
-		}
-		// Set the request content type:
-		m_doctype = content.doctype() ? papuga_contentTypeFromName( content.doctype()) : papuga_guess_ContentType( content.str(), content.len());
-		if (m_doctype == papuga_ContentType_Unknown)
-		{
-			setAnswer( ErrorCodeInputFormat);
-			return false;
-		}
-		m_doctypestr = content.doctype();
-
-		if (0!=(m_logMask & WebRequestLoggerInterface::LogRequests))
-		{
-			int reqstrlen;
-			papuga_ErrorCode errcode;
-			const char* reqstr = papuga_request_content_tostring( &m_allocator, m_doctype, m_encoding, content.str(), content.len(), 0/*scope startpos*/, m_logger->structDepth(), &reqstrlen, &errcode);
-			if (!reqstr)
-			{
-				m_logger->logError( papuga_ErrorCode_tostring( errcode));
-				setAnswer( papugaErrorToErrorCode( errcode));
-				return false;
-			}
-			else
-			{
-				m_logger->logRequest( reqstr, reqstrlen);
-			}
-		}
-		if (!initContentRootElement( content)) return false;
-	}
-	return initResultContentType();
-}
-
 

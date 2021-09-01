@@ -159,44 +159,10 @@ std::string strus::webRequestContent_tostring( const WebRequestContent& content,
 	return rt;
 }
 
-struct AcceptElem
-{
-	float weight;
-	const char* type;
-
-	bool operator < (const AcceptElem& o) const
-	{
-		if (weight > o.weight) return true;
-		if (weight < o.weight) return false;
-		return (type < o.type);			//... make sort stable
-	}
-};
-
-static AcceptElem* nextElem( AcceptElem* elembuf, std::size_t elembufsize, std::size_t& elembufpos, const char* start)
-{
-	if (elembufpos+1 >= elembufsize) throw std::bad_alloc();
-	AcceptElem* elem = elembuf + elembufpos++;
-
-	elem->type = start;
-	elem->weight = 1.0;
-	return elem;
-}
-
 static void push_char( char* strbuf, std::size_t strbufsize, std::size_t& strbufpos, char ch)
 {
 	if (strbufpos+1 >= strbufsize) throw std::bad_alloc();
 	strbuf[ strbufpos++] = ch;
-}
-
-static void push_prefix( char* strbuf, std::size_t strbufsize, std::size_t& strbufpos, const char* prefix)
-{
-	char const* di = prefix;
-	for (; *di && *di != '/'; ++di)
-	{
-		push_char( strbuf, strbufsize, strbufpos, *di);
-	}
-	if (*di != '/') throw std::runtime_error( "syntax");
-	push_char( strbuf, strbufsize, strbufpos, *di);
 }
 
 char const* skipSpaces( char const* ai)
@@ -225,129 +191,6 @@ static bool parseIdent( char const*& src, char* strbuf, std::size_t strbufsize)
 	}
 }
 
-static bool parseToken( char const*& src, char* strbuf, std::size_t strbufsize)
-{
-	std::size_t strbufpos = 0;
-	char const* ai = skipSpaces( src);
-	for (;((*ai|32) >= 'a' && (*ai|32) <= 'z') || (*ai >= '0' && *ai <= '9') || (*ai == '.' || *ai == '_' || *ai == '-'); ++ai)
-	{
-		push_char( strbuf, strbufsize, strbufpos, *ai);
-	}
-	if (strbufpos)
-	{
-		src = skipSpaces( ai);
-		push_char( strbuf, strbufsize, strbufpos, 0);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-static bool parseAssigment( char const*& src, char* keybuf, std::size_t keybufsize, char* valbuf, std::size_t valbufsize)
-{
-	char const* ai = src;
-	if (parseIdent( ai, keybuf, keybufsize) && *ai == '=')
-	{
-		++ai;
-		if (parseToken( ai, valbuf, valbufsize))
-		{
-			src = ai;
-			return true;
-		}
-	}
-	return false;
-}
-
-static const AcceptElem* parseAccept( const char* acceptsrc, char* strbuf, std::size_t strbufsize, AcceptElem* elembuf, std::size_t elembufsize, bool upcase)
-{
-	std::size_t strbufpos = 0;
-	std::size_t elembufpos = 0;
-	char const* ai = acceptsrc;
-	const char* prefix = 0;
-	try
-	{
-		while (*ai)
-		{
-			std::size_t eidx = elembufpos;
-			for (;;)
-			{
-				ai = skipSpaces( ai);
-				AcceptElem* elem = nextElem( elembuf, elembufsize, elembufpos, strbuf + strbufpos);
-				if (prefix)
-				{
-					push_prefix( strbuf, strbufsize, strbufpos, prefix);
-				}
-				for (; *ai && *ai != ',' && *ai != ';' && *ai != '+'; ++ai)
-				{
-					push_char( strbuf, strbufsize, strbufpos, upcase ? toupper(*ai) : tolower(*ai));
-				}
-				push_char( strbuf, strbufsize, strbufpos, 0);
-
-				if (*ai == '+')
-				{
-					++ai;
-					prefix = elem->type;
-					continue;
-				}
-				else
-				{
-					prefix = 0;
-				}
-				if (*ai == ',')
-				{
-					++ai;
-				}
-				else
-				{
-					break;
-				}
-			}
-			if (*ai == ';')
-			{
-				++ai;
-				char keybuf[ 32];
-				char valbuf[ 64];
-				while (parseAssigment( ai, keybuf, sizeof(keybuf), valbuf, sizeof(valbuf)))
-				{
-					if (isEqual( keybuf, "q"))
-					{
-						NumParseError numerr = strus::NumParseOk;
-						double weight = strus::doubleFromString( valbuf, std::strlen(valbuf), numerr);
-						if (numerr != strus::NumParseOk) throw std::runtime_error("conversion");
-						for (; eidx < elembufpos; ++eidx)
-						{
-							elembuf[ eidx].weight = weight;
-						}
-					}
-					if (*ai == ';') ++ai;
-				}
-			}
-			if (*ai == ',') ++ai;
-		}
-	}
-	catch (...)
-	{
-		return NULL;
-	}
-	if (elembufpos >= elembufsize) return NULL;
-	std::sort( elembuf, elembuf+elembufpos);
-	elembuf[ elembufpos].weight = 0.0;
-	elembuf[ elembufpos].type = NULL;
-	return elembuf;
-}
-
-static bool findAccept( const AcceptElem* http_accept_list, const char* suggestion)
-{
-	AcceptElem const* ai = http_accept_list;
-	for (; ai->type; ++ai)
-	{
-		if (isEqual( suggestion, ai->type)) return true;
-	}
-	return false;
-}
-
 papuga_StringEncoding strus::getStringEncoding( const char* encoding, const char* content, std::size_t contentlen)
 {
 	papuga_StringEncoding rt;
@@ -365,91 +208,13 @@ papuga_StringEncoding strus::getStringEncoding( const char* encoding, const char
 	}
 }
 
-papuga_StringEncoding strus::getResultStringEncoding( const char* accepted_charset, papuga_StringEncoding inputenc)
-{
-	char strbuf[ 8092];
-	AcceptElem elembuf[ 512];
-
-	// Parse http accept-charset list:
-	if (!accepted_charset || !accepted_charset[0]) return inputenc;
-	const AcceptElem* accepted_charset_list = parseAccept( accepted_charset, strbuf, sizeof(strbuf), elembuf, sizeof(elembuf)/sizeof(*elembuf), true);
-	if (!accepted_charset_list) return papuga_Binary;
-
-	// Prioritise the charset specified as argument:
-	if (inputenc == papuga_UTF16BE && findAccept( accepted_charset_list, papuga_stringEncodingName( papuga_UTF16))) return papuga_UTF16BE;
-	if (inputenc == papuga_UTF32BE && findAccept( accepted_charset_list, papuga_stringEncodingName( papuga_UTF32))) return papuga_UTF32BE;
-	if (inputenc != papuga_Binary && findAccept( accepted_charset_list, papuga_stringEncodingName( inputenc)))
-	{
-		if (inputenc == papuga_UTF16) return papuga_UTF16BE;
-		if (inputenc == papuga_UTF32) return papuga_UTF32BE;
-		return inputenc;
-	}
-	// Find the charset supported with the highest priority in the accepted list:
-	AcceptElem const* ai = accepted_charset_list;
-	for (; ai->type; ++ai)
-	{
-		papuga_StringEncoding encoding;
-		if (papuga_getStringEncodingFromName( &encoding, ai->type))
-		{
-			if (encoding == papuga_UTF16) return papuga_UTF16BE;
-			if (encoding == papuga_UTF32) return papuga_UTF32BE;
-			return encoding;
-		}
-	}
-	return papuga_Binary;
-}
-
-WebRequestContent::Type strus::getResultContentType( const char* http_accept, WebRequestContent::Type inputdoctype)
-{
-	char strbuf[ 8092];
-	AcceptElem elembuf[ 512];
-
-	// Parse http accept list:
-	if (!http_accept || !http_accept[0]) return inputdoctype;
-	const AcceptElem* accepted_doctype_list = parseAccept( http_accept, strbuf, sizeof(strbuf), elembuf, sizeof(elembuf)/sizeof(*elembuf), false);
-	if (!accepted_doctype_list) return WebRequestContent::Unknown;
-
-	// Prioritise the content type specified as argument:
-	if (inputdoctype != WebRequestContent::Unknown && findAccept( accepted_doctype_list, WebRequestContent::typeMime( inputdoctype))) return inputdoctype;
-	// Find the content type supported with the highest priority in the accepted list:
-	AcceptElem const* ai = accepted_doctype_list;
-	for (; ai->type; ++ai)
-	{
-		WebRequestContent::Type doctype = strus::webRequestContentFromTypeName( ai->type);
-		if (doctype != WebRequestContent::Unknown) return doctype;
-	}
-	return WebRequestContent::Unknown;
-}
-
-papuga_ContentType strus::getPapugaResultContentType( const char* http_accept, papuga_ContentType inputdoctype)
-{
-	char strbuf[ 8092];
-	AcceptElem elembuf[ 512];
-
-	// Parse http accept list:
-	if (!http_accept || !http_accept[0]) return inputdoctype;
-	const AcceptElem* accepted_doctype_list = parseAccept( http_accept, strbuf, sizeof(strbuf), elembuf, sizeof(elembuf)/sizeof(*elembuf), false);
-	if (!accepted_doctype_list) return papuga_ContentType_Unknown;
-
-	// Prioritise the content type specified as argument:
-	if (inputdoctype != papuga_ContentType_Unknown && findAccept( accepted_doctype_list, papuga_ContentType_mime( inputdoctype))) return inputdoctype;
-	// Find the content type supported with the highest priority in the accepted list:
-	AcceptElem const* ai = accepted_doctype_list;
-	for (; ai->type; ++ai)
-	{
-		papuga_ContentType doctype = papuga_contentTypeFromName( ai->type);
-		if (doctype != papuga_ContentType_Unknown) return doctype;
-	}
-	return papuga_ContentType_Unknown;
-}
-
-WebRequestContent::Type strus::webRequestContentFromTypeName( const char* name)
+papuga_ContentType strus::webRequestContentFromTypeName( const char* name)
 {
 	char namebuf[ 128];
 	char const* si = name;
 	if (!parseIdent( si, namebuf, sizeof(namebuf)))
 	{
-		return WebRequestContent::Unknown;
+		return papuga_ContentType_Unknown;
 	}
 	else if (*si == '/')
 	{
@@ -460,11 +225,11 @@ WebRequestContent::Type strus::webRequestContentFromTypeName( const char* name)
 			{
 				if (isEqual( namebuf, "xml"))
 				{
-					return WebRequestContent::XML;
+					return papuga_ContentType_XML;
 				}
 				else if (isEqual( namebuf, "json"))
 				{
-					return WebRequestContent::JSON;
+					return papuga_ContentType_JSON;
 				}
 			}
 		}
@@ -474,53 +239,32 @@ WebRequestContent::Type strus::webRequestContentFromTypeName( const char* name)
 			{
 				if (isEqual( namebuf, "html"))
 				{
-					return WebRequestContent::HTML;
+					return papuga_ContentType_HTML;
 				}
 				else if (isEqual( namebuf, "plain"))
 				{
-					return WebRequestContent::TEXT;
+					return papuga_ContentType_TEXT;
 				}
 			}
 		}
 	}
 	else if (isEqual( namebuf, "xml"))
 	{
-		return WebRequestContent::XML;
+		return papuga_ContentType_XML;
 	}
 	else if (isEqual( namebuf, "json"))
 	{
-		return WebRequestContent::JSON;
+		return papuga_ContentType_JSON;
 	}
 	else if (isEqual( namebuf, "html"))
 	{
-		return WebRequestContent::HTML;
+		return papuga_ContentType_HTML;
 	}
 	else if (isEqual( namebuf, "text"))
 	{
-		return WebRequestContent::TEXT;
+		return papuga_ContentType_TEXT;
 	}
-	return WebRequestContent::Unknown;
-}
-
-papuga_ContentType strus::papugaContentType( WebRequestContent::Type doctype)
-{
-	static papuga_ContentType ar[] = {
-		papuga_ContentType_Unknown/*Unknown*/,
-		papuga_ContentType_XML/*XML*/,
-		papuga_ContentType_JSON/*JSON*/,
-		papuga_ContentType_Unknown/*HTML*/,
-		papuga_ContentType_Unknown/*TEXT*/};
-	return ar[doctype];
-}
-
-WebRequestContent::Type strus::papugaTranslatedContentType( papuga_ContentType doctype)
-{
-	static WebRequestContent::Type ar[] = {
-		WebRequestContent::Unknown,
-		WebRequestContent::XML,
-		WebRequestContent::JSON
-	};
-	return ar[doctype];
+	return papuga_ContentType_Unknown;
 }
 
 namespace {
@@ -592,7 +336,7 @@ static bool mapResult(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const ResultType& input)
 {
@@ -639,7 +383,7 @@ bool strus::mapStringToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const std::string& input)
 {
@@ -656,7 +400,7 @@ bool strus::mapStringArrayToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const std::vector<std::string>& input)
 {
@@ -670,7 +414,7 @@ bool strus::mapStringMapToAnswer(
 		const char* html_href_base,
 		const char* rootname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const std::map<std::string,std::string>& input)
 {
@@ -685,7 +429,7 @@ bool strus::mapStringArrayToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const char** input)
 {
@@ -700,7 +444,7 @@ bool strus::mapValueVariantToAnswer(
 		const char* rootname,
 		const char* elemname,
 		papuga_StringEncoding encoding,
-		WebRequestContent::Type doctype,
+		papuga_ContentType doctype,
 		bool beautified,
 		const papuga_ValueVariant& value)
 {
@@ -711,11 +455,11 @@ bool strus::mapValueVariantToAnswer(
 	// Map the result:
 	switch (doctype)
 	{
-		case WebRequestContent::XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
-		case WebRequestContent::JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
-		case WebRequestContent::HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, beautified, rootname, elemname, html_head, html_href_base, &resultlen, &errcode); break;
-		case WebRequestContent::TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
-		case WebRequestContent::Unknown:
+		case papuga_ContentType_XML:  resultstr = (char*)papuga_ValueVariant_toxml( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
+		case papuga_ContentType_JSON: resultstr = (char*)papuga_ValueVariant_tojson( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
+		case papuga_ContentType_HTML: resultstr = (char*)papuga_ValueVariant_tohtml5( &value, allocator, structdefs, encoding, beautified, rootname, elemname, html_head, html_href_base, &resultlen, &errcode); break;
+		case papuga_ContentType_TEXT: resultstr = (char*)papuga_ValueVariant_totext( &value, allocator, structdefs, encoding, beautified, rootname, elemname, &resultlen, &errcode); break;
+		case papuga_ContentType_Unknown:
 		{
 			setAnswer( answer, ErrorCodeNotImplemented, _TXT("output content type unknown"));
 			return false;
@@ -725,7 +469,7 @@ bool strus::mapValueVariantToAnswer(
 	if (resultstr)
 	{
 		if (!allocator) answer.defineMemBlock( resultstr);
-		WebRequestContent content( papuga_stringEncodingName( encoding), WebRequestContent::typeMime(doctype), resultstr, resultlen);
+		WebRequestContent content( papuga_stringEncodingName( encoding), papuga_ContentType_mime(doctype), resultstr, resultlen);
 		answer.setContent( content);
 		return true;
 	}
