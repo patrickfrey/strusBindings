@@ -15,7 +15,6 @@ set( source_files
 	webRequestUtils.cpp
 	webRequestHandler.cpp
 	webRequestContext_result.cpp
-	webRequestContext_meta.cpp
 	webRequestContext_obj.cpp
 	webRequestContext.cpp
 )

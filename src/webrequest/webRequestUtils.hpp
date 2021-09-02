@@ -116,7 +116,7 @@ bool mapStringArrayToAnswer(
 		papuga_StringEncoding encoding,
 		papuga_ContentType doctype,
 		bool beautified,
-		const char** input);
+		char const* const* input);
 
 // \brief Map a string to string map as content to an answer
 // \param[out] answer initialized answer object

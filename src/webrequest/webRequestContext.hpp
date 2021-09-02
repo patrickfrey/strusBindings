@@ -82,12 +82,6 @@ private:
 	WebRequestContext* createClone() const;
 
 private:
-	// Implemented in webRequestContext:
-	/// \brief Execute a request of type ObjectRequest
-	bool executeObjectRequest( const WebRequestContent& content);
-	/// \brief Fetch all info/debug trace messages from current context
-	std::string fetchContextInfoMessages();
-
 	// Implemented in webRequestContext_obj:
 	/// \brief Initialize the context of the request from the specified context type/name pair
 	bool initContext();
@@ -101,8 +95,6 @@ private:
 	bool transferContext();
 	/// \brief Define the current request to have failed
 	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
-	/// \brief Define the answer of the current request to be a link (POST request result)
-	bool setAnswerLink( const char* title, const std::string& lnk, int linklevel);
 
 	// Implemented in webRequestContext_meta:
 	/// \brief List variables of the object loaded

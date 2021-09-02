@@ -306,15 +306,15 @@ bool serialize<std::map<std::string,std::string> >( papuga_Serialization* ser, b
 	if (!start && !papuga_Serialization_pushClose( ser)) return false;
 	return true;
 }
-typedef const char** CStringArray;
+typedef char const* const* CStringArray;
 template <>
 bool serialize<CStringArray>( papuga_Serialization* ser, bool start, const CStringArray& result)
 {
 	if (!start && !papuga_Serialization_pushOpen( ser)) return false;
-	char const** ri = result;
-	for (; *ri; ++ri)
+	size_t ri = 0;
+	for (; result[ri]; ++ri)
 	{
-		const char* str = papuga_Allocator_copy_charp( ser->allocator, *ri);
+		const char* str = papuga_Allocator_copy_charp( ser->allocator, result[ri]);
 		if (!str || !papuga_Serialization_pushValue_charp( ser, str)) return false;
 	}
 	if (!start && !papuga_Serialization_pushClose( ser)) return false;
@@ -431,7 +431,7 @@ bool strus::mapStringArrayToAnswer(
 		papuga_StringEncoding encoding,
 		papuga_ContentType doctype,
 		bool beautified,
-		const char** input)
+		char const* const* input)
 {
 	return mapResult( answer, allocator, html_head, html_href_base, rootname, elemname, encoding, doctype, beautified, input);
 }

@@ -95,7 +95,7 @@ WebRequestContext::WebRequestContext(
 	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
 
 	papuga_init_RequestAttributes(
-		&m_attributes, http_accept_, html_base_href_,
+		&m_attributes, http_accept_, m_handler->html_head(), html_base_href_,
 		m_handler->beautifiedOutput(), false/*deterministicOutput*/);
 	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
 }
@@ -141,200 +141,10 @@ WebRequestContext* WebRequestContext::createClone() const
 			m_attributes, m_context);
 }
 
-bool WebRequestContext::executeObjectRequest( const WebRequestContent& content)
-{
-	if (!m_path.hasMore())
-	{
-		if (m_contextName)
-		{
-			if (m_methodId == Method_PUT)
-			{
-				if (m_transactionRef.get())
-				{
-					if (content.empty())
-					{
-						// [1.A] PUT transaction:
-						return executeCommitTransaction();
-					}
-					//... else fallback to [3] or [4]
-				}
-				else
-				{
-					if (content.empty())
-					{
-						setAnswer( ErrorCodeIncompleteRequest);
-						return false;
-					}
-					else if (m_obj)
-					{
-						// [1.B.1] UPDATE of configuration:
-						return updateConfigurationRequest( content);
-					}
-					else
-					{
-						// [1.B.2] PUT of configuration:
-						return loadConfigurationRequest( content);
-					}
-				}
-			}
-			else if (m_methodId == Method_PATCH)
-			{
-				setAnswer( ErrorCodeNotImplemented);
-				return false;
-			}
-			else if (m_methodId == Method_POST)
-			{
-				if (content.empty())
-				{
-					setAnswer( ErrorCodeIncompleteRequest);
-					return false;
-				}
-				else
-				{
-					// [1.D] POST of configuration, name defined by client
-					// [NOTE] This is not conforming to REST, the REST interface is defined by [1.C]
-					return (loadConfigurationRequest( content) && setAnswerLink( m_contextType, m_contextName, 2/*link level*/));
-				}
-			}
-			else if (m_methodId == Method_DELETE)
-			{
-				if (content.empty())
-				{
-					if (m_transactionRef.get())
-					{
-						// [1.E] DELETE of a transaction object:
-						m_transactionRef.reset();
-						m_answer.setHttpStatus( 204/*no content*/);
-						return true;//... transaction automatically released when not returned
-					}
-					else
-					{
-						// [1.F] DELETE of a configuration object:
-						resetRequestObject();
-						return deleteConfigurationRequest();
-					}
-				}
-				else
-				{
-					setAnswer( ErrorCodeInvalidRequest);
-					//... DELETE with content invalid
-					return false;
-				}
-			}
-			// else fallback to [3] or [4]
-		}
-		else if (content.empty())
-		{
-			if (m_methodId == Method_GET)
-			{
-				bool beautified = m_handler->beautifiedOutput();
-				// [2] Top level introspection without context defined:
-				if (m_contextType)
-				{
-					std::vector<std::string> contextlist = m_configHandler->contextNames( m_contextType);
-					if (contextlist.empty())
-					{
-						setAnswer( ErrorCodeRequestResolveError);
-						return false;
-					}
-					else
-					{
-						return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, contextlist);
-					}
-				}
-				else
-				{
-					std::vector<std::string> contextTypes = m_configHandler->contextTypes();
-					contextTypes.push_back( ROOT_CONTEXT_NAME);
-					return strus::mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, PAPUGA_HTML_LINK_ELEMENT, m_result_encoding, m_result_doctype, beautified, contextTypes);
-				}
-			}
-			else
-			{
-				setAnswer( ErrorCodeRequestResolveError);
-				return false;
-			}
-		}
-		else if (m_methodId == Method_POST)
-		{
-			// [1.C] POST of configuration without name specified (name allocated by service):
-			bool rt = true;
-			std::string newContextName = m_handler->allocTemporaryContextName( m_contextType, ""/*prefix*/);
-			try
-			{
-				m_contextName = papuga_Allocator_copy_string( &m_allocator, newContextName.c_str(), newContextName.size());
-				rt = loadConfigurationRequest( content);
-				if (rt)
-				{
-					m_answer.setHttpStatus( 201/*created*/);
-					rt = setAnswerLink( m_contextType, newContextName, 1/*link level*/);
-				}
-			}
-			WEBREQUEST_CONTEXT_CATCH_ERROR_SET_BOOL( rt);
-			if (!rt) m_handler->releaseTemporaryContextName( m_contextType, newContextName);
-			return rt;
-		}
-	}
-	if (m_obj)
-	{
-		if (m_obj->valuetype == papuga_TypeHostObject)
-		{
-			if (m_methodId == Method_POST && isEqual( m_path.rest(),"transaction"))
-			{
-				// [3.A] Call POST transaction (a method), e.g. create a new transaction
-				return executePostTransaction();
-			}
-			else
-			{
-				// [3.B] Call object method if defined or fallback to next:
-				int classid = m_obj->value.hostObject->classid;
-				void* self = m_obj->value.hostObject->data;
-
-				const papuga_RequestMethodDescription* methoddescr = papuga_RequestHandler_get_method( m_handler->impl(), classid, methodIdName(m_methodId), !content.empty());
-				if (methoddescr)
-				{
-					return callHostObjMethodToAnswer( self, methoddescr, m_path.getRest(), content);
-				}
-				//... fallback to [4]
-			}
-		}
-		else if (m_methodId == Method_GET)
-		{
-			// [3.C] Map the addressed structure that is not a host object:
-			bool beautified = m_handler->beautifiedOutput();
-			return mapValueVariantToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_html_base_href.c_str(), STRUS_LIST_ROOT_ELEMENT, "value", m_result_encoding, m_result_doctype, beautified, *m_obj);
-		}
-	}
-	if (m_context.get())
-	{
-		if (!content.empty())
-		{
-			// [4.A] Execute schema in context with content:
-			return initContentSchemaAutomaton( getSchemaId()) && executeContentSchemaAutomaton( content);
-		}
-		else if (m_methodId == Method_GET)
-		{
-			// [4.B] List variables when no main object with introspection method defined (section [3.B]):
-			return executeListVariables();
-		}
-		else
-		{
-			setAnswer( ErrorCodeRequestResolveError);
-			return false;
-		}
-	}
-	else
-	{
-		setAnswer( ErrorCodeRequestResolveError);
-		return false;
-	}
-}
-
 bool WebRequestContext::execute(
 		const WebRequestContent& content)
 {
 	bool rt = true;
-	papuga_ErrorCode errcode = papuga_Ok;
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
 
@@ -383,10 +193,10 @@ bool WebRequestContext::execute(
 			{
 				if (m_contextName)
 				{
-					papuga_Schema const* schema = papuga_SchemaMap_get( m_handler->schemaMap(), m_contextName);
+					papuga_SchemaSource const* schema = papuga_SchemaList_get( m_handler->schemaList(), m_contextName);
 					if (schema)
 					{
-						return mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_href_base,
+						return mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
 									"schema"/*rootname*/, schema->name,
 									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 									m_attributes.beautifiedOutput, schema->source);
@@ -405,16 +215,33 @@ bool WebRequestContext::execute(
 						setAnswer( ErrorCodeBufferOverflow);
 						return false;
 					}
-					return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_href_base,
+					return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
 									"schema"/*rootname*/, "name"/*itemname*/, 
 									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
-									m_attributes.beautifiedOutput, lstbuf));
+									m_attributes.beautifiedOutput, lst);
 				}
 			}
-			else
+			else if (!m_contextType)
 			{
-				!!!! execute script
+				char const* const* tplist = papuga_RequestContextPool_list_types( m_handler->contextPool(), &m_allocator);
+				return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
+								"class"/*rootname*/, "name"/*itemname*/,
+								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
+								m_attributes.beautifiedOutput, tplist);
 			}
+			else if (!m_contextName)
+			{
+				char const* const* tplist = papuga_RequestContextPool_list_names( m_handler->contextPool(), m_contextType, &m_allocator);
+				return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
+								"object"/*rootname*/, "name"/*itemname*/, 
+								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
+								m_attributes.beautifiedOutput, tplist);
+			}
+		}
+		if (!m_contextName)
+		{
+			setAnswer( ErrorCodeRequestResolveError);
+			return false;
 		}
 		return rt;
 	}
@@ -516,11 +343,6 @@ bool WebRequestContext::complete()
 		{
 			m_transactionPool->returnTransaction( m_transactionRef);
 		}
-		std::string infomsgs = fetchContextInfoMessages();
-		if (!infomsgs.empty() && (m_logMask & WebRequestLoggerInterface::LogContextInfoMessages) != 0)
-		{
-			m_logger->logContextInfoMessages( infomsgs.c_str());
-		}
 		return rt;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
@@ -529,43 +351,5 @@ bool WebRequestContext::complete()
 WebRequestAnswer WebRequestContext::getAnswer() const
 {
 	return m_answer;
-}
-
-static int g_call_contextInfoMessages_paramtypes[1] = {0};
-static papuga_RequestMethodDescription g_call_contextInfoMessages =
-{
-	strus::bindings::method::Context::infoMessagesDump(),
-	g_call_contextInfoMessages_paramtypes,
-	false/*has_content*/,
-	200/*http status success*/,
-	0/*result type name*/,
-	0/*result_rootelem*/,0/*result_listelem*/
-};
-
-std::string WebRequestContext::fetchContextInfoMessages()
-{
-	std::string rt;
-	void* self = 0;
-	if (m_obj
-		&& m_obj->valuetype == papuga_TypeHostObject
-		&& m_obj->value.hostObject->classid == g_call_contextInfoMessages.id.classid)
-	{
-		self = m_obj->value.hostObject->data;
-	}
-	else if (m_context.get())
-	{
-		const papuga_ValueVariant* ctxobj = papuga_RequestContext_get_variable( m_context.get(), ROOT_CONTEXT_NAME);
-		if (ctxobj
-			&& ctxobj->valuetype == papuga_TypeHostObject
-			&& ctxobj->value.hostObject->classid == g_call_contextInfoMessages.id.classid)
-		{
-			self = ctxobj->value.hostObject->data;
-		}
-	}
-	if (self)
-	{
-		rt = callHostObjMethodToString( self, &g_call_contextInfoMessages, ""/*path*/, WebRequestContent());
-	}
-	return rt;
 }
 
