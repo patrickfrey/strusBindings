@@ -221,16 +221,17 @@ struct CurlEventLoop::Data
 	}
 
 	bool send(
-		const std::string& address,
-		const std::string& method,
-		const std::string& content,
+		char const* address,
+		char const* method,
+		char const* contentstr,
+		size_t contentlen,
 		WebRequestDelegateContextInterface* receiver)
 	{
 		try
 		{
 			if (!m_thread) throw std::runtime_error( _TXT("send failed because eventloop thread not started yet"));
 			strus::shared_ptr<WebRequestDelegateContextInterface> receiverRef( receiver);
-			WebRequestDelegateJobRef job( new WebRequestDelegateJob( address, method, content, receiverRef, &m_logger, this));
+			WebRequestDelegateJobRef job( new WebRequestDelegateJob( address, method, std::string( contentstr, contentlen), receiverRef, &m_logger, this));
 			{
 				strus::unique_lock lock( m_waitingList_mutex);
 				m_waitingList.push_back( job);
@@ -585,12 +586,13 @@ long CurlEventLoop::time() const
 }
 
 bool CurlEventLoop::send(
-		const std::string& address,
-		const std::string& method,
-		const std::string& content,
+		char const* address,
+		char const* method,
+		char const* contentstr,
+		size_t contentlen,
 		WebRequestDelegateContextInterface* receiver)
 {
-	return m_data->send( address, method, content, receiver);
+	return m_data->send( address, method, contentstr, contentlen, receiver);
 }
 
 bool CurlEventLoop::addTickerEvent( void* obj, TickerFunction func)

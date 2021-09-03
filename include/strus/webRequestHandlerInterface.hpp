@@ -12,6 +12,7 @@
 #include "strus/webRequestAnswer.hpp"
 #include "strus/webRequestContent.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 #include <string>
 
@@ -36,7 +37,8 @@ public:
 	/// \param[out] answer the error status
 	/// \return true on success, false on failure
 	virtual bool init( 
-			const std::string& configsrc,
+			char const* configsrc,
+			size_t configlen,
 			WebRequestAnswer& answer)=0;
 
 	/// \brief Create the structure for handling a request
@@ -47,10 +49,10 @@ public:
 	/// \param[out] answer the error status
 	/// \return the context structure for handling a request or NULL in case of an error (inspect answer for the error details)
 	virtual WebRequestContextInterface* createContext(
-			const char* http_accept,
-			const char* html_base_href,
-			const char* method,
-			const char* path,
+			char const* http_accept,
+			char const* html_base_href,
+			char const* method,
+			char const* path,
 			WebRequestAnswer& answer)=0;
 
 	/// \brief Send a request to another server and get notified by a callback
@@ -59,9 +61,10 @@ public:
 	/// \param[in] content data of the request (content type is "application/json; charset=utf-8")
 	/// \param[in] context pointer to object processing the answer of the request (with ownership)
 	virtual bool delegateRequest(
-			const std::string& address,
-			const std::string& method,
-			const std::string& content,
+			char const* address,
+			char const* method,
+			char const* contentstr,
+			size_t contentlen,
 			WebRequestDelegateContextInterface* context)=0;
 
 	/// \brief Get an answer structure for a simple message string that does not need a context to be defined
@@ -71,10 +74,11 @@ public:
 	/// \param[in] message content string for the message
 	/// \return answer answer structure (as error if an error occurred)
 	virtual WebRequestAnswer getSimpleRequestAnswer(
-			const char* http_accept,
-			const char* html_base_href,
-			const std::string& name,
-			const std::string& message)=0;
+			char const* http_accept,
+			char const* html_base_href,
+			char const* name,
+			char const* messagestr,
+			size_t messagelen)=0;
 };
 
 }//namespace

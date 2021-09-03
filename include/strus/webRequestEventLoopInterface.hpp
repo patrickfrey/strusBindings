@@ -33,12 +33,15 @@ public:
 	/// \note Response is handled via a callback with a closure encapsulated in a receiver object
 	/// \param[in] address where to send the request to
 	/// \param[in] method request method
-	/// \param[in] content content of the request
+	/// \param[in] contentstr pointer to content of the request
+	/// \param[in] contentlen length of the content in bytes
 	/// \param[in] receiver delegate (callback with closure) (passed with ownership)
 	/// \return true on success, false on error
-	virtual bool send( const std::string& address,
-			const std::string& method,
-			const std::string& content,
+	virtual bool send(
+			char const* address,
+			char const* method,
+			char const* contentstr,
+			size_t contentlen,
 			WebRequestDelegateContextInterface* receiver)=0;
 
 	typedef void (*TickerFunction)( void* THIS);

@@ -19,6 +19,7 @@
 #include "papuga/typedefs.h"
 #include "papuga/allocator.h"
 #include "papugaContextRef.hpp"
+#include "papugaLuaReqestHandlerRef.hpp"
 #include <stdexcept>
 
 #define STRUS_LIST_ROOT_ELEMENT "list"
@@ -76,7 +77,8 @@ private:
 		const char* contextType_,
 		const char* contextName_,
 		const papuga_RequestAttributes& attributes_,
-		const PapugaContextRef& context_);
+		const PapugaContextRef& context_,
+		const PapugaLuaRequestHandlerRef& luahandler_);
 
 	/// \brief Constructor of a clone with a reset state for the execution of schemas to process the delegate request results
 	WebRequestContext* createClone() const;
@@ -96,15 +98,14 @@ private:
 	/// \brief Define the current request to have failed
 	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
 
-	// Implemented in webRequestContext_meta:
-	/// \brief List variables of the object loaded
-	bool executeListVariables();
-	/// \brief List schema names
-	bool executeListSchemas();
-	/// \brief Get the description of a schema (request with /schema prefix in the URL)
-	bool executeSchemaDescription( const char* name);
-	/// \brief OPTIONS request
-	bool executeOPTIONS();
+	/// \brief Run the request as a Lua script call
+	bool initLuaScript( const WebRequestContent& content);
+	/// \brief Run the request as a Lua script call
+	bool runLuaScript();
+
+public:
+	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);
+	typedef bool doneTransaction();
 
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request
@@ -118,6 +119,7 @@ private:
 	const char* m_contextType;		//< context type
 	const char* m_contextName;		//< context name
 	PapugaContextRef m_context;		//< context reference
+	PapugaLuaRequestHandlerRef m_luahandler;//< lua request handler reference
 	PathBuf m_path;				//< iterator on path of the request
 	papuga_ErrorBuffer m_errbuf;		//< error buffer for papuga
 	WebRequestAnswer m_answer;		//< answer of the request

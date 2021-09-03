@@ -40,10 +40,12 @@ public:
 	virtual void stop();
 	virtual long time() const;
 
-	bool send( const std::string& address,
-			const std::string& method,
-			const std::string& content,
-			WebRequestDelegateContextInterface* receiver);
+	bool send(
+		char const* address,
+		char const* method,
+		char const* contentstr,
+		size_t contentlen,
+		WebRequestDelegateContextInterface* receiver);
 
 	virtual bool addTickerEvent( void* obj, TickerFunction func);
 

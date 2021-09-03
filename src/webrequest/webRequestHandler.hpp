@@ -40,11 +40,11 @@ public:
 	WebRequestHandler(
 			WebRequestEventLoopInterface* eventloop_,
 			WebRequestLoggerInterface* logger_,
-			const std::string& html_head_,
-			const std::string& config_dir_,
-			const std::string& script_dir_,
-			const std::string& schema_dir_,
-			const std::string& service_name_,
+			char const* html_head_,
+			char const* config_dir_,
+			char const* script_dir_,
+			char const* schema_dir_,
+			char const* service_name_,
 			int port_,
 			bool beautifiedOutput_,
 			int maxIdleTime_,
@@ -52,52 +52,41 @@ public:
 	virtual ~WebRequestHandler();
 
 	virtual bool init(
-			const std::string& configsrc,
+			char const* configsrc,
+			size_t configlen,
 			WebRequestAnswer& answer);
 
 	virtual WebRequestContextInterface* createContext(
-			const char* http_accept,
-			const char* html_base_href,
-			const char* method,
-			const char* path,
+			char const* http_accept,
+			char const* html_base_href,
+			char const* method,
+			char const* path,
 			WebRequestAnswer& answer);
 
 	virtual bool delegateRequest(
-			const std::string& address,
-			const std::string& method,
-			const std::string& content,
+			char const* address,
+			char const* method,
+			char const* contentstr,
+			size_t contentsize,
 			WebRequestDelegateContextInterface* context);
 
 	virtual WebRequestAnswer getSimpleRequestAnswer(
-			const char* http_accept,
-			const char* html_base_href,
-			const std::string& name,
-			const std::string& message);
-
-private:
-	/// \brief Create the structure for handling a configuration request
-	/// \note A configuration request is defined as embedded section in the configuration file and it adresses its object not by the path but explicitely addresses the object by type and name.
-	/// \note It does not store any artifacts for recreation on restart because it does not have to remember any objects defined as they are defined in the main configuration file.
-	/// \note It is not recommended to use this context except for creation of the main context. Do not use embedded configurations of other objects, if you want to build bigger systems.
-	/// \param[in] contextType context type
-	/// \param[in] contextName context name
-	/// \param[out] answer the error status
-	/// \return the context structure for handling the configuration request or NULL in case of an error (inspect answer for the error details)
-	WebRequestContextInterface* createConfigurationContext(
-			const char* contextType,
-			const char* contextName,
-			WebRequestAnswer& answer);
+			char const* http_accept,
+			char const* html_base_href,
+			char const* name,
+			char const* messagestr,
+			size_t messagelen);
 
 public:/*WebRequestContext*/
 	papuga_SchemaList const* schemaList() const noexcept		{return m_schemaList;}
 	papuga_SchemaMap* schemaMap() const noexcept			{return m_schemaMap;}
 	const std::vector<papuga_LuaRequestHandlerScript*>& scripts() const noexcept	{return m_scripts;}
 	const papuga_RequestContextPool* contextPool() const noexcept	{return m_contextPool;}
-	const char* html_head() const noexcept				{return m_html_head.c_str();}
+	char const* html_head() const noexcept				{return m_html_head.c_str();}
 	int debug_maxdepth() const noexcept				{return m_debug_maxdepth;}
 	int maxIdleTime() const noexcept				{return m_maxIdleTime;}
 	bool beautifiedOutput() const noexcept				{return m_beautifiedOutput;}
-	const char* serviceName() const noexcept			{return m_serviceName.c_str();}
+	char const* serviceName() const noexcept			{return m_serviceName.c_str();}
 
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
@@ -105,8 +94,8 @@ public:/*WebRequestContext*/
 	/// \param[in] context context transferred (with ownership, destroyed in case of failure)
 	/// \param[out] answer describes the error in case failure
 	bool transferContext(
-			const char* contextType,
-			const char* contextName,
+			char const* contextType,
+			char const* contextName,
 			papuga_RequestContext* context,
 			WebRequestAnswer& answer);
 	/// \brief Remove a context addressed by type and name
@@ -114,8 +103,8 @@ public:/*WebRequestContext*/
 	/// \param[in] contextName object name of context
 	/// \param[out] answer describes the error in case failure
 	bool removeContext(
-			const char* contextType,
-			const char* contextName,
+			char const* contextType,
+			char const* contextName,
 			WebRequestAnswer& answer);
 
 public:/*CurlEventLoopTicker*/

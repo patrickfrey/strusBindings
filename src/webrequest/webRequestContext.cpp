@@ -88,7 +88,7 @@ WebRequestContext::WebRequestContext(
 	,m_logMask(logger_->logMask())
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_contextType(nullptr),m_contextName(nullptr)
-	,m_context(),m_path(path_)
+	,m_context(),m_luahandler(),m_path(path_)
 	,m_errbuf(),m_answer()
 {
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
@@ -109,13 +109,14 @@ WebRequestContext::WebRequestContext(
 		const char* contextType_,
 		const char* contextName_,
 		const papuga_RequestAttributes& attributes_,
-		const PapugaContextRef& context_)
+		const PapugaContextRef& context_,
+		const PapugaLuaRequestHandlerRef& luahandler_)
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logMask(logger_->logMask())
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_contextType(contextType_),m_contextName(contextName_)
-	,m_context(context_),m_path()
+	,m_context(context_),m_luahandler(luahandler_),m_path()
 	,m_errbuf(),m_answer()
 {
 	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
@@ -138,16 +139,72 @@ WebRequestContext* WebRequestContext::createClone() const
 	return new WebRequestContext(
 			m_handler, m_logger, m_transactionPool,
 			m_requestMethod, m_contextType, m_contextName,
-			m_attributes, m_context);
+			m_attributes, m_context, m_luahandler);
+}
+
+static const char* createTransaction_( void* self, const char* type, papuga_RequestContext* context, papuga_Allocator* allocator)
+{
+	return ((WebRequestContext*)(self))->createTransaction( type, context, allocator);
+}
+
+static bool doneTransaction_( void* self)
+{
+	return ((WebRequestContext*)(self))->doneTransaction();
+}
+
+bool WebRequestContext::initLuaScript( const WebRequestContent& content)
+{
+	papuga_ErrorCode errcode = papuga_Ok;
+	papuga_TransactionHandler transactionHandler{ this, &createTransaction_, &doneTransaction_ };
+	
+	papuga_LuaRequestHandler* reqhnd
+		= papuga_create_LuaRequestHandler(
+			m_contextType/*script name*/, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
+			&transactionHandler, &m_attributes,
+			"PUT", ROOT_CONTEXT_NAME, "", content.str(), content.len(),
+			&errcode);
+	if (!reqhnd)
+	{
+		setAnswer( m_answer, papugaErrorToErrorCode( errcode));
+		return false;
+	}
+	m_luahandler.create( reqhnd);
+}
+
+bool WebRequestContext::runLuaScript()
+{
+	papuga_ErrorBuffer errbuf;
+	char errbufmem[ 2048];
+	papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
+
+	if (!papuga_run_LuaRequestHandler( m_luahandler.get(), &errbuf))
+	{
+		if (papuga_ErrorBuffer_hasError( &errbuf))
+		{
+			char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
+			setAnswer( ErrorCodeRuntimeError, msg, true);
+		}
+		else
+		{
+			setAnswer( ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), true);
+		}
+		return false;
+	}
+	int ni = 0, ne = papuga_LuaRequestHandler_nof_DelegateRequests( m_luahandler.get());
+	for (; ni != ne; ++ni)
+	{
+		papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
+		bool res = m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod,
+						       delegate->contentstr, delegate->contentlen, &m_luahandler);
+	}
+	return true;
 }
 
 bool WebRequestContext::execute(
 		const WebRequestContent& content)
 {
-	bool rt = true;
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
-
 	try
 	{
 		initRequestContext();
@@ -243,7 +300,7 @@ bool WebRequestContext::execute(
 			setAnswer( ErrorCodeRequestResolveError);
 			return false;
 		}
-		return rt;
+		return runLuaScript();
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
 }

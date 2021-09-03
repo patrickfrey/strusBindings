@@ -48,11 +48,11 @@ static std::vector<papuga_LuaRequestHandlerScript*> loadScripts( papuga_Allocato
 WebRequestHandler::WebRequestHandler(
 		WebRequestEventLoopInterface* eventLoop_,
 		WebRequestLoggerInterface* logger_,
-		const std::string& html_head_,
-		const std::string& config_dir_,
-		const std::string& script_dir_,
-		const std::string& schema_dir_,
-		const std::string& service_name_,
+		char const* html_head_,
+		char const* config_dir_,
+		char const* script_dir_,
+		char const* schema_dir_,
+		char const* service_name_,
 		int port_,
 		bool beautifiedOutput_,
 		int maxIdleTime_,
@@ -216,7 +216,7 @@ static std::vector<papuga_LuaRequestHandlerScript*> loadScripts( papuga_Allocato
 	return rt;
 }
 
-static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, const char* errstr=0, bool doCopy=false)
+static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, char const* errstr=0, bool doCopy=false)
 {
 	int httpstatus = errorCodeToHttpStatus( errcode);
 	if (errstr)
@@ -255,7 +255,8 @@ static papuga_RequestAttributes g_configRequestAttributes = {
 	true/*deterministicOutput*/};
 
 bool WebRequestHandler::init( 
-		const std::string& configsrc,
+		char const* configsrc,
+		size_t configlen,
 		WebRequestAnswer& answer)
 {
 	try
@@ -270,7 +271,7 @@ bool WebRequestHandler::init(
 					= papuga_create_LuaRequestHandler(
 						script, m_schemaMap, m_contextPool, context,
 						nullptr/*transaction handler*/, &g_configRequestAttributes,
-						"PUT", ROOT_CONTEXT_NAME, "", configsrc.c_str(), configsrc.size(),
+						"PUT", ROOT_CONTEXT_NAME, "", configsrc, configlen,
 						&errcode);
 				if (!reqhnd)
 				{
@@ -285,7 +286,7 @@ bool WebRequestHandler::init(
 				{
 					if (papuga_ErrorBuffer_hasError( &errbuf))
 					{
-						const char* msg = papuga_ErrorBuffer_lastError( &errbuf);
+						char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
 						setAnswer( answer, ErrorCodeRuntimeError, msg, true);
 					}
 					else
@@ -320,10 +321,10 @@ bool WebRequestHandler::init(
 }
 
 WebRequestContextInterface* WebRequestHandler::createContext(
-		const char* http_accept,
-		const char* html_base_href,
-		const char* method,
-		const char* path,
+		char const* http_accept,
+		char const* html_base_href,
+		char const* method,
+		char const* path,
 		WebRequestAnswer& answer)
 {
 	try
@@ -334,23 +335,25 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 }
 
 bool WebRequestHandler::delegateRequest(
-		const std::string& address,
-		const std::string& method,
-		const std::string& content,
+		char const* address,
+		char const* method,
+		char const* contentstr,
+		size_t contentlen,
 		WebRequestDelegateContextInterface* context)
 {
 	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogDelegateRequests))
 	{
-		m_logger->logDelegateRequest( address.c_str(), method.c_str(), content.c_str(), content.size());
+		m_logger->logDelegateRequest( address, method, contentstr, contentlen);
 	}
-	return m_eventLoop->send( address, method, content, context);
+	return m_eventLoop->send( address, method, contentstr, contentlen, context);
 }
 
 WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
-		const char* http_accept,
-		const char* html_base_href,
-		const std::string& name,
-		const std::string& message)
+		char const* http_accept,
+		char const* html_base_href,
+		char const* name,
+		char const* messagestr,
+		size_t messagelen)
 {
 	WebRequestAnswer rt;
 	try
@@ -368,7 +371,7 @@ WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
 			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept content types implemented: %s"), http_accept);
 			return rt;
 		}
-		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, SYSTEM_MESSAGE_HEADER, name.c_str(), result_encoding, result_doctype, m_beautifiedOutput, message);
+		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, SYSTEM_MESSAGE_HEADER, name, result_encoding, result_doctype, m_beautifiedOutput, std::string( messagestr, messagelen));
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -387,8 +390,8 @@ void WebRequestHandler::tick()
 }
 
 bool WebRequestHandler::transferContext(
-		const char* contextType,
-		const char* contextName,
+		char const* contextType,
+		char const* contextName,
 		papuga_RequestContext* context,
 		WebRequestAnswer& answer)
 {
@@ -404,8 +407,8 @@ bool WebRequestHandler::transferContext(
 }
 
 bool WebRequestHandler::removeContext(
-		const char* contextType,
-		const char* contextName,
+		char const* contextType,
+		char const* contextName,
 		WebRequestAnswer& answer)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
