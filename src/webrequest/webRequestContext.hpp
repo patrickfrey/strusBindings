@@ -19,7 +19,7 @@
 #include "papuga/typedefs.h"
 #include "papuga/allocator.h"
 #include "papugaContextRef.hpp"
-#include "papugaLuaReqestHandlerRef.hpp"
+#include "papugaLuaRequestHandlerRef.hpp"
 #include <stdexcept>
 
 #define STRUS_LIST_ROOT_ELEMENT "list"
@@ -49,13 +49,6 @@ public:
 
 	virtual bool execute( const WebRequestContent& content);
 
-	virtual std::vector<WebRequestDelegateRequest> getDelegateRequests();
-
-	virtual bool putDelegateRequestAnswer(
-			const char* schema,
-			const WebRequestAnswer& answer);
-
-	virtual bool complete();
 	virtual WebRequestAnswer getAnswer() const;
 
 	enum {
@@ -105,7 +98,7 @@ private:
 
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);
-	typedef bool doneTransaction();
+	bool doneTransaction();
 
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request

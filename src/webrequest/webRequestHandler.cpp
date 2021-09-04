@@ -43,7 +43,7 @@ static void tickerFunction( void* THIS)
 }
 
 static std::pair<papuga_SchemaList*,papuga_SchemaMap*> loadSchemas( papuga_Allocator* allocator, const std::string& schema_dir);
-static std::vector<papuga_LuaRequestHandlerScript*> loadScripts( papuga_Allocator* allocator, const std::string& script_dir);
+static PagugaLuaRequestHandlerScriptMap loadScripts( papuga_Allocator* allocator, const std::string& script_dir);
 
 WebRequestHandler::WebRequestHandler(
 		WebRequestEventLoopInterface* eventLoop_,
@@ -62,7 +62,7 @@ WebRequestHandler::WebRequestHandler(
 	,m_contextPool(nullptr)
 	,m_schemaList(nullptr)
 	,m_schemaMap(nullptr)
-	,m_scripts()
+	,m_scriptMap()
 	,m_html_head(html_head_)
 	,m_config_dir(config_dir_)
 	,m_script_dir(script_dir_)
@@ -83,7 +83,7 @@ WebRequestHandler::WebRequestHandler(
 		auto scma = loadSchemas( &m_allocator, m_schema_dir);
 		m_schemaList = scma.first;
 		m_schemaMap = scma.second;
-		m_scripts = loadScripts( &m_allocator, m_script_dir);
+		m_scriptMap = loadScripts( &m_allocator, m_script_dir);
 	}
 	catch (const std::bad_alloc&)
 	{
@@ -182,9 +182,9 @@ static std::pair<papuga_SchemaList*,papuga_SchemaMap*> loadSchemas( papuga_Alloc
 	return rt;
 }
 
-static std::vector<papuga_LuaRequestHandlerScript*> loadScripts( papuga_Allocator* allocator, const std::string& script_dir)
+static PagugaLuaRequestHandlerScriptMap loadScripts( papuga_Allocator* allocator, const std::string& script_dir)
 {
-	std::vector<papuga_LuaRequestHandlerScript*> rt;
+	PagugaLuaRequestHandlerScriptMap rt;
 	std::vector<std::string> files;
 	int ec = strus::readDirFiles( script_dir, ".lua", files);
 	if (ec) throw strus::runtime_error( "Error (%d) reading script files: %s", ec, ::strerror( ec));
@@ -211,7 +211,7 @@ static std::vector<papuga_LuaRequestHandlerScript*> loadScripts( papuga_Allocato
 		{
 			throw std::runtime_error( papuga_ErrorBuffer_lastError( &errbuf));
 		}
-		rt.push_back( script);
+		rt.add( script);
 	}
 	return rt;
 }
@@ -261,61 +261,63 @@ bool WebRequestHandler::init(
 {
 	try
 	{
-		for (auto script : m_scripts)
+		auto fi = m_scriptMap.find( ROOT_CONTEXT_NAME);
+		if (fi != m_scriptMap.end())
 		{
-			if (0==std::strcmp( papuga_LuaRequestHandlerScript_name( script), ROOT_CONTEXT_NAME))
+			papuga_ErrorCode errcode = papuga_Ok;
+			papuga_RequestContext* context = papuga_create_RequestContext();
+			papuga_LuaRequestHandler* reqhnd
+				= papuga_create_LuaRequestHandler(
+					fi->second.get(), m_schemaMap, m_contextPool, context,
+					nullptr/*transaction handler*/, &g_configRequestAttributes,
+					"PUT", ROOT_CONTEXT_NAME, "", configsrc, configlen,
+					&errcode);
+			if (!reqhnd)
 			{
-				papuga_ErrorCode errcode = papuga_Ok;
-				papuga_RequestContext* context = papuga_create_RequestContext();
-				papuga_LuaRequestHandler* reqhnd
-					= papuga_create_LuaRequestHandler(
-						script, m_schemaMap, m_contextPool, context,
-						nullptr/*transaction handler*/, &g_configRequestAttributes,
-						"PUT", ROOT_CONTEXT_NAME, "", configsrc, configlen,
-						&errcode);
-				if (!reqhnd)
-				{
-					setAnswer( answer, papugaErrorToErrorCode( errcode));
-					papuga_destroy_RequestContext( context);
-					return false;
-				}
-				papuga_ErrorBuffer errbuf;
-				char errbufmem[ 2048];
-				papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
-				if (!papuga_run_LuaRequestHandler( reqhnd, &errbuf))
-				{
-					if (papuga_ErrorBuffer_hasError( &errbuf))
-					{
-						char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
-						setAnswer( answer, ErrorCodeRuntimeError, msg, true);
-					}
-					else
-					{
-						setAnswer( answer, ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), true);
-					}
-					papuga_destroy_RequestContext( context);
-					papuga_destroy_LuaRequestHandler( reqhnd);
-					return false;
-				}
-				if (0<papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
-				{
-					setAnswer( answer, ErrorCodeRuntimeError, _TXT("no delegate requests allowed in configuration"), true);
-					papuga_destroy_RequestContext( context);
-					papuga_destroy_LuaRequestHandler( reqhnd);
-					return false;
-				}
-				if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
-				{
-					setAnswer( answer, papugaErrorToErrorCode( errcode));
-					papuga_destroy_RequestContext( context);
-					papuga_destroy_LuaRequestHandler( reqhnd);
-					return false;
-				}
-				papuga_destroy_LuaRequestHandler( reqhnd);
-				return true;
+				setAnswer( answer, papugaErrorToErrorCode( errcode));
+				papuga_destroy_RequestContext( context);
+				return false;
 			}
+			papuga_ErrorBuffer errbuf;
+			char errbufmem[ 2048];
+			papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
+			if (!papuga_run_LuaRequestHandler( reqhnd, &errbuf))
+			{
+				if (papuga_ErrorBuffer_hasError( &errbuf))
+				{
+					char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
+					setAnswer( answer, ErrorCodeRuntimeError, msg, true);
+				}
+				else
+				{
+					setAnswer( answer, ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), false);
+				}
+				papuga_destroy_RequestContext( context);
+				papuga_destroy_LuaRequestHandler( reqhnd);
+				return false;
+			}
+			if (0<papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
+			{
+				setAnswer( answer, ErrorCodeRuntimeError, _TXT("no delegate requests allowed in configuration"), false);
+				papuga_destroy_RequestContext( context);
+				papuga_destroy_LuaRequestHandler( reqhnd);
+				return false;
+			}
+			if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
+			{
+				setAnswer( answer, papugaErrorToErrorCode( errcode));
+				papuga_destroy_RequestContext( context);
+				papuga_destroy_LuaRequestHandler( reqhnd);
+				return false;
+			}
+			papuga_destroy_LuaRequestHandler( reqhnd);
+			return true;
 		}
-		return true;
+		else
+		{
+			setAnswer( answer, ErrorCodeRuntimeError, _TXT("no initialization script (name 'context') found"), false);
+			return false;
+		}
 	}
 	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, false);
 }

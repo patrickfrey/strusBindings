@@ -156,19 +156,26 @@ bool WebRequestContext::initLuaScript( const WebRequestContent& content)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	papuga_TransactionHandler transactionHandler{ this, &createTransaction_, &doneTransaction_ };
-	
+
+	papuga_LuaRequestHandlerScript const* script = m_handler->script( m_contextType);
+	if (!script)
+	{
+		setAnswer( ErrorCodeRequestResolveError);
+		return false;
+	}
 	papuga_LuaRequestHandler* reqhnd
 		= papuga_create_LuaRequestHandler(
-			m_contextType/*script name*/, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
+			script, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
 			&transactionHandler, &m_attributes,
 			"PUT", ROOT_CONTEXT_NAME, "", content.str(), content.len(),
 			&errcode);
 	if (!reqhnd)
 	{
-		setAnswer( m_answer, papugaErrorToErrorCode( errcode));
+		setAnswer( papugaErrorToErrorCode( errcode));
 		return false;
 	}
 	m_luahandler.create( reqhnd);
+	return true;
 }
 
 bool WebRequestContext::runLuaScript()
@@ -194,8 +201,12 @@ bool WebRequestContext::runLuaScript()
 	for (; ni != ne; ++ni)
 	{
 		papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-		bool res = m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod,
-						       delegate->contentstr, delegate->contentlen, &m_luahandler);
+		if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod,
+						       delegate->contentstr, delegate->contentlen, &m_luahandler))
+		{
+			setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);
+			return false;
+		}
 	}
 	return true;
 }
@@ -224,18 +235,19 @@ bool WebRequestContext::execute(
 			{
 				if (m_contextName)
 				{
-					for (auto script : m_handler->scripts())
+					auto script = m_handler->script( m_contextName);
+					if (script)
 					{
-						if (0==std::strcmp( papuga_LuaRequestHandlerScript_name( script), m_contextName))
-						{
-							std::string options("OPTIONS,");
-							options.append( papuga_LuaRequestHandlerScript_options( script));
-							m_answer.setMessage( 200/*OK*/, "Allow", options.c_str(), true);
-							return true;
-						}
+						std::string options("OPTIONS,");
+						options.append( papuga_LuaRequestHandlerScript_options( script));
+						m_answer.setMessage( 200/*OK*/, "Allow", options.c_str(), true);
+						return true;
 					}
-					setAnswer( ErrorCodeRequestResolveError);
-					return false;
+					else
+					{
+						setAnswer( ErrorCodeRequestResolveError);
+						return false;
+					}
 				}
 				else
 				{
@@ -301,106 +313,6 @@ bool WebRequestContext::execute(
 			return false;
 		}
 		return runLuaScript();
-	}
-	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
-}
-
-std::vector<WebRequestDelegateRequest> WebRequestContext::getDelegateRequests()
-{
-	try
-	{
-		std::vector<WebRequestDelegateRequest> rt;
-		if (!getContentRequestDelegateRequests( rt))
-		{
-			return std::vector<WebRequestDelegateRequest>();
-		}
-		return rt;
-	}
-	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( std::vector<WebRequestDelegateRequest>());
-}
-
-bool WebRequestContext::putDelegateRequestAnswer(
-		const char* schema,
-		const WebRequestAnswer& answer)
-{
-	try
-	{
-		if (m_logger && (m_logMask & WebRequestLoggerInterface::LogAction) != 0)
-		{
-			m_logger->logAction( m_contextType, m_contextName, "put delegate answer");
-		}
-		if (!m_answer.ok())
-		{
-			if (0!=(m_logMask & WebRequestLoggerInterface::LogWarning))
-			{
-				m_logger->logWarning( _TXT( "ignoring delegate request answer because of previous error"));
-			}
-			return true;
-		}
-		if (!answer.ok())
-		{
-			m_answer = answer;
-			return false;
-		}
-		if (!answer.content().empty())
-		{
-			strus::Reference<WebRequestContext> delegateContext( createClone( ObjectRequest));
-			delegateContext->initContentType( answer.content());
-			bool rt = delegateContext->initContentSchemaAutomaton( SchemaId( m_contextType, schema))
-				&& delegateContext->executeContentSchemaAutomaton( answer.content());
-			if (rt)
-			{
-				if (delegateContext->hasContentRequestDelegateRequests())
-				{
-					setAnswer( ErrorCodeInvalidOperation, _TXT("delegate requests not allowed in delegate request result schema definitions"));
-					return false;
-				}
-				if (delegateContext->hasContentRequestResult())
-				{
-					setAnswer( ErrorCodeInvalidOperation, _TXT("results not expected in delegate request result schema definitions"));
-					return false;
-				}
-				rt = delegateContext->complete();
-			}
-			if (!rt)
-			{
-				m_answer = delegateContext->getAnswer();
-			}
-			return rt;
-		}
-		return true;
-	}
-	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
-}
-
-bool WebRequestContext::complete()
-{
-	try
-	{
-		bool rt = true;
-		if (m_answer.ok())
-		{
-			if (rt && m_logger)
-			{
-				if ((m_logMask & WebRequestLoggerInterface::LogAction) != 0)
-				{
-					m_logger->logAction( m_contextType, m_contextName, "request complete");
-				}
-				if ((m_logMask & WebRequestLoggerInterface::LogRequests) != 0)
-				{
-					m_logger->logRequestAnswer( m_answer.content().str(), m_answer.content().len());
-				}
-			}
-		}
-		else
-		{
-			rt = false;
-		}
-		if (m_transactionRef.get())
-		{
-			m_transactionPool->returnTransaction( m_transactionRef);
-		}
-		return rt;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
 }

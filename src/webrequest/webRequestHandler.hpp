@@ -16,6 +16,7 @@
 #include "papuga/luaRequestHandler.h"
 #include "transaction.hpp"
 #include "curlEventLoop.hpp"
+#include "papugaLuaRequestHandlerRef.hpp"
 #include <cstddef>
 #include <utility>
 #include <set>
@@ -78,15 +79,15 @@ public:
 			size_t messagelen);
 
 public:/*WebRequestContext*/
-	papuga_SchemaList const* schemaList() const noexcept		{return m_schemaList;}
-	papuga_SchemaMap* schemaMap() const noexcept			{return m_schemaMap;}
-	const std::vector<papuga_LuaRequestHandlerScript*>& scripts() const noexcept	{return m_scripts;}
-	const papuga_RequestContextPool* contextPool() const noexcept	{return m_contextPool;}
-	char const* html_head() const noexcept				{return m_html_head.c_str();}
-	int debug_maxdepth() const noexcept				{return m_debug_maxdepth;}
-	int maxIdleTime() const noexcept				{return m_maxIdleTime;}
-	bool beautifiedOutput() const noexcept				{return m_beautifiedOutput;}
-	char const* serviceName() const noexcept			{return m_serviceName.c_str();}
+	papuga_SchemaList const* schemaList() const noexcept			{return m_schemaList;}
+	papuga_SchemaMap* schemaMap() const noexcept				{return m_schemaMap;}
+	const papuga_LuaRequestHandlerScript* script( const char* name) const noexcept	{auto fi = m_scriptMap.find(name); return fi==m_scriptMap.end() ? nullptr : fi->second.get();}
+	papuga_RequestContextPool* contextPool() const noexcept			{return m_contextPool;}
+	char const* html_head() const noexcept					{return m_html_head.c_str();}
+	int debug_maxdepth() const noexcept					{return m_debug_maxdepth;}
+	int maxIdleTime() const noexcept					{return m_maxIdleTime;}
+	bool beautifiedOutput() const noexcept					{return m_beautifiedOutput;}
+	char const* serviceName() const noexcept				{return m_serviceName.c_str();}
 
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context
@@ -117,7 +118,7 @@ private:
 	papuga_RequestContextPool* m_contextPool;	//< request context pool
 	papuga_SchemaList* m_schemaList;		//< list of schemas
 	papuga_SchemaMap* m_schemaMap;			//< map of schemas
-	std::vector<papuga_LuaRequestHandlerScript*> m_scripts; //< list of scripts
+	PagugaLuaRequestHandlerScriptMap m_scriptMap; 	//< map of scripts
 	std::string m_html_head;			//< header include for HTML output (for stylesheets, meta data etc.)
 	std::string m_config_dir;			//< directory where configuration is stored
 	std::string m_script_dir;			//< directory where scripts are stored
