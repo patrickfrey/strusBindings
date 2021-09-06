@@ -84,16 +84,6 @@ const char* convertContentCharset(
 		const char* src,
 		std::size_t srcsize);
 
-/// \brief Select the best choice for the character set for messages not related to an answer of a request
-/// \param[in] http_accept_charset list of character sets accepted taken from the HTTP header
-/// \return best choice of a character set
-const char* selectAcceptedCharset( const char* http_accept_charset);
-
-/// \brief Select the best choice for the content type for messages not related to an answer of a request
-/// \param[in] http_accept list of content types accepted taken from the HTTP header
-/// \return best choice of a content type
-WebRequestContent::Type selectAcceptedContentType( const char* http_accept);
-
 /// \brief Guess the type of the document (without encoding) as string, e.g. "application/json"
 /// \param[in] content pointer to the content
 /// \param[in] contentsize number of bytes in content

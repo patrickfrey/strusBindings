@@ -17,14 +17,6 @@
 
 using namespace strus;
 
-static std::string parentPath( const std::string& url)
-{
-	std::string rt;
-	int ec = strus::getParentPath( url, rt);
-	if (ec) throw strus::runtime_error_ec( ErrorCodeRequestResolveError, _TXT("illegal URL"));
-	return rt;
-}
-
 static void assignRequestMethod( char* destbuf, size_t destbufsize, char const* ri) noexcept
 {
 	size_t di = 0;

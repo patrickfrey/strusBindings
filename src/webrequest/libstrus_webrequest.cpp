@@ -56,9 +56,11 @@ public:
 
 	virtual bool start(){return false;}
 	virtual void stop(){}
-	virtual bool send( const std::string& address,
-			const std::string& method,
-			const std::string& content,
+	virtual bool send(
+			const char* address,
+			const char* method,
+			const char* contentstr,
+			size_t contentlen,
 			WebRequestDelegateContextInterface* receiver) {return false;}
 	virtual bool addTickerEvent( void* obj, TickerFunction func)  {return true;}
 	virtual void handleException( const char* msg) {}
@@ -135,18 +137,6 @@ DLL_PUBLIC const char* strus::convertContentCharset( const char* charsetname, ch
 	papuga_ErrorCode errcode = papuga_Ok;
 	const char* rt = (const char*)papuga_ValueVariant_tostring_enc( &res, encoding, destbuf+pos, destbufsize-pos, &length, &errcode);
 	return rt;
-}
-
-DLL_PUBLIC const char* strus::selectAcceptedCharset( const char* http_accept_charset)
-{
-	papuga_StringEncoding enc = strus::getResultStringEncoding( http_accept_charset, papuga_UTF8);
-	if (enc == papuga_Binary) return NULL;
-	return papuga_stringEncodingName( enc);
-}
-
-DLL_PUBLIC WebRequestContent::Type strus::selectAcceptedContentType( const char* http_accept)
-{
-	return strus::getResultContentType( http_accept, WebRequestContent::HTML);
 }
 
 DLL_PUBLIC const char* strus::guessContentType( const char* content, std::size_t contentsize)
