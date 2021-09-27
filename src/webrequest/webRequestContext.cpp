@@ -305,13 +305,12 @@ bool WebRequestContext::executeBuiltInCommand()
 						std::string options("OPTIONS,");
 						options.append( papuga_LuaRequestHandlerScript_options( script));
 						m_answer.setMessage( 200/*OK*/, "Allow", options.c_str(), true);
-						return true;
 					}
 					else
 					{
 						setAnswer( ErrorCodeRequestResolveError);
-						return false;
 					}
+					return true;
 				}
 				else
 				{
@@ -329,7 +328,7 @@ bool WebRequestContext::executeBuiltInCommand()
 					papuga_SchemaSource const* schema = papuga_SchemaList_get( m_handler->schemaList(), m_contextName);
 					if (schema)
 					{
-						return mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
+						mapStringToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
 									"schema"/*rootname*/, schema->name,
 									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 									m_attributes.beautifiedOutput, schema->source);
@@ -337,7 +336,6 @@ bool WebRequestContext::executeBuiltInCommand()
 					else
 					{
 						setAnswer( ErrorCodeRequestResolveError);
-						return false;
 					}
 				}
 				else
@@ -348,33 +346,36 @@ bool WebRequestContext::executeBuiltInCommand()
 						setAnswer( ErrorCodeBufferOverflow);
 						return false;
 					}
-					return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
+					mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
 									"schema"/*rootname*/, "name"/*itemname*/, 
 									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 									m_attributes.beautifiedOutput, lst);
 				}
+				return true;
 			}
 			else if (!m_contextType)
 			{
 				char const* const* tplist = papuga_RequestContextPool_list_types( m_handler->contextPool(), &m_allocator);
-				return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
+				mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
 								"class"/*rootname*/, "name"/*itemname*/,
 								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 								m_attributes.beautifiedOutput, tplist);
+				return true;
 			}
 			else if (!m_contextName)
 			{
 				char const* const* tplist = papuga_RequestContextPool_list_names( m_handler->contextPool(), m_contextType, &m_allocator);
-				return mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
+				mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
 								"object"/*rootname*/, "name"/*itemname*/, 
 								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 								m_attributes.beautifiedOutput, tplist);
+				return true;
 			}
 		}
 		if (!m_contextName)
 		{
 			setAnswer( ErrorCodeRequestResolveError);
-			return false;
+			return true;
 		}
 		return false;
 	}
@@ -385,7 +386,7 @@ bool WebRequestContext::execute()
 {
 	try
 	{
-		return runLuaScript();
+		return (!m_openDelegates.get() || *m_openDelegates == 0) ? runLuaScript() : false;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
 }

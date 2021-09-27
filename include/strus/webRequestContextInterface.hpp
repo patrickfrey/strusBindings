@@ -27,7 +27,7 @@ public:
 
 	/// \brief Run the request
 	/// \param[in] content content of the request
-	/// \return bool true if succeeded, false if an error occurred of the request not completed yet
+	/// \return bool true if completed, false if an not completed yet
 	virtual bool execute()=0;
 
 	/// \brief Get the result answer of the request

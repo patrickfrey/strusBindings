@@ -79,7 +79,7 @@ private:
 	bool initLuaScript( const char* contentstr, size_t contentlen);
 	/// \brief Run the request as a Lua script call
 	bool runLuaScript();
-	/// \brief Check and if set run a built-in command
+	/// \brief Check and if set run a built-in command, return false if not built-in command set
 	bool executeBuiltInCommand();
 
 public:
@@ -99,6 +99,7 @@ private:
 	const char* m_contextName;		//< context name
 	PapugaContextRef m_context;		//< context reference
 	PapugaLuaRequestHandlerRef m_luahandler;//< lua request handler reference
+	strus::Reference<int> m_openDelegates;	//< open delegate requests 
 	PathBuf m_path;				//< iterator on path of the request
 	papuga_ErrorBuffer m_errbuf;		//< error buffer for papuga
 	WebRequestAnswer m_answer;		//< answer of the request
