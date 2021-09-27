@@ -327,11 +327,13 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 		char const* html_base_href,
 		char const* method,
 		char const* path,
+		char const* contentstr,
+		size_t contentlen,
 		WebRequestAnswer& answer)
 {
 	try
 	{
-		return new WebRequestContext( this, m_logger, &m_transactionPool, http_accept, html_base_href, method, path);
+		return new WebRequestContext( this, m_logger, &m_transactionPool, http_accept, html_base_href, method, path, contentstr, contentlen);
 	}
 	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, NULL);
 }

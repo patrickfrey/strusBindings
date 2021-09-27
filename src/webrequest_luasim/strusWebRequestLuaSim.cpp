@@ -471,9 +471,11 @@ public:
 	virtual bool start(){return true;}
 	virtual void stop(){}
 
-	virtual bool send( const std::string& address,
-			const std::string& method,
-			const std::string& content,
+	virtual bool send(
+			char const* address,
+			char const* method,
+			char const* contentstr,
+			size_t contentlen,
 			strus::WebRequestDelegateContextInterface* receiver);
 
 	virtual bool addTickerEvent( void* obj, TickerFunction func)
@@ -702,14 +704,16 @@ void EventLoop::initConfiguration( const Configuration& config)
 	m_timerEventSecondsPeriod = std::max( 10, max_idle_time/20);
 }
 
-bool EventLoop::send( const std::string& address,
-		const std::string& method,
-		const std::string& contentstr,
+bool EventLoop::send(
+		char const* address,
+		char const* method,
+		char const* contentstr,
+		size_t contentlen,
 		strus::WebRequestDelegateContextInterface* receiver)
 {
 	try
 	{
-		strus::WebRequestAnswer result = g_globalContext->call( method, address, g_charset, g_doctype, contentstr.c_str(), contentstr.size());
+		strus::WebRequestAnswer result = g_globalContext->call( method, address, g_charset, g_doctype, contentstr, contentlen);
 		receiver->putAnswer( result);
 		return true;
 	}
@@ -728,29 +732,13 @@ static bool forwardDelegateRequests( strus::WebRequestHandlerInterface* handler,
 		try
 		{
 			std::string delegateContentStr( di->contentstr(), di->contentlen());
-			if (di->url())
+			strus::WebRequestDelegateContextInterface* receiver
+				= new WebRequestDelegateContext( &answer, ctx, di->url(), di->receiverSchema());
+			if (!handler->delegateRequest( di->url(), di->method(), delegateContentStr.c_str(), delegateContentStr.size(), receiver))
 			{
-				strus::WebRequestDelegateContextInterface* receiver
-					= new WebRequestDelegateContext( &answer, ctx, di->url(), di->receiverSchema());
-				if (!handler->delegateRequest( di->url(), di->method(), delegateContentStr, receiver))
-				{
-					answer.setError_fmt( 500, strus::ErrorCodeOutOfMem, _TXT("delegate request failed: %s"), strus::errorCodeToString( strus::ErrorCodeOutOfMem));
-					g_globalContext->reportError( answer.errorStr());
-					return false;
-				}
-			}
-			else
-			{
-				// ... without receiver feed to itself with the receiver schema:
-				strus::WebRequestContent delegateContent( g_charset, g_doctype, delegateContentStr.c_str(), delegateContentStr.size());
-				strus::WebRequestAnswer delegateAnswer( delegateContent);
-				if (!ctx->putDelegateRequestAnswer( di->receiverSchema(), delegateAnswer))
-				{
-					answer = ctx->getAnswer();
-					answer.explain( _TXT("delegate request failed"));
-					g_globalContext->reportError( answer.errorStr());
-					return false;
-				}
+				answer.setError_fmt( 500, strus::ErrorCodeOutOfMem, _TXT("delegate request failed: %s"), strus::errorCodeToString( strus::ErrorCodeOutOfMem));
+				g_globalContext->reportError( answer.errorStr());
+				return false;
 			}
 		}
 		catch (const std::bad_alloc&)

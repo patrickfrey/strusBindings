@@ -26,6 +26,11 @@ namespace strus {
 // \return strus error number
 ErrorCode papugaErrorToErrorCode( papuga_ErrorCode errcode);
 
+// \brief Maps a papuga error code to a strus error number
+// \param[in] errcode papuga error code
+// \return strus error number
+papuga_ErrorCode errorCodeToPapugaError( ErrorCode errcode);
+
 // \brief Maps an error cause (part of error codes defined in strusBase or errno) to an HTTP request status code
 // \param[in] content web request content
 // \return HTTP status c

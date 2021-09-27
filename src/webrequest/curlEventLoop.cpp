@@ -229,8 +229,8 @@ struct CurlEventLoop::Data
 	{
 		try
 		{
-			if (!m_thread) throw std::runtime_error( _TXT("send failed because eventloop thread not started yet"));
 			strus::shared_ptr<WebRequestDelegateContextInterface> receiverRef( receiver);
+			if (!m_thread) throw std::runtime_error( _TXT("send failed because eventloop thread not started yet"));
 			WebRequestDelegateJobRef job( new WebRequestDelegateJob( address, method, std::string( contentstr, contentlen), receiverRef, &m_logger, this));
 			{
 				strus::unique_lock lock( m_waitingList_mutex);

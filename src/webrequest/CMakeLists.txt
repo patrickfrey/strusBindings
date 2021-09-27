@@ -14,8 +14,6 @@ set( source_files
 	curlEventLoop.cpp
 	webRequestUtils.cpp
 	webRequestHandler.cpp
-	webRequestContext_result.cpp
-	webRequestContext_obj.cpp
 	webRequestContext.cpp
 )
 

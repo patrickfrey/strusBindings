@@ -65,8 +65,6 @@ static bool isEqual( const char* name, const char* oth)
 	}
 
 
-WebRequestContext* createClone();
-
 WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,
@@ -74,7 +72,9 @@ WebRequestContext::WebRequestContext(
 		const char* http_accept_,
 		const char* html_base_href_,
 		const char* method_,
-		const char* path_)
+		const char* path_,
+		const char* contentstr_,
+		size_t contentlen_)
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logMask(logger_->logMask())
@@ -90,33 +90,11 @@ WebRequestContext::WebRequestContext(
 		&m_attributes, http_accept_, m_handler->html_head(), html_base_href_,
 		m_handler->beautifiedOutput(), false/*deterministicOutput*/);
 	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
-}
-
-/// \brief Clone constructor
-WebRequestContext::WebRequestContext(
-		WebRequestHandler* handler_,
-		WebRequestLoggerInterface* logger_,
-		TransactionPool* transactionPool_,
-		const char* method_,
-		const char* contextType_,
-		const char* contextName_,
-		const papuga_RequestAttributes& attributes_,
-		const PapugaContextRef& context_,
-		const PapugaLuaRequestHandlerRef& luahandler_)
-	:m_handler(handler_)
-	,m_logger(logger_)
-	,m_logMask(logger_->logMask())
-	,m_transactionPool(transactionPool_),m_transactionRef()
-	,m_contextType(contextType_),m_contextName(contextName_)
-	,m_context(context_),m_luahandler(luahandler_),m_path()
-	,m_errbuf(),m_answer()
-{
-	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
-	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
-	papuga_init_ErrorBuffer( &m_errbuf, m_errbuf_mem, sizeof(m_errbuf_mem));
-	m_contextType = papuga_Allocator_copy_charp( &m_allocator, contextType_);
-	m_contextName = papuga_Allocator_copy_charp( &m_allocator, contextName_);
-	papuga_copy_RequestAttributes( &m_allocator, &m_attributes, &attributes_);
+	initRequestContext();
+	if (!executeBuiltInCommand())
+	{
+		initLuaScript( contentstr_, contentlen_);
+	}
 }
 
 WebRequestContext::~WebRequestContext()
@@ -124,14 +102,6 @@ WebRequestContext::~WebRequestContext()
 	m_transactionRef.reset();
 	m_context.reset();
 	papuga_destroy_Allocator( &m_allocator);
-}
-
-WebRequestContext* WebRequestContext::createClone() const
-{
-	return new WebRequestContext(
-			m_handler, m_logger, m_transactionPool,
-			m_requestMethod, m_contextType, m_contextName,
-			m_attributes, m_context, m_luahandler);
 }
 
 static const char* createTransaction_( void* self, const char* type, papuga_RequestContext* context, papuga_Allocator* allocator)
@@ -144,7 +114,102 @@ static bool doneTransaction_( void* self)
 	return ((WebRequestContext*)(self))->doneTransaction();
 }
 
-bool WebRequestContext::initLuaScript( const WebRequestContent& content)
+void WebRequestContext::setAnswer( int errcode, const char* errstr, bool doCopy)
+{
+	int httpstatus = errorCodeToHttpStatus( (ErrorCode)errcode);
+	if (errstr)
+	{
+		m_answer.setError( httpstatus, errcode, errstr, doCopy);
+	}
+	else
+	{
+		m_answer.setError( httpstatus, errcode, strus::errorCodeToString(errcode));
+	}
+}
+
+bool WebRequestContext::transferContext()
+{
+	if (m_context.use_count() != 1)
+	{
+		setAnswer( ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
+		return false;
+	}
+	if (!m_handler->transferContext( m_contextType, m_contextName, m_context.release(), m_answer))
+	{
+		return false;
+	}
+	return true;
+}
+
+void WebRequestContext::resetContext()
+{
+	m_transactionRef.reset();
+	m_context.reset();
+}
+
+bool WebRequestContext::initContext()
+{
+	m_transactionRef.reset();
+	m_context.create();
+	if (!m_context.get())
+	{
+		setAnswer( ErrorCodeOutOfMem);
+		return false;
+	}
+	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
+	{
+		papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+		setAnswer( papugaErrorToErrorCode( errcode));
+		return false;
+	}
+	return true;
+}
+
+bool WebRequestContext::initRequestContext()
+{
+	resetContext();
+	if (m_path.startsWith( "transaction", 11/*"transaction"*/))
+	{
+		// Fetch transaction object from pool with exclusive ownership:
+		m_contextType = m_path.getNext();
+		m_contextName = m_path.getNext();
+		if (!m_contextName)
+		{
+			setAnswer( ErrorCodeIncompleteRequest);
+			return false;
+		}
+		m_transactionRef = m_transactionPool->fetchTransaction( m_contextName);
+		if (!m_transactionRef.get())
+		{
+			setAnswer( ErrorCodeRequestResolveError);
+			return false;
+		}
+		m_contextType = m_transactionRef->contextType();
+		m_context = m_transactionRef->context();
+	}
+	else if (m_path.startsWith( "schema", 6/*"schema"*/))
+	{
+		m_contextType = m_path.getNext();
+		m_contextName = m_path.getNext();
+	}
+	else
+	{
+		if (!(m_contextType = m_path.getNext())) return true;
+		if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
+		{
+			m_contextName = ROOT_CONTEXT_NAME;
+		}
+		else
+		{
+			m_contextName = m_path.getNext();
+			if (!m_contextName) return true;
+		}
+		initContext();
+	}
+	return true;
+}
+
+bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	papuga_TransactionHandler transactionHandler{ this, &createTransaction_, &doneTransaction_ };
@@ -159,14 +224,22 @@ bool WebRequestContext::initLuaScript( const WebRequestContent& content)
 		= papuga_create_LuaRequestHandler(
 			script, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
 			&transactionHandler, &m_attributes,
-			"PUT", ROOT_CONTEXT_NAME, "", content.str(), content.len(),
+			"PUT", ROOT_CONTEXT_NAME, "", contentstr, contentlen,
 			&errcode);
 	if (!reqhnd)
 	{
 		setAnswer( papugaErrorToErrorCode( errcode));
 		return false;
 	}
-	m_luahandler.create( reqhnd);
+	try
+	{
+		m_luahandler.reset( reqhnd);
+	}
+	catch (...)
+	{
+		setAnswer( ErrorCodeOutOfMem);
+		return false;
+	}
 	return true;
 }
 
@@ -193,8 +266,8 @@ bool WebRequestContext::runLuaScript()
 	for (; ni != ne; ++ni)
 	{
 		papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-		if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod,
-						       delegate->contentstr, delegate->contentlen, &m_luahandler))
+		PapugaLuaDelegateRequestHandler* dhnd = new PapugaLuaDelegateRequestHandler( m_luahandler, ni);
+		if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
 		{
 			setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);
 			return false;
@@ -203,8 +276,7 @@ bool WebRequestContext::runLuaScript()
 	return true;
 }
 
-bool WebRequestContext::execute(
-		const WebRequestContent& content)
+bool WebRequestContext::executeBuiltInCommand()
 {
 	enum {lstbufsize=256};
 	char const* lstbuf[ lstbufsize];
@@ -304,6 +376,15 @@ bool WebRequestContext::execute(
 			setAnswer( ErrorCodeRequestResolveError);
 			return false;
 		}
+		return false;
+	}
+	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
+}
+
+bool WebRequestContext::execute()
+{
+	try
+	{
 		return runLuaScript();
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);

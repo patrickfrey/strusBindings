@@ -28,7 +28,7 @@ public:
 	/// \brief Run the request
 	/// \param[in] content content of the request
 	/// \return bool true if succeeded, false if an error occurred of the request not completed yet
-	virtual bool execute( const WebRequestContent& content)=0;
+	virtual bool execute()=0;
 
 	/// \brief Get the result answer of the request
 	/// \return result status and the data of the answer of the request

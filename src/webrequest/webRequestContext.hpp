@@ -43,11 +43,13 @@ public:
 		const char* http_accept_,
 		const char* html_base_href_,
 		const char* method_,
-		const char* path_);
+		const char* path_,
+		const char* contentstr_,
+		size_t contentlen_);
 
 	virtual ~WebRequestContext();
 
-	virtual bool execute( const WebRequestContent& content);
+	virtual bool execute();
 
 	virtual WebRequestAnswer getAnswer() const;
 
@@ -61,23 +63,6 @@ public:/*WebRequestContext*/
 	static WebRequestContent::Type defaultDocType() {return WebRequestContent::HTML;}
 
 private:
-	/// \brief Clone constructor
-	WebRequestContext(
-		WebRequestHandler* handler_,
-		WebRequestLoggerInterface* logger_,
-		TransactionPool* transactionPool_,
-		const char* method_,
-		const char* contextType_,
-		const char* contextName_,
-		const papuga_RequestAttributes& attributes_,
-		const PapugaContextRef& context_,
-		const PapugaLuaRequestHandlerRef& luahandler_);
-
-	/// \brief Constructor of a clone with a reset state for the execution of schemas to process the delegate request results
-	WebRequestContext* createClone() const;
-
-private:
-	// Implemented in webRequestContext_obj:
 	/// \brief Initialize the context of the request from the specified context type/name pair
 	bool initContext();
 	/// \brief Reset object for requests
@@ -85,16 +70,17 @@ private:
 	/// \brief Initialize the context of the request
 	bool initRequestContext();
 
-	// Implemented in webRequestContext_result:
 	/// \brief Transfer the current context to the handler as active object
 	bool transferContext();
 	/// \brief Define the current request to have failed
 	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
 
 	/// \brief Run the request as a Lua script call
-	bool initLuaScript( const WebRequestContent& content);
+	bool initLuaScript( const char* contentstr, size_t contentlen);
 	/// \brief Run the request as a Lua script call
 	bool runLuaScript();
+	/// \brief Check and if set run a built-in command
+	bool executeBuiltInCommand();
 
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);

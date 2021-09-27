@@ -76,6 +76,33 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 	return ErrorCodeUnknown;
 }
 
+papuga_ErrorCode errorCodeToPapugaError( ErrorCode errcode)
+{
+	switch (errcode)
+	{
+		case ErrorCodeUnknown: return papuga_InvalidRequest;
+		case ErrorCodeLogicError: return papuga_LogicError;
+		case ErrorCodeOutOfMem: return papuga_NoMemError;
+		case ErrorCodeEncoding: return papuga_EncodingError;
+		case ErrorCodeBufferOverflow: return papuga_BufferOverflowError;
+		case ErrorCodeValueOutOfRange: return papuga_OutOfRangeError;
+		case ErrorCodeMaxNofItemsExceeded: return papuga_NofArgsError;
+		case ErrorCodeBindingLanguageError: return papuga_InvalidAccess;
+		case ErrorCodeUnexpectedEof: return papuga_UnexpectedEof;
+		case ErrorCodeNotImplemented: return papuga_NotImplemented;
+		case ErrorCodeIncompleteDefinition: return papuga_ValueUndefined;
+		case ErrorCodeDuplicateDefinition: return papuga_DuplicateDefinition;
+		case ErrorCodeInputFormat: return papuga_SyntaxError;
+		case ErrorCodeUncaughtException: return papuga_UncaughtException;
+		case ErrorCodeNotAllowed: return papuga_NotAllowed;
+		case ErrorCodeRequestResolveError: return papuga_AddressedItemNotFound;
+		case ErrorCodeMaxRecursionDepht: return papuga_MaxRecursionDepthReached;
+		case ErrorCodeRefusedDueToComplexity: return papuga_ComplexityOfProblem;
+		case ErrorCodeInvalidRequest: return papuga_InvalidRequest;
+		default: return papuga_InvalidRequest;
+	}
+}
+
 int strus::errorCodeToHttpStatus( ErrorCode errcode)
 {
 	switch (errcode)

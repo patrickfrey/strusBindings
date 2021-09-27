@@ -62,6 +62,8 @@ public:
 			char const* html_base_href,
 			char const* method,
 			char const* path,
+			char const* contentstr,
+			size_t contentlen,
 			WebRequestAnswer& answer);
 
 	virtual bool delegateRequest(

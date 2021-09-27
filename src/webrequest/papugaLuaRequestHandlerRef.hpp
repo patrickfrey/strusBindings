@@ -13,6 +13,7 @@
 #include "papuga/luaRequestHandler.h"
 #include "strus/webRequestDelegateContextInterface.hpp"
 #include "strus/reference.hpp"
+#include "webRequestUtils.hpp"
 #include <iostream>
 #include <map>
 
@@ -36,25 +37,43 @@ public:
 	}
 };
 
-class PapugaLuaRequestHandlerRef
-	:public strus::Reference<papuga_LuaRequestHandler,PapugaLuaRequestHandlerDeleter>
+typedef strus::Reference<papuga_LuaRequestHandler,PapugaLuaRequestHandlerDeleter> PapugaLuaRequestHandlerRef;
+
+class PapugaLuaDelegateRequestHandler
+	:public PapugaLuaRequestHandlerRef
 	,public WebRequestDelegateContextInterface
 {
 public:
-	typedef strus::Reference<papuga_LuaRequestHandler,PapugaLuaRequestHandlerDeleter> Parent;
-	PapugaLuaRequestHandlerRef(){}
-	explicit PapugaLuaRequestHandlerRef( papuga_LuaRequestHandler* p) :Parent(p){}
-	PapugaLuaRequestHandlerRef( const PapugaLuaRequestHandlerRef& o) :Parent(o){}
-	~PapugaLuaRequestHandlerRef(){}
-	PapugaLuaRequestHandlerRef& operator=( const PapugaLuaRequestHandlerRef& o) {Parent::operator=(o); return *this;}
+	PapugaLuaDelegateRequestHandler(){}
+	PapugaLuaDelegateRequestHandler( const PapugaLuaRequestHandlerRef& p, int idx_) :PapugaLuaRequestHandlerRef(p),m_idx(idx_){}
+	PapugaLuaDelegateRequestHandler( const PapugaLuaDelegateRequestHandler& o) :PapugaLuaRequestHandlerRef(o),m_idx(o.m_idx){}
+	virtual ~PapugaLuaDelegateRequestHandler(){}
 
-	void create( papuga_LuaRequestHandler* ptr) {Parent::operator=( Parent( ptr));}
+	PapugaLuaDelegateRequestHandler& operator=( const PapugaLuaDelegateRequestHandler& o)
+	{
+		PapugaLuaRequestHandlerRef::operator=(o); m_idx=o.m_idx; return *this;
+	}
+
+	void reset( papuga_LuaRequestHandler* ptr_, int idx_)
+	{
+		PapugaLuaRequestHandlerRef::reset( ptr_);
+		m_idx = idx_;
+	}
 
 	void putAnswer( const WebRequestAnswer& status)
 	{
-		void papuga_LuaRequestHandler_init_result( papuga_LuaRequestHandler* handler, int idx, const char* resultstr, size_t resultlen);
-		void papuga_LuaRequestHandler_init_error( papuga_LuaRequestHandler* handler, int idx, papuga_ErrorCode errcode, const char* errmsg);
+		if (status.ok())
+		{
+			papuga_LuaRequestHandler_init_result( PapugaLuaRequestHandlerRef::get(), m_idx, status.content().str(), status.content().len());
+		}
+		else
+		{
+			papuga_LuaRequestHandler_init_error( PapugaLuaRequestHandlerRef::get(), m_idx, errorCodeToPapugaError( (strus::ErrorCode)status.appErrorCode()), status.errorStr());
+		}
 	}
+
+private:
+	int m_idx;
 };
 
 typedef strus::Reference<papuga_LuaRequestHandlerScript,PapugaLuaRequestHandlerScriptDeleter> PagugaLuaRequestHandlerScriptRef;
