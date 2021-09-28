@@ -76,7 +76,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 	return ErrorCodeUnknown;
 }
 
-papuga_ErrorCode errorCodeToPapugaError( ErrorCode errcode)
+papuga_ErrorCode strus::errorCodeToPapugaError( ErrorCode errcode)
 {
 	switch (errcode)
 	{

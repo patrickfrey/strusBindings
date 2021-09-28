@@ -314,6 +314,8 @@ private:
 
 static Logger g_logger;
 static const char* g_accept = "application/json, text/html, text/plain, application/xml";
+static const char* g_charset = "utf-8";
+static const char* g_doctype = "application/json";
 static strus::BlockingCurlClient* g_blockingCurlClient = 0;
 static int g_serverConnSleep = 2;
 static int g_serverConnRetry = 12;
@@ -825,8 +827,8 @@ strus::WebRequestAnswer GlobalContext::call( const std::string& method, const st
 {
 	if (g_blockingCurlClient)
 	{
-		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, charset, doctype, contentstr, contentlen, g_serverConnRetry);
-		strus::WebRequestContent content( charset, doctype, response.content.c_str(), response.content.size());
+		strus::BlockingCurlClient::Response response = g_blockingCurlClient->sendJsonUtf8( method, url, g_charset, g_doctype, contentstr, contentlen, g_serverConnRetry);
+		strus::WebRequestContent content( g_charset, g_doctype, response.content.c_str(), response.content.size());
 		strus::WebRequestAnswer rt( response.httpstatus, content);
 		rt.copyContent();
 		return rt;
@@ -836,7 +838,7 @@ strus::WebRequestAnswer GlobalContext::call( const std::string& method, const st
 		std::pair<std::string,std::string> serverPathPair = splitUrl( url);
 		const std::string& proc = serverPathPair.first;
 		const std::string& path = serverPathPair.second;
-		strus::WebRequestContent content( charset, doctype, contentstr, contentlen);
+		strus::WebRequestContent content( g_charset, g_doctype, contentstr, contentlen);
 
 		ProcMap::iterator pi = m_procMap.find( proc);
 		if (pi == m_procMap.end())
@@ -1093,7 +1095,7 @@ static void pushConvertedJsonAsLuaTable( lua_State* L, int luaddr)
 	}
 	papuga_ValueVariant jsonval;
 	papuga_init_ValueVariant_serialization( &jsonval, &jsonser);
-	if (!papuga_lua_push_value_plain( L, &jsonval, &errcode))
+	if (!papuga_lua_push_value( L, &jsonval, &errcode))
 	{
 		papuga_destroy_Allocator( &allocator);
 		throw strus::runtime_error( _TXT("error converting JSON to lua table: %s"), papuga_ErrorCode_tostring( errcode));
@@ -1293,18 +1295,7 @@ static int l_call_server( lua_State* L)
 				luaL_error(L, _TXT("table or string expected as 3rd argument 'call_server'"));
 			}
 		}
-		const char* doctypestr = 0;
-		const char* encodingstr = 0;
-		if (arglen > 0)
-		{
-			papuga_ContentType doctype = papuga_guess_ContentType( arg, arglen);
-			if (doctype == papuga_ContentType_Unknown) luaL_error(L, _TXT("failed to detect content type of argument of 'call_server'"));
-			doctypestr = papuga_ContentType_mime( doctype);
-			papuga_StringEncoding encoding = papuga_guess_StringEncoding( arg, arglen);
-			if (encoding == papuga_Binary) luaL_error(L, _TXT("failed to detect character set of argument of 'call_server'"));
-			encodingstr = papuga_stringEncodingName( encoding);
-		}
-		strus::WebRequestAnswer result = g_globalContext->call( method, url, encodingstr, doctypestr, arg, arglen);
+		strus::WebRequestAnswer result = g_globalContext->call( method, url, arg, arglen);
 		if (result.content().empty())
 		{
 			lua_pushnil(L);

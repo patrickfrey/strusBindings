@@ -43,6 +43,7 @@ link_directories(
 	${strusmodule_LIBRARY_DIRS}
 	${UTILS_GENSOURCE_DIR}
 	${PAPUGA_LIBRARY_DIRS}
+	${PAPUGA_LUA_LIBRARY_DIRS}
 )
 
 # ------------------------------
@@ -51,10 +52,10 @@ link_directories(
 add_cppcheck( strus_webrequest ${source_files}  libstrus_webrequest.cpp )
 
 add_library( strus_webrequest_static STATIC ${source_files} )
-target_link_libraries( strus_webrequest_static strus_bindings strus_bindings_description strusbindings_private_utils strus_base papuga_request_devel papuga_devel ${CURL_LIBRARIES} )
+target_link_libraries( strus_webrequest_static strus_bindings strus_bindings_description strusbindings_private_utils strus_base papuga_request_devel papuga_devel papuga_lua_dev papuga_luarequest ${CURL_LIBRARIES} )
 
 add_library( strus_webrequest SHARED libstrus_webrequest.cpp )
-target_link_libraries( strus_webrequest strus_webrequest_static strus_bindings strus_bindings_description strusbindings_private_utils strus_base papuga_request_devel papuga_devel ${CURL_LIBRARIES} )
+target_link_libraries( strus_webrequest strus_webrequest_static strus_bindings strus_bindings_description strusbindings_private_utils strus_base papuga_request_devel papuga_devel papuga_lua_dev papuga_luarequest ${CURL_LIBRARIES} )
 
 set_target_properties(
     strus_webrequest

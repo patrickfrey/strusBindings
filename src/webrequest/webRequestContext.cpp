@@ -109,9 +109,12 @@ static const char* createTransaction_( void* self, const char* type, papuga_Requ
 	return ((WebRequestContext*)(self))->createTransaction( type, context, allocator);
 }
 
-static bool doneTransaction_( void* self)
+const char* WebRequestContext::createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator)
 {
-	return ((WebRequestContext*)(self))->doneTransaction();
+	PapugaContextRef contextref( context);
+	std::string tr = m_transactionPool->createTransaction( type, contextref, m_handler->maxIdleTime());
+	const char* trstr = papuga_Allocator_copy_string( &m_allocator, tr.c_str(), tr.size());
+	return trstr;
 }
 
 void WebRequestContext::setAnswer( int errcode, const char* errstr, bool doCopy)
@@ -212,7 +215,7 @@ bool WebRequestContext::initRequestContext()
 bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
-	papuga_TransactionHandler transactionHandler{ this, &createTransaction_, &doneTransaction_ };
+	papuga_TransactionHandler transactionHandler{ this, &createTransaction_ };
 
 	papuga_LuaRequestHandlerScript const* script = m_handler->script( m_contextType);
 	if (!script)
@@ -263,10 +266,14 @@ bool WebRequestContext::runLuaScript()
 		return false;
 	}
 	int ni = 0, ne = papuga_LuaRequestHandler_nof_DelegateRequests( m_luahandler.get());
+	if (ne)
+	{
+		m_openDelegates.reset( new int( ne));
+	}
 	for (; ni != ne; ++ni)
 	{
 		papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-		PapugaLuaDelegateRequestHandler* dhnd = new PapugaLuaDelegateRequestHandler( m_luahandler, ni);
+		PapugaLuaDelegateRequestHandler* dhnd = new PapugaLuaDelegateRequestHandler( m_luahandler, ni, m_openDelegates);
 		if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
 		{
 			setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);

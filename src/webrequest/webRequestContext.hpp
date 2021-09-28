@@ -84,7 +84,6 @@ private:
 
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);
-	bool doneTransaction();
 
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request
