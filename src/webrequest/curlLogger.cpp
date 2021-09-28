@@ -9,6 +9,7 @@
 /// \file "curlLogger.cpp"
 #include "curlLogger.hpp"
 #include "strus/webRequestLoggerInterface.hpp"
+#include <cstring>
 #include <string>
 #include <cstdarg>
 
@@ -25,28 +26,34 @@ void CurlLogger::print( LogType logtype, const char* fmt, ...)
 	switch (logtype)
 	{
 		case LogFatal:
-			m_logger->logError( msgbuf);
+			m_logger->print( WebRequestLoggerInterface::LogError, "curl fatal", msgbuf, std::strlen(msgbuf));
 			break;
 		case LogError:
-			m_logger->logError( msgbuf);
+			m_logger->print( WebRequestLoggerInterface::LogError, "curl error", msgbuf, std::strlen(msgbuf));
 			break;
 		case LogWarning:
-			m_logger->logWarning( msgbuf);
+			m_logger->print( WebRequestLoggerInterface::LogWarning, "curl warning", msgbuf, std::strlen(msgbuf));
 			break;
 		case LogInfo:
-			m_logger->logConnectionEvent( msgbuf);
+			m_logger->print( WebRequestLoggerInterface::LogInfo, "curl", msgbuf, std::strlen(msgbuf));
 			break;
 	}
 }
 
 void CurlLogger::logState( const char* state, int arg)
 {
-	m_logger->logConnectionState( state, arg);
+	if ((m_logger->logMask() & WebRequestLoggerInterface::LogTrace) != 0)
+	{
+		char buf[ 1024];
+		std::snprintf( buf, sizeof(buf), "%s %d", state, arg);
+		buf[ sizeof(buf)-1] = 0;
+		m_logger->print( WebRequestLoggerInterface::LogTrace, "curl state", buf, std::strlen(buf));
+	}
 }
 
 CurlLogger::LogType CurlLogger::evalLogLevel( WebRequestLoggerInterface* logger_)
 {
-	if ((logger_->logMask() & WebRequestLoggerInterface::LogConnectionEvents) != 0)
+	if ((logger_->logMask() & WebRequestLoggerInterface::LogInfo) != 0)
 	{
 		return LogInfo;
 	}
@@ -63,5 +70,4 @@ CurlLogger::LogType CurlLogger::evalLogLevel( WebRequestLoggerInterface* logger_
 		return LogFatal;
 	}
 }
-
 
