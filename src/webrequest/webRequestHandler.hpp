@@ -86,7 +86,6 @@ public:/*WebRequestContext*/
 	const papuga_LuaRequestHandlerScript* script( const char* name) const noexcept	{auto fi = m_scriptMap.find(name); return fi==m_scriptMap.end() ? nullptr : fi->second.get();}
 	papuga_RequestContextPool* contextPool() const noexcept			{return m_contextPool;}
 	char const* html_head() const noexcept					{return m_html_head.c_str();}
-	int debug_maxdepth() const noexcept					{return m_debug_maxdepth;}
 	int maxIdleTime() const noexcept					{return m_maxIdleTime;}
 	bool beautifiedOutput() const noexcept					{return m_beautifiedOutput;}
 	char const* serviceName() const noexcept				{return m_serviceName.c_str();}
@@ -115,8 +114,8 @@ public:/*CurlEventLoopTicker*/
 
 private:
 	strus::mutex m_mutex_context_transfer;		//< mutual exclusion of request context access
-	int m_debug_maxdepth;				//< maximum depth for debug structures
 	WebRequestLoggerInterface* m_logger;		//< request logger
+	papuga_Logger m_papugaLogger;			//< papuga logger description
 	papuga_RequestContextPool* m_contextPool;	//< request context pool
 	papuga_SchemaList* m_schemaList;		//< list of schemas
 	papuga_SchemaMap* m_schemaMap;			//< map of schemas

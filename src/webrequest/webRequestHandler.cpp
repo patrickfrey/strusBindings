@@ -45,6 +45,22 @@ static void tickerFunction( void* THIS)
 static std::pair<papuga_SchemaList*,papuga_SchemaMap*> loadSchemas( papuga_Allocator* allocator, const std::string& schema_dir);
 static PagugaLuaRequestHandlerScriptMap loadScripts( papuga_Allocator* allocator, const std::string& script_dir);
 
+static void papugaLogMessage( void* self, const char* level, const char* tag, const char* msgstr, size_t msglen)
+{
+	WebRequestLoggerInterface* logger = (WebRequestLoggerInterface*)self;
+	WebRequestLoggerInterface::Level lv = WebRequestLoggerInterface::Info;
+	if (level && level[0])
+	{
+		unsigned char level0 = level[0]|32;
+		if (level0 == 'i' && 0==strcasecmp(level,"info")) {lv = WebRequestLoggerInterface::Info;}
+		else if (level0 == 't' && 0==strcasecmp(level,"trace")) {lv = WebRequestLoggerInterface::Trace;}
+		else if (level0 == 'w' && 0==strcasecmp(level,"warning")) {lv = WebRequestLoggerInterface::Warning;}
+		else if (level0 == 'e' && 0==strcasecmp(level,"error")) {lv = WebRequestLoggerInterface::Error;}
+		else if (level0 == 'f' && 0==strcasecmp(level,"fatal")) {lv = WebRequestLoggerInterface::Fatal;}
+	}
+	logger->print( lv, tag, msgstr, msglen);
+}
+
 WebRequestHandler::WebRequestHandler(
 		WebRequestEventLoopInterface* eventLoop_,
 		WebRequestLoggerInterface* logger_,
@@ -57,8 +73,7 @@ WebRequestHandler::WebRequestHandler(
 		bool beautifiedOutput_,
 		int maxIdleTime_,
 		int nofTransactionsPerSeconds)
-	:m_debug_maxdepth(logger_?logger_->structDepth():0)
-	,m_logger(logger_)
+	:m_logger(logger_)
 	,m_contextPool(nullptr)
 	,m_schemaList(nullptr)
 	,m_schemaMap(nullptr)
@@ -74,6 +89,9 @@ WebRequestHandler::WebRequestHandler(
 	,m_beautifiedOutput(beautifiedOutput_)
 	,m_eventLoop( eventLoop_)
 {
+	m_papugaLogger.self = m_logger;
+	m_papugaLogger.log = &papugaLogMessage;
+
 	m_contextPool = papuga_create_RequestContextPool();
 	if (!m_contextPool || !m_eventLoop->addTickerEvent( this, &tickerFunction)) throw std::bad_alloc();
 
@@ -85,15 +103,10 @@ WebRequestHandler::WebRequestHandler(
 		m_schemaMap = scma.second;
 		m_scriptMap = loadScripts( &m_allocator, m_script_dir);
 	}
-	catch (const std::bad_alloc&)
+	catch (...)
 	{
 		papuga_destroy_RequestContextPool( m_contextPool);
-		throw std::bad_alloc();
-	}
-	catch (const std::runtime_error& err)
-	{
-		papuga_destroy_RequestContextPool( m_contextPool);
-		throw err;
+		throw;
 	}
 }
 
@@ -205,8 +218,7 @@ static PagugaLuaRequestHandlerScriptMap loadScripts( papuga_Allocator* allocator
 		ec = strus::readFile( scriptPath, scriptSrc);
 		if (ec) throw strus::runtime_error( "Error (%d) reading script file: %s", ec, ::strerror( ec));
 
-		papuga_LuaRequestHandlerScript* script
-			= papuga_create_LuaRequestHandlerScript( scriptName.c_str(), scriptSrc.c_str(), &errbuf);
+		papuga_LuaRequestHandlerScript* script = papuga_create_LuaRequestHandlerScript( scriptName.c_str(), scriptSrc.c_str(), &errbuf);
 		if (!script)
 		{
 			throw std::runtime_error( papuga_ErrorBuffer_lastError( &errbuf));
@@ -254,7 +266,7 @@ static papuga_RequestAttributes g_configRequestAttributes = {
 	true/*beautifiedOutput*/,
 	true/*deterministicOutput*/};
 
-bool WebRequestHandler::init( 
+bool WebRequestHandler::init(
 		char const* configsrc,
 		size_t configlen,
 		WebRequestAnswer& answer)
@@ -269,7 +281,7 @@ bool WebRequestHandler::init(
 			papuga_LuaRequestHandler* reqhnd
 				= papuga_create_LuaRequestHandler(
 					fi->second.get(), m_schemaMap, m_contextPool, context,
-					nullptr/*transaction handler*/, &g_configRequestAttributes,
+					nullptr/*transaction handler*/, &m_papugaLogger, &g_configRequestAttributes,
 					"PUT", ROOT_CONTEXT_NAME, "", configsrc, configlen,
 					&errcode);
 			if (!reqhnd)

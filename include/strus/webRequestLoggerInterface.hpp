@@ -22,18 +22,24 @@ public:
 	/// \brief Values joined as flags in an integer telling what is to log
 	enum Level
 	{
-		LogError=0x1,
-		LogWarning=0x2,
-		LogInfo=0x4,
-		LogTrace=0x8,
-		LogAll=0xFFFF
+		Fatal,
+		Error,
+		Warning,
+		Info,
+		Trace
 	};
+
+	static const char* levelName( const Level level)
+	{
+		static const char* ar[] = {"fatal","error","warning","info","trace"};
+		return ar[ level];
+	}
 
 	/// \brief Destructor
 	virtual ~WebRequestLoggerInterface(){}
 
 	/// \brief Get the mask that tells what to log
-	virtual int logMask() const=0;
+	virtual int level() const=0;
 
 	/// \brief Log a warning message
 	/// \param[in] level log level of the message

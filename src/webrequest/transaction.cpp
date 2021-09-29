@@ -90,7 +90,7 @@ void TransactionPool::collectGarbage( int64_t timecount)
 	arend %= (m_arsize-1);
 	if (arend < arstart) arend += m_arsize;
 
-	if (m_logger && (m_logger->logMask() & WebRequestLoggerInterface::LogInfo) != 0)
+	if (m_logger && (m_logger->level() >= WebRequestLoggerInterface::Info))
 	{
 		for (int64_t aridx = arstart; aridx < arend; ++aridx)
 		{
@@ -98,7 +98,7 @@ void TransactionPool::collectGarbage( int64_t timecount)
 			if (tref.get())
 			{
 				std::string tid = tref->id();
-				m_logger->print( WebRequestLoggerInterface::LogInfo, "dispose", tid.c_str(), tid.size());
+				m_logger->print( WebRequestLoggerInterface::Info, "dispose", tid.c_str(), tid.size());
 			}
 		}
 	}

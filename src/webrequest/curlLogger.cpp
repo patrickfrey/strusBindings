@@ -26,42 +26,42 @@ void CurlLogger::print( LogType logtype, const char* fmt, ...)
 	switch (logtype)
 	{
 		case LogFatal:
-			m_logger->print( WebRequestLoggerInterface::LogError, "curl fatal", msgbuf, std::strlen(msgbuf));
+			m_logger->print( WebRequestLoggerInterface::Error, "curl fatal", msgbuf, std::strlen(msgbuf));
 			break;
 		case LogError:
-			m_logger->print( WebRequestLoggerInterface::LogError, "curl error", msgbuf, std::strlen(msgbuf));
+			m_logger->print( WebRequestLoggerInterface::Error, "curl error", msgbuf, std::strlen(msgbuf));
 			break;
 		case LogWarning:
-			m_logger->print( WebRequestLoggerInterface::LogWarning, "curl warning", msgbuf, std::strlen(msgbuf));
+			m_logger->print( WebRequestLoggerInterface::Warning, "curl warning", msgbuf, std::strlen(msgbuf));
 			break;
 		case LogInfo:
-			m_logger->print( WebRequestLoggerInterface::LogInfo, "curl", msgbuf, std::strlen(msgbuf));
+			m_logger->print( WebRequestLoggerInterface::Info, "curl", msgbuf, std::strlen(msgbuf));
 			break;
 	}
 }
 
 void CurlLogger::logState( const char* state, int arg)
 {
-	if ((m_logger->logMask() & WebRequestLoggerInterface::LogTrace) != 0)
+	if ((m_logger->level() >= WebRequestLoggerInterface::Trace))
 	{
 		char buf[ 1024];
 		std::snprintf( buf, sizeof(buf), "%s %d", state, arg);
 		buf[ sizeof(buf)-1] = 0;
-		m_logger->print( WebRequestLoggerInterface::LogTrace, "curl state", buf, std::strlen(buf));
+		m_logger->print( WebRequestLoggerInterface::Trace, "curl state", buf, std::strlen(buf));
 	}
 }
 
 CurlLogger::LogType CurlLogger::evalLogLevel( WebRequestLoggerInterface* logger_)
 {
-	if ((logger_->logMask() & WebRequestLoggerInterface::LogInfo) != 0)
+	if (logger_->level() >= WebRequestLoggerInterface::Info)
 	{
 		return LogInfo;
 	}
-	else if ((logger_->logMask() & WebRequestLoggerInterface::LogWarning) != 0)
+	else if (logger_->level() >= WebRequestLoggerInterface::Warning)
 	{
 		return LogWarning;
 	}
-	else if ((logger_->logMask() & WebRequestLoggerInterface::LogError) != 0)
+	else if (logger_->level() >= WebRequestLoggerInterface::Error)
 	{
 		return LogError;
 	}
