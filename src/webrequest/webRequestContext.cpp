@@ -77,7 +77,7 @@ WebRequestContext::WebRequestContext(
 		size_t contentlen_)
 	:m_handler(handler_)
 	,m_logger(logger_)
-	,m_logMask(logger_->logMask())
+	,m_logLevel(logger_->level())
 	,m_transactionPool(transactionPool_),m_transactionRef()
 	,m_contextType(nullptr),m_contextName(nullptr)
 	,m_context(),m_luahandler(),m_path(path_)
@@ -226,7 +226,7 @@ bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen
 	papuga_LuaRequestHandler* reqhnd
 		= papuga_create_LuaRequestHandler(
 			script, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
-			&transactionHandler, &m_attributes,
+			&transactionHandler, m_handler->papugaLogger(), &m_attributes,
 			"PUT", ROOT_CONTEXT_NAME, "", contentstr, contentlen,
 			&errcode);
 	if (!reqhnd)

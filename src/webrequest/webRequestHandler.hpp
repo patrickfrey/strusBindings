@@ -89,6 +89,7 @@ public:/*WebRequestContext*/
 	int maxIdleTime() const noexcept					{return m_maxIdleTime;}
 	bool beautifiedOutput() const noexcept					{return m_beautifiedOutput;}
 	char const* serviceName() const noexcept				{return m_serviceName.c_str();}
+	papuga_Logger* papugaLogger() noexcept					{return &m_papugaLogger;}
 
 	/// \brief Pass ownership of a context to the request handler
 	/// \param[in] contextType type name of context

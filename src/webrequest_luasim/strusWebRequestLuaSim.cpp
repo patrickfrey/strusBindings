@@ -69,248 +69,32 @@ class Logger
 {
 public:
 	Logger()
-		:m_loglevel(0),m_logmask(0){}
+		:m_level(0){}
 
-	void init( int loglevel_)
+	void init( int level_)
 	{
-		m_loglevel = loglevel_;
-		switch (m_loglevel)
-		{
-			case 4: m_logmask |= (LogContentEvents|LogConnectionEvents);
-			case 3: m_logmask |= (LogAction);
-			case 2: m_logmask |= (LogRequests|LogDelegateRequests|LogConfiguration);
-			case 1: m_logmask |= (LogError|LogWarning|LogContextInfoMessages);
-			case 0: m_logmask |= (LogNothing); break;
-			default: m_logmask = LogAll;
-		}
-	}
-
-	void initLogContextInfoMessages()
-	{
-		m_logmask |= LogContextInfoMessages;
-	}
-
-	void setCurrentProc( const char* name)
-	{
-		m_procname = name ? name : "";
+		m_level = level_;
 	}
 
 	virtual ~Logger(){}
 
-	virtual int logMask() const
+	virtual int level() const noexcept
 	{
-		return m_logmask;
+		return m_level;
 	}
 
-	virtual int structDepth() const
+	virtual void print( const Level level, const char* tag, const char* msg, size_t msglen) noexcept
 	{
-		return 100;
-	}
-	virtual void logRequest( const char* reqstr, std::size_t reqstrlen)
-	{
-		std::string reqstrbuf;
-		reqstr = reduceContentSize( reqstrbuf, reqstr, reqstrlen, MaxLogContentSize);
-		std::cerr << header() << strus::string_format( "REQUEST [%s]", reqstr) << std::endl;
-	}
-
-	void logRequestType( const char* title, const char* procdescr, const char* contextType, const char* contextName)
-	{
-		if (contextName && contextType && contextName != contextType)
+		if (level >= m_level)
 		{
-			std::cerr << header() << strus::string_format( "REQTYPE %s %s %s %s", title, procdescr, contextType, contextName) << std::endl;
-		}
-		else if (contextType)
-		{
-			std::cerr << header() << strus::string_format( "REQTYPE %s %s %s", title, procdescr, contextType) << std::endl;
-		}
-		else if (procdescr)
-		{
-			std::cerr << header() << strus::string_format( "REQTYPE %s %s", title, procdescr) << std::endl;
-		}
-		else
-		{
-			std::cerr << header() << strus::string_format( "REQTYPE %s", title) << std::endl;
-		}
-	}
-
-	void logRequestAnswer( const char* content, std::size_t contentsize)
-	{
-		if (contentsize)
-		{
-			std::string contentbuf;
-			content = reduceContentSize( contentbuf, content, contentsize, MaxLogContentSize);
-			std::cerr << header() << strus::string_format( "REQANSWER [%s]", content) << std::endl;
-		}
-		else
-		{
-			std::cerr << header() << strus::string_format( "REQANSWER none") << std::endl;
-		}
-	}
-
-	virtual void logDelegateRequest( const char* address, const char* method, const char* content, std::size_t contentsize)
-	{
-		if (contentsize == 0)
-		{
-			std::cerr << header() << strus::string_format( "DELEGATE %s '%s'", method, address) << std::endl;
-		}
-		else
-		{
-			std::string contentbuf;
-			content = reduceContentSize( contentbuf, content, contentsize, MaxLogContentSize);
-
-			std::cerr << header() << strus::string_format( "DELEGATE %s '%s': '%s...'", method, address, content) << std::endl;
-		}
-	}
-
-	virtual void logPutConfiguration( const char* contextType, const char* contextName, const std::string& configstr)
-	{
-		if (contextName && contextType && contextName != contextType)
-		{
-			std::cerr << header() << strus::string_format( "CONFIG %s '%s':\n\t", contextType, contextName) << indentString( configstr) << std::endl;
-		}
-		else
-		{
-			std::cerr << header() << strus::string_format( "CONFIG %s:\n\t", contextType) << indentString( configstr) << std::endl;
-		}
-	}
-
-	virtual void logAction( const char* contextType, const char* contextName, const char* action)
-	{
-		if (contextName && contextType && contextName != contextType)
-		{
-			std::cerr << header() << strus::string_format( "ACTION %s '%s' %s", contextType, contextName, action) << std::endl;
-		}
-		else
-		{
-			std::cerr << header() << strus::string_format( "ACTION %s %s", contextType, action) << std::endl;
-		}
-	}
-
-	virtual void logContentEvent( const char* title, const char* item, const char* content, std::size_t contentsize)
-	{
-		if (item && item[0])
-		{
-			if (content && content[0])
-			{
-				std::string contentbuf;
-				std::size_t maxsize = isReadableText( content, 64) ? MaxLogReadableItemSize : MaxLogBinaryItemSize;
-				content = reduceContentSize( contentbuf, content, contentsize, maxsize);
-
-				std::cerr << header() << strus::string_format( "PARSE %s %s: %s", title, item, content) << std::endl;
-			}
-			else
-			{
-				std::cerr << header() << strus::string_format( "PARSE %s %s", title, item) << std::endl;
-			}
-		}
-		else
-		{
-			if (contentsize)
-			{
-				std::string contentbuf;
-				std::size_t maxsize = isReadableText( content, 64) ? MaxLogReadableItemSize : MaxLogBinaryItemSize;
-				content = reduceContentSize( contentbuf, content, contentsize, maxsize);
-
-				std::cerr << header() << strus::string_format( "PARSE %s: %s", title, content) << std::endl;
-			}
-			else
-			{
-				std::cerr << header() << strus::string_format( "PARSE %s", title) << std::endl;
-			}
-		}
-	}
-
-	virtual void logConnectionEvent( const char* content)
-	{
-		std::cerr << header() << strus::string_format( "connection event %s", content) << std::endl;
-	}
-
-	virtual void logConnectionState( const char* state, int arg)
-	{
-		if (arg)
-		{
-			std::cerr << header() << strus::string_format( "delegate connection state %s [%d]", state, arg) << std::endl;
-		}
-		else
-		{
-			std::cerr << header() << strus::string_format( "delegate connection state %s", state) << std::endl;
-		}
-	}
-
-	virtual void logWarning( const char* warnmsg)
-	{
-		std::cerr << header() << strus::string_format( "WARNING %s", warnmsg) << std::endl;
-	}
-
-	virtual void logError( const char* errmsg)
-	{
-		std::cerr << header() << strus::string_format( "ERROR %s", errmsg) << std::endl;
-	}
-
-	virtual void logContextInfoMessages( const char* content)
-	{
-		std::cerr << header() << strus::string_format( "INFO %s", content) << std::endl;
-	}
-
-	enum {
-		MaxLogContentSize=2048/*2K*/,
-		MaxLogBinaryItemSize=32,
-		MaxLogReadableItemSize=256
-	};
-private:
-	std::string header() const
-	{
-		return m_procname.empty() ? std::string() : strus::string_format( "[%s] ", m_procname.c_str());
-	}
-	std::string indentString( const std::string& input, int ind=1)
-	{
-		std::string rt;
-		std::string::const_iterator ii = input.begin(), ie = input.end();
-		for (; ii != ie; ++ii)
-		{
-			rt.push_back( *ii);
-			if (*ii == '\n')
-			{
-				for (int ti=0; ti<ind; ++ti)
-				{
-					rt.push_back( '\t');
-				}
-			}
-		}
-		return rt;
-	}
-
-	static bool isReadableText( const char* sample, std::size_t samplesize)
-	{
-		int si = 0, se = samplesize;
-		for (; si != se; ++si)
-		{
-			if ((unsigned char)sample[si] <= 32) return true;
-		}
-		return false;
-	}
-
-	static const char* reduceContentSize( std::string& contentbuf, const char* content, std::size_t contentsize, std::size_t maxsize)
-	{
-		if (contentsize > maxsize)
-		{
-			std::size_t endidx = maxsize;
-			for (;endidx > 0 && strus::utf8midchr( content[ endidx-1]); --endidx){}
-			contentbuf.append( content, endidx);
-			contentbuf.append( " ...");
-			return contentbuf.c_str();
-		}
-		else
-		{
-			return content;
+			std::cerr << levelName( level) << " " << tag << std::string(msg,msglen) << std::endl;
 		}
 	}
 
 private:
-	int m_loglevel;
-	int m_logmask;
-	std::string m_procname;
+	int m_level;
 };
+
 
 static Logger g_logger;
 static const char* g_accept = "application/json, text/html, text/plain, application/xml";
@@ -494,7 +278,7 @@ public:
 
 	virtual void handleException( const char* msg)
 	{
-		g_logger.logError( msg);
+		g_logger.print( strus::WebRequestLoggerInterface::Error, "exception", msg, std::strlen(msg));
 	}
 	virtual long time() const
 	{
@@ -1833,7 +1617,6 @@ int main( int argc, const char* argv[])
 					throw std::runtime_error( _TXT("option -G (--debug) needs argument"));
 				}
 				g_debugTrace->enable( argv[argi]);
-				g_logger.initLogContextInfoMessages();
 				thisCommandLine.append( strus::string_format( " -G \"%s\"", argv[argi]));
 			}
 			else if (0==strcmp( argv[argi], "--mod") || 0==strcmp( argv[argi], "-m"))

@@ -88,7 +88,7 @@ public:
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request
 	WebRequestLoggerInterface* m_logger;	//< logger for logging this request
-	int m_logMask;				//< what to log
+	int m_logLevel;				//< what to log
 	TransactionPool* m_transactionPool;	//< transaction pool
 	TransactionRef m_transactionRef;	//< transaction reference
 	papuga_Allocator m_allocator;		//< papuga allocator used for this request context

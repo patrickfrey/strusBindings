@@ -357,9 +357,11 @@ bool WebRequestHandler::delegateRequest(
 		size_t contentlen,
 		WebRequestDelegateContextInterface* context)
 {
-	if (!!(m_logger->logMask() & WebRequestLoggerInterface::LogDelegateRequests))
+	if (m_logger->level() >= WebRequestLoggerInterface::Trace)
 	{
-		m_logger->logDelegateRequest( address, method, contentstr, contentlen);
+		char buf[ 1024];
+		std::snprintf( buf, sizeof(buf), "DELEGATE %s %s", method, address);
+		m_logger->print( WebRequestLoggerInterface::Trace, buf, contentstr, contentlen);
 	}
 	return m_eventLoop->send( address, method, contentstr, contentlen, context);
 }

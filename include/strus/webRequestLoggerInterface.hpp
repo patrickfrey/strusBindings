@@ -39,7 +39,7 @@ public:
 	virtual ~WebRequestLoggerInterface(){}
 
 	/// \brief Get the mask that tells what to log
-	virtual int level() const=0;
+	virtual int level() const noexcept=0;
 
 	/// \brief Log a warning message
 	/// \param[in] level log level of the message
@@ -47,7 +47,7 @@ public:
 	/// \param[in] msg message to log
 	/// \param[in] msglen length of the message to log in bytes (strlen)
 	/// \remark expected to be thread safe
-	virtual void print( const Level level, const char* tag, const char* msg, size_t msglen)=0;
+	virtual void print( const Level level, const char* tag, const char* msg, size_t msglen) noexcept=0;
 };
 
 }//namespace
