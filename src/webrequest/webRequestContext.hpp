@@ -53,15 +53,6 @@ public:
 
 	virtual WebRequestAnswer getAnswer() const;
 
-	enum {
-		MaxLogContentSize=2048 /*2K*/,
-		MaxLogItemSize=48
-	};
-
-public:/*WebRequestContext*/
-	static papuga_StringEncoding defaultEncoding() {return papuga_UTF8;}
-	static WebRequestContent::Type defaultDocType() {return WebRequestContent::HTML;}
-
 private:
 	/// \brief Initialize the context of the request from the specified context type/name pair
 	bool initContext();

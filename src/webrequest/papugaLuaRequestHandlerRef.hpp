@@ -38,46 +38,6 @@ public:
 };
 
 typedef strus::Reference<papuga_LuaRequestHandler,PapugaLuaRequestHandlerDeleter> PapugaLuaRequestHandlerRef;
-
-class PapugaLuaDelegateRequestHandler
-	:public PapugaLuaRequestHandlerRef
-	,public WebRequestDelegateContextInterface
-{
-public:
-	PapugaLuaDelegateRequestHandler(){}
-	PapugaLuaDelegateRequestHandler( const PapugaLuaRequestHandlerRef& p, int idx_, const strus::Reference<int>& counter_) :PapugaLuaRequestHandlerRef(p),m_idx(idx_),m_counter(counter_){}
-	PapugaLuaDelegateRequestHandler( const PapugaLuaDelegateRequestHandler& o) :PapugaLuaRequestHandlerRef(o),m_idx(o.m_idx),m_counter(o.m_counter){}
-	virtual ~PapugaLuaDelegateRequestHandler(){}
-
-	PapugaLuaDelegateRequestHandler& operator=( const PapugaLuaDelegateRequestHandler& o)
-	{
-		PapugaLuaRequestHandlerRef::operator=(o); m_idx=o.m_idx; return *this;
-	}
-
-	void reset( papuga_LuaRequestHandler* ptr_, int idx_)
-	{
-		PapugaLuaRequestHandlerRef::reset( ptr_);
-		m_idx = idx_;
-	}
-
-	void putAnswer( const WebRequestAnswer& status)
-	{
-		*m_counter -= 1;
-		if (status.ok())
-		{
-			papuga_LuaRequestHandler_init_result( PapugaLuaRequestHandlerRef::get(), m_idx, status.content().str(), status.content().len());
-		}
-		else
-		{
-			papuga_LuaRequestHandler_init_error( PapugaLuaRequestHandlerRef::get(), m_idx, errorCodeToPapugaError( (strus::ErrorCode)status.appErrorCode()), status.errorStr());
-		}
-	}
-
-private:
-	int m_idx;
-	strus::Reference<int> m_counter;
-};
-
 typedef strus::Reference<papuga_LuaRequestHandlerScript,PapugaLuaRequestHandlerScriptDeleter> PagugaLuaRequestHandlerScriptRef;
 
 struct PagugaLuaRequestHandlerScriptKey

@@ -488,15 +488,13 @@ bool EventLoop::send(
 strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Configuration& config, const std::string& configjson_)
 {
 	std::string configdir = "./";
-	std::string schemadir;
-	std::string scriptdir;
+	std::string schemadir = "./";
+	std::string scriptdir = "./";
 	std::string servicename = "test";
 	int transaction_max_idle_time = 600;
 	int transaction_nof_per_sec = 60;
 
 	(void)config.getValue( configdir, "data.configdir");
-	schemadir = strus::joinFilePath( configdir, "schema");
-	scriptdir = strus::joinFilePath( configdir, "script");
 	(void)config.getValue( schemadir, "data.schemadir");
 	(void)config.getValue( scriptdir, "data.scriptdir");
 	(void)config.getValue( servicename, "service.name");

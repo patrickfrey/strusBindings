@@ -8,6 +8,7 @@
 /// \brief Implementation of context for executing XML/JSON requests on the strus bindings
 /// \file "webRequestContext.cpp"
 #include "webRequestContext.hpp"
+#include "webRequestDelegateContext.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
 #include "strus/errorCodes.hpp"
@@ -273,7 +274,7 @@ bool WebRequestContext::runLuaScript()
 	for (; ni != ne; ++ni)
 	{
 		papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-		PapugaLuaDelegateRequestHandler* dhnd = new PapugaLuaDelegateRequestHandler( m_luahandler, ni, m_openDelegates);
+		WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
 		if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
 		{
 			setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);

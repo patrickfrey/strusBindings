@@ -308,7 +308,7 @@ bool WebRequestHandler::init(
 				papuga_destroy_LuaRequestHandler( reqhnd);
 				return false;
 			}
-			if (0<papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
+			if (0!=papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
 			{
 				setAnswer( answer, ErrorCodeRuntimeError, _TXT("no delegate requests allowed in configuration"), false);
 				papuga_destroy_RequestContext( context);
