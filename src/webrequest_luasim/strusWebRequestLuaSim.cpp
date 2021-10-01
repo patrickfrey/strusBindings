@@ -327,7 +327,7 @@ struct ChildProcess
 		:address(o.address),pid(o.pid),cmdline(o.cmdline){}
 };
 
-static std::string g_scriptDir;
+static std::string g_testDir;
 static std::string g_outputDir;
 static std::string g_serviceProgramCmdLine;
 static std::vector<ChildProcess> g_childProcessList;
@@ -488,13 +488,14 @@ bool EventLoop::send(
 strus::WebRequestHandlerInterface* Processor::createWebRequestHandler( const Configuration& config, const std::string& configjson_)
 {
 	std::string configdir = "./";
-	std::string schemadir = "./";
-	std::string scriptdir = "./";
+	(void)config.getValue( configdir, "data.configdir");
+
+	std::string schemadir = strus::joinFilePath( g_testDir, "schema");
+	std::string scriptdir = strus::joinFilePath( g_testDir, "script");
 	std::string servicename = "test";
 	int transaction_max_idle_time = 600;
 	int transaction_nof_per_sec = 60;
 
-	(void)config.getValue( configdir, "data.configdir");
 	(void)config.getValue( schemadir, "data.schemadir");
 	(void)config.getValue( scriptdir, "data.scriptdir");
 	(void)config.getValue( servicename, "service.name");
@@ -838,7 +839,7 @@ static std::string getContentArgumentValue( const char* arg)
 	else if (arg[0] == '@')
 	{
 		std::string content;
-		std::string fullpath = strus::joinFilePath( g_scriptDir, arg+1);
+		std::string fullpath = strus::joinFilePath( g_testDir, arg+1);
 		int ec = strus::readFile( fullpath, content);
 		if (ec) throw strus::runtime_error( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
 		return content;
@@ -1202,7 +1203,7 @@ static int l_load_file( lua_State* L)
 
 		const char* filename = lua_tostring( L, 1);
 		std::string content;
-		std::string fullpath = strus::joinFilePath( g_scriptDir, filename);
+		std::string fullpath = strus::joinFilePath( g_testDir, filename);
 		int ec = strus::readFile( fullpath, content);
 		if (ec) throw strus::runtime_error( _TXT("error (%d) reading file %s with content to process by server: %s"), ec, fullpath.c_str(), ::strerror(ec));
 		lua_pushlstring(L, content.c_str(), content.size());
@@ -1687,8 +1688,7 @@ int main( int argc, const char* argv[])
 		}
 		inputfile = argv[ argi++];
 		thisCommandLine.append( strus::string_format( " \"%s\"", inputfile));
-
-		int ec = strus::getParentPath( inputfile, g_scriptDir);
+		int ec = strus::getParentPath( inputfile, g_testDir);
 		if (ec) throw std::runtime_error( _TXT("failed to get directory of the script to execute"));
 
 		if (argi == argc)
@@ -1726,7 +1726,7 @@ int main( int argc, const char* argv[])
 
 			}
 		}
-		g_logger.init( g_verbosity);
+		g_logger.init( g_verbosity > 0 ? strus::WebRequestLoggerInterface::Trace : strus::WebRequestLoggerInterface::Info);
 
 		if (g_verbosity) fprintf( stderr, _TXT("create lua state\n"));
 		if (!g_serviceProgramCmdLine.empty())

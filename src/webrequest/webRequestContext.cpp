@@ -290,7 +290,6 @@ bool WebRequestContext::executeBuiltInCommand()
 	char const* lstbuf[ lstbufsize];
 	try
 	{
-		initRequestContext();
 		if (isEqual( m_requestMethod,"OPTIONS"))
 		{
 			if (!m_contextType)
@@ -394,6 +393,7 @@ bool WebRequestContext::execute()
 {
 	try
 	{
+		if (!m_answer.ok()) return true;
 		return (!m_openDelegates.get() || *m_openDelegates == 0) ? runLuaScript() : false;
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
