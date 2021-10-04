@@ -1,0 +1,6 @@
+inserter = {
+	docanalyzer = string,
+	storage = string
+}
+
+

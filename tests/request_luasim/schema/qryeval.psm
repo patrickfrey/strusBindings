@@ -1,0 +1,42 @@
+qryeval = {
+	cterm = {
+		set = string,
+		type = string,
+		value = string
+	},
+	restriction = string,
+	selection = string,
+	exclusion = string,
+	weighting = {
+		name = string,
+		feature = {
+			role = string,
+			set = string
+		},
+		param = {
+			name = string,
+			value = string
+		}
+	},
+	summarizer = {
+		id = string,
+		name = string,
+		feature = {
+			role = string,
+			set = string
+		},
+		param = {
+			name = string,
+			value = string
+		}
+	},
+	formula = {
+		expression = string,
+		param = {
+			name = string,
+			value = string
+		}
+	}
+}
+
+

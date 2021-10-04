@@ -1,0 +1,7 @@
+distqryeval = {
+	analyzer = string,
+	collector = string,
+	qryeval = {string},
+	statserver = string
+}
+

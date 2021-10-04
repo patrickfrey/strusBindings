@@ -1,0 +1,65 @@
+config = {
+	extensions = {
+		directory = string,
+		modules = {string}
+	},
+
+	data = {
+		workdir = string,
+		configdir = string,
+		scriptdir = string,
+		schemadir = string,
+		resources = string
+	},
+
+	context = {
+		trace = {
+			log = string,
+			file = string,
+			groupby = string,
+			call = string,
+			count = string
+		},
+		debug = {string},
+		rpc = string,
+		threads = integer
+	},
+
+	transactions = {
+		max_idle_time  = integer,
+		nof_per_sec = integer
+	},
+
+	http = {
+		script = string
+	},
+
+	service = {
+		worker_threads = integer,
+		name = string,
+		api = string,
+		ip = string,
+		port = integer
+	},
+
+	logging = {
+		level = string,
+		directory = string,
+		file = {
+			name = string,
+			append = boolean
+		}
+	},
+
+	debug = {
+		log_requests = boolean,
+		struct_depth = integer,
+		request_file = string,
+		protocol = {
+			pretty_print = boolean,
+			quit_enabled = boolean
+		}
+	}
+}
+
+

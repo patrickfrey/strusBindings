@@ -151,6 +151,11 @@ void WebRequestContext::resetContext()
 	m_context.reset();
 }
 
+bool WebRequestContext::isCreateRequest() const noexcept
+{
+	return isEqual( m_requestMethod, "PUT") && !m_path.hasMore() && !m_transactionRef.get();
+}
+
 bool WebRequestContext::initContext()
 {
 	m_transactionRef.reset();
@@ -160,11 +165,23 @@ bool WebRequestContext::initContext()
 		setAnswer( ErrorCodeOutOfMem);
 		return false;
 	}
-	if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
+	if (!isCreateRequest())
 	{
-		papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
-		setAnswer( papugaErrorToErrorCode( errcode));
-		return false;
+		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
+		{
+			papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+			setAnswer( papugaErrorToErrorCode( errcode));
+			return false;
+		}
+	}
+	else
+	{
+		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
+		{
+			papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+			setAnswer( papugaErrorToErrorCode( errcode));
+			return false;
+		}
 	}
 	return true;
 }
@@ -228,7 +245,7 @@ bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen
 		= papuga_create_LuaRequestHandler(
 			script, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
 			&transactionHandler, m_handler->papugaLogger(), &m_attributes,
-			"PUT", ROOT_CONTEXT_NAME, "", contentstr, contentlen,
+			"PUT", ROOT_CONTEXT_NAME, m_path.rest(), contentstr, contentlen,
 			&errcode);
 	if (!reqhnd)
 	{
@@ -281,7 +298,7 @@ bool WebRequestContext::runLuaScript()
 			return false;
 		}
 	}
-	return true;
+	return ne==0;
 }
 
 bool WebRequestContext::executeBuiltInCommand()
@@ -394,7 +411,19 @@ bool WebRequestContext::execute()
 	try
 	{
 		if (!m_answer.ok()) return true;
-		return (!m_openDelegates.get() || *m_openDelegates == 0) ? runLuaScript() : false;
+		if (!m_openDelegates.get() || *m_openDelegates == 0)
+		{
+			bool terminated = runLuaScript();
+			if (terminated && m_answer.ok() && isCreateRequest())
+			{
+				transferContext();
+			}
+			return terminated;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
 }

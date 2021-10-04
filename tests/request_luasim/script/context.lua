@@ -1,12 +1,13 @@
-function GET( context, input, path)
+function GET( self, input, path)
 	return nil
 end
 
-function PUT( context, input, path)
+function PUT( self, input, path)
+	schema( "config", input, false)
 	return nil
 end
 
-function POST( context, input, path)
+function POST( self, input, path)
 	return nil
 end
 

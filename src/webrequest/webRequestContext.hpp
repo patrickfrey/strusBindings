@@ -72,6 +72,8 @@ private:
 	bool runLuaScript();
 	/// \brief Check and if set run a built-in command, return false if not built-in command set
 	bool executeBuiltInCommand();
+	/// \brief Check if the request is a [PUT obj] command
+	bool isCreateRequest() const noexcept;
 
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);

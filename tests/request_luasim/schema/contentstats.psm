@@ -1,0 +1,23 @@
+contentstatsElement = {
+	type = string,
+	regex = string,
+	priority = integer,
+	minlen = integer,
+	maxlen = integer,
+	tokenizer = {
+		name = string,
+		arg = string
+	},
+	normalizer = {{
+		name = string,
+		arg = string
+	}}
+}
+
+contentstats = {
+	attribute = {string},
+	select = {string},
+	element = {contentstatsElement}
+}
+
+

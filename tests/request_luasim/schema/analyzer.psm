@@ -1,0 +1,134 @@
+documentClass = {
+	segmenter = string,
+	mimetype = string,
+	encoding = string,
+	schema = string
+}
+
+tokenizer = {
+	name = string,
+	arg = string
+}
+
+normalizer = {
+	name = string,
+	arg = string
+}
+
+function = {
+	name = string,
+	arg = string
+}
+
+searchFeature = {
+	type = string,
+	select = string,
+	tokenizer = tokenizer,
+	normalizer = normalizer,
+	priority = integer,
+	position = string	-- succ, pred, content, unique
+}
+
+attributeFeature = {
+	type = string,
+	select = string,
+	tokenizer = tokenizer,
+	normalizer = normalizer
+}
+
+aggregatorFeature = {
+	type = string,
+	function = function
+}
+
+documentField = {
+	name = string,
+	scope = string,
+	select = string,
+	key = string
+}
+
+documentStructure = {
+	name = string,
+	header = string,
+	content = string,
+	class = string
+}
+
+docanalyzer = {
+	class = documentClass,
+	feature = {{
+		search = searchFeature,
+		forward = searchFeature,
+		metadata = attributeFeature,
+		attribute = attributeFeature,
+		aggregator = aggregatorFeature
+	}},
+	document = {{
+		name = string,
+		select = string
+	}},
+	content = {{
+		class = documentClass,
+		select = string
+	}},
+	field = {documentField},
+	structure = {documentStructure}
+}
+
+queryAnalyzerElement = {
+	type = string,
+	field = string,
+	tokenizer = tokenizer,
+	normalizer = normalizer,
+}
+
+vectorStorage = {
+	sentanalyzer = {
+		field = string,
+		tokenizer = tokenizer,
+		normalizer = normalizer,
+		expansion = {
+			type = string,
+			sim = number
+		},
+	}
+}
+
+queryGroup = {
+	@by = string,
+	field = string,
+	op = string,
+	range = integer,
+	cardinality = integer,
+
+}
+
+qryanalyzer = {
+	element = {queryAnalyzerElement},
+	vstorage = vectorStorage,
+	group = {queryGroup}
+}
+
+documentAttribute = {
+	name = string,
+	value = string
+}
+
+documentFeature = {
+	type = string,
+	value = string,
+	pos = integer,
+	len = integer
+}
+
+document = {
+	docid = string,
+	doctype = string,
+	attribute = {documentAttribute},
+	metadata = {documentAttribute},
+	forwardindex = {documentFeature},
+	searchindex = {documentFeature},
+	access = string
+}
+

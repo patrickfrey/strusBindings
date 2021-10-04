@@ -1,0 +1,28 @@
+vstorage = {
+	path = string,
+	database = string,
+	memtypes = string,
+	lextypes = string,
+	spacesb = string,
+	coversim = number,
+	recall = number,
+	vecdim = integer,
+	bits = integer,
+	variations = integer,
+	cache = string,
+	autocompact = boolean,
+	compression = boolean,
+	max_open_files = integer,
+	write_buffer_size = integer,
+	block_size = integer
+}
+
+vstorageTransaction = {
+	feature = {{
+		type = string,
+		value = string,
+		vector = {number}
+	}}
+}
+
+

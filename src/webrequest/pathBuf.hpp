@@ -29,14 +29,14 @@ public:
 		itr = buf;
 	}
 
-	bool startsWith( const char* prefix, int prefixlen)
+	bool startsWith( const char* prefix, int prefixlen) const noexcept
 	{
 		char* itrnext = std::strchr( itr, '/');
 		if (!itrnext) itrnext = std::strchr( itr, '\0');
 		return (prefixlen == itrnext-itr && prefix[0] == itr[0] && 0==std::memcmp( prefix, itr, prefixlen));
 	}
 
-	bool hasMore()
+	bool hasMore() const noexcept
 	{
 		return itr[0];
 	}

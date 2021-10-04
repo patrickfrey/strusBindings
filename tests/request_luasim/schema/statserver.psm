@@ -1,0 +1,17 @@
+statserver = {
+	storage = string,
+	blocks = string,
+	proc = string
+}
+
+statistics = {
+	termstats = {{
+		type = string,
+		value = string,
+		df = number
+	}},
+	globalstats = {
+		nofdocs = integer
+	}
+}
+

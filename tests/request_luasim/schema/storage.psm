@@ -1,0 +1,26 @@
+deleteStorage = {
+	path = string,
+	database = string
+}
+
+metadataChange = {
+	op = string,
+	name = string,
+	type = string,
+	oldname = string
+}
+
+defineStorage = {
+	path = string,
+	database = string,
+	statsproc = string,
+	autocompact = boolean,
+	acl = boolean,
+	cachedterms = string,
+	cache = string,
+	compression = boolean,
+	max_open_files = integer,
+	write_buffer_size = integer,
+	block_size = integer
+}
+

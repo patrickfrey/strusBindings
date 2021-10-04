@@ -12,7 +12,7 @@ serverConfig = {
 	},
 	extensions = {
 		directory = "@STRUS_MODULE_PATH@",
-		modules = { 
+		modules = {
 			@STRUS_MODULES_LOADED@
 		}
 	},
@@ -74,10 +74,9 @@ function def_test_server( serverName, address, embeddedConfig)
 
 		config = serverConfig
 		config.service.name = serverName
+		def_server( address, config)
 		if embeddedConfig then
-			def_server( address, mergeValues( embeddedConfig, config))
-		else
-			def_server( address, config)
+			call_server( "PUT", address, embeddedConfig)
 		end
 		if verbose then io.stderr:write( string.format("- Defined server %s at %s\n", serverName, address)) end
 	end

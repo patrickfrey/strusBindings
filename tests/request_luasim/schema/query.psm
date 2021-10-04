@@ -1,0 +1,96 @@
+term_expression = {
+	variable = string,
+	type = string,
+	value = string,
+	len = integer
+}
+
+term_expression = {
+	variable = string,
+	op = string,
+	range = integer,
+	cardinality = integer,
+	arg = { term_expression }
+}
+
+restriction_condition = {
+	op = string,
+	name = string,
+	value = string
+}
+
+restriction_expression =
+{
+	union = {{
+		condition = {restriction_condition}
+	}}
+}
+
+restriction_expression =
+{
+	condition = {restriction_condition}
+}
+
+sentence = {
+	field = string,
+	content = string,
+	results = number,
+	minweight = number
+}
+
+termstats = {
+	type = string,
+	value = string,
+	df = integer
+}
+
+globalstats = {
+	nofdocs = integer
+}
+
+query = {
+	feature = {{
+		set = string,
+		weight = number,
+		sentence = sentence,
+		content = term_expression,
+		analyzed = term_expression
+	}},
+	restriction = {{
+		content = restriction_expression,
+		analyzed = restriction_expression
+	}},
+	termstats = termstats,
+	globalstats = globalstats,
+	evalset = {
+		docno = {integer}
+	},
+	nofranks = integer,
+	minrank = integer,
+	mergeres = boolean,
+	access = {string}
+}
+
+summaryElement = {
+	name = string,
+	value = string,
+	weight = number,
+	index = integer
+}
+
+queryresult = {
+	evalpass = integer,
+	nofranked = integer,
+	nofvisited = integer,
+	ranks = {{
+		docno = integer,
+		weight = number,
+		field = {
+			start = integer,
+			end = integer
+		},
+		summary = {summaryElement}
+	}},
+	summary = {summaryElement}
+}
+
