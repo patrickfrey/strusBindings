@@ -35,7 +35,6 @@ class WebRequestContext
 	:public WebRequestContextInterface
 {
 public:
-	/// \brief Constructor for web request
 	WebRequestContext(
 		WebRequestHandler* handler_,
 		WebRequestLoggerInterface* logger_,

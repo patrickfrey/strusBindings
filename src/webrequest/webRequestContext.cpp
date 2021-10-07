@@ -246,7 +246,7 @@ bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen
 		= papuga_create_LuaRequestHandler(
 			script, (papuga_LuaInitProc*)&luaopen_strus, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
 			&transactionHandler, m_handler->papugaLogger(), &m_attributes,
-			"PUT", ROOT_CONTEXT_NAME, m_path.rest(), contentstr, contentlen,
+			m_requestMethod, ROOT_CONTEXT_NAME, m_path.rest(), contentstr, contentlen,
 			&errcode);
 	if (!reqhnd)
 	{

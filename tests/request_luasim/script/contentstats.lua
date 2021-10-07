@@ -6,20 +6,32 @@ function PUT( self, inputstr, path)
 	input = schema( "contentstats", inputstr, true)
 	context = self:get("context")
 	contentstats = context:createContentStatistics()
-	for _,a in ipairs(input.attribute) do
-		contentstats:addVisibleAttribute( a)
+	if input.attribute then
+		for _,a in ipairs(input.attribute) do
+			contentstats:addVisibleAttribute( a)
+		end
 	end
-	for _,s in ipairs(input.select) do
-		contentstats:addSelectorExpression( s)
+	if input.select then
+		for _,s in ipairs(input.select) do
+			contentstats:addSelectorExpression( s)
+		end
 	end
-	for _,e in ipairs(input.element) do
-		contentstats:addLibraryElement( e.type, e.regex, e.priority, e.minlen, e.maxlen, e.tokenizer, e.normalizer)
+	if input.element then
+		for _,e in ipairs(input.element) do
+			contentstats:addLibraryElement( e.type, e.regex, e.priority, e.minlen, e.maxlen, e.tokenizer, e.normalizer)
+		end
 	end
 	self:set( "contentstats", contentstats)
 	return nil
 end
 
 function POST( self, inputstr, path)
-	return nil
+	if (path == "transaction") then
+		contentstats = self:get("contentstats")
+		local tid = transaction( "contentcollector", contentstats:createCollector())
+		return tid
+	else
+		http_error( "404")
+	end
 end
 

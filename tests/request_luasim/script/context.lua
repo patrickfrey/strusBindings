@@ -16,9 +16,7 @@ function dump( data, indent)
 end
 
 function PUT( self, inputstr, path)
-	print( inputstr)
 	config = schema( "config", inputstr, false)
-	print( dump( config))
 	self:set( "context", strus_Context.new( config.context))
 	return nil
 end
