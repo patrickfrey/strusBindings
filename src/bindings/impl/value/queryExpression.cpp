@@ -123,7 +123,7 @@ void QueryExpression::addRestriction( const papuga_ValueVariant& restriction)
 	}
 	papuga_ValueVariant restriction_copy;
 	papuga_ErrorCode errcode = papuga_Ok;
-	if (!papuga_Allocator_deepcopy_value( &m_allocator, &restriction_copy, const_cast<papuga_ValueVariant*>(&restriction)/*unchanged*/, false/*no host objects expected*/, &errcode))
+	if (!papuga_Allocator_deepcopy_value( &m_allocator, &restriction_copy, const_cast<papuga_ValueVariant*>(&restriction)/*unchanged*/, &errcode))
 	{
 		throw strus::runtime_error(_TXT("failed '%s': %s"), "QueryExpression::addExpression", papuga_ErrorCode_tostring( errcode));
 	}

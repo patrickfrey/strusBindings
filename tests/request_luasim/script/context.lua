@@ -2,8 +2,24 @@ function GET( self, input, path)
 	return nil
 end
 
-function PUT( self, input, path)
-	schema( "config", input, false)
+function dump( data, indent)
+	local indent = indent or "\n"
+	if type( data) == "table" then
+		local rt = ""
+		for k,v in pairs(data) do
+			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
+		end
+		return rt
+	else
+		return tostring( data)
+	end
+end
+
+function PUT( self, inputstr, path)
+	print( inputstr)
+	config = schema( "config", inputstr, false)
+	print( dump( config))
+	self:set( "context", strus_Context.new( config.context))
 	return nil
 end
 

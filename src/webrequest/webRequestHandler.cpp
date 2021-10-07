@@ -12,6 +12,7 @@
 #include "webRequestUtils.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
+#include "strus/lib/lua.h"
 #include "strus/webRequestLoggerInterface.hpp"
 #include "strus/webRequestDelegateContextInterface.hpp"
 #include "strus/errorCodes.hpp"
@@ -280,7 +281,7 @@ bool WebRequestHandler::init(
 			papuga_RequestContext* context = papuga_create_RequestContext();
 			papuga_LuaRequestHandler* reqhnd
 				= papuga_create_LuaRequestHandler(
-					fi->second.get(), m_schemaMap, m_contextPool, context,
+					fi->second.get(), (papuga_LuaInitProc*)&luaopen_strus, m_schemaMap, m_contextPool, context,
 					nullptr/*transaction handler*/, &m_papugaLogger, &g_configRequestAttributes,
 					"PUT", ROOT_CONTEXT_NAME, "", configsrc, configlen,
 					&errcode);

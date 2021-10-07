@@ -25,6 +25,7 @@ include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 	${PAPUGA_INCLUDE_DIRS}
 	${CURL_INCLUDE_DIRS}
+	${LUA_INCLUDE_DIRS}
 	${strusbase_INCLUDE_DIRS}
 	${strus_INCLUDE_DIRS}
 	${strusanalyzer_INCLUDE_DIRS}
@@ -42,6 +43,7 @@ link_directories(
 	${strusrpc_LIBRARY_DIRS}
 	${strusmodule_LIBRARY_DIRS}
 	${UTILS_GENSOURCE_DIR}
+	${LUA_LIBRARY_DIRS}
 	${PAPUGA_LIBRARY_DIRS}
 	${PAPUGA_LUA_LIBRARY_DIRS}
 )

@@ -72,8 +72,6 @@ ConfigStruct::ConfigStruct( const std::string& config, ErrorBufferInterface* err
 	{
 		throw strus::runtime_error( _TXT("failed to get the configuration: %s"), errorhnd->fetchError());
 	}
-	strus::bindings::Serializer::serialize( &serialization, *cfg, false/*deep*/);
-	if (!papuga_Allocator_alloc_HostObject( &allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<ItemList>::getDestructor())) throw std::bad_alloc();
-	cfg.release();
+	strus::bindings::Serializer::serialize( &serialization, *cfg, true/*deep*/);
 }
 

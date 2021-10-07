@@ -13,6 +13,7 @@
 #include "webRequestUtils.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/lib/error.hpp"
+#include "strus/lib/lua.h"
 #include "strus/base/fileio.hpp"
 #include "private/internationalization.hpp"
 
@@ -243,7 +244,7 @@ bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen
 	}
 	papuga_LuaRequestHandler* reqhnd
 		= papuga_create_LuaRequestHandler(
-			script, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
+			script, (papuga_LuaInitProc*)&luaopen_strus, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
 			&transactionHandler, m_handler->papugaLogger(), &m_attributes,
 			"PUT", ROOT_CONTEXT_NAME, m_path.rest(), contentstr, contentlen,
 			&errcode);

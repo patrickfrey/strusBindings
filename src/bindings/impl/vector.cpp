@@ -64,16 +64,14 @@ Struct VectorStorageClientImpl::types() const
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 	typedef std::vector<std::string> NameList;
-	Reference<NameList> cfg( new NameList( storage->types()));
-	if (cfg->empty())
+	NameList cfg( storage->types());
+	if (cfg.empty())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	Struct rt;
-	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<NameList>::getDestructor())) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( &rt.serialization, *cfg,false/*deep*/);
-	cfg.release();
+	strus::bindings::Serializer::serialize( &rt.serialization, cfg, true/*deep*/);
 	rt.release();
 	return rt;
 }
@@ -83,16 +81,14 @@ Struct VectorStorageClientImpl::featureTypes( const std::string& featureValue) c
 	const VectorStorageClientInterface* storage = m_vector_storage_impl.getObject<VectorStorageClientInterface>();
 	if (!storage) throw strus::runtime_error( _TXT("calling vector storage client method after close"));
 	typedef std::vector<std::string> NameList;
-	Reference<NameList> cfg( new NameList( storage->featureTypes( featureValue)));
-	if (cfg->empty())
+	NameList cfg( storage->featureTypes( featureValue));
+	if (cfg.empty())
 	{
 		ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 		if (errorhnd->hasError()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 	}
 	Struct rt;
-	if (!papuga_Allocator_alloc_HostObject( &rt.allocator, 0, cfg.get(), strus::bindings::BindingClassTemplate<NameList>::getDestructor())) throw std::bad_alloc();
-	strus::bindings::Serializer::serialize( &rt.serialization, *cfg,false/*deep*/);
-	cfg.release();
+	strus::bindings::Serializer::serialize( &rt.serialization, cfg, true/*deep*/);
 	rt.release();
 	return rt;
 }
