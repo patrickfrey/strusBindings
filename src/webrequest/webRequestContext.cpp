@@ -16,6 +16,7 @@
 #include "strus/lib/lua.h"
 #include "strus/base/fileio.hpp"
 #include "private/internationalization.hpp"
+#include "papuga/valueVariant.h"
 
 using namespace strus;
 
@@ -288,18 +289,30 @@ bool WebRequestContext::runLuaScript()
 	if (ne)
 	{
 		m_openDelegates.reset( new int( ne));
-	}
-	for (; ni != ne; ++ni)
-	{
-		papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-		WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
-		if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
+		for (; ni != ne; ++ni)
 		{
-			setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);
-			return false;
+			papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
+			WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
+			if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
+			{
+				setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);
+				return false;
+			}
 		}
+		return false;
 	}
-	return ne==0;
+	else
+	{
+		const papuga_LuaRequestResult* result = papuga_LuaRequestHandler_get_result( m_luahandler.get());
+		if (result)
+		{
+			m_answer.setContent( WebRequestContent(
+						papuga_StringEncoding_name(result->encoding),
+						papuga_ContentType_name(result->doctype), 
+						result->contentstr, result->contentlen));
+		}
+		return true;
+	}
 }
 
 bool WebRequestContext::executeBuiltInCommand()

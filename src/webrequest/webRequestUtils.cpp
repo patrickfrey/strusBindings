@@ -73,6 +73,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_DelegateRequestFailed:	return ErrorCodeInvalidRequest;
 		case papuga_ServiceImplementationError: return ErrorCodeLogicError;
 		case papuga_BindingLanguageError:	return ErrorCodeBindingLanguageError;
+		case papuga_InvalidOutput:		return ErrorCodeRuntimeError;
 	}
 	return ErrorCodeUnknown;
 }
@@ -100,6 +101,7 @@ papuga_ErrorCode strus::errorCodeToPapugaError( ErrorCode errcode)
 		case ErrorCodeMaxRecursionDepht: return papuga_MaxRecursionDepthReached;
 		case ErrorCodeRefusedDueToComplexity: return papuga_ComplexityOfProblem;
 		case ErrorCodeInvalidRequest: return papuga_InvalidRequest;
+		case ErrorCodeRuntimeError: return papuga_ServiceImplementationError;
 		default: return papuga_InvalidRequest;
 	}
 }

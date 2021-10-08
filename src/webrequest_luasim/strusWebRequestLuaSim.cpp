@@ -97,7 +97,7 @@ private:
 
 
 static Logger g_logger;
-static const char* g_accept = "application/json, text/html, text/plain, application/xml";
+static const char* g_accept = "application/json";
 static const char* g_charset = "utf-8";
 static const char* g_doctype = "application/json";
 static strus::BlockingCurlClient* g_blockingCurlClient = 0;
@@ -529,17 +529,22 @@ strus::WebRequestAnswer Processor::call( const std::string& method, const std::s
 	strus::Reference<strus::WebRequestContextInterface>
 		ctx( m_handler->createContext( g_accept, html_base_href.c_str(), method.c_str(), path.c_str(), content.str(), content.len(), rt));
 	if (!ctx.get()) return rt;
-	for (;;)
+	int execCount = 100;
+	while (--execCount > 0 && !ctx->execute())
+	{}
+	if (execCount <= 0)
 	{
-		if (ctx->execute())
-		{
-			return ctx->getAnswer();
-	}	}
-	if (!rt.content().empty())
-	{
-		rt.copyContent();
+		throw std::runtime_error( _TXT("endless call server loop"));
 	}
-	return rt;
+	else
+	{
+		rt = ctx->getAnswer();
+		if (!rt.content().empty())
+		{
+			rt.copyContent();
+		}
+		return rt;
+	}
 }
 
 void GlobalContext::defineServer( const std::string& hostname, const Configuration& configmap, const std::string& configjson)

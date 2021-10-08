@@ -1,5 +1,19 @@
 require "os"
 
+-- Dumping table contents to a string
+function dump( data, indent)
+	local indent = indent or "\n"
+	if type( data) == "table" then
+		local rt = ""
+		for k,v in pairs(data) do
+			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
+		end
+		return rt
+	else
+		return tostring( data)
+	end
+end
+
 -- Function checking a HTTP status code that exits if the code is not in the OK range
 function exitOnBadHttpStatus( httpStatus)
 	if (httpStatus < 200 or httpStatus >= 300) then
@@ -10,6 +24,7 @@ end
 -- Function calling a server in the emulation context (not a real server) and handling possible errors, expecting the call to succeed
 function call_server_checked( method, server, arg)
 	local result,status,errmsg = call_server( method, server, arg)
+	print( "CALL SERVER RESULT " .. dump( {result=result,status=status,errmsg=errmsg} ))
 	if (status < 200 or status >= 300) then
 		if arg then
 			if (type(arg) == "table") then arg = to_json( arg) end

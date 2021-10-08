@@ -29,7 +29,7 @@ function POST( self, inputstr, path)
 	if (path == "transaction") then
 		contentstats = self:get("contentstats")
 		local tid = transaction( "contentcollector", contentstats:createCollector())
-		return tid
+		return {transaction={link=tid}}
 	else
 		http_error( "404")
 	end
