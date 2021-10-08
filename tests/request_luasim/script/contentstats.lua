@@ -1,5 +1,6 @@
-function GET( context, inputstr, path)
-	return nil
+function GET( self, inputstr, path)
+	contentstats = self:get("contentstats")
+	return {contentstats={contentstats:introspection( path)}}
 end
 
 function PUT( self, inputstr, path)
@@ -22,7 +23,6 @@ function PUT( self, inputstr, path)
 		end
 	end
 	self:set( "contentstats", contentstats)
-	return nil
 end
 
 function POST( self, inputstr, path)

@@ -311,6 +311,10 @@ bool WebRequestContext::runLuaScript()
 						papuga_ContentType_name(result->doctype), 
 						result->contentstr, result->contentlen));
 		}
+		if (m_transactionRef.get())
+		{
+			m_transactionPool->returnTransaction( m_transactionRef);
+		}
 		return true;
 	}
 }
