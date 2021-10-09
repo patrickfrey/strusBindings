@@ -711,7 +711,7 @@ static bool convertLuaValueToJson_( lua_State* L, int luaddr, std::string& dest,
 	else if (lua_isstring( L, luaddr))
 	{
 		dest.push_back( '"');
-		dest.append( lua_tostring( L, luaddr));
+		dest.append( strus::string_conv::escape( lua_tostring( L, luaddr)));
 		dest.push_back( '"');
 	}
 	else if (lua_istable( L, luaddr))

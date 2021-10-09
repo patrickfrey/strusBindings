@@ -15,10 +15,10 @@ documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
 for k,path in pairs(documents) do
 	fullpath = "doc/xml/" .. path
 	if verbose then io.stderr:write( string.format("- Insert document %s\n", fullpath)) end
-	call_server_checked( "PUT", TRANSACTION, "@" .. fullpath)
+	call_server_checked( "PUT", TRANSACTION .. "/" .. fullpath, "@" .. fullpath)
 end
 
-OUTPUT = call_server_checked( "GET", TRANSACTION )
+OUTPUT = call_server_checked_det_json( "GET", TRANSACTION )
 if verbose then io.stderr:write( string.format("- Inspect document analysis:\n%s\n", OUTPUT)) end
 
 checkExpected( OUTPUT, "@documentStructureAnalysis.exp", "documentStructureAnalysis.res" )

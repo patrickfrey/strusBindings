@@ -24,7 +24,6 @@ end
 -- Function calling a server in the emulation context (not a real server) and handling possible errors, expecting the call to succeed
 function call_server_checked( method, server, arg)
 	local result,status,errmsg = call_server( method, server, arg)
-	print( "CALL SERVER RESULT " .. dump( {result=result,status=status,errmsg=errmsg} ))
 	if (status < 200 or status >= 300) then
 		if arg then
 			if (type(arg) == "table") then arg = to_json( arg) end
@@ -40,6 +39,11 @@ function call_server_checked( method, server, arg)
 		error( string.format("Request with method %s on server %s%s failed with HTTP status %d%s", method, server, argmsg, status, errmsg))
 	end
 	return result
+end
+
+-- Call a server and make JSON ouput deterministic
+function call_server_checked_det_json( method, server, arg)
+	return to_json( from_json( call_server_checked( method, server, arg)))
 end
 
 -- Function to make result of query evaluation comparable between different platforms

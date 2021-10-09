@@ -4,7 +4,7 @@ function GET( self, inputstr, path)
 end
 
 function PUT( self, inputstr, path)
-	input = schema( "contentstats", inputstr, true)
+	input = schema( "contentstats", inputstr, true).contentstats
 	context = self:get("context")
 	contentstats = context:createContentStatistics()
 	if input.attribute then
