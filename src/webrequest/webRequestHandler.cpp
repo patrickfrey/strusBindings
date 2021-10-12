@@ -416,6 +416,7 @@ bool WebRequestHandler::transferContext(
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	strus::unique_lock lock( m_mutex_context_transfer);
+
 	if (!papuga_RequestContextPool_transfer_context( m_contextPool, contextType, contextName, context, &errcode))
 	{
 		papuga_destroy_RequestContext( context);
@@ -432,6 +433,7 @@ bool WebRequestHandler::removeContext(
 {
 	papuga_ErrorCode errcode = papuga_Ok;
 	strus::unique_lock lock( m_mutex_context_transfer);
+
 	if (!papuga_RequestContextPool_remove_context( m_contextPool, contextType, contextName, &errcode))
 	{
 		setAnswer( answer, papugaErrorToErrorCode( errcode));

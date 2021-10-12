@@ -7,38 +7,47 @@ documentClass = {
 
 tokenizer = {
 	name = string,
-	arg = string
+	arg = {string}
 }
 
 normalizer = {
 	name = string,
-	arg = string
+	arg = {string}
 }
 
-function = {
+aggregator = {
 	name = string,
-	arg = string
+	arg = {string}
 }
 
 searchFeature = {
 	type = string,
 	select = string,
 	tokenizer = tokenizer,
-	normalizer = normalizer,
+	normalizer = {normalizer},
 	priority = integer,
-	position = string	-- succ, pred, content, unique
+	option = {
+		position = string	-- succ, pred, content, unique
+	}
 }
 
 attributeFeature = {
 	type = string,
 	select = string,
 	tokenizer = tokenizer,
-	normalizer = normalizer
+	normalizer = {normalizer}
 }
 
-aggregatorFeature = {
+metadataFeature = {
 	type = string,
-	function = function
+	select = string,
+	tokenizer = tokenizer,
+	normalizer = {normalizer}
+}
+
+metadataFeature = {
+	type = string,
+	aggregator = aggregator
 }
 
 documentField = {
@@ -57,13 +66,12 @@ documentStructure = {
 
 docanalyzer = {
 	class = documentClass,
-	feature = {{
-		search = searchFeature,
-		forward = searchFeature,
-		metadata = attributeFeature,
-		attribute = attributeFeature,
-		aggregator = aggregatorFeature
-	}},
+	feature = {
+		search = {searchFeature},
+		forward = {searchFeature},
+		metadata = {metadataFeature},
+		attribute = {attributeFeature}
+	},
 	document = {{
 		name = string,
 		select = string
@@ -80,14 +88,15 @@ queryAnalyzerElement = {
 	type = string,
 	field = string,
 	tokenizer = tokenizer,
-	normalizer = normalizer,
+	normalizer = {normalizer},
+	priority = integer,
 }
 
 vectorStorage = {
 	sentanalyzer = {
 		field = string,
 		tokenizer = tokenizer,
-		normalizer = normalizer,
+		normalizer = {normalizer},
 		expansion = {
 			type = string,
 			sim = number
@@ -100,8 +109,7 @@ queryGroup = {
 	field = string,
 	op = string,
 	range = integer,
-	cardinality = integer,
-
+	cardinality = integer
 }
 
 qryanalyzer = {

@@ -9,6 +9,7 @@ endif( NOT STRUS_CXX_STD_11 )
 # --------------------------------------
 set( source_files
 	transaction.cpp
+	configuration.cpp
 	curlLogger.cpp
 	curlMessage.cpp
 	curlEventLoop.cpp

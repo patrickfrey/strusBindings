@@ -8,7 +8,7 @@ SCRIPTPATH = script_path()
 def_test_server( "csrv1", CSERVER1)
 call_server_checked( "PUT", CSERVER1 .. "/contentstats/stats", "@contentstats.json" )
 
-TRANSACTION = from_json( call_server_checked( "POST", CSERVER1 .. "/contentstats/stats/transaction" )).transaction.link
+TRANSACTION = from_json( call_server_checked( "POST", CSERVER1 .. "/contentstats/stats" )).transaction.link
 if verbose then io.stderr:write( string.format("- Create transaction %s\n", TRANSACTION)) end
 
 documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")

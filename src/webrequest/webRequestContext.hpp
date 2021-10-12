@@ -62,6 +62,9 @@ private:
 
 	/// \brief Transfer the current context to the handler as active object
 	bool transferContext();
+	/// \brief Destroy the current context from the handler
+	bool destroyContext();
+
 	/// \brief Define the current request to have failed
 	void setAnswer( int errcode, const char* errstr=0, bool doCopy=false);
 
@@ -73,6 +76,8 @@ private:
 	bool executeBuiltInCommand();
 	/// \brief Check if the request is a [PUT obj] command
 	bool isCreateRequest() const noexcept;
+	/// \brief Check if the request is a [DELETE obj] command
+	bool isDeleteRequest() const noexcept;
 
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);

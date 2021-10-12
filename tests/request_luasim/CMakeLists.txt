@@ -36,8 +36,8 @@ endfunction( DeclareTest )
 
 DeclareTest( MapLuaTableToJson configToJson.lua "" )
 DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua "" )
-DeclareTest( DocumentAnalysis docanalyzer.lua "" )
-DeclareTest( QueryAnalysis qryanalyzer.lua "" )
+DeclareTest( DocumentAnalysis documentAnalysis.lua "" )
+DeclareTest( QueryAnalysis queryAnalysis.lua "" )
 DeclareTest( CreateStorage createStorage.lua "" )
 DeclareTest( Query query.lua "" )
 # TEMPORARILY DEPRECATED TESTS

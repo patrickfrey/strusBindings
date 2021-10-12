@@ -219,7 +219,7 @@
       "type": "title"},
     {
       "df": 1,
-      "example": ""Heroes"",
+      "example": "\"Heroes\"",
       "select": "/doc/citation/attr/pagelink/quot/text/E@id",
       "tf": 1,
       "type": "title"},
@@ -699,13 +699,13 @@
       "type": "title"},
     {
       "df": 1,
-      "example": ""Heroes"",
+      "example": "\"Heroes\"",
       "select": "/doc/citation/table/cell/quot/pagelink/text/E@id",
       "tf": 1,
       "type": "title"},
     {
       "df": 1,
-      "example": ""Heroes" (David Bowie song)",
+      "example": "\"Heroes\" (David Bowie song)",
       "select": "/doc/citation/table/cell/quot/pagelink@id",
       "tf": 2,
       "type": "title"},
@@ -735,7 +735,7 @@
       "type": "title"},
     {
       "df": 1,
-      "example": ""Heroes"",
+      "example": "\"Heroes\"",
       "select": "/doc/citation/table/cell/quot/text/E@id",
       "tf": 1,
       "type": "title"},
@@ -1995,7 +1995,7 @@
       "type": "title"},
     {
       "df": 2,
-      "example": ""Heroes"",
+      "example": "\"Heroes\"",
       "select": "/doc/pagelink/quot/text/E@id",
       "tf": 2,
       "type": "title"},
@@ -2181,7 +2181,7 @@
       "type": "title"},
     {
       "df": 1,
-      "example": "'"",
+      "example": "'\"",
       "select": "/doc/quot/mark()",
       "tf": 2,
       "type": ""},
@@ -2817,7 +2817,7 @@
       "type": "title"},
     {
       "df": 1,
-      "example": ""Heroes"",
+      "example": "\"Heroes\"",
       "select": "/doc/table/cell/entity/pagelink/quot/text/E@id",
       "tf": 1,
       "type": "title"},

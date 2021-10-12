@@ -17,6 +17,7 @@
 #include "strus/base/fileio.hpp"
 #include "private/internationalization.hpp"
 #include "papuga/valueVariant.h"
+#include "papuga/constants.h"
 
 using namespace strus;
 
@@ -109,7 +110,14 @@ WebRequestContext::~WebRequestContext()
 
 static const char* createTransaction_( void* self, const char* type, papuga_RequestContext* context, papuga_Allocator* allocator)
 {
-	return ((WebRequestContext*)(self))->createTransaction( type, context, allocator);
+	try
+	{
+		return ((WebRequestContext*)(self))->createTransaction( type, context, allocator);
+	}
+	catch (...)
+	{
+		return nullptr;
+	}
 }
 
 const char* WebRequestContext::createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator)
@@ -137,10 +145,25 @@ bool WebRequestContext::transferContext()
 {
 	if (m_context.use_count() != 1)
 	{
-		setAnswer( ErrorCodeLogicError, _TXT("transferred configuration object not singular (referenced twice)"));
+		setAnswer( ErrorCodeLogicError, _TXT("transferred object not singular"));
 		return false;
 	}
 	if (!m_handler->transferContext( m_contextType, m_contextName, m_context.release(), m_answer))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool WebRequestContext::destroyContext()
+{
+	if (m_context.use_count() != 1)
+	{
+		setAnswer( ErrorCodeLogicError, _TXT("deleted object not singular"));
+		return false;
+	}
+	m_context.reset();
+	if (!m_handler->removeContext( m_contextType, m_contextName, m_answer))
 	{
 		return false;
 	}
@@ -156,6 +179,11 @@ void WebRequestContext::resetContext()
 bool WebRequestContext::isCreateRequest() const noexcept
 {
 	return isEqual( m_requestMethod, "PUT") && !m_path.hasMore() && !m_transactionRef.get();
+}
+
+bool WebRequestContext::isDeleteRequest() const noexcept
+{
+	return isEqual( m_requestMethod, "DELETE") && !m_path.hasMore() && !m_transactionRef.get();
 }
 
 bool WebRequestContext::initContext()
@@ -288,6 +316,12 @@ bool WebRequestContext::runLuaScript()
 	int ni = 0, ne = papuga_LuaRequestHandler_nof_DelegateRequests( m_luahandler.get());
 	if (ne)
 	{
+		if (isCreateRequest())
+		{
+			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has delegate requests that are forbidden to ensure self-containment of services"), m_contextType, m_contextName);
+			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
+			return false;
+		}
 		m_openDelegates.reset( new int( ne));
 		for (; ni != ne; ++ni)
 		{
@@ -295,7 +329,8 @@ bool WebRequestContext::runLuaScript()
 			WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
 			if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
 			{
-				setAnswer( ErrorCodeDelegateRequestFailed, delegate->requesturl, true);
+				std::snprintf( errbufmem, sizeof(errbufmem), _TXT("Request to '%s' failed"), delegate->requesturl);
+				setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
 				return false;
 			}
 		}
@@ -332,7 +367,7 @@ bool WebRequestContext::executeBuiltInCommand()
 				m_answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,GET", true);
 				return true;
 			}
-			else if (0==std::strcmp( m_contextType, "schema"))
+			else if (isEqual( m_contextType, "schema"))
 			{
 				m_answer.setMessage( 200/*OK*/, "Allow", "OPTIONS,GET", true);
 				return true;
@@ -363,7 +398,7 @@ bool WebRequestContext::executeBuiltInCommand()
 		}
 		else if (isEqual( m_requestMethod,"GET"))
 		{
-			if (0==std::strcmp( m_contextType, "schema"))
+			if (isEqual( m_contextType, "schema"))
 			{
 				if (m_contextName)
 				{
@@ -389,7 +424,7 @@ bool WebRequestContext::executeBuiltInCommand()
 						return false;
 					}
 					mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
-									"schema"/*rootname*/, "name"/*itemname*/, 
+									"schema"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/, 
 									papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 									m_attributes.beautifiedOutput, lst);
 				}
@@ -399,7 +434,7 @@ bool WebRequestContext::executeBuiltInCommand()
 			{
 				char const* const* tplist = papuga_RequestContextPool_list_types( m_handler->contextPool(), &m_allocator);
 				mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
-								"class"/*rootname*/, "name"/*itemname*/,
+								"class"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/,
 								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 								m_attributes.beautifiedOutput, tplist);
 				return true;
@@ -408,7 +443,7 @@ bool WebRequestContext::executeBuiltInCommand()
 			{
 				char const* const* tplist = papuga_RequestContextPool_list_names( m_handler->contextPool(), m_contextType, &m_allocator);
 				mapStringArrayToAnswer( m_answer, &m_allocator, m_handler->html_head(), m_attributes.html_base_href,
-								"object"/*rootname*/, "name"/*itemname*/, 
+								"object"/*rootname*/, PAPUGA_HTML_LINK_ELEMENT/*itemname*/, 
 								papuga_UTF8, papuga_http_default_doctype( &m_attributes),
 								m_attributes.beautifiedOutput, tplist);
 				return true;
@@ -432,9 +467,19 @@ bool WebRequestContext::execute()
 		if (!m_openDelegates.get() || *m_openDelegates == 0)
 		{
 			bool terminated = runLuaScript();
-			if (terminated && m_answer.ok() && isCreateRequest())
+			if (terminated && m_answer.ok())
 			{
-				transferContext();
+				if (m_contextName && m_contextType)
+				{
+					if (isCreateRequest())
+					{
+						transferContext();
+					}
+					else if (isDeleteRequest())
+					{
+						destroyContext();
+					}
+				}
 			}
 			return terminated;
 		}
