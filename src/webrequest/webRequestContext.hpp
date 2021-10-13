@@ -80,6 +80,7 @@ private:
 
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);
+	int allocCounter( const char* type);
 
 private:
 	WebRequestHandler* m_handler;		//< request handler creating this request

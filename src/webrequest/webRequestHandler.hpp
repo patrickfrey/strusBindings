@@ -116,6 +116,9 @@ public:/*WebRequestContext*/
 	/// \brief DELETE of a configuration object
 	void deleteConfiguration( const std::string& type_, const std::string& name_);
 
+	/// \brief Allocate an id for a POST request
+	int allocCounter( const char* type_);
+
 public:/*CurlEventLoopTicker*/
 	void tick();
 

@@ -15,7 +15,10 @@
 #include <cstring>
 #include <utility>
 #include <map>
+#include <set>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 
 using namespace strus;
 
@@ -193,5 +196,46 @@ void Configuration::cleanup( const std::string& dir_, const std::string& service
 		std::string fullname = strus::joinFilePath( cfgstoredir, fn);
 		(void)strus::removeFile( fullname);
 	}
+}
+
+static strus::mutex g_countermutex;
+
+int Configuration::allocCounter( const std::string& dir_, const std::string& service_, const char* type_)
+{
+	char filename[ 128];
+	std::snprintf( filename, sizeof(filename), "counter_%s.list", type_);
+	filename[ sizeof( filename)-1] = 0;
+
+	std::string configstoredir = strus::joinFilePath( dir_, service_);
+	std::string counterFile = strus::joinFilePath( configstoredir, filename);
+	std::string counterString;
+	strus::unique_lock lock( g_countermutex);
+	int ec = strus::readFile( counterFile, counterString);
+	if (ec && ec != 2/*ENOENT*/)
+	{
+		throw strus::runtime_error_ec( ec, _TXT("Failed to read counter file '%s'"), counterFile.c_str());
+	}
+	std::stringstream istr( counterString);
+	std::set<int> occuppied;
+	std::string counter;
+	while (std::getline( istr, counter))
+	{
+		int elem = atoi( counter.c_str());
+		occuppied.insert( elem);
+	}
+	int start = 1;
+	while (occuppied.end() != occuppied.find( start))
+	{
+		start += 1;
+	}
+	char numbuf[ 16];
+	std::snprintf( numbuf, sizeof(numbuf), "%d\n", start);
+	counterString.append( numbuf);
+	ec = strus::writeFile( counterFile, counterString);
+	if (ec)
+	{
+		throw strus::runtime_error_ec( ec, _TXT("Failed to write counter file '%s'"), counterFile.c_str());
+	}
+	return start;
 }
 

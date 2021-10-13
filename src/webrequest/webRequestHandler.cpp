@@ -485,5 +485,11 @@ void WebRequestHandler::deleteConfiguration( const std::string& type_, const std
 	Configuration::remove( m_config_dir, m_serviceName, type_, name_);
 }
 
+int WebRequestHandler::allocCounter( const char* type_)
+{
+	return Configuration::allocCounter( m_config_dir, m_serviceName, type_);
+}
+
+
 
 

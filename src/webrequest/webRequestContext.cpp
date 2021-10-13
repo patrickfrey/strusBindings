@@ -115,12 +115,29 @@ static const char* createTransaction_( void* self, const char* type, papuga_Requ
 	}
 }
 
+static int allocCounter_( void* self, const char* type)
+{
+	try
+	{
+		return ((WebRequestContext*)(self))->allocCounter( type);
+	}
+	catch (...)
+	{
+		return 0;
+	}
+}
+
 const char* WebRequestContext::createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator)
 {
 	PapugaContextRef contextref( context);
 	std::string tr = m_transactionPool->createTransaction( type, contextref, m_handler->maxIdleTime());
 	const char* trstr = papuga_Allocator_copy_string( &m_allocator, tr.c_str(), tr.size());
 	return trstr;
+}
+
+int WebRequestContext::allocCounter( const char* type)
+{
+	m_handler->allocCounter( type);
 }
 
 void WebRequestContext::setAnswer( int errcode, const char* errstr, bool doCopy)
@@ -234,7 +251,6 @@ bool WebRequestContext::initRequestContext( const char* contentstr, size_t conte
 			else
 			{
 				m_contextName = m_path.getNext();
-				if (!m_contextName) return true;
 			}
 			m_transactionRef.reset();
 			m_context.create();
@@ -243,7 +259,7 @@ bool WebRequestContext::initRequestContext( const char* contentstr, size_t conte
 				setAnswer( ErrorCodeOutOfMem);
 				return false;
 			}
-			if (isCreateRequest())
+			if (isCreateRequest() || !m_contextName)
 			{
 				if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
 				{
@@ -275,7 +291,7 @@ bool WebRequestContext::initRequestContext( const char* contentstr, size_t conte
 bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen)
 {
 	papuga_ErrorCode errcode = papuga_Ok;
-	papuga_TransactionHandler transactionHandler{ this, &createTransaction_ };
+	papuga_TransactionHandler transactionHandler{ this, &createTransaction_, &allocCounter_ };
 
 	papuga_LuaRequestHandlerScript const* script = m_handler->script( m_contextType);
 	if (!script)
@@ -287,7 +303,7 @@ bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen
 		= papuga_create_LuaRequestHandler(
 			script, (papuga_LuaInitProc*)&luaopen_strus, m_handler->schemaMap(), m_handler->contextPool(), m_context.get(),
 			&transactionHandler, m_handler->papugaLogger(), &m_attributes,
-			m_requestMethod, ROOT_CONTEXT_NAME, m_path.rest(), contentstr, contentlen,
+			m_requestMethod, m_contextName, m_path.rest(), contentstr, contentlen,
 			&errcode);
 	if (!reqhnd)
 	{
@@ -471,7 +487,7 @@ bool WebRequestContext::executeBuiltInCommand()
 				return true;
 			}
 		}
-		if (!m_contextName)
+		if (!m_contextType)
 		{
 			setAnswer( ErrorCodeRequestResolveError);
 			return true;

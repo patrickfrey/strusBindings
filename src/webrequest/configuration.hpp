@@ -35,6 +35,7 @@ public:
 	static void remove( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_);
 	static std::vector<Configuration> list( const std::string& dir_, const std::string& service_);
 	static void cleanup( const std::string& dir_, const std::string& service_);
+	static int allocCounter( const std::string& dir_, const std::string& service_, const char* type_);
 
 	const std::string& dir() const noexcept 	{return m_dir;}
 	const std::string& service() const noexcept 	{return m_service;}

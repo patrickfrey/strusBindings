@@ -6,13 +6,13 @@ function GET( self, inputstr, path)
 	end
 end
 
-function PUT( self, inputstr, path)
+function PUT( self, inputstr, path, storageid)
 	if path then
 		http_error( "404")
 	else
-		local input = schema( "storage", inputstr, true).docanalyzer
+		local input = schema( "storage", inputstr, true).storage
 		local context = self:get("context")
-		local docanalyzer = context:createDocumentAnalyzer( input.class )
+		local storage = context:createStorage( input )
 
 		if input.feature then
 			for _,f in ipairs(input.feature.search or {}) do
@@ -46,6 +46,9 @@ function PUT( self, inputstr, path)
 		end
 		self:set( "docanalyzer", docanalyzer)
 	end
+end
+
+function POST( self, inputstr, path, storageid)
 end
 
 
