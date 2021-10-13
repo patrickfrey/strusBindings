@@ -96,6 +96,13 @@ const char* guessContentType( const char* content, std::size_t contentsize);
 /// \return the encoding as string or NULL if unknown
 const char* guessCharsetEncoding( const char* content, std::size_t contentsize);
 
+/// \brief Cleanup obsolete files from the configuration directory
+/// \param[in] config_store_dir directory where configurations are stored in
+/// \param[in] service_name identifier of the service
+void cleanupConfiguration( 
+		const std::string& config_store_dir,
+		const std::string& service_name);
+
 }//namespace
 #endif
 

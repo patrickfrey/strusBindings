@@ -10,6 +10,7 @@
 #include "webRequestHandler.hpp"
 #include "webRequestContext.hpp"
 #include "webRequestUtils.hpp"
+#include "configuration.hpp"
 #include "strus/lib/bindings_description.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/lib/lua.h"
@@ -103,6 +104,9 @@ WebRequestHandler::WebRequestHandler(
 		m_schemaList = scma.first;
 		m_schemaMap = scma.second;
 		m_scriptMap = loadScripts( &m_allocator, m_script_dir);
+		std::string cfgdirname = strus::joinFilePath( m_config_dir, m_serviceName);
+		int ec = strus::mkdirp( cfgdirname);
+		if (ec) throw strus::runtime_error_ec( ec, _TXT("failed to create configuration directory"));
 	}
 	catch (...)
 	{
@@ -242,22 +246,34 @@ static void setAnswer( WebRequestAnswer& answer, ErrorCode errcode, char const* 
 	}
 }
 
-#define WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, errorReturnValue) \
-	catch (const std::bad_alloc&) \
-	{\
-		setAnswer( answer, ErrorCodeOutOfMem);\
-		return errorReturnValue;\
-	}\
-	catch (const std::runtime_error& err)\
-	{\
-		setAnswer( answer, ErrorCodeRuntimeError, err.what(), true/*do copy*/);\
-		return errorReturnValue;\
-	}\
-	catch (...)\
-	{\
-		setAnswer( answer, ErrorCodeUncaughtException);\
-		return errorReturnValue;\
+static void setAnswerFromException( WebRequestAnswer& answer)
+{
+	try
+	{
+		throw;
 	}
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( answer, ErrorCodeOutOfMem);
+	}
+	catch (const std::runtime_error& err)
+	{
+		char const* errmsgitr = err.what();
+		strus::ErrorCode apperr = (strus::ErrorCode)strus::errorCodeFromMessage( errmsgitr);
+		if (apperr)
+		{
+			setAnswer( answer, apperr, errmsgitr, true/*do copy*/);
+		}
+		else
+		{
+			setAnswer( answer, ErrorCodeRuntimeError, err.what(), true/*do copy*/);
+		}
+	}
+	catch (...)
+	{
+		setAnswer( answer, ErrorCodeUncaughtException);
+	}
+}
 
 static papuga_RequestAttributes g_configRequestAttributes = {
 	0xffFF/*accepted_encoding_set*/,
@@ -267,6 +283,68 @@ static papuga_RequestAttributes g_configRequestAttributes = {
 	true/*beautifiedOutput*/,
 	true/*deterministicOutput*/};
 
+void WebRequestHandler::initConfigurationObject(
+			char const* contextType,
+			char const* contextName,
+			char const* configstr,
+			size_t configlen)
+{
+	papuga_ErrorCode errcode = papuga_Ok;
+	papuga_RequestContext* context = papuga_create_RequestContext();
+	papuga_LuaRequestHandler* reqhnd = nullptr;
+	if (!context) throw std::bad_alloc();
+	try
+	{
+		auto fi = m_scriptMap.find( contextType);
+		if (fi == m_scriptMap.end())
+		{
+			throw strus::runtime_error_ec( ErrorCodeUnknownIdentifier, _TXT("no request handler script found for '%s'"), contextType);
+		}
+		const char* mt = papuga_LuaRequestHandlerScript_implements( fi->second.get(), "INIT") ? "INIT":"PUT";
+		reqhnd = papuga_create_LuaRequestHandler(
+				fi->second.get(), (papuga_LuaInitProc*)&luaopen_strus, m_schemaMap, m_contextPool, context,
+				nullptr/*transaction handler*/, &m_papugaLogger, &g_configRequestAttributes,
+				mt, contextName, ""/*path*/, configstr, configlen, &errcode);
+		if (!reqhnd)
+		{
+			throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to create initialization request handler of '%s'"), contextType);
+		}
+		papuga_ErrorBuffer errbuf;
+		char errbufmem[ 2048];
+		papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
+		if (!papuga_run_LuaRequestHandler( reqhnd, &errbuf))
+		{
+			if (papuga_ErrorBuffer_hasError( &errbuf))
+			{
+				char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
+				throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("failed to run initialization request of '%s': %s"), contextType, msg);
+			}
+			else
+			{
+				throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("yield in configuration of '%s'"), contextType);
+			}
+		}
+		if (0!=papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
+		{
+			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("delegate requests in configuration of '%s'"), contextType);
+		}
+		if (papuga_LuaRequestHandler_get_result( reqhnd))
+		{
+			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("no result allowed in configuration ('%s')"), contextType);
+		}
+		if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
+		{
+			throw strus::runtime_error_ec( papugaErrorToErrorCode( errcode), _TXT("failed to transfer configuration context of '%s'"), contextType);
+		}
+	}
+	catch (...)
+	{
+		if (context) papuga_destroy_RequestContext( context);
+		if (reqhnd) papuga_destroy_LuaRequestHandler( reqhnd);
+		throw;
+	}
+}
+
 bool WebRequestHandler::init(
 		char const* configsrc,
 		size_t configlen,
@@ -274,65 +352,19 @@ bool WebRequestHandler::init(
 {
 	try
 	{
-		auto fi = m_scriptMap.find( ROOT_CONTEXT_NAME);
-		if (fi != m_scriptMap.end())
+		initConfigurationObject( ROOT_CONTEXT_NAME/*context type*/, ROOT_CONTEXT_NAME/*context name*/, configsrc, configlen);
+		std::vector<Configuration> cfglist = Configuration::list( m_config_dir, m_serviceName);
+		for (auto& cfg : cfglist)
 		{
-			papuga_ErrorCode errcode = papuga_Ok;
-			papuga_RequestContext* context = papuga_create_RequestContext();
-			papuga_LuaRequestHandler* reqhnd
-				= papuga_create_LuaRequestHandler(
-					fi->second.get(), (papuga_LuaInitProc*)&luaopen_strus, m_schemaMap, m_contextPool, context,
-					nullptr/*transaction handler*/, &m_papugaLogger, &g_configRequestAttributes,
-					"PUT", ROOT_CONTEXT_NAME, "", configsrc, configlen,
-					&errcode);
-			if (!reqhnd)
-			{
-				setAnswer( answer, papugaErrorToErrorCode( errcode));
-				papuga_destroy_RequestContext( context);
-				return false;
-			}
-			papuga_ErrorBuffer errbuf;
-			char errbufmem[ 2048];
-			papuga_init_ErrorBuffer( &errbuf, errbufmem, sizeof(errbufmem));
-			if (!papuga_run_LuaRequestHandler( reqhnd, &errbuf))
-			{
-				if (papuga_ErrorBuffer_hasError( &errbuf))
-				{
-					char const* msg = papuga_ErrorBuffer_lastError( &errbuf);
-					setAnswer( answer, ErrorCodeRuntimeError, msg, true);
-				}
-				else
-				{
-					setAnswer( answer, ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), false);
-				}
-				papuga_destroy_RequestContext( context);
-				papuga_destroy_LuaRequestHandler( reqhnd);
-				return false;
-			}
-			if (0!=papuga_LuaRequestHandler_nof_DelegateRequests( reqhnd))
-			{
-				setAnswer( answer, ErrorCodeRuntimeError, _TXT("no delegate requests allowed in configuration"), false);
-				papuga_destroy_RequestContext( context);
-				papuga_destroy_LuaRequestHandler( reqhnd);
-				return false;
-			}
-			if (!papuga_RequestContextPool_transfer_context( m_contextPool, ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME, context, &errcode))
-			{
-				setAnswer( answer, papugaErrorToErrorCode( errcode));
-				papuga_destroy_RequestContext( context);
-				papuga_destroy_LuaRequestHandler( reqhnd);
-				return false;
-			}
-			papuga_destroy_LuaRequestHandler( reqhnd);
-			return true;
+			initConfigurationObject( cfg.type().c_str(), cfg.name().c_str(), cfg.content().c_str(), cfg.content().size());
 		}
-		else
-		{
-			setAnswer( answer, ErrorCodeRuntimeError, _TXT("no initialization script (name 'context') found"), false);
-			return false;
-		}
+		return true;
 	}
-	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, false);
+	catch (...)
+	{
+		setAnswerFromException( answer);
+		return false;
+	}
 }
 
 WebRequestContextInterface* WebRequestHandler::createContext(
@@ -348,7 +380,11 @@ WebRequestContextInterface* WebRequestHandler::createContext(
 	{
 		return new WebRequestContext( this, m_logger, &m_transactionPool, http_accept, html_base_href, method, path, contentstr, contentlen);
 	}
-	WEBREQUEST_HANDLER_CATCH_ERROR_RETURN( answer, NULL);
+	catch (...)
+	{
+		setAnswerFromException( answer);
+		return nullptr;
+	}
 }
 
 bool WebRequestHandler::delegateRequest(
@@ -392,13 +428,10 @@ WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
 		}
 		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, SYSTEM_MESSAGE_HEADER, name, result_encoding, result_doctype, m_beautifiedOutput, std::string( messagestr, messagelen));
 	}
-	catch (const std::bad_alloc&)
+	catch (...)
 	{
-		setAnswer( rt, ErrorCodeOutOfMem);
-	}
-	catch (const std::runtime_error& err)
-	{
-		setAnswer( rt, ErrorCodeRuntimeError, err.what(), true);
+		setAnswerFromException( rt);
+		return rt;
 	}
 	return rt;
 }
@@ -441,5 +474,16 @@ bool WebRequestHandler::removeContext(
 	}
 	return true;
 }
+
+std::string WebRequestHandler::storeConfigurationTemporary( const std::string& type_, const std::string& name_, const std::string& content_)
+{
+	return Configuration::storeTemporary( m_config_dir, m_serviceName, type_, name_, content_);
+}
+
+void WebRequestHandler::deleteConfiguration( const std::string& type_, const std::string& name_)
+{
+	Configuration::remove( m_config_dir, m_serviceName, type_, name_);
+}
+
 
 

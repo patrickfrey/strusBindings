@@ -53,12 +53,8 @@ public:
 	virtual WebRequestAnswer getAnswer() const;
 
 private:
-	/// \brief Initialize the context of the request from the specified context type/name pair
-	bool initContext();
-	/// \brief Reset object for requests
-	void resetContext();
 	/// \brief Initialize the context of the request
-	bool initRequestContext();
+	bool initRequestContext( const char* contentstr, size_t contentlen);
 
 	/// \brief Transfer the current context to the handler as active object
 	bool transferContext();
@@ -79,6 +75,9 @@ private:
 	/// \brief Check if the request is a [DELETE obj] command
 	bool isDeleteRequest() const noexcept;
 
+	/// \brief Translate the last exception thrown into the request answer (Lippincott Function)
+	void setAnswerFromException();
+
 public:
 	const char* createTransaction( const char* type, papuga_RequestContext* context, papuga_Allocator* allocator);
 
@@ -88,6 +87,7 @@ private:
 	int m_logLevel;				//< what to log
 	TransactionPool* m_transactionPool;	//< transaction pool
 	TransactionRef m_transactionRef;	//< transaction reference
+	std::string m_configTransactionTmpFile;	//< temporary file used for the configuration of a create request object
 	papuga_Allocator m_allocator;		//< papuga allocator used for this request context
 	papuga_RequestAttributes m_attributes;	//< request attributes
 	char m_requestMethod[8];		//< request method

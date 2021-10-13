@@ -11,6 +11,7 @@
 #include "webRequestDelegateContext.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
+#include "configuration.hpp"
 #include "strus/errorCodes.hpp"
 #include "strus/lib/error.hpp"
 #include "strus/lib/lua.h"
@@ -34,40 +35,34 @@ static bool isEqual( const char* name, const char* oth)
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
 
-#define WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( errorReturnValue) \
-	catch (const std::bad_alloc&) \
-	{\
-		setAnswer( ErrorCodeOutOfMem);\
-		return errorReturnValue;\
-	}\
-	catch (const std::runtime_error& err)\
-	{\
-		setAnswer( ErrorCodeRuntimeError, err.what(), true/*do copy*/);\
-		return errorReturnValue;\
-	}\
-	catch (...)\
-	{\
-		setAnswer( ErrorCodeUncaughtException);\
-		return errorReturnValue;\
+void WebRequestContext::setAnswerFromException()
+{
+	try
+	{
+		throw;
 	}
-
-#define WEBREQUEST_CONTEXT_CATCH_ERROR_SET_BOOL( errflag) \
-	catch (const std::bad_alloc&) \
-	{\
-		setAnswer( ErrorCodeOutOfMem);\
-		errflag = false;\
-	}\
-	catch (const std::runtime_error& err)\
-	{\
-		setAnswer( ErrorCodeRuntimeError, err.what(), true/*do copy*/);\
-		errflag = false;\
-	}\
-	catch (...)\
-	{\
-		setAnswer( ErrorCodeUncaughtException);\
-		errflag = false;\
+	catch (const std::bad_alloc&)
+	{
+		setAnswer( ErrorCodeOutOfMem);
 	}
-
+	catch (const std::runtime_error& err)
+	{
+		char const* errmsgitr = err.what();
+		int apperr = strus::errorCodeFromMessage( errmsgitr);
+		if (apperr)
+		{
+			setAnswer( apperr, errmsgitr, true/*do copy*/);
+		}
+		else
+		{
+			setAnswer( ErrorCodeRuntimeError, err.what(), true/*do copy*/);
+		}
+	}
+	catch (...)
+	{
+		setAnswer( ErrorCodeUncaughtException);
+	}
+}
 
 WebRequestContext::WebRequestContext(
 		WebRequestHandler* handler_,
@@ -82,7 +77,7 @@ WebRequestContext::WebRequestContext(
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logLevel(logger_->level())
-	,m_transactionPool(transactionPool_),m_transactionRef()
+	,m_transactionPool(transactionPool_),m_transactionRef(),m_configTransactionTmpFile()
 	,m_contextType(nullptr),m_contextName(nullptr)
 	,m_context(),m_luahandler(),m_path(path_)
 	,m_errbuf(),m_answer()
@@ -94,7 +89,7 @@ WebRequestContext::WebRequestContext(
 		&m_attributes, http_accept_, m_handler->html_head(), html_base_href_,
 		m_handler->beautifiedOutput(), false/*deterministicOutput*/);
 	assignRequestMethod( m_requestMethod, sizeof(m_requestMethod), method_);
-	initRequestContext();
+	initRequestContext( contentstr_, contentlen_);
 	if (!executeBuiltInCommand())
 	{
 		initLuaScript( contentstr_, contentlen_);
@@ -152,6 +147,15 @@ bool WebRequestContext::transferContext()
 	{
 		return false;
 	}
+	try
+	{
+		Configuration::commit( m_configTransactionTmpFile);
+	}
+	catch (...)
+	{
+		setAnswerFromException();
+		return false;
+	}
 	return true;
 }
 
@@ -162,18 +166,21 @@ bool WebRequestContext::destroyContext()
 		setAnswer( ErrorCodeLogicError, _TXT("deleted object not singular"));
 		return false;
 	}
+	try
+	{
+		m_handler->deleteConfiguration( m_contextType, m_contextName);
+	}
+	catch (...)
+	{
+		setAnswerFromException();
+		return false;
+	}
 	m_context.reset();
 	if (!m_handler->removeContext( m_contextType, m_contextName, m_answer))
 	{
 		return false;
 	}
 	return true;
-}
-
-void WebRequestContext::resetContext()
-{
-	m_transactionRef.reset();
-	m_context.reset();
 }
 
 bool WebRequestContext::isCreateRequest() const noexcept
@@ -186,78 +193,83 @@ bool WebRequestContext::isDeleteRequest() const noexcept
 	return isEqual( m_requestMethod, "DELETE") && !m_path.hasMore() && !m_transactionRef.get();
 }
 
-bool WebRequestContext::initContext()
+bool WebRequestContext::initRequestContext( const char* contentstr, size_t contentlen)
 {
-	m_transactionRef.reset();
-	m_context.create();
-	if (!m_context.get())
+	try
 	{
-		setAnswer( ErrorCodeOutOfMem);
-		return false;
-	}
-	if (!isCreateRequest())
-	{
-		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
-		{
-			papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
-			setAnswer( papugaErrorToErrorCode( errcode));
-			return false;
-		}
-	}
-	else
-	{
-		if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
-		{
-			papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
-			setAnswer( papugaErrorToErrorCode( errcode));
-			return false;
-		}
-	}
-	return true;
-}
+		m_transactionRef.reset();
+		m_context.reset();
 
-bool WebRequestContext::initRequestContext()
-{
-	resetContext();
-	if (m_path.startsWith( "transaction", 11/*"transaction"*/))
-	{
-		// Fetch transaction object from pool with exclusive ownership:
-		m_contextType = m_path.getNext();
-		m_contextName = m_path.getNext();
-		if (!m_contextName)
+		if (m_path.startsWith( "transaction", 11/*"transaction"*/))
 		{
-			setAnswer( ErrorCodeIncompleteRequest);
-			return false;
+			// Fetch transaction object from pool with exclusive ownership:
+			m_contextType = m_path.getNext();
+			m_contextName = m_path.getNext();
+			if (!m_contextName)
+			{
+				setAnswer( ErrorCodeIncompleteRequest);
+				return false;
+			}
+			m_transactionRef = m_transactionPool->fetchTransaction( m_contextName);
+			if (!m_transactionRef.get())
+			{
+				setAnswer( ErrorCodeRequestResolveError);
+				return false;
+			}
+			m_contextType = m_transactionRef->contextType();
+			m_context = m_transactionRef->context();
 		}
-		m_transactionRef = m_transactionPool->fetchTransaction( m_contextName);
-		if (!m_transactionRef.get())
+		else if (m_path.startsWith( "schema", 6/*"schema"*/))
 		{
-			setAnswer( ErrorCodeRequestResolveError);
-			return false;
-		}
-		m_contextType = m_transactionRef->contextType();
-		m_context = m_transactionRef->context();
-	}
-	else if (m_path.startsWith( "schema", 6/*"schema"*/))
-	{
-		m_contextType = m_path.getNext();
-		m_contextName = m_path.getNext();
-	}
-	else
-	{
-		if (!(m_contextType = m_path.getNext())) return true;
-		if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
-		{
-			m_contextName = ROOT_CONTEXT_NAME;
+			m_contextType = m_path.getNext();
+			m_contextName = m_path.getNext();
 		}
 		else
 		{
-			m_contextName = m_path.getNext();
-			if (!m_contextName) return true;
+			if (!(m_contextType = m_path.getNext())) return true;
+			if (isEqual( m_contextType, ROOT_CONTEXT_NAME))
+			{
+				m_contextName = ROOT_CONTEXT_NAME;
+			}
+			else
+			{
+				m_contextName = m_path.getNext();
+				if (!m_contextName) return true;
+			}
+			m_transactionRef.reset();
+			m_context.create();
+			if (!m_context.get())
+			{
+				setAnswer( ErrorCodeOutOfMem);
+				return false;
+			}
+			if (isCreateRequest())
+			{
+				if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
+				{
+					papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+					setAnswer( papugaErrorToErrorCode( errcode));
+					return false;
+				}
+				m_configTransactionTmpFile = m_handler->storeConfigurationTemporary( m_contextType, m_contextName, std::string( contentstr, contentlen));
+			}
+			else
+			{
+				if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
+				{
+					papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+					setAnswer( papugaErrorToErrorCode( errcode));
+					return false;
+				}
+			}
 		}
-		initContext();
+		return true;
 	}
-	return true;
+	catch (...)
+	{
+		setAnswerFromException();
+		return false;
+	}
 }
 
 bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen)
@@ -288,7 +300,7 @@ bool WebRequestContext::initLuaScript( const char* contentstr, size_t contentlen
 	}
 	catch (...)
 	{
-		setAnswer( ErrorCodeOutOfMem);
+		setAnswerFromException();
 		return false;
 	}
 	return true;
@@ -314,14 +326,24 @@ bool WebRequestContext::runLuaScript()
 		return false;
 	}
 	int ni = 0, ne = papuga_LuaRequestHandler_nof_DelegateRequests( m_luahandler.get());
-	if (ne)
+	if (isCreateRequest())
 	{
-		if (isCreateRequest())
+		// Ensure that a PUT object request can be reissued as load configuation on restart:
+		if (ne)
 		{
-			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has delegate requests that are forbidden to ensure self-containment of services"), m_contextType, m_contextName);
+			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has delegate requests (forbidden)"), m_contextType, m_contextName);
 			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
 			return false;
 		}
+		else if (papuga_LuaRequestHandler_get_result( m_luahandler.get()))
+		{
+			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has a result (forbidden)"), m_contextType, m_contextName);
+			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
+			return false;
+		}
+	}
+	if (ne)
+	{
 		m_openDelegates.reset( new int( ne));
 		for (; ni != ne; ++ni)
 		{
@@ -456,7 +478,11 @@ bool WebRequestContext::executeBuiltInCommand()
 		}
 		return false;
 	}
-	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
+	catch (...)
+	{
+		setAnswerFromException();
+		return false;
+	}
 }
 
 bool WebRequestContext::execute()
@@ -467,18 +493,25 @@ bool WebRequestContext::execute()
 		if (!m_openDelegates.get() || *m_openDelegates == 0)
 		{
 			bool terminated = runLuaScript();
-			if (terminated && m_answer.ok())
+			if (terminated)
 			{
-				if (m_contextName && m_contextType)
+				if (m_answer.ok())
 				{
-					if (isCreateRequest())
+					if (m_contextName && m_contextType)
 					{
-						transferContext();
+						if (isCreateRequest())
+						{
+							transferContext();
+						}
+						else if (isDeleteRequest())
+						{
+							destroyContext();
+						}
 					}
-					else if (isDeleteRequest())
-					{
-						destroyContext();
-					}
+				}
+				else if (!m_configTransactionTmpFile.empty())
+				{
+					Configuration::drop( m_configTransactionTmpFile);
 				}
 			}
 			return terminated;
@@ -488,7 +521,11 @@ bool WebRequestContext::execute()
 			return false;
 		}
 	}
-	WEBREQUEST_CONTEXT_CATCH_ERROR_RETURN( false);
+	catch (...)
+	{
+		setAnswerFromException();
+		return false;
+	}
 }
 
 WebRequestAnswer WebRequestContext::getAnswer() const

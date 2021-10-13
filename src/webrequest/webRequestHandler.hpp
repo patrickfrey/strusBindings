@@ -110,8 +110,22 @@ public:/*WebRequestContext*/
 			char const* contextName,
 			WebRequestAnswer& answer);
 
+	/// \brief Store a configuration request into a temporary file and return its full path
+	std::string storeConfigurationTemporary( const std::string& type_, const std::string& name_, const std::string& content_);
+
+	/// \brief DELETE of a configuration object
+	void deleteConfiguration( const std::string& type_, const std::string& name_);
+
 public:/*CurlEventLoopTicker*/
 	void tick();
+
+private:
+	/// \brief Load the main configuration object or a configuration object stored, initialized with a "PUT" request without path (create request)
+	void initConfigurationObject(
+			char const* contextType,
+			char const* contextName,
+			char const* configstr,
+			size_t configlen);
 
 private:
 	strus::mutex m_mutex_context_transfer;		//< mutual exclusion of request context access

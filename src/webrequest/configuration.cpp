@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstring>
 #include <utility>
+#include <map>
 #include <algorithm>
 
 using namespace strus;
@@ -119,7 +120,11 @@ void Configuration::drop( const std::string& temporaryFilename)
 
 void Configuration::remove( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_)
 {
-	std::vector<std::string> fl = configurationFiles( dir_, service_, strus::string_format( "%s.%s.conf", type_.c_str(), name_.c_str()));
+	std::vector<std::string> fl_active = configurationFiles( dir_, service_, strus::string_format( "%s.%s.conf", type_.c_str(), name_.c_str()));
+	std::vector<std::string> fl_failed = configurationFiles( dir_, service_, strus::string_format( "%s.%s.temp", type_.c_str(), name_.c_str()));
+	std::vector<std::string> fl;
+	fl.insert( fl.end(), fl_active.begin(), fl_active.end());
+	fl.insert( fl.end(), fl_failed.begin(), fl_failed.end());
 	std::string cfgstoredir = strus::joinFilePath( dir_, service_);
 	for (auto fn : fl)
 	{
@@ -133,20 +138,60 @@ std::vector<Configuration> Configuration::list( const std::string& dir_, const s
 {
 	std::vector<Configuration> rt;
 	std::vector<std::string> fl = configurationFiles( dir_, service_, ".conf");
+	std::sort( fl.begin(), fl.end());
+	std::map<std::string,std::string> cfgmap;
+	for (auto& fn : fl)
+	{
+		std::string tt = getConfigFilenamePart( fn, 1);
+		std::string nn = getConfigFilenamePart( fn, 2);
+		std::string key = tt + "/" + nn;
+		cfgmap[ key] = fn;
+	}
+	std::vector<std::string> fl_uniq;
+	for (auto kv : cfgmap)
+	{
+		fl_uniq.push_back( kv.second);
+	}
+	std::sort( fl_uniq.begin(), fl_uniq.end());
+
 	std::string cfgstoredir = strus::joinFilePath( dir_, service_);
-	for (auto fn : fl)
+	for (auto fn : fl_uniq)
 	{
 		std::string fullname = strus::joinFilePath( cfgstoredir, fn);
 		std::string content_;
 		int ec = strus::readFile( fullname, content_);
 		if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to read configuration file '%s'"), fn.c_str());
 		std::string type_ = getConfigFilenamePart( fn, 1);
-		std::string name_ = getConfigFilenamePart( fn, 1);
+		std::string name_ = getConfigFilenamePart( fn, 2);
 		rt.emplace_back( dir_, service_, type_, name_, content_);
 	}
 	return rt;
 }
 
+void Configuration::cleanup( const std::string& dir_, const std::string& service_)
+{
+	std::vector<std::string> fl_delete = configurationFiles( dir_, service_, ".temp");
+	std::vector<std::string> fl = configurationFiles( dir_, service_, ".conf");
 
-
+	std::sort( fl.begin(), fl.end());
+	std::map<std::string,std::string> cfgmap;
+	for (auto& fn : fl)
+	{
+		std::string tt = getConfigFilenamePart( fn, 1);
+		std::string nn = getConfigFilenamePart( fn, 2);
+		std::string key = tt + "/" + nn;
+		auto ins = cfgmap.insert( {key, fn});
+		if (ins.second == false/*element exists*/)
+		{
+			fl_delete.push_back( ins.first->second); //... delete the older
+			ins.first->second = fn; //... overwrite with the newer
+		}
+	}
+	std::string cfgstoredir = strus::joinFilePath( dir_, service_);
+	for (auto& fn : fl_delete)
+	{
+		std::string fullname = strus::joinFilePath( cfgstoredir, fn);
+		(void)strus::removeFile( fullname);
+	}
+}
 

@@ -34,6 +34,13 @@ public:
 	static void drop( const std::string& temporaryFilename);
 	static void remove( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_);
 	static std::vector<Configuration> list( const std::string& dir_, const std::string& service_);
+	static void cleanup( const std::string& dir_, const std::string& service_);
+
+	const std::string& dir() const noexcept 	{return m_dir;}
+	const std::string& service() const noexcept 	{return m_service;}
+	const std::string& type() const noexcept 	{return m_type;}
+	const std::string& name() const noexcept 	{return m_name;}
+	const std::string& content() const noexcept 	{return m_content;}
 
 private:
 	std::string m_dir;

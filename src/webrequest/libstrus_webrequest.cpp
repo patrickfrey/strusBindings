@@ -15,6 +15,7 @@
 #include "strus/webRequestHandlerInterface.hpp"
 #include "webRequestHandler.hpp"
 #include "webRequestUtils.hpp"
+#include "configuration.hpp"
 #include "curlEventLoop.hpp"
 #include "private/internationalization.hpp"
 #include "papuga/valueVariant.h"
@@ -136,6 +137,18 @@ DLL_PUBLIC const char* strus::guessCharsetEncoding( const char* content, std::si
 {
 	papuga_StringEncoding enc = papuga_guess_StringEncoding( content, contentsize);
 	return (enc == papuga_Binary) ? NULL : papuga_stringEncodingName( enc);
+}
+
+DLL_PUBLIC void strus::cleanupConfiguration( 
+		const std::string& config_store_dir,
+		const std::string& service_name)
+{
+	try
+	{
+		Configuration::cleanup( config_store_dir, service_name);
+	}
+	catch (...)
+	{}
 }
 
 
