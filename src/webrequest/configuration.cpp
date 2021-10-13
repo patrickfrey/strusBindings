@@ -71,7 +71,7 @@ static std::string temporaryConfigFilepath( const std::string& dir, const std::s
 {
 	std::string tmpfilename = temporaryFilename( type, name);
 	std::string cfgstoredir = strus::joinFilePath( dir, service);
-	std::string rt = strus::joinFilePath( dir, service);
+	std::string rt = strus::joinFilePath( cfgstoredir, tmpfilename);
 	if (cfgstoredir.empty() || rt.empty()) throw std::bad_alloc();
 	return rt;
 }
