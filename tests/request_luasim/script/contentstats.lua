@@ -29,7 +29,7 @@ function POST( self, inputstr, path)
 	else
 		local contentstats = self:get("contentstats")
 		local tid = transaction( "contentcollector", contentstats:createCollector())
-		return {transaction={link=tid}}
+		return "transaction/" .. tid
 	end
 end
 

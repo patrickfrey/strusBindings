@@ -110,14 +110,19 @@ public:/*WebRequestContext*/
 			char const* contextName,
 			WebRequestAnswer& answer);
 
-	/// \brief Store a configuration request into a temporary file and return its full path
-	std::string storeConfigurationTemporary( const std::string& type_, const std::string& name_, const std::string& content_);
+	/// \brief Store a configuration request into a file
+	void storeConfiguration( const char* type_, const char* name_, const std::string& content_);
 
 	/// \brief DELETE of a configuration object
 	void deleteConfiguration( const std::string& type_, const std::string& name_);
 
 	/// \brief Allocate an id for a POST request
 	int allocCounter( const char* type_);
+
+	WebRequestAnswer getLinkAnswer(
+			const papuga_RequestAttributes& attributes,
+			char const* linkContextType,
+			char const* linkContextName);
 
 public:/*CurlEventLoopTicker*/
 	void tick();

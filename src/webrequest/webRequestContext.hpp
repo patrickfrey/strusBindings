@@ -88,7 +88,7 @@ private:
 	int m_logLevel;				//< what to log
 	TransactionPool* m_transactionPool;	//< transaction pool
 	TransactionRef m_transactionRef;	//< transaction reference
-	std::string m_configTransactionTmpFile;	//< temporary file used for the configuration of a create request object
+	std::string m_configuration;		//< content stored as configuration restablished with an INIT
 	papuga_Allocator m_allocator;		//< papuga allocator used for this request context
 	papuga_RequestAttributes m_attributes;	//< request attributes
 	char m_requestMethod[8];		//< request method

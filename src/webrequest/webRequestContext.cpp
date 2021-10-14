@@ -35,6 +35,25 @@ static bool isEqual( const char* name, const char* oth)
 	return name[0] == oth[0] && 0==std::strcmp(name,oth);
 }
 
+static std::pair<const char*,const char*> splitString( char* bufptr, size_t bufsize, char const* str, size_t strsize, char splt)
+{
+	std::pair<const char*,const char*> rt(nullptr,nullptr);
+	if (strsize >= bufsize)
+	{
+		strsize = bufsize-1;
+	}
+	std::memcpy( bufptr, str, strsize);
+	bufptr[ strsize] = 0;
+	rt.first = bufptr;
+	char* si = std::strchr( bufptr, splt);
+	if (si)
+	{
+		*si = '\0';
+		rt.second = si+1;
+	}
+	return rt;
+}
+
 void WebRequestContext::setAnswerFromException()
 {
 	try
@@ -77,7 +96,7 @@ WebRequestContext::WebRequestContext(
 	:m_handler(handler_)
 	,m_logger(logger_)
 	,m_logLevel(logger_->level())
-	,m_transactionPool(transactionPool_),m_transactionRef(),m_configTransactionTmpFile()
+	,m_transactionPool(transactionPool_),m_transactionRef(),m_configuration()
 	,m_contextType(nullptr),m_contextName(nullptr)
 	,m_context(),m_luahandler(),m_path(path_)
 	,m_errbuf(),m_answer()
@@ -137,7 +156,7 @@ const char* WebRequestContext::createTransaction( const char* type, papuga_Reque
 
 int WebRequestContext::allocCounter( const char* type)
 {
-	m_handler->allocCounter( type);
+	return m_handler->allocCounter( type);
 }
 
 void WebRequestContext::setAnswer( int errcode, const char* errstr, bool doCopy)
@@ -166,7 +185,7 @@ bool WebRequestContext::transferContext()
 	}
 	try
 	{
-		Configuration::commit( m_configTransactionTmpFile);
+		m_handler->storeConfiguration( m_contextType, m_contextName, m_configuration);
 	}
 	catch (...)
 	{
@@ -202,7 +221,8 @@ bool WebRequestContext::destroyContext()
 
 bool WebRequestContext::isCreateRequest() const noexcept
 {
-	return isEqual( m_requestMethod, "PUT") && !m_path.hasMore() && !m_transactionRef.get();
+	return m_requestMethod[0] == 'P' && (isEqual( m_requestMethod, "PUT") || isEqual( m_requestMethod, "POST"))
+		&& !m_path.hasMore() && !m_transactionRef.get();
 }
 
 bool WebRequestContext::isDeleteRequest() const noexcept
@@ -259,21 +279,48 @@ bool WebRequestContext::initRequestContext( const char* contentstr, size_t conte
 				setAnswer( ErrorCodeOutOfMem);
 				return false;
 			}
-			if (isCreateRequest() || !m_contextName)
+			char const* inherit_type = ROOT_CONTEXT_NAME;
+			char const* inherit_name = ROOT_CONTEXT_NAME;
+			if (isCreateRequest())
 			{
-				if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
+				m_configuration.append( contentstr, contentlen);
+				if (m_contextName)
 				{
-					papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
-					setAnswer( papugaErrorToErrorCode( errcode));
-					return false;
+					if (isEqual(m_requestMethod,"POST"))
+					{
+						inherit_type = m_contextType;
+						inherit_name = m_contextName;
+					}
 				}
-				m_configTransactionTmpFile = m_handler->storeConfigurationTemporary( m_contextType, m_contextName, std::string( contentstr, contentlen));
+				else
+				{
+					if (isEqual( m_requestMethod, "PUT"))
+					{
+						setAnswer( ErrorCodeRequestResolveError);
+						return false;
+					}
+				}
 			}
 			else
 			{
-				if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), m_contextType, m_contextName))
+				if (m_contextName)
 				{
-					papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+					inherit_type = m_contextType;
+					inherit_name = m_contextName;
+				}
+			}
+			if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), inherit_type, inherit_name))
+			{
+				papuga_ErrorCode errcode = papuga_RequestContext_last_error( m_context.get(), true);
+				if (isEqual( m_requestMethod, "DELETE"))
+				{
+					if (papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), ROOT_CONTEXT_NAME, ROOT_CONTEXT_NAME))
+					{
+						errcode = papuga_Ok;
+					}
+				}
+				if (errcode != papuga_Ok)
+				{
 					setAnswer( papugaErrorToErrorCode( errcode));
 					return false;
 				}
@@ -351,11 +398,27 @@ bool WebRequestContext::runLuaScript()
 			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
 			return false;
 		}
-		else if (papuga_LuaRequestHandler_get_result( m_luahandler.get()))
+		const papuga_LuaRequestResult* result = papuga_LuaRequestHandler_get_result( m_luahandler.get());
+		if (result)
 		{
-			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has a result (forbidden)"), m_contextType, m_contextName);
-			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
-			return false;
+			if (isEqual( m_requestMethod, "POST"))
+			{
+				char buf[ 1024];
+				std::pair<const char*,const char*> lnk = splitString( buf, sizeof(buf), result->contentstr, result->contentlen, '/');
+				if (! isEqual( lnk.first, "transaction"))
+				{
+					m_contextType = papuga_Allocator_copy_charp( &m_allocator, lnk.first);
+					m_contextName = papuga_Allocator_copy_charp( &m_allocator, lnk.second);
+				}
+				m_answer = m_handler->getLinkAnswer( m_attributes, lnk.first, lnk.second);
+				return m_answer.ok();
+			}
+			else
+			{
+				std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has a result (forbidden)"), m_contextType, m_contextName);
+				setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
+				return false;
+			}
 		}
 	}
 	if (ne)
@@ -524,10 +587,6 @@ bool WebRequestContext::execute()
 							destroyContext();
 						}
 					}
-				}
-				else if (!m_configTransactionTmpFile.empty())
-				{
-					Configuration::drop( m_configTransactionTmpFile);
 				}
 			}
 			return terminated;

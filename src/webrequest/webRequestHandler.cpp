@@ -436,6 +436,40 @@ WebRequestAnswer WebRequestHandler::getSimpleRequestAnswer(
 	return rt;
 }
 
+WebRequestAnswer WebRequestHandler::getLinkAnswer(
+		const papuga_RequestAttributes& attributes,
+		char const* linkContextType,
+		char const* linkContextName)
+{
+	WebRequestAnswer rt;
+	try
+	{
+		papuga_StringEncoding result_encoding = papuga_UTF8;
+		papuga_ContentType result_doctype = papuga_http_default_doctype( &attributes);
+
+		if (result_doctype == papuga_ContentType_Unknown)
+		{
+			rt.setError_fmt( strus::errorCodeToHttpStatus( ErrorCodeNotImplemented), ErrorCodeNotImplemented, _TXT("none of the accept content types implemented"));
+			return rt;
+		}
+		char serverbuf[ 1024];
+		char linkbuf[ 1024];
+		const char* linkbase = papuga_http_linkbase( &attributes, serverbuf, sizeof(serverbuf));
+		if (!linkbase || sizeof(linkbuf) <= (size_t)std::snprintf( linkbuf, sizeof(linkbuf), "%s/%s/%s", linkbase, linkContextType, linkContextName))
+		{
+			setAnswer( rt, ErrorCodeBufferOverflow);
+			return rt;
+		}
+		(void)strus::mapStringToAnswer( rt, 0/*allocator*/, html_head(), ""/*html href base*/, linkContextType, "link", result_encoding, result_doctype, m_beautifiedOutput, linkbuf);
+	}
+	catch (...)
+	{
+		setAnswerFromException( rt);
+		return rt;
+	}
+	return rt;
+}
+
 void WebRequestHandler::tick()
 {
 	m_transactionPool.collectGarbage( m_eventLoop->time());
@@ -475,9 +509,9 @@ bool WebRequestHandler::removeContext(
 	return true;
 }
 
-std::string WebRequestHandler::storeConfigurationTemporary( const std::string& type_, const std::string& name_, const std::string& content_)
+void WebRequestHandler::storeConfiguration( const char* type_, const char* name_, const std::string& content_)
 {
-	return Configuration::storeTemporary( m_config_dir, m_serviceName, type_, name_, content_);
+	return Configuration::store( m_config_dir, m_serviceName, type_, name_, content_);
 }
 
 void WebRequestHandler::deleteConfiguration( const std::string& type_, const std::string& name_)

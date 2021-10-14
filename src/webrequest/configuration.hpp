@@ -29,9 +29,7 @@ public:
 	Configuration( const Configuration& o)
 		:m_dir(o.m_dir),m_service(o.m_service),m_type(o.m_type),m_name(o.m_name),m_content(o.m_content){}
 
-	static std::string storeTemporary( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_, const std::string& content_);
-	static void commit( const std::string& temporaryFilename);
-	static void drop( const std::string& temporaryFilename);
+	static void store( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_, const std::string& content_);
 	static void remove( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_);
 	static std::vector<Configuration> list( const std::string& dir_, const std::string& service_);
 	static void cleanup( const std::string& dir_, const std::string& service_);

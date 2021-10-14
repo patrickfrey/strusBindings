@@ -45,7 +45,7 @@ static strus::mutex g_timestmpmutex;
 static char g_timestmpbuf[ 16] = "";
 static int g_timestmpcnt = 0;
 
-static std::string temporaryFilename( const std::string& type, const std::string& name)
+static std::string uniqueConfigurationFilename( const std::string& type, const std::string& name)
 {
 	char timebuf[ 16];
 	time_t timer;
@@ -67,24 +67,15 @@ static std::string temporaryFilename( const std::string& type, const std::string
 			g_timestmpcnt = 0;
 		}
 	}
-	return strus::string_format( "%s_%03d.%s.%s.temp", timebuf, g_timestmpcnt, type.c_str(), name.c_str());
+	return strus::string_format( "%s_%03d.%s.%s.conf", timebuf, g_timestmpcnt, type.c_str(), name.c_str());
 }
 
-static std::string temporaryConfigFilepath( const std::string& dir, const std::string& service, const std::string& type, const std::string& name)
+static std::string uniqueConfigurationFilepath( const std::string& dir, const std::string& service, const std::string& type, const std::string& name)
 {
-	std::string tmpfilename = temporaryFilename( type, name);
+	std::string filename = uniqueConfigurationFilename( type, name);
 	std::string cfgstoredir = strus::joinFilePath( dir, service);
-	std::string rt = strus::joinFilePath( cfgstoredir, tmpfilename);
+	std::string rt = strus::joinFilePath( cfgstoredir, filename);
 	if (cfgstoredir.empty() || rt.empty()) throw std::bad_alloc();
-	return rt;
-}
-
-static std::string commitConfigFilepath( const std::string& tmpfilename)
-{
-	char const* ee = tmpfilename.c_str() + tmpfilename.size();
-	while (ee > tmpfilename.c_str() && *(ee-1) != '.') {--ee;}
-	std::string rt( tmpfilename.c_str(), ee-tmpfilename.c_str());
-	rt.append( "conf");
 	return rt;
 }
 
@@ -97,37 +88,16 @@ static std::vector<std::string> configurationFiles( const std::string& dir, cons
 	return rt;
 }
 
-std::string Configuration::storeTemporary( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_, const std::string& content_)
+void Configuration::store( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_, const std::string& content_)
 {
-	std::string rt = temporaryConfigFilepath( dir_, service_, type_, name_);
-	int ec = strus::writeFile( rt, content_);
-	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to store configuration file '%s'"), rt.c_str());
-	return rt;
-}
-
-void Configuration::commit( const std::string& temporaryFilename)
-{
-	std::string commitFilename = commitConfigFilepath( temporaryFilename);
-	strus::removeFile( commitFilename);
-	int ec = strus::renameFile( temporaryFilename, commitFilename);
-	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to rename configuration file '%s' to '%s' in commit"), temporaryFilename.c_str(), commitFilename.c_str());
-}
-
-void Configuration::drop( const std::string& temporaryFilename)
-{
-	if (!temporaryFilename.empty())
-	{
-		strus::removeFile( temporaryFilename);
-	}
+	std::string path = uniqueConfigurationFilepath( dir_, service_, type_, name_);
+	int ec = strus::writeFile( path, content_);
+	if (ec) throw strus::runtime_error_ec( (ErrorCode)ec, _TXT("failed to store configuration file '%s'"), path.c_str());
 }
 
 void Configuration::remove( const std::string& dir_, const std::string& service_, const std::string& type_, const std::string& name_)
 {
-	std::vector<std::string> fl_active = configurationFiles( dir_, service_, strus::string_format( "%s.%s.conf", type_.c_str(), name_.c_str()));
-	std::vector<std::string> fl_failed = configurationFiles( dir_, service_, strus::string_format( "%s.%s.temp", type_.c_str(), name_.c_str()));
-	std::vector<std::string> fl;
-	fl.insert( fl.end(), fl_active.begin(), fl_active.end());
-	fl.insert( fl.end(), fl_failed.begin(), fl_failed.end());
+	std::vector<std::string> fl = configurationFiles( dir_, service_, strus::string_format( "%s.%s.conf", type_.c_str(), name_.c_str()));
 	std::string cfgstoredir = strus::joinFilePath( dir_, service_);
 	for (auto fn : fl)
 	{
@@ -173,7 +143,7 @@ std::vector<Configuration> Configuration::list( const std::string& dir_, const s
 
 void Configuration::cleanup( const std::string& dir_, const std::string& service_)
 {
-	std::vector<std::string> fl_delete = configurationFiles( dir_, service_, ".temp");
+	std::vector<std::string> fl_delete;
 	std::vector<std::string> fl = configurationFiles( dir_, service_, ".conf");
 
 	std::sort( fl.begin(), fl.end());
