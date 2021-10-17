@@ -20,7 +20,6 @@ config = {
 			call = string,
 			count = string
 		},
-		debug = {string},
 		rpc = string,
 		threads = integer
 	},

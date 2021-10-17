@@ -1,4 +1,4 @@
-deleteStorage = {
+storageAddress = {
 	path = string,
 	database = string
 }
@@ -10,14 +10,14 @@ metadataChange = {
 	oldname = string
 }
 
-defineStorage = {
+storage = {
 	path = string,
 	database = string,
 	statsproc = string,
 	autocompact = boolean,
 	acl = boolean,
 	cachedterms = string,
-	cache = string,
+	cache = integer,
 	compression = boolean,
 	max_open_files = integer,
 	write_buffer_size = integer,

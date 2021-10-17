@@ -44,7 +44,6 @@ serverConfig = {
 		}
 	},
 	context = {
-		debug = {"sentence","analyze"}
 	}
 }
 

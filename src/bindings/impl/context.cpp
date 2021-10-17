@@ -40,7 +40,6 @@
 #include "strus/queryProcessorInterface.hpp"
 #include "strus/debugTraceInterface.hpp"
 #include "strus/errorBufferInterface.hpp"
-#include "strus/debugTraceInterface.hpp"
 #include "strus/constants.hpp"
 #include "strus/numericVariant.hpp"
 #include "strus/storage/statisticsMessage.hpp"
