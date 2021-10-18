@@ -1,5 +1,4 @@
 storageAddress = {
-	path = string,
 	database = string
 }
 
@@ -11,7 +10,6 @@ metadataChange = {
 }
 
 storage = {
-	path = string,
 	database = string,
 	statsproc = string,
 	autocompact = boolean,

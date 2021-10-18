@@ -6,14 +6,20 @@ function GET( self, inputstr, path)
 	end
 end
 
+local function storageConfiguration( self, inputstr, storageid)
+	local config = schema( "storage", inputstr, true).storage
+	config.path = self:get( "workdir") .. "/storage/" .. storageid
+	self:set( "config", config)
+	return config
+end
+
 function INIT( self, inputstr, path, storageid)
 	if path then
 		http_error( "404")
 	else
-		local input = schema( "storage", inputstr, true).storage
-		input.path = self:get( "workdir") .. "/storage/" .. storageid
+		local config = storageConfiguration( self, inputstr, storageid)
 		local context = self:get("context")
-		local storage = context:createStorageClient( input )
+		local storage = context:createStorageClient( config )
 		self:set( "storage", storage)
 	end
 end
@@ -22,12 +28,9 @@ function PUT( self, inputstr, path, storageid)
 	if path then
 		http_error( "404")
 	else
-		print( "+++ STORAGE ID " .. storageid)
-		local input = schema( "storage", inputstr, true).storage
-		input.path = self:get( "workdir") .. "/storage/" .. storageid
+		local config = storageConfiguration( self, inputstr, storageid)
 		local context = self:get("context")
-		local storage = context:createStorage( input )
-		self:set( "storage", storage)
+		local storage = context:createStorage( config )
 	end
 end
 
@@ -48,9 +51,10 @@ function DELETE( self, inputstr, path, storageid)
 	if path or not storageid then
 		http_error( "404")
 	else
-		local input = schema( "storageAddress", inputstr, true).storageAddress
+		local config = self:get("config")
+		local address = {database=config.database, path=config.path}
 		local context = self:get("context")
-		context:destroyStorage( input)
+		context:destroyStorage( address)
 	end
 end
 

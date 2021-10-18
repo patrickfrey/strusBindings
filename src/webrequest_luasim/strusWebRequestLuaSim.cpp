@@ -1657,6 +1657,10 @@ int main( int argc, const char* argv[])
 				++argi;
 				break;
 			}
+			else
+			{
+				throw strus::runtime_error( _TXT("unknown option '%s'"), argv[argi]);
+			}
 		}
 		if (argi == argc)
 		{

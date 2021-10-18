@@ -568,7 +568,11 @@ bool WebRequestContext::execute()
 {
 	try
 	{
-		if (!m_answer.ok()) return true;
+		if (!m_answer.ok()/*initialization failed*/
+		||  !m_luahandler.get()/*already executed in constructor as built-in command*/)
+		{
+			return true;
+		}
 		if (!m_openDelegates.get() || *m_openDelegates == 0)
 		{
 			bool terminated = runLuaScript();

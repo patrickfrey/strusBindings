@@ -1,7 +1,7 @@
 require "os"
 
 -- Dumping table contents to a string
-function dump( data, indent)
+local function dump( data, indent)
 	local indent = indent or "\n"
 	if type( data) == "table" then
 		local rt = ""
