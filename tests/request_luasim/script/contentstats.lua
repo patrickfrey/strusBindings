@@ -5,7 +5,7 @@ end
 
 function PUT( self, inputstr, path)
 	if path then
-		http_error( "404")
+		http_status( "404")
 	else
 		local input = schema( "contentstats", inputstr, true).contentstats
 		local context = self:get("context")
@@ -25,7 +25,7 @@ end
 
 function POST( self, inputstr, path)
 	if path then
-		http_error( "404")
+		http_status( "404")
 	else
 		local contentstats = self:get("contentstats")
 		local tid = transaction( "contentcollector", contentstats:createCollector())

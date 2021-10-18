@@ -5,7 +5,7 @@ function GET( self, inputstr, path)
 	elseif not path or path == "statistics" then
 		return {statistics=collector:statistics()}
 	else
-		http_error( "404")
+		http_status( "404")
 	end
 end
 

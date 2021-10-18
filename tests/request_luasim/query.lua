@@ -33,13 +33,13 @@ qryevalConfig = from_json( load_file( "qryeval.json") )
 qryevalConfig.qryeval.include = inserterConfig.inserter.include
 
 def_test_server( "isrv1", ISERVER1)
-call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@docanalyzer.json" )
-call_server_checked( "PUT", ISERVER1  .. "/qryanalyzer/test", "@qryanalyzer.json" )
+call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@documentAnalysis.json" )
+call_server_checked( "PUT", ISERVER1  .. "/qryanalyzer/test", "@queryAnalysis.json" )
 if verbose then io.stderr:write( string.format("- Created document and query analyzer\n")) end
 
-call_server_checked( "POST", ISERVER1 .. "/storage/test", storageConfig )
+call_server_checked( "PUT", ISERVER1 .. "/storage/test", storageConfig )
 call_server_checked( "PUT",  ISERVER1 .. "/inserter/test", inserterConfig )
-call_server_checked( "POST", ISERVER1 .. "/qryeval/test", qryevalConfig )
+call_server_checked( "PUT", ISERVER1 .. "/qryeval/test", qryevalConfig )
 
 if verbose then io.stderr:write( string.format("- Created storage, inserter and query eval\n")) end
 
@@ -64,7 +64,7 @@ if verbose then io.stderr:write( string.format("- Inserted all documents\n")) en
 query1 = {
 	query = {
 		feature = {
-		{	set = "search", 
+		{	set = "search",
 			content = {
 				term = {
 					type = "text",
@@ -78,7 +78,7 @@ query1 = {
 query2 = {
 	query = {
 		feature = {
-		{	set = "search", 
+		{	set = "search",
 			content = {
 				term = {
 					type = "text",

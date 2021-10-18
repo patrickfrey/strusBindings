@@ -60,11 +60,9 @@ query = {
 		content = restriction_expression,
 		analyzed = restriction_expression
 	}},
-	termstats = termstats,
-	globalstats = globalstats,
-	evalset = {
-		docno = {integer}
-	},
+	termstats = {termstats},
+	globalstats = {globalstats},
+	evalset = {integer},
 	nofranks = integer,
 	minrank = integer,
 	mergeres = boolean,

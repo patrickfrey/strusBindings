@@ -1,13 +1,15 @@
 qryeval = {
-	cterm = {
+	analyzer = string,
+	storage = string,
+	cterm = {{
 		set = string,
 		type = string,
 		value = string
-	},
-	restriction = string,
-	selection = string,
-	exclusion = string,
-	weighting = {
+	}},
+	restriction = {string},
+	selection = {string},
+	exclusion = {string},
+	weighting = {{
 		name = string,
 		feature = {
 			role = string,
@@ -17,8 +19,8 @@ qryeval = {
 			name = string,
 			value = string
 		}
-	},
-	summarizer = {
+	}},
+	summarizer = {{
 		id = string,
 		name = string,
 		feature = {
@@ -29,7 +31,7 @@ qryeval = {
 			name = string,
 			value = string
 		}
-	},
+	}},
 	formula = {
 		expression = string,
 		param = {
@@ -38,5 +40,4 @@ qryeval = {
 		}
 	}
 }
-
 

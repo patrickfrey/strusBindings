@@ -227,7 +227,7 @@ bool WebRequestContext::isCreateRequest() const noexcept
 
 bool WebRequestContext::isDeleteRequest() const noexcept
 {
-	return isEqual( m_requestMethod, "DELETE") && !m_path.hasMore() && !m_transactionRef.get();
+	return isEqual( m_requestMethod, "DELETE") && !m_path.hasMore();
 }
 
 bool WebRequestContext::initRequestContext( const char* contentstr, size_t contentlen)
@@ -399,7 +399,7 @@ bool WebRequestContext::runLuaScript()
 			return false;
 		}
 		const papuga_LuaRequestResult* result = papuga_LuaRequestHandler_get_result( m_luahandler.get());
-		if (result)
+		if (result->contentstr)
 		{
 			if (isEqual( m_requestMethod, "POST"))
 			{
@@ -440,16 +440,16 @@ bool WebRequestContext::runLuaScript()
 	else
 	{
 		const papuga_LuaRequestResult* result = papuga_LuaRequestHandler_get_result( m_luahandler.get());
-		if (result)
+		if (result->contentstr)
 		{
 			m_answer.setContent( WebRequestContent(
 						papuga_StringEncoding_name(result->encoding),
 						papuga_ContentType_name(result->doctype), 
 						result->contentstr, result->contentlen));
 		}
-		if (m_transactionRef.get())
+		if (result->http_status)
 		{
-			m_transactionPool->returnTransaction( m_transactionRef);
+			m_answer.setHttpStatus( result->http_status);
 		}
 		return true;
 	}
@@ -584,12 +584,26 @@ bool WebRequestContext::execute()
 					{
 						if (isCreateRequest())
 						{
-							transferContext();
+							if (transferContext())
+							{
+								m_answer.setHttpStatus( 201);
+							}
 						}
 						else if (isDeleteRequest())
 						{
-							destroyContext();
+							if (m_transactionRef.get())
+							{
+								m_transactionRef.reset();
+							}
+							else
+							{
+								destroyContext();
+							}
 						}
+					}
+					if (m_transactionRef.get() && m_answer.httpStatus() != 201)
+					{
+						m_transactionPool->returnTransaction( m_transactionRef);
 					}
 				}
 			}

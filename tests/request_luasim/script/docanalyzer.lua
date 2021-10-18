@@ -17,7 +17,7 @@ end
 
 function PUT( self, inputstr, path)
 	if path then
-		http_error( "404")
+		http_status( "404")
 	else
 		local input = schema( "docanalyzer", inputstr, true).docanalyzer
 		local context = self:get("context")

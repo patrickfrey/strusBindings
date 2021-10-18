@@ -328,7 +328,8 @@ void WebRequestHandler::initConfigurationObject(
 		{
 			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("delegate requests in configuration of '%s'"), contextType);
 		}
-		if (papuga_LuaRequestHandler_get_result( reqhnd))
+		const papuga_LuaRequestResult* rp = papuga_LuaRequestHandler_get_result( reqhnd);
+		if (rp->contentstr)
 		{
 			throw strus::runtime_error_ec( ErrorCodeRuntimeError, _TXT("no result allowed in configuration ('%s')"), contextType);
 		}

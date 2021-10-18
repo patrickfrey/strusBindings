@@ -5,7 +5,7 @@ end
 
 function PUT( self, inputstr, path)
 	if path then
-		http_error( "404")
+		http_status( "404")
 	else
 		local config = schema( "config", inputstr, false)
 		self:set( "context", strus_Context.new( config.context))
