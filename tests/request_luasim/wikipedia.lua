@@ -39,7 +39,7 @@ end
 
 function serviceAddress( name, index)
 	if name == "storage" or name == "inserter" then
-		return server.storage[ index].address .. "/" .. name .. "/" .. server.storage[ index].context 
+		return server.storage[ index].address .. "/" .. name .. "/" .. server.storage[ index].context
 
 	elseif name == "docanalyzer" then
 		return server.storage[ index].address .. "/" .. name .. "/test"
@@ -71,7 +71,7 @@ storageConfig = {
 	storage = {
 		database = "leveldb",
 		statsproc = "std",
-		cache_size = "500M",
+		cache = "500M",
 		max_open_files = 512,
 		write_buffer_size = "8K",
 		block_size = "4K"
@@ -81,7 +81,7 @@ storageConfig = {
 vectorStorageConfig = {
 	vstorage = {
 		database = "leveldb",
-		cache_size = "500M",
+		cache = "500M",
 		max_open_files = 512,
 		write_buffer_size = "8K",
 		block_size = "4K",
@@ -172,7 +172,7 @@ function buildStorageServer()
 		TRANSACTION = from_json( call_server_checked( "POST", serviceAddress( "inserter", storageidx) .. "/transaction" )).transaction.link
 		if verbose then io.stderr:write( string.format("- Create transaction %s for server %s\n", TRANSACTION, storage.name)) end
 		local cntdoc = 0
-	
+
 		documents = getDirectoryFiles( SCRIPTPATH .. "/doc/xml", ".xml")
 		for k,path in pairs(documents) do
 			fullpath = "doc/xml/" .. path

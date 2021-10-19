@@ -10,9 +10,11 @@ function GET( self, inputstr, path)
 		for _,r in ipairs( input.restriction or {}) do
 			query:addMetaDataRestriction( r.analyzed)
 		end
-		if input.access then query:addAccess( input.access) end
-		if input.termstats then query:defineTermStatistics( termstats.type, termstats.value, termstats.df) end
 		if input.globalstats then query:defineGlobalStatistics( globalstats.nofdocs) end
+		for _,s in ipairs( input.termstats or {}) do
+			query:defineTermStatistics( t.type, t.value, t.df)
+		end
+		if input.access then query:addAccess( input.access) end
 		if input.evalset then query:addDocumentEvaluationSet( input.evalset) end
 		if input.nofranks then query:setMaxNofRanks( input.nofranks) end
 		if input.minrank then query:setMinRank( input.minrank) end
@@ -29,7 +31,6 @@ function PUT( self, inputstr, path)
 		http_status( "404")
 	else
 		local input = schema( "qryeval", inputstr, true).qryeval
-		self:inherit( "analyzer", input.analyzer)
 		self:inherit( "storage", input.storage)
 		local context = self:get("context")
 		local storage = self:get("storage")

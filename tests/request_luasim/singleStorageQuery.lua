@@ -8,7 +8,7 @@ SCRIPTPATH = script_path()
 storageConfig = {
 	storage = {
 		database = "leveldb",
-		cache_size = "500M",
+		cache = "500M",
 		max_open_files = 512,
 		write_buffer_size = "8K",
 		block_size = "4K"
@@ -23,14 +23,11 @@ metadataConfig = {
 }
 inserterConfig = {
 	inserter = {
-		include = {
-			analyzer = "test",
-			storage  = "test"
-		}
+		analyzer = "test",
+		storage  = "test"
 	}
 }
 qryevalConfig = from_json( load_file( "qryeval.json") )
-qryevalConfig.qryeval.include = inserterConfig.inserter.include
 
 def_test_server( "isrv1", ISERVER1)
 call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@documentAnalysis.json" )
@@ -107,19 +104,7 @@ if verbose then io.stderr:write( string.format("- Query evaluation result with a
 qryana = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1 )
 if verbose then io.stderr:write( string.format("- Query analysis:\n%s\n", qryana)) end
 
-qryana_with_eval = {
-	query = mergeValues(
-			from_json( qryana)["query"],
-			{eval = from_json( load_file( "qryeval.json"))["qryeval"]}
-		)
-}
-if verbose then io.stderr:write( string.format("- Analyzed query with eval:\n%s\n", to_json(qryana_with_eval))) end
-write_file( "test.json", to_json(qryana_with_eval))
-
-qryres3 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/storage/test", to_json(qryana_with_eval)))
-if verbose then io.stderr:write( string.format("- Query evaluation result from storage with query evaluation config passed:\n%s\n", qryres3)) end
-
-checkExpected( qryevalconf .. qryres1 .. qryres2 .. qryres3, "@query.exp", "query.res" )
+checkExpected( qryevalconf .. qryres1 .. qryres2, "@singleStorageQuery.exp", "singleStorageQuery.res" )
 
 
 

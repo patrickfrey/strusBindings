@@ -30,7 +30,9 @@ function PUT( self, inputstr, path, objname)
 	else
 		local config = storageConfiguration( self, inputstr, objname)
 		local context = self:get("context")
-		local storage = context:createStorage( config )
+		context:createStorage( config )
+		local storage = context:createStorageClient( config )
+		self:set( "storage", storage)
 	end
 end
 

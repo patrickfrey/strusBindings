@@ -1,6 +1,4 @@
 inserter = {
-	docanalyzer = string,
+	analyzer = string,
 	storage = string
 }
-
-

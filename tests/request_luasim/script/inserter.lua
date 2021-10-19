@@ -11,13 +11,11 @@ function PUT( self, inputstr, path)
 	if path then
 		http_status( "404")
 	else
-		local input = schema( "qryeval", inputstr, true).qryeval
-		self:inherit( "analyzer", input.analyzer)
+		local input = schema( "inserter", inputstr, true).inserter
+		self:inherit( "docanalyzer", input.analyzer)
 		self:inherit( "storage", input.storage)
 		local context = self:get("context")
-		local storage = self:get("storage")
-		local analyzer = self:get("analyzer")
-		local inserter = context:createInserter( storage, analyzer)
+		local inserter = context:createInserter( self:get("storage"), self:get("docanalyzer"))
 		self:set( "inserter", inserter)
 	end
 end

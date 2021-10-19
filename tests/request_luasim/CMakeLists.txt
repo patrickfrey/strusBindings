@@ -39,7 +39,7 @@ DeclareTest( DocumentStructureAnalysis documentStructureAnalysis.lua "" )
 DeclareTest( DocumentAnalysis documentAnalysis.lua "" )
 DeclareTest( QueryAnalysis queryAnalysis.lua "" )
 DeclareTest( CreateStorage createStorage.lua "" )
-DeclareTest( Query query.lua "" )
+DeclareTest( SingleStorageQuery singleStorageQuery.lua "" )
 # TEMPORARILY DEPRECATED TESTS
 # DeclareTest( DistributeStorage distributeStorage.lua "" )
 # DeclareTest( DistributeStorageOneServer distributeStorage.lua "1server" )

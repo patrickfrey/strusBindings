@@ -19,5 +19,3 @@ contentstats = {
 	select = {string},
 	element = {contentstatsElement}
 }
-
-

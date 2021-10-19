@@ -89,7 +89,7 @@ queryAnalyzerElement = {
 	field = string,
 	tokenizer = tokenizer,
 	normalizer = {normalizer},
-	priority = integer,
+	priority = integer
 }
 
 vectorStorage = {
