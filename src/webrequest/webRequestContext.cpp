@@ -98,7 +98,7 @@ WebRequestContext::WebRequestContext(
 	,m_logLevel(logger_->level())
 	,m_transactionPool(transactionPool_),m_transactionRef(),m_configuration()
 	,m_contextType(nullptr),m_contextName(nullptr)
-	,m_context(),m_luahandler(),m_path(path_)
+	,m_context(),m_doTransferContext(false),m_luahandler(),m_path(path_)
 	,m_errbuf(),m_answer()
 {
 	papuga_init_Allocator( &m_allocator, m_allocator_mem, sizeof(m_allocator_mem));
@@ -219,17 +219,6 @@ bool WebRequestContext::destroyContext()
 	return true;
 }
 
-bool WebRequestContext::isCreateRequest() const noexcept
-{
-	return m_requestMethod[0] == 'P' && (isEqual( m_requestMethod, "PUT") || isEqual( m_requestMethod, "POST"))
-		&& !m_path.hasMore() && !m_transactionRef.get();
-}
-
-bool WebRequestContext::isDeleteRequest() const noexcept
-{
-	return isEqual( m_requestMethod, "DELETE") && !m_path.hasMore();
-}
-
 bool WebRequestContext::initRequestContext( const char* contentstr, size_t contentlen)
 {
 	try
@@ -279,26 +268,35 @@ bool WebRequestContext::initRequestContext( const char* contentstr, size_t conte
 				setAnswer( ErrorCodeOutOfMem);
 				return false;
 			}
-			char const* inherit_type = ROOT_CONTEXT_NAME;
-			char const* inherit_name = ROOT_CONTEXT_NAME;
-			if (isCreateRequest())
+			char const* inherit_type = nullptr;
+			char const* inherit_name = nullptr;
+			if (isEqual( m_requestMethod,"PUT") && !m_path.hasMore() && !m_transactionRef.get())
 			{
-				m_configuration.append( contentstr, contentlen);
 				if (m_contextName)
 				{
-					if (isEqual(m_requestMethod,"POST"))
-					{
-						inherit_type = m_contextType;
-						inherit_name = m_contextName;
-					}
+					inherit_type = ROOT_CONTEXT_NAME;
+					inherit_name = ROOT_CONTEXT_NAME;
+					m_configuration.append( contentstr, contentlen);
+					m_doTransferContext = true;
 				}
 				else
 				{
-					if (isEqual( m_requestMethod, "PUT"))
-					{
-						setAnswer( ErrorCodeRequestResolveError);
-						return false;
-					}
+					setAnswer( ErrorCodeRequestResolveError);
+					return false;
+				}
+			}
+			else if (isEqual( m_requestMethod,"POST") && !m_path.hasMore() && !m_transactionRef.get())
+			{
+				if (m_contextName)
+				{
+					inherit_type = m_contextType;
+					inherit_name = m_contextName;
+				}
+				else
+				{
+					inherit_type = ROOT_CONTEXT_NAME;
+					inherit_name = ROOT_CONTEXT_NAME;
+					m_configuration.append( contentstr, contentlen);
 				}
 			}
 			else
@@ -307,6 +305,11 @@ bool WebRequestContext::initRequestContext( const char* contentstr, size_t conte
 				{
 					inherit_type = m_contextType;
 					inherit_name = m_contextName;
+				}
+				else
+				{
+					inherit_type = ROOT_CONTEXT_NAME;
+					inherit_name = ROOT_CONTEXT_NAME;
 				}
 			}
 			if (!papuga_RequestContext_inherit( m_context.get(), m_handler->contextPool(), inherit_type, inherit_name))
@@ -386,66 +389,66 @@ bool WebRequestContext::runLuaScript()
 		{
 			setAnswer( ErrorCodeRuntimeError, _TXT("yield not allowed in configuration"), true);
 		}
-		return false;
+		return true;
 	}
 	int ni = 0, ne = papuga_LuaRequestHandler_nof_DelegateRequests( m_luahandler.get());
-	if (isCreateRequest())
-	{
-		// Ensure that a PUT object request can be reissued as load configuation on restart:
-		if (ne)
-		{
-			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has delegate requests (forbidden)"), m_contextType, m_contextName);
-			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
-			return false;
-		}
-		const papuga_LuaRequestResult* result = papuga_LuaRequestHandler_get_result( m_luahandler.get());
-		if (result->contentstr)
-		{
-			if (isEqual( m_requestMethod, "POST"))
-			{
-				char buf[ 1024];
-				std::pair<const char*,const char*> lnk = splitString( buf, sizeof(buf), result->contentstr, result->contentlen, '/');
-				if (! isEqual( lnk.first, "transaction"))
-				{
-					m_contextType = papuga_Allocator_copy_charp( &m_allocator, lnk.first);
-					m_contextName = papuga_Allocator_copy_charp( &m_allocator, lnk.second);
-				}
-				m_answer = m_handler->getLinkAnswer( m_attributes, lnk.first, lnk.second);
-				return m_answer.ok();
-			}
-			else
-			{
-				std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has a result (forbidden)"), m_contextType, m_contextName);
-				setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
-				return false;
-			}
-		}
-	}
 	if (ne)
 	{
-		m_openDelegates.reset( new int( ne));
-		for (; ni != ne; ++ni)
+		if (isEqual(m_requestMethod,"PUT") || isEqual(m_requestMethod,"POST"))
 		{
-			papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
-			WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
-			if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
-			{
-				std::snprintf( errbufmem, sizeof(errbufmem), _TXT("Request to '%s' failed"), delegate->requesturl);
-				setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
-				return false;
-			}
+			// Ensure that a PUT object request can be reissued as load configuation on restart:
+			std::snprintf( errbufmem, sizeof(errbufmem), _TXT("%s request to %s/%s has delegate requests (forbidden)"), m_requestMethod, m_contextType, m_contextName);
+			setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
+			return true;
 		}
-		return false;
+		else
+		{
+			m_openDelegates.reset( new int( ne));
+			for (; ni != ne; ++ni)
+			{
+				papuga_DelegateRequest const* delegate = papuga_LuaRequestHandler_get_delegateRequest( m_luahandler.get(), ni);
+				WebRequestDelegateContext* dhnd = new WebRequestDelegateContext( m_luahandler, ni, m_openDelegates);
+				if (!m_handler->delegateRequest( delegate->requesturl, delegate->requestmethod, delegate->contentstr, delegate->contentlen, dhnd))
+				{
+					std::snprintf( errbufmem, sizeof(errbufmem), _TXT("Request to '%s' failed"), delegate->requesturl);
+					setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
+					return false;
+				}
+			}
+			return false;
+		}
 	}
 	else
 	{
 		const papuga_LuaRequestResult* result = papuga_LuaRequestHandler_get_result( m_luahandler.get());
 		if (result->contentstr)
 		{
-			m_answer.setContent( WebRequestContent(
-						papuga_StringEncoding_name(result->encoding),
-						papuga_ContentType_name(result->doctype), 
-						result->contentstr, result->contentlen));
+			if (isEqual( m_requestMethod, "POST"))
+			{ 	//... result is a link
+				char buf[ 1024];
+				std::pair<const char*,const char*> lnk = splitString( buf, sizeof(buf), result->contentstr, result->contentlen, '/');
+				if (! isEqual( lnk.first, "transaction"))
+				{
+					m_contextType = papuga_Allocator_copy_charp( &m_allocator, lnk.first);
+					m_contextName = papuga_Allocator_copy_charp( &m_allocator, lnk.second);
+					m_doTransferContext = true;
+				}
+				m_answer = m_handler->getLinkAnswer( m_attributes, lnk.first, lnk.second);
+				return true;
+			}
+			else if (isEqual( m_requestMethod, "PUT"))
+			{
+				std::snprintf( errbufmem, sizeof(errbufmem), _TXT("PUT request to %s/%s has a result (forbidden)"), m_contextType, m_contextName);
+				setAnswer( ErrorCodeDelegateRequestFailed, errbufmem, true);
+				return true;
+			}
+			else
+			{
+				m_answer.setContent( WebRequestContent(
+							papuga_StringEncoding_name(result->encoding),
+							papuga_ContentType_name(result->doctype), 
+							result->contentstr, result->contentlen));
+			}
 		}
 		if (result->http_status)
 		{
@@ -582,14 +585,14 @@ bool WebRequestContext::execute()
 				{
 					if (m_contextName && m_contextType)
 					{
-						if (isCreateRequest())
+						if (m_doTransferContext)
 						{
 							if (transferContext())
 							{
 								m_answer.setHttpStatus( 201);
 							}
 						}
-						else if (isDeleteRequest())
+						else if (isEqual( m_requestMethod, "DELETE") && !m_path.hasMore())
 						{
 							if (m_transactionRef.get())
 							{

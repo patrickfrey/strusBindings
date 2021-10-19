@@ -100,7 +100,7 @@ vectorStorage = {
 		expansion = {
 			type = string,
 			sim = number
-		},
+		}
 	}
 }
 

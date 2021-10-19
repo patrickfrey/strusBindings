@@ -26,6 +26,20 @@ function GET( self, inputstr, path)
 	end
 end
 
+-- Dumping table contents to a string
+local function dump( data, indent)
+	local indent = indent or "\n"
+	if type( data) == "table" then
+		local rt = ""
+		for k,v in pairs(data) do
+			rt = rt .. indent .. k .. "=" .. dump( v, indent .. "  ")
+		end
+		return rt
+	else
+		return tostring( data)
+	end
+end
+
 function PUT( self, inputstr, path)
 	if path then
 		http_status( "404")
@@ -33,8 +47,7 @@ function PUT( self, inputstr, path)
 		local input = schema( "qryeval", inputstr, true).qryeval
 		self:inherit( "storage", input.storage)
 		local context = self:get("context")
-		local storage = self:get("storage")
-		local qryeval = context:createQueryEval( storage)
+		local qryeval = context:createQueryEval()
 
 		for _,t in ipairs(input.cterm or {}) do
 			qryeval:addTerm( t.set, t.type, t.value)

@@ -1,10 +1,6 @@
-function GET( self, inputstr, path)
-	local transaction = self:get("self")
-end
-
 function PUT( self, inputstr, path)
 	local transaction = self:get("self")
-	if path then
+	if inputstr then
 		local schema = { mimetype = mimetype( inputstr), encoding = encoding( inputstr) }
 		transaction:insertDocument( path, inputstr, schema);
 	else
@@ -21,3 +17,4 @@ function DELETE( self, inputstr, path)
 		transaction:rollback()
 	end
 end
+

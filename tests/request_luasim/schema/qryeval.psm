@@ -10,32 +10,32 @@ qryeval = {
 	exclusion = {string},
 	weighting = {{
 		name = string,
-		feature = {
+		feature = {{
 			role = string,
 			set = string
-		},
-		param = {
+		}},
+		param = {{
 			name = string,
 			value = string
-		}
+		}}
 	}},
 	summarizer = {{
 		id = string,
 		name = string,
-		feature = {
+		feature = {{
 			role = string,
 			set = string
-		},
-		param = {
+		}},
+		param = {{
 			name = string,
 			value = string
-		}
+		}}
 	}},
 	formula = {
 		expression = string,
-		param = {
+		param = {{
 			name = string,
 			value = string
-		}
+		}}
 	}
 }

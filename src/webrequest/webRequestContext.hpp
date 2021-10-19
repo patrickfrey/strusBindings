@@ -66,14 +66,10 @@ private:
 
 	/// \brief Run the request as a Lua script call
 	bool initLuaScript( const char* contentstr, size_t contentlen);
-	/// \brief Run the request as a Lua script call
+	/// \brief Run the request as a Lua script call, return true if terminated (with error or succesful)
 	bool runLuaScript();
 	/// \brief Check and if set run a built-in command, return false if not built-in command set
 	bool executeBuiltInCommand();
-	/// \brief Check if the request is a [PUT obj] command
-	bool isCreateRequest() const noexcept;
-	/// \brief Check if the request is a [DELETE obj] command
-	bool isDeleteRequest() const noexcept;
 
 	/// \brief Translate the last exception thrown into the request answer (Lippincott Function)
 	void setAnswerFromException();
@@ -95,6 +91,7 @@ private:
 	const char* m_contextType;		//< context type
 	const char* m_contextName;		//< context name
 	PapugaContextRef m_context;		//< context reference
+	bool m_doTransferContext;		//< true if the context is transfered to the context pool at the end of a succesful request
 	PapugaLuaRequestHandlerRef m_luahandler;//< lua request handler reference
 	strus::Reference<int> m_openDelegates;	//< open delegate requests 
 	PathBuf m_path;				//< iterator on path of the request

@@ -7,6 +7,15 @@ function PUT( self, inputstr, path)
 	if path then
 		local input = schema( "document", inputstr, true).document
 		transaction:insertDocument( path, input, schema);
+	elseif inputstr then
+		local root = docroot( inputstr)
+		print("+++ ROOT " .. root)
+		if root == "metadataUpdate" then
+			local input = schema( "metadataUpdate", inputstr, true).metadataUpdate
+			transaction:updateMetaDataTable( input)
+		else
+			http_status( 400)
+		end
 	else
 		transaction:commit()
 		http_status( 201)

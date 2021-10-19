@@ -37,16 +37,21 @@ function PUT( self, inputstr, path, objname)
 end
 
 function POST( self, inputstr, path, objname)
-	if objname then -- storage addressed then create transaction
-		local storage = self:get("storage")
-		local tid = transaction( "storagetransaction", storage:createTransaction())
-		return "transaction/" .. tid
+	if objname then
+		if path == "transaction" then
+			local storage = self:get("storage")
+			local tid = transaction( "storagetransaction", storage:createTransaction())
+			return "transaction/" .. tid
+		end
 
-	else -- no no storage addressed then create storage
-		objname = counter("storage")
-		PUT( self, inputstr, path, objname)
-		return "storage/" .. objname
+	else
+		if not path then
+			objname = counter("storage")
+			PUT( self, inputstr, path, objname)
+			return "storage/" .. objname
+		end
 	end
+	http_status( "404")
 end
 
 function DELETE( self, inputstr, path, objname)
@@ -56,6 +61,8 @@ function DELETE( self, inputstr, path, objname)
 		local config = self:get("config")
 		local address = {database=config.database, path=config.path}
 		local context = self:get("context")
+		local storage = self:get("storage")
+		storage:close()
 		context:destroyStorage( address)
 	end
 end

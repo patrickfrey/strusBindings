@@ -21,14 +21,20 @@ function PUT( self, inputstr, path)
 end
 
 function POST( self, inputstr, path, objname)
-	if objname then -- storage addressed then create transaction
-		local inserter = self:get("inserter")
-		local tid = transaction( "insertertransaction", inserter:createTransaction())
-		return "transaction/" .. tid
+	if objname then
+		if path == "transaction" then
+			local inserter = self:get("inserter")
+			local tid = transaction( "insertertransaction", inserter:createTransaction())
+			return "transaction/" .. tid
+		end
 
-	else -- no no storage addressed then create storage
-		objname = counter("inserter")
-		PUT( self, inputstr, path)
-		return "inserter/" .. objname
+	else
+		if not path then
+			objname = counter("inserter")
+			PUT( self, inputstr, path, objname)
+			return "inserter/" .. objname
+		end
 	end
+	http_status( "404")
 end
+

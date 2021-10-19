@@ -68,6 +68,7 @@ ErrorCode strus::papugaErrorToErrorCode( papuga_ErrorCode errcode)
 		case papuga_InvalidRequest:		return ErrorCodeInvalidRequest;
 		case papuga_AttributeNotAtomic:		return ErrorCodeInvalidRequest;
 		case papuga_UnknownContentType:		return ErrorCodeInvalidRequest;
+		case papuga_InvalidContentType:		return ErrorCodeInvalidRequest;
 		case papuga_UnknownSchema:		return ErrorCodeInvalidRequest;
 		case papuga_MissingStructureDescription:return ErrorCodeLogicError;
 		case papuga_DelegateRequestFailed:	return ErrorCodeInvalidRequest;

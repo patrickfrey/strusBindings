@@ -14,11 +14,9 @@ storageConfig = {
 		block_size = "4K"
 	}
 }
-metadataConfig = {
-	storage = {
-		metadata = {
-			{op="add", name="doclen", type="UINT16"}
-		}
+metadataUpdateConfig = {
+	metadataUpdate = {
+		{op="add", name="doclen", type="UINT16"}
 	}
 }
 inserterConfig = {
@@ -28,6 +26,7 @@ inserterConfig = {
 	}
 }
 qryevalConfig = from_json( load_file( "qryeval.json") )
+qryevalConfig.qryeval.storage = "test"
 
 def_test_server( "isrv1", ISERVER1)
 call_server_checked( "PUT", ISERVER1  .. "/docanalyzer/test", "@documentAnalysis.json" )
@@ -42,7 +41,7 @@ if verbose then io.stderr:write( string.format("- Created storage, inserter and 
 
 TRANSACTION = from_json( call_server_checked( "POST", ISERVER1 .. "/storage/test/transaction" )).transaction.link
 if verbose then io.stderr:write( string.format("- Create transaction for meta data definitions %s\n", TRANSACTION)) end
-call_server_checked( "PUT", TRANSACTION, metadataConfig)
+call_server_checked( "PUT", TRANSACTION, metadataUpdateConfig)
 call_server_checked( "PUT", TRANSACTION)
 if verbose then io.stderr:write( string.format("- Defined meta data schema\n")) end
 

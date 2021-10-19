@@ -2,7 +2,7 @@ storageAddress = {
 	database = string
 }
 
-metadataChange = {
+metadataUpdate = {
 	op = string,
 	name = string,
 	type = string,

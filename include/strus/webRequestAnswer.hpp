@@ -111,9 +111,7 @@ public:
 	/// \param[in] httpStatus_ http status code
 	void setHttpStatus( int httpStatus_)
 	{
-		m_errorStr = 0;
 		m_httpStatus = httpStatus_;
-		m_appErrorCode = 0;
 	}
 
 	/// \brief Set http status with error
