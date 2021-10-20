@@ -28,7 +28,7 @@ static void printFrameFileDescription( std::ostream& out, const char* name, cons
 	out
 	<< "/*" << std::endl
 	<< "* @brief " << description << std::endl
-	<< "* @note PROGRAM (strusBindingsGen) GENERATED FILE! DO NOT MODIFY!!!" << std::endl
+	<< "* @note PROGRAM (strusBindingsModuleGen) GENERATED FILE! DO NOT MODIFY!!!" << std::endl
 	<< "* @file " << name << "." << ext << std::endl
 	<< "*/" << std::endl;
 }

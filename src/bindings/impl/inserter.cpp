@@ -17,6 +17,8 @@
 #include "deserializer.hpp"
 #include "papuga/allocator.h"
 #include "papuga/serialization.h"
+#include "papuga/valueVariant.h"
+#include "papuga/valueVariant.hpp"
 
 using namespace strus;
 using namespace strus::bindings;
@@ -89,7 +91,7 @@ InserterTransactionImpl* InserterImpl::createTransaction() const
 	return new InserterTransactionImpl( transaction.get(), &m_analyzer);
 }
 
-void InserterTransactionImpl::insertDocument( const std::string& docid, const std::string& content, const ValueVariant& documentClass)
+void InserterTransactionImpl::insertDocument( const ValueVariant& docid, const std::string& content, const ValueVariant& documentClass)
 {
 	const DocumentAnalyzerInstanceInterface* analyzer = m_analyzer.m_analyzer_impl.getObject<const DocumentAnalyzerInstanceInterface>();
 	ErrorBufferInterface* errorhnd = m_analyzer.m_errorhnd_impl.getObject<ErrorBufferInterface>();
@@ -99,6 +101,7 @@ void InserterTransactionImpl::insertDocument( const std::string& docid, const st
 	analyzerContext->putInput( content.c_str(), content.size(), true/*eof*/);
 	strus::local_ptr<analyzer::Document> doc( new analyzer::Document());
 	int documentCount = 0;
+	std::string docidstr;
 	while (analyzerContext->analyzeNext( *doc))
 	{
 		papuga_Serialization docser;
@@ -106,22 +109,30 @@ void InserterTransactionImpl::insertDocument( const std::string& docid, const st
 		int allocator_mem[ 1024];
 		papuga_init_Allocator( &allocator, &allocator_mem, sizeof(allocator_mem));
 		papuga_init_Serialization( &docser, &allocator);
-		
 		try
 		{
 			Serializer::serialize( &docser, *doc, false/*deep*/);
 			papuga_ValueVariant docval;
 			papuga_init_ValueVariant_serialization( &docval, &docser);
 
-			std::string id;
-			if (docid.empty())
+			if (papuga_ValueVariant_defined( &docid))
+			{
+				papuga_ErrorCode errcode = papuga_Ok;
+				docidstr = papuga::ValueVariant_tostring( docid, errcode);
+				if (errcode != papuga_Ok)
+				{
+					if (errcode == papuga_NoMemError) throw std::bad_alloc();
+					throw strus::runtime_error(_TXT("docid is not convertible to a string"));
+				}
+			}
+			else
 			{
 				std::vector<analyzer::DocumentAttribute>::const_iterator ai = doc->attributes().begin(), ae = doc->attributes().end();
 				for (; ai != ae; ++ai)
 				{
 					if (ai->name() == strus::Constants::attribute_docid())
 					{
-						id = ai->value();
+						docidstr = ai->value();
 						break;
 					}
 				}
@@ -129,14 +140,9 @@ void InserterTransactionImpl::insertDocument( const std::string& docid, const st
 				{
 					throw strus::runtime_error(_TXT("insert document without docid or empty docid defined"));
 				}
-				m_transaction.insertDocument( id, docval);
-				documentCount++;
 			}
-			else
-			{
-				m_transaction.insertDocument( docid, docval);
-				documentCount++;
-			}
+			m_transaction.insertDocument( docidstr, docval);
+			documentCount++;
 		}
 		catch (const std::bad_alloc&)
 		{
@@ -149,7 +155,7 @@ void InserterTransactionImpl::insertDocument( const std::string& docid, const st
 			throw err;
 		}
 		papuga_destroy_Allocator( &allocator);
-		if (documentCount > 1 && !docid.empty())
+		if (documentCount > 1 && papuga_ValueVariant_defined( &docid))
 		{
 			throw strus::runtime_error(_TXT("specified docid for inserter to insert of a multipart document"));
 		}

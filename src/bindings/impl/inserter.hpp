@@ -57,10 +57,10 @@ public:
 
 	/// \brief Prepare the inserting a document into the storage
 	/// \note The document is physically inserted with the call of 'commit()'
-	/// \param[in] docid the identifier of the document to insert or empty if document id is extracted by analyzer
+	/// \param[in] docid the identifier of the document to insert or undefined if document id is extracted by analyzer
 	/// \param[in] doc plain content of the document to analyze and insert
 	/// \param[in] documentClass (optional) document class of the document to insert (autodetection if undefined)
-	void insertDocument( const std::string& docid, const std::string& doc, const ValueVariant& documentClass=ValueVariant());
+	void insertDocument( const ValueVariant& docid, const std::string& doc, const ValueVariant& documentClass=ValueVariant());
 
 	/// \brief Prepare the deletion of a document from the storage
 	/// \note The document is physically deleted with the call of 'commit()'

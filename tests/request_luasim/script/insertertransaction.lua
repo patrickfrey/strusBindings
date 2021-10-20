@@ -2,7 +2,7 @@ function PUT( self, inputstr, path)
 	local transaction = self:get("self")
 	if inputstr then
 		local schema = { mimetype = mimetype( inputstr), encoding = encoding( inputstr) }
-		transaction:insertDocument( path, inputstr, schema);
+		transaction:insertDocument( path, inputstr, schema)
 	else
 		transaction:commit()
 		http_status( 201)

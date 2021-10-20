@@ -6,7 +6,7 @@ function PUT( self, inputstr, path)
 	local transaction = self:get("self")
 	if path then
 		local input = schema( "document", inputstr, true).document
-		transaction:insertDocument( path, input, schema);
+		transaction:insertDocument( path, input, schema)
 	elseif inputstr then
 		local root = docroot( inputstr)
 		print("+++ ROOT " .. root)

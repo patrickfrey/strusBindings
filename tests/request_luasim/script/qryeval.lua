@@ -71,7 +71,7 @@ function PUT( self, inputstr, path)
 			qryeval:defineWeightingFormula( input.formula.expression, input.formula.param)
 		end
 		for _,s in ipairs(input.noposinfo or {}) do
-			qryeval:usePositionInformation( s, false);
+			qryeval:usePositionInformation( s, false)
 		end
 		self:set( "qryeval", qryeval)
 	end
