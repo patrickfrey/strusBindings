@@ -371,15 +371,6 @@ public:
 	/// \example  [ "within" 5 ["word" "world"]  ["word" "power"]]
 	/// \example  [ "word" "public" ]
 	TermExpression* analyzeSingleTermExpression( const ValueVariant& expression) const;
-
-	/// \brief Analyze a term expression having expression,term,list typeing tags in the output, following a stricter schema more suitable for web requests
-	/// \param[in] expression query term expression tree
-	/// \example  [ "within" 5 ["word" "Worlds"]  ["word" "powers"]]
-	/// \example  [ "word" "PUBLIC" ]
-	/// \return structure analyzed
-	/// \example  [ expression: [ "within" 5 [ term: ["word" "world"] term: ["word" "power"]] ]]
-	/// \example  [ term: [ "word" "public" ] ]
-	TermExpression* analyzeSchemaTermExpression( const ValueVariant& expression) const;
 	
 	/// \brief Analyze a metadata expression
 	/// \param[in] expression query metadata expression tree
@@ -444,7 +435,7 @@ public:
 	Struct introspection( const ValueVariant& path) const;
 
 private:
-	TermExpression* analyzeTermExpression_( const ValueVariant& expression, bool unique, bool schemaTypedOutput) const;
+	TermExpression* analyzeTermExpression_( const ValueVariant& expression, bool unique) const;
 	MetaDataExpression* analyzeMetaDataExpression_( const ValueVariant& expression, bool schemaTypedOutput) const;
 
 private:

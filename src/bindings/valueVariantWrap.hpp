@@ -35,6 +35,18 @@ struct ValueVariantWrap
 	static std::string tostring( const papuga_ValueVariant& value);
 	static const char* tocharp( std::string& buf, const papuga_ValueVariant& value);
 
+	static int64_t toint64( const papuga_ValueVariant& value, int64_t default_);
+	static uint64_t touint64( const papuga_ValueVariant& value, uint64_t default_);
+	static int toint( const papuga_ValueVariant& value, int default_);
+	static unsigned int touint( const papuga_ValueVariant& value, unsigned int default_);
+	static Index toindex( const papuga_ValueVariant& value, Index default_);
+	static double todouble( const papuga_ValueVariant& value, double default_);
+	static float tofloat( const papuga_ValueVariant& value, float default_);
+	static bool tobool( const papuga_ValueVariant& value, bool default_);
+	static strus::NumericVariant tonumeric( const papuga_ValueVariant& value, const strus::NumericVariant& default_);
+	static std::string tostring( const papuga_ValueVariant& value, const std::string& default_);
+	static const char* tocharp( std::string& buf, const papuga_ValueVariant& value, const char* default_);
+
 	template <class ClassImpl>
 	static ClassImpl* toclass( const papuga_ValueVariant& val)
 	{

@@ -30,13 +30,13 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "bool $val=true")
 		("argv_default", "true")
-		("argv_map", "ValueVariantWrap::tobool( $value)")
+		("argv_map", "ValueVariantWrap::tobool( $value, true)")
 		("typename", "boolean")
 		("varname", "$val")
 	;
 	typesystem.defineType( "bool $val=false")
 		("argv_default", "false")
-		("argv_map", "ValueVariantWrap::tobool( $value)")
+		("argv_map", "ValueVariantWrap::tobool( $value, false)")
 		("typename", "boolean")
 		("varname", "$val")
 	;
@@ -51,7 +51,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "const Index& $val=0")
 		("argv_default", "0")
-		("argv_map", "ValueVariantWrap::toint( $value)")
+		("argv_map", "ValueVariantWrap::toint( $value, 0)")
 		("typename", "integer")
 		("varname", "$val")
 	;
@@ -66,7 +66,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "const GlobalCounter& $val=0")
 		("argv_default", "0")
-		("argv_map", "ValueVariantWrap::toint( $value)")
+		("argv_map", "ValueVariantWrap::toint( $value, 0)")
 		("typename", "integer")
 		("varname", "$val")
 	;
@@ -77,7 +77,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "int $val=0")
 		("argv_default", "0")
-		("argv_map", "ValueVariantWrap::toint( $value)")
+		("argv_map", "ValueVariantWrap::toint( $value, 0)")
 		("typename", "integer")
 		("varname", "$val")
 	;
@@ -88,7 +88,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "unsigned int $val=0")
 		("argv_default", "0")
-		("argv_map", "ValueVariantWrap::touint( $value)")
+		("argv_map", "ValueVariantWrap::touint( $value, 0)")
 		("typename", "integer")
 		("varname", "$val")
 	;
@@ -99,7 +99,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "long $val=0")
 		("argv_default", "0")
-		("argv_map", "ValueVariantWrap::toint( $value)")
+		("argv_map", "ValueVariantWrap::toint( $value, 0)")
 		("typename", "integer")
 		("varname", "$val")
 	;
@@ -115,7 +115,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "double $val=1")
 		("argv_default", "1.0")
-		("argv_map", "ValueVariantWrap::todouble( $value)")
+		("argv_map", "ValueVariantWrap::todouble( $value, 1)")
 		("typename", "float")
 		("varname", "$val")
 	;
@@ -135,7 +135,7 @@ void strus::fillTypeTables( TypeSystem& typesystem)
 	;
 	typesystem.defineType( "const std::string& $val=\"\"")
 		("argv_default", "std::string()")
-		("argv_map", "ValueVariantWrap::tostring( $value)")
+		("argv_map", "ValueVariantWrap::tostring( $value, std::string())")
 		("typename", "string")
 		("varname", "$val")
 	;

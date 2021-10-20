@@ -691,35 +691,43 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 		<< "using namespace strus::bindings;" << std::endl
 		<< std::endl;
 
-	out << "#define CATCH_CONSTRUCTOR_CALL_ERROR( retval, classnam)\\" << std::endl;
-	out << "\t" << "catch (const std::runtime_error& err)\\" << std::endl;
-	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_ErrorBuffer_reportError( retval, _TXT(\"error calling the constructor of %s: %s\"), classnam, err.what());\\" << std::endl;
-	out << "\t" << "}\\" << std::endl;
-	out << "\t" << "catch (const std::bad_alloc& err)\\" << std::endl;
-	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_ErrorBuffer_reportError( retval, _TXT(\"out of memory calling constructor of %s\"), classnam);\\" << std::endl;
-	out << "\t" << "}\\" << std::endl;
-	out << "\t" << "catch (const std::exception& err)\\" << std::endl;
-	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_ErrorBuffer_reportError( retval, _TXT(\"uncaught exception calling constructor of %s: %s\"), classnam, err.what());\\" << std::endl;
-	out << "\t" << "}\\" << std::endl;
-	out << "\t" << "return 0;" << std::endl << std::endl;
+	out << "static void mapExceptionToConstructorErrorBuffer( papuga_ErrorBuffer* errbuf, const char* classnam)" << std::endl;
+	out << "{" << std::endl;
+	out << "\ttry{" << std::endl;
+	out << "\t\tthrow;" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "\t" << "catch (const std::runtime_error& err)" << std::endl;
+	out << "\t" << "{" << std::endl;
+	out << "\t\t" << "papuga_ErrorBuffer_reportError( errbuf, _TXT(\"error calling the constructor of %s: %s\"), classnam, err.what());" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "\t" << "catch (const std::bad_alloc& err)" << std::endl;
+	out << "\t" << "{" << std::endl;
+	out << "\t\t" << "papuga_ErrorBuffer_reportError( errbuf, _TXT(\"out of memory calling constructor of %s\"), classnam);" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "\t" << "catch (const std::exception& err)" << std::endl;
+	out << "\t" << "{" << std::endl;
+	out << "\t\t" << "papuga_ErrorBuffer_reportError( errbuf, _TXT(\"uncaught exception calling constructor of %s: %s\"), classnam, err.what());" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "}" << std::endl << std::endl;
 
-	out << "#define CATCH_METHOD_CALL_ERROR( retval, classnam, methodnam)\\" << std::endl;
-	out << "\t" << "catch (const std::runtime_error& err)\\" << std::endl;
-	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"error calling the method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
-	out << "\t" << "}\\" << std::endl;
-	out << "\t" << "catch (const std::bad_alloc& err)\\" << std::endl;
-	out << "\t" << "{\\" << std::endl;
-	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);\\" << std::endl;
-	out << "\t" << "}\\" << std::endl;
-	out << "\t" << "catch (const std::exception& err)\\" << std::endl;
-	out << "\t" << "{\\" << std::endl;
+	out << "static void mapExceptionToMethodCallResult( papuga_CallResult* retval, const char* classnam, const char* methodnam)" << std::endl;
+	out << "{" << std::endl;
+	out << "\ttry{" << std::endl;
+	out << "\t\tthrow;" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "\t" << "catch (const std::runtime_error& err)" << std::endl;
+	out << "\t" << "{" << std::endl;
+	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"error calling the method %s::%s(): %s\"), classnam, methodnam, err.what());" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "\t" << "catch (const std::bad_alloc& err)" << std::endl;
+	out << "\t" << "{" << std::endl;
+	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"out of memory calling method %s::%s()\"), classnam, methodnam);" << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "\t" << "catch (const std::exception& err)" << std::endl;
+	out << "\t" << "{" << std::endl;
 	out << "\t\t" << "papuga_CallResult_reportError( retval, _TXT(\"uncaught exception calling method %s::%s(): %s\"), classnam, methodnam, err.what());\\" << std::endl;
-	out << "\t" << "}\\" << std::endl;
-	out << "\t" << "return 0;" << std::endl << std::endl;
+	out << "\t" << "}" << std::endl;
+	out << "}" << std::endl << std::endl;
 
 	std::vector<strus::StructDef>::const_iterator
 		si = interfaceDef.structDefs().begin(),
@@ -779,7 +787,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 
 			out << "\t\t" << "return 0;" << std::endl;
 			out << "\t" << "}" << std::endl;
-			out << "\t" << "CATCH_CONSTRUCTOR_CALL_ERROR( errbuf, \"" << ci->name().c_str() << "\")" << std::endl;
+			out << "\t" << "catch (...) {mapExceptionToConstructorErrorBuffer( errbuf, \"" << ci->name().c_str() << "\"); return 0;}" << std::endl;
 			out << "}" << std::endl << std::endl;
 		}
 
@@ -813,7 +821,7 @@ static void print_BindingObjectsCpp( std::ostream& out, const strus::InterfacesD
 
 			out << "\t\t" << "return true;" << std::endl;
 			out << "\t" << "}" << std::endl;
-			out << "\t" << "CATCH_METHOD_CALL_ERROR( retval, \"" << ci->name().c_str() << "\", \"" << mi->name().c_str() << "\")" << std::endl;
+			out << "\t" << "catch (...){mapExceptionToMethodCallResult( retval, \"" << ci->name().c_str() << "\", \"" << mi->name().c_str() << "\"); return false;}" << std::endl;
 			out << "}" << std::endl << std::endl;
 		}
 	}

@@ -198,18 +198,8 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					stk.push_back( ser);
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
 
-					if (val.schemaTypedOutput())
-					{
-						rt &= papuga_Serialization_pushName_charp( ser, "term");
-						rt &= papuga_Serialization_pushOpen_struct( ser, StructIdTemplate<analyzer::QueryTerm>::structid());
-						rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode, deep);
-						rt &= papuga_Serialization_pushClose( ser);
-					}
-					else
-					{
-						papuga_Serialization_set_structid( ser, StructIdTemplate<analyzer::QueryTerm>::structid());
-						rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode, deep);
-					}
+					papuga_Serialization_set_structid( ser, StructIdTemplate<analyzer::QueryTerm>::structid());
+					rt &= Serializer::serialize_nothrow( ser, expr.term( ii->idx()), variablename, errcode, deep);
 					break;
 				}
 				case analyzer::QueryTermExpression::Instruction::Operator:
@@ -222,11 +212,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					const TermExpression::Operator& op = val.operatorStruct( ii->idx());
 					const char* variablename = getTermExpressionVariableName( val, ii, ie);
 
-					if (val.schemaTypedOutput())
-					{
-						rt &= papuga_Serialization_pushName_charp( ser, "expression");
-						rt &= papuga_Serialization_pushOpen( ser);
-					}
 					rt &= Serializer::serializeStructMemberConstName( ser, "op", op.name, errcode, deep);
 					if (op.range) rt &= Serializer::serializeStructMemberConstName( ser, "range", (papuga_Int)op.range, errcode, deep);
 					if (op.cardinality) rt &= Serializer::serializeStructMemberConstName( ser, "cardinality", (papuga_Int)op.cardinality, errcode, deep);
@@ -247,10 +232,6 @@ bool Serializer::serialize_nothrow( papuga_Serialization* result, const TermExpr
 					if (variablename)
 					{
 						rt &= Serializer::serializeStructMemberConstName( ser, "variable", variablename, errcode, deep);
-					}
-					if (val.schemaTypedOutput())
-					{
-						rt &= papuga_Serialization_pushClose( ser);
 					}
 					stk.resize( stk.size() - ii->nofOperands());
 					stk.push_back( ser);

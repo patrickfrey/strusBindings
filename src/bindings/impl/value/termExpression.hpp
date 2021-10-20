@@ -38,9 +38,9 @@ public:
 	};
 
 	/// \brief Constructor
-	TermExpression( const QueryAnalyzerStruct* analyzerStruct_, const QueryAnalyzerInstanceInterface* analyzer_, bool singleUniqueResult_, bool schemaTypedOutput_, ErrorBufferInterface* errorhnd_)
+	TermExpression( const QueryAnalyzerStruct* analyzerStruct_, const QueryAnalyzerInstanceInterface* analyzer_, bool singleUniqueResult_, ErrorBufferInterface* errorhnd_)
 		:m_errorhnd(errorhnd_),m_analyzerStruct(analyzerStruct_),m_analyzer(analyzer_->createContext())
-		,m_singleUniqueResult(singleUniqueResult_),m_schemaTypedOutput(schemaTypedOutput_),m_fieldno_stack(),m_fieldar()
+		,m_singleUniqueResult(singleUniqueResult_),m_fieldno_stack(),m_fieldar()
 		,m_expr(),m_operators(),m_variables()
 	{
 		if (!m_analyzer) throw strus::runtime_error(_TXT("failed to create analyzer context: %s"), m_errorhnd->fetchError());
@@ -104,10 +104,6 @@ public:
 	{
 		return m_singleUniqueResult;
 	}
-	bool schemaTypedOutput() const
-	{
-		return m_schemaTypedOutput;
-	}
 
 private:
 	TermExpression( const TermExpression&){}		//... non copyable
@@ -118,7 +114,6 @@ private:
 	const QueryAnalyzerStruct* m_analyzerStruct;
 	QueryAnalyzerContextInterface* m_analyzer;
 	bool m_singleUniqueResult;
-	bool m_schemaTypedOutput;
 	std::vector<int> m_fieldno_stack;
 	std::vector<std::string> m_fieldar;
 	analyzer::QueryTermExpression m_expr;

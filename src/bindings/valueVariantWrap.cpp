@@ -118,3 +118,47 @@ const char* ValueVariantWrap::tocharp( std::string& buf, const papuga_ValueVaria
 	return buf.c_str();
 }
 
+int64_t ValueVariantWrap::toint64( const papuga_ValueVariant& value, int64_t default_)
+{
+	return papuga_ValueVariant_defined( &value) ? toint64( value) : default_;
+}
+uint64_t ValueVariantWrap::touint64( const papuga_ValueVariant& value, uint64_t default_)
+{
+	return papuga_ValueVariant_defined( &value) ? touint64( value) : default_;
+}
+int ValueVariantWrap::toint( const papuga_ValueVariant& value, int default_)
+{
+	return papuga_ValueVariant_defined( &value) ? toint( value) : default_;
+}
+unsigned int ValueVariantWrap::touint( const papuga_ValueVariant& value, unsigned int default_)
+{
+	return papuga_ValueVariant_defined( &value) ? touint( value) : default_;
+}
+Index ValueVariantWrap::toindex( const papuga_ValueVariant& value, Index default_)
+{
+	return papuga_ValueVariant_defined( &value) ? toindex( value) : default_;
+}
+double ValueVariantWrap::todouble( const papuga_ValueVariant& value, double default_)
+{
+	return papuga_ValueVariant_defined( &value) ? todouble( value) : default_;
+}
+float ValueVariantWrap::tofloat( const papuga_ValueVariant& value, float default_)
+{
+	return papuga_ValueVariant_defined( &value) ? tofloat( value) : default_;
+}
+bool ValueVariantWrap::tobool( const papuga_ValueVariant& value, bool default_)
+{
+	return papuga_ValueVariant_defined( &value) ? tobool( value) : default_;
+}
+strus::NumericVariant ValueVariantWrap::tonumeric( const papuga_ValueVariant& value, const strus::NumericVariant& default_)
+{
+	return papuga_ValueVariant_defined( &value) ? tonumeric( value) : default_;
+}
+std::string ValueVariantWrap::tostring( const papuga_ValueVariant& value, const std::string& default_)
+{
+	return papuga_ValueVariant_defined( &value) ? tostring( value) : default_;
+}
+const char* ValueVariantWrap::tocharp( std::string& buf, const papuga_ValueVariant& value, const char* default_)
+{
+	return papuga_ValueVariant_defined( &value) ? tocharp( buf, value) : default_;
+}

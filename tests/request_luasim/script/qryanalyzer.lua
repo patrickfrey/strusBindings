@@ -3,7 +3,7 @@ function GET( self, inputstr, path)
 	if inputstr then
 		local query = schema( "query", inputstr, true).query
 		for _,f in ipairs( query.feature or {}) do
-			f.analyzed = qryanalyzer:analyzeSchemaTermExpression( f.content)
+			f.analyzed = qryanalyzer:analyzeTermExpression( f.content)
 		end
 		for _,r in ipairs( query.restriction or {}) do
 			r.analyzed = qryanalyzer:analyzeMetaDataExpression( r.content)

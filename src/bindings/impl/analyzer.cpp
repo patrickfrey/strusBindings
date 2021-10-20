@@ -422,11 +422,11 @@ void QueryAnalyzerImpl::defineImplicitGroupBy( const std::string& fieldtype, con
 	m_queryAnalyzerStruct.autoGroupBy( fieldtype, opname, range, cardinality, groupBy, false/*groupSingle*/);
 }
 
-TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& expression, bool unique, bool schemaTypedOutput) const
+TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& expression, bool unique) const
 {
 	ErrorBufferInterface* errorhnd = m_errorhnd_impl.getObject<ErrorBufferInterface>();
 	const QueryAnalyzerInstanceInterface* analyzer = m_analyzer_impl.getObject<QueryAnalyzerInstanceInterface>();
-	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, unique, schemaTypedOutput, errorhnd));
+	Reference<TermExpression> termexpr( new TermExpression( &m_queryAnalyzerStruct, analyzer, unique, errorhnd));
 	if (!termexpr.get()) throw strus::runtime_error( "%s", errorhnd->fetchError());
 
 	QueryAnalyzerTermExpressionBuilder exprbuilder( termexpr.get());
@@ -442,17 +442,12 @@ TermExpression* QueryAnalyzerImpl::analyzeTermExpression_( const ValueVariant& e
 
 TermExpression* QueryAnalyzerImpl::analyzeTermExpression( const ValueVariant& expression) const
 {
-	return analyzeTermExpression_( expression, false/*unique*/, false/*schemaTypedOutput*/);
+	return analyzeTermExpression_( expression, false/*unique*/);
 }
 
 TermExpression* QueryAnalyzerImpl::analyzeSingleTermExpression( const ValueVariant& expression) const
 {
-	return analyzeTermExpression_( expression, true/*unique*/, false/*schemaTypedOutput*/);
-}
-
-TermExpression* QueryAnalyzerImpl::analyzeSchemaTermExpression( const ValueVariant& expression) const
-{
-	return analyzeTermExpression_( expression, false/*unique*/, true/*schemaTypedOutput*/);
+	return analyzeTermExpression_( expression, true/*unique*/);
 }
 
 MetaDataExpression* QueryAnalyzerImpl::analyzeMetaDataExpression_( const ValueVariant& expression, bool schemaTypedOutput) const

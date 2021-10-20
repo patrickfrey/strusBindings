@@ -25,17 +25,14 @@
     {
       "analyzed": [
         {
-          "term": {
-            "type": "word",
-            "value": "iggy"}},
+          "type": "word",
+          "value": "iggy"},
         {
-          "term": {
-            "type": "word",
-            "value": "pop"}},
+          "type": "word",
+          "value": "pop"},
         {
-          "term": {
-            "type": "entity",
-            "value": "iggy_pop"}}],
+          "type": "entity",
+          "value": "iggy_pop"}],
       "content": {
         "type": "text",
         "value": "Iggy Pop"},
