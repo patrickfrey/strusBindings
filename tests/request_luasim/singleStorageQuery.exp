@@ -1,171 +1,123 @@
 {
-"qryeval":{
-"selection_sets":[
-	"search"],
-"summarizers":[
-	{
-		"function": "attribute",
-		"param":{
-			"attribute": "title"}}],
-"weighting":[
-	{
-		"feature":{
-			"match": "search"},
-		"function": "bm25",
-		"param":{
-			"avgdoclen": "1000",
-			"b": "0.75",
-			"k1": "1.2",
-			"metadata_doclen": "doclen"}}],
-"weighting_sets":[
-	"search"]}}
+"qryeval": {
+  "selection_sets": [
+    "search"],
+  "summarizers": [
+    {
+      "function": "attribute",
+      "param": {
+        "attribute": "title"}}],
+  "weighting": [
+    {
+      "feature": {
+        "match": "search"},
+      "function": "bm25",
+      "param": {
+        "avgdoclen": 1000,
+        "b": "0.75",
+        "k1": "1.2",
+        "metadata_doclen": "doclen"}}],
+  "weighting_sets": [
+    "search"]}}
 {
-"queryresult":{
-"ranklist":{
-	"evalpass": 0,
-	"nofranked": 10,
-	"nofvisited": 10,
-	"ranks":[
-		{
-			"weight": "1.204730",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Tonight (David Bowie album)"}]},
-		{
-			"weight": "0.988134",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "VH1 Storytellers (David Bowie album)"}]},
-		{
-			"weight": "0.920080",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "List of songs recorded by David Bowie"}]},
-		{
-			"weight": "0.483256",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Let's Dance (David Bowie album)"}]},
-		{
-			"weight": "0.435539",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "David Bowie"}]},
-		{
-			"weight": "0.000016",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Liza Jane (David Bowie song)"}]},
-		{
-			"weight": "0.000010",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "List of awards and nominations received by David Bowie"}]},
-		{
-			"weight": "0.000007",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "David Bowie (1967 album)"}]},
-		{
-			"weight": "0.000006",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Stage (David Bowie album)"}]},
-		{
-			"weight": "0.000003",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Outside (David Bowie album)"}]}]}}}
+"queryresult": {
+  "evalpass": 0,
+  "nofranked": 5,
+  "nofvisited": 5,
+  "ranks": [
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "Tonight (David Bowie album)"}],
+      "weight": "0.669520"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "VH1 Storytellers (David Bowie album)"}],
+      "weight": "0.494061"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "List of songs recorded by David Bowie"}],
+      "weight": "0.460034"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "Let's Dance (David Bowie album)"}],
+      "weight": "0.241621"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "David Bowie"}],
+      "weight": "0.199666"}]}}
 {
-"queryresult":{
-"ranklist":{
-	"evalpass": 0,
-	"nofranked": 5,
-	"nofvisited": 5,
-	"ranks":[
-		{
-			"weight": "0.418200",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Liza Jane (David Bowie song)"}]},
-		{
-			"weight": "0.261638",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "Never Let Me Down (David Bowie song)"}]},
-		{
-			"weight": "0.258797",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "David Bowie (1967 album)"}]},
-		{
-			"weight": "0.121614",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "List of songs recorded by David Bowie"}]},
-		{
-			"weight": "0.112980",
-			"field":{
-				"start": 0,
-				"end": 0},
-			"summary":[
-				{
-					"name": "title",
-					"value": "David Bowie"}]}]}}}
-{
+"queryresult": {
+  "evalpass": 0,
+  "nofranked": 5,
+  "nofvisited": 5,
+  "ranks": [
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "Tonight (David Bowie album)"}],
+      "weight": "0.669520"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "VH1 Storytellers (David Bowie album)"}],
+      "weight": "0.494061"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "List of songs recorded by David Bowie"}],
+      "weight": "0.460034"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "Let's Dance (David Bowie album)"}],
+      "weight": "0.241621"},
+    {
+      "field": {
+        "end": 0,
+        "start": 0},
+      "summary": [
+        {
+          "name": "title",
+          "value": "David Bowie"}],
+      "weight": "0.199666"}]}}

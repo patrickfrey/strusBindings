@@ -78,23 +78,29 @@ query2 = {
 				value = "Iggy Pop"
 			},
 			analyzed = {
+			{
 				type = "word",
-				value = "songwriter"
-			}
+				value = "iggy"},
+			{
+				type = "word",
+				value = "pop"},
+			{
+				type = "entity",
+				value = "iggy_pop"}}
 		}}
 	}
 }
 
-qryevalconf = call_server_checked( "GET", ISERVER1 .. "/qryeval/test")
+qryevalconf = call_server_checked_det_json( "GET", ISERVER1 .. "/qryeval/test")
 if verbose then io.stderr:write( string.format("- Query evaluation configuration from the server:\n%s\n", qryevalconf)) end
 
-qryana = call_server_checked( "GET", ISERVER1 .. "/qryanalyzer/test", query1 )
+qryana = call_server_checked_det_json( "GET", ISERVER1 .. "/qryanalyzer/test", query1 )
 if verbose then io.stderr:write( string.format("- Query analysis:\n%s\n", qryana)) end
 
-qryres1 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", qryana))
+qryres1 = det_qeval_result( call_server_checked_det_json( "GET", ISERVER1 .. "/qryeval/test", qryana))
 if verbose then io.stderr:write( string.format("- Query evaluation result:\n%s\n", qryres1)) end
 
-qryres2 = det_qeval_result( call_server_checked( "GET", ISERVER1 .. "/qryeval/test", query2))
+qryres2 = det_qeval_result( call_server_checked_det_json( "GET", ISERVER1 .. "/qryeval/test", query2))
 if verbose then io.stderr:write( string.format("- Query evaluation result with analysis passed:\n%s\n", qryres2)) end
 
 checkExpected( qryevalconf .. qryres1 .. qryres2, "@singleStorageQuery.exp", "singleStorageQuery.res" )
